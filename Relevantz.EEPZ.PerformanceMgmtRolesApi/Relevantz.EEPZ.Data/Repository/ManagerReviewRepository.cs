@@ -1,18 +1,19 @@
+using System;
 using System.Collections.Generic;
-using System.Data;
-using Dapper;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.DTOs.Response;
 
 namespace Relevantz.EEPZ.Data.Repository.Implementations;
 
 /// <summary>
 /// Manager Review Repository with explicit DELETE-INSERT pattern for L1 reviews
+/// Converted from hardcoded SQL to LINQ for better type safety and maintainability
 /// When L1 (Approver) resubmits after L2 rejection, existing review rows are deleted and replaced
 /// This ensures only the latest L1 ratings are stored, preventing duplicate rows
 /// L2 Reviewer can see submitted forms immediately, regardless of L1 review status
@@ -20,8 +21,17 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations;
 public partial class ManagerReviewRepository : IManagerReviewRepository
 {
     private readonly EEPZDbContext _ctx;
+    
     public ManagerReviewRepository(EEPZDbContext ctx) => _ctx = ctx;
 
+    /// <summary>
+    /// Get submitted forms for L1 Approver (pagination supported)
+    /// Returns assessments that:
+    /// - Are in scope for the approver (based on project L1 approver assignment)
+    /// - Have been submitted by the employee
+    /// - Do NOT have any L1 reviews yet
+    /// - Do NOT have all details decided at L2
+    /// </summary>
     public async Task<IEnumerable<ApproverAssignmentRowDto>> GetApproverSubmittedFormsAsync(
         int approverUserId, int page, int pageSize)
     {
@@ -29,84 +39,127 @@ public partial class ManagerReviewRepository : IManagerReviewRepository
         if (pageSize < 1) pageSize = 25;
         var offset = (page - 1) * pageSize;
 
-        const string sql = @"
-WITH l1 AS (
-  SELECT e.EmployeeId AS L1EmployeeId
-  FROM UserAuthentication ua
-  JOIN Employee e ON e.EmployeeId = ua.EmployeeId
-  WHERE ua.UserId = @approverUserId
-),
-scope_assessments AS (
-  SELECT DISTINCT sa.assessment_id
-  FROM SelfAssessment sa
-  JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
-  JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
-  JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
-  JOIN Project p ON p.ProjectId = pe.ProjectId
-  JOIN l1 ON p.L1ApproverEmployeeId = l1.L1EmployeeId
-  WHERE sa.status = 'Submitted'
-),
-latest_l1 AS (
-  SELECT ar.detail_id, MAX(ar.review_id) AS max_id
-  FROM AssessmentReview ar
-  WHERE ar.reviewer_role = 'Approver' AND ar.detail_id IS NOT NULL
-  GROUP BY ar.detail_id
-),
-has_any_l1 AS (
-  SELECT ad.assessment_id
-  FROM AssessmentDetail ad
-  JOIN latest_l1 t ON t.detail_id = ad.detail_id
-  GROUP BY ad.assessment_id
-),
-latest_l2 AS (
-  SELECT ar.detail_id, MAX(ar.review_id) AS max_id
-  FROM AssessmentReview ar
-  WHERE ar.reviewer_role = 'Reviewer' AND ar.detail_id IS NOT NULL
-  GROUP BY ar.detail_id
-),
-l2_status AS (
-  SELECT ar.detail_id, ar.review_status
-  FROM AssessmentReview ar
-  JOIN latest_l2 t ON t.max_id = ar.review_id
-),
-decided_assessments AS (
-  SELECT ad.assessment_id
-  FROM AssessmentDetail ad
-  JOIN l2_status s ON s.detail_id = ad.detail_id
-  WHERE s.review_status IN ('Approved','Rejected')
-  GROUP BY ad.assessment_id
-)
-SELECT 
-  sa.assessment_id        AS AssessmentId,
-  COALESCE(NULLIF(CONCAT_WS(' ', up.FirstName, up.LastName), ''), emp_ua.Email, emp.EmployeeCompanyId) AS EmployeeName,
-  f.name                  AS FormName,
-  sa.submitted_at         AS SubmittedAt,
-  sa.status               AS Status,
-  GROUP_CONCAT(DISTINCT p.ProjectName ORDER BY p.ProjectName SEPARATOR ', ') AS Project
-FROM scope_assessments s
-JOIN SelfAssessment sa             ON sa.assessment_id = s.assessment_id
-LEFT JOIN decided_assessments da   ON da.assessment_id = sa.assessment_id
-LEFT JOIN has_any_l1 h1            ON h1.assessment_id = sa.assessment_id
-JOIN AssessmentForm f              ON f.form_id = sa.form_id
-JOIN UserAuthentication emp_ua     ON emp_ua.UserId = sa.employee_id
-JOIN Employee emp                  ON emp.EmployeeId = emp_ua.EmployeeId
-LEFT JOIN UserProfile up           ON up.EmployeeId = emp.EmployeeId
-JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-JOIN ProjectEmployees pe           ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
-JOIN Project p                     ON p.ProjectId = pe.ProjectId
-WHERE da.assessment_id IS NULL
-  AND h1.assessment_id IS NULL
-GROUP BY sa.assessment_id, EmployeeName, FormName, SubmittedAt, Status
-ORDER BY sa.submitted_at DESC
-LIMIT @pageSize OFFSET @offset;";
+        // Get the L1 approver's employee ID
+        var l1EmployeeId = await _ctx.Userauthentications
+            .Where(ua => ua.UserId == approverUserId)
+            .Select(ua => ua.Employee.EmployeeId)
+            .FirstOrDefaultAsync();
 
-        var conn = _ctx.Database.GetDbConnection();
-        if (conn.State != ConnectionState.Open) await conn.OpenAsync();
+        if (l1EmployeeId == 0) return Enumerable.Empty<ApproverAssignmentRowDto>();
 
-        return await conn.QueryAsync<ApproverAssignmentRowDto>(sql, new { approverUserId, pageSize, offset });
+        // Get assessments in scope for this L1 approver
+        var scopeAssessmentIds = await _ctx.Selfassessments
+            .Where(sa => sa.Status == "Submitted")
+            .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
+            .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, e })
+            .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, (x, edm) => new { x.sa, edm })
+            .Join(_ctx.Projectemployees
+                .Where(pe => pe.IsPrimary), 
+                x => x.edm.EmployeeId, 
+                pe => pe.EmployeeId, 
+                (x, pe) => new { x.sa, pe })
+            .Join(_ctx.Projects
+                .Where(p => p.L1approverEmployeeId == l1EmployeeId), 
+                x => x.pe.ProjectId, 
+                p => p.ProjectId, 
+                (x, p) => x.sa.AssessmentId)
+            .Distinct()
+            .ToListAsync();
+
+        // Get latest L1 reviews per detail
+        var latestL1ReviewIds = await _ctx.Assessmentreviews
+            .Where(ar => ar.ReviewerRole == "Approver" && ar.DetailId != null)
+            .GroupBy(ar => ar.DetailId)
+            .Select(g => g.Max(ar => ar.ReviewId))
+            .ToListAsync();
+
+        // Get assessments that have L1 reviews
+        var hasL1AssessmentIds = await _ctx.Assessmentreviews
+            .Where(ar => ar.ReviewerRole == "Approver" && ar.DetailId != null)
+            .Select(ar => ar.DetailId)
+            .ToListAsync();
+
+        var assessmentsWithL1Details = await _ctx.Assessmentdetails
+            .Where(ad => hasL1AssessmentIds.Contains(ad.DetailId))
+            .Select(ad => ad.AssessmentId)
+            .Distinct()
+            .ToListAsync();
+
+        // Get latest L2 reviews per detail
+        var latestL2Reviews = await _ctx.Assessmentreviews
+            .Where(ar => ar.ReviewerRole == "Reviewer" && ar.DetailId != null)
+            .GroupBy(ar => ar.DetailId)
+            .Select(g => g.OrderByDescending(ar => ar.ReviewId).First())
+            .ToListAsync();
+
+        // Get assessments with all details decided at L2
+        var decidedAssessmentIds = latestL2Reviews
+            .Where(ar => ar.ReviewStatus == "Approved" || ar.ReviewStatus == "Rejected")
+            .Select(ar => ar.DetailId)
+            .ToList();
+
+        var decidedDetails = await _ctx.Assessmentdetails
+            .Where(ad => decidedAssessmentIds.Contains(ad.DetailId))
+            .GroupBy(ad => ad.AssessmentId)
+            .Select(g => new { AssessmentId = g.Key, Count = g.Count() })
+            .ToListAsync();
+
+        var fullyDecidedAssessmentIds = new List<int>();
+        foreach (var decided in decidedDetails)
+        {
+            var totalDetailsForAssessment = await _ctx.Assessmentdetails
+                .CountAsync(ad => ad.AssessmentId == decided.AssessmentId);
+            if (decided.Count == totalDetailsForAssessment)
+                fullyDecidedAssessmentIds.Add(decided.AssessmentId);
+        }
+
+        // Get visible assessments (not decided, no L1 reviews)
+        var visibleAssessmentIds = scopeAssessmentIds
+            .Where(id => !fullyDecidedAssessmentIds.Contains(id) && !assessmentsWithL1Details.Contains(id))
+            .ToList();
+
+        // Get the data with pagination
+        var result = await _ctx.Selfassessments
+            .Where(sa => visibleAssessmentIds.Contains(sa.AssessmentId))
+            .Join(_ctx.Assessmentforms, sa => sa.FormId, f => f.FormId, (sa, f) => new { sa, f })
+            .Join(_ctx.Userauthentications, x => x.sa.EmployeeId, ua => ua.UserId, (x, ua) => new { x.sa, x.f, ua })
+            .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, x.f, x.ua, e })
+            .GroupJoin(_ctx.Userprofiles, x => x.e.EmployeeId, up => up.EmployeeId, 
+                (x, up) => new { x.sa, x.f, x.ua, x.e, up = up.FirstOrDefault() })
+            .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, 
+                (x, edm) => new { x.sa, x.f, x.ua, x.e, x.up, edm })
+            .Join(_ctx.Projectemployees.Where(pe => pe.IsPrimary), 
+                x => x.edm.EmployeeId, pe => pe.EmployeeId, 
+                (x, pe) => new { x.sa, x.f, x.ua, x.e, x.up, pe })
+            .Join(_ctx.Projects, x => x.pe.ProjectId, p => p.ProjectId, 
+                (x, p) => new { x.sa, x.f, x.ua, x.e, x.up, p })
+            .OrderByDescending(x => x.sa.SubmittedAt)
+            .Skip(offset)
+            .Take(pageSize)
+            .GroupBy(x => x.sa.AssessmentId)
+            .Select(g => new ApproverAssignmentRowDto
+            {
+                AssessmentId = g.Key,
+                EmployeeName = g.First().up != null 
+                    ? string.Concat(g.First().up.FirstName, " ", g.First().up.LastName).Trim()
+                    : (string.IsNullOrWhiteSpace(g.First().ua.Email) ? g.First().e.EmployeeCompanyId : g.First().ua.Email),
+                FormName = g.First().f.Name ?? string.Empty,
+                SubmittedAt = (g.First().sa.SubmittedAt ?? DateTime.Now).ToString("yyyy-MM-dd HH:mm:ss"),
+                Status = g.First().sa.Status,
+                Project = string.Join(", ", g.Select(x => x.p.ProjectName).Distinct().OrderBy(x => x))
+            })
+            .ToListAsync();
+
+        return result;
     }
 
+    /// <summary>
+    /// Get submitted forms for L2 Reviewer (pagination supported)
+    /// Returns assessments that:
+    /// - Are in scope for the reviewer (based on project L2 approver assignment)
+    /// - Have been submitted by the employee
+    /// - Do NOT have all details decided at L2
+    /// </summary>
     public async Task<IEnumerable<ApproverAssignmentRowDto>> GetReviewerSubmittedFormsAsync(
         int reviewerUserId, int page, int pageSize)
     {
@@ -114,203 +167,181 @@ LIMIT @pageSize OFFSET @offset;";
         if (pageSize < 1) pageSize = 25;
         var offset = (page - 1) * pageSize;
 
-        const string sql = @"
-WITH l2 AS (
-  SELECT e.EmployeeId AS L2EmployeeId
-  FROM UserAuthentication ua
-  JOIN Employee e ON e.EmployeeId = ua.EmployeeId
-  WHERE ua.UserId = @reviewerUserId
-),
-scope_assessments AS (
-  SELECT DISTINCT sa.assessment_id, p.L1ApproverEmployeeId
-  FROM SelfAssessment sa
-  JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
-  JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
-  JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
-  JOIN Project p ON p.ProjectId = pe.ProjectId
-  JOIN l2 ON p.L2ApproverEmployeeId = l2.L2EmployeeId
-  WHERE sa.status = 'Submitted'
-),
-latest_l2 AS (
-  SELECT ar.detail_id, MAX(ar.review_id) AS max_id
-  FROM AssessmentReview ar
-  WHERE ar.reviewer_role = 'Reviewer' AND ar.detail_id IS NOT NULL
-  GROUP BY ar.detail_id
-),
-l2_status AS (
-  SELECT ar.detail_id, ar.review_status
-  FROM AssessmentReview ar
-  JOIN latest_l2 t ON t.max_id = ar.review_id
-),
-decided_assessments AS (
-  SELECT ad.assessment_id
-  FROM AssessmentDetail ad
-  JOIN l2_status s ON s.detail_id = ad.detail_id
-  WHERE s.review_status IN ('Approved','Rejected')
-  GROUP BY ad.assessment_id
-),
-visible AS (
-  SELECT sa.assessment_id
-  FROM scope_assessments sa
-  LEFT JOIN decided_assessments da ON da.assessment_id = sa.assessment_id
-  WHERE da.assessment_id IS NULL
-)
-SELECT 
-  sa.assessment_id        AS AssessmentId,
-  COALESCE(NULLIF(CONCAT_WS(' ', up.FirstName, up.LastName), ''), emp_ua.Email, emp.EmployeeCompanyId) AS EmployeeName,
-  f.name                  AS FormName,
-  sa.submitted_at         AS SubmittedAt,
-  sa.status               AS Status,
-  GROUP_CONCAT(DISTINCT p.ProjectName ORDER BY p.ProjectName SEPARATOR ', ') AS Project
-FROM visible v
-JOIN SelfAssessment sa             ON sa.assessment_id = v.assessment_id
-JOIN AssessmentForm f              ON f.form_id = sa.form_id
-JOIN UserAuthentication emp_ua     ON emp_ua.UserId = sa.employee_id
-JOIN Employee emp                  ON emp.EmployeeId = emp_ua.EmployeeId
-LEFT JOIN UserProfile up           ON up.EmployeeId = emp.EmployeeId
-JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-JOIN ProjectEmployees pe           ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
-JOIN Project p                     ON p.ProjectId = pe.ProjectId
-GROUP BY sa.assessment_id, EmployeeName, FormName, SubmittedAt, Status
-ORDER BY sa.submitted_at DESC
-LIMIT @pageSize OFFSET @offset;";
+        // Get the L2 reviewer's employee ID
+        var l2EmployeeId = await _ctx.Userauthentications
+            .Where(ua => ua.UserId == reviewerUserId)
+            .Select(ua => ua.Employee.EmployeeId)
+            .FirstOrDefaultAsync();
 
-        var conn = _ctx.Database.GetDbConnection();
-        if (conn.State != ConnectionState.Open) await conn.OpenAsync();
+        if (l2EmployeeId == 0) return Enumerable.Empty<ApproverAssignmentRowDto>();
 
-        return await conn.QueryAsync<ApproverAssignmentRowDto>(sql, new { reviewerUserId, pageSize, offset });
+        // Get assessments in scope for this L2 reviewer
+        var scopeAssessmentIds = await _ctx.Selfassessments
+            .Where(sa => sa.Status == "Submitted")
+            .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
+            .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, e })
+            .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, (x, edm) => new { x.sa, edm })
+            .Join(_ctx.Projectemployees.Where(pe => pe.IsPrimary), 
+                x => x.edm.EmployeeId, pe => pe.EmployeeId, 
+                (x, pe) => new { x.sa, pe })
+            .Join(_ctx.Projects.Where(p => p.L2approverEmployeeId == l2EmployeeId), 
+                x => x.pe.ProjectId, p => p.ProjectId, 
+                (x, p) => x.sa.AssessmentId)
+            .Distinct()
+            .ToListAsync();
+
+        // Get latest L2 reviews per detail with decided status
+        var latestL2Reviews = await _ctx.Assessmentreviews
+            .Where(ar => ar.ReviewerRole == "Reviewer" && ar.DetailId != null)
+            .GroupBy(ar => ar.DetailId)
+            .Select(g => g.OrderByDescending(ar => ar.ReviewId).First())
+            .ToListAsync();
+
+        var decidedDetailIds = latestL2Reviews
+            .Where(ar => ar.ReviewStatus == "Approved" || ar.ReviewStatus == "Rejected")
+            .Select(ar => ar.DetailId)
+            .ToList();
+
+        // Find assessments with all details decided
+        var fullyDecidedAssessmentIds = await _ctx.Assessmentdetails
+            .Where(ad => decidedDetailIds.Contains(ad.DetailId))
+            .GroupBy(ad => ad.AssessmentId)
+            .Where(g => g.Count() == _ctx.Assessmentdetails.Count(ad => ad.AssessmentId == g.Key))
+            .Select(g => g.Key)
+            .ToListAsync();
+
+        // Get visible assessments (not fully decided)
+        var visibleAssessmentIds = scopeAssessmentIds
+            .Where(id => !fullyDecidedAssessmentIds.Contains(id))
+            .ToList();
+
+        // Get the data with pagination
+        var result = await _ctx.Selfassessments
+            .Where(sa => visibleAssessmentIds.Contains(sa.AssessmentId))
+            .Join(_ctx.Assessmentforms, sa => sa.FormId, f => f.FormId, (sa, f) => new { sa, f })
+            .Join(_ctx.Userauthentications, x => x.sa.EmployeeId, ua => ua.UserId, (x, ua) => new { x.sa, x.f, ua })
+            .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, x.f, x.ua, e })
+            .GroupJoin(_ctx.Userprofiles, x => x.e.EmployeeId, up => up.EmployeeId, 
+                (x, up) => new { x.sa, x.f, x.ua, x.e, up = up.FirstOrDefault() })
+            .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, 
+                (x, edm) => new { x.sa, x.f, x.ua, x.e, x.up, edm })
+            .Join(_ctx.Projectemployees.Where(pe => pe.IsPrimary), 
+                x => x.edm.EmployeeId, pe => pe.EmployeeId, 
+                (x, pe) => new { x.sa, x.f, x.ua, x.e, x.up, pe })
+            .Join(_ctx.Projects, x => x.pe.ProjectId, p => p.ProjectId, 
+                (x, p) => new { x.sa, x.f, x.ua, x.e, x.up, p })
+            .OrderByDescending(x => x.sa.SubmittedAt)
+            .Skip(offset)
+            .Take(pageSize)
+            .GroupBy(x => x.sa.AssessmentId)
+            .Select(g => new ApproverAssignmentRowDto
+            {
+                AssessmentId = g.Key,
+                EmployeeName = g.First().up != null 
+                    ? string.Concat(g.First().up.FirstName, " ", g.First().up.LastName).Trim()
+                    : (string.IsNullOrWhiteSpace(g.First().ua.Email) ? g.First().e.EmployeeCompanyId : g.First().ua.Email),
+                FormName = g.First().f.Name ?? string.Empty,
+                SubmittedAt = (g.First().sa.SubmittedAt ?? DateTime.Now).ToString("yyyy-MM-dd HH:mm:ss"),
+                Status = g.First().sa.Status,
+                Project = string.Join(", ", g.Select(x => x.p.ProjectName).Distinct().OrderBy(x => x))
+            })
+            .ToListAsync();
+
+        return result;
     }
 
     /// <summary>
-    /// CORRECTED: SaveApproverReviewAsync now uses DELETE + INSERT pattern
-    /// This is explicit and works without needing a UNIQUE constraint
-    /// When L1 (Approver) resubmits, all existing L1 reviews for those details are deleted first,
-    /// then the new ratings are inserted. This prevents duplicate rows.
+    /// Save L1 (Approver) review with DELETE-INSERT pattern
+    /// When L1 resubmits, existing reviews are deleted first, then new ones are inserted
+    /// This prevents duplicate rows and maintains only the latest L1 ratings
     /// </summary>
     public async Task<int> SaveApproverReviewAsync(int approverUserId, SubmitReviewDto dto)
     {
         if (dto is null || dto.Items is null || dto.Items.Count == 0)
             return 0;
 
-        const string validateSql = @"
-WITH l1 AS (
-  SELECT e.EmployeeId AS L1EmployeeId
-  FROM UserAuthentication ua
-  JOIN Employee e ON e.EmployeeId = ua.EmployeeId
-  WHERE ua.UserId = @approverUserId
-),
-scope_assessment AS (
-  SELECT DISTINCT sa.assessment_id
-  FROM SelfAssessment sa
-  JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
-  JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
-  JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
-  JOIN Project p ON p.ProjectId = pe.ProjectId
-  JOIN l1 ON p.L1ApproverEmployeeId = l1.L1EmployeeId
-  WHERE sa.assessment_id = @assessmentId
-    AND sa.status = 'Submitted'
-),
-valid_details AS (
-  SELECT ad.detail_id
-  FROM AssessmentDetail ad
-  JOIN scope_assessment s ON s.assessment_id = ad.assessment_id
-)
-SELECT 
-  (SELECT COUNT(*) FROM scope_assessment)  AS IsAssessmentInScope,
-  (SELECT COUNT(*) FROM valid_details)     AS ValidDetailCount;
-";
+        // Get the L1 approver's employee ID
+        var l1EmployeeId = await _ctx.Userauthentications
+            .Where(ua => ua.UserId == approverUserId)
+            .Select(ua => ua.Employee.EmployeeId)
+            .FirstOrDefaultAsync();
 
-        // DELETE old L1 reviews for these details
-        const string deleteSql = @"
-DELETE FROM AssessmentReview
-WHERE detail_id = @detailId
-  AND reviewer_id = @approverUserId
-  AND reviewer_role = 'Approver'
-  AND rating > 0;
-";
+        if (l1EmployeeId == 0) return 0;
 
-        // INSERT new L1 review
-        const string insertSql = @"
-INSERT INTO AssessmentReview
-  (detail_id, reviewer_id, reviewer_role, rating, comments, reviewed_at, review_status)
-VALUES
-  (@detailId, @approverUserId, 'Approver', @rating, @comments, NOW(), 'Approved');
-";
+        // Verify assessment is in scope
+        var isInScope = await _ctx.Selfassessments
+            .Where(sa => sa.AssessmentId == dto.AssessmentId && sa.Status == "Submitted")
+            .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
+            .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, e })
+            .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, (x, edm) => new { x.sa, edm })
+            .Join(_ctx.Projectemployees.Where(pe => pe.IsPrimary), 
+                x => x.edm.EmployeeId, pe => pe.EmployeeId, 
+                (x, pe) => new { x.sa, pe })
+            .Join(_ctx.Projects.Where(p => p.L1approverEmployeeId == l1EmployeeId), 
+                x => x.pe.ProjectId, p => p.ProjectId, 
+                (x, p) => x.sa)
+            .AnyAsync();
 
+        if (!isInScope) return 0;
 
-        var conn = _ctx.Database.GetDbConnection();
-        if (conn.State != ConnectionState.Open) await conn.OpenAsync();
+        // Validate all detail IDs belong to this assessment
+        var postedIds = dto.Items.Select(i => i.DetailId).Distinct().ToArray();
+        var validCount = await _ctx.Assessmentdetails
+            .CountAsync(ad => ad.AssessmentId == dto.AssessmentId && postedIds.Contains(ad.DetailId));
 
-        using var tx = await conn.BeginTransactionAsync();
+        if (validCount != postedIds.Length) return 0;
+
+        using var tx = await _ctx.Database.BeginTransactionAsync();
 
         try
         {
-            var validate = await conn.QuerySingleAsync<(int IsAssessmentInScope, int ValidDetailCount)>(
-                validateSql, new { approverUserId, assessmentId = dto.AssessmentId }, tx);
+            // Delete old L1 reviews for these details
+            var oldReviews = await _ctx.Assessmentreviews
+                .Where(ar => ar.ReviewerId == approverUserId 
+                    && ar.ReviewerRole == "Approver" 
+                    && postedIds.Contains(ar.DetailId)
+                    && ar.Rating > 0)
+                .ToListAsync();
 
-            if (validate.IsAssessmentInScope <= 0)
-            {
-                await tx.RollbackAsync();
-                return 0;
-            }
+            _ctx.Assessmentreviews.RemoveRange(oldReviews);
+            await _ctx.SaveChangesAsync();
 
-            var postedIds = dto.Items.Select(i => i.DetailId).Distinct().ToArray();
-            if (postedIds.Length == 0)
-            {
-                await tx.RollbackAsync();
-                return 0;
-            }
-
-            var validCount = await conn.ExecuteScalarAsync<int>(
-                @"SELECT COUNT(*) FROM AssessmentDetail WHERE assessment_id=@aid AND detail_id IN @ids;",
-                new { aid = dto.AssessmentId, ids = postedIds }, tx);
-
-            if (validCount != postedIds.Length)
-            {
-                await tx.RollbackAsync();
-                return 0;
-            }
-
-            // DELETE old L1 reviews and INSERT new ones
+            // Insert new L1 reviews
             var affected = 0;
             foreach (var item in dto.Items)
             {
-                // First DELETE any existing L1 reviews for this detail by this approver
-                await conn.ExecuteAsync(
-                    deleteSql,
-                    new
-                    {
-                        detailId = item.DetailId,
-                        approverUserId
-                    },
-                    tx);
+                var newReview = new Assessmentreview
+                {
+                    DetailId = item.DetailId,
+                    ReviewerId = approverUserId,
+                    ReviewerRole = "Approver",
+                    Rating = item.Rating,
+                    Comments = item.Comments,
+                    ReviewedAt = DateTime.Now,
+                    ReviewStatus = "Approved"
+                };
 
-                // Then INSERT the new L1 review
-                affected += await conn.ExecuteAsync(
-                    insertSql,
-                    new
-                    {
-                        detailId = item.DetailId,
-                        approverUserId,
-                        rating = item.Rating,
-                        comments = item.Comments
-                    },
-                    tx);
+                _ctx.Assessmentreviews.Add(newReview);
+                affected++;
             }
 
-            // Reset L2 reviews to Pending if they were previously rejected
-            await conn.ExecuteAsync(@"
-UPDATE AssessmentReview ar
-JOIN AssessmentDetail ad ON ad.detail_id = ar.detail_id
-SET ar.review_status = 'Pending'
-WHERE ad.assessment_id = @assessmentId
-  AND ar.reviewer_role = 'Reviewer'
-  AND ar.review_status = 'Rejected';",
-                new { assessmentId = dto.AssessmentId }, tx);
+            await _ctx.SaveChangesAsync();
 
+            // Reset L2 reviews to Pending if they were previously rejected
+            var rejectedL2Reviews = await _ctx.Assessmentreviews
+                .Where(ar => ar.ReviewerRole == "Reviewer" 
+                    && ar.ReviewStatus == "Rejected"
+                    && postedIds.Contains(ar.DetailId))
+                .ToListAsync();
+
+            foreach (var review in rejectedL2Reviews)
+            {
+                review.ReviewStatus = "Pending";
+            }
+
+            await _ctx.SaveChangesAsync();
             await tx.CommitAsync();
+
             return affected;
         }
         catch
@@ -320,436 +351,497 @@ WHERE ad.assessment_id = @assessmentId
         }
     }
 
-    public async Task<ReviewerAssessmentViewDto?> GetAssessmentForReviewerAsync(int reviewerUserId, int assessmentId)
+    /// <summary>
+    /// Get detailed assessment view for L2 Reviewer
+    /// </summary>
+   /// <summary>
+/// Get detailed assessment view for L2 Reviewer
+/// </summary>
+public async Task<ReviewerAssessmentViewDto?> GetAssessmentForReviewerAsync(
+    int reviewerUserId, int assessmentId)
+{
+    // Get the L2 reviewer's employee ID
+    var l2EmployeeId = await _ctx.Userauthentications
+        .Where(ua => ua.UserId == reviewerUserId)
+        .Select(ua => ua.Employee.EmployeeId)
+        .FirstOrDefaultAsync();
+
+    if (l2EmployeeId == 0) return null;
+
+    // Verify assessment is in scope
+    var isInScope = await _ctx.Selfassessments
+        .Where(sa => sa.AssessmentId == assessmentId && sa.Status == "Submitted")
+        .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
+        .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, e })
+        .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, (x, edm) => new { x.sa, edm })
+        .Join(_ctx.Projectemployees.Where(pe => pe.IsPrimary), 
+            x => x.edm.EmployeeId, pe => pe.EmployeeId, 
+            (x, pe) => new { x.sa, pe })
+        .Join(_ctx.Projects.Where(p => p.L2approverEmployeeId == l2EmployeeId), 
+            x => x.pe.ProjectId, p => p.ProjectId, 
+            (x, p) => x.sa)
+        .FirstOrDefaultAsync();
+
+    if (isInScope == null) return null;
+
+    // Get header information - FIX: Project to anonymous type to avoid navigation property access
+    var assessment = await _ctx.Selfassessments
+        .Where(sa => sa.AssessmentId == assessmentId)
+        .Select(sa => new 
+        {
+            sa.AssessmentId,
+            sa.EmployeeId,
+            sa.FormId,
+            sa.SubmittedAt
+        })
+        .FirstOrDefaultAsync();
+
+    if (assessment == null) return null;
+
+    // Use EmployeeId directly from assessment (not navigation property)
+    var employee = await _ctx.Employees
+        .FirstOrDefaultAsync(e => e.EmployeeId == assessment.EmployeeId);
+
+    if (employee == null) return null;
+
+    var userAuth = await _ctx.Userauthentications
+        .FirstOrDefaultAsync(ua => ua.EmployeeId == employee.EmployeeId);
+
+    var userProfile = await _ctx.Userprofiles
+        .FirstOrDefaultAsync(up => up.EmployeeId == employee.EmployeeId);
+
+    var form = await _ctx.Assessmentforms
+        .FirstOrDefaultAsync(f => f.FormId == assessment.FormId);
+
+    var employeeDetails = await _ctx.Employeedetailsmasters
+        .FirstOrDefaultAsync(edm => edm.EmployeeId == employee.EmployeeId);
+
+    if (employeeDetails == null) return null;
+
+    var projects = await _ctx.Projectemployees
+        .Where(pe => pe.EmployeeId == employeeDetails.EmployeeId && pe.IsPrimary)
+        .Join(_ctx.Projects, pe => pe.ProjectId, p => p.ProjectId, (pe, p) => p)
+        .Select(p => p.ProjectName)
+        .ToListAsync();
+
+    var employeeName = userProfile != null 
+        ? string.Concat(userProfile.FirstName, " ", userProfile.LastName).Trim()
+        : (string.IsNullOrWhiteSpace(userAuth?.Email) ? employee.EmployeeCompanyId : userAuth.Email);
+
+    // Get latest L1 and L2 reviews
+    var latestL1Reviews = await _ctx.Assessmentreviews
+        .Where(ar => ar.ReviewerRole == "Approver" && ar.Rating > 0)
+        .GroupBy(ar => ar.DetailId)
+        .Select(g => g.OrderByDescending(ar => ar.ReviewId).First())
+        .ToListAsync();
+
+    var latestL2Reviews = await _ctx.Assessmentreviews
+        .Where(ar => ar.ReviewerRole == "Reviewer" && ar.Rating > 0)
+        .GroupBy(ar => ar.DetailId)
+        .Select(g => g.OrderByDescending(ar => ar.ReviewId).First())
+        .ToListAsync();
+
+    // Get competency details
+    var details = await _ctx.Assessmentdetails
+        .Where(ad => ad.AssessmentId == assessmentId)
+        .Join(_ctx.Competencies, ad => ad.CompetencyId, c => c.CompetencyId, 
+            (ad, c) => new { ad, c })
+        .OrderBy(x => x.c.DisplayOrder ?? int.MaxValue)
+        .ThenBy(x => x.c.Name)
+        .ToListAsync();
+
+    var items = details.Select(x => new CompetencyReviewRowDto(
+        DetailId: x.ad.DetailId,
+        CompetencyName: x.c.Name ?? string.Empty,
+        EmployeeRating: x.ad.EmployeeRating,
+        EmployeeComments: x.ad.EmployeeComments,
+        ApproverRating: latestL1Reviews.FirstOrDefault(r => r.DetailId == x.ad.DetailId)?.Rating,
+        ApproverComments: latestL1Reviews.FirstOrDefault(r => r.DetailId == x.ad.DetailId)?.Comments,
+        ReviewerRating: latestL2Reviews.FirstOrDefault(r => r.DetailId == x.ad.DetailId)?.Rating,
+        ReviewerComments: latestL2Reviews.FirstOrDefault(r => r.DetailId == x.ad.DetailId)?.Comments
+    )).ToList();
+
+    var attachments = await GetAssessmentAttachmentsAsync(assessmentId);
+
+    return new ReviewerAssessmentViewDto(
+        AssessmentId: assessmentId,
+        EmployeeName: employeeName,
+        FormName: form?.Name ?? string.Empty,
+        SubmittedAt: assessment.SubmittedAt ?? DateTime.Now,
+        Project: string.Join(", ", projects.OrderBy(x => x)),
+        Items: items,
+        Attachments: attachments
+    );
+}
+
+    /// <summary>
+    /// Get detailed assessment view for L1 Approver
+    /// </summary>
+   /// <summary>
+/// Get detailed assessment view for L1 Approver
+/// </summary>
+public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
+    int approverUserId, int assessmentId)
+{
+    // Get the L1 approver's employee ID
+    var l1EmployeeId = await _ctx.Userauthentications
+        .Where(ua => ua.UserId == approverUserId)
+        .Select(ua => ua.Employee.EmployeeId)
+        .FirstOrDefaultAsync();
+
+    if (l1EmployeeId == 0) return null;
+
+    // Verify assessment is in scope
+    var isInScope = await _ctx.Selfassessments
+        .Where(sa => sa.AssessmentId == assessmentId && sa.Status == "Submitted")
+        .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
+        .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, e })
+        .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, (x, edm) => new { x.sa, edm })
+        .Join(_ctx.Projectemployees.Where(pe => pe.IsPrimary), 
+            x => x.edm.EmployeeId, pe => pe.EmployeeId, 
+            (x, pe) => new { x.sa, pe })
+        .Join(_ctx.Projects.Where(p => p.L1approverEmployeeId == l1EmployeeId), 
+            x => x.pe.ProjectId, p => p.ProjectId, 
+            (x, p) => x.sa)
+        .FirstOrDefaultAsync();
+
+    if (isInScope == null) return null;
+
+    // Get header information - FIX: Get EmployeeId directly from assessment
+    var assessment = await _ctx.Selfassessments
+        .Where(sa => sa.AssessmentId == assessmentId)
+        .Select(sa => new 
+        {
+            sa.AssessmentId,
+            sa.EmployeeId,
+            sa.FormId,
+            sa.SubmittedAt
+        })
+        .FirstOrDefaultAsync();
+
+    if (assessment == null) return null;
+
+    // Use the EmployeeId from the assessment object directly
+    var employee = await _ctx.Employees
+        .FirstOrDefaultAsync(e => e.EmployeeId == assessment.EmployeeId);
+
+    if (employee == null) return null;
+
+    var userAuth = await _ctx.Userauthentications
+        .FirstOrDefaultAsync(ua => ua.EmployeeId == employee.EmployeeId);
+
+    var userProfile = await _ctx.Userprofiles
+        .FirstOrDefaultAsync(up => up.EmployeeId == employee.EmployeeId);
+
+    var form = await _ctx.Assessmentforms
+        .FirstOrDefaultAsync(f => f.FormId == assessment.FormId);
+
+    var employeeDetails = await _ctx.Employeedetailsmasters
+        .FirstOrDefaultAsync(edm => edm.EmployeeId == employee.EmployeeId);
+
+    if (employeeDetails == null) return null;
+
+    var projects = await _ctx.Projectemployees
+        .Where(pe => pe.EmployeeId == employeeDetails.EmployeeId && pe.IsPrimary)
+        .Join(_ctx.Projects, pe => pe.ProjectId, p => p.ProjectId, (pe, p) => p)
+        .Select(p => p.ProjectName)
+        .ToListAsync();
+
+    var employeeName = userProfile != null 
+        ? string.Concat(userProfile.FirstName, " ", userProfile.LastName).Trim()
+        : (string.IsNullOrWhiteSpace(userAuth?.Email) ? employee.EmployeeCompanyId : userAuth.Email);
+
+    // Get latest L1 and L2 reviews
+    var latestL1Reviews = await _ctx.Assessmentreviews
+        .Where(ar => ar.ReviewerRole == "Approver")
+        .GroupBy(ar => ar.DetailId)
+        .Select(g => g.OrderByDescending(ar => ar.ReviewId).First())
+        .ToListAsync();
+
+    var latestL2Reviews = await _ctx.Assessmentreviews
+        .Where(ar => ar.ReviewerRole == "Reviewer" && ar.Rating >= 0)
+        .GroupBy(ar => ar.DetailId)
+        .Select(g => g.OrderByDescending(ar => ar.ReviewId).First())
+        .ToListAsync();
+
+    // Get competency details
+    var details = await _ctx.Assessmentdetails
+        .Where(ad => ad.AssessmentId == assessmentId)
+        .Join(_ctx.Competencies, ad => ad.CompetencyId, c => c.CompetencyId, 
+            (ad, c) => new { ad, c })
+        .OrderBy(x => x.c.DisplayOrder ?? int.MaxValue)
+        .ThenBy(x => x.c.Name)
+        .ToListAsync();
+
+    var items = details.Select(x => new CompetencyReviewRowDto(
+        DetailId: x.ad.DetailId,
+        CompetencyName: x.c.Name ?? string.Empty,
+        EmployeeRating: x.ad.EmployeeRating,
+        EmployeeComments: x.ad.EmployeeComments,
+        ApproverRating: latestL1Reviews.FirstOrDefault(r => r.DetailId == x.ad.DetailId)?.Rating,
+        ApproverComments: latestL1Reviews.FirstOrDefault(r => r.DetailId == x.ad.DetailId)?.Comments,
+        ReviewerRating: latestL2Reviews.FirstOrDefault(r => r.DetailId == x.ad.DetailId)?.Rating,
+        ReviewerComments: latestL2Reviews.FirstOrDefault(r => r.DetailId == x.ad.DetailId)?.Comments
+    )).ToList();
+
+    var attachments = await GetAssessmentAttachmentsAsync(assessmentId);
+
+    return new ReviewerAssessmentViewDto(
+        AssessmentId: assessmentId,
+        EmployeeName: employeeName,
+        FormName: form?.Name ?? string.Empty,
+        SubmittedAt: assessment.SubmittedAt ?? DateTime.Now,
+        Project: string.Join(", ", projects.OrderBy(x => x)),
+        Items: items,
+        Attachments: attachments
+    );
+}
+
+    /// <summary>
+    /// Get L1 submitted ratings with pagination
+    /// </summary>
+    public async Task<IEnumerable<ApproverAssignmentRowDto>> GetSubmittedL1RatingsAsync(
+        int approverUserId, int page, int pageSize)
     {
-        const string sql = @"
-WITH l2 AS (
-  SELECT e.EmployeeId AS L2EmployeeId
-  FROM UserAuthentication ua
-  JOIN Employee e ON e.EmployeeId = ua.EmployeeId
-  WHERE ua.UserId = @reviewerUserId
-),
-scope AS (
-  SELECT DISTINCT sa.assessment_id
-  FROM SelfAssessment sa
-  JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
-  JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
-  JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
-  JOIN Project p ON p.ProjectId = pe.ProjectId
-  JOIN l2 ON p.L2ApproverEmployeeId = l2.L2EmployeeId
-  WHERE sa.assessment_id = @assessmentId
-    AND sa.status = 'Submitted'
-),
-latest_l1 AS (
-  SELECT ar.*
-  FROM AssessmentReview ar
-  JOIN (
-    SELECT detail_id, MAX(review_id) AS max_id
-    FROM AssessmentReview
-    WHERE reviewer_role = 'Approver'
-      AND detail_id IS NOT NULL
-      AND rating > 0
-    GROUP BY detail_id
-  ) t ON t.max_id = ar.review_id
-),
-latest_l2 AS (
-  SELECT ar.*
-  FROM AssessmentReview ar
-  JOIN (
-    SELECT detail_id, MAX(review_id) AS max_id
-    FROM AssessmentReview
-    WHERE reviewer_role = 'Reviewer'
-      AND detail_id IS NOT NULL
-      AND rating > 0
-    GROUP BY detail_id
-  ) t ON t.max_id = ar.review_id
-),
-header AS (
-  SELECT
-    sa.assessment_id AS AssessmentId,
-    COALESCE(NULLIF(CONCAT_WS(' ', up.FirstName, up.LastName), ''), emp_ua.Email, e.EmployeeCompanyId) AS EmployeeName,
-    f.name AS FormName,
-    sa.submitted_at AS SubmittedAt,
-    GROUP_CONCAT(DISTINCT p.ProjectName ORDER BY p.ProjectName SEPARATOR ', ') AS Project
-  FROM SelfAssessment sa
-  JOIN scope s ON s.assessment_id = sa.assessment_id
-  JOIN AssessmentForm f ON f.form_id = sa.form_id
-  JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
-  JOIN Employee e ON e.EmployeeId = emp_ua.EmployeeId
-  LEFT JOIN UserProfile up ON up.EmployeeId = e.EmployeeId
-  JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = e.EmployeeId
-  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
-  JOIN Project p ON p.ProjectId = pe.ProjectId
-  GROUP BY sa.assessment_id, EmployeeName, FormName, SubmittedAt
-)
-SELECT 
-  h.AssessmentId,
-  h.EmployeeName,
-  h.FormName,
-  h.SubmittedAt,
-  h.Project,
-  ad.detail_id       AS DetailId,
-  c.name             AS CompetencyName,
-  ad.employee_rating AS EmployeeRating,
-  ad.employee_comments AS EmployeeComments,
-  l1.rating          AS ApproverRating,
-  l1.comments        AS ApproverComments,
-  l2.rating          AS ReviewerRating,
-  l2.comments        AS ReviewerComments
-FROM header h
-JOIN AssessmentDetail ad ON ad.assessment_id = h.AssessmentId
-JOIN Competency c ON c.competency_id = ad.competency_id
-LEFT JOIN latest_l1 l1 ON l1.detail_id = ad.detail_id
-LEFT JOIN latest_l2 l2 ON l2.detail_id = ad.detail_id
-ORDER BY c.display_order IS NULL, c.display_order, c.name;";
+        if (page < 1) page = 1;
+        if (pageSize < 1) pageSize = 25;
+        var offset = (page - 1) * pageSize;
 
-        var conn = _ctx.Database.GetDbConnection();
-        if (conn.State != ConnectionState.Open) await conn.OpenAsync();
+        // Get the L1 approver's employee ID
+        var l1EmployeeId = await _ctx.Userauthentications
+            .Where(ua => ua.UserId == approverUserId)
+            .Select(ua => ua.Employee.EmployeeId)
+            .FirstOrDefaultAsync();
 
-        var rows = (await conn.QueryAsync(sql, new { reviewerUserId, assessmentId })).ToList();
-        if (!rows.Any()) return null;
+        if (l1EmployeeId == 0) return Enumerable.Empty<ApproverAssignmentRowDto>();
 
-        var head = rows[0];
-        var items = rows.Select(r => new CompetencyReviewRowDto(
-            DetailId: (int)r.DetailId,
-            CompetencyName: (string)r.CompetencyName,
-            EmployeeRating: (int?)r.EmployeeRating,
-            EmployeeComments: (string?)r.EmployeeComments,
-            ApproverRating: (int?)r.ApproverRating,
-            ApproverComments: (string?)r.ApproverComments,
-            ReviewerRating: (int?)r.ReviewerRating,
-            ReviewerComments: (string?)r.ReviewerComments
-        )).ToList();
+        // Get assessments in scope with L1 reviews
+        var assessmentIds = await _ctx.Selfassessments
+            .Where(sa => sa.Status == "Submitted")
+            .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
+            .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, e })
+            .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, (x, edm) => new { x.sa, edm })
+            .Join(_ctx.Projectemployees.Where(pe => pe.IsPrimary), 
+                x => x.edm.EmployeeId, pe => pe.EmployeeId, 
+                (x, pe) => new { x.sa, pe })
+            .Join(_ctx.Projects.Where(p => p.L1approverEmployeeId == l1EmployeeId), 
+                x => x.pe.ProjectId, p => p.ProjectId, 
+                (x, p) => x.sa.AssessmentId)
+            .Distinct()
+            .ToListAsync();
 
-        var attachments = await GetAssessmentAttachmentsAsync(assessmentId);
+        // Get assessments with L1 reviews (rating > 0)
+        var l1DoneAssessments = await _ctx.Assessmentreviews
+            .Where(ar => ar.ReviewerRole == "Approver" && ar.Rating > 0)
+            .Select(ar => ar.DetailId)
+            .ToListAsync();
 
-        return new ReviewerAssessmentViewDto(
-            AssessmentId: (int)head.AssessmentId,
-            EmployeeName: (string)head.EmployeeName,
-            FormName: (string)head.FormName,
-            SubmittedAt: (DateTime)head.SubmittedAt,
-            Project: (string)head.Project,
-            Items: items,
-            Attachments: attachments  
-        );
+        var assessmentsWithL1 = await _ctx.Assessmentdetails
+            .Where(ad => l1DoneAssessments.Contains(ad.DetailId))
+            .Select(ad => ad.AssessmentId)
+            .Distinct()
+            .ToListAsync();
+
+        var finalAssessmentIds = assessmentIds
+            .Where(id => assessmentsWithL1.Contains(id))
+            .ToList();
+
+        // Get data with pagination
+        var result = await _ctx.Selfassessments
+            .Where(sa => finalAssessmentIds.Contains(sa.AssessmentId))
+            .Join(_ctx.Assessmentforms, sa => sa.FormId, f => f.FormId, (sa, f) => new { sa, f })
+            .Join(_ctx.Userauthentications, x => x.sa.EmployeeId, ua => ua.UserId, (x, ua) => new { x.sa, x.f, ua })
+            .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, x.f, x.ua, e })
+            .GroupJoin(_ctx.Userprofiles, x => x.e.EmployeeId, up => up.EmployeeId, 
+                (x, up) => new { x.sa, x.f, x.ua, x.e, up = up.FirstOrDefault() })
+            .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, 
+                (x, edm) => new { x.sa, x.f, x.ua, x.e, x.up, edm })
+            .Join(_ctx.Projectemployees.Where(pe => pe.IsPrimary), 
+                x => x.edm.EmployeeId, pe => pe.EmployeeId, 
+                (x, pe) => new { x.sa, x.f, x.ua, x.e, x.up, pe })
+            .Join(_ctx.Projects, x => x.pe.ProjectId, p => p.ProjectId, 
+                (x, p) => new { x.sa, x.f, x.ua, x.e, x.up, p })
+            .OrderByDescending(x => x.sa.SubmittedAt)
+            .Skip(offset)
+            .Take(pageSize)
+            .GroupBy(x => x.sa.AssessmentId)
+            .Select(g => new ApproverAssignmentRowDto
+            {
+                AssessmentId = g.Key,
+                EmployeeName = g.First().up != null 
+                    ? string.Concat(g.First().up.FirstName, " ", g.First().up.LastName).Trim()
+                    : (string.IsNullOrWhiteSpace(g.First().ua.Email) ? g.First().e.EmployeeCompanyId : g.First().ua.Email),
+                FormName = g.First().f.Name ?? string.Empty,
+                SubmittedAt = (g.First().sa.SubmittedAt ?? DateTime.Now).ToString("yyyy-MM-dd HH:mm:ss"),
+                Status = g.First().sa.Status,
+                Project = string.Join(", ", g.Select(x => x.p.ProjectName).Distinct().OrderBy(x => x))
+            })
+            .ToListAsync();
+
+        return result;
     }
 
-    public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(int approverUserId, int assessmentId)
+    /// <summary>
+    /// Get L2 submitted ratings with pagination
+    /// </summary>
+    public async Task<IEnumerable<ApproverAssignmentRowDto>> GetReviewerSubmittedRatingsAsync(
+        int reviewerUserId, int page, int pageSize)
     {
-        const string sql = @"
-WITH l1 AS (
-  SELECT e.EmployeeId AS L1EmployeeId
-  FROM UserAuthentication ua
-  JOIN Employee e ON e.EmployeeId = ua.EmployeeId
-  WHERE ua.UserId = @approverUserId
-),
-scope AS (
-  SELECT DISTINCT sa.assessment_id
-  FROM SelfAssessment sa
-  JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
-  JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
-  JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
-  JOIN Project p ON p.ProjectId = pe.ProjectId
-  JOIN l1 ON p.L1ApproverEmployeeId = l1.L1EmployeeId
-  WHERE sa.assessment_id = @assessmentId
-    AND sa.status = 'Submitted'
-),
-latest_l1 AS (
-  SELECT ar.*
-  FROM AssessmentReview ar
-  JOIN (
-    SELECT detail_id, MAX(review_id) AS max_id
-    FROM AssessmentReview
-    WHERE reviewer_role = 'Approver'
-    GROUP BY detail_id
-  ) t ON t.max_id = ar.review_id
-),
-latest_l2 AS (
-  SELECT ar.*
-  FROM AssessmentReview ar
-  JOIN (
-    SELECT detail_id, MAX(review_id) AS max_id
-    FROM AssessmentReview
-    WHERE reviewer_role = 'Reviewer'
-      AND detail_id IS NOT NULL
-      AND rating >= 0
-    GROUP BY detail_id
-  ) t ON t.max_id = ar.review_id
-),
-header AS (
-  SELECT
-    sa.assessment_id AS AssessmentId,
-    COALESCE(NULLIF(CONCAT_WS(' ', up.FirstName, up.LastName), ''), emp_ua.Email, e.EmployeeCompanyId) AS EmployeeName,
-    f.name AS FormName,
-    sa.submitted_at AS SubmittedAt,
-    GROUP_CONCAT(DISTINCT p.ProjectName ORDER BY p.ProjectName SEPARATOR ', ') AS Project
-  FROM SelfAssessment sa
-  JOIN scope s ON s.assessment_id = sa.assessment_id
-  JOIN AssessmentForm f ON f.form_id = sa.form_id
-  JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
-  JOIN Employee e ON e.EmployeeId = emp_ua.EmployeeId
-  LEFT JOIN UserProfile up ON up.EmployeeId = e.EmployeeId
-  JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = e.EmployeeId
-  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
-  JOIN Project p ON p.ProjectId = pe.ProjectId
-  GROUP BY sa.assessment_id, EmployeeName, FormName, SubmittedAt
-)
-SELECT 
-  h.AssessmentId,
-  h.EmployeeName,
-  h.FormName,
-  h.SubmittedAt,
-  h.Project,
-  ad.detail_id       AS DetailId,
-  c.name             AS CompetencyName,
-  ad.employee_rating AS EmployeeRating,
-  ad.employee_comments AS EmployeeComments,
-  l1.rating          AS ApproverRating,
-  l1.comments        AS ApproverComments,
-  l2.rating          AS ReviewerRating,
-  l2.comments        AS ReviewerComments
-FROM header h
-JOIN AssessmentDetail ad ON ad.assessment_id = h.AssessmentId
-JOIN Competency c ON c.competency_id = ad.competency_id
-LEFT JOIN latest_l1 l1 ON l1.detail_id = ad.detail_id
-LEFT JOIN latest_l2 l2 ON l2.detail_id = ad.detail_id
-ORDER BY c.display_order IS NULL, c.display_order, c.name;";
+        if (page < 1) page = 1;
+        if (pageSize < 1) pageSize = 25;
+        var offset = (page - 1) * pageSize;
 
-        var conn = _ctx.Database.GetDbConnection();
-        if (conn.State != ConnectionState.Open) await conn.OpenAsync();
+        // Get the L2 reviewer's employee ID
+        var l2EmployeeId = await _ctx.Userauthentications
+            .Where(ua => ua.UserId == reviewerUserId)
+            .Select(ua => ua.Employee.EmployeeId)
+            .FirstOrDefaultAsync();
 
-        var rows = (await conn.QueryAsync(sql, new { approverUserId, assessmentId })).ToList();
-        if (!rows.Any()) return null;
+        if (l2EmployeeId == 0) return Enumerable.Empty<ApproverAssignmentRowDto>();
 
-        var head = rows[0];
-        var items = rows.Select(r => new CompetencyReviewRowDto(
-            DetailId: (int)r.DetailId,
-            CompetencyName: (string)r.CompetencyName,
-            EmployeeRating: (int?)r.EmployeeRating,
-            EmployeeComments: (string?)r.EmployeeComments,
-            ApproverRating: (int?)r.ApproverRating,
-            ApproverComments: (string?)r.ApproverComments,
-            ReviewerRating: (int?)r.ReviewerRating,
-            ReviewerComments: (string?)r.ReviewerComments
-        )).ToList();
+        // Get assessments in scope
+        var scopeAssessments = await _ctx.Selfassessments
+            .Where(sa => sa.Status == "Submitted")
+            .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
+            .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, e })
+            .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, (x, edm) => new { x.sa, edm })
+            .Join(_ctx.Projectemployees.Where(pe => pe.IsPrimary), 
+                x => x.edm.EmployeeId, pe => pe.EmployeeId, 
+                (x, pe) => new { x.sa, pe })
+            .Join(_ctx.Projects.Where(p => p.L2approverEmployeeId == l2EmployeeId), 
+                x => x.pe.ProjectId, p => p.ProjectId, 
+                (x, p) => x.sa.AssessmentId)
+            .Distinct()
+            .ToListAsync();
 
-        var attachments = await GetAssessmentAttachmentsAsync(assessmentId);
+        // Get assessments with L2 decisions (Approved or Rejected)
+        var latestL2Reviews = await _ctx.Assessmentreviews
+            .Where(ar => ar.ReviewerRole == "Reviewer" && 
+                (ar.ReviewStatus == "Approved" || ar.ReviewStatus == "Rejected"))
+            .GroupBy(ar => ar.DetailId)
+            .Select(g => g.OrderByDescending(ar => ar.ReviewId).First())
+            .ToListAsync();
 
-        return new ReviewerAssessmentViewDto(
-            AssessmentId: (int)head.AssessmentId,
-            EmployeeName: (string)head.EmployeeName,
-            FormName: (string)head.FormName,
-            SubmittedAt: (DateTime)head.SubmittedAt,
-            Project: (string)head.Project,
-            Items: items,
-            Attachments: attachments  
-        );
+        var submittedDetailIds = latestL2Reviews.Select(ar => ar.DetailId).ToList();
+        var submittedAssessments = await _ctx.Assessmentdetails
+            .Where(ad => submittedDetailIds.Contains(ad.DetailId))
+            .Select(ad => ad.AssessmentId)
+            .Distinct()
+            .ToListAsync();
+
+        var finalAssessmentIds = scopeAssessments
+            .Where(id => submittedAssessments.Contains(id))
+            .ToList();
+
+        // Get data with pagination
+        var result = await _ctx.Selfassessments
+            .Where(sa => finalAssessmentIds.Contains(sa.AssessmentId))
+            .Join(_ctx.Assessmentforms, sa => sa.FormId, f => f.FormId, (sa, f) => new { sa, f })
+            .Join(_ctx.Userauthentications, x => x.sa.EmployeeId, ua => ua.UserId, (x, ua) => new { x.sa, x.f, ua })
+            .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, x.f, x.ua, e })
+            .GroupJoin(_ctx.Userprofiles, x => x.e.EmployeeId, up => up.EmployeeId, 
+                (x, up) => new { x.sa, x.f, x.ua, x.e, up = up.FirstOrDefault() })
+            .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, 
+                (x, edm) => new { x.sa, x.f, x.ua, x.e, x.up, edm })
+            .Join(_ctx.Projectemployees.Where(pe => pe.IsPrimary), 
+                x => x.edm.EmployeeId, pe => pe.EmployeeId, 
+                (x, pe) => new { x.sa, x.f, x.ua, x.e, x.up, pe })
+            .Join(_ctx.Projects, x => x.pe.ProjectId, p => p.ProjectId, 
+                (x, p) => new { x.sa, x.f, x.ua, x.e, x.up, p })
+            .OrderByDescending(x => x.sa.SubmittedAt)
+            .Skip(offset)
+            .Take(pageSize)
+            .GroupBy(x => x.sa.AssessmentId)
+            .Select(g => new ApproverAssignmentRowDto
+            {
+                AssessmentId = g.Key,
+                EmployeeName = g.First().up != null 
+                    ? string.Concat(g.First().up.FirstName, " ", g.First().up.LastName).Trim()
+                    : (string.IsNullOrWhiteSpace(g.First().ua.Email) ? g.First().e.EmployeeCompanyId : g.First().ua.Email),
+                FormName = g.First().f.Name ?? string.Empty,
+                SubmittedAt = (g.First().sa.SubmittedAt ?? DateTime.Now).ToString("yyyy-MM-dd HH:mm:ss"),
+                Status = g.First().sa.Status,
+                Project = string.Join(", ", g.Select(x => x.p.ProjectName).Distinct().OrderBy(x => x))
+            })
+            .ToListAsync();
+
+        return result;
     }
 
-    public async Task<IEnumerable<ApproverAssignmentRowDto>>
-GetSubmittedL1RatingsAsync(int approverUserId, int page, int pageSize)
-{
-    if (page < 1) page = 1;
-    if (pageSize < 1) pageSize = 25;
-    var offset = (page - 1) * pageSize;
- 
-    const string sql = @"
-WITH l1 AS (
-  SELECT e.EmployeeId
-  FROM UserAuthentication ua
-  JOIN Employee e ON e.EmployeeId = ua.EmployeeId
-  WHERE ua.UserId = @approverUserId
-),
-scope AS (
-  SELECT DISTINCT sa.assessment_id
-  FROM SelfAssessment sa
-  JOIN UserAuthentication ua ON ua.UserId = sa.employee_id
-  JOIN Employee e ON e.EmployeeId = ua.EmployeeId
-  JOIN EmployeeDetailsMaster edm ON edm.EmployeeId = e.EmployeeId
-  JOIN ProjectEmployees pe ON pe.EmployeeId = edm.EmployeeId AND pe.IsPrimary = 1
-  JOIN Project p ON p.ProjectId = pe.ProjectId
-  JOIN l1 ON p.L1ApproverEmployeeId = l1.EmployeeId
-  WHERE sa.status = 'Submitted'
-),
-l1_done AS (
-  SELECT DISTINCT ad.assessment_id
-  FROM AssessmentReview ar
-  JOIN AssessmentDetail ad ON ad.detail_id = ar.detail_id
-  WHERE ar.reviewer_role = 'Approver'
-    AND ar.rating > 0
-)
-SELECT
-  sa.assessment_id AS AssessmentId,
-  COALESCE(
-    NULLIF(CONCAT_WS(' ', up.FirstName, up.LastName), ''),
-    ua.Email,
-    e.EmployeeCompanyId
-  ) AS EmployeeName,
-  f.name AS FormName,
-  sa.submitted_at AS SubmittedAt,
-  sa.status AS Status,
-  GROUP_CONCAT(DISTINCT p.ProjectName ORDER BY p.ProjectName) AS Project
-FROM scope s
-JOIN l1_done l1d ON l1d.assessment_id = s.assessment_id
-JOIN SelfAssessment sa ON sa.assessment_id = s.assessment_id
-JOIN AssessmentForm f ON f.form_id = sa.form_id
-JOIN UserAuthentication ua ON ua.UserId = sa.employee_id
-JOIN Employee e ON e.EmployeeId = ua.EmployeeId
-LEFT JOIN UserProfile up ON up.EmployeeId = e.EmployeeId
-JOIN EmployeeDetailsMaster edm ON edm.EmployeeId = e.EmployeeId
-JOIN ProjectEmployees pe ON pe.EmployeeId = edm.EmployeeId AND pe.IsPrimary = 1
-JOIN Project p ON p.ProjectId = pe.ProjectId
-GROUP BY sa.assessment_id, EmployeeName, FormName, SubmittedAt, Status
-ORDER BY sa.submitted_at DESC
-LIMIT @pageSize OFFSET @offset;
-";
- 
-    var conn = _ctx.Database.GetDbConnection();
-    if (conn.State != System.Data.ConnectionState.Open)
-        await conn.OpenAsync();
- 
-    return await conn.QueryAsync<ApproverAssignmentRowDto>(
-        sql, new { approverUserId, pageSize, offset });
-}
-public async Task<IEnumerable<ApproverAssignmentRowDto>>
-GetReviewerSubmittedRatingsAsync(int reviewerUserId, int page, int pageSize)
-{
-    if (page < 1) page = 1;
-    if (pageSize < 1) pageSize = 25;
-    var offset = (page - 1) * pageSize;
- 
-    const string sql = @"
-WITH l2 AS (
-  SELECT e.EmployeeId AS L2EmployeeId
-  FROM UserAuthentication ua
-  JOIN Employee e ON e.EmployeeId = ua.EmployeeId
-  WHERE ua.UserId = @reviewerUserId
-),
-scope_assessments AS (
-  SELECT DISTINCT sa.assessment_id
-  FROM SelfAssessment sa
-  JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
-  JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
-  JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
-  JOIN Project p ON p.ProjectId = pe.ProjectId
-  JOIN l2 ON p.L2ApproverEmployeeId = l2.L2EmployeeId
-  WHERE sa.status = 'Submitted'
-),
-latest_l2_decision AS (
-  SELECT ar.detail_id, ar.review_status
-  FROM AssessmentReview ar
-  JOIN (
-    SELECT detail_id, MAX(review_id) AS max_id
-    FROM AssessmentReview
-    WHERE reviewer_role = 'Reviewer'
-      AND review_status IN ('Approved','Rejected')
-    GROUP BY detail_id
-  ) t ON t.max_id = ar.review_id
-),
-submitted_assessments AS (
-  SELECT DISTINCT ad.assessment_id
-  FROM AssessmentDetail ad
-  JOIN latest_l2_decision l2 ON l2.detail_id = ad.detail_id
-)
-SELECT
-  sa.assessment_id AS AssessmentId,
-  COALESCE(
-    NULLIF(CONCAT_WS(' ', up.FirstName, up.LastName), ''),
-    emp_ua.Email,
-    emp.EmployeeCompanyId
-  ) AS EmployeeName,
-  f.name AS FormName,
-  sa.submitted_at AS SubmittedAt,
-  sa.status AS Status,
-  GROUP_CONCAT(DISTINCT p.ProjectName ORDER BY p.ProjectName SEPARATOR ', ') AS Project
-FROM scope_assessments s
-JOIN submitted_assessments sub ON sub.assessment_id = s.assessment_id
-JOIN SelfAssessment sa ON sa.assessment_id = s.assessment_id
-JOIN AssessmentForm f ON f.form_id = sa.form_id
-JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
-JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
-LEFT JOIN UserProfile up ON up.EmployeeId = emp.EmployeeId
-JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
-JOIN Project p ON p.ProjectId = pe.ProjectId
-GROUP BY sa.assessment_id, EmployeeName, FormName, SubmittedAt, Status
-ORDER BY sa.submitted_at DESC
-LIMIT @pageSize OFFSET @offset;
-";
- 
-    var conn = _ctx.Database.GetDbConnection();
-    if (conn.State != ConnectionState.Open)
-        await conn.OpenAsync();
- 
-    return await conn.QueryAsync<ApproverAssignmentRowDto>(
-        sql, new { reviewerUserId, pageSize, offset });
-}
- 
-
+    /// <summary>
+    /// Save L2 (Reviewer) review
+    /// </summary>
     public async Task<int> SaveReviewerReviewAsync(int reviewerUserId, SubmitReviewDto dto)
     {
         if (dto is null || dto.Items is null || dto.Items.Count == 0) return 0;
 
-        const string scopeSql = @"
-WITH l2 AS (
-  SELECT e.EmployeeId AS L2EmployeeId
-  FROM UserAuthentication ua
-  JOIN Employee e ON e.EmployeeId = ua.EmployeeId
-  WHERE ua.UserId = @reviewerUserId
-),
-scope AS (
-  SELECT DISTINCT sa.assessment_id
-  FROM SelfAssessment sa
-  JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
-  JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
-  JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
-  JOIN Project p ON p.ProjectId = pe.ProjectId
-  JOIN l2 ON p.L2ApproverEmployeeId = l2.L2EmployeeId
-  WHERE sa.assessment_id = @assessmentId
-    AND sa.status = 'Submitted'
-)
-SELECT COUNT(*) FROM scope;";
+        // Get the L2 reviewer's employee ID
+        var l2EmployeeId = await _ctx.Userauthentications
+            .Where(ua => ua.UserId == reviewerUserId)
+            .Select(ua => ua.Employee.EmployeeId)
+            .FirstOrDefaultAsync();
 
-        const string validateDetails = @"SELECT COUNT(*) FROM AssessmentDetail WHERE assessment_id=@aid AND detail_id IN @ids;";
-        const string insertSql = @"
-INSERT INTO AssessmentReview
-  (detail_id, reviewer_id, reviewer_role, rating, comments, reviewed_at, review_status)
-VALUES
-  (@detailId, @reviewerUserId, 'Reviewer', @rating, @comments, NOW(), 'Pending');";
+        if (l2EmployeeId == 0) return 0;
 
-        var conn = _ctx.Database.GetDbConnection();
-        if (conn.State != ConnectionState.Open) await conn.OpenAsync();
-        using var tx = await conn.BeginTransactionAsync();
+        // Verify assessment is in scope
+        var inScope = await _ctx.Selfassessments
+            .Where(sa => sa.AssessmentId == dto.AssessmentId && sa.Status == "Submitted")
+            .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
+            .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, e })
+            .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, (x, edm) => new { x.sa, edm })
+            .Join(_ctx.Projectemployees.Where(pe => pe.IsPrimary), 
+                x => x.edm.EmployeeId, pe => pe.EmployeeId, 
+                (x, pe) => new { x.sa, pe })
+            .Join(_ctx.Projects.Where(p => p.L2approverEmployeeId == l2EmployeeId), 
+                x => x.pe.ProjectId, p => p.ProjectId, 
+                (x, p) => x.sa)
+            .AnyAsync();
 
-        var inScope = await conn.ExecuteScalarAsync<int>(scopeSql,
-            new { reviewerUserId, assessmentId = dto.AssessmentId }, tx);
-        if (inScope <= 0) { await tx.RollbackAsync(); return 0; }
+        if (!inScope) return 0;
 
+        // Validate all detail IDs belong to this assessment
         var ids = dto.Items.Select(x => x.DetailId).Distinct().ToArray();
-        var valid = await conn.ExecuteScalarAsync<int>(validateDetails,
-            new { aid = dto.AssessmentId, ids }, tx);
-        if (valid != ids.Length) { await tx.RollbackAsync(); return 0; }
+        var valid = await _ctx.Assessmentdetails
+            .CountAsync(ad => ad.AssessmentId == dto.AssessmentId && ids.Contains(ad.DetailId));
 
-        var saved = 0;
-        foreach (var it in dto.Items)
+        if (valid != ids.Length) return 0;
+
+        using var tx = await _ctx.Database.BeginTransactionAsync();
+
+        try
         {
-            saved += await conn.ExecuteAsync(insertSql, new
+            var saved = 0;
+            foreach (var it in dto.Items)
             {
-                detailId = it.DetailId,
-                reviewerUserId,
-                rating = it.Rating,
-                comments = it.Comments
-            }, tx);
-        }
+                var newReview = new Assessmentreview
+                {
+                    DetailId = it.DetailId,
+                    ReviewerId = reviewerUserId,
+                    ReviewerRole = "Reviewer",
+                    Rating = it.Rating,
+                    Comments = it.Comments,
+                    ReviewedAt = DateTime.Now,
+                    ReviewStatus = "Pending"
+                };
 
-        await tx.CommitAsync();
-        return saved;
+                _ctx.Assessmentreviews.Add(newReview);
+                saved++;
+            }
+
+            await _ctx.SaveChangesAsync();
+            await tx.CommitAsync();
+            return saved;
+        }
+        catch
+        {
+            await tx.RollbackAsync();
+            throw;
+        }
     }
 
+    /// <summary>
+    /// Submit L1 (Approver) reviews
+    /// </summary>
     public async Task SubmitApproverReviewsAsync(
         int approverId,
         int assessmentId,
@@ -765,7 +857,7 @@ VALUES
                 Rating = item.Rating,
                 Comments = item.Comments,
                 ReviewedAt = DateTime.Now,
-                ReviewStatus = "Pending"  
+                ReviewStatus = "Pending"
             };
 
             _ctx.Assessmentreviews.Add(entry);
@@ -774,59 +866,54 @@ VALUES
         await _ctx.SaveChangesAsync();
     }
 
+    /// <summary>
+    /// Submit L2 (Reviewer) reviews
+    /// </summary>
     public async Task SubmitReviewerReviewsAsync(
         int reviewerUserId,
         int assessmentId,
         List<ReviewItemDto> items)
     {
-        var detailIds = items.Select(i => i.DetailId).ToList();
-        var conn = _ctx.Database.GetDbConnection();
-
-        if (conn.State != ConnectionState.Open) await conn.OpenAsync();
-
-        const string updateExistingSql = @"
-UPDATE AssessmentReview
-SET rating = @rating, 
-    comments = @comments, 
-    reviewed_at = NOW(),
-    review_status = NULL
-WHERE reviewer_role = 'Reviewer'
-  AND reviewer_id = @reviewerUserId
-  AND detail_id = @detailId
-  AND rating > 0;";
-
-        using var tx = await conn.BeginTransactionAsync();
+        using var tx = await _ctx.Database.BeginTransactionAsync();
 
         try
         {
             foreach (var item in items)
             {
-                var updateCount = await conn.ExecuteAsync(updateExistingSql,
-                    new
-                    {
-                        rating = item.Rating,
-                        comments = item.Comments,
-                        reviewerUserId,
-                        detailId = item.DetailId
-                    }, tx);
+                // Check if review already exists
+                var existingReview = await _ctx.Assessmentreviews
+                    .FirstOrDefaultAsync(ar => ar.DetailId == item.DetailId 
+                        && ar.ReviewerId == reviewerUserId 
+                        && ar.ReviewerRole == "Reviewer" 
+                        && ar.Rating > 0);
 
-                if (updateCount == 0)
+                if (existingReview != null)
                 {
-                    await conn.ExecuteAsync(@"
-INSERT INTO AssessmentReview 
-  (detail_id, reviewer_id, reviewer_role, rating, comments, reviewed_at, review_status)
-VALUES 
-  (@detailId, @reviewerUserId, 'Reviewer', @rating, @comments, NOW(), NULL);",
-                        new
-                        {
-                            detailId = item.DetailId,
-                            reviewerUserId,
-                            rating = item.Rating,
-                            comments = item.Comments
-                        }, tx);
+                    // Update existing
+                    existingReview.Rating = item.Rating;
+                    existingReview.Comments = item.Comments;
+                    existingReview.ReviewedAt = DateTime.Now;
+                    existingReview.ReviewStatus = null;
+                    _ctx.Assessmentreviews.Update(existingReview);
+                }
+                else
+                {
+                    // Insert new
+                    var newReview = new Assessmentreview
+                    {
+                        DetailId = item.DetailId,
+                        ReviewerId = reviewerUserId,
+                        ReviewerRole = "Reviewer",
+                        Rating = item.Rating,
+                        Comments = item.Comments,
+                        ReviewedAt = DateTime.Now,
+                        ReviewStatus = null
+                    };
+                    _ctx.Assessmentreviews.Add(newReview);
                 }
             }
 
+            await _ctx.SaveChangesAsync();
             await tx.CommitAsync();
         }
         catch
@@ -836,6 +923,9 @@ VALUES
         }
     }
 
+    /// <summary>
+    /// Set L2 (Reviewer) decision (Approved/Rejected)
+    /// </summary>
     public async Task<bool> SetReviewerDecisionAsync(
         int reviewerUserId,
         int assessmentId,
@@ -848,257 +938,283 @@ VALUES
 
         if (!approved && !rejected) return false;
 
-        const string scopeSql = @"
-WITH l2 AS (
-  SELECT e.EmployeeId AS L2EmployeeId
-  FROM UserAuthentication ua
-  JOIN Employee e ON e.EmployeeId = ua.EmployeeId
-  WHERE ua.UserId = @reviewerUserId
-)
-SELECT COUNT(*)
-FROM SelfAssessment sa
-JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
-JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
-JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
-JOIN Project p ON p.ProjectId = pe.ProjectId
-JOIN l2 ON p.L2ApproverEmployeeId = l2.L2EmployeeId
-WHERE sa.assessment_id = @assessmentId
-  AND sa.status = 'Submitted';";
+        // Get the L2 reviewer's employee ID
+        var l2EmployeeId = await _ctx.Userauthentications
+            .Where(ua => ua.UserId == reviewerUserId)
+            .Select(ua => ua.Employee.EmployeeId)
+            .FirstOrDefaultAsync();
 
-        const string detailsSql = @"SELECT detail_id FROM AssessmentDetail WHERE assessment_id=@aid;";
+        if (l2EmployeeId == 0) return false;
 
-        const string updateRatingsSql = @"
-UPDATE AssessmentReview
-SET review_status = @decision, reviewed_at = NOW()
-WHERE reviewer_role = 'Reviewer'
-  AND reviewer_id = @reviewerUserId
-  AND detail_id IN @detailIds
-  AND rating > 0;";
+        // Verify assessment is in scope
+        var inScope = await _ctx.Selfassessments
+            .Where(sa => sa.AssessmentId == assessmentId && sa.Status == "Submitted")
+            .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
+            .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, e })
+            .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, (x, edm) => new { x.sa, edm })
+            .Join(_ctx.Projectemployees.Where(pe => pe.IsPrimary), 
+                x => x.edm.EmployeeId, pe => pe.EmployeeId, 
+                (x, pe) => new { x.sa, pe })
+            .Join(_ctx.Projects.Where(p => p.L2approverEmployeeId == l2EmployeeId), 
+                x => x.pe.ProjectId, p => p.ProjectId, 
+                (x, p) => x.sa)
+            .AnyAsync();
 
-        const string updateOrInsertDecisionNoteSql = @"
-UPDATE AssessmentReview
-SET rating = -1, 
-    comments = @note, 
-    review_status = @decision,
-    reviewed_at = NOW()
-WHERE reviewer_role = 'Reviewer'
-  AND reviewer_id = @reviewerUserId
-  AND detail_id = @firstDetailId
-  AND rating = -1
-LIMIT 1;
+        if (!inScope) return false;
 
--- If not updated, insert new
-INSERT INTO AssessmentReview
-  (detail_id, reviewer_id, reviewer_role, rating, comments, reviewed_at, review_status)
-SELECT @firstDetailId, @reviewerUserId, 'Reviewer', -1, @note, NOW(), @decision
-WHERE NOT EXISTS (
-  SELECT 1 FROM AssessmentReview
-  WHERE detail_id = @firstDetailId
-    AND reviewer_id = @reviewerUserId
-    AND reviewer_role = 'Reviewer'
-    AND rating = -1
-);";
-
-        var conn = _ctx.Database.GetDbConnection();
-        if (conn.State != ConnectionState.Open) await conn.OpenAsync();
-
-        var inScope = await conn.ExecuteScalarAsync<int>(scopeSql, new { reviewerUserId, assessmentId });
-        if (inScope <= 0) return false;
-
-        using var tx = await conn.BeginTransactionAsync();
+        using var tx = await _ctx.Database.BeginTransactionAsync();
 
         try
         {
-            var detailIds = (await conn.QueryAsync<int>(detailsSql, new { aid = assessmentId }, tx)).ToArray();
-            if (detailIds.Length == 0) 
-            { 
-                await tx.RollbackAsync(); 
-                return false; 
+            var detailIds = await _ctx.Assessmentdetails
+                .Where(ad => ad.AssessmentId == assessmentId)
+                .Select(ad => ad.DetailId)
+                .ToListAsync();
+
+            if (detailIds.Count == 0)
+            {
+                await tx.RollbackAsync();
+                return false;
             }
 
             var finalDecision = approved ? "Approved" : "Rejected";
 
-            await conn.ExecuteAsync(updateRatingsSql,
-                new { decision = finalDecision, reviewerUserId, detailIds }, tx);
+            // Update all L2 ratings with decision
+            var reviewsToUpdate = await _ctx.Assessmentreviews
+                .Where(ar => ar.ReviewerRole == "Reviewer" 
+                    && ar.ReviewerId == reviewerUserId 
+                    && detailIds.Contains(ar.DetailId) 
+                    && ar.Rating > 0)
+                .ToListAsync();
+
+            foreach (var review in reviewsToUpdate)
+            {
+                review.ReviewStatus = finalDecision;
+                review.ReviewedAt = DateTime.Now;
+                _ctx.Assessmentreviews.Update(review);
+            }
+
+            await _ctx.SaveChangesAsync();
 
             if (rejected)
             {
                 var note = reviewerComment ?? "Reviewer Rejected";
-                await conn.ExecuteAsync(updateOrInsertDecisionNoteSql,
-                    new
+                var firstDetailId = detailIds.First();
+
+                // Check if rejection note already exists
+                var existingNote = await _ctx.Assessmentreviews
+                    .FirstOrDefaultAsync(ar => ar.DetailId == firstDetailId 
+                        && ar.ReviewerId == reviewerUserId 
+                        && ar.ReviewerRole == "Reviewer" 
+                        && ar.Rating == -1);
+
+                if (existingNote != null)
+                {
+                    existingNote.Comments = note;
+                    existingNote.ReviewStatus = finalDecision;
+                    existingNote.ReviewedAt = DateTime.Now;
+                    _ctx.Assessmentreviews.Update(existingNote);
+                }
+                else
+                {
+                    var noteEntry = new Assessmentreview
                     {
-                        firstDetailId = detailIds[0],
-                        reviewerUserId,
-                        note,
-                        decision = finalDecision
-                    }, tx);
+                        DetailId = firstDetailId,
+                        ReviewerId = reviewerUserId,
+                        ReviewerRole = "Reviewer",
+                        Rating = -1,
+                        Comments = note,
+                        ReviewedAt = DateTime.Now,
+                        ReviewStatus = finalDecision
+                    };
+                    _ctx.Assessmentreviews.Add(noteEntry);
+                }
             }
             else
             {
-                await conn.ExecuteAsync(@"
-DELETE FROM AssessmentReview
-WHERE reviewer_role = 'Reviewer'
-  AND reviewer_id = @reviewerUserId
-  AND detail_id IN @detailIds
-  AND rating = -1;",
-                    new { reviewerUserId, detailIds }, tx);
+                // Delete rejection notes if approving
+                var notesToDelete = await _ctx.Assessmentreviews
+                    .Where(ar => ar.ReviewerRole == "Reviewer" 
+                        && ar.ReviewerId == reviewerUserId 
+                        && detailIds.Contains(ar.DetailId) 
+                        && ar.Rating == -1)
+                    .ToListAsync();
+
+                _ctx.Assessmentreviews.RemoveRange(notesToDelete);
             }
 
+            await _ctx.SaveChangesAsync();
             await tx.CommitAsync();
+
+            // Update progress tracker
+            try
+            {
+                var assessment = await _ctx.Selfassessments
+                    .FirstOrDefaultAsync(a => a.AssessmentId == assessmentId);
+
+                if (assessment != null)
+                {
+                    var tracker = await _ctx.Formprogresstrackers
+                        .Include(t => t.Assignment)
+                        .FirstOrDefaultAsync(t => t.Assignment.EmployeeId == assessment.EmployeeId
+                                               && t.Assignment.FormId == assessment.FormId);
+
+                    if (tracker != null)
+                    {
+                        tracker.ManagerCompleted = true;
+                        tracker.LastUpdated = DateTime.UtcNow;
+                        await _ctx.SaveChangesAsync();
+                    }
+                }
+            }
+            catch
+            {
+                // Silently fail - main decision was committed
+            }
+
+            return true;
         }
         catch
         {
             await tx.RollbackAsync();
             throw;
         }
+    }
+
+    /// <summary>
+    /// Set L1 (Approver) decision (Approved/Rejected)
+    /// </summary>
+    public async Task<bool> SetApproverDecisionAsync(
+        int approverUserId,
+        int assessmentId,
+        string decision,
+        string? approverComment)
+    {
+        decision = (decision ?? "").Trim();
+        var approved = string.Equals(decision, "Approved", StringComparison.OrdinalIgnoreCase);
+        var rejected = string.Equals(decision, "Rejected", StringComparison.OrdinalIgnoreCase);
+
+        if (!approved && !rejected) return false;
+
+        // Get the L1 approver's employee ID
+        var l1EmployeeId = await _ctx.Userauthentications
+            .Where(ua => ua.UserId == approverUserId)
+            .Select(ua => ua.Employee.EmployeeId)
+            .FirstOrDefaultAsync();
+
+        if (l1EmployeeId == 0) return false;
+
+        // Verify assessment is in scope
+        var inScope = await _ctx.Selfassessments
+            .Where(sa => sa.AssessmentId == assessmentId && sa.Status == "Submitted")
+            .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
+            .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, e })
+            .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, (x, edm) => new { x.sa, edm })
+            .Join(_ctx.Projectemployees.Where(pe => pe.IsPrimary), 
+                x => x.edm.EmployeeId, pe => pe.EmployeeId, 
+                (x, pe) => new { x.sa, pe })
+            .Join(_ctx.Projects.Where(p => p.L1approverEmployeeId == l1EmployeeId), 
+                x => x.pe.ProjectId, p => p.ProjectId, 
+                (x, p) => x.sa)
+            .AnyAsync();
+
+        if (!inScope) return false;
+
+        using var tx = await _ctx.Database.BeginTransactionAsync();
 
         try
         {
-            var assessment = await _ctx.Selfassessments
-                .FirstOrDefaultAsync(a => a.AssessmentId == assessmentId);
-            if (assessment != null)
+            var detailIds = await _ctx.Assessmentdetails
+                .Where(ad => ad.AssessmentId == assessmentId)
+                .Select(ad => ad.DetailId)
+                .ToListAsync();
+
+            if (detailIds.Count == 0)
             {
-                var tracker = await _ctx.Formprogresstrackers
-                    .Include(t => t.Assignment)
-                    .FirstOrDefaultAsync(t => t.Assignment.EmployeeId == assessment.EmployeeId
-                                           && t.Assignment.FormId == assessment.FormId);
-                if (tracker != null)
+                await tx.RollbackAsync();
+                return false;
+            }
+
+            var finalDecision = approved ? "Approved" : "Rejected";
+
+            // Update all L1 ratings with decision
+            var reviewsToUpdate = await _ctx.Assessmentreviews
+                .Where(ar => ar.ReviewerRole == "Approver" 
+                    && ar.ReviewerId == approverUserId 
+                    && detailIds.Contains(ar.DetailId) 
+                    && ar.Rating > 0)
+                .ToListAsync();
+
+            foreach (var review in reviewsToUpdate)
+            {
+                review.ReviewStatus = finalDecision;
+                review.ReviewedAt = DateTime.Now;
+                _ctx.Assessmentreviews.Update(review);
+            }
+
+            await _ctx.SaveChangesAsync();
+
+            if (rejected)
+            {
+                var note = approverComment ?? "Approver Rejected";
+                var firstDetailId = detailIds.First();
+
+                // Check if rejection note already exists
+                var existingNote = await _ctx.Assessmentreviews
+                    .FirstOrDefaultAsync(ar => ar.DetailId == firstDetailId 
+                        && ar.ReviewerId == approverUserId 
+                        && ar.ReviewerRole == "Approver" 
+                        && ar.Rating == 0);
+
+                if (existingNote != null)
                 {
-                    tracker.ManagerCompleted = true;
-                    tracker.LastUpdated = DateTime.UtcNow;
-                    await _ctx.SaveChangesAsync();
+                    existingNote.Comments = note;
+                    existingNote.ReviewStatus = finalDecision;
+                    existingNote.ReviewedAt = DateTime.Now;
+                    _ctx.Assessmentreviews.Update(existingNote);
+                }
+                else
+                {
+                    var noteEntry = new Assessmentreview
+                    {
+                        DetailId = firstDetailId,
+                        ReviewerId = approverUserId,
+                        ReviewerRole = "Approver",
+                        Rating = 0,
+                        Comments = note,
+                        ReviewedAt = DateTime.Now,
+                        ReviewStatus = finalDecision
+                    };
+                    _ctx.Assessmentreviews.Add(noteEntry);
                 }
             }
+            else
+            {
+                // Delete rejection notes if approving
+                var notesToDelete = await _ctx.Assessmentreviews
+                    .Where(ar => ar.ReviewerRole == "Approver" 
+                        && ar.ReviewerId == approverUserId 
+                        && detailIds.Contains(ar.DetailId) 
+                        && ar.Rating == 0)
+                    .ToListAsync();
+
+                _ctx.Assessmentreviews.RemoveRange(notesToDelete);
+            }
+
+            await _ctx.SaveChangesAsync();
+            await tx.CommitAsync();
+            return true;
         }
         catch
         {
-            // Silently fail - main decision was committed
-        }
-
-        return true;
-    }
-    public async Task<bool> SetApproverDecisionAsync(
-    int approverUserId,
-    int assessmentId,
-    string decision,
-    string? approverComment)
-{
-    decision = (decision ?? "").Trim();
-    var approved = string.Equals(decision, "Approved", StringComparison.OrdinalIgnoreCase);
-    var rejected = string.Equals(decision, "Rejected", StringComparison.OrdinalIgnoreCase);
-
-    if (!approved && !rejected) return false;
-
-    const string scopeSql = @"
-WITH l1 AS (
-  SELECT e.EmployeeId AS L1EmployeeId
-  FROM UserAuthentication ua
-  JOIN Employee e ON e.EmployeeId = ua.EmployeeId
-  WHERE ua.UserId = @approverUserId
-)
-SELECT COUNT(*)
-FROM SelfAssessment sa
-JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
-JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
-JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
-JOIN Project p ON p.ProjectId = pe.ProjectId
-JOIN l1 ON p.L1ApproverEmployeeId = l1.L1EmployeeId
-WHERE sa.assessment_id = @assessmentId
-  AND sa.status = 'Submitted';";
-
-    const string detailsSql = @"SELECT detail_id FROM AssessmentDetail WHERE assessment_id=@aid;";
-
-    const string updateRatingsSql = @"
-UPDATE AssessmentReview
-SET review_status = @decision, reviewed_at = NOW()
-WHERE reviewer_role = 'Approver'
-  AND reviewer_id = @approverUserId
-  AND detail_id IN @detailIds
-  AND rating > 0;";
-
-    const string updateOrInsertDecisionNoteSql = @"
-UPDATE AssessmentReview
-SET rating = 0, 
-    comments = @note, 
-    review_status = @decision,
-    reviewed_at = NOW()
-WHERE reviewer_role = 'Approver'
-  AND reviewer_id = @approverUserId
-  AND detail_id = @firstDetailId
-  AND rating = 0
-LIMIT 1;
-
-INSERT INTO AssessmentReview
-  (detail_id, reviewer_id, reviewer_role, rating, comments, reviewed_at, review_status)
-SELECT @firstDetailId, @approverUserId, 'Approver', 0, @note, NOW(), @decision
-WHERE NOT EXISTS (
-  SELECT 1 FROM AssessmentReview
-  WHERE detail_id = @firstDetailId
-    AND reviewer_id = @approverUserId
-    AND reviewer_role = 'Approver'
-    AND rating = 0
-);";
-
-    var conn = _ctx.Database.GetDbConnection();
-    if (conn.State != ConnectionState.Open) await conn.OpenAsync();
-
-    var inScope = await conn.ExecuteScalarAsync<int>(scopeSql, new { approverUserId, assessmentId });
-    if (inScope <= 0) return false;
-
-    using var tx = await conn.BeginTransactionAsync();
-
-    try
-    {
-        var detailIds = (await conn.QueryAsync<int>(detailsSql, new { aid = assessmentId }, tx)).ToArray();
-        if (detailIds.Length == 0)
-        {
             await tx.RollbackAsync();
-            return false;
+            throw;
         }
-
-        var finalDecision = approved ? "Approved" : "Rejected";
-
-        // Update all L1 ratings to Approved/Rejected
-        await conn.ExecuteAsync(updateRatingsSql,
-            new { decision = finalDecision, approverUserId, detailIds }, tx);
-
-        if (rejected)
-        {
-            var note = approverComment ?? "Approver Rejected";
-            await conn.ExecuteAsync(updateOrInsertDecisionNoteSql,
-                new
-                {
-                    firstDetailId = detailIds[0],
-                    approverUserId,
-                    note,
-                    decision = finalDecision
-                }, tx);
-        }
-        else
-        {
-            // Delete rejection notes if approving
-            await conn.ExecuteAsync(@"
-DELETE FROM AssessmentReview
-WHERE reviewer_role = 'Approver'
-  AND reviewer_id = @approverUserId
-  AND detail_id IN @detailIds
-  AND rating = 0;",
-                new { approverUserId, detailIds }, tx);
-        }
-
-        await tx.CommitAsync();
-        return true;
     }
-    catch
-    {
-        await tx.RollbackAsync();
-        throw;
-    }
-}
 
-
+    /// <summary>
+    /// Get rework forms for L1 Approver (rejected forms)
+    /// </summary>
     public async Task<IEnumerable<ApproverAssignmentRowDto>> GetApproverReworkFormsAsync(
         int approverUserId, int page, int pageSize)
     {
@@ -1106,440 +1222,497 @@ WHERE reviewer_role = 'Approver'
         if (pageSize < 1) pageSize = 25;
         var offset = (page - 1) * pageSize;
 
-        const string sql = @"
-WITH l1 AS (
-  SELECT e.EmployeeId AS L1EmployeeId
-  FROM UserAuthentication ua
-  JOIN Employee e ON e.EmployeeId = ua.EmployeeId
-  WHERE ua.UserId = @approverUserId
-),
-scope_assessments AS (
-  SELECT DISTINCT sa.assessment_id
-  FROM SelfAssessment sa
-  JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
-  JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
-  JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
-  JOIN Project p ON p.ProjectId = pe.ProjectId
-  JOIN l1 ON p.L1ApproverEmployeeId = l1.L1EmployeeId
-),
-latest_l2 AS (
-  SELECT ar.detail_id, MAX(ar.review_id) AS max_id
-  FROM AssessmentReview ar
-  WHERE ar.reviewer_role = 'Reviewer' AND ar.detail_id IS NOT NULL
-  GROUP BY ar.detail_id
-),
-l2_status AS (
-  SELECT ar.detail_id, ar.review_status
-  FROM AssessmentReview ar
-  JOIN latest_l2 t ON t.max_id = ar.review_id
-)
-SELECT 
-  sa.assessment_id        AS AssessmentId,
-  COALESCE(NULLIF(CONCAT_WS(' ', up.FirstName, up.LastName), ''), emp_ua.Email, emp.EmployeeCompanyId) AS EmployeeName,
-  f.name                  AS FormName,
-  sa.submitted_at         AS SubmittedAt,
-  sa.status               AS Status,
-  GROUP_CONCAT(DISTINCT p.ProjectName ORDER BY p.ProjectName SEPARATOR ', ') AS Project
-FROM scope_assessments s
-JOIN SelfAssessment sa             ON sa.assessment_id = s.assessment_id
-JOIN AssessmentDetail ad           ON ad.assessment_id = sa.assessment_id
-JOIN l2_status ls                  ON ls.detail_id = ad.detail_id
-JOIN AssessmentForm f              ON f.form_id = sa.form_id
-JOIN UserAuthentication emp_ua     ON emp_ua.UserId = sa.employee_id
-JOIN Employee emp                  ON emp.EmployeeId = emp_ua.EmployeeId
-LEFT JOIN UserProfile up           ON up.EmployeeId = emp.EmployeeId
-JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-JOIN ProjectEmployees pe           ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
-JOIN Project p                     ON p.ProjectId = pe.ProjectId
-WHERE ls.review_status = 'Rejected'
-GROUP BY sa.assessment_id, EmployeeName, FormName, SubmittedAt, Status
-ORDER BY sa.submitted_at DESC
-LIMIT @pageSize OFFSET @offset;";
+        // Get the L1 approver's employee ID
+        var l1EmployeeId = await _ctx.Userauthentications
+            .Where(ua => ua.UserId == approverUserId)
+            .Select(ua => ua.Employee.EmployeeId)
+            .FirstOrDefaultAsync();
 
-        var conn = _ctx.Database.GetDbConnection();
-        if (conn.State != ConnectionState.Open) await conn.OpenAsync();
+        if (l1EmployeeId == 0) return Enumerable.Empty<ApproverAssignmentRowDto>();
 
-        return await conn.QueryAsync<ApproverAssignmentRowDto>(
-            sql, new { approverUserId, pageSize, offset });
-    }
+        // Get assessments in scope for this L1 approver
+        var scopeAssessmentIds = await _ctx.Selfassessments
+            .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
+            .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, e })
+            .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, (x, edm) => new { x.sa, edm })
+            .Join(_ctx.Projectemployees.Where(pe => pe.IsPrimary), 
+                x => x.edm.EmployeeId, pe => pe.EmployeeId, 
+                (x, pe) => new { x.sa, pe })
+            .Join(_ctx.Projects.Where(p => p.L1approverEmployeeId == l1EmployeeId), 
+                x => x.pe.ProjectId, p => p.ProjectId, 
+                (x, p) => x.sa.AssessmentId)
+            .Distinct()
+            .ToListAsync();
 
-    public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetApproverAssessmentsWithDetailsAsync(
-        int approverUserId, int page, int pageSize)
-    {
-        if (page < 1) page = 1;
-        if (pageSize < 1) pageSize = 25;
-        var offset = (page - 1) * pageSize;
+        // Get latest L2 reviews with Rejected status
+        var latestL2Reviews = await _ctx.Assessmentreviews
+            .Where(ar => ar.ReviewerRole == "Reviewer" && ar.DetailId != null)
+            .GroupBy(ar => ar.DetailId)
+            .Select(g => g.OrderByDescending(ar => ar.ReviewId).First())
+            .ToListAsync();
 
-        const string sql = @"
-WITH l1 AS (
-  SELECT e.EmployeeId AS L1EmployeeId
-  FROM UserAuthentication ua
-  JOIN Employee e ON e.EmployeeId = ua.EmployeeId
-  WHERE ua.UserId = @approverUserId
-),
-scope_assessments AS (
-  SELECT DISTINCT sa.assessment_id
-  FROM SelfAssessment sa
-  JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
-  JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
-  JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
-  JOIN Project p ON p.ProjectId = pe.ProjectId
-  JOIN l1 ON p.L1ApproverEmployeeId = l1.L1EmployeeId
-  WHERE sa.status = 'Submitted'
-),
-latest_l1_check AS (
-  SELECT ar.detail_id, MAX(ar.review_id) AS max_id
-  FROM AssessmentReview ar
-  WHERE ar.reviewer_role = 'Approver' AND ar.detail_id IS NOT NULL
-  GROUP BY ar.detail_id
-),
-has_any_l1 AS (
-  SELECT ad.assessment_id
-  FROM AssessmentDetail ad
-  JOIN latest_l1_check t ON t.detail_id = ad.detail_id
-  GROUP BY ad.assessment_id
-),
-latest_l2_check AS (
-  SELECT ar.detail_id, MAX(ar.review_id) AS max_id
-  FROM AssessmentReview ar
-  WHERE ar.reviewer_role = 'Reviewer' AND ar.detail_id IS NOT NULL
-  GROUP BY ar.detail_id
-),
-l2_status AS (
-  SELECT ar.detail_id, ar.review_status
-  FROM AssessmentReview ar
-  JOIN latest_l2_check t ON t.max_id = ar.review_id
-),
-decided_assessments AS (
-  SELECT ad.assessment_id
-  FROM AssessmentDetail ad
-  JOIN l2_status s ON s.detail_id = ad.detail_id
-  WHERE s.review_status IN ('Approved','Rejected')
-  GROUP BY ad.assessment_id
-),
-visible_assessments AS (
-  SELECT sa.assessment_id
-  FROM scope_assessments sa
-  LEFT JOIN decided_assessments da ON da.assessment_id = sa.assessment_id
-  LEFT JOIN has_any_l1 h1 ON h1.assessment_id = sa.assessment_id
-  WHERE da.assessment_id IS NULL
-    AND h1.assessment_id IS NULL
-),
-latest_l1 AS (
-  SELECT ar.*
-  FROM AssessmentReview ar
-  JOIN (
-    SELECT detail_id, MAX(review_id) AS max_id
-    FROM AssessmentReview
-    WHERE reviewer_role = 'Approver'
-    GROUP BY detail_id
-  ) t ON t.max_id = ar.review_id
-),
-latest_l2 AS (
-  SELECT ar.*
-  FROM AssessmentReview ar
-  JOIN (
-    SELECT detail_id, MAX(review_id) AS max_id
-    FROM AssessmentReview
-    WHERE reviewer_role = 'Reviewer'
-    GROUP BY detail_id
-  ) t ON t.max_id = ar.review_id
-),
-headers AS (
-  SELECT 
-    sa.assessment_id AS AssessmentId,
-    COALESCE(NULLIF(CONCAT_WS(' ', up.FirstName, up.LastName), ''), emp_ua.Email, emp.EmployeeCompanyId) AS EmployeeName,
-    f.name AS FormName,
-    sa.submitted_at AS SubmittedAt,
-    GROUP_CONCAT(DISTINCT p.ProjectName ORDER BY p.ProjectName SEPARATOR ', ') AS Project
-  FROM visible_assessments v
-  JOIN SelfAssessment sa             ON sa.assessment_id = v.assessment_id
-  JOIN AssessmentForm f              ON f.form_id = sa.form_id
-  JOIN UserAuthentication emp_ua     ON emp_ua.UserId = sa.employee_id
-  JOIN Employee emp                  ON emp.EmployeeId = emp_ua.EmployeeId
-  LEFT JOIN UserProfile up           ON up.EmployeeId = emp.EmployeeId
-  JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-  JOIN ProjectEmployees pe           ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
-  JOIN Project p                     ON p.ProjectId = pe.ProjectId
-  GROUP BY sa.assessment_id, EmployeeName, FormName, SubmittedAt
-  ORDER BY sa.submitted_at DESC
-  LIMIT @pageSize OFFSET @offset
-)
-SELECT 
-  h.AssessmentId,
-  h.EmployeeName,
-  h.FormName,
-  h.SubmittedAt,
-  h.Project,
-  ad.detail_id        AS DetailId,
-  c.name              AS CompetencyName,
-  ad.employee_rating  AS EmployeeRating,
-  ad.employee_comments AS EmployeeComments,
-  l1.rating           AS ApproverRating,
-  l1.comments         AS ApproverComments,
-  l2.rating           AS ReviewerRating,
-  l2.comments         AS ReviewerComments
-FROM headers h
-JOIN AssessmentDetail ad ON ad.assessment_id = h.AssessmentId
-JOIN Competency c        ON c.competency_id = ad.competency_id
-LEFT JOIN latest_l1 l1   ON l1.detail_id = ad.detail_id
-LEFT JOIN latest_l2 l2   ON l2.detail_id = ad.detail_id
-ORDER BY h.SubmittedAt DESC, c.display_order IS NULL, c.display_order, c.name;";
+        var rejectedDetailIds = latestL2Reviews
+            .Where(ar => ar.ReviewStatus == "Rejected")
+            .Select(ar => ar.DetailId)
+            .ToList();
 
-        var conn = _ctx.Database.GetDbConnection();
-        if (conn.State != ConnectionState.Open) await conn.OpenAsync();
+        var reworkAssessmentIds = await _ctx.Assessmentdetails
+            .Where(ad => rejectedDetailIds.Contains(ad.DetailId))
+            .Select(ad => ad.AssessmentId)
+            .Distinct()
+            .ToListAsync();
 
-        var rows = (await conn.QueryAsync(sql, new { approverUserId, pageSize, offset })).ToList();
-        if (rows.Count == 0) return Enumerable.Empty<ReviewerAssessmentViewDto>();
+        var finalAssessmentIds = scopeAssessmentIds
+            .Where(id => reworkAssessmentIds.Contains(id))
+            .ToList();
 
-        var groups = rows.GroupBy(r => (int)r.AssessmentId);
-        var result = new List<ReviewerAssessmentViewDto>();
-        foreach (var g in groups)
-        {
-            var head = g.First();
-            var items = g.Select(r => new CompetencyReviewRowDto(
-                DetailId: (int)r.DetailId,
-                CompetencyName: (string)r.CompetencyName,
-                EmployeeRating: (int?)r.EmployeeRating,
-                EmployeeComments: (string?)r.EmployeeComments,
-                ApproverRating: (int?)r.ApproverRating,
-                ApproverComments: (string?)r.ApproverComments,
-                ReviewerRating: (int?)r.ReviewerRating,
-                ReviewerComments: (string?)r.ReviewerComments
-            )).ToList();
-
-            result.Add(new ReviewerAssessmentViewDto(
-                AssessmentId: (int)head.AssessmentId,
-                EmployeeName: (string)head.EmployeeName,
-                FormName: (string)head.FormName,
-                SubmittedAt: (DateTime)head.SubmittedAt,
-                Project: (string)head.Project,
-                Items: items
-            ));
-        }
+        // Get data with pagination
+        var result = await _ctx.Selfassessments
+            .Where(sa => finalAssessmentIds.Contains(sa.AssessmentId))
+            .Join(_ctx.Assessmentforms, sa => sa.FormId, f => f.FormId, (sa, f) => new { sa, f })
+            .Join(_ctx.Userauthentications, x => x.sa.EmployeeId, ua => ua.UserId, (x, ua) => new { x.sa, x.f, ua })
+            .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, x.f, x.ua, e })
+            .GroupJoin(_ctx.Userprofiles, x => x.e.EmployeeId, up => up.EmployeeId, 
+                (x, up) => new { x.sa, x.f, x.ua, x.e, up = up.FirstOrDefault() })
+            .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, 
+                (x, edm) => new { x.sa, x.f, x.ua, x.e, x.up, edm })
+            .Join(_ctx.Projectemployees.Where(pe => pe.IsPrimary), 
+                x => x.edm.EmployeeId, pe => pe.EmployeeId, 
+                (x, pe) => new { x.sa, x.f, x.ua, x.e, x.up, pe })
+            .Join(_ctx.Projects, x => x.pe.ProjectId, p => p.ProjectId, 
+                (x, p) => new { x.sa, x.f, x.ua, x.e, x.up, p })
+            .OrderByDescending(x => x.sa.SubmittedAt)
+            .Skip(offset)
+            .Take(pageSize)
+            .GroupBy(x => x.sa.AssessmentId)
+            .Select(g => new ApproverAssignmentRowDto
+            {
+                AssessmentId = g.Key,
+                EmployeeName = g.First().up != null 
+                    ? string.Concat(g.First().up.FirstName, " ", g.First().up.LastName).Trim()
+                    : (string.IsNullOrWhiteSpace(g.First().ua.Email) ? g.First().e.EmployeeCompanyId : g.First().ua.Email),
+                FormName = g.First().f.Name ?? string.Empty,
+                SubmittedAt = (g.First().sa.SubmittedAt ?? DateTime.Now).ToString("yyyy-MM-dd HH:mm:ss"),
+                Status = g.First().sa.Status,
+                Project = string.Join(", ", g.Select(x => x.p.ProjectName).Distinct().OrderBy(x => x))
+            })
+            .ToListAsync();
 
         return result;
     }
 
-    public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetReviewerAssessmentsWithDetailsAsync(
+    /// <summary>
+    /// Get detailed assessments for L1 Approver with pagination
+    /// </summary>
+    /// <summary>
+/// Get detailed assessments for L1 Approver with pagination
+/// </summary>
+public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetApproverAssessmentsWithDetailsAsync(
+    int approverUserId, int page, int pageSize)
+{
+    if (page < 1) page = 1;
+    if (pageSize < 1) pageSize = 25;
+    var offset = (page - 1) * pageSize;
+
+    // Get the L1 approver's employee ID
+    var l1EmployeeId = await _ctx.Userauthentications
+        .Where(ua => ua.UserId == approverUserId)
+        .Select(ua => ua.Employee.EmployeeId)
+        .FirstOrDefaultAsync();
+
+    if (l1EmployeeId == 0) return Enumerable.Empty<ReviewerAssessmentViewDto>();
+
+    // Get assessments in scope
+    var scopeAssessmentIds = await _ctx.Selfassessments
+        .Where(sa => sa.Status == "Submitted")
+        .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
+        .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, e })
+        .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, (x, edm) => new { x.sa, edm })
+        .Join(_ctx.Projectemployees.Where(pe => pe.IsPrimary), 
+            x => x.edm.EmployeeId, pe => pe.EmployeeId, 
+            (x, pe) => new { x.sa, pe })
+        .Join(_ctx.Projects.Where(p => p.L1approverEmployeeId == l1EmployeeId), 
+            x => x.pe.ProjectId, p => p.ProjectId, 
+            (x, p) => x.sa.AssessmentId)
+        .Distinct()
+        .ToListAsync();
+
+    // Get assessments with L1 reviews
+    var hasL1AssessmentIds = await _ctx.Assessmentreviews
+        .Where(ar => ar.ReviewerRole == "Approver" && ar.DetailId != null)
+        .Select(ar => ar.DetailId)
+        .ToListAsync();
+
+    var assessmentsWithL1 = await _ctx.Assessmentdetails
+        .Where(ad => hasL1AssessmentIds.Contains(ad.DetailId))
+        .Select(ad => ad.AssessmentId)
+        .Distinct()
+        .ToListAsync();
+
+    // Get assessments with all details decided at L2
+    var latestL2Reviews = await _ctx.Assessmentreviews
+        .Where(ar => ar.ReviewerRole == "Reviewer" && ar.DetailId != null)
+        .GroupBy(ar => ar.DetailId)
+        .Select(g => g.OrderByDescending(ar => ar.ReviewId).First())
+        .ToListAsync();
+
+    var decidedDetailIds = latestL2Reviews
+        .Where(ar => ar.ReviewStatus == "Approved" || ar.ReviewStatus == "Rejected")
+        .Select(ar => ar.DetailId)
+        .ToList();
+
+    var fullyDecidedAssessmentIds = new List<int>();
+    foreach (var assessmentId in scopeAssessmentIds)
+    {
+        var totalDetails = await _ctx.Assessmentdetails
+            .CountAsync(ad => ad.AssessmentId == assessmentId);
+        var decidedCount = await _ctx.Assessmentdetails
+            .CountAsync(ad => ad.AssessmentId == assessmentId && decidedDetailIds.Contains(ad.DetailId));
+        if (totalDetails == decidedCount && totalDetails > 0)
+            fullyDecidedAssessmentIds.Add(assessmentId);
+    }
+
+    // Get visible assessments
+    var visibleAssessmentIds = scopeAssessmentIds
+        .Where(id => !fullyDecidedAssessmentIds.Contains(id) && !assessmentsWithL1.Contains(id))
+        .ToList();
+
+    // Get assessments with pagination
+    var paginatedAssessmentIds = await _ctx.Selfassessments
+        .Where(sa => visibleAssessmentIds.Contains(sa.AssessmentId))
+        .OrderByDescending(sa => sa.SubmittedAt)
+        .Skip(offset)
+        .Take(pageSize)
+        .Select(sa => sa.AssessmentId)
+        .ToListAsync();
+
+    // Get all details for these assessments
+    var result = new List<ReviewerAssessmentViewDto>();
+
+    foreach (var assessmentId in paginatedAssessmentIds)
+    {
+        // FIX: Project to anonymous type to avoid navigation property access
+        var assessment = await _ctx.Selfassessments
+            .Where(sa => sa.AssessmentId == assessmentId)
+            .Select(sa => new 
+            {
+                sa.AssessmentId,
+                sa.EmployeeId,
+                sa.FormId,
+                sa.SubmittedAt
+            })
+            .FirstOrDefaultAsync();
+
+        if (assessment == null) continue;
+
+        // Use EmployeeId directly from assessment
+        var employee = await _ctx.Employees
+            .FirstOrDefaultAsync(e => e.EmployeeId == assessment.EmployeeId);
+
+        if (employee == null) continue;
+
+        var userAuth = await _ctx.Userauthentications
+            .FirstOrDefaultAsync(ua => ua.EmployeeId == employee.EmployeeId);
+
+        var userProfile = await _ctx.Userprofiles
+            .FirstOrDefaultAsync(up => up.EmployeeId == employee.EmployeeId);
+
+        var form = await _ctx.Assessmentforms
+            .FirstOrDefaultAsync(f => f.FormId == assessment.FormId);
+
+        var employeeDetails = await _ctx.Employeedetailsmasters
+            .FirstOrDefaultAsync(edm => edm.EmployeeId == employee.EmployeeId);
+
+        if (employeeDetails == null) continue;
+
+        var projects = await _ctx.Projectemployees
+            .Where(pe => pe.EmployeeId == employeeDetails.EmployeeId && pe.IsPrimary)
+            .Join(_ctx.Projects, pe => pe.ProjectId, p => p.ProjectId, (pe, p) => p)
+            .Select(p => p.ProjectName)
+            .ToListAsync();
+
+        var employeeName = userProfile != null 
+            ? string.Concat(userProfile.FirstName, " ", userProfile.LastName).Trim()
+            : (string.IsNullOrWhiteSpace(userAuth?.Email) ? employee.EmployeeCompanyId : userAuth.Email);
+
+        // Get latest reviews
+        var latestL1Reviews = await _ctx.Assessmentreviews
+            .Where(ar => ar.ReviewerRole == "Approver")
+            .GroupBy(ar => ar.DetailId)
+            .Select(g => g.OrderByDescending(ar => ar.ReviewId).First())
+            .ToListAsync();
+
+        var latestL2ReviewsList = await _ctx.Assessmentreviews
+            .Where(ar => ar.ReviewerRole == "Reviewer")
+            .GroupBy(ar => ar.DetailId)
+            .Select(g => g.OrderByDescending(ar => ar.ReviewId).First())
+            .ToListAsync();
+
+        // Get competencies
+        var details = await _ctx.Assessmentdetails
+            .Where(ad => ad.AssessmentId == assessmentId)
+            .Join(_ctx.Competencies, ad => ad.CompetencyId, c => c.CompetencyId, 
+                (ad, c) => new { ad, c })
+            .OrderBy(x => x.c.DisplayOrder ?? int.MaxValue)
+            .ThenBy(x => x.c.Name)
+            .ToListAsync();
+
+        var items = details.Select(x => new CompetencyReviewRowDto(
+            DetailId: x.ad.DetailId,
+            CompetencyName: x.c.Name ?? string.Empty,
+            EmployeeRating: x.ad.EmployeeRating,
+            EmployeeComments: x.ad.EmployeeComments,
+            ApproverRating: latestL1Reviews.FirstOrDefault(r => r.DetailId == x.ad.DetailId)?.Rating,
+            ApproverComments: latestL1Reviews.FirstOrDefault(r => r.DetailId == x.ad.DetailId)?.Comments,
+            ReviewerRating: latestL2ReviewsList.FirstOrDefault(r => r.DetailId == x.ad.DetailId)?.Rating,
+            ReviewerComments: latestL2ReviewsList.FirstOrDefault(r => r.DetailId == x.ad.DetailId)?.Comments
+        )).ToList();
+
+        result.Add(new ReviewerAssessmentViewDto(
+            AssessmentId: assessmentId,
+            EmployeeName: employeeName,
+            FormName: form?.Name ?? string.Empty,
+            SubmittedAt: assessment.SubmittedAt ?? DateTime.Now,
+            Project: string.Join(", ", projects.OrderBy(x => x)),
+            Items: items,
+            Attachments: null
+        ));
+    }
+
+    return result;
+}
+
+
+    /// <summary>
+    /// Get detailed assessments for L2 Reviewer with pagination
+    /// Only returns assessments where ALL L1 details have been approved
+    /// </summary>
+    /// <summary>
+/// Get detailed assessments for L2 Reviewer with pagination
+/// Only returns assessments where ALL L1 details have been approved
+/// </summary>
+public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetReviewerAssessmentsWithDetailsAsync(
     int reviewerUserId, int page, int pageSize)
 {
     if (page < 1) page = 1;
     if (pageSize < 1) pageSize = 25;
     var offset = (page - 1) * pageSize;
 
-    const string sql = @"
-WITH l2 AS (
-  SELECT e.EmployeeId AS L2EmployeeId
-  FROM UserAuthentication ua
-  JOIN Employee e ON e.EmployeeId = ua.EmployeeId
-  WHERE ua.UserId = @reviewerUserId
-),
-scope_assessments AS (
-  SELECT DISTINCT sa.assessment_id, p.L1ApproverEmployeeId
-  FROM SelfAssessment sa
-  JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
-  JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
-  JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
-  JOIN Project p ON p.ProjectId = pe.ProjectId
-  JOIN l2 ON p.L2ApproverEmployeeId = l2.L2EmployeeId
-  WHERE sa.status = 'Submitted'
-),
-latest_l1 AS (
-  SELECT ar.detail_id, ar.review_status, MAX(ar.review_id) AS max_id
-  FROM AssessmentReview ar
-  WHERE ar.reviewer_role = 'Approver' AND ar.detail_id IS NOT NULL
-  GROUP BY ar.detail_id, ar.review_status
-),
--- Only get assessments where ALL details have L1 approval
-l1_approved_assessments AS (
-  SELECT ad.assessment_id
-  FROM AssessmentDetail ad
-  JOIN latest_l1 l1 ON l1.detail_id = ad.detail_id
-  WHERE l1.review_status = 'Approved'
-  GROUP BY ad.assessment_id
-  HAVING COUNT(DISTINCT ad.detail_id) = (
-    SELECT COUNT(*) 
-    FROM AssessmentDetail ad2 
-    WHERE ad2.assessment_id = ad.assessment_id
-  )
-),
-latest_l1_rows AS (
-  SELECT ar.*
-  FROM AssessmentReview ar
-  JOIN (
-    SELECT detail_id, MAX(review_id) AS max_id
-    FROM AssessmentReview
-    WHERE reviewer_role = 'Approver'
-    GROUP BY detail_id
-  ) t ON t.max_id = ar.review_id
-),
-latest_l2_rows AS (
-  SELECT ar.*
-  FROM AssessmentReview ar
-  JOIN (
-    SELECT detail_id, MAX(review_id) AS max_id
-    FROM AssessmentReview
-    WHERE reviewer_role = 'Reviewer'
-    GROUP BY detail_id
-  ) t ON t.max_id = ar.review_id
-),
-latest_l2_status AS (
-  SELECT ar.detail_id, ar.review_status
-  FROM latest_l2_rows ar
-),
-decided AS (
-  SELECT ad.assessment_id
-  FROM AssessmentDetail ad
-  JOIN latest_l2_status s ON s.detail_id = ad.detail_id
-  WHERE s.review_status IN ('Approved','Rejected')
-  GROUP BY ad.assessment_id
-),
-visible AS (
-  SELECT sa.assessment_id
-  FROM scope_assessments sa
-  JOIN l1_approved_assessments l1a ON l1a.assessment_id = sa.assessment_id
-  LEFT JOIN decided d ON d.assessment_id = sa.assessment_id
-  WHERE d.assessment_id IS NULL
-),
-headers AS (
-  SELECT
-    sa.assessment_id AS AssessmentId,
-    COALESCE(NULLIF(CONCAT_WS(' ', up.FirstName, up.LastName), ''), emp_ua.Email, emp.EmployeeCompanyId) AS EmployeeName,
-    f.name AS FormName,
-    sa.submitted_at AS SubmittedAt,
-    GROUP_CONCAT(DISTINCT p.ProjectName ORDER BY p.ProjectName SEPARATOR ', ') AS Project
-  FROM visible v
-  JOIN SelfAssessment sa             ON sa.assessment_id = v.assessment_id
-  JOIN AssessmentForm f              ON f.form_id = sa.form_id
-  JOIN UserAuthentication emp_ua     ON emp_ua.UserId = sa.employee_id
-  JOIN Employee emp                  ON emp.EmployeeId = emp_ua.EmployeeId
-  LEFT JOIN UserProfile up           ON up.EmployeeId = emp.EmployeeId
-  JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-  JOIN ProjectEmployees pe           ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
-  JOIN Project p                     ON p.ProjectId = pe.ProjectId
-  GROUP BY sa.assessment_id, EmployeeName, FormName, SubmittedAt
-  ORDER BY sa.submitted_at DESC
-  LIMIT @pageSize OFFSET @offset
-)
-SELECT 
-  h.AssessmentId,
-  h.EmployeeName,
-  h.FormName,
-  h.SubmittedAt,
-  h.Project,
-  ad.detail_id         AS DetailId,
-  c.name               AS CompetencyName,
-  ad.employee_rating   AS EmployeeRating,
-  ad.employee_comments AS EmployeeComments,
-  l1.rating            AS ApproverRating,
-  l1.comments          AS ApproverComments,
-  l2.rating            AS ReviewerRating,
-  l2.comments          AS ReviewerComments
-FROM headers h
-JOIN AssessmentDetail ad  ON ad.assessment_id = h.AssessmentId
-JOIN Competency c         ON c.competency_id = ad.competency_id
-LEFT JOIN latest_l1_rows l1 ON l1.detail_id = ad.detail_id
-LEFT JOIN latest_l2_rows l2 ON l2.detail_id = ad.detail_id
-ORDER BY h.SubmittedAt DESC, c.display_order IS NULL, c.display_order, c.name;";
+    // Get the L2 reviewer's employee ID
+    var l2EmployeeId = await _ctx.Userauthentications
+        .Where(ua => ua.UserId == reviewerUserId)
+        .Select(ua => ua.Employee.EmployeeId)
+        .FirstOrDefaultAsync();
 
-    var conn = _ctx.Database.GetDbConnection();
-    if (conn.State != ConnectionState.Open) await conn.OpenAsync();
+    if (l2EmployeeId == 0) return Enumerable.Empty<ReviewerAssessmentViewDto>();
 
-    var rows = (await conn.QueryAsync(sql, new { reviewerUserId, pageSize, offset })).ToList();
-    if (rows.Count == 0) return Enumerable.Empty<ReviewerAssessmentViewDto>();
+    // Get assessments in scope
+    var scopeAssessmentIds = await _ctx.Selfassessments
+        .Where(sa => sa.Status == "Submitted")
+        .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
+        .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, e })
+        .Join(_ctx.Employeedetailsmasters, x => x.e.EmployeeId, edm => edm.EmployeeId, (x, edm) => new { x.sa, edm })
+        .Join(_ctx.Projectemployees.Where(pe => pe.IsPrimary), 
+            x => x.edm.EmployeeId, pe => pe.EmployeeId, 
+            (x, pe) => new { x.sa, pe })
+        .Join(_ctx.Projects.Where(p => p.L2approverEmployeeId == l2EmployeeId), 
+            x => x.pe.ProjectId, p => p.ProjectId, 
+            (x, p) => x.sa.AssessmentId)
+        .Distinct()
+        .ToListAsync();
 
-    var grouped = rows.GroupBy(r => (int)r.AssessmentId);
-    var list = new List<ReviewerAssessmentViewDto>();
-    foreach (var g in grouped)
+    // Get assessments with ALL L1 details approved
+    var latestL1Reviews = await _ctx.Assessmentreviews
+        .Where(ar => ar.ReviewerRole == "Approver")
+        .GroupBy(ar => ar.DetailId)
+        .Select(g => g.OrderByDescending(ar => ar.ReviewId).First())
+        .ToListAsync();
+
+    var l1ApprovedDetailIds = latestL1Reviews
+        .Where(ar => ar.ReviewStatus == "Approved")
+        .Select(ar => ar.DetailId)
+        .ToList();
+
+    var l1ApprovedAssessmentIds = new List<int>();
+    foreach (var assessmentId in scopeAssessmentIds)
     {
-        var head = g.First();
-        var items = g.Select(r => new CompetencyReviewRowDto(
-            DetailId: (int)r.DetailId,
-            CompetencyName: (string)r.CompetencyName,
-            EmployeeRating: (int?)r.EmployeeRating,
-            EmployeeComments: (string?)r.EmployeeComments,
-            ApproverRating: (int?)r.ApproverRating,
-            ApproverComments: (string?)r.ApproverComments,
-            ReviewerRating: (int?)r.ReviewerRating,
-            ReviewerComments: (string?)r.ReviewerComments
+        var totalDetails = await _ctx.Assessmentdetails
+            .CountAsync(ad => ad.AssessmentId == assessmentId);
+        var approvedCount = await _ctx.Assessmentdetails
+            .CountAsync(ad => ad.AssessmentId == assessmentId && l1ApprovedDetailIds.Contains(ad.DetailId));
+        if (totalDetails == approvedCount && totalDetails > 0)
+            l1ApprovedAssessmentIds.Add(assessmentId);
+    }
+
+    // Get assessments with all details decided at L2
+    var latestL2Reviews = await _ctx.Assessmentreviews
+        .Where(ar => ar.ReviewerRole == "Reviewer")
+        .GroupBy(ar => ar.DetailId)
+        .Select(g => g.OrderByDescending(ar => ar.ReviewId).First())
+        .ToListAsync();
+
+    var l2DecidedDetailIds = latestL2Reviews
+        .Where(ar => ar.ReviewStatus == "Approved" || ar.ReviewStatus == "Rejected")
+        .Select(ar => ar.DetailId)
+        .ToList();
+
+    var fullyDecidedAssessmentIds = new List<int>();
+    foreach (var assessmentId in l1ApprovedAssessmentIds)
+    {
+        var totalDetails = await _ctx.Assessmentdetails
+            .CountAsync(ad => ad.AssessmentId == assessmentId);
+        var decidedCount = await _ctx.Assessmentdetails
+            .CountAsync(ad => ad.AssessmentId == assessmentId && l2DecidedDetailIds.Contains(ad.DetailId));
+        if (totalDetails == decidedCount && totalDetails > 0)
+            fullyDecidedAssessmentIds.Add(assessmentId);
+    }
+
+    // Get visible assessments
+    var visibleAssessmentIds = l1ApprovedAssessmentIds
+        .Where(id => !fullyDecidedAssessmentIds.Contains(id))
+        .ToList();
+
+    // Get assessments with pagination
+    var paginatedAssessmentIds = await _ctx.Selfassessments
+        .Where(sa => visibleAssessmentIds.Contains(sa.AssessmentId))
+        .OrderByDescending(sa => sa.SubmittedAt)
+        .Skip(offset)
+        .Take(pageSize)
+        .Select(sa => sa.AssessmentId)
+        .ToListAsync();
+
+    // Get all details for these assessments
+    var result = new List<ReviewerAssessmentViewDto>();
+
+    foreach (var assessmentId in paginatedAssessmentIds)
+    {
+        // FIX: Project to anonymous type to avoid navigation property access
+        var assessment = await _ctx.Selfassessments
+            .Where(sa => sa.AssessmentId == assessmentId)
+            .Select(sa => new 
+            {
+                sa.AssessmentId,
+                sa.EmployeeId,
+                sa.FormId,
+                sa.SubmittedAt
+            })
+            .FirstOrDefaultAsync();
+
+        if (assessment == null) continue;
+
+        // Use EmployeeId directly from assessment (not navigation property)
+        var employee = await _ctx.Employees
+            .FirstOrDefaultAsync(e => e.EmployeeId == assessment.EmployeeId);
+
+        if (employee == null) continue;
+
+        var userAuth = await _ctx.Userauthentications
+            .FirstOrDefaultAsync(ua => ua.EmployeeId == employee.EmployeeId);
+
+        var userProfile = await _ctx.Userprofiles
+            .FirstOrDefaultAsync(up => up.EmployeeId == employee.EmployeeId);
+
+        var form = await _ctx.Assessmentforms
+            .FirstOrDefaultAsync(f => f.FormId == assessment.FormId);
+
+        var employeeDetails = await _ctx.Employeedetailsmasters
+            .FirstOrDefaultAsync(edm => edm.EmployeeId == employee.EmployeeId);
+
+        if (employeeDetails == null) continue;
+
+        var projects = await _ctx.Projectemployees
+            .Where(pe => pe.EmployeeId == employeeDetails.EmployeeId && pe.IsPrimary)
+            .Join(_ctx.Projects, pe => pe.ProjectId, p => p.ProjectId, (pe, p) => p)
+            .Select(p => p.ProjectName)
+            .ToListAsync();
+
+        var employeeName = userProfile != null 
+            ? string.Concat(userProfile.FirstName, " ", userProfile.LastName).Trim()
+            : (string.IsNullOrWhiteSpace(userAuth?.Email) ? employee.EmployeeCompanyId : userAuth.Email);
+
+        // Get latest reviews
+        var latestL1ReviewsList = latestL1Reviews.ToList();
+        var latestL2ReviewsList = latestL2Reviews.ToList();
+
+        // Get competencies
+        var details = await _ctx.Assessmentdetails
+            .Where(ad => ad.AssessmentId == assessmentId)
+            .Join(_ctx.Competencies, ad => ad.CompetencyId, c => c.CompetencyId, 
+                (ad, c) => new { ad, c })
+            .OrderBy(x => x.c.DisplayOrder ?? int.MaxValue)
+            .ThenBy(x => x.c.Name)
+            .ToListAsync();
+
+        var items = details.Select(x => new CompetencyReviewRowDto(
+            DetailId: x.ad.DetailId,
+            CompetencyName: x.c.Name ?? string.Empty,
+            EmployeeRating: x.ad.EmployeeRating,
+            EmployeeComments: x.ad.EmployeeComments,
+            ApproverRating: latestL1ReviewsList.FirstOrDefault(r => r.DetailId == x.ad.DetailId)?.Rating,
+            ApproverComments: latestL1ReviewsList.FirstOrDefault(r => r.DetailId == x.ad.DetailId)?.Comments,
+            ReviewerRating: latestL2ReviewsList.FirstOrDefault(r => r.DetailId == x.ad.DetailId)?.Rating,
+            ReviewerComments: latestL2ReviewsList.FirstOrDefault(r => r.DetailId == x.ad.DetailId)?.Comments
         )).ToList();
 
-        list.Add(new ReviewerAssessmentViewDto(
-            AssessmentId: (int)head.AssessmentId,
-            EmployeeName: (string)head.EmployeeName,
-            FormName: (string)head.FormName,
-            SubmittedAt: (DateTime)head.SubmittedAt,
-            Project: (string)head.Project,
-            Items: items
+        result.Add(new ReviewerAssessmentViewDto(
+            AssessmentId: assessmentId,
+            EmployeeName: employeeName,
+            FormName: form?.Name ?? string.Empty,
+            SubmittedAt: assessment.SubmittedAt ?? DateTime.Now,
+            Project: string.Join(", ", projects.OrderBy(x => x)),
+            Items: items,
+            Attachments: null
         ));
     }
 
-    return list;
+    return result;
 }
 
+
+    /// <summary>
+    /// Get the latest L2 decision for an assessment
+    /// </summary>
     public async Task<ReviewerDecisionDto?> GetLatestReviewerDecisionAsync(int assessmentId)
     {
-        const string sql = @"
-SELECT
-  ar.review_status   AS Decision,
-  ar.comments        AS Note,
-  ar.reviewed_at     AS DecidedAt
-FROM AssessmentReview ar
-JOIN AssessmentDetail ad ON ad.detail_id = ar.detail_id
-WHERE ad.assessment_id = @assessmentId
-  AND ar.reviewer_role = 'Reviewer'
-  AND (ar.rating IS NULL OR ar.rating = -1)
-ORDER BY ar.review_id DESC
-LIMIT 1;";
+        var decision = await _ctx.Assessmentreviews
+            .Where(ar => ar.ReviewerRole == "Reviewer" && (ar.Rating == null || ar.Rating == -1))
+            .Join(_ctx.Assessmentdetails, ar => ar.DetailId, ad => ad.DetailId, 
+                (ar, ad) => new { ar, ad })
+            .Where(x => x.ad.AssessmentId == assessmentId)
+            .OrderByDescending(x => x.ar.ReviewId)
+            .FirstOrDefaultAsync();
 
-        var conn = _ctx.Database.GetDbConnection();
-        if (conn.State != ConnectionState.Open) await conn.OpenAsync();
-
-        var row = await conn.QueryFirstOrDefaultAsync(sql, new { assessmentId });
-        if (row == null) return null;
+        if (decision == null) return null;
 
         return new ReviewerDecisionDto(
             AssessmentId: assessmentId,
-            Decision: (string?)row.Decision,
-            Note: (string?)row.Note,
-            DecidedAt: (DateTime?)row.DecidedAt
+            Decision: decision.ar.ReviewStatus,
+            Note: decision.ar.Comments,
+            DecidedAt: decision.ar.ReviewedAt
         );
     }
 
+    /// <summary>
+    /// Get attachments for an assessment
+    /// </summary>
     public async Task<List<AttachmentInfoDto>> GetAssessmentAttachmentsAsync(int assessmentId)
     {
-        const string sql = @"
-SELECT 
-    saa.attachment_id AS AttachmentId,
-    saa.file_name AS FileName,
-    saa.file_path AS FilePath,
-    saa.file_type AS FileType,
-    saa.file_size AS FileSize,
-    saa.attachment_note AS AttachmentNote,
-    saa.display_order AS DisplayOrder,
-    saa.uploaded_at AS UploadedAt
-FROM SelfAssessmentAttachment saa
-WHERE saa.assessment_id = @assessmentId
-ORDER BY saa.display_order IS NULL, saa.display_order, saa.uploaded_at;";
+        var attachments = await _ctx.Selfassessmentattachments
+            .Where(saa => saa.AssessmentId == assessmentId)
+            .OrderBy(saa => saa.DisplayOrder ?? int.MaxValue)
+            .ThenBy(saa => saa.UploadedAt)
+            .Select(saa => new AttachmentInfoDto(
+                saa.AttachmentId,
+                saa.FileName,
+                saa.FilePath,
+                saa.FileType,
+                saa.FileSize,
+                saa.AttachmentNote,
+                saa.DisplayOrder,
+                saa.UploadedAt
+            ))
+            .ToListAsync();
 
-        var conn = _ctx.Database.GetDbConnection();
-        if (conn.State != ConnectionState.Open) await conn.OpenAsync();
-
-        var rows = await conn.QueryAsync(sql, new { assessmentId });
-
-        return rows.Select(r => new AttachmentInfoDto(
-            AttachmentId: (int)r.AttachmentId,
-            FileName: (string)r.FileName,
-            FilePath: (string)r.FilePath,
-            FileType: (string?)r.FileType,
-            FileSize: (long?)r.FileSize,
-            AttachmentNote: (string?)r.AttachmentNote,
-            DisplayOrder: (int?)r.DisplayOrder,
-            UploadedAt: (DateTime?)r.UploadedAt
-        )).ToList();
+        return attachments;
     }
 }
