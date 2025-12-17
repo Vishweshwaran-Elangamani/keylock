@@ -517,7 +517,7 @@ const Login = () => {
                 <h3 className="fw-bold mb-3" style={{ color: "#2d3565" }}>
                   Everything You Need
                 </h3>
-                <ul className="eepz-welcome-list">
+                <ul className="eepz-welcome-list" style={{textAlign: "left"}}>
                   <li className="mb-3">
                     <i
                       className="bi bi-check-circle-fill me-2"
