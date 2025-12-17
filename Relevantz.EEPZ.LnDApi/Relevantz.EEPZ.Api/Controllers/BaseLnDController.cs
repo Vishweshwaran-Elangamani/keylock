@@ -2,7 +2,6 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.Constants;
 
-
 namespace Relevantz.EEPZ.Api.Controllers.LnD
 {
     /// <summary>
@@ -10,8 +9,6 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
     /// </summary>
     public abstract class BaseLnDController : ControllerBase
     {
-
-
         protected int GetCurrentEmployeeId()
         {
             var employeeIdClaim = User.FindFirst(LnDConstants.CLAIM_TYPES.EMPLOYEE_ID)?.Value;

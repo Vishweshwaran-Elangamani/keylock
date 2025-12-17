@@ -11,9 +11,7 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             int pageNumber,
             int pageSize
         );
-
         Task<ApiResponse<List<SkillDto>>> GetAllSkills();
-
         Task<ApiResponse<PaginatedResponse<EmployeeSkillDto>>> GetSubordinateSkills(
             int managerId,
             int? employeeId,
@@ -22,24 +20,19 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             int pageNumber,
             int pageSize
         );
-
         Task<ApiResponse<EmployeeSkillDto>> RecordEmployeeSkill(
             int managerId,
             RecordSkillRequest request
         );
-
         Task<ApiResponse<List<EmployeeSkillDto>>> BulkRecordEmployeeSkills(
             int managerId,
             BulkRecordSkillRequest request
         );
-
         Task<ApiResponse<EmployeeSkillDto>> UpdateEmployeeSkillRating(
             int managerId,
             UpdateSkillRatingRequest request
         );
-
         Task<ApiResponse<bool>> DeleteEmployeeSkill(int managerId, int mapperId);
-
         Task<ApiResponse<PaginatedResponse<EmployeeSkillDto>>> GetMySkills(
             int employeeId,
             string searchTerm,

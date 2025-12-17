@@ -33,7 +33,8 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                         .Contains(lowerSearchTerm)
                     || e.Userauthentication.Email.ToLower().Contains(lowerSearchTerm)
                     || e.Employeedetailsmasters.Any(edm =>
-                        edm.Department.DepartmentName.ToLower().Contains(lowerSearchTerm))
+                        edm.Department.DepartmentName.ToLower().Contains(lowerSearchTerm)
+                    )
                 );
             }
 
@@ -233,8 +234,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             string? sortOrder
         )
         {
-            var isAscending = string.IsNullOrEmpty(sortOrder) ||
-                             sortOrder.ToLower() == LnDConstants.SORT_ORDER.ASC;
+            var isAscending =
+                string.IsNullOrEmpty(sortOrder)
+                || sortOrder.ToLower() == LnDConstants.SORT_ORDER.ASC;
 
             return sortField?.ToLower() switch
             {

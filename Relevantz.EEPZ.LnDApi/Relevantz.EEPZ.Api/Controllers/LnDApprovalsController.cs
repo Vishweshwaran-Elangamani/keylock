@@ -15,23 +15,21 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
     {
         private readonly ILnDApprovalService _approvalService;
 
-       
         public LnDApprovalsController(ILnDApprovalService approvalService)
         {
             _approvalService = approvalService;
         }
 
         [HttpGet("my-approvals")]
-
         public async Task<IActionResult> GetMyApprovals(
-    [FromQuery] string? approvalType,
-    [FromQuery] string? status,
-    [FromQuery] string? sortField,
-    [FromQuery] string? sortOrder,
-    [FromQuery] int pageNumber = 1,
-    [FromQuery] int pageSize = 10,
-    [FromQuery] string? searchTerm = null
-)
+            [FromQuery] string? approvalType,
+            [FromQuery] string? status,
+            [FromQuery] string? sortField,
+            [FromQuery] string? sortOrder,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string? searchTerm = null
+        )
         {
             var employeeId = GetCurrentEmployeeId();
             var result = await _approvalService.GetMyApprovals(
@@ -47,7 +45,6 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             return result.Success ? Ok(result) : BadRequest(result);
         }
-
 
         [HttpPost("process")]
         public async Task<IActionResult> ProcessApproval([FromBody] ApprovalDecisionRequest request)
@@ -117,7 +114,6 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             var fileName = result.Data.FileName;
             var contentType = result.Data.ContentType;
 
-            
             Response.Headers.Add("Access-Control-Expose-Headers", "Content-Disposition");
 
             return File(fileBytes, contentType, fileName);
@@ -151,7 +147,12 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             if (!result.Success)
                 return BadRequest(result);
 
-            return File(result.Data.FileBytes, result.Data.ContentType, result.Data.FileName, enableRangeProcessing: true);
+            return File(
+                result.Data.FileBytes,
+                result.Data.ContentType,
+                result.Data.FileName,
+                enableRangeProcessing: true
+            );
         }
 
         [HttpGet("assignments/{assignmentId}/proof/preview")]
@@ -163,7 +164,12 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             if (!result.Success)
                 return BadRequest(result);
 
-            return File(result.Data.FileBytes, result.Data.ContentType, result.Data.FileName, enableRangeProcessing: true);
+            return File(
+                result.Data.FileBytes,
+                result.Data.ContentType,
+                result.Data.FileName,
+                enableRangeProcessing: true
+            );
         }
     }
 }

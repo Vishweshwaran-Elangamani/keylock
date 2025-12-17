@@ -14,9 +14,7 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             int pageSize,
             string? searchTerm
         );
-
         Task<ApiResponse<bool>> ProcessApproval(int approverId, ApprovalDecisionRequest request);
-
         Task<ApiResponse<PaginatedResponse<ApprovalDto>>> GetApprovalHistory(
             int employeeId,
             string? approvalType,
@@ -28,15 +26,13 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             int pageNumber,
             int pageSize
         );
-
         Task<ApiResponse<ApprovalDetailsDto>> GetApprovalDetails(int employeeId, int approvalId);
-
         Task<ApiResponse<FileDownloadDto>> GetApprovalAttachment(int employeeId, int approvalId);
-
         Task<ApiResponse<FileDownloadDto>> GetAssignmentProof(int employeeId, int assignmentId);
-
-        Task<ApiResponse<FileDownloadDto>> PreviewApprovalAttachment(int employeeId, int approvalId);
-
+        Task<ApiResponse<FileDownloadDto>> PreviewApprovalAttachment(
+            int employeeId,
+            int approvalId
+        );
         Task<ApiResponse<FileDownloadDto>> PreviewAssignmentProof(int employeeId, int assignmentId);
     }
 }

@@ -20,12 +20,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _smeRepository = smeRepository;
         }
 
-        public async Task<ApiResponse<PaginatedResponse<SubordinateEmployeeDto>>> GetSubordinateEmployees(
-            int managerId,
-            string? searchTerm,
-            int pageNumber,
-            int pageSize
-        )
+        public async Task<
+            ApiResponse<PaginatedResponse<SubordinateEmployeeDto>>
+        > GetSubordinateEmployees(int managerId, string? searchTerm, int pageNumber, int pageSize)
         {
             try
             {

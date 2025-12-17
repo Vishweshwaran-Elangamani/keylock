@@ -1,16 +1,17 @@
+using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Relevantz.EEPZ.Data;
-using Relevantz.EEPZ.Core.Services.Interface;
-using Serilog;
-using System.Text;
 using Relevantz.EEPZ.Common.Entities;
-using Relevantz.EEPZ.Data.Repositories.Interface;
-using Relevantz.EEPZ.Data.Repositories.Implementations;
-using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Core.Services.Implementations;
+using Relevantz.EEPZ.Core.Services.Interface;
+using Relevantz.EEPZ.Data;
+using Relevantz.EEPZ.Data.DBContexts;
+using Relevantz.EEPZ.Data.Repositories.Implementations;
+using Relevantz.EEPZ.Data.Repositories.Interface;
+using Serilog;
+
 var builder = WebApplication.CreateBuilder(args);
 Console.WriteLine("Building EEPZ Backend........");
 
@@ -19,9 +20,11 @@ Console.WriteLine("Building EEPZ Backend........");
 // ===================================
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
-    .WriteTo.File("Logs/eepz-log-.txt",
+    .WriteTo.File(
+        "Logs/eepz-log-.txt",
         rollingInterval: RollingInterval.Day,
-        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}"
+    )
     .MinimumLevel.Information()
     .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
     .MinimumLevel.Override("Microsoft.EntityFrameworkCore", Serilog.Events.LogEventLevel.Warning)
@@ -34,12 +37,27 @@ builder.Host.UseSerilog();
 // ===================================
 
 // Add Controllers with JSON Options
-builder.Services.AddControllers()
+builder
+    .Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
-        options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
-        options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.ReferenceHandler = System
+            .Text
+            .Json
+            .Serialization
+            .ReferenceHandler
+            .IgnoreCycles;
+        options.JsonSerializerOptions.DefaultIgnoreCondition = System
+            .Text
+            .Json
+            .Serialization
+            .JsonIgnoreCondition
+            .WhenWritingNull;
+        options.JsonSerializerOptions.PropertyNamingPolicy = System
+            .Text
+            .Json
+            .JsonNamingPolicy
+            .CamelCase;
     });
 
 builder.Services.AddEndpointsApiExplorer();
@@ -49,37 +67,46 @@ builder.Services.AddEndpointsApiExplorer();
 // ===================================
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "EEPZ  API",
-        Version = "v1",
-        Description = "LnD API",
-    });
-
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "Bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "Enter 'Bearer' [space] and then your valid JWT token.\n\nExample: \"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\""
-    });
-
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
+    options.SwaggerDoc(
+        "v1",
+        new OpenApiInfo
         {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
+            Title = "EEPZ  API",
+            Version = "v1",
+            Description = "LnD API",
         }
-    });
+    );
+
+    options.AddSecurityDefinition(
+        "Bearer",
+        new OpenApiSecurityScheme
+        {
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            Scheme = "Bearer",
+            BearerFormat = "JWT",
+            In = ParameterLocation.Header,
+            Description =
+                "Enter 'Bearer' [space] and then your valid JWT token.\n\nExample: \"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"",
+        }
+    );
+
+    options.AddSecurityRequirement(
+        new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer",
+                    },
+                },
+                Array.Empty<string>()
+            },
+        }
+    );
 });
 
 // ===================================
@@ -90,7 +117,9 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 if (string.IsNullOrEmpty(connectionString))
 {
     Log.Fatal("Database connection string is not configured!");
-    throw new InvalidOperationException("Database connection string 'DefaultConnection' not found.");
+    throw new InvalidOperationException(
+        "Database connection string 'DefaultConnection' not found."
+    );
 }
 
 // Register EEPZDbContext (the main context used by LnDService)
@@ -104,7 +133,8 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
             mysqlOptions.EnableRetryOnFailure(
                 maxRetryCount: 5,
                 maxRetryDelay: TimeSpan.FromSeconds(30),
-                errorNumbersToAdd: null);
+                errorNumbersToAdd: null
+            );
             mysqlOptions.CommandTimeout(60);
         }
     );
@@ -128,7 +158,8 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
             mysqlOptions.EnableRetryOnFailure(
                 maxRetryCount: 5,
                 maxRetryDelay: TimeSpan.FromSeconds(30),
-                errorNumbersToAdd: null);
+                errorNumbersToAdd: null
+            );
             mysqlOptions.CommandTimeout(60);
         }
     );
@@ -152,45 +183,46 @@ if (string.IsNullOrEmpty(secretKey))
     throw new InvalidOperationException("JWT SecretKey not found in configuration.");
 }
 
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
+builder
+    .Services.AddAuthentication(options =>
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidAudience = jwtSettings["Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
-        ClockSkew = TimeSpan.Zero
-    };
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings["Issuer"],
+            ValidAudience = jwtSettings["Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+            ClockSkew = TimeSpan.Zero,
+        };
 
-    options.Events = new JwtBearerEvents
-    {
-        OnAuthenticationFailed = context =>
+        options.Events = new JwtBearerEvents
         {
-            Log.Warning($"JWT Authentication failed: {context.Exception.Message}");
-            return Task.CompletedTask;
-        },
-        OnTokenValidated = context =>
-        {
-            var empId = context.Principal?.FindFirst("empId")?.Value;
-            Log.Information($"JWT Token validated for EmployeeId: {empId}");
-            return Task.CompletedTask;
-        },
-        OnChallenge = context =>
-        {
-            Log.Warning($"JWT Challenge: {context.Error}, {context.ErrorDescription}");
-            return Task.CompletedTask;
-        }
-    };
-});
+            OnAuthenticationFailed = context =>
+            {
+                Log.Warning($"JWT Authentication failed: {context.Exception.Message}");
+                return Task.CompletedTask;
+            },
+            OnTokenValidated = context =>
+            {
+                var empId = context.Principal?.FindFirst("empId")?.Value;
+                Log.Information($"JWT Token validated for EmployeeId: {empId}");
+                return Task.CompletedTask;
+            },
+            OnChallenge = context =>
+            {
+                Log.Warning($"JWT Challenge: {context.Error}, {context.ErrorDescription}");
+                return Task.CompletedTask;
+            },
+        };
+    });
 
 builder.Services.AddAuthorization();
 
@@ -219,30 +251,32 @@ builder.Services.AddScoped<ILnDAssignmentService, LnDAssignmentService>();
 builder.Services.AddScoped<ILnDApprovalService, LnDApprovalService>();
 builder.Services.AddScoped<ILnDHRService, LnDHRService>();
 
-
-
-
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
+    options.AddPolicy(
+        "AllowAll",
+        policy =>
+        {
+            policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+        }
+    );
 
     // Production CORS policy (more restrictive)
-    options.AddPolicy("Production", policy =>
-    {
-        policy.WithOrigins(
-                "https://yourdomain.com",
-                "https://www.yourdomain.com",
-                "http://localhost:3007"
-            )
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials();
-    });
+    options.AddPolicy(
+        "Production",
+        policy =>
+        {
+            policy
+                .WithOrigins(
+                    "https://yourdomain.com",
+                    "https://www.yourdomain.com",
+                    "http://localhost:3007"
+                )
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials();
+        }
+    );
 });
 
 // ===================================
@@ -308,7 +342,8 @@ else
 // Enable Serilog Request Logging
 app.UseSerilogRequestLogging(options =>
 {
-    options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+    options.MessageTemplate =
+        "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
     options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
     {
         diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value);
@@ -320,15 +355,17 @@ app.UseSerilogRequestLogging(options =>
 app.UseHttpsRedirection();
 
 // Static Files for File Storage (wwwroot folder)
-app.UseStaticFiles(new StaticFileOptions
-{
-    ServeUnknownFileTypes = false,
-    OnPrepareResponse = ctx =>
+app.UseStaticFiles(
+    new StaticFileOptions
     {
-        // Add security headers for static files
-        ctx.Context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+        ServeUnknownFileTypes = false,
+        OnPrepareResponse = ctx =>
+        {
+            // Add security headers for static files
+            ctx.Context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+        },
     }
-});
+);
 
 // Enable Session
 app.UseSession();
@@ -350,7 +387,8 @@ app.UseExceptionHandler(errorApp =>
         context.Response.StatusCode = StatusCodes.Status500InternalServerError;
         context.Response.ContentType = "application/json";
 
-        var exceptionHandlerPathFeature = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerPathFeature>();
+        var exceptionHandlerPathFeature =
+            context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerPathFeature>();
         var exception = exceptionHandlerPathFeature?.Error;
 
         Log.Error(exception, "Unhandled exception occurred: {Message}", exception?.Message);
@@ -360,7 +398,7 @@ app.UseExceptionHandler(errorApp =>
             success = false,
             message = "An internal server error occurred. Please try again later.",
             error = app.Environment.IsDevelopment() ? exception?.Message : null,
-            stackTrace = app.Environment.IsDevelopment() ? exception?.StackTrace : null
+            stackTrace = app.Environment.IsDevelopment() ? exception?.StackTrace : null,
         };
 
         await context.Response.WriteAsJsonAsync(response);

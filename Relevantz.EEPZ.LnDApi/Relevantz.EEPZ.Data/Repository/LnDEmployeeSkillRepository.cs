@@ -38,11 +38,10 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .Include(e => e.Employeedetailsmasters)
                 .ThenInclude(ed => ed.Department)
                 .Where(e =>
-                    e.ReportingManagerEmployeeId == managerId &&
-                    e.EmploymentStatus == LnDConstants.EMPLOYMENT_STATUS.ACTIVE
+                    e.ReportingManagerEmployeeId == managerId
+                    && e.EmploymentStatus == LnDConstants.EMPLOYMENT_STATUS.ACTIVE
                 );
 
-          
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 var lowerSearchTerm = searchTerm.ToLower();
@@ -63,7 +62,6 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 );
             }
 
-           
             var totalCount = await query.CountAsync();
 
             var items = await query

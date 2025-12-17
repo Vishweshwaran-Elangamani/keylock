@@ -13,14 +13,14 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
     [Authorize]
     public class LnDSmeController : BaseLnDController
     {
-       private readonly ILnDSmeService _smeService;
+        private readonly ILnDSmeService _smeService;
 
         public LnDSmeController(ILnDSmeService smeService)
         {
             _smeService = smeService;
         }
 
-        [HttpGet("check")]    
+        [HttpGet("check")]
         public async Task<IActionResult> CheckIfEmployeeIsSme()
         {
             var employeeId = GetCurrentEmployeeId();
@@ -29,14 +29,14 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             return result.Success ? Ok(result) : BadRequest(result);
         }
 
-        [HttpPost("apply")]    
+        [HttpPost("apply")]
         public async Task<IActionResult> ApplyToBecomeSme([FromForm] BecomeSmeRequest request)
         {
             var employeeId = GetCurrentEmployeeId();
             var result = await _smeService.ApplyToBecomeSme(employeeId, request);
 
             return result.Success ? Ok(result) : BadRequest(result);
-        }    
+        }
 
         [HttpGet("available")]
         public async Task<IActionResult> GetAvailableSmes(

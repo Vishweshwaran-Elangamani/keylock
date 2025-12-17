@@ -136,8 +136,5 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string REQUESTER = "requester";
             public const string APPROVER = "approver";
         }
-        
-      
-
     }
 }

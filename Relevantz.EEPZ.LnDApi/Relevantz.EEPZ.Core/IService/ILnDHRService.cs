@@ -9,7 +9,6 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             int pageNumber,
             int pageSize
         );
-
         Task<ApiResponse<PaginatedResponse<AssignmentDto>>> GetAllOrganizationAssignments(
             string? statusFilter,
             string? searchTerm,
@@ -18,14 +17,12 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             int pageNumber,
             int pageSize
         );
-
         Task<ApiResponse<byte[]>> ExportOrganizationAssignmentsToExcel(
             string? statusFilter,
             string? searchTerm,
             string? sortField,
             string? sortOrder
         );
-
         Task<ApiResponse<PaginatedResponse<EmployeeSkillDto>>> GetEmployeeSkillsById(
             int employeeId,
             int pageNumber,

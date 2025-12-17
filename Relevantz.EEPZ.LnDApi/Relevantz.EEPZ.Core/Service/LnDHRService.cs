@@ -15,11 +15,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _hrRepository = hrRepository;
         }
 
-        public async Task<ApiResponse<PaginatedResponse<SubordinateEmployeeDto>>> GetAllOrganizationEmployees(
-            string? searchTerm,
-            int pageNumber,
-            int pageSize
-        )
+        public async Task<
+            ApiResponse<PaginatedResponse<SubordinateEmployeeDto>>
+        > GetAllOrganizationEmployees(string? searchTerm, int pageNumber, int pageSize)
         {
             try
             {
@@ -67,15 +65,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         public async Task<
-              ApiResponse<PaginatedResponse<AssignmentDto>>
-          > GetAllOrganizationAssignments(
-              string? statusFilter,
-              string? searchTerm,
-              string? sortField,
-              string? sortOrder,
-              int pageNumber,
-              int pageSize
-          )
+            ApiResponse<PaginatedResponse<AssignmentDto>>
+        > GetAllOrganizationAssignments(
+            string? statusFilter,
+            string? searchTerm,
+            string? sortField,
+            string? sortOrder,
+            int pageNumber,
+            int pageSize
+        )
         {
             try
             {
@@ -130,6 +128,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
             }
         }
+
         public async Task<ApiResponse<byte[]>> ExportOrganizationAssignmentsToExcel(
             string? statusFilter,
             string? searchTerm,
@@ -139,18 +138,18 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             try
             {
-                var allAssignments = await _hrRepository.GetAllOrganizationAssignmentsForExportAsync(
-                    statusFilter,
-                    searchTerm,
-                    sortField,
-                    sortOrder
-                );
+                var allAssignments =
+                    await _hrRepository.GetAllOrganizationAssignmentsForExportAsync(
+                        statusFilter,
+                        searchTerm,
+                        sortField,
+                        sortOrder
+                    );
 
                 using (var workbook = new XLWorkbook())
                 {
                     var worksheet = workbook.Worksheets.Add("Organization Assignments");
 
-                
                     worksheet.Cell(1, 1).Value = "Employee Name";
                     worksheet.Cell(1, 2).Value = "Department";
                     worksheet.Cell(1, 3).Value = "Skill Name";
@@ -172,15 +171,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     foreach (var assignment in allAssignments)
                     {
                         var menteeName =
-                            $"{assignment.MenteeEmployee?.Userprofile?.FirstName ?? ""} {assignment.MenteeEmployee?.Userprofile?.LastName ?? ""}"
-                                .Trim();
+                            $"{assignment.MenteeEmployee?.Userprofile?.FirstName ?? ""} {assignment.MenteeEmployee?.Userprofile?.LastName ?? ""}".Trim();
                         var department =
-                            assignment.MenteeEmployee?.Employeedetailsmasters.FirstOrDefault()
+                            assignment
+                                .MenteeEmployee?.Employeedetailsmasters.FirstOrDefault()
                                 ?.Department?.DepartmentName ?? "N/A";
                         var skillName = assignment.Skill?.SkillName ?? "N/A";
                         var smeName =
-                            $"{assignment.Sme?.Employee?.Userprofile?.FirstName ?? ""} {assignment.Sme?.Employee?.Userprofile?.LastName ?? ""}"
-                                .Trim();
+                            $"{assignment.Sme?.Employee?.Userprofile?.FirstName ?? ""} {assignment.Sme?.Employee?.Userprofile?.LastName ?? ""}".Trim();
 
                         worksheet.Cell(row, 1).Value = menteeName;
                         worksheet.Cell(row, 2).Value = department;
@@ -203,11 +201,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     using (var stream = new MemoryStream())
                     {
                         workbook.SaveAs(stream);
-                        return new ApiResponse<byte[]>
-                        {
-                            Success = true,
-                            Data = stream.ToArray(),
-                        };
+                        return new ApiResponse<byte[]> { Success = true, Data = stream.ToArray() };
                     }
                 }
             }

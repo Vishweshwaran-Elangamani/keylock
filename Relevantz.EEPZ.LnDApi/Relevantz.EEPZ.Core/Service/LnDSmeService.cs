@@ -66,7 +66,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                             $"You need a rating of at least {LnDConstants.MIN_SME_RATING} to become an SME",
                     };
 
-                var existingSme = await _smeRepository.GetActiveSmeAsync(employeeId, request.SkillId);
+                var existingSme = await _smeRepository.GetActiveSmeAsync(
+                    employeeId,
+                    request.SkillId
+                );
 
                 if (existingSme != null)
                     return new ApiResponse<int>
@@ -281,12 +284,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     foreach (var sme in allSmes)
                     {
                         var employeeName =
-                            $"{sme.Employee?.Userprofile?.FirstName ?? ""} {sme.Employee?.Userprofile?.LastName ?? ""}"
-                                .Trim();
+                            $"{sme.Employee?.Userprofile?.FirstName ?? ""} {sme.Employee?.Userprofile?.LastName ?? ""}".Trim();
                         var skillName = sme.Skill?.SkillName ?? "N/A";
                         var departmentName =
-                            sme.Employee?.Employeedetailsmasters.FirstOrDefault()
-                                ?.Department?.DepartmentName ?? "N/A";
+                            sme.Employee?.Employeedetailsmasters.FirstOrDefault()?.Department?.DepartmentName
+                            ?? "N/A";
 
                         worksheet.Cell(row, 1).Value = employeeName;
                         worksheet.Cell(row, 2).Value = skillName;
@@ -301,11 +303,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     using (var stream = new MemoryStream())
                     {
                         workbook.SaveAs(stream);
-                        return new ApiResponse<byte[]>
-                        {
-                            Success = true,
-                            Data = stream.ToArray(),
-                        };
+                        return new ApiResponse<byte[]> { Success = true, Data = stream.ToArray() };
                     }
                 }
             }

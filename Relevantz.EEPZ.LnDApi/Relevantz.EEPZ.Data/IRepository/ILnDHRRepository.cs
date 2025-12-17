@@ -9,7 +9,6 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
             int pageNumber,
             int pageSize
         );
-
         Task<(List<Lndassignment> Items, int TotalCount)> GetAllOrganizationAssignmentsAsync(
             string? statusFilter,
             string? searchTerm,
@@ -18,14 +17,12 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
             int pageNumber,
             int pageSize
         );
-
         Task<List<Lndassignment>> GetAllOrganizationAssignmentsForExportAsync(
             string? statusFilter,
             string? searchTerm,
             string? sortField,
             string? sortOrder
         );
-
         Task<(List<Lndemployeeskillmapper> Items, int TotalCount)> GetEmployeeSkillsByIdAsync(
             int employeeId,
             string? searchTerm,
@@ -33,7 +30,6 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
             int pageNumber,
             int pageSize
         );
-
         Task<int> SaveChangesAsync();
     }
 }

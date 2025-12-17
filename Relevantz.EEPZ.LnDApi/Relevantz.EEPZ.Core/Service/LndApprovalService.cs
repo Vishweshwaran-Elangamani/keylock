@@ -98,7 +98,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-
         public async Task<ApiResponse<bool>> ProcessApproval(
             int approverId,
             ApprovalDecisionRequest request
@@ -194,9 +193,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                         await _assignmentRepository.AddAssignmentAsync(assignment);
                     }
-                    else if (approval.ApprovalType == LnDConstants.APPROVAL_TYPE.ASSIGNMENT_ACKNOWLEDGEMENT)
+                    else if (
+                        approval.ApprovalType
+                        == LnDConstants.APPROVAL_TYPE.ASSIGNMENT_ACKNOWLEDGEMENT
+                    )
                     {
-
                         var assignment = await _assignmentRepository.GetAssignmentByIdAsync(
                             approval.AssignmentId.Value
                         );
@@ -208,13 +209,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                                 Message = "Assignment not found",
                             };
 
-
-                        assignment.Status = LnDConstants.ASSIGNMENT_STATUS.PENDING_MANAGER_ACKNOWLEDGEMENT;
+                        assignment.Status = LnDConstants
+                            .ASSIGNMENT_STATUS
+                            .PENDING_MANAGER_ACKNOWLEDGEMENT;
                         assignment.UpdatedByEmployeeId = approverId;
                         assignment.UpdatedOn = DateOnly.FromDateTime(DateTime.Now);
 
                         await _assignmentRepository.UpdateAssignmentAsync(assignment);
-
 
                         var managerApproval = new Lndapproval
                         {
@@ -223,12 +224,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                             SkillId = assignment.SkillId,
                             AttachmentId = approval.AttachmentId,
                             RequesterEmployeeId = assignment.MenteeEmployeeId,
-                            ApproverEmployeeId = assignment.MenteeEmployee.ReportingManagerEmployeeId,
+                            ApproverEmployeeId = assignment
+                                .MenteeEmployee
+                                .ReportingManagerEmployeeId,
                             Status = LnDConstants.APPROVAL_STATUS.PENDING,
                             Notes = approval.Notes,
                             RequestedOn = DateOnly.FromDateTime(DateTime.Now),
-
-
                         };
 
                         await _approvalRepository.AddApprovalAsync(managerApproval);
@@ -236,8 +237,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
                 else
                 {
-
-                    if (approval.ApprovalType == LnDConstants.APPROVAL_TYPE.ASSIGNMENT_ACKNOWLEDGEMENT)
+                    if (
+                        approval.ApprovalType
+                        == LnDConstants.APPROVAL_TYPE.ASSIGNMENT_ACKNOWLEDGEMENT
+                    )
                     {
                         var assignment = await _assignmentRepository.GetAssignmentByIdAsync(
                             approval.AssignmentId.Value
@@ -245,7 +248,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                         if (assignment != null)
                         {
-
                             assignment.Status = LnDConstants.ASSIGNMENT_STATUS.IN_PROGRESS;
                             assignment.ProofFilePath = null; // Clear the proof
                             assignment.CompletionNotes = null;
@@ -280,23 +282,20 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-
-
         public async Task<ApiResponse<PaginatedResponse<ApprovalDto>>> GetApprovalHistory(
-           int employeeId,
-           string? approvalType,
-           string? status,
-           string? role,
-           string? searchTerm,
-           string? sortField,
-           string? sortOrder,
-           int pageNumber,
-           int pageSize = 10
-       )
+            int employeeId,
+            string? approvalType,
+            string? status,
+            string? role,
+            string? searchTerm,
+            string? sortField,
+            string? sortOrder,
+            int pageNumber,
+            int pageSize = 10
+        )
         {
             try
             {
-
                 if (pageSize < 1)
                     pageSize = 10;
                 if (pageSize > 100)
@@ -362,9 +361,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         public async Task<ApiResponse<ApprovalDetailsDto>> GetApprovalDetails(
-           int employeeId,
-           int approvalId
-       )
+            int employeeId,
+            int approvalId
+        )
         {
             try
             {
@@ -488,7 +487,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 var fileBytes = await _fileStorage.GetFileAsync(approval.Attachment.FilePath);
                 var contentType = GetContentType(approval.Attachment.FileName);
-
 
                 return new ApiResponse<FileDownloadDto>
                 {
@@ -619,8 +617,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         Message = "No attachment found",
                     };
 
-                var (fileBytes, contentType, fileName) =
-                    await _fileStorage.GetFileForPreviewAsync(approval.Attachment.FilePath);
+                var (fileBytes, contentType, fileName) = await _fileStorage.GetFileForPreviewAsync(
+                    approval.Attachment.FilePath
+                );
 
                 return new ApiResponse<FileDownloadDto>
                 {
@@ -675,8 +674,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         Message = "No proof document found",
                     };
 
-                var (fileBytes, contentType, fileName) =
-                    await _fileStorage.GetFileForPreviewAsync(assignment.ProofFilePath);
+                var (fileBytes, contentType, fileName) = await _fileStorage.GetFileForPreviewAsync(
+                    assignment.ProofFilePath
+                );
 
                 return new ApiResponse<FileDownloadDto>
                 {

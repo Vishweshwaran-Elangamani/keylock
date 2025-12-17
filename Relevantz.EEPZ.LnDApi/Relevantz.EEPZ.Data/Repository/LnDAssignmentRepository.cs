@@ -23,15 +23,15 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             var today = DateTime.Now.Date;
 
             return await _context
-                .Lndassignments
-                .Include(a => a.MenteeEmployee)
+                .Lndassignments.Include(a => a.MenteeEmployee)
                 .Include(a => a.Sme)
                 .Include(a => a.Skill)
                 .Where(a =>
-                    a.Deadline.HasValue &&
-                    a.Deadline.Value.Date < today &&
-                    a.Status != LnDConstants.ASSIGNMENT_STATUS.COMPLETED &&
-                    a.Status != LnDConstants.ASSIGNMENT_STATUS.OVERDUE)
+                    a.Deadline.HasValue
+                    && a.Deadline.Value.Date < today
+                    && a.Status != LnDConstants.ASSIGNMENT_STATUS.COMPLETED
+                    && a.Status != LnDConstants.ASSIGNMENT_STATUS.OVERDUE
+                )
                 .ToListAsync();
         }
 
@@ -137,14 +137,14 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         public async Task<(List<Lndassignment> Items, int TotalCount)> GetTeamAssignmentsAsync(
-           int managerId,
-           string? statusFilter,
-           string? searchTerm,
-           string? sortField,
-           string? sortOrder,
-           int pageNumber,
-           int pageSize
-       )
+            int managerId,
+            string? statusFilter,
+            string? searchTerm,
+            string? sortField,
+            string? sortOrder,
+            int pageNumber,
+            int pageSize
+        )
         {
             var query = _context
                 .Lndassignments.Include(a => a.MenteeEmployee)
@@ -155,12 +155,10 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .Include(a => a.Skill)
                 .Where(a => a.MenteeEmployee.ReportingManagerEmployeeId == managerId);
 
-
             if (!string.IsNullOrEmpty(statusFilter))
             {
                 query = query.Where(a => a.Status == statusFilter);
             }
-
 
             if (!string.IsNullOrEmpty(searchTerm))
             {
@@ -230,7 +228,6 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             }
             else
             {
-
                 query = query.OrderByDescending(a => a.CreatedOn);
             }
 
@@ -240,7 +237,6 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             return (items, totalCount);
         }
-
 
         public async Task<(List<Lndassignment> Items, int TotalCount)> GetSmeAssignmentsAsync(
             int smeEmployeeId,
@@ -261,12 +257,10 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .Include(a => a.Skill)
                 .Where(a => a.Sme.EmployeeId == smeEmployeeId);
 
-
             if (!string.IsNullOrEmpty(statusFilter))
             {
                 query = query.Where(a => a.Status == statusFilter);
             }
-
 
             if (!string.IsNullOrEmpty(searchTerm))
             {
@@ -276,7 +270,6 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                     || a.MenteeEmployee.Userprofile.LastName.Contains(searchTerm)
                 );
             }
-
 
             if (!string.IsNullOrWhiteSpace(sortField))
             {
@@ -293,12 +286,12 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                             .ThenByDescending(a => a.MenteeEmployee.Userprofile.LastName),
 
                     LnDConstants.SORT_FIELDS.SKILL_NAME => isAscending
-                          ? query.OrderBy(a => a.Skill.SkillName)
-                          : query.OrderByDescending(a => a.Skill.SkillName),
+                        ? query.OrderBy(a => a.Skill.SkillName)
+                        : query.OrderByDescending(a => a.Skill.SkillName),
 
                     LnDConstants.SORT_FIELDS.STATUS => isAscending
-                            ? query.OrderBy(a => a.Status)
-                            : query.OrderByDescending(a => a.Status),
+                        ? query.OrderBy(a => a.Status)
+                        : query.OrderByDescending(a => a.Status),
 
                     LnDConstants.SORT_FIELDS.CREATED_ON => isAscending
                         ? query.OrderBy(a => a.CreatedOn)
@@ -317,7 +310,6 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             }
             else
             {
-
                 query = query.OrderByDescending(a => a.CreatedOn);
             }
 
@@ -337,16 +329,15 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         )
         {
             var query = _context
-                .Lndassignments
+                .Lndassignments.Include(a => a.MenteeEmployee)
+                .ThenInclude(e => e.Userprofile)
                 .Include(a => a.MenteeEmployee)
-                    .ThenInclude(e => e.Userprofile)
-                .Include(a => a.MenteeEmployee)
-                    .ThenInclude(e => e.Employeedetailsmasters)
-                        .ThenInclude(ed => ed.Department)
+                .ThenInclude(e => e.Employeedetailsmasters)
+                .ThenInclude(ed => ed.Department)
                 .Include(a => a.Skill)
                 .Include(a => a.Sme)
-                    .ThenInclude(s => s.Employee)
-                        .ThenInclude(e => e.Userprofile)
+                .ThenInclude(s => s.Employee)
+                .ThenInclude(e => e.Userprofile)
                 .Where(a => a.MenteeEmployee.ReportingManagerEmployeeId == managerId)
                 .AsQueryable();
 
@@ -355,22 +346,23 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 query = query.Where(a => a.Status == statusFilter);
             }
 
-
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 query = query.Where(a =>
-                    (a.Skill.SkillName ?? "").Contains(searchTerm) ||
-                    (a.MenteeEmployee.Userprofile.FirstName ?? "").Contains(searchTerm) ||
-                    (a.MenteeEmployee.Userprofile.LastName ?? "").Contains(searchTerm) ||
-                    ((a.MenteeEmployee.Userprofile.FirstName ?? "") + " " + (a.MenteeEmployee.Userprofile.LastName ?? "")).Contains(searchTerm) ||
-                    (a.Sme.Employee.Userprofile.FirstName ?? "").Contains(searchTerm) ||
-                    (a.Sme.Employee.Userprofile.LastName ?? "").Contains(searchTerm)
+                    (a.Skill.SkillName ?? "").Contains(searchTerm)
+                    || (a.MenteeEmployee.Userprofile.FirstName ?? "").Contains(searchTerm)
+                    || (a.MenteeEmployee.Userprofile.LastName ?? "").Contains(searchTerm)
+                    || (
+                        (a.MenteeEmployee.Userprofile.FirstName ?? "")
+                        + " "
+                        + (a.MenteeEmployee.Userprofile.LastName ?? "")
+                    ).Contains(searchTerm)
+                    || (a.Sme.Employee.Userprofile.FirstName ?? "").Contains(searchTerm)
+                    || (a.Sme.Employee.Userprofile.LastName ?? "").Contains(searchTerm)
                 );
             }
 
-
             query = ApplyAssignmentSorting(query, sortField, sortOrder);
-
 
             return await query.ToListAsync();
         }
@@ -381,7 +373,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             string? sortOrder
         )
         {
-            var isAscending = string.IsNullOrEmpty(sortOrder) || sortOrder.ToLower() == LnDConstants.SORT_ORDER.ASC;
+            var isAscending =
+                string.IsNullOrEmpty(sortOrder)
+                || sortOrder.ToLower() == LnDConstants.SORT_ORDER.ASC;
 
             return sortField?.ToLower() switch
             {
@@ -410,7 +404,6 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 _ => query.OrderByDescending(a => a.CreatedOn),
             };
         }
-
 
         public async Task<int> SaveChangesAsync()
         {

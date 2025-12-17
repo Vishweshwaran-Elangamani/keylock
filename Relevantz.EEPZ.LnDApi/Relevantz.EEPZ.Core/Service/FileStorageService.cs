@@ -1,10 +1,10 @@
-using Relevantz.EEPZ.Core.Services.Interface;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Relevantz.EEPZ.Core.Services.Interface;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
-    public class FileStorageService : IFileStorageService  
+    public class FileStorageService : IFileStorageService
     {
         private readonly IWebHostEnvironment _environment;
         private readonly string _baseFolder = "uploads";
@@ -14,7 +14,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _environment = environment;
         }
 
-        public async Task<(byte[] fileBytes, string contentType, string fileName)> GetFileForPreviewAsync(string filePath)
+        public async Task<(
+            byte[] fileBytes,
+            string contentType,
+            string fileName
+        )> GetFileForPreviewAsync(string filePath)
         {
             var fullPath = Path.Combine(_environment.WebRootPath, filePath);
             if (!File.Exists(fullPath))
@@ -27,7 +31,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return (fileBytes, contentType, fileName);
         }
 
-
         private string GetContentType(string fileName)
         {
             var extension = Path.GetExtension(fileName).ToLowerInvariant();
@@ -35,17 +38,17 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 ".pdf" => "application/pdf",
                 ".doc" => "application/msword",
-                ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                ".docx" =>
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                 ".xls" => "application/vnd.ms-excel",
                 ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 ".png" => "image/png",
                 ".jpg" or ".jpeg" => "image/jpeg",
                 ".gif" => "image/gif",
                 ".txt" => "text/plain",
-                _ => "application/octet-stream"
+                _ => "application/octet-stream",
             };
         }
-
 
         public async Task<string> SaveFileAsync(IFormFile file, string subFolder)
         {
@@ -85,7 +88,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return false;
             }
         }
-                           
+
         public async Task<byte[]> GetFileAsync(string filePath)
         {
             var fullPath = Path.Combine(_environment.WebRootPath, filePath);

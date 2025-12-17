@@ -13,11 +13,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
     [Authorize(Roles = LnDConstants.USER_ROLES.HR)]
     public class LnDHRController : BaseLnDController
     {
-       
         private readonly ILnDHRService _hrService;
         private readonly ILnDSmeService _smeService;
 
-     
         public LnDHRController(ILnDHRService hrService, ILnDSmeService smeService)
         {
             _hrService = hrService;
@@ -32,7 +30,6 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             [FromQuery] string? sortOrder
         )
         {
-            
             var result = await _hrService.ExportOrganizationAssignmentsToExcel(
                 statusFilter,
                 searchTerm,
@@ -44,9 +41,11 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 return BadRequest(result);
 
             var fileName = $"OrganizationalAssignments_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
-            return File(result.Data,
+            return File(
+                result.Data,
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                fileName);
+                fileName
+            );
         }
 
         [HttpGet("employees/organization")]
@@ -67,9 +66,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         }
 
         [HttpGet("smes/export")]
-        public async Task<IActionResult> ExportAllActiveSmes(
-            [FromQuery] string? searchTerm
-        )
+        public async Task<IActionResult> ExportAllActiveSmes([FromQuery] string? searchTerm)
         {
             //  CHANGED: Call from SME service
             var result = await _smeService.ExportAllActiveSmesToExcel(searchTerm);
@@ -78,9 +75,11 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 return BadRequest(result);
 
             var fileName = $"SMEDirectory_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
-            return File(result.Data,
+            return File(
+                result.Data,
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                fileName);
+                fileName
+            );
         }
 
         [HttpGet("assignments/organization")]
@@ -127,7 +126,6 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             [FromQuery] string? sortBy = LnDConstants.DEFAULTS.SORT_BY_SKILL_NAME
         )
         {
-            
             var result = await _hrService.GetEmployeeSkillsById(
                 employeeId,
                 pageNumber,

@@ -179,7 +179,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .OrderBy(s => s.Employee.Userprofile.FirstName)
                 .ThenBy(s => s.Employee.Userprofile.LastName)
                 .ToListAsync();
-        }    
+        }
 
         public async Task<Lndsme?> GetSmeFromEmployeeId(
             Dictionary<string, object> assignmentDetails

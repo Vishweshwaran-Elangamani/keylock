@@ -63,11 +63,10 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         )
         {
             var query = _context
-                .Lndapprovals
-                .Include(a => a.RequesterEmployee)
-                    .ThenInclude(e => e.Userprofile)
+                .Lndapprovals.Include(a => a.RequesterEmployee)
+                .ThenInclude(e => e.Userprofile)
                 .Include(a => a.ApproverEmployee)
-                    .ThenInclude(e => e.Userprofile)
+                .ThenInclude(e => e.Userprofile)
                 .Include(a => a.Skill)
                 .Include(a => a.Attachment)
                 .Where(a => a.ApproverEmployeeId == employeeId);
@@ -77,10 +76,25 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             {
                 var searchLower = searchTerm.ToLower().Trim();
                 query = query.Where(a =>
-                    a.ApprovalType.ToLower().Contains(searchLower) ||
-                    (a.RequesterEmployee.Userprofile.FirstName + " " + a.RequesterEmployee.Userprofile.LastName).ToLower().Contains(searchLower) ||
-                    (a.ApproverEmployee != null && (a.ApproverEmployee.Userprofile.FirstName + " " + a.ApproverEmployee.Userprofile.LastName).ToLower().Contains(searchLower)) ||
-                    (a.Skill != null && a.Skill.SkillName.ToLower().Contains(searchLower))
+                    a.ApprovalType.ToLower().Contains(searchLower)
+                    || (
+                        a.RequesterEmployee.Userprofile.FirstName
+                        + " "
+                        + a.RequesterEmployee.Userprofile.LastName
+                    )
+                        .ToLower()
+                        .Contains(searchLower)
+                    || (
+                        a.ApproverEmployee != null
+                        && (
+                            a.ApproverEmployee.Userprofile.FirstName
+                            + " "
+                            + a.ApproverEmployee.Userprofile.LastName
+                        )
+                            .ToLower()
+                            .Contains(searchLower)
+                    )
+                    || (a.Skill != null && a.Skill.SkillName.ToLower().Contains(searchLower))
                 );
             }
 
@@ -138,15 +152,10 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             var totalCount = await query.CountAsync();
 
-            var items = await query
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 
             return (items, totalCount);
         }
-
-
 
         public async Task<(List<Lndapproval> Items, int TotalCount)> GetApprovalHistoryAsync(
             int employeeId,
@@ -233,11 +242,12 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             return (items, totalCount);
         }
+
         private IQueryable<Lndapproval> ApplyApprovalSorting(
-           IQueryable<Lndapproval> query,
-           string? sortField,
-           string? sortOrder
-       )
+            IQueryable<Lndapproval> query,
+            string? sortField,
+            string? sortOrder
+        )
         {
             var isAscending = string.IsNullOrEmpty(sortOrder) || sortOrder.ToLower() == "asc";
 

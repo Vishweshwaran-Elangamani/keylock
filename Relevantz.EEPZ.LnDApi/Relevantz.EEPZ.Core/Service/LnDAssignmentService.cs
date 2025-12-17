@@ -38,7 +38,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 {
                     Success = true,
                     Message = $"{count} assignment(s) marked as overdue",
-                    Data = count
+                    Data = count,
                 };
             }
             catch (Exception ex)
@@ -47,7 +47,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 {
                     Success = false,
                     Message = "An error occurred while checking overdue assignments",
-                    Errors = new List<string> { ex.Message }
+                    Errors = new List<string> { ex.Message },
                 };
             }
         }
@@ -125,7 +125,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-
         public async Task<ApiResponse<PaginatedResponse<AssignmentDto>>> GetMyAssignments(
             int employeeId,
             string? statusFilter,
@@ -153,22 +152,26 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var assignmentDtos = items
                     .Select(a =>
                     {
-                        var isOverdue = a.Deadline.HasValue &&
-                                       a.Deadline.Value.Date < today &&
-                                       a.Status != LnDConstants.ASSIGNMENT_STATUS.COMPLETED;
+                        var isOverdue =
+                            a.Deadline.HasValue
+                            && a.Deadline.Value.Date < today
+                            && a.Status != LnDConstants.ASSIGNMENT_STATUS.COMPLETED;
 
-                        var daysOverdue = isOverdue && a.Deadline.HasValue
-                            ? (int)(today - a.Deadline.Value.Date).TotalDays
-                            : (int?)null;
+                        var daysOverdue =
+                            isOverdue && a.Deadline.HasValue
+                                ? (int)(today - a.Deadline.Value.Date).TotalDays
+                                : (int?)null;
 
                         return new AssignmentDto
                         {
                             AssignmentId = a.AssignmentId,
                             MenteeEmployeeId = a.MenteeEmployeeId,
-                            MenteeName = $"{a.MenteeEmployee.Userprofile.FirstName} {a.MenteeEmployee.Userprofile.LastName}",
+                            MenteeName =
+                                $"{a.MenteeEmployee.Userprofile.FirstName} {a.MenteeEmployee.Userprofile.LastName}",
                             SmeId = a.SmeId,
                             SmeEmployeeId = a.Sme.EmployeeId,
-                            SmeName = $"{a.Sme.Employee.Userprofile.FirstName} {a.Sme.Employee.Userprofile.LastName}",
+                            SmeName =
+                                $"{a.Sme.Employee.Userprofile.FirstName} {a.Sme.Employee.Userprofile.LastName}",
                             SkillId = a.SkillId,
                             SkillName = a.Skill.SkillName,
                             Deadline = a.Deadline,
@@ -179,7 +182,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                             CreatedOn = a.CreatedOn,
                             UpdatedOn = a.UpdatedOn,
                             IsOverdue = isOverdue,
-                            DaysOverdue = daysOverdue
+                            DaysOverdue = daysOverdue,
                         };
                     })
                     .ToList();
@@ -208,13 +211,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         public async Task<ApiResponse<PaginatedResponse<AssignmentDto>>> GetTeamAssignments(
-     int managerId,
-     string? statusFilter,
-     string? searchTerm,
-     string? sortField,
-     string? sortOrder,
-     int pageNumber,
-     int pageSize)
+            int managerId,
+            string? statusFilter,
+            string? searchTerm,
+            string? sortField,
+            string? sortOrder,
+            int pageNumber,
+            int pageSize
+        )
         {
             try
             {
@@ -233,22 +237,26 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var assignmentDtos = items
                     .Select(a =>
                     {
-                        var isOverdue = a.Deadline.HasValue &&
-                                       a.Deadline.Value.Date < today &&
-                                       a.Status != LnDConstants.ASSIGNMENT_STATUS.COMPLETED;
+                        var isOverdue =
+                            a.Deadline.HasValue
+                            && a.Deadline.Value.Date < today
+                            && a.Status != LnDConstants.ASSIGNMENT_STATUS.COMPLETED;
 
-                        var daysOverdue = isOverdue && a.Deadline.HasValue
-                            ? (int)(today - a.Deadline.Value.Date).TotalDays
-                            : (int?)null;
+                        var daysOverdue =
+                            isOverdue && a.Deadline.HasValue
+                                ? (int)(today - a.Deadline.Value.Date).TotalDays
+                                : (int?)null;
 
                         return new AssignmentDto
                         {
                             AssignmentId = a.AssignmentId,
                             MenteeEmployeeId = a.MenteeEmployeeId,
-                            MenteeName = $"{a.MenteeEmployee.Userprofile.FirstName} {a.MenteeEmployee.Userprofile.LastName}",
+                            MenteeName =
+                                $"{a.MenteeEmployee.Userprofile.FirstName} {a.MenteeEmployee.Userprofile.LastName}",
                             SmeId = a.SmeId,
                             SmeEmployeeId = a.Sme.EmployeeId,
-                            SmeName = $"{a.Sme.Employee.Userprofile.FirstName} {a.Sme.Employee.Userprofile.LastName}",
+                            SmeName =
+                                $"{a.Sme.Employee.Userprofile.FirstName} {a.Sme.Employee.Userprofile.LastName}",
                             SkillId = a.SkillId,
                             SkillName = a.Skill.SkillName,
                             Deadline = a.Deadline,
@@ -259,7 +267,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                             CreatedOn = a.CreatedOn,
                             UpdatedOn = a.UpdatedOn,
                             IsOverdue = isOverdue,
-                            DaysOverdue = daysOverdue
+                            DaysOverdue = daysOverdue,
                         };
                     })
                     .ToList();
@@ -286,8 +294,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
             }
         }
-
-
 
         public async Task<ApiResponse<PaginatedResponse<AssignmentDto>>> GetSmeAssignments(
             int smeEmployeeId,
@@ -358,9 +364,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         public async Task<ApiResponse<bool>> UploadCompletionProof(
-      int employeeId,
-      UploadCompletionProofRequest request
-  )
+            int employeeId,
+            UploadCompletionProofRequest request
+        )
         {
             try
             {
@@ -396,7 +402,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     CreatedByEmployeeId = employeeId,
                     CreatedOn = DateOnly.FromDateTime(DateTime.Now),
                 };
-
 
                 await _approvalRepository.AddAttachmentAsync(attachment);
                 await _approvalRepository.SaveChangesAsync();
@@ -494,11 +499,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 await _assignmentRepository.UpdateAssignmentAsync(assignment);
 
-                var pendingApproval =
-                    await _approvalRepository.GetPendingAssignmentApprovalAsync(
-                        assignment.AssignmentId,
-                        LnDConstants.APPROVAL_TYPE.ASSIGNMENT_COMPLETION
-                    );
+                var pendingApproval = await _approvalRepository.GetPendingAssignmentApprovalAsync(
+                    assignment.AssignmentId,
+                    LnDConstants.APPROVAL_TYPE.ASSIGNMENT_COMPLETION
+                );
 
                 if (pendingApproval != null)
                 {
@@ -538,13 +542,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             try
             {
-                var allAssignments = await _assignmentRepository.GetAllTeamAssignmentsForExportAsync(
-                    managerId,
-                    statusFilter,
-                    searchTerm,
-                    sortField,
-                    sortOrder
-                );
+                var allAssignments =
+                    await _assignmentRepository.GetAllTeamAssignmentsForExportAsync(
+                        managerId,
+                        statusFilter,
+                        searchTerm,
+                        sortField,
+                        sortOrder
+                    );
 
                 using (var workbook = new XLWorkbook())
                 {
@@ -571,12 +576,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     foreach (var assignment in allAssignments)
                     {
                         var menteeName =
-                            $"{assignment.MenteeEmployee?.Userprofile?.FirstName ?? ""} {assignment.MenteeEmployee?.Userprofile?.LastName ?? ""}"
-                                .Trim();
+                            $"{assignment.MenteeEmployee?.Userprofile?.FirstName ?? ""} {assignment.MenteeEmployee?.Userprofile?.LastName ?? ""}".Trim();
                         var skillName = assignment.Skill?.SkillName ?? "N/A";
                         var smeName =
-                            $"{assignment.Sme?.Employee?.Userprofile?.FirstName ?? ""} {assignment.Sme?.Employee?.Userprofile?.LastName ?? ""}"
-                                .Trim();
+                            $"{assignment.Sme?.Employee?.Userprofile?.FirstName ?? ""} {assignment.Sme?.Employee?.Userprofile?.LastName ?? ""}".Trim();
 
                         worksheet.Cell(row, 1).Value = menteeName;
                         worksheet.Cell(row, 2).Value = skillName;
@@ -598,11 +601,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     using (var stream = new MemoryStream())
                     {
                         workbook.SaveAs(stream);
-                        return new ApiResponse<byte[]>
-                        {
-                            Success = true,
-                            Data = stream.ToArray(),
-                        };
+                        return new ApiResponse<byte[]> { Success = true, Data = stream.ToArray() };
                     }
                 }
             }

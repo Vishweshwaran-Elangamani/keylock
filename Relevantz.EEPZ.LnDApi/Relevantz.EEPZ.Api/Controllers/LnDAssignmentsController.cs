@@ -14,7 +14,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
     [Authorize]
     public class LnDAssignmentsController : BaseLnDController
     {
-       private readonly ILnDAssignmentService _assignmentService;
+        private readonly ILnDAssignmentService _assignmentService;
 
         // CHANGED: Constructor injection
         public LnDAssignmentsController(ILnDAssignmentService assignmentService)
@@ -36,7 +36,6 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             return Ok(result);
         }
-
 
         [HttpPost("request-sme")]
         public async Task<IActionResult> RequestSmeAssignment([FromBody] SmeRequestDto request)
@@ -93,9 +92,11 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 return BadRequest(result);
 
             var fileName = $"TeamAssignments_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
-            return File(result.Data,
+            return File(
+                result.Data,
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                fileName);
+                fileName
+            );
         }
 
         [HttpGet("team")]
@@ -157,7 +158,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             return result.Success ? Ok(result) : BadRequest(result);
         }
 
-        [HttpPost("complete")]     
+        [HttpPost("complete")]
         public async Task<IActionResult> CompleteAssignment(
             [FromBody] CompleteAssignmentRequest request
         )
@@ -165,7 +166,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             var managerId = GetCurrentEmployeeId();
             var result = await _assignmentService.CompleteAssignment(managerId, request);
 
-            return result.Success ? Ok(result) : BadRequest(result); 
+            return result.Success ? Ok(result) : BadRequest(result);
         }
     }
 }
