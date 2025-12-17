@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import apiPort5114 from "../../../services/performancemanagement/Api/nominationapi";
+import apiPort5114 from "../../../services/performancemanagement/api/nominationapi";
 import RewardTypeModal from "../../../components/performance_management/modals/Recognition/RewardTypeModal";
 import ParameterModal from "../../../components/performance_management/modals/Recognition/ParameterModal";
 import DeleteConfirmModal from "../../../components/performance_management/modals/Recognition/DeleteConfirmModal";
