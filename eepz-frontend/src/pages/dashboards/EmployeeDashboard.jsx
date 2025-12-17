@@ -21,12 +21,16 @@ import {
   Calendar,
   AlertTriangle,
   TrendingUp,
+  Award,
+  Trophy,
+  Medal,
 } from "lucide-react";
-import axios from "axios";
+
 import goalService from "../../services/goals/goalService";
 import lndService from "../../services/lnd/lndService";
 import rsvpService from "../../services/meeting/rsvpService";
 import slaService from "../../services/sla/slaService";
+import { getApprovedProfiles, getStatistics } from "../../services/performancemanagement/api/nominationapi";
 
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
@@ -62,10 +66,6 @@ const EmployeeDashboard = () => {
     }
   };
 
-  const getToken = () => {
-    return localStorage.getItem("token") || localStorage.getItem("accessToken");
-  };
-
   const extractData = (response) => {
     if (!response) return [];
     if (Array.isArray(response)) return response;
@@ -91,44 +91,6 @@ const EmployeeDashboard = () => {
     }
 
     return [];
-  };
-
-  // Create axios instance for port 5113
-  const createApiPort5113 = () => {
-    const BASE_URL = import.meta.env.VITE_PERFORMANCE_API_URL + "/api";
-    const BASE_URL_5113 = BASE_URL.replace("5108", "5113");
-
-    const instance = axios.create({
-      baseURL: BASE_URL_5113,
-      headers: { "Content-Type": "application/json" },
-      timeout: 30000,
-    });
-
-    instance.interceptors.request.use(
-      (config) => {
-        const token = getToken();
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-      },
-      (error) => {
-        return Promise.reject(error);
-      }
-    );
-
-    return instance;
-  };
-
-  // API functions using port 5113
-  const getApprovedProfiles = () => {
-    const api = createApiPort5113();
-    return api.get("/HRNomination/approved-profiles");
-  };
-
-  const getStatistics = () => {
-    const api = createApiPort5113();
-    return api.get("/HRNomination/statistics");
   };
 
   const fetchAllData = async () => {
@@ -194,20 +156,13 @@ const EmployeeDashboard = () => {
         }),
         getApprovedProfiles().catch((err) => {
           console.error("Approved Profiles Error:", err);
-          console.error("  Error Details:", err.response?.data || err.message);
-          console.error("  Status Code:", err.response?.status);
           return { data: [] };
         }),
         getStatistics().catch((err) => {
           console.error("Statistics Error:", err);
-          console.error("  Error Details:", err.response?.data || err.message);
-          console.error("  Status Code:", err.response?.status);
           return { data: null };
         }),
       ]);
-
-      console.log("Approved Profiles raw response:", approvedProfilesRes);
-      console.log("Statistics raw response:", statsRes);
 
       const selfGoals = extractData(selfGoalsRes);
       const orgGoals = extractData(orgGoalsRes);
@@ -226,25 +181,15 @@ const EmployeeDashboard = () => {
       ];
 
       const allApprovedProfiles = extractData(approvedProfilesRes);
-      console.log("Total approved profiles:", allApprovedProfiles.length);
-      if (allApprovedProfiles.length > 0) {
-        console.log("Sample approved profile:", allApprovedProfiles[0]);
-      }
 
       const myRecognitions = allApprovedProfiles.filter((p) => {
         const nomineeId =
           p.nominee?.employeeId ||
+          p.nomineeEmployeeId ||
           p.employeeId ||
-          p.employeeMasterId ||
-          p.nomineeEmployeeId;
-        const match = nomineeId == empId;
-        console.log(
-          `Checking profile - nomineeId: ${nomineeId}, empId: ${empId}, match: ${match}`
-        );
-        return match;
+          p.employeeMasterId;
+        return nomineeId == empId;
       });
-
-      console.log("My recognitions count:", myRecognitions.length);
 
       const stats =
         statsRes?.data?.data ||
@@ -252,7 +197,6 @@ const EmployeeDashboard = () => {
         statsRes?.totalNominations ||
         statsRes ||
         null;
-      console.log("Statistics parsed object:", stats);
 
       setDashboardData({
         goals: allGoals,
@@ -554,13 +498,7 @@ const EmployeeDashboard = () => {
 
   return (
     <div className="hr-dashboard-container">
-      <Breadcrumb
-        items={[
-          {
-            label: "Employee Dashboard",
-          },
-        ]}
-      />
+      <Breadcrumb items={[{ label: "Employee Dashboard" }]} />
 
       <div className="admin-kpi-grid">
         <div className="admin-kpi-card">
@@ -654,7 +592,7 @@ const EmployeeDashboard = () => {
                       display: "grid",
                       gridTemplateColumns: "1fr 1fr",
                       gap: "0.75rem",
-                      marginBottom: "1rem",
+                      marginBottom: "1.5rem",
                     }}
                   >
                     <div
@@ -698,55 +636,151 @@ const EmployeeDashboard = () => {
                         {perfOverview.orgTotalNoms}
                       </div>
                       <div style={{ fontSize: "0.7rem", color: "#047857" }}>
-                        Org Nominations
+                        Total Organization Nominations
                       </div>
                     </div>
                   </div>
 
-                  {perfOverview.chartData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height={240}>
-                      <PieChart>
-                        <Pie
-                          data={perfOverview.chartData}
-                          cx="50%"
-                          cy="45%"
-                          innerRadius={50}
-                          outerRadius={70}
-                          paddingAngle={3}
-                          dataKey="value"
-                          label={false}
-                        >
-                          {perfOverview.chartData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.fill} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                        <Legend
-                          layout="horizontal"
-                          align="center"
-                          verticalAlign="bottom"
-                          wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
-                          formatter={(value, entry) => {
-                            const item = perfOverview.chartData.find(
-                              (d) => d.name === entry.value
-                            );
-                            return `${item?.name || value}: ${
-                              item?.value || 0
-                            }`;
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "1rem 0",
+                    }}
+                  >
+                    <div
+                      style={{
+                        position: "relative",
+                        marginBottom: "1.5rem",
+                      }}
+                    >
+                      <Trophy
+                        size={100}
+                        style={{
+                          color: "#FFD700",
+                          filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.1))",
+                        }}
+                      />
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "50%",
+                          left: "50%",
+                          transform: "translate(-50%, -50%)",
+                          background: "white",
+                          borderRadius: "50%",
+                          width: "50px",
+                          height: "50px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          border: "3px solid #FFD700",
+                          boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: "1.25rem",
+                            fontWeight: "bold",
+                            color: "#FFD700",
                           }}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <div className="no-data-message">
-                      No breakdown by reward type
+                        >
+                          {perfOverview.totalRecognitions}
+                        </span>
+                      </div>
                     </div>
-                  )}
+
+                    <h4
+                      style={{
+                        fontSize: "1.1rem",
+                        fontWeight: "600",
+                        color: "#1f2937",
+                        marginBottom: "1rem",
+                      }}
+                    >
+                      My Recognitions
+                    </h4>
+
+                    {perfOverview.chartData.length > 0 && (
+                      <div
+                        style={{
+                          width: "100%",
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "0.75rem",
+                        }}
+                      >
+                        {perfOverview.chartData.map((item, index) => (
+                          <div
+                            key={index}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "0.75rem",
+                              padding: "0.75rem",
+                              background: "#f9fafb",
+                              borderRadius: "8px",
+                              border: "1px solid #e5e7eb",
+                            }}
+                          >
+                            <Medal
+                              size={24}
+                              style={{ color: item.fill, flexShrink: 0 }}
+                            />
+                            <div style={{ flex: 1 }}>
+                              <div
+                                style={{
+                                  fontSize: "0.875rem",
+                                  fontWeight: "500",
+                                  color: "#374151",
+                                  marginBottom: "0.25rem",
+                                }}
+                              >
+                                {item.name}
+                              </div>
+                              <div
+                                style={{
+                                  width: "100%",
+                                  height: "6px",
+                                  background: "#e5e7eb",
+                                  borderRadius: "3px",
+                                  overflow: "hidden",
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    width: `${
+                                      (item.value / perfOverview.totalRecognitions) *
+                                      100
+                                    }%`,
+                                    height: "100%",
+                                    background: item.fill,
+                                    transition: "width 0.3s ease",
+                                  }}
+                                />
+                              </div>
+                            </div>
+                            <span
+                              style={{
+                                fontSize: "1rem",
+                                fontWeight: "600",
+                                color: item.fill,
+                                minWidth: "30px",
+                                textAlign: "right",
+                              }}
+                            >
+                              {item.value}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </>
               ) : (
-                <div className="no-data-message">
-                  No approved recognitions yet
-                </div>
+                <div className="no-data-message">No approved recognitions yet</div>
               )}
             </div>
           </div>
@@ -857,14 +891,15 @@ const EmployeeDashboard = () => {
                           layout="horizontal"
                           align="center"
                           verticalAlign="bottom"
-                          wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
+                          wrapperStyle={{
+                            fontSize: "11px",
+                            paddingTop: "10px",
+                          }}
                           formatter={(value, entry) => {
                             const item = goalsData.chartData.find(
                               (d) => d.name === entry.value
                             );
-                            return `${item?.name || value}: ${
-                              item?.value || 0
-                            }`;
+                            return `${item?.name || value}: ${item?.value || 0}`;
                           }}
                         />
                       </PieChart>
@@ -1007,14 +1042,15 @@ const EmployeeDashboard = () => {
                           layout="horizontal"
                           align="center"
                           verticalAlign="bottom"
-                          wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
+                          wrapperStyle={{
+                            fontSize: "11px",
+                            paddingTop: "10px",
+                          }}
                           formatter={(value, entry) => {
                             const item = lndData.chartData.find(
                               (d) => d.name === entry.value
                             );
-                            return `${item?.name || value}: ${
-                              item?.value || 0
-                            }`;
+                            return `${item?.name || value}: ${item?.value || 0}`;
                           }}
                         />
                       </PieChart>
@@ -1024,16 +1060,14 @@ const EmployeeDashboard = () => {
                   )}
                 </>
               ) : (
-                <div className="no-data-message">
-                  No skills recorded in L&D
-                </div>
+                <div className="no-data-message">No skills recorded in L&D</div>
               )}
             </div>
           </div>
         </div>
 
         <div className="dashboard-row">
-          <div className="dashboard-card card-medium">
+          <div className="dashboard-card card-large">
             <div className="card-header-dark">
               <div className="card-header-content">
                 <i className="bi bi-calendar-check"></i>
@@ -1123,30 +1157,12 @@ const EmployeeDashboard = () => {
                     <ResponsiveContainer width="100%" height={240}>
                       <AreaChart data={meetingsData.chartData}>
                         <defs>
-                          <linearGradient
-                            id="colorCount"
-                            x1="0"
-                            y1="0"
-                            x2="0"
-                            y2="1"
-                          >
-                            <stop
-                              offset="5%"
-                              stopColor="#2c2c54"
-                              stopOpacity={0.8}
-                            />
-                            <stop
-                              offset="95%"
-                              stopColor="#2c2c54"
-                              stopOpacity={0.1}
-                            />
+                          <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#2c2c54" stopOpacity={0.8} />
+                            <stop offset="95%" stopColor="#2c2c54" stopOpacity={0.1} />
                           </linearGradient>
                         </defs>
-                        <CartesianGrid
-                          strokeDasharray="3 3"
-                          stroke="#f3f4f6"
-                          vertical={false}
-                        />
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
                         <XAxis dataKey="month" stroke="#9ca3af" fontSize={10} />
                         <YAxis stroke="#9ca3af" fontSize={11} />
                         <Tooltip
@@ -1177,7 +1193,7 @@ const EmployeeDashboard = () => {
             </div>
           </div>
 
-          <div className="dashboard-card card-medium">
+          <div className="dashboard-card card-large">
             <div className="card-header-dark">
               <div className="card-header-content">
                 <i className="bi bi-file-earmark-check"></i>
@@ -1285,14 +1301,15 @@ const EmployeeDashboard = () => {
                           layout="horizontal"
                           align="center"
                           verticalAlign="bottom"
-                          wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
+                          wrapperStyle={{
+                            fontSize: "11px",
+                            paddingTop: "10px",
+                          }}
                           formatter={(value, entry) => {
                             const item = slaData.chartData.find(
                               (d) => d.name === entry.value
                             );
-                            return `${item?.name || value}: ${
-                              item?.value || 0
-                            }`;
+                            return `${item?.name || value}: ${item?.value || 0}`;
                           }}
                         />
                       </PieChart>

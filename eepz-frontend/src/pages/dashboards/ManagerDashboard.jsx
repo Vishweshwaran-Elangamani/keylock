@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -23,12 +24,10 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import goalService from "../../services/goals/goalService";
-import nominationService from "../../services/internal/nominationService";
 import lndService from "../../services/lnd/lndService";
-import { getTeamMembers } from "../../services/performancemanagement/manager/managernominationapi";
+import { getTeamMembers, getMyNominations } from "../../services/performancemanagement/manager/managernominationapi";
 import meetingService from "../../services/meeting/meetingService";
 import slaService from "../../services/sla/slaService";
-import internalApi from "../../services/internal/internalApi";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
 import "../../styles/auth/AdminDashboard.css";
@@ -48,8 +47,7 @@ const ManagerDashboard = () => {
     allGoals: [],
     pendingApprovals: [],
     myProjects: [],
-    myNominationsPerfMgmt: [],
-    pendingManagerReviews: [],
+    managerNominations: [],
     teamMembers: [],
     teamAssignments: [],
     subordinateEmployees: [],
@@ -153,9 +151,7 @@ const ManagerDashboard = () => {
         allGoalsRes,
         myProjectsRes,
         pendingApprovalsRes,
-        managerTeamNominationsRes,
-        managerApprovedNominationsRes,
-        pendingManagerReviewsRes,
+        managerNominationsRes,
         teamMembersRes,
         teamAssignmentsRes,
         subordinateEmployeesRes,
@@ -169,11 +165,7 @@ const ManagerDashboard = () => {
           .catch(() => ({ data: [] })),
         goalService.getUserProjects().catch(() => ({ data: [] })),
         goalService.getPendingApprovals().catch(() => ({ data: [] })),
-        internalApi.get(`/ManagerNomination/team/${managerId}`).catch(() => ({ data: [] })),
-        internalApi.get(`/ManagerNomination/approved/${managerId}`).catch(() => ({ data: [] })),
-        nominationService
-          .getPendingManagerReview()
-          .catch(() => ({ success: false, data: [] })),
+        getMyNominations(managerId).catch(() => ({ data: [] })),
         getTeamMembers(managerId).catch(() => ({ data: [] })),
         lndService
           .getTeamAssignments(1)
@@ -212,34 +204,9 @@ const ManagerDashboard = () => {
 
       const extractedProjects = extractData(myProjectsRes);
       const extractedPendingApprovals = extractData(pendingApprovalsRes);
+      const extractedManagerNominations = extractData(managerNominationsRes);
 
-      // Extract all nominations from different sources
-      let extractedManagerNominations = extractData(managerTeamNominationsRes);
-      let extractedApprovedNominations = extractData(managerApprovedNominationsRes);
-      let extractedPendingManagerReviews = extractData(pendingManagerReviewsRes);
-
-      console.log("===== MANAGER TEAM NOMINATIONS (Pending) =====", extractedManagerNominations);
-      console.log("===== MANAGER APPROVED NOMINATIONS =====", extractedApprovedNominations);
-      console.log("===== PENDING MANAGER REVIEWS =====", extractedPendingManagerReviews);
-
-      // Combine all sources
-      const allNominationsCombined = [
-        ...extractedManagerNominations,
-        ...extractedApprovedNominations,
-        ...extractedPendingManagerReviews
-      ];
-
-      // Remove duplicates based on nominationId or id
-      const uniqueNominations = Array.from(
-        new Map(allNominationsCombined.map(item => [item.nominationId || item.id, item])).values()
-      );
-
-      console.log("===== UNIQUE NOMINATIONS =====", uniqueNominations.length);
-      uniqueNominations.forEach(nom => {
-        const status = nom.status || nom.nominationStatus;
-        const id = nom.nominationId || nom.id;
-        console.log(`- ID: ${id}, Status: ${status}`);
-      });
+      console.log("MANAGER NOMINATIONS DATA:", extractedManagerNominations);
 
       const extractedTeamMembers = extractData(teamMembersRes);
 
@@ -277,8 +244,7 @@ const ManagerDashboard = () => {
         allGoals: allGoalsCombined,
         pendingApprovals: extractedPendingApprovals,
         myProjects: extractedProjects,
-        myNominationsPerfMgmt: uniqueNominations,
-        pendingManagerReviews: extractedPendingManagerReviews,
+        managerNominations: extractedManagerNominations,
         teamMembers: extractedTeamMembers,
         teamAssignments: extractedTeamAssignments,
         subordinateEmployees: extractedSubordinateEmployees,
@@ -298,7 +264,7 @@ const ManagerDashboard = () => {
     const totalTeamMembers =
       dashboardData.subordinateEmployees.length || dashboardData.teamMembers.length;
     const pendingApprovals = dashboardData.pendingApprovals.length;
-    const pendingNominationReviews = dashboardData.pendingManagerReviews.length;
+    const totalNominations = dashboardData.managerNominations.length;
 
     const ongoingGoalsCount = dashboardData.allGoals.filter((g) => {
       const status = (g.status || g.goalStatus || "").toLowerCase();
@@ -324,7 +290,7 @@ const ManagerDashboard = () => {
     return {
       totalTeamMembers,
       pendingApprovals,
-      pendingNominationReviews,
+      totalNominations,
       ongoingGoalsCount,
       myProjectsCount,
       teamAssignmentsCount,
@@ -332,7 +298,6 @@ const ManagerDashboard = () => {
       upcomingMeetings,
       totalEscalations: dashboardData.managerEscalations.length,
       totalMeetings: dashboardData.myMeetings.length,
-      totalNominations: dashboardData.myNominationsPerfMgmt.length,
     };
   };
 
@@ -358,7 +323,6 @@ const ManagerDashboard = () => {
         total: 0,
         completed: 0,
         inProgress: 0,
-        pending: 0,
         overdue: 0,
         chartData: [],
       };
@@ -402,8 +366,7 @@ const ManagerDashboard = () => {
       total,
       completed,
       inProgress,
-      pending,
-      overdue,
+      pending: pending + overdue,
       chartData:
         chartData.length > 0
           ? chartData
@@ -475,55 +438,15 @@ const ManagerDashboard = () => {
     };
   };
 
-  const getNominationHistory = () => {
-    const nominations = dashboardData.myNominationsPerfMgmt;
-
+  const getNominationOverview = () => {
+    const nominations = dashboardData.managerNominations;
     const now = new Date();
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth();
 
-    const statusCount = {};
-    nominations.forEach((nom) => {
-      const rawStatus = nom.status || nom.nominationStatus || "Unknown";
-      const key = formatStatusLabel(rawStatus);
-      statusCount[key] = (statusCount[key] || 0) + 1;
-    });
+    const total = nominations.length;
 
-    console.log("===== NOMINATION STATUS COUNT =====", statusCount);
-
-    // Count approved nominations (all variations)
-    const approvedCount = nominations.filter(n => {
-      const status = (n.status || n.nominationStatus || "").toLowerCase();
-      return status.includes("approved") || 
-             status === "manager_approved" || 
-             status === "managerapproved" ||
-             status === "hr_approved" ||
-             status === "hrapproved";
-    }).length;
-
-    const pendingCount = nominations.filter(n => {
-      const status = (n.status || n.nominationStatus || "").toLowerCase();
-      return status.includes("pending");
-    }).length;
-
-    const rejectedCount = nominations.filter(n => {
-      const status = (n.status || n.nominationStatus || "").toLowerCase();
-      return status.includes("rejected");
-    }).length;
-
-    console.log("Approved:", approvedCount, "Pending:", pendingCount, "Rejected:", rejectedCount);
-
-    const statusChartData = Object.entries(statusCount).map(([name, value]) => ({
-      name,
-      value,
-      fill:
-        name.toLowerCase().includes("pending") ? "#f59e0b" :
-        name.toLowerCase().includes("approved") ? "#10b981" :
-        name.toLowerCase().includes("rejected") ? "#ef4444" :
-        "#0F62FE"
-    }));
-
-    const thisMonthNominations = nominations.filter((nom) => {
+    const thisMonth = nominations.filter((nom) => {
       const dateFields = [
         nom.createdDate,
         nom.submittedDate,
@@ -534,6 +457,8 @@ const ManagerDashboard = () => {
         nom.dateSubmitted,
         nom.created,
         nom.submitted,
+        nom.createdOn,
+        nom.submittedOn,
       ];
 
       for (const df of dateFields) {
@@ -545,15 +470,33 @@ const ManagerDashboard = () => {
         }
       }
       return false;
+    }).length;
+
+    const pending = nominations.filter((nom) => {
+      const status = (nom.status || nom.nominationStatus || nom.currentStatus || "").toLowerCase();
+      return status.includes("pending") || status === "submitted" || status === "open";
+    }).length;
+
+    const statusCount = {};
+    nominations.forEach((nom) => {
+      const rawStatus = nom.status || nom.nominationStatus || nom.currentStatus || "Unknown";
+      const key = formatStatusLabel(rawStatus);
+      statusCount[key] = (statusCount[key] || 0) + 1;
     });
 
+    const chartData = Object.entries(statusCount).map(([name, value]) => ({
+      name,
+      value,
+      fill: name.toLowerCase().includes("pending") ? "#f59e0b" : 
+            name.toLowerCase().includes("approved") ? "#10b981" :
+            name.toLowerCase().includes("reject") ? "#ef4444" : "#0F62FE",
+    }));
+
     return {
-      total: nominations.length,
-      thisMonth: thisMonthNominations.length,
-      approved: approvedCount,
-      pending: pendingCount,
-      rejected: rejectedCount,
-      chartData: statusChartData.filter(item => item.value > 0),
+      total,
+      thisMonth,
+      pending,
+      chartData: chartData.filter((item) => item.value > 0),
     };
   };
 
@@ -619,7 +562,7 @@ const ManagerDashboard = () => {
   const goalsData = getGoalsByType();
   const teamAssignmentStatus = getTeamAssignmentStatus();
   const escalationHistory = getEscalationHistory();
-  const nominationHistory = getNominationHistory();
+  const nominationOverview = getNominationOverview();
   const meetingScheduleData = getMeetingScheduleData();
   const meetingOverview = getMeetingOverview();
 
@@ -666,9 +609,9 @@ const ManagerDashboard = () => {
             <h2>
               <CountUp end={kpiStats.totalNominations} duration={2} />
             </h2>
-            <p>Nominations</p>
+            <p>My Nominations</p>
             <span className="admin-kpi-subtitle">
-              {kpiStats.pendingNominationReviews} pending
+              {nominationOverview.thisMonth} this month
             </span>
           </div>
         </div>
@@ -899,115 +842,117 @@ const ManagerDashboard = () => {
             <div className="card-header-dark">
               <div className="card-header-content">
                 <i className="bi bi-award"></i>
-                <h3>Nomination Status</h3>
+                <h3>My Nominations</h3>
               </div>
             </div>
             <div className="card-body">
-              <div style={{ marginBottom: "1rem" }}>
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr 1fr",
-                    gap: "0.75rem",
-                    marginBottom: "1rem",
-                  }}
-                >
-                  <div
-                    style={{
-                      background: "#f0f9ff",
-                      padding: "0.75rem",
-                      borderRadius: "6px",
-                      textAlign: "center",
-                      border: "1px solid #bfdbfe",
-                    }}
-                  >
+              {nominationOverview.total > 0 ? (
+                <>
+                  <div style={{ marginBottom: "1.5rem" }}>
                     <div
                       style={{
-                        fontSize: "1.5rem",
-                        fontWeight: "bold",
-                        color: "#0F62FE",
+                        display: "grid",
+                        gridTemplateColumns: "1fr 1fr 1fr",
+                        gap: "0.75rem",
+                        marginBottom: "1rem",
                       }}
                     >
-                      {nominationHistory.total}
-                    </div>
-                    <div style={{ fontSize: "0.75rem", color: "#1e40af" }}>
-                      Total
+                      <div
+                        style={{
+                          background: "#f0f9ff",
+                          padding: "0.75rem",
+                          borderRadius: "6px",
+                          textAlign: "center",
+                          border: "1px solid #bfdbfe",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: "1.5rem",
+                            fontWeight: "bold",
+                            color: "#0F62FE",
+                          }}
+                        >
+                          {nominationOverview.total}
+                        </div>
+                        <div style={{ fontSize: "0.7rem", color: "#1e40af" }}>
+                          Total
+                        </div>
+                      </div>
+                      <div
+                        style={{
+                          background: "#dcfce7",
+                          padding: "0.75rem",
+                          borderRadius: "6px",
+                          textAlign: "center",
+                          border: "1px solid #bbf7d0",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: "1.5rem",
+                            fontWeight: "bold",
+                            color: "#15803d",
+                          }}
+                        >
+                          {nominationOverview.thisMonth}
+                        </div>
+                        <div style={{ fontSize: "0.7rem", color: "#166534" }}>
+                          This Month
+                        </div>
+                      </div>
+                      <div
+                        style={{
+                          background: "#fef3c7",
+                          padding: "0.75rem",
+                          borderRadius: "6px",
+                          textAlign: "center",
+                          border: "1px solid #fde68a",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: "1.5rem",
+                            fontWeight: "bold",
+                            color: "#b45309",
+                          }}
+                        >
+                          {nominationOverview.pending}
+                        </div>
+                        <div style={{ fontSize: "0.7rem", color: "#92400e" }}>
+                          Pending
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div
-                    style={{
-                      background: "#f0fdf4",
-                      padding: "0.75rem",
-                      borderRadius: "6px",
-                      textAlign: "center",
-                      border: "1px solid #86efac",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "1.5rem",
-                        fontWeight: "bold",
-                        color: "#10b981",
-                      }}
-                    >
-                      {nominationHistory.approved}
-                    </div>
-                    <div style={{ fontSize: "0.75rem", color: "#047857" }}>
-                      Approved
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      background: "#fef3c7",
-                      padding: "0.75rem",
-                      borderRadius: "6px",
-                      textAlign: "center",
-                      border: "1px solid #fcd34d",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "1.5rem",
-                        fontWeight: "bold",
-                        color: "#d97706",
-                      }}
-                    >
-                      {nominationHistory.pending}
-                    </div>
-                    <div style={{ fontSize: "0.75rem", color: "#b45309" }}>
-                      Pending
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {nominationHistory.total > 0 ? (
-                <ResponsiveContainer width="100%" height={200}>
-                  <PieChart>
-                    <Pie
-                      data={nominationHistory.chartData}
-                      cx="50%"
-                      cy="45%"
-                      outerRadius={70}
-                      dataKey="value"
-                      label={false}
-                    >
-                      {nominationHistory.chartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.fill} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend
-                      layout="horizontal"
-                      align="center"
-                      verticalAlign="bottom"
-                      wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
-                      formatter={(value, entry) => {
-                        const item = nominationHistory.chartData.find(d => d.name === entry.value);
-                        return `${item?.name || value}: ${item?.value || 0}`;
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <PieChart>
+                      <Pie
+                        data={nominationOverview.chartData}
+                        cx="50%"
+                        cy="45%"
+                        outerRadius={70}
+                        dataKey="value"
+                        label={false}
+                      >
+                        {nominationOverview.chartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.fill} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend
+                        layout="horizontal"
+                        align="center"
+                        verticalAlign="bottom"
+                        wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
+                        formatter={(value, entry) => {
+                          const item = nominationOverview.chartData.find(d => d.name === entry.value);
+                          return `${item?.name || value}: ${item?.value || 0}`;
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </>
               ) : (
                 <div className="no-data-message">No nominations yet</div>
               )}
@@ -1120,9 +1065,9 @@ const ManagerDashboard = () => {
                     <Line
                       type="monotone"
                       dataKey="count"
-                      stroke="#2c2c54"
+                      stroke="#0F62FE"
                       strokeWidth={2}
-                      dot={{ fill: "#2c2c54", r: 4 }}
+                      dot={{ fill: "#0F62FE", r: 4 }}
                       activeDot={{ r: 6 }}
                     />
                   </LineChart>
@@ -1135,10 +1080,54 @@ const ManagerDashboard = () => {
         </div>
 
         <div className="dashboard-row">
-          <div className="dashboard-card card-medium">
+          <div className="dashboard-card card-large">
             <div className="card-header-dark">
               <div className="card-header-content">
-                <i className="bi bi-exclamation-triangle"></i>
+                <i className="bi bi-people-fill"></i>
+                <h3>Team L&D Assignments</h3>
+              </div>
+            </div>
+            <div className="card-body">
+              {teamAssignmentStatus.length > 0 ? (
+                <ResponsiveContainer width="100%" height={280}>
+                  <PieChart>
+                    <Pie
+                      data={teamAssignmentStatus}
+                      cx="50%"
+                      cy="45%"
+                      innerRadius={60}
+                      outerRadius={90}
+                      paddingAngle={3}
+                      dataKey="value"
+                      label={false}
+                    >
+                      {teamAssignmentStatus.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend
+                      layout="horizontal"
+                      align="center"
+                      verticalAlign="bottom"
+                      wrapperStyle={{ fontSize: "12px", paddingTop: "15px" }}
+                      formatter={(value, entry) => {
+                        const item = teamAssignmentStatus.find(d => d.name === entry.value);
+                        return `${item?.name || value}: ${item?.value || 0}`;
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="no-data-message">No team assignment data</div>
+              )}
+            </div>
+          </div>
+
+          <div className="dashboard-card card-large">
+            <div className="card-header-dark">
+              <div className="card-header-content">
+                <i className="bi bi-exclamation-triangle-fill"></i>
                 <h3>Escalation History</h3>
               </div>
             </div>
@@ -1147,7 +1136,7 @@ const ManagerDashboard = () => {
                 <div
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "1fr 1fr 1fr 1fr",
+                    gridTemplateColumns: "1fr 1fr 1fr",
                     gap: "0.75rem",
                     marginBottom: "1rem",
                   }}
@@ -1218,31 +1207,9 @@ const ManagerDashboard = () => {
                       Resolved
                     </div>
                   </div>
-                  <div
-                    style={{
-                      background: "#fee2e2",
-                      padding: "0.75rem",
-                      borderRadius: "6px",
-                      textAlign: "center",
-                      border: "1px solid #fca5a5",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "1.5rem",
-                        fontWeight: "bold",
-                        color: "#ef4444",
-                      }}
-                    >
-                      {escalationHistory.rejected}
-                    </div>
-                    <div style={{ fontSize: "0.7rem", color: "#dc2626" }}>
-                      Rejected
-                    </div>
-                  </div>
                 </div>
               </div>
-              {escalationHistory.chartData.length > 0 ? (
+              {escalationHistory.total > 0 ? (
                 <ResponsiveContainer width="100%" height={200}>
                   <PieChart>
                     <Pie
@@ -1274,48 +1241,6 @@ const ManagerDashboard = () => {
                 </ResponsiveContainer>
               ) : (
                 <div className="no-data-message">No escalation data</div>
-              )}
-            </div>
-          </div>
-
-          <div className="dashboard-card card-medium">
-            <div className="card-header-dark">
-              <div className="card-header-content">
-                <i className="bi bi-book"></i>
-                <h3>L&D Team Assignments</h3>
-              </div>
-            </div>
-            <div className="card-body">
-              {teamAssignmentStatus.length > 0 ? (
-                <ResponsiveContainer width="100%" height={240}>
-                  <PieChart>
-                    <Pie
-                      data={teamAssignmentStatus}
-                      cx="50%"
-                      cy="45%"
-                      outerRadius={70}
-                      dataKey="value"
-                      label={false}
-                    >
-                      {teamAssignmentStatus.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.fill} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend
-                      layout="horizontal"
-                      align="center"
-                      verticalAlign="bottom"
-                      wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
-                      formatter={(value, entry) => {
-                        const item = teamAssignmentStatus.find(d => d.name === entry.value);
-                        return `${item?.name || value}: ${item?.value || 0}`;
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="no-data-message">No team assignments</div>
               )}
             </div>
           </div>
