@@ -137,16 +137,16 @@ const NominationReviewModal = ({
       {/* Custom Backdrop with Blur Effect */}
       <div
         style={{
-          position: 'fixed',
+          position: "fixed",
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(39, 35, 92, 0.4)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
+          backgroundColor: "rgba(39, 35, 92, 0.4)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
           zIndex: 1040,
-          transition: 'all 0.3s ease'
+          transition: "all 0.3s ease",
         }}
         onClick={onHide}
       />
@@ -154,170 +154,285 @@ const NominationReviewModal = ({
       {/* Modal Wrapper */}
       <div
         style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "95%",
+          maxWidth: "800px",
+          maxHeight: "75vh",
           zIndex: 1050,
-          padding: '20px'
+          display: "flex",
+          flexDirection: "column",
         }}
       >
-        {/* Modal Dialog - Large Size */}
         <div
           style={{
-            width: '100%',
-            maxWidth: '800px',
-            maxHeight: '75vh',
-            display: 'flex',
-            flexDirection: 'column',
-            borderRadius: '0.5rem',
-            overflow: 'hidden',
-            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.3)',
-            backgroundColor: '#ffffff'
+            borderRadius: "0.5rem",
+            background: "#fff",
+            boxShadow: "0 8px 28px rgba(0,0,0,0.22)",
+            overflow: "hidden",
+            width: "100%",
+            maxHeight: "85vh",
+            display: "flex",
+            flexDirection: "column",
           }}
         >
-          {/* Modal Header - Navy Blue Theme */}
+          {/* HEADER - Fixed */}
           <div
             style={{
-              background: '#27235C',
-              color: '#ffffff',
-              padding: '16px 20px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexShrink: 0
+              background: "#27235C",
+              color: "#fff",
+              padding: "13px 15px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              fontSize: "15px",
+              fontWeight: 600,
+              borderRadius: "0.5rem 0.5rem 0 0",
+              flexShrink: 0,
             }}
           >
             <div
               style={{
-                fontSize: '16px',
-                fontWeight: '600',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                color: '#ffffff'
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                color: "#fff",
+                fontSize: 15,
+                fontWeight: 600,
               }}
             >
               <i className="bi bi-clipboard-check"></i>
               Review Nomination - {isDepartmentHead ? "Department Head" : "Manager"}
             </div>
             <button
+              type="button"
               onClick={onHide}
               disabled={loading}
+              aria-label="Close"
               style={{
-                background: 'transparent',
-                border: 'none',
-                color: '#ffffff',
-                fontSize: '20px',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                padding: '0',
-                width: '24px',
-                height: '24px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                opacity: loading ? 0.5 : 1
+                background: "none",
+                border: "none",
+                color: "#fff",
+                fontSize: 18,
+                cursor: loading ? "not-allowed" : "pointer",
+                opacity: loading ? 0.7 : 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
 
-          {/* Form - Scrollable Body */}
-          <form 
+          {/* BODY - Scrollable */}
+          <form
             onSubmit={handleSubmit}
-            style={{ 
-              display: 'flex', 
-              flexDirection: 'column', 
+            style={{
+              display: "flex",
+              flexDirection: "column",
               flex: 1,
-              overflow: 'hidden'
+              overflow: "hidden",
             }}
           >
-            {/* Modal Body */}
             <div
               style={{
-                padding: '20px',
-                overflowY: 'auto',
+                padding: "20px",
+                background: "#fff",
+                textAlign: "left",
+                overflowY: "auto",
                 flex: 1,
-                backgroundColor: '#ffffff',
-                maxHeight: 'calc(90vh - 140px)'
               }}
             >
-              {/* Info Section */}
+              {/* Info Section - Rearranged Layout */}
               <div
                 style={{
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                  background: '#f9fafb',
-                  padding: '1rem',
-                  marginBottom: '20px'
+                  border: "1px solid #e5e7eb",
+                  borderRadius: "8px",
+                  background: "#f9fafb",
+                  padding: "16px",
+                  marginBottom: "20px",
                 }}
               >
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
-                  <div style={{ fontSize: '13px', color: '#334155' }}>
-                    <strong style={{ fontWeight: '600' }}>Opportunity:</strong> {nomination.opportunityName}
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: "16px",
+                    marginBottom: nomination.justification ? "16px" : 0,
+                  }}
+                >
+                  {/* LEFT COLUMN */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                    {/* Opportunity */}
+                    <div style={{ textAlign: "left" }}>
+                      <label
+                        style={{
+                          fontSize: "12px",
+                          color: "#6c757d",
+                          fontWeight: 600,
+                          display: "block",
+                          marginBottom: "4px",
+                        }}
+                      >
+                        Opportunity:
+                      </label>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: "14px",
+                          color: "#334155",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {nomination.opportunityName}
+                      </p>
+                    </div>
+
+                    {/* Nominated By */}
+                    <div style={{ textAlign: "left" }}>
+                      <label
+                        style={{
+                          fontSize: "12px",
+                          color: "#6c757d",
+                          fontWeight: 600,
+                          display: "block",
+                          marginBottom: "4px",
+                        }}
+                      >
+                        Nominated By:
+                      </label>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: "14px",
+                          color: "#334155",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {nomination.nominatedByName}
+                      </p>
+                    </div>
                   </div>
-                  <div style={{ fontSize: '13px', color: '#334155' }}>
-                    <strong style={{ fontWeight: '600' }}>Nominee:</strong> {nomination.nomineeName}
+
+                  {/* RIGHT COLUMN */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                    {/* Nominee */}
+                    <div style={{ textAlign: "left" }}>
+                      <label
+                        style={{
+                          fontSize: "12px",
+                          color: "#6c757d",
+                          fontWeight: 600,
+                          display: "block",
+                          marginBottom: "4px",
+                        }}
+                      >
+                        Nominee:
+                      </label>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: "14px",
+                          color: "#334155",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {nomination.nomineeName}
+                      </p>
+                    </div>
+
+                    {/* Type */}
+                    <div style={{ textAlign: "left" }}>
+                      <label
+                        style={{
+                          fontSize: "12px",
+                          color: "#6c757d",
+                          fontWeight: 600,
+                          display: "block",
+                          marginBottom: "4px",
+                        }}
+                      >
+                        Type:
+                      </label>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: "14px",
+                          color: "#334155",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {nomination.nominationType}
+                      </p>
+                    </div>
                   </div>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: nomination.justification ? '12px' : 0 }}>
-                  <div style={{ fontSize: '13px', color: '#334155' }}>
-                    <strong style={{ fontWeight: '600' }}>Nominated By:</strong> {nomination.nominatedByName}
-                  </div>
-                  <div style={{ fontSize: '13px', color: '#334155' }}>
-                    <strong style={{ fontWeight: '600' }}>Type:</strong> {nomination.nominationType}
-                  </div>
-                </div>
+
+                {/* Justification - Full Width */}
                 {nomination.justification && (
-                  <div style={{ fontSize: '13px', color: '#334155' }}>
-                    <strong style={{ fontWeight: '600', display: 'block', marginBottom: '6px' }}>Justification:</strong>
-                    <p style={{ 
-                      margin: 0, 
-                      padding: '8px 12px', 
-                      backgroundColor: '#ffffff',
-                      borderRadius: '4px',
-                      border: '1px solid #e5e7eb',
-                      lineHeight: '1.5'
-                    }}>
+                  <div style={{ textAlign: "left" }}>
+                    <label
+                      style={{
+                        fontSize: "12px",
+                        color: "#6c757d",
+                        fontWeight: 600,
+                        display: "block",
+                        marginBottom: "6px",
+                      }}
+                    >
+                      Justification:
+                    </label>
+                    <p
+                      style={{
+                        margin: 0,
+                        padding: "8px 12px",
+                        backgroundColor: "#ffffff",
+                        borderRadius: "6px",
+                        border: "1px solid #e5e7eb",
+                        lineHeight: "1.5",
+                        fontSize: "13px",
+                        color: "#374151",
+                        textAlign: "center",
+                      }}
+                    >
                       {nomination.justification}
                     </p>
                   </div>
                 )}
               </div>
 
-              {/* Decision Field */}
-              <div style={{ marginBottom: '16px' }}>
+              {/* Decision Field with Blue Color */}
+              <div style={{ marginBottom: "16px" }}>
                 <label
                   style={{
-                    fontWeight: '600',
-                    fontSize: '13px',
-                    color: '#334155',
-                    marginBottom: '6px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px'
+                    fontWeight: 600,
+                    fontSize: 13,
+                    color: "#334155",
+                    marginBottom: 6,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 4,
                   }}
                 >
-                  Decision <span style={{ color: '#ef4444', fontWeight: '700' }}>*</span>
+                  Decision <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
                 </label>
                 <select
                   name="action"
                   value={formData.action}
                   onChange={handleChange}
                   style={{
-                    width: '100%',
-                    border: errors.action ? '1px solid #ef4444' : '1px solid #cbd5e1',
-                    borderRadius: '6px',
-                    padding: '8px 10px',
-                    fontSize: '13px',
-                    transition: 'all 0.2s ease',
-                    cursor: 'pointer',
-                    backgroundColor: '#ffffff'
+                    width: "100%",
+                    border: errors.action ? "1px solid #ef4444" : "1px solid #cbd5e1",
+                    borderRadius: 6,
+                    padding: "8px 10px",
+                    fontSize: 13,
+                    background: "#fff",
+                    color: formData.action ? "#27235C" : "#6c757d",
+                    fontWeight: formData.action ? 600 : 400,
+                    cursor: "pointer",
                   }}
                 >
                   <option value="">-- Select Action --</option>
@@ -325,7 +440,7 @@ const NominationReviewModal = ({
                   <option value="Rejected">Reject</option>
                 </select>
                 {errors.action && (
-                  <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>
+                  <div style={{ color: "#ef4444", fontSize: 11, marginTop: 4 }}>
                     {errors.action}
                   </div>
                 )}
@@ -335,21 +450,29 @@ const NominationReviewModal = ({
               {isDepartmentHead && formData.action === "Approved" && (
                 <>
                   {/* Merit and Diversity Scores Row */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '16px' }}>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr",
+                      gap: 20,
+                      marginBottom: 16,
+                    }}
+                  >
                     {/* Merit Score */}
                     <div>
                       <label
                         style={{
-                          fontWeight: '600',
-                          fontSize: '13px',
-                          color: '#334155',
-                          marginBottom: '6px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px'
+                          fontWeight: 600,
+                          fontSize: 13,
+                          color: "#334155",
+                          marginBottom: 6,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 4,
                         }}
                       >
-                        Merit Score (0-100) <span style={{ color: '#ef4444', fontWeight: '700' }}>*</span>
+                        Merit Score (0-100){" "}
+                        <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
                       </label>
                       <input
                         type="number"
@@ -361,17 +484,19 @@ const NominationReviewModal = ({
                         max="100"
                         step="0.01"
                         style={{
-                          width: '100%',
-                          border: errors.meritScore ? '1px solid #ef4444' : '1px solid #cbd5e1',
-                          borderRadius: '6px',
-                          padding: '8px 10px',
-                          fontSize: '13px',
-                          transition: 'all 0.2s ease',
-                          backgroundColor: '#ffffff'
+                          width: "100%",
+                          border: errors.meritScore
+                            ? "1px solid #ef4444"
+                            : "1px solid #cbd5e1",
+                          borderRadius: 6,
+                          padding: "8px 10px",
+                          fontSize: 13,
+                          background: "#fff",
+                          color: "#22223b",
                         }}
                       />
                       {errors.meritScore && (
-                        <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>
+                        <div style={{ color: "#ef4444", fontSize: 11, marginTop: 4 }}>
                           {errors.meritScore}
                         </div>
                       )}
@@ -381,16 +506,17 @@ const NominationReviewModal = ({
                     <div>
                       <label
                         style={{
-                          fontWeight: '600',
-                          fontSize: '13px',
-                          color: '#334155',
-                          marginBottom: '6px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px'
+                          fontWeight: 600,
+                          fontSize: 13,
+                          color: "#334155",
+                          marginBottom: 6,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 4,
                         }}
                       >
-                        Diversity Score (0-100) <span style={{ color: '#ef4444', fontWeight: '700' }}>*</span>
+                        Diversity Score (0-100){" "}
+                        <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
                       </label>
                       <input
                         type="number"
@@ -402,17 +528,19 @@ const NominationReviewModal = ({
                         max="100"
                         step="0.01"
                         style={{
-                          width: '100%',
-                          border: errors.diversityScore ? '1px solid #ef4444' : '1px solid #cbd5e1',
-                          borderRadius: '6px',
-                          padding: '8px 10px',
-                          fontSize: '13px',
-                          transition: 'all 0.2s ease',
-                          backgroundColor: '#ffffff'
+                          width: "100%",
+                          border: errors.diversityScore
+                            ? "1px solid #ef4444"
+                            : "1px solid #cbd5e1",
+                          borderRadius: 6,
+                          padding: "8px 10px",
+                          fontSize: 13,
+                          background: "#fff",
+                          color: "#22223b",
                         }}
                       />
                       {errors.diversityScore && (
-                        <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>
+                        <div style={{ color: "#ef4444", fontSize: 11, marginTop: 4 }}>
                           {errors.diversityScore}
                         </div>
                       )}
@@ -420,33 +548,37 @@ const NominationReviewModal = ({
                   </div>
 
                   {/* Conflict of Interest */}
-                  <div style={{ marginBottom: '16px' }}>
+                  <div style={{ marginBottom: 16 }}>
                     <label
                       style={{
-                        fontWeight: '600',
-                        fontSize: '13px',
-                        color: '#334155',
-                        marginBottom: '6px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px'
+                        fontWeight: 600,
+                        fontSize: 13,
+                        color: "#334155",
+                        marginBottom: 6,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 4,
                       }}
                     >
-                      Conflict of Interest <span style={{ color: '#ef4444', fontWeight: '700' }}>*</span>
+                      Conflict of Interest{" "}
+                      <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
                     </label>
                     <select
                       name="conflictOfInterest"
                       value={formData.conflictOfInterest}
                       onChange={handleChange}
                       style={{
-                        width: '100%',
-                        border: errors.conflictOfInterest ? '1px solid #ef4444' : '1px solid #cbd5e1',
-                        borderRadius: '6px',
-                        padding: '8px 10px',
-                        fontSize: '13px',
-                        transition: 'all 0.2s ease',
-                        cursor: 'pointer',
-                        backgroundColor: '#ffffff'
+                        width: "100%",
+                        border: errors.conflictOfInterest
+                          ? "1px solid #ef4444"
+                          : "1px solid #cbd5e1",
+                        borderRadius: 6,
+                        padding: "8px 10px",
+                        fontSize: 13,
+                        background: "#fff",
+                        color: formData.conflictOfInterest ? "#27235C" : "#6c757d",
+                        fontWeight: formData.conflictOfInterest ? 600 : 400,
+                        cursor: "pointer",
                       }}
                     >
                       <option value="">-- Select --</option>
@@ -454,21 +586,21 @@ const NominationReviewModal = ({
                       <option value="true">Yes</option>
                     </select>
                     {errors.conflictOfInterest && (
-                      <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>
+                      <div style={{ color: "#ef4444", fontSize: 11, marginTop: 4 }}>
                         {errors.conflictOfInterest}
                       </div>
                     )}
                   </div>
 
                   {/* Review Notes */}
-                  <div style={{ marginBottom: '16px' }}>
+                  <div style={{ marginBottom: 16 }}>
                     <label
                       style={{
-                        fontWeight: '600',
-                        fontSize: '13px',
-                        color: '#334155',
-                        marginBottom: '6px',
-                        display: 'block'
+                        fontWeight: 600,
+                        fontSize: 13,
+                        color: "#334155",
+                        marginBottom: 6,
+                        display: "block",
                       }}
                     >
                       Review Notes
@@ -480,18 +612,18 @@ const NominationReviewModal = ({
                       onChange={handleChange}
                       rows={3}
                       style={{
-                        width: '100%',
-                        border: '1px solid #cbd5e1',
-                        borderRadius: '6px',
-                        padding: '8px 10px',
-                        fontSize: '13px',
-                        transition: 'all 0.2s ease',
-                        resize: 'vertical',
-                        minHeight: '80px',
-                        maxHeight: '120px',
-                        fontFamily: 'inherit',
-                        lineHeight: '1.4',
-                        backgroundColor: '#ffffff'
+                        width: "100%",
+                        border: "1px solid #cbd5e1",
+                        borderRadius: 6,
+                        padding: "8px 10px",
+                        fontSize: 13,
+                        background: "#fff",
+                        color: "#22223b",
+                        resize: "vertical",
+                        minHeight: 80,
+                        maxHeight: 120,
+                        fontFamily: "inherit",
+                        lineHeight: 1.4,
                       }}
                     />
                   </div>
@@ -499,14 +631,14 @@ const NominationReviewModal = ({
               )}
 
               {/* Remarks */}
-              <div style={{ marginBottom: '16px' }}>
+              <div style={{ marginBottom: 16 }}>
                 <label
                   style={{
-                    fontWeight: '600',
-                    fontSize: '13px',
-                    color: '#334155',
-                    marginBottom: '6px',
-                    display: 'block'
+                    fontWeight: 600,
+                    fontSize: 13,
+                    color: "#334155",
+                    marginBottom: 6,
+                    display: "block",
                   }}
                 >
                   {formData.action === "Rejected" ? "Rejection " : ""}Remarks
@@ -518,110 +650,114 @@ const NominationReviewModal = ({
                   onChange={handleChange}
                   rows={4}
                   style={{
-                    width: '100%',
-                    border: '1px solid #cbd5e1',
-                    borderRadius: '6px',
-                    padding: '8px 10px',
-                    fontSize: '13px',
-                    transition: 'all 0.2s ease',
-                    resize: 'vertical',
-                    minHeight: '100px',
-                    maxHeight: '150px',
-                    fontFamily: 'inherit',
-                    lineHeight: '1.4',
-                    backgroundColor: '#ffffff'
+                    width: "100%",
+                    border: "1px solid #cbd5e1",
+                    borderRadius: 6,
+                    padding: "8px 10px",
+                    fontSize: 13,
+                    background: "#fff",
+                    color: "#22223b",
+                    resize: "vertical",
+                    minHeight: 100,
+                    maxHeight: 150,
+                    fontFamily: "inherit",
+                    lineHeight: 1.4,
                   }}
                 />
               </div>
             </div>
 
-            {/* Modal Footer */}
+            {/* FOOTER - Fixed */}
             <div
               style={{
-                padding: '12px 20px',
-                borderTop: '1px solid #e2e8f0',
-                background: '#ffffff',
+                padding: "10px 15px",
+                borderTop: "1px solid #e2e8f0",
+                background: "#fff",
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: 8,
+                borderBottomLeftRadius: "0.5rem",
+                borderBottomRightRadius: "0.5rem",
                 flexShrink: 0,
-                display: 'flex',
-                justifyContent: 'flex-end',
-                gap: '8px',
-                borderBottomLeftRadius: '12px',
-                borderBottomRightRadius: '12px'
               }}
             >
-              {/* Cancel Button */}
               <button
                 type="button"
                 onClick={onHide}
                 disabled={loading}
                 style={{
-                  background: '#6c757d',
-                  borderColor: '#6c757d',
-                  color: '#ffffff',
-                  fontWeight: '600',
-                  padding: '8px 16px',
-                  fontSize: '13px',
-                  borderRadius: '6px',
-                  border: 'none',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  opacity: loading ? 0.65 : 1,
-                  transition: 'all 0.2s ease',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px'
+                  background: "#6c757d",
+                  border: "none",
+                  color: "#fff",
+                  fontWeight: 600,
+                  padding: "7px 12px",
+                  fontSize: 12,
+                  borderRadius: 5,
+                  cursor: loading ? "not-allowed" : "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  opacity: loading ? 0.7 : 1,
+                  transition: "all 0.2s ease",
                 }}
                 onMouseEnter={(e) => {
-                  if (!loading) {
-                    e.target.style.background = '#5a6268';
-                    e.target.style.borderColor = '#5a6268';
-                  }
+                  if (!loading) e.target.style.background = "#5a6268";
                 }}
                 onMouseLeave={(e) => {
-                  if (!loading) {
-                    e.target.style.background = '#6c757d';
-                    e.target.style.borderColor = '#6c757d';
-                  }
+                  if (!loading) e.target.style.background = "#6c757d";
                 }}
               >
                 <i className="bi bi-x-circle"></i>
                 Cancel
               </button>
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={loading}
                 style={{
-                  background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
-                  border: 'none',
-                  color: '#ffffff',
-                  padding: '8px 16px',
-                  fontWeight: '600',
-                  fontSize: '13px',
-                  borderRadius: '6px',
-                  transition: 'all 0.12s ease',
-                  boxShadow: '0 2px 8px rgba(151, 36, 126, 0.25)',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  opacity: loading ? 0.65 : 1,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px'
+                  background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+                  border: "none",
+                  color: "#fff",
+                  fontWeight: 600,
+                  padding: "7px 12px",
+                  fontSize: 12,
+                  borderRadius: 5,
+                  boxShadow: "0 2px 8px rgba(151,36,126,0.25)",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  cursor: loading ? "not-allowed" : "pointer",
+                  opacity: loading ? 0.85 : 1,
+                  transition: "all 0.2s ease",
+                }}
+                onMouseEnter={(e) => {
+                  if (!loading) e.target.style.opacity = 0.93;
+                }}
+                onMouseLeave={(e) => {
+                  if (!loading) e.target.style.opacity = 1;
                 }}
               >
                 {loading ? (
                   <>
                     <span
                       style={{
-                        width: '14px',
-                        height: '14px',
-                        border: '2px solid #ffffff',
-                        borderTopColor: 'transparent',
-                        borderRadius: '50%',
-                        animation: 'spin 0.6s linear infinite',
-                        display: 'inline-block'
+                        width: 14,
+                        height: 14,
+                        border: "2px solid #fff",
+                        borderTop: "2px solid #E01950",
+                        borderRadius: "50%",
+                        animation: "spin 0.7s linear infinite",
+                        display: "inline-block",
+                        marginRight: 6,
                       }}
                     />
                     Submitting...
+                    <style>{`
+                      @keyframes spin {
+                        0% { transform: rotate(0deg);}
+                        100% { transform: rotate(360deg);}
+                      }
+                    `}</style>
                   </>
                 ) : (
                   <>
@@ -634,16 +770,6 @@ const NominationReviewModal = ({
           </form>
         </div>
       </div>
-
-      {/* Keyframe Animation for Spinner */}
-      <style>
-        {`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}
-      </style>
     </>
   );
 };

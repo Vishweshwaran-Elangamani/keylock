@@ -120,43 +120,45 @@ const NominationDetailsModal = ({ show, onHide, nomination }) => {
           {/* BODY - Scrollable */}
           <div
             style={{
-              padding: "24px",
+              padding: "20px",
               background: "#fff",
               textAlign: "left",
               overflowY: "auto",
               flex: 1,
             }}
           >
-            {/* Opportunity Information */}
+            {/* Top Section - Opportunity & Nominee Information in 2 Columns */}
             <div
               style={{
-                marginBottom: 24,
-                padding: 16,
-                background: "#f0f4ff",
-                borderRadius: 8,
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 20,
+                marginBottom: 20,
               }}
             >
-              <h6
-                style={{
-                  color: "#27235c",
-                  fontWeight: 600,
-                  marginBottom: 12,
-                  fontSize: 14,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                }}
-              >
-                <i className="bi bi-briefcase"></i>
-                Opportunity Information
-              </h6>
+              {/* LEFT COLUMN - Opportunity Information */}
               <div
                 style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: 12,
+                  padding: 16,
+                  background: "#f0f4ff",
+                  borderRadius: 8,
+                  border: "1px solid #dce4ff",
                 }}
               >
+                <h6
+                  style={{
+                    color: "#27235c",
+                    fontWeight: 600,
+                    marginBottom: 12,
+                    fontSize: 14,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                  }}
+                >
+                  <i className="bi bi-briefcase"></i>
+                  Opportunity Information
+                </h6>
                 <div>
                   <label
                     style={{
@@ -180,62 +182,31 @@ const NominationDetailsModal = ({ show, onHide, nomination }) => {
                     {nomination.opportunityName || "N/A"}
                   </p>
                 </div>
-                <div>
-                  <label
-                    style={{
-                      fontSize: 12,
-                      color: "#6c757d",
-                      fontWeight: 500,
-                      display: "block",
-                      marginBottom: 4,
-                    }}
-                  >
-                    Opportunity ID:
-                  </label>
-                  <p
-                    style={{
-                      margin: 0,
-                      fontWeight: 600,
-                      color: "#27235c",
-                      fontSize: 14,
-                    }}
-                  >
-                    #{nomination.opportunityId || "N/A"}
-                  </p>
-                </div>
               </div>
-            </div>
 
-            {/* Nominee Information */}
-            <div
-              style={{
-                marginBottom: 24,
-                padding: 16,
-                background: "#f0fdf4",
-                borderRadius: 8,
-              }}
-            >
-              <h6
-                style={{
-                  color: "#166534",
-                  fontWeight: 600,
-                  marginBottom: 12,
-                  fontSize: 14,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                }}
-              >
-                <i className="bi bi-person"></i>
-                Nominee Information
-              </h6>
+              {/* RIGHT COLUMN - Nominee Information */}
               <div
                 style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: 12,
+                  padding: 16,
+                  background: "#f0fdf4",
+                  borderRadius: 8,
+                  border: "1px solid #d1fae5",
                 }}
               >
+                <h6
+                  style={{
+                    color: "#166534",
+                    fontWeight: 600,
+                    marginBottom: 12,
+                    fontSize: 14,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                  }}
+                >
+                  <i className="bi bi-person"></i>
+                  Nominee Information
+                </h6>
                 <div>
                   <label
                     style={{
@@ -259,39 +230,17 @@ const NominationDetailsModal = ({ show, onHide, nomination }) => {
                     {nomination.nomineeName || "N/A"}
                   </p>
                 </div>
-                <div>
-                  <label
-                    style={{
-                      fontSize: 12,
-                      color: "#6c757d",
-                      fontWeight: 500,
-                      display: "block",
-                      marginBottom: 4,
-                    }}
-                  >
-                    Nominee User ID:
-                  </label>
-                  <p
-                    style={{
-                      margin: 0,
-                      fontWeight: 600,
-                      color: "#166534",
-                      fontSize: 14,
-                    }}
-                  >
-                    #{nomination.nomineeUserId || "N/A"}
-                  </p>
-                </div>
               </div>
             </div>
 
             {/* Nomination Details */}
             <div
               style={{
-                marginBottom: 24,
+                marginBottom: 20,
                 padding: 16,
                 background: "#fef3c7",
                 borderRadius: 8,
+                border: "1px solid #fde68a",
               }}
             >
               <h6
@@ -451,6 +400,7 @@ const NominationDetailsModal = ({ show, onHide, nomination }) => {
                   padding: 16,
                   background: "#e0e7ff",
                   borderRadius: 8,
+                  border: "1px solid #c7d2fe",
                 }}
               >
                 <h6
@@ -483,8 +433,8 @@ const NominationDetailsModal = ({ show, onHide, nomination }) => {
                     <p
                       style={{
                         margin: 0,
-                        color: "#374151",
-                        lineHeight: 1.6,
+                        fontWeight: 600,
+                        color: "#1e40af",
                         fontSize: 14,
                       }}
                     >
@@ -508,8 +458,8 @@ const NominationDetailsModal = ({ show, onHide, nomination }) => {
                     <p
                       style={{
                         margin: 0,
-                        color: "#374151",
-                        lineHeight: 1.6,
+                        fontWeight: 600,
+                        color: "#1e40af",
                         fontSize: 14,
                       }}
                     >
