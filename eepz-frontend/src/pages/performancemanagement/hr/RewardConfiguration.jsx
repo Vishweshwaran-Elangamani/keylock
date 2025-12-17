@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import apiPort5114 from "../../../services/performancemanagement/api/nominationapi";
+import { getRewardTypes, getParametersByRewardType, createRewardType, updateRewardType, createParameter, deleteParameter } from "../../../services/performancemanagement/api/nominationapi";
 import RewardTypeModal from "../../../components/performance_management/modals/Recognition/RewardTypeModal";
 import ParameterModal from "../../../components/performance_management/modals/Recognition/ParameterModal";
 import DeleteConfirmModal from "../../../components/performance_management/modals/Recognition/DeleteConfirmModal";
 import StatusConfirmModal from "../../../components/performance_management/modals/Recognition/StatusConfirmModal";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+
 
 function RewardConfiguration() {
   const [rewardTypes, setRewardTypes] = useState([]);
@@ -22,8 +23,8 @@ function RewardConfiguration() {
   const [deleteType, setDeleteType] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingRewardTypeId, setEditingRewardTypeId] = useState(null);
-  // ✅ NEW: Store parameter counts for all reward types
   const [parameterCounts, setParameterCounts] = useState({});
+
 
   const [rewardTypeForm, setRewardTypeForm] = useState({
     rewardCategory: "Recognition",
@@ -43,40 +44,46 @@ function RewardConfiguration() {
   const [activeTab, setActiveTab] = useState("Active");
   const [descExpanded, setDescExpanded] = useState(false);
 
+
   const navigate = useNavigate();
+
 
   useEffect(() => {
     fetchRewardTypes();
   }, []);
 
-  // ✅ NEW: Fetch parameter counts for all reward types
+
   useEffect(() => {
     if (rewardTypes.length > 0) {
       fetchAllParameterCounts();
     }
   }, [rewardTypes]);
 
+
   const fetchRewardTypes = async () => {
     setLoading(true);
     try {
-      const { data } = await apiPort5114.getRewardTypes(false);
-      if (data.success) setRewardTypes(data.data);
+      const response = await getRewardTypes(false);
+      if (response.data.success) {
+        setRewardTypes(response.data.data);
+      }
     } catch (error) {
+      console.error("Error fetching reward types:", error);
       toast.error("Failed to fetch reward types");
     } finally {
       setLoading(false);
     }
   };
 
-  // ✅ NEW: Fetch parameter counts for all rewards
+
   const fetchAllParameterCounts = async () => {
     const counts = {};
     try {
       await Promise.all(
         rewardTypes.map(async (rt) => {
-          const { data } = await apiPort5114.getParametersByRewardType(rt.rewardTypeId);
-          if (data.success) {
-            counts[rt.rewardTypeId] = data.data.length;
+          const response = await getParametersByRewardType(rt.rewardTypeId);
+          if (response.data.success) {
+            counts[rt.rewardTypeId] = response.data.data.length;
           }
         })
       );
@@ -86,21 +93,22 @@ function RewardConfiguration() {
     }
   };
 
+
   const fetchParameters = async (rewardTypeId) => {
     try {
-      const { data } = await apiPort5114.getParametersByRewardType(rewardTypeId);
-      if (data.success) {
-        setParameters(data.data);
-        // ✅ Update the count for this specific reward type
+      const response = await getParametersByRewardType(rewardTypeId);
+      if (response.data.success) {
+        setParameters(response.data.data);
         setParameterCounts(prev => ({
           ...prev,
-          [rewardTypeId]: data.data.length
+          [rewardTypeId]: response.data.data.length
         }));
       }
     } catch (error) {
       toast.error("Failed to fetch parameters");
     }
   };
+
 
   const openAddRewardTypeModal = () => {
     setIsEditMode(false);
@@ -114,6 +122,7 @@ function RewardConfiguration() {
     setShowRewardTypeModal(true);
   };
 
+
   const openEditRewardTypeModal = (rt) => {
     setIsEditMode(true);
     setEditingRewardTypeId(rt.rewardTypeId);
@@ -126,7 +135,9 @@ function RewardConfiguration() {
     setShowRewardTypeModal(true);
   };
 
+
   const closeRewardTypeModal = () => setShowRewardTypeModal(false);
+
 
   const openParameterModal = () => {
     if (!selectedRewardType) {
@@ -145,24 +156,26 @@ function RewardConfiguration() {
     setShowParameterModal(true);
   };
 
+
   const closeParameterModal = () => setShowParameterModal(false);
+
 
   const handleCreateOrUpdateRewardType = async (e) => {
     e.preventDefault();
     try {
       if (isEditMode) {
-        const { data } = await apiPort5114.updateRewardType(editingRewardTypeId, rewardTypeForm);
-        if (data.success) {
+        const response = await updateRewardType(editingRewardTypeId, rewardTypeForm);
+        if (response.data.success) {
           toast.success("Reward type updated successfully!");
           closeRewardTypeModal();
           fetchRewardTypes();
         }
       } else {
-        const { data } = await apiPort5114.createRewardType({
+        const response = await createRewardType({
           ...rewardTypeForm,
           createdBy: 1,
         });
-        if (data.success) {
+        if (response.data.success) {
           toast.success("Reward type created successfully!");
           closeRewardTypeModal();
           fetchRewardTypes();
@@ -173,13 +186,14 @@ function RewardConfiguration() {
     }
   };
 
+
   const handleToggleActive = async (rewardType) => {
     try {
-      const { data } = await apiPort5114.updateRewardType(rewardType.rewardTypeId, {
+      const response = await updateRewardType(rewardType.rewardTypeId, {
         ...rewardType,
         isActive: !rewardType.isActive,
       });
-      if (data.success) {
+      if (response.data.success) {
         toast.success(`Reward type ${rewardType.isActive ? "deactivated" : "activated"} successfully!`);
         fetchRewardTypes();
         if (selectedRewardType?.rewardTypeId === rewardType.rewardTypeId) {
@@ -192,6 +206,7 @@ function RewardConfiguration() {
     }
   };
 
+
   const handleBulkToggleActiveRewards = async () => {
     const activeRewards = rewardTypes.filter((rt) => rt.isActive === true);
     
@@ -200,16 +215,19 @@ function RewardConfiguration() {
       return;
     }
 
+
     const allVisible = activeRewards.every((rt) => rt.isVisibleForManagerNomination === true);
     const newVisibility = !allVisible;
 
+
     try {
       const updatePromises = activeRewards.map((rt) =>
-        apiPort5114.updateRewardType(rt.rewardTypeId, {
+        updateRewardType(rt.rewardTypeId, {
           ...rt,
           isVisibleForManagerNomination: newVisibility,
         })
       );
+
 
       await Promise.all(updatePromises);
       
@@ -222,6 +240,7 @@ function RewardConfiguration() {
     }
   };
 
+
   const handleCreateParameter = async (e) => {
     e.preventDefault();
     if (!selectedRewardType) {
@@ -229,16 +248,15 @@ function RewardConfiguration() {
       return;
     }
     try {
-      const { data } = await apiPort5114.createParameter({
+      const response = await createParameter({
         ...parameterForm,
         rewardTypeId: selectedRewardType.rewardTypeId,
         minimumValue: parameterForm.minimumValue ? parseInt(parameterForm.minimumValue) : null,
         maximumValue: parameterForm.maximumValue ? parseInt(parameterForm.maximumValue) : null,
       });
-      if (data.success) {
+      if (response.data.success) {
         toast.success("Parameter created successfully!");
         closeParameterModal();
-        // ✅ Refresh parameters for selected reward type
         await fetchParameters(selectedRewardType.rewardTypeId);
       }
     } catch {
@@ -246,19 +264,20 @@ function RewardConfiguration() {
     }
   };
 
+
   const confirmDelete = (id, type) => {
     setToDeleteId(id);
     setDeleteType(type);
     setShowDeleteModal(true);
   };
 
+
   const handleConfirmDelete = async () => {
     try {
       if (deleteType === "parameter") {
-        const { data } = await apiPort5114.deleteParameter(toDeleteId);
-        if (data.success) {
+        const response = await deleteParameter(toDeleteId);
+        if (response.data.success) {
           toast.success("Parameter deleted successfully");
-          // ✅ Refresh parameters for selected reward type
           await fetchParameters(selectedRewardType.rewardTypeId);
         }
       }
@@ -271,27 +290,32 @@ function RewardConfiguration() {
     }
   };
 
+
   const confirmStatusChange = (rt) => {
     setRewardTypeForStatus(rt);
     setStatusActionType(rt.isActive ? "deactivate" : "activate");
     setShowStatusModal(true);
   };
 
+
   const handleConfirmStatusChange = async () => {
     await handleToggleActive(rewardTypeForStatus);
     setShowStatusModal(false);
   };
 
+
   const activeRewardTypes = rewardTypes.filter((rt) => rt.isActive === true);
   const inactiveRewardTypes = rewardTypes.filter((rt) => rt.isActive === false);
   const displayedRewards = activeTab === "Active" ? activeRewardTypes : inactiveRewardTypes;
 
+
   const allActiveVisible = activeRewardTypes.length > 0 && activeRewardTypes.every((rt) => rt.isVisibleForManagerNomination === true);
 
-  // ✅ UPDATED: Get parameter count from cached state
+
   const getParameterCount = (rewardTypeId) => {
     return parameterCounts[rewardTypeId] ?? 0;
   };
+
 
   const RL_PURPLE = "#97247e";
   const RL_DARK = "#27235c";
@@ -300,12 +324,14 @@ function RewardConfiguration() {
   const BTN_RADIUS = "7px";
   const PREVIEW_CHAR_LIMIT = 280;
 
+
   function renderRewardDetails() {
     if (!selectedRewardType) return null;
     const desc = selectedRewardType.description || "No description provided";
     const needsCollapse = desc.length > PREVIEW_CHAR_LIMIT;
     const visibleDesc = descExpanded ? desc : desc.slice(0, PREVIEW_CHAR_LIMIT);
     const showReadMore = needsCollapse;
+
 
     return (
       <>
@@ -400,6 +426,7 @@ function RewardConfiguration() {
     );
   }
 
+
   function ChooseButton({ onClick }) {
     return (
       <button
@@ -427,6 +454,7 @@ function RewardConfiguration() {
       </button>
     );
   }
+
 
   return (
     <div style={{ background: RL_BG, minHeight: "100vh", minWidth: 0 }}>
@@ -473,6 +501,7 @@ function RewardConfiguration() {
           </ol>
         </nav>
 
+
         <button
           onClick={openAddRewardTypeModal}
           style={{
@@ -496,6 +525,7 @@ function RewardConfiguration() {
           Create Reward Type
         </button>
       </div>
+
 
       <div
         style={{
@@ -578,6 +608,7 @@ function RewardConfiguration() {
               </button>
             </div>
 
+
             {activeTab === "Active" && activeRewardTypes.length > 0 && (
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{ 
@@ -627,6 +658,7 @@ function RewardConfiguration() {
               </div>
             )}
           </div>
+
 
           <div
             style={{
@@ -712,7 +744,6 @@ function RewardConfiguration() {
                           fontWeight: "500",
                         }}
                       >
-                        {/* ✅ FIXED: Always show real-time parameter count */}
                         {getParameterCount(rt.rewardTypeId)} parameters
                       </span>
                       <span
@@ -779,6 +810,7 @@ function RewardConfiguration() {
             )}
           </div>
         </div>
+
 
         <div
           style={{
@@ -1000,6 +1032,7 @@ function RewardConfiguration() {
         </div>
       </div>
 
+
       {showRewardTypeModal && (
         <RewardTypeModal
           show={showRewardTypeModal}
@@ -1041,5 +1074,6 @@ function RewardConfiguration() {
     </div>
   );
 }
+
 
 export default RewardConfiguration;
