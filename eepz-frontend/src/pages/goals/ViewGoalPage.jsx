@@ -99,7 +99,7 @@ const ViewGoalPage = () => {
     setShowAssignModal(true);
   };
 
-  // ✅ FIXED: Unified callback that handles all approval types
+  // FIXED: Unified callback that handles all approval types
   const handleRequestApproval = (approvalTypeParam) => {
     const isCreator = goal.createdByEmployeeMasterId === user.empMasterId;
     const isAssignee = goal.assignees?.some(
@@ -262,7 +262,7 @@ const ViewGoalPage = () => {
         onSuccess={handleGoalUpdated}
       />
 
-      {/* ✅ FIXED: Single RequestApprovalModal with dynamic approvalType */}
+      {/*  FIXED: Single RequestApprovalModal with dynamic approvalType */}
       <RequestApprovalModal
         isOpen={showApprovalModal}
         onClose={() => {

@@ -157,7 +157,7 @@ const Pagination = ({
         </ul>
       </nav>
 
-      <style jsx>{`
+      <style>{`
         .pagination-container {
           display: flex;
           flex-wrap: wrap;

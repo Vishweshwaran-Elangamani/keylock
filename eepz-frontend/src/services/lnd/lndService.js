@@ -348,7 +348,7 @@ export const lndService = {
     searchTerm = "",
     sortField = "",
     sortOrder = "asc",
-    pageSize = 10
+    pageSize = 100
   ) => {
     try {
       const query = buildQueryString({
@@ -680,7 +680,7 @@ export const lndService = {
     sortField = "",
     sortOrder = "asc",
     pageSize = 10,
-    searchTerm=""
+    searchTerm = ""
   ) => {
     try {
       const query = buildQueryString({
@@ -690,7 +690,7 @@ export const lndService = {
         sortField,
         sortOrder,
         pageSize,
-        searchTerm
+        searchTerm,
       });
       const response = await axios.get(
         `${API_BASE_URL}/lnd-approvals/my-approvals${query}`,
@@ -887,9 +887,9 @@ export const downloadFile = (blob, filename = "download") => {
 export const previewFile = (blob, contentType = "application/pdf") => {
   const file = new Blob([blob], { type: contentType });
   const fileURL = window.URL.createObjectURL(file);
-  
+
   const previewWindow = window.open(fileURL, "_blank");
-  
+
   if (!previewWindow) {
     const link = document.createElement("a");
     link.href = fileURL;
@@ -899,10 +899,10 @@ export const previewFile = (blob, contentType = "application/pdf") => {
     link.click();
     document.body.removeChild(link);
   }
-  
+
   setTimeout(() => {
     window.URL.revokeObjectURL(fileURL);
   }, 100);
 };
 
-export default lndService;                      
+export default lndService;

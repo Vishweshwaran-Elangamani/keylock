@@ -65,9 +65,11 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
   const fetchTeamAssignments = async () => {
     try {
       setLoading(true);
+
+      // Option A: no status filter (let frontend filter)
       const response = await lndService.getTeamAssignments(
         1,
-        ASSIGNMENT_STATUS.IN_PROGRESS,
+        "", // no status filter, we'll filter in hasOngoingAssignments
         employee.employeeName,
         "",
         "desc"
@@ -127,18 +129,25 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
     return approvals.some(
       (approval) =>
         approval.skillId === skillId &&
-        approval.status === "PENDING" &&
+        approval.status === APPROVAL_STATUS.PENDING &&
         JSON.parse(approval.notes || "{}").MenteeEmployeeId ===
           employee.employeeId
     );
   };
 
   const hasOngoingAssignments = (skillId) => {
+    const ACTIVE_STATUSES = [
+      ASSIGNMENT_STATUS.IN_PROGRESS,
+      ASSIGNMENT_STATUS.PENDING_SME_ACKNOWLEDGEMENT,
+      ASSIGNMENT_STATUS.PENDING_MANAGER_ACKNOWLEDGEMENT,
+    ];
+
     return assignments.some(
       (assignment) =>
         assignment.skillId === skillId &&
-        assignment.status === "IN_PROGRESS" &&
-        assignment.MenteeEmployeeId != employee.employeeId
+        // make sure you use the correct property name from your DTO:
+        assignment.menteeEmployeeId === employee.employeeId &&
+        ACTIVE_STATUSES.includes(assignment.status)
     );
   };
 
@@ -303,7 +312,7 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
             </div>
             <button
               type="button"
-              class="btn-close-white"
+              className="btn-close-white"
               onClick={onClose}
               disabled={loading}
               style={{
@@ -535,7 +544,7 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
                                 gap: "0.3rem",
                                 opacity: 0.8,
                               }}
-                              title="SME Assignment is In Progress."
+                              title="SME assignment is in progress or under review."
                             >
                               <i
                                 className="bi bi-hourglass-split"

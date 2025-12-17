@@ -12,7 +12,7 @@ import Breadcrumb from "../../../components/lnd/common/Breadcrumb";
 import StatusBadge from "../../../components/lnd/common/StatusBadge";
 import EmptyState from "../../../components/lnd/common/EmptyState";
 import Pagination from "../../../components/lnd/common/Pagination";
-import UploadProofModal from "../../../components/lnd/modals/UploadProofModal";
+import UploadProofModal from "../../../components/lnd/modals/UploadProofModal";           
 import { lndService, downloadFile } from "../../../services/lnd/lndService";
 import { ASSIGNMENT_STATUS } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
@@ -70,21 +70,29 @@ const MyAssignments = () => {
     statusFilter,
     sortField,
     sortOrderAsc,
-  ]);
+  ]);        
 
   const fetchAssignments = async () => {
     try {
       setLoading(true);
       const response = await lndService.getMyAssignments(
         currentPage,
-        statusFilter,
+        statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter,
         searchTerm,
         sortField,
         sortOrderAsc ? "asc" : "desc",
         itemsPerPage
-      );
+      );           
+
       if (response.data.success) {
-        setAssignments(response.data.data.items);
+        let items = response.data.data.items;
+
+       
+        if (statusFilter === ASSIGNMENT_STATUS.OVERDUE) {
+          items = items.filter((a) => a.isOverdue === true);
+        }
+
+        setAssignments(items);
         setTotalItems(response.data.data.totalCount);
         setTotalPages(response.data.data.totalPages);
       }
@@ -281,15 +289,15 @@ const MyAssignments = () => {
           }}
         >
           <option value="">All Statuses</option>
-          <option value={ASSIGNMENT_STATUS.PENDING_ACKNOWLEDGEMENT}>
+          <option value={ASSIGNMENT_STATUS.PENDING_SME_ACKNOWLEDGEMENT}>
             Pending Acknowledgement
           </option>
           <option value={ASSIGNMENT_STATUS.IN_PROGRESS}>In Progress</option>
-          <option value={ASSIGNMENT_STATUS.PENDING_COMPLETION}>
+          <option value={ASSIGNMENT_STATUS.PENDING_MANAGER_ACKNOWLEDGEMENT}>
             Pending Completion
           </option>
-          <option value={ASSIGNMENT_STATUS.COMPLETED}>Completed</option>
-          <option value={ASSIGNMENT_STATUS.OVERDUE}>Overdue</option>
+          <option value={ASSIGNMENT_STATUS.COMPLETED}>Completed</option>  
+          <option value={ASSIGNMENT_STATUS.OVERDUE}>Overdue</option>   
         </select>
       </div>           
 
@@ -537,7 +545,8 @@ const MyAssignments = () => {
                         None
                       </span>
                     )}
-                  </div>
+                  </div>  
+
 
                   {/* Request Acknowledgement / Upload Proof */}
                   <div style={{ textAlign: "center" }}>
