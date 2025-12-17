@@ -305,185 +305,243 @@ public async Task<IActionResult> GetOpportunitiesByRewardType(int rewardTypeId)
         }
  
         [HttpPost("submit")]
-        public async Task<IActionResult> SubmitNomination([FromBody] NominationSubmitDto dto)
+public async Task<IActionResult> SubmitNomination([FromBody] NominationSubmitDto dto)
+{
+    try
+    {
+        _logger.LogInformation($"[SUBMIT_NOMINATION] Submitting nomination for Employee {dto.NomineeEmployeeId}");
+
+        if (dto.NomineeEmployeeId <= 0 || dto.NominatedByEmployeeId <= 0)
+            return BadRequest(new { success = false, message = "Invalid employee IDs" });
+
+        if (string.IsNullOrEmpty(dto.Justification))
+            return BadRequest(new { success = false, message = "Justification is required" });
+
+        if (dto.RewardTypeId == null || dto.RewardTypeId <= 0)
+            return BadRequest(new { success = false, message = "Reward Type is required" });
+
+        var isL1Manager = await _context.Projects
+            .AnyAsync(p => p.ResourceOwnerEmployeeId == dto.NominatedByEmployeeId
+                        || p.L1approverEmployeeId == dto.NominatedByEmployeeId);
+
+        if (!isL1Manager)
         {
-            try
+            _logger.LogWarning($"[SUBMIT_NOMINATION] Employee {dto.NominatedByEmployeeId} is not an L1 manager on any project");
+            return StatusCode(403, new { success = false, message = "Only L1 managers can submit nominations" });
+        }
+
+        var managerProjectsAsL1 = await _context.Projects
+            .Where(p => p.ResourceOwnerEmployeeId == dto.NominatedByEmployeeId
+                     || p.L1approverEmployeeId == dto.NominatedByEmployeeId)
+            .Select(p => p.ProjectId)
+            .ToListAsync();
+
+        var nomineeInManagerProjects = await _context.Projectemployees
+            .AnyAsync(pe => managerProjectsAsL1.Contains(pe.ProjectId)
+                         && pe.Employee.EmployeeId == dto.NomineeEmployeeId);
+
+        if (!nomineeInManagerProjects)
+        {
+            _logger.LogWarning($"[SUBMIT_NOMINATION] Nominee {dto.NomineeEmployeeId} is not in manager's L1 projects");
+            return StatusCode(403, new { success = false, message = "You can only nominate employees from projects where you are L1 manager" });
+        }
+
+        var rewardType = await _context.Rewardtypes
+            .FirstOrDefaultAsync(rt => rt.RewardTypeId == dto.RewardTypeId
+                                    && rt.IsActive == true
+                                    && rt.IsVisibleForManagerNomination == true);
+
+        if (rewardType == null)
+            return BadRequest(new {
+                success = false,
+                message = "Invalid reward type or not available for manager nominations"
+            });
+
+        _logger.LogInformation($"[SUBMIT_NOMINATION] Reward Type: {rewardType.RewardName} (Visible: {rewardType.IsVisibleForManagerNomination})");
+
+        // ✅ NEW: Check if this employee has already been nominated for THIS specific reward type
+        var existingNomination = await _context.Recognitionstatuses
+            .Include(n => n.Opportunity)
+            .FirstOrDefaultAsync(n => n.NomineeEmployeeId == dto.NomineeEmployeeId
+                                   && n.Opportunity.RewardTypeId == dto.RewardTypeId
+                                   && n.NominationType == "ManagerNomination");
+
+        if (existingNomination != null)
+        {
+            _logger.LogWarning($"[SUBMIT_NOMINATION] Employee {dto.NomineeEmployeeId} already nominated for RewardType {dto.RewardTypeId}");
+            
+            return BadRequest(new
             {
-                _logger.LogInformation($"[SUBMIT_NOMINATION] Submitting nomination for Employee {dto.NomineeEmployeeId}");
- 
-                if (dto.NomineeEmployeeId <= 0 || dto.NominatedByEmployeeId <= 0)
-                    return BadRequest(new { success = false, message = "Invalid employee IDs" });
- 
-                if (string.IsNullOrEmpty(dto.Justification))
-                    return BadRequest(new { success = false, message = "Justification is required" });
- 
-                if (dto.RewardTypeId == null || dto.RewardTypeId <= 0)
-                    return BadRequest(new { success = false, message = "Reward Type is required" });
- 
-                var isL1Manager = await _context.Projects
-                    .AnyAsync(p => p.ResourceOwnerEmployeeId == dto.NominatedByEmployeeId
-                                || p.L1approverEmployeeId == dto.NominatedByEmployeeId);
- 
-                if (!isL1Manager)
+                success = false,
+                message = $"This employee has already been nominated for {rewardType.RewardName}. Please select a different award."
+            });
+        }
+
+        var defaultOpportunity = await _context.Recognitiondetails
+            .FirstOrDefaultAsync(o => o.RewardTypeId == dto.RewardTypeId
+                && o.OpportunityName.Contains("Manager"));
+
+        int opportunityId;
+
+        if (defaultOpportunity == null)
+        {
+            _logger.LogInformation($"[SUBMIT_NOMINATION] Creating default opportunity for RewardType {dto.RewardTypeId}");
+
+            defaultOpportunity = new Recognitiondetail
+            {
+                RewardTypeId = dto.RewardTypeId.Value,
+                OpportunityName = $"Manager Direct Nomination - {rewardType.RewardName}",
+                Description = "Direct nomination by manager for this reward type",
+                DepartmentId = 1,
+                Deadline = DateOnly.FromDateTime(DateTime.Now.AddYears(10)),
+                Status = "Active",
+                PostedByUserId = 1,
+                CreatedAt = DateTime.UtcNow,
+                Requirements = "Nominated by direct manager",
+                EligibilityCriteria = "Active employees"
+            };
+
+            _context.Recognitiondetails.Add(defaultOpportunity);
+            await _context.SaveChangesAsync();
+
+            opportunityId = defaultOpportunity.OpportunityId;
+            _logger.LogInformation($"[SUBMIT_NOMINATION] Default opportunity created: {opportunityId}");
+        }
+        else
+        {
+            opportunityId = defaultOpportunity.OpportunityId;
+        }
+
+        var recognitionstatus = new Recognitionstatus
+        {
+            OpportunityId = opportunityId,
+            NomineeEmployeeId = dto.NomineeEmployeeId,
+            NominationType = "ManagerNomination",
+            NominatedByEmployeeId = dto.NominatedByEmployeeId,
+            Justification = dto.Justification,
+            Status = "Pending",
+            SubmittedAt = DateTime.UtcNow,
+            ReviewRemarks = $"DirectManagerNomination|RewardType:{dto.RewardTypeId}|User-Submitted"
+        };
+
+        _context.Recognitionstatuses.Add(recognitionstatus);
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation($"[SUBMIT_NOMINATION] Nomination created: {recognitionstatus.NominationId}");
+
+        if (dto.ParameterValues != null && dto.ParameterValues.Any())
+        {
+            var uniqueParams = dto.ParameterValues
+                .GroupBy(p => p.ParameterId)
+                .Select(g => g.First())
+                .ToList();
+
+            foreach (var param in uniqueParams)
+            {
+                if (param.ParameterId <= 0) continue;
+
+                var parameterExists = await _context.Nominationparameters
+                    .AnyAsync(np => np.ParameterId == param.ParameterId
+                        && np.RewardTypeId == dto.RewardTypeId);
+
+                if (!parameterExists) continue;
+
+                var existingParamValue = await _context.Nominationparametervalues
+                    .FirstOrDefaultAsync(npv => npv.NominationId == recognitionstatus.NominationId
+                                              && npv.ParameterId == param.ParameterId);
+
+                if (existingParamValue != null)
                 {
-                    _logger.LogWarning($"[SUBMIT_NOMINATION] Employee {dto.NominatedByEmployeeId} is not an L1 manager on any project");
-                    return StatusCode(403, new { success = false, message = "Only L1 managers can submit nominations" });
-                }
- 
-                var managerProjectsAsL1 = await _context.Projects
-                    .Where(p => p.ResourceOwnerEmployeeId == dto.NominatedByEmployeeId
-                             || p.L1approverEmployeeId == dto.NominatedByEmployeeId)
-                    .Select(p => p.ProjectId)
-                    .ToListAsync();
- 
-                var nomineeInManagerProjects = await _context.Projectemployees
-                    .AnyAsync(pe => managerProjectsAsL1.Contains(pe.ProjectId)
-                                 && pe.Employee.EmployeeId == dto.NomineeEmployeeId);
- 
-                if (!nomineeInManagerProjects)
-                {
-                    _logger.LogWarning($"[SUBMIT_NOMINATION] Nominee {dto.NomineeEmployeeId} is not in manager's L1 projects");
-                    return StatusCode(403, new { success = false, message = "You can only nominate employees from projects where you are L1 manager" });
-                }
- 
-var rewardType = await _context.Rewardtypes
-    .FirstOrDefaultAsync(rt => rt.RewardTypeId == dto.RewardTypeId
-                            && rt.IsActive == true
-                            && rt.IsVisibleForManagerNomination == true);
- 
-if (rewardType == null)
-    return BadRequest(new {
-        success = false,
-        message = "Invalid reward type or not available for manager nominations"
-    });
- 
-_logger.LogInformation($"[SUBMIT_NOMINATION] Reward Type: {rewardType.RewardName} (Visible: {rewardType.IsVisibleForManagerNomination})");
- 
- 
-                var defaultOpportunity = await _context.Recognitiondetails
-                    .FirstOrDefaultAsync(o => o.RewardTypeId == dto.RewardTypeId
-                        && o.OpportunityName.Contains("Manager"));
- 
-                int opportunityId;
- 
-                if (defaultOpportunity == null)
-                {
-                    _logger.LogInformation($"[SUBMIT_NOMINATION] Creating default opportunity for RewardType {dto.RewardTypeId}");
- 
-                    defaultOpportunity = new Recognitiondetail
-                    {
-                        RewardTypeId = dto.RewardTypeId.Value,
-                        OpportunityName = $"Manager Direct Nomination - {rewardType.RewardName}",
-                        Description = "Direct nomination by manager for this reward type",
-                        DepartmentId = 1,
-                        Deadline = DateOnly.FromDateTime(DateTime.Now.AddYears(10)),
-                        Status = "Active",
-                        PostedByUserId = 1,
-                        CreatedAt = DateTime.UtcNow,
-                        Requirements = "Nominated by direct manager",
-                        EligibilityCriteria = "Active employees"
-                    };
- 
-                    _context.Recognitiondetails.Add(defaultOpportunity);
-                    await _context.SaveChangesAsync();
- 
-                    opportunityId = defaultOpportunity.OpportunityId;
-                    _logger.LogInformation($"[SUBMIT_NOMINATION] Default opportunity created: {opportunityId}");
+                    existingParamValue.ParameterValue = param.Value ?? "";
+                    existingParamValue.CreatedAt = DateTime.UtcNow;
+                    _context.Nominationparametervalues.Update(existingParamValue);
                 }
                 else
                 {
-                    opportunityId = defaultOpportunity.OpportunityId;
-                }
- 
-                var recognitionstatus = new Recognitionstatus
-                {
-                    OpportunityId = opportunityId,
-                    NomineeEmployeeId = dto.NomineeEmployeeId,
-                    NominationType = "ManagerNomination",
-                    NominatedByEmployeeId = dto.NominatedByEmployeeId,
-                    Justification = dto.Justification,
-                    Status = "Pending",
-                    SubmittedAt = DateTime.UtcNow,
-                    ReviewRemarks = $"DirectManagerNomination|RewardType:{dto.RewardTypeId}|User-Submitted"
-                };
- 
-                _context.Recognitionstatuses.Add(recognitionstatus);
-                await _context.SaveChangesAsync();
- 
-                _logger.LogInformation($"[SUBMIT_NOMINATION] Nomination created: {recognitionstatus.NominationId}");
- 
-                if (dto.ParameterValues != null && dto.ParameterValues.Any())
-                {
- 
-                    var uniqueParams = dto.ParameterValues
-                        .GroupBy(p => p.ParameterId)
-                        .Select(g => g.First())
-                        .ToList();
- 
-                    foreach (var param in uniqueParams)
+                    var paramValue = new Nominationparametervalue
                     {
-                        if (param.ParameterId <= 0) continue;
- 
-                        var parameterExists = await _context.Nominationparameters
-                            .AnyAsync(np => np.ParameterId == param.ParameterId
-                                && np.RewardTypeId == dto.RewardTypeId);
- 
-                        if (!parameterExists) continue;
- 
-                        var existingParamValue = await _context.Nominationparametervalues
-                            .FirstOrDefaultAsync(npv => npv.NominationId == recognitionstatus.NominationId
-                                                      && npv.ParameterId == param.ParameterId);
- 
-                        if (existingParamValue != null)
-                        {
- 
-                            existingParamValue.ParameterValue = param.Value ?? "";
-                            existingParamValue.CreatedAt = DateTime.UtcNow;
-                            _context.Nominationparametervalues.Update(existingParamValue);
-                        }
-                        else
-                        {
- 
-                            var paramValue = new Nominationparametervalue
-                            {
-                                NominationId = recognitionstatus.NominationId,
-                                ParameterId = param.ParameterId,
-                                ParameterValue = param.Value ?? "",
-                                CreatedAt = DateTime.UtcNow
-                            };
- 
-                            _context.Nominationparametervalues.Add(paramValue);
-                        }
-                    }
- 
-                    await _context.SaveChangesAsync();
+                        NominationId = recognitionstatus.NominationId,
+                        ParameterId = param.ParameterId,
+                        ParameterValue = param.Value ?? "",
+                        CreatedAt = DateTime.UtcNow
+                    };
+
+                    _context.Nominationparametervalues.Add(paramValue);
                 }
- 
-                var tracking = new Nominationvisibilitytracking
-                {
-                    NominationId = recognitionstatus.NominationId,
-                    ViewedByEmployeeId = dto.NominatedByEmployeeId,
-                    ActionTaken = "Submitted",
-                    ViewedAt = DateTime.UtcNow
-                };
- 
-                _context.Nominationvisibilitytrackings.Add(tracking);
-                await _context.SaveChangesAsync();
- 
-                return Ok(new
-                {
-                    success = true,
-                    data = new { nominationId = recognitionstatus.NominationId },
-                    message = "Nomination submitted successfully"
-                });
             }
-            catch (Exception ex)
-            {
-                _logger.LogError($"[SUBMIT_NOMINATION] Error: {ex.Message}\n{ex.InnerException?.Message}");
-                return StatusCode(500, new { success = false, message = ex.InnerException?.Message ?? ex.Message });
-            }
+
+            await _context.SaveChangesAsync();
         }
- 
+
+        var tracking = new Nominationvisibilitytracking
+        {
+            NominationId = recognitionstatus.NominationId,
+            ViewedByEmployeeId = dto.NominatedByEmployeeId,
+            ActionTaken = "Submitted",
+            ViewedAt = DateTime.UtcNow
+        };
+
+        _context.Nominationvisibilitytrackings.Add(tracking);
+        await _context.SaveChangesAsync();
+
+        return Ok(new
+        {
+            success = true,
+            data = new { nominationId = recognitionstatus.NominationId },
+            message = "Nomination submitted successfully"
+        });
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError($"[SUBMIT_NOMINATION] Error: {ex.Message}\n{ex.InnerException?.Message}");
+        return StatusCode(500, new { success = false, message = ex.InnerException?.Message ?? ex.Message });
+    }
+}
+
+
+
+// ✅ NEW: Get existing nominations for an employee
+[HttpGet("employee-nominations/{employeeId}")]
+public async Task<IActionResult> GetEmployeeNominations(int employeeId)
+{
+    try
+    {
+        _logger.LogInformation($"[GET_EMPLOYEE_NOMINATIONS] Fetching nominations for Employee {employeeId}");
+
+        var nominations = await _context.Recognitionstatuses
+            .Include(n => n.Opportunity)
+                .ThenInclude(o => o.RewardType)
+            .Where(n => n.NomineeEmployeeId == employeeId
+                     && n.NominationType == "ManagerNomination")
+            .Select(n => new
+            {
+                n.NominationId,
+                n.Status,
+                n.SubmittedAt,
+                RewardTypeId = n.Opportunity.RewardTypeId,
+                RewardTypeName = n.Opportunity.RewardType.RewardName,
+                OpportunityName = n.Opportunity.OpportunityName
+            })
+            .ToListAsync();
+
+        _logger.LogInformation($"[GET_EMPLOYEE_NOMINATIONS] Found {nominations.Count} nominations for Employee {employeeId}");
+
+        return Ok(new
+        {
+            success = true,
+            data = nominations,
+            message = $"Found {nominations.Count} existing nominations"
+        });
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError($"[GET_EMPLOYEE_NOMINATIONS] Error: {ex.Message}");
+        return StatusCode(500, new { success = false, message = ex.Message });
+    }
+}
+
+
+
         [HttpGet("my-nominations/{managerId}")]
         public async Task<IActionResult> GetMyNominations(int managerId)
         {
