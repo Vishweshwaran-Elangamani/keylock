@@ -11,27 +11,13 @@ using Relevantz.EEPZ.Common.DTOs.Response;
 
 namespace Relevantz.EEPZ.Data.Repository.Implementations;
 
-/// <summary>
-/// Manager Review Repository with explicit DELETE-INSERT pattern for L1 reviews
-/// Converted from hardcoded SQL to LINQ for better type safety and maintainability
-/// When L1 (Approver) resubmits after L2 rejection, existing review rows are deleted and replaced
-/// This ensures only the latest L1 ratings are stored, preventing duplicate rows
-/// L2 Reviewer can see submitted forms immediately, regardless of L1 review status
-/// </summary>
+
 public partial class ManagerReviewRepository : IManagerReviewRepository
 {
     private readonly EEPZDbContext _ctx;
     
     public ManagerReviewRepository(EEPZDbContext ctx) => _ctx = ctx;
 
-    /// <summary>
-    /// Get submitted forms for L1 Approver (pagination supported)
-    /// Returns assessments that:
-    /// - Are in scope for the approver (based on project L1 approver assignment)
-    /// - Have been submitted by the employee
-    /// - Do NOT have any L1 reviews yet
-    /// - Do NOT have all details decided at L2
-    /// </summary>
     public async Task<IEnumerable<ApproverAssignmentRowDto>> GetApproverSubmittedFormsAsync(
         int approverUserId, int page, int pageSize)
     {
@@ -39,7 +25,7 @@ public partial class ManagerReviewRepository : IManagerReviewRepository
         if (pageSize < 1) pageSize = 25;
         var offset = (page - 1) * pageSize;
 
-        // Get the L1 approver's employee ID
+        
         var l1EmployeeId = await _ctx.Userauthentications
             .Where(ua => ua.UserId == approverUserId)
             .Select(ua => ua.Employee.EmployeeId)
@@ -47,7 +33,7 @@ public partial class ManagerReviewRepository : IManagerReviewRepository
 
         if (l1EmployeeId == 0) return Enumerable.Empty<ApproverAssignmentRowDto>();
 
-        // Get assessments in scope for this L1 approver
+        
         var scopeAssessmentIds = await _ctx.Selfassessments
             .Where(sa => sa.Status == "Submitted")
             .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
@@ -66,14 +52,14 @@ public partial class ManagerReviewRepository : IManagerReviewRepository
             .Distinct()
             .ToListAsync();
 
-        // Get latest L1 reviews per detail
+        
         var latestL1ReviewIds = await _ctx.Assessmentreviews
             .Where(ar => ar.ReviewerRole == "Approver" && ar.DetailId != null)
             .GroupBy(ar => ar.DetailId)
             .Select(g => g.Max(ar => ar.ReviewId))
             .ToListAsync();
 
-        // Get assessments that have L1 reviews
+        
         var hasL1AssessmentIds = await _ctx.Assessmentreviews
             .Where(ar => ar.ReviewerRole == "Approver" && ar.DetailId != null)
             .Select(ar => ar.DetailId)
@@ -85,14 +71,14 @@ public partial class ManagerReviewRepository : IManagerReviewRepository
             .Distinct()
             .ToListAsync();
 
-        // Get latest L2 reviews per detail
+        
         var latestL2Reviews = await _ctx.Assessmentreviews
             .Where(ar => ar.ReviewerRole == "Reviewer" && ar.DetailId != null)
             .GroupBy(ar => ar.DetailId)
             .Select(g => g.OrderByDescending(ar => ar.ReviewId).First())
             .ToListAsync();
 
-        // Get assessments with all details decided at L2
+        
         var decidedAssessmentIds = latestL2Reviews
             .Where(ar => ar.ReviewStatus == "Approved" || ar.ReviewStatus == "Rejected")
             .Select(ar => ar.DetailId)
@@ -113,12 +99,12 @@ public partial class ManagerReviewRepository : IManagerReviewRepository
                 fullyDecidedAssessmentIds.Add(decided.AssessmentId);
         }
 
-        // Get visible assessments (not decided, no L1 reviews)
+        
         var visibleAssessmentIds = scopeAssessmentIds
             .Where(id => !fullyDecidedAssessmentIds.Contains(id) && !assessmentsWithL1Details.Contains(id))
             .ToList();
 
-        // Get the data with pagination
+        
         var result = await _ctx.Selfassessments
             .Where(sa => visibleAssessmentIds.Contains(sa.AssessmentId))
             .Join(_ctx.Assessmentforms, sa => sa.FormId, f => f.FormId, (sa, f) => new { sa, f })
@@ -153,13 +139,8 @@ public partial class ManagerReviewRepository : IManagerReviewRepository
         return result;
     }
 
-    /// <summary>
-    /// Get submitted forms for L2 Reviewer (pagination supported)
-    /// Returns assessments that:
-    /// - Are in scope for the reviewer (based on project L2 approver assignment)
-    /// - Have been submitted by the employee
-    /// - Do NOT have all details decided at L2
-    /// </summary>
+
+    
     public async Task<IEnumerable<ApproverAssignmentRowDto>> GetReviewerSubmittedFormsAsync(
         int reviewerUserId, int page, int pageSize)
     {
@@ -167,7 +148,7 @@ public partial class ManagerReviewRepository : IManagerReviewRepository
         if (pageSize < 1) pageSize = 25;
         var offset = (page - 1) * pageSize;
 
-        // Get the L2 reviewer's employee ID
+        
         var l2EmployeeId = await _ctx.Userauthentications
             .Where(ua => ua.UserId == reviewerUserId)
             .Select(ua => ua.Employee.EmployeeId)
@@ -175,7 +156,7 @@ public partial class ManagerReviewRepository : IManagerReviewRepository
 
         if (l2EmployeeId == 0) return Enumerable.Empty<ApproverAssignmentRowDto>();
 
-        // Get assessments in scope for this L2 reviewer
+        
         var scopeAssessmentIds = await _ctx.Selfassessments
             .Where(sa => sa.Status == "Submitted")
             .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
@@ -190,7 +171,7 @@ public partial class ManagerReviewRepository : IManagerReviewRepository
             .Distinct()
             .ToListAsync();
 
-        // Get latest L2 reviews per detail with decided status
+        
         var latestL2Reviews = await _ctx.Assessmentreviews
             .Where(ar => ar.ReviewerRole == "Reviewer" && ar.DetailId != null)
             .GroupBy(ar => ar.DetailId)
@@ -202,7 +183,7 @@ public partial class ManagerReviewRepository : IManagerReviewRepository
             .Select(ar => ar.DetailId)
             .ToList();
 
-        // Find assessments with all details decided
+        
         var fullyDecidedAssessmentIds = await _ctx.Assessmentdetails
             .Where(ad => decidedDetailIds.Contains(ad.DetailId))
             .GroupBy(ad => ad.AssessmentId)
@@ -210,12 +191,12 @@ public partial class ManagerReviewRepository : IManagerReviewRepository
             .Select(g => g.Key)
             .ToListAsync();
 
-        // Get visible assessments (not fully decided)
+        
         var visibleAssessmentIds = scopeAssessmentIds
             .Where(id => !fullyDecidedAssessmentIds.Contains(id))
             .ToList();
 
-        // Get the data with pagination
+        
         var result = await _ctx.Selfassessments
             .Where(sa => visibleAssessmentIds.Contains(sa.AssessmentId))
             .Join(_ctx.Assessmentforms, sa => sa.FormId, f => f.FormId, (sa, f) => new { sa, f })
@@ -250,17 +231,17 @@ public partial class ManagerReviewRepository : IManagerReviewRepository
         return result;
     }
 
-    /// <summary>
-    /// Save L1 (Approver) review with DELETE-INSERT pattern
-    /// When L1 resubmits, existing reviews are deleted first, then new ones are inserted
-    /// This prevents duplicate rows and maintains only the latest L1 ratings
-    /// </summary>
+    
+    
+    
+    
+    
     public async Task<int> SaveApproverReviewAsync(int approverUserId, SubmitReviewDto dto)
     {
         if (dto is null || dto.Items is null || dto.Items.Count == 0)
             return 0;
 
-        // Get the L1 approver's employee ID
+        
         var l1EmployeeId = await _ctx.Userauthentications
             .Where(ua => ua.UserId == approverUserId)
             .Select(ua => ua.Employee.EmployeeId)
@@ -268,7 +249,7 @@ public partial class ManagerReviewRepository : IManagerReviewRepository
 
         if (l1EmployeeId == 0) return 0;
 
-        // Verify assessment is in scope
+        
         var isInScope = await _ctx.Selfassessments
             .Where(sa => sa.AssessmentId == dto.AssessmentId && sa.Status == "Submitted")
             .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
@@ -284,7 +265,7 @@ public partial class ManagerReviewRepository : IManagerReviewRepository
 
         if (!isInScope) return 0;
 
-        // Validate all detail IDs belong to this assessment
+        
         var postedIds = dto.Items.Select(i => i.DetailId).Distinct().ToArray();
         var validCount = await _ctx.Assessmentdetails
             .CountAsync(ad => ad.AssessmentId == dto.AssessmentId && postedIds.Contains(ad.DetailId));
@@ -295,7 +276,7 @@ public partial class ManagerReviewRepository : IManagerReviewRepository
 
         try
         {
-            // Delete old L1 reviews for these details
+            
             var oldReviews = await _ctx.Assessmentreviews
                 .Where(ar => ar.ReviewerId == approverUserId 
                     && ar.ReviewerRole == "Approver" 
@@ -306,7 +287,7 @@ public partial class ManagerReviewRepository : IManagerReviewRepository
             _ctx.Assessmentreviews.RemoveRange(oldReviews);
             await _ctx.SaveChangesAsync();
 
-            // Insert new L1 reviews
+            
             var affected = 0;
             foreach (var item in dto.Items)
             {
@@ -327,7 +308,7 @@ public partial class ManagerReviewRepository : IManagerReviewRepository
 
             await _ctx.SaveChangesAsync();
 
-            // Reset L2 reviews to Pending if they were previously rejected
+            
             var rejectedL2Reviews = await _ctx.Assessmentreviews
                 .Where(ar => ar.ReviewerRole == "Reviewer" 
                     && ar.ReviewStatus == "Rejected"
@@ -351,16 +332,16 @@ public partial class ManagerReviewRepository : IManagerReviewRepository
         }
     }
 
-    /// <summary>
-    /// Get detailed assessment view for L2 Reviewer
-    /// </summary>
-   /// <summary>
-/// Get detailed assessment view for L2 Reviewer
-/// </summary>
+    
+    
+    
+   
+
+
 public async Task<ReviewerAssessmentViewDto?> GetAssessmentForReviewerAsync(
     int reviewerUserId, int assessmentId)
 {
-    // Get the L2 reviewer's employee ID
+    
     var l2EmployeeId = await _ctx.Userauthentications
         .Where(ua => ua.UserId == reviewerUserId)
         .Select(ua => ua.Employee.EmployeeId)
@@ -368,7 +349,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForReviewerAsync(
 
     if (l2EmployeeId == 0) return null;
 
-    // Verify assessment is in scope
+    
     var isInScope = await _ctx.Selfassessments
         .Where(sa => sa.AssessmentId == assessmentId && sa.Status == "Submitted")
         .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
@@ -384,7 +365,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForReviewerAsync(
 
     if (isInScope == null) return null;
 
-    // Get header information - FIX: Project to anonymous type to avoid navigation property access
+    
     var assessment = await _ctx.Selfassessments
         .Where(sa => sa.AssessmentId == assessmentId)
         .Select(sa => new 
@@ -398,7 +379,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForReviewerAsync(
 
     if (assessment == null) return null;
 
-    // Use EmployeeId directly from assessment (not navigation property)
+    
     var employee = await _ctx.Employees
         .FirstOrDefaultAsync(e => e.EmployeeId == assessment.EmployeeId);
 
@@ -428,7 +409,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForReviewerAsync(
         ? string.Concat(userProfile.FirstName, " ", userProfile.LastName).Trim()
         : (string.IsNullOrWhiteSpace(userAuth?.Email) ? employee.EmployeeCompanyId : userAuth.Email);
 
-    // Get latest L1 and L2 reviews
+    
     var latestL1Reviews = await _ctx.Assessmentreviews
         .Where(ar => ar.ReviewerRole == "Approver" && ar.Rating > 0)
         .GroupBy(ar => ar.DetailId)
@@ -441,7 +422,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForReviewerAsync(
         .Select(g => g.OrderByDescending(ar => ar.ReviewId).First())
         .ToListAsync();
 
-    // Get competency details
+    
     var details = await _ctx.Assessmentdetails
         .Where(ad => ad.AssessmentId == assessmentId)
         .Join(_ctx.Competencies, ad => ad.CompetencyId, c => c.CompetencyId, 
@@ -474,16 +455,12 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForReviewerAsync(
     );
 }
 
-    /// <summary>
-    /// Get detailed assessment view for L1 Approver
-    /// </summary>
-   /// <summary>
-/// Get detailed assessment view for L1 Approver
-/// </summary>
+
+
 public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
     int approverUserId, int assessmentId)
 {
-    // Get the L1 approver's employee ID
+    
     var l1EmployeeId = await _ctx.Userauthentications
         .Where(ua => ua.UserId == approverUserId)
         .Select(ua => ua.Employee.EmployeeId)
@@ -491,7 +468,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
 
     if (l1EmployeeId == 0) return null;
 
-    // Verify assessment is in scope
+    
     var isInScope = await _ctx.Selfassessments
         .Where(sa => sa.AssessmentId == assessmentId && sa.Status == "Submitted")
         .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
@@ -507,7 +484,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
 
     if (isInScope == null) return null;
 
-    // Get header information - FIX: Get EmployeeId directly from assessment
+    
     var assessment = await _ctx.Selfassessments
         .Where(sa => sa.AssessmentId == assessmentId)
         .Select(sa => new 
@@ -521,7 +498,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
 
     if (assessment == null) return null;
 
-    // Use the EmployeeId from the assessment object directly
+    
     var employee = await _ctx.Employees
         .FirstOrDefaultAsync(e => e.EmployeeId == assessment.EmployeeId);
 
@@ -551,7 +528,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
         ? string.Concat(userProfile.FirstName, " ", userProfile.LastName).Trim()
         : (string.IsNullOrWhiteSpace(userAuth?.Email) ? employee.EmployeeCompanyId : userAuth.Email);
 
-    // Get latest L1 and L2 reviews
+    
     var latestL1Reviews = await _ctx.Assessmentreviews
         .Where(ar => ar.ReviewerRole == "Approver")
         .GroupBy(ar => ar.DetailId)
@@ -564,7 +541,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
         .Select(g => g.OrderByDescending(ar => ar.ReviewId).First())
         .ToListAsync();
 
-    // Get competency details
+    
     var details = await _ctx.Assessmentdetails
         .Where(ad => ad.AssessmentId == assessmentId)
         .Join(_ctx.Competencies, ad => ad.CompetencyId, c => c.CompetencyId, 
@@ -597,9 +574,9 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
     );
 }
 
-    /// <summary>
-    /// Get L1 submitted ratings with pagination
-    /// </summary>
+    
+    
+    
     public async Task<IEnumerable<ApproverAssignmentRowDto>> GetSubmittedL1RatingsAsync(
         int approverUserId, int page, int pageSize)
     {
@@ -607,7 +584,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
         if (pageSize < 1) pageSize = 25;
         var offset = (page - 1) * pageSize;
 
-        // Get the L1 approver's employee ID
+        
         var l1EmployeeId = await _ctx.Userauthentications
             .Where(ua => ua.UserId == approverUserId)
             .Select(ua => ua.Employee.EmployeeId)
@@ -615,7 +592,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
 
         if (l1EmployeeId == 0) return Enumerable.Empty<ApproverAssignmentRowDto>();
 
-        // Get assessments in scope with L1 reviews
+        
         var assessmentIds = await _ctx.Selfassessments
             .Where(sa => sa.Status == "Submitted")
             .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
@@ -630,7 +607,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
             .Distinct()
             .ToListAsync();
 
-        // Get assessments with L1 reviews (rating > 0)
+        
         var l1DoneAssessments = await _ctx.Assessmentreviews
             .Where(ar => ar.ReviewerRole == "Approver" && ar.Rating > 0)
             .Select(ar => ar.DetailId)
@@ -646,7 +623,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
             .Where(id => assessmentsWithL1.Contains(id))
             .ToList();
 
-        // Get data with pagination
+        
         var result = await _ctx.Selfassessments
             .Where(sa => finalAssessmentIds.Contains(sa.AssessmentId))
             .Join(_ctx.Assessmentforms, sa => sa.FormId, f => f.FormId, (sa, f) => new { sa, f })
@@ -681,9 +658,9 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
         return result;
     }
 
-    /// <summary>
-    /// Get L2 submitted ratings with pagination
-    /// </summary>
+    
+    
+    
     public async Task<IEnumerable<ApproverAssignmentRowDto>> GetReviewerSubmittedRatingsAsync(
         int reviewerUserId, int page, int pageSize)
     {
@@ -691,7 +668,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
         if (pageSize < 1) pageSize = 25;
         var offset = (page - 1) * pageSize;
 
-        // Get the L2 reviewer's employee ID
+        
         var l2EmployeeId = await _ctx.Userauthentications
             .Where(ua => ua.UserId == reviewerUserId)
             .Select(ua => ua.Employee.EmployeeId)
@@ -699,7 +676,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
 
         if (l2EmployeeId == 0) return Enumerable.Empty<ApproverAssignmentRowDto>();
 
-        // Get assessments in scope
+        
         var scopeAssessments = await _ctx.Selfassessments
             .Where(sa => sa.Status == "Submitted")
             .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
@@ -714,7 +691,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
             .Distinct()
             .ToListAsync();
 
-        // Get assessments with L2 decisions (Approved or Rejected)
+        
         var latestL2Reviews = await _ctx.Assessmentreviews
             .Where(ar => ar.ReviewerRole == "Reviewer" && 
                 (ar.ReviewStatus == "Approved" || ar.ReviewStatus == "Rejected"))
@@ -733,7 +710,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
             .Where(id => submittedAssessments.Contains(id))
             .ToList();
 
-        // Get data with pagination
+        
         var result = await _ctx.Selfassessments
             .Where(sa => finalAssessmentIds.Contains(sa.AssessmentId))
             .Join(_ctx.Assessmentforms, sa => sa.FormId, f => f.FormId, (sa, f) => new { sa, f })
@@ -768,14 +745,14 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
         return result;
     }
 
-    /// <summary>
-    /// Save L2 (Reviewer) review
-    /// </summary>
+    
+    
+    
     public async Task<int> SaveReviewerReviewAsync(int reviewerUserId, SubmitReviewDto dto)
     {
         if (dto is null || dto.Items is null || dto.Items.Count == 0) return 0;
 
-        // Get the L2 reviewer's employee ID
+        
         var l2EmployeeId = await _ctx.Userauthentications
             .Where(ua => ua.UserId == reviewerUserId)
             .Select(ua => ua.Employee.EmployeeId)
@@ -783,7 +760,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
 
         if (l2EmployeeId == 0) return 0;
 
-        // Verify assessment is in scope
+        
         var inScope = await _ctx.Selfassessments
             .Where(sa => sa.AssessmentId == dto.AssessmentId && sa.Status == "Submitted")
             .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
@@ -799,7 +776,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
 
         if (!inScope) return 0;
 
-        // Validate all detail IDs belong to this assessment
+        
         var ids = dto.Items.Select(x => x.DetailId).Distinct().ToArray();
         var valid = await _ctx.Assessmentdetails
             .CountAsync(ad => ad.AssessmentId == dto.AssessmentId && ids.Contains(ad.DetailId));
@@ -839,9 +816,9 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
         }
     }
 
-    /// <summary>
-    /// Submit L1 (Approver) reviews
-    /// </summary>
+    
+    
+    
     public async Task SubmitApproverReviewsAsync(
         int approverId,
         int assessmentId,
@@ -866,9 +843,9 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
         await _ctx.SaveChangesAsync();
     }
 
-    /// <summary>
-    /// Submit L2 (Reviewer) reviews
-    /// </summary>
+    
+    
+    
     public async Task SubmitReviewerReviewsAsync(
         int reviewerUserId,
         int assessmentId,
@@ -880,7 +857,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
         {
             foreach (var item in items)
             {
-                // Check if review already exists
+                
                 var existingReview = await _ctx.Assessmentreviews
                     .FirstOrDefaultAsync(ar => ar.DetailId == item.DetailId 
                         && ar.ReviewerId == reviewerUserId 
@@ -889,7 +866,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
 
                 if (existingReview != null)
                 {
-                    // Update existing
+                    
                     existingReview.Rating = item.Rating;
                     existingReview.Comments = item.Comments;
                     existingReview.ReviewedAt = DateTime.Now;
@@ -898,7 +875,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
                 }
                 else
                 {
-                    // Insert new
+                    
                     var newReview = new Assessmentreview
                     {
                         DetailId = item.DetailId,
@@ -923,9 +900,9 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
         }
     }
 
-    /// <summary>
-    /// Set L2 (Reviewer) decision (Approved/Rejected)
-    /// </summary>
+    
+    
+    
     public async Task<bool> SetReviewerDecisionAsync(
         int reviewerUserId,
         int assessmentId,
@@ -938,7 +915,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
 
         if (!approved && !rejected) return false;
 
-        // Get the L2 reviewer's employee ID
+        
         var l2EmployeeId = await _ctx.Userauthentications
             .Where(ua => ua.UserId == reviewerUserId)
             .Select(ua => ua.Employee.EmployeeId)
@@ -946,7 +923,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
 
         if (l2EmployeeId == 0) return false;
 
-        // Verify assessment is in scope
+        
         var inScope = await _ctx.Selfassessments
             .Where(sa => sa.AssessmentId == assessmentId && sa.Status == "Submitted")
             .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
@@ -979,7 +956,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
 
             var finalDecision = approved ? "Approved" : "Rejected";
 
-            // Update all L2 ratings with decision
+            
             var reviewsToUpdate = await _ctx.Assessmentreviews
                 .Where(ar => ar.ReviewerRole == "Reviewer" 
                     && ar.ReviewerId == reviewerUserId 
@@ -1001,7 +978,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
                 var note = reviewerComment ?? "Reviewer Rejected";
                 var firstDetailId = detailIds.First();
 
-                // Check if rejection note already exists
+                
                 var existingNote = await _ctx.Assessmentreviews
                     .FirstOrDefaultAsync(ar => ar.DetailId == firstDetailId 
                         && ar.ReviewerId == reviewerUserId 
@@ -1032,7 +1009,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
             }
             else
             {
-                // Delete rejection notes if approving
+                
                 var notesToDelete = await _ctx.Assessmentreviews
                     .Where(ar => ar.ReviewerRole == "Reviewer" 
                         && ar.ReviewerId == reviewerUserId 
@@ -1046,7 +1023,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
             await _ctx.SaveChangesAsync();
             await tx.CommitAsync();
 
-            // Update progress tracker
+            
             try
             {
                 var assessment = await _ctx.Selfassessments
@@ -1069,7 +1046,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
             }
             catch
             {
-                // Silently fail - main decision was committed
+                
             }
 
             return true;
@@ -1081,9 +1058,9 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
         }
     }
 
-    /// <summary>
-    /// Set L1 (Approver) decision (Approved/Rejected)
-    /// </summary>
+    
+    
+    
     public async Task<bool> SetApproverDecisionAsync(
         int approverUserId,
         int assessmentId,
@@ -1096,7 +1073,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
 
         if (!approved && !rejected) return false;
 
-        // Get the L1 approver's employee ID
+        
         var l1EmployeeId = await _ctx.Userauthentications
             .Where(ua => ua.UserId == approverUserId)
             .Select(ua => ua.Employee.EmployeeId)
@@ -1104,7 +1081,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
 
         if (l1EmployeeId == 0) return false;
 
-        // Verify assessment is in scope
+        
         var inScope = await _ctx.Selfassessments
             .Where(sa => sa.AssessmentId == assessmentId && sa.Status == "Submitted")
             .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
@@ -1137,7 +1114,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
 
             var finalDecision = approved ? "Approved" : "Rejected";
 
-            // Update all L1 ratings with decision
+            
             var reviewsToUpdate = await _ctx.Assessmentreviews
                 .Where(ar => ar.ReviewerRole == "Approver" 
                     && ar.ReviewerId == approverUserId 
@@ -1159,7 +1136,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
                 var note = approverComment ?? "Approver Rejected";
                 var firstDetailId = detailIds.First();
 
-                // Check if rejection note already exists
+                
                 var existingNote = await _ctx.Assessmentreviews
                     .FirstOrDefaultAsync(ar => ar.DetailId == firstDetailId 
                         && ar.ReviewerId == approverUserId 
@@ -1190,7 +1167,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
             }
             else
             {
-                // Delete rejection notes if approving
+                
                 var notesToDelete = await _ctx.Assessmentreviews
                     .Where(ar => ar.ReviewerRole == "Approver" 
                         && ar.ReviewerId == approverUserId 
@@ -1212,9 +1189,9 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
         }
     }
 
-    /// <summary>
-    /// Get rework forms for L1 Approver (rejected forms)
-    /// </summary>
+    
+    
+    
     public async Task<IEnumerable<ApproverAssignmentRowDto>> GetApproverReworkFormsAsync(
         int approverUserId, int page, int pageSize)
     {
@@ -1222,7 +1199,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
         if (pageSize < 1) pageSize = 25;
         var offset = (page - 1) * pageSize;
 
-        // Get the L1 approver's employee ID
+        
         var l1EmployeeId = await _ctx.Userauthentications
             .Where(ua => ua.UserId == approverUserId)
             .Select(ua => ua.Employee.EmployeeId)
@@ -1230,7 +1207,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
 
         if (l1EmployeeId == 0) return Enumerable.Empty<ApproverAssignmentRowDto>();
 
-        // Get assessments in scope for this L1 approver
+        
         var scopeAssessmentIds = await _ctx.Selfassessments
             .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
             .Join(_ctx.Employees, x => x.ua.EmployeeId, e => e.EmployeeId, (x, e) => new { x.sa, e })
@@ -1244,7 +1221,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
             .Distinct()
             .ToListAsync();
 
-        // Get latest L2 reviews with Rejected status
+        
         var latestL2Reviews = await _ctx.Assessmentreviews
             .Where(ar => ar.ReviewerRole == "Reviewer" && ar.DetailId != null)
             .GroupBy(ar => ar.DetailId)
@@ -1266,7 +1243,7 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
             .Where(id => reworkAssessmentIds.Contains(id))
             .ToList();
 
-        // Get data with pagination
+        
         var result = await _ctx.Selfassessments
             .Where(sa => finalAssessmentIds.Contains(sa.AssessmentId))
             .Join(_ctx.Assessmentforms, sa => sa.FormId, f => f.FormId, (sa, f) => new { sa, f })
@@ -1301,12 +1278,12 @@ public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(
         return result;
     }
 
-    /// <summary>
-    /// Get detailed assessments for L1 Approver with pagination
-    /// </summary>
-    /// <summary>
-/// Get detailed assessments for L1 Approver with pagination
-/// </summary>
+    
+    
+    
+    
+
+
 public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetApproverAssessmentsWithDetailsAsync(
     int approverUserId, int page, int pageSize)
 {
@@ -1314,7 +1291,7 @@ public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetApproverAssessments
     if (pageSize < 1) pageSize = 25;
     var offset = (page - 1) * pageSize;
 
-    // Get the L1 approver's employee ID
+    
     var l1EmployeeId = await _ctx.Userauthentications
         .Where(ua => ua.UserId == approverUserId)
         .Select(ua => ua.Employee.EmployeeId)
@@ -1322,7 +1299,7 @@ public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetApproverAssessments
 
     if (l1EmployeeId == 0) return Enumerable.Empty<ReviewerAssessmentViewDto>();
 
-    // Get assessments in scope
+    
     var scopeAssessmentIds = await _ctx.Selfassessments
         .Where(sa => sa.Status == "Submitted")
         .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
@@ -1337,7 +1314,7 @@ public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetApproverAssessments
         .Distinct()
         .ToListAsync();
 
-    // Get assessments with L1 reviews
+    
     var hasL1AssessmentIds = await _ctx.Assessmentreviews
         .Where(ar => ar.ReviewerRole == "Approver" && ar.DetailId != null)
         .Select(ar => ar.DetailId)
@@ -1349,7 +1326,7 @@ public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetApproverAssessments
         .Distinct()
         .ToListAsync();
 
-    // Get assessments with all details decided at L2
+    
     var latestL2Reviews = await _ctx.Assessmentreviews
         .Where(ar => ar.ReviewerRole == "Reviewer" && ar.DetailId != null)
         .GroupBy(ar => ar.DetailId)
@@ -1372,12 +1349,12 @@ public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetApproverAssessments
             fullyDecidedAssessmentIds.Add(assessmentId);
     }
 
-    // Get visible assessments
+    
     var visibleAssessmentIds = scopeAssessmentIds
         .Where(id => !fullyDecidedAssessmentIds.Contains(id) && !assessmentsWithL1.Contains(id))
         .ToList();
 
-    // Get assessments with pagination
+    
     var paginatedAssessmentIds = await _ctx.Selfassessments
         .Where(sa => visibleAssessmentIds.Contains(sa.AssessmentId))
         .OrderByDescending(sa => sa.SubmittedAt)
@@ -1386,12 +1363,12 @@ public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetApproverAssessments
         .Select(sa => sa.AssessmentId)
         .ToListAsync();
 
-    // Get all details for these assessments
+    
     var result = new List<ReviewerAssessmentViewDto>();
 
     foreach (var assessmentId in paginatedAssessmentIds)
     {
-        // FIX: Project to anonymous type to avoid navigation property access
+        
         var assessment = await _ctx.Selfassessments
             .Where(sa => sa.AssessmentId == assessmentId)
             .Select(sa => new 
@@ -1405,7 +1382,7 @@ public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetApproverAssessments
 
         if (assessment == null) continue;
 
-        // Use EmployeeId directly from assessment
+        
         var employee = await _ctx.Employees
             .FirstOrDefaultAsync(e => e.EmployeeId == assessment.EmployeeId);
 
@@ -1435,7 +1412,7 @@ public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetApproverAssessments
             ? string.Concat(userProfile.FirstName, " ", userProfile.LastName).Trim()
             : (string.IsNullOrWhiteSpace(userAuth?.Email) ? employee.EmployeeCompanyId : userAuth.Email);
 
-        // Get latest reviews
+        
         var latestL1Reviews = await _ctx.Assessmentreviews
             .Where(ar => ar.ReviewerRole == "Approver")
             .GroupBy(ar => ar.DetailId)
@@ -1448,7 +1425,7 @@ public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetApproverAssessments
             .Select(g => g.OrderByDescending(ar => ar.ReviewId).First())
             .ToListAsync();
 
-        // Get competencies
+        
         var details = await _ctx.Assessmentdetails
             .Where(ad => ad.AssessmentId == assessmentId)
             .Join(_ctx.Competencies, ad => ad.CompetencyId, c => c.CompetencyId, 
@@ -1482,15 +1459,6 @@ public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetApproverAssessments
     return result;
 }
 
-
-    /// <summary>
-    /// Get detailed assessments for L2 Reviewer with pagination
-    /// Only returns assessments where ALL L1 details have been approved
-    /// </summary>
-    /// <summary>
-/// Get detailed assessments for L2 Reviewer with pagination
-/// Only returns assessments where ALL L1 details have been approved
-/// </summary>
 public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetReviewerAssessmentsWithDetailsAsync(
     int reviewerUserId, int page, int pageSize)
 {
@@ -1498,7 +1466,7 @@ public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetReviewerAssessments
     if (pageSize < 1) pageSize = 25;
     var offset = (page - 1) * pageSize;
 
-    // Get the L2 reviewer's employee ID
+    
     var l2EmployeeId = await _ctx.Userauthentications
         .Where(ua => ua.UserId == reviewerUserId)
         .Select(ua => ua.Employee.EmployeeId)
@@ -1506,7 +1474,7 @@ public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetReviewerAssessments
 
     if (l2EmployeeId == 0) return Enumerable.Empty<ReviewerAssessmentViewDto>();
 
-    // Get assessments in scope
+    
     var scopeAssessmentIds = await _ctx.Selfassessments
         .Where(sa => sa.Status == "Submitted")
         .Join(_ctx.Userauthentications, sa => sa.EmployeeId, ua => ua.UserId, (sa, ua) => new { sa, ua })
@@ -1521,7 +1489,7 @@ public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetReviewerAssessments
         .Distinct()
         .ToListAsync();
 
-    // Get assessments with ALL L1 details approved
+    
     var latestL1Reviews = await _ctx.Assessmentreviews
         .Where(ar => ar.ReviewerRole == "Approver")
         .GroupBy(ar => ar.DetailId)
@@ -1544,7 +1512,7 @@ public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetReviewerAssessments
             l1ApprovedAssessmentIds.Add(assessmentId);
     }
 
-    // Get assessments with all details decided at L2
+    
     var latestL2Reviews = await _ctx.Assessmentreviews
         .Where(ar => ar.ReviewerRole == "Reviewer")
         .GroupBy(ar => ar.DetailId)
@@ -1567,12 +1535,12 @@ public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetReviewerAssessments
             fullyDecidedAssessmentIds.Add(assessmentId);
     }
 
-    // Get visible assessments
+    
     var visibleAssessmentIds = l1ApprovedAssessmentIds
         .Where(id => !fullyDecidedAssessmentIds.Contains(id))
         .ToList();
 
-    // Get assessments with pagination
+    
     var paginatedAssessmentIds = await _ctx.Selfassessments
         .Where(sa => visibleAssessmentIds.Contains(sa.AssessmentId))
         .OrderByDescending(sa => sa.SubmittedAt)
@@ -1581,12 +1549,12 @@ public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetReviewerAssessments
         .Select(sa => sa.AssessmentId)
         .ToListAsync();
 
-    // Get all details for these assessments
+    
     var result = new List<ReviewerAssessmentViewDto>();
 
     foreach (var assessmentId in paginatedAssessmentIds)
     {
-        // FIX: Project to anonymous type to avoid navigation property access
+        
         var assessment = await _ctx.Selfassessments
             .Where(sa => sa.AssessmentId == assessmentId)
             .Select(sa => new 
@@ -1600,7 +1568,7 @@ public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetReviewerAssessments
 
         if (assessment == null) continue;
 
-        // Use EmployeeId directly from assessment (not navigation property)
+        
         var employee = await _ctx.Employees
             .FirstOrDefaultAsync(e => e.EmployeeId == assessment.EmployeeId);
 
@@ -1630,11 +1598,11 @@ public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetReviewerAssessments
             ? string.Concat(userProfile.FirstName, " ", userProfile.LastName).Trim()
             : (string.IsNullOrWhiteSpace(userAuth?.Email) ? employee.EmployeeCompanyId : userAuth.Email);
 
-        // Get latest reviews
+        
         var latestL1ReviewsList = latestL1Reviews.ToList();
         var latestL2ReviewsList = latestL2Reviews.ToList();
 
-        // Get competencies
+        
         var details = await _ctx.Assessmentdetails
             .Where(ad => ad.AssessmentId == assessmentId)
             .Join(_ctx.Competencies, ad => ad.CompetencyId, c => c.CompetencyId, 
@@ -1669,9 +1637,9 @@ public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetReviewerAssessments
 }
 
 
-    /// <summary>
-    /// Get the latest L2 decision for an assessment
-    /// </summary>
+    
+    
+    
     public async Task<ReviewerDecisionDto?> GetLatestReviewerDecisionAsync(int assessmentId)
     {
         var decision = await _ctx.Assessmentreviews
@@ -1692,9 +1660,9 @@ public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetReviewerAssessments
         );
     }
 
-    /// <summary>
-    /// Get attachments for an assessment
-    /// </summary>
+    
+    
+    
     public async Task<List<AttachmentInfoDto>> GetAssessmentAttachmentsAsync(int assessmentId)
     {
         var attachments = await _ctx.Selfassessmentattachments
