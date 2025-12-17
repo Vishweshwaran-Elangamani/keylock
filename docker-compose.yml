@@ -261,6 +261,25 @@ services:
       - ./logs:/app/Logs
     networks:
       - eepz-network
+  
+  org-feedback-api:
+    build: ./Relevantz.EEPZ.OrgFeedbackApi
+    container_name: eepz-org-feedback-api
+    restart: always
+    ports:
+      - "5115:5115"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
+      - ASPNETCORE_URLS=http://+:5115
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/Logs
+    networks:
+      - eepz-network
 
   sla-api:
     build: ./Relevantz.EEPZ.SLAApi
