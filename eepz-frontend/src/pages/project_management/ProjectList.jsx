@@ -1,7 +1,7 @@
 // src/pages/ProjectManagement/ProjectList.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FolderKanban, Plus, Edit, Trash2, UserCog, Users, Search, Filter, Calendar, Building, Briefcase, AlertCircle, ChevronLeft, ChevronRight, Home, X } from 'lucide-react';
+import { FolderKanban, Plus, Edit, Trash2, UserCog, Users, Search, Filter, Calendar, Building, Briefcase, AlertCircle, ChevronLeft, ChevronRight, Home, X, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 import projectService from '../../services/project_management/projectService';
 import '../../styles/projectmanagement/ProjectList.css'
@@ -11,6 +11,61 @@ import EditProjectModal from '../../components/project_management_components/mod
 import ManagerSelectionModal from '../../components/project_management_components/modals/ManagerSelectionModal'
 import EmployeeMappingModal from '../../components/project_management_components/modals/EmployeeMappingModal'
 import DeleteConfirmationModal from '../../components/project_management_components/modals/DeleteConfirmationModal'
+
+// Custom Status Dropdown Component
+const CustomStatusDropdown = ({ value, onChange }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const statusOptions = [
+    "All Status",
+    "Active",
+    "On Hold",
+    "Completed",
+    "Cancelled"
+  ];
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSelect = (option) => {
+    onChange(option);
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="prj-list-dropdown-wrapper" ref={dropdownRef}>
+      <div
+        className={`prj-list-dropdown-select ${isOpen ? "open" : ""}`}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span className="prj-list-dropdown-value">{value}</span>
+        <ChevronDown size={18} className={`prj-list-dropdown-arrow ${isOpen ? "rotate" : ""}`} />
+      </div>
+      {isOpen && (
+        <ul className="prj-list-dropdown-list">
+          {statusOptions.map((option, idx) => (
+            <li
+              key={idx}
+              className={`prj-list-dropdown-option ${value === option ? "selected" : ""}`}
+              onClick={() => handleSelect(option)}
+            >
+              {option}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
 
 const ProjectList = () => {
   const navigate = useNavigate();
@@ -22,7 +77,7 @@ const ProjectList = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeSearchTerm, setActiveSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('All');
+  const [filterStatus, setFilterStatus] = useState('All Status');
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -63,7 +118,7 @@ const ProjectList = () => {
   const [selectedEmployeeIds, setSelectedEmployeeIds] = useState([]);
   const [primaryEmployeeIds, setPrimaryEmployeeIds] = useState([]);
   const [employeeSearchTerm, setEmployeeSearchTerm] = useState('');
-  const [activeEmployeeSearchTerm, setActiveEmployeeSearchTerm] = useState(''); // ✅ ADDED
+  const [activeEmployeeSearchTerm, setActiveEmployeeSearchTerm] = useState('');
   const [employeeFilterRole, setEmployeeFilterRole] = useState('All');
   const [employeeFilterDepartment, setEmployeeFilterDepartment] = useState('All');
   const [employeeFilterStatus, setEmployeeFilterStatus] = useState('All');
@@ -142,7 +197,7 @@ const ProjectList = () => {
       );
     }
 
-    if (filterStatus !== 'All') {
+    if (filterStatus !== 'All Status') {
       filtered = filtered.filter(project => project.status === filterStatus);
     }
 
@@ -245,7 +300,6 @@ const ProjectList = () => {
     return managerIds;
   };
 
-  // ✅ UPDATED: Use activeEmployeeSearchTerm
   const getFilteredEmployees = () => {
     const managerIds = getProjectManagerIds();
     
@@ -435,13 +489,12 @@ const ProjectList = () => {
     }
   };
 
-  // ✅ UPDATED: Reset activeEmployeeSearchTerm
   const handleEmployeeClick = async (project) => {
     setSelectedProject(project);
     setSelectedEmployeeIds([]);
     setPrimaryEmployeeIds([]);
     setEmployeeSearchTerm('');
-    setActiveEmployeeSearchTerm(''); // ✅ ADDED
+    setActiveEmployeeSearchTerm('');
     setEmployeeFilterRole('All');
     setEmployeeFilterDepartment('All');
     setEmployeeFilterStatus('All');
@@ -737,17 +790,10 @@ const ProjectList = () => {
           </div>
           <div className="prj-list-status-filter-wrapper">
             <Filter size={18} className="prj-list-filter-icon" />
-            <select 
-              className="prj-list-status-select" 
-              value={filterStatus} 
-              onChange={(e) => setFilterStatus(e.target.value)}
-            >
-              <option value="All">All Status</option>
-              <option value="Active">Active</option>
-              <option value="On Hold">On Hold</option>
-              <option value="Completed">Completed</option>
-              <option value="Cancelled">Cancelled</option>
-            </select>
+            <CustomStatusDropdown 
+              value={filterStatus}
+              onChange={setFilterStatus}
+            />
           </div>
           <div className="prj-list-actions-group">
             <button 
@@ -1014,7 +1060,6 @@ const ProjectList = () => {
         uniqueDepartments={getUniqueManagerDepartments()}
       />
 
-      {/* ✅ UPDATED: Added activeSearchTerm and setActiveSearchTerm props */}
       <EmployeeMappingModal 
         show={showEmployeeModal}
         onClose={() => setShowEmployeeModal(false)}
