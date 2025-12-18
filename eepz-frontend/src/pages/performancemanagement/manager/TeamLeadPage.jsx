@@ -179,7 +179,6 @@ function TeamLeadPage() {
           })
         );
  
-        // Fetch full details for submitted assessments
         const submittedWithDetails = await Promise.all(
           submittedAssessmentsBasic.map(async (basic) => {
             try {
@@ -223,7 +222,6 @@ function TeamLeadPage() {
           ? submittedData.data
           : [];
         
-        // Fetch full details for submitted L2 assessments
         const submittedWithDetails = await Promise.all(
           submittedAssessmentsBasic.map(async (basic) => {
             try {

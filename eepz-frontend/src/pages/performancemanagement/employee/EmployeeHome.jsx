@@ -5,7 +5,6 @@ import "../../../styles/performancemanagement/employee/EmployeeHome.css";
 export default function EmployeeHome() {
   const navigate = useNavigate();
   
-  // Lazy initialization of user from localStorage
   const [user] = useState(() => {
     const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
@@ -13,7 +12,6 @@ export default function EmployeeHome() {
   
   const employeeId = user?.empId || null;
 
-  // Authentication check with useEffect
   useEffect(() => {
     if (!employeeId) {
       navigate("/employee/login");
@@ -24,7 +22,6 @@ export default function EmployeeHome() {
     navigate("/employee/dashboard/performance/my-assessments");
   };
 
-  // Don't render if no employeeId
   if (!employeeId) {
     return null;
   }

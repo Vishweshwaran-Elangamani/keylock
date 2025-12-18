@@ -22,8 +22,17 @@ const ViewDetailsModal = ({
       tabIndex="-1"
     >
       <div className="modal-dialog modal-lg" style={{ marginTop: 36, marginBottom: 36, maxWidth: 700 }}>
-        <div className="modal-content border-0 shadow-lg" style={{ background: THEME.card, borderRadius: 18 }}>
-          {/* HEADER */}
+        <div 
+          className="modal-content border-0 shadow-lg" 
+          style={{ 
+            background: THEME.card, 
+            borderRadius: 18,
+            display: "flex",
+            flexDirection: "column",
+            maxHeight: "85vh", 
+          }}
+        >
+         
           <div
             className="modal-header"
             style={{
@@ -34,7 +43,8 @@ const ViewDetailsModal = ({
               alignItems: "center",
               minHeight: 60,
               display: "flex",
-              justifyContent: "space-between"
+              justifyContent: "space-between",
+              flexShrink: 0, 
             }}
           >
             <h5
@@ -53,7 +63,6 @@ const ViewDetailsModal = ({
               Nomination Details
             </h5>
 
-
             <button
               type="button"
               onClick={() => setShowModal(false)}
@@ -71,8 +80,15 @@ const ViewDetailsModal = ({
             </button>
           </div>
 
-
-          <div className="modal-body" style={{ padding: "28px 38px 18px 38px" }}>
+          {/* BODY - SCROLLABLE */}
+          <div 
+            className="modal-body" 
+            style={{ 
+              padding: "28px 38px 18px 38px",
+              overflowY: "auto", 
+              flex: 1, 
+            }}
+          >
             {detailsLoading ? (
               <div className="text-center my-5">
                 <div className="spinner-border" role="status" style={{ color: THEME.primary, width: 38, height: 38 }}></div>
@@ -80,7 +96,6 @@ const ViewDetailsModal = ({
               </div>
             ) : selectedNominationDetails ? (
               <div>
-
                 <div
                   style={{
                     background: "#fff",
@@ -138,9 +153,7 @@ const ViewDetailsModal = ({
                   </div>
                 </div>
 
-
                 <hr style={{ borderColor: "#e4e7eb", margin: "2px 0 22px 0" }} />
-
 
                 <div className="mb-4">
                   <div style={{
@@ -258,13 +271,18 @@ const ViewDetailsModal = ({
             )}
           </div>
 
-          <div className="modal-footer" style={{
-            borderTop: `1px solid ${THEME.border}`,
-            justifyContent: "flex-end",
-            padding: "16px 38px",
-            borderBottomLeftRadius: 18,
-            borderBottomRightRadius: 18,
-          }}>
+          
+          <div 
+            className="modal-footer" 
+            style={{
+              borderTop: `1px solid ${THEME.border}`,
+              justifyContent: "flex-end",
+              padding: "16px 38px",
+              borderBottomLeftRadius: 18,
+              borderBottomRightRadius: 18,
+              flexShrink: 0, 
+            }}
+          >
             <button
               type="button"
               className="btn"
