@@ -1,3 +1,5 @@
+import { useRef, useState, useEffect } from "react";
+
 const Pagination = ({
   currentPage,
   totalPages,
@@ -8,6 +10,9 @@ const Pagination = ({
   onItemsPerPageChange,
   pageSizeOptions = [5, 10, 25, 50],
 }) => {
+  const [showSizeDropdown, setShowSizeDropdown] = useState(false);
+  const sizeDropdownRef = useRef(null);
+
   // Calculate indices for display
   const indexOfLastItem = Math.min(currentPage * itemsPerPage, totalItems);
   const indexOfFirstItem = totalItems > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0;
@@ -15,6 +20,23 @@ const Pagination = ({
   // Derived navigation states
   const hasPreviousPage = currentPage > 1;
   const hasNextPage = currentPage < totalPages;
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        sizeDropdownRef.current &&
+        !sizeDropdownRef.current.contains(event.target)
+      ) {
+        setShowSizeDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Generate page numbers with ellipsis
   const getPageNumbers = () => {
@@ -55,21 +77,87 @@ const Pagination = ({
       {/* Items per page selector */}
       <div className="pagination-info">
         <span className="pagination-label">Show</span>
-        <select
-          className="pagination-select"
-          value={itemsPerPage}
-          onChange={(e) => {
-            onItemsPerPageChange?.(Number(e.target.value));
-            onPageChange(1);
-          }}
-          disabled={loading}
-        >
-          {pageSizeOptions.map((size) => (
-            <option key={size} value={size}>
-              {size}
-            </option>
-          ))}
-        </select>
+        
+        {/* CUSTOM DROPDOWN */}
+        <div ref={sizeDropdownRef} style={{ position: "relative" }}>
+          <button
+            type="button"
+            onClick={() => !loading && setShowSizeDropdown(!showSizeDropdown)}
+            disabled={loading}
+            style={{
+              padding: "0.4rem 0.75rem",
+              border: "none",
+              borderRadius: "6px",
+              fontSize: "0.875rem",
+              cursor: loading ? "not-allowed" : "pointer",
+              background: "#fff",
+              color: "black",
+              minWidth: "70px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              fontWeight: "500",
+              transition: "all 0.2s",
+              opacity: loading ? 0.6 : 1,
+            }}
+          >
+            <span>{itemsPerPage}</span>
+            <i
+              className={`bi bi-chevron-${showSizeDropdown ? "up" : "down"}`}
+              style={{ fontSize: "0.7rem", marginLeft: "0.5rem" }}
+            ></i>
+          </button>
+
+          {showSizeDropdown && !loading && (
+            <div
+              style={{
+                position: "absolute",
+                bottom: "calc(100% + 4px)",
+                left: 0,
+                minWidth: "70px",
+                background: "#fff",
+                border: "1px solid #e5e7eb",
+                borderRadius: "6px",
+                zIndex: 1000,
+                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                overflow: "hidden",
+              }}
+            >
+              {pageSizeOptions.map((size) => (
+                <div
+                  key={size}
+                  onClick={() => {
+                    onItemsPerPageChange?.(size);
+                    onPageChange(1);
+                    setShowSizeDropdown(false);
+                  }}
+                  style={{
+                    padding: "0.5rem 0.75rem",
+                    cursor: "pointer",
+                    fontSize: "0.875rem",
+                    color: "#212529",
+                    textAlign: "center",
+                    transition: "all 0.2s",
+                    background: itemsPerPage === size ? "#f3f4f6" : "#fff",
+                    fontWeight: itemsPerPage === size ? "600" : "500",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "rgb(39, 35, 92)";
+                    e.currentTarget.style.color = "white";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background =
+                      itemsPerPage === size ? "#f3f4f6" : "#fff";
+                    e.currentTarget.style.color = "#212529";
+                  }}
+                >
+                  {size}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         <span className="pagination-label">entries</span>
       </div>
 
@@ -182,38 +270,6 @@ const Pagination = ({
           font-size: 0.875rem;
           color: #6c757d;
           font-weight: 500;
-        }
-
-        .pagination-select {
-          padding: 0.4rem 2rem 0.4rem 0.75rem;
-          font-size: 0.875rem;
-          font-weight: 500;
-          border: 1px solid #dee2e6;
-          border-radius: 6px;
-          background-color: #fff;
-          color: #27235c;
-          cursor: pointer;
-          outline: none;
-          transition: all 0.2s ease;
-          appearance: none;
-          background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
-          background-repeat: no-repeat;
-          background-position: right 0.5rem center;
-          background-size: 12px;
-        }
-
-        .pagination-select:hover {
-          border-color: #27235c;
-        }
-
-        .pagination-select:focus {
-          border-color: #27235c;
-          box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.15);
-        }
-
-        .pagination-select:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
         }
 
         .pagination-status {
@@ -366,10 +422,6 @@ const Pagination = ({
 
           .nav-text {
             display: none;
-          }
-
-          .pagination-select {
-            padding: 0.35rem 1.75rem 0.35rem 0.5rem;
           }
 
           .pagination-label {

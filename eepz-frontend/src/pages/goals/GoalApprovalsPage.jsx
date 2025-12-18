@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../contexts/auth/AuthContext";
 import goalService from "../../services/goals/goalService";
 import ApprovalReviewModal from "../../components/goals/modals/ApprovalReviewModal";
@@ -20,6 +20,14 @@ const GoalApprovalsPage = () => {
   const [filterType, setFilterType] = useState("");
   const [filterDate, setFilterDate] = useState("");
 
+  // Dropdown states
+  const [showTypeDropdown, setShowTypeDropdown] = useState(false);
+  const [showDateDropdown, setShowDateDropdown] = useState(false);
+
+  // Dropdown refs
+  const typeDropdownRef = useRef(null);
+  const dateDropdownRef = useRef(null);
+
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedApproval, setSelectedApproval] = useState(null);
@@ -33,6 +41,29 @@ const GoalApprovalsPage = () => {
     user.role
   );
   const isEmployee = user.role === "Employee";
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        typeDropdownRef.current &&
+        !typeDropdownRef.current.contains(event.target)
+      ) {
+        setShowTypeDropdown(false);
+      }
+      if (
+        dateDropdownRef.current &&
+        !dateDropdownRef.current.contains(event.target)
+      ) {
+        setShowDateDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     loadApprovals();
@@ -125,7 +156,6 @@ const GoalApprovalsPage = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-
   const handleItemsPerPageChange = (newSize) => {
     setItemsPerPage(newSize);
     setCurrentPage(1);
@@ -153,6 +183,36 @@ const GoalApprovalsPage = () => {
     setViewMode(mode);
     setCurrentPage(1);
   };
+
+  const getTypeLabel = (value) => {
+    if (!value) return "All Types";
+    return APPROVAL_TYPE_LABELS[value] || value;
+  };
+
+  const getDateLabel = (value) => {
+    const dateMap = {
+      "": "All Time",
+      today: "Today",
+      week: "Last 7 Days",
+      month: "Last 30 Days",
+    };
+    return dateMap[value] || "All Time";
+  };
+
+  const typeOptions = [
+    { value: "", label: "All Types" },
+    ...Object.entries(APPROVAL_TYPE_LABELS).map(([key, value]) => ({
+      value: key,
+      label: value,
+    })),
+  ];
+
+  const dateOptions = [
+    { value: "", label: "All Time" },
+    { value: "today", label: "Today" },
+    { value: "week", label: "Last 7 Days" },
+    { value: "month", label: "Last 30 Days" },
+  ];
 
   const approvalsByMode = allApprovals.filter((approval) => {
     if (viewMode === "pending") {
@@ -233,7 +293,7 @@ const GoalApprovalsPage = () => {
 
   return (
     <>
-      <div className="container-fluid">
+      <div className="container-fluid" style={{ paddingRight: "20px" }}>
         <Breadcrumb
           items={[
             { label: "", path: "/dashboard", icon: "house-door" },
@@ -250,16 +310,16 @@ const GoalApprovalsPage = () => {
           />
         )}
 
-        <div className="row g-3 mb-4 align-items-center">
-          {/* Toggle Buttons */}
-          <div className="col-12 col-lg-6">
+        <div className="row g-2 mb-4 align-items-center">
+          {/* Toggle Buttons - SLIGHTLY INCREASED */}
+          <div className="col-12 col-lg-4">
             <div
               style={{
                 display: "flex",
                 flex: 1,
                 backgroundColor: "rgb(39, 35, 92)",
                 borderRadius: "50px",
-                padding: "5px",
+                padding: "4px",
                 maxWidth: "100%",
               }}
             >
@@ -268,7 +328,7 @@ const GoalApprovalsPage = () => {
                 onClick={() => handleViewModeChange("pending")}
                 style={{
                   flex: 1,
-                  padding: "15px 30px",
+                  padding: "11px 22px",
                   border: "none",
                   borderRadius: "50px",
                   backgroundColor:
@@ -281,11 +341,11 @@ const GoalApprovalsPage = () => {
                     viewMode === "pending"
                       ? "0 2px 4px rgba(0,0,0,0.1)"
                       : "none",
-                  fontSize: "14px",
+                  fontSize: "12.5px",
                   whiteSpace: "nowrap",
                 }}
               >
-                <i className="bi bi-hourglass-split me-2"></i>
+                <i className="bi bi-hourglass-split me-1"></i>
                 Pending ({pendingCount})
               </button>
               <button
@@ -293,7 +353,7 @@ const GoalApprovalsPage = () => {
                 onClick={() => handleViewModeChange("history")}
                 style={{
                   flex: 1,
-                  padding: "15px 30px",
+                  padding: "11px 22px",
                   border: "none",
                   borderRadius: "50px",
                   backgroundColor:
@@ -306,18 +366,18 @@ const GoalApprovalsPage = () => {
                     viewMode === "history"
                       ? "0 2px 4px rgba(0,0,0,0.1)"
                       : "none",
-                  fontSize: "14px",
+                  fontSize: "12.5px",
                   whiteSpace: "nowrap",
                 }}
               >
-                <i className="bi bi-clock-history me-2"></i>
+                <i className="bi bi-clock-history me-1"></i>
                 History ({historyCount})
               </button>
             </div>
           </div>
 
           {/* Search Bar */}
-          <div className="col-12 col-md-6 col-lg-3">
+          <div className="col-12 col-md-6 col-lg-5">
             <div className="input-group">
               <input
                 type="text"
@@ -326,18 +386,23 @@ const GoalApprovalsPage = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={handleSearchKeyPress}
-                style={{ minHeight: "35.7px" }}
+                style={{ minHeight: "37px", fontSize: "0.875rem" }}
               />
               {activeSearchTerm ? (
                 <button
                   className="btn btn-outline-secondary"
                   onClick={handleCancelSearch}
+                  style={{ fontSize: "0.875rem" }}
                 >
                   <i className="bi bi-x-lg me-1"></i>
                   Cancel
                 </button>
               ) : (
-                <button className="btn btn-primary" onClick={handleSearch}>
+                <button
+                  className="btn btn-primary"
+                  onClick={handleSearch}
+                  style={{ fontSize: "0.875rem" }}
+                >
                   <i className="bi bi-search me-1"></i>
                   Search
                 </button>
@@ -345,40 +410,201 @@ const GoalApprovalsPage = () => {
             </div>
           </div>
 
-          {/* Filter Type */}
-          <div className="col-6 col-md-3 col-lg-1">
-            <select
-              className="form-select"
-              value={filterType}
-              onChange={(e) => {
-                setFilterType(e.target.value);
-                setCurrentPage(1);
-              }}
-            >
-              <option value="">All Types</option>
-              {Object.entries(APPROVAL_TYPE_LABELS).map(([key, value]) => (
-                <option key={key} value={key}>
-                  {value}
-                </option>
-              ))}
-            </select>
+          {/* Filter Type - CUSTOM DROPDOWN */}
+          <div className="col-6 col-md-3 col-lg-2">
+            <div ref={typeDropdownRef} style={{ position: "relative" }}>
+              <button
+                type="button"
+                onClick={() => setShowTypeDropdown(!showTypeDropdown)}
+                style={{
+                  padding: "0.45rem 0.75rem",
+                  border: "none",
+                  borderRadius: "8px",
+                  fontSize: "0.875rem",
+                  cursor: "pointer",
+                  background: "#fff",
+                  color: "black",
+                  width: "100%",
+                  minWidth: "140px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  fontWeight: "500",
+                  transition: "all 0.2s",
+                  height: "37px",
+                }}
+              >
+                <span
+                  style={{
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    maxWidth: "calc(100% - 20px)",
+                  }}
+                >
+                  {getTypeLabel(filterType)}
+                </span>
+                <i
+                  className={`bi bi-chevron-${
+                    showTypeDropdown ? "up" : "down"
+                  }`}
+                  style={{
+                    fontSize: "0.7rem",
+                    marginLeft: "0.5rem",
+                    flexShrink: 0,
+                  }}
+                ></i>
+              </button>
+
+              {showTypeDropdown && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "calc(100% + 4px)",
+                    left: 0,
+                    right: 0,
+                    minWidth: "180px",
+                    background: "#fff",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "8px",
+                    zIndex: 1000,
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                    overflow: "hidden",
+                    maxHeight: "300px",
+                    overflowY: "auto",
+                  }}
+                >
+                  {typeOptions.map((option) => (
+                    <div
+                      key={option.value}
+                      onClick={() => {
+                        setFilterType(option.value);
+                        setCurrentPage(1);
+                        setShowTypeDropdown(false);
+                      }}
+                      style={{
+                        padding: "0.625rem 0.875rem",
+                        cursor: "pointer",
+                        fontSize: "0.875rem",
+                        color: "#212529",
+                        textAlign: "left",
+                        transition: "all 0.2s",
+                        background:
+                          filterType === option.value ? "#f3f4f6" : "#fff",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = "rgb(39, 35, 92)";
+                        e.currentTarget.style.color = "white";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background =
+                          filterType === option.value ? "#f3f4f6" : "#fff";
+                        e.currentTarget.style.color = "#212529";
+                      }}
+                    >
+                      {option.label}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Filter Date */}
-          <div className="col-6 col-md-3 col-lg-2">
-            <select
-              className="form-select"
-              value={filterDate}
-              onChange={(e) => {
-                setFilterDate(e.target.value);
-                setCurrentPage(1);
-              }}
-            >
-              <option value="">All Time</option>
-              <option value="today">Today</option>
-              <option value="week">Last 7 Days</option>
-              <option value="month">Last 30 Days</option>
-            </select>
+          {/* Filter Date - CUSTOM DROPDOWN WITH RIGHT MARGIN */}
+          <div className="col-6 col-md-3 col-lg-1" style={{ paddingRight: "8px" }}>
+            <div ref={dateDropdownRef} style={{ position: "relative" }}>
+              <button
+                type="button"
+                onClick={() => setShowDateDropdown(!showDateDropdown)}
+                style={{
+                  padding: "0.45rem 0.75rem",
+                  border: "none",
+                  borderRadius: "8px",
+                  fontSize: "0.875rem",
+                  cursor: "pointer",
+                  background: "#fff",
+                  color: "black",
+                  width: "100%",
+                  minWidth: "125px",
+                  maxWidth: "130px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  fontWeight: "500",
+                  transition: "all 0.2s",
+                  height: "37px",
+                }}
+              >
+                <span
+                  style={{
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {getDateLabel(filterDate)}
+                </span>
+                <i
+                  className={`bi bi-chevron-${
+                    showDateDropdown ? "up" : "down"
+                  }`}
+                  style={{
+                    fontSize: "0.7rem",
+                    marginLeft: "0.5rem",
+                    flexShrink: 0,
+                  }}
+                ></i>
+              </button>
+
+              {showDateDropdown && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "calc(100% + 4px)",
+                    right: 0,
+                    minWidth: "140px",
+                    background: "#fff",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "8px",
+                    zIndex: 1000,
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                    overflow: "hidden",
+                  }}
+                >
+                  {dateOptions.map((option) => (
+                    <div
+                      key={option.value}
+                      onClick={() => {
+                        setFilterDate(option.value);
+                        setCurrentPage(1);
+                        setShowDateDropdown(false);
+                      }}
+                      style={{
+                        padding: "0.625rem 0.875rem",
+                        cursor: "pointer",
+                        fontSize: "0.875rem",
+                        color: "#212529",
+                        textAlign: "left",
+                        transition: "all 0.2s",
+                        background:
+                          filterDate === option.value ? "#f3f4f6" : "#fff",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = "rgb(39, 35, 92)";
+                        e.currentTarget.style.color = "white";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background =
+                          filterDate === option.value ? "#f3f4f6" : "#fff";
+                        e.currentTarget.style.color = "#212529";
+                      }}
+                    >
+                      {option.label}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -415,8 +641,8 @@ const GoalApprovalsPage = () => {
                 <div
                   className="table-responsive"
                   style={{
-                    borderRadius: "1.5rem 1.5rem 0rem 0rem",
-                    border: "1px solid rgba(39, 35, 92, 0.24)",
+                    borderRadius: "12px",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.12)"
                   }}
                 >
                   <table className="table table-hover align-start mb-0">

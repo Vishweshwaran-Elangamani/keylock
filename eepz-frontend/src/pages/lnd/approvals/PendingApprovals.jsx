@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Download,
   Eye,
@@ -29,6 +29,8 @@ const PendingApprovals = () => {
 
   // Filter
   const [typeFilter, setTypeFilter] = useState("");
+  const [showTypeDropdown, setShowTypeDropdown] = useState(false);
+  const typeDropdownRef = useRef(null);
 
   // Sorting
   const [sortField, setSortField] = useState("");
@@ -59,6 +61,23 @@ const PendingApprovals = () => {
     return prefixMap[role] || "/employee";
   };
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        typeDropdownRef.current &&
+        !typeDropdownRef.current.contains(event.target)
+      ) {
+        setShowTypeDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   useEffect(() => {
     fetchPendingApprovals();
   }, [
@@ -80,14 +99,14 @@ const PendingApprovals = () => {
         sortField,
         sortOrderAsc ? "asc" : "desc",
         itemsPerPage,
-        searchTerm // Pass search term to API
+        searchTerm
       );
 
       if (response.data.success) {
         setApprovals(response.data.data.items);
         setTotalItems(response.data.data.totalCount);
         setTotalPages(response.data.data.totalPages);
-      }  
+      }
     } catch (error) {
       console.error("Failed to fetch pending approvals:", error);
       toast.error("Failed to load pending approvals");
@@ -162,6 +181,25 @@ const PendingApprovals = () => {
     };
     return labels[type] || type;
   };
+
+  const getTypeLabel = (value) => {
+    if (!value) return "All Types";
+    return getApprovalTypeLabel(value);
+  };
+
+  const typeOptions = [
+    { value: "", label: "All Types" },
+    { value: APPROVAL_TYPE.SME_REGISTRATION, label: "SME Registration" },
+    { value: APPROVAL_TYPE.SME_REQUEST, label: "SME Request" },
+    {
+      value: APPROVAL_TYPE.ASSIGNMENT_ACKNOWLEDGEMENT,
+      label: "Assignment Acknowledgement",
+    },
+    {
+      value: APPROVAL_TYPE.ASSIGNMENT_COMPLETION,
+      label: "Assignment Completion",
+    },
+  ];
 
   const onSortClick = (field) => {
     if (sortField === field) {
@@ -276,35 +314,83 @@ const PendingApprovals = () => {
           </div>
         </form>
 
-        {/* Type Filter */}
-        <select
-          value={typeFilter}
-          onChange={(e) => {
-            setTypeFilter(e.target.value);
-            setCurrentPage(1);
-          }}
-          style={{
-            padding: "0.625rem 1rem",
-            border: "1px solid #e5e7eb",
-            borderRadius: "8px",
-            fontSize: "0.875rem",
-            outline: "none",
-            cursor: "pointer",
-            background: "#fff",
-          }}
-        >
-          <option value="">All Types</option>
-          <option value={APPROVAL_TYPE.SME_REGISTRATION}>
-            SME Registration
-          </option>
-          <option value={APPROVAL_TYPE.SME_REQUEST}>SME Request</option>
-          <option value={APPROVAL_TYPE.ASSIGNMENT_ACKNOWLEDGEMENT}>
-            Assignment Acknowledgement
-          </option>
-          <option value={APPROVAL_TYPE.ASSIGNMENT_COMPLETION}>
-            Assignment Completion
-          </option>
-        </select>
+        {/* TYPE FILTER DROPDOWN */}
+        <div ref={typeDropdownRef} style={{ position: "relative" }}>
+          <button
+            type="button"
+            onClick={() => setShowTypeDropdown(!showTypeDropdown)}
+            style={{
+              padding: "0.5rem 0.875rem",
+              border: "none",
+              borderRadius: "8px",
+              fontSize: "0.875rem",
+              cursor: "pointer",
+              background: "#fff",
+              color: "black",
+              minWidth: "220px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              fontWeight: "500",
+              transition: "all 0.2s",
+            }}
+          >
+            <span>{getTypeLabel(typeFilter)}</span>
+            <i
+              className={`bi bi-chevron-${showTypeDropdown ? "up" : "down"}`}
+              style={{ fontSize: "0.75rem", marginLeft: "0.5rem" }}
+            ></i>
+          </button>
+
+          {showTypeDropdown && (
+            <div
+              style={{
+                position: "absolute",
+                top: "calc(100% + 4px)",
+                left: 0,
+                minWidth: "220px",
+                background: "#fff",
+                border: "1px solid #e5e7eb",
+                borderRadius: "8px",
+                zIndex: 1000,
+                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                overflow: "hidden",
+              }}
+            >
+              {typeOptions.map((option) => (
+                <div
+                  key={option.value}
+                  onClick={() => {
+                    setTypeFilter(option.value);
+                    setCurrentPage(1);
+                    setShowTypeDropdown(false);
+                  }}
+                  style={{
+                    padding: "0.625rem 0.875rem",
+                    cursor: "pointer",
+                    fontSize: "0.875rem",
+                    color: "#212529",
+                    textAlign: "left",
+                    transition: "all 0.2s",
+                    background:
+                      typeFilter === option.value ? "#f3f4f6" : "#fff",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "rgb(39, 35, 92)";
+                    e.currentTarget.style.color = "white";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background =
+                      typeFilter === option.value ? "#f3f4f6" : "#fff";
+                    e.currentTarget.style.color = "#212529";
+                  }}
+                >
+                  {option.label}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Pending Approvals Table */}
@@ -332,6 +418,7 @@ const PendingApprovals = () => {
                 background: "#fff",
                 borderRadius: "12px",
                 overflow: "hidden",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.12)"
               }}
             >
               {/* Table Header */}
@@ -343,7 +430,7 @@ const PendingApprovals = () => {
                   background: "rgb(39, 35, 92)",
                   borderBottom: "2px solid #abb4c5ff",
                   fontWeight: "600",
-                  fontSize: "14px",
+                  fontSize: "0.875rem",
                   color: "white",
                   textTransform: "uppercase",
                   letterSpacing: "0.025em",

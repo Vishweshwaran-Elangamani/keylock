@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Download, Filter, ChevronUp, ChevronDown, Search } from "lucide-react";
 import Breadcrumb from "../../../components/lnd/common/Breadcrumb";
 import Pagination from "../../../components/lnd/common/Pagination";
@@ -26,6 +26,16 @@ const ApprovalHistory = () => {
   const [roleFilter, setRoleFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+
+  // Dropdown states
+  const [showRoleDropdown, setShowRoleDropdown] = useState(false);
+  const [showTypeDropdown, setShowTypeDropdown] = useState(false);
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+
+  // Dropdown refs
+  const roleDropdownRef = useRef(null);
+  const typeDropdownRef = useRef(null);
+  const statusDropdownRef = useRef(null);
 
   // Sorting
   const [sortField, setSortField] = useState("");
@@ -55,6 +65,35 @@ const ApprovalHistory = () => {
     };
     return prefixMap[role] || "/employee";
   };
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        roleDropdownRef.current &&
+        !roleDropdownRef.current.contains(event.target)
+      ) {
+        setShowRoleDropdown(false);
+      }
+      if (
+        typeDropdownRef.current &&
+        !typeDropdownRef.current.contains(event.target)
+      ) {
+        setShowTypeDropdown(false);
+      }
+      if (
+        statusDropdownRef.current &&
+        !statusDropdownRef.current.contains(event.target)
+      ) {
+        setShowStatusDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     fetchApprovalHistory();
@@ -151,6 +190,57 @@ const ApprovalHistory = () => {
     };
     return labels[type] || type;
   };
+
+  const getRoleLabel = (value) => {
+    const roleMap = {
+      all: "All Roles",
+      requester: "As Requester",
+      approver: "As Approver",
+    };
+    return roleMap[value] || "All Roles";
+  };
+
+  const getTypeLabel = (value) => {
+    if (!value) return "All Types";
+    return getApprovalTypeLabel(value);
+  };
+
+  const getStatusLabel = (value) => {
+    const statusMap = {
+      "": "All Statuses",
+      [APPROVAL_STATUS.APPROVED]: "Approved",
+      [APPROVAL_STATUS.REJECTED]: "Rejected",
+      [APPROVAL_STATUS.PENDING]: "Pending",
+    };
+    return statusMap[value] || "All Statuses";
+  };
+
+  const roleOptions = [
+    { value: "all", label: "All Roles" },
+    { value: "requester", label: "As Requester" },
+    { value: "approver", label: "As Approver" },
+  ];
+
+  const typeOptions = [
+    { value: "", label: "All Types" },
+    { value: APPROVAL_TYPE.SME_REGISTRATION, label: "SME Registration" },
+    { value: APPROVAL_TYPE.SME_REQUEST, label: "SME Request" },
+    {
+      value: APPROVAL_TYPE.ASSIGNMENT_ACKNOWLEDGEMENT,
+      label: "Assignment Acknowledgement",
+    },
+    {
+      value: APPROVAL_TYPE.ASSIGNMENT_COMPLETION,
+      label: "Assignment Completion",
+    },
+  ];
+
+  const statusOptions = [
+    { value: "", label: "All Statuses" },
+    { value: APPROVAL_STATUS.APPROVED, label: "Approved" },
+    { value: APPROVAL_STATUS.REJECTED, label: "Rejected" },
+    { value: APPROVAL_STATUS.PENDING, label: "Pending" },
+  ];
 
   const onSortClick = (field) => {
     if (sortField === field) {
@@ -263,75 +353,240 @@ const ApprovalHistory = () => {
             )}
           </div>
         </form>
-        <select
-          value={roleFilter}
-          onChange={(e) => {
-            setRoleFilter(e.target.value);
-            setCurrentPage(1);
-          }}
-          style={{
-            padding: "0.625rem 1rem",
-            border: "1px solid #e5e7eb",
-            borderRadius: "8px",
-            fontSize: "0.875rem",
-            outline: "none",
-            cursor: "pointer",
-            background: "#fff",
-          }}
-        >
-          <option value="all">All Roles</option>
-          <option value="requester">As Requester</option>
-          <option value="approver">As Approver</option>
-        </select>
-        <select
-          value={typeFilter}
-          onChange={(e) => {
-            setTypeFilter(e.target.value);
-            setCurrentPage(1);
-          }}
-          style={{
-            padding: "0.625rem 1rem",
-            border: "1px solid #e5e7eb",
-            borderRadius: "8px",
-            fontSize: "0.875rem",
-            outline: "none",
-            cursor: "pointer",
-            background: "#fff",
-          }}
-        >
-          <option value="">All Types</option>
-          <option value={APPROVAL_TYPE.SME_REGISTRATION}>
-            SME Registration
-          </option>
-          <option value={APPROVAL_TYPE.SME_REQUEST}>SME Request</option>
-          <option value={APPROVAL_TYPE.ASSIGNMENT_ACKNOWLEDGEMENT}>
-            Assignment Acknowledgement
-          </option>
-          <option value={APPROVAL_TYPE.ASSIGNMENT_COMPLETION}>
-            Assignment Completion
-          </option>
-        </select>
-        <select
-          value={statusFilter}
-          onChange={(e) => {
-            setStatusFilter(e.target.value);
-            setCurrentPage(1);
-          }}
-          style={{
-            padding: "0.625rem 1rem",
-            border: "1px solid #e5e7eb",
-            borderRadius: "8px",
-            fontSize: "0.875rem",
-            outline: "none",
-            cursor: "pointer",
-            background: "#fff",
-          }}
-        >
-          <option value="">All Statuses</option>
-          <option value={APPROVAL_STATUS.APPROVED}>Approved</option>
-          <option value={APPROVAL_STATUS.REJECTED}>Rejected</option>
-          <option value={APPROVAL_STATUS.PENDING}>Pending</option>
-        </select>
+
+        {/* ROLE FILTER DROPDOWN */}
+        <div ref={roleDropdownRef} style={{ position: "relative" }}>
+          <button
+            type="button"
+            onClick={() => setShowRoleDropdown(!showRoleDropdown)}
+            style={{
+              padding: "0.5rem 0.875rem",
+              border: "none",
+              borderRadius: "8px",
+              fontSize: "0.875rem",
+              cursor: "pointer",
+              background: "#fff",
+              color: "black",
+              minWidth: "160px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              fontWeight: "500",
+              transition: "all 0.2s",
+            }}
+          >
+            <span>{getRoleLabel(roleFilter)}</span>
+            <i
+              className={`bi bi-chevron-${showRoleDropdown ? "up" : "down"}`}
+              style={{ fontSize: "0.75rem", marginLeft: "0.5rem" }}
+            ></i>
+          </button>
+
+          {showRoleDropdown && (
+            <div
+              style={{
+                position: "absolute",
+                top: "calc(100% + 4px)",
+                left: 0,
+                minWidth: "160px",
+                background: "#fff",
+                border: "1px solid #e5e7eb",
+                borderRadius: "8px",
+                zIndex: 1000,
+                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                overflow: "hidden",
+              }}
+            >
+              {roleOptions.map((option) => (
+                <div
+                  key={option.value}
+                  onClick={() => {
+                    setRoleFilter(option.value);
+                    setCurrentPage(1);
+                    setShowRoleDropdown(false);
+                  }}
+                  style={{
+                    padding: "0.625rem 0.875rem",
+                    cursor: "pointer",
+                    fontSize: "0.875rem",
+                    color: "#212529",
+                    textAlign: "left",
+                    transition: "all 0.2s",
+                    background:
+                      roleFilter === option.value ? "#f3f4f6" : "#fff",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "rgb(39, 35, 92)";
+                    e.currentTarget.style.color = "white";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background =
+                      roleFilter === option.value ? "#f3f4f6" : "#fff";
+                    e.currentTarget.style.color = "#212529";
+                  }}
+                >
+                  {option.label}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* TYPE FILTER DROPDOWN */}
+        <div ref={typeDropdownRef} style={{ position: "relative" }}>
+          <button
+            type="button"
+            onClick={() => setShowTypeDropdown(!showTypeDropdown)}
+            style={{
+              padding: "0.5rem 0.875rem",
+              border: "none",
+              borderRadius: "8px",
+              fontSize: "0.875rem",
+              cursor: "pointer",
+              background: "#fff",
+              color: "black",
+              minWidth: "220px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              fontWeight: "500",
+              transition: "all 0.2s",
+            }}
+          >
+            <span>{getTypeLabel(typeFilter)}</span>
+            <i
+              className={`bi bi-chevron-${showTypeDropdown ? "up" : "down"}`}
+              style={{ fontSize: "0.75rem", marginLeft: "0.5rem" }}
+            ></i>
+          </button>
+
+          {showTypeDropdown && (
+            <div
+              style={{
+                position: "absolute",
+                top: "calc(100% + 4px)",
+                left: 0,
+                minWidth: "220px",
+                background: "#fff",
+                border: "1px solid #e5e7eb",
+                borderRadius: "8px",
+                zIndex: 1000,
+                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                overflow: "hidden",
+              }}
+            >
+              {typeOptions.map((option) => (
+                <div
+                  key={option.value}
+                  onClick={() => {
+                    setTypeFilter(option.value);
+                    setCurrentPage(1);
+                    setShowTypeDropdown(false);
+                  }}
+                  style={{
+                    padding: "0.625rem 0.875rem",
+                    cursor: "pointer",
+                    fontSize: "0.875rem",
+                    color: "#212529",
+                    textAlign: "left",
+                    transition: "all 0.2s",
+                    background:
+                      typeFilter === option.value ? "#f3f4f6" : "#fff",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "rgb(39, 35, 92)";
+                    e.currentTarget.style.color = "white";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background =
+                      typeFilter === option.value ? "#f3f4f6" : "#fff";
+                    e.currentTarget.style.color = "#212529";
+                  }}
+                >
+                  {option.label}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* STATUS FILTER DROPDOWN */}
+        <div ref={statusDropdownRef} style={{ position: "relative" }}>
+          <button
+            type="button"
+            onClick={() => setShowStatusDropdown(!showStatusDropdown)}
+            style={{
+              padding: "0.5rem 0.875rem",
+              border: "none",
+              borderRadius: "8px",
+              fontSize: "0.875rem",
+              cursor: "pointer",
+              background: "#fff",
+              color: "black",
+              minWidth: "160px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              fontWeight: "500",
+              transition: "all 0.2s",
+            }}
+          >
+            <span>{getStatusLabel(statusFilter)}</span>
+            <i
+              className={`bi bi-chevron-${showStatusDropdown ? "up" : "down"}`}
+              style={{ fontSize: "0.75rem", marginLeft: "0.5rem" }}
+            ></i>
+          </button>
+
+          {showStatusDropdown && (
+            <div
+              style={{
+                position: "absolute",
+                top: "calc(100% + 4px)",
+                left: 0,
+                minWidth: "160px",
+                background: "#fff",
+                border: "1px solid #e5e7eb",
+                borderRadius: "8px",
+                zIndex: 1000,
+                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                overflow: "hidden",
+              }}
+            >
+              {statusOptions.map((option) => (
+                <div
+                  key={option.value}
+                  onClick={() => {
+                    setStatusFilter(option.value);
+                    setCurrentPage(1);
+                    setShowStatusDropdown(false);
+                  }}
+                  style={{
+                    padding: "0.625rem 0.875rem",
+                    cursor: "pointer",
+                    fontSize: "0.875rem",
+                    color: "#212529",
+                    textAlign: "left",
+                    transition: "all 0.2s",
+                    background:
+                      statusFilter === option.value ? "#f3f4f6" : "#fff",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "rgb(39, 35, 92)";
+                    e.currentTarget.style.color = "white";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background =
+                      statusFilter === option.value ? "#f3f4f6" : "#fff";
+                    e.currentTarget.style.color = "#212529";
+                  }}
+                >
+                  {option.label}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Approval History Table */}
@@ -356,6 +611,7 @@ const ApprovalHistory = () => {
                 borderRadius: "12px",
                 overflow: "hidden",
                 minWidth: 0,
+              boxShadow: "0 4px 12px rgba(0,0,0,0.12)"
               }}
             >
               {/* Table Header */}
@@ -368,7 +624,7 @@ const ApprovalHistory = () => {
                   borderBottom: "2px solid #abb4c5ff",
                   fontWeight: 600,
                   color: "white",
-                  fontSize: "14px",
+                  fontsize: "0.875rem",
                   padding: "1rem 1.5rem",
                   textTransform: "uppercase",
                   letterSpacing: "0.025em",

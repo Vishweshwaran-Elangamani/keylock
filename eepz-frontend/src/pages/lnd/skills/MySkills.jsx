@@ -282,6 +282,7 @@ const MySkills = () => {
                 background: "#fff",
                 borderRadius: "12px",
                 overflow: "hidden",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.12)"
               }}
             >
               <div
@@ -292,7 +293,7 @@ const MySkills = () => {
                   background: "rgb(39, 35, 92)",
                   borderBottom: "2px solid #abb4c5ff",
                   fontWeight: 600,
-                  fontSize: "14px",
+                  fontsize: "0.875rem",
                   color: "white",
                   textTransform: "uppercase",
                   letterSpacing: "0.025em",

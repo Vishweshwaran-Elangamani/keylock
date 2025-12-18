@@ -240,6 +240,7 @@ const SmeDirectory = () => {
                 borderRadius: "12px",
                 overflow: "hidden",
                 minWidth: 0,
+                boxShadow: "0 4px 12px rgba(0,0,0,0.12)"
               }}
             >
               <div

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Download,
   CheckCircle,
@@ -33,6 +33,8 @@ const TeamAssignments = () => {
 
   // Filter
   const [statusFilter, setStatusFilter] = useState("");
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+  const dropdownRef = useRef(null);
 
   // Sorting
   const [sortField, setSortField] = useState("");
@@ -62,6 +64,20 @@ const TeamAssignments = () => {
     };
     return prefixMap[role] || "/employee";
   };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowStatusDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     fetchTeamAssignments();
@@ -232,6 +248,33 @@ const TeamAssignments = () => {
     );
   };
 
+  const getStatusLabel = (value) => {
+    const statusMap = {
+      "": "All Statuses",
+      [ASSIGNMENT_STATUS.IN_PROGRESS]: "In Progress",
+      [ASSIGNMENT_STATUS.PENDING_SME_ACKNOWLEDGEMENT]: "SME Review",
+      [ASSIGNMENT_STATUS.PENDING_MANAGER_ACKNOWLEDGEMENT]: "Your Review",
+      [ASSIGNMENT_STATUS.COMPLETED]: "Completed",
+      [ASSIGNMENT_STATUS.OVERDUE]: "Overdue",
+    };
+    return statusMap[value] || "All Statuses";
+  };
+
+  const statusOptions = [
+    { value: "", label: "All Statuses" },
+    { value: ASSIGNMENT_STATUS.IN_PROGRESS, label: "In Progress" },
+    {
+      value: ASSIGNMENT_STATUS.PENDING_SME_ACKNOWLEDGEMENT,
+      label: "SME Review",
+    },
+    {
+      value: ASSIGNMENT_STATUS.PENDING_MANAGER_ACKNOWLEDGEMENT,
+      label: "Your Review",
+    },
+    { value: ASSIGNMENT_STATUS.COMPLETED, label: "Completed" },
+    { value: ASSIGNMENT_STATUS.OVERDUE, label: "Overdue" },
+  ];
+
   if (loading && assignments.length === 0) {
     return (
       <div style={{ textAlign: "center", padding: "3rem" }}>
@@ -307,33 +350,86 @@ const TeamAssignments = () => {
               )}
             </div>
           </form>
-          <select
-            value={statusFilter}
-            onChange={(e) => {
-              setStatusFilter(e.target.value);
-              setCurrentPage(1);
-            }}
-            style={{
-              padding: "0.625rem 1rem",
-              border: "1px solid #e5e7eb",
-              borderRadius: "8px",
-              fontSize: "0.875rem",
-              outline: "none",
-              cursor: "pointer",
-              background: "#fff",
-            }}
-          >
-            <option value="">All Statuses</option>
-            <option value={ASSIGNMENT_STATUS.IN_PROGRESS}>In Progress</option>
-            <option value={ASSIGNMENT_STATUS.PENDING_SME_ACKNOWLEDGEMENT}>
-              SME Review
-            </option>
-            <option value={ASSIGNMENT_STATUS.PENDING_MANAGER_ACKNOWLEDGEMENT}>
-              Your Review
-            </option>
-            <option value={ASSIGNMENT_STATUS.COMPLETED}>Completed</option>
-            <option value={ASSIGNMENT_STATUS.OVERDUE}>Overdue</option>
-          </select>
+
+          {/* CUSTOM DROPDOWN */}
+          <div ref={dropdownRef} style={{ position: "relative" }}>
+            <button
+              type="button"
+              onClick={() => setShowStatusDropdown(!showStatusDropdown)}
+              style={{
+                padding: "0.5rem 0.875rem",
+                border: "none",
+                borderRadius: "8px",
+                fontSize: "0.875rem",
+                cursor: "pointer",
+                background: "#fff",
+                color: "black",
+                minWidth: "220px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                fontWeight: "500",
+                transition: "all 0.2s",
+              }}
+            >
+              <span>{getStatusLabel(statusFilter)}</span>
+              <i
+                className={`bi bi-chevron-${
+                  showStatusDropdown ? "up" : "down"
+                }`}
+                style={{ fontSize: "0.75rem", marginLeft: "0.5rem" }}
+              ></i>
+            </button>
+
+            {showStatusDropdown && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "calc(100% + 4px)",
+                  left: 0,
+                  minWidth: "220px",
+                  background: "#fff",
+                  border: "1px solid #e5e7eb",
+                  borderRadius: "8px",
+                  zIndex: 1000,
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                  overflow: "hidden",
+                }}
+              >
+                {statusOptions.map((option) => (
+                  <div
+                    key={option.value}
+                    onClick={() => {
+                      setStatusFilter(option.value);
+                      setCurrentPage(1);
+                      setShowStatusDropdown(false);
+                    }}
+                    style={{
+                      padding: "0.625rem 0.875rem",
+                      cursor: "pointer",
+                      fontSize: "0.875rem",
+                      color: "#212529",
+                      textAlign: "left",
+                      transition: "all 0.2s",
+                      background:
+                        statusFilter === option.value ? "#f3f4f6" : "#fff",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = "rgb(39, 35, 92)";
+                      e.currentTarget.style.color = "white";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background =
+                        statusFilter === option.value ? "#f3f4f6" : "#fff";
+                      e.currentTarget.style.color = "#212529";
+                    }}
+                  >
+                    {option.label}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         <button
@@ -393,6 +489,7 @@ const TeamAssignments = () => {
                 borderRadius: "12px",
                 overflow: "hidden",
                 minWidth: 0,
+                boxShadow: "0 4px 12px rgba(0,0,0,0.12)"
               }}
             >
               <div
@@ -403,7 +500,7 @@ const TeamAssignments = () => {
                   background: "rgb(39, 35, 92)",
                   borderBottom: "2px solid #abb4c5ff",
                   fontWeight: 600,
-                  fontSize: "14px",
+                  fontsize: "0.875rem",
                   color: "white",
                   padding: "1rem 1.5rem",
                   textTransform: "uppercase",

@@ -44,6 +44,12 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
   const [assigneeSearchTerm, setAssigneeSearchTerm] = useState("");
   const assigneeDropdownRef = useRef(null);
 
+  // Custom dropdown states
+  const [showTypeDropdown, setShowTypeDropdown] = useState(false);
+  const [showProjectDropdown, setShowProjectDropdown] = useState(false);
+  const typeDropdownRef = useRef(null);
+  const projectDropdownRef = useRef(null);
+
   const canSelectTeamType = ["Manager", "Department Head"].includes(user.role);
   const canSelectOrgType = user.role === "Leadership";
 
@@ -66,6 +72,18 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
         !assigneeDropdownRef.current.contains(event.target)
       ) {
         setShowAssigneeDropdown(false);
+      }
+      if (
+        typeDropdownRef.current &&
+        !typeDropdownRef.current.contains(event.target)
+      ) {
+        setShowTypeDropdown(false);
+      }
+      if (
+        projectDropdownRef.current &&
+        !projectDropdownRef.current.contains(event.target)
+      ) {
+        setShowProjectDropdown(false);
       }
     };
 
@@ -384,7 +402,9 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
           { title: "", description: "" },
           { title: "", description: "" },
         ];
-        const emp = availableEmployees.find((e) => e.empMasterId === empMasterId);
+        const emp = availableEmployees.find(
+          (e) => e.empMasterId === empMasterId
+        );
         if (emp) {
           toast.success(`${emp.fullName} added as an assignee.`, {
             duration: 2000,
@@ -392,9 +412,11 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
         }
       } else {
         delete newChecklistByAssignee[empMasterId];
-        const emp = availableEmployees.find((e) => e.empMasterId === empMasterId);
+        const emp = availableEmployees.find(
+          (e) => e.empMasterId === empMasterId
+        );
         if (emp) {
-          toast.info(`${emp.fullName} added from assignees.`, {
+          toast.info(`${emp.fullName} removed from assignees.`, {
             duration: 2000,
           });
         }
@@ -555,17 +577,47 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
     emp.fullName?.toLowerCase().includes(assigneeSearchTerm.toLowerCase())
   );
 
+  // Get display text for selected values
+  const getSelectedTypeLabel = () => {
+    return GOAL_TYPE_LABELS[formData.type] || "Select Goal Type";
+  };
+
+  const getSelectedProjectLabel = () => {
+    if (!formData.projectId) {
+      return formData.type === GOAL_TYPES.TEAM
+        ? "Select a Project"
+        : formData.type === GOAL_TYPES.ORG
+        ? "Not applicable"
+        : "No Project";
+    }
+    const project = projects.find(
+      (p) => p.projectId === parseInt(formData.projectId)
+    );
+    return project ? project.projectName : "Select Project";
+  };
+
+  // Goal type options
+  const goalTypeOptions = [
+    { value: GOAL_TYPES.SELF, label: GOAL_TYPE_LABELS[GOAL_TYPES.SELF] },
+    ...(canSelectTeamType
+      ? [{ value: GOAL_TYPES.TEAM, label: GOAL_TYPE_LABELS[GOAL_TYPES.TEAM] }]
+      : []),
+    ...(canSelectOrgType
+      ? [{ value: GOAL_TYPES.ORG, label: GOAL_TYPE_LABELS[GOAL_TYPES.ORG] }]
+      : []),
+  ];
+
   if (!isOpen) return null;
 
   return (
     <>
       <style>
         {`
-          @keyframes fadeIn {
+          @keyframes goalModalFadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
           }
-          @keyframes slideUp {
+          @keyframes goalModalSlideUp {
             from { 
               opacity: 0;
               transform: translateY(20px);
@@ -575,23 +627,145 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
               transform: translateY(0);
             }
           }
-        `}
-      </style>
-      <div className="modal-backdrop fade show" style={{ zIndex: 1040 }} />
+          .goal-modal-backdrop-custom {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1040;
+            animation: goalModalFadeIn 0.15s ease-out;
+          }
+          .goal-modal-wrapper-custom {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1050;
+            overflow-x: hidden;
+            overflow-y: auto;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 1rem;
+          }
+          .goal-modal-dialog-custom {
+            width: 100%;
+            max-width: 700px;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            min-height: calc(100% - 2rem);
+          }
+          .goal-modal-content-custom {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            pointer-events: auto;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 1rem;
+            outline: 0;
+            animation: goalModalSlideUp 0.3s ease-out;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            max-height: calc(100vh - 2rem);
+          }
+          
+          .custom-dropdown-toggle {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            font-size: 14px;
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem;
+            background-color: white;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: border-color 0.15s ease-in-out;
+          }
+          
+          .custom-dropdown-toggle:hover:not(:disabled) {
+            border-color: #86b7fe;
+          }
+          
+          .custom-dropdown-toggle:disabled {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+            opacity: 0.6;
+          }
+          
+          .custom-dropdown-toggle.is-invalid {
+            border-color: #dc3545;
+          }
+          
+          .custom-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            max-height: 250px;
+            overflow-y: auto;
+            margin: 0;
+            padding: 0;
+          }
+          
+          .custom-dropdown-item {
+          padding: 0.75rem 1rem;
+          cursor: pointer;
+          font-size: 14px;
+          color: #212529;
+          border-bottom: 1px solid #f3f4f6;
+          transition: all 0.2s;
+          background: white;
+          text-align: left;
+            }
+
+          
+          .custom-dropdown-item:last-child {
+            border-bottom: none;
+          }
+          
+          .custom-dropdown-item:hover {
+            background-color: rgb(39, 35, 92);
+            color: white;
+          }
+          
+          .custom-dropdown-item.selected {
+            background-color: rgb(39, 35, 92);
+            color: white;
+            font-weight: 600;
+          }
+          
+          .custom-dropdown-item:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #f8f9fa;
+          }
+        `}          
+      </style>  
+
+      <div className="goal-modal-backdrop-custom" />
+
       <div
-        className="modal fade show d-block"
+        className="goal-modal-wrapper-custom"
         tabIndex="-1"
-        style={{ zIndex: 1050 }}
-        onClick={(e) => e.target === e.currentTarget && onClose()}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) onClose();
+        }}
       >
-        <div
-          className="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable"
-          style={{ borderRadius: "1.5rem" }}
-        >
-          <div
-            className="modal-content"
-            style={{ minWidth: "1000px", animation: "slideUp 0.3s ease-out" }}
-          >
+        <div className="goal-modal-dialog-custom">
+          <div className="goal-modal-content-custom">
             <div
               className="modal-header"
               style={{
@@ -599,6 +773,10 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
+                borderTopLeftRadius: "1rem",
+                borderTopRightRadius: "1rem",
+                padding: "1rem 1.5rem",
+                flexShrink: 0,
               }}
             >
               <h5
@@ -607,6 +785,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                   fontSize: "20px",
                   fontWeight: "600",
                   color: "white",
+                  margin: 0,
                 }}
               >
                 {isEdit ? "Edit Goal" : "Create New Goal"}
@@ -650,8 +829,10 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
               className="modal-body"
               ref={modalBodyRef}
               style={{
-                maxHeight: "70vh",
+                padding: "1.5rem",
                 overflowY: "auto",
+                flexGrow: 1,
+                maxHeight: "calc(100vh - 220px)",
               }}
             >
               {loadingData ? (
@@ -665,6 +846,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                 <form onSubmit={handleSubmit}>
                   <div className="row">
                     <div className="col-md-6">
+                      {/* Custom Goal Type Dropdown */}
                       <div className="mb-3">
                         <label
                           className="form-label"
@@ -672,27 +854,50 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                         >
                           Goal Type <span className="text-danger">*</span>
                         </label>
-                        <select
-                          className="form-select"
-                          value={formData.type}
-                          onChange={(e) => handleChange("type", e.target.value)}
-                          style={{ fontSize: "14px" }}
-                          disabled={isEdit || loading}
+                        <div
+                          ref={typeDropdownRef}
+                          style={{ position: "relative" }}
                         >
-                          <option value={GOAL_TYPES.SELF}>
-                            {GOAL_TYPE_LABELS[GOAL_TYPES.SELF]}
-                          </option>
-                          {canSelectTeamType && (
-                            <option value={GOAL_TYPES.TEAM}>
-                              {GOAL_TYPE_LABELS[GOAL_TYPES.TEAM]}
-                            </option>
+                          <button
+                            type="button"
+                            className={`custom-dropdown-toggle ${
+                              errors.type ? "is-invalid" : ""
+                            }`}
+                            onClick={() =>
+                              !isEdit &&
+                              !loading &&
+                              setShowTypeDropdown(!showTypeDropdown)
+                            }
+                            disabled={isEdit || loading}
+                          >
+                            <span>{getSelectedTypeLabel()}</span>
+                            <i
+                              className={`bi bi-chevron-${
+                                showTypeDropdown ? "up" : "down"
+                              }`}
+                            ></i>
+                          </button>
+                          {showTypeDropdown && !isEdit && (
+                            <div className="custom-dropdown-menu">
+                              {goalTypeOptions.map((option) => (
+                                <div
+                                  key={option.value}
+                                  className={`custom-dropdown-item ${
+                                    formData.type === option.value
+                                      ? "selected"
+                                      : ""
+                                  }`}
+                                  onClick={() => {
+                                    handleChange("type", option.value);
+                                    setShowTypeDropdown(false);
+                                  }}
+                                >
+                                  {option.label}
+                                </div>
+                              ))}
+                            </div>
                           )}
-                          {canSelectOrgType && (
-                            <option value={GOAL_TYPES.ORG}>
-                              {GOAL_TYPE_LABELS[GOAL_TYPES.ORG]}
-                            </option>
-                          )}
-                        </select>
+                        </div>
                         {isEdit && (
                           <small className="text-muted">
                             Goal type cannot be changed
@@ -736,6 +941,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                     </div>
 
                     <div className="col-md-6">
+                      {/* Custom Project Dropdown */}
                       <div className="mb-3">
                         <label
                           className="form-label"
@@ -746,43 +952,75 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                             <span className="text-danger">*</span>
                           )}
                         </label>
-                        <select
-                          className={`form-select ${
-                            errors.projectId ? "is-invalid" : ""
-                          }`}
-                          value={formData.projectId}
-                          onChange={(e) =>
-                            handleChange("projectId", e.target.value)
-                          }
-                          onBlur={() =>
-                            setTouched((prev) => ({ ...prev, projectId: true }))
-                          }
-                          disabled={
-                            isEdit ||
-                            loading ||
-                            formData.type === GOAL_TYPES.ORG
-                          }
-                          style={{ fontSize: "14px" }}
+                        <div
+                          ref={projectDropdownRef}
+                          style={{ position: "relative" }}
                         >
-                          <option value="">
-                            {formData.type === GOAL_TYPES.TEAM
-                              ? "Select a Project"
-                              : formData.type === GOAL_TYPES.ORG
-                              ? "Not applicable for Organization Goals"
-                              : "No Project"}
-                          </option>
-                          {formData.type !== GOAL_TYPES.ORG &&
-                            projects.map((project) => (
-                              <option
-                                key={project.projectId}
-                                value={project.projectId}
-                              >
-                                {project.projectName}
-                              </option>
-                            ))}
-                        </select>
+                          <button
+                            type="button"
+                            className={`custom-dropdown-toggle ${
+                              errors.projectId ? "is-invalid" : ""
+                            }`}
+                            onClick={() =>
+                              !isEdit &&
+                              !loading &&
+                              formData.type !== GOAL_TYPES.ORG &&
+                              setShowProjectDropdown(!showProjectDropdown)
+                            }
+                            disabled={
+                              isEdit ||
+                              loading ||
+                              formData.type === GOAL_TYPES.ORG
+                            }
+                          >
+                            <span>{getSelectedProjectLabel()}</span>
+                            <i
+                              className={`bi bi-chevron-${
+                                showProjectDropdown ? "up" : "down"
+                              }`}
+                            ></i>
+                          </button>
+                          {showProjectDropdown &&
+                            !isEdit &&
+                            formData.type !== GOAL_TYPES.ORG && (
+                              <div className="custom-dropdown-menu">
+                                <div
+                                  className={`custom-dropdown-item ${
+                                    !formData.projectId ? "selected" : ""
+                                  }`}
+                                  onClick={() => {
+                                    handleChange("projectId", "");
+                                    setShowProjectDropdown(false);
+                                  }}
+                                >
+                                  {formData.type === GOAL_TYPES.TEAM
+                                    ? "Select a Project"
+                                    : "No Project"}
+                                </div>
+                                {projects.map((project) => (
+                                  <div
+                                    key={project.projectId}
+                                    className={`custom-dropdown-item ${
+                                      formData.projectId === project.projectId
+                                        ? "selected"
+                                        : ""
+                                    }`}
+                                    onClick={() => {
+                                      handleChange(
+                                        "projectId",
+                                        project.projectId
+                                      );
+                                      setShowProjectDropdown(false);
+                                    }}
+                                  >
+                                    {project.projectName}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                        </div>
                         {errors.projectId && (
-                          <div className="invalid-feedback">
+                          <div className="invalid-feedback d-block">
                             {errors.projectId}
                           </div>
                         )}
@@ -1008,7 +1246,6 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
 
                   <hr />
 
-                  {/* Checklist section */}
                   <div className="mb-3">
                     <h5 className="mb-3">
                       Checklist Items
@@ -1150,14 +1387,6 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                                                   : "text",
                                             }}
                                           />
-                                          {isEdit &&
-                                            isExistingItem &&
-                                            !isItemCompleted && (
-                                              <small className="text-muted d-block mt-1">
-                                                <i className="bi bi-lock-fill me-1"></i>
-                                                Title cannot be edited
-                                              </small>
-                                            )}
                                           <button
                                             type="button"
                                             className="btn btn-sm btn-outline-danger"
@@ -1183,6 +1412,14 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                                             <i className="bi bi-trash"></i>
                                           </button>
                                         </div>
+                                        {isEdit &&
+                                          isExistingItem &&
+                                          !isItemCompleted && (
+                                            <small className="text-muted d-block mt-1">
+                                              <i className="bi bi-lock-fill me-1"></i>
+                                              Title cannot be edited
+                                            </small>
+                                          )}
                                       </div>
 
                                       <div>
@@ -1245,7 +1482,17 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
               )}
             </div>
 
-            <div className="modal-footer">
+            <div
+              className="modal-footer"
+              style={{
+                padding: "1rem 1.5rem",
+                borderTop: "1px solid #dee2e6",
+                flexShrink: 0,
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "1rem",
+              }}
+            >
               <button
                 type="button"
                 className="btn btn-secondary"
@@ -1313,6 +1560,9 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
       </div>
     </>
   );
-};
+};    
+export default GoalFormModal; 
 
-export default GoalFormModal;
+
+
+

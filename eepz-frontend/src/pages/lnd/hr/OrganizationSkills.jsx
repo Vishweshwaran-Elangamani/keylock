@@ -315,4 +315,4 @@ const OrganizationSkills = () => {
   );
 };
 
-export default OrganizationSkills;
+export default OrganizationSkills; 

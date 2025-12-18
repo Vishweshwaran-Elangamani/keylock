@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Download,
   Upload,
@@ -12,7 +12,7 @@ import Breadcrumb from "../../../components/lnd/common/Breadcrumb";
 import StatusBadge from "../../../components/lnd/common/StatusBadge";
 import EmptyState from "../../../components/lnd/common/EmptyState";
 import Pagination from "../../../components/lnd/common/Pagination";
-import UploadProofModal from "../../../components/lnd/modals/UploadProofModal";           
+import UploadProofModal from "../../../components/lnd/modals/UploadProofModal";
 import { lndService, downloadFile } from "../../../services/lnd/lndService";
 import { ASSIGNMENT_STATUS } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
@@ -31,6 +31,8 @@ const MyAssignments = () => {
 
   // Filter
   const [statusFilter, setStatusFilter] = useState("");
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+  const dropdownRef = useRef(null);
 
   // Sorting
   const [sortField, setSortField] = useState("");
@@ -61,6 +63,20 @@ const MyAssignments = () => {
     return prefixMap[role] || "/employee";
   };
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowStatusDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   useEffect(() => {
     fetchAssignments();
   }, [
@@ -70,7 +86,7 @@ const MyAssignments = () => {
     statusFilter,
     sortField,
     sortOrderAsc,
-  ]);        
+  ]);
 
   const fetchAssignments = async () => {
     try {
@@ -82,12 +98,11 @@ const MyAssignments = () => {
         sortField,
         sortOrderAsc ? "asc" : "desc",
         itemsPerPage
-      );           
+      );
 
       if (response.data.success) {
         let items = response.data.data.items;
 
-       
         if (statusFilter === ASSIGNMENT_STATUS.OVERDUE) {
           items = items.filter((a) => a.isOverdue === true);
         }
@@ -106,7 +121,7 @@ const MyAssignments = () => {
 
   const handleSearchInputChange = (e) => {
     setSearchInput(e.target.value);
-  }; 
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -157,7 +172,6 @@ const MyAssignments = () => {
       downloadFile(response.data, filename);
       toast.success("File downloaded successfully");
     } catch (error) {
-
       console.error("Failed to download proof:", error);
       toast.error("Failed to download proof");
     }
@@ -206,6 +220,33 @@ const MyAssignments = () => {
       />
     );
   };
+
+  const getStatusLabel = (value) => {
+    const statusMap = {
+      "": "All Statuses",
+      [ASSIGNMENT_STATUS.PENDING_SME_ACKNOWLEDGEMENT]: "Pending Acknowledgement",
+      [ASSIGNMENT_STATUS.IN_PROGRESS]: "In Progress",
+      [ASSIGNMENT_STATUS.PENDING_MANAGER_ACKNOWLEDGEMENT]: "Pending Completion",
+      [ASSIGNMENT_STATUS.COMPLETED]: "Completed",
+      [ASSIGNMENT_STATUS.OVERDUE]: "Overdue",
+    };
+    return statusMap[value] || "All Statuses";
+  };
+
+  const statusOptions = [
+    { value: "", label: "All Statuses" },
+    {
+      value: ASSIGNMENT_STATUS.PENDING_SME_ACKNOWLEDGEMENT,
+      label: "Pending Acknowledgement",
+    },
+    { value: ASSIGNMENT_STATUS.IN_PROGRESS, label: "In Progress" },
+    {
+      value: ASSIGNMENT_STATUS.PENDING_MANAGER_ACKNOWLEDGEMENT,
+      label: "Pending Completion",
+    },
+    { value: ASSIGNMENT_STATUS.COMPLETED, label: "Completed" },
+    { value: ASSIGNMENT_STATUS.OVERDUE, label: "Overdue" },
+  ];
 
   if (loading && assignments.length === 0) {
     return (
@@ -272,34 +313,87 @@ const MyAssignments = () => {
             )}
           </div>
         </form>
-        <select
-          value={statusFilter}
-          onChange={(e) => {
-            setStatusFilter(e.target.value);
+
+
+       {/* CUSTOM DROPDOWN */}
+<div ref={dropdownRef} style={{ position: "relative" }}>
+  <button
+    type="button"
+    onClick={() => setShowStatusDropdown(!showStatusDropdown)}
+    style={{
+      padding: "0.5rem 0.875rem",
+      border: "none",
+      borderRadius: "8px",
+      fontSize: "0.875rem",
+      cursor: "pointer",
+      background: "#fff",
+      color: "black",
+      minWidth: "220px",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      fontWeight: "500",
+      transition: "all 0.2s",
+    }}
+  >
+    <span>{getStatusLabel(statusFilter)}</span>
+    <i
+      className={`bi bi-chevron-${showStatusDropdown ? "up" : "down"}`}
+      style={{ fontSize: "0.75rem", marginLeft: "0.5rem" }}
+    ></i>
+  </button>
+
+  {showStatusDropdown && (
+    <div
+      style={{
+        position: "absolute",
+        top: "calc(100% + 4px)",
+        left: 0,
+        minWidth: "220px",
+        background: "#fff",
+        border: "1px solid #e5e7eb",
+        borderRadius: "8px",
+        zIndex: 1000,
+        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+        overflow: "hidden",
+      }}
+    >
+      {statusOptions.map((option) => (
+        <div
+          key={option.value}
+          onClick={() => {
+            setStatusFilter(option.value);
             setCurrentPage(1);
+            setShowStatusDropdown(false);
           }}
           style={{
-            padding: "0.625rem 1rem",
-            border: "1px solid #e5e7eb",
-            borderRadius: "8px",
-            fontSize: "0.875rem",
-            outline: "none",
+            padding: "0.625rem 0.875rem",
             cursor: "pointer",
-            background: "#fff",
+            fontSize: "0.875rem",
+            color: "#212529",
+            textAlign: "left",
+            transition: "all 0.2s",
+            background:
+              statusFilter === option.value ? "#f3f4f6" : "#fff",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "rgb(39, 35, 92)";
+            e.currentTarget.style.color = "white";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background =
+              statusFilter === option.value ? "#f3f4f6" : "#fff";
+            e.currentTarget.style.color = "#212529";
           }}
         >
-          <option value="">All Statuses</option>
-          <option value={ASSIGNMENT_STATUS.PENDING_SME_ACKNOWLEDGEMENT}>
-            Pending Acknowledgement
-          </option>
-          <option value={ASSIGNMENT_STATUS.IN_PROGRESS}>In Progress</option>
-          <option value={ASSIGNMENT_STATUS.PENDING_MANAGER_ACKNOWLEDGEMENT}>
-            Pending Completion
-          </option>
-          <option value={ASSIGNMENT_STATUS.COMPLETED}>Completed</option>  
-          <option value={ASSIGNMENT_STATUS.OVERDUE}>Overdue</option>   
-        </select>
-      </div>           
+          {option.label}
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
+      </div>
 
       {assignments.length === 0 && !loading ? (
         <EmptyState
@@ -322,6 +416,8 @@ const MyAssignments = () => {
                 borderRadius: "12px",
                 overflow: "hidden",
                 minWidth: 0,
+                boxShadow: "0 4px 12px rgba(0,0,0,0.12)"
+
               }}
             >
               <div
@@ -333,7 +429,7 @@ const MyAssignments = () => {
                   borderBottom: "2px solid #abb4c5ff",
                   fontWeight: 600,
                   color: "white",
-                  fontSize: "14px",
+                  fontsize: "0.875rem",
                   padding: "1rem 1.5rem",
                   textTransform: "uppercase",
                   letterSpacing: "0.025em",
@@ -487,7 +583,7 @@ const MyAssignments = () => {
                     )}
                   </div>
 
-                  {/* Score - FIXED WITH CENTER ALIGNMENT */}
+                  {/* Score */}
                   <div
                     style={{
                       display: "flex",
@@ -545,8 +641,7 @@ const MyAssignments = () => {
                         None
                       </span>
                     )}
-                  </div>  
-
+                  </div>
 
                   {/* Request Acknowledgement / Upload Proof */}
                   <div style={{ textAlign: "center" }}>

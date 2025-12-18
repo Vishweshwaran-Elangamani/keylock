@@ -302,6 +302,7 @@ const SmeAssignments = () => {
                 borderRadius: "12px",
                 overflow: "hidden",
                 minWidth: 0,
+                boxShadow: "0 4px 12px rgba(0,0,0,0.12)"
               }}
             >
               <div
@@ -313,7 +314,7 @@ const SmeAssignments = () => {
                   borderBottom: "2px solid #abb4c5ff",
                   fontWeight: 600,
                   color: "white",
-                  fontSize: "14px",
+                  fontsize: "0.875rem",
                   padding: "1rem 1.5rem",
                   textTransform: "uppercase",
                   letterSpacing: "0.025em",

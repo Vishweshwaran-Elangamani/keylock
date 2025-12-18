@@ -45,7 +45,7 @@ const UserList = () => {
     fetchData();
   }, []);
 
-  // ✅ FIXED: Use activeSearchTerm instead of searchTerm
+  //  FIXED: Use activeSearchTerm instead of searchTerm
   useEffect(() => {
     filterUsers();
   }, [users, activeSearchTerm, selectedRole, selectedStatus]);
@@ -86,7 +86,7 @@ const UserList = () => {
     // Start with non-admin users only
     let filtered = getNonAdminUsers();
 
-    // ✅ Use activeSearchTerm instead of searchTerm
+    // Use activeSearchTerm instead of searchTerm
     if (activeSearchTerm) {
       filtered = filtered.filter(
         (user) =>
@@ -109,12 +109,12 @@ const UserList = () => {
     setCurrentPage(1);
   };
 
-  // ✅ NEW: Handle search button click
+  //  NEW: Handle search button click
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
   };
 
-  // ✅ FIXED: Clear all filters including activeSearchTerm
+  //  FIXED: Clear all filters including activeSearchTerm
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
