@@ -26,7 +26,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             try
             {
-                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ?? 
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ??
                                  User.FindFirst("sub");
 
                 if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId) || userId <= 0)
@@ -101,7 +101,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             try
             {
-                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ?? 
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ??
                                  User.FindFirst("sub");
 
                 if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId) || userId <= 0)
@@ -126,7 +126,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             try
             {
-                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ?? 
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ??
                                  User.FindFirst("sub");
 
                 if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId) || userId <= 0)
@@ -175,72 +175,72 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
-[HttpGet("pending-leadership-approval")]
-[Authorize(Roles = "Leadership")]
-public async Task<IActionResult> GetPendingLeadershipApproval()
-{
-    try
-    {
-        Console.WriteLine($"✓ GetPendingLeadershipApproval");
-
-        var result = await _promotionService.GetPendingLeadershipApprovalAsync();
-        return Ok(result);
-    }
-    catch (Exception ex)
-    {
-        return BadRequest(new { message = ex.Message });
-    }
-}
-
-[HttpPut("{id}/leadership-approve")]
-[Authorize(Roles = "Leadership")]
-public async Task<IActionResult> LeadershipApprovePromotion(int id, [FromBody] ApprovePromotionRequestDto request)
-{
-    try
-    {
-        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ?? 
-                         User.FindFirst("sub");
-
-        if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId) || userId <= 0)
+        [HttpGet("pending-leadership-approval")]
+        [Authorize(Roles = "Leadership")]
+        public async Task<IActionResult> GetPendingLeadershipApproval()
         {
-            return Unauthorized(new { message = "User ID not found in token" });
+            try
+            {
+                Console.WriteLine($"✓ GetPendingLeadershipApproval");
+
+                var result = await _promotionService.GetPendingLeadershipApprovalAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
-        Console.WriteLine($"✓ LeadershipApprovePromotion - PromotionId: {id}, Remarks: {request.ApprovalRemarks}");
-
-        var result = await _promotionService.ApprovePromotionByLeadershipAsync(id, userId, request.ApprovalRemarks);
-        return Ok(result);
-    }
-    catch (Exception ex)
-    {
-        return StatusCode(500, new { message = ex.InnerException?.Message ?? ex.Message });
-    }
-}
-
-[HttpPut("{id}/leadership-reject")]
-[Authorize(Roles = "Leadership")]
-public async Task<IActionResult> LeadershipRejectPromotion(int id, [FromBody] ApprovePromotionRequestDto request)
-{
-    try
-    {
-        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ?? 
-                         User.FindFirst("sub");
-
-        if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId) || userId <= 0)
+        [HttpPut("{id}/leadership-approve")]
+        [Authorize(Roles = "Leadership")]
+        public async Task<IActionResult> LeadershipApprovePromotion(int id, [FromBody] ApprovePromotionRequestDto request)
         {
-            return Unauthorized(new { message = "User ID not found in token" });
+            try
+            {
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ??
+                                 User.FindFirst("sub");
+
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId) || userId <= 0)
+                {
+                    return Unauthorized(new { message = "User ID not found in token" });
+                }
+
+                Console.WriteLine($"✓ LeadershipApprovePromotion - PromotionId: {id}, Remarks: {request.ApprovalRemarks}");
+
+                var result = await _promotionService.ApprovePromotionByLeadershipAsync(id, userId, request.ApprovalRemarks);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.InnerException?.Message ?? ex.Message });
+            }
         }
 
-        Console.WriteLine($"✓ LeadershipRejectPromotion - PromotionId: {id}, Remarks: {request.ApprovalRemarks}");
+        [HttpPut("{id}/leadership-reject")]
+        [Authorize(Roles = "Leadership")]
+        public async Task<IActionResult> LeadershipRejectPromotion(int id, [FromBody] ApprovePromotionRequestDto request)
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ??
+                                 User.FindFirst("sub");
 
-        var result = await _promotionService.RejectPromotionByLeadershipAsync(id, userId, request.ApprovalRemarks);
-        return Ok(result);
-    }
-    catch (Exception ex)
-    {
-        return StatusCode(500, new { message = ex.InnerException?.Message ?? ex.Message });
-    }
-}
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId) || userId <= 0)
+                {
+                    return Unauthorized(new { message = "User ID not found in token" });
+                }
+
+                Console.WriteLine($"✓ LeadershipRejectPromotion - PromotionId: {id}, Remarks: {request.ApprovalRemarks}");
+
+                var result = await _promotionService.RejectPromotionByLeadershipAsync(id, userId, request.ApprovalRemarks);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.InnerException?.Message ?? ex.Message });
+            }
+        }
 
     }
 }

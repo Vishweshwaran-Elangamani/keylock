@@ -206,7 +206,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         [HttpGet("all-nominations")]
-        [Authorize(Roles = "HR,Admin,Employee")]
+        [Authorize]
         public async Task<IActionResult> GetAllNominations([FromQuery] string? status = null)
         {
             try
