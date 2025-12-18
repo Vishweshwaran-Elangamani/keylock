@@ -4,49 +4,6 @@
   background: #f8f9fa;
 }
 
-.dp-breadcrumb-nav {
-  margin-bottom: 1.25rem;
-}
-
-
-.dp-breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0;
-  margin: 0;
-  list-style: none;
-  font-size: 0.875rem;
-}
-
-
-.dp-breadcrumb-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #6c757d;
-}
-
-
-.dp-breadcrumb-item i {
-  font-size: 1rem;
-  color: #97247E;
-}
-
-
-.dp-breadcrumb-item:not(:last-child)::after {
-  content: '\F285';
-  font-family: 'bootstrap-icons';
-  margin-left: 0.5rem;
-  color: #6c757d;
-}
-
-
-.dp-breadcrumb-item.active {
-  color: #97247E;
-  font-weight: 600;
-}
-
 
 
 .dp-page-header {

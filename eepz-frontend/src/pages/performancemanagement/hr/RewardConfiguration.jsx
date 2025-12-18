@@ -6,6 +6,7 @@ import DeleteConfirmModal from "../../../components/performance_management/modal
 import StatusConfirmModal from "../../../components/performance_management/modals/Recognition/StatusConfirmModal";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import Breadcrumb from "../../../components/common/Breadcrumb";
 
 
 function RewardConfiguration() {
@@ -469,37 +470,14 @@ function RewardConfiguration() {
           marginBottom: "1.2rem",
         }}
       >
-        <nav className="cg-breadcrumbs" aria-label="breadcrumb" style={{ marginBottom: 0, background: "transparent" }}>
-          <style>
-            {`
-              .cg-breadcrumb-item + .cg-breadcrumb-item::before {
-                content: "/";
-                margin: 0 0.25rem;
-                color: #888;
-                font-weight: normal;
-              }
-            `}
-          </style>
-          <ol className="cg-breadcrumb" style={{ margin: 0, padding: 0, listStyle: "none", display: "flex" }}>
-            <li
-              className="cg-breadcrumb-item"
-              onClick={() => navigate("/hr/dashboard")}
-              style={{ cursor: "pointer" }}
-            >
-              <i className="bi bi-house-door"></i>
-            </li>
-            <li
-              className="cg-breadcrumb-item"
-              onClick={() => navigate("/hr/dashboard/performance")}
-              style={{ cursor: "pointer" }}
-            >
-              Performance
-            </li>
-            <li className="cg-breadcrumb-item active" aria-current="page">
-              Rewards
-            </li>
-          </ol>
-        </nav>
+       <Breadcrumb
+  items={[
+    { label: "Dashboard", path: "/hr/dashboard" },
+    { label: "Performance", path: "/hr/dashboard/performance" },
+    { label: "Rewards", path: null }
+  ]}
+/>
+ 
 
 
         <button

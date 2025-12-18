@@ -4,6 +4,7 @@ import { Toaster, toast } from "sonner";
 import * as managerNominationApi from "../../../services/performancemanagement/manager/managernominationapi";
 import NominationModal from "../../../components/performance_management/modals/ManagerNomination/NominationModal";
 import "../../../styles/performancemanagement/manager/ManagerNomination.css";
+import Breadcrumb from "../../../components/common/Breadcrumb";
 
 const safeText = (...vals) => {
   for (const v of vals) {
@@ -28,81 +29,7 @@ const usePagination = (items = [], pageSize = 5) => {
   return { page, setPage, totalPages, paged, pageSize };
 };
 
-const Breadcrumbs = ({ items = [] }) => {
-  return (
-    <nav className="managernomination-breadcrumbs" aria-label="breadcrumb">
-      <ol
-        className="managernomination-breadcrumb-list"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "4px",
-          padding: 0,
-          margin: "0 0 12px 0",
-          listStyle: "none",
-          fontSize: "13px",
-          color: "#9B287B",
-        }}
-      >
-        <li
-          className="managernomination-crumb"
-          style={{ display: "flex", alignItems: "center" }}
-        >
-          <Link
-            to="/manager/dashboard"
-            aria-label="Home"
-            style={{
-              color: "#9B287B",
-              textDecoration: "none",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <i className="bi bi-house" style={{ fontSize: "14px" }} />
-          </Link>
-        </li>
 
-        {items.map((it, idx) => {
-          const isLast = idx === items.length - 1;
-          return (
-            <React.Fragment key={idx}>
-              <span style={{ color: "#9B287B" }}>/</span>
-
-              <li
-                className={`managernomination-crumb ${
-                  isLast ? "managernomination-crumb-active" : ""
-                }`}
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                {it.to && !isLast ? (
-                  <Link
-                    to={it.to}
-                    style={{
-                      color: "#9B287B",
-                      textDecoration: "none",
-                      fontWeight: 400,
-                    }}
-                  >
-                    {it.label}
-                  </Link>
-                ) : (
-                  <span
-                    style={{
-                      color: "#9B287B",
-                      fontWeight: 700,
-                    }}
-                  >
-                    {it.label}
-                  </span>
-                )}
-              </li>
-            </React.Fragment>
-          );
-        })}
-      </ol>
-    </nav>
-  );
-};
 
 export default function ManagerNomination() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -235,12 +162,14 @@ export default function ManagerNomination() {
     <div className="managernomination-container">
       <Toaster position="top-right" />
 
-      <Breadcrumbs
-        items={[
-          { label: "Performance", to: "/manager/dashboard/performance" },
-          { label: "Nominations" },
-        ]}
-      />
+      <Breadcrumb
+  items={[
+    { label: "Dashboard", path: "/manager/dashboard" },
+    { label: "Performance", path: "/manager/dashboard/performance" },
+    { label: "Nominations", path: null }
+  ]}
+/>
+ 
 
       {/* TEAM MEMBERS CARD */}
       <div

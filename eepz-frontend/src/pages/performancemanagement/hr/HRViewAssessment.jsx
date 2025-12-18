@@ -4,6 +4,8 @@ import api from "../../../services/performancemanagement/api/api";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import AppraisalDetailsModal from "../../../components/performance_management/modals/HRViewAssessment/AppraisalDetailsModal";
 import "../../../styles/performancemanagement/hr/HRViewAssessment.css";
+import Breadcrumb from "../../../components/common/Breadcrumb";
+
 
 
 function exportToCsv(filename, rows) {
@@ -263,66 +265,16 @@ function HRViewAppraisals() {
 
   return (
     <div className="hrvasspm-page">
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: "2rem",
-        }}
-      >
-        <nav
-          className="cg-breadcrumbs"
-          aria-label="breadcrumb"
-          style={{ marginBottom: "16px", background: "transparent" }}
-        >
-          <style>
-            {`
-      .cg-breadcrumb {
-        margin: 0;
-        padding: 0;
-        list-style: none;
-        display: flex;
-        align-items: center;
-      }
-      .cg-breadcrumb-item + .cg-breadcrumb-item::before {
-        content: "/";
-        margin: 0 0.25rem;   /* smaller spacing */
-        color: #888;         /* lighter gray separator */
-        font-weight: normal; /* prevents thick/bold look */
-        font-size: 0.9em;    /* slightly smaller than text */
-      }
-      .cg-breadcrumb-item {
-        cursor: pointer;
-      }
-      .cg-breadcrumb-item.active {
-        color: #97247E
- ;      /* highlight active item (purple) */
-        cursor: default;
-      }
-    `}
-          </style>
+    
+  <Breadcrumb
+    items={[
+      { label: "Dashboard", path: "/hr/dashboard" },
+      { label: "Performance", path: "/hr/dashboard/performance" },
+      { label: "Form Progress", path: null }
+    ]}
+  />
 
-          <ol className="cg-breadcrumb">
-            <li
-              className="cg-breadcrumb-item"
-              onClick={() => navigate("/hr/dashboard")}
-            >
-              <i className="bi bi-house-door"></i>
-            </li>
-            <li
-              className="cg-breadcrumb-item"
-              onClick={() => navigate("/hr/dashboard/performance")}
-            >
-              Performance
-            </li>
-            <li className="cg-breadcrumb-item active" aria-current="page">
-              Form Progress
-            </li>
-          </ol>
-        </nav>
-
-      </div>
+ 
 
       <div className="hrvasspm-container">
         <div

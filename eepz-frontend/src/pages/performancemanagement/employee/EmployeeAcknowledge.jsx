@@ -5,6 +5,7 @@ import {
   acknowledgeRating,
 } from "../../../services/performancemanagement/api/rolesapi";
 import { Toaster, toast } from "sonner";
+import Breadcrumb from "../../../components/common/Breadcrumb";
 
 const THEME = {
   primary: "#27235C",
@@ -115,76 +116,19 @@ export default function EmployeeAcknowledgment() {
     return (total / vals.length).toFixed(2);
   };
 
-  const breadcrumbItems = [
-    { label: "Performance Rating Acknowledgment", path: null }
-  ];
+
 
   return (
     <div style={styles.container}>
       <Toaster position="top-right" duration={3000} />
 
-      {/* Breadcrumb Navigation */}
-      <nav
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.25rem',
-          marginBottom: '1.5rem',
-          fontSize: '0.875rem',
-          color: '#6c757d',
-          flexWrap: 'wrap'
-        }}
-      >
-        <i 
-          className="bi bi-house-door"
-          style={{ 
-            cursor: 'pointer', 
-            color: '#97247E', 
-            fontSize: '1rem',
-            flexShrink: 0 
-          }}
-          onClick={() => navigate("/employee/dashboard")}
-          title="Go Back"
-        />
-        
-        {breadcrumbItems.map((item, index) => (
-          <div
-            key={index}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.25rem'
-            }}
-          >
-            <span style={{ color: '#6c757d', fontSize: '0.875rem' }}>/</span>
-            {item.path ? (
-              <span
-                onClick={() => navigate(item.path)}
-                style={{
-                  cursor: 'pointer',
-                  color: '#97247E',
-                  fontWeight: index === breadcrumbItems.length - 1 ? '600' : '400',
-                  transition: 'color 0.2s'
-                }}
-                onMouseEnter={(e) => (e.target.style.textDecoration = 'underline')}
-                onMouseLeave={(e) => (e.target.style.textDecoration = 'none')}
-              >
-                {item.label}
-              </span>
-            ) : (
-              <span
-                style={{
-                  fontWeight: '600',
-                  color: '#212529'
-                }}
-              >
-                {item.label}
-              </span>
-            )}
-          </div>
-        ))}
-      </nav>
-
+     
+      <Breadcrumb
+  items={[
+    { label: "Dashboard", path: "employee/dashboard" },
+    { label: "Employee Acknowledgements", path: null }
+  ]}
+/>
       {loading && (
         <div style={styles.loadingCard}>
           <p style={{ margin: 0, color: THEME.textLight }}>

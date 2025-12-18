@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import Breadcrumb from "../../../common/Breadcrumb";
 
 const ManagerAcknowledgmentModal = ({ ackList, error, loading }) => {
   const navigate = useNavigate();
@@ -11,67 +12,14 @@ const ManagerAcknowledgmentModal = ({ ackList, error, loading }) => {
 
   return (
     <div style={{ padding: '2rem', backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
-      {/* Breadcrumb Navigation */}
-      <nav
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.25rem',
-          marginBottom: '1.5rem',
-          fontSize: '0.875rem',
-          color: '#6c757d',
-          flexWrap: 'wrap'
-        }}
-      >
-        <i 
-          className="bi bi-house-door"
-          style={{ 
-            cursor: 'pointer', 
-            color: '#97247E', 
-            fontSize: '1rem',
-            flexShrink: 0 
-          }}
-          onClick={() => navigate("/hr/dashboard")}
-          title="Go Back"
-        />
-        
-        {breadcrumbItems.map((item, index) => (
-          <div
-            key={index}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.25rem'
-            }}
-          >
-            <span style={{ color: '#6c757d', fontSize: '0.875rem' }}>/</span>
-            {item.path ? (
-              <span
-                onClick={() => navigate(item.path)}
-                style={{
-                  cursor: 'pointer',
-                  color: '#97247E',
-                  fontWeight: index === breadcrumbItems.length - 1 ? '600' : '400',
-                  transition: 'color 0.2s'
-                }}
-                onMouseEnter={(e) => (e.target.style.textDecoration = 'underline')}
-                onMouseLeave={(e) => (e.target.style.textDecoration = 'none')}
-              >
-                {item.label}
-              </span>
-            ) : (
-              <span
-                style={{
-                  fontWeight: '600',
-                  color: '#212529'
-                }}
-              >
-                {item.label}
-              </span>
-            )}
-          </div>
-        ))}
-      </nav>
+      
+      <Breadcrumb
+  items={[
+    { label: "Dashboard", path: "/manager/dashboard" },
+    { label: "Performance", path: "/manager/dashboard/performance" },
+    { label: "Employee Acknowledgements", path: null }
+  ]}
+/>
 
       {/* Page Title */}
       <h2 style={{ 

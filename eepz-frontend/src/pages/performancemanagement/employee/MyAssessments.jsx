@@ -4,6 +4,7 @@ import { Toaster, toast } from "sonner";
 import api from "../../../services/performancemanagement/api/api";
 import logoImage from "../../../assets/logodark.png";
 import "../../../styles/performancemanagement/employee/MyAssessments.css";
+import Breadcrumb from "../../../components/common/Breadcrumb";
 
 function getTimeLeft(deadline) {
   const now = new Date();
@@ -15,41 +16,6 @@ function getTimeLeft(deadline) {
   return { days, hours, expired: ms === 0 };
 }
 
-function Breadcrumbs({ items = [] }) {
-  if (!items || items.length === 0) return null;
-
-  return (
-    <nav aria-label="breadcrumb" className="empassper-breadcrumbs">
-      <ol>
-        {items.map((item, index) => {
-          const last = index === items.length - 1;
-
-          return (
-            <li key={index} className={last ? "current" : ""}>
-              {last ? (
-                <span className="breadcrumb-current" aria-current="page">
-                  {item.label}
-                </span>
-              ) : item.to ? (
-                <Link
-                  to={item.to}
-                  className="breadcrumb-link"
-                  aria-label={item.isIcon ? "Home" : undefined}
-                >
-                  {item.label}
-                </Link>
-              ) : (
-                <span className="breadcrumb-link">{item.label}</span>
-              )}
-
-              {!last && <span className="breadcrumb-sep">/</span>}
-            </li>
-          );
-        })}
-      </ol>
-    </nav>
-  );
-}
 
 function MyAssessments() {
   const navigate = useNavigate();
@@ -487,18 +453,18 @@ function MyAssessments() {
 
   return (
     <div className="empassper-container">
+         <Breadcrumb
+  items={[
+    { label: "Dashboard", path: "employee/dashboard" },
+    { label: "My Assessments", path: null }
+  ]}
+/>
       <Toaster position="top-right" />
 
       <div className="empassper-header-section">
         <div className="empassper-header-content">
           <div className="empassper-header-text" style={{ flex: 1 }}>
-            <Breadcrumbs
-              items={[
-                { label: <i className="bi bi-house-door"></i>, to: "/employee/dashboard", isIcon: true },
-                { label: "Performance Management", to: "/employee/dashboard/performance" },
-                { label: <strong>My Performance Assessments</strong>, to: "/employee/dashboard/performance/my-assessments" }
-              ]}
-            />
+           
           </div>
         </div>
 

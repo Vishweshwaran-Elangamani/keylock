@@ -6,7 +6,7 @@
   min-height: 100vh;
   font-family: 'Segoe UI', Arial, sans-serif;
 }
-
+/* 
 .fld-breadcrumbs {
   margin-bottom: 1.2rem;
 }
@@ -46,7 +46,7 @@
 .fld-breadcrumbs li[aria-current="page"] {
   font-weight: 700;
   color: #97247e;
-}
+} */
 
 
 .fld-header-row {

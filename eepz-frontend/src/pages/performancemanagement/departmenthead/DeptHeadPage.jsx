@@ -1108,7 +1108,7 @@ export default function DeptHeadPage() {
             }}
             onClick={() => setActiveTab("pending")}
           >
-            Pending ({pendingRequests.length})
+            Pending
           </button>
 
           <button
@@ -1135,125 +1135,144 @@ export default function DeptHeadPage() {
             }}
             onClick={() => setActiveTab("approved")}
           >
-            Approved ({approvedRequests.length})
+            Approved 
           </button>
         </div>
       </div>
 
-      {/* FILTERS - IMPROVED UI */}
-      <div className="dp-filters-card" style={{ marginBottom: '1rem' }}>
-        <div style={{
-          display: 'flex',
-          gap: '12px',
-          alignItems: 'center',
-          flexWrap: 'wrap'
-        }}>
-          {/* COMBINED SEARCH BAR + BUTTON */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'stretch',
-            border: '2px solid #27235C',
-            borderRadius: '8px',
-            overflow: 'hidden',
-            flex: '1 1 300px',
-            minWidth: '250px'
-          }}>
-            <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center' }}>
-              <i className="bi bi-search" style={{
-                position: 'absolute',
-                left: '12px',
-                color: '#6c757d',
-                fontSize: '14px',
-                pointerEvents: 'none'
-              }}></i>
-              <input
-                type="text"
-                placeholder="Search employee or project..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    setAppliedSearch(searchTerm);
-                  }
-                }}
-                style={{
-                  flex: 1,
-                  padding: '10px 12px 10px 36px',
-                  border: 'none',
-                  fontSize: '14px',
-                  outline: 'none',
-                  background: 'transparent'
-                }}
-              />
-            </div>
-            <button
-              onClick={() => setAppliedSearch(searchTerm)}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: '#27235C',
-                color: 'white',
-                border: 'none',
-                fontSize: '14px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'opacity 0.2s',
-                whiteSpace: 'nowrap'
-              }}
-              onMouseEnter={(e) => e.target.style.opacity = '0.9'}
-              onMouseLeave={(e) => e.target.style.opacity = '1'}
-            >
-              Search
-            </button>
-          </div>
-            {/* CLEAR FILTERS BUTTON */}
-            <button
-            onClick={handleClearFilters}
-            style={{
-              padding: "10px 20px",
-              backgroundColor: "#6c757d",
-              color: "#fff",
-              border: "none",
-              borderRadius: "8px",
-              fontWeight: 600,
-              fontSize: '14px',
-              cursor: "pointer",
-              transition: 'opacity 0.2s',
-              whiteSpace: 'nowrap'
-            }}
-            onMouseEnter={(e) => e.target.style.opacity = '0.9'}
-            onMouseLeave={(e) => e.target.style.opacity = '1'}
-          >
-            Clear Filters
-          </button>
-
-          {/* PROJECT FILTER */}
-          <select
-            value={filterProject}
-            onChange={(e) => setFilterProject(e.target.value)}
-            style={{
-              padding: '10px 12px',
-              border: '2px solid #27235C',
-              borderRadius: '8px',
-              fontSize: '14px',
-              fontWeight: 500,
-              cursor: 'pointer',
-              outline: 'none',
-              minWidth: '150px'
-            }}
-          >
-            <option value="">All Projects</option>
-            {getUniqueProjects().map((project, idx) => (
-              <option key={idx} value={project}>
-                {project}
-              </option>
-            ))}
-          </select>
-
-        
-        </div>
+      <div className="dp-filters-card" style={{ marginBottom: "0.75rem" }}>
+  <div
+    style={{
+      display: "flex",
+      gap: "10px",
+      alignItems: "center",
+      flexWrap: "wrap",
+    }}
+  >
+    {/* SEARCH BAR */}
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        border: "1.5px solid #27235C",
+        borderRadius: "6px",
+        overflow: "hidden",
+        flex: "1 1 280px",
+        minWidth: "220px",
+        height: "36px",
+      }}
+    >
+      <div
+        style={{
+          position: "relative",
+          flex: 1,
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        <i
+          className="bi bi-search"
+          style={{
+            position: "absolute",
+            left: "10px",
+            color: "#6c757d",
+            fontSize: "13px",
+            pointerEvents: "none",
+          }}
+        ></i>
+ 
+        <input
+          type="text"
+          placeholder="Search employee or project..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              setAppliedSearch(searchTerm);
+            }
+          }}
+          style={{
+            flex: 1,
+            padding: "6px 10px 6px 32px",
+            border: "none",
+            fontSize: "13px",
+            outline: "none",
+            background: "transparent",
+            height: "100%",
+          }}
+        />
       </div>
+ 
+      <button
+        onClick={() => setAppliedSearch(searchTerm)}
+        style={{
+          padding: "0 14px",
+          backgroundColor: "#27235C",
+          color: "#fff",
+          border: "none",
+          fontSize: "13px",
+          fontWeight: 600,
+          cursor: "pointer",
+          height: "100%",
+          whiteSpace: "nowrap",
+        }}
+        onMouseEnter={(e) => (e.target.style.opacity = "0.9")}
+        onMouseLeave={(e) => (e.target.style.opacity = "1")}
+      >
+        Search
+      </button>
+    </div>
+ 
+   
+    <button
+  onClick={handleClearFilters}
+  style={{
+    padding: "6px 14px",
+    color: "#27235c",
+    border: "2px solid #27235c",
+    borderRadius: "6px",
+    fontWeight: 600,
+    fontSize: "13px",
+    cursor: "pointer",
+    height: "36px",
+    whiteSpace: "nowrap",
+  }}
+  onMouseEnter={(e) => (e.target.style.opacity = "0.9")}
+  onMouseLeave={(e) => (e.target.style.opacity = "1")}
+>
+  Clear
+</button>
 
-      {/* TABLE */}
+ 
+    {/* PROJECT FILTER */}
+    <select
+      value={filterProject}
+      onChange={(e) => setFilterProject(e.target.value)}
+      style={{
+        padding: "6px 10px",
+        border: "1.5px solid #27235C",
+        borderRadius: "6px",
+        fontSize: "13px",
+        fontWeight: 500,
+        cursor: "pointer",
+        outline: "none",
+        height: "36px",
+        minWidth: "140px",
+        background: "#fff",
+      }}
+    >
+      <option value="">All Projects</option>
+      {getUniqueProjects().map((project, idx) => (
+        <option key={idx} value={project}>
+          {project}
+        </option>
+      ))}
+    </select>
+  </div>
+</div>
+ 
+
+      
       <div
         className="dp-table-card"
         style={{ border: "2px solid #27235C", borderRadius: "8px", overflow: "hidden" }}
@@ -1295,9 +1314,7 @@ export default function DeptHeadPage() {
                             <div className="dp-user-avatar">{getInitials(emp.employeeName)}</div>
                             <div>
                               <span className="dp-user-name">{emp.employeeName}</span>
-                              {emp.employeeCompanyId && (
-                                <small className="dp-user-id">@{emp.employeeCompanyId}</small>
-                              )}
+                              
                             </div>
                           </div>
                         </td>

@@ -422,6 +422,7 @@ function FormsList() {
   const handleView = (form) => {
     setViewFormDetails(form);
   };
+  
 
   const analytics = useMemo(() => {
     const totalForms = rows.length;
@@ -445,48 +446,14 @@ function FormsList() {
   return (
     <div className="formlistperf">
       <div className="flp-root">
-        <nav className="cg-breadcrumbs" aria-label="breadcrumb">
-          <ol
-            className="cg-breadcrumb"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "4px",
-              listStyle: "none",
-              padding: 0,
-              margin: 0
-            }}
-          >
-            <li
-              className="cg-breadcrumb-item"
-              onClick={() => navigate("/hr/dashboard")}
-              style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}
-            >
-              <i className="bi bi-house-door"></i>
-            </li>
-
-            <span style={{ color: "#6c757d" }}>/</span>
-
-            <li
-              className="cg-breadcrumb-item"
-              onClick={() => navigate("/hr/dashboard/performance")}
-              style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}
-            >
-              Performance
-            </li>
-
-            <span style={{ color: "#6c757d" }}>/</span>
-
-            <li
-              className="cg-breadcrumb-item active"
-              aria-current="page"
-              style={{ display: "flex", alignItems: "center", gap: "4px", fontWeight: "600" }}
-            >
-              Initiate Form
-            </li>
-          </ol>
-        </nav>
-
+        
+<Breadcrumb
+        items={[
+          { label: 'Dashbaord', path: '/hr/dashboard' },
+          { label: 'Performance', path: '/hr/dashboard/performance' },
+          { label: 'Initiate Form', path: null }
+        ]}
+      />
 
         <div className="row row-cols-2 row-cols-lg-3 row-cols-xl-5 g-4 mb-3">
           <div className="col">

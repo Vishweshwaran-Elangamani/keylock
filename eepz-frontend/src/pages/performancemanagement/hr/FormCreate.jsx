@@ -4,6 +4,9 @@ import api from "../../../services/performancemanagement/api/api";
 import { toast } from "sonner";
 import { useAuth } from "../../../contexts/auth/AuthContext";
 import "../../../styles/performancemanagement/hr/FormCreate.css";
+import Breadcrumb from "../../../components/common/Breadcrumb";
+
+
 
 function FormCreate() {
   const { user, loading } = useAuth();
@@ -282,28 +285,20 @@ function FormCreate() {
 
   return (
     <div className="pmhr-fc-layout">
-      {/* Top header / breadcrumb area */}
+      
       <div className="pmhr-fc-header">
         <div className="pmhr-fc-header-left">
-          <ol className="pmhr-fc-breadcrumb">
-            <li
-              className="pmhr-fc-breadcrumb-item"
-              onClick={() => navigate("/dashboard")}
-            >
-              <i className="bi bi-house-door"></i>
-            </li>
-            <span className="pmhr-fc-breadcrumb-separator">/</span>
-            <li
-              className="pmhr-fc-breadcrumb-item"
-              onClick={() => navigate("/hr/dashboard/performance")}
-            >
-              Performance
-            </li>
-            <span className="pmhr-fc-breadcrumb-separator">/</span>
-            <li className="pmhr-fc-breadcrumb-item pmhr-fc-breadcrumb-active">
-              {isEditMode ? "Edit Form" : "Create Form"}
-            </li>
-          </ol>
+        <Breadcrumb
+  items={[
+    { label: "Dashboard", path: "/hr/dashboard" },
+    { label: "Performance", path: "/hr/dashboard/performance" },
+    {
+      label: isEditMode ? "Edit Form" : "Create Form",
+      path: null
+    }
+  ]}
+/>
+ 
          
         </div>
 

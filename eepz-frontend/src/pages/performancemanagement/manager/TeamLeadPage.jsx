@@ -6,6 +6,7 @@ import { Toaster, toast } from "sonner";
 import "../../../styles/performancemanagement/manager/TeamLeadPage.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import ReviewModal from "../../../components/performance_management/modals/TeamLeadPage/ReviewModal";
+import Breadcrumb from "../../../components/common/Breadcrumb";
  
 const calculateAverageRating = (items) => {
   if (!items || items.length === 0) return 0;
@@ -965,59 +966,14 @@ function TeamLeadPage() {
       <Toaster position="top-right" richColors />
  
       <div className="hrfcper-top-bar compact">
-        <nav className="hrfcper-breadcrumb-nav" aria-label="breadcrumb">
-          <ol
-            className="hrfcper-breadcrumb compact"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "4px",
-              listStyle: "none",
-              padding: 0,
-              margin: 0,
-              fontSize: "13px",
-              color: "#9B287B",
-            }}
-          >
-            <li
-              className="hrfcper-breadcrumb-item"
-              style={{ display: "flex", alignItems: "center", gap: "4px" }}
-            >
-              <Link
-                to="/employee/dashboard"
-                aria-label="Home"
-                style={{
-                  color: "#9B287B",
-                  textDecoration: "none",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <i className="bi bi-house-door" />
-              </Link>
-            </li>
- 
-            <span style={{ color: "#9B287B" }}>/</span>
- 
-            <li className="hrfcper-breadcrumb-item">
-              <Link
-                to="/employee/dashboard/performance"
-                style={{ color: "#9B287B", textDecoration: "none" }}
-              >
-                Performance
-              </Link>
-            </li>
- 
-            <span style={{ color: "#9B287B" }}>/</span>
- 
-            <li
-              className="hrfcper-breadcrumb-item active"
-              style={{ fontWeight: 600, color: "#9B287B" }}
-            >
-              Performance Review
-            </li>
-          </ol>
-        </nav>
+           <Breadcrumb
+  items={[
+    { label: "Dashboard", path: "/manager/dashboard" },
+    { label: "Performance", path: "/manager/dashboard/performance" },
+    { label: "Performance Review", path: null }
+  ]}
+/>
+       
  
         <div className="tl-toggle compact">
           <button

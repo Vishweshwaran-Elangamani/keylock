@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { useNavigate, useLocation } from "react-router-dom";
 import api from "../../../services/performancemanagement/api/api";
 import "../../../styles/performancemanagement/hr/FormProgressTracker.css";
+import Breadcrumb from "../../../components/common/Breadcrumb";
+
 
 export default function FormProgressTrackerPage() {
   const [trackers, setTrackers] = useState([]);
@@ -91,34 +93,13 @@ export default function FormProgressTrackerPage() {
     <div className="fld-root">
       <div className="fld-header-wrapper d-flex justify-content-between align-items-center">
 
-        <nav className="cg-breadcrumbs" aria-label="breadcrumb">
-          <style>
-            {`
-      .cg-breadcrumb-item + .cg-breadcrumb-item::before {
-        content: "/";
-        margin: 0 0.5rem;
-        color:purple;
-      }
-    `}
-          </style>
-          <ol className="cg-breadcrumb">
-            <li
-              className="cg-breadcrumb-item"
-              onClick={() => navigate("/hr/dashboard")}
-              style={{ cursor: "pointer" }}>
-              <i className="bi bi-house-door"></i>
-            </li>
-            <li
-              className="cg-breadcrumb-item"
-              onClick={() => navigate("/hr/dashboard/performance")}
-              style={{ cursor: "pointer" }}>
-              Performance
-            </li>
-            <li className="cg-breadcrumb-item active" aria-current="page">
-              Initiate Form
-            </li>
-          </ol>
-        </nav>
+      <Breadcrumb
+        items={[
+          { label: 'Dashbaord', path: '/hr/dashboard' },
+          { label: 'Performance', path: '/hr/dashboard/performance' },
+          { label: 'Form Progress', path: null }
+        ]}
+      />
 
         <div className="fld-header-row d-flex justify-content-end align-items-center">
           <button className="fld-btn-export" onClick={handleExportCSV}>
