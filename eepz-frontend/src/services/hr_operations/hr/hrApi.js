@@ -16,20 +16,9 @@ hrApi.interceptors.request.use(
     const token = localStorage.getItem("token");
     if (token) {
       config.headers["Authorization"] = `Bearer ${token}`;
-      console.log(
-        ` JWT Token attached to HR API request: ${config.method?.toUpperCase()} ${
-          config.url
-        }`
-      );
     } else {
       console.warn(" No JWT token found in localStorage");
     }
-
-    console.log(
-      ` HR API Request: ${config.method?.toUpperCase()} ${config.baseURL}${
-        config.url
-      }`
-    );
     return config;
   },
   (error) => {
@@ -41,9 +30,6 @@ hrApi.interceptors.request.use(
 //  Response Interceptor - Handle HR API responses
 hrApi.interceptors.response.use(
   (response) => {
-    console.log(
-      ` HR API Response: ${response.config.url} - Status: ${response.status}`
-    );
     return response;
   },
   (error) => {

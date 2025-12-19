@@ -36,7 +36,7 @@ const ResourcePoolMapping = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeSearchTerm, setActiveSearchTerm] = useState(""); // ✅ Active search term
+  const [activeSearchTerm, setActiveSearchTerm] = useState(""); //  Active search term
 
   // Modals
   const [showClearModal, setShowClearModal] = useState(false);
@@ -55,20 +55,17 @@ const ResourcePoolMapping = () => {
     setRecentlyMappedIds([]);
     try {
       const employeesResponse = await projectService.getInitialStageEmployees();
-      console.log("Initial stage employees response:", employeesResponse);
       
       if (employeesResponse.success && employeesResponse.data) {
         const filteredEmployees = employeesResponse.data.filter(
           (emp) => emp.roleName?.toLowerCase() === "employee"
         );
         setAllEmployees(filteredEmployees);
-        console.log("Filtered employees (Employee role only):", filteredEmployees);
       } else {
         throw new Error(employeesResponse?.message || "Failed to load employees");
       }
 
       const projectsResponse = await projectService.getAllProjects();
-      console.log("All projects response:", projectsResponse);
       
       if (projectsResponse.success && projectsResponse.data) {
         const allMapped = [];
@@ -80,7 +77,6 @@ const ResourcePoolMapping = () => {
             project.projectName.toUpperCase() === RESOURCE_POOL_PROJECT_NAME.toUpperCase()
           ) {
             resourcePoolProj = project;
-            console.log("Found Resource Pool project:", resourcePoolProj);
           }
 
           if (Array.isArray(project.mappedEmployees)) {
@@ -95,14 +91,12 @@ const ResourcePoolMapping = () => {
         });
 
         setMappedEmployees(allMapped);
-        console.log("All mapped employees:", allMapped);
 
         if (resourcePoolProj && resourcePoolProj.projectId) {
           try {
             const resourcePoolDetails = await projectService.getProjectById(
               resourcePoolProj.projectId
             );
-            console.log("Resource Pool details response:", resourcePoolDetails);
             
             if (resourcePoolDetails.success && resourcePoolDetails.data) {
               setResourcePoolProject(resourcePoolDetails.data);
@@ -112,7 +106,6 @@ const ResourcePoolMapping = () => {
                   (emp) => emp.roleName?.toLowerCase() === "employee"
                 );
                 setResourcePoolMappedEmployees(rpMapped);
-                console.log("Resource Pool mapped employees:", rpMapped);
               } else {
                 setResourcePoolMappedEmployees([]);
               }
@@ -140,7 +133,7 @@ const ResourcePoolMapping = () => {
     }
   };
 
-  // ✅ Search handlers
+  //  Search handlers
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
   };
@@ -162,7 +155,6 @@ const ResourcePoolMapping = () => {
   
   const isEmployeeInResourcePool = (empId) => {
     const inPool = resourcePoolMappedEmployees.some((emp) => emp.employeeMasterId === empId);
-    console.log(`Checking if employee ${empId} is in resource pool:`, inPool);
     return inPool;
   };
   
@@ -181,7 +173,7 @@ const ResourcePoolMapping = () => {
     return { text: "Available", badge: "rp-badge-success", icon: Check };
   };
 
-  // ✅ Filter employees using activeSearchTerm (not searchTerm)
+  //  Filter employees using activeSearchTerm (not searchTerm)
   const filteredEmployees = (
     activeSearchTerm
       ? allEmployees.filter((emp) =>
@@ -195,8 +187,6 @@ const ResourcePoolMapping = () => {
     const recentlyMapped = isRecentlyMapped(emp.employeeMasterId);
     return !inResourcePool && !recentlyMapped;
   });
-
-  console.log("Filtered employees for display:", filteredEmployees);
 
   const availableCount = filteredEmployees.filter(
     (emp) => getEmployeeStatus(emp.employeeMasterId).text === "Available"
@@ -289,7 +279,6 @@ const ResourcePoolMapping = () => {
 
     try {
       const response = await projectService.mapToResourcePool(employeeIds);
-      console.log("Map to resource pool response:", response);
 
       if (response.success === false) {
         throw new Error(response.message || "Mapping failed");
@@ -433,7 +422,7 @@ const ResourcePoolMapping = () => {
             </div>
 
             <div className="rp-card-body">
-              {/* ✅ Search with Button and Clear Icon */}
+              {/*  Search with Button and Clear Icon */}
               <div className="rp-search-bar">
                 <div className="rp-search-wrapper">
                   <Search size={18} className="rp-search-icon" />

@@ -18,9 +18,6 @@ const DepartmentHeadBudgetView = () => {
   const userName = ((user.firstName || "") + " " + (user.lastName || "")).trim();
 
   useEffect(() => {
-    console.log("Department Head logged in:");
-    console.log("  - Department Name:", userDepartmentName);
-    console.log("  - User Name:", userName);
 
     if (!userDepartmentName) {
       setError("Department information not found. Please log in again.");
@@ -36,34 +33,24 @@ const DepartmentHeadBudgetView = () => {
     setError(null);
 
     try {
-      console.log("Fetching all department budgets...");
       const response = await budgetAllocationService.getAllDepartmentBudgets();
-
-      console.log("All budgets from backend:", response.data);
 
       if (!response.success || !response.data) {
         throw new Error(response.message || "Failed to fetch budgets");
       }
 
       const departmentBudgets = response.data.filter((budget) => {
-        console.log(`Checking budget: DeptName="${budget.departmentName}"`);
         return (
           budget.departmentName?.trim().toLowerCase() ===
           userDepartmentName?.trim().toLowerCase()
         );
       });
 
-      console.log(
-        `Filtered budgets for department "${userDepartmentName}":`,
-        departmentBudgets
-      );
-
       setBudgets(departmentBudgets);
 
       if (departmentBudgets.length === 0) {
         console.warn(`No budget found for department "${userDepartmentName}"`);
         const availableDepts = response.data.map((b) => b.departmentName);
-        console.log("Available departments:", availableDepts);
 
         setError(
           `No budget allocated for ${userDepartmentName} department yet. Contact HR or Leadership to create a budget.`
@@ -79,17 +66,12 @@ const DepartmentHeadBudgetView = () => {
   };
 
   const handleShowAllocations = async (budget) => {
-    console.log("Viewing allocations for budget:", budget.budgetId);
 
     try {
       setLoading(true);
-
-      console.log("Fetching allocations from backend...");
       const response = await budgetAllocationService.getBudgetAllocationsByBudget(
         budget.budgetId
       );
-
-      console.log("Backend response:", response);
 
       let budgetAllocations = [];
       if (response && response.success) {
@@ -101,8 +83,6 @@ const DepartmentHeadBudgetView = () => {
           ? response.data.data
           : [];
       }
-
-      console.log("Fetched allocations:", budgetAllocations);
 
       setSelectedBudgetForAllocations({
         ...budget,
@@ -118,7 +98,6 @@ const DepartmentHeadBudgetView = () => {
   };
 
   const handleBackToList = () => {
-    console.log("Back to budget list");
     setSelectedBudgetForAllocations(null);
     fetchBudgets();
   };

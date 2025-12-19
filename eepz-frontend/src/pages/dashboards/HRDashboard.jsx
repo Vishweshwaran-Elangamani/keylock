@@ -211,7 +211,6 @@ const HRDashboard = () => {
             allPeriodAllocations = [...allPeriodAllocations, ...periods];
           }
         } catch {
-          console.log("Period allocations error");
         }
       }
 

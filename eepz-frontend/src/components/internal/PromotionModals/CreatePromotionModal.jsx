@@ -63,8 +63,6 @@ const CreatePromotionModal = ({
         (n) => n.nominationId === parseInt(nominationId)
       );
 
-      console.log("Selected nomination object:", nomination);
-
       setSelectedNomination(nomination);
 
       if (nomination) {
@@ -154,8 +152,6 @@ const CreatePromotionModal = ({
         promotionDate: formData.promotionDate,
         justification: formData.justification.trim(),
       };
-
-      console.log("Creating promotion with payload:", payload);
 
       const response = await promotionService.createPromotion(payload);
 

@@ -111,9 +111,6 @@ const VerifyResetOtp = () => {
 
     try {
       setLoading(true);
-      console.log("Resetting password...");
-      console.log("Email:", email);
-      console.log("OTP:", otpCode);
 
       toast.loading("Resetting password...");
 
@@ -123,8 +120,6 @@ const VerifyResetOtp = () => {
         newPassword,
         confirmPassword
       );
-
-      console.log("Reset Response:", response);
 
       if (response.success) {
         toast.dismiss();

@@ -46,7 +46,6 @@ export default function HRFeedbackReport() {
   // Fetch employee map using service
   const fetchEmployeeMap = async () => {
     try {
-      console.log("Fetching employee map...");
       const response = await employeeApi.getAll();
 
       if (response?.data) {
@@ -59,7 +58,6 @@ export default function HRFeedbackReport() {
           map[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
         });
         setEmployeeMap(map);
-        console.log("Employee map loaded:", map);
         return map;
       }
     } catch (err) {
@@ -79,9 +77,7 @@ export default function HRFeedbackReport() {
       const empMap = await fetchEmployeeMap();
 
       // Step 2: Fetch all active forms
-      console.log("Fetching active forms...");
       const formsRes = await hrFormApi.getActiveForms();
-      console.log("Raw forms response:", formsRes);
 
       let formsData = [];
       const forms = formsRes?.data || [];
@@ -89,35 +85,23 @@ export default function HRFeedbackReport() {
       if (Array.isArray(forms)) {
         formsData = forms;
         setForms(formsData);
-        console.log(`${formsData.length} forms loaded`);
       }
 
       // Step 3: Fetch responses for all forms
-      console.log("Fetching ALL responses...");
       let allResponses = [];
 
       for (const form of formsData) {
         try {
           const respRes = await hrFormApi.getResponsesByFormId(form.formId);
-          console.log(`Raw responses for form ${form.formId}:`, respRes);
 
           const responseData = respRes?.data || [];
 
           if (Array.isArray(responseData)) {
             if (responseData.length > 0) {
-              console.log("FIRST RESPONSE OBJECT:", responseData[0]);
-              console.log("All field keys:", Object.keys(responseData[0]));
             }
 
             const mappedResponses = responseData.map((r) => {
               // Debug each field
-              console.log(`Processing response:`, {
-                responseId: r.responseId,
-                employeeId: r.employeeId,
-                submittedDate: r.submittedDate,
-                createdAt: r.createdAt,
-                createdDate: r.createdDate,
-              });
 
               return {
                 responseId: r.responseId,
@@ -141,9 +125,6 @@ export default function HRFeedbackReport() {
             });
 
             allResponses = [...allResponses, ...mappedResponses];
-            console.log(
-              `Added ${mappedResponses.length} responses from form ${form.formId}`
-            );
           }
         } catch (err) {
           console.warn(
@@ -157,7 +138,6 @@ export default function HRFeedbackReport() {
         (a, b) => new Date(b.submittedDate) - new Date(a.submittedDate)
       );
       setResponses(allResponses);
-      console.log(`Total ${allResponses.length} responses loaded`);
     } catch (err) {
       console.error("Fetch error:", err);
       setError(err?.message || "Failed to fetch data");

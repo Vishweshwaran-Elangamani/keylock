@@ -51,14 +51,10 @@ const ResetPassword = () => {
     setMessage("");
 
     try {
-      console.log("Sending password reset request...");
-      console.log("Email:", email);
 
       toast.loading("Sending reset code...");
 
       const response = await authService.forgotPassword(email);
-
-      console.log("Reset Response:", response);
 
       if (response.success) {
         setMessage("OTP sent to your email successfully!");

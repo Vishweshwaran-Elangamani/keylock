@@ -78,8 +78,6 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
         ? parseFloat(formData.allocatedAmount)
         : parseFloat(formData.totalBudget);
 
-      console.log("💰 Updating budget...");
-
       await budgetAllocationService.updateDepartmentBudget({
         budgetId: formData.budgetId,
         departmentId: formData.departmentId,
@@ -87,8 +85,6 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
         totalBudget: parseFloat(formData.totalBudget),
         allocatedAmount: allocatedAmount,
       });
-
-      console.log("✅ Budget updated successfully");
       toast.success("Budget updated successfully!");
       onBudgetUpdated();
       handleClose();

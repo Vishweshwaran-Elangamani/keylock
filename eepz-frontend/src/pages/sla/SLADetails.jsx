@@ -55,11 +55,6 @@ const SLADetails = () => {
     try {
       const userData = JSON.parse(localStorage.getItem("user") || "{}");
       setUser(userData);
-      console.log("Current User:", {
-        empId: userData.empId,
-        name: userData.name,
-        role: userData.roleName,
-      });
     } catch (err) {
       console.error("Error parsing user:", err);
     }
@@ -72,8 +67,6 @@ const SLADetails = () => {
 
     try {
       const userData = JSON.parse(localStorage.getItem("user") || "{}");
-
-      console.log(`Fetching SLA ${slaid}`);
       const slaResponse = await slaService.getSLAById(parseInt(slaid));
 
       if (!slaResponse?.success || !slaResponse.data) {
@@ -84,13 +77,11 @@ const SLADetails = () => {
       }
 
       setSla(slaResponse.data);
-      console.log("SLA loaded:", slaResponse.data);
 
       try {
         const historyResponse = await slaService.getSLAHistory(parseInt(slaid));
         if (historyResponse?.success && Array.isArray(historyResponse.data)) {
           setHistory(historyResponse.data);
-          console.log(`${historyResponse.data.length} history entries loaded`);
         } else {
           setHistory([]);
         }
@@ -109,7 +100,6 @@ const SLADetails = () => {
         ) {
           const escData = escalationsResponse.data;
           setEscalations(escData);
-          console.log(`${escData.length} escalations loaded`);
           updateEscalationStatus(slaResponse.data, escData, userData);
         } else {
           setEscalations([]);
@@ -132,12 +122,6 @@ const SLADetails = () => {
     (slaData, escalationsData, userData) => {
       if (!slaData || !userData) return;
 
-      console.log("Checking escalation permissions:", {
-        slaStatus: slaData.status,
-        userRole: userData.roleName,
-        escalationsCount: escalationsData.length,
-      });
-
       const canEscalateL1 = escalationHelpers.canEscalateToL1(
         slaData,
         escalationsData
@@ -148,12 +132,6 @@ const SLADetails = () => {
 
       const canEsc = canEscalateL1 && isEligibleRole;
 
-      console.log("Escalation Check Result:", {
-        canEscalateL1,
-        isEligibleRole,
-        finalDecision: canEsc,
-      });
-
       setCanEscalate(canEsc);
 
       if (!canEsc) {
@@ -163,10 +141,8 @@ const SLADetails = () => {
           "L1"
         );
         setEscalationBlockReason(reason);
-        console.log("Escalation blocked:", reason);
       } else {
         setEscalationBlockReason(null);
-        console.log("Escalation allowed");
       }
 
       setCanReopen(
@@ -177,7 +153,6 @@ const SLADetails = () => {
   );
 
   const handleEscalateClick = useCallback(() => {
-    console.log("Escalate button clicked");
     if (!canEscalate) {
       console.warn("Escalation blocked:", escalationBlockReason);
       toast.error("Cannot escalate", {
@@ -186,7 +161,6 @@ const SLADetails = () => {
       });
       return;
     }
-    console.log("Opening escalation form");
     setShowEscalationForm(true);
   }, [canEscalate, escalationBlockReason]);
 
@@ -195,7 +169,6 @@ const SLADetails = () => {
       try {
         setRefreshing(true);
         setShowCloseConfirmation(false);
-        console.log(`Closing SLA ${sla.slaid}`);
         const res = await slaService.closeSLA({
           slaid: sla.slaid,
           closedByEmployeeId: user.empId,
@@ -203,7 +176,6 @@ const SLADetails = () => {
         });
 
         if (res?.success) {
-          console.log("SLA closed successfully");
           toast.success("SLA closed successfully");
           await fetchSLADetails();
         } else {
@@ -221,13 +193,11 @@ const SLADetails = () => {
   );
 
   const handleReopenSuccess = useCallback(() => {
-    console.log("SLA reopened successfully");
     setShowReopenForm(false);
     fetchSLADetails();
   }, [fetchSLADetails]);
 
   const handleEscalationSuccess = useCallback(() => {
-    console.log("Escalation submitted successfully");
     setShowEscalationForm(false);
     fetchSLADetails();
   }, [fetchSLADetails]);

@@ -76,7 +76,6 @@ const InternalOpportunityManagement = () => {
         const oppArray = Array.isArray(opportunitiesResponse.data)
           ? opportunitiesResponse.data
           : [];
-        console.log("Opportunities loaded:", oppArray);
         setOpportunities(oppArray);
       } else {
         setOpportunities([]);

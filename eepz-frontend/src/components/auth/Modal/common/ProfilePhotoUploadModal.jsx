@@ -190,8 +190,6 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
       const formData = new FormData();
       formData.append("ProfilePhoto", croppedFile);
 
-      console.log("Uploading cropped photo:", croppedFile.size, "bytes");
-
       toast.loading("Uploading photo...");
       const response = await EmployeeProfileService.updateProfilePhoto(formData);
 

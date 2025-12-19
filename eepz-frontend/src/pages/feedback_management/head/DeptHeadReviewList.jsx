@@ -97,8 +97,6 @@ export default function DeptHeadReviewList() {
           ...new Set(enriched.map((r) => r.managerEmployeeId)),
         ];
         setManagers(uniqueManagers);
-
-        console.log(" Reviews loaded:", enriched.length);
       }
     } catch (err) {
       setError("Failed to load reviews");

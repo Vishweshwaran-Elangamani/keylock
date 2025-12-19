@@ -38,7 +38,6 @@ const ProjectDetails = () => {
       const response = await projectService.getProjectById(projectId);
       if (response.success && response.data) {
         setProject(response.data);
-        console.log("Project details:", response.data);
 
         if (response.data.mappedEmployees && response.data.mappedEmployees.length > 0) {
           await fetchPrimaryProjects(response.data.mappedEmployees);
@@ -57,12 +56,10 @@ const ProjectDetails = () => {
   const fetchPrimaryProjects = async (employees) => {
     try {
       const employeeIds = employees.map((emp) => emp.employeeMasterId);
-      console.log("Fetching primary projects for employees:", employeeIds);
 
       const response = await projectService.getPrimaryProjects(employeeIds);
       
       if (response.success && response.data) {
-        console.log("Primary projects response:", response.data);
         setPrimaryProjectsMap(response.data);
       }
     } catch (err) {

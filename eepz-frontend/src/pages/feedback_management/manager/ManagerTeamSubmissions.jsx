@@ -133,12 +133,6 @@ export default function ManageTeamSubmissions() {
 
         setEmployeeMap(map);
         setDepartmentEmployees(deptEmps);
-        console.log(
-          "Employee map loaded:",
-          Object.keys(map).length,
-          "employees"
-        );
-        console.log("Department employees:", deptEmps.length);
       }
     } catch (err) {
       console.error("Error fetching employee data:", err.message);
@@ -158,7 +152,6 @@ export default function ManageTeamSubmissions() {
             obj.title || obj.objectiveName || `Objective ${obj.objectiveId}`;
         });
         setObjectives(map);
-        console.log("Objectives loaded:", Object.keys(map).length);
       }
     } catch (err) {
       console.error("Error fetching objectives:", err.message);
@@ -200,7 +193,6 @@ export default function ManageTeamSubmissions() {
           }
         }
         setHrForms(hrData);
-        console.log("HR forms loaded:", hrData.length);
       } catch (hrErr) {
         console.warn("HR feedback API error:", hrErr.message);
         setHrForms([]);
@@ -226,7 +218,6 @@ export default function ManageTeamSubmissions() {
           }
         }
         setMentor(mentorData);
-        console.log("Mentor feedback loaded:", mentorData.length);
       } catch (mentorErr) {
         console.warn("Mentor feedback API error:", mentorErr.message);
         setMentor([]);
@@ -251,7 +242,6 @@ export default function ManageTeamSubmissions() {
             createdAtFormatted: formatDate(p.createdAt),
           }));
         setPeer(peerData);
-        console.log("Peer feedback loaded:", peerData.length);
       } catch (peerErr) {
         console.warn("Peer feedback API error:", peerErr.message);
         setPeer([]);
@@ -259,7 +249,6 @@ export default function ManageTeamSubmissions() {
 
       // Goal Feedback
       try {
-        console.log("Fetching goal feedback for department...");
 
         const goalRes = await axios.get(`${API_BASE}/OrgGoalFeedback/all`, {
           params: {
@@ -288,7 +277,6 @@ export default function ManageTeamSubmissions() {
             }));
 
           setGoalFeedback(deptGoals);
-          console.log("Goal feedback loaded:", deptGoals.length, "items");
         } else {
           setGoalFeedback([]);
         }

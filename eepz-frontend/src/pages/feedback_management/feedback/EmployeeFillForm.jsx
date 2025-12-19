@@ -416,8 +416,6 @@ export default function EmployeeFillForm() {
             QUESTION_TEMPLATES.GeneralFeedback;
           const enrichedForm = { ...formData, ...templateData };
           setForm(enrichedForm);
-          console.log("Form loaded:", enrichedForm);
-          console.log("Deadline from API:", formData.deadline);
         } else {
           throw new Error("Invalid form data");
         }
@@ -470,15 +468,10 @@ export default function EmployeeFillForm() {
       formResponse: formResponse,
     };
 
-    console.log("Step 1: Creating form response");
-    console.log("Payload:", JSON.stringify(payload, null, 2));
-
     setSubmitting(true);
     try {
       // STEP 1: Create the response (saves as Draft)
       const createResponse = await hrFormApi.createResponse(payload);
-
-      console.log("Step 1 Complete - Response created:", createResponse);
 
       if (createResponse?.success || createResponse?.data?.success) {
         const responseId =
@@ -489,12 +482,8 @@ export default function EmployeeFillForm() {
           throw new Error("Response ID not returned from create endpoint");
         }
 
-        console.log(`Step 2: Submitting response ID ${responseId}`);
-
         // STEP 2: Submit the response
         const submitResponse = await hrFormApi.submitResponse(responseId);
-
-        console.log("Step 2 Complete - Response submitted:", submitResponse);
 
         if (submitResponse?.success || submitResponse?.data?.success) {
           setSuccess("Form submitted successfully!");

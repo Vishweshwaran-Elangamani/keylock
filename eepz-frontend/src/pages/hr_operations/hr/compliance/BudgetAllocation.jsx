@@ -25,7 +25,7 @@ const BudgetAllocation = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  // ✅ UPDATED: Two-state search approach
+  //  UPDATED: Two-state search approach
   const [searchTerm, setSearchTerm] = useState(""); // What user types
   const [activeSearchTerm, setActiveSearchTerm] = useState(""); // Used for filtering
 
@@ -44,14 +44,13 @@ const BudgetAllocation = () => {
   const isLeadership = userRole === "Leadership";
 
   useEffect(() => {
-    console.log("Current User Role:", userRole);
   }, [userRole]);
 
   useEffect(() => {
     fetchBudgets();
   }, []);
 
-  // ✅ UPDATED: Include activeSearchTerm in dependencies
+  //  UPDATED: Include activeSearchTerm in dependencies
   useEffect(() => {
     applyFilters();
     setCurrentPage(1);
@@ -61,9 +60,7 @@ const BudgetAllocation = () => {
     setLoading(true);
     setError(null);
     try {
-      console.log("Fetching all department budgets...");
       const response = await budgetAllocationService.getAllDepartmentBudgets();
-      console.log("Budgets fetched:", response.data);
       const data = response.data || [];
       setBudgets(data);
       setFilteredBudgets(data);
@@ -87,7 +84,7 @@ const BudgetAllocation = () => {
     setFilterOptions({ years, departments });
   };
 
-  // ✅ UPDATED: Use activeSearchTerm for filtering
+  //  UPDATED: Use activeSearchTerm for filtering
   const applyFilters = () => {
     let filtered = budgets;
 
@@ -122,12 +119,12 @@ const BudgetAllocation = () => {
     }));
   };
 
-  // ✅ NEW: Handle search button click
+  //  NEW: Handle search button click
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
   };
 
-  // ✅ UPDATED: Clear all filters including activeSearchTerm
+  //  UPDATED: Clear all filters including activeSearchTerm
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
@@ -301,10 +298,10 @@ const BudgetAllocation = () => {
         </div>
       )}
 
-      {/* ✅ UPDATED: Filter Section with Search Button */}
+      {/*  UPDATED: Filter Section with Search Button */}
       <div className="budget-filter-section">
         <div className="budget-filter-row-single">
-          {/* ✅ NEW: Search with Button */}
+          {/*  NEW: Search with Button */}
           <div className="budget-search-input">
             <div className="budget-search-inner">
               <span className="budget-search-icon">

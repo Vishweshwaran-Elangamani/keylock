@@ -30,9 +30,6 @@ api.interceptors.request.use(
       if (config.headers.post) {
         delete config.headers.post["Content-Type"];
       }
-      
-      console.log("✓ FormData detected - Content-Type header removed");
-      console.log("✓ Browser will set: multipart/form-data with boundary");
     }
 
     return config;
@@ -72,11 +69,9 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        console.log("Attempting token refresh...");
         const refreshResponse = await authService.refreshAccessToken();
 
         if (refreshResponse.success) {
-          console.log("Token refreshed successfully");
           originalRequest.headers.Authorization = `Bearer ${authService.getToken()}`;
           return api(originalRequest);
         }

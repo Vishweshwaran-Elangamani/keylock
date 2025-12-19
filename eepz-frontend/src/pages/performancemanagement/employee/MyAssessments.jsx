@@ -166,8 +166,6 @@ function MyAssessments() {
       link.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(link);
-
-      console.log(`✓ Downloaded: ${filename}`);
     } catch (err) {
       console.error("Download error:", err);
       toast.error(`Failed to download attachment: ${err.message}`);

@@ -82,7 +82,6 @@ export default function HRFeedbackList() {
   // Fetch employee map using service
   const fetchEmployeeMap = async () => {
     try {
-      console.log("Fetching employee map...");
       const response = await employeeApi.getAll();
 
       if (response?.data) {
@@ -95,7 +94,6 @@ export default function HRFeedbackList() {
           map[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
         });
         setEmployeeMap(map);
-        console.log("Employee map loaded:", Object.keys(map).length);
       }
     } catch (err) {
       console.error("Error fetching employee map:", err.message);
@@ -111,9 +109,7 @@ export default function HRFeedbackList() {
     try {
       // Fetch HR Feedback
       try {
-        console.log("Fetching HR feedback...");
         const formsRes = await hrFormApi.getActiveForms();
-        console.log("Forms response:", formsRes);
 
         let allHRFeedback = [];
 
@@ -142,9 +138,6 @@ export default function HRFeedbackList() {
                 }));
 
                 allHRFeedback = [...allHRFeedback, ...mappedHR];
-                console.log(
-                  `${mappedHR.length} HR feedback from form ${form.formId}`
-                );
               }
             } catch (err) {
               console.warn(`Error fetching HR responses:`, err.message);
@@ -160,7 +153,6 @@ export default function HRFeedbackList() {
 
       // Fetch Mentor Feedback
       try {
-        console.log("Fetching mentor feedback...");
         const mentorRes = await mentorFeedbackApi.list(1, 100);
         const mentorData = Array.isArray(mentorRes?.data)
           ? mentorRes.data
@@ -173,7 +165,6 @@ export default function HRFeedbackList() {
         }));
 
         setMentor(enrichedMentorData);
-        console.log(`${enrichedMentorData.length} mentor feedback loaded`);
       } catch (mentorErr) {
         console.warn("Mentor feedback API error:", mentorErr.message);
         setMentor([]);
@@ -181,7 +172,6 @@ export default function HRFeedbackList() {
 
       // Fetch Peer Feedback
       try {
-        console.log("Fetching peer feedback...");
         const peerRes = await peerQueueApi.list(1, 100);
         const allPeer = Array.isArray(peerRes?.data)
           ? peerRes.data
@@ -198,7 +188,6 @@ export default function HRFeedbackList() {
         }));
 
         setPeer(enrichedPeerData);
-        console.log(`${enrichedPeerData.length} peer feedback loaded`);
       } catch (peerErr) {
         console.warn("Peer feedback API error:", peerErr.message);
         setPeer([]);
@@ -293,10 +282,9 @@ export default function HRFeedbackList() {
 
 
 
-  // ✅ KEEP ONLY THESE THREE HANDLERS:
+  //  KEEP ONLY THESE THREE HANDLERS:
 
-  const handleDeleteClick = (item, type) => {
-    console.log("Delete clicked:", { type, item }); // Debug log
+  const handleDeleteClick = (item, type) => { // Debug log
     setDeleteFeedbackData(item);
     setDeleteFeedbackType(type);
     setShowDeleteModal(true);

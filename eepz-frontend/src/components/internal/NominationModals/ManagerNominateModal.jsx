@@ -30,8 +30,6 @@ const ManagerNominateModal = ({
 
       const userIdStr = localStorage.getItem("userId");
 
-      console.log("Raw userId from localStorage:", userIdStr);
-
       if (!userIdStr) {
         console.error("No userId found in localStorage");
         toast.error("User ID not found. Please login again.");
@@ -40,8 +38,6 @@ const ManagerNominateModal = ({
       }
 
       const managerId = parseInt(userIdStr);
-
-      console.log("Fetching employees for manager ID:", managerId);
 
       if (isNaN(managerId) || managerId <= 0) {
         console.error("Invalid manager ID:", managerId);
@@ -52,13 +48,9 @@ const ManagerNominateModal = ({
 
       const response = await userService.getEmployeesByManager(managerId);
 
-      console.log("Employees response:", response);
-
       const employeeList = response.data || response || [];
 
       setEmployees(employeeList);
-
-      console.log("Employees loaded:", employeeList.length);
     } catch (error) {
       console.error("Error fetching employees:", error);
       setEmployees([]);

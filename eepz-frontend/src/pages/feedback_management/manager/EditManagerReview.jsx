@@ -59,7 +59,6 @@ export default function EditManagerReview() {
           projectContext: data?.projectContext || "",
           goalContext: data?.goalContext || "",
         });
-        console.log("Review loaded:", data);
       } else {
         setError("Review not found");
       }
@@ -99,8 +98,6 @@ export default function EditManagerReview() {
       projectContext: form.projectContext || null,
       goalContext: form.goalContext || null,
     };
-
-    console.log("Updating review:", payload);
 
     setLoading(true);
     try {

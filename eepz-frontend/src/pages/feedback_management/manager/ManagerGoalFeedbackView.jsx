@@ -67,7 +67,6 @@ export default function ManagerGoalFeedbackView() {
           map[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
         });
         setEmployeeMap(map);
-        console.log(" Employee map loaded:", Object.keys(map).length);
       }
     } catch (err) {
       console.error(" Error fetching employees:", err.message);
@@ -87,7 +86,6 @@ export default function ManagerGoalFeedbackView() {
             obj.title || obj.objectiveName || `Objective ${obj.objectiveId}`;
         });
         setObjectives(objMap);
-        console.log(" Objectives loaded:", Object.keys(objMap).length);
       }
     } catch (err) {
       console.error(" Error loading objectives:", err.message);
@@ -107,8 +105,6 @@ export default function ManagerGoalFeedbackView() {
         return;
       }
 
-      console.log(" Fetching goal feedback for manager ID:", empId);
-
       // Fetch all goal feedback with pagination
       const response = await axios.get(`${API_BASE}/OrgGoalFeedback/all`, {
         params: {
@@ -116,8 +112,6 @@ export default function ManagerGoalFeedbackView() {
           pageSize: 100,
         },
       });
-
-      console.log(" Raw goal feedback response:", response.data);
 
       if (response.data?.success && Array.isArray(response.data.data)) {
         const allFeedback = response.data.data;
@@ -140,7 +134,6 @@ export default function ManagerGoalFeedbackView() {
           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
         setMyGoalFeedback(myFeedback);
-        console.log(" My goal feedback count:", myFeedback.length);
 
         // Filter: Team feedback (submitted by my team members where I'm the manager)
         
@@ -170,7 +163,6 @@ export default function ManagerGoalFeedbackView() {
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
           setTeamGoalFeedback(teamFeedback);
-          console.log(" Team goal feedback count:", teamFeedback.length);
         }
       } else {
         console.warn(" Invalid goal feedback data structure");

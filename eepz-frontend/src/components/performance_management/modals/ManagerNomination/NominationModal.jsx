@@ -18,7 +18,7 @@ const NominationModal = ({
   const [existingNominations, setExistingNominations] = useState([]);
   const [loadingNominations, setLoadingNominations] = useState(false);
 
-  // ✅ FIXED: Fetch manager's nominations and filter for this employee
+  //  FIXED: Fetch manager's nominations and filter for this employee
   useEffect(() => {
     if (show && selectedEmployee?.employeeId && managerId) {
       fetchEmployeeNominations();
@@ -28,11 +28,11 @@ const NominationModal = ({
   const fetchEmployeeNominations = async () => {
     try {
       setLoadingNominations(true);
-      // ✅ Use existing API endpoint
+      //  Use existing API endpoint
       const { data } = await managerNominationApi.getMyNominations(managerId);
       
       if (data?.success) {
-        // ✅ Filter to get only nominations for this specific employee
+        //  Filter to get only nominations for this specific employee
         const employeeNoms = (data.data || []).filter(
           (nom) => nom?.nominee?.employeeId === selectedEmployee.employeeId
         );
@@ -102,14 +102,14 @@ const NominationModal = ({
     onHide();
   };
 
-  // ✅ Check if reward type is already nominated
+  //  Check if reward type is already nominated
   const isRewardAlreadyNominated = (rewardTypeId) => {
     return existingNominations.some(
       (nom) => nom.rewardTypeId === rewardTypeId
     );
   };
 
-  // ✅ Get nominated reward names for warning banner
+  //  Get nominated reward names for warning banner
   const getNominatedRewardNames = () => {
     return existingNominations
       .map((nom) => {
@@ -128,7 +128,7 @@ const NominationModal = ({
       return;
     }
 
-    // ✅ Check if already nominated for this reward
+    //  Check if already nominated for this reward
     if (isRewardAlreadyNominated(selectedRewardType.rewardTypeId)) {
       toast.error(
         `This employee has already been nominated for ${selectedRewardType.rewardName}`
@@ -473,7 +473,7 @@ const NominationModal = ({
           }}
         >
           <div style={bodyWrapperStyle}>
-            {/* ✅ Warning banner if employee has existing nominations */}
+            {/*  Warning banner if employee has existing nominations */}
             {existingNominations.length > 0 && (
               <div style={warningBannerStyle}>
                 <i
@@ -618,7 +618,7 @@ const NominationModal = ({
                           aria-pressed={isActive}
                           aria-disabled={isDisabled}
                         >
-                          {/* ✅ Badge showing already nominated */}
+                          {/*  Badge showing already nominated */}
                           {isDisabled && (
                             <div
                               style={{

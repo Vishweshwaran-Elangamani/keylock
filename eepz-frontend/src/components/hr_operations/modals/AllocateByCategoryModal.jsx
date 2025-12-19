@@ -100,8 +100,7 @@ const AllocateByCategoryModal = ({
         allocatedByUserId: currentUserId, // Logged-in user ID
       };
 
-      console.log(" Creating budget allocation with data:", allocationData);
-
+      
       // Call backend API to create the allocation
       const response = await budgetAllocationService.createBudgetAllocation(
         allocationData
@@ -130,8 +129,6 @@ const AllocateByCategoryModal = ({
         utilizedAmount: 0,
         allocatedAt: new Date().toISOString(),
       };
-
-      console.log(" New allocation created:", newAllocation);
 
       // Notify parent component so it can update UI accordingly
       onAllocationCreated(newAllocation);

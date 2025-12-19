@@ -18,7 +18,6 @@ const createApiInstance = (baseURL) => {
 
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
-        console.log(` JWT Token Added | ${config.method.toUpperCase()} ${config.url}`);
       } else {
         console.warn(` No JWT Token Found | ${config.method.toUpperCase()} ${config.url}`);
       }
@@ -34,7 +33,6 @@ const createApiInstance = (baseURL) => {
   
   instance.interceptors.response.use(
     (response) => {
-      console.log(` API Response Success | ${response.status} | ${response.config.url}`);
       return response;
     },
 
@@ -51,8 +49,6 @@ const createApiInstance = (baseURL) => {
       if (errorStatus === 401 && !originalRequest._retry) {
         originalRequest._retry = true;
 
-        console.log("🔄 Token expired or invalid. Attempting token refresh...");
-
         const refreshToken = authService.getRefreshToken();
 
         if (!refreshToken) {
@@ -63,11 +59,9 @@ const createApiInstance = (baseURL) => {
         }
 
         try {
-          console.log("🔄 Sending refresh token request...");
           const refreshResponse = await authService.refreshAccessToken();
 
           if (refreshResponse.success) {
-            console.log("✅ Token refreshed successfully! Retrying original request...");
 
             const newToken = authService.getToken();
             originalRequest.headers.Authorization = `Bearer ${newToken}`;

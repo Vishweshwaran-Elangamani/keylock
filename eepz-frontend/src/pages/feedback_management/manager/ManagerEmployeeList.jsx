@@ -46,7 +46,6 @@ export default function ManagerEmployeeList() {
     setLoading(true);
     try {
       setEmployees(MOCK_EMPLOYEES);
-      console.log(" Employees loaded");
     } catch (err) {
       setError("Failed to load employees");
     } finally {

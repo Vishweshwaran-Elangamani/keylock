@@ -141,9 +141,7 @@ const policyService = {
   //  Publish policy
   publishPolicy: async (policyId) => {
     try {
-      console.log(` Publishing policy ID: ${policyId}`);
       const response = await hrApi.post(`/Policy/publish/${policyId}`);
-      console.log(` Policy published successfully:`, response.data);
       return response.data;
     } catch (error) {
       console.error(" Error publishing policy:", error);
@@ -154,9 +152,7 @@ const policyService = {
   //  Unpublish policy
   unpublishPolicy: async (policyId) => {
     try {
-      console.log(` Unpublishing policy ID: ${policyId}`);
       const response = await hrApi.post(`/Policy/unpublish/${policyId}`);
-      console.log(` Policy unpublished successfully:`, response.data);
       return response.data;
     } catch (error) {
       console.error(" Error unpublishing policy:", error);

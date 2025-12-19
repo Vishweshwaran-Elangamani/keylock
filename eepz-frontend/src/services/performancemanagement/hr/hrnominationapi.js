@@ -1,4 +1,4 @@
-import api from "../api/nominationapi";
+import api from "../api/api";
 
 export const getAllManagerNominations = () =>
   api.get("/HRNomination/hr/manager-nominations");

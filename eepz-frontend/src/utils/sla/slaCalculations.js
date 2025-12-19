@@ -1,13 +1,13 @@
 // src/utils/slaCalculations.js - CLOSED SLA COMPLIANCE CALCULATION
-// ✅ MODIFIED: Includes auto-closure support, escalation tracking, and enhanced compliance logic
+//  MODIFIED: Includes auto-closure support, escalation tracking, and enhanced compliance logic
  
 /**
- * ✅ Calculate urgency status based on deadline and SLA status
+ *  Calculate urgency status based on deadline and SLA status
  * Closed SLAs show compliance status (OnTime/Breached/Extended)
  * Open SLAs show urgency (Overdue/Due Soon/On Track)
  */
 export const calculateUrgencyStatus = (deadline, status, complianceStatus) => {
-    // ✅ Closed SLAs show their compliance status
+    //  Closed SLAs show their compliance status
     if (status === 'Closed') {
       return complianceStatus || 'Completed';
     }
@@ -24,7 +24,7 @@ export const calculateUrgencyStatus = (deadline, status, complianceStatus) => {
   };
    
   /**
-   * ✅ Calculate days until deadline for open SLAs
+   *  Calculate days until deadline for open SLAs
    * Returns negative if overdue
    */
   export const calculateDaysUntilDeadline = (deadline) => {
@@ -34,24 +34,24 @@ export const calculateUrgencyStatus = (deadline, status, complianceStatus) => {
   };
    
   /**
-   * ✅ Get compliance rating based on percentage
+   *  Get compliance rating based on percentage
    */
   export const getComplianceRating = (percentage) => {
     if (percentage >= 95) return { rating: 'Outstanding', color: '#24A148', icon: '🌟' };
     if (percentage >= 85) return { rating: 'Excellent', color: '#0F62FE', icon: '⭐' };
-    if (percentage >= 75) return { rating: 'Good', color: '#F1C21B', icon: '✅' };
+    if (percentage >= 75) return { rating: 'Good', color: '#F1C21B', icon: '' };
     if (percentage >= 60) return { rating: 'Fair', color: '#FF832B', icon: '⚠️' };
     return { rating: 'Critical', color: '#DA1E28', icon: '❌' };
   };
    
   /**
-   * ✅ NEW: Get SLA status badge for display
+   *  NEW: Get SLA status badge for display
    */
   export const getStatusBadge = (status, complianceStatus) => {
     const statusMap = {
       'Open': { bg: 'bg-primary', text: 'text-white', icon: '📂' },
       'InProgress': { bg: 'bg-info', text: 'text-white', icon: '⏳' },
-      'Closed': { bg: 'bg-success', text: 'text-white', icon: '✅' },
+      'Closed': { bg: 'bg-success', text: 'text-white', icon: '' },
       'Breached': { bg: 'bg-danger', text: 'text-white', icon: '❌' },
       'Extended': { bg: 'bg-warning', text: 'text-dark', icon: '⚠️' }
     };
@@ -60,14 +60,14 @@ export const calculateUrgencyStatus = (deadline, status, complianceStatus) => {
   };
    
   /**
-   * ✅ NEW: Detect if SLA is auto-closed
+   *  NEW: Detect if SLA is auto-closed
    */
   export const isAutoClosedSLA = (sla) => {
     return sla.status === 'Closed' && sla.isAutoClosed === true;
   };
    
   /**
-   * ✅ NEW: Get days since closure
+   *  NEW: Get days since closure
    */
   export const getDaysSinceClosure = (closedAt) => {
     if (!closedAt) return null;
@@ -77,7 +77,7 @@ export const calculateUrgencyStatus = (deadline, status, complianceStatus) => {
   };
    
   /**
-   * ✅ IMPROVED: Calculate compliance percentage based on CLOSED SLAs ONLY
+   *  IMPROVED: Calculate compliance percentage based on CLOSED SLAs ONLY
    * Includes auto-closed SLAs in the calculation
    * Compliance = (Closed SLAs On Time) / (Total Closed SLAs) * 100
    */
@@ -97,7 +97,7 @@ export const calculateUrgencyStatus = (deadline, status, complianceStatus) => {
       return 0;
     }
    
-    // ✅ Filter ONLY Closed SLAs (includes auto-closed)
+    //  Filter ONLY Closed SLAs (includes auto-closed)
     const closedSLAs = slaData.filter(sla => sla.status === 'Closed');
    
     if (closedSLAs.length === 0) {
@@ -117,18 +117,11 @@ export const calculateUrgencyStatus = (deadline, status, complianceStatus) => {
    
     const percentage = ((onTimeClosedSLAs / closedSLAs.length) * 100).toFixed(1);
    
-    console.log('📊 Compliance Calculation (Closed SLAs Only):', {
-      totalClosedSLAs: closedSLAs.length,
-      onTimeClosedSLAs,
-      autoClosedBreached: autoClosedBreachedCount,
-      percentage: `${percentage}%`
-    });
-   
     return percentage;
   };
    
   /**
-   * ✅ IMPROVED: Get compliance summary from SLA array
+   *  IMPROVED: Get compliance summary from SLA array
    * Returns detailed breakdown of closed SLA compliance including auto-closure metrics
    */
   export const getComplianceSummary = (slaData) => {
@@ -152,7 +145,7 @@ export const calculateUrgencyStatus = (deadline, status, complianceStatus) => {
     const openSLAs = slaData.filter(sla => sla.status !== 'Closed');
     const autoClosedSLAs = closedSLAs.filter(sla => sla.isAutoClosed === true);
    
-    // ✅ Calculate compliance from CLOSED SLAs ONLY
+    //  Calculate compliance from CLOSED SLAs ONLY
     const onTimeSLAs = closedSLAs.filter(sla =>
       sla.complianceStatus === 'OnTime' || sla.complianceStatus === 'On Time'
     ).length;
@@ -191,7 +184,7 @@ export const calculateUrgencyStatus = (deadline, status, complianceStatus) => {
   };
    
   /**
-   * ✅ IMPROVED: Filter and calculate compliance by department
+   *  IMPROVED: Filter and calculate compliance by department
    * Returns compliance data for specific department (Closed SLAs only)
    * Includes auto-closure statistics
    */
@@ -206,7 +199,7 @@ export const calculateUrgencyStatus = (deadline, status, complianceStatus) => {
     // Filter by department AND status = Closed
     const departmentClosedSLAs = departmentSLAs.filter(sla => sla.status === 'Closed');
    
-    // ✅ NEW: Count auto-closed SLAs
+    //  NEW: Count auto-closed SLAs
     const autoClosedSLAs = departmentClosedSLAs.filter(sla => sla.isAutoClosed === true);
    
     if (departmentClosedSLAs.length === 0) {
@@ -247,7 +240,7 @@ export const calculateUrgencyStatus = (deadline, status, complianceStatus) => {
   };
    
   /**
-   * ✅ IMPROVED: Batch compliance calculation for multiple departments
+   *  IMPROVED: Batch compliance calculation for multiple departments
    * Returns compliance array for all departments with auto-closure metrics
    */
   export const calculateAllDepartmentsCompliance = (slaData) => {
@@ -266,7 +259,7 @@ export const calculateUrgencyStatus = (deadline, status, complianceStatus) => {
   };
    
   /**
-   * ✅ NEW: Get escalation status info
+   *  NEW: Get escalation status info
    */
   export const getEscalationInfo = (escalations = []) => {
     if (!escalations.length) return { count: 0, hasPending: false, latest: null };
@@ -289,7 +282,7 @@ export const calculateUrgencyStatus = (deadline, status, complianceStatus) => {
   };
    
   /**
-   * ✅ NEW: Identify high-risk SLAs (approaching deadline or auto-closure risk)
+   *  NEW: Identify high-risk SLAs (approaching deadline or auto-closure risk)
    */
   export const identifyHighRiskSLAs = (slaData) => {
     const now = new Date();
@@ -312,7 +305,7 @@ export const calculateUrgencyStatus = (deadline, status, complianceStatus) => {
   };
    
   /**
-   * ✅ NEW: Helper for auto-closure analysis
+   *  NEW: Helper for auto-closure analysis
    */
   export const analyzeAutoClosures = (slaData) => {
     const closedSLAs = slaData.filter(sla => sla.status === 'Closed');
@@ -332,7 +325,7 @@ export const calculateUrgencyStatus = (deadline, status, complianceStatus) => {
   };
    
   /**
-   * ✅ IMPROVED: Format compliance for display
+   *  IMPROVED: Format compliance for display
    * Now includes auto-closure insights
    */
   export const formatComplianceDisplay = (complianceSummary) => {
@@ -355,7 +348,7 @@ export const calculateUrgencyStatus = (deadline, status, complianceStatus) => {
   };
    
   /**
-   * ✅ NEW: Generate compliance report
+   *  NEW: Generate compliance report
    */
   export const generateComplianceReport = (slaData) => {
     const summary = getComplianceSummary(slaData);
@@ -377,7 +370,7 @@ export const calculateUrgencyStatus = (deadline, status, complianceStatus) => {
   };
    
   /**
-   * ✅ NEW: Generate recommendations based on compliance data
+   *  NEW: Generate recommendations based on compliance data
    */
   export const generateRecommendations = (summary, autoClosureAnalysis, highRiskSLAs) => {
     const recommendations = [];
@@ -409,7 +402,7 @@ export const calculateUrgencyStatus = (deadline, status, complianceStatus) => {
     if (summary.autoClosedCount === 0 && summary.closedSLAs > 0) {
       recommendations.push({
         type: 'info',
-        message: '✅ All SLAs closed manually (no auto-closures detected).',
+        message: ' All SLAs closed manually (no auto-closures detected).',
         action: 'Continue current practices'
       });
     }

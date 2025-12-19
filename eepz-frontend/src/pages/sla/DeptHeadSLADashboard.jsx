@@ -58,12 +58,8 @@ const DeptHeadSLADashboard = () => {
     try {
       const response = await slaService.getManagerEscalations(deptHeadId);
 
-      console.log("Department Head Escalations Response:", response);
-
       if (response && response.success) {
         const escalations = Array.isArray(response.data) ? response.data : [];
-
-        console.log("Raw Escalations Data:", escalations);
 
         const processed = escalations.map((e) => {
           const normalizedStatus = e.escalationStatus || "Pending";
@@ -85,8 +81,6 @@ const DeptHeadSLADashboard = () => {
             period: e.reviewCycle || "Q1-2025",
           };
         });
-
-        console.log("Processed Escalations:", processed);
 
         setAllL2Escalations(processed);
       } else {
@@ -147,7 +141,6 @@ const DeptHeadSLADashboard = () => {
 
   const handleOpenResolutionModal = (escalation, event) => {
     event.stopPropagation();
-    console.log("Opening modal for escalation:", escalation);
     setSelectedEscalation(escalation);
     setResolutionComments("");
     setShowResolutionModal(true);
@@ -176,11 +169,7 @@ const DeptHeadSLADashboard = () => {
         resolutionComments: resolutionComments.trim(),
       };
 
-      console.log("Resolving escalation with payload:", payload);
-
       const response = await slaService.resolveEscalation(payload);
-
-      console.log("Resolution response:", response);
 
       if (response.success) {
         toast.success("Escalation approved successfully");

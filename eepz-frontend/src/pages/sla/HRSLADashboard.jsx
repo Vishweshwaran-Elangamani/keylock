@@ -34,7 +34,7 @@ const HRSLADashboard = () => {
   const [itemsPerPage] = useState(5);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeSearchTerm, setActiveSearchTerm] = useState(""); // ✅ ADDED
+  const [activeSearchTerm, setActiveSearchTerm] = useState(""); //  ADDED
   const [statusFilter, setStatusFilter] = useState("All");
   const [typeFilter, setTypeFilter] = useState("All");
   const [complianceFilter, setComplianceFilter] = useState("All");
@@ -53,11 +53,11 @@ const HRSLADashboard = () => {
 
   useEffect(() => {
     applyFilters();
-  }, [slas, activeSearchTerm, statusFilter, typeFilter, complianceFilter]); // ✅ CHANGED
+  }, [slas, activeSearchTerm, statusFilter, typeFilter, complianceFilter]); //  CHANGED
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [activeSearchTerm, statusFilter, typeFilter, complianceFilter]); // ✅ CHANGED
+  }, [activeSearchTerm, statusFilter, typeFilter, complianceFilter]); //  CHANGED
 
   const fetchSLAs = async () => {
     setLoading(true);
@@ -81,7 +81,7 @@ const HRSLADashboard = () => {
     }
   };
 
-  // ✅ UPDATED: Use activeSearchTerm
+  //  UPDATED: Use activeSearchTerm
   const applyFilters = () => {
     let filtered = [...slas];
     if (activeSearchTerm) {
@@ -103,7 +103,7 @@ const HRSLADashboard = () => {
     setFilteredSlas(filtered);
   };
 
-  // ✅ ADDED: Search handlers
+  //  ADDED: Search handlers
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
   };
@@ -240,7 +240,7 @@ const HRSLADashboard = () => {
     }
   };
 
-  // ✅ UPDATED: Clear both search terms
+  //  UPDATED: Clear both search terms
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
@@ -350,7 +350,7 @@ const HRSLADashboard = () => {
         ))}
       </div>
 
-      {/* ✅ UPDATED: Filters with Search Button */}
+      {/*  UPDATED: Filters with Search Button */}
       <div className="hr-sla-filters-card">
         <div className="row g-3 align-items-center">
           <div className="col-lg-3 col-md-6">

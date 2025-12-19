@@ -19,7 +19,7 @@ export default function useFetch(endpoint, params = null, auto = true) {
       const response = await api.get(endpoint, { params });
       setData(response.data?.data ?? response.data);
     } catch (err) {
-      console.error("Fetch error:", err);
+      
       setError(err);
     } finally {
       setLoading(false);

@@ -26,8 +26,6 @@ const ReopenSLAForm = ({ sla, onClose, onSuccess }) => {
         reopenedByEmployeeId: user.empId,
       };
 
-      console.log("Sending reopen payload:", reopenData);
-
       const response = await slaService.reopenSLA(reopenData);
 
       if (response.success) {

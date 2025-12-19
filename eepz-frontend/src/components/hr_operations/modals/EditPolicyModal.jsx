@@ -52,7 +52,6 @@ const EditPolicyModal = ({
     
     // If already a full URL (starts with http/https), return as-is
     if (url.startsWith("http://") || url.startsWith("https://")) {
-      console.log(" Full URL detected:", url);
       return url;
     }
     
@@ -83,7 +82,6 @@ const EditPolicyModal = ({
           type: policy.documentType,
           size: policy.documentSizeFormatted,
         });
-        console.log("Existing document loaded:", policy.documentUrl);
       } else {
         setExistingDocument(null);
       }
@@ -122,7 +120,6 @@ const EditPolicyModal = ({
       }
 
       setSelectedFile(file);
-      console.log("📎 File selected:", file.name);
     }
   };
 
@@ -155,7 +152,6 @@ const EditPolicyModal = ({
       let documentData = {};
 
       if (documentType === "upload" && selectedFile) {
-        console.log(" Uploading new document...");
         setUploadingDoc(true);
         const uploadResult = await policyService.uploadDocument(selectedFile);
         documentData = {
@@ -164,10 +160,8 @@ const EditPolicyModal = ({
           documentType: uploadResult.documentType,
           documentSize: uploadResult.documentSize,
         };
-        console.log(" Document uploaded:", uploadResult.documentUrl);
         setUploadingDoc(false);
       } else if (documentType === "link" && documentLink) {
-        console.log("🔗 Adding document link...");
         const linkResult = await policyService.addDocumentLink(
           documentLink,
           documentName
@@ -177,13 +171,10 @@ const EditPolicyModal = ({
           documentName: linkResult.documentName,
           documentType: linkResult.documentType,
         };
-        console.log(" Document link added:", linkResult.documentUrl);
       }
 
       const policyDataWithDoc = { ...formData, ...documentData };
       await policyService.updatePolicy(policy.policyId, policyDataWithDoc);
-
-      console.log(" Policy updated successfully");
       onSuccess();
       if (typeof onToast === "function")
         onToast("success", "Policy updated successfully!");
@@ -201,11 +192,9 @@ const EditPolicyModal = ({
   const handleUnpublish = async () => {
     try {
       setUnpublishing(true);
-      console.log(" Unpublishing policy...");
       await policyService.unpublishPolicy(policy.policyId);
       if (typeof onToast === "function")
         onToast("warning", "Policy unpublished - Hidden from employees");
-      console.log(" Policy unpublished");
       onSuccess();
       onClose();
     } catch (error) {
@@ -691,7 +680,6 @@ const EditPolicyModal = ({
                         rel="noopener noreferrer"
                         onClick={(e) => {
                           const fullUrl = getFullDocumentUrl(existingDocument.url);
-                          console.log("🔍 Opening document:", fullUrl);
                         }}
                         style={{
                           padding: "4px 12px",

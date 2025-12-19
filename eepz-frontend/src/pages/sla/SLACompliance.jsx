@@ -39,7 +39,6 @@ const SLACompliance = () => {
       const res = await slaService.getAllSLAs();
 
       if (res?.success && Array.isArray(res.data)) {
-        console.log(" Loaded", res.data.length, "SLAs from all departments");
         setAllSLAs(res.data);
       } else {
         setAllSLAs([]);

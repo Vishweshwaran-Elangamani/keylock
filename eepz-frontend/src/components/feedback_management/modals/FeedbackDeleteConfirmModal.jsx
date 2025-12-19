@@ -37,15 +37,12 @@ const FeedbackDeleteConfirmModal = ({
       if (feedbackType === "Mentor") {
         const id = feedbackData.trackingId || feedbackData.id;
         await mentorFeedbackApi.remove(id);
-        console.log(`Mentor feedback ${id} deleted successfully`);
       } else if (feedbackType === "Peer") {
         const id = feedbackData.queueId || feedbackData.id;
         await peerQueueApi.remove(id);
-        console.log(`Peer feedback ${id} deleted successfully`);
       } else if (feedbackType === "HR") {
         const id = feedbackData.responseId;
         await hrFormApi.deleteResponse(id);
-        console.log(`HR Form response ${id} deleted successfully`);
       }
 
       // Call success callback

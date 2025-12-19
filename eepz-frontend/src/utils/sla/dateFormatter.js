@@ -55,9 +55,9 @@ export const formatDate = (dateString) => {
     try {
       const date = new Date(dateString);
      
-      // ✅ Check if date is valid
+      //  Check if date is valid
       if (isNaN(date.getTime())) {
-        console.warn('Invalid date:', dateString);
+        
         return 'Unknown';
       }
      
@@ -65,10 +65,10 @@ export const formatDate = (dateString) => {
       const month = date.getMonth(); // Jan = 0, Dec = 11
       const quarter = Math.floor(month / 3) + 1;
       const quarterStr = `Q${quarter}-${year}`;
-      console.log(`✅ Date: ${dateString} → ${quarterStr}`);
+      
       return quarterStr;
     } catch (err) {
-      console.error('Error parsing date:', dateString, err);
+      
       return 'Unknown';
     }
   };

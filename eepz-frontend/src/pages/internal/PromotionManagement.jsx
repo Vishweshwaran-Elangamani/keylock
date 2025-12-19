@@ -61,13 +61,10 @@ const PromotionManagement = () => {
         promotionsResponse = await promotionService.getAllPromotions();
       }
 
-      console.log("Promotions response:", promotionsResponse);
-
       if (promotionsResponse.success) {
         const promotionData = Array.isArray(promotionsResponse.data)
           ? promotionsResponse.data
           : promotionsResponse.data?.promotions || [];
-        console.log("Setting promotions:", promotionData);
         setPromotions(promotionData);
       }
 

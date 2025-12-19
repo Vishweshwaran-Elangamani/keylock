@@ -137,11 +137,6 @@ const VerifyFirstLogin = () => {
     try {
       setLoading(true);
 
-      console.log("First login password reset...");
-      console.log("Email:", email);
-      console.log("OTP:", otpCode);
-      console.log("Password Length:", newPassword.length);
-
       // Show loading toast
       toast.loading("Setting password...");
 
@@ -153,8 +148,6 @@ const VerifyFirstLogin = () => {
         newPassword,
         confirmPassword
       );
-
-      console.log("First login reset response:", response);
 
       // -------- Handle Success Response --------
       if (response.success) {

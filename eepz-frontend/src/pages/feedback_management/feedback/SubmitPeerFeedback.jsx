@@ -46,7 +46,6 @@ export default function SubmitPeerFeedback() {
           : response.data.data || [];
 
         setEmployees(employeesList);
-        console.log(`Loaded ${employeesList.length} employees`);
       } else {
         console.error("Invalid response format");
         setError("Failed to load employees: Invalid data format");
@@ -91,12 +90,7 @@ export default function SubmitPeerFeedback() {
         isAnonymous: form.isAnonymous,
       };
 
-      console.log("Step 1: Creating peer feedback");
-      console.log("Payload:", payload);
-
       const createResponse = await peerQueueApi.create(payload);
-
-      console.log("Step 1 Complete - Feedback created:", createResponse);
 
       if (createResponse?.success || createResponse?.data?.success) {
         const queueId =
@@ -106,8 +100,6 @@ export default function SubmitPeerFeedback() {
           throw new Error("Queue ID not returned from create endpoint");
         }
 
-        console.log(`Step 2: Auto-approving feedback with queueId ${queueId}`);
-
         // STEP 2: Auto-approve the feedback
         try {
           const approveResponse = await peerQueueApi.approve(queueId, {
@@ -115,8 +107,6 @@ export default function SubmitPeerFeedback() {
             isRelevant: true,
             approvedByHRId: Number(user?.empId),
           });
-
-          console.log("Step 2 Complete - Feedback approved:", approveResponse);
 
           if (approveResponse?.success || approveResponse?.data?.success) {
             setSuccessMsg(

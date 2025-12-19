@@ -97,7 +97,6 @@ export default function FeedbackHRDashboard() {
           map[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
         });
         setEmployeeMap(map);
-        console.log("Employee map created:", Object.keys(map).length);
         return map;
       }
     } catch (err) {
@@ -132,7 +131,6 @@ export default function FeedbackHRDashboard() {
         }));
 
         setFeedback(mappedFeedback);
-        console.log("Peer feedback loaded:", mappedFeedback.length);
       } catch (err) {
         console.warn("Error fetching peer feedback:", err.message);
       }

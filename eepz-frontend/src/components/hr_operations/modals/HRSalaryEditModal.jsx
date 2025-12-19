@@ -29,14 +29,10 @@ const HRSalaryEditModal = ({ show, nomination, onHide, onSalaryUpdated }) => {
         setLoading(false);
         return;
       }
-
-      console.log(" Updating salary...");
       await careerProgressionService.updateNomination({
         promotionId: nomination.promotionId,
         newSalary: parseFloat(newSalary),
       });
-
-      console.log(" Salary updated");
       showToast("Success", "Salary updated successfully", "success");
       onSalaryUpdated();
       handleClose();

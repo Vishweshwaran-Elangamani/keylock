@@ -19,7 +19,7 @@ const DepartmentList = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedDepartment, setSelectedDepartment] = useState(null);
   
-  // ✅ UPDATED: Two-state search approach
+  //  UPDATED: Two-state search approach
   const [searchTerm, setSearchTerm] = useState(""); // What user types
   const [activeSearchTerm, setActiveSearchTerm] = useState(""); // Used for filtering
   
@@ -87,19 +87,19 @@ const DepartmentList = () => {
     setShowEditModal(true);
   };
 
-  // ✅ UPDATED: Use activeSearchTerm for filtering
+  //  UPDATED: Use activeSearchTerm for filtering
   const filteredDepartments = departments.filter(
     (dept) =>
       dept.departmentName?.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
       dept.description?.toLowerCase().includes(activeSearchTerm.toLowerCase())
   );
 
-  // ✅ NEW: Handle search button click
+  //  NEW: Handle search button click
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
   };
 
-  // ✅ UPDATED: Clear all filters including activeSearchTerm
+  //  UPDATED: Clear all filters including activeSearchTerm
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
@@ -174,7 +174,7 @@ const DepartmentList = () => {
 
       {/* CONTROLS BAR - UPDATED */}
       <div className="controls-bar-dept">
-        {/* ✅ NEW: Search with Button */}
+        {/*  NEW: Search with Button */}
         <div className="dept-search-input">
           <div className="dept-search-inner">
             <span className="dept-search-icon">
@@ -202,7 +202,7 @@ const DepartmentList = () => {
           </div>
         </div>
 
-        {/* ✅ UPDATED: Clear Filters Button */}
+        {/*  UPDATED: Clear Filters Button */}
         <button className="btn-clear-dept" onClick={clearFilters}>
           Clear Filters
         </button>

@@ -146,20 +146,14 @@ const AppraisalDetailsModal = ({
 
   const handleDownloadAttachment = async (attachment) => {
     try {
-      console.log("=== DOWNLOAD START ===");
       setDownloadingId(attachment.attachmentId);
       setError(null);
 
       const downloadUrl = `${api.defaults.baseURL}/AppraisalProcess/hr/attachments/${attachment.attachmentId}/download`;
-      console.log(`[DOWNLOAD] URL: ${downloadUrl}`);
 
       const response = await fetch(downloadUrl);
 
-      console.log(`[RESPONSE] Status: ${response.status}`);
-      console.log(`[RESPONSE] OK: ${response.ok}`);
-
       const contentType = response.headers.get("content-type");
-      console.log(`[HEADER] Content-Type: ${contentType}`);
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -176,39 +170,30 @@ const AppraisalDetailsModal = ({
       }
 
       const blob = await response.blob();
-      console.log(`[BLOB] Type: ${blob.type}, Size: ${blob.size}`);
 
       let filename = attachment.fileName || "attachment";
-      console.log(`[FILENAME] Original: "${filename}"`);
 
       if (!hasExtension(filename)) {
-        console.log(`[EXTENSION] Missing - detecting...`);
         let extension = "";
 
         if (contentType) {
           extension = getExtensionFromMime(contentType);
-          console.log(`[EXTENSION] From Header: "${extension}"`);
         }
 
         if (!extension && attachment.fileType) {
           extension = getExtensionFromMime(attachment.fileType);
-          console.log(`[EXTENSION] From Attachment: "${extension}"`);
         }
 
         if (!extension && blob.type) {
           extension = getExtensionFromMime(blob.type);
-          console.log(`[EXTENSION] From Blob: "${extension}"`);
         }
 
         if (!extension) {
           extension = ".bin";
-          console.log(`[EXTENSION] Default: ".bin"`);
         }
 
         filename += extension;
-        console.log(`[FILENAME] Final: "${filename}"`);
       } else {
-        console.log(`[EXTENSION] Already has extension`);
       }
 
       const url = window.URL.createObjectURL(blob);
@@ -219,9 +204,6 @@ const AppraisalDetailsModal = ({
       link.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(link);
-
-      console.log(`✓ Downloaded: ${filename}`);
-      console.log("=== DOWNLOAD END ===");
     } catch (err) {
       console.error("✗ Download error:", err);
       console.error("Error stack:", err.stack);

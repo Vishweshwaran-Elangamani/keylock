@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts/auth/AuthContext";
 import authService from "../../../services/auth/authService";
 import { toast } from "sonner";
-import logodarkfull from "../../../assets/logodarkfull.png"
+import logodarkfullsanta from "../../../assets/logodarkfullsanta.png";
+import logodarkfull from "../../../assets/logodarkfull.png";
+import Snowfall from "react-snowfall";
 import "../../../styles/auth/Auth.css";
 
 const Login = () => {
@@ -142,7 +144,6 @@ const Login = () => {
   };
 
   const getDashboardRoute = (roleName) => {
-    console.log("Role received:", roleName);
     const normalizedRole = roleName?.toUpperCase().replace(/\s+/g, "");
 
     const routes = {
@@ -155,7 +156,6 @@ const Login = () => {
     };
 
     const route = routes[normalizedRole] || "/employee/dashboard";
-    console.log("Navigating to:", route);
     return route;
   };
 
@@ -181,14 +181,10 @@ const Login = () => {
     setLoading(true);
 
     try {
-      console.log("Login attempt:", formData.email);
-
       const response = await authService.login(
         formData.email,
         formData.password
       );
-
-      console.log("Full Backend Response:", response);
 
       if (!response.success || !response.data) {
         const errorMessage =
@@ -271,15 +267,12 @@ const Login = () => {
         departmentName: user.departmentName,
       };
 
-      console.log("User Data to save:", userData);
-
       login(userData, data.accessToken);
 
       toast.dismiss();
       toast.success(`Welcome back, ${userData.name}!`);
 
       const dashboardRoute = getDashboardRoute(user.roleName);
-      console.log("Final navigation to:", dashboardRoute);
 
       navigate(dashboardRoute, { replace: true });
     } catch (err) {
@@ -293,9 +286,6 @@ const Login = () => {
       if (err.response) {
         const status = err.response.status;
         const data = err.response.data;
-
-        console.log("Status Code:", status);
-        console.log("Response Data:", data);
 
         if (status === 400) {
           errorMessage =
@@ -324,8 +314,6 @@ const Login = () => {
         errorMessage = err.message;
       }
 
-      console.log("Final Error Message:", errorMessage);
-
       setError(errorMessage);
       toast.dismiss();
       toast.error(errorMessage);
@@ -336,17 +324,21 @@ const Login = () => {
 
   return (
     <div className="eepz-login-page">
+      <Snowfall
+        color="rgba(69, 94, 110, 1)"
+      />
       <div className="container-fluid h-100 g-0">
         <div className="row g-0 h-100">
           <div className="col-lg-6 d-flex align-items-center justify-content-center bg-white p-4">
             <div className="eepz-login-form-container">
               <div className="text-center mb-4">
                 <img
-                  src= {logodarkfull}
+                  src={logodarkfullsanta}
                   alt="EEPZ Logo"
                   className="eepz-logo-img"
                   style={{
                     width: "450px",
+                    marginBottom: "10px"
                   }}
                 />
                 <h2 className="fw-bold mb-2" style={{ color: "#2d3565" }}>
@@ -406,7 +398,10 @@ const Login = () => {
                 </div>
 
                 <div className="mb-4">
-                  <label htmlFor="password" className="form-label-log fw-semibold">
+                  <label
+                    htmlFor="password"
+                    className="form-label-log fw-semibold"
+                  >
                     <i className="bi bi-lock me-2"></i>
                     Password
                   </label>
@@ -517,7 +512,7 @@ const Login = () => {
                 <h3 className="fw-bold mb-3" style={{ color: "#2d3565" }}>
                   Everything You Need
                 </h3>
-                <ul className="eepz-welcome-list" style={{textAlign: "left"}}>
+                <ul className="eepz-welcome-list" style={{ textAlign: "left" }}>
                   <li className="mb-3">
                     <i
                       className="bi bi-check-circle-fill me-2"

@@ -88,7 +88,6 @@ export default function ViewMyReviews() {
             empMap[r.managerEmployeeId] || `Manager ${r.managerEmployeeId}`,
         }));
         setReviews(enriched);
-        console.log("My reviews loaded:", enriched.length);
       }
     } catch (err) {
       setError(err?.message || "Failed to load reviews");

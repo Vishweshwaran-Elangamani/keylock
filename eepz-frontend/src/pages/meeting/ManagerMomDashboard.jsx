@@ -65,8 +65,6 @@ const ManagerMomDashboard = () => {
 
       const allActionItems = actionItemsAssignedByMeRes.data || [];
 
-      console.log(" Action Items Assigned By Manager:", allActionItems);
-
       const overdueCount = allActionItems.filter((ai) => {
         const dueDate = new Date(ai.dueDate);
         return ai.status === "Pending" && dueDate < new Date();

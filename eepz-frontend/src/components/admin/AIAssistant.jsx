@@ -80,7 +80,7 @@ ${conversationHistory ? `Previous conversation:\n${conversationHistory}\n\n` : "
 
 Provide a helpful response:`;
 
-    // ✅ CORRECT: Use gemini-1.5-pro (stable and widely available)
+    //  CORRECT: Use gemini-1.5-pro (stable and widely available)
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`,
       {

@@ -94,7 +94,6 @@ export default function ViewManagerReview() {
             `Manager ${reviewRes.data.data.managerEmployeeId}`,
         };
         setReview(reviewData);
-        console.log("Review loaded:", reviewData);
       } else {
         setError("Review not found");
       }

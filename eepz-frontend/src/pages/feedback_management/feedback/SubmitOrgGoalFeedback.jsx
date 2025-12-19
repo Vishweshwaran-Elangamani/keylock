@@ -93,11 +93,6 @@ export default function SubmitOrgGoalFeedback() {
         isAnonymous: !!form.isAnonymous,
       };
 
-      console.log(
-        " Sending Org Objective Feedback:",
-        JSON.stringify(payload, null, 2)
-      );
-
       const response = await fetch(
         "http://localhost:5333/api/orggoalfeedback/create",
         {

@@ -39,7 +39,6 @@ const HRMomDetails = () => {
     setError(null);
     try {
       const response = await momService.getMomById(momId);
-      console.log("MOM Details Response:", response);
 
       let momData = null;
       if (response.success && response.data) {

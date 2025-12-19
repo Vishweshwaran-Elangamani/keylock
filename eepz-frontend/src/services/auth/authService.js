@@ -43,7 +43,6 @@ const getClaimsFromToken = (token) => {
 const authService = {
   login: async (email, password) => {
     try {
-      console.log("Login attempt:", email);
 
       const response = await api.post("/Authentication/login", {
         email,
@@ -51,17 +50,13 @@ const authService = {
         ipAddress: null,
         userAgent: navigator.userAgent,
       });
-
-      console.log("Login API response:", response.data);
       const result = response.data;
 
       if (result.success && result.data.requiresTwoFactor) {
-        console.log("2FA Required for Admin");
         return result;
       }
 
       if (result.success && result.data.requiresPasswordReset) {
-        console.log("Password Reset Required");
         return result;
       }
 
@@ -71,7 +66,6 @@ const authService = {
           result.data.accessToken,
           result.data.refreshToken
         );
-        console.log("Login successful - Tokens saved");
       }
 
       return result;
@@ -87,7 +81,6 @@ const authService = {
     try {
       const response = await api.post("/Authentication/logout");
       authService.clearAuthData();
-      console.log("Logout successful");
       return response.data;
     } catch (error) {
       console.error("Logout error:", error);
@@ -98,7 +91,6 @@ const authService = {
 
   verifyOtp: async (email, otpCode) => {
     try {
-      console.log("Verifying 2FA OTP...");
       const response = await api.post("/Authentication/verify-otp", {
         email: email,
         otpCode: otpCode,
@@ -113,7 +105,6 @@ const authService = {
           result.data.accessToken,
           result.data.refreshToken
         );
-        console.log("2FA OTP verified - Tokens saved");
       }
 
       return result;
@@ -125,14 +116,11 @@ const authService = {
 
   verifyFirstLoginOtp: async (email, otpCode) => {
     try {
-      console.log("Verifying First Login OTP...");
       const response = await api.post("/Authentication/verify-otp", {
         email: email,
         otpCode: otpCode,
         otpType: "ForgotPassword",
       });
-
-      console.log("First login OTP verified");
       return response.data;
     } catch (error) {
       console.error("First login OTP verification error:", error);
@@ -142,14 +130,11 @@ const authService = {
 
   verifyResetOtp: async (email, otpCode) => {
     try {
-      console.log("Verifying Reset OTP...");
       const response = await api.post("/Authentication/verify-otp", {
         email: email,
         otpCode: otpCode,
         otpType: "ForgotPassword",
       });
-
-      console.log("Reset OTP verified");
       return response.data;
     } catch (error) {
       console.error("Reset OTP verification error:", error);
@@ -159,13 +144,10 @@ const authService = {
 
   resendOtp: async (email, otpType) => {
     try {
-      console.log(`Resending OTP (${otpType})...`);
       const response = await api.post("/Authentication/resend-otp", {
         email: email,
         otpType: otpType,
       });
-
-      console.log("OTP resent successfully");
       return response.data;
     } catch (error) {
       console.error("Resend OTP error:", error);
@@ -175,12 +157,9 @@ const authService = {
 
   forgotPassword: async (email) => {
     try {
-      console.log("Sending forgot password OTP...");
       const response = await api.post("/Authentication/forgot-password", {
         email: email,
       });
-
-      console.log("Forgot password OTP sent");
       return response.data;
     } catch (error) {
       console.error("Forgot password error:", error);
@@ -190,11 +169,6 @@ const authService = {
 
   resetPassword: async (email, otpCode, newPassword, confirmPassword) => {
     try {
-      console.log("Resetting password...");
-      console.log("Email:", email);
-      console.log("OTP:", otpCode);
-      console.log("New Password Length:", newPassword?.length);
-      console.log("Confirm Password Length:", confirmPassword?.length);
 
       const response = await api.post("/Authentication/reset-password", {
         email: email,
@@ -202,9 +176,6 @@ const authService = {
         newPassword: newPassword,
         confirmPassword: confirmPassword || newPassword,
       });
-
-      console.log("Password reset successful");
-      console.log("Response:", response.data);
       return response.data;
     } catch (error) {
       console.error("Reset password error:", error.response?.data || error);
@@ -214,13 +185,10 @@ const authService = {
 
   changePassword: async (currentPassword, newPassword) => {
     try {
-      console.log("Changing password...");
       const response = await api.post("/Authentication/change-password", {
         currentPassword: currentPassword || "",
         newPassword: newPassword,
       });
-
-      console.log("Password changed successfully");
       return response.data;
     } catch (error) {
       console.error("Change password error:", error);
@@ -236,8 +204,6 @@ const authService = {
         console.error("No refresh token available");
         throw new Error("No refresh token available");
       }
-
-      console.log("Refreshing access token...");
       const response = await api.post("/Authentication/refresh-token", {
         refreshToken: refreshToken,
       });
@@ -261,10 +227,6 @@ const authService = {
         if (result.data.refreshToken) {
           localStorage.setItem("refreshToken", result.data.refreshToken);
         }
-        console.log(
-          "Token refreshed successfully with empMasterId:",
-          tokenClaims?.empMasterId
-        );
       }
 
       return result;
@@ -336,7 +298,6 @@ const authService = {
       localStorage.removeItem("firstLoginOtpLockout");
       localStorage.removeItem("otpLockout");
       localStorage.removeItem("resetOtpLockout");
-      console.log("Auth data cleared");
     } catch (error) {
       console.error("Error clearing auth data:", error);
     }
@@ -344,13 +305,9 @@ const authService = {
 
   saveAuthData: (userData, accessToken, refreshToken) => {
     try {
-      console.log(" Saving auth data...");
-      console.log("User data from backend:", userData);
 
       // DECODE TOKEN TO GET CLAIMS INCLUDING empMasterId
       const tokenClaims = getClaimsFromToken(accessToken);
-      console.log(" Token claims:", tokenClaims);
-      console.log(" empMasterId from token:", tokenClaims?.empMasterId);
 
       // MERGE USER DATA WITH TOKEN CLAIMS
       const enrichedUserData = {
@@ -358,18 +315,9 @@ const authService = {
         empMasterId: tokenClaims?.empMasterId,
       };
 
-      console.log(" Enriched user data:", enrichedUserData);
-
       localStorage.setItem("user", JSON.stringify(enrichedUserData));
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
-
-      console.log("Auth data saved:", {
-        userId: enrichedUserData?.userId,
-        email: enrichedUserData?.email,
-        role: enrichedUserData?.roleName,
-        empMasterId: enrichedUserData?.empMasterId,
-      });
     } catch (error) {
       console.error("Error saving auth data:", error);
     }
@@ -378,7 +326,6 @@ const authService = {
   saveTempUser: (tempUserData) => {
     try {
       localStorage.setItem("tempUser", JSON.stringify(tempUserData));
-      console.log("Temp user saved");
     } catch (error) {
       console.error("Error saving temp user:", error);
     }
@@ -397,7 +344,6 @@ const authService = {
   clearTempUser: () => {
     try {
       localStorage.removeItem("tempUser");
-      console.log("Temp user cleared");
     } catch (error) {
       console.error("Error clearing temp user:", error);
     }
@@ -413,7 +359,6 @@ const authService = {
           ? "firstLoginOtpLockout"
           : "otpLockout";
       localStorage.setItem(lockoutKey, lockoutUntil.toString());
-      console.log(`${type} OTP lockout set for ${minutes} minutes`);
     } catch (error) {
       console.error("Error setting OTP lockout:", error);
     }
@@ -476,7 +421,6 @@ const authService = {
           ? "firstLoginOtpLockout"
           : "otpLockout";
       localStorage.removeItem(lockoutKey);
-      console.log(`${type} OTP lockout cleared`);
     } catch (error) {
       console.error("Error clearing OTP lockout:", error);
     }

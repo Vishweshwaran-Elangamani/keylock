@@ -18,7 +18,6 @@ employeeApi.interceptors.request.use(
     const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log("JWT Token attached to Employee API request");
     }
     return config;
   },
@@ -31,9 +30,7 @@ employeeApi.interceptors.request.use(
 const employeePolicyService = {
   getPublishedPolicies: async () => {
     try {
-      console.log("Fetching published policies from /EmployeeData/policy/published");
       const response = await employeeApi.get("/EmployeeData/policy/published");
-      console.log("Published policies fetched:", response.data);
       return response.data.data || [];
     } catch (error) {
       console.error("Error fetching published policies:", error);
@@ -44,9 +41,7 @@ const employeePolicyService = {
 
   getPolicyById: async (policyId) => {
     try {
-      console.log(`Fetching policy ${policyId} from /EmployeeData/policy/${policyId}`);
       const response = await employeeApi.get(`/EmployeeData/policy/${policyId}`);
-      console.log(`Policy ${policyId} fetched:`, response.data);
       return response.data.data;
     } catch (error) {
       console.error(`Error fetching policy ${policyId}:`, error);
@@ -63,7 +58,6 @@ const employeePolicyService = {
     
     // If already a full URL (starts with http/https), return as-is
     if (url.startsWith("http://") || url.startsWith("https://")) {
-      console.log("Full URL detected:", url);
       return url;
     }
     
@@ -75,8 +69,6 @@ const employeePolicyService = {
     
     // Build document endpoint URL
     const fullUrl = `${hrBaseUrl}/api/policy/document/${fileName}`;
-    
-    console.log(`Converted relative URL: ${url} → ${fullUrl}`);
     return fullUrl;
   },
 };

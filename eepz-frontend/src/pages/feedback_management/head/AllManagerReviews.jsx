@@ -80,7 +80,6 @@ export default function AllManagerReviews() {
       const res = await managerReviewApi.getByManager(managerId);
 
       if (res.data?.success && Array.isArray(res.data.data)) {
-        console.log("Data Retrieved")
         const enriched = res.data.data.map((review) => ({
           ...review,
           managerName:
@@ -99,8 +98,6 @@ export default function AllManagerReviews() {
           ...new Set(enriched.map((r) => r.managerEmployeeId)),
         ];
         setManagers(uniqueManagers);
-
-        console.log(" Reviews loaded:", enriched.length);
       }
     } catch (err) {
       setError("Failed to load reviews");

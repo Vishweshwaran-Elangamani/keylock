@@ -44,15 +44,11 @@ const Navbar = () => {
     
     try {
       const response = await getEmployeeNominations(employeeId);
-      console.log("Fetched Nominations Response: ", response);
-      console.log("Response Data: ", response.data);
       
       if (response?.data?.success && response?.data?.data && response.data.data.length > 0) {
-        console.log("Setting hasNominations to TRUE");
         setHasNominations(true);
         setAwardName(response.data.data[0].roleType);
       } else {
-        console.log("No nominations found");
         setHasNominations(false);
       }
     } catch (error) {

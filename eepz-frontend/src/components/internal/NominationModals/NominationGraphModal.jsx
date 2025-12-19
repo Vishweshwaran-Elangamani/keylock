@@ -60,9 +60,6 @@ const NominationGraphModal = ({ show, onHide }) => {
     setLoading(true);
     const response = await nominationService.getMyNominationAnalytics();
     
-    console.log("Analytics Response:", response);
-    console.log("Analytics Data:", response?.data);
-    
     if (response.success) {
       const newData = response.data;
       // Only update if data changed

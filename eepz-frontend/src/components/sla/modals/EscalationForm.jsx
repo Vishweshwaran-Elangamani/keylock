@@ -28,17 +28,10 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
         setManagerError(null);
 
         const user = JSON.parse(localStorage.getItem("user") || "{}");
-        console.log("📋 Current User:", {
-          empId: user.empId,
-          name: user.name,
-          role: user.roleName,
-        });
 
         if (!user.empId) {
           throw new Error("User employee ID not found in localStorage");
         }
-
-        console.log(`🔍 Fetching employee details for ID: ${user.empId}`);
         const employeeResponse = await slaService.getEmployeeById(user.empId);
 
         if (!employeeResponse?.success || !employeeResponse.data) {
@@ -46,13 +39,6 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
         }
 
         const employee = employeeResponse.data;
-        console.log("👤 Employee Details:", {
-          id: employee.employeeId || employee.empId,
-          name: `${employee.firstName} ${employee.lastName}`,
-          reportsTo: employee.reportsTo,
-          reportingToId: employee.reportingToId,
-          managerId: employee.managerId,
-        });
 
         const reportingManagerId =
           employee.reportsTo ||
@@ -66,8 +52,6 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
           );
         }
 
-        console.log(`✅ Manager ID found: ${reportingManagerId}`);
-
         try {
           const managerResponse = await slaService.getEmployeeById(
             reportingManagerId
@@ -78,9 +62,6 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
               manager.lastName || ""
             }`.trim();
             setManagerName(fullName || "Manager");
-            console.log(
-              `👔 Manager Details: ${fullName} (ID: ${reportingManagerId})`
-            );
           }
         } catch (err) {
           console.warn("⚠️ Could not fetch manager name, using ID only");
@@ -88,7 +69,6 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
         }
 
         setManagerId(reportingManagerId);
-        console.log("✅ Escalation target set successfully");
       } catch (error) {
         console.error("❌ Error fetching manager:", error);
         setManagerError(error.message || "Failed to load escalation target");
@@ -128,14 +108,6 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
     try {
       const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-      console.log("🚀 Submitting L1 Escalation:", {
-        slaid: sla.slaid,
-        reason: selectedReason,
-        escalatedTo: managerId,
-        escalatedToName: managerName,
-        submittedBy: user.empId,
-      });
-
       const response = await slaService.submitEscalation({
         slaid: sla.slaid,
         reason: selectedReason,
@@ -145,7 +117,6 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
       });
 
       if (response?.success) {
-        console.log(" Escalation successful");
         toast.success("SLA Escalated Successfully", {
           description: `Escalated to ${managerName} for review`,
           duration: 4000,

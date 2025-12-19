@@ -8,7 +8,6 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        {/* Sonner Toast Notification Container */}
         <Toaster
           position="top-right"
           richColors

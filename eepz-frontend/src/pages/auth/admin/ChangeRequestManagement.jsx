@@ -100,7 +100,7 @@ const PendingRequests = ({
       {/* FILTERS CARD */}
       <div className="crm-filters-card">
         <div className="crm-filters-content">
-          {/* ✅ UPDATED: Search with Button */}
+          {/*  UPDATED: Search with Button */}
           <div className="crm-search-box">
             <div className="crm-search-inner">
               <span className="crm-search-icon">
@@ -423,7 +423,7 @@ const AllRequests = ({
       {/* FILTERS CARD */}
       <div className="crm-filters-card">
         <div className="crm-filters-content">
-          {/* ✅ UPDATED: Search with Button */}
+          {/*  UPDATED: Search with Button */}
           <div className="crm-search-box">
             <div className="crm-search-inner">
               <span className="crm-search-icon">
@@ -686,7 +686,7 @@ const ChangeRequestManagement = () => {
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(null);
 
-  // ✅ UPDATED: Two-state search approach
+  //  UPDATED: Two-state search approach
   const [searchTerm, setSearchTerm] = useState(""); // What user types
   const [activeSearchTerm, setActiveSearchTerm] = useState(""); // Used for filtering
 
@@ -769,12 +769,12 @@ const ChangeRequestManagement = () => {
     }
   };
 
-  // ✅ NEW: Handle search button click
+  //  NEW: Handle search button click
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
   };
 
-  // ✅ UPDATED: Clear all filters including activeSearchTerm
+  //  UPDATED: Clear all filters including activeSearchTerm
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");

@@ -82,11 +82,7 @@ export default function CreateFeedbackForm() {
         deadline: new Date(form.deadline).toISOString(),
       };
 
-      console.log("Creating form:", createPayload);
-
       const response = await hrFormApi.createForm(createPayload);
-
-      console.log("Form created:", response);
 
       if (response?.success || response?.data?.success) {
         setSuccess(

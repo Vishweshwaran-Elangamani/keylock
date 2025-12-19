@@ -104,7 +104,7 @@ export default function ManagerNomination() {
   const approvedPager = usePagination(approvedNominations, 5);
   const rejectedPager = usePagination(rejectedNominations, 5);
   
-  // ✅ FIXED: Show ALL team members (don't filter based on nominations)
+  //  FIXED: Show ALL team members (don't filter based on nominations)
   const teamMembersPager = usePagination(teamMembers, 5);
 
   const handleOpenNominate = (member) => {

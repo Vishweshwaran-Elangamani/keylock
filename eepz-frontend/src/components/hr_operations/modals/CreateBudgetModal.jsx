@@ -23,9 +23,7 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
 
   const fetchDepartments = async () => {
     try {
-      console.log("Fetching departments...");
       const response = await budgetAllocationService.getAllDepartments();
-      console.log("Departments fetched:", response.data);
       setDepartments(response.data || []);
     } catch (err) {
       console.error("Error fetching departments:", err);
@@ -91,8 +89,6 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
         ? parseFloat(formData.allocatedAmount)
         : parseFloat(formData.totalBudget);
 
-      console.log("Creating budget...");
-
       await budgetAllocationService.createDepartmentBudget({
         departmentId: formData.departmentId,
         fiscalYear: formData.fiscalYear,
@@ -100,7 +96,6 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
         allocatedAmount: allocatedAmount,
       });
 
-      console.log("Budget created successfully");
       onBudgetCreated();
       handleClose();
     } catch (err) {

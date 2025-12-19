@@ -132,8 +132,6 @@ export default function DeptHeadTeamSubmissions() {
       const allSubmissions = [...mentorData, ...peerData, ...hrData];
       setSubmissions(allSubmissions);
       setFilteredSubmissions(allSubmissions);
-
-      console.log(" Team submissions loaded:", allSubmissions.length);
     } catch (err) {
       setError("Failed to load team submissions");
       console.error("Error:", err);
@@ -410,9 +408,6 @@ export default function DeptHeadTeamSubmissions() {
                         <td>
                           <button
                             className="btn btn-sm btn-outline-secondary"
-                            onClick={() =>
-                              console.log("View submission:", submission)
-                            }
                           >
                             <Eye size={14} />
                           </button>

@@ -34,7 +34,6 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
           });
 
           setEmployeeCount(uniqueEmployees.size);
-          console.log(`${uniqueEmployees.size} employees found`);
         } else {
           toast.error("Failed to load employee count");
           setError("Failed to load employee count");

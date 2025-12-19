@@ -17,11 +17,9 @@ const ViewBudgetDetailsModal = ({ show, budget, onHide }) => {
     setLoading(true);
     setError(null);
     try {
-      console.log("📋 Fetching allocations for budget:", budget.budgetId);
       const response = await budgetAllocationService.getBudgetAllocationsByBudget(
         budget.budgetId
       );
-      console.log("✅ Allocations fetched:", response.data);
       setAllocations(response.data || []);
     } catch (err) {
       console.error("❌ Error fetching allocations:", err);

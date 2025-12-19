@@ -1,6 +1,6 @@
 // src/services/feedbackmanagement/hrFormApi.js
  
-import api from "./index_feedback";
+import api from "./http";
  
 export const hrFormApi = {
   // ============== FORMS ENDPOINTS ==============

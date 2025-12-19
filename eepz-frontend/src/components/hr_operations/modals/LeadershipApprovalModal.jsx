@@ -15,14 +15,9 @@ const LeadershipApproval = () => {
   const fetchSubmittedPromotions = async () => {
     try {
       setLoading(true);
-      console.log("Fetching promotions submitted to leadership...");
 
       const response =
         await careerProgressionService.getSubmittedToLeadership();
-
-      console.log("Response:", response);
-      console.log("Is array?", Array.isArray(response));
-      console.log("Promotion count:", response?.length);
 
       setPromotions(Array.isArray(response) ? response : []);
     } catch (error) {

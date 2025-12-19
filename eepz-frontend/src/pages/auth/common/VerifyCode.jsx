@@ -95,14 +95,12 @@ const VerifyCode = () => {
   useEffect(() => {
     const tempUserStr = localStorage.getItem("tempUser");
     if (!tempUserStr) {
-      console.log("No temp user found, redirecting to login");
       navigate("/login");
       return;
     }
 
     const tempUser = JSON.parse(tempUserStr);
     setUserInfo(tempUser);
-    console.log("Temp User Info:", tempUser);
 
     // Check if there's an existing lockout from localStorage
     const lockoutData = localStorage.getItem("otpLockout");
@@ -305,9 +303,6 @@ const VerifyCode = () => {
     setError("");
 
     try {
-      console.log("Starting OTP verification...");
-      console.log("Email:", userInfo.email);
-      console.log("OTP Code:", verificationCode);
 
       // Show loading toast
       toast.loading("Verifying OTP...");
@@ -317,8 +312,6 @@ const VerifyCode = () => {
         userInfo.email,
         verificationCode
       );
-
-      console.log("OTP Verification Response:", response);
 
       if (!response || response.success === false) {
         const errorMsg = response?.message || "Invalid verification code";
@@ -363,8 +356,6 @@ const VerifyCode = () => {
 
       const data = response.data;
       const user = data.user;
-      console.log("Response Data:", data);
-      console.log("User Object:", user);
 
       if (!user) {
         console.error("User object not found in response");
@@ -376,7 +367,6 @@ const VerifyCode = () => {
       }
 
       const userRole = user.roleName;
-      console.log("User Role:", userRole);
 
       const userData = {
         userId: user.userId,
@@ -385,9 +375,6 @@ const VerifyCode = () => {
         empId: user.employeeCompanyId,
         role: userRole,
       };
-
-      console.log("User Data:", userData);
-      console.log("Token received");
 
       // Clear lockout data on successful verification
       localStorage.removeItem("tempUser");
@@ -399,7 +386,6 @@ const VerifyCode = () => {
       login(userData, data.accessToken);
 
       const dashboardRoute = getDashboardRoute(userRole);
-      console.log("Navigating to:", dashboardRoute);
 
       setTimeout(() => {
         navigate(dashboardRoute, { replace: true });

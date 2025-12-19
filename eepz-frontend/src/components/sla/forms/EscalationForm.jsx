@@ -37,8 +37,6 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
         escalatedToEmployeeId: sla.assignedToEmployeeId,
         submittedByEmployeeId: user.empId,
       };
-
-      console.log("Escalation Data:", escalationData);
       const response = await slaService.submitEscalation(escalationData);
 
       if (response.success) {

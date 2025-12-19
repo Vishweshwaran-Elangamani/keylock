@@ -52,8 +52,6 @@ const UpdateUtilizationModal = ({
         return;
       }
 
-      console.log("Updating utilization...");
-
       const utilizationPercentage = Math.round(
         (utilizedAmount / (allocation.amount || 1)) * 100
       );
@@ -65,8 +63,6 @@ const UpdateUtilizationModal = ({
         notes: formData.notes,
         updatedByUserId: currentUserId,
       });
-
-      console.log("Utilization updated successfully");
       onUtilizationUpdated({
         ...allocation,
         utilizedAmount: utilizedAmount,

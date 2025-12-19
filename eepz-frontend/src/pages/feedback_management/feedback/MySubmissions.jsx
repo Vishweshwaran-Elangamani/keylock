@@ -196,7 +196,6 @@ export default function MySubmissions() {
           map[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
         });
         setEmployeeMap(map);
-        console.log("Employee Map loaded:", map);
       }
     } catch (err) {
       console.error("Error fetching employee map:", err.message);
@@ -221,7 +220,6 @@ export default function MySubmissions() {
             map[goalId] = goalTitle || `Goal ${goalId}`;
           }
         });
-        console.log("Goals Map loaded:", map);
         setObjectives(map);
       }
     } catch (err) {
@@ -237,7 +235,6 @@ export default function MySubmissions() {
 
     try {
       const userEmpId = Number(user?.empId) || 1004;
-      console.log("Fetching data for Employee ID:", userEmpId);
 
       // HR Forms
       try {
@@ -250,7 +247,6 @@ export default function MySubmissions() {
           daysAgo: getDaysAgo(hr.submittedAt),
         }));
         setHrForms(enriched);
-        console.log("HR Forms loaded:", enriched.length);
       } catch (hrErr) {
         console.error("HR Forms fetch error:", hrErr);
         setHrForms([]);
@@ -272,7 +268,6 @@ export default function MySubmissions() {
           trackingId: m.mentorFeedbackId || m.trackingId || m.id,
         }));
         setMentor(enriched);
-        console.log("Mentor Feedback loaded:", enriched.length);
       } catch (mentorErr) {
         console.error("Mentor feedback fetch error:", mentorErr);
         setMentor([]);
@@ -298,7 +293,6 @@ export default function MySubmissions() {
           queueId: p.queueId || p.id,
         }));
         setPeer(enriched);
-        console.log("Peer Feedback loaded:", enriched.length);
       } catch (peerErr) {
         console.error("Peer feedback fetch error:", peerErr);
         setPeer([]);
@@ -310,15 +304,11 @@ export default function MySubmissions() {
         
         // Fix: Handle nested data structure properly
         const allGoalData = goalRes?.data?.data || goalRes?.data || [];
-        
-        console.log("Raw Goal API Response:", goalRes);
-        console.log("Extracted Goal Data:", allGoalData);
 
         if (Array.isArray(allGoalData)) {
           const myGoals = allGoalData
             .filter((g) => {
               const matches = Number(g.submittedByEmployeeId) === userEmpId;
-              console.log(`Goal ${g.orgGoalFeedbackId}: submittedBy=${g.submittedByEmployeeId}, currentUser=${userEmpId}, matches=${matches}`);
               return matches;
             })
             .map((g) => ({
@@ -334,8 +324,6 @@ export default function MySubmissions() {
               rating: g.rating || 0,
               feedbackComments: g.feedbackComments || "",
             }));
-
-          console.log("Filtered Goal Feedback:", myGoals);
           setGoalFeedback(myGoals);
         } else {
           console.warn("Goal data is not an array:", allGoalData);

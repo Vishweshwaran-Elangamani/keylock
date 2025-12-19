@@ -4,10 +4,7 @@ import { Eye, Clock, AlertTriangle, CheckCircle } from "lucide-react";
 const TeamReviewTable = ({ reviews, onViewDetails }) => {
   //  Debug logging
   React.useEffect(() => {
-    console.log(" TeamReviewTable received reviews:", reviews);
-    console.log(" Total reviews in table:", reviews.length);
     if (reviews.length > 0) {
-      console.log(" First review:", reviews[0]);
     }
   }, [reviews]);
 

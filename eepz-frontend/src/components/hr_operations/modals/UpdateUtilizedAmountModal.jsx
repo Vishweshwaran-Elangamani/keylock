@@ -31,12 +31,10 @@ const UpdateUtilizedAmountModal = ({
 
   const fetchAllocations = async () => {
     try {
-      console.log(" Fetching allocations...");
       const response =
         await budgetAllocationService.getBudgetAllocationsByBudget(
           budget.budgetId
         );
-      console.log(" Allocations fetched:", response.data);
       setAllocations(response.data || []);
     } catch (err) {
       console.error(" Error fetching allocations:", err);
@@ -80,14 +78,10 @@ const UpdateUtilizedAmountModal = ({
         return;
       }
 
-      console.log(" Updating utilized amount...");
-
       await budgetAllocationService.updateUtilizedAmount({
         budgetId: formData.budgetId,
         utilizedAmount: utilizedAmount,
       });
-
-      console.log(" Utilized amount updated successfully");
       onUtilizedUpdated();
       handleClose();
     } catch (err) {

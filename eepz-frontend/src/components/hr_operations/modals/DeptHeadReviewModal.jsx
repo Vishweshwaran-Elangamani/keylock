@@ -22,12 +22,10 @@ const DeptHeadReviewModal = ({
     setError(null);
 
     try {
-      console.log(" Approving nomination...");
       await carearProgressionService.approveNomination(
         nomination.promotionId,
         approvalComments
       );
-      console.log(" Nomination approved");
       showToast("Success", "Nomination approved successfully", "success");
       onReviewSubmitted();
       handleClose();
@@ -51,12 +49,10 @@ const DeptHeadReviewModal = ({
     setError(null);
 
     try {
-      console.log(" Rejecting nomination...");
       await carearProgressionService.rejectNomination(
         nomination.promotionId,
         rejectionReason
       );
-      console.log(" Nomination rejected");
       showToast("Success", "Nomination rejected", "success");
       onReviewSubmitted();
       handleClose();

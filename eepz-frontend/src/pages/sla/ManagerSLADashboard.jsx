@@ -85,7 +85,6 @@ const ManagerSLADashboard = () => {
       const mySLAsRes = await slaService.getEmployeeSLAs(userData.empId);
       if (mySLAsRes?.success && Array.isArray(mySLAsRes.data)) {
         setMySLAs(mySLAsRes.data);
-        console.log('Manager\'s own SLAs:', mySLAsRes.data);
       }
     } catch (err) {
       console.error('Error loading data:', err);

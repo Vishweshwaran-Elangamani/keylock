@@ -344,7 +344,7 @@ const NominationManagement = () => {
               </button>
             )}
 
-            {/* ✅ HISTORY BUTTON - ONLY FOR MANAGER ROLE */}
+            {/*  HISTORY BUTTON - ONLY FOR MANAGER ROLE */}
             {user?.role === "Manager" && (
               <button
                 className="btn-history"

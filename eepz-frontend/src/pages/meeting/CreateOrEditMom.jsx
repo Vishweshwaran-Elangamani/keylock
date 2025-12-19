@@ -76,8 +76,6 @@ const CreateOrEditMom = ({ isEdit = false }) => {
           nameToIdMap[fullName] = emp.employeeMasterId;
         });
         setEmployeeMap(nameToIdMap);
-        
-        console.log("👥 Employee Map (Name -> ID):", nameToIdMap);
       }
     } catch (err) {
       console.error("Failed to load employees:", err);
@@ -183,8 +181,6 @@ const CreateOrEditMom = ({ isEdit = false }) => {
       // When employee name changes, also set the ID
       newItems[index].assignedToEmployeeName = value;
       newItems[index].assignedToEmployeeId = employeeMap[value] || null;
-      
-      console.log(`Assigned: ${value} -> ID: ${employeeMap[value]}`);
     } else if (field === "taskDescription") {
       newItems[index].taskDescription = value;
     } else {
@@ -260,8 +256,6 @@ const CreateOrEditMom = ({ isEdit = false }) => {
           })),
         commentsObservations: formData.commentsObservations,
       };
-
-      console.log("Submitting MOM Payload:", momPayload);
 
       if (isEdit) {
         await momService.updateMom(momPayload);

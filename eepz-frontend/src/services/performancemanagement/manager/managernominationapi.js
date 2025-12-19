@@ -1,4 +1,6 @@
 import api, { apiPort5114 } from "../api/nominationapi";
+
+// All ManagerNomination endpoints use port 5113
 export const getRewardTypes = () => apiPort5114.get("/ManagerNomination/reward-types");
 
 export const getOpportunities = () =>

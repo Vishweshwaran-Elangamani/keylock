@@ -2,14 +2,14 @@
    CAREER PROGRESSION MANAGEMENT STYLES
    ============================================ */
 
-/* ✅ ROOT CONTAINER */
+/*  ROOT CONTAINER */
 .career-progression-root {
     padding: 20px;
     background-color: #f9fafb;
     min-height: 100vh;
   }
   
-  /* ✅ HEADER SECTION */
+  /*  HEADER SECTION */
   .career-progression-header {
     display: flex;
     justify-content: space-between;
@@ -42,7 +42,7 @@
     margin: 8px 0 0;
   }
   
-  /* ✅ CREATE BUTTON */
+  /*  CREATE BUTTON */
   .career-progression-btn-create {
     padding: 10px 20px;
     background-color: #27235c;
@@ -67,7 +67,7 @@
     transform: translateY(0);
   }
   
-  /* ✅ TAB NAVIGATION */
+  /*  TAB NAVIGATION */
   .career-progression-tabs {
     display: flex;
     gap: 8px;
@@ -109,7 +109,7 @@
     font-size: 14px;
   }
   
-  /* ✅ FILTERS SECTION */
+  /*  FILTERS SECTION */
   .career-progression-filters {
     display: flex;
     gap: 12px;
@@ -162,7 +162,7 @@
     color: #6b7280;
   }
   
-  /* ✅ TABLE CONTAINER */
+  /*  TABLE CONTAINER */
   .career-progression-table-container {
     background: white;
     border-radius: 12px;
@@ -170,7 +170,7 @@
     overflow: hidden;
   }
   
-  /* ✅ LOADING STATE */
+  /*  LOADING STATE */
   .career-progression-loading {
     display: flex;
     flex-direction: column;
@@ -187,7 +187,7 @@
     border-width: 3px;
   }
   
-  /* ✅ EMPTY STATE */
+  /*  EMPTY STATE */
   .career-progression-table-empty {
     display: flex;
     flex-direction: column;
@@ -204,7 +204,7 @@
     opacity: 0.5;
   }
   
-  /* ✅ TABLE STYLES */
+  /*  TABLE STYLES */
   .career-progression-table {
     width: 100%;
     border-collapse: collapse;
@@ -245,7 +245,7 @@
     font-weight: 600;
   }
   
-  /* ✅ ACTION BUTTONS IN TABLE */
+  /*  ACTION BUTTONS IN TABLE */
   .career-progression-actions {
     display: flex;
     gap: 8px;
@@ -320,7 +320,7 @@
     transform: translateY(-1px);
   }
   
-  /* ✅ MODAL STYLES */
+  /*  MODAL STYLES */
   .promo-modal {
     z-index: 1050;
   }
@@ -350,7 +350,7 @@
     gap: 12px;
   }
   
-  /* ✅ APPROVAL INFO CARDS */
+  /*  APPROVAL INFO CARDS */
   .promo-approval-info {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -382,7 +382,7 @@
     font-weight: 500;
   }
   
-  /* ✅ FORM GRID */
+  /*  FORM GRID */
   .promo-form-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -436,7 +436,7 @@
     box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
   }
   
-  /* ✅ DETAILS SECTION */
+  /*  DETAILS SECTION */
   .promo-details-section {
     background-color: #f0fdf4;
     border: 1px solid #dcfce7;
@@ -481,7 +481,7 @@
     font-weight: 600;
   }
   
-  /* ✅ BUTTONS */
+  /*  BUTTONS */
   .promo-btn-submit {
     padding: 10px 20px;
     background-color: #27235c;
@@ -512,7 +512,7 @@
     transform: translateY(0);
   }
   
-  /* ✅ TOAST CONTAINER */
+  /*  TOAST CONTAINER */
   .career-progression-toast-container {
     position: fixed;
     bottom: 20px;
@@ -541,7 +541,7 @@
     color: #374151;
   }
   
-  /* ✅ RESPONSIVE DESIGN */
+  /*  RESPONSIVE DESIGN */
   @media (max-width: 768px) {
     .career-progression-header {
       flex-direction: column;
@@ -618,7 +618,7 @@
     }
   }
   
-  /* ✅ ANIMATIONS */
+  /*  ANIMATIONS */
   @keyframes slideIn {
     from {
       opacity: 0;
@@ -634,7 +634,7 @@
     animation: slideIn 0.3s ease-out;
   }
   
-  /* ✅ ALERT STYLES */
+  /*  ALERT STYLES */
   .alert {
     border-radius: 8px;
     padding: 12px 16px;
@@ -670,7 +670,7 @@
     margin-right: 8px;
   }
   
-  /* ✅ FORM STYLES */
+  /*  FORM STYLES */
   .form-control,
   .form-select {
     border-radius: 6px;
@@ -700,7 +700,7 @@
     display: block;
   }
   
-  /* ✅ SPINNER STYLES */
+  /*  SPINNER STYLES */
   .spinner-border {
     border-width: 2px;
     color: #27235c;
@@ -712,7 +712,7 @@
     border-width: 2px;
   }
   
-  /* ✅ BUTTON GROUP STYLES */
+  /*  BUTTON GROUP STYLES */
   .btn {
     border-radius: 6px;
     padding: 10px 16px;
@@ -741,7 +741,7 @@
     transform: translateY(-1px);
   }
   
-  /* ✅ SCROLLBAR STYLING */
+  /*  SCROLLBAR STYLING */
   .promo-modal-body::-webkit-scrollbar {
     width: 6px;
   }

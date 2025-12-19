@@ -171,9 +171,6 @@ const DepartmentHeadDashboard = () => {
         slaService.getAllSLAs().catch(() => ({ success: false, data: [] })),
       ]);
 
-      console.log("Performance Reviews raw response:", performanceReviewsRes);
-      console.log("Approved Employees raw response:", approvedEmployeesRes);
-
       const extractedPendingGoalApprovals = extractData(
         pendingGoalApprovalsRes
       );
@@ -182,9 +179,6 @@ const DepartmentHeadDashboard = () => {
       const extractedApprovedEmployees = extractData(approvedEmployeesRes);
       const extractedAllGoals = extractData(allGoalsRes);
       const extractedAllEmployees = extractData(allEmployeesRes);
-
-      console.log("Extracted Performance Reviews:", extractedPerformanceReviews);
-      console.log("Extracted Approved Employees:", extractedApprovedEmployees);
 
       const allSlas =
         allSlasRes?.success && Array.isArray(allSlasRes.data)
@@ -273,9 +267,6 @@ const DepartmentHeadDashboard = () => {
       );
 
       const approvedPerformanceReviews = extractedApprovedEmployees;
-
-      console.log("Final Pending Reviews:", pendingPerformanceReviews);
-      console.log("Final Approved Reviews:", approvedPerformanceReviews);
 
       const approvedNominations = extractedPendingNominations.filter(
         (n) => n.status?.toLowerCase() === "approved"

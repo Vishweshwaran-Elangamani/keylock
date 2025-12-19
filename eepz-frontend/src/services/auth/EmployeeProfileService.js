@@ -62,11 +62,8 @@ const EmployeeProfileService = {
    */
   updateProfilePhoto: async (formData) => {
     try {
-      console.log("Calling API: PUT /User/profile/upload-photo");
       
       const response = await api.put("/User/profile/upload-photo", formData);
-      
-      console.log("Photo upload API response:", response.data);
       
       return response.data;
     } catch (error) {

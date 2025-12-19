@@ -20,7 +20,6 @@ const employeeApi = axios.create({
     (config) => {
       const token = localStorage.getItem('token');
       if (token) config.headers.Authorization = `Bearer ${token}`;
-      console.log(`${config.baseURL?.includes('Sla') ? 'SLA' : 'Employee'} API: ${config.method.toUpperCase()} ${config.url}`);
       return config;
     },
     (error) => Promise.reject(error)
@@ -173,7 +172,6 @@ const slaService = {
  
   getAllSLAs: async () => {
     try {
-      console.log('Fetching all SLAs');
       const response = await slaApi.get('/all');
       return response;
     } catch (error) {
@@ -184,7 +182,6 @@ const slaService = {
  
   getEmployeeSLAs: async (empId) => {
     try {
-      console.log(`Fetching SLAs for employee ${empId}`);
       const response = await slaApi.get(`/employee/${empId}`);
       return response;
     } catch (error) {
@@ -195,7 +192,6 @@ const slaService = {
  
   getSLAById: async (id) => {
     try {
-      console.log(`Fetching SLA ${id}`);
       return await slaApi.get(`/${id}`);
     } catch (error) {
       console.error('Error fetching SLA:', error);
@@ -205,7 +201,6 @@ const slaService = {
  
   createSLA: async (data) => {
     try {
-      console.log('Creating single SLA');
       const payload = {
         slatype: data.slatype,
         employeeId: data.employeeId,
@@ -231,7 +226,6 @@ const slaService = {
    */
   createBulkSLA: async (slaRequests) => {
     try {
-      console.log(`Creating ${slaRequests.length} SLAs in bulk`);
      
       // Validate input
       if (!Array.isArray(slaRequests) || slaRequests.length === 0) {
@@ -255,18 +249,7 @@ const slaService = {
         creationReason: sla.creationReason || null
       }));
  
-      console.log('Payload structure:', {
-        count: payload.length,
-        sample: payload[0]
-      });
- 
       const response = await slaApi.post('/bulk-create', payload);
- 
-      console.log('Bulk creation result:', {
-        totalRequested: response.data?.totalRequested,
-        successfulInserts: response.data?.successfulInserts,
-        failedInserts: response.data?.failedInserts
-      });
  
       // Log failed records if any
       if (response.data?.failedRecords?.length > 0) {
@@ -286,7 +269,6 @@ const slaService = {
    */
   createBulkSLAForDepartment: async (departmentId, slaConfig) => {
     try {
-      console.log(`Creating bulk SLAs for department ${departmentId}`);
  
       // Step 1: Get all employees in department
       const employeesResponse = await employeeApi.get(`/department/${departmentId}`);
@@ -296,7 +278,6 @@ const slaService = {
       }
  
       const employees = employeesResponse.data;
-      console.log(`Found ${employees.length} employees`);
  
       // Step 2: Create SLA request for each employee
       const slaRequests = employees.map(emp => ({
@@ -323,7 +304,6 @@ const slaService = {
    */
   createBulkSLAForAllEmployees: async (slaConfig) => {
     try {
-      console.log('Creating bulk SLAs for ALL employees');
  
       // Step 1: Get all employees
       const employeesResponse = await employeeApi.get('/all');
@@ -333,7 +313,6 @@ const slaService = {
       }
  
       const employees = employeesResponse.data;
-      console.log(`Found ${employees.length} total employees`);
  
       // Step 2: Create SLA request for each employee
       const slaRequests = employees.map(emp => ({
@@ -356,7 +335,6 @@ const slaService = {
  
   updateSLA: async (id, data) => {
     try {
-      console.log(`Updating SLA ${id}`);
       const payload = {
         slatype: data.slatype,
         assignedToEmployeeId: data.assignedToEmployeeId,
@@ -373,7 +351,6 @@ const slaService = {
  
   deleteSLA: async (id) => {
     try {
-      console.log(`Deleting SLA ${id}`);
       return await slaApi.delete(`/${id}`);
     } catch (error) {
       console.error('Error deleting SLA:', error);
@@ -383,7 +360,6 @@ const slaService = {
  
   closeSLA: async (data) => {
     try {
-      console.log('Closing SLA');
       const payload = {
         slaid: data.slaid,
         closedByEmployeeId: data.closedByEmployeeId,
@@ -398,7 +374,6 @@ const slaService = {
  
   reopenSLA: async (data) => {
     try {
-      console.log('Reopening SLA');
       return await slaApi.put('/reopen', data);
     } catch (error) {
       console.error('Error reopening SLA:', error);
@@ -412,7 +387,6 @@ const slaService = {
  
   submitEscalation: async (data) => {
     try {
-      console.log('L1 Escalation (Employee to Manager)');
       const payload = {
         slaid: data.slaid,
         reason: data.reason,
@@ -430,7 +404,6 @@ const slaService = {
  
   escalateToDeptHead: async (data) => {
     try {
-      console.log('L2 Escalation (Manager to Dept Head)');
       const payload = {
         slaid: data.slaid,
         reason: data.reason,
@@ -448,7 +421,6 @@ const slaService = {
  
   resolveEscalation: async (data) => {
     try {
-      console.log('Resolving escalation');
       const payload = {
         escalationId: data.escalationId,
         resolvedByEmployeeId: data.resolvedByEmployeeId,
@@ -464,7 +436,6 @@ const slaService = {
  
   getSLAEscalations: async (id) => {
     try {
-      console.log(`Fetching escalations for SLA ${id}`);
       return await slaApi.get(`/${id}/escalations`);
     } catch (error) {
       console.error('Error fetching escalations:', error);
@@ -474,7 +445,6 @@ const slaService = {
  
   getSLAHistory: async (id) => {
     try {
-      console.log(`Fetching history for SLA ${id}`);
       return await slaApi.get(`/${id}/history`);
     } catch (error) {
       console.error('Error fetching history:', error);
@@ -488,7 +458,6 @@ const slaService = {
  
   getTeamReviews: async (managerId) => {
     try {
-      console.log(`Fetching team reviews for manager ${managerId}`);
       return await slaApi.get(`/manager/${managerId}/team-reviews`);
     } catch (error) {
       console.error('Error fetching team reviews:', error);
@@ -498,7 +467,6 @@ const slaService = {
  
   getManagerEscalations: async (managerId) => {
     try {
-      console.log(`Fetching escalations for manager ${managerId}`);
       return await slaApi.get(`/manager/${managerId}/escalations`);
     } catch (error) {
       console.error('Error fetching escalations:', error);
@@ -512,7 +480,6 @@ const slaService = {
  
   getDepartmentCompliance: async (deptId, period = null) => {
     try {
-      console.log(`Fetching compliance for department ${deptId}`);
       const params = period ? { period } : {};
       return await slaApi.get(`/compliance/department/${deptId}`, { params });
     } catch (error) {
@@ -523,7 +490,6 @@ const slaService = {
  
   getAllCompliance: async (period = null) => {
     try {
-      console.log('Fetching all compliance');
       const params = period ? { period } : {};
       return await slaApi.get('/compliance/all', { params });
     } catch (error) {
@@ -534,7 +500,6 @@ const slaService = {
  
   calculateCompliance: async (data) => {
     try {
-      console.log('Calculating compliance');
       return await slaApi.post('/compliance/calculate', data);
     } catch (error) {
       console.error('Error calculating compliance:', error);
@@ -548,7 +513,6 @@ const slaService = {
  
   getAllEmployees: async () => {
     try {
-      console.log('Fetching all employees');
       return await employeeApi.get('/all');
     } catch (error) {
       console.error('Error fetching employees:', error);
@@ -558,7 +522,6 @@ const slaService = {
  
   getAllManagers: async () => {
     try {
-      console.log('Fetching all managers');
       return await employeeApi.get('/managers');
     } catch (error) {
       console.error('Error fetching managers:', error);
@@ -568,7 +531,6 @@ const slaService = {
  
   getEmployeeById: async (id) => {
     try {
-      console.log(`Fetching employee ${id}`);
       return await employeeApi.get(`/${id}`);
     } catch (error) {
       console.error('Error fetching employee:', error);
@@ -578,7 +540,6 @@ const slaService = {
  
   searchEmployees: async (query) => {
     try {
-      console.log(`Searching employees: ${query}`);
       return await employeeApi.get('/search', { params: { q: query } });
     } catch (error) {
       console.error('Error searching:', error);
@@ -588,7 +549,6 @@ const slaService = {
  
   getEmployeesByDepartment: async (deptId) => {
     try {
-      console.log(`Fetching employees for department ${deptId}`);
       return await employeeApi.get(`/department/${deptId}`);
     } catch (error) {
       console.error('Error fetching department employees:', error);
@@ -598,7 +558,6 @@ const slaService = {
  
   getEmployeesByRole: async (roleId) => {
     try {
-      console.log(`Fetching employees with role ID: ${roleId}`);
       return await employeeApi.get(`/role/${roleId}`);
     } catch (error) {
       console.error('Error fetching by role:', error);
@@ -608,7 +567,6 @@ const slaService = {
  
   getAllDepartments: async () => {
     try {
-      console.log('Fetching all departments');
       return await employeeApi.get('/departments');
     } catch (error) {
       console.error('Error fetching departments:', error);
@@ -618,7 +576,6 @@ const slaService = {
  
   getDepartmentDetails: async (deptId) => {
     try {
-      console.log(`Fetching department ${deptId} details`);
       return await employeeApi.get(`/departments/${deptId}`);
     } catch (error) {
       console.error('Error fetching department:', error);
@@ -636,14 +593,10 @@ const slaService = {
         console.warn('No departmentId provided');
         return { success: false, data: [], message: 'Department ID required' };
       }
- 
-      console.log(`Fetching department heads for department ${deptId}`);
       const response = await employeeApi.get(`/department-heads/${deptId - 1}`);
  
       if (response?.success && Array.isArray(response.data)) {
-        console.log(`Found ${response.data.length} dept head(s)`);
         response.data.forEach(dh => {
-          console.log(`   -> ${dh.firstName} ${dh.lastName} (${dh.departmentName})`);
         });
         return response;
       }
@@ -662,7 +615,6 @@ const slaService = {
    */
   getAllDepartmentHeads: async () => {
     try {
-      console.log(`Fetching ALL department heads (roleId = ${ROLE_IDS.DEPARTMENT_HEAD})`);
       return await employeeApi.get(`/role/${ROLE_IDS.DEPARTMENT_HEAD}`);
     } catch (error) {
       console.error('Error fetching all dept heads:', error);
@@ -681,7 +633,6 @@ const slaService = {
    */
   getDepartmentHeadForEscalation: async (managerId) => {
     try {
-      console.log(`Step 1: Fetching manager ${managerId} details`);
  
       // Step 1: Get manager details
       const managerResponse = await employeeApi.get(`/${managerId}`);
@@ -693,35 +644,24 @@ const slaService = {
       const manager = managerResponse.data;
       const managerReportsTo = manager.reportsTo || manager.reportingToId;
  
-      console.log(`Manager found:`, {
-        id: managerId,
-        name: `${manager.firstName} ${manager.lastName}`,
-        reportsTo: managerReportsTo
-      });
- 
       if (!managerReportsTo) {
         throw new Error('Manager has no reporting manager for escalation');
       }
  
       // Step 2: Fetch all department heads by ROLE ID
-      console.log(`Step 2: Fetching all department heads (roleId = ${ROLE_IDS.DEPARTMENT_HEAD})`);
       const deptHeadsResponse = await employeeApi.get(`/role/${ROLE_IDS.DEPARTMENT_HEAD}`);
  
       if (!deptHeadsResponse?.success || !Array.isArray(deptHeadsResponse.data)) {
         throw new Error('Failed to fetch department heads');
       }
  
-      console.log(`Found ${deptHeadsResponse.data.length} department heads`);
- 
       // Step 3: Find dept head whose ID matches manager's reportsTo
-      console.log(`Step 3: Validating manager's reporting manager`);
  
       const validDeptHeads = deptHeadsResponse.data.filter(dh => {
         const dhId = dh.employeeId || dh.employeeMasterId;
         const isMatch = dhId === managerReportsTo || dhId?.toString() === managerReportsTo?.toString();
  
         if (isMatch) {
-          console.log(`MATCH: ${dh.firstName} ${dh.lastName} (ID: ${dhId})`);
         }
         return isMatch;
       });
@@ -732,7 +672,6 @@ const slaService = {
         // Fallback: Get direct manager
         const directManager = await employeeApi.get(`/${managerReportsTo}`);
         if (directManager?.success && directManager?.data) {
-          console.log(`Fallback: Using direct manager as escalation target`);
           return {
             success: true,
             data: [directManager.data],
@@ -743,8 +682,6 @@ const slaService = {
  
         throw new Error(`Manager's reporting manager (ID: ${managerReportsTo}) not found`);
       }
- 
-      console.log(`Escalation target verified`);
  
       return {
         success: true,

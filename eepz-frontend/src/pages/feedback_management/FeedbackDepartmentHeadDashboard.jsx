@@ -87,7 +87,6 @@ export default function FeedbackDepartmentHeadDashboard() {
           map[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
         });
         setEmployeeMap(map);
-        console.log("Employee map loaded:", Object.keys(map).length);
         return map;
       }
     } catch (err) {

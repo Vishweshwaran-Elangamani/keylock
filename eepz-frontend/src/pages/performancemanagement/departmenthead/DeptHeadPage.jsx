@@ -134,7 +134,6 @@ export default function DeptHeadPage() {
 
   const handleDownloadAttachment = async (attachmentId) => {
     try {
-      console.log(`Downloading attachment ${attachmentId}`);
 
       const departmentHeadId = getEmployeeIdForFilter();
       const response = await apiPort5113.get(
@@ -142,40 +141,30 @@ export default function DeptHeadPage() {
         { responseType: 'blob' }
       );
 
-      console.log('Full Response:', response);
-      console.log('Response headers object:', response.headers);
-
       let filename = 'attachment';
 
       const contentDisposition = response.headers['content-disposition'];
-      console.log('Content-Disposition header:', contentDisposition);
 
       if (contentDisposition) {
         const matches = contentDisposition.match(/filename\s*=\s*"([^"]+)"/);
         if (matches && matches[1]) {
           filename = matches[1].trim();
-          console.log('✅ Extracted filename from header:', filename);
         } else {
           const matches2 = contentDisposition.match(/filename\s*=\s*([^;,\n]+)/);
           if (matches2 && matches2[1]) {
             filename = matches2[1].trim();
-            console.log('✅ Extracted filename from header (no quotes):', filename);
           }
         }
       }
 
       const contentType = response.headers['content-type'];
-      console.log('Content-Type:', contentType);
 
       if (!filename.includes('.') && contentType) {
         const extension = getExtensionFromContentType(contentType);
         if (extension) {
           filename = `${filename}${extension}`;
-          console.log('Added extension based on content-type:', filename);
         }
       }
-
-      console.log('Final filename for download:', filename);
 
       const blob = new Blob([response.data], { type: contentType || 'application/octet-stream' });
       const url = window.URL.createObjectURL(blob);

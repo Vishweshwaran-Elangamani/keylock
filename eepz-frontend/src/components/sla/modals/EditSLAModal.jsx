@@ -50,8 +50,6 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
         status: status,
         complianceStatus: status === "Closed" ? "OnTime" : sla.complianceStatus,
       };
-
-      console.log("  Updating SLA with:", updateData);
       await onUpdate(sla.slaid, updateData);
     } catch (err) {
       setError(err.message || "Failed to update SLA");

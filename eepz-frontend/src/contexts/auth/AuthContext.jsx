@@ -45,14 +45,6 @@ export const AuthProvider = ({ children }) => {
       userData.roleType || userData.role || userData.userRole
     );
     localStorage.setItem("email", userData.email);
-
-    console.log(" User logged in:");
-    console.log("   UserID:", userData.userId);
-    console.log("   UserName:", userData.userName);
-    console.log(
-      "   UserRole:",
-      userData.roleType || userData.role || userData.userRole
-    );
   };
 
   const logout = async () => {

@@ -490,7 +490,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                   </select>
                   {errors.employmentType && <div style={{ color: "#dc3545", fontSize: 11 }}>{errors.employmentType}</div>}
                 </div>
-                {/* Role - ✅ ADMIN ROLE EXCLUDED */}
+                {/* Role -  ADMIN ROLE EXCLUDED */}
                 <div style={{ flex: 1, minWidth: "47%" }}>
                   <label style={{
                     fontWeight: 600, fontSize: 13, color: "#334155", marginBottom: 2, display: "block"

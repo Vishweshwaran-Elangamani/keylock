@@ -206,8 +206,6 @@ const ManagerDashboard = () => {
       const extractedPendingApprovals = extractData(pendingApprovalsRes);
       const extractedManagerNominations = extractData(managerNominationsRes);
 
-      console.log("MANAGER NOMINATIONS DATA:", extractedManagerNominations);
-
       const extractedTeamMembers = extractData(teamMembersRes);
 
       const extractedTeamAssignments =

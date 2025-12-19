@@ -105,8 +105,6 @@ const NominationReviewModal = ({
         };
       }
 
-      console.log("Submitting review:", payload);
-
       const response = await nominationService.reviewNomination(
         nomination.nominationId,
         payload,

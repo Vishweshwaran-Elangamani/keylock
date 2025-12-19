@@ -74,7 +74,6 @@ export default function ViewMyPeerFeedback() {
             );
 
           setPeerFeedback(myFeedback);
-          console.log("Peer feedback loaded:", myFeedback.length);
         }
       } catch (err) {
         console.warn("Error fetching peer feedback:", err.message);

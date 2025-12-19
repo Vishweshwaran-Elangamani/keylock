@@ -6,7 +6,6 @@ const promotionService = {
   getAllPromotions: async () => {
     try {
       const response = await internalApi.get(`/${API_BASE}/list`);
-      console.log("Get all promotions response:", response.data);
 
       return {
         success: true,
@@ -24,12 +23,10 @@ const promotionService = {
 
   createPromotion: async (promotionData) => {
     try {
-      console.log("Creating promotion with data:", promotionData);
       const response = await internalApi.post(
         `/${API_BASE}/create`,
         promotionData
       );
-      console.log("Create promotion response:", response.data);
 
       return {
         success: true,
@@ -54,7 +51,6 @@ const promotionService = {
       const response = await internalApi.get(
         `/${API_BASE}/pending-hr-approval`
       );
-      console.log("Pending HR approval response:", response.data);
 
       return {
         success: true,
@@ -75,7 +71,6 @@ const promotionService = {
       const response = await internalApi.get(
         `/${API_BASE}/pending-leadership-approval`
       );
-      console.log("Pending leadership approval response:", response.data);
 
       return {
         success: true,
@@ -93,12 +88,10 @@ const promotionService = {
 
   approvePromotion: async (promotionId, approvalData) => {
     try {
-      console.log("Approving promotion:", promotionId, approvalData);
       const response = await internalApi.put(
         `/${API_BASE}/${promotionId}/approve`,
         approvalData
       );
-      console.log("Approve promotion response:", response.data);
 
       return {
         success: true,
@@ -115,11 +108,9 @@ const promotionService = {
 
   rejectPromotion: async (promotionId) => {
     try {
-      console.log("Rejecting promotion:", promotionId);
       const response = await internalApi.put(
         `/${API_BASE}/${promotionId}/reject`
       );
-      console.log("Reject promotion response:", response.data);
 
       return {
         success: true,
@@ -136,12 +127,10 @@ const promotionService = {
 
   leadershipApprove: async (promotionId, approvalData) => {
     try {
-      console.log("Leadership approving promotion:", promotionId, approvalData);
       const response = await internalApi.put(
         `/${API_BASE}/${promotionId}/leadership-approve`,
         approvalData
       );
-      console.log("Leadership approve response:", response.data);
 
       return {
         success: true,
@@ -158,12 +147,10 @@ const promotionService = {
 
   leadershipReject: async (promotionId, rejectData) => {
     try {
-      console.log("Leadership rejecting promotion:", promotionId, rejectData);
       const response = await internalApi.put(
         `/${API_BASE}/${promotionId}/leadership-reject`,
         rejectData
       );
-      console.log("Leadership reject response:", response.data);
 
       return {
         success: true,

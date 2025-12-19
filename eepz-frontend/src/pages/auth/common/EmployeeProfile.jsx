@@ -140,14 +140,10 @@ const EmployeeProfile = () => {
       setCheckingPending(true);
       const response = await ChangeRequestService.hasPendingRequest();
 
-      console.log("Checking pending request:", response);
-
       if (response.success && response.data && response.data.requestId) {
-        console.log("Has pending request:", response.data.requestId);
         setHasPendingRequest(true);
         setPendingRequestId(response.data.requestId);
       } else {
-        console.log("No pending request");
         setHasPendingRequest(false);
         setPendingRequestId(null);
       }
@@ -264,14 +260,12 @@ const EmployeeProfile = () => {
    */
   const handleChangeRequest = async (requestPayload) => {
     try {
-      console.log("Submitting change request:", requestPayload);
 
       toast.loading("Submitting change request...");
 
       const response = await ChangeRequestService.submitChangeRequest(
         requestPayload
       );
-      console.log("Response:", response);
 
       if (response.success) {
         toast.dismiss();
@@ -281,7 +275,6 @@ const EmployeeProfile = () => {
 
         // Update state immediately
         if (response.data && response.data.requestId) {
-          console.log("Setting pending request ID:", response.data.requestId);
           setHasPendingRequest(true);
           setPendingRequestId(response.data.requestId);
         }
@@ -314,10 +307,8 @@ const EmployeeProfile = () => {
    * @param {string} action - Action taken before closing
    */
   const handleModalClose = (action) => {
-    console.log("Modal closing with action:", action);
 
     if (action === "requestCancelled") {
-      console.log("Request cancelled, resetting state");
       setHasPendingRequest(false);
       setPendingRequestId(null);
       toast.success("Request cancelled. You can submit a new one now.");
@@ -851,11 +842,8 @@ const EmployeeProfile = () => {
    */
   updateProfilePhoto: async (formData) => {
     try {
-      console.log("Uploading photo to: /Profile/upload-photo");
 
       const response = await api.put("/Profile/upload-photo", formData);
-
-      console.log("Photo upload successful:", response.data);
 
       return response.data;
     } catch (error) {

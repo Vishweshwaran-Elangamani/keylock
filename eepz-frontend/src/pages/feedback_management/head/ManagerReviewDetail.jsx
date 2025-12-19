@@ -57,7 +57,6 @@ export default function ManagerReviewDetail() {
       const res = await axios.get(`${API_BASE}/ManagerReview/${id}`);
       if (res.data?.success && res.data.data) {
         setReview(res.data.data);
-        console.log(" Review loaded");
       }
     } catch (err) {
       setError("Failed to load review details");

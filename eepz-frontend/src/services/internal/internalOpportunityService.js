@@ -8,8 +8,6 @@ const internalOpportunityService = {
     try {
       const response = await internalApi.get(`/${API_BASE}`);
 
-      console.log("Raw response:", response.data);
-
       return {
         success: true,
         data: response.data,

@@ -4,7 +4,7 @@ export const decodeToken = (token) => {
 
     const parts = token.split('.');
     if (parts.length !== 3) {
-      console.warn('Invalid token format');
+      
       return null;
     }
 
@@ -19,7 +19,7 @@ export const decodeToken = (token) => {
 
     return JSON.parse(jsonPayload);
   } catch (error) {
-    console.error('Error decoding token:', error);
+    
     return null;
   }
 };
@@ -35,7 +35,7 @@ export const getUserIdFromToken = () => {
 
     return claims.sub || claims.UserId || null;
   } catch (error) {
-    console.error('Error getting user ID from token:', error);
+    
     return null;
   }
 };
@@ -57,7 +57,7 @@ export const getCurrentUserData = () => {
       ...user
     };
   } catch (error) {
-    console.error('Error getting current user data:', error);
+    
     return {};
   }
 };
@@ -70,14 +70,14 @@ export const getEmployeeIdForFilter = () => {
     const empId = user.empId || user.employeeId || user.employeeCompanyId;
 
     if (empId) {
-      console.log(' Employee ID for filter:', empId);
+      
       return empId;
     }
 
-    console.warn(' Employee ID not found in user data');
+    
     return null;
   } catch (error) {
-    console.error('Error getting employee ID:', error);
+    
     return null;
   }
 };

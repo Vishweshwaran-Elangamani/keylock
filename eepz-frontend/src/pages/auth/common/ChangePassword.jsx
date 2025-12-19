@@ -51,14 +51,11 @@ const ChangePassword = () => {
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem("accessToken");
-      console.log("Token exists:", !!token);
 
       if (token) {
-        console.log("Token (first 20 chars):", token.substring(0, 20) + "...");
       }
 
       if (user) {
-        console.log("User from context:", user);
       }
     };
 
@@ -180,9 +177,6 @@ const ChangePassword = () => {
     setLoading(true);
 
     try {
-      console.log("Changing password...");
-      console.log("Is First Login:", isFirstLogin);
-      console.log("From Settings:", fromSettings);
 
       toast.loading("Changing password...");
 
@@ -191,8 +185,6 @@ const ChangePassword = () => {
         newPassword: formData.newPassword,
         confirmPassword: formData.confirmPassword,
       });
-
-      console.log("Change Password Response:", response.data);
 
       if (!response.data.success) {
         toast.dismiss();
@@ -203,7 +195,6 @@ const ChangePassword = () => {
       }
 
       if (isFirstLogin) {
-        console.log("First-time user password changed successfully");
 
         localStorage.removeItem("tempUser");
         localStorage.removeItem("firstLoginOtpLockout");
