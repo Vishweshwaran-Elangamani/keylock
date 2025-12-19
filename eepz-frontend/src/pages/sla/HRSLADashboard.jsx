@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Plus,
@@ -14,6 +14,7 @@ import {
   TrendingUp,
   Home,
   X,
+  ChevronDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import slaService from "../../services/sla/slaService";
@@ -34,7 +35,7 @@ const HRSLADashboard = () => {
   const [itemsPerPage] = useState(5);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeSearchTerm, setActiveSearchTerm] = useState(""); //  ADDED
+  const [activeSearchTerm, setActiveSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [typeFilter, setTypeFilter] = useState("All");
   const [complianceFilter, setComplianceFilter] = useState("All");
@@ -47,17 +48,31 @@ const HRSLADashboard = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [slaToDelete, setSlaToDelete] = useState(null);
 
+  // Custom dropdown states
+  const [openDropdown, setOpenDropdown] = useState(null);
+
   useEffect(() => {
     fetchSLAs();
   }, []);
 
   useEffect(() => {
     applyFilters();
-  }, [slas, activeSearchTerm, statusFilter, typeFilter, complianceFilter]); //  CHANGED
+  }, [slas, activeSearchTerm, statusFilter, typeFilter, complianceFilter]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [activeSearchTerm, statusFilter, typeFilter, complianceFilter]); //  CHANGED
+  }, [activeSearchTerm, statusFilter, typeFilter, complianceFilter]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.hr-sla-custom-select')) {
+        setOpenDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const fetchSLAs = async () => {
     setLoading(true);
@@ -81,7 +96,6 @@ const HRSLADashboard = () => {
     }
   };
 
-  //  UPDATED: Use activeSearchTerm
   const applyFilters = () => {
     let filtered = [...slas];
     if (activeSearchTerm) {
@@ -103,7 +117,6 @@ const HRSLADashboard = () => {
     setFilteredSlas(filtered);
   };
 
-  //  ADDED: Search handlers
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
   };
@@ -202,7 +215,7 @@ const HRSLADashboard = () => {
     total: slas.length,
     open: slas.filter((s) => s.status === "Open").length,
     closed: slas.filter((s) => s.status === "Closed").length,
-    onTime: slas.filter((s) => s.complianceStatus === "On Time").length,
+    onTime: slas.filter((s) => s.complianceStatus === "OnTime").length,
   });
 
   const formatDate = (dateString) => {
@@ -221,6 +234,7 @@ const HRSLADashboard = () => {
       case "Closed":
         return "hr-sla-badge-closed";
       case "In Progress":
+      case "InProgress":
         return "hr-sla-badge-progress";
       default:
         return "hr-sla-badge-default";
@@ -240,7 +254,6 @@ const HRSLADashboard = () => {
     }
   };
 
-  //  UPDATED: Clear both search terms
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
@@ -249,6 +262,93 @@ const HRSLADashboard = () => {
     setComplianceFilter("All");
     toast.info("Filters cleared");
   };
+
+  // Custom Select Component
+  const CustomSelect = ({ value, onChange, options, placeholder, name }) => {
+    const selectRef = useRef(null);
+    const dropdownRef = useRef(null);
+    const isOpen = openDropdown === name;
+    const selectedOption = options.find(opt => opt.value === value);
+    const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+
+    useEffect(() => {
+      if (isOpen && selectRef.current) {
+        const rect = selectRef.current.getBoundingClientRect();
+        setDropdownPosition({
+          top: rect.bottom + window.scrollY + 4,
+          left: rect.left + window.scrollX,
+          width: rect.width
+        });
+      }
+    }, [isOpen]);
+
+    return (
+      <div className="hr-sla-custom-select" ref={selectRef}>
+        <button
+          type="button"
+          className={`hr-sla-custom-select-trigger ${selectedOption && selectedOption.value !== 'All' ? 'has-value' : ''}`}
+          onClick={() => setOpenDropdown(isOpen ? null : name)}
+        >
+          <span className="hr-sla-custom-select-value">
+            {selectedOption?.label || placeholder}
+          </span>
+          <ChevronDown
+            size={18}
+            className={`hr-sla-custom-select-icon ${isOpen ? 'open' : ''}`}
+            strokeWidth={2}
+          />
+        </button>
+        {isOpen && (
+          <div
+            ref={dropdownRef}
+            className="hr-sla-custom-select-dropdown"
+            style={{
+              position: 'fixed',
+              top: `${dropdownPosition.top}px`,
+              left: `${dropdownPosition.left}px`,
+              width: `${dropdownPosition.width}px`
+            }}
+          >
+            {options.map((option) => (
+              <div
+                key={option.value}
+                className={`hr-sla-custom-select-option ${value === option.value ? 'selected' : ''
+                  }`}
+                onClick={() => {
+                  onChange(option.value);
+                  setOpenDropdown(null);
+                }}
+              >
+                {option.label}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const statusOptions = [
+    { value: "All", label: "All Status" },
+    { value: "Open", label: "Open" },
+    { value: "Closed", label: "Closed" },
+    { value: "InProgress", label: "In Progress" },
+  ];
+
+  const typeOptions = [
+    { value: "All", label: "All Types" },
+    { value: "Timesheet Approvals", label: "Timesheet Approvals" },
+    { value: "PerformanceForm", label: "Performance Form" },
+    { value: "Review", label: "Review" },
+    { value: "Goal", label: "Goal" },
+  ];
+
+  const complianceOptions = [
+    { value: "All", label: "All Compliance" },
+    { value: "OnTime", label: "On Time" },
+    { value: "Breached", label: "Breached" },
+    { value: "Extended", label: "Extended" },
+  ];
 
   const totalPages = Math.ceil(filteredSlas.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -304,7 +404,7 @@ const HRSLADashboard = () => {
         </div>
       )}
 
-      {/* Stats Cards - Only 4 */}
+      {/* Stats Cards */}
       <div className="row g-3 mb-3">
         {[
           {
@@ -350,20 +450,20 @@ const HRSLADashboard = () => {
         ))}
       </div>
 
-      {/*  UPDATED: Filters with Search Button */}
+      {/* Filters with Custom Dropdowns */}
       <div className="hr-sla-filters-card">
         <div className="row g-3 align-items-center">
           <div className="col-lg-3 col-md-6">
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-              <Search 
-                size={16} 
-                style={{ 
+              <Search
+                size={16}
+                style={{
                   position: 'absolute',
                   left: '0.875rem',
                   color: '#6b7280',
                   pointerEvents: 'none',
                   zIndex: 2
-                }} 
+                }}
               />
               <input
                 type="text"
@@ -372,12 +472,11 @@ const HRSLADashboard = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={handleSearchKeyPress}
-                style={{ 
+                style={{
                   paddingLeft: '2.5rem',
                   paddingRight: activeSearchTerm ? '130px' : '90px'
                 }}
               />
-              {/* Clear Icon */}
               {activeSearchTerm && (
                 <button
                   type="button"
@@ -411,7 +510,6 @@ const HRSLADashboard = () => {
                   <X size={18} style={{ strokeWidth: 2.5 }} />
                 </button>
               )}
-              {/* Search Button */}
               <button
                 type="button"
                 onClick={handleSearch}
@@ -448,41 +546,31 @@ const HRSLADashboard = () => {
             </div>
           </div>
           <div className="col-lg-2 col-md-6">
-            <select
-              className="form-select hr-sla-select"
+            <CustomSelect
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-            >
-              <option value="All">All Status</option>
-              <option value="Open">Open</option>
-              <option value="Closed">Closed</option>
-              <option value="InProgress">In Progress</option>
-            </select>
+              onChange={setStatusFilter}
+              options={statusOptions}
+              placeholder="All Status"
+              name="status"
+            />
           </div>
           <div className="col-lg-2 col-md-6">
-            <select
-              className="form-select hr-sla-select"
+            <CustomSelect
               value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value)}
-            >
-              <option value="All">All Types</option>
-              <option value="Timesheet Approvals">Timesheet Approvals</option>
-              <option value="PerformanceForm">Performance Form</option>
-              <option value="Review">Review</option>
-              <option value="Goal">Goal</option>
-            </select>
+              onChange={setTypeFilter}
+              options={typeOptions}
+              placeholder="All Types"
+              name="type"
+            />
           </div>
           <div className="col-lg-2 col-md-6">
-            <select
-              className="form-select hr-sla-select"
+            <CustomSelect
               value={complianceFilter}
-              onChange={(e) => setComplianceFilter(e.target.value)}
-            >
-              <option value="All">All Compliance</option>
-              <option value="OnTime">On Time</option>
-              <option value="Breached">Breached</option>
-              <option value="Extended">Extended</option>
-            </select>
+              onChange={setComplianceFilter}
+              options={complianceOptions}
+              placeholder="All Compliance"
+              name="compliance"
+            />
           </div>
           <div className="col-lg-3 col-md-12">
             <div className="hr-sla-filter-actions">
@@ -499,7 +587,7 @@ const HRSLADashboard = () => {
         </div>
       </div>
 
-      {/* Empty State - Outside Table */}
+      {/* Empty State or Table */}
       {currentSLAs.length === 0 ? (
         <div className="hr-sla-empty-state-wrapper">
           <div className="hr-sla-empty-state">
@@ -517,7 +605,6 @@ const HRSLADashboard = () => {
           </div>
         </div>
       ) : (
-        /* SLA Table */
         <div className="hr-sla-table-wrapper">
           <div className="table-responsive">
             <table className="table table-hover mb-0 hr-sla-table">
@@ -534,8 +621,8 @@ const HRSLADashboard = () => {
               </thead>
               <tbody>
                 {currentSLAs.map((sla) => (
-                  <tr 
-                    key={sla.slaid} 
+                  <tr
+                    key={sla.slaid}
                     onClick={() => handleRowClick(sla.slaid)}
                     className="hr-sla-clickable-row"
                   >

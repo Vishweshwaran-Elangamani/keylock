@@ -1,7 +1,7 @@
 // src/pages/ProjectManagement/ProjectList.jsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FolderKanban, Plus, Edit, Trash2, UserCog, Users, Search, Filter, Calendar, Building, Briefcase, AlertCircle, ChevronLeft, ChevronRight, Home, X, ChevronDown } from 'lucide-react';
+import { FolderKanban, Plus, Edit, Trash2, UserCog, Users, Search, Filter, Calendar, Building, Briefcase, AlertCircle, ChevronLeft, ChevronRight, Home, X } from 'lucide-react';
 import { toast } from 'sonner';
 import projectService from '../../services/project_management/projectService';
 import '../../styles/projectmanagement/ProjectList.css'
@@ -11,61 +11,6 @@ import EditProjectModal from '../../components/project_management_components/mod
 import ManagerSelectionModal from '../../components/project_management_components/modals/ManagerSelectionModal'
 import EmployeeMappingModal from '../../components/project_management_components/modals/EmployeeMappingModal'
 import DeleteConfirmationModal from '../../components/project_management_components/modals/DeleteConfirmationModal'
-
-// Custom Status Dropdown Component
-const CustomStatusDropdown = ({ value, onChange }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
-
-  const statusOptions = [
-    "All Status",
-    "Active",
-    "On Hold",
-    "Completed",
-    "Cancelled"
-  ];
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const handleSelect = (option) => {
-    onChange(option);
-    setIsOpen(false);
-  };
-
-  return (
-    <div className="prj-list-dropdown-wrapper" ref={dropdownRef}>
-      <div
-        className={`prj-list-dropdown-select ${isOpen ? "open" : ""}`}
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <span className="prj-list-dropdown-value">{value}</span>
-        <ChevronDown size={18} className={`prj-list-dropdown-arrow ${isOpen ? "rotate" : ""}`} />
-      </div>
-      {isOpen && (
-        <ul className="prj-list-dropdown-list">
-          {statusOptions.map((option, idx) => (
-            <li
-              key={idx}
-              className={`prj-list-dropdown-option ${value === option ? "selected" : ""}`}
-              onClick={() => handleSelect(option)}
-            >
-              {option}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-};
 
 const ProjectList = () => {
   const navigate = useNavigate();
@@ -77,11 +22,11 @@ const ProjectList = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeSearchTerm, setActiveSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('All Status');
+  const [filterStatus, setFilterStatus] = useState('All');
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
   // Data
   const [allEmployees, setAllEmployees] = useState([]);
@@ -197,7 +142,7 @@ const ProjectList = () => {
       );
     }
 
-    if (filterStatus !== 'All Status') {
+    if (filterStatus !== 'All') {
       filtered = filtered.filter(project => project.status === filterStatus);
     }
 
@@ -788,13 +733,73 @@ const ProjectList = () => {
               Search
             </button>
           </div>
-          <div className="prj-list-status-filter-wrapper">
-            <Filter size={18} className="prj-list-filter-icon" />
-            <CustomStatusDropdown 
-              value={filterStatus}
-              onChange={setFilterStatus}
-            />
-          </div>
+          
+         <div className="prj-list-status-filter-wrapper">
+  <Filter size={18} className="prj-list-filter-icon" />
+  <div className="prj-list-custom-dropdown">
+    <div 
+      className="prj-list-custom-dropdown-selected"
+      onClick={() => {
+        const dropdown = document.querySelector('.prj-list-custom-dropdown');
+        dropdown.classList.toggle('prj-list-dropdown-open');
+      }}
+    >
+      <span>{filterStatus === "All" ? "All Departments" : filterStatus}</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 16 16" className="prj-list-dropdown-arrow">
+        <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2 5l6 6 6-6"/>
+      </svg>
+    </div>
+    <div className="prj-list-custom-dropdown-options">
+      <div 
+        className={`prj-list-custom-option ${filterStatus === "All" ? "prj-list-option-selected" : ""}`}
+        onClick={() => {
+          setFilterStatus("All");
+          document.querySelector('.prj-list-custom-dropdown').classList.remove('prj-list-dropdown-open');
+        }}
+      >
+        All Departments
+      </div>
+      <div 
+        className={`prj-list-custom-option ${filterStatus === "Active" ? "prj-list-option-selected" : ""}`}
+        onClick={() => {
+          setFilterStatus("Active");
+          document.querySelector('.prj-list-custom-dropdown').classList.remove('prj-list-dropdown-open');
+        }}
+      >
+        Active
+      </div>
+      <div 
+        className={`prj-list-custom-option ${filterStatus === "On Hold" ? "prj-list-option-selected" : ""}`}
+        onClick={() => {
+          setFilterStatus("On Hold");
+          document.querySelector('.prj-list-custom-dropdown').classList.remove('prj-list-dropdown-open');
+        }}
+      >
+        On Hold
+      </div>
+      <div 
+        className={`prj-list-custom-option ${filterStatus === "Completed" ? "prj-list-option-selected" : ""}`}
+        onClick={() => {
+          setFilterStatus("Completed");
+          document.querySelector('.prj-list-custom-dropdown').classList.remove('prj-list-dropdown-open');
+        }}
+      >
+        Completed
+      </div>
+      <div 
+        className={`prj-list-custom-option ${filterStatus === "Cancelled" ? "prj-list-option-selected" : ""}`}
+        onClick={() => {
+          setFilterStatus("Cancelled");
+          document.querySelector('.prj-list-custom-dropdown').classList.remove('prj-list-dropdown-open');
+        }}
+      >
+        Cancelled
+      </div>
+    </div>
+  </div>
+</div>
+
+          
           <div className="prj-list-actions-group">
             <button 
               className="prj-list-btn prj-list-btn-resource" 
@@ -838,179 +843,193 @@ const ProjectList = () => {
         </div>
       )}
 
-      {/* Projects Table */}
+      {/* Projects Table WITH PAGINATION INSIDE */}
       {!isLoading && !error && (
-        <>
-          <div className="card border-0 shadow-sm flex-grow-1 prj-list-table-card">
-            <div className="card-body p-0">
-              <div className="table-responsive">
-                <table className="table table-hover mb-0 prj-list-table">
-                  <thead className="prj-list-table-header">
+       
+          <div className="card-body p-0">
+            <div className="table-responsive">
+              <table className="table table-hover mb-0 prj-list-table">
+                <thead className="prj-list-table-header">
+                  <tr>
+                    <th>Project Name</th>
+                    <th>Status</th>
+                    <th>Business Unit</th>
+                    <th>Department</th>
+                    <th>Start Date</th>
+                    <th>Resource Owner</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginatedProjects.length === 0 ? (
                     <tr>
-                      <th className="px-4 py-3">Project Name</th>
-                      <th className="py-3">Status</th>
-                      <th className="py-3">Business Unit</th>
-                      <th className="py-3">Department</th>
-                      <th className="py-3">Start Date</th>
-                      <th className="py-3">Resource Owner</th>
-                      <th className="py-3 text-center">Actions</th>
+                      <td colSpan="7" className="text-center py-5">
+                        <div className="text-muted">
+                          <FolderKanban size={64} className="mb-3 opacity-25" />
+                          <p className="mb-0 fs-5">No projects found</p>
+                          <p className="small">Try adjusting your search or filters</p>
+                        </div>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {paginatedProjects.length === 0 ? (
-                      <tr>
-                        <td colSpan="7" className="text-center py-5">
-                          <div className="text-muted">
-                            <FolderKanban size={64} className="mb-3 opacity-25" />
-                            <p className="mb-0 fs-5">No projects found</p>
-                            <p className="small">Try adjusting your search or filters</p>
+                  ) : (
+                    paginatedProjects.map((project) => (
+                      <tr key={project.projectId}>
+                        <td>
+                          <div>
+                            <div 
+                              className="prj-list-project-name" 
+                              onClick={() => handleViewClick(project.projectId)}
+                            >
+                              {project.projectName}
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <span className={`prj-list-badge prj-list-badge-${project.status.toLowerCase().replace(' ', '-')}`}>
+                            {project.status}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="d-flex align-items-center gap-2">
+                            <div className="prj-list-icon-wrapper prj-list-icon-business">
+                              <Building size={16} className="prj-list-icon-filled" />
+                            </div>
+                            <span>{project.businessUnit || 'N/A'}</span>
+                          </div>
+                        </td>
+                        <td>
+                          <div className="d-flex align-items-center gap-2">
+                            <div className="prj-list-icon-wrapper prj-list-icon-department">
+                              <Briefcase size={16} className="prj-list-icon-filled" />
+                            </div>
+                            <span>{project.department || 'N/A'}</span>
+                          </div>
+                        </td>
+                        <td>
+                          <div className="d-flex align-items-center gap-2">
+                            <div className="prj-list-icon-wrapper prj-list-icon-calendar">
+                              <Calendar size={16} className="prj-list-icon-filled" />
+                            </div>
+                            <span>{formatDate(project.startDate)}</span>
+                          </div>
+                        </td>
+                        <td>
+                          {project.resourceOwner ? (
+                            <div className="prj-list-resource-owner">
+                              <div className="prj-list-owner-name">
+                                {project.resourceOwner.firstName} {project.resourceOwner.lastName}
+                              </div>
+                              <small className="prj-list-owner-role">{project.resourceOwner.roleName}</small>
+                            </div>
+                          ) : (
+                            <span className="prj-list-not-assigned">Not Assigned</span>
+                          )}
+                        </td>
+                        <td>
+                          <div className="d-flex gap-2 justify-content-center">
+                            <button 
+                              className="prj-list-action-btn prj-list-btn-edit" 
+                              onClick={() => handleEditClick(project)} 
+                              title="Edit Project"
+                            >
+                              <Edit size={14} />
+                            </button>
+                            <button 
+                              className="prj-list-action-btn prj-list-btn-manager" 
+                              onClick={() => handleManagerClick(project)} 
+                              title="Edit Managers"
+                            >
+                              <UserCog size={14} />
+                            </button>
+                            <button 
+                              className="prj-list-action-btn prj-list-btn-employee" 
+                              onClick={() => handleEmployeeClick(project)} 
+                              title="Map/Unmap Employees"
+                            >
+                              <Users size={14} />
+                            </button>
+                            <button 
+                              className="prj-list-action-btn prj-list-btn-delete" 
+                              onClick={() => handleDeleteClick(project)} 
+                              title="Delete Project"
+                            >
+                              <Trash2 size={14} />
+                            </button>
                           </div>
                         </td>
                       </tr>
-                    ) : (
-                      paginatedProjects.map((project) => (
-                        <tr key={project.projectId}>
-                          <td className="px-4 py-3">
-                            <div>
-                              <div 
-                                className="prj-list-project-name" 
-                                onClick={() => handleViewClick(project.projectId)}
-                              >
-                                {project.projectName}
-                              </div>
-                            </div>
-                          </td>
-                          <td className="py-3">
-                            <span className={`prj-list-badge prj-list-badge-${project.status.toLowerCase().replace(' ', '-')}`}>
-                              {project.status}
-                            </span>
-                          </td>
-                          <td className="py-3">
-                            <div className="d-flex align-items-center gap-2">
-                              <div className="prj-list-icon-wrapper prj-list-icon-business">
-                                <Building size={16} className="prj-list-icon-filled" />
-                              </div>
-                              <span>{project.businessUnit || 'N/A'}</span>
-                            </div>
-                          </td>
-                          <td className="py-3">
-                            <div className="d-flex align-items-center gap-2">
-                              <div className="prj-list-icon-wrapper prj-list-icon-department">
-                                <Briefcase size={16} className="prj-list-icon-filled" />
-                              </div>
-                              <span>{project.department || 'N/A'}</span>
-                            </div>
-                          </td>
-                          <td className="py-3">
-                            <div className="d-flex align-items-center gap-2">
-                              <div className="prj-list-icon-wrapper prj-list-icon-calendar">
-                                <Calendar size={16} className="prj-list-icon-filled" />
-                              </div>
-                              <span>{formatDate(project.startDate)}</span>
-                            </div>
-                          </td>
-                          <td className="py-3">
-                            {project.resourceOwner ? (
-                              <div className="prj-list-resource-owner">
-                                <div className="prj-list-owner-name">
-                                  {project.resourceOwner.firstName} {project.resourceOwner.lastName}
-                                </div>
-                                <small className="prj-list-owner-role">{project.resourceOwner.roleName}</small>
-                              </div>
-                            ) : (
-                              <span className="prj-list-not-assigned">Not Assigned</span>
-                            )}
-                          </td>
-                          <td className="py-3">
-                            <div className="d-flex gap-2 justify-content-center">
-                              <button 
-                                className="prj-list-action-btn prj-list-btn-edit" 
-                                onClick={() => handleEditClick(project)} 
-                                title="Edit Project"
-                              >
-                                <Edit size={14} />
-                              </button>
-                              <button 
-                                className="prj-list-action-btn prj-list-btn-manager" 
-                                onClick={() => handleManagerClick(project)} 
-                                title="Edit Managers"
-                              >
-                                <UserCog size={14} />
-                              </button>
-                              <button 
-                                className="prj-list-action-btn prj-list-btn-employee" 
-                                onClick={() => handleEmployeeClick(project)} 
-                                title="Map/Unmap Employees"
-                              >
-                                <Users size={14} />
-                              </button>
-                              <button 
-                                className="prj-list-action-btn prj-list-btn-delete" 
-                                onClick={() => handleDeleteClick(project)} 
-                                title="Delete Project"
-                              >
-                                <Trash2 size={14} />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
-          </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="card border-0 shadow-sm mt-3">
-              <div className="card-body">
-                <div className="d-flex justify-content-between align-items-center">
-                  <div className="text-muted small">
+            {/* PAGINATION INSIDE TABLE CARD */}
+            {totalPages > 0 && (
+              <div className="prj-list-pagination-footer">
+                {/* Left Section - Show X entries */}
+                <div className="prj-list-pagination-left">
+                  <span className="prj-list-pagination-text">Show</span>
+                  <select 
+                    className="prj-list-pagination-dropdown"
+                    value={itemsPerPage}
+                    onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                  >
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                  </select>
+                  <span className="prj-list-pagination-text">entries</span>
+                </div>
+
+                {/* Center Section - Showing X to Y of Z entries */}
+                <div className="prj-list-pagination-center">
+                  <span className="prj-list-pagination-status">
                     Showing {startIndex + 1} to {Math.min(endIndex, filteredProjects.length)} of {filteredProjects.length} entries
-                  </div>
-                  <nav>
-                    <ul className="pagination mb-0">
-                      <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                        <button 
-                          className="page-link" 
-                          onClick={() => setCurrentPage(currentPage - 1)} 
-                          disabled={currentPage === 1}
-                        >
-                          <ChevronLeft size={16} />
-                        </button>
-                      </li>
-                      {getPageNumbers().map((page, index) => (
-                        page === '...' ? (
-                          <li key={`ellipsis-${index}`} className="page-item disabled">
-                            <span className="page-link">...</span>
-                          </li>
-                        ) : (
-                          <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
-                            <button className="page-link" onClick={() => goToPage(page)}>
-                              {page}
-                            </button>
-                          </li>
-                        )
-                      ))}
-                      <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                        <button 
-                          className="page-link" 
-                          onClick={() => setCurrentPage(currentPage + 1)} 
-                          disabled={currentPage === totalPages}
-                        >
-                          <ChevronRight size={16} />
-                        </button>
-                      </li>
-                    </ul>
-                  </nav>
-                  <div className="text-muted small">Page {currentPage} of {totalPages}</div>
+                  </span>
+                </div>
+
+                {/* Right Section - Page Numbers */}
+                <div className="prj-list-pagination-right">
+                  <ul className="prj-list-pagination-list">
+                    <li className={`prj-list-page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                      <button 
+                        className="prj-list-page-link prj-list-page-arrow" 
+                        onClick={() => goToPage(currentPage - 1)} 
+                        disabled={currentPage === 1}
+                      >
+                        <ChevronLeft size={16} />
+                      </button>
+                    </li>
+                    {getPageNumbers().map((page, index) => (
+                      page === '...' ? (
+                        <li key={`ellipsis-${index}`} className="prj-list-page-ellipsis">
+                          <span className="prj-list-page-dots">...</span>
+                        </li>
+                      ) : (
+                        <li key={page} className={`prj-list-page-item ${currentPage === page ? 'active' : ''}`}>
+                          <button className="prj-list-page-link" onClick={() => goToPage(page)}>
+                            {page}
+                          </button>
+                        </li>
+                      )
+                    ))}
+                    <li className={`prj-list-page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                      <button 
+                        className="prj-list-page-link prj-list-page-arrow" 
+                        onClick={() => goToPage(currentPage + 1)} 
+                        disabled={currentPage === totalPages}
+                      >
+                        <ChevronRight size={16} />
+                      </button>
+                    </li>
+                  </ul>
                 </div>
               </div>
-            </div>
-          )}
-        </>
+            )}
+          </div>
+        
       )}
 
       {/* Modals */}

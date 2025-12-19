@@ -1,5 +1,5 @@
 /* ========================================
-   PROJECT LIST - WITH BREADCRUMBS
+   PROJECT LIST - COMPLETE STYLES
    ======================================== */
 
 /* Wrapper */
@@ -8,11 +8,12 @@
 }
 
 /* ========================================
-   BREADCRUMBS - KEPT
+   BREADCRUMBS
    ======================================== */
 
 .prj-list-breadcrumb {
   font-size: 0.875rem !important;
+  background-color: #f8f9fa !important;
 }
 
 .prj-list-breadcrumb-link {
@@ -35,7 +36,7 @@
 }
 
 /* ========================================
-   COMPACT FILTER BAR - NO GAPS
+   COMPACT FILTER BAR
    ======================================== */
 
 .prj-list-filter-bar {
@@ -58,7 +59,6 @@
    SEARCH INPUT WITH INTEGRATED BUTTONS
    ======================================== */
 
-/* Search Input Wrapper - FLEXIBLE WIDTH */
 .prj-list-search-wrapper {
   position: relative !important;
   display: flex !important;
@@ -93,12 +93,10 @@
   box-shadow: 0 0 0 0.2rem rgba(15, 98, 254, 0.1) !important;
 }
 
-/* Adjust input padding when clear button is visible */
 .prj-list-search-wrapper:has(.prj-list-clear-btn) .prj-list-search-input {
   padding-right: 135px !important;
 }
 
-/* Clear Button - ICON ONLY WITH BETTER SPACING */
 .prj-list-clear-btn {
   position: absolute !important;
   right: 95px !important;
@@ -124,17 +122,12 @@
   transform: translateY(-50%) scale(1.2) !important;
 }
 
-.prj-list-clear-btn:active {
-  transform: translateY(-50%) scale(0.95) !important;
-}
-
 .prj-list-clear-btn svg {
   width: 18px !important;
   height: 18px !important;
   stroke-width: 2.5 !important;
 }
 
-/* Search Button - Integrated into Input */
 .prj-list-search-btn {
   position: absolute !important;
   right: 4px !important;
@@ -163,17 +156,13 @@
   box-shadow: 0 2px 8px rgba(90, 84, 134, 0.3) !important;
 }
 
-.prj-list-search-btn:active {
-  transform: translateY(-50%) scale(0.98) !important;
-}
-
 .prj-list-search-btn svg {
   width: 16px !important;
   height: 16px !important;
 }
 
 /* ========================================
-   STATUS FILTER - CUSTOM DROPDOWN
+   CUSTOM DROPDOWN - MATCHING IMAGE
    ======================================== */
 
 .prj-list-status-filter-wrapper {
@@ -181,163 +170,115 @@
   display: flex !important;
   align-items: center !important;
   flex-shrink: 0 !important;
-  min-width: 170px !important;
+  min-width: 200px !important;
 }
 
 .prj-list-filter-icon {
   position: absolute !important;
   left: 0.875rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
   color: #6c757d !important;
   pointer-events: none !important;
   z-index: 3 !important;
 }
 
-.prj-list-dropdown-wrapper {
+.prj-list-custom-dropdown {
   position: relative !important;
   width: 100% !important;
 }
 
-.prj-list-dropdown-select {
+.prj-list-custom-dropdown-selected {
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  width: 100% !important;
-  padding: 0.625rem 2.5rem 0.625rem 2.5rem !important;
-  font-size: 0.875rem !important;
-  background: #FFFFFF !important;
+  padding: 0.625rem 2.5rem 0.625rem 2.75rem !important;
   border: 1px solid #dee2e6 !important;
   border-radius: 8px !important;
+  background-color: #FFFFFF !important;
+  font-size: 0.875rem !important;
+  color: #212529 !important;
   cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  outline: none !important;
+  transition: all 0.2s !important;
   user-select: none !important;
 }
 
-.prj-list-dropdown-select:hover {
-  border-color: #dee2e6 !important;
-  cursor: pointer !important;
+.prj-list-custom-dropdown-selected:hover {
+  border-color: #0F62FE !important;
 }
 
-.prj-list-dropdown-select.open {
-  border-color: #27235C !important;
-  border-bottom-left-radius: 0 !important;
-  border-bottom-right-radius: 0 !important;
-  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1) !important;
-  cursor: pointer !important;
-}
-
-.prj-list-dropdown-value {
-  flex: 1 !important;
-  text-align: left !important;
-  color: #393939 !important;
-  font-weight: 400 !important;
-  background: transparent !important;
-  cursor: pointer !important;
+.prj-list-dropdown-open .prj-list-custom-dropdown-selected {
+  border-color: #0F62FE !important;
+  box-shadow: 0 0 0 0.2rem rgba(15, 98, 254, 0.1) !important;
 }
 
 .prj-list-dropdown-arrow {
+  transition: transform 0.2s !important;
   color: #6c757d !important;
-  transition: all 0.2s ease !important;
-  flex-shrink: 0 !important;
-  margin-left: 0.5rem !important;
-  cursor: pointer !important;
 }
 
-.prj-list-dropdown-select:hover .prj-list-dropdown-arrow {
-  color: #27235C !important;
-  cursor: pointer !important;
-}
-
-.prj-list-dropdown-arrow.rotate {
+.prj-list-dropdown-open .prj-list-dropdown-arrow {
   transform: rotate(180deg) !important;
-  color: #27235C !important;
-  cursor: pointer !important;
 }
 
-.prj-list-dropdown-list {
+.prj-list-custom-dropdown-options {
   position: absolute !important;
-  top: 100% !important;
+  top: calc(100% + 4px) !important;
   left: 0 !important;
   right: 0 !important;
   background: #FFFFFF !important;
-  border: 1px solid #27235C !important;
-  border-top: none !important;
-  border-radius: 0 0 8px 8px !important;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
-  max-height: 240px !important;
-  overflow-y: auto !important;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  transition: all 0.3s ease !important;
   z-index: 1000 !important;
-  list-style: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  animation: prjListDropdownFade 0.2s ease !important;
 }
 
-@keyframes prjListDropdownFade {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.prj-list-dropdown-open .prj-list-custom-dropdown-options {
+  max-height: 300px !important;
+  opacity: 1 !important;
+  overflow-y: auto !important;
 }
 
-.prj-list-dropdown-list::-webkit-scrollbar {
-  width: 8px !important;
-}
-
-.prj-list-dropdown-list::-webkit-scrollbar-track {
-  background: #f5f5f5 !important;
-}
-
-.prj-list-dropdown-list::-webkit-scrollbar-thumb {
-  background: #E9E9EF !important;
-  border-radius: 4px !important;
-}
-
-.prj-list-dropdown-list::-webkit-scrollbar-thumb:hover {
-  background: #8D8D8D !important;
-}
-
-.prj-list-dropdown-option {
-  padding: 0.875rem 1rem !important;
+.prj-list-custom-option {
+  padding: 0.625rem 0.875rem !important;
   font-size: 0.875rem !important;
-  color: #393939 !important;
+  color: #212529 !important;
   cursor: pointer !important;
-  transition: all 0.15s ease !important;
-  border-bottom: 1px solid #E9E9EF !important;
-  background: #FFFFFF !important;
+  transition: all 0.2s !important;
+  user-select: none !important;
 }
 
-.prj-list-dropdown-option:last-child {
-  border-bottom: none !important;
-  border-radius: 0 0 7px 7px !important;
-}
-
-.prj-list-dropdown-option:hover {
-  background: #27235C !important;
+.prj-list-custom-option:hover {
+  background-color: #3c3862 !important;
   color: #FFFFFF !important;
 }
 
-.prj-list-dropdown-option.selected {
-  background: #27235C !important;
+.prj-list-custom-option.prj-list-option-selected {
+  background-color: #3c3862 !important;
   color: #FFFFFF !important;
   font-weight: 600 !important;
 }
 
-.prj-list-dropdown-option.selected:hover {
-  background: #27235C !important;
+.prj-list-custom-option.prj-list-option-selected:hover {
+  background-color: #3c3862 !important;
   color: #FFFFFF !important;
 }
 
-/* Remove the old native select styles */
-.prj-list-status-select {
-  display: none !important;
+.prj-list-custom-option:first-child {
+  border-top-left-radius: 8px !important;
+  border-top-right-radius: 8px !important;
 }
 
-/* Action Buttons Group - NO LEFT MARGIN AUTO */
+.prj-list-custom-option:last-child {
+  border-bottom-left-radius: 8px !important;
+  border-bottom-right-radius: 8px !important;
+}
+
+/* Action Buttons */
 .prj-list-actions-group {
   display: flex !important;
   gap: 0.75rem !important;
@@ -350,7 +291,7 @@
   align-items: center !important;
   gap: 0.5rem !important;
   padding: 0.625rem 1.25rem !important;
-  font-size: 0.9rem !important;
+  font-size: 0.875rem !important;
   font-weight: 600 !important;
   border-radius: 8px !important;
   border: none !important;
@@ -365,10 +306,9 @@
 }
 
 .prj-list-btn-resource:hover {
-  background: #FFFFFF !important;
-  color: #25235c !important;
+  background: #1a1840 !important;
   transform: translateY(-1px) !important;
-  border: 1px solid #27235C !important;
+  box-shadow: 0 4px 12px rgba(37, 35, 92, 0.3) !important;
 }
 
 .prj-list-btn-create {
@@ -382,47 +322,50 @@
 }
 
 /* ========================================
-   TABLE STYLES
+   TABLE WRAPPER - WITH ROUNDED BORDER
    ======================================== */
 
-/* Table Card - Rounded Borders */
-.prj-list-table-card {
+.prj-list-table-wrapper {
   border-radius: 12px !important;
   overflow: hidden !important;
   border: 1px solid #dee2e6 !important;
+  background: #FFFFFF !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* Table Styling */
+/* ========================================
+   TABLE STYLES - WITH ROUNDED CORNERS
+   ======================================== */
+
 .prj-list-table {
   margin-bottom: 0 !important;
   border-collapse: separate !important;
   border-spacing: 0 !important;
+  width: 100% !important;
+  border: none !important;
+  background: #FFFFFF !important;
 }
 
-/* Table Header - Purple Background with Rounded Top */
 .prj-list-table-header {
-  background-color: #4A4669 !important;
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 10 !important;
+  background-color: #3c3862 !important;
 }
 
 .prj-list-table-header th {
-  background-color: #25235c !important;
+  background-color: #3c3862 !important;
   color: #ffffff !important;
   border: none !important;
-  font-weight: 600 !important;
-  font-size: 0.9rem !important;
-  padding: 14px 16px !important;
+  font-weight: 700 !important;
+  font-size: 0.75rem !important;
+  padding: 16px !important;
   vertical-align: middle !important;
   text-align: left !important;
   white-space: nowrap !important;
   text-transform: uppercase !important;
-  letter-spacing: normal !important;
+  letter-spacing: 0.5px !important;
 }
 
-/* Rounded corners for first and last header cells */
 .prj-list-table-header th:first-child {
+  padding-left: 24px !important;
   border-top-left-radius: 12px !important;
 }
 
@@ -430,27 +373,29 @@
   border-top-right-radius: 12px !important;
 }
 
-/* Center align specific header columns */
-.prj-list-table-header th:nth-child(2) {
-  text-align: center !important;
-}
-
+.prj-list-table-header th:nth-child(2),
 .prj-list-table-header th:last-child {
   text-align: center !important;
 }
 
-/* Table Body Styling */
 .prj-list-table tbody td {
   vertical-align: middle !important;
-  padding: 14px 16px !important;
-  border-top: 1px solid #dee2e6 !important;
-  border-bottom: 1px solid #dee2e6 !important;
+  padding: 16px !important;
+  border-bottom: 1px solid #e5e7eb !important;
   text-align: left !important;
-  font-size: 0.9rem !important;
+  font-size: 0.875rem !important;
   color: #212529 !important;
+  background-color: #FFFFFF !important;
 }
 
-/* Rounded corners for last row */
+.prj-list-table tbody td:first-child {
+  padding-left: 24px !important;
+}
+
+.prj-list-table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
 .prj-list-table tbody tr:last-child td:first-child {
   border-bottom-left-radius: 12px !important;
 }
@@ -459,13 +404,16 @@
   border-bottom-right-radius: 12px !important;
 }
 
-/* Row Hover Effect */
-.prj-list-table tbody tr:hover {
-  background-color: #f8f9fa !important;
-  transition: background-color 0.2s ease !important;
+.prj-list-table tbody tr:hover td {
+  background-color: #f8f9fb !important;
 }
 
-/* Project Name Styling */
+.prj-list-table tbody td:nth-child(2),
+.prj-list-table tbody td:last-child {
+  text-align: center !important;
+}
+
+/* Project Name */
 .prj-list-project-name {
   font-weight: 600 !important;
   color: #27235C !important;
@@ -479,55 +427,43 @@
   text-decoration: underline !important;
 }
 
-.prj-list-engagement-type {
-  color: #6c757d !important;
-  font-size: 0.8rem !important;
-  font-style: italic !important;
-}
-
-/* Status Badges - Normal Case */
+/* Status Badges */
 .prj-list-badge {
   display: inline-block !important;
-  padding: 0.375rem 0.75rem !important;
-  border-radius: 6px !important;
+  padding: 0.375rem 0.875rem !important;
+  border-radius: 20px !important;
   font-size: 0.75rem !important;
   font-weight: 600 !important;
-  text-transform: none !important;
-  letter-spacing: normal !important;
+  text-transform: capitalize !important;
 }
 
 .prj-list-badge-active {
   background-color: #d1e7dd !important;
   color: #0f5132 !important;
-  border: 1px solid #badbcc !important;
 }
 
 .prj-list-badge-on-hold {
   background-color: #fff3cd !important;
   color: #856404 !important;
-  border: 1px solid #ffeaa7 !important;
 }
 
 .prj-list-badge-completed {
   background-color: #cfe2ff !important;
   color: #084298 !important;
-  border: 1px solid #b6d4fe !important;
 }
 
 .prj-list-badge-cancelled {
   background-color: #f8d7da !important;
   color: #842029 !important;
-  border: 1px solid #f5c2c7 !important;
 }
 
-/* Icon Wrappers - Filled Style */
+/* Icons */
 .prj-list-icon-wrapper {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  width: 28px !important;
-  height: 28px !important;
-  border-radius: 6px !important;
+  width: 24px !important;
+  height: 24px !important;
   flex-shrink: 0 !important;
 }
 
@@ -543,7 +479,7 @@
   color: #16A34A !important;
 }
 
-/* Resource Owner Styling */
+/* Resource Owner */
 .prj-list-resource-owner {
   display: flex !important;
   flex-direction: column !important;
@@ -552,110 +488,241 @@
 .prj-list-owner-name {
   font-weight: 600 !important;
   color: #212529 !important;
-  font-size: 0.9rem !important;
+  font-size: 0.875rem !important;
 }
 
 .prj-list-owner-role {
   color: #6c757d !important;
-  font-size: 0.8rem !important;
+  font-size: 0.75rem !important;
+  font-style: italic !important;
 }
 
 .prj-list-not-assigned {
   color: #6c757d !important;
   font-style: italic !important;
-  font-size: 0.9rem !important;
+  font-size: 0.875rem !important;
 }
 
 /* ========================================
-   ACTION BUTTONS - UPDATED FOR SINGLE LINE
+   ACTION BUTTONS
    ======================================== */
 
-/* Action Buttons Container - Prevent Wrapping */
 .prj-list-table tbody td:last-child > div {
   display: flex !important;
-  gap: 0.375rem !important;
+  gap: 0.5rem !important;
   justify-content: center !important;
   align-items: center !important;
   flex-wrap: nowrap !important;
-  min-width: 145px !important;
 }
 
-/* Action Buttons - Reduced Size */
 .prj-list-action-btn {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  width: 30px !important;
-  height: 30px !important;
+  width: 36px !important;
+  height: 36px !important;
   padding: 0 !important;
-  border-radius: 6px !important;
-  border: none !important;
+  border-radius: 8px !important;
+  border: 1px solid !important;
+  background: transparent !important;
   cursor: pointer !important;
   transition: all 0.2s ease !important;
   flex-shrink: 0 !important;
 }
 
-/* Icon size within buttons */
 .prj-list-action-btn svg {
-  width: 14px !important;
-  height: 14px !important;
+  width: 16px !important;
+  height: 16px !important;
 }
 
 .prj-list-btn-edit {
-  background-color: #e3f2fd !important;
   color: #1976d2 !important;
+  border-color: #e3f2fd !important;
+  background-color: #e3f2fd !important;
 }
 
 .prj-list-btn-edit:hover {
   background-color: #1976d2 !important;
+  border-color: #1976d2 !important;
   color: #ffffff !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 8px rgba(25, 118, 210, 0.3) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 6px rgba(25, 118, 210, 0.3) !important;
 }
 
 .prj-list-btn-manager {
-  background-color: #fff3e0 !important;
   color: #f57c00 !important;
+  border-color: #fff3e0 !important;
+  background-color: #fff3e0 !important;
 }
 
 .prj-list-btn-manager:hover {
   background-color: #f57c00 !important;
+  border-color: #f57c00 !important;
   color: #ffffff !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 8px rgba(245, 124, 0, 0.3) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 6px rgba(245, 124, 0, 0.3) !important;
 }
 
 .prj-list-btn-employee {
-  background-color: #e0f2f1 !important;
   color: #00796b !important;
+  border-color: #e0f2f1 !important;
+  background-color: #e0f2f1 !important;
 }
 
 .prj-list-btn-employee:hover {
   background-color: #00796b !important;
+  border-color: #00796b !important;
   color: #ffffff !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 8px rgba(0, 121, 107, 0.3) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 6px rgba(0, 121, 107, 0.3) !important;
 }
 
 .prj-list-btn-delete {
-  background-color: #ffebee !important;
   color: #c62828 !important;
+  border-color: #ffebee !important;
+  background-color: #ffebee !important;
 }
 
 .prj-list-btn-delete:hover {
   background-color: #c62828 !important;
+  border-color: #c62828 !important;
   color: #ffffff !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 8px rgba(198, 40, 40, 0.3) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 6px rgba(198, 40, 40, 0.3) !important;
 }
 
-/* Center align status and actions columns */
-.prj-list-table tbody td:nth-child(2) {
-  text-align: center !important;
+/* ========================================
+   PAGINATION - INSIDE TABLE
+   ======================================== */
+
+.prj-list-pagination-footer {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 1rem 1.5rem !important;
+  background: #FFFFFF !important;
+  border-top: 1px solid #dee2e6 !important;
+  flex-wrap: wrap !important;
+  gap: 1rem !important;
+  margin: 0 !important;
+  border-bottom-left-radius: 12px !important;
+  border-bottom-right-radius: 12px !important;
 }
 
-.prj-list-table tbody td:last-child {
-  text-align: center !important;
+/* Left - Show X entries */
+.prj-list-pagination-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+}
+
+.prj-list-pagination-text {
+  font-size: 0.875rem !important;
+  color: #6c757d !important;
+}
+
+.prj-list-pagination-dropdown {
+  padding: 0.375rem 2rem 0.375rem 0.75rem !important;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 6px !important;
+  font-size: 0.875rem !important;
+  color: #212529 !important;
+  background-color: #FFFFFF !important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 0.5rem center !important;
+  background-size: 12px 10px !important;
+  appearance: none !important;
+  cursor: pointer !important;
+  min-width: 70px !important;
+}
+
+.prj-list-pagination-dropdown:focus {
+  outline: none !important;
+  border-color: #0F62FE !important;
+  box-shadow: 0 0 0 0.2rem rgba(15, 98, 254, 0.1) !important;
+}
+
+/* Center - Showing 1 to 5 of 11 entries */
+.prj-list-pagination-center {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 1 !important;
+}
+
+.prj-list-pagination-status {
+  font-size: 0.875rem !important;
+  color: #6c757d !important;
+  white-space: nowrap !important;
+}
+
+/* Right - Page numbers */
+.prj-list-pagination-right {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.prj-list-pagination-list {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.375rem !important;
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.prj-list-page-item {
+  list-style: none !important;
+}
+
+.prj-list-page-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 36px !important;
+  height: 36px !important;
+  padding: 0.5rem 0.75rem !important;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 6px !important;
+  background-color: #FFFFFF !important;
+  color: #212529 !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.prj-list-page-link:hover:not(:disabled) {
+  background-color: #FFFFFF !important;
+  border-color: #3c3862 !important;
+  color: #3c3862 !important;
+}
+
+.prj-list-page-item.active .prj-list-page-link {
+  background-color: #3c3862 !important;
+  border-color: #3c3862 !important;
+  color: #FFFFFF !important;
+  font-weight: 600 !important;
+}
+
+.prj-list-page-item.disabled .prj-list-page-link {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+
+.prj-list-page-ellipsis {
+  display: inline-flex !important;
+  align-items: center !important;
+  min-width: 36px !important;
+  height: 36px !important;
+  justify-content: center !important;
+}
+
+.prj-list-page-dots {
+  color: #6c757d !important;
+  user-select: none !important;
 }
 
 /* Empty State */
@@ -697,6 +764,17 @@
   .prj-list-btn {
     flex: 1 !important;
   }
+
+  .prj-list-pagination-footer {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .prj-list-pagination-left,
+  .prj-list-pagination-center,
+  .prj-list-pagination-right {
+    justify-content: center !important;
+  }
 }
 
 @media (max-width: 768px) {
@@ -709,50 +787,54 @@
   }
 
   .prj-list-table-header th {
-    font-size: 0.75rem !important;
-    padding: 10px 12px !important;
+    font-size: 0.7rem !important;
+    padding: 12px !important;
   }
 
   .prj-list-table tbody td {
+    padding: 12px !important;
     font-size: 0.8125rem !important;
-    padding: 10px 12px !important;
   }
 
-  /* Further reduce button size on mobile */
   .prj-list-action-btn {
-    width: 26px !important;
-    height: 26px !important;
+    width: 32px !important;
+    height: 32px !important;
   }
 
   .prj-list-action-btn svg {
-    width: 12px !important;
-    height: 12px !important;
+    width: 14px !important;
+    height: 14px !important;
   }
 
-  /* Reduce gap on mobile */
-  .prj-list-table tbody td:last-child > div {
-    gap: 0.25rem !important;
-    min-width: 115px !important;
-  }
-
-  /* Adjust search controls on mobile */
   .prj-list-search-wrapper:has(.prj-list-clear-btn) .prj-list-search-input {
     padding-right: 125px !important;
   }
 
   .prj-list-clear-btn {
     right: 80px !important;
-    width: 18px !important;
-    height: 18px !important;
-  }
-
-  .prj-list-clear-btn svg {
-    width: 16px !important;
-    height: 16px !important;
   }
 
   .prj-list-search-btn {
     padding: 0.4rem 0.75rem !important;
     font-size: 0.8rem !important;
+  }
+
+  .prj-list-pagination-footer {
+    padding: 0.875rem !important;
+  }
+
+  .prj-list-pagination-left {
+    font-size: 0.8125rem !important;
+  }
+
+  .prj-list-pagination-status {
+    font-size: 0.8125rem !important;
+  }
+
+  .prj-list-page-link {
+    min-width: 32px !important;
+    height: 32px !important;
+    padding: 0.375rem 0.5rem !important;
+    font-size: 0.8125rem !important;
   }
 }

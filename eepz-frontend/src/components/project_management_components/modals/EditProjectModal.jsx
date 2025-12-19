@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { Edit, CheckCircle, AlertCircle, X, MessageSquare, ChevronDown, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 
+
 // Custom Calendar Component - COMPACT VERSION
 const CustomCalendar = ({ value, onChange, onClose, minDate }) => {
   const [currentDate, setCurrentDate] = useState(
@@ -11,26 +12,32 @@ const CustomCalendar = ({ value, onChange, onClose, minDate }) => {
     value ? new Date(value + 'T00:00:00') : null
   );
 
+
   const monthNames = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
   ];
 
+
   const daysInMonth = (date) => {
     return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
   };
+
 
   const firstDayOfMonth = (date) => {
     return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
   };
 
+
   const handlePrevMonth = () => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
   };
 
+
   const handleNextMonth = () => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
   };
+
 
   const handleDateClick = (day) => {
     const selected = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
@@ -52,6 +59,7 @@ const CustomCalendar = ({ value, onChange, onClose, minDate }) => {
     onClose();
   };
 
+
   const handleToday = () => {
     const today = new Date();
     const year = today.getFullYear();
@@ -64,6 +72,7 @@ const CustomCalendar = ({ value, onChange, onClose, minDate }) => {
     onClose();
   };
 
+
   const renderCalendarDays = () => {
     const days = [];
     const totalDays = daysInMonth(currentDate);
@@ -72,6 +81,7 @@ const CustomCalendar = ({ value, onChange, onClose, minDate }) => {
     today.setHours(0, 0, 0, 0);
     
     const minDateObj = minDate ? new Date(minDate + 'T00:00:00') : null;
+
 
     const prevMonthDays = daysInMonth(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
     for (let i = firstDay - 1; i >= 0; i--) {
@@ -94,6 +104,7 @@ const CustomCalendar = ({ value, onChange, onClose, minDate }) => {
       );
     }
 
+
     for (let day = 1; day <= totalDays; day++) {
       const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
       date.setHours(0, 0, 0, 0);
@@ -101,6 +112,7 @@ const CustomCalendar = ({ value, onChange, onClose, minDate }) => {
       const isToday = date.getTime() === today.getTime();
       const isSelected = selectedDate && date.getTime() === selectedDate.getTime();
       const isDisabled = minDateObj && date < minDateObj;
+
 
       days.push(
         <div
@@ -138,6 +150,7 @@ const CustomCalendar = ({ value, onChange, onClose, minDate }) => {
       );
     }
 
+
     const remainingDays = 42 - days.length;
     for (let day = 1; day <= remainingDays; day++) {
       days.push(
@@ -159,8 +172,10 @@ const CustomCalendar = ({ value, onChange, onClose, minDate }) => {
       );
     }
 
+
     return days;
   };
+
 
   return (
     <div style={{
@@ -280,23 +295,34 @@ const CustomCalendar = ({ value, onChange, onClose, minDate }) => {
   );
 };
 
-// Custom Dropdown Component - FIXED TO APPEAR OUTSIDE MODAL
+
+// Custom Dropdown Component - FIXED VERSION
 const CustomDropdown = ({ label, value, onChange, options, required, placeholder }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);
+  const menuRef = useRef(null);
+
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      // Check if click is outside both the button and the menu
+      if (
+        dropdownRef.current && 
+        !dropdownRef.current.contains(event.target) &&
+        menuRef.current &&
+        !menuRef.current.contains(event.target)
+      ) {
         setIsOpen(false);
       }
     };
 
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
 
   useEffect(() => {
     if (isOpen && buttonRef.current) {
@@ -309,16 +335,19 @@ const CustomDropdown = ({ label, value, onChange, options, required, placeholder
     }
   }, [isOpen]);
 
+
   const handleSelect = (optionValue) => {
     onChange(optionValue);
     setIsOpen(false);
   };
+
 
   const getDisplayValue = () => {
     if (!value) return placeholder || "Select";
     const option = options.find((opt) => (opt.value || opt) === value);
     return option ? (option.label || option) : value;
   };
+
 
   return (
     <div style={{ marginBottom: '0', fontFamily: 'Poppins, sans-serif' }} ref={dropdownRef}>
@@ -380,24 +409,27 @@ const CustomDropdown = ({ label, value, onChange, options, required, placeholder
           />
         </div>
         {isOpen && ReactDOM.createPortal(
-          <ul style={{
-            position: 'fixed',
-            top: dropdownPosition.top,
-            left: dropdownPosition.left,
-            width: dropdownPosition.width,
-            background: '#FFFFFF',
-            border: '1px solid #27235C',
-            borderRadius: '8px',
-            boxShadow: '0 8px 16px rgba(0, 0, 0, 0.15)',
-            maxHeight: '220px',
-            overflowY: 'auto',
-            zIndex: 99999,
-            listStyle: 'none',
-            margin: 0,
-            padding: 0,
-            animation: 'dropdownFadeIn 0.2s ease',
-            fontFamily: 'Poppins, sans-serif'
-          }}>
+          <ul 
+            ref={menuRef}
+            style={{
+              position: 'fixed',
+              top: dropdownPosition.top,
+              left: dropdownPosition.left,
+              width: dropdownPosition.width,
+              background: '#FFFFFF',
+              border: '1px solid #27235C',
+              borderRadius: '8px',
+              boxShadow: '0 8px 16px rgba(0, 0, 0, 0.15)',
+              maxHeight: '220px',
+              overflowY: 'auto',
+              zIndex: 99999,
+              listStyle: 'none',
+              margin: 0,
+              padding: 0,
+              animation: 'dropdownFadeIn 0.2s ease',
+              fontFamily: 'Poppins, sans-serif'
+            }}
+          >
             {options.map((opt, idx) => {
               const optValue = opt.value || opt;
               const optLabel = opt.label || opt;
@@ -442,23 +474,33 @@ const CustomDropdown = ({ label, value, onChange, options, required, placeholder
   );
 };
 
+
 // Custom Date Input Component - CALENDAR APPEARS ABOVE ICON
 const DateInput = ({ label, name, value, onChange, error, required, min, placeholder }) => {
   const [showCalendar, setShowCalendar] = useState(false);
   const [calendarPosition, setCalendarPosition] = useState({ top: 0, left: 0 });
   const calendarRef = useRef(null);
   const buttonRef = useRef(null);
+  const calendarMenuRef = useRef(null);
+
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (calendarRef.current && !calendarRef.current.contains(event.target)) {
+      if (
+        calendarRef.current && 
+        !calendarRef.current.contains(event.target) &&
+        calendarMenuRef.current &&
+        !calendarMenuRef.current.contains(event.target)
+      ) {
         setShowCalendar(false);
       }
     };
 
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
 
   useEffect(() => {
     if (showCalendar && buttonRef.current) {
@@ -472,6 +514,7 @@ const DateInput = ({ label, name, value, onChange, error, required, min, placeho
     }
   }, [showCalendar]);
 
+
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
     const [year, month, day] = dateStr.split('-');
@@ -479,10 +522,12 @@ const DateInput = ({ label, name, value, onChange, error, required, min, placeho
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
+
   const handleDateChange = (formattedDate) => {
     onChange(formattedDate);
     setShowCalendar(false);
   };
+
 
   return (
     <div style={{ marginBottom: '0', fontFamily: 'Poppins, sans-serif' }} ref={calendarRef}>
@@ -549,7 +594,7 @@ const DateInput = ({ label, name, value, onChange, error, required, min, placeho
         </button>
       </div>
       {showCalendar && ReactDOM.createPortal(
-        <div style={{ position: 'fixed', top: calendarPosition.top, left: calendarPosition.left, zIndex: 99999 }}>
+        <div ref={calendarMenuRef} style={{ position: 'fixed', top: calendarPosition.top, left: calendarPosition.left, zIndex: 99999 }}>
           <CustomCalendar
             value={value}
             onChange={handleDateChange}
@@ -562,6 +607,7 @@ const DateInput = ({ label, name, value, onChange, error, required, min, placeho
     </div>
   );
 };
+
 
 const EditProjectModal = ({
   show,
@@ -586,7 +632,9 @@ const EditProjectModal = ({
     };
   }, [show]);
 
+
   if (!show) return null;
+
 
   const statusOptions = ["Active", "On Hold", "Completed", "Cancelled"];
   const engagementModelOptions = [
@@ -603,7 +651,9 @@ const EditProjectModal = ({
     label: dept.departmentName
   })) || [];
 
+
   const businessUnitOptions = businessUnits?.map(bu => bu) || [];
+
 
   const modalContent = (
     <>
@@ -644,6 +694,7 @@ const EditProjectModal = ({
         }}
         onClick={onClose}
       />
+
 
       {/* Modal Container - CENTERED WITH INCREASED SIZE */}
       <div
@@ -718,6 +769,7 @@ const EditProjectModal = ({
             </button>
           </div>
 
+
           <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden', fontFamily: 'Poppins, sans-serif' }}>
             <div 
               style={{ 
@@ -755,6 +807,7 @@ const EditProjectModal = ({
                 </div>
               )}
 
+
               {/* Goal Info Box */}
               <div 
                 style={{
@@ -771,6 +824,7 @@ const EditProjectModal = ({
                   Project: <span style={{ color: '#374151', fontWeight: 600 }}>{formData.projectName || 'New Project'}</span>
                 </span>
               </div>
+
 
               <div className="row g-4">
                 {/* Row 1: Project Name & Status */}
@@ -809,6 +863,7 @@ const EditProjectModal = ({
                   />
                 </div>
 
+
                 <div className="col-md-6">
                   <CustomDropdown
                     label="Status"
@@ -819,6 +874,7 @@ const EditProjectModal = ({
                     placeholder="Select Status"
                   />
                 </div>
+
 
                 {/* Row 2: Description & Business Unit */}
                 <div className="col-md-6">
@@ -856,6 +912,7 @@ const EditProjectModal = ({
                   />
                 </div>
 
+
                 <div className="col-md-6">
                   <CustomDropdown
                     label="Business Unit"
@@ -866,6 +923,7 @@ const EditProjectModal = ({
                     placeholder="Select Business Unit"
                   />
                 </div>
+
 
                 {/* Row 3: Department & Engagement Model */}
                 <div className="col-md-6">
@@ -879,6 +937,7 @@ const EditProjectModal = ({
                   />
                 </div>
 
+
                 <div className="col-md-6">
                   <CustomDropdown
                     label="Engagement Model"
@@ -889,6 +948,7 @@ const EditProjectModal = ({
                     placeholder="Select Model"
                   />
                 </div>
+
 
                 {/* Row 4: Start Date & End Date */}
                 <div className="col-md-6">
@@ -902,6 +962,7 @@ const EditProjectModal = ({
                   />
                 </div>
 
+
                 <div className="col-md-6">
                   <DateInput
                     label="End Date"
@@ -914,6 +975,7 @@ const EditProjectModal = ({
                 </div>
               </div>
             </div>
+
 
             {/* Footer */}
             <div 
@@ -1005,8 +1067,10 @@ const EditProjectModal = ({
     </>
   );
 
+
   // Render using React Portal
   return ReactDOM.createPortal(modalContent, document.body);
 };
+
 
 export default EditProjectModal;
