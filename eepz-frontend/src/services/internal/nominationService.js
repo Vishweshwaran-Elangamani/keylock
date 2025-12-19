@@ -165,21 +165,47 @@ const nominationService = {
 
   getMyNominationAnalytics: async () => {
     try {
-      const response = await nominationService.getMyNominations();
+      // CHANGED: Use getAllNominations to get all nominations
+      const response = await nominationService.getAllNominations();
       if (!response.success || !response.data) {
         return { success: false, message: "Failed to fetch nominations" };
       }
+      
       const nominations = response.data;
+      nominations.forEach((n, index) => {
+      });
+
       const totalCount = nominations.length;
-      const approvedCount = nominations.filter(
-        (n) => n.status?.toLowerCase() === "approved"
-      ).length;
-      const pendingCount = nominations.filter((n) =>
-        n.status?.toLowerCase().includes("pending")
-      ).length;
-      const rejectedCount = nominations.filter((n) =>
-        n.status?.toLowerCase().includes("rejected")
-      ).length;
+      
+      // FIXED: Remove extra quotes and handle underscores
+      const approvedCount = nominations.filter((n) => {
+        if (!n.status) return false;
+        
+        // Remove any surrounding quotes that might be in the string
+        let status = String(n.status).trim();
+        status = status.replace(/^["']|["']$/g, ''); // Remove leading/trailing quotes
+        status = status.toLowerCase();
+        
+        const isApproved = status.includes("approved");
+        return isApproved;
+      }).length;
+      
+      const pendingCount = nominations.filter((n) => {
+        if (!n.status) return false;
+        let status = String(n.status).trim();
+        status = status.replace(/^["']|["']$/g, '');
+        status = status.toLowerCase();
+        return status.includes("pending");
+      }).length;
+      
+      const rejectedCount = nominations.filter((n) => {
+        if (!n.status) return false;
+        let status = String(n.status).trim();
+        status = status.replace(/^["']|["']$/g, '');
+        status = status.toLowerCase();
+        return status.includes("rejected");
+      }).length;
+
       return {
         success: true,
         data: {
@@ -196,11 +222,11 @@ const nominationService = {
         },
       };
     } catch (error) {
+      console.error("Analytics calculation error:", error);
       return { success: false, message: "Failed to calculate analytics" };
     }
   },
 
-  // FIXED: Get Nomination History (Self + Team Nominations)
   getMyNominationHistory: async (status = null) => {
     try {
       let url = `/${API_BASE}/my-history`;

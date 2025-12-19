@@ -97,7 +97,7 @@ const projectService = {
   // ==================== EMPLOYEE MAPPING (US149) ====================
  
   /**
-   *  Map employees to project with isPrimary support (US149)
+   * ✅ Map employees to project with isPrimary support (US149)
    * @param {number} projectId - Project ID
    * @param {Array} employees - Array of employee objects with employeeId and isPrimary
    * @returns {Promise} Mapping result
@@ -117,7 +117,7 @@ const projectService = {
         `/ProjectManagement/${projectId}/employees/map`,
         {
           projectId: projectId,
-          employees: employees  //  Correct property name matching backend DTO
+          employees: employees  // ✅ Correct property name matching backend DTO
         }
       );
       return response.data;
@@ -283,10 +283,10 @@ const projectService = {
     }
   },
  
-  // ====================  RESOURCE POOL OPERATIONS (NEW) ====================
+  // ==================== ✅ RESOURCE POOL OPERATIONS (NEW) ====================
  
   /**
-   *  Get employees with null reporting manager (Initial Stage Employees)
+   * ✅ Get employees with null reporting manager (Initial Stage Employees)
    * @returns {Promise} Array of initial stage employees
    *
    * Returns employees who have:
@@ -317,7 +317,7 @@ const projectService = {
   },
  
   /**
-   *  Map employees to resource pool (org.rz.resourcepool)
+   * ✅ Map employees to resource pool (org.rz.resourcepool)
    * @param {Array|Object} input - Array of employee master IDs or { employeeMasterIds: [...] }
    * @returns {Promise} Mapping result
    *
@@ -334,7 +334,7 @@ const projectService = {
    */
   mapToResourcePool: async (input) => {
     try {
-      //  FIXED: More robust input handling - log for debugging and handle edge cases
+      // ✅ FIXED: More robust input handling - log for debugging and handle edge cases
      
       let employeeMasterIds = [];
      
@@ -353,7 +353,7 @@ const projectService = {
         }
       }
      
-      //  Handle empty array gracefully (backend should return success with mappedCount: 0)
+      // ✅ Handle empty array gracefully (backend should return success with mappedCount: 0)
       if (employeeMasterIds.length === 0) {
         console.warn('No employeeMasterIds provided - returning empty success response');
         return { success: true, data: { mappedCount: 0, errors: [] } };
