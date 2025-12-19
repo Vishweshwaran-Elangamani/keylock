@@ -17,7 +17,8 @@ public partial class Assessmentdetail
 
     public virtual Selfassessment Assessment { get; set; } = null!;
 
-    public virtual ICollection<Assessmentreview> Assessmentreviews { get; set; } = new List<Assessmentreview>();
+    public virtual ICollection<Assessmentreview> Assessmentreviews { get; set; } =
+        new List<Assessmentreview>();
 
     public virtual Competency Competency { get; set; } = null!;
 }

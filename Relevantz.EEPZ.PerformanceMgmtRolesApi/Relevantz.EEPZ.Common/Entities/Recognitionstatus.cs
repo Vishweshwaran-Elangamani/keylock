@@ -29,9 +29,11 @@ public partial class Recognitionstatus
 
     public virtual Employee NominatedByEmployee { get; set; } = null!;
 
-    public virtual ICollection<Nominationparametervalue> Nominationparametervalues { get; set; } = new List<Nominationparametervalue>();
+    public virtual ICollection<Nominationparametervalue> Nominationparametervalues { get; set; } =
+        new List<Nominationparametervalue>();
 
-    public virtual ICollection<Nominationvisibilitytracking> Nominationvisibilitytrackings { get; set; } = new List<Nominationvisibilitytracking>();
+    public virtual ICollection<Nominationvisibilitytracking> Nominationvisibilitytrackings { get; set; } =
+        new List<Nominationvisibilitytracking>();
 
     public virtual Employee NomineeEmployee { get; set; } = null!;
 

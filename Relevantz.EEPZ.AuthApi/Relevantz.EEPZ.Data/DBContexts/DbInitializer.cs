@@ -140,6 +140,7 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 new Department
                 {
                     DepartmentName = "Administration",
+                    DepartmentCode = "ADMIN100",
                     BudgetAllocated = 0,
                     CostCenter = "ADMIN001",
                     CreatedAt = DateTime.UtcNow,
@@ -147,6 +148,7 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 new Department
                 {
                     DepartmentName = "Human Resources",
+                    DepartmentCode = "HR100",
                     BudgetAllocated = 0,
                     CostCenter = "HR001",
                     CreatedAt = DateTime.UtcNow,
@@ -154,6 +156,7 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 new Department
                 {
                     DepartmentName = "Information Technology",
+                    DepartmentCode = "IT100",
                     BudgetAllocated = 0,
                     CostCenter = "IT001",
                     CreatedAt = DateTime.UtcNow,
@@ -161,6 +164,7 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 new Department
                 {
                     DepartmentName = "Finance",
+                    DepartmentCode = "FIN100",
                     BudgetAllocated = 0,
                     CostCenter = "FIN001",
                     CreatedAt = DateTime.UtcNow,
@@ -168,6 +172,7 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 new Department
                 {
                     DepartmentName = "Operations",
+                    DepartmentCode = "OPS100",
                     BudgetAllocated = 0,
                     CostCenter = "OPS001",
                     CreatedAt = DateTime.UtcNow,

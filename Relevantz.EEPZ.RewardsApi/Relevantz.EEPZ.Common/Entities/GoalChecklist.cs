@@ -25,5 +25,6 @@ public partial class GoalChecklist
 
     public virtual Goal Goal { get; set; } = null!;
 
-    public virtual ICollection<Goalchecklistprogress> Goalchecklistprogresses { get; set; } = new List<Goalchecklistprogress>();
+    public virtual ICollection<Goalchecklistprogress> Goalchecklistprogresses { get; set; } =
+        new List<Goalchecklistprogress>();
 }

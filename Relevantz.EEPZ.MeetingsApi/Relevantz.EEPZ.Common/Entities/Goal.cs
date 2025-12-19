@@ -43,21 +43,27 @@ public partial class Goal
 
     public virtual ICollection<GoalApproval> GoalApprovals { get; set; } = new List<GoalApproval>();
 
-    public virtual ICollection<GoalAssignment> GoalAssignments { get; set; } = new List<GoalAssignment>();
+    public virtual ICollection<GoalAssignment> GoalAssignments { get; set; } =
+        new List<GoalAssignment>();
 
-    public virtual ICollection<GoalAttachment> GoalAttachments { get; set; } = new List<GoalAttachment>();
+    public virtual ICollection<GoalAttachment> GoalAttachments { get; set; } =
+        new List<GoalAttachment>();
 
-    public virtual ICollection<GoalChecklist> GoalChecklists { get; set; } = new List<GoalChecklist>();
+    public virtual ICollection<GoalChecklist> GoalChecklists { get; set; } =
+        new List<GoalChecklist>();
 
     public virtual ICollection<GoalComment> GoalComments { get; set; } = new List<GoalComment>();
 
-    public virtual ICollection<Goalprogresslog> Goalprogresslogs { get; set; } = new List<Goalprogresslog>();
+    public virtual ICollection<Goalprogresslog> Goalprogresslogs { get; set; } =
+        new List<Goalprogresslog>();
 
-    public virtual ICollection<Managerreviewcomment> Managerreviewcomments { get; set; } = new List<Managerreviewcomment>();
+    public virtual ICollection<Managerreviewcomment> Managerreviewcomments { get; set; } =
+        new List<Managerreviewcomment>();
 
     public virtual Project? Project { get; set; }
 
-    public virtual ICollection<Projectgoalfeedback> Projectgoalfeedbacks { get; set; } = new List<Projectgoalfeedback>();
+    public virtual ICollection<Projectgoalfeedback> Projectgoalfeedbacks { get; set; } =
+        new List<Projectgoalfeedback>();
 
     public virtual Employeedetailsmaster? ReopenedByNavigation { get; set; }
 

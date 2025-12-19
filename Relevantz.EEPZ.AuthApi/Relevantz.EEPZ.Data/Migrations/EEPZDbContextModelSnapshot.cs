@@ -576,6 +576,191 @@ namespace Relevantz.EEPZ.Data.Migrations
                     b.ToTable("changerequests", (string)null);
                 });
 
+            modelBuilder.Entity("Relevantz.EEPZ.Common.Entities.Chatactionlog", b =>
+                {
+                    b.Property<int>("ActionLogId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ActionLogId"));
+
+                    b.Property<string>("ActionDetails")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ActionType")
+                        .IsRequired()
+                        .HasColumnType("enum('Query','DataRetrieval','Export','UserManagement','Error')");
+
+                    b.Property<int>("ConversationId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ExecutedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<int>("MessageId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ActionLogId")
+                        .HasName("PRIMARY");
+
+                    b.HasIndex(new[] { "MessageId" }, "MessageId");
+
+                    b.HasIndex(new[] { "ActionType" }, "idx_action_type");
+
+                    b.HasIndex(new[] { "ConversationId" }, "idx_conversation");
+
+                    b.HasIndex(new[] { "ExecutedAt" }, "idx_executed_at");
+
+                    b.ToTable("chatactionlogs", (string)null);
+                });
+
+            modelBuilder.Entity("Relevantz.EEPZ.Common.Entities.Chatconversation", b =>
+                {
+                    b.Property<int>("ConversationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ConversationId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValueSql("'1'");
+
+                    b.Property<string>("SessionId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlComputedColumn(b.Property<DateTime?>("UpdatedAt"));
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ConversationId")
+                        .HasName("PRIMARY");
+
+                    b.HasIndex(new[] { "CreatedAt" }, "idx_created_at");
+
+                    b.HasIndex(new[] { "IsActive" }, "idx_is_active");
+
+                    b.HasIndex(new[] { "UserId", "SessionId" }, "idx_user_session");
+
+                    b.ToTable("chatconversations", (string)null);
+                });
+
+            modelBuilder.Entity("Relevantz.EEPZ.Common.Entities.Chatmessage", b =>
+                {
+                    b.Property<int>("MessageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("MessageId"));
+
+                    b.Property<int>("ConversationId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<bool>("IsUserMessage")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("MessageId")
+                        .HasName("PRIMARY");
+
+                    b.HasIndex(new[] { "ConversationId" }, "idx_conversation")
+                        .HasDatabaseName("idx_conversation1");
+
+                    b.HasIndex(new[] { "CreatedAt" }, "idx_created_at")
+                        .HasDatabaseName("idx_created_at1");
+
+                    b.HasIndex(new[] { "IsUserMessage" }, "idx_is_user_message");
+
+                    b.ToTable("chatmessages", (string)null);
+                });
+
+            modelBuilder.Entity("Relevantz.EEPZ.Common.Entities.Chatpattern", b =>
+                {
+                    b.Property<int>("PatternId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("PatternId"));
+
+                    b.Property<string>("Category")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<int?>("CreatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValueSql("'1'");
+
+                    b.Property<string>("Pattern")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<int?>("Priority")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("'0'");
+
+                    b.Property<string>("Response")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlComputedColumn(b.Property<DateTime?>("UpdatedAt"));
+
+                    b.HasKey("PatternId")
+                        .HasName("PRIMARY");
+
+                    b.HasIndex(new[] { "CreatedByUserId" }, "CreatedByUserId");
+
+                    b.HasIndex(new[] { "Category" }, "idx_category");
+
+                    b.HasIndex(new[] { "IsActive" }, "idx_is_active")
+                        .HasDatabaseName("idx_is_active1");
+
+                    b.HasIndex(new[] { "Pattern" }, "idx_pattern")
+                        .HasAnnotation("MySql:IndexPrefixLength", new[] { 255 });
+
+                    b.HasIndex(new[] { "Priority" }, "idx_priority")
+                        .IsDescending();
+
+                    b.ToTable("chatpatterns", (string)null);
+                });
+
             modelBuilder.Entity("Relevantz.EEPZ.Common.Entities.Competency", b =>
                 {
                     b.Property<int>("CompetencyId")
@@ -632,10 +817,31 @@ namespace Relevantz.EEPZ.Data.Migrations
                         .HasColumnType("datetime")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
+                    b.Property<string>("DepartmentCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
                     b.Property<string>("DepartmentName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int?>("HodEmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ParentDepartmentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("enum('Active','Inactive')")
+                        .HasDefaultValueSql("'Active'");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .ValueGeneratedOnAddOrUpdate()
@@ -646,8 +852,17 @@ namespace Relevantz.EEPZ.Data.Migrations
                     b.HasKey("DepartmentId")
                         .HasName("PRIMARY");
 
-                    b.HasIndex(new[] { "DepartmentName" }, "DepartmentName")
+                    b.HasIndex(new[] { "DepartmentCode" }, "idx_department_code")
                         .IsUnique();
+
+                    b.HasIndex(new[] { "HodEmployeeId" }, "idx_department_hod");
+
+                    b.HasIndex(new[] { "DepartmentName" }, "idx_department_name")
+                        .IsUnique();
+
+                    b.HasIndex(new[] { "ParentDepartmentId" }, "idx_department_parent");
+
+                    b.HasIndex(new[] { "Status" }, "idx_department_status");
 
                     b.ToTable("department", (string)null);
                 });
@@ -779,25 +994,6 @@ namespace Relevantz.EEPZ.Data.Migrations
                     b.ToTable("departmentheadapprovals", (string)null);
                 });
 
-            modelBuilder.Entity("Relevantz.EEPZ.Common.Entities.Efmigrationshistory", b =>
-                {
-                    b.Property<string>("MigrationId")
-                        .HasMaxLength(150)
-                        .HasColumnType("varchar(150)");
-
-                    b.Property<string>("ProductVersion")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("varchar(32)");
-
-                    b.HasKey("MigrationId")
-                        .HasName("PRIMARY");
-
-                    b.ToTable("__efmigrationshistory", (string)null);
-
-                    MySqlEntityTypeBuilderExtensions.UseCollation(b, "utf8mb4_0900_ai_ci");
-                });
-
             modelBuilder.Entity("Relevantz.EEPZ.Common.Entities.Employee", b =>
                 {
                     b.Property<int>("EmployeeId")
@@ -876,7 +1072,8 @@ namespace Relevantz.EEPZ.Data.Migrations
 
                     b.HasIndex(new[] { "EmploymentStatus" }, "idx_employment_status");
 
-                    b.HasIndex(new[] { "IsActive" }, "idx_is_active");
+                    b.HasIndex(new[] { "IsActive" }, "idx_is_active")
+                        .HasDatabaseName("idx_is_active2");
 
                     b.ToTable("employee", (string)null);
                 });
@@ -1049,7 +1246,8 @@ namespace Relevantz.EEPZ.Data.Migrations
 
                     b.HasIndex(new[] { "BiasFlag" }, "idx_bias_flag");
 
-                    b.HasIndex(new[] { "CreatedAt" }, "idx_created_at");
+                    b.HasIndex(new[] { "CreatedAt" }, "idx_created_at")
+                        .HasDatabaseName("idx_created_at2");
 
                     b.HasIndex(new[] { "FairnessFlag" }, "idx_fairness_flag");
 
@@ -1186,7 +1384,7 @@ namespace Relevantz.EEPZ.Data.Migrations
                         .HasDatabaseName("idx_feedback_type1");
 
                     b.HasIndex(new[] { "IsActive" }, "idx_is_active")
-                        .HasDatabaseName("idx_is_active1");
+                        .HasDatabaseName("idx_is_active3");
 
                     b.HasIndex(new[] { "QuestionCode" }, "uniq_question_code")
                         .IsUnique();
@@ -3404,7 +3602,8 @@ namespace Relevantz.EEPZ.Data.Migrations
 
                     b.HasIndex(new[] { "PublishedBy" }, "PublishedBy");
 
-                    b.HasIndex(new[] { "Category" }, "idx_category");
+                    b.HasIndex(new[] { "Category" }, "idx_category")
+                        .HasDatabaseName("idx_category1");
 
                     b.HasIndex(new[] { "CreatedByUserId" }, "idx_created_by")
                         .HasDatabaseName("idx_created_by2");
@@ -4445,7 +4644,7 @@ namespace Relevantz.EEPZ.Data.Migrations
                         .HasName("PRIMARY");
 
                     b.HasIndex(new[] { "CreatedAt" }, "idx_created_at")
-                        .HasDatabaseName("idx_created_at1");
+                        .HasDatabaseName("idx_created_at3");
 
                     b.HasIndex(new[] { "ExpiresAt" }, "idx_expires_at")
                         .HasDatabaseName("idx_expires_at1");
@@ -4573,6 +4772,9 @@ namespace Relevantz.EEPZ.Data.Migrations
                         .HasColumnType("tinyint(1)")
                         .HasDefaultValueSql("'1'");
 
+                    b.Property<bool>("IsVisibleForManagerNomination")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<string>("RewardCategory")
                         .IsRequired()
                         .HasColumnType("enum('Recognition','Promotion')");
@@ -4591,7 +4793,9 @@ namespace Relevantz.EEPZ.Data.Migrations
                     b.HasIndex(new[] { "IsActive" }, "idx_active");
 
                     b.HasIndex(new[] { "RewardCategory" }, "idx_category")
-                        .HasDatabaseName("idx_category1");
+                        .HasDatabaseName("idx_category2");
+
+                    b.HasIndex(new[] { "IsVisibleForManagerNomination" }, "idx_manager_visible");
 
                     b.ToTable("rewardtype", (string)null);
                 });
@@ -4730,6 +4934,82 @@ namespace Relevantz.EEPZ.Data.Migrations
                         .HasDatabaseName("idx_form3");
 
                     b.ToTable("selfassessment", (string)null);
+                });
+
+            modelBuilder.Entity("Relevantz.EEPZ.Common.Entities.Selfassessmentattachment", b =>
+                {
+                    b.Property<int>("AttachmentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("attachment_id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("AttachmentId"));
+
+                    b.Property<int>("AssessmentId")
+                        .HasColumnType("int")
+                        .HasColumnName("assessment_id");
+
+                    b.Property<string>("AttachmentNote")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("attachment_note");
+
+                    b.Property<int?>("DisplayOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("display_order")
+                        .HasDefaultValueSql("'0'");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("file_name");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("file_path");
+
+                    b.Property<long?>("FileSize")
+                        .HasColumnType("bigint")
+                        .HasColumnName("file_size");
+
+                    b.Property<string>("FileType")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("file_type");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlComputedColumn(b.Property<DateTime?>("UpdatedAt"));
+
+                    b.Property<DateTime?>("UploadedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasColumnName("uploaded_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<int?>("UploadedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("uploaded_by");
+
+                    b.HasKey("AttachmentId")
+                        .HasName("PRIMARY");
+
+                    b.HasIndex(new[] { "AssessmentId" }, "idx_assessment")
+                        .HasDatabaseName("idx_assessment1");
+
+                    b.HasIndex(new[] { "UploadedAt" }, "idx_uploaded_at");
+
+                    b.HasIndex(new[] { "UploadedBy" }, "idx_uploaded_by");
+
+                    b.ToTable("selfassessmentattachment", (string)null);
                 });
 
             modelBuilder.Entity("Relevantz.EEPZ.Common.Entities.Sla", b =>
@@ -5555,6 +5835,62 @@ namespace Relevantz.EEPZ.Data.Migrations
                     b.Navigation("Employee");
                 });
 
+            modelBuilder.Entity("Relevantz.EEPZ.Common.Entities.Chatactionlog", b =>
+                {
+                    b.HasOne("Relevantz.EEPZ.Common.Entities.Chatconversation", "Conversation")
+                        .WithMany("Chatactionlogs")
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("chatactionlogs_ibfk_1");
+
+                    b.HasOne("Relevantz.EEPZ.Common.Entities.Chatmessage", "Message")
+                        .WithMany("Chatactionlogs")
+                        .HasForeignKey("MessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("chatactionlogs_ibfk_2");
+
+                    b.Navigation("Conversation");
+
+                    b.Navigation("Message");
+                });
+
+            modelBuilder.Entity("Relevantz.EEPZ.Common.Entities.Chatconversation", b =>
+                {
+                    b.HasOne("Relevantz.EEPZ.Common.Entities.Userauthentication", "User")
+                        .WithMany("Chatconversations")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("chatconversations_ibfk_1");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Relevantz.EEPZ.Common.Entities.Chatmessage", b =>
+                {
+                    b.HasOne("Relevantz.EEPZ.Common.Entities.Chatconversation", "Conversation")
+                        .WithMany("Chatmessages")
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("chatmessages_ibfk_1");
+
+                    b.Navigation("Conversation");
+                });
+
+            modelBuilder.Entity("Relevantz.EEPZ.Common.Entities.Chatpattern", b =>
+                {
+                    b.HasOne("Relevantz.EEPZ.Common.Entities.Userauthentication", "CreatedByUser")
+                        .WithMany("Chatpatterns")
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("chatpatterns_ibfk_1");
+
+                    b.Navigation("CreatedByUser");
+                });
+
             modelBuilder.Entity("Relevantz.EEPZ.Common.Entities.Competency", b =>
                 {
                     b.HasOne("Relevantz.EEPZ.Common.Entities.Assessmentform", "Form")
@@ -5565,6 +5901,25 @@ namespace Relevantz.EEPZ.Data.Migrations
                         .HasConstraintName("competency_ibfk_1");
 
                     b.Navigation("Form");
+                });
+
+            modelBuilder.Entity("Relevantz.EEPZ.Common.Entities.Department", b =>
+                {
+                    b.HasOne("Relevantz.EEPZ.Common.Entities.Employee", "HodEmployee")
+                        .WithMany("Departments")
+                        .HasForeignKey("HodEmployeeId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_department_hod");
+
+                    b.HasOne("Relevantz.EEPZ.Common.Entities.Department", "ParentDepartment")
+                        .WithMany("InverseParentDepartment")
+                        .HasForeignKey("ParentDepartmentId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_department_parent");
+
+                    b.Navigation("HodEmployee");
+
+                    b.Navigation("ParentDepartment");
                 });
 
             modelBuilder.Entity("Relevantz.EEPZ.Common.Entities.Departmentbudget", b =>
@@ -7145,6 +7500,27 @@ namespace Relevantz.EEPZ.Data.Migrations
                     b.Navigation("Form");
                 });
 
+            modelBuilder.Entity("Relevantz.EEPZ.Common.Entities.Selfassessmentattachment", b =>
+                {
+                    b.HasOne("Relevantz.EEPZ.Common.Entities.Selfassessment", "Assessment")
+                        .WithMany("Selfassessmentattachments")
+                        .HasForeignKey("AssessmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("selfassessmentattachment_ibfk_1");
+
+                    b.HasOne("Relevantz.EEPZ.Common.Entities.Userauthentication", "UploadedByNavigation")
+                        .WithMany("Selfassessmentattachments")
+                        .HasForeignKey("UploadedBy")
+                        .HasPrincipalKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("selfassessmentattachment_ibfk_2");
+
+                    b.Navigation("Assessment");
+
+                    b.Navigation("UploadedByNavigation");
+                });
+
             modelBuilder.Entity("Relevantz.EEPZ.Common.Entities.Sla", b =>
                 {
                     b.HasOne("Relevantz.EEPZ.Common.Entities.Employee", "AssignedToEmployee")
@@ -7364,6 +7740,18 @@ namespace Relevantz.EEPZ.Data.Migrations
                     b.Navigation("Formprogresstrackers");
                 });
 
+            modelBuilder.Entity("Relevantz.EEPZ.Common.Entities.Chatconversation", b =>
+                {
+                    b.Navigation("Chatactionlogs");
+
+                    b.Navigation("Chatmessages");
+                });
+
+            modelBuilder.Entity("Relevantz.EEPZ.Common.Entities.Chatmessage", b =>
+                {
+                    b.Navigation("Chatactionlogs");
+                });
+
             modelBuilder.Entity("Relevantz.EEPZ.Common.Entities.Competency", b =>
                 {
                     b.Navigation("Assessmentdetails");
@@ -7380,6 +7768,8 @@ namespace Relevantz.EEPZ.Data.Migrations
                     b.Navigation("Engagements");
 
                     b.Navigation("Internalopportunities");
+
+                    b.Navigation("InverseParentDepartment");
 
                     b.Navigation("Organizationwideobjectives");
 
@@ -7408,6 +7798,8 @@ namespace Relevantz.EEPZ.Data.Migrations
                     b.Navigation("Addresses");
 
                     b.Navigation("Changerequests");
+
+                    b.Navigation("Departments");
 
                     b.Navigation("Employeedetailsmasters");
 
@@ -7743,6 +8135,8 @@ namespace Relevantz.EEPZ.Data.Migrations
                     b.Navigation("Assessmentdetails");
 
                     b.Navigation("Departmentheadapprovals");
+
+                    b.Navigation("Selfassessmentattachments");
                 });
 
             modelBuilder.Entity("Relevantz.EEPZ.Common.Entities.Sla", b =>
@@ -7780,6 +8174,10 @@ namespace Relevantz.EEPZ.Data.Migrations
                     b.Navigation("Budgetperiodallocations");
 
                     b.Navigation("Bulkoperationlogs");
+
+                    b.Navigation("Chatconversations");
+
+                    b.Navigation("Chatpatterns");
 
                     b.Navigation("Departmentheadapprovals");
 
@@ -7852,6 +8250,8 @@ namespace Relevantz.EEPZ.Data.Migrations
                     b.Navigation("Reports");
 
                     b.Navigation("Rewardtypes");
+
+                    b.Navigation("Selfassessmentattachments");
 
                     b.Navigation("Selfassessments");
 

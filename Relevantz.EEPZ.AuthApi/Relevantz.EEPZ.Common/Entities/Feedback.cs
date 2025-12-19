@@ -45,9 +45,11 @@ public partial class Feedback
 
     public DateTime? SubmittedAt { get; set; }
 
-    public virtual ICollection<Feedbackedithistory> Feedbackedithistories { get; set; } = new List<Feedbackedithistory>();
+    public virtual ICollection<Feedbackedithistory> Feedbackedithistories { get; set; } =
+        new List<Feedbackedithistory>();
 
-    public virtual ICollection<Feedbackquestionresponse> Feedbackquestionresponses { get; set; } = new List<Feedbackquestionresponse>();
+    public virtual ICollection<Feedbackquestionresponse> Feedbackquestionresponses { get; set; } =
+        new List<Feedbackquestionresponse>();
 
     public virtual Employee RecipientEmployee { get; set; } = null!;
 

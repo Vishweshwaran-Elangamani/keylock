@@ -41,7 +41,8 @@ public partial class Organizationalpolicy
 
     public virtual Userauthentication CreatedByUser { get; set; } = null!;
 
-    public virtual ICollection<Policyviolation> Policyviolations { get; set; } = new List<Policyviolation>();
+    public virtual ICollection<Policyviolation> Policyviolations { get; set; } =
+        new List<Policyviolation>();
 
     public virtual Userauthentication? PublishedByNavigation { get; set; }
 }

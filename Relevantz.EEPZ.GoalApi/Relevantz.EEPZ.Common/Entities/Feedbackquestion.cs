@@ -35,5 +35,6 @@ public partial class Feedbackquestion
 
     public DateTime? UpdatedAt { get; set; }
 
-    public virtual ICollection<Feedbackquestionresponse> Feedbackquestionresponses { get; set; } = new List<Feedbackquestionresponse>();
+    public virtual ICollection<Feedbackquestionresponse> Feedbackquestionresponses { get; set; } =
+        new List<Feedbackquestionresponse>();
 }

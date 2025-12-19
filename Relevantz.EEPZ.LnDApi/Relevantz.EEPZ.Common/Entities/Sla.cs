@@ -57,11 +57,14 @@ public partial class Sla
 
     public virtual Employee? ReopenedByEmployee { get; set; }
 
-    public virtual ICollection<Slaescalation> Slaescalations { get; set; } = new List<Slaescalation>();
+    public virtual ICollection<Slaescalation> Slaescalations { get; set; } =
+        new List<Slaescalation>();
 
     public virtual ICollection<Slahistory> Slahistories { get; set; } = new List<Slahistory>();
 
-    public virtual ICollection<Slanotification> Slanotifications { get; set; } = new List<Slanotification>();
+    public virtual ICollection<Slanotification> Slanotifications { get; set; } =
+        new List<Slanotification>();
 
-    public virtual ICollection<Slareviewtracking> Slareviewtrackings { get; set; } = new List<Slareviewtracking>();
+    public virtual ICollection<Slareviewtracking> Slareviewtrackings { get; set; } =
+        new List<Slareviewtracking>();
 }

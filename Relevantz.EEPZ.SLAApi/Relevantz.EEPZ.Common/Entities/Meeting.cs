@@ -40,7 +40,8 @@ public partial class Meeting
 
     public DateTime? UpdatedAt { get; set; }
 
-    public virtual ICollection<Meetingparticipant> Meetingparticipants { get; set; } = new List<Meetingparticipant>();
+    public virtual ICollection<Meetingparticipant> Meetingparticipants { get; set; } =
+        new List<Meetingparticipant>();
 
     public virtual ICollection<Mom> Moms { get; set; } = new List<Mom>();
 

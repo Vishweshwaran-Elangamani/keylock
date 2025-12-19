@@ -23,7 +23,9 @@ public partial class Assessmentform
 
     public virtual Userauthentication? CreatedByNavigation { get; set; }
 
-    public virtual ICollection<Selfassessment> Selfassessments { get; set; } = new List<Selfassessment>();
+    public virtual ICollection<Selfassessment> Selfassessments { get; set; } =
+        new List<Selfassessment>();
 
-    public virtual ICollection<Slareviewtracking> Slareviewtrackings { get; set; } = new List<Slareviewtracking>();
+    public virtual ICollection<Slareviewtracking> Slareviewtrackings { get; set; } =
+        new List<Slareviewtracking>();
 }

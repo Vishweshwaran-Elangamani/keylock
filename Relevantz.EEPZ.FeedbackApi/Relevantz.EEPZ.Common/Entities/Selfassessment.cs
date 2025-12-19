@@ -15,13 +15,16 @@ public partial class Selfassessment
 
     public string? Status { get; set; }
 
-    public virtual ICollection<Assessmentdetail> Assessmentdetails { get; set; } = new List<Assessmentdetail>();
+    public virtual ICollection<Assessmentdetail> Assessmentdetails { get; set; } =
+        new List<Assessmentdetail>();
 
-    public virtual ICollection<Departmentheadapproval> Departmentheadapprovals { get; set; } = new List<Departmentheadapproval>();
+    public virtual ICollection<Departmentheadapproval> Departmentheadapprovals { get; set; } =
+        new List<Departmentheadapproval>();
 
     public virtual Userauthentication Employee { get; set; } = null!;
 
     public virtual Assessmentform Form { get; set; } = null!;
 
-    public virtual ICollection<Selfassessmentattachment> Selfassessmentattachments { get; set; } = new List<Selfassessmentattachment>();
+    public virtual ICollection<Selfassessmentattachment> Selfassessmentattachments { get; set; } =
+        new List<Selfassessmentattachment>();
 }

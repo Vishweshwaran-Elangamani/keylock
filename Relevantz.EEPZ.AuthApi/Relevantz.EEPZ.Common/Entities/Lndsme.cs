@@ -27,9 +27,11 @@ public partial class Lndsme
 
     public virtual Employee Employee { get; set; } = null!;
 
-    public virtual ICollection<Lndassignment> Lndassignments { get; set; } = new List<Lndassignment>();
+    public virtual ICollection<Lndassignment> Lndassignments { get; set; } =
+        new List<Lndassignment>();
 
-    public virtual ICollection<Mentorfeedbacktracking> Mentorfeedbacktrackings { get; set; } = new List<Mentorfeedbacktracking>();
+    public virtual ICollection<Mentorfeedbacktracking> Mentorfeedbacktrackings { get; set; } =
+        new List<Mentorfeedbacktracking>();
 
     public virtual MasterSkill Skill { get; set; } = null!;
 }

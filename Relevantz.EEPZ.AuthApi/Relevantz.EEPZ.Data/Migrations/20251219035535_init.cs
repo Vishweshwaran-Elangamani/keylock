@@ -7,51 +7,13 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Relevantz.EEPZ.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
                 .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "__efmigrationshistory",
-                columns: table => new
-                {
-                    MigrationId = table.Column<string>(type: "varchar(150)", maxLength: 150, nullable: false, collation: "utf8mb4_0900_ai_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ProductVersion = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: false, collation: "utf8mb4_0900_ai_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PRIMARY", x => x.MigrationId);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
-
-            migrationBuilder.CreateTable(
-                name: "department",
-                columns: table => new
-                {
-                    DepartmentId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    DepartmentName = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    BudgetAllocated = table.Column<decimal>(type: "decimal(15,2)", precision: 15, scale: 2, nullable: true),
-                    CostCenter = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: true)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.ComputedColumn)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PRIMARY", x => x.DepartmentId);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
 
             migrationBuilder.CreateTable(
                 name: "employee",
@@ -201,91 +163,6 @@ namespace Relevantz.EEPZ.Data.Migrations
                 .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
 
             migrationBuilder.CreateTable(
-                name: "departmentbudgets",
-                columns: table => new
-                {
-                    BudgetId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    DepartmentId = table.Column<int>(type: "int", nullable: false),
-                    FiscalYear = table.Column<int>(type: "int", nullable: false),
-                    TotalBudget = table.Column<decimal>(type: "decimal(15,2)", precision: 15, scale: 2, nullable: false),
-                    AllocatedAmount = table.Column<decimal>(type: "decimal(15,2)", precision: 15, scale: 2, nullable: true, defaultValueSql: "'0.00'"),
-                    UtilizedAmount = table.Column<decimal>(type: "decimal(15,2)", precision: 15, scale: 2, nullable: true, defaultValueSql: "'0.00'"),
-                    UtilizationPercentage = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: true, computedColumnSql: "(`UtilizedAmount` / nullif(`TotalBudget`,0)) * 100", stored: true),
-                    Headcount = table.Column<int>(type: "int", nullable: true, defaultValueSql: "'0'"),
-                    AvgCostPerEmployee = table.Column<decimal>(type: "decimal(15,2)", precision: 15, scale: 2, nullable: true, computedColumnSql: "case when (`Headcount` > 0) then (`UtilizedAmount` / `Headcount`) else 0 end", stored: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: true)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.ComputedColumn)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PRIMARY", x => x.BudgetId);
-                    table.ForeignKey(
-                        name: "departmentbudgets_ibfk_1",
-                        column: x => x.DepartmentId,
-                        principalTable: "department",
-                        principalColumn: "DepartmentId",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
-
-            migrationBuilder.CreateTable(
-                name: "engagement",
-                columns: table => new
-                {
-                    engagement_id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    department_id = table.Column<int>(type: "int", nullable: true),
-                    engagement_score = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: true),
-                    period_start = table.Column<DateTime>(type: "datetime", nullable: true),
-                    period_end = table.Column<DateTime>(type: "datetime", nullable: true),
-                    trend_score = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: true),
-                    created_at = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PRIMARY", x => x.engagement_id);
-                    table.ForeignKey(
-                        name: "engagement_ibfk_1",
-                        column: x => x.department_id,
-                        principalTable: "department",
-                        principalColumn: "DepartmentId",
-                        onDelete: ReferentialAction.SetNull);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
-
-            migrationBuilder.CreateTable(
-                name: "risk",
-                columns: table => new
-                {
-                    risk_id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    department_id = table.Column<int>(type: "int", nullable: true),
-                    risk_type = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    trend_graph = table.Column<string>(type: "text", nullable: true, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    period_start = table.Column<DateTime>(type: "datetime", nullable: true),
-                    period_end = table.Column<DateTime>(type: "datetime", nullable: true),
-                    created_at = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PRIMARY", x => x.risk_id);
-                    table.ForeignKey(
-                        name: "risk_ibfk_1",
-                        column: x => x.department_id,
-                        principalTable: "department",
-                        principalColumn: "DepartmentId",
-                        onDelete: ReferentialAction.SetNull);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
-
-            migrationBuilder.CreateTable(
                 name: "address",
                 columns: table => new
                 {
@@ -366,6 +243,48 @@ namespace Relevantz.EEPZ.Data.Migrations
                         principalTable: "employee",
                         principalColumn: "EmployeeId",
                         onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4")
+                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
+
+            migrationBuilder.CreateTable(
+                name: "department",
+                columns: table => new
+                {
+                    DepartmentId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    DepartmentName = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    DepartmentCode = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Description = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Status = table.Column<string>(type: "enum('Active','Inactive')", nullable: false, defaultValueSql: "'Active'", collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ParentDepartmentId = table.Column<int>(type: "int", nullable: true),
+                    HodEmployeeId = table.Column<int>(type: "int", nullable: true),
+                    BudgetAllocated = table.Column<decimal>(type: "decimal(15,2)", precision: 15, scale: 2, nullable: true),
+                    CostCenter = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: true)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.ComputedColumn)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PRIMARY", x => x.DepartmentId);
+                    table.ForeignKey(
+                        name: "fk_department_hod",
+                        column: x => x.HodEmployeeId,
+                        principalTable: "employee",
+                        principalColumn: "EmployeeId",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "fk_department_parent",
+                        column: x => x.ParentDepartmentId,
+                        principalTable: "department",
+                        principalColumn: "DepartmentId",
+                        onDelete: ReferentialAction.SetNull);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4")
                 .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
@@ -495,6 +414,245 @@ namespace Relevantz.EEPZ.Data.Migrations
                 .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
 
             migrationBuilder.CreateTable(
+                name: "userauthentication",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    EmployeeId = table.Column<int>(type: "int", nullable: false),
+                    Email = table.Column<string>(type: "varchar(255)", nullable: false, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PasswordHash = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: false, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Status = table.Column<string>(type: "enum('Active','Inactive','Locked')", nullable: false, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsFirstLogin = table.Column<bool>(type: "tinyint(1)", nullable: true, defaultValueSql: "'1'"),
+                    LastLoginAt = table.Column<DateTime>(type: "datetime", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: true)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.ComputedColumn)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PRIMARY", x => x.UserId);
+                    table.UniqueConstraint("AK_userauthentication_EmployeeId", x => x.EmployeeId);
+                    table.ForeignKey(
+                        name: "userauthentication_ibfk_1",
+                        column: x => x.EmployeeId,
+                        principalTable: "employee",
+                        principalColumn: "EmployeeId",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4")
+                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
+
+            migrationBuilder.CreateTable(
+                name: "userprofile",
+                columns: table => new
+                {
+                    ProfileId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    EmployeeId = table.Column<int>(type: "int", nullable: false),
+                    FirstName = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    MiddleName = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    LastName = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CallingName = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ProfilePhoto = table.Column<byte[]>(type: "longblob", nullable: true),
+                    ReferredBy = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Gender = table.Column<string>(type: "enum('Male','Female','Other','PreferNotToSay')", nullable: true, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    DateOfBirthOfficial = table.Column<DateOnly>(type: "date", nullable: true),
+                    DateOfBirthActual = table.Column<DateOnly>(type: "date", nullable: true),
+                    MobileNumber = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: true, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    AlternateNumber = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: true, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PersonalEmail = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    MaritalStatus = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Nationality = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PRIMARY", x => x.ProfileId);
+                    table.ForeignKey(
+                        name: "userprofile_ibfk_1",
+                        column: x => x.EmployeeId,
+                        principalTable: "employee",
+                        principalColumn: "EmployeeId",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4")
+                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
+
+            migrationBuilder.CreateTable(
+                name: "lndemployeeskillmapper",
+                columns: table => new
+                {
+                    MapperId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    EmployeeId = table.Column<int>(type: "int", nullable: false),
+                    SkillId = table.Column<int>(type: "int", nullable: false),
+                    Rating = table.Column<int>(type: "int", nullable: false),
+                    UpdatedByEmployeeId = table.Column<int>(type: "int", nullable: false),
+                    CreatedByEmployeeId = table.Column<int>(type: "int", nullable: false),
+                    CreatedOn = table.Column<DateOnly>(type: "date", nullable: true),
+                    UpdatedOn = table.Column<DateOnly>(type: "date", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PRIMARY", x => x.MapperId);
+                    table.ForeignKey(
+                        name: "FK_EmployeeSkillMapper_CreatedBy",
+                        column: x => x.CreatedByEmployeeId,
+                        principalTable: "employee",
+                        principalColumn: "EmployeeId");
+                    table.ForeignKey(
+                        name: "FK_EmployeeSkillMapper_Employee",
+                        column: x => x.EmployeeId,
+                        principalTable: "employee",
+                        principalColumn: "EmployeeId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EmployeeSkillMapper_Skill",
+                        column: x => x.SkillId,
+                        principalTable: "master_skill",
+                        principalColumn: "SkillId");
+                    table.ForeignKey(
+                        name: "FK_EmployeeSkillMapper_UpdatedBy",
+                        column: x => x.UpdatedByEmployeeId,
+                        principalTable: "employee",
+                        principalColumn: "EmployeeId");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4")
+                .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
+
+            migrationBuilder.CreateTable(
+                name: "departmentbudgets",
+                columns: table => new
+                {
+                    BudgetId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    DepartmentId = table.Column<int>(type: "int", nullable: false),
+                    FiscalYear = table.Column<int>(type: "int", nullable: false),
+                    TotalBudget = table.Column<decimal>(type: "decimal(15,2)", precision: 15, scale: 2, nullable: false),
+                    AllocatedAmount = table.Column<decimal>(type: "decimal(15,2)", precision: 15, scale: 2, nullable: true, defaultValueSql: "'0.00'"),
+                    UtilizedAmount = table.Column<decimal>(type: "decimal(15,2)", precision: 15, scale: 2, nullable: true, defaultValueSql: "'0.00'"),
+                    UtilizationPercentage = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: true, computedColumnSql: "(`UtilizedAmount` / nullif(`TotalBudget`,0)) * 100", stored: true),
+                    Headcount = table.Column<int>(type: "int", nullable: true, defaultValueSql: "'0'"),
+                    AvgCostPerEmployee = table.Column<decimal>(type: "decimal(15,2)", precision: 15, scale: 2, nullable: true, computedColumnSql: "case when (`Headcount` > 0) then (`UtilizedAmount` / `Headcount`) else 0 end", stored: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: true)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.ComputedColumn)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PRIMARY", x => x.BudgetId);
+                    table.ForeignKey(
+                        name: "departmentbudgets_ibfk_1",
+                        column: x => x.DepartmentId,
+                        principalTable: "department",
+                        principalColumn: "DepartmentId",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4")
+                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
+
+            migrationBuilder.CreateTable(
+                name: "employeedetailsmaster",
+                columns: table => new
+                {
+                    EmployeeMasterId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    EmployeeId = table.Column<int>(type: "int", nullable: false),
+                    RoleId = table.Column<int>(type: "int", nullable: false),
+                    DepartmentId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PRIMARY", x => x.EmployeeMasterId);
+                    table.ForeignKey(
+                        name: "employeedetailsmaster_ibfk_1",
+                        column: x => x.EmployeeId,
+                        principalTable: "employee",
+                        principalColumn: "EmployeeId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "employeedetailsmaster_ibfk_2",
+                        column: x => x.RoleId,
+                        principalTable: "role",
+                        principalColumn: "RoleId");
+                    table.ForeignKey(
+                        name: "employeedetailsmaster_ibfk_3",
+                        column: x => x.DepartmentId,
+                        principalTable: "department",
+                        principalColumn: "DepartmentId");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4")
+                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
+
+            migrationBuilder.CreateTable(
+                name: "engagement",
+                columns: table => new
+                {
+                    engagement_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    department_id = table.Column<int>(type: "int", nullable: true),
+                    engagement_score = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: true),
+                    period_start = table.Column<DateTime>(type: "datetime", nullable: true),
+                    period_end = table.Column<DateTime>(type: "datetime", nullable: true),
+                    trend_score = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: true),
+                    created_at = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PRIMARY", x => x.engagement_id);
+                    table.ForeignKey(
+                        name: "engagement_ibfk_1",
+                        column: x => x.department_id,
+                        principalTable: "department",
+                        principalColumn: "DepartmentId",
+                        onDelete: ReferentialAction.SetNull);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4")
+                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
+
+            migrationBuilder.CreateTable(
+                name: "risk",
+                columns: table => new
+                {
+                    risk_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    department_id = table.Column<int>(type: "int", nullable: true),
+                    risk_type = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    trend_graph = table.Column<string>(type: "text", nullable: true, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    period_start = table.Column<DateTime>(type: "datetime", nullable: true),
+                    period_end = table.Column<DateTime>(type: "datetime", nullable: true),
+                    created_at = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PRIMARY", x => x.risk_id);
+                    table.ForeignKey(
+                        name: "risk_ibfk_1",
+                        column: x => x.department_id,
+                        principalTable: "department",
+                        principalColumn: "DepartmentId",
+                        onDelete: ReferentialAction.SetNull);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4")
+                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
+
+            migrationBuilder.CreateTable(
                 name: "sla",
                 columns: table => new
                 {
@@ -587,159 +745,6 @@ namespace Relevantz.EEPZ.Data.Migrations
                         principalColumn: "EmployeeId");
                     table.ForeignKey(
                         name: "fk_slacompliance_department",
-                        column: x => x.DepartmentId,
-                        principalTable: "department",
-                        principalColumn: "DepartmentId");
-                })
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
-
-            migrationBuilder.CreateTable(
-                name: "userauthentication",
-                columns: table => new
-                {
-                    UserId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    EmployeeId = table.Column<int>(type: "int", nullable: false),
-                    Email = table.Column<string>(type: "varchar(255)", nullable: false, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    PasswordHash = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: false, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Status = table.Column<string>(type: "enum('Active','Inactive','Locked')", nullable: false, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    IsFirstLogin = table.Column<bool>(type: "tinyint(1)", nullable: true, defaultValueSql: "'1'"),
-                    LastLoginAt = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: true)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.ComputedColumn)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PRIMARY", x => x.UserId);
-                    table.ForeignKey(
-                        name: "userauthentication_ibfk_1",
-                        column: x => x.EmployeeId,
-                        principalTable: "employee",
-                        principalColumn: "EmployeeId",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
-
-            migrationBuilder.CreateTable(
-                name: "userprofile",
-                columns: table => new
-                {
-                    ProfileId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    EmployeeId = table.Column<int>(type: "int", nullable: false),
-                    FirstName = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    MiddleName = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    LastName = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CallingName = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ReferredBy = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Gender = table.Column<string>(type: "enum('Male','Female','Other','PreferNotToSay')", nullable: true, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    DateOfBirthOfficial = table.Column<DateOnly>(type: "date", nullable: true),
-                    DateOfBirthActual = table.Column<DateOnly>(type: "date", nullable: true),
-                    MobileNumber = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: true, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    AlternateNumber = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: true, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    PersonalEmail = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    MaritalStatus = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Nationality = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ProfilePhoto = table.Column<byte[]>(type: "longblob", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PRIMARY", x => x.ProfileId);
-                    table.ForeignKey(
-                        name: "userprofile_ibfk_1",
-                        column: x => x.EmployeeId,
-                        principalTable: "employee",
-                        principalColumn: "EmployeeId",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
-
-            migrationBuilder.CreateTable(
-                name: "lndemployeeskillmapper",
-                columns: table => new
-                {
-                    MapperId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    EmployeeId = table.Column<int>(type: "int", nullable: false),
-                    SkillId = table.Column<int>(type: "int", nullable: false),
-                    Rating = table.Column<int>(type: "int", nullable: false),
-                    UpdatedByEmployeeId = table.Column<int>(type: "int", nullable: false),
-                    CreatedByEmployeeId = table.Column<int>(type: "int", nullable: false),
-                    CreatedOn = table.Column<DateOnly>(type: "date", nullable: true),
-                    UpdatedOn = table.Column<DateOnly>(type: "date", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PRIMARY", x => x.MapperId);
-                    table.ForeignKey(
-                        name: "FK_EmployeeSkillMapper_CreatedBy",
-                        column: x => x.CreatedByEmployeeId,
-                        principalTable: "employee",
-                        principalColumn: "EmployeeId");
-                    table.ForeignKey(
-                        name: "FK_EmployeeSkillMapper_Employee",
-                        column: x => x.EmployeeId,
-                        principalTable: "employee",
-                        principalColumn: "EmployeeId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_EmployeeSkillMapper_Skill",
-                        column: x => x.SkillId,
-                        principalTable: "master_skill",
-                        principalColumn: "SkillId");
-                    table.ForeignKey(
-                        name: "FK_EmployeeSkillMapper_UpdatedBy",
-                        column: x => x.UpdatedByEmployeeId,
-                        principalTable: "employee",
-                        principalColumn: "EmployeeId");
-                })
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .Annotation("Relational:Collation", "utf8mb4_0900_ai_ci");
-
-            migrationBuilder.CreateTable(
-                name: "employeedetailsmaster",
-                columns: table => new
-                {
-                    EmployeeMasterId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    EmployeeId = table.Column<int>(type: "int", nullable: false),
-                    RoleId = table.Column<int>(type: "int", nullable: false),
-                    DepartmentId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PRIMARY", x => x.EmployeeMasterId);
-                    table.ForeignKey(
-                        name: "employeedetailsmaster_ibfk_1",
-                        column: x => x.EmployeeId,
-                        principalTable: "employee",
-                        principalColumn: "EmployeeId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "employeedetailsmaster_ibfk_2",
-                        column: x => x.RoleId,
-                        principalTable: "role",
-                        principalColumn: "RoleId");
-                    table.ForeignKey(
-                        name: "employeedetailsmaster_ibfk_3",
                         column: x => x.DepartmentId,
                         principalTable: "department",
                         principalColumn: "DepartmentId");
@@ -873,96 +878,6 @@ namespace Relevantz.EEPZ.Data.Migrations
                 .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
 
             migrationBuilder.CreateTable(
-                name: "slaescalation",
-                columns: table => new
-                {
-                    EscalationId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    SLAId = table.Column<int>(type: "int", nullable: false),
-                    Reason = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Description = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    EscalationLevel = table.Column<string>(type: "enum('L1','L2','DeptHead','Leadership')", nullable: false, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    EscalatedToEmployeeId = table.Column<int>(type: "int", nullable: false),
-                    EscalationStatus = table.Column<string>(type: "enum('Pending','InProgress','Resolved','Rejected')", nullable: false, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    EscalationDeadline = table.Column<DateTime>(type: "datetime", nullable: true),
-                    ResolvedAt = table.Column<DateTime>(type: "datetime", nullable: true),
-                    ResolvedByEmployeeId = table.Column<int>(type: "int", nullable: true),
-                    ResolutionComments = table.Column<string>(type: "text", nullable: true, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    SubmittedBy = table.Column<int>(type: "int", nullable: true),
-                    SubmittedByEmployeeId = table.Column<int>(type: "int", nullable: false),
-                    SubmittedAt = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PRIMARY", x => x.EscalationId);
-                    table.ForeignKey(
-                        name: "fk_slaescalation_escalated_to",
-                        column: x => x.EscalatedToEmployeeId,
-                        principalTable: "employee",
-                        principalColumn: "EmployeeId");
-                    table.ForeignKey(
-                        name: "fk_slaescalation_resolved_by",
-                        column: x => x.ResolvedByEmployeeId,
-                        principalTable: "employee",
-                        principalColumn: "EmployeeId");
-                    table.ForeignKey(
-                        name: "fk_slaescalation_sla",
-                        column: x => x.SLAId,
-                        principalTable: "sla",
-                        principalColumn: "SLAId");
-                    table.ForeignKey(
-                        name: "fk_slaescalation_submitted_by",
-                        column: x => x.SubmittedByEmployeeId,
-                        principalTable: "employee",
-                        principalColumn: "EmployeeId");
-                })
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
-
-            migrationBuilder.CreateTable(
-                name: "slanotifications",
-                columns: table => new
-                {
-                    NotificationId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    SLAId = table.Column<int>(type: "int", nullable: false),
-                    EmployeeId = table.Column<int>(type: "int", nullable: false),
-                    NotificationType = table.Column<string>(type: "enum('Reminder','Escalation','Breach','Closure','Reopen')", nullable: false, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    NotificationSubject = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    NotificationBody = table.Column<string>(type: "text", nullable: false, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    SentAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    DeliveryStatus = table.Column<string>(type: "enum('Sent','Failed','Read','Pending')", nullable: false, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ReadAt = table.Column<DateTime>(type: "datetime", nullable: true),
-                    Channel = table.Column<string>(type: "enum('Email','InApp','SMS')", nullable: false, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PRIMARY", x => x.NotificationId);
-                    table.ForeignKey(
-                        name: "fk_slanotifications_employee",
-                        column: x => x.EmployeeId,
-                        principalTable: "employee",
-                        principalColumn: "EmployeeId");
-                    table.ForeignKey(
-                        name: "fk_slanotifications_sla",
-                        column: x => x.SLAId,
-                        principalTable: "sla",
-                        principalColumn: "SLAId");
-                })
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
-
-            migrationBuilder.CreateTable(
                 name: "assessmentform",
                 columns: table => new
                 {
@@ -1019,99 +934,6 @@ namespace Relevantz.EEPZ.Data.Migrations
                 .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
 
             migrationBuilder.CreateTable(
-                name: "budgetallocations",
-                columns: table => new
-                {
-                    AllocationId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    DepartmentId = table.Column<int>(type: "int", nullable: false),
-                    EmployeeUserId = table.Column<int>(type: "int", nullable: true),
-                    AllocationType = table.Column<string>(type: "enum('Bonus','Promotion','Training','Other')", nullable: false, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Amount = table.Column<decimal>(type: "decimal(15,2)", precision: 15, scale: 2, nullable: false),
-                    GoalStatus = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Notes = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    AllocatedByUserId = table.Column<int>(type: "int", nullable: false),
-                    AllocatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    BudgetId = table.Column<int>(type: "int", nullable: true),
-                    UtilizedAmount = table.Column<decimal>(type: "decimal(15,2)", precision: 15, scale: 2, nullable: true, defaultValueSql: "'0.00'"),
-                    UtilizationPercentage = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: true, defaultValueSql: "'0.00'"),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP")
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.ComputedColumn),
-                    Period = table.Column<string>(type: "varchar(10)", maxLength: 10, nullable: true, comment: "Q1, Q2, Q3, Q4", collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    PeriodYear = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PRIMARY", x => x.AllocationId);
-                    table.ForeignKey(
-                        name: "budgetallocations_ibfk_1",
-                        column: x => x.DepartmentId,
-                        principalTable: "department",
-                        principalColumn: "DepartmentId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "budgetallocations_ibfk_2",
-                        column: x => x.EmployeeUserId,
-                        principalTable: "userauthentication",
-                        principalColumn: "UserId",
-                        onDelete: ReferentialAction.SetNull);
-                    table.ForeignKey(
-                        name: "budgetallocations_ibfk_3",
-                        column: x => x.AllocatedByUserId,
-                        principalTable: "userauthentication",
-                        principalColumn: "UserId");
-                    table.ForeignKey(
-                        name: "budgetallocations_ibfk_4",
-                        column: x => x.BudgetId,
-                        principalTable: "departmentbudgets",
-                        principalColumn: "BudgetId");
-                })
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
-
-            migrationBuilder.CreateTable(
-                name: "budgetperiodallocations",
-                columns: table => new
-                {
-                    PeriodAllocationId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    BudgetId = table.Column<int>(type: "int", nullable: false),
-                    Period = table.Column<string>(type: "varchar(10)", maxLength: 10, nullable: false, comment: "Q1, Q2, Q3, Q4, H1, H2", collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    PeriodYear = table.Column<int>(type: "int", nullable: false),
-                    AllocatedAmount = table.Column<decimal>(type: "decimal(15,2)", precision: 15, scale: 2, nullable: false),
-                    UtilizedAmount = table.Column<decimal>(type: "decimal(15,2)", precision: 15, scale: 2, nullable: false),
-                    UtilizationPercentage = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
-                    AllocatedByUserId = table.Column<int>(type: "int", nullable: false),
-                    AllocatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: true)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.ComputedColumn),
-                    Notes = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PRIMARY", x => x.PeriodAllocationId);
-                    table.ForeignKey(
-                        name: "fk_period_allocated_by",
-                        column: x => x.AllocatedByUserId,
-                        principalTable: "userauthentication",
-                        principalColumn: "UserId");
-                    table.ForeignKey(
-                        name: "fk_period_budget",
-                        column: x => x.BudgetId,
-                        principalTable: "departmentbudgets",
-                        principalColumn: "BudgetId",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
-
-            migrationBuilder.CreateTable(
                 name: "bulkoperationlogs",
                 columns: table => new
                 {
@@ -1138,6 +960,65 @@ namespace Relevantz.EEPZ.Data.Migrations
                         principalTable: "userauthentication",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4")
+                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
+
+            migrationBuilder.CreateTable(
+                name: "chatconversations",
+                columns: table => new
+                {
+                    ConversationId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    SessionId = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: true)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.ComputedColumn),
+                    IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValueSql: "'1'")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PRIMARY", x => x.ConversationId);
+                    table.ForeignKey(
+                        name: "chatconversations_ibfk_1",
+                        column: x => x.UserId,
+                        principalTable: "userauthentication",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4")
+                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
+
+            migrationBuilder.CreateTable(
+                name: "chatpatterns",
+                columns: table => new
+                {
+                    PatternId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Pattern = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: false, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Response = table.Column<string>(type: "text", nullable: false, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Category = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Priority = table.Column<int>(type: "int", nullable: true, defaultValueSql: "'0'"),
+                    IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValueSql: "'1'"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: true)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.ComputedColumn),
+                    CreatedByUserId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PRIMARY", x => x.PatternId);
+                    table.ForeignKey(
+                        name: "chatpatterns_ibfk_1",
+                        column: x => x.CreatedByUserId,
+                        principalTable: "userauthentication",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.SetNull);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4")
                 .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
@@ -1595,6 +1476,7 @@ namespace Relevantz.EEPZ.Data.Migrations
                     Description = table.Column<string>(type: "text", nullable: true, collation: "utf8mb4_unicode_ci")
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValueSql: "'1'"),
+                    IsVisibleForManagerNomination = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CreatedBy = table.Column<int>(type: "int", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
@@ -1636,6 +1518,99 @@ namespace Relevantz.EEPZ.Data.Migrations
                         column: x => x.ManagerUserId,
                         principalTable: "userauthentication",
                         principalColumn: "UserId");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4")
+                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
+
+            migrationBuilder.CreateTable(
+                name: "budgetallocations",
+                columns: table => new
+                {
+                    AllocationId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    DepartmentId = table.Column<int>(type: "int", nullable: false),
+                    EmployeeUserId = table.Column<int>(type: "int", nullable: true),
+                    AllocationType = table.Column<string>(type: "enum('Bonus','Promotion','Training','Other')", nullable: false, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Amount = table.Column<decimal>(type: "decimal(15,2)", precision: 15, scale: 2, nullable: false),
+                    GoalStatus = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Notes = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    AllocatedByUserId = table.Column<int>(type: "int", nullable: false),
+                    AllocatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    BudgetId = table.Column<int>(type: "int", nullable: true),
+                    UtilizedAmount = table.Column<decimal>(type: "decimal(15,2)", precision: 15, scale: 2, nullable: true, defaultValueSql: "'0.00'"),
+                    UtilizationPercentage = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: true, defaultValueSql: "'0.00'"),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP")
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.ComputedColumn),
+                    Period = table.Column<string>(type: "varchar(10)", maxLength: 10, nullable: true, comment: "Q1, Q2, Q3, Q4", collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PeriodYear = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PRIMARY", x => x.AllocationId);
+                    table.ForeignKey(
+                        name: "budgetallocations_ibfk_1",
+                        column: x => x.DepartmentId,
+                        principalTable: "department",
+                        principalColumn: "DepartmentId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "budgetallocations_ibfk_2",
+                        column: x => x.EmployeeUserId,
+                        principalTable: "userauthentication",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "budgetallocations_ibfk_3",
+                        column: x => x.AllocatedByUserId,
+                        principalTable: "userauthentication",
+                        principalColumn: "UserId");
+                    table.ForeignKey(
+                        name: "budgetallocations_ibfk_4",
+                        column: x => x.BudgetId,
+                        principalTable: "departmentbudgets",
+                        principalColumn: "BudgetId");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4")
+                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
+
+            migrationBuilder.CreateTable(
+                name: "budgetperiodallocations",
+                columns: table => new
+                {
+                    PeriodAllocationId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    BudgetId = table.Column<int>(type: "int", nullable: false),
+                    Period = table.Column<string>(type: "varchar(10)", maxLength: 10, nullable: false, comment: "Q1, Q2, Q3, Q4, H1, H2", collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PeriodYear = table.Column<int>(type: "int", nullable: false),
+                    AllocatedAmount = table.Column<decimal>(type: "decimal(15,2)", precision: 15, scale: 2, nullable: false),
+                    UtilizedAmount = table.Column<decimal>(type: "decimal(15,2)", precision: 15, scale: 2, nullable: false),
+                    UtilizationPercentage = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
+                    AllocatedByUserId = table.Column<int>(type: "int", nullable: false),
+                    AllocatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: true)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.ComputedColumn),
+                    Notes = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PRIMARY", x => x.PeriodAllocationId);
+                    table.ForeignKey(
+                        name: "fk_period_allocated_by",
+                        column: x => x.AllocatedByUserId,
+                        principalTable: "userauthentication",
+                        principalColumn: "UserId");
+                    table.ForeignKey(
+                        name: "fk_period_budget",
+                        column: x => x.BudgetId,
+                        principalTable: "departmentbudgets",
+                        principalColumn: "BudgetId",
+                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4")
                 .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
@@ -1782,6 +1757,96 @@ namespace Relevantz.EEPZ.Data.Migrations
                         principalTable: "employeedetailsmaster",
                         principalColumn: "EmployeeMasterId",
                         onDelete: ReferentialAction.SetNull);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4")
+                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
+
+            migrationBuilder.CreateTable(
+                name: "slaescalation",
+                columns: table => new
+                {
+                    EscalationId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    SLAId = table.Column<int>(type: "int", nullable: false),
+                    Reason = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Description = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    EscalationLevel = table.Column<string>(type: "enum('L1','L2','DeptHead','Leadership')", nullable: false, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    EscalatedToEmployeeId = table.Column<int>(type: "int", nullable: false),
+                    EscalationStatus = table.Column<string>(type: "enum('Pending','InProgress','Resolved','Rejected')", nullable: false, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    EscalationDeadline = table.Column<DateTime>(type: "datetime", nullable: true),
+                    ResolvedAt = table.Column<DateTime>(type: "datetime", nullable: true),
+                    ResolvedByEmployeeId = table.Column<int>(type: "int", nullable: true),
+                    ResolutionComments = table.Column<string>(type: "text", nullable: true, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    SubmittedBy = table.Column<int>(type: "int", nullable: true),
+                    SubmittedByEmployeeId = table.Column<int>(type: "int", nullable: false),
+                    SubmittedAt = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PRIMARY", x => x.EscalationId);
+                    table.ForeignKey(
+                        name: "fk_slaescalation_escalated_to",
+                        column: x => x.EscalatedToEmployeeId,
+                        principalTable: "employee",
+                        principalColumn: "EmployeeId");
+                    table.ForeignKey(
+                        name: "fk_slaescalation_resolved_by",
+                        column: x => x.ResolvedByEmployeeId,
+                        principalTable: "employee",
+                        principalColumn: "EmployeeId");
+                    table.ForeignKey(
+                        name: "fk_slaescalation_sla",
+                        column: x => x.SLAId,
+                        principalTable: "sla",
+                        principalColumn: "SLAId");
+                    table.ForeignKey(
+                        name: "fk_slaescalation_submitted_by",
+                        column: x => x.SubmittedByEmployeeId,
+                        principalTable: "employee",
+                        principalColumn: "EmployeeId");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4")
+                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
+
+            migrationBuilder.CreateTable(
+                name: "slanotifications",
+                columns: table => new
+                {
+                    NotificationId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    SLAId = table.Column<int>(type: "int", nullable: false),
+                    EmployeeId = table.Column<int>(type: "int", nullable: false),
+                    NotificationType = table.Column<string>(type: "enum('Reminder','Escalation','Breach','Closure','Reopen')", nullable: false, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    NotificationSubject = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    NotificationBody = table.Column<string>(type: "text", nullable: false, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    SentAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    DeliveryStatus = table.Column<string>(type: "enum('Sent','Failed','Read','Pending')", nullable: false, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ReadAt = table.Column<DateTime>(type: "datetime", nullable: true),
+                    Channel = table.Column<string>(type: "enum('Email','InApp','SMS')", nullable: false, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PRIMARY", x => x.NotificationId);
+                    table.ForeignKey(
+                        name: "fk_slanotifications_employee",
+                        column: x => x.EmployeeId,
+                        principalTable: "employee",
+                        principalColumn: "EmployeeId");
+                    table.ForeignKey(
+                        name: "fk_slanotifications_sla",
+                        column: x => x.SLAId,
+                        principalTable: "sla",
+                        principalColumn: "SLAId");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4")
                 .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
@@ -2006,49 +2071,6 @@ namespace Relevantz.EEPZ.Data.Migrations
                 .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
 
             migrationBuilder.CreateTable(
-                name: "slahistory",
-                columns: table => new
-                {
-                    SLAHistoryId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    SLAId = table.Column<int>(type: "int", nullable: false),
-                    ChangeType = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ChangedFrom = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ChangedTo = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ChangedByEmployeeId = table.Column<int>(type: "int", nullable: true),
-                    ReferenceEscalationId = table.Column<int>(type: "int", nullable: true),
-                    Reason = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Metadata = table.Column<string>(type: "json", nullable: true, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PRIMARY", x => x.SLAHistoryId);
-                    table.ForeignKey(
-                        name: "fk_slahistory_changed_by",
-                        column: x => x.ChangedByEmployeeId,
-                        principalTable: "employee",
-                        principalColumn: "EmployeeId");
-                    table.ForeignKey(
-                        name: "fk_slahistory_reference_escalation",
-                        column: x => x.ReferenceEscalationId,
-                        principalTable: "slaescalation",
-                        principalColumn: "EscalationId");
-                    table.ForeignKey(
-                        name: "fk_slahistory_sla",
-                        column: x => x.SLAId,
-                        principalTable: "sla",
-                        principalColumn: "SLAId");
-                })
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
-
-            migrationBuilder.CreateTable(
                 name: "assignment",
                 columns: table => new
                 {
@@ -2193,6 +2215,31 @@ namespace Relevantz.EEPZ.Data.Migrations
                         column: x => x.SLAId,
                         principalTable: "sla",
                         principalColumn: "SLAId");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4")
+                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
+
+            migrationBuilder.CreateTable(
+                name: "chatmessages",
+                columns: table => new
+                {
+                    MessageId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    ConversationId = table.Column<int>(type: "int", nullable: false),
+                    Message = table.Column<string>(type: "text", nullable: false, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsUserMessage = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PRIMARY", x => x.MessageId);
+                    table.ForeignKey(
+                        name: "chatmessages_ibfk_1",
+                        column: x => x.ConversationId,
+                        principalTable: "chatconversations",
+                        principalColumn: "ConversationId",
+                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4")
                 .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
@@ -2592,6 +2639,49 @@ namespace Relevantz.EEPZ.Data.Migrations
                 .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
 
             migrationBuilder.CreateTable(
+                name: "slahistory",
+                columns: table => new
+                {
+                    SLAHistoryId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    SLAId = table.Column<int>(type: "int", nullable: false),
+                    ChangeType = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ChangedFrom = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ChangedTo = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ChangedByEmployeeId = table.Column<int>(type: "int", nullable: true),
+                    ReferenceEscalationId = table.Column<int>(type: "int", nullable: true),
+                    Reason = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Metadata = table.Column<string>(type: "json", nullable: true, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PRIMARY", x => x.SLAHistoryId);
+                    table.ForeignKey(
+                        name: "fk_slahistory_changed_by",
+                        column: x => x.ChangedByEmployeeId,
+                        principalTable: "employee",
+                        principalColumn: "EmployeeId");
+                    table.ForeignKey(
+                        name: "fk_slahistory_reference_escalation",
+                        column: x => x.ReferenceEscalationId,
+                        principalTable: "slaescalation",
+                        principalColumn: "EscalationId");
+                    table.ForeignKey(
+                        name: "fk_slahistory_sla",
+                        column: x => x.SLAId,
+                        principalTable: "sla",
+                        principalColumn: "SLAId");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4")
+                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
+
+            migrationBuilder.CreateTable(
                 name: "lndapprovals",
                 columns: table => new
                 {
@@ -2752,6 +2842,80 @@ namespace Relevantz.EEPZ.Data.Migrations
                         column: x => x.ApprovedBy,
                         principalTable: "userauthentication",
                         principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4")
+                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
+
+            migrationBuilder.CreateTable(
+                name: "selfassessmentattachment",
+                columns: table => new
+                {
+                    attachment_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    assessment_id = table.Column<int>(type: "int", nullable: false),
+                    uploaded_by = table.Column<int>(type: "int", nullable: true),
+                    file_name = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    file_path = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: false, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    file_type = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    file_size = table.Column<long>(type: "bigint", nullable: true),
+                    attachment_note = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    display_order = table.Column<int>(type: "int", nullable: true, defaultValueSql: "'0'"),
+                    uploaded_at = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    updated_at = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP")
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.ComputedColumn)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PRIMARY", x => x.attachment_id);
+                    table.ForeignKey(
+                        name: "selfassessmentattachment_ibfk_1",
+                        column: x => x.assessment_id,
+                        principalTable: "selfassessment",
+                        principalColumn: "assessment_id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "selfassessmentattachment_ibfk_2",
+                        column: x => x.uploaded_by,
+                        principalTable: "userauthentication",
+                        principalColumn: "EmployeeId",
+                        onDelete: ReferentialAction.SetNull);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4")
+                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
+
+            migrationBuilder.CreateTable(
+                name: "chatactionlogs",
+                columns: table => new
+                {
+                    ActionLogId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    ConversationId = table.Column<int>(type: "int", nullable: false),
+                    MessageId = table.Column<int>(type: "int", nullable: false),
+                    ActionType = table.Column<string>(type: "enum('Query','DataRetrieval','Export','UserManagement','Error')", nullable: false, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ActionDetails = table.Column<string>(type: "text", nullable: true, collation: "utf8mb4_unicode_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ExecutedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PRIMARY", x => x.ActionLogId);
+                    table.ForeignKey(
+                        name: "chatactionlogs_ibfk_1",
+                        column: x => x.ConversationId,
+                        principalTable: "chatconversations",
+                        principalColumn: "ConversationId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "chatactionlogs_ibfk_2",
+                        column: x => x.MessageId,
+                        principalTable: "chatmessages",
+                        principalColumn: "MessageId",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4")
@@ -3706,15 +3870,113 @@ namespace Relevantz.EEPZ.Data.Migrations
                 column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
+                name: "idx_action_type",
+                table: "chatactionlogs",
+                column: "ActionType");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_conversation",
+                table: "chatactionlogs",
+                column: "ConversationId");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_executed_at",
+                table: "chatactionlogs",
+                column: "ExecutedAt");
+
+            migrationBuilder.CreateIndex(
+                name: "MessageId",
+                table: "chatactionlogs",
+                column: "MessageId");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_created_at",
+                table: "chatconversations",
+                column: "CreatedAt");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_is_active",
+                table: "chatconversations",
+                column: "IsActive");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_user_session",
+                table: "chatconversations",
+                columns: new[] { "UserId", "SessionId" });
+
+            migrationBuilder.CreateIndex(
+                name: "idx_conversation1",
+                table: "chatmessages",
+                column: "ConversationId");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_created_at1",
+                table: "chatmessages",
+                column: "CreatedAt");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_is_user_message",
+                table: "chatmessages",
+                column: "IsUserMessage");
+
+            migrationBuilder.CreateIndex(
+                name: "CreatedByUserId",
+                table: "chatpatterns",
+                column: "CreatedByUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_category",
+                table: "chatpatterns",
+                column: "Category");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_is_active1",
+                table: "chatpatterns",
+                column: "IsActive");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_pattern",
+                table: "chatpatterns",
+                column: "Pattern")
+                .Annotation("MySql:IndexPrefixLength", new[] { 255 });
+
+            migrationBuilder.CreateIndex(
+                name: "idx_priority",
+                table: "chatpatterns",
+                column: "Priority",
+                descending: new bool[0]);
+
+            migrationBuilder.CreateIndex(
                 name: "idx_form1",
                 table: "competency",
                 column: "form_id");
 
             migrationBuilder.CreateIndex(
-                name: "DepartmentName",
+                name: "idx_department_code",
+                table: "department",
+                column: "DepartmentCode",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "idx_department_hod",
+                table: "department",
+                column: "HodEmployeeId");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_department_name",
                 table: "department",
                 column: "DepartmentName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "idx_department_parent",
+                table: "department",
+                column: "ParentDepartmentId");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_department_status",
+                table: "department",
+                column: "Status");
 
             migrationBuilder.CreateIndex(
                 name: "idx_department_year",
@@ -3764,7 +4026,7 @@ namespace Relevantz.EEPZ.Data.Migrations
                 column: "EmploymentStatus");
 
             migrationBuilder.CreateIndex(
-                name: "idx_is_active",
+                name: "idx_is_active2",
                 table: "employee",
                 column: "IsActive");
 
@@ -3824,7 +4086,7 @@ namespace Relevantz.EEPZ.Data.Migrations
                 column: "BiasFlag");
 
             migrationBuilder.CreateIndex(
-                name: "idx_created_at",
+                name: "idx_created_at2",
                 table: "feedback",
                 column: "CreatedAt");
 
@@ -3884,7 +4146,7 @@ namespace Relevantz.EEPZ.Data.Migrations
                 column: "FeedbackType");
 
             migrationBuilder.CreateIndex(
-                name: "idx_is_active1",
+                name: "idx_is_active3",
                 table: "feedbackquestion",
                 column: "IsActive");
 
@@ -4610,7 +4872,7 @@ namespace Relevantz.EEPZ.Data.Migrations
                 column: "ParticipantEmployeeId");
 
             migrationBuilder.CreateIndex(
-                name: "idx_category",
+                name: "idx_category1",
                 table: "organizationalpolicies",
                 column: "Category");
 
@@ -4982,7 +5244,7 @@ namespace Relevantz.EEPZ.Data.Migrations
                 column: "ReviewedByEmployeeId");
 
             migrationBuilder.CreateIndex(
-                name: "idx_created_at1",
+                name: "idx_created_at3",
                 table: "refreshtokens",
                 column: "CreatedAt");
 
@@ -5039,9 +5301,14 @@ namespace Relevantz.EEPZ.Data.Migrations
                 column: "IsActive");
 
             migrationBuilder.CreateIndex(
-                name: "idx_category1",
+                name: "idx_category2",
                 table: "rewardtype",
                 column: "RewardCategory");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_manager_visible",
+                table: "rewardtype",
+                column: "IsVisibleForManagerNomination");
 
             migrationBuilder.CreateIndex(
                 name: "idx_department5",
@@ -5074,6 +5341,21 @@ namespace Relevantz.EEPZ.Data.Migrations
                 name: "idx_form3",
                 table: "selfassessment",
                 column: "form_id");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_assessment1",
+                table: "selfassessmentattachment",
+                column: "assessment_id");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_uploaded_at",
+                table: "selfassessmentattachment",
+                column: "uploaded_at");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_uploaded_by",
+                table: "selfassessmentattachment",
+                column: "uploaded_by");
 
             migrationBuilder.CreateIndex(
                 name: "idx_sla_AssignedToEmployeeId",
@@ -5278,9 +5560,6 @@ namespace Relevantz.EEPZ.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "__efmigrationshistory");
-
-            migrationBuilder.DropTable(
                 name: "address");
 
             migrationBuilder.DropTable(
@@ -5300,6 +5579,12 @@ namespace Relevantz.EEPZ.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "changerequests");
+
+            migrationBuilder.DropTable(
+                name: "chatactionlogs");
+
+            migrationBuilder.DropTable(
+                name: "chatpatterns");
 
             migrationBuilder.DropTable(
                 name: "departmentheadapprovals");
@@ -5431,6 +5716,9 @@ namespace Relevantz.EEPZ.Data.Migrations
                 name: "risk");
 
             migrationBuilder.DropTable(
+                name: "selfassessmentattachment");
+
+            migrationBuilder.DropTable(
                 name: "slacompliance");
 
             migrationBuilder.DropTable(
@@ -5453,6 +5741,9 @@ namespace Relevantz.EEPZ.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "departmentbudgets");
+
+            migrationBuilder.DropTable(
+                name: "chatmessages");
 
             migrationBuilder.DropTable(
                 name: "feedback");
@@ -5501,6 +5792,9 @@ namespace Relevantz.EEPZ.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "competency");
+
+            migrationBuilder.DropTable(
+                name: "chatconversations");
 
             migrationBuilder.DropTable(
                 name: "goals");
