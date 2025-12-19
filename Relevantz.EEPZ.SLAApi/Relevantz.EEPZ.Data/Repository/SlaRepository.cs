@@ -24,25 +24,22 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         #region Basic CRUD Operations
 
 
-        public async Task<List<Sla>> GetAllSlasAsync()
-        {
-            try
-            {
-                return await _context.Slas
-                    .Include(s => s.Employee)
-                        .ThenInclude(e => e.Userprofile)
-                    .Include(s => s.Department)
-                    .Include(s => s.AssignedToEmployee)
-                        .ThenInclude(e => e.Userprofile)
-                    .OrderByDescending(s => s.CreatedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving all SLAs");
-                throw;
-            }
-        }
+       public async Task<List<Sla>> GetAllSlasAsync()
+{
+    return await _context.Slas
+        .Include(s => s.Employee)
+            .ThenInclude(e => e.Userprofile)
+        .Include(s => s.Employee)
+            .ThenInclude(e => e.Userauthentication)
+        .Include(s => s.Department)
+        .Include(s => s.AssignedToEmployee)
+            .ThenInclude(e => e.Userprofile)
+        .Include(s => s.AssignedToEmployee)
+            .ThenInclude(e => e.Userauthentication)
+        .OrderByDescending(s => s.CreatedAt)
+        .ToListAsync();
+}
+
 
 public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
 {
@@ -862,14 +859,23 @@ public async Task<List<Slaescalation>> GetEscalationsByEscalatedToAsync(int empl
             .AsNoTracking()
             .Where(e => e.EscalatedToEmployeeId == employeeId)
             .Include(e => e.Sla)
-                .ThenInclude(s => s.Employee!)  
+                .ThenInclude(s => s.Employee!)
                 .ThenInclude(emp => emp.Userprofile)
-            .Include(e => e.EscalatedToEmployee!)  
+            .Include(e => e.Sla)
+                .ThenInclude(s => s.Employee!)
+                .ThenInclude(emp => emp.Userauthentication)
+            .Include(e => e.EscalatedToEmployee!)
                 .ThenInclude(emp => emp.Userprofile)
-            .Include(e => e.SubmittedByEmployee!)  
+            .Include(e => e.EscalatedToEmployee!)
+                .ThenInclude(emp => emp.Userauthentication)
+            .Include(e => e.SubmittedByEmployee!)
                 .ThenInclude(emp => emp.Userprofile)
-            .Include(e => e.ResolvedByEmployee!)  
+            .Include(e => e.SubmittedByEmployee!)
+                .ThenInclude(emp => emp.Userauthentication)
+            .Include(e => e.ResolvedByEmployee!)
                 .ThenInclude(emp => emp.Userprofile)
+            .Include(e => e.ResolvedByEmployee!)
+                .ThenInclude(emp => emp.Userauthentication)
             .OrderByDescending(e => e.SubmittedAt)
             .ToListAsync();
     }
@@ -879,6 +885,7 @@ public async Task<List<Slaescalation>> GetEscalationsByEscalatedToAsync(int empl
         throw;
     }
 }
+
 
         /// <summary>
         /// Get SLAs due in specific number of days (for reminders)

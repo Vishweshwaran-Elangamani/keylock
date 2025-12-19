@@ -501,7 +501,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                     EmployeeId = s.EmployeeId,
                     EmployeeName = GetEmployeeName(s.Employee),
-                    EmployeeEmail = s.Employee?.Userprofile?.PersonalEmail ?? string.Empty,
+                    EmployeeEmail = s.Employee?.Userauthentication?.Email ?? string.Empty,
 
                     DepartmentId = s.DepartmentId,
                     DepartmentName = s.Department?.DepartmentName ?? string.Empty,
@@ -816,7 +816,7 @@ public async Task<ApiResponse<CreateSlaResponse>> CreateSla(CreateSlaRequest req
 
                     EmployeeId = e.Sla?.EmployeeId,
                     EmployeeName = GetEmployeeName(e.Sla?.Employee),
-                    EmployeeEmail = e.Sla?.Employee?.Userprofile?.PersonalEmail ?? string.Empty,
+                    EmployeeEmail = e.Sla?.Employee?.Userauthentication?.Email ?? string.Empty,
 
                     SubmittedByName = GetEmployeeName(e.SubmittedByEmployee),
                     SubmittedByEmployeeId = e.SubmittedByEmployeeId,
