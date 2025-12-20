@@ -10,11 +10,11 @@ namespace eepzbackend.Controllers
     [Route("api/[controller]")]
     public class RsvpController : ControllerBase
     {
-        private readonly IMomService _momService;
+        private readonly IMeetingService _meetingService;
 
-        public RsvpController(IMomService momService)
+        public RsvpController(IMeetingService meetingService)
         {
-            _momService = momService;
+             _meetingService = meetingService;
         }
 
 
@@ -24,7 +24,7 @@ namespace eepzbackend.Controllers
             try
             {
                 var employeeId = GetEmployeeIdFromClaims();
-                var result = await _momService.GetMyMeetingInvitationsAsync(employeeId);
+                var result = await _meetingService.GetMyMeetingInvitationsAsync(employeeId);
                 return Ok(new { success = true, data = result });
             }
             catch (Exception ex)
@@ -40,7 +40,7 @@ namespace eepzbackend.Controllers
             try
             {
                 var employeeId = GetEmployeeIdFromClaims();
-                var result = await _momService.SubmitRsvpAsync(rsvpDto, employeeId);
+                var result = await _meetingService.SubmitRsvpAsync(rsvpDto, employeeId);
                 return Ok(new { 
                     success = true, 
                     message = "RSVP submitted successfully", 
@@ -62,7 +62,7 @@ namespace eepzbackend.Controllers
             {
                 var employeeId = GetEmployeeIdFromClaims();
                 rsvpDto.MeetingId = meetingId; 
-                var result = await _momService.SubmitRsvpAsync(rsvpDto, employeeId);
+                var result = await _meetingService.SubmitRsvpAsync(rsvpDto, employeeId);
                 return Ok(new { 
                     success = true, 
                     message = "RSVP updated successfully", 
@@ -82,7 +82,7 @@ namespace eepzbackend.Controllers
             try
             {
                 var employeeId = GetEmployeeIdFromClaims();
-                var count = await _momService.GetPendingRsvpCountAsync(employeeId);
+                var count = await _meetingService.GetPendingRsvpCountAsync(employeeId);
                 return Ok(new { success = true, pendingCount = count });
             }
             catch (Exception ex)
@@ -99,7 +99,7 @@ namespace eepzbackend.Controllers
             {
                 var managerId = GetEmployeeIdFromClaims();
                 var role = GetRoleFromClaims();
-                var result = await _momService.GetMeetingRsvpSummaryAsync(meetingId, managerId, role);
+                var result = await _meetingService.GetMeetingRsvpSummaryAsync(meetingId, managerId, role);
                 return Ok(new { success = true, data = result });
             }
             catch (UnauthorizedAccessException ex)

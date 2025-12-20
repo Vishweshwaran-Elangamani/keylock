@@ -5,297 +5,16 @@ using Relevantz.EEPZ.Core.Services.Interfaces;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
-    public class MomService : IMomService
+    public class MeetingService : IMeetingService
     {
-        private readonly IMomRepository _momRepository;
+        private readonly IMeetingRepository _meetingRepository;
 
-        public MomService(IMomRepository momRepository)
+        public MeetingService(IMeetingRepository meetingRepository)
         {
-            _momRepository = momRepository;
+            _meetingRepository = meetingRepository;
         }
 
-        public async Task<MomResponseDto> CreateMomAsync(CreateMomDto createMomDto, int submittedByEmployeeId, string role)
-        {
-            ValidateCreateMomDto(createMomDto);
 
-            var mappedRole = MapRoleToEnum(role);
-
-            var mom = new Mom
-            {
-                MeetingId = createMomDto.MeetingId,
-                MeetingTitle = createMomDto.MeetingTitle,
-                MeetingType = createMomDto.MeetingType,
-                MeetingDate = createMomDto.MeetingDate,
-                MeetingLink = createMomDto.MeetingLink,
-                Attendees = createMomDto.Attendees,
-                CommentsObservations = createMomDto.CommentsObservations,
-                SubmittedByEmployeeId = submittedByEmployeeId,
-                SubmittedByRole = mappedRole,
-                IsEditable = mappedRole == "Manager", 
-                CreatedAt = DateTime.Now
-            };
-
-            var createdMom = await _momRepository.CreateMomAsync(mom);
-
-            if (createMomDto.DiscussionPoints != null && createMomDto.DiscussionPoints.Any())
-            {
-                var discussionPoints = createMomDto.DiscussionPoints.Select(dp => new Momdiscussionpoint
-                {
-                    Momid = createdMom.Momid,
-                    PointText = dp.PointText,
-                    PointOrder = dp.PointOrder
-                }).ToList();
-
-                await _momRepository.AddDiscussionPointsAsync(discussionPoints);
-            }
-
-            if (createMomDto.ActionItems != null && createMomDto.ActionItems.Any())
-            {
-                var actionItems = createMomDto.ActionItems.Select(ai => new Momactionitem
-                {
-                    Momid = createdMom.Momid,
-                    TaskDescription = ai.TaskDescription,
-                    AssignedToEmployeeId = ai.AssignedToEmployeeId,
-                    DueDate = ai.DueDate,
-                    Status = ai.Status,
-                    CreatedAt = DateTime.Now
-                }).ToList();
-
-                await _momRepository.AddActionItemsAsync(actionItems);
-
-                var uniqueEmployeeIds = createMomDto.ActionItems
-                    .Select(ai => ai.AssignedToEmployeeId)
-                    .Distinct()
-                    .Where(id => id != submittedByEmployeeId)
-                    .ToList();
-
-                if (uniqueEmployeeIds.Any())
-                {
-                    var sharings = uniqueEmployeeIds.Select(empId => new Momsharing
-                    {
-                        Momid = createdMom.Momid,
-                        SharedByEmployeeId = submittedByEmployeeId,
-                        SharedWithEmployeeId = empId,
-                        SharedAt = DateTime.Now
-                    }).ToList();
-
-                    await _momRepository.ShareMomAsync(sharings);
-                    Console.WriteLine($"✅ Auto-shared MOM {createdMom.Momid} '{createdMom.MeetingTitle}' with {uniqueEmployeeIds.Count} employees");
-                }
-            }
-
-            return await GetMomByIdAsync(createdMom.Momid) ?? throw new Exception("Failed to retrieve created MOM");
-        }
-
-        public async Task<MomResponseDto?> GetMomByIdAsync(int momId)
-        {
-            var mom = await _momRepository.GetMomByIdAsync(momId);
-            if (mom == null) return null;
-
-            return MapToMomResponseDto(mom);
-        }
-
-        public async Task<List<MomResponseDto>> GetMomsSubmittedByEmployeeAsync(int employeeId)
-        {
-            var moms = await _momRepository.GetMomsSubmittedByEmployeeAsync(employeeId);
-            return moms.Select(MapToMomResponseDto).ToList();
-        }
-
-        public async Task<MomResponseDto> UpdateMomAsync(UpdateMomDto updateMomDto, int employeeId, string role)
-        {
-            var existingMom = await _momRepository.GetMomByIdAsync(updateMomDto.MomId);
-            if (existingMom == null)
-                throw new Exception("MOM not found");
-
-            var mappedRole = MapRoleToEnum(role);
-
-            if (mappedRole != "Manager")
-                throw new UnauthorizedAccessException("Only managers can edit MOMs");
-
-            if (existingMom.SubmittedByEmployeeId != employeeId)
-                throw new UnauthorizedAccessException("You can only edit your own MOMs");
-
-            if (existingMom.IsEditable != true)
-                throw new UnauthorizedAccessException("This MOM is no longer editable");
-
-            if (!string.IsNullOrEmpty(updateMomDto.MeetingTitle))
-                existingMom.MeetingTitle = updateMomDto.MeetingTitle;
-
-            if (!string.IsNullOrEmpty(updateMomDto.MeetingType))
-                existingMom.MeetingType = updateMomDto.MeetingType;
-
-            if (updateMomDto.MeetingDate.HasValue)
-                existingMom.MeetingDate = updateMomDto.MeetingDate.Value;
-
-            if (!string.IsNullOrEmpty(updateMomDto.MeetingLink))
-                existingMom.MeetingLink = updateMomDto.MeetingLink;
-
-            if (!string.IsNullOrEmpty(updateMomDto.Attendees))
-                existingMom.Attendees = updateMomDto.Attendees;
-
-            if (!string.IsNullOrEmpty(updateMomDto.CommentsObservations))
-                existingMom.CommentsObservations = updateMomDto.CommentsObservations;
-
-            existingMom.UpdatedAt = DateTime.Now;
-
-            await _momRepository.UpdateMomAsync(existingMom);
-
-            if (updateMomDto.DiscussionPoints != null)
-            {
-                await _momRepository.DeleteDiscussionPointsByMomIdAsync(existingMom.Momid);
-
-                var discussionPoints = updateMomDto.DiscussionPoints.Select(dp => new Momdiscussionpoint
-                {
-                    Momid = existingMom.Momid,
-                    PointText = dp.PointText,
-                    PointOrder = dp.PointOrder
-                }).ToList();
-
-                await _momRepository.AddDiscussionPointsAsync(discussionPoints);
-            }
-
-            if (updateMomDto.ActionItems != null)
-            {
-                await _momRepository.DeleteActionItemsByMomIdAsync(existingMom.Momid);
-
-                var actionItems = updateMomDto.ActionItems.Select(ai => new Momactionitem
-                {
-                    Momid = existingMom.Momid,
-                    TaskDescription = ai.TaskDescription,
-                    AssignedToEmployeeId = ai.AssignedToEmployeeId,
-                    DueDate = ai.DueDate,
-                    Status = ai.Status,
-                    CreatedAt = DateTime.Now
-                }).ToList();
-
-                await _momRepository.AddActionItemsAsync(actionItems);
-
-                var uniqueEmployeeIds = updateMomDto.ActionItems
-                    .Select(ai => ai.AssignedToEmployeeId)
-                    .Distinct()
-                    .Where(id => id != employeeId)
-                    .ToList();
-
-                if (uniqueEmployeeIds.Any())
-                {
-                    var sharings = uniqueEmployeeIds.Select(empId => new Momsharing
-                    {
-                        Momid = existingMom.Momid,
-                        SharedByEmployeeId = employeeId,
-                        SharedWithEmployeeId = empId,
-                        SharedAt = DateTime.Now
-                    }).ToList();
-
-                    await _momRepository.ShareMomAsync(sharings);
-                    Console.WriteLine($"✅ Auto-shared updated MOM {existingMom.Momid} with {uniqueEmployeeIds.Count} employees");
-                }
-            }
-
-            return await GetMomByIdAsync(existingMom.Momid) ?? throw new Exception("Failed to retrieve updated MOM");
-        }
-
-        public async Task<bool> DeleteMomAsync(int momId, int employeeId, string role)
-        {
-            var mom = await _momRepository.GetMomByIdAsync(momId);
-            if (mom == null) return false;
-
-            if (mom.SubmittedByEmployeeId != employeeId)
-                throw new UnauthorizedAccessException("You are not authorized to delete this MOM");
-
-            return await _momRepository.DeleteMomAsync(momId);
-        }
-
-        public async Task<PaginatedMomResponseDto> GetAllMomsForHRAsync(
-            int hrEmployeeId,
-            string role,
-            string? searchTerm = null,
-            string? meetingType = null,
-            int? departmentId = null,
-            DateTime? startDate = null,
-            DateTime? endDate = null,
-            int pageNumber = 1,
-            int pageSize = 20)
-        {
-            var mappedRole = MapRoleToEnum(role);
-            if (mappedRole != "HR")
-                throw new UnauthorizedAccessException("Only HR can view all MOMs");
-
-            var totalCount = await _momRepository.GetAllMomsCountAsync(
-                searchTerm, meetingType, departmentId, startDate, endDate);
-
-            var moms = await _momRepository.GetAllMomsAsync(
-                searchTerm, meetingType, departmentId, startDate, endDate, pageNumber, pageSize);
-
-            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
-
-            return new PaginatedMomResponseDto
-            {
-                Moms = moms.Select(MapToMomResponseDto).ToList(),
-                TotalCount = totalCount,
-                PageNumber = pageNumber,
-                PageSize = pageSize,
-                TotalPages = totalPages,
-                HasPreviousPage = pageNumber > 1,
-                HasNextPage = pageNumber < totalPages
-            };
-        }
-
-        public async Task<List<MomSharingResponseDto>> ShareMomAsync(ShareMomDto shareMomDto, int sharedByEmployeeId)
-        {
-            var mom = await _momRepository.GetMomByIdAsync(shareMomDto.MomId);
-            if (mom == null)
-                throw new Exception("MOM not found");
-
-            var sharings = shareMomDto.SharedWithEmployeeIds.Select(empId => new Momsharing
-            {
-                Momid = shareMomDto.MomId,
-                SharedByEmployeeId = sharedByEmployeeId,
-                SharedWithEmployeeId = empId,
-                SharedAt = DateTime.Now
-            }).ToList();
-
-            var createdSharings = await _momRepository.ShareMomAsync(sharings);
-
-            var sharingIds = createdSharings.Select(s => s.SharingId).ToList();
-            var completeSharings = await _momRepository.GetMomSharingsByEmployeeIdAsync(sharedByEmployeeId);
-
-            return completeSharings
-                .Where(s => sharingIds.Contains(s.SharingId))
-                .Select(s => new MomSharingResponseDto
-                {
-                    SharingId = s.SharingId,
-                    MomId = s.Momid,
-                    MeetingTitle = s.Mom.MeetingTitle,
-                    SharedByEmployeeId = s.SharedByEmployeeId,
-                    SharedByEmployeeName = GetEmployeeName(s.SharedByEmployee),
-                    SharedWithEmployeeId = s.SharedWithEmployeeId,
-                    SharedWithEmployeeName = GetEmployeeName(s.SharedWithEmployee),
-                    SharedAt = s.SharedAt
-                }).ToList();
-        }
-
-        public async Task<List<MomSharingResponseDto>> GetMomsSharedByEmployeeAsync(int employeeId)
-        {
-            var sharings = await _momRepository.GetMomSharingsByEmployeeIdAsync(employeeId);
-
-            return sharings.Select(s => new MomSharingResponseDto
-            {
-                SharingId = s.SharingId,
-                MomId = s.Momid,
-                MeetingTitle = s.Mom.MeetingTitle,
-                SharedByEmployeeId = s.SharedByEmployeeId,
-                SharedByEmployeeName = GetEmployeeName(s.SharedByEmployee),
-                SharedWithEmployeeId = s.SharedWithEmployeeId,
-                SharedWithEmployeeName = GetEmployeeName(s.SharedWithEmployee),
-                SharedAt = s.SharedAt
-            }).ToList();
-        }
-
-        public async Task<List<MomResponseDto>> GetMomsSharedWithEmployeeAsync(int employeeId)
-        {
-            var moms = await _momRepository.GetMomsSharedWithEmployeeAsync(employeeId);
-            return moms.Select(MapToMomResponseDto).ToList();
-        }
 
         public async Task<MeetingResponseDto> ScheduleMeetingAsync(
             ScheduleMeetingDto scheduleMeetingDto,
@@ -306,7 +25,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (mappedRole != "Manager")
                 throw new UnauthorizedAccessException("Only managers can schedule meetings");
 
-            var employeeExists = await _momRepository.GetEmployeeByIdAsync(scheduledByEmployeeId);
+            var employeeExists = await _meetingRepository.GetEmployeeByIdAsync(scheduledByEmployeeId);
             if (employeeExists == null)
             {
                 throw new Exception($"Scheduling employee with ID {scheduledByEmployeeId} does not exist in the employee table.");
@@ -317,7 +36,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             foreach (var empId in scheduleMeetingDto.ParticipantEmployeeIds)
             {
-                var participantExists = await _momRepository.GetEmployeeByIdAsync(empId);
+                var participantExists = await _meetingRepository.GetEmployeeByIdAsync(empId);
                 if (participantExists == null)
                 {
                     throw new Exception($"Participant with employee ID {empId} does not exist.");
@@ -336,7 +55,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 CreatedAt = DateTime.Now
             };
 
-            var createdMeeting = await _momRepository.CreateMeetingAsync(meeting);
+            var createdMeeting = await _meetingRepository.CreateMeetingAsync(meeting);
 
             var participants = scheduleMeetingDto.ParticipantEmployeeIds.Select(empId => new Meetingparticipant
             {
@@ -345,7 +64,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 CreatedAt = DateTime.Now
             }).ToList();
 
-            await _momRepository.AddMeetingParticipantsAsync(participants);
+            await _meetingRepository.AddMeetingParticipantsAsync(participants);
 
             return await GetMeetingByIdAsync(createdMeeting.MeetingId)
                 ?? throw new Exception("Failed to retrieve created meeting");
@@ -353,13 +72,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         public async Task<List<MeetingResponseDto>> GetMeetingsByManagerIdAsync(int managerId)
         {
-            var meetings = await _momRepository.GetMeetingsByManagerIdAsync(managerId);
+            var meetings = await _meetingRepository.GetMeetingsByManagerIdAsync(managerId);
             return meetings.Select(MapToMeetingResponseDto).ToList();
         }
 
         public async Task<MeetingResponseDto?> GetMeetingByIdAsync(int meetingId)
         {
-            var meeting = await _momRepository.GetMeetingByIdAsync(meetingId);
+            var meeting = await _meetingRepository.GetMeetingByIdAsync(meetingId);
             if (meeting == null) return null;
 
             return MapToMeetingResponseDto(meeting);
@@ -376,7 +95,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (mappedRole != "Manager")
                 throw new UnauthorizedAccessException("Only managers can view reports");
 
-            var oneOnOneMeetings = await _momRepository.GetOneOnOneMeetingsByManagerAsync(
+            var oneOnOneMeetings = await _meetingRepository.GetOneOnOneMeetingsByManagerAsync(
                 managerId, employeeId, startDate, endDate);
 
             if (!oneOnOneMeetings.Any())
@@ -463,12 +182,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var startOfQuarter = new DateTime(now.Year, ((now.Month - 1) / 3) * 3 + 1, 1);
             var startOfLastMonth = startOfMonth.AddMonths(-1);
 
-            var allMeetings = await _momRepository.GetOneOnOneMeetingsByManagerAsync(managerId, null, null, null);
+            var allMeetings = await _meetingRepository.GetOneOnOneMeetingsByManagerAsync(managerId, null, null, null);
             var thisMonthMeetings = allMeetings.Count(m => m.MeetingDate >= startOfMonth);
             var thisQuarterMeetings = allMeetings.Count(m => m.MeetingDate >= startOfQuarter);
             var lastMonthMeetings = allMeetings.Count(m => m.MeetingDate >= startOfLastMonth && m.MeetingDate < startOfMonth);
 
-            var teamMembers = await _momRepository.GetTeamMembersByManagerIdAsync(managerId);
+            var teamMembers = await _meetingRepository.GetTeamMembersByManagerIdAsync(managerId);
             var totalTeamMembers = teamMembers.Count;
 
             var avgMeetingsPerEmployee = totalTeamMembers > 0
@@ -538,101 +257,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
-        public async Task<bool> UpdateActionItemStatusAsync(int actionItemId, string status, int employeeId)
-        {
-            var actionItem = await _momRepository.GetActionItemByIdAsync(actionItemId);
-            if (actionItem == null)
-                throw new Exception("Action item not found");
-
-            if (actionItem.AssignedToEmployeeId != employeeId)
-                throw new UnauthorizedAccessException("You can only update action items assigned to you");
-
-            if (status != "Pending" && status != "Completed")
-                throw new ArgumentException("Invalid status. Must be 'Pending' or 'Completed'");
-
-            var updated = await _momRepository.UpdateActionItemStatusAsync(actionItemId, status);
-            return updated != null;
-        }
-
-        public async Task<List<ActionItemResponseDto>> GetMyActionItemsAsync(int employeeId)
-        {
-            var actionItems = await _momRepository.GetActionItemsByEmployeeIdAsync(employeeId);
-            
-            Console.WriteLine($"[SERVICE] Found {actionItems.Count} action items for employee {employeeId}");
-            
-            var result = actionItems.Select(ai => {
-                var meetingTitle = ai.Mom?.MeetingTitle ?? "N/A";
-                Console.WriteLine($"[SERVICE] Action Item {ai.ActionItemId}: Meeting Title = '{meetingTitle}', MomId = {ai.Momid}");
-                
-                return new ActionItemResponseDto
-                {
-                    ActionItemId = ai.ActionItemId,
-                    TaskDescription = ai.TaskDescription,
-                    AssignedToEmployeeId = ai.AssignedToEmployeeId,
-                    AssignedToEmployeeName = GetEmployeeName(ai.AssignedToEmployee),
-                    DueDate = ai.DueDate,
-                    Status = ai.Status,
-                    CreatedAt = ai.CreatedAt,
-                    MeetingTitle = meetingTitle,
-                    MomId = ai.Momid,
-                    AssignedByEmployeeId = ai.Mom?.SubmittedByEmployeeId,
-                    AssignedByEmployeeName = ai.Mom?.SubmittedByEmployee != null 
-                        ? GetEmployeeName(ai.Mom.SubmittedByEmployee) 
-                        : null
-                };
-            }).ToList();
-            
-            Console.WriteLine($"[SERVICE] Returning {result.Count} action items");
-            return result;
-        }
-
-        public async Task<List<ActionItemResponseDto>> GetActionItemsAssignedByMeAsync(int employeeId)
-        {
-            var actionItems = await _momRepository.GetActionItemsAssignedByEmployeeAsync(employeeId);
-            return actionItems.Select(ai => new ActionItemResponseDto
-            {
-                ActionItemId = ai.ActionItemId,
-                TaskDescription = ai.TaskDescription,
-                AssignedToEmployeeId = ai.AssignedToEmployeeId,
-                AssignedToEmployeeName = GetEmployeeName(ai.AssignedToEmployee),
-                DueDate = ai.DueDate,
-                Status = ai.Status,
-                CreatedAt = ai.CreatedAt,
-                MeetingTitle = ai.Mom?.MeetingTitle ?? "N/A",
-                MomId = ai.Momid,
-                AssignedByEmployeeId = ai.Mom?.SubmittedByEmployeeId,
-                AssignedByEmployeeName = ai.Mom?.SubmittedByEmployee != null 
-                    ? GetEmployeeName(ai.Mom.SubmittedByEmployee) 
-                    : null
-            }).ToList();
-        }
-
-        public async Task<List<ActionItemResponseDto>> GetOverdueActionItemsAsync(int employeeId)
-        {
-            var today = DateOnly.FromDateTime(DateTime.Now);
-            var actionItems = await _momRepository.GetActionItemsByEmployeeIdAsync(employeeId);
-
-            var overdueItems = actionItems
-                .Where(ai => ai.Status != "Completed" && ai.DueDate < today)
-                .Select(ai => new ActionItemResponseDto
-                {
-                    ActionItemId = ai.ActionItemId,
-                    TaskDescription = ai.TaskDescription,
-                    AssignedToEmployeeId = ai.AssignedToEmployeeId,
-                    AssignedToEmployeeName = GetEmployeeName(ai.AssignedToEmployee),
-                    DueDate = ai.DueDate,
-                    Status = ai.Status,
-                    CreatedAt = ai.CreatedAt,
-                    MeetingTitle = ai.Mom?.MeetingTitle ?? "N/A",
-                    MomId = ai.Momid,
-                    AssignedByEmployeeId = ai.Mom?.SubmittedByEmployeeId,
-                    AssignedByEmployeeName = ai.Mom?.SubmittedByEmployee != null 
-                        ? GetEmployeeName(ai.Mom.SubmittedByEmployee) 
-                        : null
-                }).ToList();
-
-            return overdueItems;
-        }
 
         private void ValidateCreateMomDto(CreateMomDto dto)
         {
@@ -782,7 +406,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             int managerId,
             List<Meeting> meetings)
         {
-            var teamMembers = await _momRepository.GetTeamMembersByManagerIdAsync(managerId);
+            var teamMembers = await _meetingRepository.GetTeamMembersByManagerIdAsync(managerId);
             var now = DateTime.Now;
             var today = DateOnly.FromDateTime(now);
 
@@ -834,7 +458,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (!validStatuses.Contains(rsvpDto.RsvpStatus))
                 throw new ArgumentException("Invalid RSVP status. Must be: Accepted, Declined, or Tentative");
 
-            var participant = await _momRepository.GetMeetingParticipantAsync(rsvpDto.MeetingId, employeeId);
+            var participant = await _meetingRepository.GetMeetingParticipantAsync(rsvpDto.MeetingId, employeeId);
             if (participant == null)
                 throw new Exception("Meeting invitation not found for this employee");
 
@@ -847,7 +471,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (participant.Meeting.MeetingDate < DateTime.Now)
                 throw new Exception("Cannot RSVP to a past meeting");
 
-            var updatedParticipant = await _momRepository.UpdateRsvpStatusAsync(
+            var updatedParticipant = await _meetingRepository.UpdateRsvpStatusAsync(
                 participant.ParticipantId,
                 rsvpDto.RsvpStatus,
                 rsvpDto.RsvpComments);
@@ -857,7 +481,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         public async Task<List<MeetingInvitationDto>> GetMyMeetingInvitationsAsync(int employeeId)
         {
-            var invitations = await _momRepository.GetMeetingInvitationsAsync(employeeId);
+            var invitations = await _meetingRepository.GetMeetingInvitationsAsync(employeeId);
             return invitations.Select(MapToMeetingInvitationDto).ToList();
         }
 
@@ -870,14 +494,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (mappedRole != "Manager")
                 throw new UnauthorizedAccessException("Only managers can view RSVP summaries");
 
-            var meeting = await _momRepository.GetMeetingByIdAsync(meetingId);
+            var meeting = await _meetingRepository.GetMeetingByIdAsync(meetingId);
             if (meeting == null)
                 throw new Exception("Meeting not found");
 
             if (meeting.ScheduledByEmployeeId != managerId)
                 throw new UnauthorizedAccessException("You can only view RSVP summary for meetings you scheduled");
 
-            var participants = await _momRepository.GetMeetingRsvpSummaryAsync(meetingId);
+            var participants = await _meetingRepository.GetMeetingRsvpSummaryAsync(meetingId);
 
             var acceptedCount = participants.Count(p => p.Rsvpstatus == "Accepted");
             var declinedCount = participants.Count(p => p.Rsvpstatus == "Declined");
@@ -907,7 +531,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         public async Task<int> GetPendingRsvpCountAsync(int employeeId)
         {
-            return await _momRepository.GetPendingRsvpCountAsync(employeeId);
+            return await _meetingRepository.GetPendingRsvpCountAsync(employeeId);
         }
 
         private MeetingInvitationDto MapToMeetingInvitationDto(Meetingparticipant participant)

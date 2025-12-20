@@ -12,12 +12,12 @@ namespace eepzbackend.Controllers
     [Authorize]
     public class MeetingController : ControllerBase
     {
-        private readonly IMomService _momService;
+        private readonly IMeetingService _meetingService;
         private readonly EEPZDbContext _context;
 
-        public MeetingController(IMomService momService, EEPZDbContext context)
+        public MeetingController(IMeetingService meetingService, EEPZDbContext context)
         {
-            _momService = momService;
+            _meetingService = meetingService;
             _context = context;
         }
 
@@ -30,7 +30,7 @@ namespace eepzbackend.Controllers
                 var employeeId = GetEmployeeIdFromUserId(); 
                 var role = GetRoleFromClaims();
 
-                var result = await _momService.ScheduleMeetingAsync(scheduleMeetingDto, employeeId, role);
+                var result = await _meetingService.ScheduleMeetingAsync(scheduleMeetingDto, employeeId, role);
                 return Ok(new { success = true, message = "Meeting scheduled successfully", data = result });
             }
             catch (UnauthorizedAccessException ex)
@@ -50,7 +50,7 @@ namespace eepzbackend.Controllers
             try
             {
                 var employeeId = GetEmployeeIdFromUserId();
-                var result = await _momService.GetMeetingsByManagerIdAsync(employeeId);
+                var result = await _meetingService.GetMeetingsByManagerIdAsync(employeeId);
                 return Ok(new { success = true, data = result });
             }
             catch (Exception ex)
@@ -64,7 +64,7 @@ namespace eepzbackend.Controllers
         {
             try
             {
-                var result = await _momService.GetMeetingByIdAsync(meetingId);
+                var result = await _meetingService.GetMeetingByIdAsync(meetingId);
                 if (result == null)
                     return NotFound(new { success = false, message = "Meeting not found" });
                 return Ok(new { success = true, data = result });
@@ -87,7 +87,7 @@ namespace eepzbackend.Controllers
                 var managerId = GetEmployeeIdFromUserId();
                 var role = GetRoleFromClaims();
 
-                var result = await _momService.GetOneOnOneReportsAsync(managerId, role, employeeId, startDate, endDate);
+                var result = await _meetingService.GetOneOnOneReportsAsync(managerId, role, employeeId, startDate, endDate);
                 return Ok(new { success = true, data = result });
             }
             catch (UnauthorizedAccessException ex)
@@ -109,7 +109,7 @@ namespace eepzbackend.Controllers
                 var managerId = GetEmployeeIdFromUserId();
                 var role = GetRoleFromClaims();
 
-                var result = await _momService.GetOneOnOneSummaryAsync(managerId, role);
+                var result = await _meetingService.GetOneOnOneSummaryAsync(managerId, role);
                 return Ok(new { success = true, data = result });
             }
             catch (UnauthorizedAccessException ex)
