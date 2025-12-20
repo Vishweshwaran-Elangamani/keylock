@@ -211,14 +211,10 @@ try
     builder.Services.AddHttpContextAccessor();
 
     builder.Services.AddScoped<IManagerReviewRepository, ManagerReviewRepository>();
-    builder.Services.AddScoped<IMentorFeedbackRepository, MentorFeedbackRepository>();
-    builder.Services.AddScoped<IOrgGoalFeedbackRepository, OrgGoalFeedbackRepository>();
     builder.Services.AddScoped<IPeerFeedbackQueueRepository, PeerFeedbackQueueRepository>();
     builder.Services.AddScoped<IHrFeedbackFormRepository, HrFeedbackFormRepository>();
 
     builder.Services.AddScoped<IManagerReviewService, ManagerReviewService>();
-    builder.Services.AddScoped<IMentorFeedbackService, MentorFeedbackService>();
-    builder.Services.AddScoped<IOrgGoalFeedbackService, OrgGoalFeedbackService>();
     builder.Services.AddScoped<IPeerFeedbackQueueService, PeerFeedbackQueueService>();
     builder.Services.AddScoped<IHrFeedbackFormService, HrFeedbackFormService>();
 
