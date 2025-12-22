@@ -22,6 +22,9 @@ namespace Relevantz.EEPZ.Api.Controllers
             _nominationService = nominationService;
         }
 
+        /// <summary>
+        /// Employee Self-Nomination
+        /// </summary>
         [HttpPost("self-nominate")]
         [Authorize(Roles = "Employee,Manager")]
         public async Task<IActionResult> SelfNominate([FromBody] CreateSelfNominationRequestDto request)
@@ -30,15 +33,15 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 NominationValidator.ValidateSelfNomination(request);
 
-                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ?? 
-                                 User.FindFirst("sub");
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) 
+                                  ?? User.FindFirst("sub");
 
-                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId) || userId <= 0)
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId) || userId == 0)
                 {
                     return Unauthorized(new { message = "User ID not found in token" });
                 }
 
-                Console.WriteLine($"✓ Self-Nominate - UserId: {userId}, OpportunityId: {request.OpportunityId}");
+                Console.WriteLine($"[Controller] Self-Nominate - UserId: {userId}, OpportunityId: {request.OpportunityId}");
 
                 var result = await _nominationService.CreateSelfNominationAsync(userId, request);
 
@@ -54,6 +57,9 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Manager Nomination
+        /// </summary>
         [HttpPost("manager-nominate")]
         [Authorize(Roles = "Manager")]
         public async Task<IActionResult> ManagerNominate([FromBody] CreateManagerNominationRequestDto request)
@@ -62,13 +68,15 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 NominationValidator.ValidateManagerNomination(request);
 
-                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ?? 
-                                 User.FindFirst("sub");
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) 
+                                  ?? User.FindFirst("sub");
 
-                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int managerId) || managerId <= 0)
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int managerId) || managerId == 0)
                 {
                     return Unauthorized(new { message = "Manager ID not found in token" });
                 }
+
+                Console.WriteLine($"[Controller] Manager-Nominate - ManagerId: {managerId}, NomineeId: {request.NomineeEmployeeId}");
 
                 var result = await _nominationService.CreateManagerNominationAsync(managerId, request);
 
@@ -84,6 +92,9 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Get Nomination by ID
+        /// </summary>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetNominationById(int id)
         {
@@ -98,29 +109,27 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Get My Nominations (Employee) - Shows ONLY pending nominations
+        /// </summary>
         [HttpGet("my-nominations")]
         [Authorize(Roles = "Employee,Manager")]
         public async Task<IActionResult> GetMyNominations()
         {
             try
             {
-                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ?? 
-                                 User.FindFirst("sub");
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) 
+                                  ?? User.FindFirst("sub");
 
-                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId) || userId <= 0)
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId) || userId == 0)
                 {
                     var allClaims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
-                    return Unauthorized(new 
-                    { 
-                        message = "User ID not found in token",
-                        availableClaims = allClaims
-                    });
+                    return Unauthorized(new { message = "User ID not found in token", availableClaims = allClaims });
                 }
 
-                Console.WriteLine($"✓ GetMyNominations - UserId: {userId}");
+                Console.WriteLine($"[Controller] GetMyNominations - UserId: {userId}");
 
                 var result = await _nominationService.GetMyNominationsAsync(userId);
-                
                 return Ok(result);
             }
             catch (Exception ex)
@@ -128,25 +137,29 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { message = ex.InnerException?.Message ?? ex.Message });
             }
         }
-        
+
+        /// <summary>
+        /// Get My Nomination History (Employee)
+        /// Shows: Self-nominations + Manager-nominated (where user is nominee)
+        /// All statuses: pending, approved, rejected
+        /// </summary>
         [HttpGet("my-history")]
         [Authorize(Roles = "Employee,Manager")]
         public async Task<IActionResult> GetMyNominationHistory([FromQuery] string? status = null)
         {
             try
             {
-                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ?? 
-                                 User.FindFirst("sub");
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) 
+                                  ?? User.FindFirst("sub");
 
-                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId) || userId <= 0)
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId) || userId == 0)
                 {
                     return Unauthorized(new { message = "User ID not found in token" });
                 }
 
-                Console.WriteLine($"✓ GetMyNominationHistory - UserId: {userId}, Status Filter: {status ?? "All"}");
+                Console.WriteLine($"[Controller] GetMyNominationHistory - UserId: {userId}, Status Filter: {status ?? "All"}");
 
                 var result = await _nominationService.GetMyNominationHistoryAsync(userId, status);
-                
                 return Ok(result);
             }
             catch (Exception ex)
@@ -155,21 +168,54 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Get Manager Team Nominations
+        /// Shows: Nominations created BY this manager for their team members
+        /// </summary>
+        [HttpGet("manager-team-nominations")]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> GetManagerTeamNominations([FromQuery] string? status = null)
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) 
+                                  ?? User.FindFirst("sub");
+
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int managerId) || managerId == 0)
+                {
+                    return Unauthorized(new { message = "Manager ID not found in token" });
+                }
+
+                Console.WriteLine($"[Controller] GetManagerTeamNominations - ManagerId: {managerId}, Status: {status ?? "All"}");
+
+                var result = await _nominationService.GetManagerTeamNominationsAsync(managerId, status);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.InnerException?.Message ?? ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Get Pending Manager Review (L2 Manager)
+        /// Shows: Nominations requiring THIS manager's review
+        /// </summary>
         [HttpGet("pending-manager-review")]
         [Authorize(Roles = "Manager")]
         public async Task<IActionResult> GetPendingManagerReview()
         {
             try
             {
-                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ?? 
-                                 User.FindFirst("sub");
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) 
+                                  ?? User.FindFirst("sub");
 
-                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int managerId) || managerId <= 0)
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int managerId) || managerId == 0)
                 {
                     return Unauthorized(new { message = "Manager ID not found in token" });
                 }
 
-                Console.WriteLine($"✓ GetPendingManagerReview - ManagerId (UserId): {managerId}");
+                Console.WriteLine($"[Controller] GetPendingManagerReview - ManagerId (UserId): {managerId}");
 
                 var result = await _nominationService.GetPendingManagerReviewAsync(managerId);
                 return Ok(result);
@@ -180,21 +226,25 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Get Pending DeptHead Review
+        /// Shows: Nominations requiring THIS department head's review
+        /// </summary>
         [HttpGet("pending-depthead-review")]
-        [Authorize(Roles = "Department Head,DepartmentHead,DEPT_HEAD")]
+        [Authorize(Roles = "Department Head,DepartmentHead,DEPTHEAD")]
         public async Task<IActionResult> GetPendingDeptHeadReview()
         {
             try
             {
-                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ?? 
-                                 User.FindFirst("sub");
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) 
+                                  ?? User.FindFirst("sub");
 
-                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int deptHeadId) || deptHeadId <= 0)
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int deptHeadId) || deptHeadId == 0)
                 {
                     return Unauthorized(new { message = "Department Head ID not found in token" });
                 }
 
-                Console.WriteLine($"✓ GetPendingDeptHeadReview - DeptHeadId (UserId): {deptHeadId}");
+                Console.WriteLine($"[Controller] GetPendingDeptHeadReview - DeptHeadId (UserId): {deptHeadId}");
 
                 var result = await _nominationService.GetPendingDeptHeadReviewAsync(deptHeadId);
                 return Ok(result);
@@ -205,13 +255,17 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Get All Nominations (Admin/HR)
+        /// Shows: All nominations with optional status filter
+        /// </summary>
         [HttpGet("all-nominations")]
         [Authorize]
         public async Task<IActionResult> GetAllNominations([FromQuery] string? status = null)
         {
             try
             {
-                Console.WriteLine($"✓ GetAllNominations - Status Filter: {status ?? "All"}");
+                Console.WriteLine($"[Controller] GetAllNominations - Status Filter: {status ?? "All"}");
 
                 var result = await _nominationService.GetAllNominationsAsync(status);
                 return Ok(result);
@@ -222,6 +276,10 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Manager Review (L2 Approve/Reject)
+        /// Action: "Approved" or "Rejected"
+        /// </summary>
         [HttpPut("{id}/manager-review")]
         [Authorize(Roles = "Manager")]
         public async Task<IActionResult> ManagerReview(int id, [FromBody] ManagerReviewRequestDto request)
@@ -230,15 +288,15 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 NominationValidator.ValidateManagerReview(request);
 
-                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ?? 
-                                 User.FindFirst("sub");
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) 
+                                  ?? User.FindFirst("sub");
 
-                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int managerId) || managerId <= 0)
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int managerId) || managerId == 0)
                 {
                     return Unauthorized(new { message = "Manager ID not found in token" });
                 }
 
-                Console.WriteLine($"✓ ManagerReview - NominationId: {id}, Action: {request.ActionTaken}");
+                Console.WriteLine($"[Controller] ManagerReview - NominationId: {id}, Action: {request.ActionTaken}");
 
                 var result = await _nominationService.ManagerReviewNominationAsync(id, managerId, request);
                 return Ok(result);
@@ -247,56 +305,100 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = ex.InnerException?.Message ?? ex.Message });
             }
         }
 
+        /// <summary>
+        /// Department Head Review (Final Approve/Send Back to L2)
+        /// Action: "Approved" or "Rejected"
+        /// All fields are OPTIONAL except Action
+        /// </summary>
         [HttpPut("{id}/department-head-review")]
-        [Authorize(Roles = "Department Head,DepartmentHead,DEPT_HEAD")]
+        [Authorize(Roles = "Department Head,DepartmentHead,DEPTHEAD")]
         public async Task<IActionResult> DepartmentHeadReview(int id, [FromBody] DepartmentHeadReviewRequestDto request)
         {
             try
             {
-                NominationValidator.ValidateDeptHeadReview(request);
+                Console.WriteLine($"[Controller] DepartmentHeadReview - NominationId: {id}");
+                Console.WriteLine($"[Controller] Request.Action: {request?.Action ?? "NULL"}");
+                Console.WriteLine($"[Controller] Request.ReviewRemarks: {request?.ReviewRemarks ?? "NULL"}");
+                Console.WriteLine($"[Controller] Request.MeritScore: {request?.MeritScore?.ToString() ?? "NULL"}");
+                Console.WriteLine($"[Controller] Request.DiversityScore: {request?.DiversityScore?.ToString() ?? "NULL"}");
+                Console.WriteLine($"[Controller] Request.ConflictOfInterest: {request?.ConflictOfInterest?.ToString() ?? "NULL"}");
 
-                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ?? 
-                                 User.FindFirst("sub");
+                // ✅ Validate only Action field
+                if (request == null)
+                {
+                    return BadRequest(new { message = "Request body is required" });
+                }
 
-                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int deptHeadId) || deptHeadId <= 0)
+                if (string.IsNullOrEmpty(request.Action))
+                {
+                    return BadRequest(new { message = "Action is required" });
+                }
+
+                if (request.Action != "Approved" && request.Action != "Rejected")
+                {
+                    return BadRequest(new { message = "Action must be 'Approved' or 'Rejected'" });
+                }
+
+                // ✅ Get user ID from token
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) 
+                                  ?? User.FindFirst("sub");
+
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int deptHeadId) || deptHeadId == 0)
                 {
                     return Unauthorized(new { message = "Department Head ID not found in token" });
                 }
 
-                Console.WriteLine($"✓ DepartmentHeadReview - NominationId: {id}, Action: {request.Action}");
+                Console.WriteLine($"[Controller] DeptHeadId from token: {deptHeadId}");
 
                 var result = await _nominationService.DepartmentHeadReviewAsync(id, deptHeadId, request);
                 return Ok(result);
             }
             catch (ArgumentException ex)
             {
+                Console.WriteLine($"[Controller] ArgumentException: {ex.Message}");
                 return BadRequest(new { message = ex.Message });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                Console.WriteLine($"[Controller] UnauthorizedAccessException: {ex.Message}");
+                return Unauthorized(new { message = ex.Message });
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"[Controller] Exception: {ex.Message}");
+                Console.WriteLine($"[Controller] StackTrace: {ex.StackTrace}");
                 return StatusCode(500, new { message = ex.InnerException?.Message ?? ex.Message });
             }
         }
 
+        /// <summary>
+        /// Check Eligibility for Self-Nomination
+        /// </summary>
         [HttpPost("check-eligibility")]
-        [Authorize(Roles = "Employee")]
+        [Authorize(Roles = "Employee,Manager")]
         public async Task<IActionResult> CheckEligibility([FromBody] EligibilityCheckRequestDto request)
         {
             try
             {
-                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ?? 
-                                 User.FindFirst("sub");
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) 
+                                  ?? User.FindFirst("sub");
 
-                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId) || userId <= 0)
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId) || userId == 0)
                 {
                     return Unauthorized(new { message = "User ID not found in token" });
                 }
+
+                Console.WriteLine($"[Controller] CheckEligibility - UserId: {userId}, OpportunityId: {request.OpportunityId}");
 
                 var result = await _nominationService.CheckEligibilityAsync(userId, request.OpportunityId);
                 return Ok(result);

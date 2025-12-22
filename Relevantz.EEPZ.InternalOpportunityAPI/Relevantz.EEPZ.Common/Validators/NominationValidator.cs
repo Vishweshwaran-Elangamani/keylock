@@ -42,12 +42,6 @@ namespace Relevantz.EEPZ.Common.Validators
 
             if (request.Action != "Approved" && request.Action != "Rejected")
                 throw new ArgumentException("Action must be either 'Approved' or 'Rejected'");
-
-            if (request.MeritScore.HasValue && (request.MeritScore < 0 || request.MeritScore > 100))
-                throw new ArgumentException("Merit score must be between 0 and 100");
-
-            if (request.DiversityScore.HasValue && (request.DiversityScore < 0 || request.DiversityScore > 100))
-                throw new ArgumentException("Diversity score must be between 0 and 100");
         }
     }
 }

@@ -7,22 +7,24 @@ namespace Relevantz.EEPZ.Data.IRepository
     public interface INominationRepository
     {
         Task<Nomination> CreateAsync(Nomination nomination);
-        Task<Nomination?> GetByIdAsync(int id);
-        Task<List<Nomination>> GetAllAsync();
-        Task<List<Nomination>> GetByOpportunityAsync(int opportunityId);
-        Task<List<Nomination>> GetByEmployeeAsync(int employeeUserId);
-        Task<List<Nomination>> GetByStatusAsync(string status);
-        Task<List<Nomination>> GetPendingManagerReviewAsync();
-        Task<List<Nomination>> GetPendingDeptHeadApprovalAsync();
-        Task<List<Nomination>> GetPendingDeptHeadApprovalByDeptHeadIdAsync(int deptHeadId);
-        Task<List<Nomination>> GetPendingManagerReviewByManagerIdAsync(int managerId);
         Task<Nomination> UpdateAsync(Nomination nomination);
-        Task<bool> DeleteAsync(int id);
+        Task<Nomination?> GetByIdAsync(int id);
+        Task<List<Nomination>> GetByEmployeeAsync(int employeeId);
+        Task<List<Nomination>> GetAllAsync();
+        Task<List<Nomination>> GetByStatusAsync(string status);
+        Task<List<Nomination>> GetPendingManagerReviewByManagerIdAsync(int managerId);
+        Task<List<Nomination>> GetPendingDeptHeadApprovalByDeptHeadIdAsync(int deptHeadId);
+        Task<List<Nomination>> GetNominationHistoryByUserIdAsync(int userId, string? status);
+
+        Task<List<Nomination>> GetManagerTeamNominationsAsync(int managerId, string? status);
+
         Task<bool> ExistsDuplicateAsync(int opportunityId, int employeeId);
+        Task<int?> GetManagerFromProjectAsync(int employeeId);
+        Task<int?> GetDeptHeadFromProjectAsync(int employeeId);
         Task AddReviewMetricAsync(Nominationreviewmetric metric);
-        Task<int?> GetManagerFromProjectAsync(int employeeUserId);
-        Task<int?> GetDeptHeadFromProjectAsync(int employeeUserId);
-        Task<string?> GetUserRoleNameAsync(int userId);
-        Task<List<Nomination>> GetNominationHistoryByUserIdAsync(int userId, string? status = null);
+        Task<int?> GetManagerFromReportingHierarchyAsync(int employeeId);
+        Task<int?> GetFirstAvailableManagerAsync();
+        Task<int?> GetFirstAvailableDeptHeadAsync();
+
     }
 }
