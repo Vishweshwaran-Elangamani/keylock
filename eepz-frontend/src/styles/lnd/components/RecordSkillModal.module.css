@@ -1,0 +1,375 @@
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease-out;
+}
+
+.header {
+  padding: 1.5rem;
+  background: rgb(39, 35, 92);
+  border-bottom: 1px solid #e5e7eb;
+  border-radius: 12px 12px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.headerTitle {
+  margin: 0;
+  font-weight: 600;
+  color: white;
+}
+
+.btnClose {
+  border: none;
+  width: 36px;
+  height: 36px;
+  background-color: transparent;
+  color: white;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.btnClose:hover:not(:disabled) {
+  color: red;
+}
+
+.btnClose:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.body {
+  overflow-y: auto;
+  flex-grow: 1;
+  padding: 0;
+}
+
+.formContent {
+  padding: 1.5rem;
+}
+
+.editModeInfo {
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.infoLabel {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin: 0 0 0.25rem 0;
+}
+
+.infoValue {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #212529;
+  margin: 0 0 0.75rem 0;
+}
+
+.formField {
+  margin-bottom: 1.5rem;
+}
+
+.formLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: #212529;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.formLabelDisabled {
+  composes: formLabel;
+  color: #9ca3af;
+}
+
+.select {
+  width: 100%;
+  padding: 0.625rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  background: #fff;
+  cursor: pointer;
+  appearance: none;
+  webkit-appearance: none;
+  moz-appearance: none;
+  background-image: none;
+}
+
+.selectDisabled {
+  composes: select;
+  background: #f9fafb;
+  cursor: not-allowed;
+  color: #9ca3af;
+}
+
+.selectDisabled option {
+  color: #212529;
+}
+
+.availableCount {
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin: 0.5rem 0 0 0;
+}
+
+.ratingContainer {
+  opacity: 1;
+}
+
+.ratingContainerDisabled {
+  composes: ratingContainer;
+  opacity: 0.5;
+}
+
+.ratingLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #212529;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ratingCurrent {
+  color: inherit;
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.ratingScaleLabel {
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.ratingButtons {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.ratingBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ccc;
+  background: #f8f9fa;
+  color: #212529;
+}
+
+.ratingBtnActive {
+  composes: ratingBtn;
+}
+
+.ratingBtnLow {
+  composes: ratingBtnActive;
+  border: 2px solid #dc3545;
+  background: #dc3545;
+  color: #fff;
+}
+
+.ratingBtnMedium {
+  composes: ratingBtnActive;
+  border: 2px solid #0d6efd;
+  background: #0d6efd;
+  color: #fff;
+}
+
+.ratingBtnHigh {
+  composes: ratingBtnActive;
+  border: 2px solid #198754;
+  background: #198754;
+  color: #fff;
+}
+
+.ratingBtnDisabled {
+  composes: ratingBtn;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.ratingScale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+.ratingScaleMin {
+  text-align: left;
+  flex: 1;
+}
+
+.ratingScaleCenter {
+  text-align: center;
+  flex: 1;
+}
+
+.ratingScaleMax {
+  text-align: right;
+  flex: 1;
+}
+
+.ratingScaleLabel {
+  font-size: 0.75rem;
+  color: #6c757d;
+  display: block;
+}
+
+.ratingScaleValueMin {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #dc3545;
+}
+
+.ratingScaleValueMax {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #198754;
+}
+
+.ratingBadge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: inherit;
+  padding: 0.375rem 0.75rem;
+  background: var(--bg-color, rgba(220, 53, 69, 0.15));
+  border-radius: 12px;
+  border: 1px solid var(--border-color, rgba(220, 53, 69, 0.3));
+}
+
+.footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.btnCancel {
+  padding: 0.625rem 1.25rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  background: #fff;
+  color: #6c757d;
+}
+
+.btnCancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btnSubmit {
+  padding: 0.625rem 1.25rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+.btnSubmitEnabled {
+  composes: btnSubmit;
+  background: linear-gradient(90deg, #97247E 0%, #E01950 100%);
+  color: #fff;
+}
+
+.btnSubmitEnabled:hover:not(:disabled) {
+  filter: brightness(105%);
+}
+
+.btnSubmit:disabled {
+  background: #e5e7eb;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.loadingSpinner {
+  width: 16px;
+  height: 16px;
+}
+
+.required {
+  color: #dc3545;
+}
+
+@media (max-width: 480px) {
+  .ratingButtons {
+    justify-content: center;
+  }
+  
+  .ratingBtn {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+}

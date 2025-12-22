@@ -1,3 +1,4 @@
+// GoalDetailsHeader.jsx
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../contexts/auth/AuthContext";
 import GoalStatusBadge from "../badges/GoalStatusBadge";
@@ -9,6 +10,7 @@ import {
   isOverdue,
   getDaysUntilDeadline,
 } from "../../../utils/goals/goalHelpers";
+import styles from "../../../styles/goals/components/GoalDetailsHeader.module.css";
 
 const GoalDetailsHeader = ({
   goal,
@@ -84,19 +86,15 @@ const GoalDetailsHeader = ({
   const hasPendingReactivationRequest =
     goal.hasPendingReactivationRequest || false;
 
-  // Check if goal is already completed/closed/cancelled
   const isCompleted = ["completed", "closed", "cancelled"].includes(
     goal.status?.toLowerCase()
   );
 
-  // Check if org goal and user is Leadership
   const isOrgGoal = goal.goalType === "org";
   const isLeadershipOrgGoal = isOrgGoal && isLeadership;
 
-  // Check if user can manage org goals (creator or leadership)
   const canManageOrgGoal = isOrgGoal && (isCreator || isLeadership);
 
-  // Leadership can auto-close org goals (exclude "inprogress", include "reopened")
   const canAutoClosePremature =
     isLeadershipOrgGoal &&
     !isCompleted &&
@@ -104,7 +102,6 @@ const GoalDetailsHeader = ({
     goal.status !== "closed" &&
     ["open", "reopened"].includes(goal.status?.toLowerCase());
 
-  // Can auto-complete when progress = 100 (only for org goals at 100%)
   const canAutoCompletePremature =
     isLeadershipOrgGoal &&
     !isCompleted &&
@@ -119,7 +116,6 @@ const GoalDetailsHeader = ({
     !hasPendingApproval &&
     ["open", "inprogress", "reopened"].includes(goal.status?.toLowerCase());
 
-  // UPDATED: Don't allow reopening if already reopened and overdue again
   const canRequestReopening =
     isCreator &&
     !isMonitoringMode &&
@@ -128,7 +124,6 @@ const GoalDetailsHeader = ({
     goal.status !== "reopened" &&
     !["closed", "cancelled"].includes(goal.status?.toLowerCase());
 
-  // Button for org goal reopen (no overdue requirement)
   const canReopenOrgGoal =
     isCreator &&
     !isMonitoringMode &&
@@ -143,23 +138,21 @@ const GoalDetailsHeader = ({
     !hasPendingApproval &&
     ["open", "inprogress", "reopened"].includes(goal.status?.toLowerCase());
 
-  // NEW: Allow closure for reopened goals that are overdue
   const canRequestClosureForReopened =
     !isLeadershipOrgGoal &&
     isCreator &&
     !isMonitoringMode &&
     !hasPendingClosureRequest &&
     isGoalOverdue &&
-    goal.status === "reopened"; // NEW: Only for reopened goals that missed deadline again
+    goal.status === "reopened";
 
-  // UPDATED: canRequestClosure to exclude "reopened" status
   const canRequestClosure =
     !isLeadershipOrgGoal &&
     isCreator &&
     !isMonitoringMode &&
     !hasPendingClosureRequest &&
-    !isGoalOverdue && // Don't allow closure for overdue
-    ["open", "inprogress", "reopened"].includes(goal.status?.toLowerCase()); // UPDATED: Exclude "reopened"
+    !isGoalOverdue &&
+    ["open", "inprogress", "reopened"].includes(goal.status?.toLowerCase());
 
   const canRequestReactivation =
     isCreator &&
@@ -167,7 +160,6 @@ const GoalDetailsHeader = ({
     !hasPendingReactivationRequest &&
     goal.status === "closed";
 
-  // Button text prioritizes completion when progress = 100
   const getApprovalButtonText = () => {
     if (canAutoCompletePremature) return "Complete Goal";
     if (canAutoClosePremature) return "Close Goal";
@@ -176,7 +168,7 @@ const GoalDetailsHeader = ({
     if (hasPendingReactivationRequest) return "Reactivation Pending";
     if (hasPendingApproval) return "Approval Pending";
     if (canRequestCompletion) return "Request Completion";
-    if (canRequestClosureForReopened) return "Request Closure"; // NEW: For reopened+overdue
+    if (canRequestClosureForReopened) return "Request Closure";
     if (canRequestClosure) return "Request Closure";
     if (canRequestReactivation) return "Request Reactivation";
     if (canRequestReopening) return "Request Reopening";
@@ -201,7 +193,7 @@ const GoalDetailsHeader = ({
       canRequestClosure ||
       canRequestReactivation
     )
-      return "btn-danger"; // UPDATED
+      return "btn-danger";
     if (canRequestReopening) return "btn-danger";
     if (isUserAcknowledged) return "btn-outline-success";
     return "btn-outline-secondary";
@@ -212,7 +204,7 @@ const GoalDetailsHeader = ({
     canAutoClosePremature ||
     canReopenOrgGoal ||
     canRequestCompletion ||
-    canRequestClosureForReopened || // ADDED
+    canRequestClosureForReopened ||
     canRequestReopening ||
     canRequestAcknowledgment ||
     canRequestClosure ||
@@ -227,7 +219,6 @@ const GoalDetailsHeader = ({
     hasPendingReactivationRequest ||
     isUserAcknowledged;
 
-  // Only show approval button for org goals if user can manage them
   const shouldShowApprovalButtonForOrgGoal =
     !isOrgGoal || (isOrgGoal && canManageOrgGoal);
 
@@ -256,20 +247,15 @@ const GoalDetailsHeader = ({
   };
 
   return (
-    <div
-      className="card mb-3"
-      style={{
-        border: "1px solid #dee2e6",
-        borderRadius: "0.75rem",
-        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
-      }}
-    >
-      <div className="card-body" style={{ padding: "1.25rem" }}>
+    <div className={`card mb-3 ${styles.card}`}>
+      <div className={`card-body ${styles.cardBody}`}>
         <div className="row">
           {/* Left Section - Title, Progress, Actions */}
           <div className="col-lg-7 col-md-12">
             {/* Badges */}
-            <div className="d-flex gap-2 flex-wrap align-items-center mb-3">
+            <div
+              className={`d-flex gap-2 flex-wrap align-items-center mb-3 ${styles.badges}`}
+            >
               <GoalTypeBadge type={goal.goalType} />
               {isEmployeeAssignee ? (
                 <TaskStatusBadge
@@ -281,7 +267,7 @@ const GoalDetailsHeader = ({
                 <GoalStatusBadge status={goal.status} />
               )}
               {overdueStatus && (
-                <span className="badge bg-danger">
+                <span className={`badge bg-danger ${styles.overdueBadge}`}>
                   <i className="bi bi-exclamation-triangle-fill me-1"></i>
                   Overdue
                 </span>
@@ -289,15 +275,7 @@ const GoalDetailsHeader = ({
             </div>
 
             {/* Title */}
-            <h4
-              className="mb-3"
-              style={{
-                fontWeight: 700,
-                color: "#212529",
-              }}
-            >
-              {goal.title}
-            </h4>
+            <h4 className={`mb-3 ${styles.title}`}>{goal.title}</h4>
 
             {/* Progress Section */}
             <div className="mb-3">
@@ -310,7 +288,7 @@ const GoalDetailsHeader = ({
                     showPercentage={true}
                     variant="info"
                   />
-                  <div style={{ marginTop: "0.5rem" }}>
+                  <div className={styles.progressGap}>
                     <GoalProgress
                       progress={progress}
                       size="sm"
@@ -332,7 +310,7 @@ const GoalDetailsHeader = ({
                         showPercentage={true}
                         variant="info"
                       />
-                      <div style={{ marginTop: "0.5rem" }}>
+                      <div className={styles.progressGap}>
                         <GoalProgress
                           progress={goal.cascadingProgress || 0}
                           size="md"
@@ -355,27 +333,15 @@ const GoalDetailsHeader = ({
 
             {/* Team Members (for team goals) */}
             {isTeamGoal && goal.assignees && goal.assignees.length > 0 && (
-              <div className="mb-3">
-                <div
-                  style={{
-                    fontSize: "0.8rem",
-                    color: "#6c757d",
-                    marginBottom: "0.5rem",
-                  }}
-                >
+              <div className={`mb-3 ${styles.teamSection}`}>
+                <div className={styles.teamLabel}>
                   Team Members ({goal.assignees.length})
                 </div>
                 <div className="d-flex flex-wrap gap-2">
                   {goal.assignees.slice(0, 3).map((assignee, index) => (
                     <div
                       key={index}
-                      className="badge bg-light text-dark"
-                      style={{
-                        padding: "0.35rem 0.5rem",
-                        fontSize: "0.8rem",
-                        fontWeight: 500,
-                        border: "1px solid #dee2e6",
-                      }}
+                      className={`badge bg-light text-dark ${styles.teamBadge}`}
                     >
                       <i className="bi bi-person me-1"></i>
                       {assignee.name}
@@ -386,13 +352,7 @@ const GoalDetailsHeader = ({
                   ))}
                   {goal.assignees.length > 3 && (
                     <div
-                      className="badge bg-light text-dark"
-                      style={{
-                        padding: "0.35rem 0.5rem",
-                        fontSize: "0.8rem",
-                        fontWeight: 500,
-                        border: "1px solid #dee2e6",
-                      }}
+                      className={`badge bg-light text-dark ${styles.teamBadge}`}
                     >
                       +{goal.assignees.length - 3} more
                     </div>
@@ -403,7 +363,7 @@ const GoalDetailsHeader = ({
 
             {/* Action Buttons */}
             {!isMonitoringMode && shouldShowApprovalButtonForOrgGoal && (
-              <div className="d-flex gap-2 flex-wrap">
+              <div className={`d-flex gap-2 flex-wrap ${styles.actionButtons}`}>
                 {canEdit &&
                   isCreator &&
                   !hasPendingApproval &&
@@ -433,7 +393,9 @@ const GoalDetailsHeader = ({
                     canAutoCompletePremature ||
                     canReopenOrgGoal) && (
                     <button
-                      className={`btn btn-sm ${getButtonVariant()}`}
+                      className={`btn btn-sm ${getButtonVariant()} ${
+                        styles.approvalButton
+                      }`}
                       onClick={
                         hasPendingApproval ||
                         hasPendingClosureRequest ||
@@ -448,15 +410,6 @@ const GoalDetailsHeader = ({
                         hasPendingReactivationRequest ||
                         isUserAcknowledged
                       }
-                      style={{
-                        cursor:
-                          hasPendingApproval ||
-                          hasPendingClosureRequest ||
-                          hasPendingReactivationRequest ||
-                          isUserAcknowledged
-                            ? "not-allowed"
-                            : "pointer",
-                      }}
                       title={
                         canAutoCompletePremature
                           ? "Complete this org goal (auto-approved as Leadership)"
@@ -524,169 +477,65 @@ const GoalDetailsHeader = ({
 
           {/* Right Section - Details */}
           <div className="col-lg-5 col-md-12">
-            <div
-              className="ps-lg-4 pt-3 pt-lg-0"
-              style={{
-                marginLeft: "5rem",
-              }}
-            >
-              <h6
-                className="text-muted mb-3"
-                style={{ fontSize: "0.85rem", fontWeight: 600 }}
-              >
+            <div className={`ps-lg-4 pt-3 pt-lg-0 ${styles.detailsSection}`}>
+              <h6 className={`text-muted mb-3 ${styles.detailsLabel}`}>
                 GOAL DETAILS
               </h6>
-              <br />
-              <div
-                className="d-flex flex-column gap-2"
-                style={{
-                  marginLeft: "9rem",
-                }}
-              >
-                <div className="d-flex">
-                  <div
-                    style={{
-                      flex: "0 0 40%",
-                      fontSize: "0.85rem",
-                      color: "#6c757d",
-                      paddingRight: "0.5rem",
-                      textAlign: "left",
-                    }}
-                  >
-                    Creator
-                  </div>
-                  <div
-                    style={{
-                      fontSize: "0.9rem",
-                      fontWeight: 500,
-                      flex: 1,
-                      textAlign: "left",
-                    }}
-                  >
-                    <i
-                      className="bi bi-person-circle me-1"
-                      style={{ color: "#97247E", fontSize: "0.85rem" }}
-                    ></i>
+              <div className={`d-flex flex-column gap-2 ${styles.detailsList}`}>
+                <div className={`d-flex ${styles.detailRow}`}>
+                  <div className={styles.detailLabel}>Creator</div>
+                  <div className={styles.detailValue}>
+                    <i className="bi bi-person-circle me-1"></i>
                     {goal.createdByName}
                   </div>
                 </div>
 
                 {goal.projectName && (
-                  <div className="d-flex">
-                    <div
-                      style={{
-                        flex: "0 0 40%",
-                        fontSize: "0.85rem",
-                        color: "#6c757d",
-                        paddingRight: "0.5rem",
-                        textAlign: "left",
-                      }}
-                    >
-                      Project
-                    </div>
-                    <div
-                      style={{
-                        fontSize: "0.9rem",
-                        fontWeight: 500,
-                        flex: 1,
-                        textAlign: "left",
-                      }}
-                    >
-                      <i
-                        className="bi bi-folder me-1"
-                        style={{ color: "#0dcaf0", fontSize: "0.85rem" }}
-                      ></i>
+                  <div className={`d-flex ${styles.detailRow}`}>
+                    <div className={styles.detailLabel}>Project</div>
+                    <div className={styles.detailValue}>
+                      <i className="bi bi-folder me-1"></i>
                       {goal.projectName}
                     </div>
                   </div>
                 )}
 
-                <div className="d-flex">
-                  <div
-                    style={{
-                      flex: "0 0 40%",
-                      fontSize: "0.85rem",
-                      color: "#6c757d",
-                      paddingRight: "0.5rem",
-                      textAlign: "left",
-                    }}
-                  >
-                    Created On
-                  </div>
-                  <div
-                    style={{
-                      fontSize: "0.9rem",
-                      fontWeight: 500,
-                      flex: 1,
-                      textAlign: "left",
-                    }}
-                  >
-                    <i
-                      className="bi bi-calendar-plus me-1"
-                      style={{ color: "#0d6efd", fontSize: "0.85rem" }}
-                    ></i>
+                <div className={`d-flex ${styles.detailRow}`}>
+                  <div className={styles.detailLabel}>Created On</div>
+                  <div className={styles.detailValue}>
+                    <i className="bi bi-calendar-plus me-1"></i>
                     {formatDate(goal.createdAt)}
                   </div>
                 </div>
 
-                <div className="d-flex">
+                <div className={`d-flex ${styles.detailRow}`}>
+                  <div className={styles.detailLabel}>Deadline</div>
                   <div
-                    style={{
-                      flex: "0 0 40%",
-                      fontSize: "0.85rem",
-                      color: "#6c757d",
-                      paddingRight: "0.5rem",
-                      textAlign: "left",
-                    }}
-                  >
-                    Deadline
-                  </div>
-                  <div
-                    style={{
-                      fontSize: "0.9rem",
-                      fontWeight: 500,
-                      color: overdueStatus ? "#dc3545" : "inherit",
-                      flex: 1,
-                      textAlign: "left",
-                    }}
+                    className={`${styles.detailValue} ${
+                      overdueStatus ? styles.overdue : ""
+                    }`}
                   >
                     <i
                       className="bi bi-calendar-check me-1"
                       style={{
                         color: overdueStatus ? "#dc3545" : "#28a745",
-                        fontSize: "0.85rem",
                       }}
                     ></i>
                     {formatDate(goal.endAt)}
                   </div>
                 </div>
 
-                <div className="d-flex">
+                <div className={`d-flex ${styles.detailRow}`}>
+                  <div className={styles.detailLabel}>Time Remaining</div>
                   <div
-                    style={{
-                      flex: "0 0 40%",
-                      fontSize: "0.85rem",
-                      color: "#6c757d",
-                      paddingRight: "0.5rem",
-                      textAlign: "left",
-                    }}
-                  >
-                    Time Remaining
-                  </div>
-                  <div
-                    style={{
-                      fontSize: "0.9rem",
-                      fontWeight: 500,
-                      color: daysUntil <= 7 ? "#dc3545" : "inherit",
-                      flex: 1,
-                      textAlign: "left",
-                    }}
+                    className={`${styles.detailValue} ${
+                      daysUntil <= 7 ? styles.warning : ""
+                    }`}
                   >
                     <i
                       className="bi bi-hourglass-split me-1"
                       style={{
                         color: daysUntil <= 7 ? "#dc3545" : "#6c757d",
-                        fontSize: "0.85rem",
                       }}
                     ></i>
                     {overdueStatus

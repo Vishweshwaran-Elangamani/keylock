@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from "react";
+import styles from "../../../styles/lnd/components/Pagination.module.css";
 
 const Pagination = ({
   currentPage,
@@ -73,82 +74,37 @@ const Pagination = ({
   const pageNumbers = getPageNumbers();
 
   return (
-    <div className="pagination-container">
+    <div className={styles.container}>
       {/* Items per page selector */}
-      <div className="pagination-info">
-        <span className="pagination-label">Show</span>
+      <div className={styles.info}>
+        <span className={styles.label}>Show</span>
         
         {/* CUSTOM DROPDOWN */}
-        <div ref={sizeDropdownRef} style={{ position: "relative" }}>
+        <div ref={sizeDropdownRef} className={styles.dropdownContainer}>
           <button
             type="button"
+            className={styles.dropdownToggle}
             onClick={() => !loading && setShowSizeDropdown(!showSizeDropdown)}
             disabled={loading}
-            style={{
-              padding: "0.4rem 0.75rem",
-              border: "none",
-              borderRadius: "6px",
-              fontSize: "0.875rem",
-              cursor: loading ? "not-allowed" : "pointer",
-              background: "#fff",
-              color: "black",
-              minWidth: "70px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              fontWeight: "500",
-              transition: "all 0.2s",
-              opacity: loading ? 0.6 : 1,
-            }}
           >
             <span>{itemsPerPage}</span>
             <i
-              className={`bi bi-chevron-${showSizeDropdown ? "up" : "down"}`}
-              style={{ fontSize: "0.7rem", marginLeft: "0.5rem" }}
-            ></i>
+              className={`bi bi-chevron-${showSizeDropdown ? "up" : "down"} ${styles.chevronIcon}`}
+            />
           </button>
 
           {showSizeDropdown && !loading && (
-            <div
-              style={{
-                position: "absolute",
-                bottom: "calc(100% + 4px)",
-                left: 0,
-                minWidth: "70px",
-                background: "#fff",
-                border: "1px solid #e5e7eb",
-                borderRadius: "6px",
-                zIndex: 1000,
-                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                overflow: "hidden",
-              }}
-            >
+            <div className={styles.dropdownMenu}>
               {pageSizeOptions.map((size) => (
                 <div
                   key={size}
+                  className={`${styles.dropdownItem} ${
+                    itemsPerPage === size ? styles.dropdownItemActive : ''
+                  }`}
                   onClick={() => {
                     onItemsPerPageChange?.(size);
                     onPageChange(1);
                     setShowSizeDropdown(false);
-                  }}
-                  style={{
-                    padding: "0.5rem 0.75rem",
-                    cursor: "pointer",
-                    fontSize: "0.875rem",
-                    color: "#212529",
-                    textAlign: "center",
-                    transition: "all 0.2s",
-                    background: itemsPerPage === size ? "#f3f4f6" : "#fff",
-                    fontWeight: itemsPerPage === size ? "600" : "500",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "rgb(39, 35, 92)";
-                    e.currentTarget.style.color = "white";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background =
-                      itemsPerPage === size ? "#f3f4f6" : "#fff";
-                    e.currentTarget.style.color = "#212529";
                   }}
                 >
                   {size}
@@ -158,16 +114,16 @@ const Pagination = ({
           )}
         </div>
 
-        <span className="pagination-label">entries</span>
+        <span className={styles.label}>entries</span>
       </div>
 
       {/* Status text */}
-      <div className="pagination-status">
+      <div className={styles.status}>
         Showing <strong>{indexOfFirstItem}</strong> to{" "}
         <strong>{indexOfLastItem}</strong> of <strong>{totalItems}</strong> items
         {loading && (
-          <span className="pagination-loading">
-            <span className="spinner-border spinner-border-sm" role="status">
+          <span className={styles.loading}>
+            <span className={`spinner-border spinner-border-sm ${styles.loadingSpinner}`} role="status">
               <span className="visually-hidden">Loading...</span>
             </span>
           </span>
@@ -175,12 +131,12 @@ const Pagination = ({
       </div>
 
       {/* Navigation */}
-      <nav className="pagination-nav">
-        <ul className="pagination">
+      <nav className={`${styles.nav} pagination-nav`}>
+        <ul className={`pagination ${styles.paginationList}`}>
           {/* First Page */}
           <li className={`page-item ${!hasPreviousPage ? "disabled" : ""}`}>
             <button
-              className="page-link"
+              className={`page-link ${styles.pageLink}`}
               onClick={() => onPageChange(1)}
               disabled={!hasPreviousPage || loading}
               title="First page"
@@ -192,12 +148,12 @@ const Pagination = ({
           {/* Previous Page */}
           <li className={`page-item ${!hasPreviousPage ? "disabled" : ""}`}>
             <button
-              className="page-link nav-btn"
+              className={`page-link nav-btn ${styles.pageLink} ${styles.pageLinkNavBtn}`}
               onClick={() => onPageChange(currentPage - 1)}
               disabled={!hasPreviousPage || loading}
             >
               <i className="bi bi-chevron-left"></i>
-              <span className="nav-text">Previous</span>
+              <span className={`nav-text ${styles.navText}`}>Previous</span>
             </button>
           </li>
 
@@ -207,10 +163,12 @@ const Pagination = ({
               key={index}
               className={`page-item page-number ${
                 page === currentPage ? "active" : ""
-              } ${typeof page !== "number" ? "disabled ellipsis" : ""}`}
+              } ${typeof page !== "number" ? "disabled ellipsis" : ""} ${
+                styles.pageItemPageNumber
+              }`}
             >
               <button
-                className="page-link"
+                className={`page-link ${styles.pageLink}`}
                 onClick={() => typeof page === "number" && onPageChange(page)}
                 disabled={typeof page !== "number" || loading}
               >
@@ -222,11 +180,11 @@ const Pagination = ({
           {/* Next Page */}
           <li className={`page-item ${!hasNextPage ? "disabled" : ""}`}>
             <button
-              className="page-link nav-btn"
+              className={`page-link nav-btn ${styles.pageLink} ${styles.pageLinkNavBtn}`}
               onClick={() => onPageChange(currentPage + 1)}
               disabled={!hasNextPage || loading}
             >
-              <span className="nav-text">Next</span>
+              <span className={`nav-text ${styles.navText}`}>Next</span>
               <i className="bi bi-chevron-right"></i>
             </button>
           </li>
@@ -234,7 +192,7 @@ const Pagination = ({
           {/* Last Page */}
           <li className={`page-item ${!hasNextPage ? "disabled" : ""}`}>
             <button
-              className="page-link"
+              className={`page-link ${styles.pageLink}`}
               onClick={() => onPageChange(totalPages)}
               disabled={!hasNextPage || loading}
               title="Last page"
@@ -244,195 +202,6 @@ const Pagination = ({
           </li>
         </ul>
       </nav>
-
-      <style>{`
-        .pagination-container {
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: space-between;
-          align-items: center;
-          padding: 1.5rem;
-          gap: 1rem;
-          background: #fff;
-          border-radius: 12px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-          margin-top: 1.5rem;
-          border: 1px solid #e5e7eb;
-        }
-
-        .pagination-info {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-        }
-
-        .pagination-label {
-          font-size: 0.875rem;
-          color: #6c757d;
-          font-weight: 500;
-        }
-
-        .pagination-status {
-          font-size: 0.875rem;
-          color: #6c757d;
-          font-weight: 400;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-        }
-
-        .pagination-status strong {
-          font-weight: 600;
-          color: #212529;
-        }
-
-        .pagination-loading {
-          display: inline-flex;
-          align-items: center;
-          margin-left: 0.5rem;
-        }
-
-        .pagination-loading .spinner-border {
-          width: 14px;
-          height: 14px;
-          border-width: 2px;
-          color: #27235c;
-        }
-
-        .pagination-nav {
-          display: flex;
-        }
-
-        .pagination {
-          display: flex;
-          list-style: none;
-          padding: 0;
-          margin: 0;
-          gap: 0.25rem;
-          align-items: center;
-        }
-
-        .page-item {
-          list-style: none;
-        }
-
-        .page-link {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          min-width: 36px;
-          height: 36px;
-          padding: 0.4rem 0.5rem;
-          font-size: 0.875rem;
-          font-weight: 500;
-          color: #212529;
-          background-color: #fff;
-          border: 1px solid #e5e7eb;
-          border-radius: 6px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          gap: 0.25rem;
-        }
-
-        .page-link:hover:not(:disabled) {
-          background-color: #f8f9fa;
-          border-color: #27235c;
-          color: #27235c;
-        }
-
-        .page-link.nav-btn {
-          padding: 0.4rem 0.75rem;
-          min-width: auto;
-        }
-
-        .nav-text {
-          font-size: 0.875rem;
-          font-weight: 500;
-        }
-
-        .page-item.active .page-link {
-          background-color: rgb(39, 35, 92);
-          border-color: rgb(39, 35, 92);
-          color: #fff;
-        }
-
-        .page-item.active .page-link:hover {
-          background-color: #1e1a47;
-        }
-
-        .page-item.disabled .page-link {
-          opacity: 0.5;
-          cursor: not-allowed;
-          pointer-events: none;
-          background-color: #f8f9fa;
-          color: #6c757d;
-        }
-
-        .page-item.ellipsis .page-link {
-          border: none;
-          background: transparent;
-          cursor: default;
-          min-width: 30px;
-          pointer-events: none;
-        }
-
-        .page-item.ellipsis .page-link:hover {
-          background: transparent;
-        }
-
-        /* Hide page numbers on mobile, show only nav buttons */
-        @media (max-width: 768px) {
-          .pagination-container {
-            flex-direction: column;
-            gap: 1rem;
-            padding: 1rem;
-          }
-
-          .pagination-info,
-          .pagination-status,
-          .pagination-nav {
-            width: 100%;
-            justify-content: center;
-          }
-
-          .pagination-status {
-            text-align: center;
-          }
-
-          .page-item.page-number {
-            display: none;
-          }
-
-          .nav-text {
-            display: inline;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .page-link {
-            min-width: 32px;
-            height: 32px;
-            padding: 0.3rem 0.5rem;
-            font-size: 0.8rem;
-          }
-
-          .page-link.nav-btn {
-            padding: 0.3rem 0.5rem;
-          }
-
-          .nav-text {
-            display: none;
-          }
-
-          .pagination-label {
-            font-size: 0.8rem;
-          }
-
-          .pagination-status {
-            font-size: 0.8rem;
-          }
-        }
-      `}</style>
     </div>
   );
 };

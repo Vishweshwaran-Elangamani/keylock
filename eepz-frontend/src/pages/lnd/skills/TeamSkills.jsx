@@ -6,6 +6,7 @@ import EmptyState from "../../../components/lnd/common/EmptyState";
 import EmployeeSkillsModal from "../../../components/lnd/modals/EmployeeSkillsModal";
 import { lndService } from "../../../services/lnd/lndService";
 import { toast } from "sonner";
+import styles from "../../../styles/lnd/pages/skills/TeamSkills.module.css";
 
 const TeamSkills = () => {
   const [employees, setEmployees] = useState([]);
@@ -112,10 +113,20 @@ const TeamSkills = () => {
     setSelectedEmployee(null);
   };
 
+  // Get employee initials for avatar
+  const getEmployeeInitials = (name) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .substring(0, 2)
+      .toUpperCase();
+  };
+
   // Show initial loading spinner only when no data
   if (loading && employees.length === 0) {
     return (
-      <div style={{ textAlign: "center", padding: "3rem" }}>
+      <div className={styles.loadingContainer}>
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
@@ -134,17 +145,16 @@ const TeamSkills = () => {
       />
 
       {/* Search Bar */}
-      <div style={{ marginBottom: "1.5rem" }}>
-        <div style={{ width: "100%", maxWidth: "400px" }}>
+      <div className={styles.searchSection}>
+        <div className={styles.searchWrapper}>
           <div className="input-group">
             <input
               type="text"
-              className="form-control"
+              className={`form-control ${styles.searchInput}`}
               placeholder="Search employees..."
               value={searchInput}
               onChange={handleSearchChange}
               onKeyPress={handleSearchSubmit}
-              style={{ minHeight: "35.7px" }}
             />
             {searchTerm ? (
               <button
@@ -178,117 +188,38 @@ const TeamSkills = () => {
       ) : (
         <>
           <div
-            style={{
-              minHeight: "65vh",
-              opacity: loading ? 0.6 : 1,
-              transition: "opacity 0.2s",
-            }}
+            className={`${styles.contentContainer} ${
+              loading ? styles.contentContainerLoading : ""
+            }`}
           >
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-                gap: "1rem",
-              }}
-            >
+            <div className={styles.employeeGrid}>
               {employees.map((employee) => (
                 <div
                   key={employee.employeeId}
                   onClick={() => handleEmployeeClick(employee)}
-                  style={{
-                    background: "#fff",
-                    border: "1px solid rgb(39, 35, 92, 0.5)",
-                    borderRadius: "12px",
-                    padding: "1.5rem",
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.boxShadow =
-                      "0 4px 12px rgba(0,0,0,0.08)";
-                    e.currentTarget.style.borderColor = "#97247E";
-                    e.currentTarget.style.transform = "translateY(-2px)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.boxShadow = "none";
-                    e.currentTarget.style.borderColor = "rgb(39, 35, 92, 0.5)";
-                    e.currentTarget.style.transform = "translateY(0)";
-                  }}
+                  className={styles.employeeCard}
                 >
-                  <div style={{ flex: 1 }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.75rem",
-                        textAlign: "left",
-                        marginBottom: "0.5rem",
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: "48px",
-                          height: "48px",
-                          borderRadius: "50%",
-                          backgroundColor: "rgb(39, 35, 92)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: "#fff",
-                          fontWeight: "700",
-                          fontSize: "1.125rem",
-                        }}
-                      >
-                        {employee.employeeName
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")
-                          .substring(0, 2)
-                          .toUpperCase()}
+                  <div className={styles.cardContent}>
+                    <div className={styles.employeeHeader}>
+                      <div className={styles.employeeAvatar}>
+                        {getEmployeeInitials(employee.employeeName)}
                       </div>
-                      <div>
-                        <h5
-                          style={{
-                            margin: 0,
-                            fontWeight: "600",
-                            color: "#212529",
-                            fontSize: "1rem",
-                          }}
-                        >
+                      <div className={styles.employeeInfo}>
+                        <h5 className={styles.employeeName}>
                           {employee.employeeName}
                         </h5>
-                        <p
-                          style={{
-                            margin: 0,
-                            fontSize: "0.875rem",
-                            color: "#6c757d",
-                          }}
-                        >
+                        <p className={styles.employeeEmail}>
                           {employee.email}
                         </p>
                       </div>
                     </div>
                     {employee.departmentName && (
-                      <div
-                        style={{
-                          display: "inline-block",
-                          padding: "0.25rem 0.75rem",
-                          background: "#f3f4f6",
-                          borderRadius: "12px",
-                          fontSize: "0.75rem",
-                          color: "#4b5563",
-                          fontWeight: "500",
-                          marginTop: "0.5rem",
-                        }}
-                      >
+                      <div className={styles.departmentBadge}>
                         {employee.departmentName}
                       </div>
                     )}
                   </div>
-                  <ChevronRight size={20} color="#97247E" />
+                  <ChevronRight size={20} className={styles.chevronIcon} />
                 </div>
               ))}
             </div>

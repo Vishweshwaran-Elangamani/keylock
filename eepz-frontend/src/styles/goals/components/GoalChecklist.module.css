@@ -1,0 +1,200 @@
+/* GoalChecklist.module.css */
+
+.alert {
+  border-radius: 12px;
+}
+
+.descriptionHeader {
+  background-color: rgb(39, 35, 92);
+  font-weight: 600;
+  font-size: 14px;
+  border: 1px solid rgba(39, 35, 92, 0.46);
+  padding: 1rem 1.25rem;
+  border-radius: 1.5rem 1.5rem 0rem 0rem;
+  color: white;
+}
+
+.descriptionHeader > div {
+  color: white;
+}
+
+.badgeLocked {
+  font-size: 12px;
+}
+
+.descriptionBody {
+  padding: 1.25rem;
+  border: 1px solid rgba(39, 35, 92, 0.46);
+  border-radius: 0rem 0rem 1.5rem 1.5rem;
+}
+
+.descriptionTextarea {
+  font-size: 14px;
+  height: 100px;
+  resize: vertical;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.descriptionText {
+  white-space: pre-wrap;
+  margin-bottom: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #495057;
+  font-style: normal;
+  text-align: left;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.descriptionText:empty::before {
+  content: "No description provided";
+  color: #6c757d;
+  font-style: italic;
+}
+
+.checklistHeader {
+  color: white;
+  font-weight: 600;
+  padding: 1rem 1.25rem;
+  font-size: 14px;
+  text-align: left;
+  background-color: rgb(39, 35, 92);
+  border-radius: 1.5rem 1.5rem 0rem 0rem;
+}
+
+.badgeLockedSm {
+  font-size: 0.7rem;
+}
+
+.checklistBody {
+  padding: 10px;
+  border: 1px solid rgba(39, 35, 92, 0.46);
+  border-radius: 0rem 0rem 1.5rem 1.5rem;
+}
+
+.emptyState {
+  padding: 3rem 2rem;
+  text-align: center;
+  color: #6c757d;
+  background-color: #f8f9fa;
+}
+
+.groupHeader {
+  background-color: #e9ecef;
+  border-radius: 0.5rem;
+}
+
+.groupHeader.currentUserHeader {
+  background-color: #e3f2fd;
+  border: 2px solid #2196f3;
+}
+
+.checklistItem {
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #fff;
+  border-bottom: 1px solid #e9ecef;
+  border-left: 4px solid transparent;
+  opacity: 1;
+}
+
+.checklistItem.completed {
+  background-color: #e8f5e9;
+  border-left: 4px solid #28a745;
+}
+
+.checklistItem.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.checklistItem.notLast {
+  border-bottom: 1px solid #e9ecef;
+}
+
+.checklistItem:hover:not(.disabled) {
+  background-color: #f5f5f5;
+}
+
+.checklistItem.completed:hover:not(.disabled) {
+  background-color: #c8e6c9;
+}
+
+.checkboxWrapper {
+  flex-shrink: 0;
+}
+
+.checkbox {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 2px solid #dee2e6;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: none;
+}
+
+.checkbox.checked {
+  border-color: #28a745;
+  background-color: #28a745;
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+}
+
+.checkbox.disabledCheckbox {
+  cursor: not-allowed;
+}
+
+.content {
+  flex: 1;
+  text-align: left;
+}
+
+.title {
+  text-decoration: none;
+  color: #212529;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 0.25rem;
+  opacity: 1;
+  transition: all 0.3s ease;
+}
+
+.title.strikethrough {
+  text-decoration: line-through;
+  color: #6c757d;
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+.description {
+  font-size: 0.85rem;
+  color: #6c757d;
+  line-height: 1.4;
+  margin-top: 0.25rem;
+  text-decoration: none;
+  opacity: 1;
+}
+
+.description.strikethrough {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.doneBadge {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  background-color: #28a745;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+}

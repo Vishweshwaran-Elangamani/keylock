@@ -1,3 +1,5 @@
+import styles from "../../../styles/goals/components/ConfirmDialog.module.css";
+
 const ConfirmDialog = ({
   isOpen,
   onClose,
@@ -17,56 +19,15 @@ const ConfirmDialog = ({
 
   return (
     <>
-      {/* Backdrop */}
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
-          zIndex: 1050,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-        onClick={onClose}
-      >
-        {/* Modal */}
-        <div
-          style={{
-            backgroundColor: "#fff",
-            borderRadius: "0.5rem",
-            boxShadow: "0 10px 40px rgba(0, 0, 0, 0.2)",
-            width: "90%",
-            maxWidth: "500px",
-            padding: 0,
-          }}
-          onClick={(e) => e.stopPropagation()}
-        >
+      <div className={styles.backdrop} onClick={onClose}>
+        <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
           {/* Header */}
-          <div
-            style={{
-              padding: "1.25rem 1.5rem",
-              borderBottom: "1px solid #dee2e6",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <h5 style={{ margin: 0, fontWeight: 600 }}>{title}</h5>
+          <div className={styles.header}>
+            <h5 className={styles.title}>{title}</h5>
             <button
               type="button"
               onClick={onClose}
-              style={{
-                background: "transparent",
-                border: "none",
-                fontSize: "1.5rem",
-                cursor: "pointer",
-                padding: 0,
-                color: "#6c757d",
-              }}
+              className={styles.closeButton}
               disabled={loading}
             >
               &times;
@@ -74,20 +35,12 @@ const ConfirmDialog = ({
           </div>
 
           {/* Body */}
-          <div style={{ padding: "1.5rem" }}>
-            <p style={{ margin: 0, color: "#495057" }}>{message}</p>
+          <div className={styles.body}>
+            <p className={styles.message}>{message}</p>
           </div>
 
           {/* Footer */}
-          <div
-            style={{
-              padding: "1rem 1.5rem",
-              borderTop: "1px solid #dee2e6",
-              display: "flex",
-              gap: "0.5rem",
-              justifyContent: "flex-end",
-            }}
-          >
+          <div className={styles.footer}>
             <button
               type="button"
               className="btn btn-secondary"

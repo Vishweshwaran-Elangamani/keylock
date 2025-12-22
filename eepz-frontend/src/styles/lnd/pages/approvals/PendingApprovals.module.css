@@ -1,0 +1,247 @@
+/* PendingApprovals.module.css */
+
+/* Loading State */
+.loadingContainer {
+  text-align: center;
+  padding: 3rem;
+}
+
+/* Search and Filter Container */
+.filterContainer {
+  margin-bottom: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Search Form */
+.searchForm {
+  display: flex;
+  gap: 0.5rem;
+  flex-grow: 1;
+  min-width: 250px;
+}
+
+.searchInput {
+  min-height: 35.7px;
+}
+
+/* Type Filter Dropdown */
+.dropdownWrapper {
+  position: relative;
+}
+
+.dropdownButton {
+  padding: 0.5rem 0.875rem;
+  border: 1px solid rgb(39, 35, 92, 0.5);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  background: #fff;
+  color: black;
+  min-width: 220px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.dropdownIcon {
+  font-size: 0.75rem;
+  margin-left: 0.5rem;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 220px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.dropdownItem {
+  padding: 0.625rem 0.875rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #212529;
+  text-align: left;
+  transition: all 0.2s;
+}
+
+.dropdownItemActive {
+  background: #f3f4f6;
+}
+
+.dropdownItem:hover {
+  background: rgb(39, 35, 92);
+  color: white;
+}
+
+/* Table Container */
+.tableContainer {
+  min-height: 65vh;
+  transition: opacity 0.2s;
+}
+
+.tableContainerLoading {
+  opacity: 0.6;
+}
+
+.tableWrapper {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* Table Header */
+.tableHeader {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.5fr 1.2fr 1.3fr;
+  padding: 1rem 1.5rem;
+  background: rgb(39, 35, 92);
+  border-bottom: 2px solid #abb4c5ff;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.tableHeaderCell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  -webkit-user-select: none;
+  user-select: none;
+  transition: color 0.2s;
+  color: white;
+}
+
+.tableHeaderCellLeft {
+  justify-content: flex-start;
+}
+
+.tableHeaderCellCenter {
+  justify-content: center;
+}
+
+.tableHeaderCellSortable {
+  cursor: pointer;
+}
+
+.tableHeaderCellSortable:hover {
+  color: lightpink;
+}
+
+.tableHeaderCellActive {
+  color: lightpink;
+}
+
+/* Sort Icons */
+.sortIcon {
+  margin-left: 4px;
+}
+
+.sortIconInactive {
+  opacity: 0.5;
+  color: white;
+}
+
+.sortIconActive {
+  color: lightpink;
+  font-weight: bold;
+}
+
+/* Table Row */
+.tableRow {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.5fr 1.2fr 1.3fr;
+  padding: 1rem 1.5rem;
+  align-items: center;
+  font-size: 0.875rem;
+  color: #212529;
+  transition: background 0.2s;
+  text-align: left;
+  background: #fff;
+}
+
+.tableRow:hover {
+  background: #f9fafb;
+}
+
+.tableRowBorder {
+  border-bottom: 1px solid #f3f4f6;
+}
+
+/* Table Cell Styles */
+.cellRequestType {
+  font-weight: 500;
+}
+
+.cellName {
+  font-weight: 600;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.cellDate {
+  color: #6b7280;
+}
+
+.cellActions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+/* Download Button */
+.downloadButton {
+  padding: 0.4rem 0.75rem;
+  background: #fff;
+  border: 1px solid #97247e;
+  border-radius: 8px;
+  color: #97247e;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: all 0.2s;
+}
+
+.downloadButton:hover {
+  border-color: #ac5098;
+  color: #ac5098;
+}
+
+/* Review Button */
+.reviewButton {
+  padding: 0.4rem 0.85rem;
+  background: linear-gradient(135deg, #ac5098 0%, #97247e 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  box-shadow: 0 2px 7px rgba(151, 36, 126, 0.3);
+  transition: all 0.2s;
+}
+
+.reviewButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(151, 36, 126, 0.5);
+}

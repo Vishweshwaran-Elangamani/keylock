@@ -14,6 +14,7 @@ import ApprovalDecisionModal from "../../../components/lnd/modals/ApprovalDecisi
 import { lndService, downloadFile } from "../../../services/lnd/lndService";
 import { APPROVAL_TYPE } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
+import styles from "../../../styles/lnd/pages/approvals/PendingApprovals.module.css";
 
 const PendingApprovals = () => {
   const [approvals, setApprovals] = useState([]);
@@ -212,43 +213,37 @@ const PendingApprovals = () => {
   };
 
   const renderSortIcon = (field) => {
-    if (sortField !== field) {
-      return (
-        <ChevronUp
-          size={14}
-          style={{
-            marginLeft: 4,
-            opacity: 0.5,
-            color: "white",
-          }}
-        />
-      );
+    const isActive = sortField === field;
+    const iconClass = isActive ? styles.sortIconActive : styles.sortIconInactive;
+
+    if (!isActive) {
+      return <ChevronUp size={14} className={`${styles.sortIcon} ${iconClass}`} />;
     }
     return sortOrderAsc ? (
-      <ChevronUp
-        size={14}
-        style={{
-          marginLeft: 4,
-          color: "lightpink",
-          fontWeight: "bold",
-        }}
-      />
+      <ChevronUp size={14} className={`${styles.sortIcon} ${iconClass}`} />
     ) : (
-      <ChevronDown
-        size={14}
-        style={{
-          marginLeft: 4,
-          color: "lightpink",
-          fontWeight: "bold",
-        }}
-      />
+      <ChevronDown size={14} className={`${styles.sortIcon} ${iconClass}`} />
     );
+  };
+
+  const getHeaderCellClass = (field, align) => {
+    const baseClass = styles.tableHeaderCell;
+    const alignClass = align === "center" ? styles.tableHeaderCellCenter : styles.tableHeaderCellLeft;
+    const sortableClass = field ? styles.tableHeaderCellSortable : "";
+    const activeClass = sortField === field ? styles.tableHeaderCellActive : "";
+    return `${baseClass} ${alignClass} ${sortableClass} ${activeClass}`.trim();
+  };
+
+  const getDropdownItemClass = (currentValue, optionValue) => {
+    return `${styles.dropdownItem} ${
+      currentValue === optionValue ? styles.dropdownItemActive : ""
+    }`.trim();
   };
 
   // Show initial loading spinner only when no data
   if (loading && approvals.length === 0) {
     return (
-      <div style={{ textAlign: "center", padding: "3rem" }}>
+      <div className={styles.loadingContainer}>
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
@@ -267,34 +262,17 @@ const PendingApprovals = () => {
       />
 
       {/* Search and Filter */}
-      <div
-        style={{
-          marginBottom: "1.5rem",
-          display: "flex",
-          gap: "1rem",
-          flexWrap: "wrap",
-          alignItems: "center",
-        }}
-      >
+      <div className={styles.filterContainer}>
         {/* Search Bar */}
-        <form
-          onSubmit={handleSearchSubmit}
-          style={{
-            display: "flex",
-            gap: "0.5rem",
-            flexGrow: 1,
-            minWidth: 250,
-          }}
-        >
+        <form onSubmit={handleSearchSubmit} className={styles.searchForm}>
           <div className="input-group">
             <input
               type="text"
-              className="form-control"
+              className={`form-control ${styles.searchInput}`}
               placeholder="Search approvals..."
               value={searchInput}
               onChange={handleSearchInputChange}
               onKeyPress={handleKeyPress}
-              style={{ minHeight: "35.7px" }}
             />
             {searchTerm ? (
               <button
@@ -315,48 +293,20 @@ const PendingApprovals = () => {
         </form>
 
         {/* TYPE FILTER DROPDOWN */}
-        <div ref={typeDropdownRef} style={{ position: "relative" }}>
+        <div ref={typeDropdownRef} className={styles.dropdownWrapper}>
           <button
             type="button"
             onClick={() => setShowTypeDropdown(!showTypeDropdown)}
-            style={{
-              padding: "0.5rem 0.875rem",
-              border: "none",
-              borderRadius: "8px",
-              fontSize: "0.875rem",
-              cursor: "pointer",
-              background: "#fff",
-              color: "black",
-              minWidth: "220px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              fontWeight: "500",
-              transition: "all 0.2s",
-            }}
+            className={styles.dropdownButton}
           >
             <span>{getTypeLabel(typeFilter)}</span>
             <i
-              className={`bi bi-chevron-${showTypeDropdown ? "up" : "down"}`}
-              style={{ fontSize: "0.75rem", marginLeft: "0.5rem" }}
+              className={`bi bi-chevron-${showTypeDropdown ? "up" : "down"} ${styles.dropdownIcon}`}
             ></i>
           </button>
 
           {showTypeDropdown && (
-            <div
-              style={{
-                position: "absolute",
-                top: "calc(100% + 4px)",
-                left: 0,
-                minWidth: "220px",
-                background: "#fff",
-                border: "1px solid #e5e7eb",
-                borderRadius: "8px",
-                zIndex: 1000,
-                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                overflow: "hidden",
-              }}
-            >
+            <div className={styles.dropdownMenu}>
               {typeOptions.map((option) => (
                 <div
                   key={option.value}
@@ -365,25 +315,7 @@ const PendingApprovals = () => {
                     setCurrentPage(1);
                     setShowTypeDropdown(false);
                   }}
-                  style={{
-                    padding: "0.625rem 0.875rem",
-                    cursor: "pointer",
-                    fontSize: "0.875rem",
-                    color: "#212529",
-                    textAlign: "left",
-                    transition: "all 0.2s",
-                    background:
-                      typeFilter === option.value ? "#f3f4f6" : "#fff",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "rgb(39, 35, 92)";
-                    e.currentTarget.style.color = "white";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background =
-                      typeFilter === option.value ? "#f3f4f6" : "#fff";
-                    e.currentTarget.style.color = "#212529";
-                  }}
+                  className={getDropdownItemClass(typeFilter, option.value)}
                 >
                   {option.label}
                 </div>
@@ -407,80 +339,24 @@ const PendingApprovals = () => {
       ) : (
         <>
           <div
-            style={{
-              minHeight: "65vh",
-              opacity: loading ? 0.6 : 1,
-              transition: "opacity 0.2s",
-            }}
+            className={`${styles.tableContainer} ${
+              loading ? styles.tableContainerLoading : ""
+            }`}
           >
-            <div
-              style={{
-                background: "#fff",
-                borderRadius: "12px",
-                overflow: "hidden",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.12)"
-              }}
-            >
+            <div className={styles.tableWrapper}>
               {/* Table Header */}
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "2fr 1.5fr 1.5fr 1.2fr 1.3fr",
-                  padding: "1rem 1.5rem",
-                  background: "rgb(39, 35, 92)",
-                  borderBottom: "2px solid #abb4c5ff",
-                  fontWeight: "600",
-                  fontSize: "0.875rem",
-                  color: "white",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.025em",
-                }}
-              >
+              <div className={styles.tableHeader}>
                 {[
-                  {
-                    label: "Request Type",
-                    field: "approvalType",
-                    align: "left",
-                  },
-                  {
-                    label: "Submitted By",
-                    field: "requesterName",
-                    align: "left",
-                  },
-                  {
-                    label: "Assigned To",
-                    field: "approverName",
-                    align: "left",
-                  },
-                  {
-                    label: "Submission Date",
-                    field: "requestedOn",
-                    align: "left",
-                  },
+                  { label: "Request Type", field: "approvalType", align: "left" },
+                  { label: "Submitted By", field: "requesterName", align: "left" },
+                  { label: "Assigned To", field: "approverName", align: "left" },
+                  { label: "Submission Date", field: "requestedOn", align: "left" },
                   { label: "Quick Actions", field: null, align: "center" },
                 ].map(({ label, field, align }) => (
                   <div
                     key={field || label}
                     onClick={() => field && onSortClick(field)}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent:
-                        align === "center" ? "center" : "flex-start",
-                      gap: 4,
-                      userSelect: "none",
-                      cursor: field ? "pointer" : "default",
-                      transition: "color 0.2s",
-                      color: "white",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (field) e.currentTarget.style.color = "lightpink";
-                    }}
-                    onMouseLeave={(e) => {
-                      if (field && sortField !== field) {
-                        e.currentTarget.style.color = "white";
-                      }
-                    }}
+                    className={getHeaderCellClass(field, align)}
                   >
                     {label}
                     {field && renderSortIcon(field)}
@@ -492,89 +368,33 @@ const PendingApprovals = () => {
               {approvals.map((approval, idx) => (
                 <div
                   key={approval.approvalId}
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "2fr 1.5fr 1.5fr 1.2fr 1.3fr",
-                    padding: "1rem 1.5rem",
-                    borderBottom:
-                      idx < approvals.length - 1 ? "1px solid #f3f4f6" : "none",
-                    alignItems: "center",
-                    fontSize: "0.875rem",
-                    color: "#212529",
-                    transition: "background 0.2s",
-                    textAlign: "left",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.background = "#f9fafb")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.background = "#fff")
-                  }
+                  className={`${styles.tableRow} ${
+                    idx < approvals.length - 1 ? styles.tableRowBorder : ""
+                  }`}
                 >
-                  <div style={{ fontWeight: "500" }}>
+                  <div className={styles.cellRequestType}>
                     {getApprovalTypeLabel(approval.approvalType)}
                   </div>
                   <div>
-                    <div
-                      style={{
-                        fontWeight: 600,
-                        textOverflow: "ellipsis",
-                        overflow: "hidden",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
+                    <div className={styles.cellName}>
                       {approval.requesterName}
                     </div>
                   </div>
                   <div>
-                    <div
-                      style={{
-                        fontWeight: 600,
-                        textOverflow: "ellipsis",
-                        overflow: "hidden",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
+                    <div className={styles.cellName}>
                       {approval.approverName || "-"}
                     </div>
                   </div>
-                  <div style={{ color: "#6b7280" }}>
+                  <div className={styles.cellDate}>
                     {approval.requestedOn
                       ? new Date(approval.requestedOn).toLocaleDateString()
                       : "-"}
                   </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: "0.5rem",
-                      justifyContent: "center",
-                    }}
-                  >
+                  <div className={styles.cellActions}>
                     {approval.attachmentPath && (
                       <button
                         onClick={() => handleDownload(approval)}
-                        style={{
-                          padding: "0.4rem 0.75rem",
-                          background: "#fff",
-                          border: "1px solid #97247E",
-                          borderRadius: "8px",
-                          color: "#97247E",
-                          fontSize: "0.85rem",
-                          fontWeight: "600",
-                          cursor: "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "0.25rem",
-                          transition: "all 0.2s",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.borderColor = "#AC5098";
-                          e.currentTarget.style.color = "#AC5098";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.borderColor = "#97247E";
-                          e.currentTarget.style.color = "#97247E";
-                        }}
+                        className={styles.downloadButton}
                         title="Download Attachment"
                       >
                         <Download size={16} />
@@ -582,32 +402,7 @@ const PendingApprovals = () => {
                     )}
                     <button
                       onClick={() => handleReview(approval)}
-                      style={{
-                        padding: "0.4rem 0.85rem",
-                        background:
-                          "linear-gradient(135deg, #AC5098 0%, #97247E 100%)",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: "8px",
-                        fontSize: "0.85rem",
-                        fontWeight: "600",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.35rem",
-                        boxShadow: "0 2px 7px rgba(151, 36, 126, 0.3)",
-                        transition: "all 0.2s",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = "translateY(-1px)";
-                        e.currentTarget.style.boxShadow =
-                          "0 4px 12px rgba(151, 36, 126, 0.5)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = "translateY(0)";
-                        e.currentTarget.style.boxShadow =
-                          "0 2px 7px rgba(151, 36, 126, 0.3)";
-                      }}
+                      className={styles.reviewButton}
                       title="Review Approval"
                     >
                       <Eye size={16} />

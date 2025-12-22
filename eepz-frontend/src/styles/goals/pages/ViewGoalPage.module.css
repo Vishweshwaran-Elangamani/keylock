@@ -1,0 +1,63 @@
+/* ViewGoalPage.module.css */
+
+/* Main Container */
+.pageContainer {
+  margin-bottom: 15px;
+}
+
+/* Navigation Tabs */
+.navTab {
+  cursor: pointer;
+}
+
+.navTabActive {
+  /* Active state is handled by Bootstrap's .active class */
+  /* Add any custom active styles here if needed */
+}
+
+/* Spin Animation for Refresh Button */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Error State Container */
+.errorContainer {
+  padding: 1.5rem;
+}
+
+/* Tab Content Area */
+.tabContent {
+  min-height: 300px;
+}
+
+/* Optional: Custom Tab Styling */
+.tabList {
+  border-bottom-color: #dee2e6;
+}
+
+.tabButton {
+  border: none;
+  background: transparent;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.tabButton:hover {
+  border-bottom-color: #0d6efd;
+}
+
+.tabButtonActive {
+  border-bottom-color: #0d6efd;
+  color: #0d6efd;
+}

@@ -8,6 +8,7 @@ import Alert from "../../components/goals/common/Alert";
 import Pagination from "../../components/goals/common/Pagination";
 import { APPROVAL_TYPE_LABELS } from "../../constants/goals/goalConstants";
 import Breadcrumb from "../../components/goals/common/Breadcrumb";
+import styles from "../../styles/goals/pages/GoalApprovalsPage.module.css";
 
 const GoalApprovalsPage = () => {
   const { user } = useAuth();
@@ -291,9 +292,25 @@ const GoalApprovalsPage = () => {
     );
   };
 
+  const getToggleButtonClass = (mode) => {
+    return `${styles.toggleButton} ${
+      viewMode === mode
+        ? styles.toggleButtonActive
+        : styles.toggleButtonInactive
+    }`;
+  };
+
+  const getDropdownItemClass = (currentValue, optionValue) => {
+    return `${styles.dropdownItem} ${
+      currentValue === optionValue
+        ? styles.dropdownItemActive
+        : styles.dropdownItemInactive
+    }`;
+  };
+
   return (
     <>
-      <div className="container-fluid" style={{ paddingRight: "20px" }}>
+      <div className={`container-fluid ${styles.container}`}>
         <Breadcrumb
           items={[
             { label: "", path: "/dashboard", icon: "house-door" },
@@ -311,39 +328,13 @@ const GoalApprovalsPage = () => {
         )}
 
         <div className="row g-2 mb-4 align-items-center">
-          {/* Toggle Buttons - SLIGHTLY INCREASED */}
+          {/* Toggle Buttons */}
           <div className="col-12 col-lg-4">
-            <div
-              style={{
-                display: "flex",
-                flex: 1,
-                backgroundColor: "rgb(39, 35, 92)",
-                borderRadius: "50px",
-                padding: "4px",
-                maxWidth: "100%",
-              }}
-            >
+            <div className={styles.toggleContainer}>
               <button
                 type="button"
                 onClick={() => handleViewModeChange("pending")}
-                style={{
-                  flex: 1,
-                  padding: "11px 22px",
-                  border: "none",
-                  borderRadius: "50px",
-                  backgroundColor:
-                    viewMode === "pending" ? "#ffffff" : "rgb(39, 35, 92)",
-                  color: viewMode === "pending" ? "#000000" : "white",
-                  fontWeight: 500,
-                  cursor: "pointer",
-                  transition: "all 0.3s ease",
-                  boxShadow:
-                    viewMode === "pending"
-                      ? "0 2px 4px rgba(0,0,0,0.1)"
-                      : "none",
-                  fontSize: "12.5px",
-                  whiteSpace: "nowrap",
-                }}
+                className={getToggleButtonClass("pending")}
               >
                 <i className="bi bi-hourglass-split me-1"></i>
                 Pending ({pendingCount})
@@ -351,24 +342,7 @@ const GoalApprovalsPage = () => {
               <button
                 type="button"
                 onClick={() => handleViewModeChange("history")}
-                style={{
-                  flex: 1,
-                  padding: "11px 22px",
-                  border: "none",
-                  borderRadius: "50px",
-                  backgroundColor:
-                    viewMode === "history" ? "#ffffff" : "rgb(39, 35, 92)",
-                  color: viewMode === "history" ? "#000000" : "white",
-                  fontWeight: 500,
-                  cursor: "pointer",
-                  transition: "all 0.3s ease",
-                  boxShadow:
-                    viewMode === "history"
-                      ? "0 2px 4px rgba(0,0,0,0.1)"
-                      : "none",
-                  fontSize: "12.5px",
-                  whiteSpace: "nowrap",
-                }}
+                className={getToggleButtonClass("history")}
               >
                 <i className="bi bi-clock-history me-1"></i>
                 History ({historyCount})
@@ -377,31 +351,28 @@ const GoalApprovalsPage = () => {
           </div>
 
           {/* Search Bar */}
-          <div className="col-12 col-md-6 col-lg-5">
+          <div className="col-12 col-md-6 col-lg-4">
             <div className="input-group">
               <input
                 type="text"
-                className="form-control"
+                className={`form-control ${styles.searchInput}`}
                 placeholder="Search by goal title or requester..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={handleSearchKeyPress}
-                style={{ minHeight: "37px", fontSize: "0.875rem" }}
               />
               {activeSearchTerm ? (
                 <button
-                  className="btn btn-outline-secondary"
+                  className={`btn btn-outline-secondary ${styles.searchButton}`}
                   onClick={handleCancelSearch}
-                  style={{ fontSize: "0.875rem" }}
                 >
                   <i className="bi bi-x-lg me-1"></i>
                   Cancel
                 </button>
               ) : (
                 <button
-                  className="btn btn-primary"
+                  className={`btn btn-primary ${styles.searchButton}`}
                   onClick={handleSearch}
-                  style={{ fontSize: "0.875rem" }}
                 >
                   <i className="bi bi-search me-1"></i>
                   Search
@@ -410,69 +381,29 @@ const GoalApprovalsPage = () => {
             </div>
           </div>
 
-          {/* Filter Type - CUSTOM DROPDOWN */}
+          {/* Filter Type - Custom Dropdown */}
           <div className="col-6 col-md-3 col-lg-2">
-            <div ref={typeDropdownRef} style={{ position: "relative" }}>
+            <div ref={typeDropdownRef} className={styles.dropdownWrapper}>
               <button
                 type="button"
                 onClick={() => setShowTypeDropdown(!showTypeDropdown)}
-                style={{
-                  padding: "0.45rem 0.75rem",
-                  border: "none",
-                  borderRadius: "8px",
-                  fontSize: "0.875rem",
-                  cursor: "pointer",
-                  background: "#fff",
-                  color: "black",
-                  width: "100%",
-                  minWidth: "140px",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  fontWeight: "500",
-                  transition: "all 0.2s",
-                  height: "37px",
-                }}
+                className={`${styles.dropdownButton} ${styles.typeDropdownButton}`}
               >
                 <span
-                  style={{
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    maxWidth: "calc(100% - 20px)",
-                  }}
+                  className={`${styles.dropdownButtonText} ${styles.typeDropdownButtonText}`}
                 >
                   {getTypeLabel(filterType)}
                 </span>
                 <i
                   className={`bi bi-chevron-${
                     showTypeDropdown ? "up" : "down"
-                  }`}
-                  style={{
-                    fontSize: "0.7rem",
-                    marginLeft: "0.5rem",
-                    flexShrink: 0,
-                  }}
+                  } ${styles.dropdownIcon}`}
                 ></i>
               </button>
 
               {showTypeDropdown && (
                 <div
-                  style={{
-                    position: "absolute",
-                    top: "calc(100% + 4px)",
-                    left: 0,
-                    right: 0,
-                    minWidth: "180px",
-                    background: "#fff",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: "8px",
-                    zIndex: 1000,
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                    overflow: "hidden",
-                    maxHeight: "300px",
-                    overflowY: "auto",
-                  }}
+                  className={`${styles.dropdownMenu} ${styles.typeDropdownMenu}`}
                 >
                   {typeOptions.map((option) => (
                     <div
@@ -482,25 +413,7 @@ const GoalApprovalsPage = () => {
                         setCurrentPage(1);
                         setShowTypeDropdown(false);
                       }}
-                      style={{
-                        padding: "0.625rem 0.875rem",
-                        cursor: "pointer",
-                        fontSize: "0.875rem",
-                        color: "#212529",
-                        textAlign: "left",
-                        transition: "all 0.2s",
-                        background:
-                          filterType === option.value ? "#f3f4f6" : "#fff",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = "rgb(39, 35, 92)";
-                        e.currentTarget.style.color = "white";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background =
-                          filterType === option.value ? "#f3f4f6" : "#fff";
-                        e.currentTarget.style.color = "#212529";
-                      }}
+                      className={getDropdownItemClass(filterType, option.value)}
                     >
                       {option.label}
                     </div>
@@ -510,66 +423,27 @@ const GoalApprovalsPage = () => {
             </div>
           </div>
 
-          {/* Filter Date - CUSTOM DROPDOWN WITH RIGHT MARGIN */}
-          <div className="col-6 col-md-3 col-lg-1" style={{ paddingRight: "8px" }}>
-            <div ref={dateDropdownRef} style={{ position: "relative" }}>
+          {/* Filter Date - Custom Dropdown */}
+          <div className={`col-6 col-md-3 col-lg-2`}>
+            <div ref={dateDropdownRef} className={styles.dropdownWrapper}>
               <button
                 type="button"
                 onClick={() => setShowDateDropdown(!showDateDropdown)}
-                style={{
-                  padding: "0.45rem 0.75rem",
-                  border: "none",
-                  borderRadius: "8px",
-                  fontSize: "0.875rem",
-                  cursor: "pointer",
-                  background: "#fff",
-                  color: "black",
-                  width: "100%",
-                  minWidth: "125px",
-                  maxWidth: "130px",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  fontWeight: "500",
-                  transition: "all 0.2s",
-                  height: "37px",
-                }}
+                className={`${styles.dropdownButton}`}
               >
-                <span
-                  style={{
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
+                <span className={styles.dropdownButtonText}>
                   {getDateLabel(filterDate)}
                 </span>
                 <i
                   className={`bi bi-chevron-${
                     showDateDropdown ? "up" : "down"
-                  }`}
-                  style={{
-                    fontSize: "0.7rem",
-                    marginLeft: "0.5rem",
-                    flexShrink: 0,
-                  }}
+                  } ${styles.dropdownIcon}`}
                 ></i>
               </button>
 
               {showDateDropdown && (
                 <div
-                  style={{
-                    position: "absolute",
-                    top: "calc(100% + 4px)",
-                    right: 0,
-                    minWidth: "140px",
-                    background: "#fff",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: "8px",
-                    zIndex: 1000,
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                    overflow: "hidden",
-                  }}
+                  className={`${styles.dropdownMenu} ${styles.dateDropdownMenu}`}
                 >
                   {dateOptions.map((option) => (
                     <div
@@ -579,25 +453,7 @@ const GoalApprovalsPage = () => {
                         setCurrentPage(1);
                         setShowDateDropdown(false);
                       }}
-                      style={{
-                        padding: "0.625rem 0.875rem",
-                        cursor: "pointer",
-                        fontSize: "0.875rem",
-                        color: "#212529",
-                        textAlign: "left",
-                        transition: "all 0.2s",
-                        background:
-                          filterDate === option.value ? "#f3f4f6" : "#fff",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = "rgb(39, 35, 92)";
-                        e.currentTarget.style.color = "white";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background =
-                          filterDate === option.value ? "#f3f4f6" : "#fff";
-                        e.currentTarget.style.color = "#212529";
-                      }}
+                      className={getDropdownItemClass(filterDate, option.value)}
                     >
                       {option.label}
                     </div>
@@ -611,15 +467,9 @@ const GoalApprovalsPage = () => {
         {loading ? (
           <LoadingSpinner text="Loading approvals..." />
         ) : currentApprovals.length === 0 ? (
-          <div
-            className="card text-center"
-            style={{ padding: "3rem", backgroundColor: "#f8f9fa" }}
-          >
-            <i
-              className="bi bi-inbox"
-              style={{ fontSize: "4rem", color: "#dee2e6" }}
-            ></i>
-            <h6 className="mt-3 mb-2" style={{ color: "#6c757d" }}>
+          <div className={`card text-center ${styles.emptyStateCard}`}>
+            <i className={`bi bi-inbox ${styles.emptyStateIcon}`}></i>
+            <h6 className={`mt-3 mb-2 ${styles.emptyStateTitle}`}>
               No approvals found
             </h6>
             <p className="text-muted mb-0">
@@ -630,72 +480,34 @@ const GoalApprovalsPage = () => {
           </div>
         ) : (
           <>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                minHeight: "70vh",
-              }}
-            >
-              <div style={{ flexGrow: 1 }}>
-                <div
-                  className="table-responsive"
-                  style={{
-                    borderRadius: "12px",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.12)"
-                  }}
-                >
-                  <table className="table table-hover align-start mb-0">
-                    <thead
-                      style={{
-                        height: "50px",
-                        fontWeight: 600,
-                        verticalAlign: "middle",
-                      }}
-                    >
+            <div className={styles.tableWrapper}>
+              <div className={styles.tableContent}>
+                <div className={`table-responsive ${styles.tableResponsive}`}>
+                  <table className={`table table-hover align-start mb-0`}>
+                    <thead className={styles.tableHeader}>
                       <tr>
                         <th
-                          style={{
-                            width: "25%",
-                            color: "white",
-                            backgroundColor: "rgb(39, 35, 92)",
-                          }}
+                          className={`${styles.tableHeaderCell} ${styles.titleColumn}`}
                         >
                           TITLE
                         </th>
                         <th
-                          style={{
-                            width: "20%",
-                            color: "white",
-                            backgroundColor: "rgb(39, 35, 92)",
-                          }}
+                          className={`${styles.tableHeaderCell} ${styles.typeColumn}`}
                         >
                           TYPE
                         </th>
                         <th
-                          style={{
-                            width: "20%",
-                            color: "white",
-                            backgroundColor: "rgb(39, 35, 92)",
-                          }}
+                          className={`${styles.tableHeaderCell} ${styles.statusColumn}`}
                         >
                           STATUS
                         </th>
                         <th
-                          style={{
-                            width: "15%",
-                            color: "white",
-                            backgroundColor: "rgb(39, 35, 92)",
-                          }}
+                          className={`${styles.tableHeaderCell} ${styles.requestorColumn}`}
                         >
                           REQUESTOR
                         </th>
                         <th
-                          style={{
-                            width: "20%",
-                            color: "white",
-                            backgroundColor: "rgb(39, 35, 92)",
-                          }}
+                          className={`${styles.tableHeaderCell} ${styles.dateColumn}`}
                         >
                           REQUESTED ON
                         </th>
@@ -703,84 +515,41 @@ const GoalApprovalsPage = () => {
                     </thead>
                     <tbody>
                       {currentApprovals.map((approval) => {
-                        const isAutoApproved =
-                          approval.approvalStatus === "approved" &&
-                          approval.approverEmployeeMasterId ===
-                            approval.requestedByEmployeeMasterId;
-
                         return (
                           <tr
                             key={approval.approvalId}
                             onClick={() => handleReviewClick(approval)}
-                            style={{ cursor: "pointer", height: "60px" }}
+                            className={styles.tableRow}
                           >
-                            <td
-                              style={{
-                                fontSize: "14px",
-                                paddingTop: "20px",
-                                paddingBottom: "20px",
-                              }}
-                            >
-                              <div
-                                style={{
-                                  fontWeight: 500,
-                                  paddingLeft: "50px",
-                                  textAlign: "left",
-                                }}
-                              >
+                            <td className={styles.tableCell}>
+                              <div className={styles.titleCell}>
                                 {approval.goalTitle}
                               </div>
                             </td>
 
                             <td
-                              style={{
-                                paddingLeft: "50px",
-                                textAlign: "left",
-                                paddingTop: "20px",
-                                paddingBottom: "20px",
-                              }}
+                              className={`${styles.tableCell} ${styles.typeCell}`}
                             >
-                              <span
-                                className="text-muted"
-                                style={{ fontSize: "14px" }}
-                              >
+                              <span className={`text-muted ${styles.cellText}`}>
                                 {APPROVAL_TYPE_LABELS[approval.approvalType] ||
                                   approval.approvalType}
                               </span>
                             </td>
 
-                            <td
-                              style={{
-                                paddingTop: "20px",
-                                paddingBottom: "20px",
-                              }}
-                            >
+                            <td className={styles.tableCell}>
                               {getStatusBadge(approval.approvalStatus)}
                             </td>
 
                             <td
-                              style={{
-                                paddingLeft: "30px",
-                                textAlign: "left",
-                                paddingTop: "20px",
-                                paddingBottom: "20px",
-                              }}
+                              className={`${styles.tableCell} ${styles.requestorCell}`}
                             >
-                              <span style={{ fontSize: "14px" }}>
+                              <span className={styles.cellText}>
                                 {approval.requestedByName}
                               </span>
                             </td>
 
-                            <td
-                              style={{
-                                paddingTop: "20px",
-                                paddingBottom: "20px",
-                              }}
-                            >
-                              <span
-                                className="text-muted"
-                                style={{ fontSize: "14px" }}
-                              >
+                            <td className={styles.tableCell}>
+                              <span className={`text-muted ${styles.cellText}`}>
                                 {new Date(
                                   approval.requestedOn
                                 ).toLocaleDateString()}
@@ -794,7 +563,6 @@ const GoalApprovalsPage = () => {
                 </div>
               </div>
 
-              {/* Updated Pagination with new props */}
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}

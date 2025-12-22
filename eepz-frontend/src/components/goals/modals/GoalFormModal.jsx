@@ -6,6 +6,7 @@ import {
   GOAL_TYPES,
   GOAL_TYPE_LABELS,
 } from "../../../constants/goals/goalConstants";
+import styles from "../../../styles/goals/components/GoalFormModal.module.css";
 
 const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
   const { user } = useAuth();
@@ -607,252 +608,53 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
       : []),
   ];
 
-  if (!isOpen) return null;
-
-  return (
+  return !isOpen ? null : (
     <>
-      <style>
-        {`
-          @keyframes goalModalFadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-          }
-          @keyframes goalModalSlideUp {
-            from { 
-              opacity: 0;
-              transform: translateY(20px);
-            }
-            to { 
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-          .goal-modal-backdrop-custom {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1040;
-            animation: goalModalFadeIn 0.15s ease-out;
-          }
-          .goal-modal-wrapper-custom {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1050;
-            overflow-x: hidden;
-            overflow-y: auto;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            padding: 1rem;
-          }
-          .goal-modal-dialog-custom {
-            width: 100%;
-            max-width: 700px;
-            margin: auto;
-            display: flex;
-            align-items: center;
-            min-height: calc(100% - 2rem);
-          }
-          .goal-modal-content-custom {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            pointer-events: auto;
-            background-color: #fff;
-            background-clip: padding-box;
-            border: 1px solid rgba(0, 0, 0, 0.2);
-            border-radius: 1rem;
-            outline: 0;
-            animation: goalModalSlideUp 0.3s ease-out;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-            max-height: calc(100vh - 2rem);
-          }
-          
-          .custom-dropdown-toggle {
-            width: 100%;
-            padding: 0.5rem 0.75rem;
-            font-size: 14px;
-            border: 1px solid #ced4da;
-            border-radius: 0.375rem;
-            background-color: white;
-            text-align: left;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: border-color 0.15s ease-in-out;
-          }
-          
-          .custom-dropdown-toggle:hover:not(:disabled) {
-            border-color: #86b7fe;
-          }
-          
-          .custom-dropdown-toggle:disabled {
-            background-color: #e9ecef;
-            cursor: not-allowed;
-            opacity: 0.6;
-          }
-          
-          .custom-dropdown-toggle.is-invalid {
-            border-color: #dc3545;
-          }
-          
-          .custom-dropdown-menu {
-            position: absolute;
-            top: calc(100% + 4px);
-            left: 0;
-            right: 0;
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 0.375rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            max-height: 250px;
-            overflow-y: auto;
-            margin: 0;
-            padding: 0;
-          }
-          
-          .custom-dropdown-item {
-          padding: 0.75rem 1rem;
-          cursor: pointer;
-          font-size: 14px;
-          color: #212529;
-          border-bottom: 1px solid #f3f4f6;
-          transition: all 0.2s;
-          background: white;
-          text-align: left;
-            }
-
-          
-          .custom-dropdown-item:last-child {
-            border-bottom: none;
-          }
-          
-          .custom-dropdown-item:hover {
-            background-color: rgb(39, 35, 92);
-            color: white;
-          }
-          
-          .custom-dropdown-item.selected {
-            background-color: rgb(39, 35, 92);
-            color: white;
-            font-weight: 600;
-          }
-          
-          .custom-dropdown-item:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            background-color: #f8f9fa;
-          }
-        `}          
-      </style>  
-
-      <div className="goal-modal-backdrop-custom" />
-
       <div
-        className="goal-modal-wrapper-custom"
-        tabIndex="-1"
+        className={styles.modalBackdrop}
         onClick={(e) => {
           if (e.target === e.currentTarget) onClose();
         }}
-      >
-        <div className="goal-modal-dialog-custom">
-          <div className="goal-modal-content-custom">
-            <div
-              className="modal-header"
-              style={{
-                backgroundColor: "rgb(39, 35, 92)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                borderTopLeftRadius: "1rem",
-                borderTopRightRadius: "1rem",
-                padding: "1rem 1.5rem",
-                flexShrink: 0,
-              }}
-            >
-              <h5
-                className="modal-title"
-                style={{
-                  fontSize: "20px",
-                  fontWeight: "600",
-                  color: "white",
-                  margin: 0,
-                }}
-              >
+      />
+      <div className={styles.modalWrapper} tabIndex="-1">
+        <div className={styles.modalDialog}>
+          <div className={styles.modalContent}>
+            <div className={styles.modalHeader}>
+              <h5 className={styles.modalTitle}>
                 {isEdit ? "Edit Goal" : "Create New Goal"}
               </h5>
               <button
                 type="button"
-                className="btn-close-white"
+                className={styles.btnClose}
                 onClick={onClose}
                 disabled={loading}
-                style={{
-                  border: "none",
-                  width: "36px",
-                  backgroundColor: "transparent",
-                  height: "36px",
-                  borderRadius: "0.5rem",
-                  cursor: loading ? "not-allowed" : "pointer",
-                  color: "white",
-                  fontSize: "20px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  transition: "all 0.2s",
-                  flexShrink: 0,
-                }}
                 onMouseEnter={(e) => {
-                  if (!loading) {
-                    e.currentTarget.style.color = "red";
-                  }
+                  if (!loading) e.currentTarget.style.color = "red";
                 }}
                 onMouseLeave={(e) => {
-                  if (!loading) {
-                    e.currentTarget.style.color = "white";
-                  }
+                  if (!loading) e.currentTarget.style.color = "white";
                 }}
               >
-                <i className="bi bi-x-lg"></i>
+                <i className="bi bi-x-lg" />
               </button>
             </div>
 
-            <div
-              className="modal-body"
-              ref={modalBodyRef}
-              style={{
-                padding: "1.5rem",
-                overflowY: "auto",
-                flexGrow: 1,
-                maxHeight: "calc(100vh - 220px)",
-              }}
-            >
+            <div className={styles.modalBody} ref={modalBodyRef}>
               {loadingData ? (
-                <div className="text-center py-5">
-                  <div className="spinner-border text-primary" role="status">
+                <div className={styles.loadingData}>
+                  <div className={styles.spinnerBorder} role="status">
                     <span className="visually-hidden">Loading...</span>
                   </div>
                   <p className="mt-3 text-muted">Loading goal data...</p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit}>
+                  {/* Goal Type & Title */}
                   <div className="row">
                     <div className="col-md-6">
-                      {/* Custom Goal Type Dropdown */}
                       <div className="mb-3">
-                        <label
-                          className="form-label"
-                          style={{ fontSize: "14px", fontWeight: 700 }}
-                        >
-                          Goal Type <span className="text-danger">*</span>
+                        <label className={styles.formLabel}>
+                          Goal Type <span className={styles.textDanger}>*</span>
                         </label>
                         <div
                           ref={typeDropdownRef}
@@ -860,13 +662,13 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                         >
                           <button
                             type="button"
-                            className={`custom-dropdown-toggle ${
-                              errors.type ? "is-invalid" : ""
+                            className={`${styles.customDropdownToggle} ${
+                              errors.type ? styles.formControlIsInvalid : ""
                             }`}
-                            onClick={() =>
-                              !isEdit &&
-                              !loading &&
-                              setShowTypeDropdown(!showTypeDropdown)
+                            onClick={
+                              !isEdit && !loading
+                                ? () => setShowTypeDropdown(!showTypeDropdown)
+                                : undefined
                             }
                             disabled={isEdit || loading}
                           >
@@ -875,16 +677,16 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                               className={`bi bi-chevron-${
                                 showTypeDropdown ? "up" : "down"
                               }`}
-                            ></i>
+                            />
                           </button>
                           {showTypeDropdown && !isEdit && (
-                            <div className="custom-dropdown-menu">
+                            <div className={styles.customDropdownMenu}>
                               {goalTypeOptions.map((option) => (
                                 <div
                                   key={option.value}
-                                  className={`custom-dropdown-item ${
+                                  className={`${styles.customDropdownItem} ${
                                     formData.type === option.value
-                                      ? "selected"
+                                      ? styles.selected
                                       : ""
                                   }`}
                                   onClick={() => {
@@ -906,16 +708,13 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                       </div>
 
                       <div className="mb-3">
-                        <label
-                          className="form-label"
-                          style={{ fontSize: "14px", fontWeight: 700 }}
-                        >
-                          Title <span className="text-danger">*</span>
+                        <label className={styles.formLabel}>
+                          Title <span className={styles.textDanger}>*</span>
                         </label>
                         <input
                           type="text"
-                          className={`form-control ${
-                            errors.title ? "is-invalid" : ""
+                          className={`${styles.formControl} ${
+                            errors.title ? styles.formControlIsInvalid : ""
                           }`}
                           value={formData.title}
                           onChange={(e) =>
@@ -926,8 +725,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                           }
                           placeholder="Enter goal title"
                           disabled={isEdit || loading}
-                          style={{ fontSize: "14px" }}
-                          maxLength={200}
+                          style={{ fontSize: "14px", maxLength: 200 }}
                         />
                         {isEdit && (
                           <small className="text-muted">
@@ -935,21 +733,20 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                           </small>
                         )}
                         {errors.title && (
-                          <div className="invalid-feedback">{errors.title}</div>
+                          <div className={styles.invalidFeedback}>
+                            {errors.title}
+                          </div>
                         )}
                       </div>
                     </div>
 
+                    {/* Project & Deadline */}
                     <div className="col-md-6">
-                      {/* Custom Project Dropdown */}
                       <div className="mb-3">
-                        <label
-                          className="form-label"
-                          style={{ fontSize: "14px", fontWeight: 700 }}
-                        >
-                          Project
+                        <label className={styles.formLabel}>
+                          Project{" "}
                           {formData.type === GOAL_TYPES.TEAM && (
-                            <span className="text-danger">*</span>
+                            <span className={styles.textDanger}>*</span>
                           )}
                         </label>
                         <div
@@ -958,14 +755,18 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                         >
                           <button
                             type="button"
-                            className={`custom-dropdown-toggle ${
-                              errors.projectId ? "is-invalid" : ""
+                            className={`${styles.customDropdownToggle} ${
+                              errors.projectId
+                                ? styles.formControlIsInvalid
+                                : ""
                             }`}
-                            onClick={() =>
+                            onClick={
                               !isEdit &&
                               !loading &&
-                              formData.type !== GOAL_TYPES.ORG &&
-                              setShowProjectDropdown(!showProjectDropdown)
+                              formData.type !== GOAL_TYPES.ORG
+                                ? () =>
+                                    setShowProjectDropdown(!showProjectDropdown)
+                                : undefined
                             }
                             disabled={
                               isEdit ||
@@ -978,15 +779,15 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                               className={`bi bi-chevron-${
                                 showProjectDropdown ? "up" : "down"
                               }`}
-                            ></i>
+                            />
                           </button>
                           {showProjectDropdown &&
                             !isEdit &&
                             formData.type !== GOAL_TYPES.ORG && (
-                              <div className="custom-dropdown-menu">
+                              <div className={styles.customDropdownMenu}>
                                 <div
-                                  className={`custom-dropdown-item ${
-                                    !formData.projectId ? "selected" : ""
+                                  className={`${styles.customDropdownItem} ${
+                                    !formData.projectId ? styles.selected : ""
                                   }`}
                                   onClick={() => {
                                     handleChange("projectId", "");
@@ -1000,9 +801,9 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                                 {projects.map((project) => (
                                   <div
                                     key={project.projectId}
-                                    className={`custom-dropdown-item ${
-                                      formData.projectId === project.projectId
-                                        ? "selected"
+                                    className={`${styles.customDropdownItem} ${
+                                      formData.projectId == project.projectId
+                                        ? styles.selected
                                         : ""
                                     }`}
                                     onClick={() => {
@@ -1020,7 +821,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                             )}
                         </div>
                         {errors.projectId && (
-                          <div className="invalid-feedback d-block">
+                          <div className={styles.invalidFeedback}>
                             {errors.projectId}
                           </div>
                         )}
@@ -1032,16 +833,13 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                       </div>
 
                       <div className="mb-3">
-                        <label
-                          className="form-label"
-                          style={{ fontSize: "14px", fontWeight: 700 }}
-                        >
-                          Deadline <span className="text-danger">*</span>
+                        <label className={styles.formLabel}>
+                          Deadline <span className={styles.textDanger}>*</span>
                         </label>
                         <input
                           type="date"
-                          className={`form-control ${
-                            errors.deadline ? "is-invalid" : ""
+                          className={`${styles.formControl} ${
+                            errors.deadline ? styles.formControlIsInvalid : ""
                           }`}
                           value={formData.deadline}
                           onChange={(e) =>
@@ -1068,7 +866,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                           </small>
                         )}
                         {errors.deadline && (
-                          <div className="invalid-feedback">
+                          <div className={styles.invalidFeedback}>
                             {errors.deadline}
                           </div>
                         )}
@@ -1077,15 +875,10 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                   </div>
 
                   <div className="mb-3">
-                    <label
-                      className="form-label"
-                      style={{ fontSize: "14px", fontWeight: 700 }}
-                    >
-                      Description
-                    </label>
+                    <label className={styles.formLabel}>Description</label>
                     <textarea
-                      className="form-control"
-                      rows="3"
+                      className={styles.formControl}
+                      rows={3}
                       value={formData.description}
                       onChange={(e) =>
                         handleChange("description", e.target.value)
@@ -1101,26 +894,27 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                     />
                   </div>
 
+                  {/* Team Members Section */}
                   {formData.type === GOAL_TYPES.TEAM && (
                     <div className="mb-3" ref={assigneeDropdownRef}>
-                      <label
-                        className="form-label"
-                        style={{ fontSize: "14px", fontWeight: 700 }}
-                      >
-                        Team Members <span className="text-danger">*</span>
+                      <label className={styles.formLabel}>
+                        Team Members{" "}
+                        <span className={styles.textDanger}>*</span>
                       </label>
                       {!formData.projectId && !isEdit ? (
                         <div className="alert alert-info">
-                          <i className="bi bi-info-circle me-2"></i>
+                          <i className="bi bi-info-circle me-2" />
                           Please select a project first to load team members
                         </div>
                       ) : (
                         <>
-                          <div className="input-group">
+                          <div className={styles.inputGroup}>
                             <input
                               type="text"
-                              className={`form-control ${
-                                errors.assignees ? "is-invalid" : ""
+                              className={`${styles.formControl} ${
+                                errors.assignees
+                                  ? styles.formControlIsInvalid
+                                  : ""
                               }`}
                               placeholder="Search subordinates..."
                               value={assigneeSearchTerm}
@@ -1132,7 +926,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                             />
                           </div>
                           {errors.assignees && (
-                            <div className="invalid-feedback d-block">
+                            <div className={styles.invalidFeedback}>
                               {errors.assignees}
                             </div>
                           )}
@@ -1151,11 +945,14 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                                 textAlign: "left",
                               }}
                             >
-                              <div className="list-group list-group-flush">
+                              <div
+                                className={styles.listGroup}
+                                style={{ listGroup: "list-group-flush" }}
+                              >
                                 {loadingEmployees ? (
                                   <div className="text-center py-3">
                                     <div
-                                      className="spinner-border spinner-border-sm text-primary"
+                                      className={`${styles.spinnerBorder} spinner-border-sm text-primary`}
                                       role="status"
                                     >
                                       <span className="visually-hidden">
@@ -1171,7 +968,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                                   filteredEmployees.map((emp) => (
                                     <div
                                       key={emp.empMasterId}
-                                      className="list-group-item list-group-item-action"
+                                      className={`${styles.listGroupItem} list-group-item-action`}
                                       onClick={() =>
                                         handleAssigneeToggle(emp.empMasterId)
                                       }
@@ -1207,38 +1004,39 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                               </div>
                             </div>
                           )}
-
-                          {formData.assignees.length > 0 && (
-                            <div className="mt-2">
-                              <small className="text-muted">
-                                Selected ({formData.assignees.length}):
-                              </small>
-                              <div className="d-flex flex-wrap gap-1 mt-1">
-                                {formData.assignees.map((empId) => {
-                                  const emp = availableEmployees.find(
-                                    (e) => e.empMasterId === empId
-                                  );
-                                  return emp ? (
-                                    <span
-                                      key={empId}
-                                      className="badge bg-primary"
-                                    >
-                                      {emp.fullName}
-                                      {!isEdit && (
-                                        <i
-                                          className="bi bi-x ms-1"
-                                          style={{ cursor: "pointer" }}
-                                          onClick={() =>
-                                            handleAssigneeToggle(empId)
-                                          }
-                                        ></i>
-                                      )}
-                                    </span>
-                                  ) : null;
-                                })}
-                              </div>
-                            </div>
-                          )}
+                        </>
+                      )}
+                      {formData.assignees.length > 0 && (
+                        <>
+                          <div className="mt-2">
+                            <small className="text-muted">
+                              Selected ({formData.assignees.length})
+                            </small>
+                          </div>
+                          <div className="d-flex flex-wrap gap-1 mt-1">
+                            {formData.assignees.map((empId) => {
+                              const emp = availableEmployees.find(
+                                (e) => e.empMasterId === empId
+                              );
+                              return emp ? (
+                                <span
+                                  key={empId}
+                                  className={`${styles.badge} ${styles.badgePrimary}`}
+                                >
+                                  {emp.fullName}
+                                  {!isEdit && (
+                                    <i
+                                      className="bi bi-x ms-1"
+                                      style={{ cursor: "pointer" }}
+                                      onClick={() =>
+                                        handleAssigneeToggle(empId)
+                                      }
+                                    />
+                                  )}
+                                </span>
+                              ) : null;
+                            })}
+                          </div>
                         </>
                       )}
                     </div>
@@ -1246,21 +1044,14 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
 
                   <hr />
 
+                  {/* Checklist Section */}
                   <div className="mb-3">
-                    <h5 className="mb-3">
-                      Checklist Items
-                      {formData.type === GOAL_TYPES.TEAM && (
-                        <small className="text-muted ms-2">
-                          (Each team member will have their own tasks)
-                        </small>
-                      )}
-                    </h5>
-
+                    <h5 className="mb-3">Checklist Items</h5>
                     {formData.type === GOAL_TYPES.TEAM &&
                     formData.assignees.length === 0 &&
                     !isEdit ? (
                       <div className="alert alert-info">
-                        <i className="bi bi-info-circle me-2"></i>
+                        <i className="bi bi-info-circle me-2" />
                         Select team members first to assign checklist items
                       </div>
                     ) : (
@@ -1272,9 +1063,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                           const assigneeName =
                             assigneeId === String(user.empMasterId)
                               ? "Your Checklist"
-                              : assignee
-                              ? `${assignee.fullName}'s Tasks`
-                              : "Checklist";
+                              : assignee?.fullName || "Tasks Checklist";
 
                           return (
                             <div key={assigneeId} className="mb-4">
@@ -1283,7 +1072,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                                   className="form-label mb-0"
                                   style={{ fontSize: "14px", fontWeight: 700 }}
                                 >
-                                  <i className="bi bi-person-badge me-2"></i>
+                                  <i className="bi bi-person-badge me-2" />
                                   {assigneeName}
                                 </label>
                                 {items.length < 10 && (
@@ -1295,7 +1084,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                                     style={{ fontSize: "15px" }}
                                     title="Add checklist item"
                                   >
-                                    <i className="bi bi-clipboard2-plus m-1"></i>
+                                    <i className="bi bi-clipboard2-plus m-1" />
                                   </button>
                                 )}
                               </div>
@@ -1308,7 +1097,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                                 return (
                                   <div
                                     key={index}
-                                    className="card mb-2"
+                                    className={`${styles.card} mb-2`}
                                     style={{
                                       border: "1px solid #dee2e6",
                                       opacity: isItemCompleted ? 0.6 : 1,
@@ -1317,16 +1106,13 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                                         : "#fff",
                                     }}
                                   >
-                                    <div
-                                      className="card-body"
-                                      style={{ padding: "0.75rem" }}
-                                    >
+                                    <div className={styles.cardBody}>
                                       {isItemCompleted && (
                                         <div
                                           className="alert alert-warning py-1 mb-2"
                                           style={{ fontSize: "0.75rem" }}
                                         >
-                                          <i className="bi bi-lock-fill me-1"></i>
+                                          <i className="bi bi-lock-fill me-1" />
                                           Completed - Cannot edit
                                         </div>
                                       )}
@@ -1409,59 +1195,57 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                                                 : "Remove item"
                                             }
                                           >
-                                            <i className="bi bi-trash"></i>
+                                            <i className="bi bi-trash" />
                                           </button>
                                         </div>
                                         {isEdit &&
                                           isExistingItem &&
                                           !isItemCompleted && (
                                             <small className="text-muted d-block mt-1">
-                                              <i className="bi bi-lock-fill me-1"></i>
+                                              <i className="bi bi-lock-fill me-1" />
                                               Title cannot be edited
                                             </small>
                                           )}
                                       </div>
 
-                                      <div>
-                                        <label
-                                          style={{
-                                            fontSize: "14px",
-                                            fontWeight: 700,
-                                            display: "block",
-                                            textAlign: "left",
-                                            marginBottom: "0.25rem",
-                                          }}
-                                        >
-                                          Description (Optional)
-                                        </label>
-                                        <textarea
-                                          className="form-control form-control-sm"
-                                          rows="2"
-                                          placeholder="Enter optional description"
-                                          value={item.description}
-                                          onChange={(e) =>
-                                            updateChecklistItem(
-                                              assigneeId,
-                                              index,
-                                              "description",
-                                              e.target.value
-                                            )
-                                          }
-                                          disabled={loading || isItemCompleted}
-                                          style={{
-                                            fontSize: "14px",
-                                            resize: "vertical",
-                                            minHeight: "80px",
-                                            backgroundColor: isItemCompleted
-                                              ? "#e9ecef"
-                                              : "#fff",
-                                            cursor: isItemCompleted
-                                              ? "not-allowed"
-                                              : "text",
-                                          }}
-                                          maxLength={500}
-                                        />
-                                      </div>
+                                      <label
+                                        style={{
+                                          fontSize: "14px",
+                                          fontWeight: 700,
+                                          display: "block",
+                                          textAlign: "left",
+                                          marginBottom: "0.25rem",
+                                        }}
+                                      >
+                                        Description (Optional)
+                                      </label>
+                                      <textarea
+                                        className="form-control form-control-sm"
+                                        rows={2}
+                                        placeholder="Enter optional description"
+                                        value={item.description}
+                                        onChange={(e) =>
+                                          updateChecklistItem(
+                                            assigneeId,
+                                            index,
+                                            "description",
+                                            e.target.value
+                                          )
+                                        }
+                                        disabled={loading || isItemCompleted}
+                                        style={{
+                                          fontSize: "14px",
+                                          resize: "vertical",
+                                          minHeight: "80px",
+                                          backgroundColor: isItemCompleted
+                                            ? "#e9ecef"
+                                            : "#fff",
+                                          cursor: isItemCompleted
+                                            ? "not-allowed"
+                                            : "text",
+                                        }}
+                                        maxLength={500}
+                                      />
                                     </div>
                                   </div>
                                 );
@@ -1471,7 +1255,6 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                         }
                       )
                     )}
-
                     {errors.checklist && (
                       <div className="text-danger small">
                         {errors.checklist}
@@ -1482,17 +1265,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
               )}
             </div>
 
-            <div
-              className="modal-footer"
-              style={{
-                padding: "1rem 1.5rem",
-                borderTop: "1px solid #dee2e6",
-                flexShrink: 0,
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: "1rem",
-              }}
-            >
+            <div className={styles.modalFooter}>
               <button
                 type="button"
                 className="btn btn-secondary"
@@ -1505,11 +1278,6 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                 type="button"
                 className="btn btn-primary"
                 onClick={handleSubmit}
-                style={{
-                  background:
-                    "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                  border: "none",
-                }}
                 disabled={
                   loading ||
                   loadingData ||
@@ -1521,26 +1289,17 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                   (formData.type === GOAL_TYPES.TEAM && !formData.projectId) ||
                   getFilledChecklistCount() < 3
                 }
-                title={
-                  Object.keys(errors).length > 0
-                    ? "Please fix validation errors"
-                    : !formData.title.trim()
-                    ? "Goal title is required"
-                    : !formData.deadline
-                    ? "Deadline is required"
-                    : formData.type === GOAL_TYPES.TEAM && !formData.projectId
-                    ? "Project is required for team goals"
-                    : formData.type === GOAL_TYPES.TEAM &&
-                      formData.assignees.length === 0
-                    ? "At least one team member must be assigned"
-                    : getFilledChecklistCount() < 3
-                    ? `At least 3 checklist items required (${getFilledChecklistCount()}/3)`
-                    : ""
-                }
+                style={{
+                  background:
+                    "linear-gradient(90deg, #97247e 0%, #e01950 100%)",
+                  border: "none",
+                }}
               >
                 {loading ? (
                   <>
-                    <span className="spinner-border spinner-border-sm me-2" />
+                    <span
+                      className={`${styles.spinnerBorder} spinner-border-sm me-2`}
+                    />
                     {isEdit ? "Updating..." : "Saving..."}
                   </>
                 ) : (
@@ -1549,7 +1308,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                       className={`bi ${
                         isEdit ? "bi-check-circle" : "bi-plus-circle"
                       } me-2`}
-                    ></i>
+                    />
                     {isEdit ? "Update Goal" : "Save Goal"}
                   </>
                 )}
@@ -1560,9 +1319,5 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
       </div>
     </>
   );
-};    
-export default GoalFormModal; 
-
-
-
-
+};
+export default GoalFormModal;

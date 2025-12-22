@@ -5,18 +5,16 @@ import Pagination from "../../../components/lnd/common/Pagination";
 import EmptyState from "../../../components/lnd/common/EmptyState";
 import { lndService, downloadFile } from "../../../services/lnd/lndService";
 import { toast } from "sonner";
-
+import styles from "../../../styles/lnd/pages/hr/SmeDirectory.module.css";
 
 const SmeDirectory = () => {
   const [smes, setSmes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
 
-
   // Search
   const [searchTerm, setSearchTerm] = useState("");
   const [searchInput, setSearchInput] = useState("");
-
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -24,11 +22,9 @@ const SmeDirectory = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
-
   useEffect(() => {
     fetchSmes();
   }, [currentPage, itemsPerPage, searchTerm]);
-
 
   const fetchSmes = async () => {
     try {
@@ -38,7 +34,6 @@ const SmeDirectory = () => {
         searchTerm,
         itemsPerPage
       );
-
 
       if (response.data.success) {
         setSmes(response.data.data.items);
@@ -52,7 +47,6 @@ const SmeDirectory = () => {
       setLoading(false);
     }
   };
-
 
   const handleExportToExcel = async () => {
     try {
@@ -77,11 +71,9 @@ const SmeDirectory = () => {
     }
   };
 
-
   const handleSearchInputChange = (e) => {
     setSearchInput(e.target.value);
   };
-
 
   const handleSearchSubmit = (e) => {
     if (e) e.preventDefault();
@@ -89,13 +81,11 @@ const SmeDirectory = () => {
     setCurrentPage(1);
   };
 
-
   const handleCancelSearch = () => {
     setSearchInput("");
     setSearchTerm("");
     setCurrentPage(1);
   };
-
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
@@ -103,12 +93,10 @@ const SmeDirectory = () => {
     }
   };
 
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
 
   const handleItemsPerPageChange = (newSize) => {
     setItemsPerPage(newSize);
@@ -116,17 +104,15 @@ const SmeDirectory = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-
   if (loading && smes.length === 0) {
     return (
-      <div style={{ textAlign: "center", padding: "3rem" }}>
+      <div className={styles.loadingContainer}>
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
       </div>
     );
   }
-
 
   return (
     <div>
@@ -138,27 +124,16 @@ const SmeDirectory = () => {
         ]}
       />
 
-
-      <div
-        style={{
-          marginBottom: "1.5rem",
-          display: "flex",
-          gap: "1rem",
-          flexWrap: "wrap",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <div style={{ width: "100%", maxWidth: "400px" }}>
+      <div className={styles.actionBar}>
+        <div className={styles.searchWrapper}>
           <div className="input-group">
             <input
               type="text"
-              className="form-control"
+              className={`form-control ${styles.searchInput}`}
               placeholder="Search by SME name or skill..."
               value={searchInput}
               onChange={handleSearchInputChange}
               onKeyPress={handleKeyPress}
-              style={{ minHeight: "35.7px" }}
             />
             {searchTerm ? (
               <button
@@ -185,16 +160,7 @@ const SmeDirectory = () => {
         <button
           onClick={handleExportToExcel}
           disabled={exporting || smes.length === 0}
-          className="btn btn-success"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0.5rem",
-            padding: "0.625rem 1.25rem",
-            fontSize: "0.875rem",
-            fontWeight: 500,
-            whiteSpace: "nowrap",
-          }}
+          className={`btn btn-success ${styles.exportButton}`}
         >
           {exporting ? (
             <>
@@ -214,7 +180,6 @@ const SmeDirectory = () => {
         </button>
       </div>
 
-
       {smes.length === 0 && !loading ? (
         <EmptyState
           icon={Award}
@@ -228,93 +193,40 @@ const SmeDirectory = () => {
       ) : (
         <>
           <div
-            style={{
-              minHeight: "65vh",
-              opacity: loading ? 0.6 : 1,
-              transition: "opacity 0.2s",
-            }}
+            className={`${styles.tableContainer} ${
+              loading ? styles.tableContainerLoading : ""
+            }`}
           >
-            <div
-              style={{
-                background: "#fff",
-                borderRadius: "12px",
-                overflow: "hidden",
-                minWidth: 0,
-                boxShadow: "0 4px 12px rgba(0,0,0,0.12)"
-              }}
-            >
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "2fr 1.5fr 1.2fr 1fr",
-                  background: "rgb(39, 35, 92)",
-                  borderBottom: "2px solid #abb4c5ff",
-                  fontWeight: 600,
-                  color: "white",
-                  fontSize: "14px",
-                  padding: "1rem 1.5rem",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.025em",
-                }}
-              >
-                <div style={{ textAlign: "left" }}>SME Name</div>
-                <div style={{ textAlign: "left" }}>Skill</div>
-                <div style={{ textAlign: "left" }}>Department</div>
-                <div style={{ textAlign: "left" }}>Approved Date</div>
+            <div className={styles.tableWrapper}>
+              <div className={`${styles.tableHeader} ${styles.gridLayout}`}>
+                <div className={styles.cellLeft}>SME Name</div>
+                <div className={styles.cellLeft}>Skill</div>
+                <div className={styles.cellLeft}>Department</div>
+                <div className={styles.cellLeft}>Approved Date</div>
               </div>
-
 
               {smes.map((sme, idx) => (
                 <div
                   key={sme.smeId}
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "2fr 1.5fr 1.2fr 1fr",
-                    alignItems: "center",
-                    fontSize: "0.875rem",
-                    color: "#212529",
-                    padding: "1rem 1.5rem",
-                    borderBottom:
-                      idx < smes.length - 1 ? "1px solid #f3f4f6" : "none",
-                    background: "#fff",
-                    transition: "background 0.2s",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "#f9fafb";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "#fff";
-                  }}
+                  className={`${styles.tableRow} ${styles.gridLayout} ${
+                    idx < smes.length - 1 ? styles.tableRowBorder : ""
+                  }`}
                 >
-                  <div style={{ textAlign: "left" }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.75rem",
-                      }}
-                    >
-                      <span style={{ fontWeight: 600 }}>
+                  <div className={styles.cellLeft}>
+                    <div className={styles.nameContainer}>
+                      <span className={styles.nameText}>
                         {sme.employeeName}
                       </span>
                     </div>
                   </div>
-                  <div
-                    style={{
-                      textAlign: "left",
-                      fontWeight: 500,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.5rem",
-                    }}
-                  >
+                  <div className={styles.skillContainer}>
                     <Award size={16} color="#198754" />
                     {sme.skillName}
                   </div>
-                  <div style={{ textAlign: "left", color: "#6b7280" }}>
+                  <div className={styles.grayText}>
                     {sme.departmentName || "None"}
                   </div>
-                  <div style={{ textAlign: "left", color: "#6b7280" }}>
+                  <div className={styles.grayText}>
                     {sme.approvedDate
                       ? new Date(sme.approvedDate).toLocaleDateString()
                       : "None"}
@@ -323,7 +235,6 @@ const SmeDirectory = () => {
               ))}
             </div>
           </div>
-
 
           <Pagination
             currentPage={currentPage}
@@ -340,6 +251,5 @@ const SmeDirectory = () => {
     </div>
   );
 };
-
 
 export default SmeDirectory;

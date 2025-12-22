@@ -10,7 +10,8 @@ import LoadingSpinner from "../../components/goals/common/LoadingSpinner";
 import Alert from "../../components/goals/common/Alert";
 import Pagination from "../../components/goals/common/Pagination";
 import Breadcrumb from "../../components/goals/common/Breadcrumb";
-import { GOAL_TYPES } from "../../constants/goals/goalConstants"; 
+import { GOAL_TYPES } from "../../constants/goals/goalConstants";
+import styles from "../../styles/goals/pages/GoalsDashboard.module.css";
 
 const GoalsDashboard = () => {
   const { user } = useAuth();
@@ -186,35 +187,22 @@ const GoalsDashboard = () => {
         <>
           {/* Summary Cards with Action Buttons */}
           <div className="d-flex align-items-start gap-3 mb-4">
-            <div style={{ flex: 1 }}>
+            <div className={styles.summarySection}>
               <GoalTracker summary={summary} />
             </div>
             <div
-              className="d-flex flex-column gap-2"
-              style={{ minWidth: "180px" }}
+              className={`d-flex flex-column gap-2 ${styles.actionButtonsContainer}`}
             >
               <button
-                className="btn btn-primary"
+                className={`btn btn-primary ${styles.createGoalButton}`}
                 onClick={handleCreateGoal}
-                style={{
-                  background:
-                    "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                  whiteSpace: "nowrap",
-                  height: "55px",
-                }}
               >
                 <i className="bi bi-plus-circle me-2"></i>
                 Create Goal
               </button>
               <button
-                className="btn btn-primary"
+                className={`btn btn-primary ${styles.viewGoalsButton}`}
                 onClick={handleViewAll}
-                style={{
-                  backgroundColor: "rgb(39, 35, 92)",
-                  color: "white",
-                  whiteSpace: "nowrap",
-                  height: "50px",
-                }}
               >
                 <i className="bi bi-list-ul me-2"></i>
                 Your Goals
@@ -231,17 +219,11 @@ const GoalsDashboard = () => {
           {/* Ongoing Goals Section */}
           <div className="mb-4">
             <div className="d-flex justify-content-between align-items-center mb-3">
-              <h5 style={{ fontWeight: 600, marginBottom: 0 }}>
-                <i
-                  className="bi bi-arrow-repeat me-2"
-                  style={{ color: "#0d6efd" }}
-                ></i>
+              <h5 className={styles.sectionTitle}>
+                <i className={`bi bi-arrow-repeat me-2 ${styles.sectionIcon}`}></i>
                 Ongoing Goals
                 {paginatedData.totalCount > 0 && (
-                  <span
-                    className="text-muted ms-2"
-                    style={{ fontSize: "0.9rem", fontWeight: 400 }}
-                  >
+                  <span className={`text-muted ms-2 ${styles.goalCount}`}>
                     ({paginatedData.totalCount}{" "}
                     {paginatedData.totalCount === 1 ? "goal" : "goals"})
                   </span>
@@ -250,35 +232,25 @@ const GoalsDashboard = () => {
             </div>
 
             {loadingGoals ? (
-              <div className="text-center py-5">
+              <div className={styles.loadingContainer}>
                 <div className="spinner-border text-primary" role="status">
                   <span className="visually-hidden">Loading...</span>
                 </div>
-                <p className="mt-3 text-muted">Loading goals...</p>
+                <p className={`text-muted ${styles.loadingText}`}>
+                  Loading goals...
+                </p>
               </div>
             ) : paginatedData.goals.length === 0 ? (
-              <div
-                className="card text-center"
-                style={{ padding: "3rem", backgroundColor: "#f8f9fa" }}
-              >
-                <i
-                  className="bi bi-inbox"
-                  style={{ fontSize: "4rem", color: "#dee2e6" }}
-                ></i>
-                <h6 className="mt-3 mb-2" style={{ color: "#6c757d" }}>
+              <div className={`card text-center ${styles.emptyStateCard}`}>
+                <i className={`bi bi-inbox ${styles.emptyStateIcon}`}></i>
+                <h6 className={`mt-3 mb-2 ${styles.emptyStateTitle}`}>
                   No ongoing goals
                 </h6>
               </div>
             ) : (
               <>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    minHeight: "60vh",
-                  }}
-                >
-                  <div style={{ flexGrow: 1 }}>
+                <div className={styles.goalsContainer}>
+                  <div className={styles.goalsContent}>
                     <div className="row g-3 mb-4">
                       {paginatedData.goals.map((goal) => (
                         <div
@@ -301,16 +273,7 @@ const GoalsDashboard = () => {
                     itemsPerPage={itemsPerPage}
                     onItemsPerPageChange={handleItemsPerPageChange}
                     pageSizeOptions={[6, 12, 24, 48]}
-                    style={{
-                      position: "fixed",
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      background: "#fff",
-                      padding: "0.75rem 1rem",
-                      borderTop: "1px solid #ddd",
-                      zIndex: 1000,
-                    }}
+                    className={styles.stickyPagination}
                   />
                 </div>
               </>
@@ -329,4 +292,4 @@ const GoalsDashboard = () => {
   );
 };
 
-export default GoalsDashboard; 
+export default GoalsDashboard;

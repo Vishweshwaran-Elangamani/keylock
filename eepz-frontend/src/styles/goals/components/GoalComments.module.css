@@ -1,0 +1,142 @@
+.inputCard {
+  border: 1px solid rgb(39, 35, 92, 0.5) !important;
+  border-radius: 12px;
+}
+
+.inputCardBody {
+  padding: 10px;
+}
+
+.inputHeader {
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.monitoringBadge {
+  font-size: 0.7rem;
+}
+
+.commentTextarea {
+  border: 1px solid rgb(39, 35, 92, 0.5) !important;
+  resize: vertical;
+  font-size: 14px;
+}
+
+.characterCount {
+  font-size: 12px;
+}
+
+.commentsCard {
+  border: 1px solid rgb(39, 35, 92, 0.5) !important;
+  border-radius: 12px;
+}
+
+.commentsHeader {
+  background-color: #f8f9fa;
+  padding: 1rem 1.25rem;
+}
+
+.commentsTitle {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.commentsCount {
+  font-size: 0.75rem;
+}
+
+.viewOnlyBadge {
+  font-size: 0.7rem;
+}
+
+.filterBtn {
+  font-size: 12px;
+  padding: 0.25rem 0.75rem;
+}
+
+.sortBtn {
+  font-size: 14px;
+}
+
+.commentsListBody {
+  padding: 0;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.loadingState {
+  padding: 3rem;
+}
+
+.emptyState {
+  padding: 3rem;
+  text-align: center;
+  color: #6c757d;
+}
+
+.emptyIcon {
+  font-size: 4rem;
+  opacity: 0.2;
+}
+
+.emptyTitle {
+  font-weight: 500;
+}
+
+.commentItem {
+  padding: 1.25rem;
+  background-color: #fff;
+  border-left: none;
+  transition: background-color 0.2s ease;
+}
+
+.commentItem.ownComment {
+  background-color: #f0f7ff;
+  border-left: 4px solid #0d6efd;
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #AC5098 0%, #97247E 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.avatar.ownAvatar {
+  background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+}
+
+.commentContent {
+  flex: 1;
+}
+
+.commentAuthor {
+  font-weight: 600;
+  color: #212529;
+  font-size: 0.95rem;
+}
+
+.youBadge,
+.creatorBadge {
+  font-size: 0.65rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.commentText {
+  margin-bottom: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #495057;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}

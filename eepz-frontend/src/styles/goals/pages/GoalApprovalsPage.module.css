@@ -1,0 +1,236 @@
+/* GoalApprovalsPage.module.css */
+
+.container {
+  padding-right: 20px;
+}
+
+/* Toggle Button Container */
+.toggleContainer {
+  display: flex;
+  flex: 1;
+  background-color: rgb(39, 35, 92);
+  border-radius: 50px;
+  padding: 4px;
+  max-width: 100%;
+}
+
+.toggleButton {
+  flex: 1;
+  padding: 11px 22px;
+  border: none;
+  border-radius: 50px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+
+.toggleButtonActive {
+  background-color: #ffffff;
+  border-radius: 50px !important;
+  color: #000000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.toggleButtonInactive {
+  background-color: rgb(39, 35, 92);
+  border-radius: 50px;
+  color: white;
+  box-shadow: none;
+}
+
+/* Search Input */
+.searchInput {
+  min-height: 37px;
+  font-size: 0.875rem;
+}
+
+.searchButton {
+  font-size: 0.875rem;
+}
+
+/* Custom Dropdown */
+.dropdownWrapper {
+  border: 1px solid rgba(39, 35, 92, 0.5);
+  border-radius: 8px;
+  position: relative;
+}
+
+.dropdownButton {
+  padding: 0.45rem 0.75rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  background: #fff;
+  color: black;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+  transition: all 0.2s;
+  height: 37px;
+}
+
+.typeDropdownButton {
+  min-width: 140px;
+}
+
+.dropdownButtonText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.typeDropdownButtonText {
+  max-width: calc(100% - 20px);
+}
+
+.dropdownIcon {
+  font-size: 0.7rem;
+  margin-left: 0.5rem;
+  flex-shrink: 0;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 4px);
+  background: #fff;
+  border: 1px solid rgba(39, 35, 92, 0.5);
+  border-radius: 8px;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.typeDropdownMenu {
+  left: 0;
+  right: 0;
+  min-width: 180px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.dateDropdownMenu {
+  right: 0;
+  min-width: 140px;
+}
+
+.dropdownItem {
+  padding: 0.625rem 0.875rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #212529;
+  text-align: left;
+  transition: all 0.2s;
+}
+
+.dropdownItemActive {
+  background: #f3f4f6;
+}
+
+.dropdownItemInactive {
+  background: #fff;
+}
+
+.dropdownItem:hover {
+  background: rgb(39, 35, 92);
+  color: white;
+}
+
+/* Empty State Card */
+.emptyStateCard {
+  padding: 3rem;
+  background-color: #f8f9fa;
+}
+
+.emptyStateIcon {
+  font-size: 4rem;
+  color: #dee2e6;
+}
+
+.emptyStateTitle {
+  color: #6c757d;
+}
+
+/* Table Container */
+.tableWrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 70vh;
+}
+
+.tableContent {
+  flex-grow: 1;
+}
+
+.tableResponsive {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* Table Header */
+.tableHeader {
+  height: 50px;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+.tableHeaderCell {
+  color: white !important;
+  background-color: rgb(39, 35, 92) !important;
+}
+
+.titleColumn {
+  width: 25%;
+}
+
+.typeColumn {
+  width: 20%;
+}
+
+.statusColumn {
+  width: 20%;
+}
+
+.requestorColumn {
+  width: 15%;
+}
+
+.dateColumn {
+  width: 20%;
+}
+
+/* Table Rows */
+.tableRow {
+  cursor: pointer;
+  height: 60px;
+}
+
+.tableCell {
+  font-size: 14px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.titleCell {
+  font-weight: 500;
+  padding-left: 50px;
+  text-align: left;
+}
+
+.typeCell {
+  padding-left: 50px;
+  text-align: left;
+}
+
+.requestorCell {
+  padding-left: 30px;
+  text-align: left;
+}
+
+.cellText {
+  font-size: 14px;
+}

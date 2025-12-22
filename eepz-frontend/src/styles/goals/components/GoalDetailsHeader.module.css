@@ -1,0 +1,85 @@
+.card {
+  border: 1px solid #dee2e6;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.cardBody {
+  padding: 1.25rem;
+}
+
+.title {
+  font-weight: 700;
+  color: #212529;
+}
+
+.progressGap {
+  margin-top: 0.5rem;
+}
+
+.teamLabel {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+}
+
+.teamBadge {
+  padding: 0.35rem 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1px solid #dee2e6;
+}
+
+.approvalButton {
+  cursor: pointer;
+}
+
+.approvalButton:disabled {
+  cursor: not-allowed;
+}
+
+.detailsSection {
+  margin-left: 5rem;
+}
+
+.detailsLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.detailsList {
+  margin-left: 9rem;
+}
+
+.detailLabel {
+  flex: 0 0 40%;
+  font-size: 0.85rem;
+  color: #6c757d;
+  padding-right: 0.5rem;
+  text-align: left;
+}
+
+.detailValue {
+  font-size: 0.9rem;
+  font-weight: 500;
+  flex: 1;
+  text-align: left;
+}
+
+.detailValue.overdue {
+  color: #dc3545;
+}
+
+.detailValue.warning {
+  color: #dc3545;
+}
+
+@media (max-width: 991.98px) {
+  .detailsSection {
+    margin-left: 0;
+  }
+
+  .detailsList {
+    margin-left: 0;
+  }
+}

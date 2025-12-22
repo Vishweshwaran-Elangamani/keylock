@@ -1,0 +1,44 @@
+.nav {
+  margin-bottom: 1rem;
+}
+
+.breadcrumb {
+  background-color: #f8f9fa;
+  color: #97247e;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 0;
+}
+
+.item {
+  font-size: 0.95rem;
+}
+
+.linkButton {
+  background: none;
+  border: none;
+  color: #97247e;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.linkButton:hover {
+  text-decoration: underline;
+}
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #212529;
+  font-weight: 400;
+}
+
+.labelActive {
+  color: #97247e;
+  font-weight: 500;
+}

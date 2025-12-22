@@ -1,9 +1,11 @@
+// GoalChecklist.jsx
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../contexts/auth/AuthContext";
 import goalService from "../../../services/goals/goalService";
 import Alert from "../common/Alert";
 import ConfirmationModal from "../modals/ConfirmationModal";
 import { isOverdue } from "../../../utils/goals/goalHelpers";
+import styles from "../../../styles/goals/components/GoalChecklist.module.css";
 
 const GoalChecklist = ({
   goal,
@@ -25,22 +27,18 @@ const GoalChecklist = ({
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [pendingToggle, setPendingToggle] = useState(null);
 
-  // Determine user role and permissions
   const isCreator = goal.createdByEmployeeMasterId === user.empMasterId;
   const isTeamGoal = goal.goalType === "team";
   const isAssignee = goal.assignees?.some(
     (a) => a.employeeMasterId === user.empMasterId
   );
 
-  // Check if user is Manager or DeptHead (view-only permission for team goals)
   const isManagerOrDeptHead =
     user.role === "Manager" || user.role === "Department Head";
 
-  // Check if Leadership (view-only permission for team goals)
   const isLeadership = user.role === "Leadership";
   const isLeadershipMonitoring = isLeadership && isTeamGoal;
 
-  // Combined monitoring mode
   const canViewAsManager =
     ((isManagerOrDeptHead || isLeadershipMonitoring) &&
       isTeamGoal &&
@@ -64,7 +62,6 @@ const GoalChecklist = ({
           onProgressChange(freshGoal.progressPercent || 0);
         }
 
-        // Calculate and send personal progress
         if (onPersonalProgressChange && freshGoal.checklist) {
           const userItems = freshGoal.checklist.filter(
             (item) => item.addedForEmployeeMasterId === user.empMasterId
@@ -100,7 +97,6 @@ const GoalChecklist = ({
         onProgressChange(goal.progressPercent || 0);
       }
 
-      // Update personal progress
       if (onPersonalProgressChange && goal.checklist) {
         const userItems = goal.checklist.filter(
           (item) => item.addedForEmployeeMasterId === user.empMasterId
@@ -127,7 +123,6 @@ const GoalChecklist = ({
 
       const userId = response.metadata?.userId;
 
-      // Check if there is at least one pending request for this user
       const hasPending =
         response.data?.items?.some(
           (item) =>
@@ -142,7 +137,6 @@ const GoalChecklist = ({
     }
   };
 
-  // Check if user is acknowledged
   const checkUserAcknowledgment = () => {
     if (!isTeamGoal || !isAssignee || isCreator) return false;
 
@@ -155,13 +149,11 @@ const GoalChecklist = ({
 
   const isUserAcknowledged = checkUserAcknowledgment();
 
-  // Group checklist by assignee for team goals
   const groupChecklistByAssignee = () => {
     if (!checklist || checklist.length === 0) return {};
 
     const grouped = {};
 
-    // Create a map of employeeMasterId to assignee info
     const assigneeMap = {};
     if (goal.assignees) {
       goal.assignees.forEach((assignee) => {
@@ -172,7 +164,6 @@ const GoalChecklist = ({
     checklist.forEach((item) => {
       const assigneeId = item.addedForEmployeeMasterId;
 
-      // Look up assignee name from the assignees array
       const assigneeInfo = assigneeMap[assigneeId];
       const assigneeName = assigneeInfo?.name || "Unassigned";
 
@@ -189,7 +180,6 @@ const GoalChecklist = ({
     return grouped;
   };
 
-  // Filter checklist based on user role
   const getDisplayedChecklist = () => {
     const items = checklist || [];
 
@@ -198,42 +188,34 @@ const GoalChecklist = ({
     }
 
     if (!isTeamGoal) {
-      // Self goals - show all items (ungrouped)
       return { ungrouped: items };
     }
 
     const grouped = groupChecklistByAssignee();
 
-    // Creator always sees everything
     if (isCreator) {
       return grouped;
     }
 
-    // Leadership/Manager/DeptHead not assigned to goal sees all (read-only)
     if (canViewAsManager) {
       return grouped;
     }
 
-    // If user is an assignee
     if (isAssignee) {
-      // Managers/Leaders who are assignees see all groups
       if (user.role !== "Employee") {
         return grouped;
       }
 
-      // Regular employees only see their own tasks
       const userGroup = grouped[user.empMasterId];
       if (userGroup && userGroup.items.length > 0) {
         return { [user.empMasterId]: userGroup };
       }
     }
 
-    // If not creator and not assignee, or no items found, return empty
     return {};
   };
 
   const handleToggleClick = (checklistId, currentStatus, itemTitle) => {
-    // Include canViewAsManager check
     if (
       hasPendingApproval ||
       isCompleted ||
@@ -275,7 +257,6 @@ const GoalChecklist = ({
       onProgressChange(newProgress);
     }
 
-    // Update personal progress
     if (onPersonalProgressChange) {
       const userItems = updatedChecklist.filter(
         (item) => item.addedForEmployeeMasterId === user.empMasterId
@@ -308,8 +289,7 @@ const GoalChecklist = ({
       if (onProgressChange) {
         onProgressChange(goal.progressPercent || 0);
       }
-      setAlert({
-        type: "danger",
+      setAlert({        type: "danger",
         message: error.response?.data?.message || "Failed to update checklist",
       });
       setPendingToggle(null);
@@ -324,7 +304,6 @@ const GoalChecklist = ({
   };
 
   const handleDescriptionSave = async () => {
-    // Include canViewAsManager check
     if (
       hasPendingApproval ||
       isCompleted ||
@@ -374,11 +353,9 @@ const GoalChecklist = ({
 
   const isGoalOverdue = isOverdue(goal.endAt);
 
-  // Check if org goal and if user can edit
   const isOrgGoal = goal.goalType === "org";
   const canEditOrgGoal = !isOrgGoal || user.role === "Leadership";
 
-  // Include acknowledgment check AND org goal check AND canViewAsManager
   const canEdit =
     !hasPendingApproval &&
     !isCompleted &&
@@ -393,7 +370,6 @@ const GoalChecklist = ({
     Object.keys(displayedChecklist).length > 0 &&
     !displayedChecklist.ungrouped;
 
-  // Calculate total displayed items
   const totalDisplayedItems = isGrouped
     ? Object.values(displayedChecklist).reduce(
         (sum, group) => sum + group.items.length,
@@ -410,7 +386,6 @@ const GoalChecklist = ({
       )
     : checklist.filter((item) => item.isCompletedForCurrentUser).length;
 
-  // Check if employee completed all their tasks
   const userItems = checklist.filter(
     (item) => item.addedForEmployeeMasterId === user.empMasterId
   );
@@ -430,12 +405,8 @@ const GoalChecklist = ({
         />
       )}
 
-      {/* Overdue Alert */}
       {isGoalOverdue && !isCompleted && (
-        <div
-          className="alert alert-danger mb-4"
-          style={{ borderRadius: "12px" }}
-        >
+        <div className={`alert alert-danger mb-4 ${styles.alert}`}>
           <i className="bi bi-exclamation-triangle-fill me-2"></i>
           <strong>Goal Overdue:</strong> This goal has passed its deadline.
           Checklist and description are locked. Request reopening to extend the
@@ -444,10 +415,7 @@ const GoalChecklist = ({
       )}
 
       {hasPendingApproval && !isCompleted && (
-        <div
-          className="alert alert-warning mb-4"
-          style={{ borderRadius: "12px" }}
-        >
+        <div className={`alert alert-warning mb-4 ${styles.alert}`}>
           <i className="bi bi-exclamation-triangle-fill me-2"></i>
           <strong>Approval Pending:</strong> This goal has a pending completion
           approval. Checklist and description cannot be modified until the
@@ -455,12 +423,8 @@ const GoalChecklist = ({
         </div>
       )}
 
-      {/* Acknowledgment Notice */}
       {isUserAcknowledged && !isCompleted && (
-        <div
-          className="alert alert-success mb-4"
-          style={{ borderRadius: "12px" }}
-        >
+        <div className={`alert alert-success mb-4 ${styles.alert}`}>
           <i className="bi bi-check-circle-fill me-2"></i>
           <strong>Tasks Acknowledged!</strong> Your manager has acknowledged
           your completed tasks. The checklist is now locked. Contact your
@@ -468,17 +432,15 @@ const GoalChecklist = ({
         </div>
       )}
 
-      {/* Monitoring Notice for Manager/DeptHead/Leadership */}
       {canViewAsManager && (
-        <div className="alert alert-info mb-4" style={{ borderRadius: "12px" }}>
+        <div className={`alert alert-info mb-4 ${styles.alert}`}>
           <i className="bi bi-eye-fill me-2"></i>
           <strong>Monitoring View</strong>
         </div>
       )}
 
-      {/* Org Goal Notice for Non-Leadership */}
       {isOrgGoal && user.role !== "Leadership" && (
-        <div className="alert alert-info mb-4" style={{ borderRadius: "12px" }}>
+        <div className={`alert alert-info mb-4 ${styles.alert}`}>
           <i className="bi bi-info-circle-fill me-2"></i>
           <strong>Organization Goal:</strong> This is a company-wide goal. Only
           Leadership can modify it.
@@ -486,31 +448,16 @@ const GoalChecklist = ({
       )}
 
       {/* Description Section */}
-
-      <div
-        className="goal-card-header d-flex justify-content-between align-items-center"
-        style={{
-          backgroundColor: "rgb(39, 35, 92)",
-          fontWeight: 600,
-          fontSize: "14px",
-          border: "1px solid rgba(39, 35, 92, 0.46)",
-          padding: "1rem 1.25rem",
-          borderRadius: "1.5rem 1.5rem 0rem 0rem",
-        }}
-      >
-        <div style={{ color: "white" }}>
+      <div className={`goal-card-header d-flex justify-content-between align-items-center ${styles.descriptionHeader}`}>
+        <div>
           <i className="bi bi-file-text me-2"></i>
           Description
-          {/* Include acknowledgment check and canViewAsManager */}
           {(hasPendingApproval ||
             isCompleted ||
             isUserAcknowledged ||
             isGoalOverdue ||
             canViewAsManager) && (
-            <span
-              className="badge bg-secondary text-white ms-2"
-              style={{ fontSize: "12px" }}
-            >
+            <span className={`badge bg-secondary text-white ms-2 ${styles.badgeLocked}`}>
               <i className="bi bi-lock-fill me-1"></i>
               {isCompleted
                 ? "View Only"
@@ -534,31 +481,16 @@ const GoalChecklist = ({
           </button>
         )}
       </div>
-      <div
-        className="card-body mb-4"
-        style={{
-          padding: "1.25rem",
-          border: "1px solid rgba(39, 35, 92, 0.46)",
-          borderRadius: "0rem 0rem 1.5rem 1.5rem",
-        }}
-      >
+      <div className={`card-body mb-4 ${styles.descriptionBody}`}>
         {editingDescription ? (
           <>
             <textarea
-              className="form-control mb-3"
+              className={`form-control mb-3 ${styles.descriptionTextarea}`}
               rows="4"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               disabled={loading}
               placeholder="Enter goal description..."
-              style={{
-                fontSize: "14px",
-                height: "100px",
-
-                resize: "vertical", // allows manual resizing
-                overflowWrap: "break-word", // breaks long words
-                wordBreak: "break-word", // ensures wrapping
-              }}
             />
             <div className="d-flex gap-2">
               <button
@@ -588,49 +520,22 @@ const GoalChecklist = ({
             </div>
           </>
         ) : (
-          <p
-            style={{
-              whiteSpace: "pre-wrap",
-              marginBottom: 0,
-              fontSize: "15px",
-              lineHeight: "1.6",
-              color: goal.description ? "#495057" : "#6c757d",
-              fontStyle: goal.description ? "normal" : "italic",
-              textAlign: "left",
-              wordBreak: "break-word",
-              overflowWrap: "break-word",
-            }}
-          >
+          <p className={styles.descriptionText}>
             {goal.description || "No description provided"}
           </p>
         )}
       </div>
 
       {/* Checklist */}
-      <div
-        className="goal-card-header"
-        style={{
-          color: "white",
-          fontWeight: 600,
-          padding: "1rem 1.25rem",
-          fontSize: "14px",
-          textAlign: "left",
-          backgroundColor: "rgb(39, 35, 92)",
-          borderRadius: "1.5rem 1.5rem 0rem 0rem",
-        }}
-      >
+      <div className={`goal-card-header ${styles.checklistHeader}`}>
         <i className="bi bi-list-check me-2"></i>
         Checklist ({completedDisplayedItems}/{totalDisplayedItems})
-        {/* Include acknowledgment check and canViewAsManager */}
         {(hasPendingApproval ||
           isCompleted ||
           isUserAcknowledged ||
           isGoalOverdue ||
           canViewAsManager) && (
-          <span
-            className="badge bg-secondary text-white ms-2"
-            style={{ fontSize: "0.7rem" }}
-          >
+          <span className={`badge bg-secondary text-white ms-2 ${styles.badgeLockedSm}`}>
             <i className="bi bi-lock-fill me-1"></i>
             {isCompleted
               ? "View Only"
@@ -644,27 +549,10 @@ const GoalChecklist = ({
           </span>
         )}
       </div>
-      <div
-        className="card-body"
-        style={{
-          padding: "10px",
-          border: "1px solid rgba(39, 35, 92, 0.46)",
-          borderRadius: "0rem 0rem 1.5rem 1.5rem",
-        }}
-      >
+      <div className={`card-body ${styles.checklistBody}`}>
         {totalDisplayedItems === 0 ? (
-          <div
-            style={{
-              padding: "3rem 2rem",
-              textAlign: "center",
-              color: "#6c757d",
-              backgroundColor: "#f8f9fa",
-            }}
-          >
-            <i
-              className="bi bi-inbox"
-              style={{ fontSize: "3rem", opacity: 0.3 }}
-            ></i>
+          <div className={styles.emptyState}>
+            <i className="bi bi-inbox" style={{ fontSize: "3rem", opacity: 0.3 }}></i>
             <p className="mt-3 mb-0" style={{ fontWeight: 500 }}>
               No checklist items
             </p>
@@ -673,69 +561,56 @@ const GoalChecklist = ({
             </p>
           </div>
         ) : isGrouped ? (
-          // Grouped display for team goals
-          <div style={{ padding: "1rem" }}>
-            {Object.entries(displayedChecklist).map(([assigneeId, group]) => (
-              <div key={assigneeId} className="mb-3">
-                <div
-                  className="d-flex align-items-center gap-2 mb-2 p-2"
-                  style={{
-                    backgroundColor: group.isCurrentUser
-                      ? "#e3f2fd"
-                      : "#e9ecef",
-                    borderRadius: "0.5rem",
-                    border: group.isCurrentUser ? "2px solid #2196f3" : "none",
-                  }}
-                >
-                  <i
-                    className={`bi ${
-                      group.isCurrentUser ? "bi-person-fill" : "bi-person-badge"
-                    } text-primary`}
-                  ></i>
-                  <span className="fw-semibold">
-                    {group.isCurrentUser
-                      ? "Your Tasks"
-                      : `${group.name}'s Tasks`}
-                  </span>
-                  <span className="badge bg-secondary ms-auto">
-                    {
-                      group.items.filter((i) => i.isCompletedForCurrentUser)
-                        .length
-                    }
-                    /{group.items.length}
-                  </span>
-                </div>
-
-                <ul className="list-group">
-                  {group.items
-                    .sort(
-                      (a, b) =>
-                        (a.isCompletedForCurrentUser ? 1 : 0) -
-                        (b.isCompletedForCurrentUser ? 1 : 0)
-                    )
-                    .map((item, index) => (
-                      <ChecklistItem
-                        key={item.checklistId || index}
-                        item={item}
-                        isDisabled={
-                          loading ||
-                          hasPendingApproval ||
-                          isCompleted ||
-                          isUserAcknowledged ||
-                          isGoalOverdue ||
-                          !canEditOrgGoal ||
-                          canViewAsManager ||
-                          !group.isCurrentUser
-                        }
-                        onToggle={handleToggleClick}
-                      />
-                    ))}
-                </ul>
+          Object.entries(displayedChecklist).map(([assigneeId, group]) => (
+            <div key={assigneeId} className="mb-3">
+              <div className={`${styles.groupHeader} ${group.isCurrentUser ? styles.currentUserHeader : ""}`}>
+                <i
+                  className={`bi ${
+                    group.isCurrentUser ? "bi-person-fill" : "bi-person-badge"
+                  } text-primary`}
+                ></i>
+                <span className="fw-semibold">
+                  {group.isCurrentUser
+                    ? "Your Tasks"
+                    : `${group.name}'s Tasks`}
+                </span>
+                <span className="badge bg-secondary ms-auto">
+                  {
+                    group.items.filter((i) => i.isCompletedForCurrentUser)
+                      .length
+                  }
+                  /{group.items.length}
+                </span>
               </div>
-            ))}
-          </div>
+
+              <ul className="list-group">
+                {group.items
+                  .sort(
+                    (a, b) =>
+                      (a.isCompletedForCurrentUser ? 1 : 0) -
+                      (b.isCompletedForCurrentUser ? 1 : 0)
+                  )
+                  .map((item, index) => (
+                    <ChecklistItem
+                      key={item.checklistId || index}
+                      item={item}
+                      isDisabled={
+                        loading ||
+                        hasPendingApproval ||
+                        isCompleted ||
+                        isUserAcknowledged ||
+                        isGoalOverdue ||
+                        !canEditOrgGoal ||
+                        canViewAsManager ||
+                        !group.isCurrentUser
+                      }
+                      onToggle={handleToggleClick}
+                    />
+                  ))}
+              </ul>
+            </div>
+          ))
         ) : (
-          // Regular list for self goals
           <ul className="list-group list-group-flush">
             {(displayedChecklist.ungrouped || checklist).map((item, index) => (
               <ChecklistItem
@@ -758,7 +633,6 @@ const GoalChecklist = ({
         )}
       </div>
 
-      {/* Confirmation Modal */}
       <ConfirmationModal
         isOpen={showConfirmModal}
         onClose={handleCancelToggle}
@@ -789,52 +663,19 @@ const ChecklistItem = ({ item, isDisabled, onToggle, isLast = false }) => {
 
   return (
     <li
-      className="list-group-item"
-      style={{
-        padding: "1rem 1.25rem",
-        cursor: isDisabled ? "not-allowed" : "pointer",
-        transition: "all 0.3s ease",
-        backgroundColor: isItemCompleted ? "#e8f5e9" : "#fff",
-        borderBottom: !isLast ? "1px solid #e9ecef" : "none",
-        borderLeft: isItemCompleted
-          ? "4px solid #28a745"
-          : "4px solid transparent",
-        opacity: isDisabled ? 0.6 : 1,
-      }}
-      onMouseEnter={(e) => {
-        if (!isDisabled) {
-          e.currentTarget.style.backgroundColor = isItemCompleted
-            ? "#c8e6c9"
-            : "#f5f5f5";
-        }
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = isItemCompleted
-          ? "#e8f5e9"
-          : "#fff";
-      }}
+      className={`list-group-item ${styles.checklistItem} ${
+        isItemCompleted ? styles.completed : ""
+      } ${isDisabled ? styles.disabled : ""} ${isLast ? "" : styles.notLast}`}
       onClick={() =>
         !isDisabled && onToggle(item.checklistId, isItemCompleted, item.title)
       }
     >
       <div className="d-flex align-items-center gap-3">
-        <div style={{ flexShrink: 0 }}>
+        <div className={styles.checkboxWrapper}>
           <div
-            style={{
-              width: "24px",
-              height: "24px",
-              borderRadius: "6px",
-              border: `2px solid ${isItemCompleted ? "#28a745" : "#dee2e6"}`,
-              backgroundColor: isItemCompleted ? "#28a745" : "#fff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: isDisabled ? "not-allowed" : "pointer",
-              transition: "all 0.2s ease",
-              boxShadow: isItemCompleted
-                ? "0 2px 4px rgba(40, 167, 69, 0.3)"
-                : "none",
-            }}
+            className={`${styles.checkbox} ${
+              isItemCompleted ? styles.checked : ""
+            } ${isDisabled ? styles.disabledCheckbox : ""}`}
           >
             {isItemCompleted && (
               <i
@@ -849,52 +690,20 @@ const ChecklistItem = ({ item, isDisabled, onToggle, isLast = false }) => {
           </div>
         </div>
 
-        <div style={{ flex: 1, textAlign: "left" }}>
-          <div
-            style={{
-              textDecoration: isItemCompleted ? "line-through" : "none",
-              color: isItemCompleted ? "#6c757d" : "#212529",
-              fontWeight: isItemCompleted ? 400 : 600,
-              fontSize: "14px",
-              lineHeight: "1.5",
-              marginBottom: item.description ? "0.25rem" : 0,
-              opacity: isItemCompleted ? 0.7 : 1,
-              transition: "all 0.3s ease",
-            }}
-          >
+        <div className={styles.content}>
+          <div className={`${styles.title} ${isItemCompleted ? styles.strikethrough : ""}`}>
             {item.title}
           </div>
 
           {item.description && (
-            <div
-              style={{
-                fontSize: "0.85rem",
-                color: "#6c757d",
-                lineHeight: "1.4",
-                marginTop: "0.25rem",
-                textDecoration: isItemCompleted ? "line-through" : "none",
-                opacity: isItemCompleted ? 0.6 : 1,
-              }}
-            >
+            <div className={`${styles.description} ${isItemCompleted ? styles.strikethrough : ""}`}>
               {item.description}
             </div>
           )}
         </div>
 
         {isItemCompleted && (
-          <span
-            className="badge"
-            style={{
-              padding: "0.4rem 0.75rem",
-              fontSize: "0.75rem",
-              flexShrink: 0,
-              backgroundColor: "#28a745",
-              color: "#fff",
-              fontWeight: 600,
-              borderRadius: "6px",
-              boxShadow: "0 2px 4px rgba(40, 167, 69, 0.2)",
-            }}
-          >
+          <span className={`${styles.doneBadge}`}>
             <i className="bi bi-check-circle-fill me-1"></i>
             Done
           </span>
@@ -905,3 +714,4 @@ const ChecklistItem = ({ item, isDisabled, onToggle, isLast = false }) => {
 };
 
 export default GoalChecklist;
+

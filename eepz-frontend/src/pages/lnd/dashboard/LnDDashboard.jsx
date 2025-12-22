@@ -15,6 +15,7 @@ import {
 import Breadcrumb from "../../../components/lnd/common/Breadcrumb";
 import { lndService } from "../../../services/lnd/lndService";
 import { toast } from "sonner";
+import styles from "../../../styles/lnd/pages/dashboard/LnDDashboard.module.css";
 
 const LnDDashboard = () => {
   const navigate = useNavigate();
@@ -176,9 +177,13 @@ const LnDDashboard = () => {
     },
   ];
 
+  const getBadgeClass = (isSme) => {
+    return isSme ? styles.badgeActive : styles.badgeInactive;
+  };
+
   if (loading) {
     return (
-      <div style={{ textAlign: "center", padding: "3rem" }}>
+      <div className={styles.loadingContainer}>
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
@@ -197,17 +202,9 @@ const LnDDashboard = () => {
       />
 
       {/* Header Section */}
-      <div style={{ marginBottom: "2rem" }}>
-        <h2
-          style={{
-            marginBottom: "0.5rem",
-            fontWeight: "700",
-            color: "#212529",
-          }}
-        >
-          Learning & Development
-        </h2>
-        <p style={{ color: "#6c757d", fontSize: "0.9375rem", margin: 0 }}>
+      <div className={styles.headerSection}>
+        <h2 className={styles.headerTitle}>Learning & Development</h2>
+        <p className={styles.headerDescription}>
           {isHR
             ? "Manage organization-wide learning and development"
             : "Track skills, manage assignments, and grow your expertise"}
@@ -215,13 +212,7 @@ const LnDDashboard = () => {
       </div>
 
       {/* Navigation Cards */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-          gap: "1.5rem",
-        }}
-      >
+      <div className={styles.cardsGrid}>
         {navigationCards
           .filter((card) => card.show)
           .map((card, index) => {
@@ -230,118 +221,46 @@ const LnDDashboard = () => {
               <div
                 key={index}
                 onClick={() => navigate(card.path)}
-                style={{
-                  background: "#fff",
-                  borderRadius: "12px",
-                  padding: "1.5rem",
-                  border: "1px solid rgba(39, 35, 92, 0.56)",
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                  position: "relative",
-                  overflow: "hidden",
-                }}
+                className={styles.navCard}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-4px)";
-                  e.currentTarget.style.boxShadow =
-                    "0 8px 16px rgba(0,0,0,0.12)";
                   e.currentTarget.style.borderColor = card.backgroundColor;
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
                   e.currentTarget.style.borderColor = "rgba(39, 35, 92, 0.56)";
                 }}
               >
                 {/* Card Content */}
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    gap: "1rem",
-                  }}
-                >
+                <div className={styles.cardContent}>
                   {/* Left Section: Icon + Text */}
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "1rem",
-                    }}
-                  >
+                  <div className={styles.leftSection}>
                     {/* Icon */}
                     <div
+                      className={styles.iconContainer}
                       style={{
-                        width: "48px",
-                        height: "48px",
-                        borderRadius: "12px",
                         background: `${card.backgroundColor}15`,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
                         border: `2px solid ${card.backgroundColor}30`,
-                        flexShrink: 0,
                       }}
                     >
-                      <Icon size={24} color={card.color} />
+                      <Icon size={24} color={card.backgroundColor} />
                     </div>
 
                     {/* Title & Description */}
-                    <div
-                      style={{
-                        textAlign: "left",
-                      }}
-                    >
-                      <h5
-                        style={{
-                          margin: 0,
-                          fontWeight: "600",
-                          color: "#212529",
-                          fontSize: "1rem",
-                        }}
-                      >
-                        {card.title}
-                      </h5>
-                      <p
-                        style={{
-                          fontSize: "0.875rem",
-                          color: "#6c757d",
-                          margin: 0,
-                          lineHeight: 1.5,
-                        }}
-                      >
+                    <div className={styles.textContainer}>
+                      <h5 className={styles.cardTitle}>{card.title}</h5>
+                      <p className={styles.cardDescription}>
                         {card.description}
                       </p>
                     </div>
                   </div>
 
                   {/* Right Section: Count or Badge */}
-                  <div style={{ textAlign: "right" }}>
+                  <div className={styles.rightSection}>
                     {card.count !== undefined ? (
-                      <span
-                        style={{
-                          fontSize: "2rem",
-                          fontWeight: "700",
-                          lineHeight: 1,
-                        }}
-                      >
+                      <span className={styles.countDisplay}>
                         {card.count}
                       </span>
                     ) : card.badge ? (
-                      <span
-                        style={{
-                          padding: "0.375rem 0.75rem",
-                          borderRadius: "12px",
-                          fontSize: "10px",
-                          fontWeight: "600",
-                          background: stats.isSme ? "#d1fae5" : "#f3f4f6",
-                          color: stats.isSme ? "#065f46" : "#6c757d",
-                          border: `1px solid ${
-                            stats.isSme ? "#065f46" : "#6c757d"
-                          }30`,
-                        }}
-                      >
+                      <span className={`${styles.badge} ${getBadgeClass(stats.isSme)}`}>
                         {card.badge}
                       </span>
                     ) : null}

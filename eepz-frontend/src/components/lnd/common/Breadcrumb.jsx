@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts/auth/AuthContext";
+import styles from "../../../styles/lnd/components/Breadcrumb.module.css";
 
 const Breadcrumb = ({ items }) => {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ const Breadcrumb = ({ items }) => {
     if (role === "Admin") return "/admin";
     if (role === "HR") return "/HR";
     if (role === "Employee") return "/employee";
-    if (role === "Leadership" || role === "Leadership") return "/leadership";
+    if (role === "Leadership") return "/leadership";
     if (role === "Department Head") return "/department-head";
     return "/manager";
   };
@@ -24,64 +25,35 @@ const Breadcrumb = ({ items }) => {
   const basePath = getRoleBasePath();
 
   return (
-    <nav aria-label="breadcrumb" style={{ marginBottom: "1rem" }}>
-      <ol
-        className="breadcrumb"
-        style={{
-          backgroundColor: "#f8f9fa",
-          color: "#97247E",
-          padding: "0.75rem 1rem",
-          borderRadius: "0.5rem",
-          marginBottom: 0,
-        }}
-      >
+    <nav aria-label="breadcrumb" className={styles.container}>
+      <ol className={`breadcrumb ${styles.breadcrumbList}`}>
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
-          // Build full path correctly
           const fullPath = basePath + item.path;
 
           return (
             <li
               key={index}
-              className={`breadcrumb-item ${isLast ? "active" : ""}`}
+              className={`breadcrumb-item ${isLast ? "active" : ""} ${styles.breadcrumbItem}`}
               aria-current={isLast ? "page" : undefined}
-              style={{ fontSize: "0.95rem" }}
             >
               {!isLast && fullPath ? (
                 <button
+                  className={styles.breadcrumbLink}
                   onClick={() => handleNavigate(fullPath)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "#97247E",
-                    cursor: "pointer",
-                    padding: 0,
-                    textDecoration: "none",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.textDecoration = "underline";
                   }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.textDecoration = "underline")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.textDecoration = "none")
-                  }
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.textDecoration = "none";
+                  }}
                 >
-                  {item.icon && <i className={`bi bi-${item.icon}`}></i>}
+                  {item.icon && <i className={`bi bi-${item.icon} ${styles.breadcrumbIcon}`}></i>}
                   {item.label}
                 </button>
               ) : (
-                <span
-                  style={{
-                    color: isLast ? "#97247E" : "#212529",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                    fontWeight: isLast ? 500 : 400,
-                  }}
-                >
-                  {item.icon && <i className={`bi bi-${item.icon}`}></i>}
+                <span className={styles.breadcrumbCurrent}>
+                  {item.icon && <i className={`bi bi-${item.icon} ${styles.breadcrumbIcon}`}></i>}
                   {item.label}
                 </span>
               )}

@@ -122,7 +122,11 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
         label: "Department Compliance",
         path: "/department-head/dashboard/sla/compliance",
       },
-      { icon: "bi-hand-thumbs-up", label: "Nominations", path: "/internal/nominations" },
+      {
+        icon: "bi-hand-thumbs-up",
+        label: "Nominations",
+        path: "/internal/nominations",
+      },
       {
         icon: "bi-graph-up",
         label: "Performance",
@@ -360,7 +364,8 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
                     border: "none",
                     borderRadius: "10px",
                     fontWeight: active ? 600 : 400,
-                    fontSize: "0.9375rem",
+                    fontSize: "14px",
+                    textAlign: "left",
                     transition: "all 0.2s ease",
                     position: "relative",
                     overflow: "hidden",
@@ -399,7 +404,7 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
                   <i
                     className={`bi ${item.icon}`}
                     style={{
-                      fontSize: "20px",
+                      fontSize: "18px",
                       color: active ? "#AC5098" : "rgba(255, 255, 255, 0.65)",
                       transition: "color 0.2s ease",
                       flexShrink: 0,

@@ -4,6 +4,7 @@ import { lndService } from "../../../services/lnd/lndService";
 import { RATING } from "../../../constants/lnd/lndConstants";
 import ConfirmationModal from "./ConfirmationModal";
 import { toast } from "sonner";
+import styles from "../../../styles/lnd/components/RecordSkillModal.module.css";
 
 const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
   const [employees, setEmployees] = useState([]);
@@ -35,9 +36,7 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
     }
   }, []);
 
-  // Add this NEW useEffect to fetch available skills when modal opens with employeeId:
   useEffect(() => {
-    // If modal opens with employeeId already set (from parent), fetch skills once allSkills loads
     if (selectedEmployeeId && !isEditMode && allSkillsLoaded) {
       fetchEmployeeSkills();
     }
@@ -198,91 +197,17 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
 
   return (
     <>
-      <style>
-        {`
-          @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-          }
-          @keyframes slideUp {
-            from { 
-              opacity: 0;
-              transform: translateY(20px);
-            }
-            to { 
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-        `}
-      </style>
-
-      <div
-        onClick={onClose}
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: "rgba(0, 0, 0, 0.5)",
-          zIndex: 1500,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "10px",
-          animation: "fadeIn 0.2s ease-in-out",
-        }}
-      >
-        <div
-          onClick={(e) => e.stopPropagation()}
-          style={{
-            background: "#fff",
-            borderRadius: "14px",
-            width: "100%",
-            maxWidth: "500px",
-            maxHeight: "90vh",
-            boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
-            display: "flex",
-            flexDirection: "column",
-            animation: "slideUp 0.3s ease-out",
-          }}
-        >
-          <div
-            style={{
-              padding: "1.5rem",
-              background: "rgb(39, 35, 92)",
-              borderBottom: "1px solid #e5e7eb",
-              borderRadius: "12px 12px 0px 0px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexShrink: 0,
-            }}
-          >
-            <h5 style={{ margin: 0, fontWeight: "600", color: "white" }}>
+      <div className={styles.backdrop} onClick={onClose}>
+        <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+          <div className={styles.header}>
+            <h5 className={styles.headerTitle}>
               {isEditMode ? "Update Skill Rating" : "Record Employee Skill"}
             </h5>
             <button
               type="button"
-              class="btn-close-white"
+              className={`btn-close-white ${styles.btnClose}`}
               onClick={onClose}
               disabled={loading}
-              style={{
-                border: "none",
-                width: "36px",
-                backgroundColor: "transparent",
-                height: "36px",
-                borderRadius: "0.5rem",
-                cursor: loading ? "not-allowed" : "pointer",
-                color: "white",
-                fontSize: "20px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                transition: "all 0.2s",
-                flexShrink: 0,
-              }}
               onMouseEnter={(e) => {
                 if (!loading) {
                   e.currentTarget.style.color = "red";
@@ -298,103 +223,28 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
             </button>
           </div>
 
-          <div
-            style={{
-              overflowY: "auto",
-              flexGrow: 1,
-              padding: 0,
-            }}
-          >
+          <div className={styles.body}>
             <form onSubmit={handleSubmit}>
-              <div style={{ padding: "1.5rem" }}>
+              <div className={styles.formContent}>
                 {isEditMode ? (
-                  <div
-                    style={{
-                      padding: "1rem",
-                      background: "#f8f9fa",
-                      borderRadius: "8px",
-                      marginBottom: "1.5rem",
-                    }}
-                  >
-                    <p
-                      style={{
-                        fontSize: "0.875rem",
-                        color: "#6c757d",
-                        margin: 0,
-                        marginBottom: "0.25rem",
-                      }}
-                    >
-                      Employee
-                    </p>
-                    <p
-                      style={{
-                        fontSize: "1rem",
-                        fontWeight: "600",
-                        color: "#212529",
-                        margin: 0,
-                        marginBottom: "0.75rem",
-                      }}
-                    >
-                      {skill.employeeName}
-                    </p>
-                    <p
-                      style={{
-                        fontSize: "0.875rem",
-                        color: "#6c757d",
-                        margin: 0,
-                        marginBottom: "0.25rem",
-                      }}
-                    >
-                      Skill
-                    </p>
-                    <p
-                      style={{
-                        fontSize: "1rem",
-                        fontWeight: "600",
-                        color: "#212529",
-                        margin: 0,
-                      }}
-                    >
-                      {skill.skillName}
-                    </p>
+                  <div className={styles.editModeInfo}>
+                    <p className={styles.infoLabel}>Employee</p>
+                    <p className={styles.infoValue}>{skill.employeeName}</p>
+                    <p className={styles.infoLabel}>Skill</p>
+                    <p className={styles.infoValue}>{skill.skillName}</p>
                   </div>
                 ) : (
                   <>
-                    <div style={{ marginBottom: "1.5rem" }}>
-                      <label
-                        style={{
-                          fontSize: "14px",
-                          fontWeight: "600",
-                          color: "#212529",
-                          marginBottom: "0.5rem",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "0.5rem",
-                        }}
-                      >
-                        Employee <span style={{ color: "#dc3545" }}>*</span>
+                    <div className={styles.formField}>
+                      <label className={styles.formLabel}>
+                        Employee <span className={styles.required}> *</span>
                       </label>
                       <select
                         value={selectedEmployeeId}
-                        className="EmployeeSelector"
+                        className={`EmployeeSelector ${styles.select} ${styles.selectDisabled}`}
                         onChange={handleEmployeeChange}
                         required
                         disabled
-                        style={{
-                          width: "100%",
-                          padding: "0.625rem",
-                          border: "1px solid #e5e7eb",
-                          borderRadius: "8px",
-                          fontSize: "14px",
-                          outline: "none",
-                          background: "#fff",
-                          cursor: fetchingEmployees ? "not-allowed" : "pointer",
-                          disabled: "true",
-                          appearance: "none",
-                          WebkitAppearance: "none",
-                          MozAppearance: "none",
-                          backgroundImage: "none",
-                        }}
                       >
                         <option value="">
                           {fetchingEmployees
@@ -410,19 +260,13 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
                       </select>
                     </div>
 
-                    <div style={{ marginBottom: "1.5rem" }}>
+                    <div className={styles.formField}>
                       <label
-                        style={{
-                          fontSize: "14px",
-                          fontWeight: "600",
-                          color: selectedEmployeeId ? "#212529" : "#9ca3af",
-                          marginBottom: "0.5rem",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "0.5rem",
-                        }}
+                        className={`${styles.formLabel} ${
+                          selectedEmployeeId ? "" : styles.formLabelDisabled
+                        }`}
                       >
-                        Select Skill <span style={{ color: "#dc3545" }}>*</span>
+                        Select Skill <span className={styles.required}> *</span>
                       </label>
                       <select
                         value={selectedSkillId}
@@ -433,20 +277,13 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
                           fetchingSkills ||
                           !allSkillsLoaded
                         }
-                        style={{
-                          width: "100%",
-                          padding: "0.625rem",
-                          border: "1px solid #e5e7eb",
-                          borderRadius: "8px",
-                          fontSize: "14px",
-                          outline: "none",
-                          background: !selectedEmployeeId ? "#f9fafb" : "#fff",
-                          cursor:
-                            !selectedEmployeeId || fetchingSkills
-                              ? "not-allowed"
-                              : "pointer",
-                          color: !selectedEmployeeId ? "#9ca3af" : "#212529",
-                        }}
+                        className={`${styles.select} ${
+                          !selectedEmployeeId ||
+                          fetchingSkills ||
+                          !allSkillsLoaded
+                            ? styles.selectDisabled
+                            : ""
+                        }`}
                       >
                         <option value="">
                           {!selectedEmployeeId
@@ -466,13 +303,7 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
                         ))}
                       </select>
                       {selectedEmployeeId && availableSkills.length > 0 && (
-                        <p
-                          style={{
-                            fontSize: "0.75rem",
-                            color: "#6c757d",
-                            margin: "0.5rem 0 0 0",
-                          }}
-                        >
+                        <p className={styles.availableCount}>
                           {availableSkills.length} skill(s) available for this
                           employee
                         </p>
@@ -482,72 +313,46 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
                 )}
 
                 <div
-                  style={{ opacity: isEditMode || selectedSkillId ? 1 : 0.5 }}
+                  className={`${styles.ratingContainer} ${
+                    !isEditMode && !selectedSkillId
+                      ? styles.ratingContainerDisabled
+                      : ""
+                  }`}
                 >
-                  <label
-                    style={{
-                      fontSize: "0.875rem",
-                      fontWeight: "600",
-                      color:
-                        isEditMode || selectedSkillId ? "#212529" : "#9ca3af",
-                      marginBottom: "0.75rem",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.5rem",
-                    }}
-                  >
+                  <label className={styles.ratingLabel}>
                     Rating:{" "}
                     <span
-                      style={{
-                        color: getRatingColor(rating),
-                        fontWeight: "700",
-                        fontSize: "1.25rem",
-                      }}
+                      className={styles.ratingCurrent}
+                      style={{ color: getRatingColor(rating) }}
                     >
                       {rating}
                     </span>
-                    <span style={{ color: "#6c757d", fontWeight: "500" }}>
-                      /10
-                    </span>
+                    <span className={styles.ratingScaleLabel}>/10</span>
                   </label>
 
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      gap: "8px",
-                      flexWrap: "wrap",
-                    }}
-                  >
+                  <div className={styles.ratingButtons}>
                     {[...Array(10)].map((_, index) => {
                       const value = index + 1;
+                      const isActive = rating === value;
+                      const ratingClass = isActive
+                        ? value < RATING.MIN_REQUEST_SME
+                          ? styles.ratingBtnLow
+                          : value < RATING.MIN_SME
+                          ? styles.ratingBtnMedium
+                          : styles.ratingBtnHigh
+                        : styles.ratingBtn;
+
                       return (
                         <button
                           type="button"
                           key={value}
                           onClick={() => setRating(value)}
                           disabled={!isEditMode && !selectedSkillId}
-                          style={{
-                            width: "36px",
-                            height: "36px",
-                            borderRadius: "50%",
-                            border:
-                              rating === value
-                                ? `2px solid ${getRatingColor(value)}`
-                                : "1px solid #ccc",
-                            backgroundColor:
-                              rating === value
-                                ? getRatingColor(value)
-                                : "#f8f9fa",
-                            color: rating === value ? "#fff" : "#212529",
-                            fontSize: "14px",
-                            fontWeight: "600",
-                            cursor:
-                              !isEditMode && !selectedSkillId
-                                ? "not-allowed"
-                                : "pointer",
-                            transition: "all 0.2s ease",
-                          }}
+                          className={`${ratingClass} ${
+                            !isEditMode && !selectedSkillId
+                              ? styles.ratingBtnDisabled
+                              : ""
+                          }`}
                         >
                           {value}
                         </button>
@@ -555,137 +360,62 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
                     })}
                   </div>
 
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      marginTop: "0.75rem",
-                      paddingTop: "0.5rem",
-                      borderTop: "1px solid #f3f4f6",
-                    }}
-                  >
-                    <div style={{ textAlign: "left", flex: 1 }}>
-                      <span
-                        style={{
-                          fontSize: "0.75rem",
-                          color: "#6c757d",
-                          display: "block",
-                        }}
-                      >
-                        Min
-                      </span>
-                      <span
-                        style={{
-                          fontSize: "0.875rem",
-                          fontWeight: "600",
-                          color: "#dc3545",
-                        }}
-                      >
-                        1
-                      </span>
+                  <div className={styles.ratingScale}>
+                    <div className={styles.ratingScaleMin}>
+                      <span className={styles.ratingScaleLabel}>Min</span>
+                      <span className={styles.ratingScaleValueMin}>1</span>
                     </div>
 
-                    <div style={{ textAlign: "center", flex: 1 }}>
+                    <div className={styles.ratingScaleCenter}>
                       <span
+                        className={styles.ratingBadge}
                         style={{
-                          fontSize: "0.75rem",
-                          fontWeight: "600",
+                          "--bg-color": `${getRatingColor(rating)}15`,
+                          "--border-color": `${getRatingColor(rating)}30`,
                           color: getRatingColor(rating),
-                          padding: "0.375rem 0.75rem",
-                          background: `${getRatingColor(rating)}15`,
-                          borderRadius: "12px",
-                          border: `1px solid ${getRatingColor(rating)}30`,
                         }}
                       >
                         {getRatingLabel(rating)}
                       </span>
                     </div>
 
-                    <div style={{ textAlign: "right", flex: 1 }}>
-                      <span
-                        style={{
-                          fontSize: "0.75rem",
-                          color: "#6c757d",
-                          display: "block",
-                        }}
-                      >
-                        Max
-                      </span>
-                      <span
-                        style={{
-                          fontSize: "0.875rem",
-                          fontWeight: "600",
-                          color: "#198754",
-                        }}
-                      >
-                        10
-                      </span>
+                    <div className={styles.ratingScaleMax}>
+                      <span className={styles.ratingScaleLabel}>Max</span>
+                      <span className={styles.ratingScaleValueMax}>10</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div
-                style={{
-                  padding: "1rem 1.5rem",
-                  borderTop: "1px solid #e5e7eb",
-                  display: "flex",
-                  gap: "0.75rem",
-                  justifyContent: "flex-end",
-                }}
-              >
+              <div className={styles.footer}>
                 <button
                   type="button"
-                  className="btn btn-secondary"
+                  className={`btn btn-secondary ${styles.btnCancel}`}
                   onClick={onClose}
                   disabled={loading}
-                  style={{
-                    padding: "0.625rem 1.25rem",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: "8px",
-                    fontSize: "0.875rem",
-                    fontWeight: "500",
-                    cursor: "pointer",
-                  }}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
+                  className={`
+                  ${styles.btnSubmit}
+                  ${
+                    !loading &&
+                    (isEditMode || (selectedEmployeeId && selectedSkillId))
+                      ? styles.btnSubmitEnabled
+                      : ""
+                  }
+                `}
                   disabled={
                     loading ||
                     (!isEditMode && (!selectedEmployeeId || !selectedSkillId))
                   }
-                  style={{
-                    padding: "0.625rem 1.25rem",
-                    border: "none",
-                    borderRadius: "8px",
-                    background:
-                      !loading &&
-                      (isEditMode || (selectedEmployeeId && selectedSkillId))
-                        ? "linear-gradient(90deg, #97247E 0%, #E01950 100%)"
-                        : "#e5e7eb",
-                    color:
-                      !loading &&
-                      (isEditMode || (selectedEmployeeId && selectedSkillId))
-                        ? "#fff"
-                        : "#6c757d",
-                    fontSize: "0.875rem",
-                    fontWeight: "600",
-                    cursor:
-                      !loading &&
-                      (isEditMode || (selectedEmployeeId && selectedSkillId))
-                        ? "pointer"
-                        : "not-allowed",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                  }}
                 >
                   {loading ? (
                     <>
                       <span
-                        className="spinner-border spinner-border-sm"
+                        className={`spinner-border spinner-border-sm ${styles.loadingSpinner}`}
                         role="status"
                       />
                       {isEditMode ? "Updating..." : "Recording..."}

@@ -11,6 +11,7 @@ import Pagination from "../../components/goals/common/Pagination";
 import { GOAL_TYPES } from "../../constants/goals/goalConstants";
 import Breadcrumb from "../../components/goals/common/Breadcrumb";
 import { toast } from "sonner";
+import styles from "../../styles/goals/pages/YourGoalsPage.module.css";
 
 const YourGoalsPage = () => {
   const { user } = useAuth();
@@ -180,9 +181,7 @@ const YourGoalsPage = () => {
       }
     } catch (error) {
       console.error("Failed to load goals:", error);
-      toast.error(
-        error.response?.data?.message || "Failed to load goals"
-      );
+      toast.error(error.response?.data?.message || "Failed to load goals");
       setGoals([]);
       setTotalCount(0);
       setTotalPages(0);
@@ -289,7 +288,7 @@ const YourGoalsPage = () => {
         />
       )}
 
-      <div className="d-flex gap-3 mb-3 align-items-center flex-wrap">
+      <div className={styles.toolbar}>
         {/* Goal Type Toggle */}
         <GoalTypeToggle
           selectedType={selectedType}
@@ -297,21 +296,17 @@ const YourGoalsPage = () => {
           counts={typeCounts}
         />
 
-        {/* Search Bar - Updated to match PendingApprovals */}
-        <div className="flex-grow-1">
+        {/* Search Bar */}
+        <div className={styles.searchContainer}>
           <form onSubmit={handleSearchSubmit}>
             <div className="input-group">
               <input
                 type="text"
-                className="form-control"
+                className={`form-control ${styles.searchInput}`}
                 placeholder="Search by goal title or requester..."
                 value={searchInput}
                 onChange={handleSearchInputChange}
                 onKeyPress={handleKeyPress}
-                style={{
-                  minHeight: "36px",
-                  border: "1px solid rgb(39, 35, 92)",
-                }}
               />
               {searchTerm ? (
                 <button
@@ -325,8 +320,7 @@ const YourGoalsPage = () => {
               ) : (
                 <button
                   type="submit"
-                  className="btn btn-primary"
-                  style={{ backgroundColor: "rgb(39, 35, 92)" }}
+                  className={`btn btn-primary ${styles.searchButton}`}
                 >
                   <i className="bi bi-search me-1"></i>
                   Search
@@ -338,20 +332,13 @@ const YourGoalsPage = () => {
 
         {/* Filter Button */}
         <button
-          className="btn btn-outline-secondary flex-shrink-0"
+          className={`btn btn-outline-secondary flex-shrink-0 ${styles.filterButton}`}
           onClick={() => setShowFiltersModal(true)}
-          style={{
-            borderRadius: "8px",
-            padding: "0.5rem 1rem",
-          }}
         >
           <i className="bi bi-funnel me-2"></i>
           Filters
           {activeFilterCount > 0 && (
-            <span
-              className="badge bg-primary ms-2"
-              style={{ fontSize: "0.7rem" }}
-            >
+            <span className={`badge bg-primary ms-2 ${styles.filterBadge}`}>
               {activeFilterCount}
             </span>
           )}
@@ -359,11 +346,8 @@ const YourGoalsPage = () => {
 
         {/* Create Button */}
         <button
-          className="btn btn-primary flex-shrink-0"
+          className={`btn btn-primary flex-shrink-0 ${styles.createButton}`}
           onClick={() => setShowCreateModal(true)}
-          style={{
-            background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-          }}
         >
           <i className="bi bi-plus-circle me-2"></i>
           Create Goal
@@ -372,9 +356,9 @@ const YourGoalsPage = () => {
 
       {/* Clear Filters */}
       {activeFilterCount > 0 && (
-        <div className="d-flex justify-content-end align-items-center mb-3">
+        <div className={styles.clearFiltersContainer}>
           <button
-            className="btn btn-link btn-sm text-danger p-0"
+            className={`btn btn-link btn-sm text-danger ${styles.clearFiltersButton}`}
             onClick={handleClearFilters}
           >
             <i className="bi bi-x-circle me-1"></i>
@@ -387,15 +371,9 @@ const YourGoalsPage = () => {
       {loading ? (
         <LoadingSpinner text="Loading goals..." />
       ) : goals.length === 0 ? (
-        <div
-          className="card text-center"
-          style={{ padding: "3rem", backgroundColor: "#f8f9fa" }}
-        >
-          <i
-            className="bi bi-inbox"
-            style={{ fontSize: "4rem", color: "#dee2e6" }}
-          ></i>
-          <h6 className="mt-3 mb-2" style={{ color: "#6c757d" }}>
+        <div className={`card text-center ${styles.emptyStateCard}`}>
+          <i className={`bi bi-inbox ${styles.emptyStateIcon}`}></i>
+          <h6 className={`mt-3 mb-2 ${styles.emptyStateTitle}`}>
             {activeFilterCount > 0
               ? "No goals match your filters"
               : "No goals found"}
@@ -419,19 +397,13 @@ const YourGoalsPage = () => {
       ) : (
         <>
           {/* Goals Grid */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              minHeight: "60vh",
-            }}
-          >
+          <div className={styles.goalsContainer}>
             <div className="flex-grow-1">
               <div className="row g-3 mb-4">
                 {goals.map((goal) => (
                   <div
                     key={goal.goalId}
-                    className="col-12 col-md-6 col-lg-4 col-xl-3"
+                    className={`col-12 col-md-6 col-lg-4 col-xl-3 ${styles.goalCardColumn}`}
                   >
                     <GoalCard
                       goal={goal}
@@ -446,24 +418,18 @@ const YourGoalsPage = () => {
           </div>
 
           {/* Sticky Pagination */}
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-            loading={loading}
-            totalItems={totalCount}
-            itemsPerPage={itemsPerPage}
-            onItemsPerPageChange={handleItemsPerPageChange}
-            pageSizeOptions={[8, 12, 24, 48]}
-            style={{
-              position: "fixed",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              background: "#fff",
-              zIndex: 1000,
-            }}
-          />
+          <div className={styles.stickyPagination}>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              loading={loading}
+              totalItems={totalCount}
+              itemsPerPage={itemsPerPage}
+              onItemsPerPageChange={handleItemsPerPageChange}
+              pageSizeOptions={[8, 12, 24, 48]}
+            />
+          </div>
         </>
       )}
 

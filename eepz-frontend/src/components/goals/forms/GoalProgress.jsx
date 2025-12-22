@@ -1,3 +1,5 @@
+import styles from "../../../styles/goals/components/GoalProgress.module.css";
+
 const GoalProgress = ({
   progress = 0,
   size = "md",
@@ -23,29 +25,16 @@ const GoalProgress = ({
   const progressVariant = progress === 100 ? "success" : variant;
 
   return (
-    <div style={{ width: "100%" }}>
+    <div className={styles.container}>
       {/* Label */}
       {showLabel && (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginBottom: "0.25rem",
-            fontSize: labelSizes[size],
-            color: "#495057",
-          }}
-        >
-          <span style={{ fontWeight: 500 }}>
-            <i className="bi bi-bar-chart-fill me-1"></i>
+        <div className={`${styles.label} ${styles[`labelSize${size.toUpperCase()}`]}`}>
+          <span className={styles.labelText}>
+            <i className="bi bi-bar-chart-fill"></i>
             {label}
           </span>
           {showPercentage && (
-            <span
-              style={{
-                fontWeight: 600,
-                color: progress === 100 ? "#198754" : "#0d6efd",
-              }}
-            >
+            <span className={`${styles.percentage} ${progress === 100 ? styles.complete : ""}`}>
               {progress}%
             </span>
           )}
@@ -53,26 +42,19 @@ const GoalProgress = ({
       )}
 
       {/* Progress Bar */}
-      <div
-        className="progress"
-        style={{
-          height: heights[size],
-          backgroundColor: "#e9ecef",
-          borderRadius: "0.375rem",
-        }}
+      <div 
+        className={`${styles.progress} ${styles[`size${size.toUpperCase()}`]}`}
+        role="progressbar"
+        aria-valuenow={progress}
+        aria-valuemin="0"
+        aria-valuemax="100"
       >
-        <div
-          className={`progress-bar ${striped ? "progress-bar-striped" : ""} ${
-            animated ? "progress-bar-animated" : ""
-          } bg-${progressVariant}`}
-          role="progressbar"
+        <div 
+          className={`${styles.bar} ${styles[`variant${progressVariant.toUpperCase()}`]} ${striped ? styles.striped : ''} ${animated ? styles.animated : ''}`}
           style={{ width: `${progress}%` }}
-          aria-valuenow={progress}
-          aria-valuemin="0"
-          aria-valuemax="100"
         >
           {size === "lg" && showPercentage && (
-            <span style={{ fontSize: "0.875rem", fontWeight: 600 }}>
+            <span className={styles.barText}>
               {progress}%
             </span>
           )}

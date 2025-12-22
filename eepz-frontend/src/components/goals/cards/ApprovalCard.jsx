@@ -5,6 +5,7 @@ import { formatDate, getInitials } from "../../../utils/goals/goalHelpers";
 import { APPROVAL_TYPE_LABELS } from "../../../constants/goals/goalConstants";
 import goalService from "../../../services/goals/goalService";
 import Alert from "../common/Alert";
+import styles from "./ApprovalCard.module.css";
 
 const ApprovalCard = ({ approval, onDecide, canDecide = true, onRefresh }) => {
   const [loading, setLoading] = useState(false);
@@ -41,14 +42,7 @@ const ApprovalCard = ({ approval, onDecide, canDecide = true, onRefresh }) => {
     approval.attachments && approval.attachments.length > 0;
 
   return (
-    <div
-      className="card mb-3"
-      style={{
-        border: "1px solid #dee2e6",
-        borderRadius: "0.5rem",
-        overflow: "hidden",
-      }}
-    >
+    <div className={`card mb-3 ${styles.card}`}>
       {/* Alert */}
       {alert && (
         <div style={{ padding: "1rem 1rem 0 1rem" }}>
@@ -60,15 +54,12 @@ const ApprovalCard = ({ approval, onDecide, canDecide = true, onRefresh }) => {
         </div>
       )}
 
-      <div className="card-body" style={{ padding: "1.25rem" }}>
+      <div className={`card-body ${styles.cardBody}`}>
         {/* Header - Badges */}
-        <div className="d-flex justify-content-between align-items-start mb-3">
-          <div className="d-flex gap-2 flex-wrap">
+        <div className={styles.headerRow}>
+          <div className={styles.typeBadges}>
             <GoalTypeBadge type={approval.goalType} size="sm" />
-            <span
-              className="badge bg-info"
-              style={{ fontSize: "0.75rem", fontWeight: 600 }}
-            >
+            <span className={`badge bg-info ${styles.approvalTypeBadge}`}>
               {APPROVAL_TYPE_LABELS[approval.approvalType] ||
                 approval.approvalType}
             </span>
@@ -78,45 +69,20 @@ const ApprovalCard = ({ approval, onDecide, canDecide = true, onRefresh }) => {
         </div>
 
         {/* Goal Title */}
-        <h5
-          className="mb-3"
-          style={{ fontWeight: 600, color: "#212529", lineHeight: 1.3 }}
-        >
+        <h5 className={styles.goalTitle}>
           {approval.goalTitle}
         </h5>
 
         {/* Requester Info */}
-        <div
-          className="d-flex align-items-center gap-3 mb-3 p-2"
-          style={{
-            backgroundColor: "#f8f9fa",
-            borderRadius: "0.375rem",
-          }}
-        >
-          <div
-            style={{
-              width: "48px",
-              height: "48px",
-              borderRadius: "50%",
-              background: "linear-gradient(135deg, #AC5098 0%, #97247E 100%)",
-              color: "#fff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontWeight: 600,
-              fontSize: "1rem",
-              flexShrink: 0,
-            }}
-          >
+        <div className={styles.requesterInfo}>
+          <div className={styles.avatar}>
             {getInitials(approval.requesterName)}
           </div>
-          <div style={{ flex: 1 }}>
-            <div
-              style={{ fontWeight: 600, color: "#212529", fontSize: "0.95rem" }}
-            >
+          <div>
+            <div className={styles.requesterName}>
               {approval.requesterName}
             </div>
-            <div style={{ fontSize: "0.8rem", color: "#6c757d" }}>
+            <div className={styles.requestedDate}>
               <i className="bi bi-clock me-1"></i>
               Requested {formatDate(approval.requestedOn)}
             </div>
@@ -125,47 +91,23 @@ const ApprovalCard = ({ approval, onDecide, canDecide = true, onRefresh }) => {
 
         {/* Attachments Section */}
         {hasAttachments && (
-          <div
-            className="mb-3"
-            style={{
-              backgroundColor: "#e7f3ff",
-              border: "1px solid #b3d9ff",
-              borderRadius: "0.375rem",
-              padding: "1rem",
-            }}
-          >
-            <div
-              className="d-flex align-items-center mb-2"
-              style={{ fontWeight: 600, color: "#084298", fontSize: "0.9rem" }}
-            >
+          <div className={styles.attachmentsSection}>
+            <div className={styles.attachmentsHeader}>
               <i className="bi bi-paperclip me-2"></i>
               Attachments ({approval.attachments.length})
             </div>
-            <div className="d-flex flex-wrap gap-2">
+            <div className={styles.attachmentsList}>
               {approval.attachments.map((attachment) => (
                 <button
                   key={attachment.attachmentId}
-                  className="btn btn-sm btn-outline-primary"
+                  className={`btn btn-sm btn-outline-primary ${styles.attachmentButton}`}
                   onClick={() =>
                     handleDownload(attachment.attachmentId, attachment.fileName)
                   }
-                  style={{
-                    fontSize: "0.85rem",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                  }}
                   title={`Download ${attachment.fileName}`}
                 >
                   <i className="bi bi-file-earmark-arrow-down"></i>
-                  <span
-                    style={{
-                      maxWidth: "150px",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
+                  <span className={styles.attachmentName}>
                     {attachment.fileName}
                   </span>
                 </button>
@@ -176,10 +118,7 @@ const ApprovalCard = ({ approval, onDecide, canDecide = true, onRefresh }) => {
 
         {/* No Attachments Warning (for completion approvals) */}
         {!hasAttachments && approval.approvalType === "completion" && (
-          <div
-            className="alert alert-warning mb-3"
-            style={{ fontSize: "0.875rem" }}
-          >
+          <div className={`alert alert-warning mb-3 ${styles.noAttachmentsWarning}`}>
             <i className="bi bi-exclamation-triangle me-2"></i>
             No proof attachments submitted
           </div>
@@ -187,12 +126,11 @@ const ApprovalCard = ({ approval, onDecide, canDecide = true, onRefresh }) => {
 
         {/* Action Buttons - Pending State */}
         {canDecide && approval.approvalStatus === "pending" && (
-          <div className="d-flex gap-2">
+          <div className={styles.actionButtons}>
             <button
-              className="btn btn-success flex-grow-1"
+              className={`btn btn-success ${styles.approveButton}`}
               onClick={() => handleDecide("approved")}
               disabled={loading}
-              style={{ fontWeight: 600 }}
             >
               {loading ? (
                 <>
@@ -207,10 +145,9 @@ const ApprovalCard = ({ approval, onDecide, canDecide = true, onRefresh }) => {
               )}
             </button>
             <button
-              className="btn btn-danger flex-grow-1"
+              className={`btn btn-danger ${styles.rejectButton}`}
               onClick={() => handleDecide("rejected")}
               disabled={loading}
-              style={{ fontWeight: 600 }}
             >
               <i className="bi bi-x-circle me-2"></i>
               Reject
@@ -220,28 +157,24 @@ const ApprovalCard = ({ approval, onDecide, canDecide = true, onRefresh }) => {
 
         {/* Already Decided - Success/Rejected State */}
         {approval.approvalStatus !== "pending" && (
-          <div
-            className={`alert alert-${
-              approval.approvalStatus === "approved" ? "success" : "danger"
-            } mb-0`}
-            style={{ fontSize: "0.875rem" }}
-          >
-            <div className="d-flex align-items-center">
+          <div className={`alert alert-${
+            approval.approvalStatus === "approved" ? "success" : "danger"
+          } mb-0 ${styles.decisionAlert}`}>
+            <div className={styles.decisionAlertContent}>
               <i
                 className={`bi bi-${
                   approval.approvalStatus === "approved"
                     ? "check-circle-fill"
                     : "x-circle-fill"
-                } me-2`}
-                style={{ fontSize: "1.2rem" }}
+                } me-2 ${styles.decisionAlertIcon}`}
               ></i>
               <div>
-                <div style={{ fontWeight: 600 }}>
+                <div className={styles.decisionAlertTitle}>
                   {approval.approvalStatus === "approved"
                     ? "Approved"
                     : "Rejected"}
                 </div>
-                <div style={{ fontSize: "0.8rem", marginTop: "0.25rem" }}>
+                <div className={styles.decisionAlertDetails}>
                   by {approval.approverName} on{" "}
                   {formatDate(approval.approvedOn)}
                 </div>
@@ -252,10 +185,7 @@ const ApprovalCard = ({ approval, onDecide, canDecide = true, onRefresh }) => {
 
         {/* Cannot Decide Warning */}
         {!canDecide && approval.approvalStatus === "pending" && (
-          <div
-            className="alert alert-info mb-0"
-            style={{ fontSize: "0.875rem" }}
-          >
+          <div className={`alert alert-info mb-0 ${styles.permissionWarning}`}>
             <i className="bi bi-info-circle me-2"></i>
             You don't have permission to decide this approval
           </div>

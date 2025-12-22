@@ -1,0 +1,296 @@
+/* ApprovalHistory.module.css */
+
+/* Loading State */
+.loadingContainer {
+  text-align: center;
+  padding: 3rem;
+}
+
+/* Filters Container */
+.filtersContainer {
+  margin-bottom: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Search Form */
+.searchForm {
+  display: flex;
+  gap: 0.5rem;
+  flex-grow: 1;
+  min-width: 250px;
+}
+
+.searchInput {
+  min-height: 35.7px;
+}
+
+/* Dropdown Wrapper */
+.dropdownWrapper {
+  position: relative;
+}
+
+/* Dropdown Button Base */
+.dropdownButton {
+  padding: 0.5rem 0.875rem;
+  border: 1px solid rgb(39, 35, 92, 0.5);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  background: #fff;
+  color: black;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.dropdownButtonRole {
+  min-width: 160px;
+}
+
+.dropdownButtonType {
+  min-width: 220px;
+}
+
+.dropdownButtonStatus {
+  min-width: 160px;
+}
+
+.dropdownIcon {
+  font-size: 0.75rem;
+  margin-left: 0.5rem;
+}
+
+/* Dropdown Menu */
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.dropdownMenuRole {
+  min-width: 160px;
+}
+
+.dropdownMenuType {
+  min-width: 220px;
+}
+
+.dropdownMenuStatus {
+  min-width: 160px;
+}
+
+/* Dropdown Item */
+.dropdownItem {
+  padding: 0.625rem 0.875rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #212529;
+  text-align: left;
+  transition: all 0.2s;
+}
+
+.dropdownItemActive {
+  background: #f3f4f6;
+}
+
+.dropdownItem:hover {
+  background: rgb(39, 35, 92);
+  color: white;
+}
+
+/* Table Container */
+.tableContainer {
+  min-height: 65vh;
+  transition: opacity 0.2s;
+}
+
+.tableContainerLoading {
+  opacity: 0.6;
+}
+
+.tableWrapper {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  min-width: 0;
+  padding-bottom: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* Table Header */
+.tableHeader {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1.2fr 1.2fr 0.9fr 0.8fr 0.8fr 0.8fr;
+  background: rgb(39, 35, 92);
+  border-bottom: 2px solid #abb4c5ff;
+  font-weight: 600;
+  color: white;
+  font-size: 0.875rem;
+  padding: 1rem 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.tableHeaderCell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  -webkit-user-select: none;
+  user-select: none;
+  text-align: center;
+  transition: color 0.2s;
+  color: white;
+}
+
+.tableHeaderCellSortable {
+  cursor: pointer;
+}
+
+.tableHeaderCellSortable:hover {
+  color: lightpink;
+}
+
+.tableHeaderCellActive {
+  color: lightpink;
+}
+
+/* Sort Icons */
+.sortIcon {
+  margin-left: 4px;
+}
+
+.sortIconInactive {
+  opacity: 0.5;
+  color: white;
+}
+
+.sortIconActive {
+  color: lightpink;
+  font-weight: bold;
+}
+
+/* Table Row */
+.tableRow {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1.2fr 1.2fr 0.9fr 1fr 0.8fr 0.8fr;
+  align-items: center;
+  font-size: 0.875rem;
+  color: #212529;
+  padding: 1rem 1.5rem;
+  background: #fff;
+  transition: background 0.2s;
+  text-align: start;
+}
+
+.tableRow:hover {
+  background: #f9fafb;
+}
+
+.tableRowBorder {
+  border-bottom: 1px solid #f3f4f6;
+}
+
+/* Cell Styles */
+.cellRequestType {
+  font-weight: 500;
+  padding-left: 5px;
+}
+
+.cellSkill {
+  color: #6b7280;
+}
+
+.cellName {
+  font-weight: 600;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.cellDate {
+  color: #6b7280;
+  padding-left: 20px;
+}
+
+.cellAttachment {
+  text-align: left;
+}
+
+.cellComments {
+  text-align: left;
+}
+
+.cellNone {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+/* Download Button */
+.downloadButton {
+  padding: 0.4rem 0.75rem;
+  background: #fff;
+  border: 1px solid #97247e;
+  color: #97247e;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: all 0.2s;
+}
+
+.downloadButton:hover {
+  border-color: white;
+  background-color: rgb(39, 35, 92);
+  color: white;
+}
+
+/* Comments Button */
+.commentsButton {
+  background: transparent;
+  border: none;
+  color: #97247e;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.commentsButtonExpanded {
+  text-decoration: underline;
+}
+
+/* Expanded Notes */
+.expandedNotes {
+  padding: 1rem 1.5rem;
+  background: #f9fafb;
+  font-size: 0.875rem;
+  color: #4b5563;
+  white-space: pre-wrap;
+  border-left: 3px solid #97247e;
+  margin-left: 1.5rem;
+  text-align: left;
+}
+
+.expandedNotesBorder {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.expandedNotesLabel {
+  color: #374151;
+  display: block;
+  margin-bottom: 0.5rem;
+}

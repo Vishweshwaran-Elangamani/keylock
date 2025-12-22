@@ -14,6 +14,7 @@ import EmptyState from "../../../components/lnd/common/EmptyState";
 import { lndService, downloadFile } from "../../../services/lnd/lndService";
 import { ASSIGNMENT_STATUS } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
+import styles from "../../../styles/lnd/pages/assignments/SmeAssignments.module.css";
 
 const SmeAssignments = () => {
   const [assignments, setAssignments] = useState([]);
@@ -152,42 +153,37 @@ const SmeAssignments = () => {
   };
 
   const renderSortIcon = (field) => {
-    if (sortField !== field) {
+    const isActive = sortField === field;
+    const iconClass = isActive
+      ? styles.sortIconActive
+      : styles.sortIconInactive;
+
+    if (!isActive) {
       return (
-        <ChevronUp
-          size={14}
-          style={{
-            marginLeft: 4,
-            opacity: 0.5,
-            color: "white",
-          }}
-        />
+        <ChevronUp size={14} className={`${styles.sortIcon} ${iconClass}`} />
       );
     }
     return sortOrderAsc ? (
-      <ChevronUp
-        size={14}
-        style={{
-          marginLeft: 4,
-          color: "lightpink",
-          fontWeight: "bold",
-        }}
-      />
+      <ChevronUp size={14} className={`${styles.sortIcon} ${iconClass}`} />
     ) : (
-      <ChevronDown
-        size={14}
-        style={{
-          marginLeft: 4,
-          color: "lightpink",
-          fontWeight: "bold",
-        }}
-      />
+      <ChevronDown size={14} className={`${styles.sortIcon} ${iconClass}`} />
     );
+  };
+
+  const getHeaderCellClass = (field, align) => {
+    const baseClass = styles.tableHeaderCell;
+    const alignClass =
+      align === "center"
+        ? styles.tableHeaderCellCenter
+        : styles.tableHeaderCellLeft;
+    const sortableClass = field ? styles.tableHeaderCellSortable : "";
+    const activeClass = sortField === field ? styles.tableHeaderCellActive : "";
+    return `${baseClass} ${alignClass} ${sortableClass} ${activeClass}`.trim();
   };
 
   if (loading && assignments.length === 0) {
     return (
-      <div style={{ textAlign: "center", padding: "3rem" }}>
+      <div className={styles.loadingContainer}>
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
@@ -205,33 +201,16 @@ const SmeAssignments = () => {
         ]}
       />
 
-      <div
-        style={{
-          marginBottom: "1.5rem",
-          display: "flex",
-          gap: "1rem",
-          flexWrap: "wrap",
-          alignItems: "center",
-        }}
-      >
-        <form
-          onSubmit={handleSearchSubmit}
-          style={{
-            display: "flex",
-            gap: "0.5rem",
-            flexGrow: 1,
-            minWidth: 250,
-          }}
-        >
+      <div className={styles.filterContainer}>
+        <form onSubmit={handleSearchSubmit} className={styles.searchForm}>
           <div className="input-group">
             <input
               type="text"
-              className="form-control"
+              className={`form-control ${styles.searchInput}`}
               placeholder="Search by mentee or skill..."
               value={searchInput}
               onChange={handleSearchInputChange}
               onKeyPress={handleKeyPress}
-              style={{ minHeight: "35.7px" }}
             />
             {searchTerm ? (
               <button
@@ -256,15 +235,7 @@ const SmeAssignments = () => {
             setStatusFilter(e.target.value);
             setCurrentPage(1);
           }}
-          style={{
-            padding: "0.625rem 1rem",
-            border: "1px solid #e5e7eb",
-            borderRadius: "8px",
-            fontSize: "0.875rem",
-            outline: "none",
-            cursor: "pointer",
-            background: "#fff",
-          }}
+          className={styles.statusSelect}
         >
           <option value="">All Statuses</option>
           <option value={ASSIGNMENT_STATUS.IN_PROGRESS}>In Progress</option>
@@ -290,37 +261,12 @@ const SmeAssignments = () => {
       ) : (
         <>
           <div
-            style={{
-              minHeight: "65vh",
-              opacity: loading ? 0.6 : 1,
-              transition: "opacity 0.2s",
-            }}
+            className={`${styles.tableContainer} ${
+              loading ? styles.tableContainerLoading : ""
+            }`}
           >
-            <div
-              style={{
-                background: "#fff",
-                borderRadius: "12px",
-                overflow: "hidden",
-                minWidth: 0,
-                boxShadow: "0 4px 12px rgba(0,0,0,0.12)"
-              }}
-            >
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns:
-                    "1.5fr 1.3fr 1.2fr 1fr 1fr 0.7fr 0.7fr 0.8fr",
-                  background: "rgb(39, 35, 92)",
-                  borderBottom: "2px solid #abb4c5ff",
-                  fontWeight: 600,
-                  color: "white",
-                  fontsize: "0.875rem",
-                  padding: "1rem 1.5rem",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.025em",
-                  alignItems: "center",
-                }}
-              >
+            <div className={styles.tableWrapper}>
+              <div className={styles.tableHeader}>
                 {[
                   { label: "Mentee Name", field: "menteeName", align: "left" },
                   { label: "Skill Name", field: "skillName", align: "left" },
@@ -342,25 +288,7 @@ const SmeAssignments = () => {
                   <div
                     key={field || label}
                     onClick={() => field && onSortClick(field)}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent:
-                        align === "center" ? "center" : "flex-start",
-                      gap: 4,
-                      userSelect: "none",
-                      cursor: field ? "pointer" : "default",
-                      transition: "color 0.2s",
-                      color: "white",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (field) e.currentTarget.style.color = "lightpink";
-                    }}
-                    onMouseLeave={(e) => {
-                      if (field && sortField !== field) {
-                        e.currentTarget.style.color = "white";
-                      }
-                    }}
+                    className={getHeaderCellClass(field, align)}
                   >
                     {label}
                     {field && renderSortIcon(field)}
@@ -371,37 +299,13 @@ const SmeAssignments = () => {
               {assignments.map((assignment, idx) => (
                 <div key={assignment.assignmentId}>
                   <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns:
-                        "1.5fr 1.3fr 1.2fr 1fr 1fr 0.7fr 0.7fr 0.8fr",
-                      alignItems: "center",
-                      fontSize: "0.875rem",
-                      color: "#212529",
-                      padding: "1rem 1.5rem",
-                      borderBottom:
-                        idx < assignments.length - 1
-                          ? "1px solid #f3f4f6"
-                          : "none",
-                      background: "#fff",
-                      transition: "background 0.2s",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = "#f9fafb";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = "#fff";
-                    }}
+                    className={`${styles.tableRow} ${
+                      idx < assignments.length - 1 ? styles.tableRowBorder : ""
+                    }`}
                   >
                     {/* Mentee Name */}
                     <div
-                      style={{
-                        fontWeight: 600,
-                        textOverflow: "ellipsis",
-                        overflow: "hidden",
-                        whiteSpace: "nowrap",
-                        textAlign: "left",
-                      }}
+                      className={styles.cellMenteeName}
                       title={assignment.menteeName}
                     >
                       {assignment.menteeName}
@@ -409,126 +313,75 @@ const SmeAssignments = () => {
 
                     {/* Skill Name */}
                     <div
-                      style={{
-                        fontWeight: 500,
-                        textOverflow: "ellipsis",
-                        overflow: "hidden",
-                        whiteSpace: "nowrap",
-                        textAlign: "left",
-                      }}
+                      className={styles.cellSkillName}
                       title={assignment.skillName}
                     >
                       {assignment.skillName}
                     </div>
 
                     {/* Assignment Status */}
-                    <div style={{ display: "flex", justifyContent: "center" }}>
+                    <div className={styles.cellStatus}>
                       <StatusBadge status={assignment.status} />
                     </div>
 
                     {/* Start Date */}
-                    <div style={{ textAlign: "left", color: "#6b7280" }}>
+                    <div className={styles.cellDate}>
                       {assignment.createdOn ? (
                         new Date(assignment.createdOn).toLocaleDateString()
                       ) : (
-                        <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
-                          None
-                        </span>
+                        <span className={styles.cellNone}>None</span>
                       )}
                     </div>
 
                     {/* Due Date */}
                     <div
-                      style={{
-                        textAlign: "left",
-                        color: assignment.isOverdue ? "#DC2626" : "#6b7280",
-                        fontWeight: assignment.isOverdue ? "600" : "normal",
-                      }}
+                      className={
+                        assignment.isOverdue
+                          ? styles.cellDateOverdue
+                          : styles.cellDate
+                      }
                     >
                       {assignment.deadline ? (
                         <>
                           {assignment.isOverdue && (
                             <AlertTriangle
                               size={14}
-                              style={{
-                                marginRight: "0.25rem",
-                                color: "#DC2626",
-                                display: "inline-block",
-                                verticalAlign: "middle",
-                              }}
+                              className={styles.overdueIcon}
                             />
                           )}
                           {new Date(assignment.deadline).toLocaleDateString()}
                         </>
                       ) : (
-                        <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
-                          None
-                        </span>
+                        <span className={styles.cellNone}>None</span>
                       )}
                     </div>
 
-                 
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        fontWeight: 600,
-                        color: "#198754",
-                      }}
-                    >
+                    {/* Score */}
+                    <div className={styles.cellScore}>
                       {assignment.completionRating ? (
                         `${assignment.completionRating}/10`
                       ) : (
-                        <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
-                          None
-                        </span>
+                        <span className={styles.cellNone}>None</span>
                       )}
                     </div>
 
                     {/* Proof */}
-                    <div style={{ textAlign: "center" }}>
+                    <div className={styles.cellCenter}>
                       {assignment.proofFilePath ? (
                         <button
                           onClick={() => handleDownloadProof(assignment)}
                           title="Download Proof"
-                          style={{
-                            padding: "0.4rem 0.75rem",
-                            background: "#fff",
-                            border: "1px solid #97247E",
-                            color: "#97247E",
-                            borderRadius: "8px",
-                            fontSize: "0.85rem",
-                            fontWeight: "600",
-                            cursor: "pointer",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: "0.25rem",
-                            transition: "all 0.2s",
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.borderColor = "white";
-                            e.currentTarget.style.backgroundColor =
-                              "rgb(39, 35, 92)";
-                            e.currentTarget.style.color = "white";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.borderColor = "#97247E";
-                            e.currentTarget.style.backgroundColor = "white";
-                            e.currentTarget.style.color = "#97247E";
-                          }}
+                          className={styles.downloadButton}
                         >
                           <Download size={15} />
                         </button>
                       ) : (
-                        <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
-                          None
-                        </span>
+                        <span className={styles.cellNone}>None</span>
                       )}
                     </div>
 
                     {/* Comments */}
-                    <div style={{ textAlign: "center" }}>
+                    <div className={styles.cellCenter}>
                       {assignment.completionNotes ? (
                         <button
                           onClick={() =>
@@ -538,20 +391,11 @@ const SmeAssignments = () => {
                                 !prev[assignment.assignmentId],
                             }))
                           }
-                          style={{
-                            background: "transparent",
-                            border: "none",
-                            color: "#97247E",
-                            cursor: "pointer",
-                            fontWeight: "600",
-                            fontSize: "0.875rem",
-                            textDecoration: expandedNotes?.[
-                              assignment.assignmentId
-                            ]
-                              ? "underline"
-                              : "none",
-                            padding: "0.25rem 0.5rem",
-                          }}
+                          className={`${styles.commentsButton} ${
+                            expandedNotes?.[assignment.assignmentId]
+                              ? styles.commentsButtonExpanded
+                              : ""
+                          }`}
                           title={
                             expandedNotes?.[assignment.assignmentId]
                               ? "Hide comments"
@@ -563,9 +407,7 @@ const SmeAssignments = () => {
                             : "View"}
                         </button>
                       ) : (
-                        <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
-                          None
-                        </span>
+                        <span className={styles.cellNone}>None</span>
                       )}
                     </div>
                   </div>
@@ -574,28 +416,13 @@ const SmeAssignments = () => {
                   {expandedNotes?.[assignment.assignmentId] &&
                     assignment.completionNotes && (
                       <div
-                        style={{
-                          padding: "1rem 1.5rem",
-                          background: "#f9fafb",
-                          fontSize: "0.875rem",
-                          color: "#4b5563",
-                          whiteSpace: "pre-wrap",
-                          borderBottom:
-                            idx < assignments.length - 1
-                              ? "1px solid #e5e7eb"
-                              : "none",
-                          textAlign: "left",
-                          borderLeft: "3px solid #97247E",
-                          marginLeft: "1.5rem",
-                        }}
+                        className={`${styles.expandedNotes} ${
+                          idx < assignments.length - 1
+                            ? styles.expandedNotesBorder
+                            : ""
+                        }`}
                       >
-                        <strong
-                          style={{
-                            color: "#374151",
-                            display: "block",
-                            marginBottom: "0.5rem",
-                          }}
-                        >
+                        <strong className={styles.notesLabel}>
                           Mentee's Completion Notes:
                         </strong>
                         {assignment.completionNotes}

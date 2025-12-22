@@ -1,0 +1,148 @@
+.card {
+  border: 1px solid rgb(39, 35, 92, 0.5) !important;
+  border-radius: 12px;
+}
+
+.header {
+  background-color: #f8f9fa;
+  padding: 1rem 1.25rem;
+}
+
+.title {
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.eventCount {
+  font-size: 10px;
+}
+
+.filterBtn {
+  font-size: 12px;
+  padding: 0.25rem 0.75rem;
+}
+
+.content {
+  padding: 2rem;
+  max-height: 700px;
+  overflow-y: auto;
+}
+
+.emptyState {
+  text-align: center;
+  color: #6c757d;
+  padding: 3rem;
+}
+
+.emptyIcon {
+  font-size: 4rem;
+  opacity: 0.2;
+}
+
+.emptyTitle {
+  font-weight: 500;
+}
+
+.timelineContainer {
+  position: relative;
+}
+
+.verticalLine {
+  position: absolute;
+  left: 19px;
+  top: 20px;
+  bottom: 20px;
+  width: 2px;
+  background: linear-gradient(180deg, #dee2e6 0%, rgba(222, 226, 230, 0.3) 100%);
+}
+
+.eventWrapper {
+  position: relative;
+  padding-left: 3rem;
+  margin-bottom: 1.5rem;
+}
+
+.eventWrapper:last-child {
+  margin-bottom: 0;
+}
+
+.eventIcon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  border: 3px solid #fff;
+  z-index: 2;
+}
+
+.eventIcon i {
+  color: #fff;
+  font-size: 1rem;
+}
+
+.eventCard {
+  border: 1px solid #dee2e6 !important;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.eventCard.hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transform: translateX(4px);
+}
+
+.eventCardBody {
+  padding: 1rem;
+}
+
+.eventTitle {
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.eventTime {
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.eventUser {
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.eventUserName {
+  font-weight: 500;
+}
+
+.eventDescription {
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+  color: #495057;
+  line-height: 1.5;
+}
+
+.metadataSection {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e9ecef !important;
+}
+
+.metadataLabel {
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-bottom: 0.25rem;
+}
+
+.metadataValue {
+  font-size: 0.85rem;
+  color: #212529;
+  font-weight: 500;
+  padding-left: 1.25rem;
+}

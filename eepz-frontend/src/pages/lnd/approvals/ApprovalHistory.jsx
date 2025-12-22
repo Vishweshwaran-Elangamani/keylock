@@ -10,6 +10,7 @@ import {
   APPROVAL_STATUS,
 } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
+import styles from "../../../styles/lnd/pages/approvals/ApprovalHistory.module.css";
 
 const ApprovalHistory = () => {
   const [approvals, setApprovals] = useState([]);
@@ -253,43 +254,36 @@ const ApprovalHistory = () => {
   };
 
   const renderSortIcon = (field) => {
-    if (sortField !== field) {
-      return (
-        <ChevronUp
-          size={14}
-          style={{
-            marginLeft: 4,
-            opacity: 0.5,
-            color: "white",
-          }}
-        />
-      );
+    const isActive = sortField === field;
+    const iconClass = isActive ? styles.sortIconActive : styles.sortIconInactive;
+
+    if (!isActive) {
+      return <ChevronUp size={14} className={`${styles.sortIcon} ${iconClass}`} />;
     }
     return sortOrderAsc ? (
-      <ChevronUp
-        size={14}
-        style={{
-          marginLeft: 4,
-          color: "lightpink",
-          fontWeight: "bold",
-        }}
-      />
+      <ChevronUp size={14} className={`${styles.sortIcon} ${iconClass}`} />
     ) : (
-      <ChevronDown
-        size={14}
-        style={{
-          marginLeft: 4,
-          color: "lightpink",
-          fontWeight: "bold",
-        }}
-      />
+      <ChevronDown size={14} className={`${styles.sortIcon} ${iconClass}`} />
     );
+  };
+
+  const getHeaderCellClass = (field) => {
+    const baseClass = styles.tableHeaderCell;
+    const sortableClass = field ? styles.tableHeaderCellSortable : "";
+    const activeClass = sortField === field ? styles.tableHeaderCellActive : "";
+    return `${baseClass} ${sortableClass} ${activeClass}`.trim();
+  };
+
+  const getDropdownItemClass = (currentValue, optionValue) => {
+    return `${styles.dropdownItem} ${
+      currentValue === optionValue ? styles.dropdownItemActive : ""
+    }`.trim();
   };
 
   // Show initial loading spinner only when no data
   if (loading && approvals.length === 0) {
     return (
-      <div style={{ textAlign: "center", padding: "3rem" }}>
+      <div className={styles.loadingContainer}>
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
@@ -308,33 +302,16 @@ const ApprovalHistory = () => {
       />
 
       {/* Filters and search inline */}
-      <div
-        style={{
-          marginBottom: "1.5rem",
-          display: "flex",
-          gap: "1rem",
-          flexWrap: "wrap",
-          alignItems: "center",
-        }}
-      >
-        <form
-          onSubmit={handleSearchSubmit}
-          style={{
-            display: "flex",
-            gap: "0.5rem",
-            flexGrow: 1,
-            minWidth: 250,
-          }}
-        >
+      <div className={styles.filtersContainer}>
+        <form onSubmit={handleSearchSubmit} className={styles.searchForm}>
           <div className="input-group">
             <input
               type="text"
-              className="form-control"
+              className={`form-control ${styles.searchInput}`}
               placeholder="Search approvals..."
               value={searchInput}
               onChange={handleSearchInputChange}
               onKeyPress={handleKeyPress}
-              style={{ minHeight: "35.7px" }}
             />
             {searchTerm ? (
               <button
@@ -355,48 +332,20 @@ const ApprovalHistory = () => {
         </form>
 
         {/* ROLE FILTER DROPDOWN */}
-        <div ref={roleDropdownRef} style={{ position: "relative" }}>
+        <div ref={roleDropdownRef} className={styles.dropdownWrapper}>
           <button
             type="button"
             onClick={() => setShowRoleDropdown(!showRoleDropdown)}
-            style={{
-              padding: "0.5rem 0.875rem",
-              border: "none",
-              borderRadius: "8px",
-              fontSize: "0.875rem",
-              cursor: "pointer",
-              background: "#fff",
-              color: "black",
-              minWidth: "160px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              fontWeight: "500",
-              transition: "all 0.2s",
-            }}
+            className={`${styles.dropdownButton} ${styles.dropdownButtonRole}`}
           >
             <span>{getRoleLabel(roleFilter)}</span>
             <i
-              className={`bi bi-chevron-${showRoleDropdown ? "up" : "down"}`}
-              style={{ fontSize: "0.75rem", marginLeft: "0.5rem" }}
+              className={`bi bi-chevron-${showRoleDropdown ? "up" : "down"} ${styles.dropdownIcon}`}
             ></i>
           </button>
 
           {showRoleDropdown && (
-            <div
-              style={{
-                position: "absolute",
-                top: "calc(100% + 4px)",
-                left: 0,
-                minWidth: "160px",
-                background: "#fff",
-                border: "1px solid #e5e7eb",
-                borderRadius: "8px",
-                zIndex: 1000,
-                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                overflow: "hidden",
-              }}
-            >
+            <div className={`${styles.dropdownMenu} ${styles.dropdownMenuRole}`}>
               {roleOptions.map((option) => (
                 <div
                   key={option.value}
@@ -405,25 +354,7 @@ const ApprovalHistory = () => {
                     setCurrentPage(1);
                     setShowRoleDropdown(false);
                   }}
-                  style={{
-                    padding: "0.625rem 0.875rem",
-                    cursor: "pointer",
-                    fontSize: "0.875rem",
-                    color: "#212529",
-                    textAlign: "left",
-                    transition: "all 0.2s",
-                    background:
-                      roleFilter === option.value ? "#f3f4f6" : "#fff",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "rgb(39, 35, 92)";
-                    e.currentTarget.style.color = "white";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background =
-                      roleFilter === option.value ? "#f3f4f6" : "#fff";
-                    e.currentTarget.style.color = "#212529";
-                  }}
+                  className={getDropdownItemClass(roleFilter, option.value)}
                 >
                   {option.label}
                 </div>
@@ -433,48 +364,20 @@ const ApprovalHistory = () => {
         </div>
 
         {/* TYPE FILTER DROPDOWN */}
-        <div ref={typeDropdownRef} style={{ position: "relative" }}>
+        <div ref={typeDropdownRef} className={styles.dropdownWrapper}>
           <button
             type="button"
             onClick={() => setShowTypeDropdown(!showTypeDropdown)}
-            style={{
-              padding: "0.5rem 0.875rem",
-              border: "none",
-              borderRadius: "8px",
-              fontSize: "0.875rem",
-              cursor: "pointer",
-              background: "#fff",
-              color: "black",
-              minWidth: "220px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              fontWeight: "500",
-              transition: "all 0.2s",
-            }}
+            className={`${styles.dropdownButton} ${styles.dropdownButtonType}`}
           >
             <span>{getTypeLabel(typeFilter)}</span>
             <i
-              className={`bi bi-chevron-${showTypeDropdown ? "up" : "down"}`}
-              style={{ fontSize: "0.75rem", marginLeft: "0.5rem" }}
+              className={`bi bi-chevron-${showTypeDropdown ? "up" : "down"} ${styles.dropdownIcon}`}
             ></i>
           </button>
 
           {showTypeDropdown && (
-            <div
-              style={{
-                position: "absolute",
-                top: "calc(100% + 4px)",
-                left: 0,
-                minWidth: "220px",
-                background: "#fff",
-                border: "1px solid #e5e7eb",
-                borderRadius: "8px",
-                zIndex: 1000,
-                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                overflow: "hidden",
-              }}
-            >
+            <div className={`${styles.dropdownMenu} ${styles.dropdownMenuType}`}>
               {typeOptions.map((option) => (
                 <div
                   key={option.value}
@@ -483,25 +386,7 @@ const ApprovalHistory = () => {
                     setCurrentPage(1);
                     setShowTypeDropdown(false);
                   }}
-                  style={{
-                    padding: "0.625rem 0.875rem",
-                    cursor: "pointer",
-                    fontSize: "0.875rem",
-                    color: "#212529",
-                    textAlign: "left",
-                    transition: "all 0.2s",
-                    background:
-                      typeFilter === option.value ? "#f3f4f6" : "#fff",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "rgb(39, 35, 92)";
-                    e.currentTarget.style.color = "white";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background =
-                      typeFilter === option.value ? "#f3f4f6" : "#fff";
-                    e.currentTarget.style.color = "#212529";
-                  }}
+                  className={getDropdownItemClass(typeFilter, option.value)}
                 >
                   {option.label}
                 </div>
@@ -511,48 +396,20 @@ const ApprovalHistory = () => {
         </div>
 
         {/* STATUS FILTER DROPDOWN */}
-        <div ref={statusDropdownRef} style={{ position: "relative" }}>
+        <div ref={statusDropdownRef} className={styles.dropdownWrapper}>
           <button
             type="button"
             onClick={() => setShowStatusDropdown(!showStatusDropdown)}
-            style={{
-              padding: "0.5rem 0.875rem",
-              border: "none",
-              borderRadius: "8px",
-              fontSize: "0.875rem",
-              cursor: "pointer",
-              background: "#fff",
-              color: "black",
-              minWidth: "160px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              fontWeight: "500",
-              transition: "all 0.2s",
-            }}
+            className={`${styles.dropdownButton} ${styles.dropdownButtonStatus}`}
           >
             <span>{getStatusLabel(statusFilter)}</span>
             <i
-              className={`bi bi-chevron-${showStatusDropdown ? "up" : "down"}`}
-              style={{ fontSize: "0.75rem", marginLeft: "0.5rem" }}
+              className={`bi bi-chevron-${showStatusDropdown ? "up" : "down"} ${styles.dropdownIcon}`}
             ></i>
           </button>
 
           {showStatusDropdown && (
-            <div
-              style={{
-                position: "absolute",
-                top: "calc(100% + 4px)",
-                left: 0,
-                minWidth: "160px",
-                background: "#fff",
-                border: "1px solid #e5e7eb",
-                borderRadius: "8px",
-                zIndex: 1000,
-                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                overflow: "hidden",
-              }}
-            >
+            <div className={`${styles.dropdownMenu} ${styles.dropdownMenuStatus}`}>
               {statusOptions.map((option) => (
                 <div
                   key={option.value}
@@ -561,25 +418,7 @@ const ApprovalHistory = () => {
                     setCurrentPage(1);
                     setShowStatusDropdown(false);
                   }}
-                  style={{
-                    padding: "0.625rem 0.875rem",
-                    cursor: "pointer",
-                    fontSize: "0.875rem",
-                    color: "#212529",
-                    textAlign: "left",
-                    transition: "all 0.2s",
-                    background:
-                      statusFilter === option.value ? "#f3f4f6" : "#fff",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "rgb(39, 35, 92)";
-                    e.currentTarget.style.color = "white";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background =
-                      statusFilter === option.value ? "#f3f4f6" : "#fff";
-                    e.currentTarget.style.color = "#212529";
-                  }}
+                  className={getDropdownItemClass(statusFilter, option.value)}
                 >
                   {option.label}
                 </div>
@@ -599,37 +438,13 @@ const ApprovalHistory = () => {
       ) : (
         <>
           <div
-            style={{
-              minHeight: "65vh",
-              opacity: loading ? 0.6 : 1,
-              transition: "opacity 0.2s",
-            }}
+            className={`${styles.tableContainer} ${
+              loading ? styles.tableContainerLoading : ""
+            }`}
           >
-            <div
-              style={{
-                background: "#fff",
-                borderRadius: "12px",
-                overflow: "hidden",
-                minWidth: 0,
-              boxShadow: "0 4px 12px rgba(0,0,0,0.12)"
-              }}
-            >
+            <div className={styles.tableWrapper}>
               {/* Table Header */}
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns:
-                    "1.2fr 1fr 1.2fr 1.2fr 0.9fr 0.8fr 0.8fr 0.8fr",
-                  background: "rgb(39, 35, 92)",
-                  borderBottom: "2px solid #abb4c5ff",
-                  fontWeight: 600,
-                  color: "white",
-                  fontsize: "0.875rem",
-                  padding: "1rem 1.5rem",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.025em",
-                }}
-              >
+              <div className={styles.tableHeader}>
                 {[
                   { label: "Request Type", field: "approvalType" },
                   { label: "Skill", field: "skillName" },
@@ -637,154 +452,65 @@ const ApprovalHistory = () => {
                   { label: "Assigned To", field: "approverName" },
                   { label: "Status", field: "status" },
                   { label: "Date", field: "requestedOn" },
-                  { label: "Attachment" },
-                  { label: "Comments" },
+                  { label: "Attachment", field: null },
+                  { label: "Comments", field: null },
                 ].map(({ label, field }) => (
                   <div
                     key={field || label}
                     onClick={() => field && onSortClick(field)}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 4,
-                      userSelect: "none",
-                      cursor: field ? "pointer" : "default",
-                      textAlign: "center",
-                      transition: "color 0.2s",
-                      color: "white",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (field) e.currentTarget.style.color = "lightpink";
-                    }}
-                    onMouseLeave={(e) => {
-                      if (field && sortField !== field) {
-                        e.currentTarget.style.color = "white";
-                      }
-                    }}
+                    className={getHeaderCellClass(field)}
                   >
                     {label}
                     {field && renderSortIcon(field)}
                   </div>
                 ))}
               </div>
+
               {/* Table Rows */}
               {approvals.map((approval, idx) => (
                 <div key={approval.approvalId}>
                   <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns:
-                        "1.2fr 1fr 1.2fr 1.2fr 0.9fr 1fr 0.8fr 0.8fr",
-                      alignItems: "center",
-                      fontSize: "0.875rem",
-                      color: "#212529",
-                      padding: "1rem 1.5rem",
-                      borderBottom:
-                        idx < approvals.length - 1
-                          ? "1px solid #f3f4f6"
-                          : "none",
-                      background: "#fff",
-                      transition: "background 0.2s",
-                      textAlign: "start",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = "#f9fafb";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = "#fff";
-                    }}
+                    className={`${styles.tableRow} ${
+                      idx < approvals.length - 1 ? styles.tableRowBorder : ""
+                    }`}
                   >
-                    <div style={{ fontWeight: "500", paddingLeft: "5px" }}>
+                    <div className={styles.cellRequestType}>
                       {getApprovalTypeLabel(approval.approvalType)}
                     </div>
-                    <div style={{ color: "#6b7280" }}>
+                    <div className={styles.cellSkill}>
                       {approval.skillName || "None"}
                     </div>
-                    <div
-                      style={{
-                        fontWeight: 600,
-                        textOverflow: "ellipsis",
-                        overflow: "hidden",
-                        whiteSpace: "nowrap",
-                      }}
-                      title={approval.requesterName}
-                    >
+                    <div className={styles.cellName} title={approval.requesterName}>
                       {approval.requesterName}
                     </div>
-                    <div
-                      style={{
-                        fontWeight: 600,
-                        textOverflow: "ellipsis",
-                        overflow: "hidden",
-                        whiteSpace: "nowrap",
-                      }}
-                      title={approval.approverName}
-                    >
+                    <div className={styles.cellName} title={approval.approverName}>
                       {approval.approverName || "None"}
                     </div>
                     <div>
                       <StatusBadge status={approval.status} />
                     </div>
-                    <div style={{ color: "#6b7280", paddingLeft: "20px" }}>
+                    <div className={styles.cellDate}>
                       {approval.requestedOn
                         ? new Date(approval.requestedOn).toLocaleDateString()
                         : "None"}
                     </div>
-                    <div style={{ textAlign: "left" }}>
+                    <div className={styles.cellAttachment}>
                       {approval.attachmentPath ? (
                         <button
                           onClick={() => handleDownload(approval)}
                           title="Download Attachment"
-                          style={{
-                            padding: "0.4rem 0.75rem",
-                            background: "#fff",
-                            border: "1px solid #97247E",
-                            color: "#97247E",
-                            borderRadius: "8px",
-                            fontSize: "0.85rem",
-                            fontWeight: "600",
-                            cursor: "pointer",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: "0.25rem",
-                            transition: "all 0.2s",
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.borderColor = "white";
-                            e.currentTarget.style.backgroundColor =
-                              "rgb(39, 35, 92)";
-                            e.currentTarget.style.color = "white";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.borderColor = "#97247E";
-                            e.currentTarget.style.backgroundColor = "white";
-                            e.currentTarget.style.color = "#97247E";
-                          }}
+                          className={styles.downloadButton}
                         >
                           <Download size={15} />
                         </button>
                       ) : (
-                        <span
-                          style={{
-                            fontSize: "0.75rem",
-                            color: "#9ca3af",
-                          }}
-                        >
-                          None
-                        </span>
+                        <span className={styles.cellNone}>None</span>
                       )}
                     </div>
 
-                    <div style={{ textAlign: "left" }}>
+                    <div className={styles.cellComments}>
                       {approval.approvalType === "SME_REQUEST" ? (
-                        <span
-                          style={{
-                            fontSize: "0.75rem",
-                            color: "#9ca3af",
-                          }}
-                        >
-                          None
-                        </span>
+                        <span className={styles.cellNone}>None</span>
                       ) : approval.notes ? (
                         <button
                           onClick={() =>
@@ -793,67 +519,35 @@ const ApprovalHistory = () => {
                               [approval.approvalId]: !prev[approval.approvalId],
                             }))
                           }
-                          style={{
-                            background: "transparent",
-                            border: "none",
-                            color: "#97247E",
-                            cursor: "pointer",
-                            fontWeight: "600",
-                            fontSize: "0.875rem",
-                            textDecoration: expandedNotes?.[approval.approvalId]
-                              ? "underline"
-                              : "none",
-                            padding: "0.25rem 0.5rem",
-                          }}
+                          className={`${styles.commentsButton} ${
+                            expandedNotes?.[approval.approvalId]
+                              ? styles.commentsButtonExpanded
+                              : ""
+                          }`}
                           title={
                             expandedNotes?.[approval.approvalId]
                               ? "Hide comments"
                               : "Show comments"
                           }
                         >
-                          {expandedNotes?.[approval.approvalId]
-                            ? "Hide"
-                            : "View"}
+                          {expandedNotes?.[approval.approvalId] ? "Hide" : "View"}
                         </button>
                       ) : (
-                        <span
-                          style={{
-                            fontSize: "0.75rem",
-                            color: "#9ca3af",
-                          }}
-                        >
-                          None
-                        </span>
+                        <span className={styles.cellNone}>None</span>
                       )}
                     </div>
                   </div>
+
                   {/* Expanded notes */}
                   {approval.approvalType !== "SME_REQUEST" &&
                     expandedNotes?.[approval.approvalId] &&
                     approval.notes && (
                       <div
-                        style={{
-                          padding: "1rem 1.5rem",
-                          background: "#f9fafb",
-                          fontSize: "0.875rem",
-                          color: "#4b5563",
-                          whiteSpace: "pre-wrap",
-                          borderBottom:
-                            idx < approvals.length - 1
-                              ? "1px solid #e5e7eb"
-                              : "none",
-                          borderLeft: "3px solid #97247E",
-                          marginLeft: "1.5rem",
-                          textAlign: "left",
-                        }}
+                        className={`${styles.expandedNotes} ${
+                          idx < approvals.length - 1 ? styles.expandedNotesBorder : ""
+                        }`}
                       >
-                        <strong
-                          style={{
-                            color: "#374151",
-                            display: "block",
-                            marginBottom: "0.5rem",
-                          }}
-                        >
+                        <strong className={styles.expandedNotesLabel}>
                           Approver Comments:
                         </strong>
                         {approval.notes}
@@ -864,7 +558,7 @@ const ApprovalHistory = () => {
             </div>
           </div>
 
-          {/* Updated Pagination with new props */}
+          {/* Pagination */}
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}

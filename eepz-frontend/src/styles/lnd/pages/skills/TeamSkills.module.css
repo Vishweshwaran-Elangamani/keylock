@@ -1,0 +1,115 @@
+/* TeamSkills.module.css */
+
+/* Loading Container */
+.loadingContainer {
+  text-align: center;
+  padding: 3rem;
+}
+
+/* Search Section */
+.searchSection {
+  margin-bottom: 1.5rem;
+}
+
+.searchWrapper {
+  width: 100%;
+  max-width: 400px;
+}
+
+.searchInput {
+  min-height: 35.7px;
+}
+
+/* Content Container */
+.contentContainer {
+  min-height: 65vh;
+  transition: opacity 0.2s;
+}
+
+.contentContainerLoading {
+  opacity: 0.6;
+}
+
+/* Employee Grid */
+.employeeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+/* Employee Card */
+.employeeCard {
+  background: #fff;
+  border: 1px solid rgba(39, 35, 92, 0.5);
+  border-radius: 12px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.employeeCard:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: #97247E;
+  transform: translateY(-2px);
+}
+
+/* Card Content */
+.cardContent {
+  flex: 1;
+}
+
+.employeeHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: left;
+  margin-bottom: 0.5rem;
+}
+
+/* Employee Avatar */
+.employeeAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: rgb(39, 35, 92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+
+
+.employeeName {
+  margin: 0;
+  font-weight: 600;
+  color: #212529;
+  font-size: 1rem;
+}
+
+.employeeEmail {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+/* Department Badge */
+.departmentBadge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: #f3f4f6;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  color: #4b5563;
+  font-weight: 500;
+  margin-top: 0.5rem;
+}
+
+/* Chevron Icon */
+.chevronIcon {
+  color: #97247E;
+}

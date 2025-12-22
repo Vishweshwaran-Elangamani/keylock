@@ -1,0 +1,252 @@
+/* SmeAssignments.module.css */
+
+/* Loading Container */
+.loadingContainer {
+  text-align: center;
+  padding: 3rem;
+}
+
+/* Filters Container */
+.filterContainer {
+  margin-bottom: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.searchForm {
+  display: flex;
+  gap: 0.5rem;
+  flex-grow: 1;
+  min-width: 250px;
+}
+
+.searchInput {
+  min-height: 35.7px;
+}
+
+.statusSelect {
+  padding: 0.625rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  outline: none;
+  cursor: pointer;
+  background: #fff;
+  min-width: 180px;
+}
+
+/* Table Container */
+.tableContainer {
+  min-height: 65vh;
+  transition: opacity 0.2s;
+}
+
+.tableContainerLoading {
+  opacity: 0.6;
+}
+
+.tableWrapper {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  min-width: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* Table Header */
+.tableHeader {
+  display: grid;
+  grid-template-columns: 1.5fr 1.3fr 1.2fr 1fr 1fr 0.7fr 0.7fr 0.8fr;
+  background: rgb(39, 35, 92);
+  border-bottom: 2px solid #abb4c5ff;
+  font-weight: 600;
+  color: white;
+  font-size: 0.875rem;
+  padding: 1rem 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  align-items: center;
+}
+
+.tableHeaderCell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  -webkit-user-select: none;
+  user-select: none;
+  transition: color 0.2s;
+  color: white;
+}
+
+.tableHeaderCellLeft {
+  justify-content: flex-start;
+}
+
+.tableHeaderCellCenter {
+  justify-content: center;
+}
+
+.tableHeaderCellSortable {
+  cursor: pointer;
+}
+
+.tableHeaderCellSortable:hover {
+  color: lightpink;
+}
+
+.tableHeaderCellActive {
+  color: lightpink;
+}
+
+/* Sort Icons */
+.sortIcon {
+  margin-left: 4px;
+}
+
+.sortIconInactive {
+  opacity: 0.5;
+  color: white;
+}
+
+.sortIconActive {
+  color: lightpink;
+  font-weight: bold;
+}
+
+/* Table Row */
+.tableRow {
+  display: grid;
+  grid-template-columns: 1.5fr 1.3fr 1.2fr 1fr 1fr 0.7fr 0.7fr 0.8fr;
+  align-items: center;
+  font-size: 0.875rem;
+  color: #212529;
+  padding: 1rem 1.5rem;
+  background: #fff;
+  transition: background 0.2s;
+}
+
+.tableRow:hover {
+  background: #f9fafb;
+}
+
+.tableRowBorder {
+  border-bottom: 1px solid #f3f4f6;
+}
+
+/* Cell Styles */
+.cellMenteeName {
+  font-weight: 600;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.cellSkillName {
+  font-weight: 500;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.cellStatus {
+  display: flex;
+  justify-content: center;
+}
+
+.cellDate {
+  text-align: left;
+  color: #6b7280;
+}
+
+.cellDateOverdue {
+  text-align: left;
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.overdueIcon {
+  margin-right: 0.25rem;
+  color: #dc2626;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.cellScore {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 600;
+  color: #198754;
+}
+
+.cellCenter {
+  text-align: center;
+}
+
+.cellNone {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+/* Download Button */
+.downloadButton {
+  padding: 0.4rem 0.75rem;
+  background: #fff;
+  border: 1px solid #97247E;
+  color: #97247E;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: all 0.2s;
+}
+
+.downloadButton:hover {
+  border-color: white;
+  background-color: rgb(39, 35, 92);
+  color: white;
+}
+
+/* Comments Button */
+.commentsButton {
+  background: transparent;
+  border: none;
+  color: #97247E;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.commentsButtonExpanded {
+  text-decoration: underline;
+}
+
+/* Expanded Notes */
+.expandedNotes {
+  padding: 1rem 1.5rem;
+  background: #f9fafb;
+  font-size: 0.875rem;
+  color: #4b5563;
+  white-space: pre-wrap;
+  text-align: left;
+  border-left: 3px solid #97247E;
+  margin-left: 1.5rem;
+}
+
+.expandedNotesBorder {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.notesLabel {
+  color: #374151;
+  display: block;
+  margin-bottom: 0.5rem;
+}

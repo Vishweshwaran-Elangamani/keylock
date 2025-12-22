@@ -10,6 +10,7 @@ import {
   APPROVAL_TYPE,
   APPROVAL_STATUS,
 } from "../../../constants/lnd/lndConstants";
+import styles from "../../../styles/lnd/pages/skills/MySkills.module.css";
 
 const MySkills = () => {
   const [skills, setSkills] = useState([]);
@@ -69,11 +70,11 @@ const MySkills = () => {
     try {
       setLoading(true);
       const response = await lndService.getMySkills(
-        currentPage, // pageNumber
-        searchTerm, // searchTerm
-        sortField, // sortField
-        sortOrderAsc ? "asc" : "desc", // sortOrder
-        itemsPerPage // pageSize
+        currentPage,
+        searchTerm,
+        sortField,
+        sortOrderAsc ? "asc" : "desc",
+        itemsPerPage
       );
 
       if (response.data.success) {
@@ -164,6 +165,12 @@ const MySkills = () => {
     return "#198754";
   };
 
+  const getRatingClass = (rating) => {
+    if (rating < 5) return styles.ratingLow;
+    if (rating < 8) return styles.ratingMedium;
+    return styles.ratingHigh;
+  };
+
   const onSortClick = (field) => {
     if (sortField === field) {
       setSortOrderAsc(!sortOrderAsc);
@@ -175,42 +182,30 @@ const MySkills = () => {
   };
 
   const renderSortIcon = (field) => {
-    if (sortField !== field) {
-      return (
-        <ChevronUp
-          size={14}
-          style={{
-            marginLeft: 4,
-            opacity: 0.5,
-            color: "white",
-          }}
-        />
-      );
+    const isActive = sortField === field;
+    const iconClass = isActive ? styles.sortIconActive : styles.sortIconInactive;
+
+    if (!isActive) {
+      return <ChevronUp size={14} className={`${styles.sortIcon} ${iconClass}`} />;
     }
     return sortOrderAsc ? (
-      <ChevronUp
-        size={14}
-        style={{
-          marginLeft: 4,
-          color: "lightpink",
-          fontWeight: "bold",
-        }}
-      />
+      <ChevronUp size={14} className={`${styles.sortIcon} ${iconClass}`} />
     ) : (
-      <ChevronDown
-        size={14}
-        style={{
-          marginLeft: 4,
-          color: "lightpink",
-          fontWeight: "bold",
-        }}
-      />
+      <ChevronDown size={14} className={`${styles.sortIcon} ${iconClass}`} />
     );
+  };
+
+  const getHeaderCellClass = (field, align) => {
+    const baseClass = styles.tableHeaderCell;
+    const alignClass = align === "center" ? styles.tableHeaderCellCenter : styles.tableHeaderCellLeft;
+    const sortableClass = field ? styles.tableHeaderCellSortable : "";
+    const activeClass = sortField === field ? styles.tableHeaderCellActive : "";
+    return `${baseClass} ${alignClass} ${sortableClass} ${activeClass}`.trim();
   };
 
   if (loading && skills.length === 0) {
     return (
-      <div style={{ textAlign: "center", padding: "3rem" }}>
+      <div className={styles.loadingContainer}>
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
@@ -233,12 +228,11 @@ const MySkills = () => {
           <div className="input-group">
             <input
               type="text"
-              className="form-control"
+              className={`form-control ${styles.searchInput}`}
               placeholder="Search skills..."
               value={searchInput}
               onChange={handleSearchChange}
               onKeyPress={handleSearchKeyPress}
-              style={{ minHeight: "35.7px" }}
             />
             {searchTerm ? (
               <button
@@ -271,34 +265,12 @@ const MySkills = () => {
       ) : (
         <>
           <div
-            style={{
-              minHeight: "65vh",
-              opacity: loading ? 0.6 : 1,
-              transition: "opacity 0.2s",
-            }}
+            className={`${styles.tableContainer} ${
+              loading ? styles.tableContainerLoading : ""
+            }`}
           >
-            <div
-              style={{
-                background: "#fff",
-                borderRadius: "12px",
-                overflow: "hidden",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.12)"
-              }}
-            >
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "2fr 1.5fr 1fr 1.5fr",
-                  padding: "1rem 1.5rem",
-                  background: "rgb(39, 35, 92)",
-                  borderBottom: "2px solid #abb4c5ff",
-                  fontWeight: 600,
-                  fontsize: "0.875rem",
-                  color: "white",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.025em",
-                }}
-              >
+            <div className={styles.tableWrapper}>
+              <div className={styles.tableHeader}>
                 {[
                   { label: "Skill Name", field: "skillName", align: "left" },
                   { label: "Last Updated", field: "updatedOn", align: "left" },
@@ -308,25 +280,7 @@ const MySkills = () => {
                   <div
                     key={field || label}
                     onClick={() => field && onSortClick(field)}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent:
-                        align === "center" ? "center" : "flex-start",
-                      gap: 4,
-                      userSelect: "none",
-                      cursor: field ? "pointer" : "default",
-                      transition: "color 0.2s",
-                      color: "white",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (field) e.currentTarget.style.color = "lightpink";
-                    }}
-                    onMouseLeave={(e) => {
-                      if (field && sortField !== field) {
-                        e.currentTarget.style.color = "white";
-                      }
-                    }}
+                    className={getHeaderCellClass(field, align)}
                   >
                     {label}
                     {field && renderSortIcon(field)}
@@ -337,62 +291,24 @@ const MySkills = () => {
               {skills.map((skill, index) => (
                 <div
                   key={skill.mapperId}
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "2fr 1.5fr 1fr 1.5fr",
-                    padding: "1rem 1.5rem",
-                    borderBottom:
-                      index < skills.length - 1 ? "1px solid #f3f4f6" : "none",
-                    alignItems: "center",
-                    transition: "background 0.2s",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "#f9fafb";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "#fff";
-                  }}
+                  className={`${styles.tableRow} ${
+                    index < skills.length - 1 ? styles.tableRowBorder : ""
+                  }`}
                 >
-                  <div style={{ textAlign: "left" }}>
-                    <p
-                      style={{
-                        margin: 0,
-                        fontWeight: "600",
-                        color: "#212529",
-                        fontSize: "0.9375rem",
-                      }}
-                    >
-                      {skill.skillName}
-                    </p>
+                  <div className={styles.cellLeft}>
+                    <p className={styles.skillName}>{skill.skillName}</p>
                   </div>
 
-                  <div style={{ textAlign: "left" }}>
-                    <p
-                      style={{
-                        margin: 0,
-                        fontSize: "0.875rem",
-                        color: "#6b7280",
-                      }}
-                    >
+                  <div className={styles.cellLeft}>
+                    <p className={styles.dateText}>
                       {new Date(skill.updatedOn).toLocaleDateString()}
                     </p>
                   </div>
 
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "0.5rem",
-                    }}
-                  >
+                  <div className={styles.proficiencyContainer}>
                     <div
+                      className={`${styles.ratingBadge} ${getRatingClass(skill.rating)}`}
                       style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.25rem",
-                        padding: "0.375rem 0.75rem",
-                        borderRadius: "8px",
                         background: `${getRatingColor(skill.rating)}15`,
                         border: `1px solid ${getRatingColor(skill.rating)}30`,
                       }}
@@ -403,39 +319,17 @@ const MySkills = () => {
                         color={getRatingColor(skill.rating)}
                       />
                       <span
-                        style={{
-                          fontWeight: "700",
-                          fontSize: "0.875rem",
-                          color: getRatingColor(skill.rating),
-                        }}
+                        className={styles.ratingText}
+                        style={{ color: getRatingColor(skill.rating) }}
                       >
                         {skill.rating}/10
                       </span>
                     </div>
                   </div>
 
-                  <div
-                    style={{
-                      textAlign: "center",
-                      display: "flex",
-                      justifyContent: "center",
-                    }}
-                  >
+                  <div className={styles.cellCenter}>
                     {skill.isSme ? (
-                      <span
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "0.25rem",
-                          padding: "0.375rem 0.75rem",
-                          borderRadius: "12px",
-                          fontSize: "0.75rem",
-                          fontWeight: "600",
-                          background: "#d1fae5",
-                          color: "#065f46",
-                          border: "1px solid #065f4620",
-                        }}
-                      >
+                      <span className={styles.smeBadge}>
                         <Award size={12} />
                         SME
                       </span>
@@ -443,75 +337,23 @@ const MySkills = () => {
                       hasPendingSmeRequest(skill.skillId) ? (
                         <button
                           disabled
-                          style={{
-                            padding: "0.375rem 0.5rem",
-                            background: "#f59e0b",
-                            border: "none",
-                            borderRadius: "4px",
-                            color: "#fff",
-                            cursor: "not-allowed",
-                            display: "flex",
-                            alignItems: "center",
-                            fontSize: "0.75rem",
-                            fontWeight: "600",
-                            gap: "0.3rem",
-                            opacity: 0.8,
-                          }}
+                          className={styles.pendingButton}
                           title="SME Activation request is pending approval"
                         >
-                          <i
-                            className="bi bi-hourglass-split"
-                            style={{ fontSize: "12px" }}
-                          ></i>
+                          <i className={`bi bi-hourglass-split ${styles.pendingIcon}`}></i>
                           Pending
                         </button>
                       ) : (
                         <button
                           onClick={() => handleBecomeSme(skill)}
-                          style={{
-                            padding: "0.5rem 1rem",
-                            background:
-                              "linear-gradient(135deg, #AC5098 0%, #97247E 100%)",
-                            color: "#fff",
-                            border: "none",
-                            borderRadius: "8px",
-                            fontSize: "0.8125rem",
-                            fontWeight: "600",
-                            cursor: "pointer",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: "0.375rem",
-                            transition: "all 0.2s",
-                            boxShadow: "0 2px 6px rgba(151, 36, 126, 0.25)",
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.transform =
-                              "translateY(-1px)";
-                            e.currentTarget.style.boxShadow =
-                              "0 4px 10px rgba(151, 36, 126, 0.35)";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = "translateY(0)";
-                            e.currentTarget.style.boxShadow =
-                              "0 2px 6px rgba(151, 36, 126, 0.25)";
-                          }}
+                          className={styles.applyButton}
                         >
                           <Award size={14} />
                           Apply
                         </button>
                       )
                     ) : (
-                      <span
-                        style={{
-                          display: "inline-block",
-                          padding: "0.375rem 0.75rem",
-                          borderRadius: "12px",
-                          fontSize: "0.75rem",
-                          fontWeight: "600",
-                          background: "#f3f4f6",
-                          color: "#6c757d",
-                        }}
-                      >
+                      <span className={styles.notEligibleBadge}>
                         Not Eligible
                       </span>
                     )}
@@ -521,7 +363,6 @@ const MySkills = () => {
             </div>
           </div>
 
-          {/* Updated Pagination with new props */}
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}

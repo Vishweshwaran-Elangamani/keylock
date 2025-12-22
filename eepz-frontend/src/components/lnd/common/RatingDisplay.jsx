@@ -68,17 +68,6 @@ const RatingDisplay = ({ rating, showLabel = true, size = 'md' }) => {
           {rating}/{RATING.MAX}
         </span>
       </div>
-      {/* {showLabel && (
-        <span
-          style={{
-            fontSize: '0.8125rem',
-            color: '#6c757d',
-            fontWeight: '500'
-          }}
-        >
-          {info.label}
-        </span>
-      )} */}
     </div>
   );
 };

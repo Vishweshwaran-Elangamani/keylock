@@ -14,11 +14,11 @@ import EmptyState from "../../../components/lnd/common/EmptyState";
 import { lndService, downloadFile } from "../../../services/lnd/lndService";
 import { ASSIGNMENT_STATUS } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
+import styles from "../../../styles/lnd/pages/hr/OrganizationAssignments.module.css";
 
 const OrganizationAssignments = () => {
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [expandedNotes, setExpandedNotes] = useState({});
   const [exporting, setExporting] = useState(false);
 
   // Search
@@ -157,20 +157,6 @@ const OrganizationAssignments = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleDownloadProof = async (assignment) => {
-    try {
-      const response = await lndService.downloadAssignmentProof(
-        assignment.assignmentId
-      );
-      const filename = `${assignment.menteeName}_${assignment.skillName}_proof.pdf`;
-      downloadFile(response.data, filename);
-      toast.success("File downloaded successfully");
-    } catch (error) {
-      console.error("Failed to download:", error);
-      toast.error("Failed to download proof");
-    }
-  };
-
   const getStatusLabel = (value) => {
     const statusMap = {
       "": "All Statuses",
@@ -209,42 +195,38 @@ const OrganizationAssignments = () => {
   };
 
   const renderSortIcon = (field) => {
-    if (sortField !== field) {
+    const isActive = sortField === field;
+    const iconClass = isActive ? styles.sortIconActive : styles.sortIconInactive;
+
+    if (!isActive) {
       return (
-        <ChevronUp
-          size={14}
-          style={{
-            marginLeft: 4,
-            opacity: 0.5,
-            color: "white",
-          }}
-        />
+        <ChevronUp size={14} className={`${styles.sortIcon} ${iconClass}`} />
       );
     }
     return sortOrderAsc ? (
-      <ChevronUp
-        size={14}
-        style={{
-          marginLeft: 4,
-          color: "lightpink",
-          fontWeight: "bold",
-        }}
-      />
+      <ChevronUp size={14} className={`${styles.sortIcon} ${iconClass}`} />
     ) : (
-      <ChevronDown
-        size={14}
-        style={{
-          marginLeft: 4,
-          color: "lightpink",
-          fontWeight: "bold",
-        }}
-      />
+      <ChevronDown size={14} className={`${styles.sortIcon} ${iconClass}`} />
     );
+  };
+
+  const getHeaderCellClass = (field, align) => {
+    const baseClass = styles.tableHeaderCell;
+    const alignClass = align === "center" ? styles.tableHeaderCellCenter : styles.tableHeaderCellLeft;
+    const sortableClass = field ? styles.tableHeaderCellSortable : "";
+    const activeClass = sortField === field ? styles.tableHeaderCellActive : "";
+    return `${baseClass} ${alignClass} ${sortableClass} ${activeClass}`.trim();
+  };
+
+  const getDropdownItemClass = (currentValue, optionValue) => {
+    return `${styles.dropdownItem} ${
+      currentValue === optionValue ? styles.dropdownItemActive : ""
+    }`.trim();
   };
 
   if (loading && assignments.length === 0) {
     return (
-      <div style={{ textAlign: "center", padding: "3rem" }}>
+      <div className={styles.loadingContainer}>
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
@@ -262,43 +244,17 @@ const OrganizationAssignments = () => {
         ]}
       />
 
-      <div
-        style={{
-          marginBottom: "1.5rem",
-          display: "flex",
-          gap: "1rem",
-          flexWrap: "wrap",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            gap: "1rem",
-            flexWrap: "wrap",
-            alignItems: "center",
-            flexGrow: 1,
-          }}
-        >
-          <form
-            onSubmit={handleSearchSubmit}
-            style={{
-              display: "flex",
-              gap: "0.5rem",
-              flexGrow: 1,
-              minWidth: 250,
-            }}
-          >
+      <div className={styles.actionBar}>
+        <div className={styles.filterGroup}>
+          <form onSubmit={handleSearchSubmit} className={styles.searchForm}>
             <div className="input-group">
               <input
                 type="text"
-                className="form-control"
+                className={`form-control ${styles.searchInput}`}
                 placeholder="Search by employee or skill..."
                 value={searchInput}
                 onChange={handleSearchInputChange}
                 onKeyPress={handleKeyPress}
-                style={{ minHeight: "35.7px" }}
               />
               {searchTerm ? (
                 <button
@@ -319,50 +275,22 @@ const OrganizationAssignments = () => {
           </form>
 
           {/* STATUS FILTER DROPDOWN */}
-          <div ref={statusDropdownRef} style={{ position: "relative" }}>
+          <div ref={statusDropdownRef} className={styles.dropdownWrapper}>
             <button
               type="button"
               onClick={() => setShowStatusDropdown(!showStatusDropdown)}
-              style={{
-                padding: "0.5rem 0.875rem",
-                border: "none",
-                borderRadius: "8px",
-                fontSize: "0.875rem",
-                cursor: "pointer",
-                background: "#fff",
-                color: "black",
-                minWidth: "180px",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                fontWeight: "500",
-                transition: "all 0.2s",
-              }}
+              className={styles.dropdownButton}
             >
               <span>{getStatusLabel(statusFilter)}</span>
               <i
                 className={`bi bi-chevron-${
                   showStatusDropdown ? "up" : "down"
-                }`}
-                style={{ fontSize: "0.75rem", marginLeft: "0.5rem" }}
+                } ${styles.dropdownIcon}`}
               ></i>
             </button>
 
             {showStatusDropdown && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: "calc(100% + 4px)",
-                  left: 0,
-                  minWidth: "180px",
-                  background: "#fff",
-                  border: "1px solid #e5e7eb",
-                  borderRadius: "8px",
-                  zIndex: 1000,
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                  overflow: "hidden",
-                }}
-              >
+              <div className={styles.dropdownMenu}>
                 {statusOptions.map((option) => (
                   <div
                     key={option.value}
@@ -371,25 +299,7 @@ const OrganizationAssignments = () => {
                       setCurrentPage(1);
                       setShowStatusDropdown(false);
                     }}
-                    style={{
-                      padding: "0.625rem 0.875rem",
-                      cursor: "pointer",
-                      fontSize: "0.875rem",
-                      color: "#212529",
-                      textAlign: "left",
-                      transition: "all 0.2s",
-                      background:
-                        statusFilter === option.value ? "#f3f4f6" : "#fff",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = "rgb(39, 35, 92)";
-                      e.currentTarget.style.color = "white";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background =
-                        statusFilter === option.value ? "#f3f4f6" : "#fff";
-                      e.currentTarget.style.color = "#212529";
-                    }}
+                    className={getDropdownItemClass(statusFilter, option.value)}
                   >
                     {option.label}
                   </div>
@@ -402,16 +312,7 @@ const OrganizationAssignments = () => {
         <button
           onClick={handleExportToExcel}
           disabled={exporting || assignments.length === 0}
-          className="btn btn-success"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0.5rem",
-            padding: "0.625rem 1.25rem",
-            fontSize: "0.875rem",
-            fontWeight: 500,
-            whiteSpace: "nowrap",
-          }}
+          className={`btn btn-success ${styles.exportButton}`}
         >
           {exporting ? (
             <>
@@ -444,37 +345,12 @@ const OrganizationAssignments = () => {
       ) : (
         <>
           <div
-            style={{
-              minHeight: "65vh",
-              opacity: loading ? 0.6 : 1,
-              transition: "opacity 0.2s",
-            }}
+            className={`${styles.tableContainer} ${
+              loading ? styles.tableContainerLoading : ""
+            }`}
           >
-            <div
-              style={{
-                background: "#fff",
-                borderRadius: "12px",
-                overflow: "hidden",
-                minWidth: 0,
-                boxShadow: "0 4px 12px rgba(0,0,0,0.12)"
-              }}
-            >
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns:
-                    "1.5fr 1.5fr 1fr 1.6fr 1.1fr 1.1fr 0.8fr",
-                  background: "rgb(39, 35, 92)",
-                  borderBottom: "2px solid #abb4c5ff",
-                  fontWeight: 600,
-                  color: "white",
-                  fontSize: "14px",
-                  padding: "1rem 1.5rem",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.025em",
-                  alignItems: "center",
-                }}
-              >
+            <div className={styles.tableWrapper}>
+              <div className={`${styles.tableHeader} ${styles.gridLayout}`}>
                 {[
                   {
                     label: "Employee Name",
@@ -499,25 +375,7 @@ const OrganizationAssignments = () => {
                   <div
                     key={field || label}
                     onClick={() => field && onSortClick(field)}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent:
-                        align === "center" ? "center" : "flex-start",
-                      gap: 4,
-                      userSelect: "none",
-                      cursor: field ? "pointer" : "default",
-                      transition: "color 0.2s",
-                      color: "white",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (field) e.currentTarget.style.color = "lightpink";
-                    }}
-                    onMouseLeave={(e) => {
-                      if (field && sortField !== field) {
-                        e.currentTarget.style.color = "white";
-                      }
-                    }}
+                    className={getHeaderCellClass(field, align)}
                   >
                     {label}
                     {field && renderSortIcon(field)}
@@ -528,133 +386,59 @@ const OrganizationAssignments = () => {
               {assignments.map((assignment, idx) => (
                 <div key={assignment.assignmentId}>
                   <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns:
-                        "1.5fr 1.5fr 1fr 1.6fr 1.1fr 1.1fr 0.8fr",
-                      alignItems: "center",
-                      fontSize: "0.875rem",
-                      color: "#212529",
-                      padding: "1rem 1.5rem",
-                      borderBottom:
-                        idx < assignments.length - 1
-                          ? "1px solid #f3f4f6"
-                          : "none",
-                      background: "#fff",
-                      transition: "background 0.2s",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = "#f9fafb";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = "#fff";
-                    }}
+                    className={`${styles.tableRow} ${styles.gridLayout} ${
+                      idx < assignments.length - 1 ? styles.tableRowBorder : ""
+                    }`}
                   >
                     {/* Employee Name */}
-                    <div
-                      style={{
-                        fontWeight: 600,
-                        textOverflow: "ellipsis",
-                        overflow: "hidden",
-                        whiteSpace: "nowrap",
-                        textAlign: "left",
-                      }}
-                      title={assignment.menteeName}
-                    >
+                    <div className={styles.cellName} title={assignment.menteeName}>
                       {assignment.menteeName}
                     </div>
 
                     {/* Skill Name */}
-                    <div
-                      style={{
-                        fontWeight: 500,
-                        textOverflow: "ellipsis",
-                        overflow: "hidden",
-                        whiteSpace: "nowrap",
-                        textAlign: "left",
-                      }}
-                      title={assignment.skillName}
-                    >
+                    <div className={styles.cellText} title={assignment.skillName}>
                       {assignment.skillName}
                     </div>
 
                     {/* SME Assigned */}
-                    <div
-                      style={{
-                        fontWeight: 500,
-                        textOverflow: "ellipsis",
-                        overflow: "hidden",
-                        whiteSpace: "nowrap",
-                        textAlign: "left",
-                        color: "#6b7280",
-                      }}
-                      title={assignment.smeName}
-                    >
+                    <div className={`${styles.cellText} ${styles.cellSme}`} title={assignment.smeName}>
                       {assignment.smeName}
                     </div>
 
                     {/* Assignment Status */}
-                    <div style={{ display: "flex", justifyContent: "center" }}>
+                    <div className={styles.cellStatus}>
                       <StatusBadge status={assignment.status} />
                     </div>
 
                     {/* Start Date */}
-                    <div style={{ textAlign: "left", color: "#6b7280" }}>
+                    <div className={styles.cellDate}>
                       {assignment.createdOn ? (
                         new Date(assignment.createdOn).toLocaleDateString()
                       ) : (
-                        <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
-                          None
-                        </span>
+                        <span className={styles.cellNone}>None</span>
                       )}
                     </div>
 
                     {/* Due Date */}
-                    <div
-                      style={{
-                        textAlign: "left",
-                        color: assignment.isOverdue ? "#DC2626" : "#6b7280",
-                        fontWeight: assignment.isOverdue ? "600" : "normal",
-                      }}
-                    >
+                    <div className={assignment.isOverdue ? styles.cellDateOverdue : styles.cellDate}>
                       {assignment.deadline ? (
                         <>
                           {assignment.isOverdue && (
-                            <AlertTriangle
-                              size={14}
-                              style={{
-                                marginRight: "0.25rem",
-                                color: "#DC2626",
-                                display: "inline-block",
-                                verticalAlign: "middle",
-                              }}
-                            />
+                            <AlertTriangle size={14} className={styles.overdueIcon} />
                           )}
                           {new Date(assignment.deadline).toLocaleDateString()}
                         </>
                       ) : (
-                        <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
-                          None
-                        </span>
+                        <span className={styles.cellNone}>None</span>
                       )}
                     </div>
 
                     {/* Score */}
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        fontWeight: 600,
-                        color: "#198754",
-                      }}
-                    >
+                    <div className={styles.cellScore}>
                       {assignment.completionRating ? (
                         `${assignment.completionRating}/10`
                       ) : (
-                        <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
-                          None
-                        </span>
+                        <span className={styles.cellNone}>None</span>
                       )}
                     </div>
                   </div>

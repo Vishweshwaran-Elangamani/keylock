@@ -1,0 +1,99 @@
+/* GoalsDashboard.module.css */
+
+/* Summary Section Layout */
+.summarySection {
+  flex: 1;
+}
+
+.actionButtonsContainer {
+  min-width: 180px;
+}
+
+/* Action Buttons */
+.createGoalButton {
+  background: linear-gradient(90deg, #97247E 0%, #E01950 100%);
+  white-space: nowrap;
+  height: 55px;
+  border: none;
+}
+
+.createGoalButton:hover {
+  background: linear-gradient(90deg, #7a1d68 0%, #c01545 100%);
+}
+
+.viewGoalsButton {
+  background-color: rgb(39, 35, 92);
+  color: white;
+  white-space: nowrap;
+  height: 50px;
+  border: none;
+}
+
+.viewGoalsButton:hover {
+  background-color: rgb(30, 27, 75);
+  color: white;
+}
+
+/* Section Header */
+.sectionTitle {
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.sectionIcon {
+  color: #0d6efd;
+}
+
+.goalCount {
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+
+/* Loading State */
+.loadingContainer {
+  text-align: center;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+.loadingText {
+  margin-top: 1rem;
+}
+
+/* Empty State */
+.emptyStateCard {
+  padding: 3rem;
+  background-color: #f8f9fa;
+}
+
+.emptyStateIcon {
+  font-size: 4rem;
+  color: #dee2e6;
+}
+
+.emptyStateTitle {
+  color: #6c757d;
+}
+
+/* Goals Grid Container */
+.goalsContainer {
+  display: flex;
+  flex-direction: column;
+  min-height: 60vh;
+}
+
+.goalsContent {
+  flex-grow: 1;
+}
+
+/* Sticky Pagination */
+.stickyPagination {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #ddd;
+  z-index: 1000;
+}

@@ -9,8 +9,8 @@ import {
   getInitials,
   getRelativeTime,
 } from "../../../utils/goals/goalHelpers";
+import styles from "../../../styles/goals/components/GoalComments.module.css";
 
-// Added goal prop
 const GoalComments = ({
   goalId,
   goal,
@@ -30,7 +30,6 @@ const GoalComments = ({
 
   const MAX_CHARS = 1000;
 
-  // Check if DeptHead can comment on team goals
   const isManagerOrDeptHead =
     user.role === "Manager" || user.role === "Department Head";
   const isCreator = goal?.createdByEmployeeMasterId === user.empMasterId;
@@ -39,7 +38,6 @@ const GoalComments = ({
   );
   const isTeamGoal = goal?.goalType === "team";
 
-  // DeptHead can comment even if not creator/assignee
   const isDeptHeadMonitoring =
     isManagerOrDeptHead && isTeamGoal && !isCreator && !isAssignee;
   const effectiveCanComment = canComment || isDeptHeadMonitoring;
@@ -110,19 +108,16 @@ const GoalComments = ({
     }
   };
 
-  // Check if goal is completed
   const isCompleted = ["completed", "closed", "cancelled"].includes(
     goalStatus?.toLowerCase()
   );
 
-  // Filter comments
   const filteredComments = comments.filter((comment) => {
     if (filter === "mine") return comment.commentedByName === user.name;
     if (filter === "others") return comment.commentedByName !== user.name;
     return true;
   });
 
-  // Sort comments
   const sortedComments = [...filteredComments].sort((a, b) => {
     const dateA = new Date(a.commentedOn);
     const dateB = new Date(b.commentedOn);
@@ -139,29 +134,15 @@ const GoalComments = ({
         />
       )}
 
-      {/* Comment Input - Show if user has permission AND goal not completed */}
       {effectiveCanComment && !isCompleted && (
-        <div
-          className="card mb-4"
-          style={{ border: "1px solid rgb(39, 35, 92, 0.5)", borderRadius: "12px" }}
-        >
-          <div className="card-body" style={{ padding: "10px", }}>
-            <h6
-              style={{
-                fontWeight: 600,
-                fontSize: "16px",
-                marginBottom: "1rem",
-              }}
-            >
-              <i
-                className="bi bi-chat-dots me-2"
-                style={{ color: "rgb(39, 35, 92)" }}
-              ></i>
+        <div className={`card mb-4 ${styles.inputCard}`}>
+          <div className={styles.inputCardBody}>
+            <h6 className={styles.inputHeader}>
+              <i className="bi bi-chat-dots me-2"></i>
               Add Comment
               {isDeptHeadMonitoring && (
                 <span
-                  className="badge bg-info ms-2"
-                  style={{ fontSize: "0.7rem" }}
+                  className={`badge bg-info ms-2 ${styles.monitoringBadge}`}
                 >
                   <i className="bi bi-eye me-1"></i>
                   Monitoring
@@ -170,27 +151,21 @@ const GoalComments = ({
             </h6>
             <form onSubmit={handleSubmitClick}>
               <textarea
-                className="form-control mb-4"
+                className={`form-control mb-4 ${styles.commentTextarea}`}
                 rows="4"
                 placeholder="Share your thoughts, updates, or questions... (Ctrl+Enter to post)"
                 value={newComment}
                 onChange={handleCommentChange}
                 onKeyDown={handleKeyDown}
                 disabled={submitting}
-                style={{
-                  border: "1px solid rgb(39, 35, 92, 0.5)",
-                  resize: "vertical",
-                  fontSize: "14px",
-                }}
               />
               <div className="d-flex justify-content-between align-items-center">
                 <small
-                  className={
+                  className={`${
                     characterCount > MAX_CHARS * 0.9
                       ? "text-danger"
                       : "text-muted"
-                  }
-                  style={{ fontSize: "12px" }}
+                  } ${styles.characterCount}`}
                 >
                   <i className="bi bi-keyboard me-1"></i>
                   {characterCount}/{MAX_CHARS} characters
@@ -206,7 +181,8 @@ const GoalComments = ({
                   className="btn btn-primary"
                   disabled={submitting || !newComment.trim()}
                   style={{
-                    background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)"
+                    background:
+                      "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
                   }}
                 >
                   {submitting ? (
@@ -227,31 +203,19 @@ const GoalComments = ({
         </div>
       )}
 
-      {/* Comments List */}
-      <div
-        className="card"
-        style={{ border: "1px solid rgb(39, 35, 92, 0.5)", borderRadius: "12px" }}
-      >
+      <div className={`card ${styles.commentsCard}`}>
         <div
-          className="goal-card-header d-flex justify-content-between align-items-center flex-wrap gap-2"
-          style={{ backgroundColor: "#f8f9fa", padding: "1rem 1.25rem" }}
+          className={`goal-card-header d-flex justify-content-between align-items-center flex-wrap gap-2 ${styles.commentsHeader}`}
         >
-          <h6 className="mb-0" style={{ fontWeight: 600, fontSize: "16px" }}>
-            <i
-              className="bi bi-chat-left-text me-2"
-              style={{ color: "rgb(39, 35, 92)" }}
-            ></i>
+          <h6 className={`mb-0 ${styles.commentsTitle}`}>
+            <i className="bi bi-chat-left-text me-2"></i>
             Comments
-            <span
-              className="badge bg-secondary ms-2"
-              style={{ fontSize: "0.75rem" }}
-            >
+            <span className={`badge bg-secondary ms-2 ${styles.commentsCount}`}>
               {sortedComments.length}
             </span>
             {isCompleted && (
               <span
-                className="badge bg-secondary text-white ms-2"
-                style={{ fontSize: "0.7rem" }}
+                className={`badge bg-secondary text-white ms-2 ${styles.viewOnlyBadge}`}
               >
                 <i className="bi bi-eye me-1"></i>
                 View Only
@@ -260,15 +224,13 @@ const GoalComments = ({
           </h6>
 
           <div className="d-flex gap-2 align-items-center flex-wrap">
-            {/* Filter Buttons */}
             <div className="btn-group btn-group-sm" role="group">
               <button
                 type="button"
                 className={`btn ${
                   filter === "all" ? "btn-primary" : "btn-outline-secondary"
-                }`}
+                } ${styles.filterBtn}`}
                 onClick={() => setFilter("all")}
-                style={{ fontSize: "12px", padding: "0.25rem 0.75rem" }}
               >
                 <i className="bi bi-people me-1"></i>
                 All
@@ -277,9 +239,8 @@ const GoalComments = ({
                 type="button"
                 className={`btn ${
                   filter === "mine" ? "btn-primary" : "btn-outline-secondary"
-                }`}
+                } ${styles.filterBtn}`}
                 onClick={() => setFilter("mine")}
-                style={{ fontSize: "12px", padding: "0.25rem 0.75rem" }}
               >
                 <i className="bi bi-person me-1"></i>
                 Mine
@@ -288,22 +249,19 @@ const GoalComments = ({
                 type="button"
                 className={`btn ${
                   filter === "others" ? "btn-primary" : "btn-outline-secondary"
-                }`}
+                } ${styles.filterBtn}`}
                 onClick={() => setFilter("others")}
-                style={{ fontSize: "12px", padding: "0.25rem 0.75rem" }}
               >
                 <i className="bi bi-person-dash me-1"></i>
                 Others
               </button>
             </div>
 
-            {/* Sort Toggle */}
             <button
-              className="btn btn-sm btn-primary"
+              className={`btn btn-sm btn-primary ${styles.sortBtn}`}
               onClick={() =>
                 setSortOrder(sortOrder === "desc" ? "asc" : "desc")
               }
-              style={{ fontSize: "14px" }}
               title={sortOrder === "desc" ? "Newest First" : "Oldest First"}
             >
               <i
@@ -315,24 +273,15 @@ const GoalComments = ({
           </div>
         </div>
 
-        {/* Comments List Body */}
-        <div
-          className="card-body"
-          style={{ padding: 0, maxHeight: "600px", overflowY: "auto" }}
-        >
+        <div className={`card-body ${styles.commentsListBody}`}>
           {loading ? (
-            <div style={{ padding: "3rem" }}>
+            <div className={styles.loadingState}>
               <LoadingSpinner text="Loading comments..." />
             </div>
           ) : sortedComments.length === 0 ? (
-            <div
-              style={{ padding: "3rem", textAlign: "center", color: "#6c757d" }}
-            >
-              <i
-                className="bi bi-chat-quote"
-                style={{ fontSize: "4rem", opacity: 0.2 }}
-              ></i>
-              <p className="mt-3 mb-1" style={{ fontWeight: 500 }}>
+            <div className={styles.emptyState}>
+              <i className={`bi bi-chat-quote ${styles.emptyIcon}`}></i>
+              <p className={`mt-3 mb-1 ${styles.emptyTitle}`}>
                 {filter === "all"
                   ? "No comments yet"
                   : filter === "mine"
@@ -354,58 +303,30 @@ const GoalComments = ({
                 return (
                   <div
                     key={comment.commentId || index}
-                    className="list-group-item"
-                    style={{
-                      padding: "1.25rem",
-                      backgroundColor: isOwn ? "#f0f7ff" : "#fff",
-                      borderLeft: isOwn ? "4px solid #0d6efd" : "none",
-                      transition: "background-color 0.2s ease",
-                    }}
+                    className={`list-group-item ${styles.commentItem} ${
+                      isOwn ? styles.ownComment : ""
+                    }`}
                   >
                     <div className="d-flex gap-3">
-                      {/* Avatar */}
                       <div
-                        style={{
-                          width: "44px",
-                          height: "44px",
-                          borderRadius: "50%",
-                          background: isOwn
-                            ? "linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%)"
-                            : "linear-gradient(135deg, #AC5098 0%, #97247E 100%)",
-                          color: "#fff",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontWeight: 700,
-                          fontSize: "0.9rem",
-                          flexShrink: 0,
-                          boxShadow: "0 2px 6px rgba(0, 0, 0, 0.15)",
-                        }}
+                        className={`${styles.avatar} ${
+                          isOwn ? styles.ownAvatar : ""
+                        }`}
                       >
                         {getInitials(comment.commentedByName)}
                       </div>
 
-                      {/* Comment Content */}
-                      <div style={{ flex: 1 }}>
-                        {/* Header */}
-                        <div className="d-flex justify-content-between align-items-start mb-2 flex-wrap gap-2">
+                      <div className={styles.commentContent}>
+                        <div
+                          className={`d-flex justify-content-between align-items-start mb-2 flex-wrap gap-2 ${styles.commentHeader}`}
+                        >
                           <div className="d-flex align-items-center gap-2 flex-wrap">
-                            <span
-                              style={{
-                                fontWeight: 600,
-                                color: "#212529",
-                                fontSize: "0.95rem",
-                              }}
-                            >
+                            <span className={styles.commentAuthor}>
                               {comment.commentedByName}
                             </span>
                             {isOwn && (
                               <span
-                                className="badge bg-primary"
-                                style={{
-                                  fontSize: "0.65rem",
-                                  padding: "0.25rem 0.5rem",
-                                }}
+                                className={`badge bg-primary ${styles.youBadge}`}
                               >
                                 <i className="bi bi-person-check me-1"></i>
                                 You
@@ -413,11 +334,7 @@ const GoalComments = ({
                             )}
                             {isCreatorComment && (
                               <span
-                                className="badge bg-success"
-                                style={{
-                                  fontSize: "0.65rem",
-                                  padding: "0.25rem 0.5rem",
-                                }}
+                                className={`badge bg-success ${styles.creatorBadge}`}
                               >
                                 <i className="bi bi-star-fill me-1"></i>
                                 Creator
@@ -426,19 +343,7 @@ const GoalComments = ({
                           </div>
                         </div>
 
-                        {/* Comment Text */}
-                        <p
-                          style={{
-                            marginBottom: 0,
-                            whiteSpace: "pre-wrap",
-                            wordBreak: "break-word",
-                            color: "#495057",
-                            lineHeight: 1.6,
-                            fontSize: "0.95rem",
-                          }}
-                        >
-                          {comment.comment}
-                        </p>
+                        <p className={styles.commentText}>{comment.comment}</p>
                       </div>
                     </div>
                   </div>
@@ -449,7 +354,6 @@ const GoalComments = ({
         </div>
       </div>
 
-      {/* Confirmation Modal */}
       <ConfirmationModal
         isOpen={showConfirmModal}
         onClose={() => setShowConfirmModal(false)}

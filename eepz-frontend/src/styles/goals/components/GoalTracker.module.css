@@ -1,0 +1,128 @@
+.card {
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  box-shadow: none;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Variants (border + colors) */
+
+.completed {
+  border: 1px solid #28a745;
+}
+
+.ongoing {
+  border: 1px solid #0d6efd;
+}
+
+.pending {
+  border: 1px solid #fcd03e;
+}
+
+.overdue {
+  border: 1px solid #dc3545;
+}
+
+.approvals {
+  border: 1px solid #6f42c1;
+}
+
+.cardBody {
+  padding: 1.25rem;
+}
+
+.title {
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Title colors per variant */
+.completed .title {
+  color: #155724;
+}
+
+.ongoing .title {
+  color: #084298;
+}
+
+.pending .title {
+  color: #856404;
+}
+
+.overdue .title {
+  color: #721c24;
+}
+
+.approvals .title {
+  color: #432874;
+}
+
+.count {
+  margin-bottom: 0;
+  font-weight: 700;
+  font-size: 2rem;
+}
+
+/* Count colors per variant */
+.completed .count {
+  color: #155724;
+}
+
+.ongoing .count {
+  color: #084298;
+}
+
+.pending .count {
+  color: #856404;
+}
+
+.overdue .count {
+  color: #721c24;
+}
+
+.approvals .count {
+  color: #432874;
+}
+
+.iconWrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon {
+  font-size: 1.5rem;
+}
+
+/* Icon colors per variant */
+.completed .icon {
+  color: #28a745;
+}
+
+.ongoing .icon {
+  color: #0d6efd;
+}
+
+.pending .icon {
+  color: #ffc107;
+}
+
+.overdue .icon {
+  color: #dc3545;
+}
+
+.approvals .icon {
+  color: #6f42c1;
+}

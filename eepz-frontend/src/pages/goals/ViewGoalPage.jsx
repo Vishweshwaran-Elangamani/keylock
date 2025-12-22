@@ -18,6 +18,7 @@ import {
   isOverdue,
 } from "../../utils/goals/goalHelpers";
 import Breadcrumb from "../../components/goals/common/Breadcrumb";
+import styles from "../../styles/goals/pages/ViewGoalPage.module.css";
 
 const ViewGoalPage = () => {
   const { id } = useParams();
@@ -129,13 +130,18 @@ const ViewGoalPage = () => {
     loadGoal(true);
   };
 
+  // Helper function to get tab button classes
+  const getTabClass = (tabName) => {
+    return `nav-link ${styles.navTab} ${activeTab === tabName ? "active" : ""}`;
+  };
+
   if (loading) {
     return <LoadingSpinner text="Loading goal..." fullScreen />;
   }
 
   if (!goal) {
     return (
-      <div className="container-fluid p-4">
+      <div className={`container-fluid p-4 ${styles.errorContainer}`}>
         <Alert type="danger" message="Goal not found" />
         <button className="btn btn-secondary" onClick={() => navigate(-1)}>
           <i className="bi bi-arrow-left me-2"></i>
@@ -161,16 +167,16 @@ const ViewGoalPage = () => {
     !isLeadershipMonitoring;
 
   return (
-    <div className="container-fluid" style={{ marginBottom: "15px" }}>
+    <div className={`container-fluid ${styles.pageContainer}`}>
       {/* Breadcrumb */}
       {goal && (
         <Breadcrumb
-        items={[
-          { label: "", path: "/dashboard", icon: "house-door" },
-          { label: "Goals Dashboard", path: "/dashboard/goals", icon: "" },
-          { label: goal.title || "Goal Details", path: null, icon: "" },
-        ]}
-      />
+          items={[
+            { label: "", path: "/dashboard", icon: "house-door" },
+            { label: "Goals Dashboard", path: "/dashboard/goals", icon: "" },
+            { label: goal.title || "Goal Details", path: null, icon: "" },
+          ]}
+        />
       )}
 
       {alert && (
@@ -193,12 +199,11 @@ const ViewGoalPage = () => {
         userPersonalProgress={personalProgress}
       />
 
-      <ul className="nav nav-tabs mb-4">
+      <ul className={`nav nav-tabs mb-4 ${styles.tabList}`}>
         <li className="nav-item">
           <button
-            className={`nav-link ${activeTab === "details" ? "active" : ""}`}
+            className={getTabClass("details")}
             onClick={() => setActiveTab("details")}
-            style={{ cursor: "pointer" }}
           >
             <i className="bi bi-list-check me-2"></i>
             Details
@@ -207,9 +212,8 @@ const ViewGoalPage = () => {
         {shouldShowCommentsAndTimeline && (
           <li className="nav-item">
             <button
-              className={`nav-link ${activeTab === "comments" ? "active" : ""}`}
+              className={getTabClass("comments")}
               onClick={() => setActiveTab("comments")}
-              style={{ cursor: "pointer" }}
             >
               <i className="bi bi-chat-left-text me-2"></i>
               Comments
@@ -219,9 +223,8 @@ const ViewGoalPage = () => {
         {shouldShowCommentsAndTimeline && (
           <li className="nav-item">
             <button
-              className={`nav-link ${activeTab === "timeline" ? "active" : ""}`}
+              className={getTabClass("timeline")}
               onClick={() => setActiveTab("timeline")}
-              style={{ cursor: "pointer" }}
             >
               <i className="bi bi-clock-history me-2"></i>
               Timeline
@@ -230,7 +233,7 @@ const ViewGoalPage = () => {
         )}
       </ul>
 
-      <div className="tab-content">
+      <div className={`tab-content ${styles.tabContent}`}>
         {activeTab === "details" && (
           <GoalChecklist
             goal={goal}
@@ -262,7 +265,7 @@ const ViewGoalPage = () => {
         onSuccess={handleGoalUpdated}
       />
 
-      {/*  FIXED: Single RequestApprovalModal with dynamic approvalType */}
+      {/* FIXED: Single RequestApprovalModal with dynamic approvalType */}
       <RequestApprovalModal
         isOpen={showApprovalModal}
         onClose={() => {
@@ -275,16 +278,6 @@ const ViewGoalPage = () => {
         goalType={goal?.goalType}
         requesterRole={user?.role}
       />
-
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        .spin {
-          animation: spin 1s linear infinite;
-        }
-      `}</style>
     </div>
   );
 };

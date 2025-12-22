@@ -6,6 +6,7 @@ import lndService, {
 } from "../../../services/lnd/lndService";
 import { APPROVAL_TYPE } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
+import styles from "../../../styles/lnd/components/ApprovalDecisionModal.module.css";
 
 const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
   const [decision, setDecision] = useState(null);
@@ -179,225 +180,54 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
 
   return (
     <>
-      <style>
-        {`
-          @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-          }
-          @keyframes slideUp {
-            from { 
-              opacity: 0;
-              transform: translateY(20px);
-            }
-            to { 
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-        `}
-      </style>
-
       {/* Backdrop */}
-      <div
-        onClick={onClose}
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: "rgba(0, 0, 0, 0.5)",
-          zIndex: 1000,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "1rem",
-          animation: "fadeIn 0.2s ease-in-out",
-        }}
-      >
+      <div className={styles.backdrop} onClick={onClose}>
         {/* Modal */}
-        <div
-          onClick={(e) => e.stopPropagation()}
-          style={{
-            background: "#fff",
-            borderRadius: "12px",
-            width: "100%",
-            maxWidth: "600px",
-            maxHeight: "90vh",
-            overflow: "auto",
-            boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
-            display: "flex",
-            flexDirection: "column",
-            animation: "slideUp 0.3s ease-out",
-          }}
-        >
+        <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
           {/* Header */}
-          <div
-            style={{
-              padding: "1.5rem",
-              borderBottom: "1px solid #e5e7eb",
-              backgroundColor: "rgb(39, 35, 92)",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center", 
-              flexShrink: 0,
-            }}
-          >
-            <h5 style={{ margin: 0, fontWeight: "600", color: "white" }}>
-              Review Approval Request
-            </h5>
+          <div className={styles.header}>
+            <h5 className={styles.headerTitle}>Review Approval Request</h5>
             <button
               type="button"
-              className="btn-close-white"
               onClick={onClose}
-              style={{
-                border: "none",
-                width: "36px",
-                backgroundColor: "transparent",
-                height: "36px",
-                borderRadius: "0.5rem",
-                cursor: "pointer",
-                color: "white",
-                fontSize: "20px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                transition: "all 0.2s",
-                flexShrink: 0,
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = "red";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = "white";
-              }}
+              className={`btn-close-white ${styles.btnClose}`}
             >
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
 
           {/* Body */}
-          <div
-            style={{
-              flexGrow: 1,
-              overflowY: "auto",
-              padding: "1.5rem",
-            }}
-          >
+          <div className={styles.body}>
             <form onSubmit={handleSubmit}>
-              <div style={{ padding: "1.5rem" }}>
+              <div>
                 {/* Approval Info */}
-                <div
-                  style={{
-                    padding: "1rem",
-                    background: "#f8f9fa",
-                    borderRadius: "8px",
-                    marginBottom: "1.5rem",
-                    border: "1px solid rgb(39, 35, 92, 0.5)",
-                  }}
-                >
-                  <p
-                    style={{
-                      fontSize: "0.875rem",
-                      color: "#6c757d",
-                      margin: 0,
-                      marginBottom: "0.25rem",
-                    }}
-                  >
-                    Approval Type
-                  </p>
-                  <p
-                    style={{
-                      fontSize: "1rem",
-                      fontWeight: "600",
-                      color: "#212529",
-                      margin: 0,
-                      marginBottom: "0.75rem",
-                    }}
-                  >
+                <div className={styles.infoCard}>
+                  <p className={styles.infoLabel}>Approval Type</p>
+                  <p className={styles.infoValue}>
                     {getApprovalTypeLabel(approval.approvalType)}
                   </p>
 
                   {approval.skillName && (
                     <>
-                      <p
-                        style={{
-                          fontSize: "0.875rem",
-                          color: "#6c757d",
-                          margin: 0,
-                          marginBottom: "0.25rem",
-                        }}
-                      >
-                        Skill
-                      </p>
-                      <p
-                        style={{
-                          fontSize: "1rem",
-                          fontWeight: "600",
-                          color: "#212529",
-                          margin: 0,
-                          marginBottom: "0.75rem",
-                        }}
-                      >
-                        {approval.skillName}
-                      </p>
+                      <p className={styles.infoLabel}>Skill</p>
+                      <p className={styles.infoValue}>{approval.skillName}</p>
                     </>
                   )}
 
-                  <p
-                    style={{
-                      fontSize: "0.875rem",
-                      color: "#6c757d",
-                      margin: 0,
-                      marginBottom: "0.25rem",
-                    }}
-                  >
-                    Requested by
-                  </p>
-                  <p
-                    style={{
-                      fontSize: "0.9375rem",
-                      fontWeight: "500",
-                      color: "#212529",
-                      margin: 0,
-                      marginBottom: "0.75rem",
-                    }}
-                  >
+                  <p className={styles.infoLabel}>Requested by</p>
+                  <p className={styles.infoValueSmall}>
                     {approval.requesterName}
                   </p>
 
-                  <p
-                    style={{
-                      fontSize: "0.875rem",
-                      color: "#6c757d",
-                      margin: 0,
-                      marginBottom: "0.25rem",
-                    }}
-                  >
-                    Requested On
-                  </p>
-                  <p
-                    style={{
-                      fontSize: "0.9375rem",
-                      fontWeight: "500",
-                      color: "#212529",
-                      margin: 0,
-                    }}
-                  >
+                  <p className={styles.infoLabel}>Requested On</p>
+                  <p className={styles.infoValueSmall}>
                     {new Date(approval.requestedOn).toLocaleDateString()}
                   </p>
                 </div>
 
                 {/* Preview & Download Buttons */}
                 {approval.attachmentPath && (
-                  <div
-                    style={{
-                      marginBottom: "1.5rem",
-                      display: "flex",
-                      gap: "0.75rem",
-                    }}
-                  >
+                  <div className={styles.fileActions}>
                     {/* Preview Button */}
                     <button
                       type="button"
@@ -408,34 +238,7 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
                           ? "Preview not supported for this file type"
                           : "Preview document in browser"
                       }
-                      style={{
-                        flex: 1,
-                        padding: "0.75rem",
-                        background: canPreview ? "#f8f9fa" : "#e5e7eb",
-                        border: "1px solid rgb(39, 35, 92, 0.5)",
-                        borderRadius: "8px",
-                        fontSize: "0.875rem",
-                        fontWeight: "600",
-                        cursor: canPreview ? "pointer" : "not-allowed",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "0.5rem",
-                        color: canPreview ? "#97247E" : "#6b7280",
-                        transition: "all 0.2s",
-                      }}
-                      onMouseEnter={(e) => {
-                        if (canPreview) {
-                          e.currentTarget.style.background = "rgb(39, 35, 92)";
-                          e.currentTarget.style.color = "#fff";
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (canPreview) {
-                          e.currentTarget.style.background = "#f8f9fa";
-                          e.currentTarget.style.color = "#97247E";
-                        }
-                      }}
+                      className={`${styles.fileBtn} ${styles.fileBtnPreview}`}
                     >
                       <Eye size={16} />
                       {canPreview
@@ -447,30 +250,7 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
                     <button
                       type="button"
                       onClick={handleDownload}
-                      style={{
-                        flex: 1,
-                        padding: "0.75rem",
-                        background: "#f8f9fa",
-                        border: "1px solid rgb(39, 35, 92, 0.5)",
-                        borderRadius: "8px",
-                        fontSize: "0.875rem",
-                        fontWeight: "600",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "0.5rem",
-                        color: "#97247E",
-                        transition: "all 0.2s",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = "rgb(39, 35, 92)";
-                        e.currentTarget.style.color = "#fff";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = "#f8f9fa";
-                        e.currentTarget.style.color = "#97247E";
-                      }}
+                      className={`${styles.fileBtn} ${styles.fileBtnDownload}`}
                     >
                       <Download size={16} />
                       Download Attachment
@@ -479,41 +259,17 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
                 )}
 
                 {/* Decision Buttons */}
-                <div style={{ marginBottom: "1.5rem" }}>
-                  <label
-                    style={{
-                      fontSize: "0.875rem",
-                      fontWeight: "600",
-                      color: "#212529",
-                      marginBottom: "0.75rem",
-                      display: "block",
-                    }}
-                  >
-                    Decision <span style={{ color: "#dc3545" }}>*</span>
+                <div className="mb-4">
+                  <label className={styles.decisionLabel}>
+                    Decision <span className={styles.required}> *</span>
                   </label>
-                  <div style={{ display: "flex", gap: "1rem" }}>
+                  <div className={styles.decisionButtons}>
                     <button
                       type="button"
                       onClick={() => setDecision("approve")}
-                      style={{
-                        flex: 1,
-                        padding: "0.75rem",
-                        border:
-                          decision === "approve"
-                            ? "2px solid #198754"
-                            : "1px solid rgb(39, 35, 92, 0.5)",
-                        borderRadius: "8px",
-                        background: decision === "approve" ? "#d1fae5" : "#fff",
-                        color: decision === "approve" ? "#065f46" : "#212529",
-                        fontSize: "0.875rem",
-                        fontWeight: "600",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "0.5rem",
-                        transition: "all 0.2s",
-                      }}
+                      className={`${styles.decisionBtn} ${
+                        styles.decisionBtnApprove
+                      } ${decision === "approve" ? styles.selected : ""}`}
                     >
                       <CheckCircle size={16} />
                       Approve
@@ -522,25 +278,9 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
                     <button
                       type="button"
                       onClick={() => setDecision("reject")}
-                      style={{
-                        flex: 1,
-                        padding: "0.75rem",
-                        border:
-                          decision === "reject"
-                            ? "2px solid #dc3545"
-                            : "1px solid rgb(39, 35, 92, 0.5)",
-                        borderRadius: "8px",
-                        background: decision === "reject" ? "#fee2e2" : "#fff",
-                        color: decision === "reject" ? "#991b1b" : "#212529",
-                        fontSize: "0.875rem",
-                        fontWeight: "600",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "0.5rem",
-                        transition: "all 0.2s",
-                      }}
+                      className={`${styles.decisionBtn} ${
+                        styles.decisionBtnReject
+                      } ${decision === "reject" ? styles.selected : ""}`}
                     >
                       <XCircle size={16} />
                       Reject
@@ -552,17 +292,9 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
                 {approval.approvalType ===
                   APPROVAL_TYPE.ASSIGNMENT_COMPLETION &&
                   decision === "approve" && (
-                    <div style={{ marginBottom: "1rem" }}>
-                      <label
-                        style={{
-                          fontSize: "0.875rem",
-                          fontWeight: "600",
-                          color: "#212529",
-                          marginBottom: "0.5rem",
-                          display: "block",
-                        }}
-                      >
-                        New Rating <span style={{ color: "#dc3545" }}>*</span>
+                    <div className="mb-4">
+                      <label className={styles.ratingLabel}>
+                        New Rating <span className={styles.required}> *</span>
                       </label>
                       <input
                         type="number"
@@ -570,34 +302,25 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
                         max={10}
                         step={1}
                         value={newRating}
-                        onChange={(e) => setNewRating(e.target.value)}
-                        placeholder="Enter new skill rating for this employee (1-10)"
-                        style={{
-                          width: "100%",
-                          padding: "0.75rem",
-                          border: "1px solid #e5e7eb",
-                          borderRadius: "8px",
-                          fontSize: "0.875rem",
-                          outline: "none",
-                          fontFamily: "inherit",
+                        onChange={(e) => {
+                          let val = Number(e.target.value);
+
+                          if (val < 1) val = 1;
+                          if (val > 10) val = 10;
+
+                          setNewRating(val);
                         }}
+                        placeholder="Enter new skill rating for this employee (1-10)"
+                        className={styles.ratingInput}
                       />
                     </div>
                   )}
 
                 {/* Notes */}
                 {approval.approvalType !== APPROVAL_TYPE.SME_REQUEST && (
-                  <div style={{ marginBottom: "1.5rem" }}>
-                    <label
-                      style={{
-                        fontSize: "0.875rem",
-                        fontWeight: "600",
-                        color: "#212529",
-                        marginBottom: "0.5rem",
-                        display: "block",
-                      }}
-                    >
-                      Notes <span style={{ color: "#dc3545" }}>*</span>
+                  <div className="mb-4">
+                    <label className={styles.notesLabel}>
+                      Notes <span className={styles.required}> *</span>
                     </label>
                     <textarea
                       value={notes}
@@ -613,58 +336,44 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
                       required={
                         approval.approvalType !== APPROVAL_TYPE.SME_REQUEST
                       }
-                      style={{
-                        width: "100%",
-                        padding: "0.75rem",
-                        border: "1px solid rgb(39, 35, 92, 0.5)",
-                        borderRadius: "8px",
-                        fontSize: "0.875rem",
-                        outline: "none",
-                        resize: "vertical",
-                        fontFamily: "inherit",
-                      }}
-                      onFocus={(e) => {
-                        e.target.style.borderColor = "#97247E";
-                        e.target.style.boxShadow =
-                          "0 0 0 3px rgba(151, 36, 126, 0.1)";
-                      }}
-                      onBlur={(e) => {
-                        e.target.style.borderColor = "#e5e7eb";
-                        e.target.style.boxShadow = "none";
-                      }}
+                      className={styles.notesTextarea}
                     />
                   </div>
                 )}
               </div>
 
               {/* Footer */}
-              <div
-                style={{
-                  padding: "1rem 1.5rem",
-                  borderTop: "1px solid #e5e7eb",
-                  display: "flex",
-                  gap: "0.75rem",
-                  justifyContent: "flex-end",
-                }}
-              >
+              <div className={styles.footer}>
                 <button
                   type="button"
-                  className="btn btn-secondary"
+                  className={`btn btn-secondary ${styles.btnCancel}`}
                   onClick={onClose}
                   disabled={processing}
-                  style={{
-                    padding: "0.625rem 1.25rem",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: "8px",
-                    fontSize: "0.875rem",
-                    fontWeight: "500",
-                    cursor: "pointer",
-                  }}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
+                  className={`
+                  ${styles.btnSubmit}
+                  ${
+                    decision &&
+                    (approval.approvalType !==
+                      APPROVAL_TYPE.ASSIGNMENT_COMPLETION ||
+                      (decision === "approve" &&
+                        newRating &&
+                        !isNaN(newRating) &&
+                        Number(newRating) >= 1 &&
+                        Number(newRating) <= 10)) &&
+                    (approval.approvalType === APPROVAL_TYPE.SME_REQUEST ||
+                      notes.trim()) &&
+                    !processing
+                      ? decision === "approve"
+                        ? styles.btnSubmitApprove
+                        : styles.btnSubmitReject
+                      : ""
+                  }
+                `}
                   disabled={
                     !decision ||
                     (approval.approvalType ===
@@ -679,60 +388,6 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
                       !notes.trim()) ||
                     processing
                   }
-                  style={{
-                    padding: "0.625rem 1.25rem",
-                    border: "none",
-                    borderRadius: "8px",
-                    background:
-                      decision &&
-                      (approval.approvalType !==
-                        APPROVAL_TYPE.ASSIGNMENT_COMPLETION ||
-                        (decision === "approve" &&
-                          newRating &&
-                          !isNaN(newRating) &&
-                          Number(newRating) >= 1 &&
-                          Number(newRating) <= 10)) &&
-                      (approval.approvalType === APPROVAL_TYPE.SME_REQUEST ||
-                        notes.trim()) &&
-                      !processing
-                        ? decision === "approve"
-                          ? "#198754"
-                          : "#dc3545"
-                        : "#e5e7eb",
-                    color:
-                      decision &&
-                      (approval.approvalType !==
-                        APPROVAL_TYPE.ASSIGNMENT_COMPLETION ||
-                        (decision === "approve" &&
-                          newRating &&
-                          !isNaN(newRating) &&
-                          Number(newRating) >= 1 &&
-                          Number(newRating) <= 10)) &&
-                      (approval.approvalType === APPROVAL_TYPE.SME_REQUEST ||
-                        notes.trim()) &&
-                      !processing
-                        ? "#fff"
-                        : "#6c757d",
-                    fontSize: "0.875rem",
-                    fontWeight: "600",
-                    cursor:
-                      decision &&
-                      (approval.approvalType !==
-                        APPROVAL_TYPE.ASSIGNMENT_COMPLETION ||
-                        (decision === "approve" &&
-                          newRating &&
-                          !isNaN(newRating) &&
-                          Number(newRating) >= 1 &&
-                          Number(newRating) <= 10)) &&
-                      (approval.approvalType === APPROVAL_TYPE.SME_REQUEST ||
-                        notes.trim()) &&
-                      !processing
-                        ? "pointer"
-                        : "not-allowed",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                  }}
                 >
                   {processing ? (
                     <>

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { X, Users, AlertCircle, Calendar } from "lucide-react";
 import { lndService } from "../../../services/lnd/lndService";
 import { toast } from "sonner";
+import styles from "../../../styles/lnd/components/RequestSmeModal.module.css";
 
 const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
   const [availableSmes, setAvailableSmes] = useState([]);
@@ -78,30 +79,15 @@ const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
 
   if (fetchingSmes) {
     return (
-      <div
-        onClick={onClose}
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: "rgba(0, 0, 0, 0.5)",
-          zIndex: 1000,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <div
-          style={{ background: "#fff", padding: "2rem", borderRadius: "12px" }}
-        >
-          <div className="spinner-border text-primary" role="status">
+      <div className={styles.loadingBackdrop} onClick={onClose}>
+        <div className={styles.loadingModal}>
+          <div
+            className={`spinner-border text-primary ${styles.loadingSpinner}`}
+            role="status"
+          >
             <span className="visually-hidden">Loading...</span>
           </div>
-          <p style={{ marginTop: "1rem", marginBottom: 0 }}>
-            Loading available SMEs...
-          </p>
+          <p className={styles.loadingText}>Loading available SMEs...</p>
         </div>
       </div>
     );
@@ -109,90 +95,14 @@ const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
 
   return (
     <>
-      <style>
-        {`
-          @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-          }
-          @keyframes slideUp {
-            from { 
-              opacity: 0;
-              transform: translateY(20px);
-            }
-            to { 
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-        `}
-      </style>
-
-      {/* Backdrop */}
-      <div
-        onClick={onClose}
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: "rgba(0, 0, 0, 0.5)",
-          zIndex: 1000,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "1rem",
-          animation: "fadeIn 0.2s ease-in-out",
-        }}
-      >
-        {/* Modal */}
-        <div
-          onClick={(e) => e.stopPropagation()}
-          style={{
-            background: "#fff",
-            borderRadius: "12px",
-            width: "100%",
-            maxWidth: "650px",
-            maxHeight: "90vh",
-            overflow: "auto",
-            boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
-            animation: "slideUp 0.3s ease-out",
-          }}
-        >
-          {/* Header */}
-          <div
-            style={{
-              padding: "1.5rem",
-              borderBottom: "1px solid #e5e7eb",
-              backgroundColor: "rgb(39, 35, 92)",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <h5 style={{ margin: 0, fontWeight: "600", color: "white" }}>
-              Request SME Assignment
-            </h5>
+      <div className={styles.backdrop} onClick={onClose}>
+        <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+          <div className={styles.header}>
+            <h5 className={styles.headerTitle}>Request SME Assignment</h5>
             <button
               type="button"
-              class="btn-close-white"
               onClick={onClose}
-              style={{
-                border: "none",
-                width: "36px",
-                backgroundColor: "transparent",
-                height: "36px",
-                borderRadius: "0.5rem",
-                cursor: "pointer",
-                color: "white",
-                fontSize: "20px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                transition: "all 0.2s",
-                flexShrink: 0,
-              }}
+              className={`btn-close-white ${styles.btnClose}`}
               onMouseEnter={(e) => {
                 e.currentTarget.style.color = "red";
               }}
@@ -204,115 +114,44 @@ const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
             </button>
           </div>
 
-          {/* Body */}
           <form onSubmit={handleSubmit}>
-            <div style={{ padding: "1.5rem" }}>
+            <div className={styles.body}>
               {availableSmes.length === 0 ? (
-                <div
-                  style={{
-                    padding: "2rem",
-                    textAlign: "center",
-                    background: "#fff3cd",
-                    borderRadius: "8px",
-                    border: "1px solid #ffc107",
-                  }}
-                >
+                <div className={styles.noSmesContainer}>
                   <Users
                     size={48}
                     color="#856404"
-                    style={{ marginBottom: "1rem" }}
+                    className={styles.noSmesIcon}
                   />
-                  <p
-                    style={{
-                      fontSize: "1rem",
-                      fontWeight: "600",
-                      color: "#856404",
-                      margin: 0,
-                      marginBottom: "0.5rem",
-                    }}
-                  >
-                    No Available SMEs
-                  </p>
-                  <p
-                    style={{
-                      fontSize: "0.875rem",
-                      color: "#856404",
-                      margin: 0,
-                    }}
-                  >
+                  <p className={styles.noSmesTitle}>No Available SMEs</p>
+                  <p className={styles.noSmesText}>
                     All SMEs for this skill are currently at maximum capacity (3
                     assignments). Please try again later.
                   </p>
                 </div>
               ) : (
                 <>
-                  {/* Available SMEs List */}
-                  <div style={{ marginBottom: "1.5rem" }}>
-                    <label
-                      style={{
-                        fontSize: "0.875rem",
-                        fontWeight: "600",
-                        color: "#212529",
-                        marginBottom: "0.75rem",
-                        display: "block",
-                        textAlign: "left",
-                      }}
-                    >
+                  <div className="mb-4">
+                    <label className={styles.smesLabel}>
                       Available SMEs ({availableSmes.length})
                     </label>
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "0.75rem",
-                      }}
-                    >
+                    <div className={styles.smesList}>
                       {availableSmes.map((sme) => (
                         <div
                           key={sme.employeeId}
-                          style={{
-                            padding: "1rem",
-                            border:
-                              selectedSmeId === sme.employeeId
-                                ? "2px solid #97247E"
-                                : "1px solid rgba(39, 35, 92, 0.5)",
-                            borderRadius: "8px",
-                            background:
-                              selectedSmeId === sme.employeeId
-                                ? "#f9f5ff"
-                                : "#fff",
-                            cursor: "pointer",
-                            transition: "all 0.2s",
-                          }}
+                          className={
+                            selectedSmeId === sme.employeeId
+                              ? `${styles.smeItem} ${styles.smeItemSelected}`
+                              : `${styles.smeItem} ${styles.smeItemUnselected}`
+                          }
                           onClick={() => setSelectedSmeId(sme.employeeId)}
                         >
-                          <div
-                            style={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              alignItems: "start",
-                            }}
-                          >
-                            <div>
-                              <p
-                                style={{
-                                  fontSize: "0.9375rem",
-                                  fontWeight: "600",
-                                  color: "#212529",
-                                  margin: 0,
-                                  marginBottom: "0.25rem",
-                                  textAlign: "left",
-                                }}
-                              >
+                          <div className={styles.smeContent}>
+                            <div className={styles.smeInfo}>
+                              <p className={styles.smeName}>
                                 {sme.employeeName}
                               </p>
-                              <p
-                                style={{
-                                  fontSize: "0.8125rem",
-                                  color: "#6c757d",
-                                  margin: 0,
-                                }}
-                              >
+                              <p className={styles.smeAssignments}>
                                 Current Assignments: {sme.inProgressAssignments}
                                 /3
                               </p>
@@ -322,7 +161,7 @@ const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
                               name="smeSelection"
                               checked={selectedSmeId === sme.employeeId}
                               onChange={() => setSelectedSmeId(sme.employeeId)}
-                              style={{ cursor: "pointer" }}
+                              className={styles.smeRadio}
                             />
                           </div>
                         </div>
@@ -330,21 +169,10 @@ const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
                     </div>
                   </div>
 
-                  {/* Deadline */}
-                  <div style={{ marginBottom: "1.5rem" }}>
-                    <label
-                      style={{
-                        fontSize: "0.875rem",
-                        fontWeight: "600",
-                        color: "#212529",
-                        marginBottom: "0.5rem",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.5rem",
-                      }}
-                    >
+                  <div className={styles.deadlineField}>
+                    <label className={styles.deadlineLabel}>
                       <Calendar size={16} />
-                      Deadline <span style={{ color: "#dc3545" }}>*</span>
+                      Deadline <span className={styles.required}> *</span>
                     </label>
                     <input
                       type="date"
@@ -352,79 +180,34 @@ const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
                       onChange={(e) => setDeadline(e.target.value)}
                       min={getMinDate()}
                       required
-                      style={{
-                        width: "100%",
-                        padding: "0.625rem",
-                        border: "1px solid rgba(39, 35, 92, 0.5)",
-                        borderRadius: "8px",
-                        fontSize: "0.875rem",
-                        outline: "none",
-                      }}
-                      onFocus={(e) => {
-                        e.target.style.borderColor = "#97247E";
-                        e.target.style.boxShadow =
-                          "0 0 0 3px rgba(151, 36, 126, 0.1)";
-                      }}
-                      onBlur={(e) => {
-                        e.target.style.borderColor = "#e5e7eb";
-                        e.target.style.boxShadow = "none";
-                      }}
+                      className={styles.dateInput}
                     />
                   </div>
                 </>
               )}
             </div>
 
-            {/* Footer */}
-            <div
-              style={{
-                padding: "1rem 1.5rem",
-                borderTop: "1px solid #e5e7eb",
-                display: "flex",
-                gap: "0.75rem",
-                justifyContent: "flex-end",
-              }}
-            >
+            <div className={styles.footer}>
               <button
                 type="button"
-                className="btn btn-secondary"
+                className={`btn btn-secondary ${styles.btnCancel}`}
                 onClick={onClose}
                 disabled={loading}
-                style={{
-                  padding: "0.625rem 1.25rem",
-                  border: "1px solid #e5e7eb",
-                  borderRadius: "8px",
-                  fontSize: "0.875rem",
-                  fontWeight: "500",
-                  cursor: loading ? "not-allowed" : "pointer",
-                }}
               >
                 Cancel
               </button>
               <button
                 type="submit"
+                className={`
+                ${styles.btnSubmit}
+                ${isSubmitEnabled ? styles.btnSubmitEnabled : ""}
+              `}
                 disabled={!isSubmitEnabled}
-                style={{
-                  padding: "0.625rem 1.25rem",
-                  border: "none",
-                  borderRadius: "8px",
-                  background: isSubmitEnabled
-                    ? "linear-gradient(90deg, #97247E 0%, #E01950 100%)"
-                    : "#e5e7eb",
-                  color: isSubmitEnabled ? "#fff" : "#6c757d",
-                  fontSize: "0.875rem",
-                  fontWeight: "600",
-                  cursor: isSubmitEnabled ? "pointer" : "not-allowed",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  transition: "all 0.2s",
-                }}
               >
                 {loading ? (
                   <>
                     <span
-                      className="spinner-border spinner-border-sm"
+                      className={`spinner-border spinner-border-sm ${styles.loadingSpinner}`}
                       role="status"
                     />
                     Requesting...

@@ -1,0 +1,244 @@
+/* src/components/modals/ApprovalReviewModal.module.css */
+
+:global {
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+.backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1050;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.modalContent {
+  border-radius: 2rem;
+  min-width: 900px;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.modalHeader {
+  background: rgb(39, 35, 92);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modalTitle {
+  font-weight: 700;
+  color: white;
+}
+
+.modalSubtitle {
+  font-size: 0.875rem;
+}
+
+.closeButton {
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 0.5rem;
+  background-color: transparent;
+  color: white;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.closeButton:hover:not(:disabled) {
+  color: red;
+}
+
+.closeButton:disabled {
+  cursor: not-allowed;
+}
+
+.modalBody {
+  padding: 1.5rem;
+  overflow: auto;
+}
+
+.modalFooter {
+  background-color: #f8f9fa;
+  border-radius: 0 0 0.75rem 0.75rem;
+  padding: 1rem 1.5rem;
+}
+
+.sectionTitle {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.cardBorder {
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+}
+
+.cardBodyLight {
+  background-color: #f8f9fa;
+  padding: 1.25rem;
+}
+
+.labelText {
+  font-size: 0.75rem;
+}
+
+.goalTitleText {
+  font-size: 1.05rem;
+}
+
+.descriptionText {
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.badgeSmall {
+  font-size: 0.85rem;
+}
+
+.progressWrapper {
+  height: 24px;
+  border-radius: 12px;
+}
+
+.progressText {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.teamMemberBadge {
+  font-size: 0.85rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.assigneeHeader {
+  background-color: #e9ecef;
+  border-radius: 0.5rem;
+}
+
+.checklistItem {
+  padding: 0.875rem 1rem;
+}
+
+.checklistItemCompleted {
+  background-color: #d1f0dc;
+  border-left: 4px solid #28a745;
+  opacity: 0.85;
+}
+
+.checklistItemPending {
+  background-color: #fff;
+  border-left: 4px solid #dee2e6;
+  opacity: 1;
+}
+
+.checklistTitle {
+    padding-left: 5px;
+  font-size: 14px;
+  text-align: left;
+}
+
+.checklistTitleCompleted {
+  text-decoration: line-through;
+}
+
+.checklistDescription {
+  line-height: 1.5;
+}
+
+.proofCard {
+  border: 2px solid #28a745;
+  border-radius: 0.5rem;
+}
+
+.proofItem {
+  background-color: #f0fff4;
+  padding: 1rem;
+}
+
+.proofIconBox {
+  width: 48px;
+  height: 48px;
+  background-color: #28a745;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.proofIcon {
+  font-size: 1.5rem;
+  color: white;
+}
+
+.fileButton {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+}
+
+.latestBadge {
+  font-size: 0.7rem;
+}
+
+.attachmentItem {
+  padding: 1rem;
+}
+
+.attachmentIcon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.attachmentTitle{
+    text-align: left;
+}
+
+.reopeningCard {
+  border: 2px solid #ffc107;
+  border-radius: 0.5rem;
+  background-color: #fffbea;
+}
+
+.reopeningInput {
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 2px solid #ffc107;
+}
+
+.reopeningHint {
+  color: #6c757d;
+  margin-top: 0.5rem;
+  display: block;
+  font-size: 0.875rem;
+}
+
+.actionButton {
+  border-radius: 0.5rem;
+  font-weight: 500;
+  padding: 0.5rem 1.25rem;
+}
+
+.errorIcon {
+  font-size: 3rem;
+  color: #dc3545;
+}
