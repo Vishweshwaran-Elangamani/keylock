@@ -1,4 +1,3 @@
-/* Overall layout - full width professional dashboard */
 .pmhr-fc-layout {
   display: flex;
   flex-direction: column;
@@ -8,10 +7,9 @@
   box-sizing: border-box;
 }
 
-/* Top header with breadcrumb */
 .pmhr-fc-header {
   display: flex;
-    flex-direction: column;   /* NEW: stack breadcrumb & steps */
+    flex-direction: column;   
   align-items: center;  
   gap: 2rem;
   margin-bottom: 1.25rem;
@@ -24,7 +22,6 @@
   align-self: flex-start; 
 }
 
-/* Breadcrumb always on left, outside the form card */
 .pmhr-fc-breadcrumb {
   display: flex;
   align-items: center;
@@ -78,19 +75,16 @@
   font-size: 0.9rem;
   color: #6b7280;
 }
-
-/* Center the step indicator row */
 .pmhr-fc-step-center {
   display: flex;
   justify-content: center;
   margin-bottom: 1rem;
 }
 
-/* Step indicator pill */
 .pmhr-fc-step-indicator {
   display: flex;
   align-items: center;
-  justify-content: center; /* centered */
+  justify-content: center; 
   gap: 60px;
   position: relative;
   padding: 0.5rem 1rem;
@@ -183,7 +177,6 @@
   background: #97247e;
 }
 
-/* Main content: wider stretched form card */
 .pmhr-fc-content {
   display: flex;
   flex-direction: column;
@@ -196,22 +189,19 @@
   padding-left: 1.25rem;
 }
 
-
-
 .pmhr-fc-form-container {
   width: 100%;
-  max-width: 950px;        /* or your preferred width */
-  margin: 0 auto;          /* center horizontally */
+  max-width: 950px;        
+  margin: 0 auto;          
   display: flex;
   flex-direction: column;
   gap: 0;
-  border: 1px solid #27235c;  /* move border here */
+  border: 1px solid #27235c;  
   border-radius: 10px;
   background: #ffffff;
 }
 
 
-/* Compact form content */
 .pmhr-fc-form-content {
   display: flex;
   flex-direction: column;
@@ -220,7 +210,6 @@
   position: relative;
 }
 
-/* Card sections */
 .pmhr-fc-section {
   background: #ffffff;
   border-radius: 10px;
@@ -283,12 +272,10 @@
   flex: 1;
 }
 
-/* Tighter vertical spacing for compact look */
 .pmhr-fc-section-body-compact .pmhr-fc-form-group {
   margin-bottom: 0.8rem;
 }
 
-/* Competencies list scroll */
 .pmhr-fc-competencies-section .pmhr-fc-section-body {
   max-height: calc(100vh - 330px);
   overflow-y: auto;
@@ -313,7 +300,6 @@
   background: #94a3b8;
 }
 
-/* Form groups */
 .pmhr-fc-form-group {
   display: flex;
   flex-direction: column;
@@ -330,7 +316,6 @@
   flex-direction: column;
 }
 
-/* Inline row for two-column compact layout */
 .pmhr-fc-form-row-two {
   display: flex;
   flex-direction: column;
@@ -346,7 +331,6 @@
   flex: 1;
 }
 
-/* Labels and fields */
 .pmhr-fc-label {
   display: block;
   font-size: 0.9rem;
@@ -365,7 +349,6 @@
 .pmhr-fc-textarea {
   width: 100%;
   padding: 0.55rem 0.8rem;
-  border: 1px solid  #27235c;
   border-radius: 6px;
   font-size: 0.95rem;
   color: #27235c;
@@ -401,7 +384,6 @@
   min-height: 60px;
 }
 
-/* Error text */
 .pmhr-fc-error-wrapper {
   display: flex;
   flex-direction: column;
@@ -418,7 +400,6 @@
   font-weight: 500;
 }
 
-/* Add competency button */
 .pmhr-fc-btn-add-comp {
   display: flex;
   align-items: center;
@@ -446,7 +427,6 @@
   transform: none;
 }
 
-/* Competency cards */
 .pmhr-fc-comp-card {
   background: #f9fafb;
   border: 1px solid #e5e7eb;
@@ -550,8 +530,6 @@
 .pmhr-fc-comp-body .pmhr-fc-form-group {
   margin-bottom: 0;
 }
-
-/* Warning alert */
 .pmhr-fc-alert-warning {
   display: flex;
   align-items: center;
@@ -570,7 +548,6 @@
   flex-shrink: 0;
 }
 
-/* Form actions - inline buttons, compact */
 .pmhr-fc-form-actions {
   display: flex;
   flex-direction: column;
@@ -636,7 +613,6 @@
   transform: none;
 }
 
-/* Loading state */
 .pmhr-fc-loading-container {
   display: flex;
   flex-direction: column;
@@ -679,7 +655,6 @@
   }
 }
 
-/* Auth error */
 .pmhr-fc-error-container {
   display: flex;
   flex-direction: column;
@@ -708,7 +683,6 @@
   margin: 0;
 }
 
-/* Focus styles for accessibility */
 .pmhr-fc-btn-add-comp:focus-visible,
 .pmhr-fc-btn-icon:focus-visible,
 .pmhr-fc-btn-cancel:focus-visible,
@@ -721,7 +695,6 @@
   outline-offset: 2px;
 }
 
-/* Responsive */
 @media (max-width: 1024px) {
   .pmhr-fc-header {
     flex-direction: column;

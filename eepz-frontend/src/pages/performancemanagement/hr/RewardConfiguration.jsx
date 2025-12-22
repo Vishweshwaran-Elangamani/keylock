@@ -190,10 +190,14 @@ function RewardConfiguration() {
 
   const handleToggleActive = async (rewardType) => {
     try {
+      // ✅ FIX: Only send the fields that UpdateRewardTypeDto expects
       const response = await updateRewardType(rewardType.rewardTypeId, {
-        ...rewardType,
+        rewardName: rewardType.rewardName,
+        description: rewardType.description || "",
         isActive: !rewardType.isActive,
+        isVisibleForManagerNomination: rewardType.isVisibleForManagerNomination || false
       });
+      
       if (response.data.success) {
         toast.success(`Reward type ${rewardType.isActive ? "deactivated" : "activated"} successfully!`);
         fetchRewardTypes();
@@ -202,10 +206,12 @@ function RewardConfiguration() {
           setParameters([]);
         }
       }
-    } catch {
+    } catch (error) {
+      console.error("Toggle error:", error);
       toast.error("Error updating reward type");
     }
   };
+  
 
 
   const handleBulkToggleActiveRewards = async () => {
@@ -215,31 +221,32 @@ function RewardConfiguration() {
       toast.warning("No active rewards to toggle");
       return;
     }
-
-
+  
     const allVisible = activeRewards.every((rt) => rt.isVisibleForManagerNomination === true);
     const newVisibility = !allVisible;
-
-
+  
     try {
       const updatePromises = activeRewards.map((rt) =>
         updateRewardType(rt.rewardTypeId, {
-          ...rt,
+          rewardName: rt.rewardName,           
+          description: rt.description || "",    
+          isActive: rt.isActive,                
           isVisibleForManagerNomination: newVisibility,
         })
       );
-
-
+  
       await Promise.all(updatePromises);
       
       toast.success(
         `All active rewards ${newVisibility ? "now visible to" : "hidden from"} managers!`
       );
       fetchRewardTypes();
-    } catch {
+    } catch (error) {
+      console.error("Bulk toggle error:", error);
       toast.error("Error updating bulk visibility");
     }
   };
+  
 
 
   const handleCreateParameter = async (e) => {

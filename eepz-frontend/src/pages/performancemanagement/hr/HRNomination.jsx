@@ -23,6 +23,12 @@ function HRNominations() {
   const [actionType, setActionType] = useState("");
   const [actionNominationId, setActionNominationId] = useState(null);
   const [actionRemarks, setActionRemarks] = useState("");
+  
+  // New state for viewing employees under a reward type
+  const [showEmployeeList, setShowEmployeeList] = useState(false);
+  const [selectedRewardEmployees, setSelectedRewardEmployees] = useState([]);
+  const [selectedRewardName, setSelectedRewardName] = useState("");
+  
   const navigate = useNavigate();
 
   const [statistics, setStatistics] = useState({
@@ -32,11 +38,6 @@ function HRNominations() {
     rejectedNominations: 0,
   });
   const [statsLoading, setStatsLoading] = useState(true);
-
-
-
-
-
 
   const THEME = {
     primary: "#27235c",
@@ -57,6 +58,7 @@ function HRNominations() {
     fetchNominations();
     fetchStatistics();
     setCurrentPage(1);
+    setShowEmployeeList(false);
   }, [activeTab]);
 
   const fetchStatistics = async () => {
@@ -142,6 +144,33 @@ function HRNominations() {
     }
   };
 
+  // Group nominations by reward type
+  const groupByRewardType = (nominations) => {
+    const grouped = {};
+    
+    nominations.forEach((opp) => {
+      const rewardName = opp.rewardType?.rewardName || "Unknown Reward";
+      
+      if (!grouped[rewardName]) {
+        grouped[rewardName] = {
+          rewardName: rewardName,
+          rewardCategory: opp.rewardType?.rewardCategory || "",
+          employees: [],
+          totalCount: 0,
+        };
+      }
+      
+      opp.nominations.forEach((nom) => {
+        if (nom.status === activeTab) {
+          grouped[rewardName].employees.push(nom);
+          grouped[rewardName].totalCount++;
+        }
+      });
+    });
+    
+    return Object.values(grouped).filter(group => group.totalCount > 0);
+  };
+
   const filterNominationsByStatus = (status) => {
     return nominations
       .map((opp) => ({
@@ -152,9 +181,10 @@ function HRNominations() {
   };
 
   const filteredNominations = filterNominationsByStatus(activeTab);
-  const allNominations = filteredNominations.flatMap((opp) => opp.nominations);
-  const totalPages = Math.ceil(allNominations.length / itemsPerPage);
-  const paginatedNominations = allNominations.slice(
+  const groupedRewards = groupByRewardType(filteredNominations);
+  
+  const totalPages = Math.ceil(groupedRewards.length / itemsPerPage);
+  const paginatedRewards = groupedRewards.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -172,13 +202,12 @@ function HRNominations() {
     setActionRemarks("");
     setShowActionModal(true);
   };
-
   const submitAction = async () => {
     if (!actionRemarks.trim()) {
       toast.warning("Please enter remarks");
       return;
     }
-
+  
     try {
       if (actionType === "approve") {
         const payload = {
@@ -187,13 +216,18 @@ function HRNominations() {
           approvalRemarks: actionRemarks,
           rejectionRemarks: "Not selected in final round",
         };
-
+  
         const { data } = await api.approveNominations(payload);
-
-        if (data.success) {
+  
+        if (data.success || data.Success) {
           toast.success(`✓ Nomination approved successfully!`);
           setShowActionModal(false);
           setActionRemarks("");
+          
+          setSelectedRewardEmployees(prev => 
+            prev.filter(emp => emp.nominationId !== actionNominationId)
+          );
+          
           fetchNominations();
           fetchStatistics();
         }
@@ -203,11 +237,16 @@ function HRNominations() {
           hrUserId: 1,
           rejectionRemarks: actionRemarks,
         });
-
-        if (data.success) {
+  
+        if (data.success || data.Success) {
           toast.success(`✓ Nomination rejected successfully!`);
           setShowActionModal(false);
           setActionRemarks("");
+          
+          setSelectedRewardEmployees(prev => 
+            prev.filter(emp => emp.nominationId !== actionNominationId)
+          );
+          
           fetchNominations();
           fetchStatistics();
         }
@@ -217,7 +256,7 @@ function HRNominations() {
       toast.error("Error: " + (error.response?.data?.message || error.message));
     }
   };
-
+  
   const viewDetails = async (nominationId) => {
     try {
       setDetailsLoading(true);
@@ -232,6 +271,24 @@ function HRNominations() {
     } finally {
       setDetailsLoading(false);
     }
+  };
+
+  const viewEmployeeList = (rewardGroup) => {
+    setSelectedRewardName(rewardGroup.rewardName);
+    setSelectedRewardEmployees(rewardGroup.employees);
+    setShowEmployeeList(true);
+  };
+
+  const goBackToNominations = () => {
+    setShowEmployeeList(false);
+    setSelectedRewardName("");
+    setSelectedRewardEmployees([]);
+  };
+
+  // Handle breadcrumb click for Nominations
+  const handleNominationsClick = (e) => {
+    if (e) e.preventDefault();
+    goBackToNominations();
   };
 
   const statIcons = {
@@ -260,7 +317,6 @@ function HRNominations() {
     </div>
   );
 
-
   if (loading) {
     return (
       <div
@@ -275,6 +331,244 @@ function HRNominations() {
     );
   }
 
+  // Employee List View - COMPACT 2 COLUMNS
+  if (showEmployeeList) {
+    return (
+      <div style={{ background: THEME.background, minHeight: "100vh", paddingTop: "16px", paddingBottom: "32px" }}>
+        <ToastContainer position="top-right" autoClose={3000} />
+        
+        <div className="container-fluid">
+          {/* Breadcrumb with custom handler */}
+          <div onClick={(e) => {
+            // Check if Nominations breadcrumb was clicked
+            const target = e.target;
+            if (target.textContent === "Nominations" || target.closest('[data-breadcrumb="nominations"]')) {
+              handleNominationsClick(e);
+            }
+          }}>
+            <Breadcrumb
+              items={[
+                { label: "Dashboard", path: "/hr/dashboard" },
+                { label: "Performance", path: "/hr/dashboard/performance" },
+                { label: "Nominations", path: "/hr/dashboard/performance/nominations", isClickable: true, onClick: handleNominationsClick },
+                { label: selectedRewardName, path: null }
+              ]}
+            />
+          </div>
+
+          {/* Header */}
+          <div style={{
+            background: "#fff",
+            border: "2px solid #27235c",
+            borderRadius: "12px",
+            padding: "16px 20px",
+            marginBottom: "20px",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center"
+          }}>
+            <div>
+              <h4 style={{ margin: 0, color: THEME.primary, fontSize: "18px", fontWeight: "700" }}>
+                {selectedRewardName}
+              </h4>
+              <p style={{ margin: 0, color: THEME.textLight, fontSize: "13px" }}>
+                {selectedRewardEmployees.length} employee(s) nominated
+              </p>
+            </div>
+            <div style={{
+              background: THEME.primary,
+              color: "#fff",
+              padding: "6px 16px",
+              borderRadius: "20px",
+              fontSize: "16px",
+              fontWeight: "700"
+            }}>
+              {selectedRewardEmployees.length}
+            </div>
+          </div>
+
+          {/* Employee Cards - 2 COLUMNS COMPACT */}
+          <div className="row g-3">
+            {selectedRewardEmployees.map((employee) => (
+              <div key={employee.nominationId} className="col-md-6">
+                <div
+                  style={{
+                    background: "#fff",
+                    border: "2px solid #e5e7eb",
+                    borderRadius: "10px",
+                    padding: "14px 16px",
+                    transition: "all 0.2s",
+                    height: "100%"
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = THEME.primary;
+                    e.currentTarget.style.boxShadow = "0 4px 12px rgba(39,35,92,0.1)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = "#e5e7eb";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                >
+                  {/* Employee Header - LEFT ALIGNED */}
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
+                    <div style={{
+                      width: "40px",
+                      height: "40px",
+                      flexShrink: 0,
+                      borderRadius: "50%",
+                      background: `linear-gradient(135deg, ${THEME.primary} 0%, ${THEME.secondary} 100%)`,
+                      color: "#fff",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "16px",
+                      fontWeight: "700"
+                    }}>
+                      {employee.nomineeName.charAt(0).toUpperCase()}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
+                      <h6 style={{ margin: 0, fontSize: "15px", fontWeight: "700", color: THEME.text }}>
+                        {employee.nomineeName}
+                      </h6>
+                      <p style={{ margin: 0, fontSize: "12px", color: THEME.textLight }}>
+                        {employee.nomineeEmail}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Info Grid */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "12px" }}>
+                    <div style={{ background: "#f8f9fc", padding: "8px 10px", borderRadius: "6px" }}>
+                      <span style={{ fontSize: "10px", color: THEME.textLight, fontWeight: "600", textTransform: "uppercase", display: "block" }}>
+                        Department
+                      </span>
+                      <p style={{ margin: 0, fontSize: "13px", fontWeight: "600", color: THEME.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {employee.nomineeDepartmentName}
+                      </p>
+                    </div>
+                    <div style={{ background: "#f8f9fc", padding: "8px 10px", borderRadius: "6px" }}>
+                      <span style={{ fontSize: "10px", color: THEME.textLight, fontWeight: "600", textTransform: "uppercase", display: "block" }}>
+                        Submitted
+                      </span>
+                      <p style={{ margin: 0, fontSize: "13px", fontWeight: "600", color: THEME.text }}>
+                        {new Date(employee.submittedAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Justification */}
+                  {employee.justification && (
+                    <div style={{
+                      background: "#f8f9fc",
+                      padding: "10px",
+                      borderRadius: "6px",
+                      borderLeft: `3px solid ${THEME.primary}`,
+                      marginBottom: "12px"
+                    }}>
+                      <p style={{ 
+                        margin: 0, 
+                        fontSize: "12px", 
+                        color: THEME.text, 
+                        lineHeight: "1.5",
+                        display: "-webkit-box",
+                        WebkitLineClamp: "2",
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden"
+                      }}>
+                        {employee.justification}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Action Buttons - ICON ONLY */}
+                  <div style={{ display: "flex", gap: "6px", justifyContent: "center" }}>
+                    <button
+                      onClick={() => viewDetails(employee.nominationId)}
+                      title="View Details"
+                      style={{
+                        padding: "6px 8px",
+                        background: "#fff",
+                        color: THEME.primary,
+                        border: `1.3px solid ${THEME.primary}`,
+                        borderRadius: "6px",
+                        fontSize: "15px",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <i className="bi bi-eye" />
+                    </button>
+                    {activeTab === "Pending" && (
+                      <>
+                        <button
+                          onClick={() => openApproveModal(employee.nominationId)}
+                          title="Approve"
+                          style={{
+                            padding: "6px 8px",
+                            background: "#fff",
+                            color: THEME.success,
+                            border: `1.3px solid ${THEME.success}`,
+                            borderRadius: "6px",
+                            fontSize: "15px",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <i className="bi bi-check-circle" />
+                        </button>
+                        <button
+                          onClick={() => openRejectModal(employee.nominationId)}
+                          title="Reject"
+                          style={{
+                            padding: "6px 8px",
+                            background: "#fff",
+                            color: THEME.danger,
+                            border: `1.3px solid ${THEME.danger}`,
+                            borderRadius: "6px",
+                            fontSize: "15px",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <i className="bi bi-x-circle" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <ViewDetailsModal
+          showModal={showModal}
+          setShowModal={setShowModal}
+          detailsLoading={detailsLoading}
+          selectedNominationDetails={selectedNominationDetails}
+          THEME={THEME}
+        />
+
+        <ActionModal
+          show={showActionModal}
+          onClose={() => setShowActionModal(false)}
+          actionType={actionType}
+          actionRemarks={actionRemarks}
+          setActionRemarks={setActionRemarks}
+          onSubmit={submitAction}
+          THEME={THEME}
+        />
+      </div>
+    );
+  }
+
+  // Main View - Grouped by Reward Type
   return (
     <div style={{ background: THEME.background, minHeight: "100vh", paddingTop: "16px", paddingBottom: "32px" }}>
       <ToastContainer position="top-right" autoClose={3000} />
@@ -309,15 +603,13 @@ function HRNominations() {
       `}</style>
 
       <div className="container-fluid">
-      <Breadcrumb
-  items={[
-    { label: "Dashboard", path: "/hr/dashboard" },
-    { label: "Performance", path: "/hr/dashboard/performance" },
-    { label: "Nominations", path: null }
-  ]}
-/>
- 
-
+        <Breadcrumb
+          items={[
+            { label: "Dashboard", path: "/hr/dashboard" },
+            { label: "Performance", path: "/hr/dashboard/performance" },
+            { label: "Nominations", path: null }
+          ]}
+        />
 
         {statsLoading ? (
           <div className="text-center mb-3">
@@ -338,9 +630,6 @@ function HRNominations() {
               <StatCard title="Rejected" value={statistics.rejectedNominations} />
             </div>
           </div>
-
-
-
         )}
 
         <div
@@ -384,7 +673,6 @@ function HRNominations() {
               height: "36px",
             }}
           >
-
             <button
               onClick={() => setViewMode("grid")}
               title="Grid View"
@@ -430,11 +718,10 @@ function HRNominations() {
             >
               <i className="bi bi-table" style={{ fontSize: 18 }} />
             </button>
-
           </div>
         </div>
 
-        {filteredNominations.length === 0 ? (
+        {groupedRewards.length === 0 ? (
           <div
             style={{
               background: "#fff",
@@ -469,149 +756,123 @@ function HRNominations() {
                       style={{
                         fontWeight: "700",
                         color: "#fff",
-                        padding: "12px",
+                        padding: "12px 20px",
                         fontSize: "13px",
                         textTransform: "uppercase",
                         letterSpacing: "0.4px",
                         textAlign: "left",
                       }}
                     >
-                      Nominee
+                      Reward Type
                     </th>
                     <th
                       style={{
                         fontWeight: "700",
                         color: "#fff",
-                        padding: "12px",
+                        padding: "12px 20px",
                         fontSize: "13px",
                         textTransform: "uppercase",
                         letterSpacing: "0.4px",
-                        textAlign: "left",
+                        textAlign: "center",
                       }}
                     >
-                      Department
+                      Nominated Employees
                     </th>
                     <th
                       style={{
                         fontWeight: "700",
                         color: "#fff",
-                        padding: "12px",
+                        padding: "12px 20px",
                         fontSize: "13px",
                         textTransform: "uppercase",
                         letterSpacing: "0.4px",
-                        textAlign: "left",
+                        textAlign: "center",
                       }}
                     >
-                      Submitted Date
+                      Actions
                     </th>
-                    {activeTab === "Pending" && (
-                      <th
-                        style={{
-                          fontWeight: "700",
-                          color: "#fff",
-                          padding: "12px",
-                          fontSize: "13px",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.4px",
-                          textAlign: "center",
-                        }}
-                      >
-                        Actions
-                      </th>
-                    )}
                   </tr>
                 </thead>
                 <tbody>
-                  {paginatedNominations.map((nomination, index) => (
+                  {paginatedRewards.map((reward, index) => (
                     <tr
-                      key={nomination.nominationId}
+                      key={reward.rewardName}
                       style={{
-                        borderBottom: index < paginatedNominations.length - 1 ? "1px solid #e5e7eb" : "none",
+                        borderBottom: index < paginatedRewards.length - 1 ? "1px solid #e5e7eb" : "none",
                       }}
                     >
-                      <td style={{ padding: "12px", verticalAlign: "middle", textAlign: "left" }}>
-                        <div style={{ fontWeight: "600", color: "#1A202C", fontSize: "13px" }}>
-                          {nomination.nomineeName}
-                        </div>
-                        <div style={{ color: "#718096", fontSize: "11px", marginTop: "2px" }}>
-                          {nomination.nomineeEmail}
-                        </div>
-                      </td>
-                      <td
-                        style={{
-                          color: "#1A202C",
-                          fontSize: "13px",
-                          verticalAlign: "middle",
-                          padding: "12px",
-                          fontWeight: "500",
-                          textAlign: "left",
-                        }}
-                      >
-                        {nomination.nomineeDepartmentName}
-                      </td>
-                      <td style={{ color: "#718096", fontSize: "13px", verticalAlign: "middle", padding: "12px", textAlign: "left" }}>
-                        {new Date(nomination.submittedAt).toLocaleDateString()}
-                      </td>
-                      {activeTab === "Pending" && (
-                        <td style={{ verticalAlign: "middle", padding: "12px", textAlign: "center" }}>
-                          <div style={{ display: "flex", gap: "6px", justifyContent: "center" }}>
-                            <button
-                              onClick={() => viewDetails(nomination.nominationId)}
-                              title="View"
-                              style={{
-                                padding: "6px 8px",
-                                background: "#fff",
-                                color: "#4a73e8",
-                                border: "1.3px solid #4a73e8",
-                                borderRadius: "6px",
-                                fontSize: "15px",
-                                cursor: "pointer",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                              }}
-                            >
-                              <i className="bi bi-eye" />
-                            </button>
-                            <button
-                              onClick={() => openApproveModal(nomination.nominationId)}
-                              title="Approve"
-                              style={{
-                                padding: "6px 8px",
-                                background: "#fff",
-                                color: "#10B981",
-                                border: "1.3px solid #10B981",
-                                borderRadius: "6px",
-                                fontSize: "15px",
-                                cursor: "pointer",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                              }}
-                            >
-                              <i className="bi bi-check-circle" />
-                            </button>
-                            <button
-                              onClick={() => openRejectModal(nomination.nominationId)}
-                              title="Reject"
-                              style={{
-                                padding: "6px 8px",
-                                background: "#fff",
-                                color: "#EF4444",
-                                border: "1.3px solid #EF4444",
-                                borderRadius: "6px",
-                                fontSize: "15px",
-                                cursor: "pointer",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                              }}
-                            >
-                              <i className="bi bi-x-circle" />
-                            </button>
+                      <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                          <div style={{
+                            width: "40px",
+                            height: "40px",
+                            borderRadius: "8px",
+                            background: `linear-gradient(135deg, ${THEME.primary} 0%, ${THEME.secondary} 100%)`,
+                            color: "#fff",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: "18px",
+                            fontWeight: "700"
+                          }}>
+                            <i className="bi bi-award-fill" />
                           </div>
-                        </td>
-                      )}
+                          <div>
+                            <div style={{ fontWeight: "700", color: THEME.text, fontSize: "15px" }}>
+                              {reward.rewardName}
+                            </div>
+                           
+                          </div>
+                        </div>
+                      </td>
+                      <td style={{ padding: "16px 20px", verticalAlign: "middle", textAlign: "center" }}>
+                        <div style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          background: THEME.primary,
+                          color: "#fff",
+                          padding: "6px 16px",
+                          borderRadius: "20px",
+                          fontSize: "14px",
+                          fontWeight: "700"
+                        }}>
+                          <i className="bi bi-people-fill" />
+                          {reward.totalCount}
+                        </div>
+                      </td>
+                      <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
+                        <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
+                          <button
+                            onClick={() => viewEmployeeList(reward)}
+                            title="View Employees"
+                            style={{
+                              padding: "8px 16px",
+                              background: THEME.primary,
+                              color: "#fff",
+                              border: "none",
+                              borderRadius: "8px",
+                              fontSize: "13px",
+                              fontWeight: "700",
+                              cursor: "pointer",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "6px",
+                              transition: "all 0.2s"
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.transform = "translateY(-2px)";
+                              e.currentTarget.style.boxShadow = "0 4px 12px rgba(39,35,92,0.3)";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.transform = "translateY(0)";
+                              e.currentTarget.style.boxShadow = "none";
+                            }}
+                          >
+                            View Nominations
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -668,103 +929,105 @@ function HRNominations() {
           </>
         ) : (
           <>
-            <div className="row g-2 mb-3">
-              {paginatedNominations.map((nomination) => (
-                <div key={nomination.nominationId} className="col-md-6 col-lg-4 col-xl-3">
+            <div className="row g-3 mb-3">
+              {paginatedRewards.map((reward) => (
+                <div key={reward.rewardName} className="col-md-6 col-lg-4">
                   <div
                     style={{
                       background: "#fff",
-                      border: "1.5px solid #27235c",
-                      borderRadius: "8px",
-                      padding: "12px",
+                      border: "2px solid #27235c",
+                      borderRadius: "12px",
+                      padding: "20px",
                       transition: "transform 0.2s, box-shadow 0.2s",
                       cursor: "pointer",
-                      boxShadow: "0 1px 3px rgba(39,35,92,0.06)",
+                      height: "100%",
+                      display: "flex",
+                      flexDirection: "column"
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = "translateY(-2px)";
-                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(39,35,92,0.1)";
+                      e.currentTarget.style.transform = "translateY(-4px)";
+                      e.currentTarget.style.boxShadow = "0 8px 20px rgba(39,35,92,0.15)";
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.transform = "translateY(0)";
-                      e.currentTarget.style.boxShadow = "0 1px 3px rgba(39,35,92,0.06)";
+                      e.currentTarget.style.boxShadow = "none";
                     }}
                   >
-                    <div style={{ marginBottom: "8px" }}>
-                      <h6 style={{ color: "#27235c", fontWeight: "700", fontSize: "13.5px", marginBottom: "2px" }}>
-                        {nomination.nomineeName}
-                      </h6>
+                    <div style={{
+                      width: "56px",
+                      height: "56px",
+                      borderRadius: "12px",
+                      background: `linear-gradient(135deg, ${THEME.primary} 0%, ${THEME.secondary} 100%)`,
+                      color: "#fff",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "24px",
+                      marginBottom: "16px"
+                    }}>
+                      <i className="bi bi-award-fill" />
                     </div>
-                    <div style={{ background: "#f8f9fc", padding: "8px", borderRadius: "5px", marginBottom: "10px" }}>
-                      <p style={{ fontSize: "11px", marginBottom: "5px" }}>
-                        <span style={{ color: "#718096", fontWeight: "600" }}>Dept:</span>
-                        <br />
-                        <span style={{ color: "#1A202C", fontWeight: "600", fontSize: "12px" }}>
-                          {nomination.nomineeDepartmentName}
-                        </span>
+                    
+                    <h5 style={{
+                      color: THEME.primary,
+                      fontSize: "17px",
+                      fontWeight: "700",
+                      marginBottom: "8px"
+                    }}>
+                      {reward.rewardName}
+                    </h5>
+                    
+                    {reward.rewardCategory && (
+                      <p style={{
+                        color: THEME.textLight,
+                        fontSize: "12px",
+                        marginBottom: "12px"
+                      }}>
+                        {reward.rewardCategory}
                       </p>
-                      <p style={{ fontSize: "11px", margin: 0 }}>
-                        <span style={{ color: "#718096", fontWeight: "600" }}>Submitted:</span>
-                        <br />
-                        <span style={{ color: "#1A202C", fontWeight: "500", fontSize: "11px" }}>
-                          {new Date(nomination.submittedAt).toLocaleDateString()}
-                        </span>
-                      </p>
+                    )}
+
+                    <div style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      padding: "12px",
+                      background: "#f8f9fc",
+                      borderRadius: "8px",
+                      marginBottom: "16px"
+                    }}>
+                      <i className="bi bi-people-fill" style={{ fontSize: "20px", color: THEME.primary }} />
+                      <div>
+                        <div style={{ fontSize: "24px", fontWeight: "700", color: THEME.primary }}>
+                          {reward.totalCount}
+                        </div>
+                        <div style={{ fontSize: "11px", color: THEME.textLight, fontWeight: "600" }}>
+                          Nominated Employees
+                        </div>
+                      </div>
                     </div>
-                    <div style={{ display: "flex", gap: "5px" }}>
-                      <button
-                        style={{
-                          flex: 1,
-                          background: "#27235c",
-                          color: "#fff",
-                          border: "none",
-                          fontWeight: "700",
-                          fontSize: "11px",
-                          padding: "7px",
-                          borderRadius: "5px",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => viewDetails(nomination.nominationId)}
-                      >
-                        View
-                      </button>
-                      {activeTab === "Pending" && (
-                        <>
-                          <button
-                            style={{
-                              background: "#10B981",
-                              color: "#fff",
-                              border: "none",
-                              fontWeight: "700",
-                              padding: "7px 10px",
-                              fontSize: "13px",
-                              borderRadius: "5px",
-                              cursor: "pointer",
-                            }}
-                            onClick={() => openApproveModal(nomination.nominationId)}
-                            title="Approve"
-                          >
-                            ✓
-                          </button>
-                          <button
-                            style={{
-                              background: "#EF4444",
-                              color: "#fff",
-                              border: "none",
-                              fontWeight: "700",
-                              padding: "7px 10px",
-                              fontSize: "13px",
-                              borderRadius: "5px",
-                              cursor: "pointer",
-                            }}
-                            onClick={() => openRejectModal(nomination.nominationId)}
-                            title="Reject"
-                          >
-                            ✗
-                          </button>
-                        </>
-                      )}
-                    </div>
+
+                    <button
+                      onClick={() => viewEmployeeList(reward)}
+                      style={{
+                        width: "100%",
+                        padding: "12px",
+                        background: THEME.primary,
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: "8px",
+                        fontSize: "14px",
+                        fontWeight: "700",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "8px",
+                        marginTop: "auto"
+                      }}
+                    >
+                      <i className="bi bi-eye" /> View Details
+                    </button>
                   </div>
                 </div>
               ))}

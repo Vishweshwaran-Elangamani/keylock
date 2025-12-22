@@ -8,10 +8,12 @@ import logoImage from "../../../assets/logodark.png";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 import "../../../components/performance_management/modals/ManagerPerformanceDashboard/ManagerPerformanceDashboardModal";
 
+
 export default function ManagerDashboard() {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
   const userId = user ? user.empId : null;
+
 
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -22,11 +24,13 @@ export default function ManagerDashboard() {
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState("pending");
 
+
   const recentToastsRef = useRef(new Set());
   const safeToast = (type, message, id, duration = 3000) => {
     const key = id || message;
     if (recentToastsRef.current.has(key)) return;
     recentToastsRef.current.add(key);
+
 
     const options = { duration, icon: null };
     switch (type) {
@@ -34,6 +38,7 @@ export default function ManagerDashboard() {
         console.info("SUCCESS:", message);
         break;
       case "info":
+        console.log("INFO:", message);
         break;
       case "warning":
         toast(message, options);
@@ -45,10 +50,12 @@ export default function ManagerDashboard() {
         toast(message, options);
     }
 
+
     setTimeout(() => {
       recentToastsRef.current.delete(key);
     }, duration + 200);
   };
+
 
 
   const [pendingFormNameInput, setPendingFormNameInput] = useState("");
@@ -58,17 +65,20 @@ export default function ManagerDashboard() {
   const [completedFormNameFilter, setCompletedFormNameFilter] = useState("");
   const [completedTypeFilter, setCompletedTypeFilter] = useState("");
 
+
   useEffect(() => {
     if (userId) {
       fetchAssignments();
     }
   }, [userId]);
 
+
   const fetchAssignments = async () => {
     if (!userId) {
       safeToast("error", "Unable to load manager ID. Please login again.", "no-manager-id");
       return;
     }
+
 
     setLoading(true);
     setAssignments([]);
@@ -98,6 +108,7 @@ export default function ManagerDashboard() {
     }
   };
 
+
   const updateAssessmentData = (competencyId, field, value) => {
     setAssessmentData((prev) =>
       prev.map((item) =>
@@ -106,6 +117,7 @@ export default function ManagerDashboard() {
     );
   };
 
+
   const handleSubmitAssessment = async () => {
     const incompleteRating = assessmentData.filter((item) => !item.rating);
     if (incompleteRating.length > 0) {
@@ -113,11 +125,13 @@ export default function ManagerDashboard() {
       return;
     }
 
+
     const incompleteComments = assessmentData.filter((item) => !item.comments || item.comments.trim() === "");
     if (incompleteComments.length > 0) {
       safeToast("warning", "Please provide comments for all competencies.", "incomplete-comments");
       return;
     }
+
 
     setSubmitting(true);
     const payload = {
@@ -130,6 +144,7 @@ export default function ManagerDashboard() {
         employeeComments: item.comments || "",
       })),
     };
+
 
     try {
       const response = await api.post("/SelfAssessment/submit", payload);
@@ -146,6 +161,7 @@ export default function ManagerDashboard() {
       setSubmitting(false);
     }
   };
+
 
   const handleViewCompleted = async (assignment) => {
     setCurrentAssignment(assignment);
@@ -177,6 +193,7 @@ export default function ManagerDashboard() {
     }
   };
 
+
   const pendingAssignments = assignments
     .filter((a) => !a.isCompleted)
     .filter((a) => {
@@ -184,6 +201,7 @@ export default function ManagerDashboard() {
       const matchesType = pendingTypeFilter === "" || a.formType === pendingTypeFilter;
       return matchesFormName && matchesType;
     });
+
 
   const completedAssignments = assignments
     .filter((a) => a.isCompleted)
@@ -193,7 +211,9 @@ export default function ManagerDashboard() {
       return matchesFormName && matchesType;
     });
 
+
   const allFormTypes = [...new Set(assignments.map(a => a.formType))];
+
 
   const renderTable = (data, isCompleted) => (
     <div className="manevap-table-container">
@@ -266,15 +286,39 @@ export default function ManagerDashboard() {
                       e.currentTarget.style.transform = "translateY(0)";
                     }}
                   >
-                    
                     Submit
                   </button>
                 ) : (
                   <button
                     className="manevap-btn manevap-btn-view"
                     onClick={() => handleViewCompleted(assignment)}
+                    style={{
+                      background: "linear-gradient(135deg, #97247E 0%, #E01950 100%)",
+                      border: "none",
+                      boxShadow: "0 4px 12px rgba(151, 36, 126, 0.3)",
+                      color: "white",
+                      padding: "8px 16px",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                      fontWeight: 600,
+                      fontSize: "14px",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      transition: "all 0.2s"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = "linear-gradient(135deg, #7d1a6a 0%, #c01640 100%)";
+                      e.currentTarget.style.boxShadow = "0 6px 16px rgba(151, 36, 126, 0.4)";
+                      e.currentTarget.style.transform = "translateY(-1px)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = "linear-gradient(135deg, #97247E 0%, #E01950 100%)";
+                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(151, 36, 126, 0.3)";
+                      e.currentTarget.style.transform = "translateY(0)";
+                    }}
                   >
-                    <i className="bi bi-eye-fill"></i>
+                    <i className="bi bi-eye-fill"></i> View
                   </button>
                 )}
               </td>
@@ -285,22 +329,21 @@ export default function ManagerDashboard() {
     </div>
   );
 
+
   const internalStyles = `
   /* Breadcrumb purple color and remove underline */
   .hrfcper-top-bar a {
-    color: #97247E
-  !important;
+    color: #97247E !important;
     text-decoration: none !important;
   }
   .hrfcper-top-bar a:hover {
-    color:#97247E
-  !important;
+    color:#97247E !important;
     text-decoration: none !important;
   }
   .hrfcper-top-bar span {
-    color:#97247E
- !important;
+    color:#97247E !important;
   }
+
 
   .mgrdash-pill-toggle {
     display: flex;
@@ -353,6 +396,7 @@ export default function ManagerDashboard() {
     margin-left: 10px;
   }
 
+
   /* Remove background from filter section */
   .manevap-filter-section {
     background: transparent !important;
@@ -360,6 +404,7 @@ export default function ManagerDashboard() {
     padding: 0 !important;
     margin-bottom: 20px !important;
   }
+
 
   /* Unified search bar styling */
   .unified-search-wrapper {
@@ -370,11 +415,13 @@ export default function ManagerDashboard() {
     background: white;
   }
 
+
   .unified-search-wrapper .manevap-filter-input {
     border: none !important;
     border-radius: 0 !important;
     margin: 0 !important;
   }
+
 
   .unified-search-wrapper .manevap-btn-primary {
     border-radius: 0 !important;
@@ -383,12 +430,14 @@ export default function ManagerDashboard() {
     border-left: 2px solid #26225A !important;
   }
 
+
   /* Card with only outer border */
   .manevap-card {
     border: 2px solid #26225A !important;
     border-radius: 8px !important;
     box-shadow: none !important;
   }
+
 
   @media (max-width: 700px) {
     .mgrdash-pill-toggle {
@@ -403,6 +452,7 @@ export default function ManagerDashboard() {
     }
   }
   `;
+
 
   if (loading) {
     return (
@@ -419,6 +469,7 @@ export default function ManagerDashboard() {
       </div>
     );
   }
+
 
   return (
     <div className="manevap-container">
@@ -442,6 +493,7 @@ export default function ManagerDashboard() {
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
       />
 
+
       {/* Updated Pill Toggle */}
       <div className="mgrdash-pill-toggle" role="tablist" aria-label="Assignments">
         <button
@@ -461,6 +513,7 @@ export default function ManagerDashboard() {
           Completed <span className="mgrdash-pill-count">{completedAssignments.length}</span>
         </button>
       </div>
+
 
       {activeTab === "pending" && (
         <div className="manevap-card">
@@ -482,8 +535,24 @@ export default function ManagerDashboard() {
                 >
                   Search
                 </button>
+
+                
               </div>
+              
             </div>
+            {(pendingFormNameFilter || pendingTypeFilter) && (
+              <button
+                onClick={() => {
+                  setPendingFormNameInput("");
+                  setPendingFormNameFilter("");
+                  setPendingTypeFilter("");
+                }}
+                className="manevap-clear-btn"
+              >
+               
+                Clear Filters
+              </button>
+            )}
             <div className="manevap-filter-group">
               <select
                 value={pendingTypeFilter}
@@ -497,19 +566,7 @@ export default function ManagerDashboard() {
                 ))}
               </select>
             </div>
-            {(pendingFormNameFilter || pendingTypeFilter) && (
-              <button
-                onClick={() => {
-                  setPendingFormNameInput("");
-                  setPendingFormNameFilter("");
-                  setPendingTypeFilter("");
-                }}
-                className="manevap-clear-btn"
-              >
-                <i className="bi bi-x-circle"></i>
-                Clear Filters
-              </button>
-            )}
+           
           </div>
           {pendingAssignments.length === 0 ? (
             <div className="manevap-empty-state">
@@ -530,6 +587,7 @@ export default function ManagerDashboard() {
           )}
         </div>
       )}
+
 
 
       {activeTab === "completed" && (
@@ -602,6 +660,7 @@ export default function ManagerDashboard() {
       )}
 
 
+
 {showModal && currentAssignment && (
   <div className="manevap-modal-overlay" onClick={() => setShowModal(false)}>
     <div 
@@ -647,6 +706,7 @@ export default function ManagerDashboard() {
             </div>
           </div>
 
+
           {/* Form name CENTERED */}
           <div style={{ 
             flex: 1, 
@@ -664,6 +724,7 @@ export default function ManagerDashboard() {
               {currentAssignment?.formName || ""}
             </div>
           </div>
+
 
           {/* Close button on RIGHT */}
           <button
@@ -688,6 +749,7 @@ export default function ManagerDashboard() {
           </button>
         </div>
       </div>
+
 
       {/* SCROLLABLE BODY */}
       {submitting && modalMode === "view" ? (
@@ -758,6 +820,7 @@ export default function ManagerDashboard() {
               </tbody>
             </table>
           </div>
+
 
           {/* FIXED FOOTER */}
           <div
@@ -833,10 +896,7 @@ export default function ManagerDashboard() {
       )}
     </div>
   </div>
-)}
-
-             
-          
+)}      
     </div>
   );
 }
