@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
+import { Spinner, CloseButton } from "react-bootstrap";
 import departmentService from "../../../../services/auth/departmentService";
+import userService from "../../../../services/auth/userService";
 import { toast } from "sonner";
 
 const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
@@ -7,10 +9,17 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
     departmentId: "",
     departmentName: "",
     departmentCode: "",
+    description: "",
+    status: "Active",
+    parentDepartmentId: "",
+    hodEmployeeId: "",
   });
 
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [departments, setDepartments] = useState([]);
+  const [departmentHeads, setDepartmentHeads] = useState([]);
+  const [loadingDropdowns, setLoadingDropdowns] = useState(true);
 
   useEffect(() => {
     if (department && show) {
@@ -18,10 +27,45 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
         departmentId: department.departmentId || "",
         departmentName: department.departmentName || "",
         departmentCode: department.departmentCode || "",
+        description: department.description || "",
+        status: department.status || "Active",
+        parentDepartmentId: department.parentDepartmentId ?? "",
+        hodEmployeeId: department.hodEmployeeId ?? "",
       });
       setErrors({});
+      fetchDropdownData();
     }
   }, [department, show]);
+
+  const fetchDropdownData = async () => {
+    try {
+      setLoadingDropdowns(true);
+
+      // Fetch active departments (exclude current department)
+      const deptResponse = await departmentService.getActiveDepartments();
+      if (deptResponse.success) {
+        const filteredDepts = (deptResponse.data || []).filter(
+          (dept) => dept.departmentId !== department.departmentId
+        );
+        setDepartments(filteredDepts);
+      }
+
+      // Fetch ALL users and filter for Department Head role on frontend
+      const usersResponse = await userService.getAllUsers();
+      if (usersResponse.success) {
+        // Filter only users with Department Head role (RoleCode === "DEPT_HEAD")
+        const filteredHeads = (usersResponse.data || []).filter(
+          (user) => user.roleName === "Department Head"  && user.status === "Active"
+        );
+        setDepartmentHeads(filteredHeads);
+      }
+    } catch (error) {
+      console.error("Error loading dropdown data:", error);
+      toast.error("Failed to load dropdown data");
+    } finally {
+      setLoadingDropdowns(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -30,44 +74,37 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
       [name]: value,
     }));
     if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: "",
-      }));
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-    if (!formData.departmentName.trim()) {
-      newErrors.departmentName = "Department name is required";
-    } else if (formData.departmentName.trim().length < 3) {
-      newErrors.departmentName = "Department name must be at least 3 characters";
-    }
-    if (!formData.departmentCode.trim()) {
-      newErrors.departmentCode = "Department code is required";
-    } else if (formData.departmentCode.trim().length < 2) {
-      newErrors.departmentCode = "Department code must be at least 2 characters";
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) {
-      toast.error("Enter Valid Details!");
-      return;
-    }
+
     try {
       setLoading(true);
       toast.loading("Updating department...");
+
+      // Build payload - ALWAYS send all editable fields
       const payload = {
         departmentId: formData.departmentId,
-        departmentName: formData.departmentName,
-        departmentCode: formData.departmentCode,
+        description: formData.description.trim() || null,
+        status: formData.status,
+        // IMPORTANT: Always send these fields (even if unchanged)
+        parentDepartmentId: 
+          formData.parentDepartmentId === "" || formData.parentDepartmentId === null
+            ? null
+            : parseInt(formData.parentDepartmentId),
+        hodEmployeeId: 
+          formData.hodEmployeeId === "" || formData.hodEmployeeId === null
+            ? null
+            : parseInt(formData.hodEmployeeId),
       };
+
+      console.log("✅ Update Payload (All Fields):", payload);
+
       const response = await departmentService.updateDepartment(payload);
+
       if (response.success) {
         toast.dismiss();
         toast.success("Department updated successfully");
@@ -92,7 +129,7 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
 
   return (
     <>
-      {/* Blurred Blue Backdrop */}
+      {/* Backdrop */}
       <div
         style={{
           position: "fixed",
@@ -108,7 +145,7 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
         onClick={onClose}
       />
 
-      {/* Centered Modal */}
+      {/* Modal */}
       <div
         style={{
           position: "fixed",
@@ -116,7 +153,9 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
           left: "50%",
           transform: "translate(-50%, -50%)",
           width: "95%",
-          maxWidth: "490px",
+          maxWidth: "550px",
+          maxHeight: "90vh",
+          overflowY: "auto",
           zIndex: 1050,
         }}
       >
@@ -126,12 +165,11 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
             background: "#fff",
             boxShadow: "0 8px 28px rgba(0,0,0,0.22)",
             overflow: "hidden",
-            width: "100%",
             display: "flex",
             flexDirection: "column",
           }}
         >
-          {/* HEADER */}
+          {/* Header */}
           <div
             style={{
               background: "#27235C",
@@ -142,155 +180,160 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
               justifyContent: "space-between",
               fontSize: "15px",
               fontWeight: 600,
-              borderRadius: "0.5rem 0.5rem 0 0",
             }}
           >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                color: "#fff",
-                fontSize: "15px",
-                fontWeight: 600,
-              }}
-            >
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <i className="bi bi-pencil-square"></i>
               Edit Department
             </div>
-            <button
-              type="button"
+            <CloseButton
               onClick={onClose}
+              variant="white"
+              style={{ filter: "brightness(0) invert(1)", opacity: 1 }}
               disabled={loading}
-              aria-label="Close"
-              style={{
-                background: "none",
-                border: "none",
-                color: "#fff",
-                fontSize: 18,
-                cursor: loading ? "not-allowed" : "pointer",
-                opacity: loading ? 0.7 : 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <i className="bi bi-x-lg"></i>
-            </button>
+            />
           </div>
 
-          {/* BODY / FORM */}
-          <form onSubmit={handleSubmit} style={{ margin: 0 }}>
-            <div style={{ padding: "16px 15px 4px 15px", background: "#fff" }}>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 10,
-                  marginBottom: 7,
-                }}
-              >
-                {/* Department Name */}
-                <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                  <label
-                    style={{
-                      fontWeight: 600,
-                      fontSize: 13,
-                      color: "#334155",
-                      marginBottom: 3,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 4,
-                    }}
-                  >
-                    Department Name{" "}
-                    <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
-                  </label>
-                  <input
-                    type="text"
-                    maxLength={100}
-                    name="departmentName"
-                    disabled={loading}
-                    placeholder="Enter department name"
-                    value={formData.departmentName}
-                    onChange={handleChange}
-                    style={{
-                      border: errors.departmentName
-                        ? "1px solid #dc3545"
-                        : "1px solid #cbd5e1",
-                      borderRadius: 6,
-                      padding: "8px 10px",
-                      fontSize: 13,
-                      background: "#fff",
-                      color: "#22223b",
-                    }}
-                  />
-                  {errors.departmentName && (
-                    <div style={{ color: "#dc3545", fontSize: 11, marginTop: 2 }}>
-                      {errors.departmentName}
-                    </div>
-                  )}
+          {/* Body */}
+          <form onSubmit={handleSubmit} autoComplete="off" style={{ margin: 0 }}>
+            <div style={{ padding: "16px 15px", background: "#fff" }}>
+              {loadingDropdowns ? (
+                <div style={{ textAlign: "center", padding: "20px" }}>
+                  <Spinner animation="border" size="sm" />
+                  <p style={{ marginTop: "10px", fontSize: "13px", color: "#64748b" }}>
+                    Loading form data...
+                  </p>
                 </div>
-                {/* Department Code */}
-                <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                  <label
-                    style={{
-                      fontWeight: 600,
-                      fontSize: 13,
-                      color: "#334155",
-                      marginBottom: 3,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 4,
-                    }}
-                  >
-                    Department Code{" "}
-                    <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
-                  </label>
-                  <input
-                    type="text"
-                    maxLength={100}
-                    name="departmentCode"
-                    disabled={loading}
-                    placeholder="Enter department code"
-                    value={formData.departmentCode}
-                    onChange={handleChange}
-                    style={{
-                      border: errors.departmentCode
-                        ? "1px solid #dc3545"
-                        : "1px solid #cbd5e1",
-                      borderRadius: 6,
-                      padding: "8px 10px",
-                      fontSize: 13,
-                      background: "#fff",
-                      color: "#22223b",
-                    }}
-                  />
-                  {errors.departmentCode && (
-                    <div style={{ color: "#dc3545", fontSize: 11, marginTop: 2 }}>
-                      {errors.departmentCode}
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  {/* Row 1: Department Name & Code (READ-ONLY) */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                      <label style={labelStyle}>Department Name</label>
+                      <input
+                        type="text"
+                        value={formData.departmentName}
+                        disabled
+                        style={{
+                          ...inputStyle,
+                          background: "#f1f5f9",
+                          color: "#64748b",
+                          cursor: "not-allowed",
+                        }}
+                      />
+                      <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2 }}>
+                        <i className="bi bi-lock-fill"></i> Cannot be edited
+                      </div>
                     </div>
-                  )}
+
+                    <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                      <label style={labelStyle}>Department Code</label>
+                      <input
+                        type="text"
+                        value={formData.departmentCode}
+                        disabled
+                        style={{
+                          ...inputStyle,
+                          background: "#f1f5f9",
+                          color: "#64748b",
+                          cursor: "not-allowed",
+                          textTransform: "uppercase",
+                        }}
+                      />
+                      <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2 }}>
+                        <i className="bi bi-lock-fill"></i> Cannot be edited
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Row 2: Description (EDITABLE) */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                    <label style={labelStyle}>Description</label>
+                    <textarea
+                      name="description"
+                      placeholder="Brief description of the department"
+                      value={formData.description}
+                      onChange={handleChange}
+                      disabled={loading}
+                      maxLength={255}
+                      rows={2}
+                      style={{
+                        ...inputStyle,
+                        resize: "vertical",
+                        minHeight: "60px",
+                      }}
+                    />
+                  </div>
+
+                  {/* Row 3: Status & Parent Department (EDITABLE) */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                      <label style={labelStyle}>Status</label>
+                      <select
+                        name="status"
+                        value={formData.status}
+                        onChange={handleChange}
+                        disabled={loading}
+                        style={inputStyle}
+                      >
+                        <option value="Active">✅ Active</option>
+                        <option value="Inactive">⏸️ Inactive</option>
+                      </select>
+                    </div>
+
+                    <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                      <label style={labelStyle}>Parent Department</label>
+                      <select
+                        name="parentDepartmentId"
+                        value={formData.parentDepartmentId}
+                        onChange={handleChange}
+                        disabled={loading}
+                        style={inputStyle}
+                      >
+                        <option value="">🏢 None (Root Department)</option>
+                        {departments.map((dept) => (
+                          <option key={dept.departmentId} value={dept.departmentId}>
+                            {dept.departmentName} ({dept.departmentCode})
+                          </option>
+                        ))}
+                      </select>
+                      <div style={{ fontSize: 10, color: "#64748b", marginTop: 2 }}>
+                        <i className="bi bi-info-circle"></i> Select "None" to remove parent
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Row 4: HOD (EDITABLE - Department Heads Only) */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                    <label style={labelStyle}>Head of Department (HOD)</label>
+                    <select
+                      name="hodEmployeeId"
+                      value={formData.hodEmployeeId}
+                      onChange={handleChange}
+                      disabled={loading}
+                      style={inputStyle}
+                    >
+                      <option value="">👤 None (No HOD Assigned)</option>
+                      {departmentHeads.map((emp) => (
+                        <option key={emp.employeeId} value={emp.employeeId}>
+                          {emp.firstName} {emp.lastName} ({emp.employeeCompanyId})
+                        </option>
+                      ))}
+                    </select>
+                    <div style={{ fontSize: 10, color: "#64748b", marginTop: 2 }}>
+                      <i className="bi bi-info-circle"></i> Select "None" to remove current HOD
+                    </div>
+                    {departmentHeads.length === 0 && !loadingDropdowns && (
+                      <div style={{ fontSize: 11, color: "#f59e0b", marginTop: 4 }}>
+                        <i className="bi bi-exclamation-triangle"></i> No employees with "Department Head" role found
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-              {/* Info Alert */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  background: "#f1f5f9",
-                  color: "#64748b",
-                  borderRadius: 4,
-                  fontSize: 12,
-                  padding: "5px 8px",
-                  gap: 5,
-                }}
-              >
-                <i className="bi bi-info-circle"></i>
-                <small>Update department information</small>
-              </div>
+              )}
             </div>
-            {/* FOOTER */}
+
+            {/* Footer */}
             <div
               style={{
                 padding: "10px 15px",
@@ -299,95 +342,26 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
                 display: "flex",
                 justifyContent: "flex-end",
                 gap: 8,
-                borderBottomLeftRadius: "0.5rem",
-                borderBottomRightRadius: "0.5rem",
               }}
             >
-              {/* Cancel Button */}
               <button
                 type="button"
                 onClick={onClose}
                 disabled={loading}
-                style={{
-                  background: "#6c757d",
-                  border: "none",
-                  color: "#fff",
-                  fontWeight: 600,
-                  padding: "7px 12px",
-                  fontSize: 12,
-                  borderRadius: 5,
-                  cursor: loading ? "not-allowed" : "pointer",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  opacity: loading ? 0.7 : 1,
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  if (!loading) {
-                    e.target.style.background = "#5a6268";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!loading) {
-                    e.target.style.background = "#6c757d";
-                  }
-                }}
+                style={cancelButtonStyle}
               >
                 <i className="bi bi-x-circle"></i>
                 Cancel
               </button>
-              {/* Submit Button */}
               <button
                 type="submit"
-                disabled={loading}
-                style={{
-                  background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                  border: "none",
-                  color: "#fff",
-                  fontWeight: 600,
-                  padding: "7px 12px",
-                  fontSize: 12,
-                  borderRadius: 5,
-                  cursor: loading ? "not-allowed" : "pointer",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  opacity: loading ? 0.85 : 1,
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  if (!loading) {
-                    e.target.style.opacity = 0.93;
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!loading) {
-                    e.target.style.opacity = 1;
-                  }
-                }}
+                disabled={loading || loadingDropdowns}
+                style={submitButtonStyle}
               >
                 {loading ? (
                   <>
-                    <span
-                      style={{
-                        width: 14,
-                        height: 14,
-                        border: "2px solid #fff",
-                        borderTop: "2px solid #138cbe",
-                        borderRadius: "50%",
-                        animation: "spin 0.7s linear infinite",
-                        display: "inline-block",
-                        marginRight: 6,
-                      }}
-                    />
+                    <Spinner animation="border" size="sm" />
                     Updating...
-                    <style>{`
-                      @keyframes spin {
-                        0% { transform: rotate(0deg);}
-                        100% { transform: rotate(360deg);}
-                      }
-                    `}</style>
                   </>
                 ) : (
                   <>
@@ -402,6 +376,57 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
       </div>
     </>
   );
+};
+
+// Shared Styles
+const labelStyle = {
+  fontWeight: 600,
+  fontSize: 13,
+  color: "#334155",
+  marginBottom: 3,
+  display: "flex",
+  alignItems: "center",
+  gap: 4,
+};
+
+const inputStyle = {
+  border: "1px solid #cbd5e1",
+  borderRadius: 6,
+  padding: "8px 10px",
+  fontSize: 13,
+  background: "#fff",
+  color: "#22223b",
+};
+
+const cancelButtonStyle = {
+  background: "#6c757d",
+  border: "none",
+  color: "#fff",
+  fontWeight: 600,
+  padding: "7px 12px",
+  fontSize: 12,
+  borderRadius: 5,
+  cursor: "pointer",
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 6,
+  transition: "all 0.2s ease",
+};
+
+const submitButtonStyle = {
+  background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+  border: "none",
+  color: "#fff",
+  fontWeight: 600,
+  padding: "7px 12px",
+  fontSize: 12,
+  borderRadius: 5,
+  boxShadow: "0 2px 8px rgba(151, 36, 126, 0.25)",
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 6,
+  cursor: "pointer",
+  transition: "all 0.2s ease",
 };
 
 export default EditDepartmentModal;
