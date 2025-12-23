@@ -29,25 +29,54 @@
   animation: fadeIn 0.2s ease-in-out;
 }
  
+/* Modal is a flex column: header (top), body (scrollable), footer (bottom) */
 .modal {
   background: #fff;
   border-radius: 12px;
   width: 100%;
   max-width: 600px;
   max-height: 90vh;
-  overflow: auto;
-  scrollbar-width: none;
-  ms-overflow-style: none;
   box-shadow: 0 20px 60px rgba(0,0,0,0.3);
   animation: slideUp 0.3s ease-out;
   display: flex;
   flex-direction: column;
 }
  
-.modal::-webkit-scrollbar {
-  display: none;
+/* Make only body scroll, not the whole modal */
+.body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  max-height: calc(90vh - 1.5rem - 60px - 56px); /* adjust for header/footer heights */
 }
  
+/* hide native scrollbar width helpers */
+.modal {
+  scrollbar-width: none;
+  ms-overflow-style: none;
+}
+ 
+/* Scrollbar styling on the scrollable body only */
+/* Firefox */
+.body {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(39, 35, 92) transparent;
+}
+ 
+/* WebKit (Chrome, Edge, Safari) */
+.body::-webkit-scrollbar {
+  width: 6px;
+}
+ 
+.body::-webkit-scrollbar-track {
+  background: transparent;
+}
+ 
+.body::-webkit-scrollbar-thumb {
+  background-color: rgb(39, 35, 92); /* same as header background */
+  border-radius: 999px;
+}
+ 
+/* Header stays at top of modal (no scrolling) */
 .header {
   padding: 1.5rem;
   border-bottom: 1px solid #e5e7eb;
@@ -55,6 +84,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0; /* prevent shrinking when body scrolls */
 }
  
 .headerTitle {
@@ -81,10 +111,6 @@
  
 .btnClose:hover {
   color: red;
-}
- 
-.body {
-  padding: 1.5rem;
 }
  
 .assignmentInfo {
@@ -264,6 +290,7 @@
   display: flex;
   gap: 0.75rem;
   justify-content: flex-end;
+  flex-shrink: 0; /* keep footer visible */
 }
  
 .btnCancel {
@@ -331,6 +358,5 @@
     font-size: 12px;
   }
 }
- 
  
  

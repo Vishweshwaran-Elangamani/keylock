@@ -132,6 +132,7 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
             boxShadow: "0 8px 28px rgba(0,0,0,0.22)",
             overflow: "hidden",
             width: "100%",
+            
             display: "flex",
             flexDirection: "column",
           }}
