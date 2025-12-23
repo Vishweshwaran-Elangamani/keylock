@@ -25,6 +25,5 @@ public partial class Assignment
 
     public virtual Assessmentform Form { get; set; } = null!;
 
-    public virtual ICollection<Formprogresstracker> Formprogresstrackers { get; set; } =
-        new List<Formprogresstracker>();
+    public virtual ICollection<Formprogresstracker> Formprogresstrackers { get; set; } = new List<Formprogresstracker>();
 }

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Relevantz.EEPZ.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class InitialCommit : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -960,65 +960,6 @@ namespace Relevantz.EEPZ.Data.Migrations
                         principalTable: "userauthentication",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
-
-            migrationBuilder.CreateTable(
-                name: "chatconversations",
-                columns: table => new
-                {
-                    ConversationId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    SessionId = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: true)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.ComputedColumn),
-                    IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValueSql: "'1'")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PRIMARY", x => x.ConversationId);
-                    table.ForeignKey(
-                        name: "chatconversations_ibfk_1",
-                        column: x => x.UserId,
-                        principalTable: "userauthentication",
-                        principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
-
-            migrationBuilder.CreateTable(
-                name: "chatpatterns",
-                columns: table => new
-                {
-                    PatternId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Pattern = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: false, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Response = table.Column<string>(type: "text", nullable: false, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Category = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Priority = table.Column<int>(type: "int", nullable: true, defaultValueSql: "'0'"),
-                    IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValueSql: "'1'"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: true)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.ComputedColumn),
-                    CreatedByUserId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PRIMARY", x => x.PatternId);
-                    table.ForeignKey(
-                        name: "chatpatterns_ibfk_1",
-                        column: x => x.CreatedByUserId,
-                        principalTable: "userauthentication",
-                        principalColumn: "UserId",
-                        onDelete: ReferentialAction.SetNull);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4")
                 .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
@@ -2220,31 +2161,6 @@ namespace Relevantz.EEPZ.Data.Migrations
                 .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
 
             migrationBuilder.CreateTable(
-                name: "chatmessages",
-                columns: table => new
-                {
-                    MessageId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    ConversationId = table.Column<int>(type: "int", nullable: false),
-                    Message = table.Column<string>(type: "text", nullable: false, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    IsUserMessage = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PRIMARY", x => x.MessageId);
-                    table.ForeignKey(
-                        name: "chatmessages_ibfk_1",
-                        column: x => x.ConversationId,
-                        principalTable: "chatconversations",
-                        principalColumn: "ConversationId",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
-
-            migrationBuilder.CreateTable(
                 name: "hrfeedbackformresponses",
                 columns: table => new
                 {
@@ -2884,39 +2800,6 @@ namespace Relevantz.EEPZ.Data.Migrations
                         principalTable: "userauthentication",
                         principalColumn: "EmployeeId",
                         onDelete: ReferentialAction.SetNull);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
-
-            migrationBuilder.CreateTable(
-                name: "chatactionlogs",
-                columns: table => new
-                {
-                    ActionLogId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    ConversationId = table.Column<int>(type: "int", nullable: false),
-                    MessageId = table.Column<int>(type: "int", nullable: false),
-                    ActionType = table.Column<string>(type: "enum('Query','DataRetrieval','Export','UserManagement','Error')", nullable: false, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ActionDetails = table.Column<string>(type: "text", nullable: true, collation: "utf8mb4_unicode_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ExecutedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PRIMARY", x => x.ActionLogId);
-                    table.ForeignKey(
-                        name: "chatactionlogs_ibfk_1",
-                        column: x => x.ConversationId,
-                        principalTable: "chatconversations",
-                        principalColumn: "ConversationId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "chatactionlogs_ibfk_2",
-                        column: x => x.MessageId,
-                        principalTable: "chatmessages",
-                        principalColumn: "MessageId",
-                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4")
                 .Annotation("Relational:Collation", "utf8mb4_unicode_ci");
@@ -3870,83 +3753,6 @@ namespace Relevantz.EEPZ.Data.Migrations
                 column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
-                name: "idx_action_type",
-                table: "chatactionlogs",
-                column: "ActionType");
-
-            migrationBuilder.CreateIndex(
-                name: "idx_conversation",
-                table: "chatactionlogs",
-                column: "ConversationId");
-
-            migrationBuilder.CreateIndex(
-                name: "idx_executed_at",
-                table: "chatactionlogs",
-                column: "ExecutedAt");
-
-            migrationBuilder.CreateIndex(
-                name: "MessageId",
-                table: "chatactionlogs",
-                column: "MessageId");
-
-            migrationBuilder.CreateIndex(
-                name: "idx_created_at",
-                table: "chatconversations",
-                column: "CreatedAt");
-
-            migrationBuilder.CreateIndex(
-                name: "idx_is_active",
-                table: "chatconversations",
-                column: "IsActive");
-
-            migrationBuilder.CreateIndex(
-                name: "idx_user_session",
-                table: "chatconversations",
-                columns: new[] { "UserId", "SessionId" });
-
-            migrationBuilder.CreateIndex(
-                name: "idx_conversation1",
-                table: "chatmessages",
-                column: "ConversationId");
-
-            migrationBuilder.CreateIndex(
-                name: "idx_created_at1",
-                table: "chatmessages",
-                column: "CreatedAt");
-
-            migrationBuilder.CreateIndex(
-                name: "idx_is_user_message",
-                table: "chatmessages",
-                column: "IsUserMessage");
-
-            migrationBuilder.CreateIndex(
-                name: "CreatedByUserId",
-                table: "chatpatterns",
-                column: "CreatedByUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "idx_category",
-                table: "chatpatterns",
-                column: "Category");
-
-            migrationBuilder.CreateIndex(
-                name: "idx_is_active1",
-                table: "chatpatterns",
-                column: "IsActive");
-
-            migrationBuilder.CreateIndex(
-                name: "idx_pattern",
-                table: "chatpatterns",
-                column: "Pattern")
-                .Annotation("MySql:IndexPrefixLength", new[] { 255 });
-
-            migrationBuilder.CreateIndex(
-                name: "idx_priority",
-                table: "chatpatterns",
-                column: "Priority",
-                descending: new bool[0]);
-
-            migrationBuilder.CreateIndex(
                 name: "idx_form1",
                 table: "competency",
                 column: "form_id");
@@ -4026,7 +3832,7 @@ namespace Relevantz.EEPZ.Data.Migrations
                 column: "EmploymentStatus");
 
             migrationBuilder.CreateIndex(
-                name: "idx_is_active2",
+                name: "idx_is_active",
                 table: "employee",
                 column: "IsActive");
 
@@ -4086,7 +3892,7 @@ namespace Relevantz.EEPZ.Data.Migrations
                 column: "BiasFlag");
 
             migrationBuilder.CreateIndex(
-                name: "idx_created_at2",
+                name: "idx_created_at",
                 table: "feedback",
                 column: "CreatedAt");
 
@@ -4146,7 +3952,7 @@ namespace Relevantz.EEPZ.Data.Migrations
                 column: "FeedbackType");
 
             migrationBuilder.CreateIndex(
-                name: "idx_is_active3",
+                name: "idx_is_active1",
                 table: "feedbackquestion",
                 column: "IsActive");
 
@@ -4872,7 +4678,7 @@ namespace Relevantz.EEPZ.Data.Migrations
                 column: "ParticipantEmployeeId");
 
             migrationBuilder.CreateIndex(
-                name: "idx_category1",
+                name: "idx_category",
                 table: "organizationalpolicies",
                 column: "Category");
 
@@ -5244,7 +5050,7 @@ namespace Relevantz.EEPZ.Data.Migrations
                 column: "ReviewedByEmployeeId");
 
             migrationBuilder.CreateIndex(
-                name: "idx_created_at3",
+                name: "idx_created_at1",
                 table: "refreshtokens",
                 column: "CreatedAt");
 
@@ -5301,7 +5107,7 @@ namespace Relevantz.EEPZ.Data.Migrations
                 column: "IsActive");
 
             migrationBuilder.CreateIndex(
-                name: "idx_category2",
+                name: "idx_category1",
                 table: "rewardtype",
                 column: "RewardCategory");
 
@@ -5581,12 +5387,6 @@ namespace Relevantz.EEPZ.Data.Migrations
                 name: "changerequests");
 
             migrationBuilder.DropTable(
-                name: "chatactionlogs");
-
-            migrationBuilder.DropTable(
-                name: "chatpatterns");
-
-            migrationBuilder.DropTable(
                 name: "departmentheadapprovals");
 
             migrationBuilder.DropTable(
@@ -5743,9 +5543,6 @@ namespace Relevantz.EEPZ.Data.Migrations
                 name: "departmentbudgets");
 
             migrationBuilder.DropTable(
-                name: "chatmessages");
-
-            migrationBuilder.DropTable(
                 name: "feedback");
 
             migrationBuilder.DropTable(
@@ -5792,9 +5589,6 @@ namespace Relevantz.EEPZ.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "competency");
-
-            migrationBuilder.DropTable(
-                name: "chatconversations");
 
             migrationBuilder.DropTable(
                 name: "goals");
