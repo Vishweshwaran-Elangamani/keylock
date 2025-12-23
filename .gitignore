@@ -493,3 +493,11 @@ _EEPZBusinessLog/
 
 # Ignore EEPZ_ServiceLog directories everywhere
 _EEPZServiceLog/
+
+*.dll
+*.exe
+Relevantz.EEPZ.AuthApi/Relevantz.EEPZ.Api/bin/Debug/net8.0/Relevantz.EEPZ.Api.dll
+Relevantz.EEPZ.AuthApi/Relevantz.EEPZ.Api/bin/Debug/net8.0/Relevantz.EEPZ.Api.exe
+Relevantz.EEPZ.AuthApi/Relevantz.EEPZ.Api/bin/Debug/net8.0/Relevantz.EEPZ.Common.dll
+Relevantz.EEPZ.AuthApi/Relevantz.EEPZ.Api/bin/Debug/net8.0/Relevantz.EEPZ.Core.dll
+Relevantz.EEPZ.AuthApi/Relevantz.EEPZ.Api/bin/Debug/net8.0/Relevantz.EEPZ.Data.dll

@@ -19,6 +19,7 @@ var builder = WebApplication.CreateBuilder(args);
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
+    .Enrich.WithProperty("Service", "Internal-Opportunities")
     .CreateLogger();
 
 builder.Host.UseSerilog();
@@ -34,9 +35,9 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo 
     { 
-        Title = "EEPZ API", 
+        Title = "EEPZ Internal Opportunities API", 
         Version = "v1",
-        Description = "EEPZ Internal Opportunities & Authentication API"
+        Description = "Internal Opportunities, Nominations, Promotions & Manager Tracking API"
     });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -91,6 +92,23 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
         ClockSkew = TimeSpan.Zero
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            Log.Warning("JWT Authentication Failed: {Message}", context.Exception.Message);
+            return Task.CompletedTask;
+        },
+        OnTokenValidated = context =>
+        {
+            var userId = context.Principal?
+                .FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?
+                .Value;
+            Log.Information("JWT Token Validated for UserId: {UserId}", userId);
+            return Task.CompletedTask;
+        }
     };
 });
 
@@ -150,7 +168,7 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<EEPZDbContext>();
         
-        if (context.Database.CanConnect())
+        if (await context.Database.CanConnectAsync())
         {
             Log.Information("Database connection established successfully");
         }
@@ -173,7 +191,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "EEPZ API V1");
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "EEPZ Internal Opportunities API V1");
+        c.RoutePrefix = string.Empty;
         c.DisplayRequestDuration();
     });
 }
@@ -198,15 +217,73 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.MapGet("/health", async (EEPZDbContext dbContext, IConfiguration config) =>
+{
+    bool dbConnected = false;
+    
+    try
+    {
+        dbConnected = await dbContext.Database.CanConnectAsync();
+    }
+    catch (Exception)
+    {
+        // Health check failed silently
+    }
+
+    return Results.Ok(new
+    {
+        status = "Healthy",
+        timestamp = DateTime.UtcNow,
+        service = "EEPZ Internal Opportunities API",
+        version = "v1.0",
+        environment = builder.Environment.EnvironmentName,
+        
+        database = new
+        {
+            connected = dbConnected,
+            provider = "MySQL (Pomelo EF Core 8.0)",
+            connectionStringName = "DefaultConnection"
+        },
+        
+        endpoints = new
+        {
+            total = 32,
+            categories = new[]
+            {
+                "Internal Opportunities (7)",
+                "Nominations (12)",
+                "Oppourtunity Analytics (2)",
+                "Promotions (11)"
+            }
+        },
+        
+        authentication = new
+        {
+            enabled = true,
+            type = "JWT Bearer",
+            issuerConfigured = !string.IsNullOrEmpty(config["Jwt:Issuer"])
+        },
+        
+        features = new
+        {
+            autoMapperEnabled = true,
+            cors = "AllowAll Enabled",
+            swagger = app.Environment.IsDevelopment()
+        }
+    });
+});
+
 try
 {
     Log.Information("EEPZ Internal Opportunities API Server Started Successfully");
+    Log.Information("Authentication: JWT Bearer Token Enabled");
     Log.Information("Environment: {Environment}", app.Environment.EnvironmentName);
+    
     app.Run();
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, "Application terminated unexpectedly");
+    Log.Fatal(ex, "Internal Opportunities API terminated unexpectedly");
     throw;
 }
 finally

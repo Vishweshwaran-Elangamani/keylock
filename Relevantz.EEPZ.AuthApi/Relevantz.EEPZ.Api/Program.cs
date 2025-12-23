@@ -16,6 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
+    .Enrich.WithProperty("Service", "EEPZ-Auth")
     .CreateLogger();
 
 builder.Host.UseSerilog();
@@ -63,9 +64,9 @@ builder.Services.AddSwaggerGen(c =>
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<EEPZDbContext>(options =>
    options.UseMySql(
-        connectionString,
-        new MySqlServerVersion(new Version(8, 0, 36))
-    ));
+       connectionString,
+       new MySqlServerVersion(new Version(8, 0, 36))
+   ));
 
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT Secret Key not configured");
@@ -88,6 +89,23 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
         ClockSkew = TimeSpan.Zero
     };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            Log.Warning("JWT Authentication Failed: {Message}", context.Exception.Message);
+            return Task.CompletedTask;
+        },
+        OnTokenValidated = context =>
+        {
+            var userId = context.Principal?
+                .FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?
+                .Value;
+            Log.Information("JWT Token Validated for UserId: {UserId}", userId);
+            return Task.CompletedTask;
+        }
+    };
 });
 
 builder.Services.AddAuthorization();
@@ -104,7 +122,6 @@ builder.Services.AddScoped<ILoginAttemptRepository, LoginAttemptRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IChangeRequestRepository, ChangeRequestRepository>();
 builder.Services.AddScoped<IBulkOperationLogRepository, BulkOperationLogRepository>();
-builder.Services.AddScoped<IChatbotRepository, ChatbotRepository>();
 
 // Register Services
 builder.Services.AddScoped<IPasswordService, PasswordService>();
@@ -117,7 +134,6 @@ builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IChangeRequestService, ChangeRequestService>();
-builder.Services.AddScoped<IChatbotService, ChatbotService>();
 builder.Services.AddScoped<IBulkOperationService, BulkOperationService>();
 builder.Services.AddScoped<IExportService, ExportService>();
 
@@ -187,6 +203,59 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapGet("/health", async (EEPZDbContext dbContext, IConfiguration config) =>
+{
+    bool dbConnected = false;
+    
+    try
+    {
+        dbConnected = await dbContext.Database.CanConnectAsync();
+    }
+    catch (Exception)
+    {
+        // Health check failed silently
+    }
+
+    return Results.Ok(new
+    {
+        status = "Healthy",
+        timestamp = DateTime.UtcNow,
+        service = "EEPZ Authentication & User Management API",
+        version = "v1.0",
+        environment = builder.Environment.EnvironmentName,
+        
+        database = new
+        {
+            connected = dbConnected,
+            provider = "MySQL (EF Core 8.0)",
+            connectionStringName = "DefaultConnection"
+        },
+        
+        endpoints = new
+        {
+            total = 64,
+            categories = new[]
+            {
+                "Authentication (6)",
+                "Bulk Operations (8)",
+                "Role & Department (24)",
+                "User (12)",
+                "Change Requests (7)"
+            }
+        },
+        
+        authentication = new
+        {
+            enabled = true,
+            type = "JWT Bearer",
+            issuerConfigured = !string.IsNullOrEmpty(config["Jwt:Issuer"])
+        },
+        
+        cors = "AllowAll Enabled",
+        swagger = app.Environment.IsDevelopment()
+    });
+});
 
 try
 {

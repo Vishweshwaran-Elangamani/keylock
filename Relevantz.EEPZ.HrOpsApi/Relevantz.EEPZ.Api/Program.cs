@@ -10,9 +10,7 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using Serilog;
 
-
 var builder = WebApplication.CreateBuilder(args);
-
 
 // ===================================
 // Configure Serilog
@@ -23,22 +21,17 @@ Log.Logger = new LoggerConfiguration()
     .Enrich.WithProperty("Service", "HR-Operations")
     .CreateLogger();
 
-
 builder.Host.UseSerilog();
 
-
 Log.Information("Starting EEPZ HR Operations Microservice...");
-
 
 // SERVICE CONFIGURATION
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-
 // ---------- JWT AUTHENTICATION ----------
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT Secret Key not configured");
-
 
 builder.Services.AddAuthentication(options =>
 {
@@ -59,7 +52,6 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.Zero
     };
 
-
     options.Events = new JwtBearerEvents
     {
         OnAuthenticationFailed = context =>
@@ -76,9 +68,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-
 builder.Services.AddAuthorization();
-
 
 // ---------- SWAGGER ----------
 builder.Services.AddSwaggerGen(c =>
@@ -87,9 +77,8 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "EEPZ HR Operations API",
         Version = "v1",
-        Description = "Sprint 2 (Policies & Goals) + Sprint 3 (Career Progression & Payroll) - Combined API"
+        Description = "HR Operations - Policies, Goals, Career Progression & Payroll API"
     });
-
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -100,7 +89,6 @@ builder.Services.AddSwaggerGen(c =>
         In = ParameterLocation.Header,
         Description = "Enter 'Bearer' followed by your JWT token"
     });
-
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
@@ -118,12 +106,10 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-
 // ---------- DATABASE ----------
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<EEPZDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
-
 
 // ---------- REPOSITORIES & SERVICES ----------
 // Sprint 2
@@ -133,7 +119,6 @@ builder.Services.AddScoped<IPolicyService, PolicyService>();
 builder.Services.AddScoped<IViolationService, ViolationService>();
 builder.Services.AddScoped<IComplianceService, ComplianceService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
-
 
 // Sprint 3
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
@@ -158,17 +143,14 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.SetIsOriginAllowed(origin => true)  // Allow any origin dynamically
+        policy.SetIsOriginAllowed(origin => true)
               .AllowAnyMethod()
               .AllowAnyHeader()
-              .AllowCredentials();  // Support credentials
+              .AllowCredentials();
     });
 });
 
-
-
 var app = builder.Build();
-
 
 // DATABASE INITIALIZATION
 using (var scope = app.Services.CreateScope())
@@ -179,13 +161,10 @@ using (var scope = app.Services.CreateScope())
         var context = services.GetRequiredService<EEPZDbContext>();
         await context.Database.MigrateAsync();
 
-
         Log.Information("HR API: Database migration completed successfully");
-
 
         var initializerType = typeof(Program).Assembly.GetType("eepzbackend.Data.DbInitializer");
         var method = initializerType?.GetMethod("InitializeAsync");
-
 
         if (method != null)
         {
@@ -199,7 +178,6 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-
 // HTTP REQUEST PIPELINE
 if (app.Environment.IsDevelopment())
 {
@@ -210,7 +188,6 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = string.Empty;
     });
 }
-
 
 // Enable Serilog Request Logging
 app.UseSerilogRequestLogging(options =>
@@ -223,29 +200,70 @@ app.UseSerilogRequestLogging(options =>
     };
 });
 
-
 app.UseStaticFiles();
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 
-
 app.MapControllers();
-app.MapGet("/health", () => Results.Ok(new
-{
-    status = "Healthy",
-    service = "EEPZ HR Operations Microservice",
-    version = "Sprint 2 + Sprint 3",
-    endpoints = "16 Total Endpoints",
-    timestamp = DateTime.UtcNow
-}));
 
+app.MapGet("/health", async (EEPZDbContext dbContext, IConfiguration config) =>
+{
+    bool dbConnected = false;
+    
+    try
+    {
+        dbConnected = await dbContext.Database.CanConnectAsync();
+    }
+    catch (Exception)
+    {
+        // Health check failed silently
+    }
+
+    return Results.Ok(new
+    {
+        status = "Healthy",
+        timestamp = DateTime.UtcNow,
+        service = "EEPZ HR Operations Microservice",
+        version = "v1.0",
+        environment = builder.Environment.EnvironmentName,
+        
+        database = new
+        {
+            connected = dbConnected,
+            provider = "MySQL (Pomelo EF Core 8.0)",
+            connectionStringName = "DefaultConnection"
+        },
+        
+        endpoints = new
+        {
+            total = 57,
+            categories = new[]
+            {
+                "Employee Data (10)",
+                "Fund Allocation (16)",
+                "Period Allocation (6)",
+                "Policy (13)",
+                "Violation (12)"
+            }
+        },
+        
+        authentication = new
+        {
+            enabled = true,
+            type = "JWT Bearer",
+            issuerConfigured = !string.IsNullOrEmpty(config["Jwt:Issuer"])
+        },
+        
+        cors = "AllowAll Enabled",
+        swagger = app.Environment.IsDevelopment()
+    });
+});
 
 try
 {
     Log.Information("EEPZ HR Operations Microservice Started Successfully");
-    Log.Information("Sprints: Sprint 2 (Auth & Goals) + Sprint 3 (Career Progression & Payroll)");
     Log.Information("Authentication: JWT Bearer Token Enabled");
     Log.Information("Endpoints: 16 Total");
     Log.Information("Environment: {Environment}", app.Environment.EnvironmentName);
