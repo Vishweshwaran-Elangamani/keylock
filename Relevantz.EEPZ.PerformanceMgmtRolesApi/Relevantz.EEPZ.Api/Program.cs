@@ -193,6 +193,18 @@ builder.Services.AddScoped<ISelfAssessmentService, SelfAssessmentService>();
 builder.Services.AddScoped<IManagerReviewRepository, ManagerReviewRepository>();
 builder.Services.AddScoped<ILeadershipRepository, LeadershipRepository>();
 builder.Services.AddScoped<ILeadershipService, LeadershipService>();
+// Service
+builder.Services.AddScoped<IDeptHeadApprovalsService, DeptHeadApprovalsService>();
+
+// Repository
+builder.Services.AddScoped<IDeptHeadApprovalsRepository, DeptHeadApprovalsRepository>();
+builder.Services.AddScoped<IDeptHeadApprovalsService, DeptHeadApprovalsService>();
+ 
+// Repository
+builder.Services.AddScoped<IDeptHeadApprovalsRepository, DeptHeadApprovalsRepository>();
+builder.Services.AddScoped<IEmployeesRepository, EmployeesRepository>();
+builder.Services.AddScoped<IEmployeesService, EmployeesService>();
+
 
 // ============ CORS CONFIGURATION ============
 builder.Services.AddCors(options =>
@@ -235,7 +247,7 @@ app.UseAuthorization();
 app.MapControllers();
 try
 {
-    Log.Information("EEPZ Performance Management API started successfully on port 5222");
+    Log.Information("EEPZ Performance Management API started successfully on port 5113");
     app.Run();
 }
 catch (Exception ex)
