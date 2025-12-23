@@ -120,7 +120,7 @@ const Navbar = () => {
           background: "#FFFFFF",
           borderBottom: "1px solid #e5e7eb",
           boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
-          height:"69.5px"
+          height:"74px"
         }}
       >
         <div
@@ -128,8 +128,8 @@ const Navbar = () => {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "0.75rem 1.5rem", // Reduced from 1.15rem
-            height: "60px", // Fixed compact height
+            padding: "15px",
+            height: "70px", 
           }}
         >
           {/* Left Section */}
@@ -151,11 +151,11 @@ const Navbar = () => {
               >
                 <i
                   className="bi bi-person-circle"
-                  style={{ fontSize: "0.875rem", color: "#97247E" }}
+                  style={{ fontSize: "16px", color: "#97247E" }}
                 />
                 <h6 style={{ 
                   margin: 0, 
-                  fontSize: "0.875rem",
+                  fontSize: "16px",
                   fontWeight: "bold", 
                   color: "#97247E" 
                 }}>
@@ -164,7 +164,7 @@ const Navbar = () => {
               </div>
               <small style={{ 
                 color: "#6c757d", 
-                fontSize: "0.75rem"
+                fontSize: "10px"
               }}>
                 {formattedDate}
               </small>
@@ -185,12 +185,9 @@ const Navbar = () => {
                 aria-label="View Nominations"
                 style={{
                   position: "relative",
-                  width: "220px", // Reduced width
-                  height: "46px", // Fixed compact height
                   backgroundColor: "#f5f5f7",
                   borderRadius: 12,
                   padding: "0 12px",
-                  // boxShadow: "0 4px 16px rgba(249, 202, 36, 0.3)",
                   cursor: "pointer",
                   transition: "all 0.2s ease",
                   display: "flex",
@@ -220,7 +217,6 @@ const Navbar = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    // boxShadow: "0 2px 8px rgba(243, 156, 18, 0.4)",
                   }}
                 >
                   <div

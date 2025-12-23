@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import icon from "../assets/icon.png";
-import logodarkfull from "../assets/logodarkfull.png";
 import logodarkbarred from "../assets/logodarkbarred.png";
+import logodarkbarredsanta from "../assets/logodarkbarredsanta.png";
 
 const Sidebar = ({ allowedRoles = [], currentRole }) => {
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
@@ -320,11 +320,11 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
       >
         <img
           onClick={() => setSidebarExpanded(!sidebarExpanded)}
-          src={sidebarExpanded ? logodarkbarred : icon}
+          src={sidebarExpanded ? logodarkbarredsanta : icon}
           alt="EEPZ Logo"
           style={{
             width: sidebarExpanded ? "180px" : "50px",
-            height: sidebarExpanded ? "auto" : "50px",
+            height: sidebarExpanded ? "80px" : "50px",
             maxHeight: "30px",
             objectFit: "contain",
             cursor: "pointer",
