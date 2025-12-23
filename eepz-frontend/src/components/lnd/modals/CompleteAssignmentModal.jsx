@@ -2,6 +2,7 @@ import { X, CheckCircle } from "lucide-react";
 import { lndService } from "../../../services/lnd/lndService";
 import { RATING } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
+import { useState } from "react";
 import styles from "../../../styles/lnd/components/CompleteAssignmentModal.module.css";
 
 const CompleteAssignmentModal = ({ assignment, onClose, onSuccess }) => {

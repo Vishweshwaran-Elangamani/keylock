@@ -416,9 +416,7 @@ const YourGoalsPage = () => {
               </div>
             </div>
           </div>
-
-          {/* Sticky Pagination */}
-          <div className={styles.stickyPagination}>
+          
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
@@ -429,7 +427,6 @@ const YourGoalsPage = () => {
               onItemsPerPageChange={handleItemsPerPageChange}
               pageSizeOptions={[8, 12, 24, 48]}
             />
-          </div>
         </>
       )}
 

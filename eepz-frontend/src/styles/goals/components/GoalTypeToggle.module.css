@@ -4,7 +4,7 @@
   background-color: rgb(39, 35, 92);
   border-radius: 50px;
   padding: 10px !important;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   width: 100%;
   max-width: 600px;
   gap: 4px;
@@ -17,7 +17,7 @@
 
 .toggleButton {
   flex: 1;
-  padding: 15px 30px !important;
+  padding: 15px !important;
   border: none;
   border-radius: 50px !important;
   background-color: rgb(39, 35, 92);

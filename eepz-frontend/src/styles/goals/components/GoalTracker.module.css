@@ -7,29 +7,29 @@
 
 .card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1) !important;
 }
 
 /* Variants (border + colors) */
 
 .completed {
-  border: 1px solid #28a745;
+  border: 1px solid #28a745 !important;
 }
 
 .ongoing {
-  border: 1px solid #0d6efd;
+  border: 1px solid #0d6efd !important;
 }
 
 .pending {
-  border: 1px solid #fcd03e;
+  border: 1px solid #fcd03e !important;
 }
 
 .overdue {
-  border: 1px solid #dc3545;
+  border: 1px solid #dc3545 !important;
 }
 
 .approvals {
-  border: 1px solid #6f42c1;
+  border: 1px solid #6f42c1 !important;
 }
 
 .cardBody {

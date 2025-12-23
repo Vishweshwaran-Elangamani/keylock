@@ -98,6 +98,7 @@
   border-radius: 12px;
   overflow: hidden;
   min-width: 0;
+  padding-bottom: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 

@@ -207,6 +207,7 @@
 .tableRow {
   cursor: pointer;
   height: 60px;
+  vertical-align: middle
 }
 
 .tableCell {
