@@ -11,7 +11,6 @@ import "../../../styles/performancemanagement/hr/DeptHeadPage.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 import { apiPort5113 } from "../../../services/performancemanagement/api/rolesapi";
 
-
 const getExtensionFromContentType = (contentType) => {
   if (!contentType) return null;
 
@@ -72,9 +71,10 @@ export default function DeptHeadPage() {
     return () => clearInterval(refreshInterval);
   }, []);
 
+  // Fixed: Added appliedSearch to dependency array
   useEffect(() => {
     applyFilters();
-  }, [pendingRequests, approvedRequests, activeTab, searchTerm, filterProject]);
+  }, [pendingRequests, approvedRequests, activeTab, appliedSearch, filterProject]);
 
   const fetchData = async (silent = false) => {
     try {
@@ -208,10 +208,16 @@ export default function DeptHeadPage() {
     setCurrentPage(1);
   };
 
+  // Fixed: Clear all filters and reset UI
   const handleClearFilters = () => {
     setSearchTerm("");
     setAppliedSearch("");
     setFilterProject("");
+  };
+
+  // Fixed: Handle search button click
+  const handleSearchClick = () => {
+    setAppliedSearch(searchTerm);
   };
 
   const handleViewDetails = async (employee) => {
@@ -405,31 +411,9 @@ export default function DeptHeadPage() {
       <>
         <div className="dp-modal-backdrop"></div>
         <div className="dp-modal-wrapper">
-          <div className="dp-modal-dialog" style={{
-            border: "2px solid #27235c",
-            borderRadius: "12px",
-            overflow: "hidden"
-          }}>
-            <div style={{
-              background: '#27235C',
-              color: '#fff',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: '20px 28px',
-              borderTopLeftRadius: '12px',
-              borderTopRightRadius: '12px',
-              borderBottom: '1px solid #e5e7eb',
-              textAlign: "left",
-            }}>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                fontWeight: '700',
-                fontSize: '1.18rem',
-                gap: '10px',
-                textAlign: "left",
-              }}>
+          <div className="dp-modal-dialog dp-modal-bordered">
+            <div className="dp-modal-header dp-modal-header-primary">
+              <div className="dp-modal-title">
                 <i className="bi bi-check-circle-fill"></i>
                 Approve Employee Assessment
               </div>
@@ -438,30 +422,13 @@ export default function DeptHeadPage() {
                 onClick={handleModalClose}
                 disabled={approvingEmployeeId}
                 aria-label="Close"
-                style={{
-                  background: 'transparent',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '6px',
-                  width: '38px',
-                  height: '38px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '1.1rem',
-                  textAlign: "left",
-                }}>
+                className="dp-modal-close-btn dp-modal-close-primary"
+              >
                 <i className="bi bi-x-lg"></i>
               </button>
             </div>
 
-            <div style={{
-              background: '#fff',
-              padding: '24px 28px',
-              borderBottomLeftRadius: '12px',
-              borderBottomRightRadius: '12px',
-              textAlign: "left",
-            }}>
+            <div className="dp-modal-body">
               <div className="dp-details-box">
                 <h6 className="dp-details-title">
                   <i className="bi bi-person-badge me-2"></i>
@@ -520,51 +487,21 @@ export default function DeptHeadPage() {
                   The employee will be notified via system notification.
                 </div>
               </div>
-              <div style={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-                gap: '12px',
-                background: '#f8f9fa',
-                borderTop: '1px solid #e5e7eb',
-                margin: '24px -28px -28px -28px',
-                padding: '20px 28px',
-                borderBottomLeftRadius: '12px',
-                borderBottomRightRadius: '12px',
-                textAlign: "left"
-              }}>
+              <div className="dp-modal-footer dp-modal-footer-primary">
                 <button
                   type="button"
                   className="dp-btn-cancel"
                   onClick={handleModalClose}
                   disabled={approvingEmployeeId}
-                  style={{
-                    background: '#6c757d',
-                    color: '#fff',
-                    border: 'none',
-                    fontWeight: 600,
-                    borderRadius: '8px',
-                    fontSize: '1rem',
-                    padding: '0.75rem 2rem',
-                    textAlign: "left"
-                  }}>
+                >
                   <i className="bi bi-x-circle"></i> Cancel
                 </button>
                 <button
                   type="button"
-                  className="dp-btn-submit"
+                  className="dp-btn-submit dp-btn-success"
                   onClick={handleApproveSubmit}
                   disabled={approvingEmployeeId}
-                  style={{
-                    background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
-                    color: '#fff',
-                    border: 'none',
-                    fontWeight: 600,
-                    borderRadius: '8px',
-                    fontSize: '1rem',
-                    padding: '0.75rem 2rem',
-                    boxShadow: '0 2px 8px rgba(151, 36, 126, 0.15)',
-                    textAlign: "left"
-                  }}>
+                >
                   {approvingEmployeeId ? (
                     <>
                       <span className="dp-spinner"></span> Approving...
@@ -588,55 +525,11 @@ export default function DeptHeadPage() {
 
     return (
       <>
-        <div
-          className="dp-modal-backdrop"
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            background: 'rgba(39, 35, 92, 0.35)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-            zIndex: 1040,
-          }}
-        ></div>
-        <div className="dp-modal-wrapper"
-          style={{
-            position: 'fixed',
-            top: 0, left: 0, width: '100vw', height: '100vh',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            zIndex: 1050,
-            padding: '30px 10px'
-          }}>
-          <div className="dp-modal-dialog"
-            style={{
-              maxWidth: '780px',
-              width: '100%',
-              background: '#fff',
-              borderRadius: '16px',
-              boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
-              display: 'flex',
-              flexDirection: 'column',
-              overflow: 'hidden',
-              border: "2px solid #27235c"
-            }}
-          >
-            <div style={{
-              background: '#27235C',
-              color: '#fff',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: '20px 32px',
-              borderTopLeftRadius: '16px',
-              borderTopRightRadius: '16px',
-              borderBottom: '1.5px solid #e5e7eb',
-              fontWeight: 700,
-              fontSize: '1.18rem'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div className="dp-modal-backdrop dp-modal-backdrop-blur"></div>
+        <div className="dp-modal-wrapper dp-modal-wrapper-large">
+          <div className="dp-modal-dialog dp-modal-dialog-large dp-modal-bordered">
+            <div className="dp-modal-header dp-modal-header-primary">
+              <div className="dp-modal-title">
                 <i className="bi bi-file-text-fill"></i>
                 Employee Assessment Details
               </div>
@@ -644,168 +537,86 @@ export default function DeptHeadPage() {
                 type="button"
                 onClick={handleModalClose}
                 aria-label="Close"
-                style={{
-                  background: 'transparent',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '7px',
-                  width: '38px',
-                  height: '38px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '1.20rem'
-                }}>
+                className="dp-modal-close-btn dp-modal-close-primary"
+              >
                 <i className="bi bi-x-lg"></i>
               </button>
             </div>
 
-            <div style={{
-              background: '#f7f8fc',
-              padding: '0 0 0 0',
-              flex: 1,
-              maxHeight: '80vh',
-              overflowY: 'auto',
-              borderBottomLeftRadius: '16px',
-              borderBottomRightRadius: '16px',
-              textAlign: "left"
-            }}>
-              <div style={{
-                display: 'flex',
-                gap: '2rem',
-                padding: '32px 32px 0 32px',
-                alignItems: 'flex-start',
-                flexWrap: 'wrap',
-              }}>
-                <div style={{
-                  flex: '1 1 240px',
-                  background: '#fff',
-                  borderRadius: '14px',
-                  boxShadow: '0 2px 7px #c1b6dd26',
-                  marginBottom: '20px',
-                  padding: '18px 24px',
-                  minWidth: '240px',
-                  minHeight: "170px",
-                  border: "1px solid #27235c"
-                }}>
-                  <h5 style={{
-                    margin: 0,
-                    fontWeight: 700,
-                    color: '#27235c',
-                    fontSize: "1.09rem",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 7,
-                  }}>
+            <div className="dp-details-modal-body">
+              <div className="dp-details-cards-wrapper">
+                <div className="dp-details-info-card">
+                  <h5 className="dp-details-card-title">
                     <i className="bi bi-person-badge"></i>
                     Employee Info
                   </h5>
-                  <div style={{ marginTop: 10 }}>
-                    <div style={{ fontWeight: 600, marginBottom: 6 }}>
+                  <div className="dp-details-card-content">
+                    <div className="dp-details-employee-name">
                       {selectedEmployee.employeeName}
                     </div>
-                    <div style={{ fontSize: "1.02rem", color: "#666" }}>
+                    <div className="dp-details-project-name">
                       {selectedEmployee.projectName}
                     </div>
-                    <div style={{ fontSize: "0.99rem", color: "#9c8dbb" }}>
+                    <div className="dp-details-goals-count">
                       <i className="bi bi-bullseye"></i>&nbsp;Goals:&nbsp;
                       <b>{selectedEmployee.goals?.length || 0}</b>
                     </div>
                   </div>
                 </div>
 
-                <div style={{
-                  flex: '1 1 240px',
-                  background: '#fff',
-                  borderRadius: '14px',
-                  boxShadow: '0 2px 7px #c1b6dd26',
-                  marginBottom: '20px',
-                  padding: '18px 24px',
-                  minWidth: '240px',
-                  minHeight: "170px",
-                  border: "1px solid #27235c"
-                }}>
-                  <h5 style={{
-                    margin: 0,
-                    fontWeight: 700,
-                    color: '#27235c',
-                    fontSize: "1.09rem",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 7,
-                  }}>
+                <div className="dp-details-rating-card">
+                  <h5 className="dp-details-card-title">
                     <i className="bi bi-star-half"></i>
                     Average Ratings
                   </h5>
-                  <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 8 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <span style={{ fontSize: 13, color: "#a1a2c0" }}>
+                  <div className="dp-details-ratings-list">
+                    <div className="dp-details-rating-item">
+                      <span className="dp-details-rating-label">
                         <i className="bi bi-person"></i>&nbsp;Employee
                       </span>
-                      <span style={{
-                        fontSize: 19,
-                        fontWeight: 700,
-                        color: "#97247e"
-                      }}>{getAvgRating(selectedEmployee.competencies, "employeeRating")}</span>
+                      <span className="dp-details-rating-value dp-rating-emp">
+                        {getAvgRating(selectedEmployee.competencies, "employeeRating")}
+                      </span>
                     </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <span style={{ fontSize: 13, color: "#a1a2c0" }}>
+                    <div className="dp-details-rating-item">
+                      <span className="dp-details-rating-label">
                         <i className="bi bi-1-circle"></i>&nbsp;L1
                       </span>
-                      <span style={{
-                        fontSize: 19,
-                        fontWeight: 700,
-                        color: "#6666B2"
-                      }}>{getAvgRating(selectedEmployee.competencies, "l1Rating")}</span>
+                      <span className="dp-details-rating-value dp-rating-l1">
+                        {getAvgRating(selectedEmployee.competencies, "l1Rating")}
+                      </span>
                     </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <span style={{ fontSize: 13, color: "#a1a2c0" }}>
+                    <div className="dp-details-rating-item">
+                      <span className="dp-details-rating-label">
                         <i className="bi bi-2-circle"></i>&nbsp;L2
                       </span>
-                      <span style={{
-                        fontSize: 19,
-                        fontWeight: 700,
-                        color: "#3CA36E"
-                      }}>{getAvgRating(selectedEmployee.competencies, "l2Rating")}</span>
+                      <span className="dp-details-rating-value dp-rating-l2">
+                        {getAvgRating(selectedEmployee.competencies, "l2Rating")}
+                      </span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div style={{
-                background: "#fff",
-                margin: "0 32px 22px 32px",
-                borderRadius: '13px',
-                boxShadow: '0 2px 8px #c1b6dd1c',
-                padding: '24px 20px',
-                border: "1px solid #27235c"
-              }}>
-                <div style={{
-                  fontWeight: 700,
-                  color: "#27235c",
-                  fontSize: "1.03rem",
-                  marginBottom: 10,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 7,
-                }}>
+              <div className="dp-details-section-card">
+                <div className="dp-details-section-title">
                   <i className="bi bi-grid"></i>
                   Competencies Breakdown
                 </div>
                 <div className="dp-inner-table-wrapper">
-                  <table className="dp-inner-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <table className="dp-inner-table">
                     <thead>
-                      <tr style={{ background: '#27235c' }}>
-                        <th style={{ color: '#ffffff', padding: '8px', textAlign: 'left' }}>Competency</th>
-                        <th style={{ color: '#ffffff', padding: '8px', textAlign: 'left' }}>Employee Rating</th>
-                        <th style={{ color: '#ffffff', padding: '8px', textAlign: 'left' }}>Employee Comments</th>
-                        <th style={{ color: '#ffffff', padding: '8px', textAlign: 'left' }}>L1 Reviewer</th>
-                        <th style={{ color: '#ffffff', padding: '8px', textAlign: 'left' }}>L1 Rating</th>
-                        <th style={{ color: '#ffffff', padding: '8px', textAlign: 'left' }}>L1 Comments</th>
-                        <th style={{ color: '#ffffff', padding: '8px', textAlign: 'left' }}>L2 Reviewer</th>
-                        <th style={{ color: '#ffffff', padding: '8px', textAlign: 'left' }}>L2 Rating</th>
-                        <th style={{ color: '#ffffff', padding: '8px', textAlign: 'left' }}>L2 Comments</th>
-                        <th style={{ color: '#ffffff', padding: '8px', textAlign: 'left' }}>Status</th>
+                      <tr>
+                        <th>Competency</th>
+                        <th>Employee Rating</th>
+                        <th>Employee Comments</th>
+                        <th>L1 Reviewer</th>
+                        <th>L1 Rating</th>
+                        <th>L1 Comments</th>
+                        <th>L2 Reviewer</th>
+                        <th>L2 Rating</th>
+                        <th>L2 Comments</th>
+                        <th>Status</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -836,77 +647,40 @@ export default function DeptHeadPage() {
                 </div>
               </div>
 
-              <div style={{
-                background: "#fff",
-                margin: "0 32px 22px 32px",
-                borderRadius: '13px',
-                boxShadow: '0 2px 8px #c1b6dd1c',
-                padding: '22px 20px 18px 20px',
-                border: "1px solid #27235c"
-              }}>
-                <div style={{
-                  fontWeight: 700,
-                  color: "#27235c",
-                  fontSize: "1.03rem",
-                  marginBottom: 10,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 7
-                }}>
+              <div className="dp-details-section-card">
+                <div className="dp-details-section-title">
                   <i className="bi bi-paperclip"></i>
                   Attachments
                 </div>
                 {loadingAttachments ? (
-                  <div style={{ textAlign: 'center', padding: '20px', color: '#6c757d' }}>
+                  <div className="dp-loading-attachments">
                     <div className="spinner-border spinner-border-sm" role="status">
                       <span className="visually-hidden">Loading...</span>
                     </div>
-                    <p style={{ marginTop: '10px', marginBottom: 0 }}>Loading attachments...</p>
+                    <p>Loading attachments...</p>
                   </div>
                 ) : attachments.length === 0 ? (
                   <p className="dp-no-data">No attachments found.</p>
                 ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div className="dp-attachments-list">
                     {attachments.map((attachment) => (
-                      <div key={attachment.attachmentId} style={{
-                        border: '1.2px solid #ece6fa',
-                        borderRadius: '9px',
-                        padding: '12px 15px',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        background: '#f8f7fc'
-                      }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
-                          <div style={{ flex: 1 }}>
-                            <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>
-                              {attachment.fileName}
-                            </div>
-                            <div style={{ fontSize: '0.85rem', color: '#666' }}>
-                              {formatFileSize(attachment.fileSize)} • Uploaded {new Date(attachment.uploadedAt).toLocaleDateString()}
-                            </div>
-                            {attachment.attachmentNote && (
-                              <div style={{ fontSize: '0.85rem', color: '#9c8dbb', marginTop: '4px' }}>
-                                {attachment.attachmentNote}
-                              </div>
-                            )}
+                      <div key={attachment.attachmentId} className="dp-attachment-item">
+                        <div className="dp-attachment-info">
+                          <div className="dp-attachment-filename">
+                            {attachment.fileName}
                           </div>
+                          <div className="dp-attachment-meta">
+                            {formatFileSize(attachment.fileSize)} • Uploaded {new Date(attachment.uploadedAt).toLocaleDateString()}
+                          </div>
+                          {attachment.attachmentNote && (
+                            <div className="dp-attachment-note">
+                              {attachment.attachmentNote}
+                            </div>
+                          )}
                         </div>
                         <button
                           onClick={() => handleDownloadAttachment(attachment.attachmentId)}
-                          style={{
-                            background: " #27235c",
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: '6px',
-                            padding: '8px 16px',
-                            fontWeight: 600,
-                            fontSize: '0.9rem',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px'
-                          }}
+                          className="dp-attachment-download-btn"
                         >
                           <i className="bi bi-download"></i> Download
                         </button>
@@ -916,23 +690,8 @@ export default function DeptHeadPage() {
                 )}
               </div>
 
-              <div style={{
-                background: "#fff",
-                margin: "0 32px 28px 32px",
-                borderRadius: '13px',
-                boxShadow: '0 2px 8px #c1b6dd1c',
-                padding: '22px 20px 18px 20px',
-                border: "1px solid #27235c"
-              }}>
-                <div style={{
-                  fontWeight: 700,
-                  color: "#27235c",
-                  fontSize: "1.03rem",
-                  marginBottom: 10,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 7
-                }}>
+              <div className="dp-details-section-card">
+                <div className="dp-details-section-title">
                   <i className="bi bi-bullseye"></i>
                   Goals
                 </div>
@@ -949,53 +708,25 @@ export default function DeptHeadPage() {
                     const overallProgress = latestProgress || checklistProgress;
 
                     return (
-                      <div key={goal.goalId} className="dp-goal-card" style={{
-                        border: '1.2px solid #ece6fa',
-                        borderRadius: '9px',
-                        marginBottom: '13px',
-                        padding: '10px 13px'
-                      }}>
-                        <div className="dp-goal-header" style={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center'
-                        }}>
+                      <div key={goal.goalId} className="dp-goal-card">
+                        <div className="dp-goal-header">
                           <div>
-                            <h5 className="dp-goal-title" style={{ fontWeight: 600, fontSize: '1.01rem', margin: 0 }}>
+                            <h5 className="dp-goal-title">
                               {goal.goalTitle}
                             </h5>
-                            <p className="dp-goal-description" style={{
-                              fontSize: '0.96rem',
-                              margin: 0,
-                              opacity: 0.82
-                            }}>{goal.goalDescription}</p>
+                            <p className="dp-goal-description">{goal.goalDescription}</p>
                           </div>
                           <span className={`dp-goal-status-badge status-${goal.goalstatus?.toLowerCase()}`}>
                             {goal.goalstatus}
                           </span>
                         </div>
-                        <div className="dp-progress-container" style={{ marginTop: 8 }}>
-                          <div className="dp-progress-label" style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            fontSize: '0.97rem'
-                          }}>
+                        <div className="dp-progress-container">
+                          <div className="dp-progress-label">
                             <span>Progress</span>
                             <span className="dp-progress-value">{overallProgress}%</span>
                           </div>
-                          <div className="dp-progress-bar-bg" style={{
-                            background: '#efe2f1',
-                            borderRadius: '5px',
-                            height: 6,
-                            width: '96%',
-                            marginTop: 4
-                          }}>
-                            <div className="dp-progress-bar-fill" style={{
-                              background: 'linear-gradient(90deg, #af295c 0%, #d1297b 100%)',
-                              height: 6,
-                              borderRadius: '4px',
-                              width: `${overallProgress}%`
-                            }} />
+                          <div className="dp-progress-bar-bg">
+                            <div className="dp-progress-bar-fill" style={{ width: `${overallProgress}%` }} />
                           </div>
                         </div>
                       </div>
@@ -1005,29 +736,12 @@ export default function DeptHeadPage() {
               </div>
             </div>
 
-            <div style={{
-              display: 'flex',
-              justifyContent: 'flex-end',
-              gap: '16px',
-              background: '#f8f9fa',
-              borderBottomLeftRadius: '16px',
-              borderBottomRightRadius: '16px',
-              borderTop: '1px solid #e5e7eb',
-              padding: '20px 32px 16px 32px'
-            }}>
+            <div className="dp-modal-footer dp-modal-footer-bottom">
               <button
                 type="button"
                 className="dp-btn-cancel"
                 onClick={handleModalClose}
-                style={{
-                  background: '#6c757d',
-                  color: '#fff',
-                  border: 'none',
-                  fontWeight: 600,
-                  borderRadius: '8px',
-                  fontSize: '1rem',
-                  padding: '0.75rem 2.25rem'
-                }}>
+              >
                 <i className="bi bi-x-circle"></i> Close
               </button>
             </div>
@@ -1047,228 +761,98 @@ export default function DeptHeadPage() {
     );
   }
 
-  return (
-    <div className="dp-page">
-      {/* REDUCED TOP PADDING */}
-      <div style={{ padding: '0.5rem 0 0.25rem 0' }}>
-        <nav className="hrfcper-breadcrumb-nav" aria-label="breadcrumb">
-          <Breadcrumb
-            items={[{ label: 'Department Head Dashboard' }]}
-          />
-        </nav>
-      </div>
+  // Check if filters are active
+  const hasActiveFilters = appliedSearch || filterProject;
 
-      {/* TABS */}
-      <div style={{ marginBottom: '1rem' }}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-start",
-            background: "#27235C",
-            borderRadius: 30,
-            padding: "4px 8px",
-            gap: 6,
-            border: "3px solid #27235C",
-            width: "fit-content",
-            boxShadow: "0 1.5px 8px 0 rgba(39,35,92,0.03)",
-          }}
+  // Around line 750 in your return statement, remove the hasActiveFilters check and replace with:
+
+return (
+  <div className="dp-page">
+    <div className="dp-breadcrumb-wrapper">
+      <nav className="hrfcper-breadcrumb-nav" aria-label="breadcrumb">
+        <Breadcrumb
+          items={[{ label: 'Department Head Dashboard' }]}
+        />
+      </nav>
+    </div>
+
+    <div className="dp-tab-toggle-wrapper">
+      <div className="dp-tab-toggle">
+        <button
+          className={`dp-tab-toggle-btn ${activeTab === "pending" ? "active" : ""}`}
+          onClick={() => setActiveTab("pending")}
         >
-          <button
-            style={{
-              padding: "10px 28px",
-              background: activeTab === "pending" ? "#fff" : "transparent",
-              color: activeTab === "pending" ? "#27235C" : "#fff",
-              border: "none",
-              borderRadius: 30,
-              fontWeight: 700,
-              fontSize: 15,
-              cursor: "pointer",
-              minWidth: 140,
-              transition: "all 0.18s cubic-bezier(.82,.75,.11,1.36)",
-              outline: "none",
-              boxShadow:
-                activeTab === "pending"
-                  ? "0 2px 8px 0 rgb(39 35 92 / 7%)"
-                  : "none",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-            }}
-            onClick={() => setActiveTab("pending")}
-          >
-            Pending
-          </button>
+          Pending
+        </button>
+
+        <button
+          className={`dp-tab-toggle-btn ${activeTab === "approved" ? "active" : ""}`}
+          onClick={() => setActiveTab("approved")}
+        >
+          Approved
+        </button>
+      </div>
+    </div>
+
+    <div className="dp-filters-card">
+      <div className="dp-filter-controls">
+        <div className="dp-search-wrapper">
+          <div className="dp-search-input-container">
+            <i className="bi bi-search dp-search-icon-input"></i>
+            <input
+              type="text"
+              placeholder="Search employee or project..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSearchClick();
+                }
+              }}
+              className="dp-search-input-field"
+            />
+          </div>
 
           <button
-            style={{
-              padding: "10px 28px",
-              background: activeTab === "approved" ? "#fff" : "transparent",
-              color: activeTab === "approved" ? "#27235C" : "#fff",
-              border: "none",
-              borderRadius: 30,
-              fontWeight: 700,
-              fontSize: 15,
-              cursor: "pointer",
-              minWidth: 140,
-              transition: "all 0.18s cubic-bezier(.82,.75,.11,1.36)",
-              outline: "none",
-              boxShadow:
-                activeTab === "approved"
-                  ? "0 2px 8px 0 rgb(39 35 92 / 7%)"
-                  : "none",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-            }}
-            onClick={() => setActiveTab("approved")}
+            onClick={handleSearchClick}
+            className="dp-search-submit-btn"
           >
-            Approved 
+            Search
           </button>
         </div>
-      </div>
 
-      <div className="dp-filters-card" style={{ marginBottom: "0.75rem" }}>
-  <div
-    style={{
-      display: "flex",
-      gap: "10px",
-      alignItems: "center",
-      flexWrap: "wrap",
-    }}
-  >
-    {/* SEARCH BAR */}
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        border: "1.5px solid #27235C",
-        borderRadius: "6px",
-        overflow: "hidden",
-        flex: "1 1 280px",
-        minWidth: "220px",
-        height: "36px",
-      }}
-    >
-      <div
-        style={{
-          position: "relative",
-          flex: 1,
-          display: "flex",
-          alignItems: "center",
-        }}
-      >
-        <i
-          className="bi bi-search"
-          style={{
-            position: "absolute",
-            left: "10px",
-            color: "#6c757d",
-            fontSize: "13px",
-            pointerEvents: "none",
-          }}
-        ></i>
- 
-        <input
-          type="text"
-          placeholder="Search employee or project..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              setAppliedSearch(searchTerm);
-            }
-          }}
-          style={{
-            flex: 1,
-            padding: "6px 10px 6px 32px",
-            border: "none",
-            fontSize: "13px",
-            outline: "none",
-            background: "transparent",
-            height: "100%",
-          }}
-        />
+        {/* Show Clear Filters button only when filters are active */}
+        {hasActiveFilters && (
+          <button
+            onClick={handleClearFilters}
+            className="dp-clear-filters-btn"
+          >
+            Clear Filters
+          </button>
+        )}
+
+        <select
+          value={filterProject}
+          onChange={(e) => setFilterProject(e.target.value)}
+          className="dp-project-filter-select"
+        >
+          <option value="">All Projects</option>
+          {getUniqueProjects().map((project, idx) => (
+            <option key={idx} value={project}>
+              {project}
+            </option>
+          ))}
+        </select>
       </div>
- 
-      <button
-        onClick={() => setAppliedSearch(searchTerm)}
-        style={{
-          padding: "0 14px",
-          backgroundColor: "#27235C",
-          color: "#fff",
-          border: "none",
-          fontSize: "13px",
-          fontWeight: 600,
-          cursor: "pointer",
-          height: "100%",
-          whiteSpace: "nowrap",
-        }}
-        onMouseEnter={(e) => (e.target.style.opacity = "0.9")}
-        onMouseLeave={(e) => (e.target.style.opacity = "1")}
-      >
-        Search
-      </button>
     </div>
- 
-   
-    <button
-  onClick={handleClearFilters}
-  style={{
-    padding: "6px 14px",
-    color: "#27235c",
-    border: "2px solid #27235c",
-    borderRadius: "6px",
-    fontWeight: 600,
-    fontSize: "13px",
-    cursor: "pointer",
-    height: "36px",
-    whiteSpace: "nowrap",
-  }}
-  onMouseEnter={(e) => (e.target.style.opacity = "0.9")}
-  onMouseLeave={(e) => (e.target.style.opacity = "1")}
->
-  Clear
-</button>
 
- 
-    {/* PROJECT FILTER */}
-    <select
-      value={filterProject}
-      onChange={(e) => setFilterProject(e.target.value)}
-      style={{
-        padding: "6px 10px",
-        border: "1.5px solid #27235C",
-        borderRadius: "6px",
-        fontSize: "13px",
-        fontWeight: 500,
-        cursor: "pointer",
-        outline: "none",
-        height: "36px",
-        minWidth: "140px",
-        background: "#fff",
-      }}
-    >
-      <option value="">All Projects</option>
-      {getUniqueProjects().map((project, idx) => (
-        <option key={idx} value={project}>
-          {project}
-        </option>
-      ))}
-    </select>
-  </div>
-</div>
- 
+    {/* Rest of your code remains the same... */}
 
-      
-      <div
-        className="dp-table-card"
-        style={{ border: "2px solid #27235C", borderRadius: "8px", overflow: "hidden" }}
-      >
+
+      <div className="dp-table-card dp-table-card-bordered">
         <div className="dp-table-wrapper">
           {activeTab === "pending" ? (
-            <table className="dp-table" style={{ width: "100%", borderCollapse: "collapse" }}>
+            <table className="dp-table">
               <thead>
                 <tr>
                   <th>Employee</th>
@@ -1283,14 +867,10 @@ export default function DeptHeadPage() {
               <tbody>
                 {getPaginatedData("pending").length === 0 ? (
                   <tr>
-                    <td
-                      colSpan={7}
-                      className="dp-empty-state"
-                      style={{ textAlign: "center", padding: "20px", color: "#6c757d" }}
-                    >
-                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px" }}>
-                        <i className="bi bi-inbox" style={{ fontSize: "1.5rem" }}></i>
-                        <p style={{ margin: 0 }}>No pending approvals found</p>
+                    <td colSpan={7} className="dp-empty-state">
+                      <div className="dp-empty-content">
+                        <i className="bi bi-inbox"></i>
+                        <p>No pending approvals found</p>
                       </div>
                     </td>
                   </tr>
@@ -1303,7 +883,6 @@ export default function DeptHeadPage() {
                             <div className="dp-user-avatar">{getInitials(emp.employeeName)}</div>
                             <div>
                               <span className="dp-user-name">{emp.employeeName}</span>
-                              
                             </div>
                           </div>
                         </td>
@@ -1354,7 +933,7 @@ export default function DeptHeadPage() {
               </tbody>
             </table>
           ) : (
-            <table className="dp-table" style={{ width: "100%", borderCollapse: "collapse" }}>
+            <table className="dp-table">
               <thead>
                 <tr>
                   <th>Employee</th>
@@ -1365,10 +944,10 @@ export default function DeptHeadPage() {
               <tbody>
                 {getPaginatedData("approved").length === 0 ? (
                   <tr>
-                    <td colSpan={3} className="dp-empty-state" style={{ textAlign: "center", padding: "20px", color: "#6c757d" }}>
-                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px" }}>
-                        <i className="bi bi-inbox" style={{ fontSize: "1.5rem" }}></i>
-                        <p style={{ margin: 0 }}>No approved employees found</p>
+                    <td colSpan={3} className="dp-empty-state">
+                      <div className="dp-empty-content">
+                        <i className="bi bi-inbox"></i>
+                        <p>No approved employees found</p>
                       </div>
                     </td>
                   </tr>
@@ -1398,12 +977,8 @@ export default function DeptHeadPage() {
           )}
         </div>
 
-        {/* PAGINATION */}
         {filteredData.length > 0 && (
-          <div
-            className="dp-pagination-container"
-            style={{ borderTop: "2px solid #27235C", paddingTop: "10px", marginTop: "10px" }}
-          >
+          <div className="dp-pagination-container dp-pagination-bordered">
             <div className="dp-pagination-info">
               <span className="dp-pagination-label">Show</span>
               <select

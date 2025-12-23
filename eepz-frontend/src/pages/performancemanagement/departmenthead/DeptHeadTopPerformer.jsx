@@ -88,20 +88,10 @@ export default function TopPerformers() {
                 <label className="dtp-detail-label">REWARD TYPE</label>
                 <p className="dtp-detail-value">{selectedNomination.rewardType.rewardName}</p>
               </div>
-              {/* <div className="dtp-detail-col">
-                <label className="dtp-detail-label">EMPLOYEE ID</label>
-                <p className="dtp-detail-value">{selectedNomination.nominee.employeeId}</p>
-              </div> */}
+             
             </div>
 
             <div className="dtp-detail-row">
-              {/* <div className="dtp-detail-col">
-                <label className="dtp-detail-label">DEPARTMENT</label>
-                <p className="dtp-detail-value">
-                  {selectedNomination.nominee.department || "N/A"}
-                </p>
-              </div> */}
-              
             </div>
 
             <div className="dtp-detail-section">

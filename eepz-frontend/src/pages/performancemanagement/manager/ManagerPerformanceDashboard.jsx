@@ -6,14 +6,12 @@ import { apiPort5114 } from "../../../services/performancemanagement/api/nominat
 import { toast, Toaster } from "sonner";
 import logoImage from "../../../assets/logodark.png";
 import Breadcrumb from "../../../components/common/Breadcrumb";
-import "../../../components/performance_management/modals/ManagerPerformanceDashboard/ManagerPerformanceDashboardModal";
-
+import "../../../styles/performancemanagement/manager/ManagerPerformanceDashboard.css";
 
 export default function ManagerDashboard() {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
   const userId = user ? user.empId : null;
-
 
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -24,13 +22,11 @@ export default function ManagerDashboard() {
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState("pending");
 
-
   const recentToastsRef = useRef(new Set());
   const safeToast = (type, message, id, duration = 3000) => {
     const key = id || message;
     if (recentToastsRef.current.has(key)) return;
     recentToastsRef.current.add(key);
-
 
     const options = { duration, icon: null };
     switch (type) {
@@ -50,21 +46,15 @@ export default function ManagerDashboard() {
         toast(message, options);
     }
 
-
     setTimeout(() => {
       recentToastsRef.current.delete(key);
     }, duration + 200);
   };
 
-
-
   const [pendingFormNameInput, setPendingFormNameInput] = useState("");
   const [pendingFormNameFilter, setPendingFormNameFilter] = useState("");
-  const [pendingTypeFilter, setPendingTypeFilter] = useState("");
   const [completedFormNameInput, setCompletedFormNameInput] = useState("");
   const [completedFormNameFilter, setCompletedFormNameFilter] = useState("");
-  const [completedTypeFilter, setCompletedTypeFilter] = useState("");
-
 
   useEffect(() => {
     if (userId) {
@@ -72,13 +62,11 @@ export default function ManagerDashboard() {
     }
   }, [userId]);
 
-
   const fetchAssignments = async () => {
     if (!userId) {
       safeToast("error", "Unable to load manager ID. Please login again.", "no-manager-id");
       return;
     }
-
 
     setLoading(true);
     setAssignments([]);
@@ -108,7 +96,6 @@ export default function ManagerDashboard() {
     }
   };
 
-
   const updateAssessmentData = (competencyId, field, value) => {
     setAssessmentData((prev) =>
       prev.map((item) =>
@@ -117,7 +104,6 @@ export default function ManagerDashboard() {
     );
   };
 
-
   const handleSubmitAssessment = async () => {
     const incompleteRating = assessmentData.filter((item) => !item.rating);
     if (incompleteRating.length > 0) {
@@ -125,13 +111,11 @@ export default function ManagerDashboard() {
       return;
     }
 
-
     const incompleteComments = assessmentData.filter((item) => !item.comments || item.comments.trim() === "");
     if (incompleteComments.length > 0) {
       safeToast("warning", "Please provide comments for all competencies.", "incomplete-comments");
       return;
     }
-
 
     setSubmitting(true);
     const payload = {
@@ -144,7 +128,6 @@ export default function ManagerDashboard() {
         employeeComments: item.comments || "",
       })),
     };
-
 
     try {
       const response = await api.post("/SelfAssessment/submit", payload);
@@ -161,7 +144,6 @@ export default function ManagerDashboard() {
       setSubmitting(false);
     }
   };
-
 
   const handleViewCompleted = async (assignment) => {
     setCurrentAssignment(assignment);
@@ -193,27 +175,13 @@ export default function ManagerDashboard() {
     }
   };
 
-
   const pendingAssignments = assignments
     .filter((a) => !a.isCompleted)
-    .filter((a) => {
-      const matchesFormName = a.formName.toLowerCase().includes(pendingFormNameFilter.toLowerCase());
-      const matchesType = pendingTypeFilter === "" || a.formType === pendingTypeFilter;
-      return matchesFormName && matchesType;
-    });
-
+    .filter((a) => a.formName.toLowerCase().includes(pendingFormNameFilter.toLowerCase()));
 
   const completedAssignments = assignments
     .filter((a) => a.isCompleted)
-    .filter((a) => {
-      const matchesFormName = a.formName.toLowerCase().includes(completedFormNameFilter.toLowerCase());
-      const matchesType = completedTypeFilter === "" || a.formType === completedTypeFilter;
-      return matchesFormName && matchesType;
-    });
-
-
-  const allFormTypes = [...new Set(assignments.map(a => a.formType))];
-
+    .filter((a) => a.formName.toLowerCase().includes(completedFormNameFilter.toLowerCase()));
 
   const renderTable = (data, isCompleted) => (
     <div className="manevap-table-container">
@@ -329,135 +297,9 @@ export default function ManagerDashboard() {
     </div>
   );
 
-
-  const internalStyles = `
-  /* Breadcrumb purple color and remove underline */
-  .hrfcper-top-bar a {
-    color: #97247E !important;
-    text-decoration: none !important;
-  }
-  .hrfcper-top-bar a:hover {
-    color:#97247E !important;
-    text-decoration: none !important;
-  }
-  .hrfcper-top-bar span {
-    color:#97247E !important;
-  }
-
-
-  .mgrdash-pill-toggle {
-    display: flex;
-    justify-content: center;
-    width: 420px;
-    max-width: 90vw;
-    border-radius: 999px;
-    background: #2E2B5F;
-    padding: 4px;
-    box-shadow: 0 2px 12px rgba(46,43,95,0.12);
-    margin: 0 auto 28px auto;
-    gap: 0;
-  }
-  .mgrdash-pill-tab {
-    flex: 1 1 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    color: #fff;
-    border: none;
-    outline: none;
-    border-radius: 999px;
-    font-weight: 600;
-    font-size: 15px;
-    padding: 10px 0;
-    cursor: pointer;
-    transition: background 0.22s, color 0.22s;
-    position: relative;
-    margin: 0 2px;
-    letter-spacing: 0.5px;
-  }
-  .mgrdash-pill-tab.active {
-    background: #fff;
-    color: #2E2B5F;
-    box-shadow: 0 2px 8px rgba(46,43,95,.13);
-    z-index: 1;
-  }
-  .mgrdash-pill-tab:not(.active):hover {
-    background: #393874;
-    color: #fff;
-  }
-  .mgrdash-pill-count {
-    background: rgba(46, 43, 95, 0.09);
-    color: #2E2B5F;
-    font-size: 13px;
-    padding: 2px 11px;
-    border-radius: 14px;
-    font-weight: 600;
-    margin-left: 10px;
-  }
-
-
-  /* Remove background from filter section */
-  .manevap-filter-section {
-    background: transparent !important;
-    border: none !important;
-    padding: 0 !important;
-    margin-bottom: 20px !important;
-  }
-
-
-  /* Unified search bar styling */
-  .unified-search-wrapper {
-    display: flex;
-    border: 1px solid #26225A;
-    border-radius: 8px;
-    overflow: hidden;
-    background: white;
-  }
-
-
-  .unified-search-wrapper .manevap-filter-input {
-    border: none !important;
-    border-radius: 0 !important;
-    margin: 0 !important;
-  }
-
-
-  .unified-search-wrapper .manevap-btn-primary {
-    border-radius: 0 !important;
-    margin: 0 !important;
-    border: none !important;
-    border-left: 2px solid #26225A !important;
-  }
-
-
-  /* Card with only outer border */
-  .manevap-card {
-    border: 2px solid #26225A !important;
-    border-radius: 8px !important;
-    box-shadow: none !important;
-  }
-
-
-  @media (max-width: 700px) {
-    .mgrdash-pill-toggle {
-      padding: 4px;
-    }
-    .mgrdash-pill-tab {
-      padding: 11px 0;
-      font-size: 14px;
-    }
-    .mgrdash-pill-count {
-      margin-left: 6px;
-    }
-  }
-  `;
-
-
   if (loading) {
     return (
       <div className="manevap-container">
-        <style>{internalStyles}</style>
         <Toaster position="top-right" />
         <div style={{ position: 'relative', zIndex: 12000 }}>
           <Toaster position="top-right" />
@@ -470,14 +312,11 @@ export default function ManagerDashboard() {
     );
   }
 
-
   return (
     <div className="manevap-container">
-      <style>{internalStyles}</style>
       <div style={{ position: 'relative', zIndex: 12000 }}>
         <Toaster position="top-right" />
       </div>
-      {/* Breadcrumb */}
       <div className="hrfcper-top-bar">
         <div style={{ width: '100%' }}>
           <Breadcrumb
@@ -493,8 +332,6 @@ export default function ManagerDashboard() {
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
       />
 
-
-      {/* Updated Pill Toggle */}
       <div className="mgrdash-pill-toggle" role="tablist" aria-label="Assignments">
         <button
           className={`mgrdash-pill-tab ${activeTab === "pending" ? "active" : ""}`}
@@ -514,12 +351,11 @@ export default function ManagerDashboard() {
         </button>
       </div>
 
-
       {activeTab === "pending" && (
         <div className="manevap-card">
           <div className="manevap-filter-section">
-            <div className="manevap-filter-group" style={{ display: 'flex', flexDirection: 'column' }}>
-              <div className="unified-search-wrapper">
+            <div className="manevap-filter-group" style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <div className="unified-search-wrapper" style={{ flex: 1 }}>
                 <input
                   type="text"
                   placeholder="Search by form name..."
@@ -535,49 +371,30 @@ export default function ManagerDashboard() {
                 >
                   Search
                 </button>
-
-                
               </div>
-              
+              {pendingFormNameFilter && (
+                <button
+                  onClick={() => {
+                    setPendingFormNameInput("");
+                    setPendingFormNameFilter("");
+                  }}
+                  className="manevap-clear-btn"
+                >
+                  Clear Filters
+                </button>
+              )}
             </div>
-            {(pendingFormNameFilter || pendingTypeFilter) && (
-              <button
-                onClick={() => {
-                  setPendingFormNameInput("");
-                  setPendingFormNameFilter("");
-                  setPendingTypeFilter("");
-                }}
-                className="manevap-clear-btn"
-              >
-               
-                Clear Filters
-              </button>
-            )}
-            <div className="manevap-filter-group">
-              <select
-                value={pendingTypeFilter}
-                onChange={(e) => setPendingTypeFilter(e.target.value)}
-                className="manevap-filter-select"
-                style={{ border: '1px solid #26225A' }}
-              >
-                <option value="">All Types</option>
-                {allFormTypes.map((type) => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
-              </select>
-            </div>
-           
           </div>
           {pendingAssignments.length === 0 ? (
             <div className="manevap-empty-state">
               <i className="bi bi-inbox"></i>
               <h3>
-                {pendingFormNameFilter || pendingTypeFilter
+                {pendingFormNameFilter
                   ? "No Matching Assessments"
                   : "No Pending Assessments"}
               </h3>
               <p>
-                {pendingFormNameFilter || pendingTypeFilter
+                {pendingFormNameFilter
                   ? "Try adjusting your filters"
                   : "All assessments have been completed!"}
               </p>
@@ -588,13 +405,11 @@ export default function ManagerDashboard() {
         </div>
       )}
 
-
-
       {activeTab === "completed" && (
         <div className="manevap-card">
           <div className="manevap-filter-section">
-            <div className="manevap-filter-group" style={{ display: 'flex', flexDirection: 'column' }}>
-              <div className="unified-search-wrapper">
+            <div className="manevap-filter-group" style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <div className="unified-search-wrapper" style={{ flex: 1 }}>
                 <input
                   type="text"
                   placeholder="Search by form name..."
@@ -611,44 +426,29 @@ export default function ManagerDashboard() {
                   <i className="bi bi-search"></i> Search
                 </button>
               </div>
+              {completedFormNameFilter && (
+                <button
+                  onClick={() => {
+                    setCompletedFormNameInput("");
+                    setCompletedFormNameFilter("");
+                  }}
+                  className="manevap-clear-btn"
+                >
+                  <i className="bi bi-x-circle"></i> Clear Filters
+                </button>
+              )}
             </div>
-            <div className="manevap-filter-group">
-              <select
-                value={completedTypeFilter}
-                onChange={(e) => setCompletedTypeFilter(e.target.value)}
-                className="manevap-filter-select"
-                style={{ border: '1px solid #26225A' }}
-              >
-                <option value="">All Types</option>
-                {allFormTypes.map((type) => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
-              </select>
-            </div>
-            {(completedFormNameFilter || completedTypeFilter) && (
-              <button
-                onClick={() => {
-                  setCompletedFormNameInput("");
-                  setCompletedFormNameFilter("");
-                  setCompletedTypeFilter("");
-                }}
-                className="manevap-clear-btn"
-              >
-                <i className="bi bi-x-circle"></i>
-                Clear Filters
-              </button>
-            )}
           </div>
           {completedAssignments.length === 0 ? (
             <div className="manevap-empty-state">
               <i className="bi bi-clipboard-check"></i>
               <h3>
-                {completedFormNameFilter || completedTypeFilter
+                {completedFormNameFilter
                   ? "No Matching Assessments"
                   : "No Completed Assessments"}
               </h3>
               <p>
-                {completedFormNameFilter || completedTypeFilter
+                {completedFormNameFilter
                   ? "Try adjusting your filters"
                   : "Complete your pending assessments to see them here."}
               </p>
@@ -659,244 +459,232 @@ export default function ManagerDashboard() {
         </div>
       )}
 
-
-
-{showModal && currentAssignment && (
-  <div className="manevap-modal-overlay" onClick={() => setShowModal(false)}>
-    <div 
-      className="manevap-modal-content" 
-      onClick={(e) => e.stopPropagation()}
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        maxHeight: "90vh"
-      }}
-    >
-      {/* FIXED HEADER */}
-      <div
-        className="manevap-form-header-strict"
-        style={{
-          padding: "12px 20px",
-          minHeight: "auto",
-          borderBottom: "2px solid #2E2B5F",
-          flexShrink: 0
-        }}
-      >
-        <div style={{ 
-          display: "flex", 
-          alignItems: "center", 
-          justifyContent: "space-between",
-          gap: "12px"
-        }}>
-          {/* Logo on LEFT */}
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <img
-              src={logoImage}
-              alt="EEPZ Logo"
-              className="manevap-modal-logo"
-              style={{ height: "32px", width: "auto" }}
-            />
-            <div style={{
-              fontSize: "9px",
-              marginTop: "2px",
-              fontWeight: 600,
-              color: "#26225A"
-            }}>
-              MANAGER FORM
-            </div>
-          </div>
-
-
-          {/* Form name CENTERED */}
-          <div style={{ 
-            flex: 1, 
-            textAlign: "center"
-          }}>
-            <div style={{
-              fontSize: "16px",
-              fontWeight: 700,
-              marginBottom: "2px",
-              color: "#26225A"
-            }}>
-              Appraisal Form
-            </div>
-            <div style={{ fontSize: "13px", color: "#6b7280" }}>
-              {currentAssignment?.formName || ""}
-            </div>
-          </div>
-
-
-          {/* Close button on RIGHT */}
-          <button
-            onClick={() => setShowModal(false)}
+      {showModal && currentAssignment && (
+        <div className="manevap-modal-overlay" onClick={() => setShowModal(false)}>
+          <div 
+            className="manevap-modal-content" 
+            onClick={(e) => e.stopPropagation()}
             style={{
-              background: "transparent",
-              border: "none",
-              fontSize: "32px",
-              color: "#6b7280",
-              cursor: "pointer",
-              padding: "0",
-              lineHeight: 1,
-              transition: "color 0.2s",
-              fontWeight: 300,
-              flexShrink: 0
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = "#26225A"}
-            onMouseLeave={(e) => e.currentTarget.style.color = "#6b7280"}
-            aria-label="Close modal"
-          >
-            ×
-          </button>
-        </div>
-      </div>
-
-
-      {/* SCROLLABLE BODY */}
-      {submitting && modalMode === "view" ? (
-        <div className="manevap-modal-loading">
-          <div className="spinner-border"></div>
-          <p>Loading assessment...</p>
-        </div>
-      ) : (
-        <>
-          <div className="manevap-strict-form-body">
-            <table className="manevap-strict-table">
-              <thead>
-                <tr>
-                  <th style={{ textAlign: "left" }}>COMPETENCY NAME</th>
-                  <th style={{ textAlign: "left" }}>DESCRIPTION</th>
-                  <th style={{ textAlign: "left" }}>RATING</th>
-                  <th style={{ textAlign: "left" }}>COMMENTS</th>
-                </tr>
-              </thead>
-              <tbody>
-                {assessmentData.map((item, idx) => (
-                  <tr key={item.competencyId || idx}>
-                    <td className="manevap-cell-bold" style={{ textAlign: "left" }}>
-                      {item.competencyName}
-                    </td>
-                    <td style={{ textAlign: "left" }}>
-                      {item.competencyDescription || ""}
-                    </td>
-                    <td style={{ textAlign: "left" }}>
-                      {modalMode === "view" ? (
-                        <div className="manevap-modal-cell-view">
-                          {item.rating ? `${item.rating} / 5` : '-'}
-                        </div>
-                      ) : (
-                        <select
-                          value={item.rating || ""}
-                          onChange={e =>
-                            updateAssessmentData(item.competencyId, "rating", e.target.value)
-                          }
-                          className="manevap-modal-cell-input"
-                        >
-                          <option value="">-</option>
-                          <option value="1">1 - Poor</option>
-                          <option value="2">2 - Fair</option>
-                          <option value="3">3 - Good</option>
-                          <option value="4">4 - Very Good</option>
-                          <option value="5">5 - Excellent</option>
-                        </select>
-                      )}
-                    </td>
-                    <td style={{ textAlign: "left" }}>
-                      {modalMode === "view" ? (
-                        <div className="manevap-modal-cell-view">{item.comments || "-"}</div>
-                      ) : (
-                        <input
-                          className="manevap-modal-cell-input"
-                          type="text"
-                          value={item.comments}
-                          onChange={e =>
-                            updateAssessmentData(item.competencyId, "comments", e.target.value)
-                          }
-                          placeholder="-"
-                        />
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-
-          {/* FIXED FOOTER */}
-          <div
-            className="manevap-modal-actions"
-            style={{
-              padding: "10px 20px",
               display: "flex",
-              gap: "10px",
-              justifyContent: "flex-end",
-              borderTop: "1px solid #e5e7eb",
-              flexShrink: 0
+              flexDirection: "column",
+              maxHeight: "90vh"
             }}
           >
-            <button
-              onClick={() => setShowModal(false)}
-              className="manevap-btn-close"
+            <div
+              className="manevap-form-header-strict"
               style={{
-                background: "#6b7280",
-                color: "white",
-                border: "none",
-                padding: "8px 16px",
-                borderRadius: "6px",
-                cursor: "pointer",
-                fontWeight: 600,
-                fontSize: "14px",
-                transition: "background 0.2s"
+                padding: "12px 20px",
+                minHeight: "auto",
+                borderBottom: "2px solid #2E2B5F",
+                flexShrink: 0
               }}
-              onMouseEnter={(e) => e.currentTarget.style.background = "#4b5563"}
-              onMouseLeave={(e) => e.currentTarget.style.background = "#6b7280"}
             >
-              Cancel
-            </button>
-            {modalMode === "submit" && (
-              <button
-                onClick={handleSubmitAssessment}
-                disabled={submitting}
-                className="manevap-btn-submit-form"
-                style={{
-                  background: submitting
-                    ? "#9ca3af"
-                    : "linear-gradient(135deg, #97247E 0%, #E01950 100%)",
-                  color: "white",
-                  border: "none",
-                  padding: "8px 20px",
-                  borderRadius: "6px",
-                  cursor: submitting ? "not-allowed" : "pointer",
-                  fontWeight: 700,
-                  fontSize: "14px",
-                  boxShadow: submitting ? "none" : "0 4px 12px rgba(151, 36, 126, 0.3)",
-                  transition: "all 0.2s",
-                  opacity: submitting ? 0.7 : 1
-                }}
-                onMouseEnter={(e) => {
-                  if (!submitting) {
-                    e.currentTarget.style.background = "linear-gradient(135deg, #7d1a6a 0%, #c01640 100%)";
-                    e.currentTarget.style.boxShadow = "0 6px 16px rgba(151, 36, 126, 0.4)";
-                    e.currentTarget.style.transform = "translateY(-1px)";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!submitting) {
-                    e.currentTarget.style.background = "linear-gradient(135deg, #97247E 0%, #E01950 100%)";
-                    e.currentTarget.style.boxShadow = "0 4px 12px rgba(151, 36, 126, 0.3)";
-                    e.currentTarget.style.transform = "translateY(0)";
-                  }
-                }}
-              >
-                {submitting ? "Submitting..." : "Submit Assessment"}
-              </button>
+              <div style={{ 
+                display: "flex", 
+                alignItems: "center", 
+                justifyContent: "space-between",
+                gap: "12px"
+              }}>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                  <img
+                    src={logoImage}
+                    alt="EEPZ Logo"
+                    className="manevap-modal-logo"
+                    style={{ height: "32px", width: "auto" }}
+                  />
+                  <div style={{
+                    fontSize: "9px",
+                    marginTop: "2px",
+                    fontWeight: 600,
+                    color: "#26225A"
+                  }}>
+                    MANAGER FORM
+                  </div>
+                </div>
+
+                <div style={{ 
+                  flex: 1, 
+                  textAlign: "center"
+                }}>
+                  <div style={{
+                    fontSize: "16px",
+                    fontWeight: 700,
+                    marginBottom: "2px",
+                    color: "#26225A"
+                  }}>
+                    Appraisal Form
+                  </div>
+                  <div style={{ fontSize: "13px", color: "#6b7280" }}>
+                    {currentAssignment?.formName || ""}
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setShowModal(false)}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    fontSize: "32px",
+                    color: "#6b7280",
+                    cursor: "pointer",
+                    padding: "0",
+                    lineHeight: 1,
+                    transition: "color 0.2s",
+                    fontWeight: 300,
+                    flexShrink: 0
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = "#26225A"}
+                  onMouseLeave={(e) => e.currentTarget.style.color = "#6b7280"}
+                  aria-label="Close modal"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+
+            {submitting && modalMode === "view" ? (
+              <div className="manevap-modal-loading">
+                <div className="spinner-border"></div>
+                <p>Loading assessment...</p>
+              </div>
+            ) : (
+              <>
+                <div className="manevap-strict-form-body">
+                  <table className="manevap-strict-table">
+                    <thead>
+                      <tr>
+                        <th style={{ textAlign: "left" }}>COMPETENCY NAME</th>
+                        <th style={{ textAlign: "left" }}>DESCRIPTION</th>
+                        <th style={{ textAlign: "left" }}>RATING</th>
+                        <th style={{ textAlign: "left" }}>COMMENTS</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {assessmentData.map((item, idx) => (
+                        <tr key={item.competencyId || idx}>
+                          <td className="manevap-cell-bold" style={{ textAlign: "left" }}>
+                            {item.competencyName}
+                          </td>
+                          <td style={{ textAlign: "left" }}>
+                            {item.competencyDescription || ""}
+                          </td>
+                          <td style={{ textAlign: "left" }}>
+                            {modalMode === "view" ? (
+                              <div className="manevap-modal-cell-view">
+                                {item.rating ? `${item.rating} / 5` : '-'}
+                              </div>
+                            ) : (
+                              <select
+                                value={item.rating || ""}
+                                onChange={e =>
+                                  updateAssessmentData(item.competencyId, "rating", e.target.value)
+                                }
+                                className="manevap-modal-cell-input"
+                              >
+                                <option value="">-</option>
+                                <option value="1">1 - Poor</option>
+                                <option value="2">2 - Fair</option>
+                                <option value="3">3 - Good</option>
+                                <option value="4">4 - Very Good</option>
+                                <option value="5">5 - Excellent</option>
+                              </select>
+                            )}
+                          </td>
+                          <td style={{ textAlign: "left" }}>
+                            {modalMode === "view" ? (
+                              <div className="manevap-modal-cell-view">{item.comments || "-"}</div>
+                            ) : (
+                              <input
+                                className="manevap-modal-cell-input"
+                                type="text"
+                                value={item.comments}
+                                onChange={e =>
+                                  updateAssessmentData(item.competencyId, "comments", e.target.value)
+                                }
+                                placeholder="-"
+                              />
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div
+                  className="manevap-modal-actions"
+                  style={{
+                    padding: "10px 20px",
+                    display: "flex",
+                    gap: "10px",
+                    justifyContent: "flex-end",
+                    borderTop: "1px solid #e5e7eb",
+                    flexShrink: 0
+                  }}
+                >
+                  <button
+                    onClick={() => setShowModal(false)}
+                    className="manevap-btn-close"
+                    style={{
+                      background: "#6b7280",
+                      color: "white",
+                      border: "none",
+                      padding: "8px 16px",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                      fontWeight: 600,
+                      fontSize: "14px",
+                      transition: "background 0.2s"
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = "#4b5563"}
+                    onMouseLeave={(e) => e.currentTarget.style.background = "#6b7280"}
+                  >
+                    Cancel
+                  </button>
+                  {modalMode === "submit" && (
+                    <button
+                      onClick={handleSubmitAssessment}
+                      disabled={submitting}
+                      className="manevap-btn-submit-form"
+                      style={{
+                        background: submitting
+                          ? "#9ca3af"
+                          : "linear-gradient(135deg, #97247E 0%, #E01950 100%)",
+                        color: "white",
+                        border: "none",
+                        padding: "8px 20px",
+                        borderRadius: "6px",
+                        cursor: submitting ? "not-allowed" : "pointer",
+                        fontWeight: 700,
+                        fontSize: "14px",
+                        boxShadow: submitting ? "none" : "0 4px 12px rgba(151, 36, 126, 0.3)",
+                        transition: "all 0.2s",
+                        opacity: submitting ? 0.7 : 1
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!submitting) {
+                          e.currentTarget.style.background = "linear-gradient(135deg, #7d1a6a 0%, #c01640 100%)";
+                          e.currentTarget.style.boxShadow = "0 6px 16px rgba(151, 36, 126, 0.4)";
+                          e.currentTarget.style.transform = "translateY(-1px)";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!submitting) {
+                          e.currentTarget.style.background = "linear-gradient(135deg, #97247E 0%, #E01950 100%)";
+                          e.currentTarget.style.boxShadow = "0 4px 12px rgba(151, 36, 126, 0.3)";
+                          e.currentTarget.style.transform = "translateY(0)";
+                        }
+                      }}
+                    >
+                      {submitting ? "Submitting..." : "Submit Assessment"}
+                    </button>
+                  )}
+                </div>
+              </>
             )}
           </div>
-        </>
-      )}
-    </div>
-  </div>
-)}      
+        </div>
+      )}      
     </div>
   );
 }

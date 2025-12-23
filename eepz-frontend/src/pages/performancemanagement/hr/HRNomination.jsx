@@ -568,7 +568,6 @@ function HRNominations() {
     );
   }
 
-  // Main View - Grouped by Reward Type
   return (
     <div style={{ background: THEME.background, minHeight: "100vh", paddingTop: "16px", paddingBottom: "32px" }}>
       <ToastContainer position="top-right" autoClose={3000} />

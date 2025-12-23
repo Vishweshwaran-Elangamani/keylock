@@ -29,8 +29,6 @@ const usePagination = (items = [], pageSize = 5) => {
   return { page, setPage, totalPages, paged, pageSize };
 };
 
-
-
 export default function ManagerNomination() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const empId = user?.empId ?? null;
@@ -103,8 +101,6 @@ export default function ManagerNomination() {
   const pendingPager = usePagination(pendingNominations, 5);
   const approvedPager = usePagination(approvedNominations, 5);
   const rejectedPager = usePagination(rejectedNominations, 5);
-  
-  //  FIXED: Show ALL team members (don't filter based on nominations)
   const teamMembersPager = usePagination(teamMembers, 5);
 
   const handleOpenNominate = (member) => {
@@ -163,63 +159,20 @@ export default function ManagerNomination() {
       <Toaster position="top-right" />
 
       <Breadcrumb
-  items={[
-    { label: "Dashboard", path: "/manager/dashboard" },
-    { label: "Performance", path: "/manager/dashboard/performance" },
-    { label: "Nominations", path: null }
-  ]}
-/>
- 
+        items={[
+          { label: "Dashboard", path: "/manager/dashboard" },
+          { label: "Performance", path: "/manager/dashboard/performance" },
+          { label: "Nominations", path: null }
+        ]}
+      />
 
-      {/* TEAM MEMBERS CARD */}
-      <div
-        className="managernomination-card managernomination-available-section"
-        style={{
-          border: "none",
-          borderRadius: 0,
-          boxShadow: "none",
-          padding: 0,
-          background: "transparent",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            background: "linear-gradient(135deg, #26225A 0%, #1a1740 100%)",
-            padding: "16px 24px",
-            borderRadius: "16px 16px 8px 8px",
-            marginBottom: 8,
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <div
-              style={{
-                background: "rgba(255, 255, 255, 0.15)",
-                borderRadius: "50%",
-                width: "40px",
-                height: "40px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <i
-                className="bi bi-people-fill"
-                style={{ fontSize: "20px", color: "#fff" }}
-              ></i>
+      <div className="managernomination-card managernomination-available-section managernomination-team-section">
+        <div className="managernomination-section-header">
+          <div className="managernomination-section-header-left">
+            <div className="managernomination-section-icon">
+              <i className="bi bi-people-fill"></i>
             </div>
-            <h3
-              style={{
-                margin: 0,
-                color: "#fff",
-                fontSize: 18,
-                fontWeight: 700,
-              }}
-            >
-              Team Members
-            </h3>
+            <h3 className="managernomination-section-title">Team Members</h3>
           </div>
           <button
             onClick={() => {
@@ -235,54 +188,14 @@ export default function ManagerNomination() {
                 }, 100);
               }
             }}
-            style={{
-              background: "linear-gradient(90deg, #97247e 0%, #e01950 100%)",
-              boxShadow: "0 10px 28px rgba(224, 25, 80, 0.18)",
-              color: "#fff",
-              border: "none",
-              padding: "10px 20px",
-              borderRadius: 8,
-              fontWeight: 700,
-              cursor: "pointer",
-              transition: "all 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow =
-                "0 12px 32px rgba(224, 25, 80, 0.28)";
-              e.currentTarget.style.transform = "translateY(-2px)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow =
-                "0 10px 28px rgba(224, 25, 80, 0.18)";
-              e.currentTarget.style.transform = "translateY(0)";
-            }}
+            className="managernomination-view-nominations-btn"
           >
             {showNominationsView ? "Hide Nominations" : "View Nominations"}
           </button>
         </div>
 
-        <div
-          className="managernomination-table-wrapper"
-          style={{
-            marginTop: 0,
-            background: "transparent",
-            padding: 0,
-          }}
-        >
-          <table
-            className="managernomination-table"
-            role="table"
-            aria-label="Team members"
-            style={{
-              borderCollapse: "separate",
-              borderSpacing: 0,
-              width: "100%",
-              border: "1px solid #27235c",
-              borderRadius: 12,
-              overflow: "hidden",
-              background: "#fff",
-            }}
-          >
+        <div className="managernomination-table-wrapper managernomination-table-wrapper-transparent">
+          <table className="managernomination-table" role="table" aria-label="Team members">
             <thead>
               <tr>
                 <th className="col-index">SNO</th>
@@ -327,10 +240,7 @@ export default function ManagerNomination() {
               })}
               {teamMembers.length === 0 && (
                 <tr>
-                  <td
-                    colSpan={4}
-                    className="managernomination-empty-row"
-                  >
+                  <td colSpan={4} className="managernomination-empty-row">
                     {loading ? "Loading team members..." : "No team members found"}
                   </td>
                 </tr>
@@ -338,97 +248,35 @@ export default function ManagerNomination() {
             </tbody>
           </table>
         </div>
-        <div style={{ marginTop: 12 }}>
+        <div className="managernomination-pagination-wrapper">
           <Pagination pager={teamMembersPager} />
         </div>
       </div>
 
-      {/* NOMINATIONS VIEW */}
       {showNominationsView && (
         <div
           id="nominations-section"
-          className="managernomination-card"
-          style={{
-            marginTop: 32,
-            animation: "slideDown 0.3s ease-out",
-            border: "none",
-            boxShadow: "none",
-            padding: 0,
-            background: "transparent",
-          }}
+          className="managernomination-card managernomination-nominations-section"
         >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              background: "linear-gradient(135deg, #26225A 0%, #1a1740 100%)",
-              padding: "16px 24px",
-              borderRadius: "16px 16px 8px 8px",
-              marginBottom: 8,
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              <div
-                style={{
-                  background: "rgba(255, 255, 255, 0.15)",
-                  borderRadius: "50%",
-                  width: "40px",
-                  height: "40px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <i
-                  className="bi bi-list-check"
-                  style={{ fontSize: "20px", color: "#fff" }}
-                ></i>
+          <div className="managernomination-section-header">
+            <div className="managernomination-section-header-left">
+              <div className="managernomination-section-icon">
+                <i className="bi bi-list-check"></i>
               </div>
-              <h3
-                style={{
-                  margin: 0,
-                  color: "#fff",
-                  fontSize: 18,
-                  fontWeight: 700,
-                }}
-              >
-                My Nominations
-              </h3>
+              <h3 className="managernomination-section-title">My Nominations</h3>
             </div>
             <button
-  onClick={() => setShowNominationsView(false)}
-  style={{
-    background: "#e0e0e0",        // light grey
-    color: "#333",
-    border: "none",
-    padding: "8px 16px",
-    borderRadius: 6,
-    fontWeight: 600,
-    cursor: "pointer",
-    fontSize: 13,
-    display: "flex",
-    alignItems: "center",
-    gap: "6px",
-    transition: "background 0.2s",
-  }}
-  onMouseEnter={(e) =>
-    (e.currentTarget.style.background = "#d5d5d5") // slightly darker grey
-  }
-  onMouseLeave={(e) =>
-    (e.currentTarget.style.background = "#e0e0e0")
-  }
->
-  Close
-</button>
-
+              onClick={() => setShowNominationsView(false)}
+              className="managernomination-close-btn"
+            >
+              Close
+            </button>
           </div>
 
           <div
             className="managernomination-tab-container"
             role="tablist"
             aria-label="Nomination tabs"
-            style={{ marginTop: 8 }}
           >
             <button
               className={`managernomination-tab ${
@@ -470,27 +318,11 @@ export default function ManagerNomination() {
             </button>
           </div>
 
-          <div
-            className="managernomination-table-wrapper"
-            style={{
-              marginTop: 8,
-              background: "transparent",
-              padding: 0,
-            }}
-          >
+          <div className="managernomination-table-wrapper managernomination-table-wrapper-transparent">
             <table
               className="managernomination-table"
               role="table"
               aria-label="Nominations table"
-              style={{
-                borderCollapse: "separate",
-                borderSpacing: 0,
-                width: "100%",
-                border: "1px solid #27235c",
-                borderRadius: 12,
-                overflow: "hidden",
-                background: "#fff",
-              }}
             >
               <thead>
                 <tr>
@@ -617,10 +449,7 @@ export default function ManagerNomination() {
                   (activeTab === "rejected" &&
                     rejectedNominations.length === 0)) && (
                   <tr>
-                    <td
-                      colSpan={4}
-                      className="managernomination-empty-row"
-                    >
+                    <td colSpan={4} className="managernomination-empty-row">
                       No {activeTab} nominations found
                     </td>
                   </tr>
@@ -629,7 +458,7 @@ export default function ManagerNomination() {
             </table>
           </div>
 
-          <div style={{ marginTop: 12 }}>
+          <div className="managernomination-pagination-wrapper">
             {activeTab === "pending" && <Pagination pager={pendingPager} />}
             {activeTab === "approved" && <Pagination pager={approvedPager} />}
             {activeTab === "rejected" && <Pagination pager={rejectedPager} />}
@@ -645,24 +474,6 @@ export default function ManagerNomination() {
         rewardTypes={rewardTypes}
         managerId={managerId}
       />
-
-      <style jsx>{`
-        @keyframes slideDown {
-          from {
-            opacity: 0;
-            transform: translateY(-20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .managernomination-table thead th {
-          background: #26225a;
-          color: white;
-        }
-      `}</style>
     </div>
   );
 }

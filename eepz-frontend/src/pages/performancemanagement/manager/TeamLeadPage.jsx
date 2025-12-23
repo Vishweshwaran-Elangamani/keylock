@@ -7,7 +7,7 @@ import "../../../styles/performancemanagement/manager/TeamLeadPage.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import ReviewModal from "../../../components/performance_management/modals/TeamLeadPage/ReviewModal";
 import Breadcrumb from "../../../components/common/Breadcrumb";
- 
+
 const calculateAverageRating = (items) => {
   if (!items || items.length === 0) return 0;
   const validRatings = items
@@ -18,10 +18,10 @@ const calculateAverageRating = (items) => {
     validRatings.reduce((a, b) => a + b, 0) / validRatings.length
   ).toFixed(2);
 };
- 
+
 const getExtensionFromContentType = (contentType) => {
   if (!contentType) return null;
- 
+
   const mimeToExt = {
     "application/pdf": ".pdf",
     "application/msword": ".doc",
@@ -41,10 +41,10 @@ const getExtensionFromContentType = (contentType) => {
     "application/zip": ".zip",
     "application/x-zip-compressed": ".zip",
   };
- 
+
   return mimeToExt[contentType.toLowerCase()] || null;
 };
- 
+
 const isL1Complete = (assess) => {
   return (assess.items || []).every(
     (item) =>
@@ -54,7 +54,7 @@ const isL1Complete = (assess) => {
       item.approverRating <= 5
   );
 };
- 
+
 const getL1Categories = (allSubs) => {
   if (!Array.isArray(allSubs))
     return { pending: [], submitted: [], rejected: [] };
@@ -74,7 +74,7 @@ const getL1Categories = (allSubs) => {
   });
   return { pending, submitted, rejected };
 };
- 
+
 function TeamLeadPage() {
   const user = JSON.parse(localStorage.getItem("user"));
   const empId = user ? user.empId : null;
@@ -95,14 +95,13 @@ function TeamLeadPage() {
   const [rejectionReason, setRejectionReason] = useState("");
   const [l2ActionLoading, setL2ActionLoading] = useState(false);
   const [isReadOnly, setIsReadOnly] = useState(false);
- 
- 
+
   useEffect(() => {
     if (userId) {
       fetchData();
     }
   }, [userId, active]);
- 
+
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -116,11 +115,13 @@ function TeamLeadPage() {
               params: { page: 1, pageSize: 25 },
             })
             .catch(() => ({ data: [] })),
-          apiPort5113.get(`/approver/${userId}/submitted-l1-ratings`, {
-            params: { page: 1, pageSize: 25 },
-          }).catch(() => ({ data: [] })),
+          apiPort5113
+            .get(`/approver/${userId}/submitted-l1-ratings`, {
+              params: { page: 1, pageSize: 25 },
+            })
+            .catch(() => ({ data: [] })),
         ]);
- 
+
         const extractAssessments = (resp) => {
           const respData = resp?.data;
           return Array.isArray(respData)
@@ -133,16 +134,16 @@ function TeamLeadPage() {
             ? respData.assessments
             : [];
         };
- 
+
         const pendingAssessments = extractAssessments(pendingResp);
         const reworkAssessmentsList = extractAssessments(reworkResp);
         const submittedAssessmentsBasic = extractAssessments(submittedResp);
-        
+
         const allAssessmentIds = [
           ...pendingAssessments.map((a) => a.assessmentId),
           ...reworkAssessmentsList.map((a) => a.assessmentId),
         ];
- 
+
         const allWithDetails = await Promise.all(
           allAssessmentIds.map(async (assessmentId) => {
             try {
@@ -162,7 +163,7 @@ function TeamLeadPage() {
             }
           })
         );
- 
+
         const withNotes = await Promise.all(
           allWithDetails.map(async (a) => {
             try {
@@ -179,7 +180,7 @@ function TeamLeadPage() {
             }
           })
         );
- 
+
         const submittedWithDetails = await Promise.all(
           submittedAssessmentsBasic.map(async (basic) => {
             try {
@@ -192,7 +193,7 @@ function TeamLeadPage() {
             }
           })
         );
- 
+
         setAllL1(withNotes);
         setSubmittedL1(submittedWithDetails);
       } else {
@@ -200,11 +201,13 @@ function TeamLeadPage() {
           apiPort5113.get(`/reviewer/${userId}/assessments/full`, {
             params: { page: 1, pageSize: 25 },
           }),
-          apiPort5113.get(`/reviewer/${userId}/submitted-ratings`, {
-            params: { page: 1, pageSize: 25 },
-          }).catch(() => ({ data: [] })),
+          apiPort5113
+            .get(`/reviewer/${userId}/submitted-ratings`, {
+              params: { page: 1, pageSize: 25 },
+            })
+            .catch(() => ({ data: [] })),
         ]);
-        
+
         const respData = pendingResp?.data;
         const assessments = Array.isArray(respData)
           ? respData
@@ -215,14 +218,14 @@ function TeamLeadPage() {
           : Array.isArray(respData?.assessments)
           ? respData.assessments
           : [];
-          
+
         const submittedData = submittedResp?.data;
         const submittedAssessmentsBasic = Array.isArray(submittedData)
           ? submittedData
           : Array.isArray(submittedData?.data)
           ? submittedData.data
           : [];
-        
+
         const submittedWithDetails = await Promise.all(
           submittedAssessmentsBasic.map(async (basic) => {
             try {
@@ -235,7 +238,7 @@ function TeamLeadPage() {
             }
           })
         );
-          
+
         setL2Subs(assessments);
         setSubmittedL2(submittedWithDetails);
       }
@@ -245,7 +248,7 @@ function TeamLeadPage() {
       setLoading(false);
     }
   };
- 
+
   const openModal = async (assess, readOnly = false) => {
     setIsReadOnly(readOnly);
     setModalData(assess);
@@ -266,17 +269,17 @@ function TeamLeadPage() {
     setModalRatings(ratings);
     setShowRejectReason(false);
     setRejectionReason("");
- 
+
     try {
       const endpoint =
         active === "l1"
           ? `/approver/${userId}/assessment/${assess.assessmentId}/attachments`
           : `/reviewer/${userId}/assessment/${assess.assessmentId}/attachments`;
- 
+
       const attachmentsResp = await apiPort5113.get(endpoint);
       const attachments =
         attachmentsResp.data?.data || attachmentsResp.data || [];
- 
+
       setModalData((prev) => ({
         ...assess,
         attachments: attachments,
@@ -288,10 +291,10 @@ function TeamLeadPage() {
         attachments: [],
       }));
     }
- 
+
     setShowModal(true);
   };
- 
+
   const closeModal = () => {
     setShowModal(false);
     setModalData(null);
@@ -300,7 +303,7 @@ function TeamLeadPage() {
     setRejectionReason("");
     setIsReadOnly(false);
   };
- 
+
   const handleL1Submit = async () => {
     setSubmitting(true);
     try {
@@ -309,7 +312,7 @@ function TeamLeadPage() {
         rating: Number(modalRatings[item.detailId]?.rating),
         comments: modalRatings[item.detailId]?.comment,
       }));
- 
+
       if (
         !items.every(
           (it) =>
@@ -325,7 +328,7 @@ function TeamLeadPage() {
         setSubmitting(false);
         return;
       }
- 
+
       await apiPort5113.post(`/approver/${userId}/reviews`, {
         assessmentId: modalData.assessmentId,
         items,
@@ -339,7 +342,7 @@ function TeamLeadPage() {
       setSubmitting(false);
     }
   };
- 
+
   const handleL2Approve = async () => {
     setL2ActionLoading(true);
     try {
@@ -372,13 +375,13 @@ function TeamLeadPage() {
           return null;
         })
         .filter((item) => item !== null);
- 
+
       if (items.length !== (modalData.items || []).length) {
         toast.error("Please complete all items.");
         setL2ActionLoading(false);
         return;
       }
- 
+
       await apiPort5113.post(`/reviewer/${userId}/reviews`, {
         assessmentId: modalData.assessmentId,
         items,
@@ -397,7 +400,7 @@ function TeamLeadPage() {
       setL2ActionLoading(false);
     }
   };
- 
+
   const handleL2Reject = async () => {
     if (!rejectionReason.trim()) {
       toast.error("Please provide a rejection reason.");
@@ -419,22 +422,22 @@ function TeamLeadPage() {
       setL2ActionLoading(false);
     }
   };
- 
+
   const handleDownloadAttachment = async (attachmentId) => {
     try {
       const endpoint =
         active === "l1"
           ? `/approver/${userId}/attachments/${attachmentId}/download`
           : `/reviewer/${userId}/attachments/${attachmentId}/download`;
- 
+
       const response = await apiPort5113.get(endpoint, {
         responseType: "blob",
       });
- 
+
       let filename = "attachment";
- 
+
       const contentDisposition = response.headers["content-disposition"];
- 
+
       if (contentDisposition) {
         const matches = contentDisposition.match(
           /filename\s*=\s*(?:"([^"]*)"|([^;,\n]*))/
@@ -444,16 +447,16 @@ function TeamLeadPage() {
           filename = filename.trim();
         }
       }
- 
+
       const contentType = response.headers["content-type"];
- 
+
       if (!filename.includes(".") && contentType) {
         const extension = getExtensionFromContentType(contentType);
         if (extension) {
           filename = `${filename}${extension}`;
         }
       }
- 
+
       const blob = new Blob([response.data], {
         type: contentType || "application/octet-stream",
       });
@@ -461,22 +464,22 @@ function TeamLeadPage() {
       const link = document.createElement("a");
       link.href = url;
       link.setAttribute("download", filename);
- 
+
       document.body.appendChild(link);
       link.click();
- 
+
       setTimeout(() => {
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
       }, 100);
- 
+
       toast.success(`Downloaded: ${filename}`);
     } catch (error) {
       console.error("Error downloading attachment:", error);
       toast.error("Failed to download attachment.");
     }
   };
- 
+
   function renderL1Table() {
     const categories = getL1Categories(allL1);
     const tabs = [
@@ -485,7 +488,7 @@ function TeamLeadPage() {
       { key: "Submitted", label: "Submitted L1 Ratings", subs: submittedL1 },
     ];
     const currentSubs = tabs.find((t) => t.key === activeL1Tab)?.subs || [];
- 
+
     return (
       <>
         <div
@@ -576,8 +579,9 @@ function TeamLeadPage() {
                   const l1Complete = isL1Complete(assess);
                   const isSubmittedTab = activeL1Tab === "Submitted";
                   const showReviewBtn =
-                    !isSubmittedTab && (!l1Complete || assess.l2Decision === "Rejected");
-                  
+                    !isSubmittedTab &&
+                    (!l1Complete || assess.l2Decision === "Rejected");
+
                   return (
                     <tr key={assess.assessmentId}>
                       <td>{assess.employeeName}</td>
@@ -625,14 +629,11 @@ function TeamLeadPage() {
                         )}
                         {isSubmittedTab && (
                           <button
-                            className="cg-bulk-btn"
+                            type="button"
+                            className="tl-icon-btn tl-icon-btn-view"
                             onClick={() => openModal(assess, true)}
-                            style={{
-                              background: "linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)",
-                              boxShadow: "0 4px 12px rgba(59,130,246,0.18)",
-                            }}
                           >
-                            <i className="bi bi-eye"></i> 
+                            <i className="bi bi-eye"></i>
                           </button>
                         )}
                       </td>
@@ -721,7 +722,7 @@ function TeamLeadPage() {
       </>
     );
   }
- 
+
   function renderL2Table() {
     const tabs = [
       { key: "Pending", label: "Pending L2 Review", subs: l2Subs },
@@ -729,7 +730,7 @@ function TeamLeadPage() {
     ];
     const currentSubs = tabs.find((t) => t.key === activeL2Tab)?.subs || [];
     const isSubmittedTab = activeL2Tab === "Submitted";
-    
+
     return (
       <>
         <div
@@ -786,7 +787,7 @@ function TeamLeadPage() {
             </button>
           ))}
         </div>
-        
+
         {currentSubs.length === 0 ? (
           <div className="tl-empty">
             <i className="bi bi-inbox"></i>
@@ -846,7 +847,11 @@ function TeamLeadPage() {
                         </span>
                       </td>
                       <td>
-                        <span className={`cg-days-badge ${isSubmittedTab ? "badge-success" : "badge-info"}`}>
+                        <span
+                          className={`cg-days-badge ${
+                            isSubmittedTab ? "badge-success" : "badge-info"
+                          }`}
+                        >
                           {isSubmittedTab ? "Submitted" : "Awaiting"}
                         </span>
                       </td>
@@ -866,14 +871,11 @@ function TeamLeadPage() {
                         )}
                         {isSubmittedTab && (
                           <button
-                            className="cg-bulk-btn"
+                            type="button"
+                            className="tl-icon-btn tl-icon-btn-view"
                             onClick={() => openModal(assess, true)}
-                            style={{
-                              background: "linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)",
-                              boxShadow: "0 4px 12px rgba(59,130,246,0.18)",
-                            }}
                           >
-                            <i className="bi bi-eye"></i> View
+                            <i className="bi bi-eye"></i>
                           </button>
                         )}
                       </td>
@@ -960,21 +962,20 @@ function TeamLeadPage() {
       </>
     );
   }
- 
+
   return (
     <div className="tl-page">
       <Toaster position="top-right" richColors />
- 
+
       <div className="hrfcper-top-bar compact">
-           <Breadcrumb
-  items={[
-    { label: "Dashboard", path: "/manager/dashboard" },
-    { label: "Performance", path: "/manager/dashboard/performance" },
-    { label: "Performance Review", path: null }
-  ]}
-/>
-       
- 
+        <Breadcrumb
+          items={[
+            { label: "Dashboard", path: "/manager/dashboard" },
+            { label: "Performance", path: "/manager/dashboard/performance" },
+            { label: "Performance Review", path: null },
+          ]}
+        />
+
         <div className="tl-toggle compact">
           <button
             className={`tl-toggle-btn ${active === "l1" ? "active" : ""}`}
@@ -998,7 +999,7 @@ function TeamLeadPage() {
           </button>
         </div>
       </div>
- 
+
       <div className="tl-content">
         {loading ? (
           <div className="tl-loading">
@@ -1012,7 +1013,7 @@ function TeamLeadPage() {
           </>
         )}
       </div>
- 
+
       {showModal && modalData && (
         <ReviewModal
           showModal={showModal}
@@ -1037,5 +1038,5 @@ function TeamLeadPage() {
     </div>
   );
 }
- 
+
 export default TeamLeadPage;

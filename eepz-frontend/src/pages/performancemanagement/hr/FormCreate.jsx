@@ -6,8 +6,6 @@ import { useAuth } from "../../../contexts/auth/AuthContext";
 import "../../../styles/performancemanagement/hr/FormCreate.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 
-
-
 function FormCreate() {
   const { user, loading } = useAuth();
   const { formId } = useParams();
@@ -16,12 +14,19 @@ function FormCreate() {
 
   const [currentStep, setCurrentStep] = useState(1);
 
+  // 1) INITIALIZE WITH ONE EMPTY COMPETENCY
   const [model, setModel] = useState({
     name: "",
     type: "",
     createdBy: null,
     deliveryEnablement: "",
-    competencies: [],
+    competencies: [
+      {
+        name: "",
+        description: "",
+        displayOrder: 1,
+      },
+    ],
   });
 
   const [busy, setBusy] = useState(false);
@@ -42,9 +47,22 @@ function FormCreate() {
         toast.loading("Loading form data...");
         const { data } = await api.get(`/FormManagement/${formId}`);
         const payload = data?.data ?? {};
+
+        // 2) WHEN EDITING, ENSURE AT LEAST ONE COMPETENCY ROW EXISTS
+        const loadedCompetencies =
+          payload.competencies && payload.competencies.length > 0
+            ? payload.competencies
+            : [
+                {
+                  name: "",
+                  description: "",
+                  displayOrder: 1,
+                },
+              ];
+
         setModel({
           ...payload,
-          competencies: payload.competencies ?? [],
+          competencies: loadedCompetencies,
         });
         toast.dismiss();
         toast.success("Form data loaded successfully");
@@ -285,83 +303,78 @@ function FormCreate() {
 
   return (
     <div className="pmhr-fc-layout">
-      
       <div className="pmhr-fc-header">
         <div className="pmhr-fc-header-left">
-        <Breadcrumb
-  items={[
-    { label: "Dashboard", path: "/hr/dashboard" },
-    { label: "Performance", path: "/hr/dashboard/performance" },
-    {
-      label: isEditMode ? "Edit Form" : "Create Form",
-      path: null
-    }
-  ]}
-/>
- 
-         
+          <Breadcrumb
+            items={[
+              { label: "Dashboard", path: "/hr/dashboard" },
+              { label: "Performance", path: "/hr/dashboard/performance" },
+              {
+                label: isEditMode ? "Edit Form" : "Create Form",
+                path: null,
+              },
+            ]}
+          />
         </div>
 
         {/* Step indicator aligned right in header, like dashboards */}
         <div className="pmhr-fc-step-center">
-        <div className="pmhr-fc-step-indicator">
-          <div className="pmhr-fc-step-item">
-            <button
-              type="button"
-              className={`pmhr-fc-step-number ${
-                currentStep === 1 ? "pmhr-fc-step-active" : ""
-              } ${isStep1Complete() ? "pmhr-fc-step-complete" : ""}`}
-              onClick={() => navigateToStep(1)}
-              disabled={currentStep === 1}
-              title="Form Details"
-            >
-              {isStep1Complete() && currentStep !== 1 ? (
-                <i className="bi bi-check-lg"></i>
-              ) : (
-                <span>1</span>
-              )}
-            </button>
-            <div className="pmhr-fc-step-label">
-              <p className="pmhr-fc-step-title">Form Details</p>
-              <p className="pmhr-fc-step-desc">Basic information</p>
+          <div className="pmhr-fc-step-indicator">
+            <div className="pmhr-fc-step-item">
+              <button
+                type="button"
+                className={`pmhr-fc-step-number ${
+                  currentStep === 1 ? "pmhr-fc-step-active" : ""
+                } ${isStep1Complete() ? "pmhr-fc-step-complete" : ""}`}
+                onClick={() => navigateToStep(1)}
+                disabled={currentStep === 1}
+                title="Form Details"
+              >
+                {isStep1Complete() && currentStep !== 1 ? (
+                  <i className="bi bi-check-lg"></i>
+                ) : (
+                  <span>1</span>
+                )}
+              </button>
+              <div className="pmhr-fc-step-label">
+                <p className="pmhr-fc-step-title">Form Details</p>
+                <p className="pmhr-fc-step-desc">Basic information</p>
+              </div>
             </div>
-          </div>
 
-          <div
-            className={`pmhr-fc-step-line ${
-              isStep1Complete() ? "pmhr-fc-step-line-complete" : ""
-            }`}
-          ></div>
-
-          <div className="pmhr-fc-step-item">
-            <button
-              type="button"
-              className={`pmhr-fc-step-number ${
-                currentStep === 2 ? "pmhr-fc-step-active" : ""
-              } ${isStep2Complete() ? "pmhr-fc-step-complete" : ""} ${
-                !isStep1Complete() ? "pmhr-fc-step-disabled" : ""
+            <div
+              className={`pmhr-fc-step-line ${
+                isStep1Complete() ? "pmhr-fc-step-line-complete" : ""
               }`}
-              onClick={() => navigateToStep(2)}
-              disabled={!isStep1Complete() || currentStep === 2}
-              title={
-                isStep1Complete()
-                  ? "Add Competencies"
-                  : "Complete Step 1 first"
-              }
-            >
-              {isStep2Complete() ? (
-                <i className="bi bi-check-lg"></i>
-              ) : (
-                <span>2</span>
-              )}
-            </button>
-            <div className="pmhr-fc-step-label">
-              <p className="pmhr-fc-step-title">Add Competencies</p>
-              <p className="pmhr-fc-step-desc">Skills & abilities</p>
+            ></div>
+
+            <div className="pmhr-fc-step-item">
+              <button
+                type="button"
+                className={`pmhr-fc-step-number ${
+                  currentStep === 2 ? "pmhr-fc-step-active" : ""
+                } ${isStep2Complete() ? "pmhr-fc-step-complete" : ""} ${
+                  !isStep1Complete() ? "pmhr-fc-step-disabled" : ""
+                }`}
+                onClick={() => navigateToStep(2)}
+                disabled={!isStep1Complete() || currentStep === 2}
+                title={
+                  isStep1Complete() ? "Add Competencies" : "Complete Step 1 first"
+                }
+              >
+                {isStep2Complete() ? (
+                  <i className="bi bi-check-lg"></i>
+                ) : (
+                  <span>2</span>
+                )}
+              </button>
+              <div className="pmhr-fc-step-label">
+                <p className="pmhr-fc-step-title">Add Competencies</p>
+                <p className="pmhr-fc-step-desc">Skills & abilities</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
       </div>
 
       {/* Main content – wider & more compact form card */}
@@ -409,7 +422,6 @@ function FormCreate() {
                       )}
                     </div>
                   </div>
-                  
 
                   <div className="pmhr-fc-form-row-two pmhr-fc-form-row-inline">
                     <div className="pmhr-fc-form-group">
@@ -511,10 +523,10 @@ function FormCreate() {
                 </button>
               </div>
               <p className="pmhr-fc-info-text">
-      After completing the general details, continue to the next step to add competencies and finish setting up this appraisal form.
-    </p>
+                After completing the general details, continue to the next step
+                to add competencies and finish setting up this appraisal form.
+              </p>
             </div>
-            
           )}
 
           {currentStep === 2 && (
@@ -647,9 +659,11 @@ function FormCreate() {
                             {validationErrors[`comp_${index}_description`] && (
                               <span className="pmhr-fc-error-text">
                                 <i className="bi bi-exclamation-circle"></i>
-                                {validationErrors[
-                                  `comp_${index}_description`
-                                ]}
+                                {
+                                  validationErrors[
+                                    `comp_${index}_description`
+                                  ]
+                                }
                               </span>
                             )}
                           </div>
