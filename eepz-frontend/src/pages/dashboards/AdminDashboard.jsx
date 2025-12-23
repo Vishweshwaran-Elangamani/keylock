@@ -38,7 +38,6 @@ import roleService from "../../services/auth/roleService";
 import departmentService from "../../services/auth/departmentService";
 import ChangeRequestService from "../../services/auth/changeRequestService";
 import Breadcrumb from "../../components/common/Breadcrumb";
-import Chatbot from "../../components/Chatbot/Chatbot"; // ✅ ADDED
 import { toast } from "sonner";
 import "../../styles/auth/AdminDashboard.css";
 
@@ -733,9 +732,6 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-
-      {/* ✅ CHATBOT COMPONENT ADDED - Floating at bottom right */}
-      <Chatbot />
     </div>
   );
 };
