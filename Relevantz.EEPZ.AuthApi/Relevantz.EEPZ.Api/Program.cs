@@ -104,6 +104,7 @@ builder.Services.AddScoped<ILoginAttemptRepository, LoginAttemptRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IChangeRequestRepository, ChangeRequestRepository>();
 builder.Services.AddScoped<IBulkOperationLogRepository, BulkOperationLogRepository>();
+builder.Services.AddScoped<IChatbotRepository, ChatbotRepository>();
 
 // Register Services
 builder.Services.AddScoped<IPasswordService, PasswordService>();
@@ -116,6 +117,7 @@ builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IChangeRequestService, ChangeRequestService>();
+builder.Services.AddScoped<IChatbotService, ChatbotService>();
 builder.Services.AddScoped<IBulkOperationService, BulkOperationService>();
 builder.Services.AddScoped<IExportService, ExportService>();
 
