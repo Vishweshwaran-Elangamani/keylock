@@ -13,6 +13,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure Serilog
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
@@ -23,16 +24,24 @@ builder.Host.UseSerilog();
 
 Log.Information("Starting EEPZ Application...");
 
-builder.Services.AddControllers();
+// Add Controllers
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
+        options.JsonSerializerOptions.Converters.Add(new NullableDateOnlyJsonConverter());
+    });
+
 builder.Services.AddEndpointsApiExplorer();
 
+// Configure Swagger
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "EEPZ API",
         Version = "v1",
-        Description = "EEPZ Authentication & User Management API"
+        Description = "EEPZ Authentication & User Management API with MongoDB Integration"
     });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -61,13 +70,30 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// Configure MySQL Database Context
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<EEPZDbContext>(options =>
    options.UseMySql(
-       connectionString,
-       new MySqlServerVersion(new Version(8, 0, 36))
-   ));
+        connectionString,
+        new MySqlServerVersion(new Version(8, 0, 36)),
+        mySqlOptions =>
+        {
+            mySqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(10),
+                errorNumbersToAdd: null);
+        }
+    ));
 
+// Configure MongoDB Settings
+builder.Services.Configure<MongoDbSettings>(
+    builder.Configuration.GetSection("MongoDbSettings"));
+
+Log.Information($"MongoDB Configuration - ConnectionString: {builder.Configuration["MongoDbSettings:ConnectionString"]}");
+Log.Information($"MongoDB Configuration - Database: {builder.Configuration["MongoDbSettings:DatabaseName"]}");
+Log.Information($"MongoDB Configuration - Collection: {builder.Configuration["MongoDbSettings:ProfileImagesCollectionName"]}");
+
+// Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT Secret Key not configured");
 
@@ -110,7 +136,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// Register Repositories
+// Register MySQL Repositories
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IUserAuthenticationRepository, UserAuthenticationRepository>();
 builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
@@ -122,6 +148,10 @@ builder.Services.AddScoped<ILoginAttemptRepository, LoginAttemptRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IChangeRequestRepository, ChangeRequestRepository>();
 builder.Services.AddScoped<IBulkOperationLogRepository, BulkOperationLogRepository>();
+
+// Register MongoDB Repository
+builder.Services.AddScoped<IProfileImageRepository, ProfileImageRepository>();
+Log.Information("MongoDB ProfileImageRepository registered successfully");
 
 // Register Services
 builder.Services.AddScoped<IPasswordService, PasswordService>();
@@ -137,6 +167,7 @@ builder.Services.AddScoped<IChangeRequestService, ChangeRequestService>();
 builder.Services.AddScoped<IBulkOperationService, BulkOperationService>();
 builder.Services.AddScoped<IExportService, ExportService>();
 
+// Configure CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -147,15 +178,15 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
-        options.JsonSerializerOptions.Converters.Add(new NullableDateOnlyJsonConverter());
-    });
+// Add Memory Cache
+builder.Services.AddMemoryCache();
+
+// Add HTTP Client
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
+// Database Initialization
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -164,27 +195,45 @@ using (var scope = app.Services.CreateScope())
         var context = services.GetRequiredService<EEPZDbContext>();
         var configuration = services.GetRequiredService<IConfiguration>();
 
+        Log.Information("Initializing MySQL database...");
         context.Database.EnsureCreated();
 
+        Log.Information("Seeding database with initial data...");
         await DbInitializer.InitializeAsync(context, configuration);
 
-        Log.Information("Database initialized successfully");
+        Log.Information("MySQL database initialized successfully");
+
+        // Test MongoDB Connection
+        try
+        {
+            var profileImageRepo = services.GetRequiredService<IProfileImageRepository>();
+            var mongoTestExists = await profileImageRepo.ImageExistsAsync(0); // Test query
+            Log.Information("MongoDB connection verified successfully");
+        }
+        catch (Exception mongoEx)
+        {
+            Log.Warning($"MongoDB connection test failed - continuing with startup: {mongoEx.Message}");
+        }
     }
     catch (Exception ex)
     {
-        Log.Error(ex, "An error occurred while seeding the database");
+        Log.Error(ex, "An error occurred while initializing the database");
+        throw;
     }
 }
 
+// Configure middleware pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "EEPZ API V1");
+        c.RoutePrefix = "swagger";
     });
 }
 
+// Serilog Request Logging
 app.UseSerilogRequestLogging(options =>
 {
     options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
@@ -192,10 +241,36 @@ app.UseSerilogRequestLogging(options =>
     {
         diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value);
         diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
+        diagnosticContext.Set("UserAgent", httpContext.Request.Headers["User-Agent"].ToString());
     };
 });
 
+// Global Exception Handler
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "application/json";
+        
+        var error = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>();
+        if (error != null)
+        {
+            Log.Error(error.Error, "Unhandled exception occurred");
+            
+            await context.Response.WriteAsJsonAsync(new
+            {
+                success = false,
+                message = "An internal server error occurred",
+                error = app.Environment.IsDevelopment() ? error.Error.Message : "Internal Server Error",
+                timestamp = DateTime.UtcNow
+            });
+        }
+    });
+});
+
 app.UseHttpsRedirection();
+app.UseStaticFiles(); // Enable static files from wwwroot
 
 app.UseCors("AllowAll");
 
@@ -259,7 +334,7 @@ app.MapGet("/health", async (EEPZDbContext dbContext, IConfiguration config) =>
 
 try
 {
-    Log.Information("EEPZ Application Started Successfully");
+    Log.Information("EEPZ Application Starting...");
     app.Run();
 }
 catch (Exception ex)

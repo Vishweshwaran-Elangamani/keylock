@@ -12,11 +12,28 @@ services:
       - mysql_data:/var/lib/mysql
       - ./mysql-init:/docker-entrypoint-initdb.d
     healthcheck:
-      test: [ "CMD-SHELL", "mysqladmin ping --silent --protocol=TCP -h mysql -uroot -p$root" ]
+      test: [ "CMD-SHELL", "mysqladmin ping --silent --protocol=TCP -h mysql -uroot -proot" ]
       interval: 10s
       timeout: 20s
       retries: 10
       start_period: 30s
+    networks:
+      - eepz-network
+
+  mongodb:
+    image: mongo:7
+    container_name: eepz-mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     networks:
       - eepz-network
 
@@ -26,6 +43,10 @@ services:
     restart: always
     ports:
       - "5111:5111"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
+      - ASPNETCORE_URLS=http://+:5111
     depends_on:
       mysql:
         condition: service_healthy
@@ -44,9 +65,13 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5101
-
+      - MongoDbSettings__ConnectionString=mongodb://mongodb:27017
+      - MongoDbSettings__DatabaseName=EEPZFileStorage
+      - MongoDbSettings__ProfileImagesCollectionName=ProfileImages
     depends_on:
       mysql:
+        condition: service_healthy
+      mongodb:
         condition: service_healthy
     volumes:
       - ./logs:/app/Logs
@@ -63,7 +88,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5102
-
     depends_on:
       mysql:
         condition: service_healthy
@@ -82,7 +106,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5103
-
     depends_on:
       mysql:
         condition: service_healthy
@@ -101,9 +124,13 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5104
-
+      - MongoDbSettings__ConnectionString=mongodb://mongodb:27017
+      - MongoDbSettings__DatabaseName=EEPZFileStorage
+      - MongoDbSettings__PolicyDocumentsCollectionName=PolicyDocuments
     depends_on:
       mysql:
+        condition: service_healthy
+      mongodb:
         condition: service_healthy
     volumes:
       - ./logs:/app/Logs
@@ -120,7 +147,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5105
-
     depends_on:
       mysql:
         condition: service_healthy
@@ -139,7 +165,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5106
-
     depends_on:
       mysql:
         condition: service_healthy
@@ -158,7 +183,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5107
-
     depends_on:
       mysql:
         condition: service_healthy
@@ -177,7 +201,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5112
-
     depends_on:
       mysql:
         condition: service_healthy
@@ -196,7 +219,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5108
-
     depends_on:
       mysql:
         condition: service_healthy
@@ -215,7 +237,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5113
-
     depends_on:
       mysql:
         condition: service_healthy
@@ -234,7 +255,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5109
-
     depends_on:
       mysql:
         condition: service_healthy
@@ -253,7 +273,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5114
-
     depends_on:
       mysql:
         condition: service_healthy
@@ -272,7 +291,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5115
-
     depends_on:
       mysql:
         condition: service_healthy
@@ -291,7 +309,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5110
-
     depends_on:
       mysql:
         condition: service_healthy
@@ -302,6 +319,7 @@ services:
 
 volumes:
   mysql_data:
+  mongodb_data:
 
 networks:
   eepz-network:

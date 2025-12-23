@@ -16,15 +16,18 @@ namespace Relevantz.EEPZ.Core.Service
     {
         private readonly IUserProfileRepository _userProfileRepository;
         private readonly IUserAuthenticationRepository _userAuthRepository;
+        private readonly IProfileImageRepository _profileImageRepository;
         private readonly EEPZDbContext _context;
 
         public ProfileService(
             IUserProfileRepository userProfileRepository,
             IUserAuthenticationRepository userAuthRepository,
+            IProfileImageRepository profileImageRepository,
             EEPZDbContext context)
         {
             _userProfileRepository = userProfileRepository;
             _userAuthRepository = userAuthRepository;
+            _profileImageRepository = profileImageRepository;
             _context = context;
         }
 
@@ -62,7 +65,23 @@ namespace Relevantz.EEPZ.Core.Service
                 var currentAddress = employee.Addresses?.FirstOrDefault(a => a.AddressType == Constants.AddressTypes.Current);
                 var permanentAddress = employee.Addresses?.FirstOrDefault(a => a.AddressType == Constants.AddressTypes.Permanent);
 
-                var response = MapToProfileResponse(profile, user.Email, employee, employeeDetails, currentAddress, permanentAddress);
+                // Retrieve profile photo from MongoDB
+                string profilePhotoBase64 = null;
+                try
+                {
+                    var profileImage = await _profileImageRepository.GetImageAsync(employee.EmployeeId);
+                    if (profileImage != null && profileImage.ImageData != null)
+                    {
+                        profilePhotoBase64 = Convert.ToBase64String(profileImage.ImageData);
+                        EEPZBusinessLog.Information($"Profile image retrieved from MongoDB for EmployeeId: {employee.EmployeeId}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    EEPZBusinessLog.Information($"Could not retrieve profile image from MongoDB for EmployeeId: {employee.EmployeeId} - {ex.Message}");
+                }
+
+                var response = MapToProfileResponse(profile, user.Email, employee, employeeDetails, currentAddress, permanentAddress, profilePhotoBase64);
 
                 return ApiResponseDto<ProfileResponseDto>.SuccessResponse(response, "Profile retrieved successfully");
             }
@@ -142,10 +161,10 @@ namespace Relevantz.EEPZ.Core.Service
                 if (request.Nationality != null) 
                     profile.Nationality = request.Nationality;
 
-                // Profile photo upload with optimization
+                // Profile photo upload with optimization and MongoDB storage
                 if (request.ProfilePhoto != null && request.ProfilePhoto.Length > 0)
                 {
-                    EEPZBusinessLog.Information($"Processing profile photo upload for UserId: {userId}");
+                    EEPZBusinessLog.Information($"Processing profile photo upload for UserId: {userId}, EmployeeId: {employee.EmployeeId}");
                     EEPZBusinessLog.Information($"Original file size: {request.ProfilePhoto.Length} bytes ({request.ProfilePhoto.Length / 1024.0:F2} KB)");
 
                     try
@@ -170,12 +189,26 @@ namespace Relevantz.EEPZ.Core.Service
                         // Compress as JPEG with quality 85
                         using var ms = new MemoryStream();
                         await image.SaveAsJpegAsync(ms, new JpegEncoder { Quality = 85 });
-                        profile.ProfilePhoto = ms.ToArray();
+                        byte[] compressedImageData = ms.ToArray();
                         
                         EEPZBusinessLog.Information($"Profile photo optimized successfully");
                         EEPZBusinessLog.Information($"Original size: {request.ProfilePhoto.Length} bytes ({request.ProfilePhoto.Length / 1024.0:F2} KB)");
-                        EEPZBusinessLog.Information($"Compressed size: {ms.Length} bytes ({ms.Length / 1024.0:F2} KB)");
-                        EEPZBusinessLog.Information($"Compression ratio: {(1 - (double)ms.Length / request.ProfilePhoto.Length) * 100:F2}%");
+                        EEPZBusinessLog.Information($"Compressed size: {compressedImageData.Length} bytes ({compressedImageData.Length / 1024.0:F2} KB)");
+                        EEPZBusinessLog.Information($"Compression ratio: {(1 - (double)compressedImageData.Length / request.ProfilePhoto.Length) * 100:F2}%");
+
+                        // Store in MongoDB
+                        await _profileImageRepository.UploadImageAsync(
+                            employee.EmployeeId, 
+                            compressedImageData, 
+                            request.ProfilePhoto.FileName ?? $"profile_{employee.EmployeeId}.jpg", 
+                            "image/jpeg");
+
+                        // Remove photo from MySQL if exists (for migration)
+                        if (profile.ProfilePhoto != null && profile.ProfilePhoto.Length > 0)
+                        {
+                            profile.ProfilePhoto = null;
+                            EEPZBusinessLog.Information($"Removed profile photo from MySQL for EmployeeId: {employee.EmployeeId}");
+                        }
                     }
                     catch (Exception photoEx)
                     {
@@ -274,7 +307,22 @@ namespace Relevantz.EEPZ.Core.Service
                 var updatedCurrentAddress = employee.Addresses?.FirstOrDefault(a => a.AddressType == Constants.AddressTypes.Current);
                 var updatedPermanentAddress = employee.Addresses?.FirstOrDefault(a => a.AddressType == Constants.AddressTypes.Permanent);
 
-                var response = MapToProfileResponse(profile, user.Email, employee, employeeDetails, updatedCurrentAddress, updatedPermanentAddress);
+                // Retrieve updated profile photo from MongoDB
+                string profilePhotoBase64 = null;
+                try
+                {
+                    var profileImage = await _profileImageRepository.GetImageAsync(employee.EmployeeId);
+                    if (profileImage != null && profileImage.ImageData != null)
+                    {
+                        profilePhotoBase64 = Convert.ToBase64String(profileImage.ImageData);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    EEPZBusinessLog.Information($"Could not retrieve profile image from MongoDB for EmployeeId: {employee.EmployeeId} - {ex.Message}");
+                }
+
+                var response = MapToProfileResponse(profile, user.Email, employee, employeeDetails, updatedCurrentAddress, updatedPermanentAddress, profilePhotoBase64);
 
                 EEPZBusinessLog.Information($"Profile updated successfully for UserId: {userId}");
 
@@ -293,7 +341,8 @@ namespace Relevantz.EEPZ.Core.Service
             Employee employee,
             Employeedetailsmaster employeeDetails,
             Address currentAddress,
-            Address permanentAddress)
+            Address permanentAddress,
+            string profilePhotoBase64 = null)
         {
             return new ProfileResponseDto
             {
@@ -324,10 +373,8 @@ namespace Relevantz.EEPZ.Core.Service
                 MaritalStatus = profile.MaritalStatus,
                 Nationality = profile.Nationality,
 
-                // Profile photo as Base64
-                ProfilePhotoBase64 = profile.ProfilePhoto != null 
-                    ? Convert.ToBase64String(profile.ProfilePhoto) 
-                    : null,
+                // Profile photo from MongoDB as Base64
+                ProfilePhotoBase64 = profilePhotoBase64,
 
                 CurrentAddress = currentAddress != null ? new AddressDto
                 {
@@ -360,3 +407,4 @@ namespace Relevantz.EEPZ.Core.Service
         }
     }
 }
+
