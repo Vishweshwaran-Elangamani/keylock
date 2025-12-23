@@ -1434,3 +1434,228 @@ Type "help" for complete command reference.`;
 };
 
 export default Chatbot;
+
+// src/components/chatbot/Chatbot.jsx
+// import React, { useState, useEffect, useRef } from 'react';
+// import { chatbotService } from '../../services/chatbotService';
+// import { generateSessionId, STORAGE_KEYS } from '../../utils/chatbotHelpers';
+// import styles from './Chatbot.module.css';
+
+// const Chatbot = () => {
+//   const [isOpen, setIsOpen] = useState(false);
+//   const [messages, setMessages] = useState([]);
+//   const [inputMessage, setInputMessage] = useState('');
+//   const [isLoading, setIsLoading] = useState(false);
+//   const [sessionId, setSessionId] = useState('');
+
+//   const messagesEndRef = useRef(null);
+//   const textareaRef = useRef(null);
+
+//   // Initialize session + load history from backend
+//   useEffect(() => {
+//     let storedSessionId = localStorage.getItem(STORAGE_KEYS.SESSION_ID);
+//     if (!storedSessionId) {
+//       storedSessionId = generateSessionId();
+//       localStorage.setItem(STORAGE_KEYS.SESSION_ID, storedSessionId);
+//     }
+//     setSessionId(storedSessionId);
+
+//     const loadHistory = async () => {
+//       try {
+//         const res = await chatbotService.getHistory(storedSessionId);
+//         if (res.success && Array.isArray(res.data)) {
+//           const history = res.data.map(m => ({
+//             id: m.messageId,
+//             text: m.message,
+//             isUser: m.isUserMessage,
+//             timestamp: m.createdAt,
+//           }));
+//           setMessages(history);
+//         }
+//       } catch (err) {
+//         console.error('Error loading conversation history', err);
+//       }
+//     };
+
+//     loadHistory();
+//   }, []);
+
+//   useEffect(() => {
+//     scrollToBottom();
+//   }, [messages, isLoading]);
+
+//   const scrollToBottom = () => {
+//     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+//   };
+
+//   const handleToggle = () => {
+//     setIsOpen(prev => !prev);
+//   };
+
+//   const handleInputChange = (e) => {
+//     setInputMessage(e.target.value);
+//     autoResizeTextarea();
+//   };
+
+//   const autoResizeTextarea = () => {
+//     if (!textareaRef.current) return;
+//     textareaRef.current.style.height = 'auto';
+//     textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
+//   };
+
+//   const handleKeyDown = (e) => {
+//     if (e.key === 'Enter' && !e.shiftKey) {
+//       e.preventDefault();
+//       handleSend();
+//     }
+//   };
+
+//   const handleSend = async () => {
+//     const trimmed = inputMessage.trim();
+//     if (!trimmed || !sessionId) return;
+
+//     const userMessage = {
+//       id: Date.now(),
+//       text: trimmed,
+//       isUser: true,
+//       timestamp: new Date().toISOString(),
+//     };
+
+//     setMessages(prev => [...prev, userMessage]);
+//     setInputMessage('');
+//     autoResizeTextarea();
+//     setIsLoading(true);
+
+//     try {
+//       // All intelligence is in backend:
+//       // sendMessage → ChatbotController → ChatbotService → patterns
+//       const res = await chatbotService.sendMessage(trimmed, sessionId);
+
+//       const payload = res.data || res; // depending on your ApiResponseDto wrapper
+//       const botText = payload.response || payload.Response || 'No response from server.';
+
+//       const botMessage = {
+//         id: Date.now() + 1,
+//         text: botText,
+//         isUser: false,
+//         timestamp: payload.timestamp || new Date().toISOString(),
+//       };
+
+//       setMessages(prev => [...prev, botMessage]);
+//     } catch (err) {
+//       console.error('Error sending message', err);
+//       setMessages(prev => [
+//         ...prev,
+//         {
+//           id: Date.now() + 2,
+//           text: 'An error occurred while processing your message.',
+//           isUser: false,
+//           timestamp: new Date().toISOString(),
+//         },
+//       ]);
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   return (
+//     <>
+//       {/* Floating launcher button */}
+//       <button
+//         type="button"
+//         className={styles.toggleButton}
+//         onClick={handleToggle}
+//       >
+//         {isOpen ? 'Close Assistant' : 'Open Assistant'}
+//       </button>
+
+//       {/* Chat window */}
+//       {isOpen && (
+//         <div className={styles.container}>
+//           <div className={styles.header}>
+//             <div className={styles.headerTitle}>
+//               <div className={styles.brandMark}>EA</div>
+//               <div>
+//                 <div className={styles.title}>EEPZ Admin Assistant</div>
+//                 <div className={styles.subtitle}>HR & User Operations</div>
+//               </div>
+//             </div>
+//             <div className={styles.headerStatus}>
+//               <span className={styles.statusDot} />
+//               <span>Online</span>
+//             </div>
+//           </div>
+
+//           <div className={styles.body}>
+//             {messages.map(msg => (
+//               <div
+//                 key={msg.id}
+//                 className={`${styles.messageRow} ${
+//                   msg.isUser ? styles.messageRowUser : styles.messageRowBot
+//                 }`}
+//               >
+//                 {!msg.isUser && (
+//                   <div className={styles.avatarBot}>
+//                     EA
+//                   </div>
+//                 )}
+//                 {msg.isUser && (
+//                   <div className={styles.avatarUser}>
+//                     You
+//                   </div>
+//                 )}
+//                 <div
+//                   className={`${styles.bubble} ${
+//                     msg.isUser ? styles.bubbleUser : styles.bubbleBot
+//                   }`}
+//                 >
+//                   <div className={styles.messageText}>
+//                     {msg.text}
+//                   </div>
+//                   <div className={styles.messageMeta}>
+//                     {new Date(msg.timestamp).toLocaleTimeString()}
+//                   </div>
+//                 </div>
+//               </div>
+//             ))}
+
+//             {isLoading && (
+//               <div className={`${styles.messageRow} ${styles.messageRowBot}`}>
+//                 <div className={styles.avatarBot}>EA</div>
+//                 <div className={`${styles.bubble} ${styles.bubbleBot} ${styles.typingBubble}`}>
+//                   <span className={styles.dot} />
+//                   <span className={styles.dot} />
+//                   <span className={styles.dot} />
+//                 </div>
+//               </div>
+//             )}
+
+//             <div ref={messagesEndRef} />
+//           </div>
+
+//           <div className={styles.footer}>
+//             <textarea
+//               ref={textareaRef}
+//               className={styles.input}
+//               placeholder="Ask about users, departments, roles, or change requests..."
+//               value={inputMessage}
+//               onChange={handleInputChange}
+//               onKeyDown={handleKeyDown}
+//               rows={1}
+//             />
+//             <button
+//               type="button"
+//               className={styles.sendButton}
+//               onClick={handleSend}
+//               disabled={!inputMessage.trim() || isLoading}
+//             >
+//               Send
+//             </button>
+//           </div>
+//         </div>
+//       )}
+//     </>
+//   );
+// };
+
+// export default Chatbot;
