@@ -33,7 +33,7 @@ const HRMomDashboard = () => {
     startDate: "",
     endDate: "",
     pageNumber: 1,
-    pageSize: 20,
+    pageSize: 5, // use 5 to match the screenshot style
   });
   const [loading, setLoading] = useState(false);
   const [totalMoms, setTotalMoms] = useState(0);
@@ -91,13 +91,18 @@ const HRMomDashboard = () => {
       startDate: "",
       endDate: "",
       pageNumber: 1,
-      pageSize: 20,
+      pageSize: 5,
     });
     setTimeout(() => fetchMoms(), 100);
   };
 
   const handlePageChange = (newPage) => {
     setFilters((prev) => ({ ...prev, pageNumber: newPage }));
+  };
+
+  const handlePageSizeChange = (e) => {
+    const newSize = Number(e.target.value) || 5;
+    setFilters((prev) => ({ ...prev, pageSize: newSize, pageNumber: 1 }));
   };
 
   const getMeetingTypeBadge = (type) => {
@@ -163,6 +168,10 @@ const HRMomDashboard = () => {
     }, 0);
   };
 
+  const fromIndex =
+    totalMoms === 0 ? 0 : (filters.pageNumber - 1) * filters.pageSize + 1;
+  const toIndex = Math.min(filters.pageNumber * filters.pageSize, totalMoms);
+
   return (
     <div className="mom-dashboard-container">
       <div className="mom-dashboard-wrapper">
@@ -227,7 +236,9 @@ const HRMomDashboard = () => {
                     <CheckCircle size={24} className="text-success" />
                   </div>
                   <div className="mom-stat-info">
-                    <div className="mom-stat-value">{getTotalActionItems()}</div>
+                    <div className="mom-stat-value">
+                      {getTotalActionItems()}
+                    </div>
                     <div className="mom-stat-label">Action Items</div>
                   </div>
                 </div>
@@ -246,7 +257,9 @@ const HRMomDashboard = () => {
                     <AlertCircle size={24} className="text-danger" />
                   </div>
                   <div className="mom-stat-info">
-                    <div className="mom-stat-value">{getOverdueActionItems()}</div>
+                    <div className="mom-stat-value">
+                      {getOverdueActionItems()}
+                    </div>
                     <div className="mom-stat-label">Overdue</div>
                   </div>
                 </div>
@@ -255,8 +268,8 @@ const HRMomDashboard = () => {
           </div>
         </div>
 
-        {/* Table */}
-        <div className="card mom-table-card mb-3">
+        {/* Table + Pagination */}
+        <div className="card">
           <div className="card-body p-0">
             <div className="mom-table-wrapper">
               <table className="table mom-table mb-0">
@@ -312,7 +325,10 @@ const HRMomDashboard = () => {
                         <td>
                           <div className="d-flex align-items-center gap-2">
                             <div className="mom-table-icon">
-                              <FileText size={20} style={{ color: "#0284c7" }} />
+                              <FileText
+                                size={20}
+                                style={{ color: "#0284c7" }}
+                              />
                             </div>
                             <div>
                               <div className="mom-meeting-title">
@@ -328,7 +344,6 @@ const HRMomDashboard = () => {
                         {/* Submitted By */}
                         <td>
                           <div className="d-flex align-items-center gap-2">
-                           
                             <div>
                               <div className="mom-submitter-name">
                                 {mom.submittedByEmployeeName || "Unknown"}
@@ -365,7 +380,10 @@ const HRMomDashboard = () => {
                         {/* Topics */}
                         <td>
                           <div className="mom-count-badge">
-                            <MessageSquare size={14} style={{ color: "#06b6d4" }} />
+                            <MessageSquare
+                              size={14}
+                              style={{ color: "#06b6d4" }}
+                            />
                             <span>
                               {Array.isArray(mom.discussionPoints)
                                 ? mom.discussionPoints.length
@@ -377,7 +395,10 @@ const HRMomDashboard = () => {
                         {/* Actions */}
                         <td>
                           <div className="mom-count-badge">
-                            <CheckCircle size={14} style={{ color: "#10b981" }} />
+                            <CheckCircle
+                              size={14}
+                              style={{ color: "#10b981" }}
+                            />
                             <span>
                               {Array.isArray(mom.actionItems)
                                 ? mom.actionItems.length
@@ -403,24 +424,38 @@ const HRMomDashboard = () => {
                 </tbody>
               </table>
             </div>
-          </div>
-        </div>
 
-        {/* Pagination */}
-        {!loading &&
-          Array.isArray(moms) &&
-          moms.length > 0 &&
-          totalPages > 1 && (
-            <div className="card mom-pagination-card">
-              <div className="card-body p-2">
-                <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                  <div className="text-muted small">
-                    Showing {(filters.pageNumber - 1) * filters.pageSize + 1} to{" "}
-                    {Math.min(filters.pageNumber * filters.pageSize, totalMoms)}{" "}
-                    of {totalMoms}
+            {/* Pagination footer inside the same card, matching the screenshot */}
+            {!loading &&
+              Array.isArray(moms) &&
+              moms.length > 0 &&
+              totalPages > 0 && (
+                <div className="mom-pagination-footer px-3 py-2 border-top d-flex flex-wrap align-items-center justify-content-between gap-2">
+                  {/* Left: page size */}
+                  <div className="d-flex align-items-center gap-1 small text-muted">
+                    <span>Show</span>
+                    <select
+                      className="form-select form-select-sm mom-page-size-select"
+                      value={filters.pageSize}
+                      onChange={handlePageSizeChange}
+                      style={{ width: "70px" }}
+                    >
+                      <option value={5}>5</option>
+                      <option value={10}>10</option>
+                      <option value={25}>25</option>
+                      <option value={50}>50</option>
+                    </select>
+                    <span>entries</span>
                   </div>
-                  <nav>
-                    <ul className="pagination pagination-sm mb-0">
+
+                  {/* Center: info text */}
+                  <div className="small text-muted text-center flex-grow-1">
+                    Showing {fromIndex} to {toIndex} of {totalMoms} entries
+                  </div>
+
+                  {/* Right: pager */}
+                  <div className="d-flex justify-content-end">
+                    <ul className="pagination pagination-sm mb-0 mom-pagination-list">
                       <li
                         className={`page-item ${
                           filters.pageNumber <= 1 ? "disabled" : ""
@@ -428,7 +463,9 @@ const HRMomDashboard = () => {
                       >
                         <button
                           className="page-link mom-page-btn"
-                          onClick={() => handlePageChange(filters.pageNumber - 1)}
+                          onClick={() =>
+                            handlePageChange(filters.pageNumber - 1)
+                          }
                           disabled={filters.pageNumber <= 1}
                           aria-label="Previous page"
                         >
@@ -472,7 +509,9 @@ const HRMomDashboard = () => {
                       >
                         <button
                           className="page-link mom-page-btn"
-                          onClick={() => handlePageChange(filters.pageNumber + 1)}
+                          onClick={() =>
+                            handlePageChange(filters.pageNumber + 1)
+                          }
                           disabled={filters.pageNumber >= totalPages}
                           aria-label="Next page"
                         >
@@ -480,14 +519,11 @@ const HRMomDashboard = () => {
                         </button>
                       </li>
                     </ul>
-                  </nav>
-                  <div className="text-muted small">
-                    Page {filters.pageNumber} of {totalPages}
                   </div>
                 </div>
-              </div>
-            </div>
-          )}
+              )}
+          </div>
+        </div>
       </div>
     </div>
   );

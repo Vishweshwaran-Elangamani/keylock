@@ -22,6 +22,8 @@ import {
 } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
+const PRIMARY = "#27235C"; // primary blue
+
 const MyMomsList = () => {
   const [moms, setMoms] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -86,13 +88,11 @@ const MyMomsList = () => {
   };
 
   const toggleEmployeeSelection = (employeeId) => {
-    setSelectedEmployees((prev) => {
-      if (prev.includes(employeeId)) {
-        return prev.filter((id) => id !== employeeId);
-      } else {
-        return [...prev, employeeId];
-      }
-    });
+    setSelectedEmployees((prev) =>
+      prev.includes(employeeId)
+        ? prev.filter((id) => id !== employeeId)
+        : [...prev, employeeId]
+    );
   };
 
   const handleShareMom = async () => {
@@ -216,8 +216,11 @@ const MyMomsList = () => {
     >
       <div className="row justify-content-center">
         <div className="col-12 col-xl-11">
-          {/* Header */}
-          <div className="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+          {/* PAGE HEADER – primary blue */}
+          <div
+            className="mb-4 rounded-3 shadow-sm d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 px-4 py-3"
+            style={{ backgroundColor: PRIMARY, color: "#ffffff" }}
+          >
             <div className="d-flex align-items-center gap-3">
               <button
                 className="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
@@ -226,24 +229,21 @@ const MyMomsList = () => {
               >
                 <ArrowLeft size={20} />
               </button>
-              <div>
-                <h2
-                  className="fw-bold mb-1"
-                  style={{ color: "#1e293b", fontSize: "1.75rem" }}
-                >
+              <div className="text-md-start text-center">
+                <h2 className="fw-bold mb-1" style={{ fontSize: "1.75rem" }}>
                   My MOMs
                 </h2>
-                <p className="text-muted mb-0" style={{ fontSize: "0.95rem" }}>
+                <p className="mb-0" style={{ fontSize: "0.95rem" }}>
                   View and manage your meeting minutes
                 </p>
               </div>
             </div>
             <button
-              className="btn btn-success d-flex align-items-center gap-2 px-4"
+              className="btn btn-light d-flex align-items-center gap-2 px-4"
               onClick={() => navigate("/mom/create")}
             >
               <Plus size={18} />
-              Create New MOM
+              <span style={{ color: PRIMARY }}>Create New MOM</span>
             </button>
           </div>
 
@@ -303,7 +303,10 @@ const MyMomsList = () => {
                               backgroundColor: "#e3f2fd",
                             }}
                           >
-                            <FileText size={28} style={{ color: "#1976d2" }} />
+                            <FileText
+                              size={28}
+                              style={{ color: "#1976d2" }}
+                            />
                           </div>
                         </div>
 
@@ -449,12 +452,17 @@ const MyMomsList = () => {
             </div>
           )}
 
-          {/* Share Modal - UPDATED with left-aligned employee details */}
+          {/* Share Modal – header primary blue */}
           {showShareModal && shareModalMom && (
             <div
               className="modal fade show d-block"
               tabIndex="-1"
-              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+              style={{
+                backgroundColor: "rgba(0,0,0,0.5)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
               onClick={closeShareModal}
             >
               <div
@@ -462,16 +470,30 @@ const MyMomsList = () => {
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="modal-content border-0 shadow">
-                  <div className="modal-header" style={{ textAlign: "left" }}>
-                    <div style={{ textAlign: "left" }}>
-                      <h5 className="modal-title fw-bold mb-1">Share MOM</h5>
-                      <p className="text-muted small mb-0">
+                  <div
+                    className="modal-header"
+                    style={{
+                      backgroundColor: PRIMARY,
+                      color: "#ffffff",
+                    }}
+                  >
+                    <div>
+                      <h5
+                        className="modal-title fw-bold mb-1"
+                        style={{ color: "#ffffff" }}
+                      >
+                        Share MOM
+                      </h5>
+                      <p
+                        className="small mb-0"
+                        style={{ color: "#ffffff" }}
+                      >
                         {shareModalMom.meetingTitle}
                       </p>
                     </div>
                     <button
                       type="button"
-                      className="btn-close"
+                      className="btn-close btn-close-white"
                       onClick={closeShareModal}
                     ></button>
                   </div>
@@ -512,7 +534,7 @@ const MyMomsList = () => {
                       </div>
                     )}
 
-                    {/* Employee List - UPDATED: Left-aligned */}
+                    {/* Employee List */}
                     <div style={{ maxHeight: "400px", overflowY: "auto" }}>
                       {filteredEmployees.length === 0 ? (
                         <div className="text-center py-4 text-muted">
@@ -534,14 +556,16 @@ const MyMomsList = () => {
                                   employee.employeeId
                                 )}
                                 onChange={() =>
-                                  toggleEmployeeSelection(employee.employeeId)
+                                  toggleEmployeeSelection(
+                                    employee.employeeId
+                                  )
                                 }
                               />
-                              <div className="flex-grow-1" style={{ textAlign: "left" }}>
-                                <div className="fw-semibold" style={{ textAlign: "left" }}>
+                              <div className="flex-grow-1">
+                                <div className="fw-semibold">
                                   {employee.firstName} {employee.lastName}
                                 </div>
-                                <div className="small text-muted" style={{ textAlign: "left" }}>
+                                <div className="small text-muted">
                                   {employee.email} • {employee.departmentName} •{" "}
                                   {employee.roleName}
                                 </div>
@@ -578,36 +602,53 @@ const MyMomsList = () => {
             </div>
           )}
 
+         
           {selectedMom && (
             <div
               className="modal fade show d-block"
               tabIndex="-1"
-              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+               
+              }}
               onClick={closeMomDetails}
             >
               <div
                 className="modal-dialog modal-dialog-scrollable modal-xl modal-dialog-centered"
                 onClick={(e) => e.stopPropagation()}
+                
+
               >
                 <div className="modal-content border-0 shadow">
-                  <div className="modal-header border-0 pb-0">
-                    <div className="flex-grow-1">
-                      <h5 className="modal-title fw-bold">
+                  <div
+                    className="modal-header border-0"
+                    style={{
+                      backgroundColor: PRIMARY,
+                      color: "#ffffff",
+                    }}
+                  >
+                    <div>
+                      <h5
+                        className="modal-title fw-bold mb-1"
+                        style={{ color: "#ffffff" }}
+                      >
                         {selectedMom.meetingTitle}
                       </h5>
-                      <p className="text-muted small mb-0">
+                      <div className="small">
                         {getMeetingTypeBadge(selectedMom.meetingType)}
-                      </p>
+                      </div>
                     </div>
                     <button
                       type="button"
-                      className="btn-close"
+                      className="btn-close btn-close-white"
                       onClick={closeMomDetails}
                     ></button>
                   </div>
 
                   <div className="modal-body">
-                    {/* Meeting Info Card */}
+                  
                     <div className="card bg-light border-0 mb-4">
                       <div className="card-body">
                         <h6 className="fw-semibold mb-3">
@@ -629,7 +670,10 @@ const MyMomsList = () => {
                           {selectedMom.meetingLink && (
                             <div className="col-md-6">
                               <div className="d-flex align-items-center gap-2 mb-2">
-                                <LinkIcon size={16} className="text-primary" />
+                                <LinkIcon
+                                  size={16}
+                                  className="text-primary"
+                                />
                                 <small className="text-muted">
                                   Meeting Link:
                                 </small>

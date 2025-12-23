@@ -6,13 +6,19 @@ import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
+const PRIMARY = "#5E4B9A";
+
 const ActionItemsManagement = () => {
   const navigate = useNavigate();
   const [actionItems, setActionItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
-  const [searchTerm, setSearchTerm] = useState("");
   const [employeeMap, setEmployeeMap] = useState({});
+
+  // Search states
+  const [searchInput, setSearchInput] = useState(""); // what user types
+  const [searchTerm, setSearchTerm] = useState("");   // committed search
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -58,11 +64,12 @@ const ActionItemsManagement = () => {
 
   const filteredItems = actionItems.filter((item) => {
     const meetingTitle = getMeetingTitle(item);
+    const term = searchTerm.trim().toLowerCase();
+
     const matchesSearch =
-      item.taskDescription
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      meetingTitle.toLowerCase().includes(searchTerm.toLowerCase());
+      term.length === 0 ||
+      item.taskDescription?.toLowerCase().includes(term) ||
+      meetingTitle.toLowerCase().includes(term);
 
     if (!matchesSearch) return false;
 
@@ -85,6 +92,18 @@ const ActionItemsManagement = () => {
 
   const isOverdue = (item) => {
     return item.status === "Pending" && new Date(item.dueDate) < new Date();
+  };
+
+  const handleSearchClick = () => {
+    const trimmed = searchInput.trim();
+    setSearchTerm(trimmed);
+    setIsSearching(trimmed.length > 0);
+  };
+
+  const handleCancelClick = () => {
+    setSearchInput("");
+    setSearchTerm("");
+    setIsSearching(false);
   };
 
   if (loading) {
@@ -113,7 +132,6 @@ const ActionItemsManagement = () => {
       style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}
     >
       {/* Breadcrumb */}
-      {/* Breadcrumb Navigation */}
       <nav aria-label="breadcrumb" className="mb-3">
         <ol
           className="breadcrumb mb-0 d-flex align-items-center"
@@ -146,11 +164,11 @@ const ActionItemsManagement = () => {
               onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
               onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
             >
-              <i className="bi bi-house-door" style={{ fontSize: '1rem' }}></i>
+              <i className="bi bi-house-door" style={{ fontSize: "1rem" }}></i>
               Dashboard
             </button>
           </li>
-           <li
+          <li
             style={{
               display: "flex",
               alignItems: "center",
@@ -161,7 +179,7 @@ const ActionItemsManagement = () => {
           >
             /
           </li>
-          
+
           <li
             className="breadcrumb-item"
             style={{ display: "flex", alignItems: "center" }}
@@ -185,7 +203,6 @@ const ActionItemsManagement = () => {
               onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
               onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
             >
-             
               Meetings and MoM
             </button>
           </li>
@@ -310,18 +327,81 @@ const ActionItemsManagement = () => {
         <div className="card-body py-3">
           <div className="row g-3 align-items-center">
             <div className="col-lg-9">
-              <div className="input-group">
-                <span className="input-group-text bg-white border-end-0">
-                  <i className="bi bi-search text-muted"></i>
+              <div
+                className="d-flex align-items-stretch"
+                style={{
+                  borderRadius: "9999px",
+                  overflow: "hidden",
+                  border: "1px solid #CBD5E1",
+                  backgroundColor: "#ffffff",
+                }}
+              >
+                <span
+                  className="d-flex align-items-center justify-content-center px-3"
+                  style={{ color: "#9CA3AF" }}
+                >
+                  <i className="bi bi-search" />
                 </span>
+
                 <input
                   type="text"
-                  className="form-control border-start-0 ps-0"
+                  className="form-control border-0"
+                  style={{
+                    boxShadow: "none",
+                    borderRadius: 0,
+                    fontSize: "0.9rem",
+                  }}
                   placeholder="Search action items..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  style={{ boxShadow: "none" }}
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleSearchClick();
+                  }}
                 />
+
+                {isSearching ? (
+                  <button
+                    type="button"
+                    onClick={handleCancelClick}
+                    style={{
+                      border: "none",
+                      outline: "none",
+                      padding: "0 18px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      backgroundColor: "#5F6472",
+                      color: "#ffffff",
+                      fontSize: "0.85rem",
+                      fontWeight: 600,
+                      borderRadius: "9999px",
+                    }}
+                  >
+                    <i className="bi bi-x" />
+                    Cancel
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleSearchClick}
+                    style={{
+                      border: "none",
+                      outline: "none",
+                      padding: "0 18px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      backgroundColor: PRIMARY,
+                      color: "#ffffff",
+                      fontSize: "0.85rem",
+                      fontWeight: 600,
+                      borderRadius: "9999px",
+                    }}
+                  >
+                    <i className="bi bi-search" />
+                    Search
+                  </button>
+                )}
               </div>
             </div>
             <div className="col-lg-3 text-end">
@@ -386,7 +466,7 @@ const ActionItemsManagement = () => {
                     >
                       <div
                         className="card-body p-4"
-                        style={{ fontSize: "0.95rem" }} // increased text size inside card
+                        style={{ fontSize: "0.95rem" }}
                       >
                         <h6
                           className="fw-semibold mb-3"

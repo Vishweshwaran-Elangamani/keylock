@@ -8,29 +8,34 @@ import {
   Users,
   Link as LinkIcon,
   CheckCircle,
-  Clock,
   Edit,
   Trash2,
   Eye,
-  Plus,
   MessageSquare,
   AlertTriangle,
   Share2,
   Search,
   X,
-  Home,
 } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
+
+const PRIMARY = "#27235C"; // primary blue
 
 const MyMomsList = () => {
   const [moms, setMoms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedMom, setSelectedMom] = useState(null);
+
   const [showShareModal, setShowShareModal] = useState(false);
   const [shareModalMom, setShareModalMom] = useState(null);
   const [employees, setEmployees] = useState([]);
   const [selectedEmployees, setSelectedEmployees] = useState([]);
+
+  // search states for Share MOM modal
+  const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchMode, setSearchMode] = useState(false); // false = show Search, true = show Cancel
+
   const [sharingLoading, setSharingLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -63,36 +68,33 @@ const MyMomsList = () => {
     }
   };
 
-  const openMomDetails = (mom) => {
-    setSelectedMom(mom);
-  };
-
-  const closeMomDetails = () => {
-    setSelectedMom(null);
-  };
+  const openMomDetails = (mom) => setSelectedMom(mom);
+  const closeMomDetails = () => setSelectedMom(null);
 
   const openShareModal = (mom) => {
     setShareModalMom(mom);
     setShowShareModal(true);
     setSelectedEmployees([]);
+    setSearchInput("");
     setSearchTerm("");
+    setSearchMode(false);
   };
 
   const closeShareModal = () => {
     setShowShareModal(false);
     setShareModalMom(null);
     setSelectedEmployees([]);
+    setSearchInput("");
     setSearchTerm("");
+    setSearchMode(false);
   };
 
   const toggleEmployeeSelection = (employeeId) => {
-    setSelectedEmployees((prev) => {
-      if (prev.includes(employeeId)) {
-        return prev.filter((id) => id !== employeeId);
-      } else {
-        return [...prev, employeeId];
-      }
-    });
+    setSelectedEmployees((prev) =>
+      prev.includes(employeeId)
+        ? prev.filter((id) => id !== employeeId)
+        : [...prev, employeeId]
+    );
   };
 
   const handleShareMom = async () => {
@@ -155,26 +157,7 @@ const MyMomsList = () => {
         </span>
       );
     }
-    switch (status) {
-      case "Completed":
-        return (
-          <span className="badge bg-success d-inline-flex align-items-center gap-1">
-            <CheckCircle size={14} /> Completed
-          </span>
-        );
-      case "Pending":
-        return (
-          <span className="badge bg-warning text-dark d-inline-flex align-items-center gap-1">
-            <Clock size={14} /> Pending
-          </span>
-        );
-      default:
-        return (
-          <span className="badge bg-secondary d-inline-flex align-items-center gap-1">
-            {status}
-          </span>
-        );
-    }
+    return null;
   };
 
   const formatDateTime = (dateString) => {
@@ -189,11 +172,12 @@ const MyMomsList = () => {
     });
   };
 
-  const filteredEmployees = employees.filter((emp) =>
-    `${emp.firstName} ${emp.lastName} ${emp.email} ${emp.departmentName}`
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase())
-  );
+  // apply filter only when searchTerm is set (after clicking Search)
+  const filteredEmployees = employees.filter((emp) => {
+    if (!searchTerm.trim()) return true;
+    const haystack = `${emp.firstName} ${emp.lastName} ${emp.email} ${emp.departmentName}`.toLowerCase();
+    return haystack.includes(searchTerm.toLowerCase());
+  });
 
   if (loading) {
     return (
@@ -216,7 +200,7 @@ const MyMomsList = () => {
     >
       <div className="row justify-content-center">
         <div className="col-12 col-xl-11">
-          {/* Breadcrumb Navigation */}
+          {/* Breadcrumb */}
           <nav aria-label="breadcrumb" className="mb-3">
             <ol
               className="breadcrumb mb-0 d-flex align-items-center"
@@ -249,7 +233,7 @@ const MyMomsList = () => {
                   onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
                   onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
                 >
-                  <i className="bi bi-house-door" style={{ fontSize: '1rem' }}></i>
+                  <i className="bi bi-house-door" style={{ fontSize: "1rem" }}></i>
                   Dashboard
                 </button>
               </li>
@@ -264,7 +248,7 @@ const MyMomsList = () => {
               >
                 /
               </li>
-              
+
               <li
                 className="breadcrumb-item"
                 style={{ display: "flex", alignItems: "center" }}
@@ -323,7 +307,7 @@ const MyMomsList = () => {
             </ol>
           </nav>
 
-          {/* MOMs Count Badge */}
+          {/* Count */}
           {moms.length > 0 && (
             <div className="alert alert-info d-flex align-items-center gap-2 mb-4">
               <FileText size={20} />
@@ -334,7 +318,7 @@ const MyMomsList = () => {
             </div>
           )}
 
-          {/* Empty State */}
+          {/* Empty */}
           {moms.length === 0 ? (
             <div className="card border-0 shadow-sm">
               <div className="card-body text-center py-5">
@@ -355,14 +339,12 @@ const MyMomsList = () => {
               </div>
             </div>
           ) : (
-            /* MOMs List */
             <div className="row g-3">
               {moms.map((mom) => (
                 <div key={mom.momId} className="col-12">
                   <div className="card border-0 shadow-sm h-100">
                     <div className="card-body p-4">
                       <div className="row align-items-start">
-                        {/* MOM Icon */}
                         <div className="col-auto d-none d-md-block">
                           <div
                             className="rounded-circle d-flex align-items-center justify-content-center"
@@ -376,7 +358,6 @@ const MyMomsList = () => {
                           </div>
                         </div>
 
-                        {/* MOM Details */}
                         <div className="col">
                           <div className="d-flex justify-content-between align-items-start mb-2 flex-wrap gap-2">
                             <h5
@@ -399,7 +380,10 @@ const MyMomsList = () => {
                                 <div>
                                   <div
                                     className="text-muted fw-medium"
-                                    style={{ fontSize: "0.8rem", textAlign: "left" }}
+                                    style={{
+                                      fontSize: "0.8rem",
+                                      textAlign: "left",
+                                    }}
                                   >
                                     Meeting Date
                                   </div>
@@ -426,7 +410,10 @@ const MyMomsList = () => {
                                 <div>
                                   <div
                                     className="text-muted fw-medium"
-                                    style={{ fontSize: "0.8rem", textAlign: "left" }}
+                                    style={{
+                                      fontSize: "0.8rem",
+                                      textAlign: "left",
+                                    }}
                                   >
                                     Attendees
                                   </div>
@@ -453,7 +440,10 @@ const MyMomsList = () => {
                                 <div>
                                   <div
                                     className="text-muted fw-medium"
-                                    style={{ fontSize: "0.8rem", textAlign: "left" }}
+                                    style={{
+                                      fontSize: "0.8rem",
+                                      textAlign: "left",
+                                    }}
                                   >
                                     Submitted by
                                   </div>
@@ -472,7 +462,6 @@ const MyMomsList = () => {
                             </div>
                           </div>
 
-                          {/* Action Buttons */}
                           <div className="d-flex gap-2 flex-wrap">
                             <button
                               className="btn btn-sm btn-outline-primary d-flex align-items-center gap-2"
@@ -518,73 +507,146 @@ const MyMomsList = () => {
             </div>
           )}
 
-          {/* Share Modal */}
+          {/* Share Modal - PROPERLY CENTERED */}
           {showShareModal && shareModalMom && (
             <div
-              className="modal fade show d-block modal-centered-custom"
+              className="modal fade show d-block"
               tabIndex="-1"
               style={{
-                backgroundColor: "rgba(0,0,0,0.5)",
+                position: "fixed",
+                inset: 0,
+                backgroundColor: "rgba(0,0,0,0.6)",
+                backdropFilter: "blur(8px)",
+                WebkitBackdropFilter: "blur(8px)",
+                zIndex: 1050,
               }}
               onClick={closeShareModal}
             >
               <div
-                className="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered"
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  width: "80%",
+                  maxWidth: "900px",
+                }}
                 onClick={(e) => e.stopPropagation()}
               >
-                
-<div
-  className="modal-content border-0 shadow"
-  style={{
-    borderRadius: '12px',
-    overflow: 'hidden',
-    width: '150%',
-    maxWidth: '1000px', // Increased from 560px to 800px
-    margin: '0 auto',  // Keeps it centered horizontally
-    backgroundColor: '#fff'
-  }}
->
-
-                  <div className="modal-header">
+                <div
+                  className="border-0 shadow"
+                  style={{
+                    borderRadius: "12px",
+                    overflow: "hidden",
+                    backgroundColor: "#fff",
+                  }}
+                >
+                  <div
+                    style={{
+                      backgroundColor: PRIMARY,
+                      color: "#fff",
+                      padding: "0.75rem 1rem",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
                     <div>
-                      <h5 className="modal-title fw-bold mb-1">Share MOM</h5>
-                      <p className="text-muted small mb-0">
+                      <h5 className="fw-bold mb-1" style={{ color: "#ffffff" }}>
+                        Share MOM
+                      </h5>
+                      <p className="text-light small mb-0">
                         {shareModalMom.meetingTitle}
                       </p>
                     </div>
                     <button
                       type="button"
-                      className="btn-close"
+                      className="btn-close btn-close-white"
                       onClick={closeShareModal}
                     ></button>
                   </div>
 
                   <div className="modal-body">
-                    {/* Search Bar */}
                     <div className="mb-3">
-                      <div className="input-group">
-                        <span className="input-group-text bg-light border-end-0">
+                      <div
+                        className="d-flex"
+                        style={{
+                          borderRadius: "999px",
+                          border: "1px solid #e2e8f0",
+                          overflow: "hidden",
+                          backgroundColor: "#fff",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            padding: "0 12px",
+                            color: "#9ca3af",
+                          }}
+                        >
                           <Search size={18} />
-                        </span>
+                        </div>
                         <input
                           type="text"
-                          className="form-control border-start-0"
-                          placeholder="Search employees by name, email, or department..."
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="form-control border-0"
+                          style={{
+                            boxShadow: "none",
+                            borderRadius: 0,
+                          }}
+                          placeholder="Search by employee name"
+                          value={searchInput}
+                          onChange={(e) => setSearchInput(e.target.value)}
                         />
-                        {searchTerm && (
+                        {!searchMode ? (
                           <button
-                            className="btn btn-light border"
-                            onClick={() => setSearchTerm("")}
+                            type="button"
+                            onClick={() => {
+                              setSearchTerm(searchInput.trim());
+                              setSearchMode(true);
+                            }}
+                            style={{
+                              border: "none",
+                              padding: "0 18px",
+                              backgroundColor: "#5c4ba8",
+                              color: "#ffffff",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "8px",
+                              fontWeight: 600,
+                              cursor: "pointer",
+                            }}
                           >
-                            <X size={18} />
+                            <Search size={16} />
+                            Search
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSearchInput("");
+                              setSearchTerm("");
+                              setSearchMode(false);
+                            }}
+                            style={{
+                              border: "none",
+                              padding: "0 18px",
+                              backgroundColor: "#6b7280",
+                              color: "#ffffff",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "8px",
+                              fontWeight: 600,
+                              cursor: "pointer",
+                            }}
+                          >
+                            <X size={16} />
+                            Cancel
                           </button>
                         )}
                       </div>
                     </div>
 
-                    {/* Selected Count */}
                     {selectedEmployees.length > 0 && (
                       <div className="alert alert-info d-flex align-items-center gap-2 mb-3">
                         <Users size={18} />
@@ -595,7 +657,6 @@ const MyMomsList = () => {
                       </div>
                     )}
 
-                    {/* Employee List */}
                     <div style={{ maxHeight: "400px", overflowY: "auto" }}>
                       {filteredEmployees.length === 0 ? (
                         <div className="text-center py-4 text-muted">
@@ -619,7 +680,10 @@ const MyMomsList = () => {
                                   toggleEmployeeSelection(employee.employeeId)
                                 }
                               />
-                              <div className="flex-grow-1" style={{ textAlign: "left" }}>
+                              <div
+                                className="flex-grow-1"
+                                style={{ textAlign: "left" }}
+                              >
                                 <div className="fw-semibold">
                                   {employee.firstName} {employee.lastName}
                                 </div>
@@ -650,21 +714,23 @@ const MyMomsList = () => {
                         selectedEmployees.length === 0 || sharingLoading
                       }
                       style={{
-                        background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
-                        color: '#fff',
-                        border: 'none',
-                        fontWeight: '500',
-                        transition: 'all 0.2s ease'
+                        background:
+                          "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+                        color: "#fff",
+                        border: "none",
+                        fontWeight: "500",
+                        transition: "all 0.2s ease",
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.opacity = '0.9';
-                        e.currentTarget.style.transform = 'translateY(-1px)';
-                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(151, 36, 126, 0.3)';
+                        e.currentTarget.style.opacity = "0.9";
+                        e.currentTarget.style.transform = "translateY(-1px)";
+                        e.currentTarget.style.boxShadow =
+                          "0 4px 12px rgba(151, 36, 126, 0.3)";
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.opacity = '1';
-                        e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.boxShadow = 'none';
+                        e.currentTarget.style.opacity = "1";
+                        e.currentTarget.style.transform = "translateY(0)";
+                        e.currentTarget.style.boxShadow = "none";
                       }}
                     >
                       <Share2 size={16} />
@@ -678,53 +744,82 @@ const MyMomsList = () => {
             </div>
           )}
 
-          {/* MOM Details Modal */}
+        
           {selectedMom && (
             <div
-              className="modal fade show d-block modal-centered-custom"
+              className="modal fade show d-block"
               tabIndex="-1"
               style={{
-                backgroundColor: "rgba(0,0,0,0.5)",
+                position: "fixed",
+                inset: 0,
+                backgroundColor: "rgba(0,0,0,0.6)",
+                backdropFilter: "blur(8px)",
+                WebkitBackdropFilter: "blur(8px)",
+                zIndex: 1055,
               }}
               onClick={closeMomDetails}
             >
               <div
-                className="modal-dialog modal-dialog-scrollable modal-xl modal-dialog-centered"
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "58%",
+                  transform: "translate(-50%, -50%)",
+                  width: "80%",
+                  maxWidth: "900px",
+                }}
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="modal-content border-0 shadow">
-                  <div className="modal-header border-0 pb-0" style={{ textAlign: 'left' }}>
+                  <div
+                    className="border-0 pb-0"
+                    style={{
+                      textAlign: "left",
+                      backgroundColor: PRIMARY,
+                      color: "#fff",
+                      padding: "0.75rem 1rem",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
                     <div className="flex-grow-1">
-                      <h5 className="modal-title fw-bold" style={{ textAlign: 'left' }}>
+                      <h5
+                        className="fw-bold mb-1"
+                        style={{ textAlign: "left", color: "#ffffff" }}
+                      >
                         {selectedMom.meetingTitle}
                       </h5>
-                      <p className="text-muted small mb-0" style={{ textAlign: 'left' }}>
+                      <p
+                        className="small mb-0"
+                        style={{ textAlign: "left", color: "#e2e8f0" }}
+                      >
                         {getMeetingTypeBadge(selectedMom.meetingType)}
                       </p>
                     </div>
                     <button
                       type="button"
-                      className="btn-close"
+                      className="btn-close btn-close-white"
                       onClick={closeMomDetails}
                     ></button>
                   </div>
 
-                  <div className="modal-body" style={{ textAlign: 'left' }}>
-                    {/* Meeting Info Card */}
+                  <div
+                    className="modal-body"
+                    style={{ textAlign: "left", backgroundColor: "#fff" }}
+                  >
                     <div className="card bg-light border-0 mb-4">
-                      <div className="card-body" style={{ textAlign: 'left' }}>
-                        <h6 className="fw-semibold mb-3" style={{ textAlign: 'left' }}>
+                      <div className="card-body" style={{ textAlign: "left" }}>
+                        <h6 className="fw-semibold mb-3" style={{ textAlign: "left" }}>
                           Meeting Information
                         </h6>
                         <div className="row g-3">
                           <div className="col-md-6">
                             <div className="d-flex align-items-center gap-2 mb-2">
                               <Calendar size={16} className="text-primary" />
-                              <small className="text-muted">
-                                Meeting Date:
-                              </small>
+                              <small className="text-muted">Meeting Date:</small>
                             </div>
-                            <div className="fw-semibold" style={{ textAlign: 'left' }}>
+                            <div className="fw-semibold" style={{ textAlign: "left" }}>
                               {formatDateTime(selectedMom.meetingDate)}
                             </div>
                           </div>
@@ -733,16 +828,14 @@ const MyMomsList = () => {
                             <div className="col-md-6">
                               <div className="d-flex align-items-center gap-2 mb-2">
                                 <LinkIcon size={16} className="text-primary" />
-                                <small className="text-muted">
-                                  Meeting Link:
-                                </small>
+                                <small className="text-muted">Meeting Link:</small>
                               </div>
                               <a
                                 href={selectedMom.meetingLink}
                                 target="_blank"
                                 rel="noreferrer"
                                 className="text-primary text-decoration-none d-flex align-items-center gap-1"
-                                style={{ textAlign: 'left' }}
+                                style={{ textAlign: "left" }}
                               >
                                 Join Meeting <LinkIcon size={14} />
                               </a>
@@ -754,7 +847,7 @@ const MyMomsList = () => {
                               <Users size={16} className="text-primary" />
                               <small className="text-muted">Attendees:</small>
                             </div>
-                            <div className="fw-semibold" style={{ textAlign: 'left' }}>
+                            <div className="fw-semibold" style={{ textAlign: "left" }}>
                               {selectedMom.attendees || "N/A"}
                             </div>
                           </div>
@@ -762,11 +855,9 @@ const MyMomsList = () => {
                           <div className="col-md-6">
                             <div className="d-flex align-items-center gap-2 mb-2">
                               <Users size={16} className="text-primary" />
-                              <small className="text-muted">
-                                Submitted by:
-                              </small>
+                              <small className="text-muted">Submitted by:</small>
                             </div>
-                            <div className="fw-semibold" style={{ textAlign: 'left' }}>
+                            <div className="fw-semibold" style={{ textAlign: "left" }}>
                               {selectedMom.submittedByEmployeeName} (
                               {selectedMom.submittedByRole})
                             </div>
@@ -775,22 +866,29 @@ const MyMomsList = () => {
                       </div>
                     </div>
 
-                    {/* Comments/Observations */}
                     {selectedMom.commentsObservations && (
                       <div className="mb-4">
-                        <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2" style={{ textAlign: 'left' }}>
+                        <h6
+                          className="fw-semibold mb-3 d-flex align-items-center gap-2"
+                          style={{ textAlign: "left" }}
+                        >
                           <MessageSquare size={18} />
                           Comments & Observations
                         </h6>
-                        <div className="alert alert-secondary mb-0" style={{ textAlign: 'left' }}>
+                        <div
+                          className="alert alert-secondary mb-0"
+                          style={{ textAlign: "left" }}
+                        >
                           {selectedMom.commentsObservations}
                         </div>
                       </div>
                     )}
 
-                    {/* Discussion Points */}
                     <div className="mb-4">
-                      <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2" style={{ textAlign: 'left' }}>
+                      <h6
+                        className="fw-semibold mb-3 d-flex align-items-center gap-2"
+                        style={{ textAlign: "left" }}
+                      >
                         <MessageSquare size={18} />
                         Discussion Points
                       </h6>
@@ -800,7 +898,7 @@ const MyMomsList = () => {
                             <div
                               key={dp.pointId}
                               className="list-group-item border-0 bg-light mb-2 rounded"
-                              style={{ textAlign: 'left' }}
+                              style={{ textAlign: "left" }}
                             >
                               <div className="d-flex gap-2">
                                 <span
@@ -815,7 +913,7 @@ const MyMomsList = () => {
                                 >
                                   {index + 1}
                                 </span>
-                                <span className="flex-grow-1" style={{ textAlign: 'left' }}>
+                                <span className="flex-grow-1" style={{ textAlign: "left" }}>
                                   {dp.pointText}
                                 </span>
                               </div>
@@ -823,15 +921,20 @@ const MyMomsList = () => {
                           ))}
                         </div>
                       ) : (
-                        <div className="alert alert-info mb-0" style={{ textAlign: 'left' }}>
+                        <div
+                          className="alert alert-info mb-0"
+                          style={{ textAlign: "left" }}
+                        >
                           No discussion points recorded
                         </div>
                       )}
                     </div>
 
-                    {/* Action Items */}
                     <div className="mb-4">
-                      <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2" style={{ textAlign: 'left' }}>
+                      <h6
+                        className="fw-semibold mb-3 d-flex align-items-center gap-2"
+                        style={{ textAlign: "left" }}
+                      >
                         <CheckCircle size={18} />
                         Action Items
                       </h6>
@@ -841,28 +944,33 @@ const MyMomsList = () => {
                             <div
                               key={ai.actionItemId}
                               className="list-group-item border-0 bg-light mb-2 rounded"
-                              style={{ textAlign: 'left' }}
+                              style={{ textAlign: "left" }}
                             >
                               <div className="d-flex justify-content-between align-items-start mb-2">
-                                <h6 className="mb-0 fw-semibold" style={{ textAlign: 'left' }}>
+                                <h6
+                                  className="mb-0 fw-semibold"
+                                  style={{ textAlign: "left" }}
+                                >
                                   {ai.taskDescription}
                                 </h6>
                                 {getStatusBadge(ai.status, ai.isOverdue)}
                               </div>
                               <div className="row g-2 mt-2">
                                 <div className="col-md-6">
-                                  <small className="text-muted">
-                                    Assigned to:
-                                  </small>
-                                  <div className="fw-semibold" style={{ textAlign: 'left' }}>
+                                  <small className="text-muted">Assigned to:</small>
+                                  <div
+                                    className="fw-semibold"
+                                    style={{ textAlign: "left" }}
+                                  >
                                     {ai.assignedToEmployeeName}
                                   </div>
                                 </div>
                                 <div className="col-md-6">
-                                  <small className="text-muted">
-                                    Due Date:
-                                  </small>
-                                  <div className="fw-semibold" style={{ textAlign: 'left' }}>
+                                  <small className="text-muted">Due Date:</small>
+                                  <div
+                                    className="fw-semibold"
+                                    style={{ textAlign: "left" }}
+                                  >
                                     {ai.dueDate || "N/A"}
                                   </div>
                                 </div>
@@ -871,33 +979,18 @@ const MyMomsList = () => {
                           ))}
                         </div>
                       ) : (
-                        <div className="alert alert-info mb-0" style={{ textAlign: 'left' }}>
+                        <div
+                          className="alert alert-info mb-0"
+                          style={{ textAlign: "left" }}
+                        >
                           No action items recorded
                         </div>
                       )}
                     </div>
-
-                    {/* Metadata */}
-                    <div className="border-top pt-3" style={{ textAlign: 'left' }}>
-                      <small className="text-muted">
-                        <strong>Created:</strong>{" "}
-                        {formatDateTime(selectedMom.createdAt)}
-                        {selectedMom.updatedAt && (
-                          <>
-                            {" "}
-                            | <strong>Last Updated:</strong>{" "}
-                            {formatDateTime(selectedMom.updatedAt)}
-                          </>
-                        )}
-                      </small>
-                    </div>
                   </div>
 
                   <div className="modal-footer border-0">
-                    <button
-                      className="btn btn-danger px-4"
-                      onClick={closeMomDetails}
-                    >
+                    <button className="btn btn-danger px-4" onClick={closeMomDetails}>
                       <X size={16} className="me-2" />
                       Close
                     </button>
@@ -909,21 +1002,23 @@ const MyMomsList = () => {
                           navigate(`/mom/edit/${selectedMom.momId}`);
                         }}
                         style={{
-                          background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
-                          color: '#fff',
-                          border: 'none',
-                          fontWeight: '500',
-                          transition: 'all 0.2s ease'
+                          background:
+                            "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+                          color: "#fff",
+                          border: "none",
+                          fontWeight: "500",
+                          transition: "all 0.2s ease",
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.opacity = '0.9';
-                          e.currentTarget.style.transform = 'translateY(-1px)';
-                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(151, 36, 126, 0.3)';
+                          e.currentTarget.style.opacity = "0.9";
+                          e.currentTarget.style.transform = "translateY(-1px)";
+                          e.currentTarget.style.boxShadow =
+                            "0 4px 12px rgba(151, 36, 126, 0.3)";
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.opacity = '1';
-                          e.currentTarget.style.transform = 'translateY(0)';
-                          e.currentTarget.style.boxShadow = 'none';
+                          e.currentTarget.style.opacity = "1";
+                          e.currentTarget.style.transform = "translateY(0)";
+                          e.currentTarget.style.boxShadow = "none";
                         }}
                       >
                         <Edit size={16} />
@@ -935,23 +1030,13 @@ const MyMomsList = () => {
               </div>
             </div>
           )}
+
         </div>
       </div>
 
       <style>{`
         .breadcrumb-item + .breadcrumb-item::before {
           display: none;
-        }
-        
-        /* Center Modal Fix */
-        .modal-centered-custom {
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-        }
-        
-        .modal-centered-custom .modal-dialog {
-          margin: 0 !important;
         }
       `}</style>
     </div>

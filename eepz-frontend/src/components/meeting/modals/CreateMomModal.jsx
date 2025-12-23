@@ -92,8 +92,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
       );
       if (!clickedAssign) setAssignOpenIndex(null);
       if (!clickedStatus) setStatusOpenIndex(null);
-      if (!clickedCal)
-        setCalendarState((prev) => ({ ...prev, openIndex: null }));
+      if (!clickedCal) setCalendarState((prev) => ({ ...prev, openIndex: null }));
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -367,15 +366,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
   });
 
   return (
-    <div
-      className="card border-0 shadow-sm mt-3"
-      style={{
-        borderRadius: "12px",
-        maxWidth: "1040px",   // widened modal
-        width: "100%",
-        margin: "0 auto",
-      }}
-    >
+    <div className="card border-0 shadow-sm mt-3" style={{ borderRadius: "12px" }}>
       <div className="card-body p-4">
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h6 className="card-title fw-bold mb-0 d-flex align-items-center gap-2">
@@ -881,8 +872,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                                     style={{
                                       display: "grid",
                                       gridTemplateColumns: "repeat(7, 1fr)",
-                                      padding:
-                                        "0.25rem 0.75rem 0.5rem 0.75rem",
+                                      padding: "0.25rem 0.75rem 0.5rem 0.75rem",
                                       gap: 2,
                                     }}
                                   >

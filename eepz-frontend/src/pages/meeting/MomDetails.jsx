@@ -1,7 +1,9 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import momService from "../../services/meeting/momService";
 import toastr from "toastr";
+
+const PRIMARY = "#27235C"; // primary blue
 
 const MomDetails = () => {
   const { momId } = useParams();
@@ -24,62 +26,168 @@ const MomDetails = () => {
   };
 
   if (loading) {
-    return <p>Loading MOM details...</p>;
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#f3f4f6",
+        }}
+      >
+        <p>Loading MOM details...</p>
+      </div>
+    );
   }
+
   if (!mom) {
-    return <p>No MOM information available.</p>;
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#f3f4f6",
+        }}
+      >
+        <p>No MOM information available.</p>
+      </div>
+    );
   }
 
   return (
-    <div className="mom-details">
-      <h2>{mom.meetingTitle}</h2>
-      <p>
-        <strong>Meeting Type:</strong> {mom.meetingType}
-      </p>
-      <p>
-        <strong>Date/Time:</strong> {new Date(mom.meetingDate).toLocaleString()}
-      </p>
+    <div
+      style={{
+        minHeight: "100vh",
+        backgroundColor: "#f3f4f6",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "2rem 1rem",
+      }}
+    >
+      <div
+        className="card shadow-lg border-0"
+        style={{
+          width: "100%",
+          maxWidth: "900px",
+          borderRadius: "16px",
+          overflow: "hidden",
+          backgroundColor: "#ffffff",
+        }}
+      >
+        {/* HEADER in primary blue */}
+        <div
+          className="card-header border-0"
+          style={{
+            backgroundColor: PRIMARY,
+            color: "#ffffff",
+            padding: "1.5rem 2rem",
+          }}
+        >
+          <div>
+            <h2
+              className="fw-bold mb-2"
+              style={{ fontSize: "1.5rem", margin: 0 }}
+            >
+              {mom.meetingTitle}
+            </h2>
+            <span
+              className="badge"
+              style={{
+                backgroundColor: "#ffffff",
+                color: PRIMARY,
+                borderRadius: "9999px",
+                fontSize: "0.75rem",
+                padding: "0.25rem 0.8rem",
+              }}
+            >
+              {mom.meetingType}
+            </span>
+          </div>
+        </div>
 
-      {mom.meetingLink && (
-        <p>
-          Meeting Link:{" "}
-          <a href={mom.meetingLink} target="_blank" rel="noopener noreferrer">
-            Join Meeting
-          </a>
-        </p>
-      )}
+        {/* BODY */}
+        <div className="card-body" style={{ padding: "1.75rem 2rem 2rem" }}>
+          {/* Top info */}
+          <div className="mb-4">
+            <p className="mb-2">
+              <strong>Meeting Type: </strong>
+              {mom.meetingType}
+            </p>
+            <p className="mb-2">
+              <strong>Date/Time: </strong>
+              {new Date(mom.meetingDate).toLocaleString()}
+            </p>
 
-      <p>
-        <strong>Attendees:</strong> {mom.attendees?.join(", ")}
-      </p>
+            {mom.meetingLink && (
+              <p className="mb-2">
+                <strong>Meeting Link: </strong>
+                <a
+                  href={mom.meetingLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Join Meeting
+                </a>
+              </p>
+            )}
 
-      <section>
-        <h3>Comments/Observations</h3>
-        <p>{mom.commentsObservations}</p>
-      </section>
+            <p className="mb-2">
+              <strong>Attendees: </strong>
+              {Array.isArray(mom.attendees)
+                ? mom.attendees.join(", ")
+                : mom.attendees || "N/A"}
+            </p>
+          </div>
 
-      <section>
-        <h3>Discussion Points</h3>
-        <ul>
-          {mom.discussionPoints?.map((dp, i) => (
-            <li key={i}>{dp.point}</li>
-          ))}
-        </ul>
-      </section>
+          {/* Comments / Observations */}
+          <section className="mb-4">
+            <h5 className="fw-semibold mb-2">Comments / Observations</h5>
+            <div className="border rounded p-3 bg-light">
+              {mom.commentsObservations || "No comments recorded."}
+            </div>
+          </section>
 
-      <section>
-        <h3>Action Items</h3>
-        <ul>
-          {mom.actionItems?.map((ai) => (
-            <li key={ai.actionItemId}>
-              <strong>{ai.task}</strong> - Assigned to: {ai.assignTo} - Due:{" "}
-              {new Date(ai.dueDate).toLocaleDateString()} - Status: {ai.status}
-            </li>
-          ))}
-        </ul>
-      </section>
+          {/* Discussion Points */}
+          <section className="mb-4">
+            <h5 className="fw-semibold mb-2">Discussion Points</h5>
+            {mom.discussionPoints && mom.discussionPoints.length > 0 ? (
+              <ul className="mb-0">
+                {mom.discussionPoints.map((dp, i) => (
+                  <li key={i}>{dp.point || dp.pointText || ""}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-muted mb-0">No discussion points recorded.</p>
+            )}
+          </section>
 
-      
+          {/* Action Items */}
+          <section>
+            <h5 className="fw-semibold mb-2">Action Items</h5>
+            {mom.actionItems && mom.actionItems.length > 0 ? (
+              <ul className="mb-0">
+                {mom.actionItems.map((ai) => (
+                  <li key={ai.actionItemId}>
+                    <strong>{ai.task || ai.taskDescription}</strong> - Assigned
+                    to: {ai.assignTo || ai.assignedToEmployeeName || "N/A"} -
+                    Due:{" "}
+                    {ai.dueDate
+                      ? new Date(ai.dueDate).toLocaleDateString()
+                      : "N/A"}{" "}
+                    - Status: {ai.status}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-muted mb-0">No action items recorded.</p>
+            )}
+          </section>
+        </div>
+      </div>
     </div>
   );
 };

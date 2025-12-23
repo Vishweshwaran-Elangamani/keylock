@@ -13,12 +13,12 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
         tabIndex="-1"
         style={{
           position: "fixed",
-          inset: 0, // top:0, right:0, bottom:0, left:0
+          inset: 0,
           zIndex: 1050,
           backgroundColor: "rgba(0,0,0,0.5)",
           backdropFilter: "blur(4px)",
           display: "flex",
-          alignItems: "center", // vertical center
+          alignItems: "center",     // vertical center
           justifyContent: "center", // horizontal center
           overflowY: "auto",
         }}
@@ -27,11 +27,14 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
         <div
           className="modal-dialog"
           style={{
-            margin: 0, // important: let flexbox centre it, not margins
+            margin: 0,              // no default bootstrap margin
             width: "100%",
-            maxWidth: "960px", // overall width of the dialog
+            maxWidth: "1000px",
             maxHeight: "90vh",
-            display: "flex",
+            position: "absolute",
+            top:"5%",
+            left : "35%"
+
           }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -41,7 +44,9 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
               borderRadius: "12px",
               overflow: "hidden",
               width: "100%",
-              alignSelf: "center",
+              maxHeight: "90vh",
+              display: "flex",
+              flexDirection: "column",
             }}
           >
             {/* Header */}
@@ -78,13 +83,12 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
               ></button>
             </div>
 
-            {/* Body */}
+            {/* Body (scrollable inside fixed-height modal) */}
             <div
               className="modal-body"
               style={{
                 padding: "2rem",
                 textAlign: "left",
-                maxHeight: "calc(90vh - 180px)",
                 overflowY: "auto",
               }}
             >
@@ -270,15 +274,6 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
                           >
                             {ai.taskDescription}
                           </h6>
-                          <span
-                            className={`badge ${
-                              ai.status === "Pending"
-                                ? "bg-warning text-dark"
-                                : "bg-success"
-                            }`}
-                          >
-                            {ai.status}
-                          </span>
                         </div>
                         <div
                           className="d-flex flex-wrap gap-3 text-muted small"
@@ -289,8 +284,10 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
                             <span>
                               <strong>Assigned to:</strong>{" "}
                               <span className="text-primary fw-medium">
-                                {employeeMap[ai.assignedToEmployeeId] ||
-                                  `Employee ${ai.assignedToEmployeeId}`}
+                                {employeeMap[ai.assignedToEmployeeId] ??
+                                  (ai.assignedToEmployeeId
+                                    ? `Employee ${ai.assignedToEmployeeId}`
+                                    : "Unassigned")}
                               </span>
                             </span>
                           </span>
@@ -298,7 +295,9 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
                             <i className="bi bi-calendar-event text-danger"></i>
                             <span>
                               <strong>Due:</strong>{" "}
-                              {new Date(ai.dueDate).toLocaleDateString()}
+                              {ai.dueDate
+                                ? new Date(ai.dueDate).toLocaleDateString()
+                                : "N/A"}
                             </span>
                           </span>
                         </div>
@@ -308,60 +307,24 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
                 </div>
               )}
 
-              {/* Create MOM Button */}
               <button
                 className="btn btn-outline-primary w-100 py-2 d-flex align-items-center justify-content-center gap-2 shadow-sm"
                 onClick={toggleCreateMom}
                 style={{
                   transition: "all 0.2s",
-                  borderRadius: "8px",
-                  textAlign: "center",
                 }}
               >
-                <i
-                  className={`bi ${
-                    showCreateMom ? "bi-x-circle" : "bi-plus-circle"
-                  }`}
-                ></i>
-                {showCreateMom
-                  ? "Cancel MOM Creation"
-                  : "Create MOM for this Meeting"}
-              </button>
-
-              {/* Conditional Create MOM Modal */}
-              {showCreateMom && (
-                <CreateMomModal meetingData={meeting} onClose={toggleCreateMom} />
-              )}
-            </div>
-
-            {/* Footer */}
-            <div
-              className="modal-footer border-0"
-              style={{
-                padding: "1rem 2rem",
-                backgroundColor: "#f8f9fa",
-              }}
-            >
-              <button
-                className="btn btn-secondary px-4"
-                onClick={onClose}
-                style={{
-                  borderRadius: "8px",
-                  padding: "0.5rem 1.5rem",
-                }}
-              >
-                Close
+                <i className="bi bi-file-earmark-plus"></i>
+                Create MOM from this Meeting
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      <style>{`
-        .modal.show.d-block {
-          display: flex !important;
-        }
-      `}</style>
+      {showCreateMom && (
+        <CreateMomModal meeting={meeting} onClose={toggleCreateMom} />
+      )}
     </>
   );
 };

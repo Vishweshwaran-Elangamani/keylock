@@ -81,26 +81,7 @@ const HRMomDetails = () => {
         </span>
       );
     }
-    switch (status) {
-      case "Completed":
-        return (
-          <span className="hrmom-badge hrmom-badge-success hrmom-badge-icon">
-            <CheckCircle size={14} /> Completed
-          </span>
-        );
-      case "Pending":
-        return (
-          <span className="hrmom-badge hrmom-badge-warning hrmom-badge-icon">
-            <Clock size={14} /> Pending
-          </span>
-        );
-      default:
-        return (
-          <span className="hrmom-badge hrmom-badge-secondary hrmom-badge-icon">
-            {status}
-          </span>
-        );
-    }
+   
   };
 
   const getPriorityBadge = (priority) => {

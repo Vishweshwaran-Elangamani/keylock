@@ -126,7 +126,6 @@ const HRSLADashboard = () => {
     setFilteredSlas(filtered);
   };
 
-  // Updated search handlers
   const handleSearch = () => {
     if (!searchTerm.trim()) return;
     setActiveSearchTerm(searchTerm.trim());
@@ -372,7 +371,6 @@ const HRSLADashboard = () => {
     { value: "Extended", label: "Extended" },
   ];
 
-  // Pagination helpers
   const safeTotal = filteredSlas.length;
   const totalPages = Math.max(1, Math.ceil(safeTotal / itemsPerPage));
   const startIndex = safeTotal === 0 ? 0 : (currentPage - 1) * itemsPerPage;
@@ -420,7 +418,7 @@ const HRSLADashboard = () => {
         </ol>
       </nav>
 
-      {/* Error Alert */}
+     
       {error && (
         <div className="alert alert-danger hr-sla-alert-error" role="alert">
           <AlertTriangle size={20} />
@@ -436,7 +434,7 @@ const HRSLADashboard = () => {
         </div>
       )}
 
-      {/* Stats Cards */}
+    
       <div className="row g-3 mb-3">
         {[
           {
@@ -485,109 +483,110 @@ const HRSLADashboard = () => {
         ))}
       </div>
 
-      {/* Filters with Custom Dropdowns */}
+   
       <div className="hr-sla-filters-card">
-        <div className="row g-3 align-items-center">
-          <div className="col-lg-3 col-md-6">
-            <div
+        <div className="d-flex flex-wrap align-items-center gap-3">
+         
+          <div
+            className="hr-sla-search-wrapper"
+            style={{
+              position: "relative",
+              display: "flex",
+              alignItems: "center",
+              width: "280px",
+              maxWidth: "100%",
+            }}
+          >
+            <Search size={16} className="hr-sla-search-icon" />
+            <input
+              type="text"
+              className="form-control hr-sla-search-input"
+              placeholder="Search by employee name"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyPress={handleSearchKeyPress}
               style={{
-                position: "relative",
-                display: "flex",
-                alignItems: "center",
-                width: "100%",
+                paddingRight: "7.5rem",
               }}
-              className="hr-sla-search-wrapper"
-            >
-              <Search size={16} className="hr-sla-search-icon" />
-              <input
-                type="text"
-                className="form-control hr-sla-search-input"
-                placeholder="Search by employee name"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyPress={handleSearchKeyPress}
-                style={{
-                  paddingRight: "7.5rem",
-                }}
-              />
+            />
 
-              {activeSearchTerm ? (
-                <button
-                  type="button"
-                  onClick={handleCancelSearch}
-                  style={{
-                    position: "absolute",
-                    right: "3px",
-                    top: "3px",
-                    bottom: "3px",
-                    background: "#6b7280",
-                    border: "1px solid #6b7280",
-                    color: "white",
-                    borderRadius: "0 8px 8px 0",
-                    padding: "0 1rem",
-                    fontSize: "0.8rem",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.4rem",
-                    zIndex: 1,
-                    transition: "all 0.2s ease",
-                    whiteSpace: "nowrap",
-                    fontFamily: "Poppins, sans-serif",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "#4b5563";
-                    e.currentTarget.style.borderColor = "#4b5563";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "#6b7280";
-                    e.currentTarget.style.borderColor = "#6b7280";
-                  }}
-                >
-                  <X size={14} />
-                  Cancel
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={handleSearch}
-                  style={{
-                    position: "absolute",
-                    right: "3px",
-                    top: "3px",
-                    bottom: "3px",
-                    background: "#5a5486",
-                    border: "none",
-                    color: "white",
-                    borderRadius: "0 8px 8px 0",
-                    padding: "0 1rem",
-                    fontSize: "0.8rem",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.4rem",
-                    zIndex: 1,
-                    transition: "all 0.2s ease",
-                    whiteSpace: "nowrap",
-                    fontFamily: "Poppins, sans-serif",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "#4a4076";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "#5a5486";
-                  }}
-                >
-                  <Search size={14} />
-                  Search
-                </button>
-              )}
-            </div>
+            {activeSearchTerm ? (
+              <button
+                type="button"
+                onClick={handleCancelSearch}
+                style={{
+                  position: "absolute",
+                  right: "3px",
+                  top: "3px",
+                  bottom: "3px",
+                  background: "#6b7280",
+                  border: "1px solid #6b7280",
+                  color: "white",
+                  borderRadius: "0 8px 8px 0",
+                  padding: "0 1rem",
+                  fontSize: "0.8rem",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.4rem",
+                  zIndex: 1,
+                  transition: "all 0.2s ease",
+                  whiteSpace: "nowrap",
+                  fontFamily: "Poppins, sans-serif",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "#4b5563";
+                  e.currentTarget.style.borderColor = "#4b5563";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "#6b7280";
+                  e.currentTarget.style.borderColor = "#6b7280";
+                }}
+              >
+                <X size={14} />
+                Cancel
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleSearch}
+                style={{
+                  position: "absolute",
+                  right: "3px",
+                  top: "3px",
+                  bottom: "3px",
+                  background: "#5a5486",
+                  border: "none",
+                  color: "white",
+                  borderRadius: "0 8px 8px 0",
+                  padding: "0 1rem",
+                  fontSize: "0.8rem",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.4rem",
+                  zIndex: 1,
+                  transition: "all 0.2s ease",
+                  whiteSpace: "nowrap",
+                  fontFamily: "Poppins, sans-serif",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "#4a4076";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "#5a5486";
+                }}
+              >
+                <Search size={14} />
+                Search
+              </button>
+            )}
           </div>
 
-          <div className="col-lg-2 col-md-6">
+          {/* Status */}
+          <div style={{ width: "170px", maxWidth: "100%" }}>
             <CustomSelect
               value={statusFilter}
               onChange={setStatusFilter}
@@ -597,17 +596,7 @@ const HRSLADashboard = () => {
             />
           </div>
 
-          <div className="col-lg-2 col-md-6">
-            <CustomSelect
-              value={typeFilter}
-              onChange={setTypeFilter}
-              options={typeOptions}
-              placeholder="All Types"
-              name="type"
-            />
-          </div>
-
-          <div className="col-lg-2 col-md-6">
+          <div style={{ width: "200px", maxWidth: "100%" }}>
             <CustomSelect
               value={complianceFilter}
               onChange={setComplianceFilter}
@@ -617,35 +606,33 @@ const HRSLADashboard = () => {
             />
           </div>
 
-          <div className="col-lg-3 col-md-12">
-            <div className="hr-sla-filter-actions">
-              <button
-                className="btn btn-outline-secondary hr-sla-btn-clear"
-                onClick={clearFilters}
-              >
-                <Filter size={16} />
-                Clear
-              </button>
-              <button
-                className="btn btn-outline-success hr-sla-btn-export"
-                onClick={handleExport}
-              >
-                <Download size={16} />
-                Export
-              </button>
-              <button
-                className="btn btn-primary hr-sla-btn-create"
-                onClick={() => setShowCreateModal(true)}
-              >
-                <Plus size={16} />
-                Create SLA
-              </button>
-            </div>
+          <div className="ms-auto d-flex gap-2 flex-wrap">
+            <button
+              className="btn btn-outline-secondary hr-sla-btn-clear"
+              onClick={clearFilters}
+            >
+              <Filter size={16} />
+              Clear
+            </button>
+            <button
+              className="btn btn-outline-success hr-sla-btn-export"
+              onClick={handleExport}
+            >
+              <Download size={16} />
+              Export
+            </button>
+            <button
+              className="btn btn-primary hr-sla-btn-create"
+              onClick={() => setShowCreateModal(true)}
+            >
+              <Plus size={16} />
+              Create SLA
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Empty State or Table */}
+  
       {currentSLAs.length === 0 ? (
         <div className="hr-sla-empty-state-wrapper">
           <div className="hr-sla-empty-state">
@@ -758,7 +745,7 @@ const HRSLADashboard = () => {
             </table>
           </div>
 
-          {/* Pagination footer */}
+         
           {filteredSlas.length > 0 && (
             <div className="hr-sla-pagination-footer">
               <div className="hr-sla-pagination-left">
@@ -844,7 +831,6 @@ const HRSLADashboard = () => {
         </div>
       )}
 
-      {/* Modals */}
       <ConfirmationModal
         isOpen={showConfirmModal}
         onClose={() => {
