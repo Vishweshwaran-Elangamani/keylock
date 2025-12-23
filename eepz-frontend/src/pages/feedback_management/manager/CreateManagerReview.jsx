@@ -1,4 +1,3 @@
-
 import React, { useMemo, useState, useEffect } from "react";
 import {
   CheckCircle,
@@ -52,6 +51,8 @@ export default function CreateManagerReview() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const [openEmployeeDropdown, setOpenEmployeeDropdown] = useState(false);
+
   useEffect(() => {
     const fetchEmployees = async () => {
       setLoadingEmployees(true);
@@ -104,20 +105,19 @@ export default function CreateManagerReview() {
     setError("");
     setSuccess("");
 
-     const payload = {
+    const payload = {
       managerEmployeeId: Number(user?.empId),
       targetEmployeeId: Number(form.targetEmployeeId),
       rating: Number(form.rating),
       reviewComment: form.reviewComment,
       projectContext: form.projectContext || null,
       goalContext: form.goalContext || null,
-      status: "Submitted", // Directly set to Submitted
+      status: "Submitted",
       submittedDate: new Date().toISOString(),
     };
 
     try {
       await managerReviewApi.create(payload);
-
       setSuccess("Review created successfully.");
     } catch (err) {
       console.error(err);
@@ -131,19 +131,29 @@ export default function CreateManagerReview() {
     }
   };
 
+  const selectedEmployeeLabel = (() => {
+    if (loadingEmployees) return "Loading employees...";
+    if (!form.targetEmployeeId) return "-- Choose an employee --";
+    const emp = employees.find(
+      (e) => String(e.employeeId) === String(form.targetEmployeeId)
+    );
+    if (!emp) return "-- Choose an employee --";
+    return `${emp.firstName} ${emp.lastName}${
+      emp.email ? ` (${emp.email})` : ""
+    }`;
+  })();
+
   return (
     <div className="fm-page">
       <div className="fm-container">
-        
         {/* HEADER */}
         <div className="fm-header">
-          {/* Breadcrumb */}
           <nav aria-label="breadcrumb" className="mb-4">
             <ol
               className="breadcrumb mb-0 d-flex align-items-center"
               style={{ backgroundColor: "transparent", padding: 0, margin: 0 }}
             >
-             <li className="breadcrumb-item d-flex align-items-center">
+              <li className="breadcrumb-item d-flex align-items-center">
                 <button
                   onClick={() => navigate("/manager/dashboard/")}
                   style={{
@@ -163,8 +173,8 @@ export default function CreateManagerReview() {
                   onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
                   onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
                 >
-                   <Home size={16} /> 
-                 Dashboard
+                  <Home size={16} />
+                  Dashboard
                 </button>
               </li>
               <li
@@ -198,7 +208,7 @@ export default function CreateManagerReview() {
                   onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
                   onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
                 >
-                 Feedback Management
+                  Feedback Management
                 </button>
               </li>
               <li
@@ -212,14 +222,22 @@ export default function CreateManagerReview() {
               >
                 /
               </li>
-              <li className="breadcrumb-item active d-flex align-items-center" aria-current="page">
-                <span style={{ color: "#97247E", fontSize: "0.875rem", fontWeight: 600 }}>
+              <li
+                className="breadcrumb-item active d-flex align-items-center"
+                aria-current="page"
+              >
+                <span
+                  style={{
+                    color: "#97247E",
+                    fontSize: "0.875rem",
+                    fontWeight: 600,
+                  }}
+                >
                   Create Review
                 </span>
               </li>
             </ol>
           </nav>
-         
         </div>
 
         {/* ERROR ALERT */}
@@ -230,7 +248,10 @@ export default function CreateManagerReview() {
               <strong className="fm-alert-title">Error</strong>
               <p className="fm-alert-text">{error}</p>
             </div>
-            <button className="btn-close fm-close" onClick={() => setError("")} />
+            <button
+              className="btn-close fm-close"
+              onClick={() => setError("")}
+            />
           </div>
         )}
 
@@ -239,7 +260,10 @@ export default function CreateManagerReview() {
           <div className="alert fm-alert fm-alert-success">
             <CheckCircle size={18} className="flex-shrink-0" />
             <div className="small flex-grow-1">{success}</div>
-            <button className="btn-close fm-close" onClick={() => setSuccess("")} />
+            <button
+              className="btn-close fm-close"
+              onClick={() => setSuccess("")}
+            />
           </div>
         )}
 
@@ -252,29 +276,57 @@ export default function CreateManagerReview() {
                 <label className="form-label fm-label">
                   Select Employee <span className="text-danger">*</span>
                 </label>
-                <select
-                  className="form-select fm-select"
-                  value={form.targetEmployeeId}
-                  onChange={(e) =>
-                    setForm((prev) => ({
-                      ...prev,
-                      targetEmployeeId: e.target.value,
-                    }))
-                  }
-                  required
-                  disabled={loadingEmployees}
-                >
-                  <option value="">
-                    {loadingEmployees
-                      ? "Loading employees..."
-                      : "-- Choose an employee --"}
-                  </option>
-                  {employees.map(({ employeeId, firstName, lastName, email }) => (
-                    <option key={employeeId} value={employeeId}>
-                      {firstName} {lastName} {email ? `(${email})` : ""}
-                    </option>
-                  ))}
-                </select>
+
+                <div className="fm-dropdown">
+                  <button
+                    type="button"
+                    className={`fm-dropdown-trigger ${
+                      openEmployeeDropdown ? "open" : ""
+                    }`}
+                    onClick={() =>
+                      !loadingEmployees &&
+                      setOpenEmployeeDropdown((prev) => !prev)
+                    }
+                    disabled={loadingEmployees}
+                  >
+                    <span className="fm-dropdown-placeholder">
+                      {selectedEmployeeLabel}
+                    </span>
+                    <span className="fm-dropdown-arrow">▾</span>
+                  </button>
+
+                  {openEmployeeDropdown && (
+                    <div className="fm-dropdown-menu">
+                      {employees.map(
+                        ({ employeeId, firstName, lastName, email }) => {
+                          const label = `${firstName} ${lastName}${
+                            email ? ` (${email})` : ""
+                          }`;
+                          const isSelected =
+                            String(employeeId) ===
+                            String(form.targetEmployeeId);
+                          return (
+                            <div
+                              key={employeeId}
+                              className={`fm-dropdown-item ${
+                                isSelected ? "selected" : ""
+                              }`}
+                              onClick={() => {
+                                setForm((prev) => ({
+                                  ...prev,
+                                  targetEmployeeId: employeeId,
+                                }));
+                                setOpenEmployeeDropdown(false);
+                              }}
+                            >
+                              {label}
+                            </div>
+                          );
+                        }
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* SELECTED EMPLOYEE INFO */}
@@ -284,12 +336,11 @@ export default function CreateManagerReview() {
                     <strong>Reviewing:</strong> {selectedEmployee.firstName}{" "}
                     {selectedEmployee.lastName}
                     <br />
-                    
                   </div>
                 </div>
               )}
 
-              {/* RATING BUTTONS */}
+              {/* RATING */}
               <div className="col-12">
                 <label className="form-label fm-label mb-2">
                   Rating <span className="text-danger">*</span>
@@ -302,7 +353,9 @@ export default function CreateManagerReview() {
                       className={`btn fm-rating-btn ${
                         form.rating === rating ? "active" : ""
                       }`}
-                      onClick={() => setForm((prev) => ({ ...prev, rating }))}
+                      onClick={() =>
+                        setForm((prev) => ({ ...prev, rating }))
+                      }
                     >
                       <div className="fm-rating-content">
                         <div className="fw-bold">{rating}</div>
@@ -339,7 +392,8 @@ export default function CreateManagerReview() {
               {/* PROJECT CONTEXT */}
               <div className="col-12">
                 <label className="form-label fm-label">
-                  Project Context <span className="text-muted">(Optional)</span>
+                  Project Context{" "}
+                  <span className="text-muted">(Optional)</span>
                 </label>
                 <textarea
                   className="form-control fm-textarea"
@@ -398,13 +452,15 @@ export default function CreateManagerReview() {
       </div>
 
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
         .fm-page {
           min-height: 100vh;
           display: flex;
           justify-content: center;
           align-items: start;
           padding: 3rem 0;
-          font-family: var(--font-sans);
+          font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
           color: var(--color-gray-9);
         }
 
@@ -421,19 +477,6 @@ export default function CreateManagerReview() {
           margin-bottom: 1.5rem;
         }
 
-        .fm-title {
-          margin: 0 0 0.25rem 0;
-          font-weight: 700;
-          font-size: 1.5rem;
-          color: var(--color-primary-1);
-        }
-
-        .fm-subtitle {
-          margin: 0;
-          font-size: 0.85rem;
-          color: var(--color-gray-6);
-        }
-
         .fm-card {
           border: 1px solid var(--color-gray-2);
           border-radius: 16px;
@@ -445,11 +488,19 @@ export default function CreateManagerReview() {
           padding: 1.5rem;
         }
 
+        /* ensure all labels are left aligned */
         .fm-label {
           font-size: 0.85rem;
           font-weight: 600;
           color: var(--color-primary-1);
-          text-align:left;
+          display: block;
+          text-align: left;
+          margin-bottom: 0.35rem;
+        }
+
+        .form-label.fm-label {
+          text-align: left !important;
+          width: 100%;
         }
 
         .fm-select,
@@ -459,41 +510,12 @@ export default function CreateManagerReview() {
           background: var(--color-white);
           color: var(--color-gray-9);
           transition: border-color 0.2s ease, box-shadow 0.2s ease;
+          font-family: 'Poppins', system-ui, sans-serif;
         }
 
-        
-.fm-select {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%23475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>') no-repeat right 1rem center;
-  background-color: #fff;
-  padding-right: 2.5rem;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 10px;
-  font-size: 0.938rem;
-  cursor: pointer;
-}
-
-.fm-select:focus {
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%2327235C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
-}
-
-
-
-
-
-
-        .fm-select:focus,
         .fm-textarea:focus {
           border-color: var(--color-primary-3);
           box-shadow: 0 0 0 4px rgba(151,36,126,0.12);
-        }
-
-        .fm-select:disabled {
-          background: var(--color-gray-1);
-          color: var(--color-gray-5);
-          cursor: not-allowed;
         }
 
         .fm-info {
@@ -502,7 +524,7 @@ export default function CreateManagerReview() {
           background: rgba(12, 80, 255, 0.06);
           border: 1px solid var(--color-accent-5);
           color: var(--color-gray-8);
-          text-align: left
+          text-align: left;
         }
 
         .fm-alert {
@@ -512,6 +534,7 @@ export default function CreateManagerReview() {
           padding: 0.75rem 1rem;
           border-radius: 12px;
           border: 1px solid transparent;
+          font-family: 'Poppins', system-ui, sans-serif;
         }
 
         .fm-alert-title {
@@ -541,15 +564,6 @@ export default function CreateManagerReview() {
           filter: grayscale(40%);
         }
 
-        .fm-back-btn {
-          border-radius: 12px;
-          height: 36px;
-          width: 36px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-        }
-
         .fm-btn-primary {
           border-radius: 12px;
           min-width: 160px;
@@ -559,9 +573,8 @@ export default function CreateManagerReview() {
           border: none;
           box-shadow: 0 6px 16px rgba(224, 25, 80, 0.18);
           transition: transform 0.05s ease, box-shadow 0.2s ease;
+          font-family: 'Poppins', system-ui, sans-serif;
         }
-
-        
 
         .fm-btn-primary:disabled {
           opacity: 0.7;
@@ -572,14 +585,11 @@ export default function CreateManagerReview() {
           box-shadow: 0 10px 24px rgba(224, 25, 80, 0.24);
         }
 
-       
-
         .fm-btn-primary:active {
           transform: translateY(1px);
         }
 
-        .fm-btn-outline,
-        .fm-btn-outline.fm-back-btn {
+        .fm-btn-outline {
           border-radius: 12px;
           min-width: 120px;
           font-weight: 600;
@@ -587,6 +597,7 @@ export default function CreateManagerReview() {
           background: var(--color-white);
           border: 1px solid var(--color-primary-3);
           transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+          font-family: 'Poppins', system-ui, sans-serif;
         }
 
         .fm-btn-outline:hover {
@@ -603,17 +614,16 @@ export default function CreateManagerReview() {
           background: var(--color-white);
           color: var(--color-gray-8);
           transition: all 0.2s ease;
+          font-family: 'Poppins', system-ui, sans-serif;
         }
 
         .fm-rating-btn:hover {
-          border: 1px solid #23257c
+          border: 1px solid #23257c;
         }
 
         .fm-rating-btn.active {
-        
           color: var(--color-white);
           background: var(--color-primary-1);
-          
         }
 
         .fm-rating-content {
@@ -626,6 +636,117 @@ export default function CreateManagerReview() {
           margin-top: 0.25rem;
           font-size: 0.75rem;
           color: var(--color-gray-6);
+        }
+
+        /* DROPDOWN */
+
+        .fm-dropdown {
+          position: relative;
+          width: 100%;
+          font-size: 0.875rem;
+        }
+
+        .fm-dropdown-trigger {
+          width: 100%;
+          border-radius: 10px;
+          padding: 0.75rem 1rem;
+          border: 1.5px solid #e2e8f0;
+          background-color: #ffffff;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          cursor: pointer;
+          color: #111827;
+          font-weight: 500;
+          transition: border-color 0.15s ease, box-shadow 0.15s ease,
+            background-color 0.15s ease;
+          font-family: 'Poppins', system-ui, sans-serif;
+        }
+
+        .fm-dropdown-trigger:hover {
+          border-color: #27235c;
+        }
+
+        .fm-dropdown-trigger.open {
+          border-color: #27235c;
+          box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.18);
+        }
+
+        .fm-dropdown-trigger:disabled {
+          background-color: #f1f5f9;
+          color: #9ca3af;
+          cursor: not-allowed;
+        }
+
+        .fm-dropdown-placeholder {
+          color: #475569;
+          font-weight: 500;
+          text-align: left;
+          flex: 1 1 auto;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .fm-dropdown-arrow {
+          font-size: 0.75rem;
+          color: #6b7280;
+          margin-left: 0.75rem;
+        }
+
+        .fm-dropdown-menu {
+          position: absolute;
+          top: calc(100% + 4px);
+          left: 0;
+          right: 0;
+          background-color: #ffffff;
+          border-radius: 12px;
+          box-shadow: 0 18px 40px rgba(15, 23, 42, 0.24);
+          border: 1px solid #e5e7eb;
+          z-index: 40;
+          max-height: 360px;
+          overflow-y: auto;
+        }
+
+        .fm-dropdown-item {
+          padding: 0.9rem 1rem;
+          font-size: 0.9rem;
+          color: #111827;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          background-color: #ffffff;
+          transition: background-color 0.12s ease, color 0.12s ease;
+          border-bottom: 1px solid #f1f5f9;
+          font-family: 'Poppins', system-ui, sans-serif;
+        }
+
+        .fm-dropdown-item:last-child {
+          border-bottom: none;
+        }
+
+        .fm-dropdown-item:hover {
+          background-color: #27235c;
+          color: #ffffff;
+        }
+
+        .fm-dropdown-item.selected {
+          background-color: #27235c;
+          color: #ffffff;
+        }
+
+        .fm-dropdown-menu::-webkit-scrollbar {
+          width: 8px;
+        }
+
+        .fm-dropdown-menu::-webkit-scrollbar-track {
+          background: #f3f4f6;
+          border-radius: 999px;
+        }
+
+        .fm-dropdown-menu::-webkit-scrollbar-thumb {
+          background: #27235c;
+          border-radius: 999px;
         }
       `}</style>
     </div>

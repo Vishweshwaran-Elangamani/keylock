@@ -1,8 +1,17 @@
 import React, { useEffect, useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
-import { X, Search, ChevronLeft, ChevronRight, AlertCircle, CheckCircle, UserCog, Info, ChevronDown } from 'lucide-react';
+import {
+  X,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  AlertCircle,
+  CheckCircle,
+  UserCog,
+  Info,
+  ChevronDown,
+} from 'lucide-react';
 
-// Custom Dropdown Component
 const CustomDropdown = ({ value, onChange, options, placeholder }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -14,8 +23,8 @@ const CustomDropdown = ({ value, onChange, options, placeholder }) => {
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const handleSelect = (optionValue) => {
@@ -24,12 +33,15 @@ const CustomDropdown = ({ value, onChange, options, placeholder }) => {
   };
 
   const getDisplayValue = () => {
-    if (!value || value === 'All') return placeholder || "Select";
+    if (!value || value === 'All') return placeholder || 'Select';
     return value;
   };
 
   return (
-    <div style={{ position: 'relative', fontFamily: 'Poppins, sans-serif' }} ref={dropdownRef}>
+    <div
+      style={{ position: 'relative', fontFamily: 'Poppins, sans-serif' }}
+      ref={dropdownRef}
+    >
       <div
         style={{
           display: 'flex',
@@ -46,53 +58,57 @@ const CustomDropdown = ({ value, onChange, options, placeholder }) => {
           outline: 'none',
           userSelect: 'none',
           boxShadow: isOpen ? '0 0 0 3px rgba(39, 35, 92, 0.1)' : 'none',
-          fontFamily: 'Poppins, sans-serif'
+          fontFamily: 'Poppins, sans-serif',
         }}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span style={{
-          flex: 1,
-          textAlign: 'left',
-          color: value && value !== 'All' ? '#393939' : '#8D8D8D',
-          fontWeight: 400,
-          background: 'transparent',
-          cursor: 'pointer',
-          fontFamily: 'Poppins, sans-serif'
-        }}>
+        <span
+          style={{
+            flex: 1,
+            textAlign: 'left',
+            color: value && value !== 'All' ? '#393939' : '#8D8D8D',
+            fontWeight: 400,
+            background: 'transparent',
+            cursor: 'pointer',
+            fontFamily: 'Poppins, sans-serif',
+          }}
+        >
           {getDisplayValue()}
         </span>
-        <ChevronDown 
-          size={16} 
+        <ChevronDown
+          size={16}
           style={{
             color: isOpen ? '#27235C' : '#6c757d',
             transition: 'all 0.2s ease',
             transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
             flexShrink: 0,
             marginLeft: '0.5rem',
-            cursor: 'pointer'
+            cursor: 'pointer',
           }}
         />
       </div>
       {isOpen && (
-        <ul style={{
-          position: 'absolute',
-          top: '100%',
-          left: 0,
-          right: 0,
-          background: '#FFFFFF',
-          border: '1px solid #27235C',
-          borderTop: 'none',
-          borderRadius: '0 0 8px 8px',
-          boxShadow: '0 8px 16px rgba(0, 0, 0, 0.15)',
-          maxHeight: '220px',
-          overflowY: 'auto',
-          zIndex: 10000,
-          listStyle: 'none',
-          margin: 0,
-          padding: 0,
-          animation: 'dropdownFadeIn 0.2s ease',
-          fontFamily: 'Poppins, sans-serif'
-        }}>
+        <ul
+          style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            background: '#FFFFFF',
+            border: '1px solid #27235C',
+            borderTop: 'none',
+            borderRadius: '0 0 8px 8px',
+            boxShadow: '0 8px 16px rgba(0, 0, 0, 0.15)',
+            maxHeight: '220px',
+            overflowY: 'auto',
+            zIndex: 10000,
+            listStyle: 'none',
+            margin: 0,
+            padding: 0,
+            animation: 'dropdownFadeIn 0.2s ease',
+            fontFamily: 'Poppins, sans-serif',
+          }}
+        >
           {options.map((opt, idx) => {
             const optValue = opt.value || opt;
             const optLabel = opt.label || opt;
@@ -105,11 +121,12 @@ const CustomDropdown = ({ value, onChange, options, placeholder }) => {
                   color: value === optValue ? '#FFFFFF' : '#393939',
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
-                  borderBottom: idx === options.length - 1 ? 'none' : '1px solid #f0f0f0',
+                  borderBottom:
+                    idx === options.length - 1 ? 'none' : '1px solid #f0f0f0',
                   background: value === optValue ? '#27235C' : '#FFFFFF',
                   fontWeight: value === optValue ? 600 : 400,
                   borderRadius: idx === options.length - 1 ? '0 0 7px 7px' : '0',
-                  fontFamily: 'Poppins, sans-serif'
+                  fontFamily: 'Poppins, sans-serif',
                 }}
                 onClick={() => handleSelect(optValue)}
                 onMouseEnter={(e) => {
@@ -163,8 +180,11 @@ const ManagerSelectionModal = ({
   onUpdate,
   isSubmitting,
   message,
+  // pagination
+  itemsPerPage,
+  onPageSizeChange,
+  totalItems,
 }) => {
-  // Prevent body scroll when modal is open
   useEffect(() => {
     if (show) {
       document.body.style.overflow = 'hidden';
@@ -176,20 +196,22 @@ const ManagerSelectionModal = ({
     };
   }, [show]);
 
-  // Search handlers
+  // UPDATED search handlers (same behavior as other pages)
   const handleSearch = () => {
-    setActiveSearchTerm(searchTerm);
+    if (!searchTerm.trim()) return;
+    setActiveSearchTerm(searchTerm.trim());
+  };
+
+  const handleCancelSearch = () => {
+    setSearchTerm('');
+    setActiveSearchTerm('');
   };
 
   const handleSearchKeyPress = (e) => {
     if (e.key === 'Enter') {
+      e.preventDefault();
       handleSearch();
     }
-  };
-
-  const handleClearSearch = () => {
-    setSearchTerm('');
-    setActiveSearchTerm('');
   };
 
   if (!show) return null;
@@ -209,22 +231,22 @@ const ManagerSelectionModal = ({
   const roleOptions = ['All', ...uniqueRoles];
   const departmentOptions = ['All', ...uniqueDepartments];
 
+  const safeTotal =
+    typeof totalItems === 'number' ? totalItems : paginatedManagers.length;
+  const perPage = itemsPerPage || paginatedManagers.length || 1;
+  const startIndex = safeTotal === 0 ? 0 : (currentPage - 1) * perPage + 1;
+  const endIndex =
+    safeTotal === 0 ? 0 : Math.min(currentPage * perPage, safeTotal);
+
   const modalContent = (
     <>
       <style>
         {`
           @keyframes dropdownFadeIn {
-            from {
-              opacity: 0;
-              transform: translateY(-8px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
           }
-          
-          /* Custom Radio Button Styles - Smaller & Perfect Circle */
+
           .custom-radio {
             appearance: none;
             -webkit-appearance: none;
@@ -244,39 +266,36 @@ const ManagerSelectionModal = ({
             display: inline-block;
             vertical-align: middle;
           }
-          
-          .custom-radio:hover {
-            border-color: #524F7D;
-          }
-          
+
+          .custom-radio:hover { border-color: #524F7D; }
+
           .custom-radio:checked {
             border-color: #27235C;
             background-color: #27235C;
             box-shadow: inset 0 0 0 2.5px #FFFFFF;
           }
-          
-          .custom-radio:focus {
-            outline: none;
-          }
+
+          .custom-radio:focus { outline: none; }
         `}
       </style>
+
       {/* Backdrop */}
-      <div 
-        style={{ 
+      <div
+        style={{
           position: 'fixed',
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
           backgroundColor: 'rgba(0, 0, 0, 0.7)',
-          zIndex: 10000
+          zIndex: 10000,
         }}
         onClick={onClose}
       />
 
       {/* Modal Container */}
       <div
-        style={{ 
+        style={{
           position: 'fixed',
           top: '50%',
           left: '50%',
@@ -285,11 +304,11 @@ const ManagerSelectionModal = ({
           width: '950px',
           maxWidth: '90vw',
           maxHeight: '85vh',
-          fontFamily: 'Poppins, sans-serif'
+          fontFamily: 'Poppins, sans-serif',
         }}
       >
-        <div 
-          style={{ 
+        <div
+          style={{
             borderRadius: '12px',
             border: 'none',
             boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4)',
@@ -298,12 +317,12 @@ const ManagerSelectionModal = ({
             display: 'flex',
             flexDirection: 'column',
             backgroundColor: 'white',
-            fontFamily: 'Poppins, sans-serif'
+            fontFamily: 'Poppins, sans-serif',
           }}
         >
           {/* Header */}
-          <div 
-            style={{ 
+          <div
+            style={{
               backgroundColor: '#25235c',
               borderBottom: 'none',
               padding: '1.25rem 1.5rem',
@@ -312,19 +331,21 @@ const ManagerSelectionModal = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              fontFamily: 'Poppins, sans-serif'
+              fontFamily: 'Poppins, sans-serif',
             }}
           >
-            <h5 style={{ 
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              margin: 0,
-              fontSize: '1.1rem',
-              fontWeight: 600,
-              color: 'white',
-              fontFamily: 'Poppins, sans-serif'
-            }}>
+            <h5
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                margin: 0,
+                fontSize: '1.1rem',
+                fontWeight: 600,
+                color: 'white',
+                fontFamily: 'Poppins, sans-serif',
+              }}
+            >
               <UserCog size={20} style={{ color: 'white' }} />
               <span>Edit Reporting Managers - {project?.projectName}</span>
             </h5>
@@ -341,41 +362,43 @@ const ManagerSelectionModal = ({
                 cursor: 'pointer',
                 padding: '0.25rem',
                 lineHeight: 1,
-                opacity: 0.9
+                opacity: 0.9,
               }}
             >
               <X size={22} />
             </button>
           </div>
 
-          <div 
-            style={{ 
-              padding: '1.25rem 1.5rem', 
+          {/* Body */}
+          <div
+            style={{
+              padding: '1.25rem 1.5rem',
               backgroundColor: '#f8f9fa',
               overflowY: 'auto',
               flex: 1,
-              fontFamily: 'Poppins, sans-serif'
+              fontFamily: 'Poppins, sans-serif',
             }}
           >
             {message && (
               <div
                 className={`alert alert-${
-                  message.type === "success" ? "success" : "danger"
+                  message.type === 'success' ? 'success' : 'danger'
                 } d-flex align-items-center gap-2 mb-3`}
                 style={{
                   borderRadius: '8px',
                   border: 'none',
                   padding: '0.75rem 1rem',
                   fontSize: '0.875rem',
-                  backgroundColor: message.type === 'success' 
-                    ? 'rgba(36, 161, 72, 0.1)' 
-                    : 'rgba(224, 25, 80, 0.1)',
+                  backgroundColor:
+                    message.type === 'success'
+                      ? 'rgba(36, 161, 72, 0.1)'
+                      : 'rgba(224, 25, 80, 0.1)',
                   color: message.type === 'success' ? '#24A148' : '#E01950',
                   textAlign: 'left',
-                  fontFamily: 'Poppins, sans-serif'
+                  fontFamily: 'Poppins, sans-serif',
                 }}
               >
-                {message.type === "success" ? (
+                {message.type === 'success' ? (
                   <CheckCircle size={18} />
                 ) : (
                   <AlertCircle size={18} />
@@ -384,39 +407,50 @@ const ManagerSelectionModal = ({
               </div>
             )}
 
-            {/* Manager Tabs */}
-            <ul 
-              className="nav nav-pills mb-3" 
-              style={{ 
+            {/* Tabs */}
+            <ul
+              className="nav nav-pills mb-3"
+              style={{
                 borderBottom: 'none',
                 gap: '0.5rem',
-                fontFamily: 'Poppins, sans-serif'
+                fontFamily: 'Poppins, sans-serif',
               }}
             >
               <li className="nav-item">
                 <button
-                  className={`nav-link ${activeTab === "resource" ? "active" : ""}`}
-                  onClick={() => setActiveTab("resource")}
-                  style={{ 
-                    fontSize: '0.875rem', 
+                  className={`nav-link ${
+                    activeTab === 'resource' ? 'active' : ''
+                  }`}
+                  onClick={() => setActiveTab('resource')}
+                  style={{
+                    fontSize: '0.875rem',
                     fontWeight: 600,
                     borderRadius: '8px',
                     padding: '0.5rem 1rem',
-                    backgroundColor: activeTab === 'resource' ? 'var(--color-primary-1)' : 'white',
+                    backgroundColor:
+                      activeTab === 'resource'
+                        ? 'var(--color-primary-1)'
+                        : 'white',
                     color: activeTab === 'resource' ? 'white' : '#6b7280',
-                    border: activeTab === 'resource' ? 'none' : '1px solid #d1d5db',
+                    border:
+                      activeTab === 'resource'
+                        ? 'none'
+                        : '1px solid #d1d5db',
                     transition: 'all 0.2s ease',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.4rem',
-                    fontFamily: 'Poppins, sans-serif'
+                    fontFamily: 'Poppins, sans-serif',
                   }}
                 >
-                  Resource Owner{" "}
+                  Resource Owner{' '}
                   {selectedResourceOwner && (
-                    <span 
-                      style={{ 
-                        backgroundColor: activeTab === 'resource' ? 'rgba(255,255,255,0.3)' : '#10b981',
+                    <span
+                      style={{
+                        backgroundColor:
+                          activeTab === 'resource'
+                            ? 'rgba(255,255,255,0.3)'
+                            : '#10b981',
                         color: 'white',
                         fontSize: '0.65rem',
                         borderRadius: '50%',
@@ -424,7 +458,7 @@ const ManagerSelectionModal = ({
                         height: '16px',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
                       }}
                     >
                       <CheckCircle size={10} />
@@ -434,28 +468,33 @@ const ManagerSelectionModal = ({
               </li>
               <li className="nav-item">
                 <button
-                  className={`nav-link ${activeTab === "l1" ? "active" : ""}`}
-                  onClick={() => setActiveTab("l1")}
-                  style={{ 
-                    fontSize: '0.875rem', 
+                  className={`nav-link ${activeTab === 'l1' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('l1')}
+                  style={{
+                    fontSize: '0.875rem',
                     fontWeight: 600,
                     borderRadius: '8px',
                     padding: '0.5rem 1rem',
-                    backgroundColor: activeTab === 'l1' ? 'var(--color-primary-1)' : 'white',
+                    backgroundColor:
+                      activeTab === 'l1' ? 'var(--color-primary-1)' : 'white',
                     color: activeTab === 'l1' ? 'white' : '#6b7280',
-                    border: activeTab === 'l1' ? 'none' : '1px solid #d1d5db',
+                    border:
+                      activeTab === 'l1' ? 'none' : '1px solid #d1d5db',
                     transition: 'all 0.2s ease',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.4rem',
-                    fontFamily: 'Poppins, sans-serif'
+                    fontFamily: 'Poppins, sans-serif',
                   }}
                 >
-                  L1 Approver{" "}
+                  L1 Approver{' '}
                   {selectedL1Approver && (
-                    <span 
-                      style={{ 
-                        backgroundColor: activeTab === 'l1' ? 'rgba(255,255,255,0.3)' : '#10b981',
+                    <span
+                      style={{
+                        backgroundColor:
+                          activeTab === 'l1'
+                            ? 'rgba(255,255,255,0.3)'
+                            : '#10b981',
                         color: 'white',
                         fontSize: '0.65rem',
                         borderRadius: '50%',
@@ -463,7 +502,7 @@ const ManagerSelectionModal = ({
                         height: '16px',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
                       }}
                     >
                       <CheckCircle size={10} />
@@ -473,28 +512,33 @@ const ManagerSelectionModal = ({
               </li>
               <li className="nav-item">
                 <button
-                  className={`nav-link ${activeTab === "l2" ? "active" : ""}`}
-                  onClick={() => setActiveTab("l2")}
-                  style={{ 
-                    fontSize: '0.875rem', 
+                  className={`nav-link ${activeTab === 'l2' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('l2')}
+                  style={{
+                    fontSize: '0.875rem',
                     fontWeight: 600,
                     borderRadius: '8px',
                     padding: '0.5rem 1rem',
-                    backgroundColor: activeTab === 'l2' ? 'var(--color-primary-1)' : 'white',
+                    backgroundColor:
+                      activeTab === 'l2' ? 'var(--color-primary-1)' : 'white',
                     color: activeTab === 'l2' ? 'white' : '#6b7280',
-                    border: activeTab === 'l2' ? 'none' : '1px solid #d1d5db',
+                    border:
+                      activeTab === 'l2' ? 'none' : '1px solid #d1d5db',
                     transition: 'all 0.2s ease',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.4rem',
-                    fontFamily: 'Poppins, sans-serif'
+                    fontFamily: 'Poppins, sans-serif',
                   }}
                 >
-                  L2 Approver{" "}
+                  L2 Approver{' '}
                   {selectedL2Approver && (
-                    <span 
-                      style={{ 
-                        backgroundColor: activeTab === 'l2' ? 'rgba(255,255,255,0.3)' : '#10b981',
+                    <span
+                      style={{
+                        backgroundColor:
+                          activeTab === 'l2'
+                            ? 'rgba(255,255,255,0.3)'
+                            : '#10b981',
                         color: 'white',
                         fontSize: '0.65rem',
                         borderRadius: '50%',
@@ -502,7 +546,7 @@ const ManagerSelectionModal = ({
                         height: '16px',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
                       }}
                     >
                       <CheckCircle size={10} />
@@ -512,7 +556,7 @@ const ManagerSelectionModal = ({
               </li>
             </ul>
 
-            {/* Current Selection Display */}
+            {/* Current Selection */}
             <div
               className="alert alert-info d-flex align-items-start gap-2 mb-3"
               style={{
@@ -522,48 +566,69 @@ const ManagerSelectionModal = ({
                 backgroundColor: 'rgba(13, 110, 253, 0.1)',
                 color: '#084298',
                 textAlign: 'left',
-                fontFamily: 'Poppins, sans-serif'
+                fontFamily: 'Poppins, sans-serif',
               }}
             >
               <Info size={18} className="flex-shrink-0 mt-1" />
               <div style={{ textAlign: 'left' }}>
-                <strong style={{ fontSize: '0.875rem', fontFamily: 'Poppins, sans-serif' }}>Current Selection:</strong>
+                <strong
+                  style={{
+                    fontSize: '0.875rem',
+                    fontFamily: 'Poppins, sans-serif',
+                  }}
+                >
+                  Current Selection:
+                </strong>
                 <div className="mt-1">
                   {getSelectedManager() ? (
-                    <span 
-                      className="badge" 
-                      style={{ 
-                        fontSize: '0.8rem', 
+                    <span
+                      className="badge"
+                      style={{
+                        fontSize: '0.8rem',
                         padding: '0.4rem 0.65rem',
                         backgroundColor: '#10b981',
                         color: 'white',
-                        fontFamily: 'Poppins, sans-serif'
+                        fontFamily: 'Poppins, sans-serif',
                       }}
                     >
-                      {getSelectedManager().firstName}{" "}
-                      {getSelectedManager().lastName} -{" "}
+                      {getSelectedManager().firstName}{' '}
+                      {getSelectedManager().lastName} -{' '}
                       {getSelectedManager().roleName}
                     </span>
                   ) : (
-                    <span className="text-muted" style={{ fontSize: '0.8rem', fontFamily: 'Poppins, sans-serif' }}>None selected</span>
+                    <span
+                      className="text-muted"
+                      style={{
+                        fontSize: '0.8rem',
+                        fontFamily: 'Poppins, sans-serif',
+                      }}
+                    >
+                      None selected
+                    </span>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Filters with Search Button and Clear Icon */}
+            {/* Search + Filters */}
             <div className="row g-2 mb-3">
               <div className="col-md-6">
-                <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                  <Search 
-                    size={16} 
-                    style={{ 
+                <div
+                  style={{
+                    position: 'relative',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Search
+                    size={16}
+                    style={{
                       position: 'absolute',
                       left: '0.875rem',
                       color: '#6b7280',
                       pointerEvents: 'none',
-                      zIndex: 2
-                    }} 
+                      zIndex: 2,
+                    }}
                   />
                   <input
                     type="text"
@@ -572,85 +637,92 @@ const ManagerSelectionModal = ({
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     onKeyPress={handleSearchKeyPress}
-                    style={{ 
+                    style={{
                       fontSize: '0.875rem',
                       border: '1px solid #d1d5db',
                       padding: '0.5rem 0.75rem 0.5rem 2.5rem',
                       borderRadius: '8px',
                       width: '100%',
-                      paddingRight: activeSearchTerm ? '130px' : '90px',
-                      fontFamily: 'Poppins, sans-serif'
+                      paddingRight: '7.5rem',
+                      fontFamily: 'Poppins, sans-serif',
                     }}
                   />
-                  {/* Clear Icon */}
-                  {activeSearchTerm && (
-                    <button
-                      type="button"
-                      onClick={handleClearSearch}
-                      style={{
-                        position: 'absolute',
-                        right: '85px',
-                        background: 'transparent',
-                        border: 'none',
-                        color: '#dc3545',
-                        cursor: 'pointer',
-                        padding: 0,
-                        width: '20px',
-                        height: '20px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 2,
-                        transition: 'all 0.2s ease'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.color = '#c82333';
-                        e.currentTarget.style.transform = 'scale(1.2)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.color = '#dc3545';
-                        e.currentTarget.style.transform = 'scale(1)';
-                      }}
-                      title="Clear search"
-                    >
-                      <X size={18} style={{ strokeWidth: 2.5 }} />
-                    </button>
-                  )}
-                  {/* Search Button */}
-                  <button
-                    type="button"
-                    onClick={handleSearch}
-                    style={{
-                      position: 'absolute',
-                      right: '4px',
-                      background: '#5A5486',
-                      border: 'none',
-                      color: 'white',
-                      borderRadius: '6px',
-                      padding: '0.4rem 0.75rem',
-                      fontSize: '0.8rem',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.4rem',
-                      zIndex: 1,
-                      transition: 'all 0.2s ease',
-                      whiteSpace: 'nowrap',
-                      fontFamily: 'Poppins, sans-serif'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = '#4A4076';
-                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(90, 84, 134, 0.3)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = '#5A5486';
-                      e.currentTarget.style.boxShadow = 'none';
-                    }}
-                  >
-                    <Search size={14} />
-                    Search
-                  </button>
+
+                  {/* Search / Cancel button – same style as other pages */}
+                 {activeSearchTerm ? (
+  <button
+    type="button"
+    onClick={handleCancelSearch}
+    style={{
+      position: 'absolute',
+      right: '3px',
+      top: '3px',
+      bottom: '3px',
+      background: '#6b7280',
+      border: '1px solid #6b7280',
+      color: 'white',
+      borderRadius: '0 8px 8px 0',
+      padding: '0 1rem',
+      fontSize: '0.8rem',
+      fontWeight: 600,
+      cursor: 'pointer',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.4rem',
+      zIndex: 1,
+      transition: 'all 0.2s ease',
+      whiteSpace: 'nowrap',
+      fontFamily: 'Poppins, sans-serif',
+    }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.background = '#4b5563';
+      e.currentTarget.style.borderColor = '#4b5563';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.background = '#6b7280';
+      e.currentTarget.style.borderColor = '#6b7280';
+    }}
+  >
+    <X size={14} />
+    Cancel
+  </button>
+) : (
+  <button
+    type="button"
+    onClick={handleSearch}
+    style={{
+      position: 'absolute',
+      right: '3px',
+      top: '3px',
+      bottom: '3px',
+      background: '#252267',
+      border: 'none',
+      color: 'white',
+      borderRadius: '0 8px 8px 0',
+      padding: '0 1rem',
+      fontSize: '0.8rem',
+      fontWeight: 600,
+      cursor: 'pointer',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.4rem',
+      zIndex: 1,
+      transition: 'all 0.2s ease',
+      whiteSpace: 'nowrap',
+      fontFamily: 'Poppins, sans-serif',
+    }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.background = '#1f1b5a';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.background = '#252267';
+    }}
+  >
+    <Search size={14} />
+    Search
+  </button>
+)}
+
                 </div>
               </div>
               <div className="col-md-3">
@@ -674,33 +746,69 @@ const ManagerSelectionModal = ({
             {/* Manager List Table */}
             <div
               className="table-responsive"
-              style={{ 
-                minHeight: '300px', 
-                borderRadius: '8px', 
+              style={{
+                minHeight: '300px',
+                borderRadius: '8px',
                 border: '1px solid #e5e7eb',
-                backgroundColor: 'white'
+                backgroundColor: 'white',
               }}
             >
-              <table className="table table-hover mb-0" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                <thead 
-                  className="table-light" 
-                  style={{ 
-                    position: 'sticky', 
+              <table
+                className="table table-hover mb-0"
+                style={{ fontFamily: 'Poppins, sans-serif' }}
+              >
+                <thead
+                  className="table-light"
+                  style={{
+                    position: 'sticky',
                     top: 0,
-                    zIndex: 10
+                    zIndex: 10,
                   }}
                 >
                   <tr style={{ textAlign: 'left' }}>
-                    <th style={{ width: '50px', fontSize: '0.8rem', padding: '0.75rem', fontWeight: 600, textAlign: 'left', fontFamily: 'Poppins, sans-serif' }}>
+                    <th
+                      style={{
+                        width: '50px',
+                        fontSize: '0.8rem',
+                        padding: '0.75rem',
+                        fontWeight: 600,
+                        textAlign: 'left',
+                        fontFamily: 'Poppins, sans-serif',
+                      }}
+                    >
                       Select
                     </th>
-                    <th style={{ fontSize: '0.8rem', padding: '0.75rem', fontWeight: 600, textAlign: 'left', fontFamily: 'Poppins, sans-serif' }}>
+                    <th
+                      style={{
+                        fontSize: '0.8rem',
+                        padding: '0.75rem',
+                        fontWeight: 600,
+                        textAlign: 'left',
+                        fontFamily: 'Poppins, sans-serif',
+                      }}
+                    >
                       Employee Name
                     </th>
-                    <th style={{ fontSize: '0.8rem', padding: '0.75rem', fontWeight: 600, textAlign: 'left', fontFamily: 'Poppins, sans-serif' }}>
+                    <th
+                      style={{
+                        fontSize: '0.8rem',
+                        padding: '0.75rem',
+                        fontWeight: 600,
+                        textAlign: 'left',
+                        fontFamily: 'Poppins, sans-serif',
+                      }}
+                    >
                       Role
                     </th>
-                    <th style={{ fontSize: '0.8rem', padding: '0.75rem', fontWeight: 600, textAlign: 'left', fontFamily: 'Poppins, sans-serif' }}>
+                    <th
+                      style={{
+                        fontSize: '0.8rem',
+                        padding: '0.75rem',
+                        fontWeight: 600,
+                        textAlign: 'left',
+                        fontFamily: 'Poppins, sans-serif',
+                      }}
+                    >
                       Department
                     </th>
                   </tr>
@@ -711,45 +819,80 @@ const ManagerSelectionModal = ({
                       <td
                         colSpan="4"
                         className="text-center py-4 text-muted"
-                        style={{ fontSize: '0.875rem', fontFamily: 'Poppins, sans-serif' }}
+                        style={{
+                          fontSize: '0.875rem',
+                          fontFamily: 'Poppins, sans-serif',
+                        }}
                       >
-                        {activeSearchTerm ? 'No employees found matching your search' : 'No employees found'}
+                        {activeSearchTerm
+                          ? 'No employees found matching your search'
+                          : 'No employees found'}
                       </td>
                     </tr>
                   ) : (
                     paginatedManagers.map((emp) => {
-                      const isSelected = isManagerSelected(emp);
+                      const selected = isManagerSelected(emp);
                       return (
                         <tr
                           key={emp.employeeMasterId}
-                          className={isSelected ? 'table-active' : ''}
-                          style={{ 
+                          className={selected ? 'table-active' : ''}
+                          style={{
                             cursor: 'pointer',
-                            transition: 'background-color 0.15s ease'
+                            transition: 'background-color 0.15s ease',
                           }}
                           onClick={() => onManagerSelect(emp)}
                         >
-                          <td 
-                            onClick={(e) => e.stopPropagation()} 
-                            style={{ padding: '0.75rem', textAlign: 'left', verticalAlign: 'middle' }}
+                          <td
+                            onClick={(e) => e.stopPropagation()}
+                            style={{
+                              padding: '0.75rem',
+                              textAlign: 'left',
+                              verticalAlign: 'middle',
+                            }}
                           >
                             <input
                               type="radio"
                               className="custom-radio"
                               name={`manager-${activeTab}`}
-                              checked={isSelected}
+                              checked={selected}
                               onChange={() => onManagerSelect(emp)}
                             />
                           </td>
-                          <td style={{ fontSize: '0.875rem', padding: '0.75rem', textAlign: 'left', fontFamily: 'Poppins, sans-serif', verticalAlign: 'middle' }}>
+                          <td
+                            style={{
+                              fontSize: '0.875rem',
+                              padding: '0.75rem',
+                              textAlign: 'left',
+                              fontFamily: 'Poppins, sans-serif',
+                              verticalAlign: 'middle',
+                            }}
+                          >
                             <span style={{ fontWeight: 500 }}>
                               {emp.firstName} {emp.lastName}
                             </span>
                           </td>
-                          <td style={{ fontSize: '0.875rem', padding: '0.75rem', color: '#6b7280', textAlign: 'left', fontFamily: 'Poppins, sans-serif', verticalAlign: 'middle' }}>
+                          <td
+                            style={{
+                              fontSize: '0.875rem',
+                              padding: '0.75rem',
+                              color: '#6b7280',
+                              textAlign: 'left',
+                              fontFamily: 'Poppins, sans-serif',
+                              verticalAlign: 'middle',
+                            }}
+                          >
                             {emp.roleName}
                           </td>
-                          <td style={{ fontSize: '0.875rem', padding: '0.75rem', color: '#6b7280', textAlign: 'left', fontFamily: 'Poppins, sans-serif', verticalAlign: 'middle' }}>
+                          <td
+                            style={{
+                              fontSize: '0.875rem',
+                              padding: '0.75rem',
+                              color: '#6b7280',
+                              textAlign: 'left',
+                              fontFamily: 'Poppins, sans-serif',
+                              verticalAlign: 'middle',
+                            }}
+                          >
                             {emp.departmentName}
                           </td>
                         </tr>
@@ -760,47 +903,96 @@ const ManagerSelectionModal = ({
               </table>
             </div>
 
-            {/* Pagination */}
+            {/* Pagination – aligned like ProjectList */}
             {totalPages > 1 && (
-              <div className="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
-                <div className="text-muted" style={{ fontSize: '0.8rem', fontFamily: 'Poppins, sans-serif' }}>
-                  Page {currentPage} of {totalPages}
+              <div
+                className="prj-list-pagination-container mt-3 pt-2"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '1rem',
+                  flexWrap: 'wrap',
+                }}
+              >
+                {/* Left: page size */}
+                <div
+                  className="prj-list-pagination-left"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                  }}
+                >
+                  <span className="prj-list-pagination-label">Show</span>
+                  <select
+                    className="prj-list-page-size-select"
+                    value={itemsPerPage}
+                    onChange={(e) => onPageSizeChange(Number(e.target.value))}
+                    style={{ minWidth: '72px' }}
+                  >
+                    <option value={5}>5</option>
+                    <option value={10}>10</option>
+                    <option value={25}>25</option>
+                  </select>
+                  <span className="prj-list-pagination-label">entries</span>
                 </div>
-                <nav>
-                  <ul className="pagination mb-0" style={{ fontSize: '0.875rem', fontFamily: 'Poppins, sans-serif' }}>
+
+                {/* Center: status text */}
+                <div
+                  className="prj-list-pagination-center"
+                  style={{
+                    flex: 1,
+                    textAlign: 'center',
+                    minWidth: '180px',
+                  }}
+                >
+                  <span className="prj-list-pagination-status">
+                    Showing {startIndex} to {endIndex} of {safeTotal} entries
+                  </span>
+                </div>
+
+                {/* Right: page controls */}
+                <div
+                  className="prj-list-pagination-right"
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    minWidth: '140px',
+                  }}
+                >
+                  <ul className="prj-list-pagination-list">
                     <li
-                      className={`page-item ${
-                        currentPage === 1 ? "disabled" : ""
+                      className={`prj-list-page-item ${
+                        currentPage === 1 ? 'disabled' : ''
                       }`}
                     >
                       <button
-                        className="page-link"
+                        className="prj-list-page-link prj-list-page-arrow"
                         onClick={() => goToPage(currentPage - 1)}
                         disabled={currentPage === 1}
-                        style={{ borderRadius: '6px 0 0 6px', padding: '0.375rem 0.75rem', fontFamily: 'Poppins, sans-serif' }}
                       >
-                        <ChevronLeft size={14} />
+                        <ChevronLeft size={16} />
                       </button>
                     </li>
                     {getPageNumbers().map((page, index) =>
-                      page === "..." ? (
+                      page === '...' ? (
                         <li
                           key={`mgr-ellipsis-${index}`}
-                          className="page-item disabled"
+                          className="prj-list-page-ellipsis"
                         >
-                          <span className="page-link" style={{ padding: '0.375rem 0.75rem', fontFamily: 'Poppins, sans-serif' }}>...</span>
+                          <span className="prj-list-page-dots">...</span>
                         </li>
                       ) : (
                         <li
                           key={`mgr-${page}`}
-                          className={`page-item ${
-                            currentPage === page ? "active" : ""
+                          className={`prj-list-page-item ${
+                            currentPage === page ? 'active' : ''
                           }`}
                         >
                           <button
-                            className="page-link"
+                            className="prj-list-page-link"
                             onClick={() => goToPage(page)}
-                            style={{ padding: '0.375rem 0.75rem', fontFamily: 'Poppins, sans-serif' }}
                           >
                             {page}
                           </button>
@@ -808,28 +1000,27 @@ const ManagerSelectionModal = ({
                       )
                     )}
                     <li
-                      className={`page-item ${
-                        currentPage === totalPages ? "disabled" : ""
+                      className={`prj-list-page-item ${
+                        currentPage === totalPages ? 'disabled' : ''
                       }`}
                     >
                       <button
-                        className="page-link"
+                        className="prj-list-page-link prj-list-page-arrow"
                         onClick={() => goToPage(currentPage + 1)}
                         disabled={currentPage === totalPages}
-                        style={{ borderRadius: '0 6px 6px 0', padding: '0.375rem 0.75rem', fontFamily: 'Poppins, sans-serif' }}
                       >
-                        <ChevronRight size={14} />
+                        <ChevronRight size={16} />
                       </button>
                     </li>
                   </ul>
-                </nav>
+                </div>
               </div>
             )}
           </div>
 
           {/* Footer */}
-          <div 
-            style={{ 
+          <div
+            style={{
               padding: '1rem 1.5rem',
               borderTop: '1px solid #e5e7eb',
               backgroundColor: 'white',
@@ -837,13 +1028,13 @@ const ManagerSelectionModal = ({
               justifyContent: 'flex-end',
               gap: '0.75rem',
               flexShrink: 0,
-              fontFamily: 'Poppins, sans-serif'
+              fontFamily: 'Poppins, sans-serif',
             }}
           >
             <button
               type="button"
               onClick={onClose}
-              style={{ 
+              style={{
                 fontSize: '0.875rem',
                 fontWeight: 600,
                 padding: '0.5rem 1.25rem',
@@ -853,7 +1044,7 @@ const ManagerSelectionModal = ({
                 color: 'white',
                 transition: 'all 0.2s ease',
                 cursor: 'pointer',
-                fontFamily: 'Poppins, sans-serif'
+                fontFamily: 'Poppins, sans-serif',
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = '#4b5563';
@@ -868,7 +1059,7 @@ const ManagerSelectionModal = ({
               type="button"
               onClick={onUpdate}
               disabled={isSubmitting}
-              style={{ 
+              style={{
                 fontSize: '0.875rem',
                 fontWeight: 600,
                 padding: '0.5rem 1.5rem',
@@ -883,22 +1074,27 @@ const ManagerSelectionModal = ({
                 gap: '0.4rem',
                 opacity: isSubmitting ? 0.7 : 1,
                 cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                fontFamily: 'Poppins, sans-serif'
+                fontFamily: 'Poppins, sans-serif',
               }}
               onMouseEnter={(e) => {
                 if (!isSubmitting) {
                   e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(192, 38, 211, 0.4)';
+                  e.currentTarget.style.boxShadow =
+                    '0 6px 16px rgba(192, 38, 211, 0.4)';
                 }
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(192, 38, 211, 0.3)';
+                e.currentTarget.style.boxShadow =
+                  '0 4px 12px rgba(192, 38, 211, 0.3)';
               }}
             >
               {isSubmitting ? (
                 <>
-                  <span className="spinner-border spinner-border-sm" style={{ width: '14px', height: '14px' }} />
+                  <span
+                    className="spinner-border spinner-border-sm"
+                    style={{ width: '14px', height: '14px' }}
+                  />
                   Updating...
                 </>
               ) : (
@@ -914,7 +1110,6 @@ const ManagerSelectionModal = ({
     </>
   );
 
-  // Render using React Portal
   return ReactDOM.createPortal(modalContent, document.body);
 };
 

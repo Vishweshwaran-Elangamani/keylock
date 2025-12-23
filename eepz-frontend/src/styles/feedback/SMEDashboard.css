@@ -1,18 +1,8 @@
-/* ========================================
-   SME SLA DASHBOARD
-   All classes prefixed with sme-sla-
-   ======================================== */
-
-/* Wrapper */
 .sme-sla-wrapper {
   padding: 1.5rem 2rem !important;
   background-color: #f8f9fa;
   min-height: 100vh;
 }
-
-/* ========================================
-   BREADCRUMBS
-   ======================================== */
 
 .sme-sla-breadcrumb {
   font-size: 0.875rem !important;
@@ -39,10 +29,6 @@
   color: #7A1D66 !important;
   font-weight: 600 !important;
 }
-
-/* ========================================
-   PAGE HEADER
-   ======================================== */
 
 .sme-sla-page-title {
   font-size: 1.5rem !important;
@@ -105,10 +91,6 @@
   to { transform: rotate(360deg); }
 }
 
-/* ========================================
-   ERROR ALERT
-   ======================================== */
-
 .sme-sla-alert-error {
   border-radius: 8px !important;
   border: none !important;
@@ -121,35 +103,37 @@
   color: #991b1b !important;
 }
 
-/* ========================================
-   STATS CARDS
-   ======================================== */
 
 .sme-sla-stat-card {
-  background: #FFFFFF !important;
-  border-radius: 12px !important;
-  padding: 1.25rem !important;
-  text-align: center !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  border: 2px solid #27235C !important;
+  background: #ffffff !important;
+  border-radius: 14px !important;
+
+  padding: 1rem 1.25rem !important;
+  min-height: 110px !important;
+  max-width: 260px !important;
+
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06) !important;
+  border: 2px solid #27235c !important;
+
   display: flex !important;
-  flex-direction: row !important;
   align-items: center !important;
-  min-height: 150px !important;
-  justify-content: flex-start !important;
-  gap: 1.25rem !important;
+  gap: 1rem !important;
+
+  width: 100% !important;
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
 }
 
 .sme-sla-stat-card:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+  transform: translateY(-3px) !important;
+  box-shadow: 0 8px 20px rgba(39, 35, 92, 0.16) !important;
+  border-color: #27235c !important;
 }
 
 .sme-sla-stat-icon {
-  width: 56px !important;
-  height: 56px !important;
-  border-radius: 12px !important;
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 14px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -157,24 +141,45 @@
 }
 
 .sme-sla-stat-value {
-  font-size: 2.25rem !important;
+  font-size: 1.8rem !important;
   font-weight: 700 !important;
   color: #111827 !important;
-  margin: 0 0 0.5rem !important;
-  line-height: 1 !important;
+  margin: 0 0 0.25rem !important;
+  line-height: 1.1 !important;
 }
 
 .sme-sla-stat-label {
-  font-size: 0.875rem !important;
+  font-size: 0.78rem !important;
   font-weight: 600 !important;
   color: #6B7280 !important;
   margin: 0 !important;
-  line-height: 1.3 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
 }
 
-/* ========================================
-   FILTERS CARD
-   ======================================== */
+@media (max-width: 992px) {
+  .sme-sla-stat-card {
+    max-width: 100% !important;
+    min-height: 105px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .sme-sla-stat-card {
+    max-width: 100% !important;
+    min-height: 100px !important;
+    padding: 0.85rem 1rem !important;
+  }
+
+  .sme-sla-stat-value {
+    font-size: 1.6rem !important;
+  }
+
+  .sme-sla-stat-icon {
+    width: 48px !important;
+    height: 48px !important;
+  }
+}
 
 .sme-sla-filters-card {
   background: #FFFFFF !important;
@@ -201,7 +206,6 @@
   color: #64748b !important;
   margin-bottom: 0.5rem !important;
 }
-
 .sme-sla-select {
   appearance: none !important;
   background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="gray" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>') no-repeat right 1rem center !important;
@@ -222,11 +226,6 @@
   border-color: #3B82F6 !important;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
 }
-
-/* ========================================
-   EMPTY STATE
-   ======================================== */
-
 .sme-sla-empty-state-wrapper {
   background: white !important;
   border-radius: 12px !important;
@@ -257,11 +256,6 @@
   font-size: 0.875rem !important;
   margin: 0 !important;
 }
-
-/* ========================================
-   TABLE
-   ======================================== */
-
 .sme-sla-table-wrapper {
   background: #FFFFFF !important;
   border-radius: 12px !important;
@@ -318,7 +312,6 @@
   letter-spacing: 0.025em !important;
 }
 
-/* Center specific columns */
 .sme-sla-table-header th:nth-child(3),
 .sme-sla-table-header th:nth-child(4),
 .sme-sla-table-header th:nth-child(5),
@@ -350,7 +343,7 @@
   border: none !important;
 }
 
-/* Center specific columns in body */
+
 .sme-sla-table tbody td:nth-child(3),
 .sme-sla-table tbody td:nth-child(4),
 .sme-sla-table tbody td:nth-child(5),
@@ -358,7 +351,7 @@
   text-align: center !important;
 }
 
-/* Clickable Row Styles */
+
 .sme-sla-clickable-row {
   cursor: pointer !important;
 }
@@ -371,7 +364,6 @@
   background-color: #e0eaff !important;
 }
 
-/* Remove all Bootstrap table defaults */
 .sme-sla-table.table {
   --bs-table-bg: transparent !important;
   --bs-table-accent-bg: transparent !important;
@@ -389,10 +381,6 @@
   color: inherit !important;
   background-color: #e0eaff !important;
 }
-
-/* ========================================
-   TABLE CELLS
-   ======================================== */
 
 .sme-sla-employee-cell {
   display: flex !important;
@@ -437,10 +425,6 @@
   font-size: 0.875rem !important;
 }
 
-/* ========================================
-   BADGES
-   ======================================== */
-
 .sme-sla-badge {
   display: inline-flex !important;
   align-items: center !important;
@@ -472,10 +456,6 @@
   background: #DCFCE7 !important;
   color: #16A34A !important;
 }
-
-/* ========================================
-   ACTION BUTTONS
-   ======================================== */
 
 .sme-sla-actions {
   display: flex !important;
@@ -530,9 +510,6 @@
   box-shadow: 0 2px 4px rgba(22, 163, 74, 0.3) !important;
 }
 
-/* ========================================
-   MODAL
-   ======================================== */
 
 .sme-sla-modal-content {
   border-radius: 12px !important;
@@ -627,9 +604,6 @@
   background-color: #475569 !important;
 }
 
-/* ========================================
-   SCROLLBAR
-   ======================================== */
 
 .sme-sla-table-wrapper::-webkit-scrollbar,
 .table-responsive::-webkit-scrollbar {
@@ -655,24 +629,15 @@
   background: #1b193f !important;
 }
 
-/* Firefox */
 .sme-sla-table-wrapper,
 .table-responsive {
   scrollbar-width: thin !important;
   scrollbar-color: #27235C #f1f1f1 !important;
 }
 
-/* ========================================
-   RESPONSIVE
-   ======================================== */
 
 @media (max-width: 992px) {
   .sme-sla-wrapper {
-    padding: 1rem !important;
-  }
-
-  .sme-sla-stat-card {
-    min-height: 140px !important;
     padding: 1rem !important;
   }
 
@@ -682,13 +647,8 @@
 }
 
 @media (max-width: 768px) {
-  .sme-sla-stat-value {
-    font-size: 2rem !important;
-  }
-
-  .sme-sla-stat-icon {
-    width: 48px !important;
-    height: 48px !important;
+  .sme-sla-stat-card {
+    justify-content: flex-start !important;
   }
 
   .sme-sla-table-header th,
@@ -718,22 +678,97 @@
     padding: 0.75rem !important;
   }
 
-  .sme-sla-stat-card {
-    min-height: 120px !important;
-    padding: 0.875rem !important;
-  }
-
-  .sme-sla-stat-value {
-    font-size: 1.75rem !important;
-  }
-
-  .sme-sla-table-header th,
-  .sme-sla-table tbody td {
-    padding: 0.75rem 0.875rem !important;
-    font-size: 0.75rem !important;
-  }
-
   .sme-sla-empty-state-wrapper {
     padding: 2rem 1rem !important;
   }
+}
+
+.sme-dropdown {
+  position: relative;
+  width: 100%;
+  font-size: 0.875rem;
+}
+
+.sme-dropdown-trigger {
+  width: 100%;
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  color: #111827;
+  font-weight: 500;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.sme-dropdown-trigger:hover {
+  border-color: #27235c;
+}
+
+.sme-dropdown-trigger.open {
+  border-color: #27235c;
+  box-shadow: 0 0 0 2px rgba(39, 35, 92, 0.18);
+}
+
+.sme-dropdown-placeholder {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.sme-dropdown-arrow {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.sme-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
+  border: 1px solid #e5e7eb;
+  z-index: 20;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.sme-dropdown-item {
+  padding: 0.55rem 0.9rem;
+  font-size: 0.875rem;
+  color: #111827;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.sme-dropdown-item:hover {
+  background-color: #27235c;
+  color: #ffffff;
+}
+
+.sme-dropdown-item.selected {
+  background-color: #27235c;
+  color: #ffffff;
+}
+
+.sme-dropdown-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sme-dropdown-menu::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 8px;
+}
+
+.sme-dropdown-menu::-webkit-scrollbar-thumb {
+  background: #27235c;
+  border-radius: 8px;
 }

@@ -1,25 +1,14 @@
-/* ========================================
-   PROJECT DETAILS PAGE
-   All classes prefixed with prj-detail-
-   Uniform Left Alignment + Proper Spacing
-   Scrollbar Color: #27235C
-   ======================================== */
-
-/* Wrapper */
 .prj-detail-wrapper {
   padding: 1.5rem 2rem 1.5rem 1.5rem !important;
   overflow-y: auto !important;
   height: 100% !important;
 }
 
-/* Add padding to the right for scrollbar space */
 .prj-detail-wrapper > .flex-grow-1 {
   padding-right: 1rem !important;
 }
 
-/* ========================================
-   BREADCRUMBS
-   ======================================== */
+
 
 .prj-detail-breadcrumb {
 
@@ -43,9 +32,6 @@
   font-weight: 600 !important;
 }
 
-/* ========================================
-   CARDS
-   ======================================== */
 
 .prj-detail-card {
   background: #ffffff !important;
@@ -85,16 +71,12 @@
   padding: 1.5rem !important;
 }
 
-/* Sticky Card with proper spacing */
+
 .prj-detail-sticky {
   position: sticky !important;
   top: 20px !important;
   margin-bottom: 1.5rem !important;
 }
-
-/* ========================================
-   ROW SPACING (for cards in columns)
-   ======================================== */
 
 .prj-detail-wrapper .row {
   margin-right: 0 !important;
@@ -105,9 +87,6 @@
   padding-right: 1rem !important;
 }
 
-/* ========================================
-   INFO ITEMS - LEFT ALIGNED
-   ======================================== */
 
 .prj-detail-info-item {
   display: flex !important;
@@ -178,10 +157,6 @@
   text-align: left !important;
 }
 
-/* ========================================
-   STATUS BADGES - LEFT ALIGNED
-   ======================================== */
-
 .prj-detail-status-badge {
   display: inline-flex !important;
   align-items: center !important;
@@ -221,10 +196,6 @@
   color: #41464b !important;
   border: 1px solid #d3d6d8 !important;
 }
-
-/* ========================================
-   EMPLOYEE CARDS - LEFT ALIGNED
-   ======================================== */
 
 .prj-detail-employee-card {
   border: 1px solid #4f5152 !important;
@@ -341,10 +312,6 @@
   gap: 0.25rem !important;
 }
 
-/* ========================================
-   MANAGER CARDS - LEFT ALIGNED
-   ======================================== */
-
 .prj-detail-manager-section {
   margin-bottom: 1.5rem !important;
   text-align: left !important;
@@ -439,9 +406,6 @@
   text-align: left !important;
 }
 
-/* ========================================
-   EMPTY STATE - LEFT ALIGNED
-   ======================================== */
 
 .prj-detail-empty-state {
   text-align: left !important;
@@ -460,10 +424,6 @@
   font-size: 0.9375rem !important;
   text-align: left !important;
 }
-
-/* ========================================
-   SCROLLBAR CUSTOMIZATION - #27235C
-   ======================================== */
 
 .prj-detail-wrapper::-webkit-scrollbar {
   width: 10px !important;
@@ -485,15 +445,10 @@
   background: #1b193f !important;
 }
 
-/* For Firefox */
 .prj-detail-wrapper {
   scrollbar-width: thin !important;
   scrollbar-color: #27235C #f1f1f1 !important;
 }
-
-/* ========================================
-   OVERRIDE BOOTSTRAP TEXT-CENTER
-   ======================================== */
 
 .prj-detail-wrapper .text-center {
   text-align: left !important;
@@ -503,12 +458,10 @@
   text-align: left !important;
 }
 
-/* Force left alignment on all child elements */
 .prj-detail-wrapper * {
   text-align: inherit !important;
 }
 
-/* Exceptions - Keep centered for specific elements */
 .prj-detail-wrapper .prj-detail-empty-state,
 .prj-detail-wrapper .spinner-border {
   text-align: center !important;
@@ -518,9 +471,6 @@
   text-align: center !important;
 }
 
-/* ========================================
-   RESPONSIVE
-   ======================================== */
 
 @media (max-width: 768px) {
   .prj-detail-wrapper {
@@ -555,11 +505,6 @@
   }
 }
 
-/* ========================================
-   ADDITIONAL FIXES
-   ======================================== */
-
-/* Ensure all paragraphs are left-aligned */
 .prj-detail-wrapper p,
 .prj-detail-wrapper h1,
 .prj-detail-wrapper h2,
@@ -573,7 +518,6 @@
   text-align: left !important;
 }
 
-/* Exception for loading states */
 .prj-detail-wrapper .d-flex.align-items-center.justify-content-center {
   text-align: center !important;
 }
@@ -582,11 +526,6 @@
   text-align: center !important;
 }
 
-/* ========================================
-   CARD SPACING IMPROVEMENTS
-   ======================================== */
-
-/* Add space between cards in the left column */
 .prj-detail-wrapper .col-lg-8 > .prj-detail-card {
   margin-bottom: 1.5rem !important;
 }
@@ -595,12 +534,12 @@
   margin-bottom: 0 !important;
 }
 
-/* Ensure right column has proper spacing */
+
 .prj-detail-wrapper .col-lg-4 {
   padding-left: 1rem !important;
 }
 
-/* Add gap between row columns */
+
 .prj-detail-wrapper .row.g-4 {
   margin-right: -1rem !important;
 }

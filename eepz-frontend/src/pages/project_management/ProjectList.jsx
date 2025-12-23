@@ -1,7 +1,7 @@
 // src/pages/ProjectManagement/ProjectList.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FolderKanban, Plus, Edit, Trash2, UserCog, Users, Search, Filter, Calendar, Building, Briefcase, AlertCircle, ChevronLeft, ChevronRight, Home, X } from 'lucide-react';
+import { FolderKanban, Plus, Edit, Trash2, UserCog, Users, Search, Filter, Calendar, Building, Briefcase, AlertCircle, ChevronLeft, ChevronRight, Home, X, FileX } from 'lucide-react';
 import { toast } from 'sonner';
 import projectService from '../../services/project_management/projectService';
 import '../../styles/projectmanagement/ProjectList.css'
@@ -68,9 +68,9 @@ const ProjectList = () => {
   const [employeeFilterDepartment, setEmployeeFilterDepartment] = useState('All');
   const [employeeFilterStatus, setEmployeeFilterStatus] = useState('All');
 
-  // Manager modal pagination
+  // Manager modal pagination (UPDATED - now using state)
   const [managerCurrentPage, setManagerCurrentPage] = useState(1);
-  const managerItemsPerPage = 10;
+  const [managerItemsPerPage, setManagerItemsPerPage] = useState(10);
 
   // Initial data load
   useEffect(() => {
@@ -149,20 +149,25 @@ const ProjectList = () => {
     setFilteredProjects(filtered);
   };
 
-  const handleSearch = () => {
-    setActiveSearchTerm(searchTerm);
-  };
+ const handleSearch = () => {
+  if (!searchTerm.trim()) return;
+  setActiveSearchTerm(searchTerm.trim());
+  setCurrentPage(1);
+};
 
-  const handleSearchKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
+const handleCancelSearch = () => {
+  setSearchTerm('');
+  setActiveSearchTerm('');
+  setCurrentPage(1);
+};
 
-  const handleClearSearch = () => {
-    setSearchTerm('');
-    setActiveSearchTerm('');
-  };
+const handleSearchKeyPress = (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    handleSearch();
+  }
+};
+
 
   // Get filtered managers (ALL employees, no role restriction)
   const getFilteredManagers = () => {
@@ -191,9 +196,9 @@ const ProjectList = () => {
     return depts.sort();
   };
 
-  // Manager pagination
+  // Manager pagination (UPDATED - now uses managerItemsPerPage state)
   const filteredManagers = getFilteredManagers();
-  const managerTotalPages = Math.ceil(filteredManagers.length / managerItemsPerPage);
+  const managerTotalPages = Math.ceil(filteredManagers.length / managerItemsPerPage) || 1;
   const managerStartIndex = (managerCurrentPage - 1) * managerItemsPerPage;
   const managerEndIndex = managerStartIndex + managerItemsPerPage;
   const paginatedManagers = filteredManagers.slice(managerStartIndex, managerEndIndex);
@@ -705,100 +710,105 @@ const ProjectList = () => {
       <div className="prj-list-filter-bar">
         <div className="prj-list-filter-bar-content">
           <div className="prj-list-search-wrapper">
-            <Search size={18} className="prj-list-search-icon" />
-            <input 
-              type="text" 
-              className="prj-list-search-input" 
-              placeholder="Search projects..." 
-              value={searchTerm} 
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyPress={handleSearchKeyPress}
-            />
-            {activeSearchTerm && (
-              <button 
-                className="prj-list-clear-btn" 
-                type="button"
-                onClick={handleClearSearch}
-                title="Clear search"
-              >
-                <X size={16} />
-              </button>
-            )}
-            <button 
-              className="prj-list-search-btn" 
-              type="button"
-              onClick={handleSearch}
-            >
-              <Search size={16} />
-              Search
-            </button>
-          </div>
-          
-         <div className="prj-list-status-filter-wrapper">
-  <Filter size={18} className="prj-list-filter-icon" />
-  <div className="prj-list-custom-dropdown">
-    <div 
-      className="prj-list-custom-dropdown-selected"
-      onClick={() => {
-        const dropdown = document.querySelector('.prj-list-custom-dropdown');
-        dropdown.classList.toggle('prj-list-dropdown-open');
-      }}
-    >
-      <span>{filterStatus === "All" ? "All Departments" : filterStatus}</span>
-      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 16 16" className="prj-list-dropdown-arrow">
-        <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2 5l6 6 6-6"/>
-      </svg>
-    </div>
-    <div className="prj-list-custom-dropdown-options">
-      <div 
-        className={`prj-list-custom-option ${filterStatus === "All" ? "prj-list-option-selected" : ""}`}
-        onClick={() => {
-          setFilterStatus("All");
-          document.querySelector('.prj-list-custom-dropdown').classList.remove('prj-list-dropdown-open');
-        }}
-      >
-        All Departments
-      </div>
-      <div 
-        className={`prj-list-custom-option ${filterStatus === "Active" ? "prj-list-option-selected" : ""}`}
-        onClick={() => {
-          setFilterStatus("Active");
-          document.querySelector('.prj-list-custom-dropdown').classList.remove('prj-list-dropdown-open');
-        }}
-      >
-        Active
-      </div>
-      <div 
-        className={`prj-list-custom-option ${filterStatus === "On Hold" ? "prj-list-option-selected" : ""}`}
-        onClick={() => {
-          setFilterStatus("On Hold");
-          document.querySelector('.prj-list-custom-dropdown').classList.remove('prj-list-dropdown-open');
-        }}
-      >
-        On Hold
-      </div>
-      <div 
-        className={`prj-list-custom-option ${filterStatus === "Completed" ? "prj-list-option-selected" : ""}`}
-        onClick={() => {
-          setFilterStatus("Completed");
-          document.querySelector('.prj-list-custom-dropdown').classList.remove('prj-list-dropdown-open');
-        }}
-      >
-        Completed
-      </div>
-      <div 
-        className={`prj-list-custom-option ${filterStatus === "Cancelled" ? "prj-list-option-selected" : ""}`}
-        onClick={() => {
-          setFilterStatus("Cancelled");
-          document.querySelector('.prj-list-custom-dropdown').classList.remove('prj-list-dropdown-open');
-        }}
-      >
-        Cancelled
-      </div>
-    </div>
-  </div>
-</div>
+  <Search size={18} className="prj-list-search-icon" />
 
+  <input 
+    type="text" 
+    className="prj-list-search-input" 
+    placeholder="Search projects..." 
+    value={searchTerm} 
+    onChange={(e) => setSearchTerm(e.target.value)}
+    onKeyPress={handleSearchKeyPress}
+  />
+
+  {/* round × when search is active */}
+
+  {/* purple Search before search, gray Cancel after search */}
+  {activeSearchTerm ? (
+    <button 
+      className="prj-list-search-btn prj-list-search-btn-cancel" 
+      type="button"
+      onClick={handleCancelSearch}
+    >
+      <X size={16} />
+      Cancel
+    </button>
+  ) : (
+    <button 
+      className="prj-list-search-btn" 
+      type="button"
+      onClick={handleSearch}
+    >
+      <Search size={16} />
+      Search
+    </button>
+  )}
+</div>
+          
+          <div className="prj-list-status-filter-wrapper">
+            <Filter size={18} className="prj-list-filter-icon" />
+            <div className="prj-list-custom-dropdown">
+              <div 
+                className="prj-list-custom-dropdown-selected"
+                onClick={() => {
+                  const dropdown = document.querySelector('.prj-list-custom-dropdown');
+                  dropdown.classList.toggle('prj-list-dropdown-open');
+                }}
+              >
+                <span>{filterStatus === "All" ? "All Departments" : filterStatus}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 16 16" className="prj-list-dropdown-arrow">
+                  <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2 5l6 6 6-6"/>
+                </svg>
+              </div>
+              <div className="prj-list-custom-dropdown-options">
+                <div 
+                  className={`prj-list-custom-option ${filterStatus === "All" ? "prj-list-option-selected" : ""}`}
+                  onClick={() => {
+                    setFilterStatus("All");
+                    document.querySelector('.prj-list-custom-dropdown').classList.remove('prj-list-dropdown-open');
+                  }}
+                >
+                  All Departments
+                </div>
+                <div 
+                  className={`prj-list-custom-option ${filterStatus === "Active" ? "prj-list-option-selected" : ""}`}
+                  onClick={() => {
+                    setFilterStatus("Active");
+                    document.querySelector('.prj-list-custom-dropdown').classList.remove('prj-list-dropdown-open');
+                  }}
+                >
+                  Active
+                </div>
+                <div 
+                  className={`prj-list-custom-option ${filterStatus === "On Hold" ? "prj-list-option-selected" : ""}`}
+                  onClick={() => {
+                    setFilterStatus("On Hold");
+                    document.querySelector('.prj-list-custom-dropdown').classList.remove('prj-list-dropdown-open');
+                  }}
+                >
+                  On Hold
+                </div>
+                <div 
+                  className={`prj-list-custom-option ${filterStatus === "Completed" ? "prj-list-option-selected" : ""}`}
+                  onClick={() => {
+                    setFilterStatus("Completed");
+                    document.querySelector('.prj-list-custom-dropdown').classList.remove('prj-list-dropdown-open');
+                  }}
+                >
+                  Completed
+                </div>
+                <div 
+                  className={`prj-list-custom-option ${filterStatus === "Cancelled" ? "prj-list-option-selected" : ""}`}
+                  onClick={() => {
+                    setFilterStatus("Cancelled");
+                    document.querySelector('.prj-list-custom-dropdown').classList.remove('prj-list-dropdown-open');
+                  }}
+                >
+                  Cancelled
+                </div>
+              </div>
+            </div>
+          </div>
           
           <div className="prj-list-actions-group">
             <button 
@@ -845,197 +855,196 @@ const ProjectList = () => {
 
       {/* Projects Table WITH PAGINATION INSIDE */}
       {!isLoading && !error && (
-       
-          <div className="card-body p-0">
-            <div className="table-responsive">
-              <table className="table table-hover mb-0 prj-list-table">
-                <thead className="prj-list-table-header">
+        <div className="card-body p-0">
+          <div className="table-responsive">
+            <table className="table table-hover mb-0 prj-list-table">
+              <thead className="prj-list-table-header">
+                <tr>
+                  <th>Project Name</th>
+                  <th>Status</th>
+                  <th>Business Unit</th>
+                  <th>Department</th>
+                  <th>Start Date</th>
+                  <th>Resource Owner</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginatedProjects.length === 0 ? (
                   <tr>
-                    <th>Project Name</th>
-                    <th>Status</th>
-                    <th>Business Unit</th>
-                    <th>Department</th>
-                    <th>Start Date</th>
-                    <th>Resource Owner</th>
-                    <th>Actions</th>
+                    <td colSpan="7" className="text-center py-5">
+                      <div className="text-muted">
+                        <FolderKanban size={64} className="mb-3 opacity-25" />
+                        <p className="mb-0 fs-5">No projects found</p>
+                        <p className="small">Try adjusting your search or filters</p>
+                      </div>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {paginatedProjects.length === 0 ? (
-                    <tr>
-                      <td colSpan="7" className="text-center py-5">
-                        <div className="text-muted">
-                          <FolderKanban size={64} className="mb-3 opacity-25" />
-                          <p className="mb-0 fs-5">No projects found</p>
-                          <p className="small">Try adjusting your search or filters</p>
+                ) : (
+                  paginatedProjects.map((project) => (
+                    <tr key={project.projectId}>
+                      <td>
+                        <div>
+                          <div 
+                            className="prj-list-project-name" 
+                            onClick={() => handleViewClick(project.projectId)}
+                          >
+                            {project.projectName}
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <span className={`prj-list-badge prj-list-badge-${project.status.toLowerCase().replace(' ', '-')}`}>
+                          {project.status}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="d-flex align-items-center gap-2">
+                          <div className="prj-list-icon-wrapper prj-list-icon-business">
+                            <Building size={16} className="prj-list-icon-filled" />
+                          </div>
+                          <span>{project.businessUnit || 'N/A'}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="d-flex align-items-center gap-2">
+                          <div className="prj-list-icon-wrapper prj-list-icon-department">
+                            <Briefcase size={16} className="prj-list-icon-filled" />
+                          </div>
+                          <span>{project.department || 'N/A'}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="d-flex align-items-center gap-2">
+                          <div className="prj-list-icon-wrapper prj-list-icon-calendar">
+                            <Calendar size={16} className="prj-list-icon-filled" />
+                          </div>
+                          <span>{formatDate(project.startDate)}</span>
+                        </div>
+                      </td>
+                      <td>
+                        {project.resourceOwner ? (
+                          <div className="prj-list-resource-owner">
+                            <div className="prj-list-owner-name">
+                              {project.resourceOwner.firstName} {project.resourceOwner.lastName}
+                            </div>
+                            <small className="prj-list-owner-role">{project.resourceOwner.roleName}</small>
+                          </div>
+                        ) : (
+                          <span className="prj-list-not-assigned">Not Assigned</span>
+                        )}
+                      </td>
+                      <td>
+                        <div className="d-flex gap-2 justify-content-center">
+                          <button 
+                            className="prj-list-action-btn prj-list-btn-edit" 
+                            onClick={() => handleEditClick(project)} 
+                            title="Edit Project"
+                          >
+                            <Edit size={14} />
+                          </button>
+                          <button 
+                            className="prj-list-action-btn prj-list-btn-manager" 
+                            onClick={() => handleManagerClick(project)} 
+                            title="Edit Managers"
+                          >
+                            <UserCog size={14} />
+                          </button>
+                          <button 
+                            className="prj-list-action-btn prj-list-btn-employee" 
+                            onClick={() => handleEmployeeClick(project)} 
+                            title="Map/Unmap Employees"
+                          >
+                            <Users size={14} />
+                          </button>
+                          <button 
+                            className="prj-list-action-btn prj-list-btn-delete" 
+                            onClick={() => handleDeleteClick(project)} 
+                            title="Delete Project"
+                          >
+                            <Trash2 size={14} />
+                          </button>
                         </div>
                       </td>
                     </tr>
-                  ) : (
-                    paginatedProjects.map((project) => (
-                      <tr key={project.projectId}>
-                        <td>
-                          <div>
-                            <div 
-                              className="prj-list-project-name" 
-                              onClick={() => handleViewClick(project.projectId)}
-                            >
-                              {project.projectName}
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <span className={`prj-list-badge prj-list-badge-${project.status.toLowerCase().replace(' ', '-')}`}>
-                            {project.status}
-                          </span>
-                        </td>
-                        <td>
-                          <div className="d-flex align-items-center gap-2">
-                            <div className="prj-list-icon-wrapper prj-list-icon-business">
-                              <Building size={16} className="prj-list-icon-filled" />
-                            </div>
-                            <span>{project.businessUnit || 'N/A'}</span>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="d-flex align-items-center gap-2">
-                            <div className="prj-list-icon-wrapper prj-list-icon-department">
-                              <Briefcase size={16} className="prj-list-icon-filled" />
-                            </div>
-                            <span>{project.department || 'N/A'}</span>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="d-flex align-items-center gap-2">
-                            <div className="prj-list-icon-wrapper prj-list-icon-calendar">
-                              <Calendar size={16} className="prj-list-icon-filled" />
-                            </div>
-                            <span>{formatDate(project.startDate)}</span>
-                          </div>
-                        </td>
-                        <td>
-                          {project.resourceOwner ? (
-                            <div className="prj-list-resource-owner">
-                              <div className="prj-list-owner-name">
-                                {project.resourceOwner.firstName} {project.resourceOwner.lastName}
-                              </div>
-                              <small className="prj-list-owner-role">{project.resourceOwner.roleName}</small>
-                            </div>
-                          ) : (
-                            <span className="prj-list-not-assigned">Not Assigned</span>
-                          )}
-                        </td>
-                        <td>
-                          <div className="d-flex gap-2 justify-content-center">
-                            <button 
-                              className="prj-list-action-btn prj-list-btn-edit" 
-                              onClick={() => handleEditClick(project)} 
-                              title="Edit Project"
-                            >
-                              <Edit size={14} />
-                            </button>
-                            <button 
-                              className="prj-list-action-btn prj-list-btn-manager" 
-                              onClick={() => handleManagerClick(project)} 
-                              title="Edit Managers"
-                            >
-                              <UserCog size={14} />
-                            </button>
-                            <button 
-                              className="prj-list-action-btn prj-list-btn-employee" 
-                              onClick={() => handleEmployeeClick(project)} 
-                              title="Map/Unmap Employees"
-                            >
-                              <Users size={14} />
-                            </button>
-                            <button 
-                              className="prj-list-action-btn prj-list-btn-delete" 
-                              onClick={() => handleDeleteClick(project)} 
-                              title="Delete Project"
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            {/* PAGINATION INSIDE TABLE CARD */}
-            {totalPages > 0 && (
-              <div className="prj-list-pagination-footer">
-                {/* Left Section - Show X entries */}
-                <div className="prj-list-pagination-left">
-                  <span className="prj-list-pagination-text">Show</span>
-                  <select 
-                    className="prj-list-pagination-dropdown"
-                    value={itemsPerPage}
-                    onChange={(e) => setItemsPerPage(Number(e.target.value))}
-                  >
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                  </select>
-                  <span className="prj-list-pagination-text">entries</span>
-                </div>
-
-                {/* Center Section - Showing X to Y of Z entries */}
-                <div className="prj-list-pagination-center">
-                  <span className="prj-list-pagination-status">
-                    Showing {startIndex + 1} to {Math.min(endIndex, filteredProjects.length)} of {filteredProjects.length} entries
-                  </span>
-                </div>
-
-                {/* Right Section - Page Numbers */}
-                <div className="prj-list-pagination-right">
-                  <ul className="prj-list-pagination-list">
-                    <li className={`prj-list-page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                      <button 
-                        className="prj-list-page-link prj-list-page-arrow" 
-                        onClick={() => goToPage(currentPage - 1)} 
-                        disabled={currentPage === 1}
-                      >
-                        <ChevronLeft size={16} />
-                      </button>
-                    </li>
-                    {getPageNumbers().map((page, index) => (
-                      page === '...' ? (
-                        <li key={`ellipsis-${index}`} className="prj-list-page-ellipsis">
-                          <span className="prj-list-page-dots">...</span>
-                        </li>
-                      ) : (
-                        <li key={page} className={`prj-list-page-item ${currentPage === page ? 'active' : ''}`}>
-                          <button className="prj-list-page-link" onClick={() => goToPage(page)}>
-                            {page}
-                          </button>
-                        </li>
-                      )
-                    ))}
-                    <li className={`prj-list-page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                      <button 
-                        className="prj-list-page-link prj-list-page-arrow" 
-                        onClick={() => goToPage(currentPage + 1)} 
-                        disabled={currentPage === totalPages}
-                      >
-                        <ChevronRight size={16} />
-                      </button>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            )}
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
-        
+
+          {/* PAGINATION INSIDE TABLE CARD */}
+          {totalPages > 0 && (
+            <div className="prj-list-pagination-footer" style={{ display: "flex" }}>
+              {/* Left Section - Show X entries */}
+              <div className="prj-list-pagination-left">
+                <span className="prj-list-pagination-text">Show</span>
+                <select 
+                  className="prj-list-pagination-dropdown"
+                  value={itemsPerPage}
+                  onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                >
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                </select>
+                <span className="prj-list-pagination-text">entries</span>
+              </div>
+
+              {/* Center Section - Showing X to Y of Z entries */}
+              <div className="prj-list-pagination-center">
+                <span className="prj-list-pagination-status">
+                  Showing {startIndex + 1} to {Math.min(endIndex, filteredProjects.length)} of {filteredProjects.length} entries
+                </span>
+              </div>
+
+              {/* Right Section - Page Numbers */}
+              <div className="prj-list-pagination-right">
+                <ul className="prj-list-pagination-list">
+                  <li className={`prj-list-page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                    <button 
+                      className="prj-list-page-link prj-list-page-arrow" 
+                      onClick={() => goToPage(currentPage - 1)} 
+                      disabled={currentPage === 1}
+                    >
+                      <ChevronLeft size={16} />
+                    </button>
+                  </li>
+                  {getPageNumbers().map((page, index) => (
+                    page === '...' ? (
+                      <li key={`ellipsis-${index}`} className="prj-list-page-ellipsis">
+                        <span className="prj-list-page-dots">...</span>
+                      </li>
+                    ) : (
+                      <li key={page} className={`prj-list-page-item ${currentPage === page ? 'active' : ''}`}>
+                        <button className="prj-list-page-link" onClick={() => goToPage(page)}>
+                          {page}
+                        </button>
+                      </li>
+                    )
+                  ))}
+                  <li className={`prj-list-page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                    <button 
+                      className="prj-list-page-link prj-list-page-arrow" 
+                      onClick={() => goToPage(currentPage + 1)} 
+                      disabled={currentPage === totalPages}
+                    >
+                      <ChevronRight size={16} />
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          )}
+        </div>
       )}
 
-      {/* Modals */}
+      {/* Edit Project Modal */}
       <EditProjectModal 
         show={showEditModal}
         onClose={() => setShowEditModal(false)}
+        project={selectedProject}
         formData={editFormData}
         setFormData={setEditFormData}
         onSubmit={handleUpdateProject}
@@ -1045,6 +1054,7 @@ const ProjectList = () => {
         businessUnits={businessUnits}
       />
 
+      {/* Manager Selection Modal (UPDATED - now passes pagination props) */}
       <ManagerSelectionModal 
         show={showManagerModal}
         onClose={() => setShowManagerModal(false)}
@@ -1053,9 +1063,6 @@ const ProjectList = () => {
         selectedL1Approver={selectedL1Approver}
         selectedL2Approver={selectedL2Approver}
         onManagerSelect={handleManagerSelect}
-        onUpdate={handleUpdateManagers}
-        isSubmitting={isSubmitting}
-        message={modalMessage}
         activeTab={activeManagerTab}
         setActiveTab={setActiveManagerTab}
         searchTerm={managerSearchTerm}
@@ -1066,19 +1073,25 @@ const ProjectList = () => {
         setFilterRole={setManagerFilterRole}
         filterDepartment={managerFilterDepartment}
         setFilterDepartment={setManagerFilterDepartment}
-        currentPage={managerCurrentPage}
-        setCurrentPage={setManagerCurrentPage}
         paginatedManagers={paginatedManagers}
+        currentPage={managerCurrentPage}
         totalPages={managerTotalPages}
-        startIndex={managerStartIndex}
-        endIndex={managerEndIndex}
-        totalCount={filteredManagers.length}
-        getPageNumbers={getManagerPageNumbers}
         goToPage={goToManagerPage}
+        getPageNumbers={getManagerPageNumbers}
         uniqueRoles={getUniqueManagerRoles()}
         uniqueDepartments={getUniqueManagerDepartments()}
+        onUpdate={handleUpdateManagers}
+        isSubmitting={isSubmitting}
+        message={modalMessage}
+        itemsPerPage={managerItemsPerPage}
+        onPageSizeChange={(size) => {
+          setManagerItemsPerPage(size);
+          setManagerCurrentPage(1);
+        }}
+        totalItems={filteredManagers.length}
       />
 
+      {/* Employee Mapping Modal */}
       <EmployeeMappingModal 
         show={showEmployeeModal}
         onClose={() => setShowEmployeeModal(false)}
@@ -1113,6 +1126,7 @@ const ProjectList = () => {
         hasSelectedUnmapped={hasSelectedUnmappedEmployees}
       />
 
+      {/* Delete Confirmation Modal */}
       <DeleteConfirmationModal 
         show={showDeleteModal}
         onClose={handleCancelDelete}

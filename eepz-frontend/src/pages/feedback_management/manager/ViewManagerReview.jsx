@@ -8,31 +8,11 @@ import {
   Star,
   Target,
   Briefcase,
-  RefreshCw,
+  X,
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import { employeeApi, managerReviewApi } from "../../../services/feedbackmanagement/feedbackApi";
-import FeedbackBreadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb"
-
-const API_BASE = import.meta.env.VITE_API_BASE;
-
-const Badge = ({ text, color = "#525252" }) => (
-  <span
-    style={{
-      display: "inline-block",
-      backgroundColor: `${color}20`,
-      color,
-      padding: "6px 14px",
-      fontSize: "0.813rem",
-      fontWeight: "600",
-      borderRadius: "6px",
-      border: `1.5px solid ${color}40`,
-    }}
-  >
-    {text}
-  </span>
-);
+import FeedbackBreadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb";
 
 const RATING_LABELS = {
   1: "Poor",
@@ -40,6 +20,41 @@ const RATING_LABELS = {
   3: "Good",
   4: "Very Good",
   5: "Excellent",
+};
+
+const StatusPill = ({ status }) => {
+  let bg = "#e5e7eb";
+  let fg = "#374151";
+
+  if (status === "Finalized") {
+    bg = "#dcfce7";
+    fg = "#166534";
+  } else if (status === "Submitted") {
+    bg = "#dbeafe";
+    fg = "#1d4ed8";
+  } else if (status === "In Progress") {
+    bg = "#fef9c3";
+    fg = "#854d0e";
+  }
+
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        padding: "2px 10px",
+        borderRadius: "999px",
+        fontSize: "0.7rem",
+        fontWeight: 600,
+        textTransform: "uppercase",
+        letterSpacing: "0.08em",
+        backgroundColor: bg,
+        color: fg,
+      }}
+    >
+      {status || "Submitted"}
+    </span>
+  );
 };
 
 export default function ViewManagerReview() {
@@ -50,26 +65,21 @@ export default function ViewManagerReview() {
     () => JSON.parse(localStorage.getItem("user") || "{}") || {},
     []
   );
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [review, setReview] = useState(null);
   const [employeeMap, setEmployeeMap] = useState({});
 
-  // ============================================================================
-  // FETCH REVIEW DATA
-  // ============================================================================
-
   const fetchReviewData = async () => {
     setLoading(true);
     setError("");
 
     try {
-      // Fetch employee map
       let empMap = {};
       try {
         const empRes = await employeeApi.getAll();
-
         if (empRes.data?.success && Array.isArray(empRes.data.data)) {
           empRes.data.data.forEach((emp) => {
             empMap[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
@@ -80,18 +90,17 @@ export default function ViewManagerReview() {
         console.warn("Error fetching employee map:", err.message);
       }
 
-      // Fetch review details
-      const reviewRes = await managerReviewApi.getById(id)
+      const reviewRes = await managerReviewApi.getById(id);
       if (reviewRes.data?.success && reviewRes.data.data) {
+        const r = reviewRes.data.data;
         const reviewData = {
-          ...reviewRes.data.data,
+          ...r,
           targetEmployeeName:
-            empMap[reviewRes.data.data.targetEmployeeId] ||
-            reviewRes.data.data.targetEmployeeName ||
-            `Employee ${reviewRes.data.data.targetEmployeeId}`,
+            empMap[r.targetEmployeeId] ||
+            r.targetEmployeeName ||
+            `Employee ${r.targetEmployeeId}`,
           managerName:
-            empMap[reviewRes.data.data.managerEmployeeId] ||
-            `Manager ${reviewRes.data.data.managerEmployeeId}`,
+            empMap[r.managerEmployeeId] || `Manager ${r.managerEmployeeId}`,
         };
         setReview(reviewData);
       } else {
@@ -108,582 +117,582 @@ export default function ViewManagerReview() {
   };
 
   useEffect(() => {
-    if (id) {
-      fetchReviewData();
-    }
+    if (id) fetchReviewData();
   }, [id]);
 
-  // ============================================================================
-  // LOADING & ERROR STATES
-  // ============================================================================
+  const createdDate =
+    review &&
+    new Date(review.createdAt).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
 
+  const submittedDate =
+    review && review.submittedDate
+      ? new Date(review.submittedDate).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        })
+      : null;
+
+  // common close handler
+  const handleClose = () => navigate(-1);
+
+  // LOADING STATE (still modal-style)
   if (loading) {
     return (
       <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "60vh" }}
+        style={{
+          position: "fixed",
+          inset: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "rgba(15,23,42,0.3)",
+          zIndex: 1050,
+        }}
+        onClick={handleClose} // click anywhere closes
       >
-        <div className="text-center">
-          <div
-            className="spinner-border"
-            style={{
-              width: "3rem",
-              height: "3rem",
-              color: "#0d6efd",
-              borderWidth: "3px",
-            }}
-            role="status"
-          >
-            <span className="visually-hidden">Loading...</span>
+        <div
+          style={{
+            background: "#ffffff",
+            borderRadius: "16px",
+            padding: "1.5rem 2rem",
+            boxShadow: "0 18px 40px rgba(15,23,42,0.25)",
+          }}
+          onClick={(e) => e.stopPropagation()} // prevent close when clicking inside
+        >
+          <div className="text-center">
+            <div
+              className="spinner-border"
+              style={{
+                width: "3rem",
+                height: "3rem",
+                color: "#2563eb",
+                borderWidth: "3px",
+              }}
+              role="status"
+            >
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            <p className="mt-3 text-muted mb-0">Loading review…</p>
           </div>
-          <p className="text-muted mt-3 fw-medium">Loading review details...</p>
         </div>
       </div>
     );
   }
 
+  // NOT FOUND
   if (!review) {
     return (
-      <div className="container-fluid py-4" style={{ maxWidth: "900px" }}>
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "rgba(15,23,42,0.35)",
+          zIndex: 1050,
+        }}
+        onClick={handleClose}
+      >
         <div
-          className="alert alert-danger d-flex align-items-center gap-3"
-          style={{ borderRadius: "8px", border: "1px solid #dc3545" }}
+          style={{
+            width: "100%",
+            maxWidth: "420px",
+            background: "#ffffff",
+            borderRadius: "18px",
+            padding: "1.5rem 1.75rem",
+            boxShadow: "0 18px 40px rgba(15,23,42,0.25)",
+            border: "1px solid #e5e7eb",
+          }}
+          onClick={(e) => e.stopPropagation()}
         >
-          <AlertTriangle size={20} />
-          <span className="fw-medium">Review not found</span>
+          <div className="d-flex justify-content-between align-items-start mb-2">
+            <div className="d-flex align-items-center gap-2" style={{ color: "#b91c1c" }}>
+              <AlertTriangle size={20} />
+              <span className="fw-semibold">Review not found</span>
+            </div>
+            <button
+              type="button"
+              className="btn btn-sm"
+              onClick={handleClose}
+              style={{
+                border: "none",
+                background: "transparent",
+                padding: 0,
+                color: "#9ca3af",
+              }}
+            >
+              <X size={18} />
+            </button>
+          </div>
+          <p className="text-muted mb-3" style={{ fontSize: "0.9rem" }}>
+            The requested review could not be located. It may have been removed or the
+            link is invalid.
+          </p>
+          <div className="d-flex justify-content-end">
+            <button
+              className="btn d-inline-flex align-items-center gap-2"
+              onClick={handleClose}
+              style={{
+                borderRadius: "999px",
+                padding: "8px 18px",
+                background: "#2563eb",
+                border: "none",
+                fontWeight: 600,
+                color: "#ffffff",
+                fontSize: "0.9rem",
+              }}
+            >
+              <ArrowLeft size={16} />
+              Go back
+            </button>
+          </div>
         </div>
-        <button
-          className="btn btn-primary d-inline-flex align-items-center gap-2"
-          onClick={() => navigate(-1)}
-          style={{ borderRadius: "6px", padding: "10px 20px" }}
-        >
-          <ArrowLeft size={18} />
-          Go Back
-        </button>
       </div>
     );
   }
 
-  const statusColor =
-    review.status === "Finalized"
-      ? "#198754"
-      : review.status === "Submitted"
-      ? "#0d6efd"
-      : "#ffc107";
-
+  // MAIN MODAL
   return (
     <div
       style={{
-        minHeight: "100vh",
-        background: "#f8f9fa",
-        padding: "2rem 1rem",
+        position: "fixed",
+        inset: 0,
+        zIndex: 1050,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "rgba(15,23,42,0.35)",
       }}
+      onClick={handleClose} // click outside closes
     >
-      <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
-        {/* HEADER SECTION */}
-        <div
-          className="d-flex justify-content-between align-items-center mb-4"
-          style={{ flexWrap: "wrap", gap: "1rem" }}
-        >
-         
-           <FeedbackBreadcrumb
-              items={[
-                { label: "Feedback Management", path: "/manager/dashboard/feedback" },
-                { label: "My Reviews" },
-              ]}
-            />
-        </div>
-
-        {/* ERROR ALERT */}
-        {error && (
-          <div
-            className="alert alert-danger alert-dismissible fade show d-flex align-items-start gap-2 mb-3"
-            role="alert"
-            style={{ borderRadius: "8px" }}
-          >
-            <AlertTriangle size={18} className="mt-1 flex-shrink-0" />
-            <div className="flex-grow-1">
-              <strong>Error</strong>
-              <p className="mb-0 small mt-1">{error}</p>
-            </div>
-            <button
-              type="button"
-              className="btn-close"
-              onClick={() => setError("")}
-            />
-          </div>
-        )}
-
-        {/* SUCCESS ALERT */}
-        {success && (
-          <div
-            className="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 mb-3"
-            role="alert"
-            style={{ borderRadius: "8px" }}
-          >
-            <CheckCircle size={18} className="flex-shrink-0" />
-            <div className="small flex-grow-1">{success}</div>
-            <button
-              type="button"
-              className="btn-close"
-              onClick={() => setSuccess("")}
-            />
-          </div>
-        )}
-
-        {/* MAIN RATING CARD - MODAL HEADER STYLE */}
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "720px",
+          maxHeight: "80vh",
+          background: "#ffffff",
+          borderRadius: "18px",
+          boxShadow: "0 24px 60px rgba(15,23,42,0.35)",
+          border: "1px solid #e5e7eb",
+          display: "flex",
+          flexDirection: "column",
+        }}
+        onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
+      >
+        {/* HEADER */}
         <div
           style={{
-            background: "linear-gradient(135deg, #9D247D 0%, #7a1d63 100%)",
-            borderRadius: "10px",
-            padding: "2rem",
-            marginBottom: "1.5rem",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-            color: "white",
+            padding: "1rem 1.5rem",
+            borderBottom: "1px solid #e5e7eb",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "0.75rem",
+            backgroundColor: "#2f316a",
+            borderTopLeftRadius: "18px",
+            borderTopRightRadius: "18px",
+            color: "#ffffff",
           }}
         >
-          <div className="row align-items-center g-3">
-            <div className="col-md-6">
-              <div
-                className="d-flex align-items-center gap-2 mb-2"
-                style={{ opacity: 0.9, color: "white" }}
-              >
-                <User size={18} />
-                <small
-                  style={{
-                    fontSize: "0.813rem",
-                    fontWeight: 600,
-                    textTransform: "uppercase",
-                    fontStyle : "normal",
-                    letterSpacing: "0.5px",
-                    color: "white",
-                  }}
-                >
-                  Reviewing Employee
-                </small>
-              </div>
-              <h4
-                className="fw-bold mb-0"
-                style={{
-                  fontSize: "1.5rem",
-                  color: "white",
-                  textAlign: "left",
-                }}
-              >
-                {review.targetEmployeeName}
-              </h4>
+          <div>
+            <h2
+              style={{
+                fontSize: "1.05rem",
+                fontWeight: 600,
+                margin: 0,
+                color: "#ffffff",
+              }}
+            >
+              Manager Review
+            </h2>
+            <div
+              style={{
+                fontSize: "0.85rem",
+                marginTop: "2px",
+                opacity: 0.9,
+              }}
+            >
+              {review.targetEmployeeName}
             </div>
-            <div className="col-md-6 text-md-end">
+          </div>
+          <button
+            type="button"
+            onClick={handleClose}
+            style={{
+              border: "none",
+              background: "transparent",
+              padding: 6,
+              borderRadius: "999px",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#ffffff",
+            }}
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* BODY */}
+        <div
+          style={{
+            padding: "1.25rem 1.5rem 1.25rem",
+            overflowY: "auto",
+          }}
+        >
+          {/* SUMMARY ROW */}
+          <div
+            className="d-flex flex-wrap"
+            style={{
+              gap: "1rem",
+              marginBottom: "1.25rem",
+            }}
+          >
+            <div
+              style={{
+                flex: "1 1 180px",
+                minWidth: "0",
+                background: "#f9fafb",
+                borderRadius: "12px",
+                padding: "0.9rem 1rem",
+                border: "1px solid #e5e7eb",
+              }}
+            >
               <div
-                className="d-flex align-items-center justify-content-md-end gap-2 mb-2"
-                style={{ opacity: 0.9 }}
+                className="d-flex justify-content-between align-items-center mb-1"
+                style={{ gap: "0.5rem" }}
               >
-                <Star size={18} style={{ fill: "white" }} />
-                <small
+                <span
                   style={{
-                    fontSize: "0.813rem",
-                    fontWeight: 600,
+                    fontSize: "0.75rem",
                     textTransform: "uppercase",
-                    letterSpacing: "0.5px",
-                    color: "white",
+                    letterSpacing: "0.08em",
+                    color: "#6b7280",
                   }}
                 >
-                  Performance Rating
-                </small>
-              </div>
-              <h3
-                className="fw-bold mb-2"
-                style={{ fontSize: "2rem", color: "white" }}
-              >
-                {review.rating}/5
-                <span
-                  className="ms-2"
-                  style={{ fontSize: "0.875rem", opacity: 0.85 }}
-                >
-                  ({RATING_LABELS[review.rating]})
+                  Rating
                 </span>
-              </h3>
-              <div className="d-flex justify-content-md-end gap-1">
-                {[...Array(5)].map((_, index) => (
+                <div className="d-flex align-items-center gap-1">
+                  <Star size={16} style={{ color: "#f97316" }} />
+                  <span
+                    style={{
+                      fontSize: "0.8rem",
+                      color: "#6b7280",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {RATING_LABELS[review.rating]}
+                  </span>
+                </div>
+              </div>
+              <div className="d-flex align-items-baseline gap-1 mb-1">
+                <span
+                  style={{
+                    fontSize: "1.7rem",
+                    fontWeight: 700,
+                    color: "#111827",
+                  }}
+                >
+                  {review.rating}
+                  <span style={{ fontSize: "0.9rem", color: "#6b7280" }}>
+                    /5
+                  </span>
+                </span>
+              </div>
+              <div style={{ display: "flex", gap: "0.15rem" }}>
+                {[...Array(5)].map((_, i) => (
                   <Star
-                    key={index}
+                    key={i}
                     size={18}
                     style={{
-                      color: "white",
-                      fill: index < review.rating ? "white" : "transparent",
-                      opacity: index < review.rating ? 1 : 0.5,
+                      color: i < review.rating ? "#f97316" : "#e5e7eb",
+                      fill: i < review.rating ? "#f97316" : "transparent",
                     }}
                   />
                 ))}
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* TWO COLUMN GRID - MODAL STYLE */}
-        <div className="row g-3 mb-3">
-          {/* LEFT COLUMN */}
-          <div className="col-md-4">
             <div
               style={{
-                background: "white",
+                flex: "1 1 180px",
+                minWidth: "0",
+                background: "#f9fafb",
+                borderRadius: "12px",
+                padding: "0.9rem 1rem",
                 border: "1px solid #e5e7eb",
-                borderRadius: "8px",
-                padding: "1.25rem",
-                height: "100%",
               }}
             >
-              <div className="d-flex align-items-center gap-2 mb-3">
+              <div className="d-flex align-items-center gap-2 mb-1">
                 <div
                   style={{
-                    width: "32px",
-                    height: "32px",
-                    borderRadius: "6px",
-                    background: `${statusColor}15`,
+                    width: "28px",
+                    height: "28px",
+                    borderRadius: "999px",
+                    background: "#e0f2fe",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                   }}
                 >
-                  <CheckCircle size={16} style={{ color: statusColor }} />
+                  <User size={16} style={{ color: "#2563eb" }} />
                 </div>
-                <small
-                  className="text-muted fw-bold"
+                <span
                   style={{
                     fontSize: "0.75rem",
                     textTransform: "uppercase",
-                    letterSpacing: "0.5px",
-                    textAlign: "left",
+                    letterSpacing: "0.08em",
+                    color: "#6b7280",
+                    fontWeight: 600,
                   }}
                 >
-                  Status
-                </small>
-              </div>
-              <Badge
-                text={review.status || "Submitted"}
-                color={statusColor}
-                style={{ textAlign: "left" }}
-              />
-            </div>
-          </div>
-
-          {/* MIDDLE COLUMN */}
-          <div className="col-md-4">
-            <div
-              style={{
-                background: "white",
-                border: "1px solid #e5e7eb",
-                borderRadius: "8px",
-                padding: "1.25rem",
-                height: "100%",
-              }}
-            >
-              <div className="d-flex align-items-center gap-2 mb-3">
-                <div
-                  style={{
-                    width: "32px",
-                    height: "32px",
-                    borderRadius: "6px",
-                    background: "#0d6efd15",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <User size={16} style={{ color: "#0d6efd" }} />
-                </div>
-                <small
-                  className="text-muted fw-bold"
-                  style={{
-                    fontSize: "0.75rem",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.5px",
-                  }}
-                >
-                  Reviewed By
-                </small>
+                  Manager
+                </span>
               </div>
               <p
-                className="mb-0 fw-semibold"
+                className="mb-1"
                 style={{
-                  fontSize: "0.938rem",
-                  color: "#212529",
-                  textAlign: "left",
+                  fontSize: "0.92rem",
+                  color: "#111827",
+                  fontWeight: 500,
                 }}
               >
                 {review.managerName}
               </p>
-            </div>
-          </div>
-
-          {/* RIGHT COLUMN */}
-          <div className="col-md-4">
-            <div
-              style={{
-                background: "white",
-                border: "1px solid #e5e7eb",
-                borderRadius: "8px",
-                padding: "1.25rem",
-                height: "100%",
-              }}
-            >
-              <div className="d-flex align-items-center gap-2 mb-3">
-                <div
-                  style={{
-                    width: "32px",
-                    height: "32px",
-                    borderRadius: "6px",
-                    background: "#0d6efd15",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Calendar size={16} style={{ color: "#0d6efd" }} />
-                </div>
-                <small
-                  className="text-muted fw-bold"
-                  style={{
-                    fontSize: "0.75rem",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.5px",
-                    textAlign: "left",
-                  }}
-                >
-                  Created On
-                </small>
-              </div>
               <p
-                className="mb-0 fw-semibold"
-                style={{
-                  fontSize: "0.938rem",
-                  color: "#212529",
-                  textAlign: "left",
-                }}
+                className="mb-0 text-muted"
+                style={{ fontSize: "0.8rem", color: "#6b7280" }}
               >
-                {new Date(review.createdAt).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
+                Created on {createdDate}
               </p>
             </div>
-          </div>
-        </div>
 
-        {/* REVIEW COMMENT SECTION - DOCUMENT SECTION STYLE */}
-        <div
-          style={{
-            background: "white",
-            border: "1px solid #e5e7eb",
-            borderRadius: "8px",
-            padding: "1.5rem",
-            marginBottom: "1.5rem",
-          }}
-        >
-          <div className="d-flex align-items-center gap-2 mb-3">
-            <div
+            {submittedDate && (
+              <div
+                style={{
+                  flex: "1 1 160px",
+                  minWidth: "0",
+                  background: "#f9fafb",
+                  borderRadius: "12px",
+                  padding: "0.9rem 1rem",
+                  border: "1px solid #e5e7eb",
+                }}
+              >
+                <div className="d-flex align-items-center gap-2 mb-1">
+                  <div
+                    style={{
+                      width: "28px",
+                      height: "28px",
+                      borderRadius: "999px",
+                      background: "#e0f2fe",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Calendar size={16} style={{ color: "#2563eb" }} />
+                  </div>
+                  <span
+                    style={{
+                      fontSize: "0.75rem",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.08em",
+                      color: "#6b7280",
+                      fontWeight: 600,
+                    }}
+                  >
+                    Submitted
+                  </span>
+                </div>
+                <p
+                  className="mb-0"
+                  style={{ fontSize: "0.9rem", color: "#111827" }}
+                >
+                  {submittedDate}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* REVIEW COMMENT */}
+          <div style={{ marginBottom: "1.25rem" }}>
+            <div className="d-flex align-items-center gap-2 mb-2">
+              <div
+                style={{
+                  width: "28px",
+                  height: "28px",
+                  borderRadius: "999px",
+                  background: "#eff6ff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Star size={16} style={{ color: "#f97316" }} />
+              </div>
+            <h3
               style={{
-                width: "36px",
-                height: "36px",
-                borderRadius: "8px",
-                background: "linear-gradient(135deg, #9D247D 0%, #7a1d63 100%)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                fontSize: "0.96rem",
+                fontWeight: 600,
+                margin: 0,
+                color: "#111827",
               }}
             >
-              <Star size={18} style={{ color: "white" }} />
+              Review comment
+            </h3>
             </div>
-            <h5
-              className="fw-bold mb-0"
-              style={{ fontSize: "1.125rem", color: "#212529" }}
+            <div
+              style={{
+                borderRadius: "10px",
+                background: "#f9fafb",
+                border: "1px solid #e5e7eb",
+                padding: "0.9rem 1rem",
+                fontSize: "0.92rem",
+                lineHeight: "1.7",
+                color: "#374151",
+                whiteSpace: "pre-wrap",
+              }}
             >
-              Review Comment
-            </h5>
+              {review.reviewComment}
+            </div>
           </div>
-          <p
-            className="mb-0"
-            style={{
-              lineHeight: "1.7",
-              color: "#6c757d",
-              fontSize: "0.938rem",
-              textAlign: "left",
-            }}
-          >
-            {review.reviewComment}
-          </p>
-        </div>
 
-        {/* PROJECT & GOAL CONTEXT - TWO COLUMN GRID */}
-        {(review.projectContext || review.goalContext) && (
-          <div className="row g-3 mb-3">
-            {review.projectContext && (
-              <div className="col-md-6">
-                <div
-                  style={{
-                    background: "white",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: "8px",
-                    padding: "1.5rem",
-                    height: "100%",
-                  }}
-                >
-                  <div className="d-flex align-items-center gap-2 mb-3">
+          {/* CONTEXT */}
+          {(review.projectContext || review.goalContext) && (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns:
+                  review.projectContext && review.goalContext
+                    ? "repeat(auto-fit, minmax(260px, 1fr))"
+                    : "minmax(0, 1fr)",
+                gap: "1rem",
+                marginBottom: "0.75rem",
+              }}
+            >
+              {review.projectContext && (
+                <div>
+                  <div className="d-flex align-items-center gap-2 mb-2">
                     <div
                       style={{
-                        width: "32px",
-                        height: "32px",
-                        borderRadius: "6px",
-                        background: "#0d6efd15",
+                        width: "26px",
+                        height: "26px",
+                        borderRadius: "999px",
+                        background: "#e0f2fe",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                       }}
                     >
-                      <Briefcase size={16} style={{ color: "#0d6efd" }} />
+                      <Briefcase size={15} style={{ color: "#0284c7" }} />
                     </div>
-                    <h6
-                      className="fw-bold mb-0"
-                      style={{ fontSize: "1rem", color: "#212529" }}
+                    <h4
+                      style={{
+                        fontSize: "0.9rem",
+                        fontWeight: 600,
+                        margin: 0,
+                        color: "#111827",
+                      }}
                     >
-                      Project Context
-                    </h6>
+                      Project context
+                    </h4>
                   </div>
-                  <p
-                    className="mb-0"
+                  <div
                     style={{
+                      borderRadius: "10px",
+                      background: "#f9fafb",
+                      border: "1px solid #e5e7eb",
+                      padding: "0.8rem 0.95rem",
+                      fontSize: "0.88rem",
                       lineHeight: "1.6",
-                      color: "#6c757d",
-                      fontSize: "0.875rem",
+                      color: "#4b5563",
+                      whiteSpace: "pre-wrap",
                     }}
                   >
                     {review.projectContext}
-                  </p>
+                  </div>
                 </div>
-              </div>
-            )}
-            {review.goalContext && (
-              <div className="col-md-6">
-                <div
-                  style={{
-                    background: "white",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: "8px",
-                    padding: "1.5rem",
-                    height: "100%",
-                  }}
-                >
-                  <div className="d-flex align-items-center gap-2 mb-3">
+              )}
+
+              {review.goalContext && (
+                <div>
+                  <div className="d-flex align-items-center gap-2 mb-2">
                     <div
                       style={{
-                        width: "32px",
-                        height: "32px",
-                        borderRadius: "6px",
-                        background: "#19875415",
+                        width: "26px",
+                        height: "26px",
+                        borderRadius: "999px",
+                        background: "#dcfce7",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                       }}
                     >
-                      <Target size={16} style={{ color: "#198754" }} />
+                      <Target size={15} style={{ color: "#15803d" }} />
                     </div>
-                    <h6
-                      className="fw-bold mb-0"
-                      style={{ fontSize: "1rem", color: "#212529" }}
+                    <h4
+                      style={{
+                        fontSize: "0.9rem",
+                        fontWeight: 600,
+                        margin: 0,
+                        color: "#111827",
+                      }}
                     >
-                      Goal Context
-                    </h6>
+                      Goal context
+                    </h4>
                   </div>
-                  <p
-                    className="mb-0"
+                  <div
                     style={{
+                      borderRadius: "10px",
+                      background: "#f9fafb",
+                      border: "1px solid #e5e7eb",
+                      padding: "0.8rem 0.95rem",
+                      fontSize: "0.88rem",
                       lineHeight: "1.6",
-                      color: "#6c757d",
-                      fontSize: "0.875rem",
+                      color: "#4b5563",
+                      whiteSpace: "pre-wrap",
                     }}
                   >
                     {review.goalContext}
-                  </p>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* SUBMITTED DATE INFO */}
-        {review.submittedDate && (
-          <div
-            style={{
-              background: "#f9fafb",
-              border: "1px solid #e5e7eb",
-              borderRadius: "8px",
-              padding: "1rem 1.25rem",
-              marginBottom: "1.5rem",
-            }}
-          >
-            <div className="d-flex align-items-center gap-2">
-              <CheckCircle size={16} style={{ color: "#198754" }} />
-              <small
-                className="text-muted fw-medium"
-                style={{ fontSize: "0.875rem" }}
-              >
-                Submitted on
-              </small>
-              <strong style={{ fontSize: "0.875rem", color: "#212529" }}>
-                {new Date(review.submittedDate).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </strong>
+              )}
             </div>
-          </div>
-        )}
-
-        {/* FINALIZED MESSAGE */}
-        {review.status === "Finalized" && (
-          <div
-            className="alert alert-success d-flex align-items-start gap-2 mb-3"
-            role="alert"
-            style={{ borderRadius: "8px", border: "1px solid #198754" }}
-          >
-            <CheckCircle
-              size={20}
-              className="flex-shrink-0"
-              style={{ marginTop: "2px" }}
-            />
-            <div>
-              <strong style={{ fontSize: "0.938rem" }}>Review Finalized</strong>
-              <p className="mb-0 small mt-1">
-                This review has been finalized and can no longer be modified.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* MODAL FOOTER STYLE BUTTONS */}
-        <div className="d-flex justify-content-end gap-2">
-          <button
-            className="btn btn-secondary d-flex align-items-center gap-2"
-            onClick={() => navigate(-1)}
-            style={{
-              borderRadius: "6px",
-              padding: "10px 20px",
-              fontWeight: 600,
-            }}
-          >
-            <ArrowLeft size={16} />
-            Back to List
-          </button>
+          )}
         </div>
 
-        <style>{`
-          @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-          }
-        `}</style>
+        {/* FOOTER */}
+        <div
+          style={{
+            padding: "0.75rem 1.5rem 1rem",
+            borderTop: "1px solid #e5e7eb",
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: "0.5rem",
+          }}
+        >
+          <button
+            className="btn"
+            onClick={handleClose}
+            style={{
+              borderRadius: "999px",
+              padding: "8px 16px",
+              background: "#ffffff",
+              border: "1px solid #d1d5db",
+              color: "#374151",
+              fontSize: "0.9rem",
+              fontWeight: 500,
+            }}
+          >
+            Close
+          </button>
+        </div>
       </div>
     </div>
   );

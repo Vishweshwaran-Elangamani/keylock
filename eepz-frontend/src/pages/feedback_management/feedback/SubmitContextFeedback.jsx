@@ -6,7 +6,6 @@ import {
   Target,
   Users,
   Loader,
-  ArrowLeft,
   Star,
   Home,
 } from "lucide-react";
@@ -17,16 +16,110 @@ import {
   employeeApi,
   goalsApi,
 } from "../../../services/feedbackmanagement/feedbackApi";
- 
+
+const PRIMARY = "#27235C";
+
+/** Reusable custom dropdown */
+const CustomSelect = ({
+  value,
+  onChange,
+  options,
+  placeholder,
+  disabled,
+  id,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const selectedOption = options.find(
+    (opt) => String(opt.value) === String(value)
+  );
+
+  const displayLabel = selectedOption ? selectedOption.label : placeholder;
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="ctx-dropdown-wrapper">
+      <button
+        type="button"
+        id={id}
+        onClick={() => !disabled && setIsOpen((o) => !o)}
+        className={`ctx-dropdown-select ${isOpen ? "open" : ""}`}
+        disabled={disabled}
+      >
+        <span className="ctx-dropdown-value">{displayLabel}</span>
+        <span className="ctx-dropdown-arrow">{isOpen ? "▴" : "▾"}</span>
+      </button>
+      {isOpen && (
+        <ul className="ctx-dropdown-list">
+          {options.map((opt) => {
+            const isSelected = String(opt.value) === String(value);
+            return (
+              <li
+                key={opt.value}
+                className={`ctx-dropdown-option ${
+                  isSelected ? "selected" : ""
+                }`}
+                onClick={() => handleSelect(opt.value)}
+              >
+                {opt.label}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+};
+
+// Helper to get role-based base dashboard + feedback paths
+const getRolePaths = (roleName) => {
+  switch (roleName) {
+    case "Manager":
+      return {
+        baseDashboard: "/manager/dashboard",
+        feedbackDashboard: "/manager/dashboard/feedback",
+        baseLabel: "Manager Dashboard",
+      };
+    case "HR":
+      return {
+        baseDashboard: "/hr/dashboard",
+        feedbackDashboard: "/hr/dashboard/feedback",
+        baseLabel: "HR Dashboard",
+      };
+    case "DepartmentHead":
+    case "Department Head":
+      return {
+        baseDashboard: "/depthead/dashboard",
+        feedbackDashboard: "/depthead/dashboard/feedback",
+        baseLabel: "Department Head Dashboard",
+      };
+    default:
+      // Employee fallback
+      return {
+        baseDashboard: "/employee/dashboard",
+        feedbackDashboard: "/employee/dashboard/feedback",
+        baseLabel: "Dashboard",
+      };
+  }
+};
+
 export default function SubmitContextFeedback() {
   const navigate = useNavigate();
- 
-  // Get logged-in user from localStorage
+
   const user = useMemo(
     () => JSON.parse(localStorage.getItem("user") || "{}") || {},
     []
   );
- 
+
+  const { baseDashboard, feedbackDashboard, baseLabel } = useMemo(
+    () => getRolePaths(user?.roleName),
+    [user?.roleName]
+  );
+
   const [activeTab, setActiveTab] = useState("goal");
   const [goalForm, setGoalForm] = useState({
     organizationObjectiveId: "",
@@ -48,36 +141,37 @@ export default function SubmitContextFeedback() {
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
   const [error, setError] = useState("");
- 
-  // Fetch goals and employees on mount
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoadingData(true);
         setError("");
- 
-        // Fetch organization-level goals
+
+        // Goals
         try {
           const goalsResponse = await goalsApi.getOrganizationLevel();
-         
           let goalsList = [];
-         
-          // Handle different response structures
           if (Array.isArray(goalsResponse.data)) {
             goalsList = goalsResponse.data;
-          } else if (goalsResponse.data?.data && Array.isArray(goalsResponse.data.data)) {
+          } else if (
+            goalsResponse.data?.data &&
+            Array.isArray(goalsResponse.data.data)
+          ) {
             goalsList = goalsResponse.data.data;
-          } else if (goalsResponse.data?.$values && Array.isArray(goalsResponse.data.$values)) {
+          } else if (
+            goalsResponse.data?.$values &&
+            Array.isArray(goalsResponse.data.$values)
+          ) {
             goalsList = goalsResponse.data.$values;
           }
-         
           setObjectives(goalsList);
         } catch (goalsError) {
           console.error("Failed to fetch goals:", goalsError);
           setObjectives([]);
         }
- 
-        // Fetch employees
+
+        // Employees
         try {
           const empResponse = await employeeApi.getAll();
           const employeesList = Array.isArray(empResponse.data)
@@ -89,7 +183,6 @@ export default function SubmitContextFeedback() {
           setError("Failed to load employees. Please refresh the page.");
           setEmployees([]);
         }
- 
       } catch (err) {
         console.error("Error in fetchData:", err);
         setError("Failed to load data. Please refresh the page.");
@@ -97,59 +190,56 @@ export default function SubmitContextFeedback() {
         setLoadingData(false);
       }
     };
- 
+
     fetchData();
   }, []);
- 
+
   // Handle goal selection
-  const handleObjectiveChange = (e) => {
-    const selectedId = Number(e.target.value);
-   
-    const selectedObjective = objectives.find(
-      (obj) => {
-        const objId = obj.goalId || obj.objectiveId || obj.id;
-        return objId === selectedId;
-      }
-    );
-   
-    setGoalForm({
-      ...goalForm,
-      organizationObjectiveId: selectedId,
-      objectiveTitle: selectedObjective?.goalName ||
-                     selectedObjective?.title ||
-                     selectedObjective?.name ||
-                     selectedObjective?.goalTitle || "",
+  const handleObjectiveChange = (selectedIdStr) => {
+    const selectedId = Number(selectedIdStr);
+    const selectedObjective = objectives.find((obj) => {
+      const objId = obj.goalId || obj.objectiveId || obj.id;
+      return objId === selectedId;
     });
+
+    setGoalForm((prev) => ({
+      ...prev,
+      organizationObjectiveId: selectedId,
+      objectiveTitle:
+        selectedObjective?.goalName ||
+        selectedObjective?.title ||
+        selectedObjective?.name ||
+        selectedObjective?.goalTitle ||
+        "",
+    }));
   };
- 
-  // Submit goal feedback
+
   const submitGoal = async (e) => {
     e.preventDefault();
     setSuccessMsg("");
     setError("");
- 
+
     if (!goalForm.organizationObjectiveId || !goalForm.feedbackComments?.trim()) {
       setError("Goal and comments are required.");
       return;
     }
- 
+
     setLoading(true);
     try {
-    const payload = {
-  goalId: Number(goalForm.organizationObjectiveId),
-  submittedByEmployeeId: Number(user?.empId),
-  recipientEmployeeId: Number(user?.empId),  // self
-  rating: Number(goalForm.rating || 0),
-  feedbackComments: goalForm.feedbackComments,
-  isAnonymous: !!goalForm.isAnonymous
-};
- 
-await orgGoalFeedbackApi.create(payload);
- 
- 
+      const payload = {
+        goalId: Number(goalForm.organizationObjectiveId),
+        submittedByEmployeeId: Number(user?.empId),
+        recipientEmployeeId: Number(user?.empId),
+        rating: Number(goalForm.rating || 0),
+        feedbackComments: goalForm.feedbackComments,
+        isAnonymous: !!goalForm.isAnonymous,
+      };
+
+      await orgGoalFeedbackApi.create(payload);
+
       setSuccessMsg("Goal feedback submitted successfully!");
       setGoalForm({
-        organizationObjectiveId: null,
+        organizationObjectiveId: "",
         objectiveTitle: "",
         rating: 4,
         feedbackComments: "",
@@ -167,28 +257,27 @@ await orgGoalFeedbackApi.create(payload);
       setLoading(false);
     }
   };
- 
+
   // Handle employee selection
-  const handleEmployeeChange = (e) => {
-    const selectedId = Number(e.target.value);
+  const handleEmployeeChange = (selectedIdStr) => {
+    const selectedId = Number(selectedIdStr);
     const selectedEmployee = employees.find(
       (emp) => emp.employeeId === selectedId
     );
-    setContextForm({
-      ...contextForm,
+    setContextForm((prev) => ({
+      ...prev,
       recipientEmployeeId: selectedId,
       recipientName: selectedEmployee
         ? `${selectedEmployee.firstName} ${selectedEmployee.lastName}`
         : "",
-    });
+    }));
   };
- 
-  // Submit context feedback
+
   const submitContext = async (e) => {
     e.preventDefault();
     setSuccessMsg("");
     setError("");
- 
+
     if (
       !contextForm.recipientEmployeeId ||
       !contextForm.feedbackContent?.trim() ||
@@ -197,38 +286,37 @@ await orgGoalFeedbackApi.create(payload);
       setError("Recipient, project context, and feedback are required.");
       return;
     }
- 
+
     setLoading(true);
     try {
       const contextPrefix = contextForm.projectContext
         ? `[${contextForm.projectContext}] `
         : "";
-     
+
       const peerPayload = {
         submittedByEmployeeId: Number(user?.empId),
         recipientEmployeeId: Number(contextForm.recipientEmployeeId),
         feedbackContent: contextPrefix + contextForm.feedbackContent,
         isAnonymous: !!contextForm.isAnonymous,
       };
- 
+
       const createResponse = await peerQueueApi.create(peerPayload);
- 
+
       if (createResponse?.data?.success || createResponse?.success) {
-        const queueId = createResponse.data?.data?.queueId ||
-                       createResponse.data?.queueId;
- 
+        const queueId =
+          createResponse.data?.data?.queueId || createResponse.data?.queueId;
+
         if (!queueId) {
           throw new Error("Queue ID not returned from server");
         }
- 
-        // Attempt auto-approval
+
         try {
           const approveResponse = await peerQueueApi.approve(queueId, {
             isProfessional: true,
             isRelevant: true,
             approvedByHRId: Number(user?.empId),
           });
- 
+
           if (approveResponse?.success || approveResponse?.data?.success) {
             setSuccessMsg(
               `Context feedback submitted successfully for ${contextForm.recipientName}!`
@@ -244,7 +332,7 @@ await orgGoalFeedbackApi.create(payload);
             `Context feedback submitted to ${contextForm.recipientName}, pending approval.`
           );
         }
- 
+
         setContextForm({
           recipientEmployeeId: "",
           recipientName: "",
@@ -256,8 +344,8 @@ await orgGoalFeedbackApi.create(payload);
       } else {
         setError(
           createResponse?.data?.message ||
-          createResponse?.message ||
-          "Failed to submit context feedback"
+            createResponse?.message ||
+            "Failed to submit context feedback"
         );
       }
     } catch (err) {
@@ -271,20 +359,16 @@ await orgGoalFeedbackApi.create(payload);
       setLoading(false);
     }
   };
- 
-  // Get selected goal/employee for display
-  const selectedObjective = objectives.find(
-    (obj) => {
-      const objId = obj.goalId || obj.objectiveId || obj.id;
-      return objId == goalForm.organizationObjectiveId;
-    }
-  );
- 
+
+  const selectedObjective = objectives.find((obj) => {
+    const objId = obj.goalId || obj.objectiveId || obj.id;
+    return objId == goalForm.organizationObjectiveId;
+  });
+
   const selectedEmployee = employees.find(
     (emp) => emp.employeeId == contextForm.recipientEmployeeId
   );
- 
-  // Render star rating
+
   const renderStars = (rating) => {
     return [...Array(5)].map((_, index) => {
       const starValue = index + 1;
@@ -301,17 +385,18 @@ await orgGoalFeedbackApi.create(payload);
       );
     });
   };
- 
-  // Helper function to get goal display name
+
   const getGoalDisplayName = (goal) => {
-    return goal.goalName ||
-           goal.title ||
-           goal.name ||
-           goal.goalTitle ||
-           goal.objectiveName ||
-           `Untitled Goal`;
+    return (
+      goal.goalName ||
+      goal.title ||
+      goal.name ||
+      goal.goalTitle ||
+      goal.objectiveName ||
+      `Untitled Goal`
+    );
   };
- 
+
   return (
     <div
       style={{
@@ -320,6 +405,7 @@ await orgGoalFeedbackApi.create(payload);
         display: "flex",
         justifyContent: "center",
         padding: "1.25rem 1rem",
+        fontFamily: "'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif",
       }}
     >
       <div
@@ -328,7 +414,7 @@ await orgGoalFeedbackApi.create(payload);
           maxWidth: "900px",
         }}
       >
-        {/* Breadcrumb Navigation */}
+        {/* Breadcrumb – role-aware */}
         <nav aria-label="breadcrumb" style={{ marginBottom: "2rem" }}>
           <ol
             style={{
@@ -342,7 +428,7 @@ await orgGoalFeedbackApi.create(payload);
           >
             <li>
               <Link
-                to="/employee/dashboard"
+                to={baseDashboard}
                 style={{
                   color: "#97247E",
                   display: "flex",
@@ -350,23 +436,29 @@ await orgGoalFeedbackApi.create(payload);
                   textDecoration: "none",
                   fontWeight: 500,
                   transition: "color 0.2s ease",
+                  fontFamily: "inherit",
                 }}
                 onMouseEnter={(e) => (e.currentTarget.style.color = "#E01950")}
                 onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
               >
                 <Home size={18} style={{ marginRight: "5px" }} />
-                Dashboard
+                {baseLabel}
               </Link>
             </li>
-            <li style={{ margin: "0 0.75rem", color: "#97247E", fontWeight: 400 }}>/</li>
+            <li
+              style={{ margin: "0 0.75rem", color: "#97247E", fontWeight: 400 }}
+            >
+              /
+            </li>
             <li>
               <Link
-                to="/employee/dashboard/feedback"
+                to={feedbackDashboard}
                 style={{
                   color: "#97247E",
                   textDecoration: "none",
                   fontWeight: 500,
                   transition: "color 0.2s ease",
+                  fontFamily: "inherit",
                 }}
                 onMouseEnter={(e) => (e.currentTarget.style.color = "#E01950")}
                 onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
@@ -374,23 +466,26 @@ await orgGoalFeedbackApi.create(payload);
                 Feedback Management
               </Link>
             </li>
-            <li style={{ margin: "0 0.75rem", color: "#97247E", fontWeight: 400 }}>/</li>
+            <li
+              style={{ margin: "0 0.75rem", color: "#97247E", fontWeight: 400 }}
+            >
+              /
+            </li>
             <li>
-              <Link
-                to="/employee/dashboard/feedback/contextfeedback"
+              <span
                 style={{
                   color: "#97247E",
-                  textDecoration: "none",
                   fontWeight: 600,
+                  fontFamily: "inherit",
                 }}
               >
                 Submit Feedback
-              </Link>
+              </span>
             </li>
           </ol>
         </nav>
- 
-        {/* Error alert */}
+
+        {/* Error */}
         {error && (
           <div
             className="alert alert-danger d-flex align-items-start gap-2 mb-3"
@@ -399,6 +494,7 @@ await orgGoalFeedbackApi.create(payload);
               border: "none",
               backgroundColor: "#fee2e2",
               padding: "0.75rem 1rem",
+              fontFamily: "inherit",
             }}
           >
             <AlertTriangle
@@ -409,7 +505,7 @@ await orgGoalFeedbackApi.create(payload);
             <div className="flex-grow-1">
               <p
                 className="mb-0"
-                style={{ fontSize: "0.875rem", color: "#991b1b" }}
+                style={{ fontSize: "0.875rem", color: "#991b1b", fontFamily: "inherit" }}
               >
                 {error}
               </p>
@@ -422,8 +518,8 @@ await orgGoalFeedbackApi.create(payload);
             />
           </div>
         )}
- 
-        {/* Success alert */}
+
+        {/* Success */}
         {successMsg && (
           <div
             className="alert alert-success d-flex align-items-center gap-2 mb-3"
@@ -432,6 +528,7 @@ await orgGoalFeedbackApi.create(payload);
               border: "none",
               backgroundColor: "#dcfce7",
               padding: "0.75rem 1rem",
+              fontFamily: "inherit",
             }}
           >
             <CheckCircle
@@ -441,7 +538,7 @@ await orgGoalFeedbackApi.create(payload);
             />
             <p
               className="mb-0 flex-grow-1"
-              style={{ fontSize: "0.875rem", color: "#166534" }}
+              style={{ fontSize: "0.875rem", color: "#166534", fontFamily: "inherit" }}
             >
               {successMsg}
             </p>
@@ -453,17 +550,18 @@ await orgGoalFeedbackApi.create(payload);
             />
           </div>
         )}
- 
-        {/* Tab selector - NEW DESIGN */}
+
+        {/* Tabs */}
         <div
           style={{
-            background: "#27235C",
+            background: PRIMARY,
             borderRadius: "30px",
             padding: "4px",
             display: "inline-flex",
             gap: "4px",
             marginBottom: "1.5rem",
             boxShadow: "0 2px 8px rgba(39, 35, 92, 0.15)",
+            fontFamily: "inherit",
           }}
         >
           <button
@@ -471,7 +569,7 @@ await orgGoalFeedbackApi.create(payload);
             onClick={() => setActiveTab("goal")}
             style={{
               background: activeTab === "goal" ? "#fff" : "transparent",
-              color: activeTab === "goal" ? "#27235C" : "#fff",
+              color: activeTab === "goal" ? PRIMARY : "#fff",
               border: "none",
               borderRadius: "26px",
               padding: "10px 24px",
@@ -483,18 +581,19 @@ await orgGoalFeedbackApi.create(payload);
               alignItems: "center",
               gap: "8px",
               whiteSpace: "nowrap",
+              fontFamily: "inherit",
             }}
           >
             <Target size={16} />
             Goal Feedback
           </button>
- 
+
           <button
             type="button"
             onClick={() => setActiveTab("context")}
             style={{
               background: activeTab === "context" ? "#fff" : "transparent",
-              color: activeTab === "context" ? "#27235C" : "#fff",
+              color: activeTab === "context" ? PRIMARY : "#fff",
               border: "none",
               borderRadius: "26px",
               padding: "10px 24px",
@@ -506,30 +605,29 @@ await orgGoalFeedbackApi.create(payload);
               alignItems: "center",
               gap: "8px",
               whiteSpace: "nowrap",
+              fontFamily: "inherit",
             }}
           >
             <Users size={16} />
             Context Feedback
           </button>
         </div>
- 
-        {/* Loading state */}
+
+        {/* Loading */}
         {loadingData && (
-          <div
-            className="card border-0 shadow-sm"
-            style={{ borderRadius: "10px" }}
-          >
-            <div className="card-body text-center py-5">
+          <div className="card border-0 shadow-sm" style={{ borderRadius: "10px" }}>
+            <div className="card-body text-center py-5" style={{ fontFamily: "inherit" }}>
               <Loader
                 size={40}
                 className="mb-3 animate-spin"
-                style={{ color: "#27235C" }}
+                style={{ color: PRIMARY }}
               />
               <p
                 style={{
                   fontSize: "0.875rem",
                   color: "#64748b",
                   marginBottom: 0,
+                  fontFamily: "inherit",
                 }}
               >
                 Loading data...
@@ -537,52 +635,40 @@ await orgGoalFeedbackApi.create(payload);
             </div>
           </div>
         )}
- 
-        {/* Goal feedback form */}
+
+        {/* Goal feedback */}
         {!loadingData && activeTab === "goal" && (
-          <div
-            className="card border-0 shadow-sm"
-            style={{ borderRadius: "10px" }}
-          >
-            <div className="card-body" style={{ padding: "1.5rem" }}>
+          <div className="card border-0 shadow-sm" style={{ borderRadius: "10px" }}>
+            <div className="card-body" style={{ padding: "1.5rem", fontFamily: "inherit" }}>
               <form onSubmit={submitGoal}>
+                {/* Goal dropdown */}
                 <div className="mb-4">
                   <label
-                    className="form-label fw-semibold mb-2"
-                    style={{ fontSize: "0.875rem", color: "#0f172a" }}
+                    className="form-label fw-semibold mb-2 left-label"
+                    style={{ fontSize: "0.875rem", color: "#0f172a", fontFamily: "inherit" }}
                   >
                     Select Organization Goal <span className="text-danger">*</span>
                   </label>
-                  <select
-                    className="form-select"
+                  <CustomSelect
+                    id="goalSelect"
                     value={goalForm.organizationObjectiveId}
                     onChange={handleObjectiveChange}
-                    required
-                    style={{
-                      borderRadius: "8px",
-                      border: "1px solid #e2e8f0",
-                      fontSize: "0.875rem",
-                      padding: "0.625rem 0.875rem",
-                    }}
-                  >
-                    <option value="">Choose a goal...</option>
-                    {objectives.map((obj) => {
+                    disabled={false}
+                    placeholder={
+                      objectives.length === 0
+                        ? "No organization goals available"
+                        : "Choose a goal..."
+                    }
+                    options={objectives.map((obj) => {
                       const objId = obj.goalId || obj.objectiveId || obj.id;
-                      const objName = getGoalDisplayName(obj);
-                      return (
-                        <option key={objId} value={objId}>
-                          {objName}
-                        </option>
-                      );
+                      return {
+                        value: objId,
+                        label: getGoalDisplayName(obj),
+                      };
                     })}
-                  </select>
-                  {objectives.length === 0 && (
-                    <small className="text-muted d-block mt-1">
-                      No organization goals available
-                    </small>
-                  )}
+                  />
                 </div>
- 
+
                 {selectedObjective && (
                   <div
                     className="mb-4 p-3"
@@ -590,6 +676,7 @@ await orgGoalFeedbackApi.create(payload);
                       backgroundColor: "#f8fafc",
                       borderRadius: "8px",
                       border: "1px solid #e2e8f0",
+                      fontFamily: "inherit",
                     }}
                   >
                     <div
@@ -597,6 +684,7 @@ await orgGoalFeedbackApi.create(payload);
                         fontSize: "0.75rem",
                         color: "#64748b",
                         marginBottom: "0.25rem",
+                        fontFamily: "inherit",
                       }}
                     >
                       Goal Description
@@ -606,20 +694,22 @@ await orgGoalFeedbackApi.create(payload);
                         fontSize: "0.875rem",
                         color: "#0f172a",
                         marginBottom: 0,
+                        fontFamily: "inherit",
                       }}
                     >
                       {selectedObjective.description ||
-                       selectedObjective.goalDescription ||
-                       selectedObjective.objectiveDescription ||
-                       "No description available"}
+                        selectedObjective.goalDescription ||
+                        selectedObjective.objectiveDescription ||
+                        "No description available"}
                     </p>
                   </div>
                 )}
- 
+
+                {/* Rating */}
                 <div className="mb-4">
                   <label
-                    className="form-label fw-semibold mb-2"
-                    style={{ fontSize: "0.875rem", color: "#0f172a" }}
+                    className="form-label fw-semibold mb-2 left-label"
+                    style={{ fontSize: "0.875rem", color: "#0f172a", fontFamily: "inherit" }}
                   >
                     Rating <span className="text-danger">*</span>
                   </label>
@@ -629,6 +719,7 @@ await orgGoalFeedbackApi.create(payload);
                       backgroundColor: "#f8fafc",
                       borderRadius: "8px",
                       border: "1px solid #e2e8f0",
+                      fontFamily: "inherit",
                     }}
                   >
                     <div className="d-flex gap-1">{renderStars(goalForm.rating)}</div>
@@ -636,18 +727,20 @@ await orgGoalFeedbackApi.create(payload);
                       style={{
                         fontSize: "0.875rem",
                         fontWeight: 600,
-                        color: "#27235C",
+                        color: PRIMARY,
+                        fontFamily: "inherit",
                       }}
                     >
                       {goalForm.rating}/5
                     </span>
                   </div>
                 </div>
- 
+
+                {/* Comments */}
                 <div className="mb-4">
                   <label
-                    className="form-label fw-semibold mb-2"
-                    style={{ fontSize: "0.875rem", color: "#0f172a" }}
+                    className="form-label fw-semibold mb-2 left-label"
+                    style={{ fontSize: "0.875rem", color: "#0f172a", fontFamily: "inherit" }}
                   >
                     Feedback Comments <span className="text-danger">*</span>
                   </label>
@@ -656,10 +749,10 @@ await orgGoalFeedbackApi.create(payload);
                     rows={5}
                     value={goalForm.feedbackComments}
                     onChange={(e) =>
-                      setGoalForm({
-                        ...goalForm,
+                      setGoalForm((prev) => ({
+                        ...prev,
                         feedbackComments: e.target.value,
-                      })
+                      }))
                     }
                     placeholder="Provide your detailed feedback on this goal..."
                     required
@@ -670,11 +763,12 @@ await orgGoalFeedbackApi.create(payload);
                       fontSize: "0.875rem",
                       resize: "vertical",
                       minHeight: "120px",
+                      fontFamily: "inherit",
                     }}
                   />
                   <div
                     className="d-flex justify-content-between"
-                    style={{ marginTop: "0.5rem" }}
+                    style={{ marginTop: "0.5rem", fontFamily: "inherit" }}
                   >
                     <span style={{ fontSize: "0.75rem", color: "#64748b" }}>
                       Be specific and constructive
@@ -692,37 +786,39 @@ await orgGoalFeedbackApi.create(payload);
                     </span>
                   </div>
                 </div>
- 
+
+                {/* Anonymous checkbox */}
                 <div className="mb-4">
-                  <div className="form-check">
+                  <div className="form-check" style={{ fontFamily: "inherit" }}>
                     <input
                       className="form-check-input"
                       type="checkbox"
                       id="goalAnon"
                       checked={goalForm.isAnonymous}
                       onChange={(e) =>
-                        setGoalForm({
-                          ...goalForm,
+                        setGoalForm((prev) => ({
+                          ...prev,
                           isAnonymous: e.target.checked,
-                        })
+                        }))
                       }
                     />
                     <label
-                      className="form-check-label"
+                      className="form-check-label left-label"
                       htmlFor="goalAnon"
-                      style={{ fontSize: "0.875rem" }}
+                      style={{ fontSize: "0.875rem", fontFamily: "inherit" }}
                     >
                       Submit anonymously
                     </label>
                   </div>
                 </div>
- 
+
                 <button
                   type="submit"
                   className="btn w-100 d-flex align-items-center justify-content-center gap-2"
                   disabled={loading || !goalForm.organizationObjectiveId}
                   style={{
-                    background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+                    background:
+                      "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
                     color: "white",
                     border: "none",
                     borderRadius: "8px",
@@ -731,6 +827,7 @@ await orgGoalFeedbackApi.create(payload);
                     fontWeight: 600,
                     transition: "all 0.3s ease",
                     boxShadow: "0 2px 8px rgba(151, 36, 126, 0.2)",
+                    fontFamily: "inherit",
                   }}
                   onMouseEnter={(e) => {
                     if (!loading) {
@@ -761,43 +858,37 @@ await orgGoalFeedbackApi.create(payload);
             </div>
           </div>
         )}
- 
-        {/* Context feedback form */}
+
+        {/* Context feedback */}
         {!loadingData && activeTab === "context" && (
-          <div
-            className="card border-0 shadow-sm"
-            style={{ borderRadius: "10px" }}
-          >
-            <div className="card-body" style={{ padding: "1.5rem" }}>
+          <div className="card border-0 shadow-sm" style={{ borderRadius: "10px" }}>
+            <div className="card-body" style={{ padding: "1.5rem", fontFamily: "inherit" }}>
               <form onSubmit={submitContext}>
+                {/* Recipient dropdown */}
                 <div className="mb-4">
                   <label
-                    className="form-label fw-semibold mb-2"
-                    style={{ fontSize: "0.875rem", color: "#0f172a" }}
+                    className="form-label fw-semibold mb-2 left-label"
+                    style={{ fontSize: "0.875rem", color: "#0f172a", fontFamily: "inherit" }}
                   >
                     Select Recipient <span className="text-danger">*</span>
                   </label>
-                  <select
-                    className="form-select"
+                  <CustomSelect
+                    id="recipientSelect"
                     value={contextForm.recipientEmployeeId}
                     onChange={handleEmployeeChange}
-                    required
-                    style={{
-                      borderRadius: "8px",
-                      border: "1px solid #e2e8f0",
-                      fontSize: "0.875rem",
-                      padding: "0.625rem 0.875rem",
-                    }}
-                  >
-                    <option value="">Choose a team member...</option>
-                    {employees.map((emp) => (
-                      <option key={emp.employeeId} value={emp.employeeId}>
-                        {emp.firstName} {emp.lastName} ({emp.email})
-                      </option>
-                    ))}
-                  </select>
+                    disabled={false}
+                    placeholder={
+                      employees.length === 0
+                        ? "No employees available"
+                        : "Choose a team member..."
+                    }
+                    options={employees.map((emp) => ({
+                      value: emp.employeeId,
+                      label: `${emp.firstName} ${emp.lastName} (${emp.email})`,
+                    }))}
+                  />
                 </div>
- 
+
                 {selectedEmployee && (
                   <div
                     className="mb-4 p-3"
@@ -805,6 +896,7 @@ await orgGoalFeedbackApi.create(payload);
                       backgroundColor: "#f8fafc",
                       borderRadius: "8px",
                       border: "1px solid #e2e8f0",
+                      fontFamily: "inherit",
                     }}
                   >
                     <div
@@ -812,6 +904,7 @@ await orgGoalFeedbackApi.create(payload);
                         fontSize: "0.75rem",
                         color: "#64748b",
                         marginBottom: "0.25rem",
+                        fontFamily: "inherit",
                       }}
                     >
                       Feedback for
@@ -821,20 +914,22 @@ await orgGoalFeedbackApi.create(payload);
                         fontSize: "0.875rem",
                         fontWeight: 600,
                         color: "#0f172a",
+                        fontFamily: "inherit",
                       }}
                     >
                       {selectedEmployee.firstName} {selectedEmployee.lastName}
                     </div>
-                    <small style={{ fontSize: "0.75rem", color: "#64748b" }}>
+                    <small style={{ fontSize: "0.75rem", color: "#64748b", fontFamily: "inherit" }}>
                       {selectedEmployee.email}
                     </small>
                   </div>
                 )}
- 
+
+                {/* Project context */}
                 <div className="mb-4">
                   <label
-                    className="form-label fw-semibold mb-2"
-                    style={{ fontSize: "0.875rem", color: "#0f172a" }}
+                    className="form-label fw-semibold mb-2 left-label"
+                    style={{ fontSize: "0.875rem", color: "#0f172a", fontFamily: "inherit" }}
                   >
                     Project Context <span className="text-danger">*</span>
                   </label>
@@ -843,10 +938,10 @@ await orgGoalFeedbackApi.create(payload);
                     className="form-control"
                     value={contextForm.projectContext}
                     onChange={(e) =>
-                      setContextForm({
-                        ...contextForm,
+                      setContextForm((prev) => ({
+                        ...prev,
                         projectContext: e.target.value,
-                      })
+                      }))
                     }
                     placeholder="e.g., AI Platform Project, Q4 Sprint"
                     required
@@ -855,14 +950,16 @@ await orgGoalFeedbackApi.create(payload);
                       border: "1px solid #e2e8f0",
                       fontSize: "0.875rem",
                       padding: "0.625rem 0.875rem",
+                      fontFamily: "inherit",
                     }}
                   />
                 </div>
- 
+
+                {/* Feedback content */}
                 <div className="mb-4">
                   <label
-                    className="form-label fw-semibold mb-2"
-                    style={{ fontSize: "0.875rem", color: "#0f172a" }}
+                    className="form-label fw-semibold mb-2 left-label"
+                    style={{ fontSize: "0.875rem", color: "#0f172a", fontFamily: "inherit" }}
                   >
                     Feedback Content <span className="text-danger">*</span>
                   </label>
@@ -871,10 +968,10 @@ await orgGoalFeedbackApi.create(payload);
                     rows={5}
                     value={contextForm.feedbackContent}
                     onChange={(e) =>
-                      setContextForm({
-                        ...contextForm,
+                      setContextForm((prev) => ({
+                        ...prev,
                         feedbackContent: e.target.value,
-                      })
+                      }))
                     }
                     placeholder="Provide constructive feedback on their work, collaboration, or skills..."
                     required
@@ -885,11 +982,12 @@ await orgGoalFeedbackApi.create(payload);
                       fontSize: "0.875rem",
                       resize: "vertical",
                       minHeight: "120px",
+                      fontFamily: "inherit",
                     }}
                   />
                   <div
                     className="d-flex justify-content-between"
-                    style={{ marginTop: "0.5rem" }}
+                    style={{ marginTop: "0.5rem", fontFamily: "inherit" }}
                   >
                     <span style={{ fontSize: "0.75rem", color: "#64748b" }}>
                       Be specific and constructive
@@ -907,31 +1005,32 @@ await orgGoalFeedbackApi.create(payload);
                     </span>
                   </div>
                 </div>
- 
+
+                {/* Anonymous checkbox */}
                 <div className="mb-4">
-                  <div className="form-check">
+                  <div className="form-check" style={{ fontFamily: "inherit" }}>
                     <input
                       className="form-check-input"
                       type="checkbox"
                       id="contextAnon"
                       checked={contextForm.isAnonymous}
                       onChange={(e) =>
-                        setContextForm({
-                          ...contextForm,
+                        setContextForm((prev) => ({
+                          ...prev,
                           isAnonymous: e.target.checked,
-                        })
+                        }))
                       }
                     />
                     <label
-                      className="form-check-label"
+                      className="form-check-label left-label"
                       htmlFor="contextAnon"
-                      style={{ fontSize: "0.875rem" }}
+                      style={{ fontSize: "0.875rem", fontFamily: "inherit" }}
                     >
                       Submit anonymously
                     </label>
                   </div>
                 </div>
- 
+
                 <button
                   type="submit"
                   className="btn w-100 d-flex align-items-center justify-content-center gap-2"
@@ -941,7 +1040,8 @@ await orgGoalFeedbackApi.create(payload);
                     !contextForm.projectContext
                   }
                   style={{
-                    background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+                    background:
+                      "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
                     color: "white",
                     border: "none",
                     borderRadius: "8px",
@@ -950,6 +1050,7 @@ await orgGoalFeedbackApi.create(payload);
                     fontWeight: 600,
                     transition: "all 0.3s ease",
                     boxShadow: "0 2px 8px rgba(151, 36, 126, 0.2)",
+                    fontFamily: "inherit",
                   }}
                   onMouseEnter={(e) => {
                     if (!loading) {
@@ -981,27 +1082,133 @@ await orgGoalFeedbackApi.create(payload);
           </div>
         )}
       </div>
- 
+
       <style>{`
+        /* Import Poppins font */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
         .animate-spin { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .form-control:focus, .form-select:focus {
-          border-color: #27235C;
+
+        .form-control,
+        .btn,
+        .form-label,
+        .form-check-label,
+        .alert,
+        .card,
+        .ctx-dropdown-select,
+        .ctx-dropdown-option {
+          font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+        }
+
+        .form-control::placeholder {
+          font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+        }
+
+        .form-control:focus {
+          border-color: ${PRIMARY};
           box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
         }
- 
-        .form-select {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%23475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>') no-repeat right 1rem center;
-  background-color: #fff;
-  padding-right: 2.5rem;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 10px;
-  font-size: 0.938rem;
-  cursor: pointer;
-}
+
+        /* Force all form labels on this page to be left aligned */
+        .left-label,
+        .card .form-label,
+        .card .form-check-label {
+          text-align: left !important;
+          display: block;
+          width: 100%;
+        }
+
+        /* Custom dropdown styles */
+        .ctx-dropdown-wrapper {
+          position: relative;
+          width: 100%;
+        }
+
+        .ctx-dropdown-select {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
+          padding: 0.75rem 1rem;
+          font-size: 0.9375rem;
+          background: #ffffff;
+          border: 1.5px solid #e2e8f0;
+          border-radius: 10px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          text-align: left;
+        }
+
+        .ctx-dropdown-select.open {
+          border-color: ${PRIMARY};
+          border-bottom-left-radius: 0;
+          border-bottom-right-radius: 0;
+          box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+        }
+
+        .ctx-dropdown-select:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .ctx-dropdown-value {
+          flex: 1;
+          text-align: left;
+          color: #111827;
+          font-weight: 400;
+        }
+
+        .ctx-dropdown-arrow {
+          color: #6b7280;
+          margin-left: 0.5rem;
+          font-size: 0.85rem;
+        }
+
+        .ctx-dropdown-list {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          background: #ffffff;
+          border: 1px solid ${PRIMARY};
+          border-top: none;
+          border-radius: 0 0 10px 10px;
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+          max-height: 260px;
+          overflow-y: auto;
+          z-index: 1000;
+          list-style: none;
+          margin: 0;
+          padding: 0;
+        }
+
+        .ctx-dropdown-option {
+          padding: 0.75rem 1rem;
+          font-size: 0.9375rem;
+          color: #4b5563;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          border-bottom: 1px solid #e5e7eb;
+          background: #ffffff;
+          text-align: left;
+        }
+
+        .ctx-dropdown-option:last-child {
+          border-bottom: none;
+        }
+
+        .ctx-dropdown-option:hover {
+          background: ${PRIMARY};
+          color: #ffffff;
+          font-weight: 600;
+        }
+
+        .ctx-dropdown-option.selected {
+          background: ${PRIMARY};
+          color: #ffffff;
+          font-weight: 600;
+        }
       `}</style>
     </div>
   );

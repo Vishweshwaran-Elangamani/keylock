@@ -1,7 +1,3 @@
-
-/* src/styles/feedback/ManagerReviewsList.css */
-/* Namespace: fm-mgrrev- (feedback management, manager reviews) */
-
 .fm-mgrrev-page-wrapper {
   background-color: #f8f9fa;
   min-height: 100vh;
@@ -13,7 +9,6 @@
   margin: 0 auto;
 }
 
-/* Header */
 .fm-mgrrev-header {
   display: flex;
   justify-content: space-between;
@@ -28,7 +23,6 @@
   gap: 0.75rem;
 }
 
-/* Buttons */
 .fm-mgrrev-btn {
   display: inline-flex;
   align-items: center;
@@ -104,7 +98,6 @@
   }
 }
 
-/* Error Alert */
 .fm-mgrrev-error-alert {
   display: flex;
   align-items: flex-start;
@@ -114,7 +107,6 @@
   margin-bottom: 1.5rem;
 }
 
-/* Table Wrapper */
 .fm-mgrrev-table-wrapper {
   background: white;
   border: 2px solid #27235c;
@@ -122,7 +114,6 @@
   overflow: hidden;
 }
 
-/* Loading & Empty States */
 .fm-mgrrev-loading {
   text-align: center;
   padding: 4rem 2rem;
@@ -157,7 +148,6 @@
   font-size: 0.875rem;
 }
 
-/* Table */
 .fm-mgrrev-table-scroll {
   overflow-x: auto;
 }
@@ -165,7 +155,7 @@
 .fm-mgrrev-table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed; /* Ensures consistent column widths */
+  table-layout: fixed; 
 }
 
 .fm-mgrrev-table__head {
@@ -175,7 +165,7 @@
 
 .fm-mgrrev-table__th,
 .fm-mgrrev-table__td {
-  padding: 1rem 1.25rem; /* Unified padding */
+  padding: 1rem 1.25rem; 
   font-size: 0.875rem;
   text-align: left;
   vertical-align: middle;
@@ -221,7 +211,6 @@
   white-space: nowrap;
 }
 
-/* Employee Cell */
 .fm-mgrrev-table__employee {
   display: flex;
   align-items: center;
@@ -264,7 +253,6 @@
   gap: 0.5rem;
 }
 
-/* Column Widths for Alignment */
 .fm-mgrrev-table__th:nth-child(1),
 .fm-mgrrev-table__td:nth-child(1) { width: 25%; }
 .fm-mgrrev-table__th:nth-child(2),
@@ -278,7 +266,7 @@
 .fm-mgrrev-table__th:nth-child(6),
 .fm-mgrrev-table__td:nth-child(6) { width: 10%; }
 
-/* Badges */
+
 .fm-mgrrev-badge {
   display: inline-block;
   padding: 0.5rem 1rem;
@@ -298,7 +286,7 @@
   color: #3b82f6;
 }
 
-/* Action Button */
+
 .fm-mgrrev-action-btn {
   padding: 0.625rem;
   border: 1.5px solid #e5e7eb;
@@ -320,7 +308,6 @@
   color: white;
 }
 
-/* Modal */
 .fm-mgrrev-modal-backdrop {
   position: fixed;
   top: 0;
@@ -398,7 +385,6 @@
   gap: 0.75rem;
 }
 
-/* Form Elements */
 .fm-mgrrev-form-label {
   display: block;
   font-size: 0.875rem;
@@ -426,7 +412,7 @@
   color: #475569;
 }
 
-/* Rating Buttons */
+
 .fm-mgrrev-rating-buttons {
   display: flex;
   gap: 0.5rem;
@@ -465,7 +451,6 @@
   font-weight: 500;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .fm-mgrrev-page-wrapper {
     padding: 1rem;

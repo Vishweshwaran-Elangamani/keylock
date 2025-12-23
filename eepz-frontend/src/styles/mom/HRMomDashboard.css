@@ -1,8 +1,3 @@
-/* ========================================
-   HR MOM Dashboard - Compact Styling with Rounded Tables
-   ======================================== */
-
-/* Container */
 .mom-dashboard-container {
   min-height: 100vh;
   background: #f8f9fa;
@@ -14,7 +9,6 @@
   margin: 0 auto;
 }
 
-/* Header */
 .mom-header {
   display: flex;
   justify-content: space-between;
@@ -39,7 +33,6 @@
   border-radius: 6px !important;
 }
 
-/* Breadcrumb */
 .mom-breadcrumb {
   margin-bottom: 0;
 }
@@ -68,7 +61,7 @@
   color: #1e293b;
 }
 
-/* Stat Cards - Compact */
+
 .mom-stat-card {
   border: 2px solid #27235c !important;
   border-radius: 10px !important;
@@ -123,7 +116,6 @@
   letter-spacing: 0.025em !important;
 }
 
-/* Table Card - Rounded */
 .mom-table-card {
   border: none !important;
   border-radius: 12px !important;
@@ -131,13 +123,12 @@
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Table Wrapper */
+
 .mom-table-wrapper {
   overflow: hidden;
   border-radius: 12px;
 }
 
-/* Table - Rounded Corners */
 .mom-table {
   margin-bottom: 0 !important;
   border-collapse: separate !important;
@@ -147,7 +138,6 @@
   overflow: hidden !important;
 }
 
-/* Table Header - Rounded Top Corners */
 .mom-table thead {
   background-color: #27235c !important;
   color: white !important;
@@ -166,7 +156,6 @@
   text-transform: uppercase;
 }
 
-/* Rounded corners for header cells */
 .mom-table thead tr:first-child th:first-child {
   border-top-left-radius: 12px !important;
 }
@@ -175,7 +164,6 @@
   border-top-right-radius: 12px !important;
 }
 
-/* Center align specific headers */
 .mom-table thead th:nth-child(4),
 .mom-table thead th:nth-child(5),
 .mom-table thead th:nth-child(6),
@@ -183,7 +171,7 @@
   text-align: center !important;
 }
 
-/* Table Body Cells - Compact */
+
 .mom-table tbody td {
   padding: 0.75rem 0.875rem !important;
   vertical-align: middle !important;
@@ -195,7 +183,6 @@
   background-color: white !important;
 }
 
-/* Rounded corners for last row body cells */
 .mom-table tbody tr:last-child td:first-child {
   border-bottom-left-radius: 12px !important;
 }
@@ -204,7 +191,6 @@
   border-bottom-right-radius: 12px !important;
 }
 
-/* Center align specific body columns */
 .mom-table tbody td:nth-child(4),
 .mom-table tbody td:nth-child(5),
 .mom-table tbody td:nth-child(6),
@@ -212,12 +198,11 @@
   text-align: center !important;
 }
 
-/* Remove border from first row */
 .mom-table tbody tr:first-child td {
   border-top: none !important;
 }
 
-/* Row Hover Effect */
+
 .mom-table tbody tr {
   transition: background-color 0.15s ease !important;
 }
@@ -230,7 +215,7 @@
   background-color: rgba(39, 35, 92, 0.04) !important;
 }
 
-/* Table Icon - Compact */
+
 .mom-table-icon {
   width: 36px !important;
   height: 36px !important;
@@ -242,7 +227,6 @@
   flex-shrink: 0 !important;
 }
 
-/* Meeting Title - Compact */
 .mom-meeting-title {
   font-size: 0.875rem !important;
   color: #1e293b !important;
@@ -251,7 +235,6 @@
   line-height: 1.3 !important;
 }
 
-/* Badge - Compact */
 .mom-badge {
   font-size: 0.688rem !important;
   font-weight: 600 !important;
@@ -259,7 +242,6 @@
   border-radius: 4px !important;
 }
 
-/* Count Badge - Compact */
 .mom-count-badge {
   display: inline-flex !important;
   align-items: center !important;
@@ -272,7 +254,6 @@
   font-size: 0.813rem !important;
 }
 
-/* View Button - Compact */
 .mom-view-btn {
   background-color: #27235c !important;
   color: white !important;
@@ -293,13 +274,11 @@
   transform: translateY(-1px) !important;
 }
 
-/* Empty State - Compact */
 .mom-empty-state {
   padding: 2rem 1rem !important;
   text-align: center !important;
 }
 
-/* Submitter Avatar - Compact */
 .mom-submitter-avatar {
   width: 32px !important;
   height: 32px !important;
@@ -324,13 +303,12 @@
   color: #64748b !important;
 }
 
-/* Meeting Date - Compact */
 .mom-meeting-date {
   font-size: 0.75rem !important;
   color: #64748b !important;
 }
 
-/* Pagination Card - Compact & Rounded */
+
 .mom-pagination-card {
   border: none !important;
   border-radius: 10px !important;
@@ -341,7 +319,6 @@
   padding: 0.625rem !important;
 }
 
-/* Pagination Buttons - Compact */
 .mom-page-btn {
   min-width: 28px !important;
   height: 28px !important;
@@ -373,7 +350,6 @@
   cursor: not-allowed !important;
 }
 
-/* Responsive - Compact */
 @media (max-width: 768px) {
   .mom-dashboard-container {
     padding: 0.75rem;

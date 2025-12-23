@@ -1,10 +1,3 @@
-/* ========================================
-   DELETE CONFIRMATION MODAL
-   Proper Alignment + Gradient Button
-   ======================================== */
-
-/* Delete Modal Overlay */
-
 .delete-modal-overlay {
   position: fixed;
   top: 0;
@@ -28,7 +21,6 @@
   }
 }
 
-/* Delete Modal Container */
 .delete-modal-container {
   background: white;
   border-radius: 12px;
@@ -50,13 +42,11 @@
   }
 }
 
-/* Delete Modal Content */
 .delete-modal-content {
   display: flex;
   flex-direction: column;
 }
 
-/* Delete Modal Header */
 .delete-modal-header {
   display: flex;
   align-items: center;
@@ -113,7 +103,6 @@
   cursor: not-allowed;
 }
 
-/* Delete Modal Body */
 .delete-modal-body {
   padding: 1.5rem;
   text-align: left;
@@ -179,7 +168,6 @@
   font-weight: 600;
 }
 
-/* Delete Modal Footer */
 .delete-modal-footer {
   display: flex;
   align-items: center;
@@ -191,7 +179,6 @@
   border-radius: 0 0 10px 10px;
 }
 
-/* Delete Modal Buttons */
 .delete-btn-cancel,
 .delete-btn-confirm {
   padding: 0.625rem 1.5rem;
@@ -252,7 +239,6 @@
   background: linear-gradient(90deg, #dc2626 0%, #991b1b 100%);
 }
 
-/* Delete Spinner */
 .delete-spinner {
   display: inline-block;
   width: 16px;
@@ -269,7 +255,6 @@
   }
 }
 
-/* Responsive Design */
 @media (max-width: 576px) {
   .delete-modal-container {
     width: 95%;
@@ -313,7 +298,6 @@
   }
 }
 
-/* Extra Small Devices */
 @media (max-width: 400px) {
   .delete-modal-container {
     max-width: 340px;

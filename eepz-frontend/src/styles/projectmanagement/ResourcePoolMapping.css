@@ -1,16 +1,6 @@
-/* ========================================
-   RESOURCE POOL MAPPING PAGE
-   All classes prefixed with rp-
-   ======================================== */
-
-/* Wrapper */
 .rp-wrapper {
   padding: 1.5rem 2rem !important;
 }
-
-/* ========================================
-   BREADCRUMBS
-   ======================================== */
 
 .rp-breadcrumb {
  
@@ -36,10 +26,6 @@
   font-weight: 600 !important;
 }
 
-/* ========================================
-   ALERTS
-   ======================================== */
-
 .rp-alert-error {
   background: #f8d7da !important;
   color: #842029 !important;
@@ -51,10 +37,6 @@
   border-radius: 8px !important;
   margin-bottom: 1.5rem !important;
 }
-
-/* ========================================
-   CARDS
-   ======================================== */
 
 .rp-card {
   background: #ffffff !important;
@@ -113,19 +95,12 @@
   overflow: hidden !important;
 }
 
-/* ========================================
-   SEARCH BAR
-   ======================================== */
 
 .rp-search-bar {
   padding: 1rem 1.25rem !important;
   border-bottom: 1px solid #dee2e6 !important;
   background: #f8f9fa !important;
 }
-
-/* ========================================
-   TABLE
-   ======================================== */
 
 .rp-table-wrapper {
   flex: 1 !important;
@@ -213,7 +188,6 @@
   color: #41464b !important;
 }
 
-/* Empty State */
 .rp-empty-state {
   text-align: center !important;
   padding: 4rem 2rem !important;
@@ -245,10 +219,6 @@
   font-size: 0.9375rem !important;
   text-align: center;
 }
-
-/* ========================================
-   SELECTED EMPLOYEES (RIGHT CARD)
-   ======================================== */
 
 .rp-selected-body {
   display: flex !important;
@@ -338,10 +308,6 @@
   color: #6c757d !important;
   margin-top: 0.75rem !important;
 }
-
-/* ========================================
-   MODALS
-   ======================================== */
 
 .rp-modal-overlay {
   position: fixed !important;
@@ -567,10 +533,6 @@
   transform: none !important;
 }
 
-/* ========================================
-   SCROLLBAR
-   ======================================== */
-
 .rp-table-wrapper::-webkit-scrollbar,
 .rp-selected-list::-webkit-scrollbar {
   width: 8px !important;
@@ -592,11 +554,6 @@
 .rp-selected-list::-webkit-scrollbar-thumb:hover {
   background: #1b193f !important;
 }
-
-/* ========================================
-   RESPONSIVE
-   ======================================== */
-
 @media (max-width: 992px) {
   .rp-wrapper {
     padding: 1rem !important;
@@ -627,11 +584,6 @@
     width: 100% !important;
   }
 }
-
-/* ========================================
-   SEARCH WITH BUTTON AND CLEAR ICON
-   ======================================== */
-
 .rp-search-wrapper {
   position: relative !important;
   display: flex !important;
@@ -664,12 +616,11 @@
   box-shadow: 0 0 0 0.2rem rgba(15, 98, 254, 0.1) !important;
 }
 
-/* Adjust input padding when clear button is visible */
 .rp-search-wrapper:has(.rp-clear-btn) .rp-search-input {
   padding-right: 135px !important;
 }
 
-/* Clear Button - ICON ONLY */
+
 .rp-clear-btn {
   position: absolute !important;
   right: 95px !important;
@@ -705,7 +656,7 @@
   stroke-width: 2.5 !important;
 }
 
-/* Search Button */
+
 .rp-search-btn {
   position: absolute !important;
   right: 4px !important;
@@ -743,7 +694,6 @@
   height: 16px !important;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .rp-search-wrapper:has(.rp-clear-btn) .rp-search-input {
     padding-right: 125px !important;

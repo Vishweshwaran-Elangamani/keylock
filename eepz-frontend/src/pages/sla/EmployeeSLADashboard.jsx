@@ -5,39 +5,41 @@ import {
   Clock,
   CheckCircle,
   FileText,
-  RefreshCw,
   AlertCircle,
   Eye,
   Zap,
   Grid,
   List,
-  User,
-  LogOut,
-  Settings,
-  ChevronDown,
-  Download,
+  TrendingUp,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
-import slaService, { dateHelpers } from "../../services/sla/slaService";
+import slaService, {
+  dateHelpers,
+} from "../../services/sla/slaService";
 import Breadcrumb from "../../components/sla/common/Breadcrumbs";
 import "../../styles/sla/EmployeeSLADashboard.css";
+import "../../styles/sla/HRSLADashboard.css";
 
 const EmployeeSLADashboard = () => {
   const navigate = useNavigate();
 
-  // State Management
   const [slas, setSlas] = useState([]);
   const [filteredSLAs, setFilteredSLAs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState("all");
-  const [viewMode, setViewMode] = useState("cards");
+
+  const [activeTab, setActiveTab] = useState("all"); // all | open | inprogress | completed | overdue
+  const [viewMode, setViewMode] = useState("table"); // table | cards
   const [user, setUser] = useState(null);
-  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
   useEffect(() => {
     try {
-      const userData = JSON.parse(localStorage.getItem("user") || "{}");
+      const userData = JSON.parse(localStorage.getItem("user"));
       if (!userData?.empId) {
         setError("User not found. Please login again.");
         setLoading(false);
@@ -55,83 +57,82 @@ const EmployeeSLADashboard = () => {
     filterSLAs();
   }, [activeTab, slas]);
 
-  const getInitials = (name) => {
-    if (!name) return "U";
-    const parts = name.trim().split(" ");
-    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-  };
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, slas.length, itemsPerPage]);
 
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/login");
-  };
+  const fetchSLAs = useCallback(
+    async (empId) => {
+      setLoading(true);
+      setRefreshing(true);
+      setError(null);
+      try {
+        if (!empId) throw new Error("Employee ID not found");
 
-  const fetchSLAs = useCallback(async (empId) => {
-    setLoading(true);
-    setRefreshing(true);
-    setError(null);
-    try {
-      if (!empId) throw new Error("Employee ID not found");
-      const response = await slaService.getEmployeeSLAs(empId);
+        const response = await slaService.getEmployeeSLAs(empId);
+        if (response?.success) {
+          let slasData;
+          if (Array.isArray(response.data)) {
+            slasData = response.data;
+          } else if (response.data && typeof response.data === "object") {
+            slasData = response.data;
+          } else {
+            slasData = [];
+          }
 
-      if (response?.success) {
-        let slasData = [];
-        if (Array.isArray(response.data)) {
-          slasData = response.data;
-        } else if (response.data && typeof response.data === "object") {
-          slasData = [response.data];
+          const processed = slasData.map((sla, idx) => ({
+            ...sla,
+            daysUntilDeadline: dateHelpers.daysRemaining(sla.deadline),
+            urgencyStatus: dateHelpers.getUrgencyStatus(sla.deadline),
+            key: `${sla.slaid || "sla"}-${sla.employeeId || "emp"}-${idx}`,
+          }));
+
+          setSlas(processed);
         } else {
-          slasData = [];
+          setSlas([]);
+          setError(response?.message || "No SLAs found");
         }
-        const processedSLAs = slasData.map((sla, idx) => ({
-          ...sla,
-          daysUntilDeadline: dateHelpers.daysRemaining(sla.deadline),
-          urgencyStatus: dateHelpers.getUrgencyStatus(sla.deadline),
-          _key: `${sla.slaid}-${sla.employeeId || idx}`,
-        }));
-        setSlas(processedSLAs);
-      } else {
+      } catch (err) {
+        setError(err.message || "Failed to fetch SLAs");
         setSlas([]);
-        setError(response?.message || "No SLAs found");
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
       }
-    } catch (err) {
-      setError(err.message || "Failed to fetch SLAs");
-      setSlas([]);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, []);
+    },
+    [setSlas]
+  );
 
   const filterSLAs = useCallback(() => {
     let filtered = [...slas];
+
     switch (activeTab) {
       case "open":
-        filtered = slas.filter((sla) => sla.status === "Open");
+        filtered = slas.filter((s) => s.status === "Open");
         break;
       case "inprogress":
-        filtered = slas.filter((sla) => sla.status === "InProgress");
+        filtered = slas.filter((s) => s.status === "InProgress");
         break;
       case "completed":
-        filtered = slas.filter((sla) => sla.status === "Closed");
+        filtered = slas.filter((s) => s.status === "Closed");
         break;
       case "overdue":
         filtered = slas.filter(
-          (sla) =>
-            (sla.status === "Open" || sla.status === "InProgress") &&
-            sla.daysUntilDeadline < 0
+          (s) =>
+            (s.status === "Open" || s.status === "InProgress") &&
+            s.daysUntilDeadline < 0
         );
         break;
       default:
         filtered = slas;
     }
+
     setFilteredSLAs(filtered);
   }, [slas, activeTab]);
 
   const handleViewDetails = useCallback(
     (slaid) => {
-      navigate(`/employee/dashboard/sla/details/` + slaid);
+      navigate(`/employee/dashboard/sla/details/${slaid}`);
     },
     [navigate]
   );
@@ -143,17 +144,20 @@ const EmployeeSLADashboard = () => {
   }, [user, fetchSLAs]);
 
   const calculateStats = useCallback(() => {
-    return {
-      total: slas.length,
-      open: slas.filter((s) => s.status === "Open").length,
-      inProgress: slas.filter((s) => s.status === "InProgress").length,
-      completed: slas.filter((s) => s.status === "Closed").length,
-      overdue: slas.filter(
-        (s) =>
-          (s.status === "Open" || s.status === "InProgress") &&
-          s.daysUntilDeadline < 0
-      ).length,
-    };
+    const total = slas.length;
+    const open = slas.filter((s) => s.status === "Open").length;
+    const inProgress = slas.filter((s) => s.status === "InProgress").length;
+    const completed = slas.filter((s) => s.status === "Closed").length;
+    const overdue = slas.filter(
+      (s) =>
+        (s.status === "Open" || s.status === "InProgress") &&
+        s.daysUntilDeadline < 0
+    ).length;
+    const onTime = slas.filter(
+      (s) => s.complianceStatus && s.complianceStatus === "OnTime"
+    ).length;
+
+    return { total, open, inProgress, completed, overdue, onTime };
   }, [slas]);
 
   const stats = calculateStats();
@@ -171,11 +175,53 @@ const EmployeeSLADashboard = () => {
     }
   };
 
-  const isOverdue = (sla) => {
-    return (
-      (sla.status === "Open" || sla.status === "InProgress") &&
-      sla.daysUntilDeadline < 0
-    );
+  const isOverdue = (sla) =>
+    (sla.status === "Open" || sla.status === "InProgress") &&
+    sla.daysUntilDeadline < 0;
+
+  const safeTotal = filteredSLAs.length;
+  const totalPages = Math.max(1, Math.ceil(safeTotal / itemsPerPage));
+
+  const startIndex =
+    safeTotal === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+  const endIndex =
+    safeTotal === 0 ? 0 : Math.min(currentPage * itemsPerPage, safeTotal);
+
+  const paginatedSLAs =
+    viewMode === "table"
+      ? filteredSLAs.slice(
+          (currentPage - 1) * itemsPerPage,
+          currentPage * itemsPerPage
+        )
+      : filteredSLAs;
+
+  const goToPage = (page) => {
+    const p = Math.max(1, Math.min(page, totalPages));
+    setCurrentPage(p);
+  };
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxPagesToShow = 5;
+
+    if (totalPages <= maxPagesToShow) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else if (currentPage <= 3) {
+      for (let i = 1; i <= 4; i++) pages.push(i);
+      pages.push("...");
+      pages.push(totalPages);
+    } else if (currentPage >= totalPages - 2) {
+      pages.push(1);
+      pages.push("...");
+      for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      pages.push("...");
+      for (let i = currentPage - 1; i <= currentPage + 1; i++) pages.push(i);
+      pages.push("...");
+      pages.push(totalPages);
+    }
+    return pages;
   };
 
   if (loading) {
@@ -192,15 +238,17 @@ const EmployeeSLADashboard = () => {
   return (
     <div className="emp-sla-dashboard">
       <Breadcrumb
-        items={[{ label: "SLA Compliance" }, { label: "My SLAs" }]}
+        items={[
+          { label: "SLA Compliance" },
+          { label: "My SLAs", active: true },
+        ]}
       />
 
-      {/* Error Alert */}
       {error && (
         <div className="emp-sla-alert-error">
           <AlertCircle size={18} className="emp-sla-alert-icon" />
           <div className="emp-sla-alert-content">
-            <strong>Error:</strong> {error}
+            <strong>Error</strong> {error}
           </div>
           <button
             type="button"
@@ -212,54 +260,61 @@ const EmployeeSLADashboard = () => {
         </div>
       )}
 
-      {/* Stats Grid - Centered Layout with Black Border */}
-      <div className="emp-sla-stats-grid">
-        <div className="emp-sla-stat-card">
+      {/* Metrics */}
+      <div className="emp-sla-metric-row">
+        <div className="emp-sla-metric-card">
           <div
-            className="emp-sla-stat-icon-wrapper"
-            style={{ backgroundColor: "#E8F1FF" }}
+            className="emp-sla-metric-icon"
+            style={{ background: "#E4F0FF" }}
           >
-            <FileText size={24} style={{ color: "#5B93FF" }} />
+            <FileText size={26} color="#2F64FF" />
           </div>
-          <h3 className="emp-sla-stat-value">{stats.total}</h3>
-          <p className="emp-sla-stat-label">Total SLAs</p>
+          <div className="emp-sla-metric-content">
+            <div className="emp-sla-metric-value">{stats.total}</div>
+            <div className="emp-sla-metric-label">TOTAL SLAs</div>
+          </div>
         </div>
 
-        <div className="emp-sla-stat-card">
+        <div className="emp-sla-metric-card">
           <div
-            className="emp-sla-stat-icon-wrapper"
-            style={{ backgroundColor: "#E0E7FF" }}
+            className="emp-sla-metric-icon"
+            style={{ background: "#E9E6FF" }}
           >
-            <Clock size={24} style={{ color: "#6366F1" }} />
+            <Clock size={26} color="#4C3FD8" />
           </div>
-          <h3 className="emp-sla-stat-value">{stats.open}</h3>
-          <p className="emp-sla-stat-label">Open</p>
+          <div className="emp-sla-metric-content">
+            <div className="emp-sla-metric-value">{stats.open}</div>
+            <div className="emp-sla-metric-label">OPEN</div>
+          </div>
         </div>
 
-        <div className="emp-sla-stat-card">
+        <div className="emp-sla-metric-card">
           <div
-            className="emp-sla-stat-icon-wrapper"
-            style={{ backgroundColor: "#FEF3C7" }}
+            className="emp-sla-metric-icon"
+            style={{ background: "#E3F9EF" }}
           >
-            <Zap size={24} style={{ color: "#F59E0B" }} />
+            <CheckCircle size={26} color="#10B981" />
           </div>
-          <h3 className="emp-sla-stat-value">{stats.inProgress}</h3>
-          <p className="emp-sla-stat-label">In Progress</p>
+          <div className="emp-sla-metric-content">
+            <div className="emp-sla-metric-value">{stats.completed}</div>
+            <div className="emp-sla-metric-label">CLOSED</div>
+          </div>
         </div>
 
-        <div className="emp-sla-stat-card">
+        <div className="emp-sla-metric-card">
           <div
-            className="emp-sla-stat-icon-wrapper"
-            style={{ backgroundColor: "#D1FAE5" }}
+            className="emp-sla-metric-icon"
+            style={{ background: "#E4FFF1" }}
           >
-            <CheckCircle size={24} style={{ color: "#10B981" }} />
+            <TrendingUp size={26} color="#059669" />
           </div>
-          <h3 className="emp-sla-stat-value">{stats.completed}</h3>
-          <p className="emp-sla-stat-label">Completed</p>
+          <div className="emp-sla-metric-content">
+            <div className="emp-sla-metric-value">{stats.onTime}</div>
+            <div className="emp-sla-metric-label">ON TIME</div>
+          </div>
         </div>
       </div>
 
-      {/* Overdue Alert */}
       {stats.overdue > 0 && (
         <div className="emp-sla-alert-overdue">
           <div className="emp-sla-alert-overdue-icon">
@@ -267,60 +322,71 @@ const EmployeeSLADashboard = () => {
           </div>
           <div>
             <h6 className="emp-sla-alert-overdue-title">
-              {stats.overdue} Overdue SLA(s)
+              {stats.overdue} Overdue SLAs
             </h6>
             <p className="emp-sla-alert-overdue-text">
-              Please take immediate action on overdue items
+              Please take immediate action on overdue items.
             </p>
           </div>
         </div>
       )}
 
-      {/* Pill-Style Tabs */}
-      <div className="emp-sla-tabs-wrapper">
-        <div className="emp-sla-tabs-container">
-          {[
-            { key: "all", label: "All" },
-            { key: "open", label: "Open" },
-            { key: "inprogress", label: "In Progress" },
-            { key: "completed", label: "Completed" },
-            { key: "overdue", label: "Overdue" },
-          ].map(({ key, label }) => (
+      {/* Tabs + view toggle as one strip */}
+      <div className="emp-sla-header-row">
+        <div className="emp-sla-tabs-strip">
+          <div className="emp-sla-tabs-container">
+            {[
+              { key: "all", label: "All" },
+              { key: "open", label: "Open" },
+              { key: "inprogress", label: "In Progress" },
+              { key: "completed", label: "Completed" },
+              { key: "overdue", label: "Overdue" },
+            ].map(({ key, label }) => (
+              <button
+                key={key}
+                className={`emp-sla-tab-pill ${
+                  activeTab === key ? "active" : ""
+                }`}
+                onClick={() => setActiveTab(key)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <div className="emp-sla-view-toggle">
             <button
-              key={key}
-              className={`emp-sla-tab-pill ${
-                activeTab === key ? "active" : ""
+              type="button"
+              className={`emp-sla-view-btn ${
+                viewMode === "cards" ? "active" : ""
               }`}
-              onClick={() => setActiveTab(key)}
+              onClick={() => setViewMode("cards")}
             >
-              {label}
+              <Grid size={16} />
             </button>
-          ))}
+            <button
+              type="button"
+              className={`emp-sla-view-btn ${
+                viewMode === "table" ? "active" : ""
+              }`}
+              onClick={() => setViewMode("table")}
+            >
+              <List size={16} />
+            </button>
+          </div>
         </div>
 
-        <div className="emp-sla-view-toggle">
-          <button
-            type="button"
-            className={`emp-sla-view-btn ${
-              viewMode === "cards" ? "active" : ""
-            }`}
-            onClick={() => setViewMode("cards")}
-          >
-            <Grid size={16} />
-          </button>
-          <button
-            type="button"
-            className={`emp-sla-view-btn ${
-              viewMode === "table" ? "active" : ""
-            }`}
-            onClick={() => setViewMode("table")}
-          >
-            <List size={16} />
-          </button>
-        </div>
+        <button
+          type="button"
+          className="emp-sla-refresh-btn"
+          onClick={handleRefresh}
+          disabled={refreshing}
+        >
+          {refreshing ? "Refreshing..." : "Refresh"}
+        </button>
       </div>
 
-      {/* Content Area */}
+      {/* Content */}
       <div className="emp-sla-content">
         {filteredSLAs.length === 0 ? (
           <div className="emp-sla-empty">
@@ -328,38 +394,36 @@ const EmployeeSLADashboard = () => {
             <h5 className="emp-sla-empty-title">No SLAs found</h5>
             <p className="emp-sla-empty-text">
               {activeTab === "all"
-                ? "You don't have any SLAs assigned yet"
-                : `No ${activeTab} SLAs at this time`}
+                ? "You don't have any SLAs assigned yet."
+                : `No ${activeTab} SLAs at this time.`}
             </p>
           </div>
         ) : viewMode === "table" ? (
-          // Table View
-          <div className="emp-sla-table-wrapper">
+          <div className="hr-sla-table-container">
             <div className="table-responsive">
-              <table className="emp-sla-table">
-                <thead>
+              <table className="table table-hover mb-0 emp-sla-table">
+                <thead className="hr-sla-table-header">
                   <tr>
-                    <th>Type</th>
-                    <th>Status</th>
-                    <th>Deadline</th>
-                    <th>Days Left</th>
-                    <th>Assigned To</th>
-                    <th>Compliance</th>
-                    <th>Actions</th>
+                    <th>TYPE</th>
+                    <th>STATUS</th>
+                    <th>DEADLINE</th>
+                    <th>DAYS LEFT</th>
+                    <th>ASSIGNED TO</th>
+                    <th>COMPLIANCE</th>
+                    <th>ACTIONS</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredSLAs.map((sla) => {
-                    const isOverdueStatus = isOverdue(sla);
-                    const style = getStatusStyle(sla.status);
-                    const Icon = style.icon;
+                  {paginatedSLAs.map((sla) => {
+                    const overdue = isOverdue(sla);
+                    const statusStyle = getStatusStyle(sla.status);
+                    const Icon = statusStyle.icon;
+
                     return (
-                      <tr key={sla._key}>
+                      <tr key={sla.key} className="hr-sla-clickable-row">
                         <td>
                           <div className="emp-sla-table-type">
-                            <div
-                              className={`emp-sla-table-icon ${style.className}`}
-                            >
+                            <div className={statusStyle.className}>
                               <Icon size={18} />
                             </div>
                             <span className="emp-sla-table-type-text">
@@ -370,12 +434,12 @@ const EmployeeSLADashboard = () => {
                         <td>
                           <span
                             className={`emp-sla-badge ${
-                              isOverdueStatus
+                              overdue
                                 ? "emp-sla-badge-overdue"
-                                : style.className
+                                : statusStyle.className
                             }`}
                           >
-                            {isOverdueStatus ? "OVERDUE" : sla.status}
+                            {overdue ? "OVERDUE" : sla.status}
                           </span>
                         </td>
                         <td className="emp-sla-table-text">
@@ -384,28 +448,30 @@ const EmployeeSLADashboard = () => {
                         <td>
                           <span
                             className={`emp-sla-days ${
-                              isOverdueStatus
+                              overdue
                                 ? "emp-sla-days-overdue"
                                 : sla.daysUntilDeadline <= 3
                                 ? "emp-sla-days-warning"
                                 : "emp-sla-days-ok"
                             }`}
                           >
-                            {isOverdueStatus
-                              ? `${Math.abs(sla.daysUntilDeadline)}d overdue`
-                              : `${sla.daysUntilDeadline}d left`}
+                            {overdue
+                              ? `${Math.abs(sla.daysUntilDeadline)} overdue`
+                              : `${sla.daysUntilDeadline} left`}
                           </span>
                         </td>
                         <td className="emp-sla-table-text">
-                          {sla.assignedToName || "—"}
+                          {sla.assignedToName || "-"}
                         </td>
                         <td>
-                          {sla.complianceStatus && (
+                          {sla.complianceStatus ? (
                             <span
                               className={`emp-sla-badge emp-sla-badge-compliance-${sla.complianceStatus.toLowerCase()}`}
                             >
                               {sla.complianceStatus}
                             </span>
+                          ) : (
+                            "-"
                           )}
                         </td>
                         <td>
@@ -414,7 +480,7 @@ const EmployeeSLADashboard = () => {
                             onClick={() => handleViewDetails(sla.slaid)}
                           >
                             <Eye size={14} />
-                            View
+                            <span>View</span>
                           </button>
                         </td>
                       </tr>
@@ -423,22 +489,104 @@ const EmployeeSLADashboard = () => {
                 </tbody>
               </table>
             </div>
+
+            {safeTotal > 0 && (
+              <div className="hr-sla-pagination-footer">
+                <div className="hr-sla-pagination-left">
+                  <span className="hr-sla-pagination-text">Show</span>
+                  <select
+                    className="hr-sla-pagination-dropdown"
+                    value={itemsPerPage}
+                    onChange={(e) => {
+                      setItemsPerPage(Number(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                  >
+                    <option value={5}>5</option>
+                    <option value={10}>10</option>
+                    <option value={25}>25</option>
+                  </select>
+                  <span className="hr-sla-pagination-text">entries</span>
+                </div>
+
+                <div className="hr-sla-pagination-center">
+                  <span className="hr-sla-pagination-status">
+                    Showing {startIndex} to {endIndex} of {safeTotal} entries
+                  </span>
+                </div>
+
+                <div className="hr-sla-pagination-right">
+                  <ul className="hr-sla-pagination-list">
+                    <li
+                      className={`hr-sla-page-item ${
+                        currentPage === 1 ? "disabled" : ""
+                      }`}
+                    >
+                      <button
+                        className="hr-sla-page-link"
+                        onClick={() => goToPage(currentPage - 1)}
+                        disabled={currentPage === 1}
+                      >
+                        <ChevronLeft size={14} />
+                      </button>
+                    </li>
+
+                    {getPageNumbers().map((page, idx) =>
+                      page === "..." ? (
+                        <li
+                          key={`ellipsis-${idx}`}
+                          className="hr-sla-page-item disabled"
+                        >
+                          <span className="hr-sla-page-link">…</span>
+                        </li>
+                      ) : (
+                        <li
+                          key={page}
+                          className={`hr-sla-page-item ${
+                            currentPage === page ? "active" : ""
+                          }`}
+                        >
+                          <button
+                            className="hr-sla-page-link"
+                            onClick={() => goToPage(page)}
+                          >
+                            {page}
+                          </button>
+                        </li>
+                      )
+                    )}
+
+                    <li
+                      className={`hr-sla-page-item ${
+                        currentPage === totalPages ? "disabled" : ""
+                      }`}
+                    >
+                      <button
+                        className="hr-sla-page-link"
+                        onClick={() => goToPage(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                      >
+                        <ChevronRight size={14} />
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
-          // Card View
           <div className="emp-sla-cards-grid">
             {filteredSLAs.map((sla) => {
-              const isOverdueStatus = isOverdue(sla);
-              const style = isOverdueStatus
+              const overdue = isOverdue(sla);
+              const statusStyle = overdue
                 ? { className: "emp-sla-status-overdue", icon: AlertTriangle }
                 : getStatusStyle(sla.status);
-              const IconComponent = style.icon;
+              const IconComponent = statusStyle.icon;
 
               return (
-                <div key={sla._key} className="emp-sla-card">
-                  {/* Card Header */}
+                <div key={sla.key} className="emp-sla-card">
                   <div className="emp-sla-card-header">
-                    <div className={`emp-sla-card-icon ${style.className}`}>
+                    <div className={`emp-sla-card-icon ${statusStyle.className}`}>
                       <IconComponent size={20} strokeWidth={2} />
                     </div>
                     <div className="emp-sla-card-header-text">
@@ -446,14 +594,13 @@ const EmployeeSLADashboard = () => {
                         {sla.slatype || "SLA"}
                       </h6>
                       <span
-                        className={`emp-sla-card-badge ${style.className}`}
+                        className={`emp-sla-card-badge ${statusStyle.className}`}
                       >
-                        {isOverdueStatus ? "OVERDUE" : sla.status}
+                        {overdue ? "OVERDUE" : sla.status}
                       </span>
                     </div>
                   </div>
 
-                  {/* Card Body */}
                   <div className="emp-sla-card-body">
                     <div className="emp-sla-card-row">
                       <span className="emp-sla-card-label">Deadline</span>
@@ -468,27 +615,23 @@ const EmployeeSLADashboard = () => {
                       </span>
                       <span
                         className={`emp-sla-card-value ${
-                          isOverdueStatus
+                          overdue
                             ? "emp-sla-text-danger"
                             : "emp-sla-text-success"
                         }`}
                       >
-                        {isOverdueStatus
-                          ? `${Math.abs(sla.daysUntilDeadline)}d overdue`
+                        {overdue
+                          ? `${Math.abs(sla.daysUntilDeadline)} overdue`
                           : `${sla.daysUntilDeadline} days`}
                       </span>
                     </div>
 
-                    {sla.assignedToName && (
-                      <div className="emp-sla-card-row">
-                        <span className="emp-sla-card-label">
-                          Assigned To
-                        </span>
-                        <span className="emp-sla-card-value emp-sla-truncate">
-                          {sla.assignedToName}
-                        </span>
-                      </div>
-                    )}
+                    <div className="emp-sla-card-row">
+                      <span className="emp-sla-card-label">Assigned To</span>
+                      <span className="emp-sla-card-value emp-sla-truncate">
+                        {sla.assignedToName || "-"}
+                      </span>
+                    </div>
 
                     {sla.complianceStatus && (
                       <div className="emp-sla-card-row">
@@ -502,7 +645,6 @@ const EmployeeSLADashboard = () => {
                     )}
                   </div>
 
-                  {/* Card Footer */}
                   <div className="emp-sla-card-footer">
                     <button
                       className="emp-sla-card-btn"

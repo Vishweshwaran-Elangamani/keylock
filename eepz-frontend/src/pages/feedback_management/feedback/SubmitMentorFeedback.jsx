@@ -1,13 +1,12 @@
 // src/pages/feedback_management/feedback/SubmitMentorFeedback.jsx
 
-import React, { useMemo, useState, useEffect, useCallback } from "react";
+import React, { useMemo, useState, useEffect, useCallback, useRef } from "react";
 import {
   CheckCircle,
   Send,
   AlertTriangle,
   Loader,
   Star,
-  ArrowLeft,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -27,6 +26,83 @@ const getFeedbackDashboardPath = (roleName) => {
     HR: "/hr/dashboard/feedback",
   };
   return routes[roleName] || "/hr/dashboard/feedback";
+};
+
+// PRIMARY color to match other dropdowns
+const PRIMARY = "#27235C";
+
+/** Reusable custom select (same behavior as your Business Unit dropdown) */
+const CustomSelect = ({
+  name,
+  value,
+  onChange,
+  options,
+  placeholder = "Select",
+  disabled,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const handleClickOutside = useCallback((event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setIsOpen(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [handleClickOutside]);
+
+  const handleSelect = (optionValue) => {
+    onChange(optionValue);
+    setIsOpen(false);
+  };
+
+  const getDisplayValue = () => {
+    if (!value) return placeholder;
+    const opt = options.find((o) => String(o.value) === String(value));
+    return opt ? opt.label : placeholder;
+  };
+
+  return (
+    <div className="prj-dropdown-wrapper" ref={dropdownRef}>
+      <div
+        className={`prj-dropdown-select ${isOpen ? "open" : ""}`}
+        onClick={() => !disabled && setIsOpen((o) => !o)}
+        style={
+          disabled
+            ? { opacity: 0.6, cursor: "not-allowed" }
+            : { cursor: "pointer" }
+        }
+      >
+        <span className="prj-dropdown-value">
+          {getDisplayValue()}
+        </span>
+        <span className="prj-dropdown-arrow">
+          {isOpen ? "▴" : "▾"}
+        </span>
+      </div>
+      {isOpen && (
+        <ul className="prj-dropdown-list">
+          {options.map((opt, idx) => {
+            const isSelected = String(opt.value) === String(value);
+            return (
+              <li
+                key={idx}
+                className={`prj-dropdown-option ${
+                  isSelected ? "selected" : ""
+                }`}
+                onClick={() => handleSelect(opt.value)}
+              >
+                {opt.label}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
 };
 
 export default function SubmitMentorFeedback() {
@@ -262,8 +338,8 @@ export default function SubmitMentorFeedback() {
   const isLoading = loadingSme || loadingEmployees;
 
   // Get role-based dashboard path
-  const feedbackDashboardPath = user?.roleName 
-    ? getFeedbackDashboardPath(user.roleName) 
+  const feedbackDashboardPath = user?.roleName
+    ? getFeedbackDashboardPath(user.roleName)
     : "/hr/dashboard/feedback";
 
   return (
@@ -291,10 +367,7 @@ export default function SubmitMentorFeedback() {
         />
 
         {/* BACK BUTTON & HEADER */}
-        <div className="d-flex align-items-center gap-3 mb-4">
-          
-          
-        </div>
+        <div className="d-flex align-items-center gap-3 mb-4"></div>
 
         {/* ALERTS */}
         {error && (
@@ -358,20 +431,11 @@ export default function SubmitMentorFeedback() {
             >
               {success}
             </p>
-            <button
-              type="button"
-              className="btn-close"
-              style={{ fontSize: "0.875rem" }}
-              onClick={() => setSuccess("")}
-            />
           </div>
         )}
 
         {/* MAIN CARD */}
-        <div
-          className="card border-0 shadow-sm"
-          style={{ borderRadius: "12px" }}
-        >
+        <div className="card border-0 shadow-sm" style={{ borderRadius: "12px" }}>
           <div className="card-body" style={{ padding: "2rem" }}>
             <form onSubmit={handleSubmit} noValidate>
               {/* SELECT SME */}
@@ -396,37 +460,30 @@ export default function SubmitMentorFeedback() {
                     />
                   )}
                 </label>
-                <select
-                  id="smeSelect"
-                  className="form-select form-select-lg"
+
+                {/* Custom dropdown to match your sample image */}
+                <CustomSelect
+                  name="smeId"
                   value={form.smeId}
-                  onChange={(e) => handleSmeChange(e.target.value)}
+                  onChange={(val) => handleSmeChange(val)}
                   disabled={isLoading || loading}
-                  style={{
-                    borderRadius: "10px",
-                    border: "1.5px solid #e2e8f0",
-                    fontSize: "0.938rem",
-                    padding: "0.75rem 1rem",
-                    backgroundColor: "#fff",
-                    textAlign: "left",
-                  }}
-                >
-                  <option value="">
-                    {loadingEmployees
+                  options={smeList.map((sme) => ({
+                    value: String(sme.smeId),
+                    label: `${sme.employeeName} - ${sme.skillName}${
+                      sme.proficiencyLevel ? ` (${sme.proficiencyLevel})` : ""
+                    }`,
+                  }))}
+                  placeholder={
+                    loadingEmployees
                       ? "Loading employee data..."
                       : loadingSme
                       ? "Loading mentors..."
                       : smeList.length === 0
                       ? "No mentors available"
-                      : "Choose a mentor to provide feedback for"}
-                  </option>
-                  {smeList.map((sme) => (
-                    <option key={`sme-${sme.smeId}`} value={sme.smeId}>
-                      {sme.employeeName} - {sme.skillName}
-                      {sme.proficiencyLevel && ` (${sme.proficiencyLevel})`}
-                    </option>
-                  ))}
-                </select>
+                      : "Choose a mentor to provide feedback for"
+                  }
+                />
+
                 <div
                   className="form-text"
                   style={{
@@ -564,7 +621,7 @@ export default function SubmitMentorFeedback() {
                         style={{
                           fontSize: "1rem",
                           fontWeight: 700,
-                          color: "#27235C",
+                          color: PRIMARY,
                           textAlign: "left",
                         }}
                       >
@@ -645,56 +702,62 @@ export default function SubmitMentorFeedback() {
                   </div>
 
                   {/* ANONYMOUS CHECKBOX */}
-                  <div className="mb-4" style={{ textAlign: "left" }}>
-                    <div
-                      className="form-check p-3"
-                      style={{
-                        backgroundColor: "#f8fafc",
-                        borderRadius: "10px",
-                        border: "1.5px solid #e2e8f0",
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        className="form-check-input"
-                        id="anonCheck"
-                        checked={form.isAnonymous}
-                        onChange={(e) =>
-                          setForm((prev) => ({
-                            ...prev,
-                            isAnonymous: e.target.checked,
-                          }))
-                        }
-                        disabled={loading}
-                        style={{
-                          borderRadius: "4px",
-                          width: "18px",
-                          height: "18px",
-                        }}
-                      />
-                      <label
-                        className="form-check-label"
-                        htmlFor="anonCheck"
-                        style={{
-                          fontSize: "0.938rem",
-                          textAlign: "left",
-                          marginLeft: "0.5rem",
-                        }}
-                      >
-                        Submit anonymously
-                        <div
-                          className="form-text"
-                          style={{
-                            fontSize: "0.813rem",
-                            marginTop: "0.25rem",
-                            textAlign: "left",
-                          }}
-                        >
-                          Your identity will be hidden from the mentor
-                        </div>
-                      </label>
-                    </div>
-                  </div>
+                <div className="mb-4" style={{ textAlign: "left" }}>
+  <div
+    className="form-check p-3"
+    style={{
+      backgroundColor: "#f8fafc",
+      borderRadius: "10px",
+      border: "1.5px solid #e2e8f0",
+      // make the box flex so checkbox can sit slightly outside
+      display: "flex",
+      alignItems: "flex-start",
+    }}
+  >
+    <input
+      type="checkbox"
+      className="form-check-input"
+      id="anonCheck"
+      checked={form.isAnonymous}
+      onChange={(e) =>
+        setForm((prev) => ({
+          ...prev,
+          isAnonymous: e.target.checked,
+        }))
+      }
+      disabled={loading}
+      style={{
+        borderRadius: "4px",
+        width: "18px",
+        height: "18px",
+        marginLeft: "-8px",   // pull checkbox left outside the box
+        marginTop: "2px",
+      }}
+    />
+    <label
+      className="form-check-label"
+      htmlFor="anonCheck"
+      style={{
+        fontSize: "0.938rem",
+        textAlign: "left",
+        marginLeft: "0.75rem",
+      }}
+    >
+      Submit anonymously
+      <div
+        className="form-text"
+        style={{
+          fontSize: "0.813rem",
+          marginTop: "0.25rem",
+          textAlign: "left",
+        }}
+      >
+        Your identity will be hidden from the mentor
+      </div>
+    </label>
+  </div>
+</div>
+
 
                   {/* SUBMIT BUTTON */}
                   <button
@@ -749,37 +812,95 @@ export default function SubmitMentorFeedback() {
         .animate-spin { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        
-        #smeSelect {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%23475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>') no-repeat right 1rem center;
-  background-color: #fff;
-  padding-right: 2.5rem;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 10px;
-  font-size: 0.938rem;
-  cursor: pointer;
-}
-
-#smeSelect:focus {
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%2327235C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
-}
-
-#smeSelect:disabled {
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%23CBD5E1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
-}
-
-
+        /* Custom dropdown styles to match your Business Unit / Compliance dropdowns */
+        .prj-dropdown-wrapper {
+          position: relative;
+          width: 100%;
         }
+
+        .prj-dropdown-select {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
+          padding: 0.75rem 1rem;
+          font-size: 0.9375rem;
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-radius: 10px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          user-select: none;
+        }
+
+        .prj-dropdown-select.open {
+          border-color: ${PRIMARY};
+          border-bottom-left-radius: 0;
+          border-bottom-right-radius: 0;
+          box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+        }
+
+        .prj-dropdown-value {
+          flex: 1;
+          text-align: left;
+          color: #111827;
+          font-weight: 400;
+        }
+
+        .prj-dropdown-arrow {
+          color: #6b7280;
+          margin-left: 0.5rem;
+          font-size: 0.85rem;
+        }
+
+        .prj-dropdown-list {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          background: #ffffff;
+          border: 1px solid ${PRIMARY};
+          border-top: none;
+          border-radius: 0 0 10px 10px;
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+          max-height: 260px;
+          overflow-y: auto;
+          z-index: 1000;
+          list-style: none;
+          margin: 0;
+          padding: 0;
+        }
+
+        .prj-dropdown-option {
+          padding: 0.75rem 1rem;
+          font-size: 0.9375rem;
+          color: #4b5563;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          border-bottom: 1px solid #e5e7eb;
+          background: #ffffff;
+        }
+
+        .prj-dropdown-option:last-child {
+          border-bottom: none;
+        }
+
+        .prj-dropdown-option:hover {
+          background: ${PRIMARY};
+          color: #ffffff;
+          font-weight: 600;
+        }
+
+        .prj-dropdown-option.selected {
+          background: ${PRIMARY};
+          color: #ffffff;
+          font-weight: 600;
+        }
+
         .form-control:focus, .form-select:focus {
-          border-color: #27235C;
+          border-color: ${PRIMARY};
           box-shadow: 0 0 0 4px rgba(39, 35, 92, 0.1);
-
         }
-
-
       `}</style>
     </div>
   );

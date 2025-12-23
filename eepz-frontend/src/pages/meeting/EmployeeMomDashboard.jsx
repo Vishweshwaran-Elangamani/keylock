@@ -7,7 +7,7 @@ import toastr from 'toastr';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import './../../styles/mom/EmployeeMomDashboard.css';
+
 
 import MeetingDetailsModal from '../../components/meeting/modals/MeetingDetailsModal';
 import SharedMomsModal from '../../components/meeting/modals/SharedMomsModal';

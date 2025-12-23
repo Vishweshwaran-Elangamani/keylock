@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { Plus, Loader, AlertCircle, X } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { Plus, Loader, AlertCircle, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import slaService from "../../../services/sla/slaService";
+
+const PRIMARY = "#27235C";
 
 const CreateSLAModal = ({ onClose, onSuccess }) => {
   const [loading, setLoading] = useState(false);
@@ -15,9 +17,15 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
     reason: "",
   });
 
+  // calendar state
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [calendarMonth, setCalendarMonth] = useState(null);
+  const [calendarYear, setCalendarYear] = useState(null);
+  const calendarRef = useRef(null);
+
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-  // ========== FETCH EMPLOYEE COUNT ==========
+  // ===== FETCH EMPLOYEE COUNT =====
   useEffect(() => {
     const fetchCount = async () => {
       try {
@@ -26,13 +34,11 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
 
         if (res?.success && Array.isArray(res.data)) {
           const uniqueEmployees = new Set();
-
           res.data.forEach((item) => {
             if (item.employeeId) {
               uniqueEmployees.add(item.employeeId);
             }
           });
-
           setEmployeeCount(uniqueEmployees.size);
         } else {
           toast.error("Failed to load employee count");
@@ -50,7 +56,18 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
     fetchCount();
   }, []);
 
-  // ========== HANDLE FORM CHANGE ==========
+  // ===== CLOSE CALENDAR ON OUTSIDE CLICK =====
+  useEffect(() => {
+    const handler = (e) => {
+      if (calendarOpen && calendarRef.current && !calendarRef.current.contains(e.target)) {
+        setCalendarOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [calendarOpen]);
+
+  // ===== FORM CHANGE =====
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -60,12 +77,11 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
     setError(null);
   };
 
-  // ========== SUBMIT (BULK CREATE WITH TOAST) ==========
+  // ===== SUBMIT =====
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
-    // Validation
     if (!formData.reviewType.trim()) {
       toast.error("Please enter a review type");
       setError("Please enter a review type");
@@ -77,27 +93,22 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
       return;
     }
 
-    // Validate deadline
-    const deadline = new Date(formData.deadline);
+    const deadlineDate = new Date(formData.deadline);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    if (deadline < today) {
+    if (deadlineDate < today) {
       toast.error("Deadline must be in the future");
       setError("Deadline must be in the future");
       return;
     }
 
     setLoading(true);
-
-    // Show loading toast
     const loadingToast = toast.loading("Creating SLAs...");
 
     try {
       const deadlineIso = new Date(formData.deadline).toISOString();
 
-      // Step 1: Fetch all employees
       const res = await slaService.getAllEmployees();
-
       if (!res?.success || !Array.isArray(res.data)) {
         toast.dismiss(loadingToast);
         toast.error("Failed to fetch employees");
@@ -106,7 +117,6 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
         return;
       }
 
-      // Step 2: Build unique employees map
       const uniqueEmployees = new Map();
       res.data.forEach((item) => {
         if (item.employeeId && !uniqueEmployees.has(item.employeeId)) {
@@ -122,7 +132,6 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
         }
       });
 
-      // Step 3: Build bulk SLA requests array
       const bulkRequests = Array.from(uniqueEmployees.values()).map((emp) => ({
         slatype: formData.reviewType,
         employeeId: emp.employeeId,
@@ -135,24 +144,14 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
         creationReason: formData.reason || `${formData.reviewType} assigned`,
       }));
 
-      // Step 4: Call bulk create endpoint
       const response = await slaService.createBulkSLA(bulkRequests);
-
-      // Dismiss loading toast
       toast.dismiss(loadingToast);
 
       if (response?.success) {
         const resultData = response.data;
 
-        // Show success toast with count only
-        toast.success(
-          `SLA Created Successfully`,
-          {
-            duration: 3000,
-          }
-        );
+        toast.success("SLA Created Successfully", { duration: 3000 });
 
-        // Close modal after short delay
         setTimeout(() => {
           if (resultData.successfulInserts > 0) {
             onSuccess?.();
@@ -173,15 +172,109 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
     }
   };
 
+  // ===== CALENDAR HELPERS =====
+  const formatDisplayDate = (iso) => {
+    if (!iso) return "";
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return "";
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    const yyyy = d.getFullYear();
+    return `${mm}/${dd}/${yyyy}`;
+  };
+
+  const ensureCalendarMonthYear = () => {
+    if (calendarMonth === null || calendarYear === null) {
+      const base = formData.deadline ? new Date(formData.deadline) : new Date();
+      setCalendarMonth(base.getMonth());
+      setCalendarYear(base.getFullYear());
+    }
+  };
+
+  const getCalendarMatrix = () => {
+    const today = new Date();
+    const month = calendarMonth ?? today.getMonth();
+    const year = calendarYear ?? today.getFullYear();
+
+    const firstDay = new Date(year, month, 1);
+    const startDay = firstDay.getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const prevMonthDays = new Date(year, month, 0).getDate();
+
+    const cells = [];
+    for (let i = startDay - 1; i >= 0; i--) {
+      cells.push({ day: prevMonthDays - i, current: false });
+    }
+    for (let d = 1; d <= daysInMonth; d++) {
+      cells.push({ day: d, current: true });
+    }
+    while (cells.length % 7 !== 0) {
+      cells.push({ day: cells.length, current: false });
+    }
+    return { cells, month, year };
+  };
+
+  const { cells, month, year } = getCalendarMatrix();
+  const today = new Date();
+  const selectedDate = formData.deadline ? new Date(formData.deadline) : null;
+
+  const monthNames = [
+    "January","February",  "March",  "April", "May", "June", "July", "August", "September", "October", "November", "December",
+  ];
+  const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+
+  const handleSelectCalendarDay = (day, current) => {
+    if (!current) return;
+    const selected = new Date(year, month, day);
+    const yyyy = selected.getFullYear();
+    const mm = String(selected.getMonth() + 1).padStart(2, "0");
+    const dd = String(selected.getDate()).padStart(2, "0");
+    const value = `${yyyy}-${mm}-${dd}`;
+    setFormData((prev) => ({ ...prev, deadline: value }));
+    setCalendarOpen(false);
+  };
+
+  const goPrevMonth = () => {
+    if (calendarMonth === null || calendarYear === null) return;
+    let m = calendarMonth - 1;
+    let y = calendarYear;
+    if (m < 0) {
+      m = 11;
+      y -= 1;
+    }
+    setCalendarMonth(m);
+    setCalendarYear(y);
+  };
+
+  const goNextMonth = () => {
+    if (calendarMonth === null || calendarYear === null) return;
+    let m = calendarMonth + 1;
+    let y = calendarYear;
+    if (m > 11) {
+      m = 0;
+      y += 1;
+    }
+    setCalendarMonth(m);
+    setCalendarYear(y);
+  };
+
+  const goToday = () => {
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+    const dd = String(now.getDate()).padStart(2, "0");
+    setFormData((prev) => ({ ...prev, deadline: `${yyyy}-${mm}-${dd}` }));
+    setCalendarMonth(now.getMonth());
+    setCalendarYear(now.getFullYear());
+    setCalendarOpen(false);
+  };
+
   return (
     <div
       style={{
         position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: "rgba(0, 0, 0, 0.7)",
+        inset: 0,
+        backgroundColor: "rgba(0,0,0,0.7)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -193,10 +286,10 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
       <div
         style={{
           backgroundColor: "white",
-          borderRadius: "12px",
+          borderRadius: 12,
           width: "90%",
-          maxWidth: "500px",
-          boxShadow: "0 20px 60px rgba(0, 0, 0, 0.4)",
+          maxWidth: 500,
+          boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
           overflow: "hidden",
         }}
         onClick={(e) => e.stopPropagation()}
@@ -209,7 +302,6 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
             alignItems: "center",
             padding: "1.25rem 1.5rem",
             backgroundColor: "#3c3862",
-            borderBottom: "none",
           }}
         >
           <h5
@@ -237,9 +329,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
               opacity: loading ? 0.5 : 0.8,
               transition: "opacity 0.2s ease",
             }}
-            onMouseEnter={(e) =>
-              !loading && (e.currentTarget.style.opacity = "1")
-            }
+            onMouseEnter={(e) => !loading && (e.currentTarget.style.opacity = "1")}
             onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.8")}
           >
             <X size={24} color="white" />
@@ -255,7 +345,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                 flexDirection: "column",
                 justifyContent: "center",
                 alignItems: "center",
-                height: "200px",
+                height: 200,
               }}
             >
               <Loader
@@ -306,7 +396,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                 </div>
               )}
 
-              {/* REVIEW TYPE INPUT */}
+              {/* REVIEW TYPE */}
               <div style={{ marginBottom: "1.5rem" }}>
                 <label
                   style={{
@@ -343,7 +433,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                 />
               </div>
 
-              {/* DEADLINE INPUT */}
+              {/* DEADLINE with same calendar icon as EditSLAModal */}
               <div style={{ marginBottom: "1.5rem" }}>
                 <label
                   style={{
@@ -357,30 +447,264 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                 >
                   Deadline <span style={{ color: "#E01950" }}>*</span>
                 </label>
-                <input
-                  type="date"
-                  name="deadline"
-                  value={formData.deadline}
-                  onChange={handleChange}
-                  min={new Date().toISOString().split("T")[0]}
-                  required
-                  disabled={loading}
-                  style={{
-                    width: "100%",
-                    padding: "0.65rem 0.75rem",
-                    borderRadius: "8px",
-                    border: "1px solid #d1d5db",
-                    fontSize: "0.95rem",
-                    fontFamily: "inherit",
-                    boxSizing: "border-box",
-                    backgroundColor: loading ? "#f3f4f6" : "white",
-                    textAlign: "left",
-                    cursor: loading ? "not-allowed" : "text",
-                  }}
-                />
+
+                <div
+                  ref={calendarRef}
+                  style={{ position: "relative", width: "100%" }}
+                >
+                  <input
+                    type="text"
+                    readOnly
+                    value={formatDisplayDate(formData.deadline)}
+                    onClick={() => {
+                      ensureCalendarMonthYear();
+                      setCalendarOpen((o) => !o);
+                    }}
+                    disabled={loading}
+                    placeholder="Select date"
+                    style={{
+                      width: "100%",
+                      padding: "0.6rem 2.5rem 0.6rem 0.75rem",
+                      borderRadius: 8,
+                      border: "1px solid #d1d5db",
+                      fontSize: "0.95rem",
+                      boxSizing: "border-box",
+                      cursor: loading ? "not-allowed" : "pointer",
+                      backgroundColor: loading ? "#f3f4f6" : "white",
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      ensureCalendarMonthYear();
+                      setCalendarOpen((o) => !o);
+                    }}
+                    disabled={loading}
+                    style={{
+                      position: "absolute",
+                      top: "50%",
+                      right: 10,
+                      transform: "translateY(-50%)",
+                      border: "none",
+                      background: "transparent",
+                      cursor: loading ? "not-allowed" : "pointer",
+                      padding: 0,
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 16,          // smaller width
+                         height: 16,         // smaller height
+                          borderRadius: 3,
+                            border: `1.6px solid ${PRIMARY}`, // slightly thinner border
+                             position: "relative",
+                      }}
+                    >
+                      {/* top bar */}
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: -2,
+                          left: 0,
+                          right: 0,
+                          height: 4,
+                          backgroundColor: PRIMARY,
+                          borderRadius: "4px 4px 0 0",
+                        }}
+                      />
+                      {/* two pegs */}
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: -4,
+                          left: 4,
+                          width: 2,
+                          height: 4,
+                          backgroundColor: PRIMARY,
+                          borderRadius: 2,
+                        }}
+                      />
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: -4,
+                          right: 4,
+                          width: 2,
+                          height: 4,
+                          backgroundColor: PRIMARY,
+                          borderRadius: 2,
+                        }}
+                      />
+                    </div>
+                  </button>
+
+                  {calendarOpen && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "100%",
+                        right: 0,
+                        marginTop: 4,
+                        backgroundColor: "white",
+                        borderRadius: 8,
+                        boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
+                        border: "1px solid #e5e7eb",
+                        zIndex: 9999,
+                        width: 260,
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          padding: "0.5rem 0.75rem",
+                          borderBottom: "1px solid #e5e7eb",
+                          backgroundColor: "#f9fafb",
+                        }}
+                      >
+                        <button
+                          type="button"
+                          onClick={goPrevMonth}
+                          style={{
+                            border: "none",
+                            background: "transparent",
+                            cursor: "pointer",
+                            padding: 4,
+                          }}
+                        >
+                          <ChevronLeft size={16} />
+                        </button>
+                        <span
+                          style={{
+                            fontWeight: 600,
+                            fontSize: "0.9rem",
+                            color: "#111827",
+                          }}
+                        >
+                          {monthNames[month]} {year}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={goNextMonth}
+                          style={{
+                            border: "none",
+                            background: "transparent",
+                            cursor: "pointer",
+                            padding: 4,
+                          }}
+                        >
+                          <ChevronRight size={16} />
+                        </button>
+                      </div>
+
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "repeat(7, 1fr)",
+                          padding: "0.25rem 0.5rem",
+                          gap: 2,
+                          fontSize: "0.75rem",
+                          color: "#6b7280",
+                        }}
+                      >
+                        {weekdays.map((w) => (
+                          <div
+                            key={w}
+                            style={{
+                              textAlign: "center",
+                              padding: "0.25rem 0",
+                            }}
+                          >
+                            {w}
+                          </div>
+                        ))}
+                      </div>
+
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "repeat(7, 1fr)",
+                          padding: "0.25rem 0.5rem 0.5rem",
+                          gap: 2,
+                        }}
+                      >
+                        {cells.map((c, idx) => {
+                          const cellDate = new Date(year, month, c.day);
+                          const isToday =
+                            c.current &&
+                            cellDate.getDate() === today.getDate() &&
+                            cellDate.getMonth() === today.getMonth() &&
+                            cellDate.getFullYear() === today.getFullYear();
+
+                          const isSelected =
+                            selectedDate &&
+                            c.current &&
+                            cellDate.getDate() === selectedDate.getDate() &&
+                            cellDate.getMonth() === selectedDate.getMonth() &&
+                            cellDate.getFullYear() === selectedDate.getFullYear();
+
+                          const baseStyle = {
+                            textAlign: "center",
+                            padding: "0.35rem 0",
+                            borderRadius: 6,
+                            cursor: c.current ? "pointer" : "default",
+                            fontSize: "0.8rem",
+                          };
+
+                          let bg = "transparent";
+                          let color = c.current ? "#111827" : "#d1d5db";
+
+                          if (isToday) {
+                            bg = "rgba(39,35,92,0.08)";
+                          }
+                          if (isSelected) {
+                            bg = PRIMARY;
+                            color = "#ffffff";
+                          }
+
+                          return (
+                            <div
+                              key={idx}
+                              style={{ ...baseStyle, backgroundColor: bg, color }}
+                              onClick={() =>
+                                handleSelectCalendarDay(c.day, c.current)
+                              }
+                            >
+                              {c.day}
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      <div
+                        style={{
+                          padding: "0.4rem 0.75rem 0.6rem",
+                          borderTop: "1px solid #e5e7eb",
+                          textAlign: "right",
+                        }}
+                      >
+                        <button
+                          type="button"
+                          onClick={goToday}
+                          style={{
+                            border: "none",
+                            background: "transparent",
+                            color: PRIMARY,
+                            fontSize: "0.8rem",
+                            fontWeight: 600,
+                            cursor: "pointer",
+                          }}
+                        >
+                          Today
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
-              {/* REASON INPUT */}
+              {/* REASON */}
               <div style={{ marginBottom: "1.5rem" }}>
                 <label
                   style={{
@@ -416,7 +740,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                 />
               </div>
 
-              {/* EMPLOYEE COUNT INFO */}
+              {/* EMPLOYEE COUNT */}
               <div
                 style={{
                   backgroundColor: "rgba(13, 110, 253, 0.1)",
@@ -502,7 +826,8 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
               display: "flex",
               alignItems: "center",
               gap: "0.5rem",
-              opacity: loading || fetchLoading || employeeCount === 0 ? 0.6 : 1,
+              opacity:
+                loading || fetchLoading || employeeCount === 0 ? 0.6 : 1,
               boxShadow: "0 4px 12px rgba(151, 36, 126, 0.3)",
               transition: "all 0.2s ease",
             }}

@@ -1,15 +1,7 @@
-/* ========================================
-   PROJECT LIST - COMPLETE STYLES
-   ======================================== */
-
-/* Wrapper */
 .prj-list-wrapper {
   padding: 1.5rem 2rem !important;
 }
 
-/* ========================================
-   BREADCRUMBS
-   ======================================== */
 
 .prj-list-breadcrumb {
   font-size: 0.875rem !important;
@@ -35,10 +27,6 @@
   font-weight: 600 !important;
 }
 
-/* ========================================
-   COMPACT FILTER BAR
-   ======================================== */
-
 .prj-list-filter-bar {
   background: #FFFFFF !important;
   border: 1px solid #dee2e6 !important;
@@ -54,10 +42,6 @@
   gap: 0.75rem !important;
   flex-wrap: nowrap !important;
 }
-
-/* ========================================
-   SEARCH INPUT WITH INTEGRATED BUTTONS
-   ======================================== */
 
 .prj-list-search-wrapper {
   position: relative !important;
@@ -80,11 +64,15 @@
 
 .prj-list-search-input {
   width: 100% !important;
-  padding: 0.625rem 0.875rem 0.625rem 2.5rem !important;
+  padding: 0.625rem 7rem 0.625rem 2.5rem !important;
   border: 1px solid #dee2e6 !important;
   border-radius: 8px !important;
   font-size: 0.875rem !important;
   transition: all 0.2s !important;
+}
+
+.prj-list-search-input::placeholder {
+  color: #9ca3af !important;
 }
 
 .prj-list-search-input:focus {
@@ -93,13 +81,15 @@
   box-shadow: 0 0 0 0.2rem rgba(15, 98, 254, 0.1) !important;
 }
 
+
 .prj-list-search-wrapper:has(.prj-list-clear-btn) .prj-list-search-input {
-  padding-right: 135px !important;
+  padding-right: 8.5rem !important;
 }
+
 
 .prj-list-clear-btn {
   position: absolute !important;
-  right: 95px !important;
+  right: 5.3rem !important;
   top: 50% !important;
   transform: translateY(-50%) !important;
   display: inline-flex !important;
@@ -108,40 +98,39 @@
   width: 20px !important;
   height: 20px !important;
   padding: 0 !important;
-  background: transparent !important;
-  color: #dc3545 !important;
+  background: #f3f4ff !important;
+  color: #5b5096 !important;
   border: none !important;
-  border-radius: 0 !important;
+  border-radius: 999px !important;
   cursor: pointer !important;
   transition: all 0.2s ease !important;
+  box-shadow: 0 0 0 1px rgba(91, 80, 150, 0.2) !important;
   z-index: 2 !important;
 }
 
 .prj-list-clear-btn:hover {
-  color: #c82333 !important;
-  transform: translateY(-50%) scale(1.2) !important;
+  background: #5b5096 !important;
+  color: #ffffff !important;
 }
 
-.prj-list-clear-btn svg {
-  width: 18px !important;
-  height: 18px !important;
-  stroke-width: 2.5 !important;
-}
 
 .prj-list-search-btn {
   position: absolute !important;
-  right: 4px !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
+  right: 3px !important;
+  top: 3px !important;
+  bottom: 3px !important;      
+  transform: none !important;
+
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   gap: 0.5rem !important;
-  padding: 0.5rem 0.875rem !important;
-  background: #5A5486 !important;
+  padding: 0 1rem !important;
+
+  background: #252267 !important;
   color: #FFFFFF !important;
   border: none !important;
-  border-radius: 6px !important;
+  border-radius: 0 8px 8px 0 !important;  
   font-size: 0.875rem !important;
   font-weight: 600 !important;
   cursor: pointer !important;
@@ -151,19 +140,25 @@
 }
 
 .prj-list-search-btn:hover {
-  background: #4A4076 !important;
-  transform: translateY(-50%) scale(1.02) !important;
-  box-shadow: 0 2px 8px rgba(90, 84, 134, 0.3) !important;
+  background: #1f1b5a !important;
+  box-shadow: 0 2px 8px rgba(37, 35, 92, 0.3) !important;
+}
+
+.prj-list-search-btn.prj-list-search-btn-cancel {
+  background: #6b7280 !important;
+  border-radius: 0 8px 8px 0 !important;
+  border: 1px solid #6b7280 !important;
+}
+
+.prj-list-search-btn.prj-list-search-btn-cancel:hover {
+  background: #4b5563 !important;
+  border-color: #4b5563 !important;
 }
 
 .prj-list-search-btn svg {
   width: 16px !important;
   height: 16px !important;
 }
-
-/* ========================================
-   CUSTOM DROPDOWN - MATCHING IMAGE
-   ======================================== */
 
 .prj-list-status-filter-wrapper {
   position: relative !important;
@@ -278,7 +273,6 @@
   border-bottom-right-radius: 8px !important;
 }
 
-/* Action Buttons */
 .prj-list-actions-group {
   display: flex !important;
   gap: 0.75rem !important;
@@ -321,10 +315,6 @@
   box-shadow: 0 4px 12px rgba(151, 36, 126, 0.3) !important;
 }
 
-/* ========================================
-   TABLE WRAPPER - WITH ROUNDED BORDER
-   ======================================== */
-
 .prj-list-table-wrapper {
   border-radius: 12px !important;
   overflow: hidden !important;
@@ -332,10 +322,6 @@
   background: #FFFFFF !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
 }
-
-/* ========================================
-   TABLE STYLES - WITH ROUNDED CORNERS
-   ======================================== */
 
 .prj-list-table {
   margin-bottom: 0 !important;
@@ -413,7 +399,6 @@
   text-align: center !important;
 }
 
-/* Project Name */
 .prj-list-project-name {
   font-weight: 600 !important;
   color: #27235C !important;
@@ -427,7 +412,6 @@
   text-decoration: underline !important;
 }
 
-/* Status Badges */
 .prj-list-badge {
   display: inline-block !important;
   padding: 0.375rem 0.875rem !important;
@@ -457,7 +441,6 @@
   color: #842029 !important;
 }
 
-/* Icons */
 .prj-list-icon-wrapper {
   display: inline-flex !important;
   align-items: center !important;
@@ -479,7 +462,7 @@
   color: #16A34A !important;
 }
 
-/* Resource Owner */
+
 .prj-list-resource-owner {
   display: flex !important;
   flex-direction: column !important;
@@ -502,10 +485,6 @@
   font-style: italic !important;
   font-size: 0.875rem !important;
 }
-
-/* ========================================
-   ACTION BUTTONS
-   ======================================== */
 
 .prj-list-table tbody td:last-child > div {
   display: flex !important;
@@ -591,9 +570,6 @@
   box-shadow: 0 2px 6px rgba(198, 40, 40, 0.3) !important;
 }
 
-/* ========================================
-   PAGINATION - INSIDE TABLE
-   ======================================== */
 
 .prj-list-pagination-footer {
   display: flex !important;
@@ -609,7 +585,7 @@
   border-bottom-right-radius: 12px !important;
 }
 
-/* Left - Show X entries */
+
 .prj-list-pagination-left {
   display: flex !important;
   align-items: center !important;
@@ -643,7 +619,7 @@
   box-shadow: 0 0 0 0.2rem rgba(15, 98, 254, 0.1) !important;
 }
 
-/* Center - Showing 1 to 5 of 11 entries */
+
 .prj-list-pagination-center {
   display: flex !important;
   align-items: center !important;
@@ -657,7 +633,7 @@
   white-space: nowrap !important;
 }
 
-/* Right - Page numbers */
+
 .prj-list-pagination-right {
   display: flex !important;
   align-items: center !important;
@@ -725,15 +701,11 @@
   user-select: none !important;
 }
 
-/* Empty State */
 .prj-list-table tbody td[colspan] {
   text-align: center !important;
   padding: 3rem 1rem !important;
 }
 
-/* ========================================
-   RESPONSIVE
-   ======================================== */
 
 @media (max-width: 1200px) {
   .prj-list-search-wrapper {
@@ -775,6 +747,20 @@
   .prj-list-pagination-right {
     justify-content: center !important;
   }
+
+  .prj-list-search-wrapper:has(.prj-list-clear-btn) .prj-list-search-input {
+     width: 100% !important;
+  padding: 0.5rem 7.5rem 0.5rem 2.5rem !important;
+  }
+
+  .prj-list-clear-btn {
+    right: 5rem !important;
+  }
+
+  .prj-list-search-btn {
+    padding: 0 0.875rem !important;
+    font-size: 0.8rem !important;
+  }
 }
 
 @media (max-width: 768px) {
@@ -804,19 +790,6 @@
   .prj-list-action-btn svg {
     width: 14px !important;
     height: 14px !important;
-  }
-
-  .prj-list-search-wrapper:has(.prj-list-clear-btn) .prj-list-search-input {
-    padding-right: 125px !important;
-  }
-
-  .prj-list-clear-btn {
-    right: 80px !important;
-  }
-
-  .prj-list-search-btn {
-    padding: 0.4rem 0.75rem !important;
-    font-size: 0.8rem !important;
   }
 
   .prj-list-pagination-footer {

@@ -1,16 +1,10 @@
-/* ========================================
-   MANAGER PEER FEEDBACK - FIXED TEXT LAYOUT
-   ======================================== */
+
 
 .mgrpeer-container {
   padding: 1.5rem 2rem;
   min-height: 100vh;
   background: #f8f9fa;
 }
-
-/* ========================================
-   LOADING
-   ======================================== */
 
 .mgrpeer-loading {
   display: flex;
@@ -45,10 +39,6 @@
 .mgrpeer-refresh-spinning {
   animation: spin 1s linear infinite;
 }
-
-/* ========================================
-   ERROR ALERT
-   ======================================== */
 
 .mgrpeer-alert-error {
   background: #FEE2E2;
@@ -88,9 +78,6 @@
   opacity: 0.7;
 }
 
-/* ========================================
-   HEADER
-   ======================================== */
 
 .mgrpeer-header {
   display: flex;
@@ -177,15 +164,12 @@
   cursor: not-allowed;
 }
 
-/* ========================================
-   CONTENT
-   ======================================== */
+
 
 .mgrpeer-content {
   background: transparent;
 }
 
-/* Empty State */
 .mgrpeer-empty {
   background: white;
   border: 2px solid #27235C;
@@ -216,10 +200,6 @@
   max-width: 480px;
 }
 
-/* ========================================
-   CARDS GRID
-   ======================================== */
-
 .mgrpeer-cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -240,7 +220,6 @@
   transform: translateY(-4px);
 }
 
-/* Card Header - FIXED SPACING */
 .mgrpeer-card-header {
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid #E5E7EB;
@@ -307,7 +286,6 @@
   flex-shrink: 0;
 }
 
-/* Card Body - FIXED TEXT SPACING */
 .mgrpeer-card-body {
   padding: 1.5rem;
   background: white;
@@ -365,7 +343,6 @@
   overflow-wrap: break-word;
 }
 
-/* Badges */
 .mgrpeer-badge {
   display: inline-flex;
   align-items: center;
@@ -389,9 +366,6 @@
   color: #1E40AF;
 }
 
-/* ========================================
-   RESPONSIVE
-   ======================================== */
 
 @media (max-width: 1200px) {
   .mgrpeer-cards-grid {

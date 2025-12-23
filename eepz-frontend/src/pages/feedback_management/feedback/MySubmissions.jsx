@@ -721,13 +721,7 @@ export default function MySubmissions() {
                             <Eye size={16} />
                             View
                           </button>
-                          <button
-                            type="button"
-                            className="btn fm-mysub-btn-danger d-flex align-items-center justify-content-center"
-                            onClick={() => deleteHRForm(hr.responseId, hr.formName)}
-                          >
-                            <Trash2 size={16} />
-                          </button>
+                          
                         </div>
                       </div>
                     </div>
@@ -814,13 +808,7 @@ export default function MySubmissions() {
                             <Eye size={16} />
                             View
                           </button>
-                          <button
-                            type="button"
-                            className="btn fm-mysub-btn-danger d-flex align-items-center justify-content-center"
-                            onClick={() => deleteGoalFeedback(goal.feedbackId, goal.objectiveTitle)}
-                          >
-                            <Trash2 size={16} />
-                          </button>
+                          
                         </div>
                       </div>
                     </div>
@@ -895,13 +883,7 @@ export default function MySubmissions() {
                             <Eye size={16} />
                             View
                           </button>
-                          <button
-                            type="button"
-                            className="btn fm-mysub-btn-danger d-flex align-items-center justify-content-center"
-                            onClick={() => deleteMentor(m.trackingId, m.mentorNameFull)}
-                          >
-                            <Trash2 size={16} />
-                          </button>
+                          
                         </div>
                       </div>
                     </div>
@@ -973,13 +955,6 @@ export default function MySubmissions() {
                           >
                             <Eye size={16} />
                             View
-                          </button>
-                          <button
-                            type="button"
-                            className="btn fm-mysub-btn-danger d-flex align-items-center justify-content-center"
-                            onClick={() => deletePeer(p.queueId, p.recipientNameFull)}
-                          >
-                            <Trash2 size={16} />
                           </button>
                         </div>
                       </div>

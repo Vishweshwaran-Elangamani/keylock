@@ -1,18 +1,8 @@
-/* ========================================
-   SLA DETAILS PAGE - ADAPTIVE HEIGHT LAYOUT
-   Left: Main Card + Status Summary + Escalations
-   Right: Tabs (Details/History) - Content Adaptive
-   ======================================== */
-
 .sla-details-container {
   padding: 1.5rem 1.75rem;
   background-color: #F9FAFB;
   min-height: 100vh;
 }
-
-/* ========================================
-   HEADER
-   ======================================== */
 
 .sla-details-header {
   display: flex;
@@ -29,9 +19,6 @@
   flex-wrap: wrap;
 }
 
-/* ========================================
-   LOADING & ERROR STATES
-   ======================================== */
 
 .sla-details-loading-wrapper {
   display: flex;
@@ -96,10 +83,6 @@
   }
 }
 
-/* ========================================
-   LAYOUT - TWO COLUMNS (ADAPTIVE)
-   ======================================== */
-
 .sla-details-layout {
   display: grid;
   grid-template-columns: 1fr 420px;
@@ -120,10 +103,6 @@
   position: sticky;
   top: 1.5rem;
 }
-
-/* ========================================
-   BUTTONS
-   ======================================== */
 
 .sla-details-btn {
   display: inline-flex;
@@ -178,11 +157,6 @@
   color: #9CA3AF;
   cursor: not-allowed;
 }
-
-/* ========================================
-   CARDS
-   ======================================== */
-
 .sla-details-card {
   background: #FFFFFF;
   border-radius: 12px;
@@ -262,8 +236,8 @@
   border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 600;
-  width: auto;       /* Ensures badge fits text */
-  max-width: fit-content; /* Modern browsers */
+  width: auto;       
+  max-width: fit-content; 
 }
 
 
@@ -318,10 +292,6 @@
   color: #3B82F6;
 }
 
-/* ========================================
-   INTEGRATED STATUS SUMMARY
-   ======================================== */
-
 .sla-details-summary-section {
   margin-top: 1rem;
 }
@@ -356,11 +326,6 @@
   align-items: start;
   margin-top: 1.5rem;
 }
-
-/* ========================================
-   ESCALATIONS
-   ======================================== */
-
 .sla-details-section-title {
   font-size: 1.125rem;
   font-weight: 700;
@@ -383,10 +348,6 @@
   padding: 1.25rem;
   box-shadow: 0 2px 6px rgba(39, 35, 92, 0.08);
 }
-
-/* ========================================
-   TABS (RIGHT SIDE) - CONTENT ADAPTIVE
-   ======================================== */
 
 .sla-details-tabs-wrapper {
   flex-shrink: 0;
@@ -423,8 +384,6 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-
-/* Tab Content - Adapts to Content Height */
 .sla-details-tab-details {
   min-height: 150px;
 }
@@ -451,10 +410,6 @@
   font-size: 0.9375rem;
   margin: 0;
 }
-
-/* ========================================
-   CLOSE MODAL
-   ======================================== */
 
 .sla-close-modal-backdrop {
   position: fixed;
@@ -734,10 +689,6 @@
     transform: rotate(360deg);
   }
 }
-
-/* ========================================
-   RESPONSIVE
-   ======================================== */
 
 @media (max-width: 1200px) {
   .sla-details-layout {

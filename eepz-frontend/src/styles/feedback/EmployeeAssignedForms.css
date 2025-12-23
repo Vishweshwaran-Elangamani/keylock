@@ -1,17 +1,9 @@
-/* ========================================
-   EMPLOYEE ASSIGNED FORMS - CLEAN DESIGN
-   ======================================== */
-
-/* Container */
 .employee-forms-container {
   padding: 1.5rem 1.75rem;
   background-color: #F9FAFB;
   min-height: 100vh;
 }
 
-/* ========================================
-   HEADER
-   ======================================== */
 
 .employee-forms-header {
   display: flex;
@@ -53,10 +45,6 @@
   gap: 0.75rem;
   flex-wrap: wrap;
 }
-
-/* ========================================
-   BUTTONS
-   ======================================== */
 
 .employee-forms-btn {
   display: inline-flex;
@@ -104,7 +92,7 @@
 }
 
 .employee-forms-btn-primary {
-  background-color:linear-gradient(90deg, #97247E 0%, #E01950 100%);
+  background-color: linear-gradient(90deg, #97247E 0%, #E01950 100%);
   color: #27235C;
   border: 1.5px solid #27235C;
 }
@@ -115,7 +103,6 @@
   transform: translateY(-1px);
 }
 
-/* Spin Animation */
 .employee-forms-spin {
   animation: employee-forms-spin-animation 1s linear infinite;
 }
@@ -128,10 +115,6 @@
     transform: rotate(360deg);
   }
 }
-
-/* ========================================
-   ALERTS
-   ======================================== */
 
 .employee-forms-alert-error {
   background: #FEF2F2;
@@ -171,70 +154,88 @@
   line-height: 1;
 }
 
-/* ========================================
-   STATS GRID
-   ======================================== */
 
 .employee-forms-stats-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
 
 .employee-forms-stat-card {
   background: #FFFFFF;
-  border-radius: 10px;
-  padding: 1.25rem 1rem;
-  text-align: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  border: 1px solid #27235C;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  min-height: 135px;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  text-align: left;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+  border: 2px solid #27235C;
+  transition: all 0.25s ease;
+  min-height: 110px;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  gap: 0.85rem;
   cursor: pointer;
 }
 
-.employee-forms-stat-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(15, 98, 254, 0.2);
-  border-color: #0F62FE;
+.sla-stat-card {
+  justify-content: flex-start;
+  
 }
 
+
 .employee-forms-stat-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 10px;
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 0.75rem;
+  flex-shrink: 0;
 }
+
+.sla-stat-icon {
+  margin-bottom: 0;
+}
+
+.sla-stat-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
 
 .employee-forms-stat-value {
   font-size: 2rem;
   font-weight: 700;
   color: #111827;
-  margin: 0 0 0.375rem;
-  line-height: 1;
-  font-style: normal;
+  margin: 0;
+  line-height: 1.1;
 }
+
+.sla-stat-value {
+  font-size: 2.1rem;
+}
+
 
 .employee-forms-stat-label {
-  font-size: 0.8125rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: #6B7280;
-  margin: 0;
-  line-height: 1.2;
-  font-style: normal;
+  margin: 0.25rem 0 0;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
-/* ========================================
-   LOADING & EMPTY STATES
-   ======================================== */
+.sla-stat-label {
+  font-size: 0.78rem;
+}
+
+.employee-forms-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(39, 35, 92, 0.15);
+  border-color: #27235C;
+}
+
 
 .employee-forms-loading {
   display: flex;
@@ -291,9 +292,6 @@
   font-style: normal;
 }
 
-/* ========================================
-   FORMS GRID
-   ======================================== */
 
 .employee-forms-content {
   flex: 1;
@@ -304,10 +302,6 @@
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 1.25rem;
 }
-
-/* ========================================
-   FORM CARDS - CLEAN MINIMAL DESIGN
-   ======================================== */
 
 .employee-forms-card {
   background: #FFFFFF;
@@ -328,7 +322,7 @@
   transform: translateY(-4px);
 }
 
-/* Card Header - Clean Design */
+/* Card Header */
 .employee-forms-card-header {
   display: flex;
   align-items: center;
@@ -378,7 +372,7 @@
   font-style: normal;
 }
 
-/* Card Body - Simple Clean Rows */
+
 .employee-forms-card-body {
   padding: 1.125rem;
   flex: 1;
@@ -431,7 +425,6 @@
   font-style: normal;
 }
 
-/* Utility Classes */
 .employee-forms-text-success {
   color: #16A34A !important;
 }
@@ -451,7 +444,7 @@
   white-space: nowrap;
 }
 
-/* Card Footer - Clean Design */
+
 .employee-forms-card-footer {
   padding: 1rem 1.125rem;
   border-top: 1px solid #F3F4F6;
@@ -476,15 +469,12 @@
 }
 
 .employee-forms-card-btn-primary {
-  background:linear-gradient(90deg, #97247E 0%, #E01950 100%);
+  background: linear-gradient(90deg, #97247E 0%, #E01950 100%);
   color: white;
-  
 }
 
 .employee-forms-card-btn-primary:hover {
-  
   transform: translateY(-1px);
- 
 }
 
 .employee-forms-card-btn-disabled {
@@ -493,10 +483,6 @@
   border: 1.5px solid #E5E7EB;
   cursor: not-allowed;
 }
-
-/* ========================================
-   BADGES - CLEAN DESIGN
-   ======================================== */
 
 .employee-forms-badge {
   display: inline-block;
@@ -520,13 +506,16 @@
   color: #92400E;
 }
 
-/* ========================================
-   RESPONSIVE
-   ======================================== */
+
 
 @media (max-width: 1024px) {
   .employee-forms-stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+   display: grid;
+  grid-template-columns: repeat(4, auto);  
+  justify-content: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  
   }
 
   .employee-forms-grid {
@@ -550,6 +539,7 @@
 
   .employee-forms-stats-grid {
     grid-template-columns: 1fr;
+    
   }
 
   .employee-forms-grid {
@@ -567,9 +557,6 @@
   }
 }
 
-/* ========================================
-   GLOBAL OVERRIDE - NO ITALIC
-   ======================================== */
 
 .employee-forms-container * {
   font-style: normal !important;

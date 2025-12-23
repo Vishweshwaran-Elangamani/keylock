@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { X, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import slaService from "../../../services/sla/slaService";
+import "../../../styles/sla/EscalationForm.css";
 
 const EscalationForm = ({ sla, onClose, onSuccess }) => {
   const [selectedReason, setSelectedReason] = useState("");
@@ -13,7 +14,7 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
   const [managerError, setManagerError] = useState(null);
 
   const reasonOptions = [
-    { value: "", label: "-- Select --" },
+    { value: "", label: "-- Select Reason --" },
     { value: "Performance Issues", label: "Performance Issues" },
     { value: "Resource Constraints", label: "Resource Constraints" },
     { value: "Technical Challenges", label: "Technical Challenges" },
@@ -63,14 +64,12 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
             }`.trim();
             setManagerName(fullName || "Manager");
           }
-        } catch (err) {
-          console.warn("⚠️ Could not fetch manager name, using ID only");
+        } catch {
           setManagerName(`Manager (ID: ${reportingManagerId})`);
         }
 
         setManagerId(reportingManagerId);
       } catch (error) {
-        console.error("❌ Error fetching manager:", error);
         setManagerError(error.message || "Failed to load escalation target");
         toast.error("Manager Not Found", {
           description:
@@ -123,14 +122,12 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
         });
         onSuccess();
       } else {
-        console.error("Escalation failed:", response?.message);
         toast.error("Escalation Failed", {
           description: response?.message || "Unable to escalate SLA",
           duration: 5000,
         });
       }
     } catch (error) {
-      console.error(" Escalation error:", error);
       toast.error("Error Escalating SLA", {
         description: error.message || "An unexpected error occurred",
         duration: 5000,
@@ -176,7 +173,7 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
             boxShadow: "0 10px 40px rgba(0,0,0,0.15)",
           }}
         >
-          {/* Header - Dark Purple Theme */}
+          {/* Header */}
           <div
             style={{
               background: "#3E3A64",
@@ -283,7 +280,7 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
               </div>
             ) : (
               <form onSubmit={handleSubmit}>
-                {/* Goal Section */}
+                {/* Goal */}
                 <div
                   className="mb-3"
                   style={{
@@ -315,7 +312,7 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                   </div>
                 </div>
 
-                {/* Deadline Info */}
+                {/* Deadline */}
                 <div className="mb-3">
                   <small
                     style={{
@@ -333,7 +330,7 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                   </small>
                 </div>
 
-                {/* Manager Info */}
+                {/* Manager info */}
                 {managerName && (
                   <div
                     className="alert d-flex align-items-start gap-2 mb-3"
@@ -355,7 +352,7 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                   </div>
                 )}
 
-                {/* Reason Dropdown */}
+                {/* Reason dropdown styled like screenshot */}
                 <div className="mb-3">
                   <label
                     htmlFor="reason"
@@ -369,41 +366,28 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                   >
                     Reason <span style={{ color: "#DC2626" }}>*</span>
                   </label>
-                  <select
-                    id="reason"
-                    className="form-select"
-                    value={selectedReason}
-                    onChange={(e) => setSelectedReason(e.target.value)}
-                    required
-                    disabled={submitting}
-                    style={{
-                      borderRadius: "8px",
-                      border: "1px solid #D1D5DB",
-                      padding: "0.625rem 0.875rem",
-                      fontSize: "0.875rem",
-                      color: selectedReason ? "#1F2937" : "#9CA3AF",
-                      outline: "none",
-                      transition: "all 0.2s",
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "#3B82F6";
-                      e.currentTarget.style.boxShadow =
-                        "0 0 0 3px rgba(59,130,246,0.1)";
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = "#D1D5DB";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
-                  >
-                    {reasonOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="esc-select-wrapper">
+                    <select
+                      id="reason"
+                      className="esc-select"
+                      value={selectedReason}
+                      onChange={(e) => setSelectedReason(e.target.value)}
+                      disabled={submitting}
+                    >
+                      {reasonOptions.map((option, index) => (
+                        <option
+                          key={option.value || "placeholder"}
+                          value={option.value}
+                          disabled={index === 0}
+                        >
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
-                {/* Your Comment Textarea */}
+                {/* Comment */}
                 <div className="mb-2">
                   <label
                     htmlFor="details"
@@ -468,7 +452,7 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                   </div>
                 </div>
 
-                {/* Info Alert */}
+                {/* Info */}
                 <div
                   style={{
                     background: "#DBEAFE",
@@ -493,12 +477,12 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                       lineHeight: "1.4",
                     }}
                   >
-                    <strong>Level 1 (L1)</strong> escalation to your manager
-                    for immediate review.
+                    <strong>Level 1 (L1)</strong> escalation to your manager for
+                    immediate review.
                   </small>
                 </div>
 
-                {/* Footer Buttons */}
+                {/* Footer buttons */}
                 <div
                   style={{
                     marginTop: "1.25rem",
@@ -521,18 +505,6 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                       background: "#fff",
                       color: "#6B7280",
                       transition: "all 0.2s",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!submitting) {
-                        e.currentTarget.style.borderColor = "#9CA3AF";
-                        e.currentTarget.style.color = "#374151";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!submitting) {
-                        e.currentTarget.style.borderColor = "#D1D5DB";
-                        e.currentTarget.style.color = "#6B7280";
-                      }
                     }}
                   >
                     Cancel
@@ -564,33 +536,6 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                         description.trim().length < 10
                           ? 0.6
                           : 1,
-                    }}
-                    onMouseEnter={(e) => {
-                      if (
-                        !submitting &&
-                        !loadingManager &&
-                        managerId &&
-                        selectedReason &&
-                        description.trim().length >= 10
-                      ) {
-                        e.currentTarget.style.background = "#AD1457";
-                        e.currentTarget.style.transform = "translateY(-1px)";
-                        e.currentTarget.style.boxShadow =
-                          "0 4px 12px rgba(194,24,91,0.25)";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (
-                        !submitting &&
-                        !loadingManager &&
-                        managerId &&
-                        selectedReason &&
-                        description.trim().length >= 10
-                      ) {
-                        e.currentTarget.style.background = "#C2185B";
-                        e.currentTarget.style.transform = "translateY(0)";
-                        e.currentTarget.style.boxShadow = "none";
-                      }
                     }}
                   >
                     {submitting ? (

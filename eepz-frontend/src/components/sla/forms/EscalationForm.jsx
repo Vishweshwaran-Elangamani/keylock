@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { X, Send, AlertCircle } from "lucide-react";
+import { X, Send, AlertCircle, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import slaService from "../../../services/sla/slaService";
 import "../../../styles/sla/EscalationForm.css";
@@ -13,6 +13,8 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const [reasonOpen, setReasonOpen] = useState(false);
+
   const reasons = [
     "SLA Deadline Breach",
     "Performance Issue",
@@ -22,7 +24,18 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
   ];
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
+    if (loading) return;
+
+    if (!formData.reason) {
+      toast.error("Please select a reason");
+      return;
+    }
+    if (!formData.description.trim() || formData.description.trim().length < 10) {
+      toast.error("Description must be at least 10 characters");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -64,7 +77,13 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
     });
   };
 
-  const isValid = formData.reason && formData.description.trim().length >= 10;
+  const isValid =
+    formData.reason && formData.description.trim().length >= 10 && !loading;
+
+  const handleReasonSelect = (value) => {
+    setFormData((prev) => ({ ...prev, reason: value }));
+    setReasonOpen(false);
+  };
 
   return (
     <>
@@ -93,7 +112,10 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                 <div>
                   <p>{error}</p>
                 </div>
-                <button onClick={() => setError(null)} className="esc-error-close">
+                <button
+                  onClick={() => setError(null)}
+                  className="esc-error-close"
+                >
                   <X size={16} />
                 </button>
               </div>
@@ -103,38 +125,68 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
               <div className="esc-sla-info">
                 <div className="esc-info-row">
                   <span className="esc-info-label">SLA Type:</span>
-                  <span className="esc-info-value">{sla?.slatype || "N/A"}</span>
+                  <span className="esc-info-value">
+                    {sla?.slatype || "N/A"}
+                  </span>
                 </div>
                 <div className="esc-info-row">
                   <span className="esc-info-label">Employee:</span>
-                  <span className="esc-info-value">{sla?.employeeName || "N/A"}</span>
+                  <span className="esc-info-value">
+                    {sla?.employeeName || "N/A"}
+                  </span>
                 </div>
                 <div className="esc-info-row">
                   <span className="esc-info-label">Deadline:</span>
-                  <span className="esc-info-value esc-deadline">{formatDate(sla?.deadline)}</span>
+                  <span className="esc-info-value esc-deadline">
+                    {formatDate(sla?.deadline)}
+                  </span>
                 </div>
               </div>
 
+              {/* Reason dropdown (custom, like Department screenshot) */}
               <div className="esc-form-group">
                 <label className="esc-form-label">
                   Reason <span className="esc-required">*</span>
                 </label>
-                <select
-                  className="esc-form-select"
-                  value={formData.reason}
-                  onChange={(e) =>
-                    setFormData({ ...formData, reason: e.target.value })
-                  }
-                  disabled={loading}
-                  required
-                >
-                  <option value="">-- Select Reason --</option>
-                  {reasons.map((r) => (
-                    <option key={r} value={r}>
-                      {r}
-                    </option>
-                  ))}
-                </select>
+
+                <div className="esc-dropdown">
+                  <button
+                    type="button"
+                    className="esc-dropdown-control"
+                    onClick={() => !loading && setReasonOpen((o) => !o)}
+                    disabled={loading}
+                  >
+                    <span
+                      className={
+                        formData.reason ? "esc-dropdown-value" : "esc-dropdown-placeholder"
+                      }
+                    >
+                      {formData.reason || "Select Reason"}
+                    </span>
+                    <ChevronDown
+                      size={18}
+                      className={`esc-dropdown-icon ${
+                        reasonOpen ? "open" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {reasonOpen && (
+                    <div className="esc-dropdown-menu">
+                      {reasons.map((r) => (
+                        <div
+                          key={r}
+                          className={`esc-dropdown-option ${
+                            formData.reason === r ? "selected" : ""
+                          }`}
+                          onClick={() => handleReasonSelect(r)}
+                        >
+                          {r}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="esc-form-group">
@@ -172,7 +224,7 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
             <button
               onClick={handleSubmit}
               className="esc-btn esc-btn-primary"
-              disabled={loading || !isValid}
+              disabled={!isValid}
             >
               {loading ? (
                 <>

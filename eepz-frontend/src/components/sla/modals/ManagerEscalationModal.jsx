@@ -3,6 +3,68 @@ import { X, Send, AlertTriangle, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import slaService from "../../../services/sla/slaService";
 
+const MgrSelect = ({ value, onChange, options, placeholder }) => {
+  const [open, setOpen] = useState(false);
+  const selected = options.find((o) => o.value === value);
+
+  return (
+    <div className="mgr-select">
+      <button
+        type="button"
+        className={`mgr-select-control ${open ? "open" : ""}`}
+        onClick={() => setOpen((p) => !p)}
+      >
+        <span className="mgr-select-value">
+          {selected ? selected.label : placeholder}
+        </span>
+        <span className={`mgr-select-icon ${open ? "open" : ""}`}>
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <polyline
+              points="6 9 12 15 18 9"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </span>
+      </button>
+
+      {open && (
+        <div className="mgr-select-menu">
+          <div
+            className="mgr-select-option selected"
+            onClick={() => {
+              onChange("");
+              setOpen(false);
+            }}
+          >
+            {placeholder}
+          </div>
+          {options.map((opt) => (
+            <div
+              key={opt.value}
+              className="mgr-select-option"
+              onClick={() => {
+                onChange(opt.value);
+                setOpen(false);
+              }}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
   const [reason, setReason] = useState("");
   const [comments, setComments] = useState("");
@@ -24,7 +86,6 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
   useEffect(() => {
     checkEscalationStatus();
     fetchDepartmentHead();
-    // eslint-disable-next-line
   }, []);
 
   const checkEscalationStatus = async () => {
@@ -37,9 +98,7 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
         );
         if (pendingL2Escalation) setAlreadyEscalated(true);
       }
-    } catch (error) {
-      /* silent */
-    }
+    } catch (error) {}
   };
 
   const fetchDepartmentHead = async () => {
@@ -110,7 +169,6 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
 
   if (!review) return null;
 
-  // Loading State
   if (fetchingDeptHead) {
     return (
       <div
@@ -150,7 +208,6 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
     );
   }
 
-  // Already Escalated Error
   if (alreadyEscalated) {
     return (
       <div
@@ -221,13 +278,36 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
             </button>
           </div>
 
-          <div style={{ padding: "2rem", backgroundColor: "#f8f9fa", textAlign: "center" }}>
-            <AlertTriangle size={48} style={{ color: "#F59E0B", marginBottom: "1rem" }} />
-            <h6 style={{ fontWeight: 600, color: "#111827", marginBottom: "0.75rem" }}>
+          <div
+            style={{
+              padding: "2rem",
+              backgroundColor: "#f8f9fa",
+              textAlign: "center",
+            }}
+          >
+            <AlertTriangle
+              size={48}
+              style={{ color: "#F59E0B", marginBottom: "1rem" }}
+            />
+            <h6
+              style={{
+                fontWeight: 600,
+                color: "#111827",
+                marginBottom: "0.75rem",
+              }}
+            >
               Escalation Already Pending
             </h6>
-            <p style={{ margin: 0, color: "#6B7280", fontSize: "0.875rem", textAlign: "center" }}>
-              This SLA has already been escalated to the Department Head and is awaiting response.
+            <p
+              style={{
+                margin: 0,
+                color: "#6B7280",
+                fontSize: "0.875rem",
+                textAlign: "center",
+              }}
+            >
+              This SLA has already been escalated to the Department Head and is
+              awaiting response.
             </p>
           </div>
 
@@ -267,7 +347,6 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
     );
   }
 
-  // No Department Head Error
   if (!deptHead) {
     return (
       <div
@@ -338,12 +417,34 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
             </button>
           </div>
 
-          <div style={{ padding: "2rem", backgroundColor: "#f8f9fa", textAlign: "center" }}>
-            <AlertTriangle size={48} style={{ color: "#EF4444", marginBottom: "1rem" }} />
-            <h6 style={{ fontWeight: 600, color: "#111827", marginBottom: "0.75rem" }}>
+          <div
+            style={{
+              padding: "2rem",
+              backgroundColor: "#f8f9fa",
+              textAlign: "center",
+            }}
+          >
+            <AlertTriangle
+              size={48}
+              style={{ color: "#EF4444", marginBottom: "1rem" }}
+            />
+            <h6
+              style={{
+                fontWeight: 600,
+                color: "#111827",
+                marginBottom: "0.75rem",
+              }}
+            >
               No Department Head Available
             </h6>
-            <p style={{ margin: 0, color: "#6B7280", fontSize: "0.875rem", textAlign: "center" }}>
+            <p
+              style={{
+                margin: 0,
+                color: "#6B7280",
+                fontSize: "0.875rem",
+                textAlign: "center",
+              }}
+            >
               Cannot escalate: No department head found for your department.
             </p>
           </div>
@@ -414,7 +515,6 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <div
           style={{
             display: "flex",
@@ -451,23 +551,17 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
               transition: "opacity 0.2s ease",
             }}
             onMouseEnter={(e) => {
-              if (!loading) {
-                e.currentTarget.style.opacity = "1";
-              }
+              if (!loading) e.currentTarget.style.opacity = "1";
             }}
             onMouseLeave={(e) => {
-              if (!loading) {
-                e.currentTarget.style.opacity = "0.8";
-              }
+              if (!loading) e.currentTarget.style.opacity = "0.8";
             }}
           >
             <X size={24} color="white" />
           </button>
         </div>
 
-        {/* Body */}
         <div style={{ padding: "1.75rem", backgroundColor: "#f8f9fa" }}>
-          {/* Error Alert */}
           {error && (
             <div
               style={{
@@ -486,7 +580,14 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
                 style={{ color: "#E01950", flexShrink: 0, marginTop: "2px" }}
               />
               <div style={{ flex: 1 }}>
-                <p style={{ margin: 0, color: "#991b1b", fontSize: "0.875rem", textAlign: "left" }}>
+                <p
+                  style={{
+                    margin: 0,
+                    color: "#991b1b",
+                    fontSize: "0.875rem",
+                    textAlign: "left",
+                  }}
+                >
                   {error}
                 </p>
               </div>
@@ -512,7 +613,6 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
           )}
 
           <form onSubmit={handleSubmit}>
-            {/* SLA Details Box */}
             <div
               style={{
                 backgroundColor: "white",
@@ -557,7 +657,6 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
               </small>
             </div>
 
-            {/* Escalating To Box */}
             <div
               style={{
                 backgroundColor: "#E0E7FF",
@@ -602,7 +701,6 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
               </small>
             </div>
 
-            {/* Reason Dropdown */}
             <div style={{ marginBottom: "1.5rem" }}>
               <label
                 style={{
@@ -616,34 +714,22 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
               >
                 Reason <span style={{ color: "#E01950" }}>*</span>
               </label>
-              <select
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                disabled={loading}
+
+              <div
                 style={{
-                  width: "100%",
-                  padding: "0.65rem 0.75rem",
-                  borderRadius: "8px",
-                  border: "1px solid #d1d5db",
-                  fontSize: "0.875rem",
-                  fontFamily: "inherit",
-                  boxSizing: "border-box",
-                  backgroundColor: "white",
-                  textAlign: "left",
                   opacity: loading ? 0.6 : 1,
-                  cursor: loading ? "not-allowed" : "pointer",
+                  pointerEvents: loading ? "none" : "auto",
                 }}
               >
-                <option value="">-- Select Reason --</option>
-                {reasons.map((r) => (
-                  <option key={r} value={r}>
-                    {r}
-                  </option>
-                ))}
-              </select>
+                <MgrSelect
+                  value={reason}
+                  onChange={setReason}
+                  options={reasons.map((r) => ({ value: r, label: r }))}
+                  placeholder="-- Select Reason --"
+                />
+              </div>
             </div>
 
-            {/* Comments Textarea */}
             <div style={{ marginBottom: "1rem" }}>
               <label
                 style={{
@@ -695,7 +781,6 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
           </form>
         </div>
 
-        {/* Footer */}
         <div
           style={{
             display: "flex",
@@ -755,12 +840,14 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
             onMouseEnter={(e) => {
               if (!(loading || !isValid)) {
                 e.currentTarget.style.transform = "translateY(-2px)";
-                e.currentTarget.style.boxShadow = "0 6px 16px rgba(151, 36, 126, 0.4)";
+                e.currentTarget.style.boxShadow =
+                  "0 6px 16px rgba(151, 36, 126, 0.4)";
               }
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "0 4px 12px rgba(151, 36, 126, 0.3)";
+              e.currentTarget.style.boxShadow =
+                "0 4px 12px rgba(151, 36, 126, 0.3)";
             }}
           >
             {loading ? (

@@ -18,7 +18,6 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import slaService from "../../services/sla/slaService";
-import Pagination from "../../components/project_management_components/common/Pagination";
 import EditSLAModal from "../../components/sla/modals/EditSLAModal";
 import CreateSLAModal from "../../components/sla/modals/CreateSLAModal";
 import ConfirmationModal from "../../components/goals/modals/ConfirmationModal";
@@ -32,7 +31,7 @@ const HRSLADashboard = () => {
   const [error, setError] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
@@ -48,7 +47,7 @@ const HRSLADashboard = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [slaToDelete, setSlaToDelete] = useState(null);
 
-  // Custom dropdown states
+  // Custom dropdown state
   const [openDropdown, setOpenDropdown] = useState(null);
 
   useEffect(() => {
@@ -61,17 +60,17 @@ const HRSLADashboard = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [activeSearchTerm, statusFilter, typeFilter, complianceFilter]);
+  }, [activeSearchTerm, statusFilter, typeFilter, complianceFilter, itemsPerPage]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (!e.target.closest('.hr-sla-custom-select')) {
+      if (!e.target.closest(".hr-sla-custom-select")) {
         setOpenDropdown(null);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const fetchSLAs = async () => {
@@ -98,38 +97,51 @@ const HRSLADashboard = () => {
 
   const applyFilters = () => {
     let filtered = [...slas];
+
     if (activeSearchTerm) {
       filtered = filtered.filter(
         (sla) =>
-          sla.employeeName?.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
+          sla.employeeName
+            ?.toLowerCase()
+            .includes(activeSearchTerm.toLowerCase()) ||
           sla.slatype?.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
           sla.slaid.toString().includes(activeSearchTerm)
       );
     }
-    if (statusFilter !== "All")
+
+    if (statusFilter !== "All") {
       filtered = filtered.filter((sla) => sla.status === statusFilter);
-    if (typeFilter !== "All")
+    }
+
+    if (typeFilter !== "All") {
       filtered = filtered.filter((sla) => sla.slatype === typeFilter);
-    if (complianceFilter !== "All")
+    }
+
+    if (complianceFilter !== "All") {
       filtered = filtered.filter(
         (sla) => sla.complianceStatus === complianceFilter
       );
+    }
+
     setFilteredSlas(filtered);
   };
 
+  // Updated search handlers
   const handleSearch = () => {
-    setActiveSearchTerm(searchTerm);
+    if (!searchTerm.trim()) return;
+    setActiveSearchTerm(searchTerm.trim());
+  };
+
+  const handleCancelSearch = () => {
+    setSearchTerm("");
+    setActiveSearchTerm("");
   };
 
   const handleSearchKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
+      e.preventDefault();
       handleSearch();
     }
-  };
-
-  const handleClearSearch = () => {
-    setSearchTerm('');
-    setActiveSearchTerm('');
   };
 
   const handleEdit = (e, sla) => {
@@ -185,6 +197,7 @@ const HRSLADashboard = () => {
       toast.warning("No SLAs to export");
       return;
     }
+
     const csvData = filteredSlas.map((sla) => ({
       ID: sla.slaid,
       Employee: sla.employeeName,
@@ -194,6 +207,7 @@ const HRSLADashboard = () => {
       Compliance: sla.complianceStatus,
       Deadline: formatDate(sla.deadline),
     }));
+
     const csv = [
       Object.keys(csvData[0]).join(","),
       ...csvData.map((row) =>
@@ -202,6 +216,7 @@ const HRSLADashboard = () => {
           .join(",")
       ),
     ].join("\n");
+
     const blob = new Blob([csv], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -268,8 +283,12 @@ const HRSLADashboard = () => {
     const selectRef = useRef(null);
     const dropdownRef = useRef(null);
     const isOpen = openDropdown === name;
-    const selectedOption = options.find(opt => opt.value === value);
-    const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+    const selectedOption = options.find((opt) => opt.value === value);
+    const [dropdownPosition, setDropdownPosition] = useState({
+      top: 0,
+      left: 0,
+      width: 0,
+    });
 
     useEffect(() => {
       if (isOpen && selectRef.current) {
@@ -277,7 +296,7 @@ const HRSLADashboard = () => {
         setDropdownPosition({
           top: rect.bottom + window.scrollY + 4,
           left: rect.left + window.scrollX,
-          width: rect.width
+          width: rect.width,
         });
       }
     }, [isOpen]);
@@ -286,7 +305,9 @@ const HRSLADashboard = () => {
       <div className="hr-sla-custom-select" ref={selectRef}>
         <button
           type="button"
-          className={`hr-sla-custom-select-trigger ${selectedOption && selectedOption.value !== 'All' ? 'has-value' : ''}`}
+          className={`hr-sla-custom-select-trigger ${
+            selectedOption && selectedOption.value !== "All" ? "has-value" : ""
+          }`}
           onClick={() => setOpenDropdown(isOpen ? null : name)}
         >
           <span className="hr-sla-custom-select-value">
@@ -294,7 +315,7 @@ const HRSLADashboard = () => {
           </span>
           <ChevronDown
             size={18}
-            className={`hr-sla-custom-select-icon ${isOpen ? 'open' : ''}`}
+            className={`hr-sla-custom-select-icon ${isOpen ? "open" : ""}`}
             strokeWidth={2}
           />
         </button>
@@ -303,17 +324,18 @@ const HRSLADashboard = () => {
             ref={dropdownRef}
             className="hr-sla-custom-select-dropdown"
             style={{
-              position: 'fixed',
+              position: "fixed",
               top: `${dropdownPosition.top}px`,
               left: `${dropdownPosition.left}px`,
-              width: `${dropdownPosition.width}px`
+              width: `${dropdownPosition.width}px`,
             }}
           >
             {options.map((option) => (
               <div
                 key={option.value}
-                className={`hr-sla-custom-select-option ${value === option.value ? 'selected' : ''
-                  }`}
+                className={`hr-sla-custom-select-option ${
+                  value === option.value ? "selected" : ""
+                }`}
                 onClick={() => {
                   onChange(option.value);
                   setOpenDropdown(null);
@@ -350,9 +372,12 @@ const HRSLADashboard = () => {
     { value: "Extended", label: "Extended" },
   ];
 
-  const totalPages = Math.ceil(filteredSlas.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
+  // Pagination helpers
+  const safeTotal = filteredSlas.length;
+  const totalPages = Math.max(1, Math.ceil(safeTotal / itemsPerPage));
+  const startIndex = safeTotal === 0 ? 0 : (currentPage - 1) * itemsPerPage;
+  const endIndex =
+    safeTotal === 0 ? 0 : Math.min(currentPage * itemsPerPage, safeTotal);
   const currentSLAs = filteredSlas.slice(startIndex, endIndex);
 
   const stats = calculateStats();
@@ -361,7 +386,10 @@ const HRSLADashboard = () => {
     return (
       <div className="hr-sla-wrapper h-100 d-flex align-items-center justify-content-center">
         <div className="text-center">
-          <div className="spinner-border text-primary" style={{ width: "3rem", height: "3rem" }}></div>
+          <div
+            className="spinner-border text-primary"
+            style={{ width: "3rem", height: "3rem" }}
+          ></div>
           <p className="text-muted mt-3">Loading SLA data...</p>
         </div>
       </div>
@@ -382,7 +410,8 @@ const HRSLADashboard = () => {
               }}
               className="hr-sla-breadcrumb-link"
             >
-              <Home size={14} />Dashboard
+              <Home size={14} />
+              Dashboard
             </a>
           </li>
           <li className="breadcrumb-item active" aria-current="page">
@@ -397,7 +426,10 @@ const HRSLADashboard = () => {
           <AlertTriangle size={20} />
           <div>
             <strong>Error:</strong> {error}
-            <button className="btn btn-sm btn-outline-danger ms-3" onClick={fetchSLAs}>
+            <button
+              className="btn btn-sm btn-outline-danger ms-3"
+              onClick={fetchSLAs}
+            >
               Retry
             </button>
           </div>
@@ -438,7 +470,10 @@ const HRSLADashboard = () => {
         ].map(({ label, value, icon: Icon, bgColor, iconColor }) => (
           <div key={label} className="col-lg-3 col-md-6 col-sm-6">
             <div className="hr-sla-stat-card">
-              <div className="hr-sla-stat-icon" style={{ backgroundColor: bgColor }}>
+              <div
+                className="hr-sla-stat-icon"
+                style={{ backgroundColor: bgColor }}
+              >
                 <Icon size={28} color={iconColor} strokeWidth={2.5} />
               </div>
               <div>
@@ -454,97 +489,104 @@ const HRSLADashboard = () => {
       <div className="hr-sla-filters-card">
         <div className="row g-3 align-items-center">
           <div className="col-lg-3 col-md-6">
-            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-              <Search
-                size={16}
-                style={{
-                  position: 'absolute',
-                  left: '0.875rem',
-                  color: '#6b7280',
-                  pointerEvents: 'none',
-                  zIndex: 2
-                }}
-              />
+            <div
+              style={{
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
+                width: "100%",
+              }}
+              className="hr-sla-search-wrapper"
+            >
+              <Search size={16} className="hr-sla-search-icon" />
               <input
                 type="text"
                 className="form-control hr-sla-search-input"
-                placeholder="Search by employee, type, or ID..."
+                placeholder="Search by employee name"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={handleSearchKeyPress}
                 style={{
-                  paddingLeft: '2.5rem',
-                  paddingRight: activeSearchTerm ? '130px' : '90px'
+                  paddingRight: "7.5rem",
                 }}
               />
-              {activeSearchTerm && (
+
+              {activeSearchTerm ? (
                 <button
                   type="button"
-                  onClick={handleClearSearch}
+                  onClick={handleCancelSearch}
                   style={{
-                    position: 'absolute',
-                    right: '85px',
-                    background: 'transparent',
-                    border: 'none',
-                    color: '#dc3545',
-                    cursor: 'pointer',
-                    padding: 0,
-                    width: '20px',
-                    height: '20px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 2,
-                    transition: 'all 0.2s ease'
+                    position: "absolute",
+                    right: "3px",
+                    top: "3px",
+                    bottom: "3px",
+                    background: "#6b7280",
+                    border: "1px solid #6b7280",
+                    color: "white",
+                    borderRadius: "0 8px 8px 0",
+                    padding: "0 1rem",
+                    fontSize: "0.8rem",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.4rem",
+                    zIndex: 1,
+                    transition: "all 0.2s ease",
+                    whiteSpace: "nowrap",
+                    fontFamily: "Poppins, sans-serif",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.color = '#c82333';
-                    e.currentTarget.style.transform = 'scale(1.2)';
+                    e.currentTarget.style.background = "#4b5563";
+                    e.currentTarget.style.borderColor = "#4b5563";
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.color = '#dc3545';
-                    e.currentTarget.style.transform = 'scale(1)';
+                    e.currentTarget.style.background = "#6b7280";
+                    e.currentTarget.style.borderColor = "#6b7280";
                   }}
-                  title="Clear search"
                 >
-                  <X size={18} style={{ strokeWidth: 2.5 }} />
+                  <X size={14} />
+                  Cancel
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleSearch}
+                  style={{
+                    position: "absolute",
+                    right: "3px",
+                    top: "3px",
+                    bottom: "3px",
+                    background: "#5a5486",
+                    border: "none",
+                    color: "white",
+                    borderRadius: "0 8px 8px 0",
+                    padding: "0 1rem",
+                    fontSize: "0.8rem",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.4rem",
+                    zIndex: 1,
+                    transition: "all 0.2s ease",
+                    whiteSpace: "nowrap",
+                    fontFamily: "Poppins, sans-serif",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "#4a4076";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "#5a5486";
+                  }}
+                >
+                  <Search size={14} />
+                  Search
                 </button>
               )}
-              <button
-                type="button"
-                onClick={handleSearch}
-                style={{
-                  position: 'absolute',
-                  right: '4px',
-                  background: '#5A5486',
-                  border: 'none',
-                  color: 'white',
-                  borderRadius: '6px',
-                  padding: '0.4rem 0.75rem',
-                  fontSize: '0.8rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.4rem',
-                  zIndex: 1,
-                  transition: 'all 0.2s ease',
-                  whiteSpace: 'nowrap'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = '#4A4076';
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(90, 84, 134, 0.3)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = '#5A5486';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-              >
-                <Search size={14} />
-                Search
-              </button>
             </div>
           </div>
+
           <div className="col-lg-2 col-md-6">
             <CustomSelect
               value={statusFilter}
@@ -554,6 +596,7 @@ const HRSLADashboard = () => {
               name="status"
             />
           </div>
+
           <div className="col-lg-2 col-md-6">
             <CustomSelect
               value={typeFilter}
@@ -563,6 +606,7 @@ const HRSLADashboard = () => {
               name="type"
             />
           </div>
+
           <div className="col-lg-2 col-md-6">
             <CustomSelect
               value={complianceFilter}
@@ -572,13 +616,27 @@ const HRSLADashboard = () => {
               name="compliance"
             />
           </div>
+
           <div className="col-lg-3 col-md-12">
             <div className="hr-sla-filter-actions">
-              <button className="btn btn-outline-secondary hr-sla-btn-clear" onClick={clearFilters}>
+              <button
+                className="btn btn-outline-secondary hr-sla-btn-clear"
+                onClick={clearFilters}
+              >
                 <Filter size={16} />
                 Clear
               </button>
-              <button className="btn btn-primary hr-sla-btn-create" onClick={() => setShowCreateModal(true)}>
+              <button
+                className="btn btn-outline-success hr-sla-btn-export"
+                onClick={handleExport}
+              >
+                <Download size={16} />
+                Export
+              </button>
+              <button
+                className="btn btn-primary hr-sla-btn-create"
+                onClick={() => setShowCreateModal(true)}
+              >
                 <Plus size={16} />
                 Create SLA
               </button>
@@ -627,32 +685,52 @@ const HRSLADashboard = () => {
                     className="hr-sla-clickable-row"
                   >
                     <td>
-                      <div className="hr-sla-employee-name">{sla.employeeName}</div>
-                      <div className="hr-sla-employee-email">{sla.employeeEmail}</div>
+                      <div className="hr-sla-employee-name">
+                        {sla.employeeName}
+                      </div>
+                      <div className="hr-sla-employee-email">
+                        {sla.employeeEmail}
+                      </div>
                     </td>
                     <td>
-                      <span className="hr-sla-badge hr-sla-badge-type">{sla.slatype}</span>
+                      <span className="hr-sla-badge hr-sla-badge-type">
+                        {sla.slatype}
+                      </span>
                     </td>
                     <td>
                       {sla.assignedToName ? (
-                        <span className="hr-sla-assigned-name">{sla.assignedToName}</span>
+                        <span className="hr-sla-assigned-name">
+                          {sla.assignedToName}
+                        </span>
                       ) : (
                         <span className="hr-sla-not-assigned">Not assigned</span>
                       )}
                     </td>
                     <td>
-                      <div className="hr-sla-deadline-date">{formatDate(sla.deadline)}</div>
+                      <div className="hr-sla-deadline-date">
+                        {formatDate(sla.deadline)}
+                      </div>
                       {sla.closedAt && (
-                        <div className="hr-sla-closed-date">Closed: {formatDate(sla.closedAt)}</div>
+                        <div className="hr-sla-closed-date">
+                          Closed: {formatDate(sla.closedAt)}
+                        </div>
                       )}
                     </td>
                     <td>
-                      <span className={`hr-sla-badge ${getStatusBadgeClass(sla.status)}`}>
+                      <span
+                        className={`hr-sla-badge ${getStatusBadgeClass(
+                          sla.status
+                        )}`}
+                      >
                         {sla.status}
                       </span>
                     </td>
                     <td>
-                      <span className={`hr-sla-badge ${getComplianceBadgeClass(sla.complianceStatus)}`}>
+                      <span
+                        className={`hr-sla-badge ${getComplianceBadgeClass(
+                          sla.complianceStatus
+                        )}`}
+                      >
                         {sla.complianceStatus}
                       </span>
                     </td>
@@ -679,16 +757,88 @@ const HRSLADashboard = () => {
               </tbody>
             </table>
           </div>
-          {filteredSlas.length > itemsPerPage && (
-            <div className="hr-sla-pagination-wrapper">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                startIndex={startIndex}
-                endIndex={endIndex}
-                totalItems={filteredSlas.length}
-                onPageChange={setCurrentPage}
-              />
+
+          {/* Pagination footer */}
+          {filteredSlas.length > 0 && (
+            <div className="hr-sla-pagination-footer">
+              <div className="hr-sla-pagination-left">
+                <span className="hr-sla-pagination-text">Show</span>
+                <select
+                  className="hr-sla-pagination-dropdown"
+                  value={itemsPerPage}
+                  onChange={(e) => {
+                    setItemsPerPage(Number(e.target.value));
+                    setCurrentPage(1);
+                  }}
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                </select>
+                <span className="hr-sla-pagination-text">entries</span>
+              </div>
+
+              <div className="hr-sla-pagination-center">
+                <span className="hr-sla-pagination-status">
+                  Showing {safeTotal === 0 ? 0 : startIndex + 1} to {endIndex} of{" "}
+                  {safeTotal} entries
+                </span>
+              </div>
+
+              <div className="hr-sla-pagination-right">
+                <ul className="hr-sla-pagination-list">
+                  <li
+                    className={`hr-sla-page-item ${
+                      currentPage === 1 ? "disabled" : ""
+                    }`}
+                  >
+                    <button
+                      className="hr-sla-page-link"
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(1, prev - 1))
+                      }
+                      disabled={currentPage === 1}
+                    >
+                      ‹
+                    </button>
+                  </li>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    (page) => (
+                      <li
+                        key={page}
+                        className={`hr-sla-page-item ${
+                          currentPage === page ? "active" : ""
+                        }`}
+                      >
+                        <button
+                          className="hr-sla-page-link"
+                          onClick={() => setCurrentPage(page)}
+                        >
+                          {page}
+                        </button>
+                      </li>
+                    )
+                  )}
+                  <li
+                    className={`hr-sla-page-item ${
+                      currentPage === totalPages ? "disabled" : ""
+                    }`}
+                  >
+                    <button
+                      className="hr-sla-page-link"
+                      onClick={() =>
+                        setCurrentPage((prev) =>
+                          Math.min(totalPages, prev + 1)
+                        )
+                      }
+                      disabled={currentPage === totalPages}
+                    >
+                      ›
+                    </button>
+                  </li>
+                </ul>
+              </div>
             </div>
           )}
         </div>

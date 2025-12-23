@@ -5,14 +5,26 @@ import {
   CheckCircle,
   Send,
   AlertTriangle,
-  ArrowLeft,
   MessageSquare,
   Clock,
   HelpCircle,
   Loader,
+  Home,
 } from "lucide-react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import hrFormApi from "../../../services/feedbackmanagement/hrFormApi";
+
+// Helper function to get role-based feedback dashboard path
+const getFeedbackDashboardPath = (roleName) => {
+  const routes = {
+    Employee: "/employee/dashboard/feedback",
+    Manager: "/manager/dashboard/feedback",
+    DepartmentHead: "/depthead/dashboard/feedback",
+    "Department Head": "/depthead/dashboard/feedback",
+    HR: "/hr/dashboard/feedback",
+  };
+  return routes[roleName] || "/hr/dashboard/feedback";
+};
 
 export default function EmployeeFillForm() {
   const navigate = useNavigate();
@@ -30,7 +42,11 @@ export default function EmployeeFillForm() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // Process-focused question templates
+  const feedbackDashboardPath = user?.roleName
+    ? getFeedbackDashboardPath(user.roleName)
+    : "/hr/dashboard/feedback";
+
+  // Question templates
   const QUESTION_TEMPLATES = {
     PerformanceReview: {
       label: "Performance Appraisal Process",
@@ -340,13 +356,10 @@ export default function EmployeeFillForm() {
     5: "Excellent",
   };
 
-  // Helper function to safely parse dates from API
   const parseDate = useCallback((dateValue) => {
     if (!dateValue) return null;
-
     try {
       let parsedDate;
-
       if (typeof dateValue === "string") {
         parsedDate = new Date(dateValue);
       } else if (typeof dateValue === "number") {
@@ -357,42 +370,33 @@ export default function EmployeeFillForm() {
       } else {
         parsedDate = new Date(dateValue);
       }
-
       if (isNaN(parsedDate.getTime())) {
         console.error("Invalid date parsed:", dateValue);
         return null;
       }
-
       return parsedDate;
-    } catch (error) {
-      console.error("Error parsing date:", error, dateValue);
+    } catch (e) {
+      console.error("Error parsing date:", e, dateValue);
       return null;
     }
   }, []);
 
-  // Helper function to calculate days remaining
   const calculateDaysLeft = useCallback(
     (deadlineDate) => {
       if (!deadlineDate) return null;
-
       const deadline = parseDate(deadlineDate);
       if (!deadline) return null;
-
       const now = new Date();
       const diffTime = deadline - now;
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-      return diffDays;
+      return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     },
     [parseDate]
   );
 
-  // Helper function to format date for display
   const formatDate = useCallback(
     (dateValue) => {
       const date = parseDate(dateValue);
       if (!date) return "No deadline set";
-
       return date.toLocaleDateString("en-US", {
         weekday: "short",
         year: "numeric",
@@ -403,19 +407,17 @@ export default function EmployeeFillForm() {
     [parseDate]
   );
 
-  // Fetch form details using service
+  // Fetch form
   useEffect(() => {
     const fetchForm = async () => {
       try {
         const response = await hrFormApi.getFormById(formId);
-
         if (response?.data) {
           const formData = response.data;
           const templateData =
             QUESTION_TEMPLATES[formData.formType] ||
             QUESTION_TEMPLATES.GeneralFeedback;
-          const enrichedForm = { ...formData, ...templateData };
-          setForm(enrichedForm);
+          setForm({ ...formData, ...templateData });
         } else {
           throw new Error("Invalid form data");
         }
@@ -426,18 +428,13 @@ export default function EmployeeFillForm() {
         setLoading(false);
       }
     };
-
-    if (formId) {
-      fetchForm();
-    }
+    if (formId) fetchForm();
   }, [formId]);
 
-  // Handle rating change
   const handleRatingChange = useCallback((questionId, rating) => {
     setResponses((prev) => ({ ...prev, [questionId]: rating }));
   }, []);
 
-  // Handle form submission using service
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -450,47 +447,33 @@ export default function EmployeeFillForm() {
       return;
     }
 
-    // Build form response object
     const formResponse = {};
     Object.entries(responses).forEach(([questionId, rating]) => {
       formResponse[`question_${questionId}`] = String(rating);
     });
+    if (comments.trim()) formResponse["comments"] = comments.trim();
 
-    if (comments.trim()) {
-      formResponse["comments"] = comments.trim();
-    }
-
-    // Payload for creating the response
     const payload = {
       formId: Number(formId),
       submittedByEmployeeId: Number(user?.empId || 1004),
       submittedAt: new Date().toISOString(),
-      formResponse: formResponse,
+      formResponse,
     };
 
     setSubmitting(true);
     try {
-      // STEP 1: Create the response (saves as Draft)
       const createResponse = await hrFormApi.createResponse(payload);
-
       if (createResponse?.success || createResponse?.data?.success) {
         const responseId =
           createResponse.data?.responseId ||
           createResponse.data?.data?.responseId;
-
         if (!responseId) {
           throw new Error("Response ID not returned from create endpoint");
         }
-
-        // STEP 2: Submit the response
         const submitResponse = await hrFormApi.submitResponse(responseId);
-
         if (submitResponse?.success || submitResponse?.data?.success) {
           setSuccess("Form submitted successfully!");
-
-          setTimeout(() => {
-            navigate("/feedback/assigned-forms");
-          }, 2000);
+          setTimeout(() => navigate(-1), 2000);
         } else {
           setError(
             "Response saved as draft but failed to submit. Please contact support."
@@ -500,12 +483,7 @@ export default function EmployeeFillForm() {
         setError(createResponse?.message || "Failed to create form response");
       }
     } catch (err) {
-      console.error("Submission Error:", {
-        status: err?.response?.status,
-        message: err?.response?.data?.message,
-        errors: err?.response?.data?.errors,
-      });
-
+      console.error("Submission Error:", err);
       const errorMsg =
         err?.response?.data?.message ||
         err?.response?.data?.errors?.[0] ||
@@ -517,14 +495,12 @@ export default function EmployeeFillForm() {
     }
   };
 
-  // Calculate progress and days left using helper functions
   const progress = form
     ? (Object.keys(responses).length / form.questions.length) * 100
     : 0;
   const daysLeft = form ? calculateDaysLeft(form.deadline) : null;
   const formattedDeadline = form ? formatDate(form.deadline) : "";
 
-  // Loading state
   if (loading) {
     return (
       <div
@@ -543,30 +519,138 @@ export default function EmployeeFillForm() {
     );
   }
 
-  // Error state
   if (!form) {
     return (
       <div className="container-fluid py-4" style={{ maxWidth: "800px" }}>
+        <nav aria-label="breadcrumb" className="mb-3">
+          <ol
+            className="breadcrumb mb-0"
+            style={{ columnGap: "0.5rem", alignItems: "center" }}
+          >
+            <li className="breadcrumb-item">
+              <Link
+                to={feedbackDashboardPath.replace("/feedback", "")}
+                className="d-flex align-items-center"
+                style={{ color: "#97247E", textDecoration: "none" }}
+              >
+                <Home size={16} className="me-1" />
+                Dashboard
+              </Link>
+            </li>
+            <li className="breadcrumb-separator" style={{ color: "#97247E" }}>
+              /
+            </li>
+            <li className="breadcrumb-item">
+              <Link
+                to={feedbackDashboardPath}
+                style={{ color: "#97247E", textDecoration: "none" }}
+              >
+                Feedback Management
+              </Link>
+            </li>
+            <li className="breadcrumb-separator" style={{ color: "#97247E" }}>
+              /
+            </li>
+            <li className="breadcrumb-item active" aria-current="page">
+              Assigned Forms
+            </li>
+          </ol>
+        </nav>
+
         <div className="alert alert-danger d-flex align-items-center gap-2">
           <AlertTriangle size={20} />
           <div>
             <strong>Error</strong>
-            <p className="mb-0 small mt-1">Form not found or failed to load</p>
+            <p className="mb-0 small mt-1">
+              Form not found or failed to load
+            </p>
           </div>
         </div>
-        <button
-          className="btn btn-primary"
-          onClick={() => navigate("/feedback/assigned-forms")}
-        >
-          <ArrowLeft size={16} className="me-2" style={{ display: "inline" }} />
-          Back to Forms
+        <button className="btn btn-primary" onClick={() => navigate(-1)}>
+          Back to Assigned Forms
         </button>
+
+        <style>{`
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
     );
   }
 
   return (
     <div className="container-fluid py-4">
+      {/* Breadcrumb aligned with form header */}
+      <div className="row">
+        <div className="col-lg-9 col-xl-10 offset-lg-3 offset-xl-2">
+          <nav aria-label="breadcrumb" className="mb-3">
+            <ol
+              className="breadcrumb mb-0"
+              style={{ columnGap: "0.5rem", alignItems: "center" }}
+            >
+              <li className="breadcrumb-item">
+                <Link
+                  to={feedbackDashboardPath.replace("/feedback", "")}
+                  className="d-flex align-items-center"
+                  style={{
+                    color: "#97247E",
+                    textDecoration: "none",
+                    fontWeight: 500,
+                  }}
+                >
+                  <Home size={16} className="me-1" />
+                  Dashboard
+                </Link>
+              </li>
+              <li
+                className="breadcrumb-separator"
+                style={{ color: "#97247E" }}
+              >
+                /
+              </li>
+              <li className="breadcrumb-item">
+                <Link
+                  to={feedbackDashboardPath}
+                  style={{
+                    color: "#97247E",
+                    textDecoration: "none",
+                    fontWeight: 500,
+                  }}
+                >
+                  Feedback Management
+                </Link>
+              </li>
+              <li
+                className="breadcrumb-separator"
+                style={{ color: "#97247E" }}
+              >
+                /
+              </li>
+              {/* Clickable Assigned Forms that goes back */}
+              <li className="breadcrumb-item">
+                <button
+                  type="button"
+                  onClick={() => navigate(-1)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    padding: 0,
+                    margin: 0,
+                    color: "#97247E",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                  }}
+                >
+                  Assigned Forms
+                </button>
+              </li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+
       <div className="row">
         {/* LEFT SIDEBAR - CIRCULAR PROGRESS */}
         <div className="col-lg-3 col-xl-2">
@@ -577,7 +661,6 @@ export default function EmployeeFillForm() {
               paddingTop: "20px",
             }}
           >
-            {/* Circular Progress */}
             <div className="text-center mb-4">
               <div
                 style={{
@@ -592,7 +675,6 @@ export default function EmployeeFillForm() {
                   height="140"
                   style={{ transform: "rotate(-90deg)" }}
                 >
-                  {/* Background circle */}
                   <circle
                     cx="70"
                     cy="70"
@@ -601,7 +683,6 @@ export default function EmployeeFillForm() {
                     stroke="#e0e0e0"
                     strokeWidth="10"
                   />
-                  {/* Progress circle */}
                   <circle
                     cx="70"
                     cy="70"
@@ -653,10 +734,15 @@ export default function EmployeeFillForm() {
               </div>
             </div>
 
-            {/* Question List */}
-            <div className="card border-0 shadow-sm" style={{ borderRadius: "8px" }}>
+            <div
+              className="card border-0 shadow-sm"
+              style={{ borderRadius: "8px" }}
+            >
               <div className="card-body p-3">
-                <h6 className="fw-bold mb-3 text-start" style={{ fontSize: "14px" }}>
+                <h6
+                  className="fw-bold mb-3 text-start"
+                  style={{ fontSize: "14px" }}
+                >
                   Questions
                 </h6>
                 <div className="d-flex flex-column gap-2">
@@ -668,7 +754,10 @@ export default function EmployeeFillForm() {
                       onClick={() => {
                         document
                           .getElementById(`question-${q.id}`)
-                          ?.scrollIntoView({ behavior: "smooth", block: "center" });
+                          ?.scrollIntoView({
+                            behavior: "smooth",
+                            block: "center",
+                          });
                       }}
                     >
                       <div
@@ -716,22 +805,11 @@ export default function EmployeeFillForm() {
         <div className="col-lg-9 col-xl-10">
           {/* HEADER */}
           <div className="mb-4 text-start">
-            <div className="d-flex align-items-center gap-3 mb-3">
-              <button
-                className="btn btn-outline-secondary"
-                onClick={() => navigate(-1)}
-                disabled={submitting}
-                style={{ padding: "0.5rem 0.75rem", borderRadius: "8px" }}
-                title="Go back"
-              >
-                <ArrowLeft size={18} />
-              </button>
-              <div className="flex-grow-1">
-                <h2 className="fw-bold mb-1" style={{ color: "#27235C" }}>
-                  {form.formName}
-                </h2>
-                <p className="mb-0 text-muted small">{form.formDescription}</p>
-              </div>
+            <div className="mb-3">
+              <h2 className="fw-bold mb-1" style={{ color: "#27235C" }}>
+                {form.formName}
+              </h2>
+              <p className="mb-0 text-muted small">{form.formDescription}</p>
             </div>
 
             <div className="d-flex gap-2 flex-wrap">
@@ -875,7 +953,6 @@ export default function EmployeeFillForm() {
                     }}
                   >
                     <div className="d-flex gap-3">
-                      {/* Question Number */}
                       <div
                         className="d-flex align-items-center justify-content-center fw-bold"
                         style={{
@@ -890,9 +967,7 @@ export default function EmployeeFillForm() {
                         {idx + 1}
                       </div>
 
-                      {/* Question Content */}
                       <div className="flex-grow-1">
-                        {/* Question Text */}
                         <div className="mb-2">
                           <h6 className="fw-bold mb-2">{q.text}</h6>
                           <span
@@ -903,7 +978,6 @@ export default function EmployeeFillForm() {
                           </span>
                         </div>
 
-                        {/* Help Text */}
                         {q.helpText && (
                           <div
                             className="d-flex gap-2 mb-3 p-2"
@@ -922,7 +996,6 @@ export default function EmployeeFillForm() {
                           </div>
                         )}
 
-                        {/* Rating Buttons */}
                         <div className="d-flex gap-2 flex-wrap mb-2">
                           {[1, 2, 3, 4, 5].map((rating) => (
                             <button
@@ -954,7 +1027,6 @@ export default function EmployeeFillForm() {
                           ))}
                         </div>
 
-                        {/* Response Status */}
                         <div>
                           {responses[q.id] ? (
                             <small className="text-success fw-bold">
@@ -984,7 +1056,10 @@ export default function EmployeeFillForm() {
                     paddingTop: "1.5rem",
                   }}
                 >
-                  <label htmlFor="comments" className="form-label fw-bold mb-2">
+                  <label
+                    htmlFor="comments"
+                    className="form-label fw-bold mb-2"
+                  >
                     <MessageSquare
                       size={16}
                       className="me-2"
@@ -1000,7 +1075,9 @@ export default function EmployeeFillForm() {
                     className="form-control"
                     rows={4}
                     value={comments}
-                    onChange={(e) => setComments(e.target.value.slice(0, 1000))}
+                    onChange={(e) =>
+                      setComments(e.target.value.slice(0, 1000))
+                    }
                     placeholder="Share any additional feedback about the process or system..."
                     disabled={submitting}
                     maxLength={1000}
@@ -1069,35 +1146,6 @@ export default function EmployeeFillForm() {
                   </button>
                 </div>
               </form>
-            </div>
-          </div>
-
-          {/* RATING GUIDE */}
-          <div
-            className="card border-0 shadow-sm mt-4 text-start"
-            style={{ borderRadius: "8px", backgroundColor: "#fafafa" }}
-          >
-            <div className="card-body">
-              <h6 className="fw-bold mb-3">Rating Scale</h6>
-              <div className="row g-3">
-                {Object.entries(RATING_LABELS).map(([rating, label]) => (
-                  <div key={rating} className="col-12 col-sm-6 col-md-4">
-                    <div className="d-flex align-items-center gap-2">
-                      <span
-                        className="badge text-white fw-bold"
-                        style={{
-                          minWidth: "35px",
-                          textAlign: "center",
-                          backgroundColor: "#27235C",
-                        }}
-                      >
-                        {rating}
-                      </span>
-                      <span className="small">{label}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
         </div>

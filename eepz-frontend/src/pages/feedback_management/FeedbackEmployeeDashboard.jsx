@@ -325,208 +325,131 @@ export default function FeedbackEmployeeDashboard() {
         ))}
       </div>
 
-      {/* Centered Rounded Toggle Navigation */}
+      {/* Centered Rounded Toggle Navigation – only Quick Actions */}
       <div className="d-flex justify-content-center align-items-center mb-3 fm-empdb-toggle-nav-wrapper">
         <div className="d-inline-flex fm-empdb-toggle-nav">
           <button
-            className={`fm-empdb-toggle-tab ${
-              activeTab === "overview" ? "fm-empdb-toggle-tab--active" : ""
-            }`}
+            className="fm-empdb-toggle-tab fm-empdb-toggle-tab--active"
             onClick={() => setActiveTab("overview")}
           >
             <Zap size={16} />
             Quick Actions
           </button>
-          <button
-            className={`fm-empdb-toggle-tab ${
-              activeTab === "peer-feedback" ? "fm-empdb-toggle-tab--active" : ""
-            }`}
-            onClick={() => setActiveTab("peer-feedback")}
-          >
-            <Users size={16} />
-            Peer Feedback
-            {myPeerFeedback.length > 0 && (
-              <span className="fm-empdb-toggle-tab__badge">
-                {myPeerFeedback.length}
-              </span>
-            )}
-          </button>
         </div>
       </div>
 
-      {/* Content Area */}
+      {/* Content Area – only overview / quick actions */}
       <div className="fm-empdb-content">
-        {activeTab === "overview" && (
-          <div className="row g-3">
+        <div className="row g-3">
+          <div className="col-md-4 col-6">
+            <Link
+              to="/employee/dashboard/feedback/submit-mentor"
+              className="fm-empdb-action-card"
+            >
+              <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--primary mb-2">
+                <Send
+                  size={20}
+                  className="fm-empdb-action-card__icon--primary"
+                />
+              </div>
+              <span className="fm-empdb-action-card__label">
+                Mentor Feedback
+              </span>
+            </Link>
+          </div>
+
+          <div className="col-md-4 col-6">
+            <Link
+              to="/employee/dashboard/feedback/contextfeedback"
+              className="fm-empdb-action-card"
+            >
+              <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--primary mb-2">
+                <MessageSquare
+                  size={20}
+                  className="fm-empdb-action-card__icon--primary"
+                />
+              </div>
+              <span className="fm-empdb-action-card__label">
+                Context Feedback
+              </span>
+            </Link>
+          </div>
+
+          <div className="col-md-4 col-6">
+            <Link
+              to="/employee/dashboard/feedback/assignedform"
+              className="fm-empdb-action-card"
+            >
+              <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--primary mb-2">
+                <Eye
+                  size={20}
+                  className="fm-empdb-action-card__icon--primary"
+                />
+              </div>
+              <span className="fm-empdb-action-card__label">
+                Assigned Forms
+              </span>
+            </Link>
+          </div>
+
+          <div className="col-md-4 col-6">
+            <Link
+              to="/employee/dashboard/feedback/submit-peer"
+              className="fm-empdb-action-card fm-empdb-action-card--peer"
+            >
+              <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--peer mb-2">
+                <Users
+                  size={20}
+                  className="fm-empdb-action-card__icon--peer"
+                />
+              </div>
+              <span className="fm-empdb-action-card__label">
+                Peer Feedback Received
+              </span>
+            </Link>
+          </div>
+
+          <div className="col-md-4 col-6">
+            <Link
+              to="/employee/dashboard/feedback/submissions"
+              className="fm-empdb-action-card fm-empdb-action-card--submissions"
+            >
+              <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--submissions mb-2">
+                <Search
+                  size={20}
+                  className="fm-empdb-action-card__icon--submissions"
+                />
+              </div>
+              <span className="fm-empdb-action-card__label">
+                My Submissions
+              </span>
+            </Link>
+          </div>
+
+          {isMentor && (
             <div className="col-md-4 col-6">
               <Link
-                to="/employee/dashboard/feedback/submit-mentor"
-                className="fm-empdb-action-card"
+                to="/employee/dashboard/feedback/mentor"
+                className="fm-empdb-action-card fm-empdb-action-card--sme"
               >
-                <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--primary mb-2">
-                  <Send
+                <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--sme mb-2">
+                  <Award
                     size={20}
-                    className="fm-empdb-action-card__icon--primary"
+                    className="fm-empdb-action-card__icon--sme"
                   />
                 </div>
                 <span className="fm-empdb-action-card__label">
-                  Mentor Feedback
+                  SME Dashboard
                 </span>
-              </Link>
-            </div>
-
-            <div className="col-md-4 col-6">
-              <Link
-                to="/employee/dashboard/feedback/contextfeedback"
-                className="fm-empdb-action-card"
-              >
-                <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--primary mb-2">
-                  <MessageSquare
-                    size={20}
-                    className="fm-empdb-action-card__icon--primary"
-                  />
-                </div>
-                <span className="fm-empdb-action-card__label">
-                  Context Feedback
-                </span>
-              </Link>
-            </div>
-
-            <div className="col-md-4 col-6">
-              <Link
-                to="/employee/dashboard/feedback/assignedform"
-                className="fm-empdb-action-card"
-              >
-                <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--primary mb-2">
-                  <Eye
-                    size={20}
-                    className="fm-empdb-action-card__icon--primary"
-                  />
-                </div>
-                <span className="fm-empdb-action-card__label">
-                  Assigned Forms
-                </span>
-              </Link>
-            </div>
-
-            <div className="col-md-4 col-6">
-              <Link
-                to="/employee/dashboard/feedback/submit-peer"
-                className="fm-empdb-action-card fm-empdb-action-card--peer"
-              >
-                <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--peer mb-2">
-                  <Users
-                    size={20}
-                    className="fm-empdb-action-card__icon--peer"
-                  />
-                </div>
-                <span className="fm-empdb-action-card__label">
-                  Peer Feedback Received
-                </span>
-              </Link>
-            </div>
-
-            <div className="col-md-4 col-6">
-              <Link
-                to="/employee/dashboard/feedback/submissions"
-                className="fm-empdb-action-card fm-empdb-action-card--submissions"
-              >
-                <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--submissions mb-2">
-                  <Search
-                    size={20}
-                    className="fm-empdb-action-card__icon--submissions"
-                  />
-                </div>
-                <span className="fm-empdb-action-card__label">
-                  My Submissions
-                </span>
-              </Link>
-            </div>
-
-            {isMentor && (
-              <div className="col-md-4 col-6">
-                <Link
-                  to="/employee/dashboard/feedback/mentor"
-                  className="fm-empdb-action-card fm-empdb-action-card--sme"
-                >
-                  <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--sme mb-2">
-                    <Award
-                      size={20}
-                      className="fm-empdb-action-card__icon--sme"
-                    />
-                  </div>
-                  <span className="fm-empdb-action-card__label">
-                    SME Dashboard
+                {mentorFeedbackCount > 0 && (
+                  <span className="fm-empdb-action-card__badge">
+                    {mentorFeedbackCount}
                   </span>
-                  {mentorFeedbackCount > 0 && (
-                    <span className="fm-empdb-action-card__badge">
-                      {mentorFeedbackCount}
-                    </span>
-                  )}
-                </Link>
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === "peer-feedback" && (
-          <div>
-            <h5 className="fw-bold mb-4 fm-empdb-peer-title">
-              All Peer Feedback ({myPeerFeedback.length})
-            </h5>
-
-            {myPeerFeedback.length === 0 ? (
-              <div className="text-center py-5">
-                <Users size={56} className="mb-3 fm-empdb-peer-empty__icon" />
-                <h6 className="fw-bold mb-2 fm-empdb-peer-empty__title">
-                  No peer feedback yet
-                </h6>
-                <p className="text-muted mb-0 fm-empdb-peer-empty__subtitle">
-                  You haven't received any peer feedback yet
-                </p>
-              </div>
-            ) : (
-              <div className="row g-3">
-                {myPeerFeedback.map((feedback) => (
-                  <div
-                    className="col-12"
-                    key={feedback.peerQueueId || feedback.contextFeedbackId}
-                  >
-                    <div className="card border-0 fm-empdb-peer-card">
-                      <div className="card-body fm-empdb-peer-card__body">
-                        <div className="d-flex justify-content-between align-items-start mb-3">
-                          <div>
-                            <h6 className="fw-bold mb-1 fm-empdb-peer-card__name">
-                              {feedback.submittedByName}
-                            </h6>
-                            <small className="fm-empdb-peer-card__date">
-                              {feedback.submittedDate
-                                ? new Date(
-                                    feedback.submittedDate
-                                  ).toLocaleDateString()
-                                : new Date(
-                                    feedback.createdAt
-                                  ).toLocaleDateString()}
-                            </small>
-                          </div>
-                          <span className="badge fm-empdb-peer-card__badge">
-                            Peer Feedback
-                          </span>
-                        </div>
-                        <p className="mb-0 fm-empdb-peer-card__text">
-                          {feedback.feedbackContent ||
-                            feedback.comment ||
-                            feedback.feedbackComment ||
-                            "No comment provided"}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+                )}
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

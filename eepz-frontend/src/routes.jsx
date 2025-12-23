@@ -1449,16 +1449,7 @@ const AppRoutes = () => {
         }
       />
       {/* Feedback - depthead */}
-      <Route
-        path="/department-head/dashboard/feedback"
-        element={
-          <ProtectedRoute allowedRoles={["Department Head"]}>
-            <DashboardLayout role="Department Head">
-              <FeedbackDepartmentHeadDashboard />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
+     
       <Route
         path="/department-head/dashboard/feedback/allreviews"
         element={

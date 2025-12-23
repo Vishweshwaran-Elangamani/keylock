@@ -79,19 +79,20 @@ export default function MentorFeedbackDashboard() {
     skill: "all",
   });
 
- 
+  // NEW: which dropdown is open
+  const [openDropdown, setOpenDropdown] = useState(null); // "status" | "rating" | "skill" | null
+
   const fetchEmployeeName = async (employeeId) => {
     try {
-  const response = await axios.get(
-    `${import.meta.env.VITE_PROJECT_API_URL}/api/EmployeeManagement/${employeeId}`
-  );
+      const response = await axios.get(
+        `${import.meta.env.VITE_PROJECT_API_URL}/api/EmployeeManagement/${employeeId}`
+      );
       if (response.data?.success && response.data.data) {
         const { firstName, lastName } = response.data.data;
         return `${firstName} ${lastName}`;
       }
       return `Employee ${employeeId}`;
     } catch (err) {
-    
       return `Employee ${employeeId}`;
     }
   };
@@ -103,37 +104,30 @@ export default function MentorFeedbackDashboard() {
     try {
       const empId = user?.empId || user?.employeeId || 1;
 
-      
       const response = await mentorFeedbackApi.aboutMe(empId);
 
       if (response.data?.success && Array.isArray(response.data.data)) {
-
         const enrichedPromises = response.data.data.map(async (feedback) => {
           let menteeName = "Unknown";
 
-
           if (feedback.menteeName) {
-
             const menteeId = parseInt(feedback.menteeName, 10);
-            
-            if (!isNaN(menteeId)) {
 
+            if (!isNaN(menteeId)) {
               menteeName = await fetchEmployeeName(menteeId);
-              
             }
           } else if (feedback.menteeEmployeeId) {
-  
             const menteeId = parseInt(feedback.menteeEmployeeId, 10);
-            
+
             if (!isNaN(menteeId)) {
               menteeName = await fetchEmployeeName(menteeId);
-            
             }
           }
 
           return {
             ...feedback,
-            menteeEmployeeId: feedback.menteeEmployeeId || parseInt(feedback.menteeName, 10),
+            menteeEmployeeId:
+              feedback.menteeEmployeeId || parseInt(feedback.menteeName, 10),
             menteeName: menteeName,
             createdAtFormatted: formatDate(feedback.createdAt),
           };
@@ -143,13 +137,11 @@ export default function MentorFeedbackDashboard() {
 
         setFeedbacks(enriched);
         setFilteredFeedbacks(enriched);
-        
       } else {
         setFeedbacks([]);
         setFilteredFeedbacks([]);
       }
     } catch (err) {
-      
       setError("Failed to load feedback. Please try again.");
       setFeedbacks([]);
       setFilteredFeedbacks([]);
@@ -199,7 +191,6 @@ export default function MentorFeedbackDashboard() {
         alert("✓ Feedback acknowledged successfully!");
       }
     } catch (err) {
-      
       alert("Failed to acknowledge feedback");
     }
   };
@@ -234,6 +225,75 @@ export default function MentorFeedbackDashboard() {
             strokeWidth={2}
           />
         ))}
+      </div>
+    );
+  };
+
+  // options for new dropdowns
+  const statusOptions = [
+    { label: "Select Status", value: "all" },
+    { label: "Submitted", value: "Submitted" },
+    { label: "Acknowledged", value: "Acknowledged" },
+    { label: "Reviewed", value: "Reviewed" },
+  ];
+
+  const ratingOptions = [
+    { label: "Select Rating", value: "all" },
+    { label: "5 Stars", value: "5" },
+    { label: "4 Stars", value: "4" },
+    { label: "3 Stars", value: "3" },
+    { label: "2 Stars", value: "2" },
+    { label: "1 Star", value: "1" },
+  ];
+
+  const skillOptions = [
+    { label: "Select Skill", value: "all" },
+    ...uniqueSkills.map((s) => ({ label: s, value: s })),
+  ];
+
+  const getLabel = (list, value) => {
+    const match = list.find((o) => o.value === value);
+    return match ? match.label : list[0].label;
+  };
+
+  const renderDropdown = (name, options) => {
+    const isOpen = openDropdown === name;
+    const selectedValue = filters[name];
+    const selectedLabel = getLabel(options, selectedValue);
+
+    return (
+      <div className="sme-dropdown">
+        <button
+          type="button"
+          className={`sme-dropdown-trigger ${isOpen ? "open" : ""}`}
+          onClick={() =>
+            setOpenDropdown((prev) => (prev === name ? null : name))
+          }
+        >
+          <span className="sme-dropdown-placeholder">
+            {selectedLabel}
+          </span>
+          <span className="sme-dropdown-arrow">▾</span>
+        </button>
+
+        {isOpen && (
+          <div className="sme-dropdown-menu">
+            {options.map((opt) => (
+              <div
+                key={opt.value}
+                className={`sme-dropdown-item ${
+                  opt.value === selectedValue ? "selected" : ""
+                }`}
+                onClick={() => {
+                  setFilters((prev) => ({ ...prev, [name]: opt.value }));
+                  setOpenDropdown(null);
+                }}
+              >
+                {opt.label}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     );
   };
@@ -288,7 +348,7 @@ export default function MentorFeedbackDashboard() {
               onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
               onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
             >
-              <i className="bi bi-house-door" style={{ fontSize: '1rem' }}></i>
+              <i className="bi bi-house-door" style={{ fontSize: "1rem" }}></i>
               Dashboard
             </button>
           </li>
@@ -303,7 +363,7 @@ export default function MentorFeedbackDashboard() {
           >
             /
           </li>
-          
+
           <li
             className="breadcrumb-item"
             style={{ display: "flex", alignItems: "center" }}
@@ -363,7 +423,7 @@ export default function MentorFeedbackDashboard() {
       </nav>
 
       {/* Header with Refresh */}
-     
+      {/* (you can keep your header here if you add it later) */}
 
       {/* Error Alert */}
       {error && (
@@ -372,92 +432,54 @@ export default function MentorFeedbackDashboard() {
         </div>
       )}
 
-      <div className="row g-3 mb-3">
-        {[
-          {
-            label: "Total Feedback",
-            value: stats.total,
-            icon: MessageSquare,
-            bgColor: "#EEF2FF",
-            iconColor: "#3B82F6",
-          },
-          {
-            label: "Average Rating",
-            value: stats.avgRating,
-            icon: Star,
-            bgColor: "#FEF3C7",
-            iconColor: "#E2B93B",
-          },
-        
-        ].map(({ label, value, icon: Icon, bgColor, iconColor }) => (
-          <div key={label} className="col-lg-3 col-md-6 col-sm-6">
-            <div className="sme-sla-stat-card">
-              <div className="sme-sla-stat-icon" style={{ backgroundColor: bgColor }}>
-                <Icon size={28} color={iconColor} strokeWidth={2.5} />
-              </div>
-              <div>
-                <h3 className="sme-sla-stat-value">{value}</h3>
-                <p className="sme-sla-stat-label">{label}</p>
-              </div>
-            </div>
-          </div>
-        ))}
+     <div className="row g-3 mb-3">
+  {[
+    {
+      label: "Total Feedback",
+      value: stats.total,
+      icon: MessageSquare,
+      bgColor: "#EEF2FF",
+      iconColor: "#3B82F6",
+    },
+    {
+      label: "Average Rating",
+      value: stats.avgRating,
+      icon: Star,
+      bgColor: "#FEF3C7",
+      iconColor: "#E2B93B",
+    },
+  ].map(({ label, value, icon: Icon, bgColor, iconColor }) => (
+    <div key={label} className="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+      <div className="sme-sla-stat-card">
+        <div className="sme-sla-stat-icon" style={{ backgroundColor: bgColor }}>
+          <Icon size={28} color={iconColor} strokeWidth={2.5} />
+        </div>
+        <div>
+          <h3 className="sme-sla-stat-value">{value}</h3>
+          <p className="sme-sla-stat-label">{label}</p>
+        </div>
       </div>
+    </div>
+  ))}
+</div>
 
 
+      {/* FILTERS CARD – custom dropdowns */}
       <div className="sme-sla-filters-card">
         <div className="row g-3">
           <div className="col-md-4">
-            <select
-              className="form-select sme-sla-select"
-              value={filters.status}
-              onChange={(e) =>
-                setFilters((prev) => ({ ...prev, status: e.target.value }))
-              }
-            >
-              <option value="all">All Status</option>
-              <option value="Submitted">Submitted</option>
-              <option value="Acknowledged">Acknowledged</option>
-              <option value="Reviewed">Reviewed</option>
-            </select>
+            {renderDropdown("status", statusOptions)}
           </div>
 
           <div className="col-md-4">
-            <select
-              className="form-select sme-sla-select"
-              value={filters.rating}
-              onChange={(e) =>
-                setFilters((prev) => ({ ...prev, rating: e.target.value }))
-              }
-            >
-              <option value="all">All Ratings</option>
-              <option value="5">5 Stars</option>
-              <option value="4">4 Stars</option>
-              <option value="3">3 Stars</option>
-              <option value="2">2 Stars</option>
-              <option value="1">1 Star</option>
-            </select>
+            {renderDropdown("rating", ratingOptions)}
           </div>
 
           <div className="col-md-4">
-            <select
-              className="form-select sme-sla-select"
-              value={filters.skill}
-              onChange={(e) =>
-                setFilters((prev) => ({ ...prev, skill: e.target.value }))
-              }
-            >
-              <option value="all">All Skills</option>
-              {uniqueSkills.map((skill) => (
-                <option key={skill} value={skill}>
-                  {skill}
-                </option>
-              ))}
-            </select>
+            {renderDropdown("skill", skillOptions)}
           </div>
         </div>
       </div>
-
 
       {filteredFeedbacks.length === 0 ? (
         <div className="sme-sla-empty-state-wrapper">
@@ -481,7 +503,6 @@ export default function MentorFeedbackDashboard() {
                   <th>SKILL</th>
                   <th>RATING</th>
                   <th>SUBMITTED</th>
-              
                   <th>ACTIONS</th>
                 </tr>
               </thead>
@@ -526,7 +547,7 @@ export default function MentorFeedbackDashboard() {
                         {feedback.createdAtFormatted}
                       </div>
                     </td>
-                   
+
                     <td>
                       <div className="sme-sla-actions">
                         <button
@@ -594,11 +615,10 @@ export default function MentorFeedbackDashboard() {
                   <div className="row g-3 mb-4">
                     <div className="col-6">
                       <small className="sme-sla-modal-label">Skill</small>
-                     
-                 <div className="sme-sla-modal-value" style={{ textAlign: "left" }}>
-                        {selectedFeedback.skillName}
-                  </div>
 
+                      <div className="sme-sla-modal-value" style={{ textAlign: "left" }}>
+                        {selectedFeedback.skillName}
+                      </div>
                     </div>
                     <div className="col-6">
                       <small className="sme-sla-modal-label">Rating</small>
@@ -662,4 +682,3 @@ export default function MentorFeedbackDashboard() {
     </div>
   );
 }
-

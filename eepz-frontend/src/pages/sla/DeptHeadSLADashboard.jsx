@@ -32,6 +32,10 @@ const DeptHeadSLADashboard = () => {
   const [resolutionComments, setResolutionComments] = useState("");
   const [approvingEscalation, setApprovingEscalation] = useState(false);
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   useEffect(() => {
     fetchAllData();
   }, []);
@@ -39,6 +43,10 @@ const DeptHeadSLADashboard = () => {
   useEffect(() => {
     applyFilters();
   }, [selectedPeriod, searchQuery, selectedStatus, activeTab, allL2Escalations]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedStatus, activeTab, selectedPeriod]);
 
   const fetchAllData = async () => {
     setLoading(true);
@@ -224,6 +232,43 @@ const DeptHeadSLADashboard = () => {
 
   const stats = calculateStats();
 
+  // Pagination helpers
+  const safeTotal = filteredL2Escalations.length;
+  const totalPages = Math.max(1, Math.ceil(safeTotal / itemsPerPage));
+  const startIndex = safeTotal === 0 ? 0 : (currentPage - 1) * itemsPerPage;
+  const endIndex =
+    safeTotal === 0 ? 0 : Math.min(currentPage * itemsPerPage, safeTotal);
+  const paginatedData = filteredL2Escalations.slice(startIndex, endIndex);
+
+  const goToPage = (page) => {
+    const p = Math.max(1, Math.min(page, totalPages));
+    setCurrentPage(p);
+  };
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxPagesToShow = 5;
+
+    if (totalPages <= maxPagesToShow) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else if (currentPage <= 3) {
+      for (let i = 1; i <= 4; i++) pages.push(i);
+      pages.push("...");
+      pages.push(totalPages);
+    } else if (currentPage >= totalPages - 2) {
+      pages.push(1);
+      pages.push("...");
+      for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      pages.push("...");
+      for (let i = currentPage - 1; i <= currentPage + 1; i++) pages.push(i);
+      pages.push("...");
+      pages.push(totalPages);
+    }
+    return pages;
+  };
+
   if (loading) {
     return (
       <div className="dh-sla-loading-wrapper">
@@ -252,7 +297,7 @@ const DeptHeadSLADashboard = () => {
         </div>
       )}
 
-      {/* Updated Stats Grid - Horizontal Layout */}
+      {/* Stats Grid */}
       <div className="dh-sla-stats-grid">
         <div className="dh-sla-stat-card">
           <div
@@ -307,7 +352,8 @@ const DeptHeadSLADashboard = () => {
         </div>
       </div>
 
-      <div className="dh-sla-table-wrapper">
+      {/* Table with HR-style pagination */}
+      <div className="dh-sla-table-wrapper hr-sla-table-container">
         <div className="table-responsive">
           <table className="dh-sla-table">
             <thead className="dh-sla-table-header">
@@ -321,7 +367,7 @@ const DeptHeadSLADashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredL2Escalations.length === 0 ? (
+              {paginatedData.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="dh-sla-table-empty">
                     <FileText size={48} className="dh-sla-empty-icon" />
@@ -329,7 +375,7 @@ const DeptHeadSLADashboard = () => {
                   </td>
                 </tr>
               ) : (
-                filteredL2Escalations.map((esc, index) => (
+                paginatedData.map((esc) => (
                   <tr
                     key={esc.escalationId}
                     className="dh-sla-clickable-row"
@@ -411,8 +457,95 @@ const DeptHeadSLADashboard = () => {
             </tbody>
           </table>
         </div>
+
+        {/* HR-style Pagination Footer */}
+        {safeTotal > 0 && (
+          <div className="hr-sla-pagination-footer">
+            <div className="hr-sla-pagination-left">
+              <span className="hr-sla-pagination-text">Show</span>
+              <select
+                className="hr-sla-pagination-dropdown"
+                value={itemsPerPage}
+                onChange={(e) => {
+                  setItemsPerPage(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+              </select>
+              <span className="hr-sla-pagination-text">entries</span>
+            </div>
+
+            <div className="hr-sla-pagination-center">
+              <span className="hr-sla-pagination-status">
+                Showing {safeTotal === 0 ? 0 : startIndex + 1} to {endIndex} of{" "}
+                {safeTotal} entries
+              </span>
+            </div>
+
+            <div className="hr-sla-pagination-right">
+              <ul className="hr-sla-pagination-list">
+                <li
+                  className={`hr-sla-page-item ${
+                    currentPage === 1 ? "disabled" : ""
+                  }`}
+                >
+                  <button
+                    className="hr-sla-page-link hr-sla-page-arrow"
+                    onClick={() => goToPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  >
+                    <span className="hr-sla-arrow-icon">‹</span>
+                  </button>
+                </li>
+
+                {getPageNumbers().map((page, idx) =>
+                  page === "..." ? (
+                    <li
+                      key={`ellipsis-${idx}`}
+                      className="hr-sla-page-item disabled"
+                    >
+                      <span className="hr-sla-page-link">…</span>
+                    </li>
+                  ) : (
+                    <li
+                      key={page}
+                      className={`hr-sla-page-item ${
+                        currentPage === page ? "active" : ""
+                      }`}
+                    >
+                      <button
+                        className="hr-sla-page-link"
+                        onClick={() => goToPage(page)}
+                      >
+                        {page}
+                      </button>
+                    </li>
+                  )
+                )}
+
+                <li
+                  className={`hr-sla-page-item ${
+                    currentPage === totalPages ? "disabled" : ""
+                  }`}
+                >
+                  <button
+                    className="hr-sla-page-link hr-sla-page-arrow"
+                    onClick={() => goToPage(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    <span className="hr-sla-arrow-icon">›</span>
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        )}
       </div>
 
+      {/* Resolution Modal */}
       {showResolutionModal && selectedEscalation && (
         <>
           <div

@@ -1,9 +1,3 @@
-/* ==========================================
-   HR CREATE SLA MODAL STYLES
-   BEM Naming: hr-create-sla-modal
-   ========================================== */
-
-/* Overlay */
 .hr-create-sla-modal__overlay {
   position: fixed;
   top: 0;
@@ -18,7 +12,6 @@
   backdrop-filter: blur(4px);
 }
 
-/* Modal Container */
 .hr-create-sla-modal {
   background-color: white;
   border-radius: 12px;
@@ -28,7 +21,6 @@
   overflow: hidden;
 }
 
-/* Header */
 .hr-create-sla-modal__header {
   display: flex;
   justify-content: space-between;
@@ -68,13 +60,13 @@
   opacity: 0.5;
 }
 
-/* Body */
+
 .hr-create-sla-modal__body {
   padding: 1.75rem;
   background-color: #f8f9fa;
 }
 
-/* Loading State */
+
 .hr-create-sla-modal__loading-container {
   display: flex;
   flex-direction: column;
@@ -95,12 +87,10 @@
   margin: 0;
 }
 
-/* Form */
 .hr-create-sla-modal__form {
   width: 100%;
 }
 
-/* Error Alert */
 .hr-create-sla-modal__error-alert {
   display: flex;
   gap: 0.75rem;
@@ -124,7 +114,6 @@
   font-size: 0.95rem;
 }
 
-/* Form Field */
 .hr-create-sla-modal__field {
   margin-bottom: 1.5rem;
 }
@@ -165,7 +154,7 @@
   cursor: not-allowed;
 }
 
-/* Employee Info Box */
+
 .hr-create-sla-modal__employee-info {
   background-color: rgba(13, 110, 253, 0.1);
   border: 1px solid rgba(13, 110, 253, 0.3);
@@ -188,7 +177,6 @@
   font-size: 0.85rem;
 }
 
-/* Footer */
 .hr-create-sla-modal__footer {
   display: flex;
   gap: 0.75rem;
@@ -198,7 +186,7 @@
   justify-content: flex-end;
 }
 
-/* Buttons */
+
 .hr-create-sla-modal__btn {
   padding: 0.6rem 1.25rem;
   border: none;
@@ -212,7 +200,7 @@
   gap: 0.5rem;
 }
 
-/* Cancel Button */
+
 .hr-create-sla-modal__btn--cancel {
   background-color: #6b7280;
   color: white;
@@ -227,7 +215,6 @@
   cursor: not-allowed;
 }
 
-/* Create Button */
 .hr-create-sla-modal__btn--create {
   padding: 0.6rem 1.5rem;
   background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
@@ -250,7 +237,6 @@
   box-shadow: 0 4px 12px rgba(151, 36, 126, 0.3);
 }
 
-/* Button Spinner */
 .hr-create-sla-modal__btn-spinner {
   display: inline-block;
   width: 14px;
@@ -261,7 +247,6 @@
   animation: hr-create-sla-modal-spin 0.8s linear infinite;
 }
 
-/* Animation */
 @keyframes hr-create-sla-modal-spin {
   from {
     transform: rotate(0deg);
@@ -271,7 +256,6 @@
   }
 }
 
-/* Responsive Design */
 @media (max-width: 576px) {
   .hr-create-sla-modal {
     width: 95%;

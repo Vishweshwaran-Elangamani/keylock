@@ -353,73 +353,91 @@ export default function ViewMyPeerFeedback() {
               </div>
             )}
 
-            {/* Table View */}
-            {viewMode === "table" && (
-              <div className="fm-viewpeer-table-wrapper">
-                <div className="fm-viewpeer-table-scroll">
-                  <table className="fm-viewpeer-table">
-                    <thead className="fm-viewpeer-table__head">
-                      <tr>
-                        <th className="fm-viewpeer-table__th">From</th>
-                        <th className="fm-viewpeer-table__th">Type</th>
-                        <th className="fm-viewpeer-table__th">Feedback</th>
-                        <th className="fm-viewpeer-table__th">Date</th>
-                      </tr>
-                    </thead>
-                    <tbody className="fm-viewpeer-table__body">
-                      {peerFeedback.map((feedback) => {
-                        const isAnon = checkIsAnonymous(feedback);
+            
+{/* Table View */}
+{/* Table View */}
+{viewMode === "table" && (
+  <div className="fm-viewpeer-table-wrapper">
+    <div className="fm-viewpeer-table-scroll">
+      <table className="fm-viewpeer-table">
+        <thead className="fm-viewpeer-table__head">
+          <tr>
+            <th className="fm-viewpeer-table__th fm-viewpeer-table__th--from">
+              Employee
+            </th>
+            <th className="fm-viewpeer-table__th fm-viewpeer-table__th--type">
+              Type
+            </th>
+            <th className="fm-viewpeer-table__th fm-viewpeer-table__th--feedback">
+              Feedback
+            </th>
+            <th className="fm-viewpeer-table__th fm-viewpeer-table__th--date">
+              Date
+            </th>
+          </tr>
+        </thead>
+        <tbody className="fm-viewpeer-table__body">
+          {peerFeedback.map((feedback) => {
+            const isAnon = checkIsAnonymous(feedback);
 
-                        return (
-                          <tr
-                            key={
-                              feedback.queueId ||
-                              feedback.QueueId ||
-                              feedback.peerQueueId
-                            }
-                            className="fm-viewpeer-table__row"
-                          >
-                            <td className="fm-viewpeer-table__td">
-                              <div className="fm-viewpeer-table__sender">
-                                {isAnon ? (
-                                  <Lock size={18} className="fm-viewpeer-table__icon fm-viewpeer-table__icon--anonymous" />
-                                ) : (
-                                  <User size={18} className="fm-viewpeer-table__icon" />
-                                )}
-                                <span className="fm-viewpeer-table__name">
-                                  {getSenderDisplayName(feedback)}
-                                </span>
-                              </div>
-                            </td>
-                            <td className="fm-viewpeer-table__td">
-                              <div className="fm-viewpeer-table__badges">
-                                {isAnon && (
-                                  <span className="fm-viewpeer-badge fm-viewpeer-badge--anonymous">
-                                    Anonymous
-                                  </span>
-                                )}
-                                <span className="fm-viewpeer-badge fm-viewpeer-badge--peer">
-                                  Peer
-                                </span>
-                              </div>
-                            </td>
-                            <td className="fm-viewpeer-table__td fm-viewpeer-table__td--comment">
-                              {feedback.feedbackContent ||
-                                feedback.comment ||
-                                feedback.feedbackComment ||
-                                "No comment provided"}
-                            </td>
-                            <td className="fm-viewpeer-table__td fm-viewpeer-table__td--date">
-                              {feedback.formattedDate}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
+            return (
+              <tr
+                key={
+                  feedback.queueId ||
+                  feedback.QueueId ||
+                  feedback.peerQueueId
+                }
+                className="fm-viewpeer-table__row"
+              >
+                {/* EMPLOYEE */}
+                <td className="fm-viewpeer-table__td fm-viewpeer-table__td--from">
+                  <div className="fm-viewpeer-table__sender">
+                    {isAnon ? (
+                      <Lock
+                        size={18}
+                        className="fm-viewpeer-table__icon fm-viewpeer-table__icon--anonymous"
+                      />
+                    ) : (
+                      <User
+                        size={18}
+                        className="fm-viewpeer-table__icon"
+                      />
+                    )}
+                    <div className="fm-viewpeer-table__sender-text">
+                      <span className="fm-viewpeer-table__name">
+                        {getSenderDisplayName(feedback)}
+                      </span>
+                    </div>
+                  </div>
+                </td>
+
+                {/* TYPE */}
+                <td className="fm-viewpeer-table__td fm-viewpeer-table__td--type">
+                  <span className="fm-viewpeer-badge fm-viewpeer-badge--peer">
+                    Peer
+                  </span>
+                </td>
+
+                {/* FEEDBACK */}
+                <td className="fm-viewpeer-table__td fm-viewpeer-table__td--comment">
+                  {feedback.feedbackContent ||
+                    feedback.comment ||
+                    feedback.feedbackComment ||
+                    "No comment provided"}
+                </td>
+
+                {/* DATE */}
+                <td className="fm-viewpeer-table__td fm-viewpeer-table__td--date">
+                  {feedback.formattedDate}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}
           </>
         )}
       </div>
