@@ -1,12 +1,16 @@
 import { useAuth } from "../contexts/auth/AuthContext";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
+import AdminChatbot from "../components/Chatbot/Chatbot"; // add this
 
 const DashboardLayout = ({ children, role, allowedRoles = [] }) => {
   const { user } = useAuth();
 
   // Determine current role from user object or use the role prop
   const currentRole = user?.role || role;
+
+  const isAdmin =
+    currentRole === "Admin" || currentRole === "ADMIN" || currentRole === "admin";
 
   return (
     <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
@@ -36,6 +40,9 @@ const DashboardLayout = ({ children, role, allowedRoles = [] }) => {
         >
           {children}
         </main>
+
+        {/* ADMIN CHATBOT – visible on ALL pages, only for admin */}
+        {isAdmin && <AdminChatbot />}
       </div>
     </div>
   );
