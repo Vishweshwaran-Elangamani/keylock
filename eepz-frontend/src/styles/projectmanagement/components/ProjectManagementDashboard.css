@@ -4,6 +4,8 @@
   height: 100%;
   max-width: 100%;
   width: 100%;
+  padding: 1.5rem 2rem;
+  box-sizing: border-box;
 }
 
 .pm-dashboard__stats-grid {
@@ -14,7 +16,7 @@
 }
 
 .pm-dashboard__stat-card {
-  background: white;
+  background: #ffffff;
   border: 2px solid #27235c;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -98,7 +100,7 @@
 }
 
 .pm-dashboard__main-card {
-  background: white;
+  background: #ffffff;
   border: 2px solid #27235c;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -147,11 +149,11 @@
 }
 
 .pm-dashboard__btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  font-size: 1.5rem !important;
+  font-size: 1rem;
   font-weight: 600;
   border-radius: 8px;
   border: none;
@@ -160,9 +162,14 @@
   white-space: nowrap;
 }
 
+.pm-dashboard__btn svg {
+  width: 20px;
+  height: 20px;
+}
+
 .pm-dashboard__btn--primary {
   background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
-  color: white;
+  color: #ffffff;
   box-shadow: 0 2px 8px rgba(151, 36, 126, 0.3);
 }
 
@@ -183,13 +190,24 @@
 
 .pm-dashboard__btn--secondary:hover {
   background-color: #27235c;
-  color: white;
+  color: #ffffff;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(39, 35, 92, 0.3);
 }
 
 .pm-dashboard__btn--secondary:active {
   transform: translateY(0);
+}
+
+.pm-dashboard__btn:focus {
+  outline: 2px solid #97247e;
+  outline-offset: 2px;
+}
+
+.pm-dashboard__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
 }
 
 @media (max-width: 1200px) {
@@ -199,6 +217,10 @@
 }
 
 @media (max-width: 768px) {
+  .pm-dashboard {
+    padding: 1.5rem 1rem;
+  }
+
   .pm-dashboard__stats-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
@@ -266,17 +288,6 @@
     font-size: 0.9375rem;
   }
 }
-.pm-dashboard__btn:focus {
-  outline: 2px solid #97247e;
-  outline-offset: 2px;
-}
-
-.pm-dashboard__btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none !important;
-}
-
 
 @media print {
   .pm-dashboard__actions {

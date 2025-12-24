@@ -15,6 +15,10 @@
   align-items: center !important;
   gap: 0.25rem !important;
   transition: color 0.2s !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+
 }
 
 .prj-list-breadcrumb-link:hover {

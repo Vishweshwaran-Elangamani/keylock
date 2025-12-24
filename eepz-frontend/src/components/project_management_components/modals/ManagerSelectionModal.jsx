@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react';
-import ReactDOM from 'react-dom';
+import React, { useEffect, useState, useRef } from "react";
+import ReactDOM from "react-dom";
 import {
   X,
   Search,
@@ -10,7 +10,8 @@ import {
   UserCog,
   Info,
   ChevronDown,
-} from 'lucide-react';
+} from "lucide-react";
+import "../../../styles/projectmanagement/modals/ManagerSelectionModal.css";
 
 const CustomDropdown = ({ value, onChange, options, placeholder }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,8 +24,9 @@ const CustomDropdown = ({ value, onChange, options, placeholder }) => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleSelect = (optionValue) => {
@@ -33,114 +35,45 @@ const CustomDropdown = ({ value, onChange, options, placeholder }) => {
   };
 
   const getDisplayValue = () => {
-    if (!value || value === 'All') return placeholder || 'Select';
+    if (!value || value === "All") return placeholder || "Select";
     return value;
   };
 
   return (
-    <div
-      style={{ position: 'relative', fontFamily: 'Poppins, sans-serif' }}
-      ref={dropdownRef}
-    >
+    <div className="msm-dd-wrapper" ref={dropdownRef}>
       <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          width: '100%',
-          padding: '0.5rem 0.75rem',
-          fontSize: '0.875rem',
-          background: '#FFFFFF',
-          border: isOpen ? '1px solid #27235C' : '1px solid #d1d5db',
-          borderRadius: isOpen ? '8px 8px 0 0' : '8px',
-          cursor: 'pointer',
-          transition: 'all 0.2s ease',
-          outline: 'none',
-          userSelect: 'none',
-          boxShadow: isOpen ? '0 0 0 3px rgba(39, 35, 92, 0.1)' : 'none',
-          fontFamily: 'Poppins, sans-serif',
-        }}
+        className={`msm-dd-button ${isOpen ? "msm-dd-button--open" : ""}`}
         onClick={() => setIsOpen(!isOpen)}
       >
         <span
-          style={{
-            flex: 1,
-            textAlign: 'left',
-            color: value && value !== 'All' ? '#393939' : '#8D8D8D',
-            fontWeight: 400,
-            background: 'transparent',
-            cursor: 'pointer',
-            fontFamily: 'Poppins, sans-serif',
-          }}
+          className={`msm-dd-value ${
+            value && value !== "All"
+              ? "msm-dd-value--filled"
+              : "msm-dd-value--placeholder"
+          }`}
         >
           {getDisplayValue()}
         </span>
         <ChevronDown
           size={16}
-          style={{
-            color: isOpen ? '#27235C' : '#6c757d',
-            transition: 'all 0.2s ease',
-            transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-            flexShrink: 0,
-            marginLeft: '0.5rem',
-            cursor: 'pointer',
-          }}
+          className={`msm-dd-chevron ${
+            isOpen ? "msm-dd-chevron--open" : ""
+          }`}
         />
       </div>
       {isOpen && (
-        <ul
-          style={{
-            position: 'absolute',
-            top: '100%',
-            left: 0,
-            right: 0,
-            background: '#FFFFFF',
-            border: '1px solid #27235C',
-            borderTop: 'none',
-            borderRadius: '0 0 8px 8px',
-            boxShadow: '0 8px 16px rgba(0, 0, 0, 0.15)',
-            maxHeight: '220px',
-            overflowY: 'auto',
-            zIndex: 10000,
-            listStyle: 'none',
-            margin: 0,
-            padding: 0,
-            animation: 'dropdownFadeIn 0.2s ease',
-            fontFamily: 'Poppins, sans-serif',
-          }}
-        >
+        <ul className="msm-dd-menu">
           {options.map((opt, idx) => {
             const optValue = opt.value || opt;
             const optLabel = opt.label || opt;
+            const selected = value === optValue;
             return (
               <li
                 key={idx}
-                style={{
-                  padding: '0.65rem 0.875rem',
-                  fontSize: '0.875rem',
-                  color: value === optValue ? '#FFFFFF' : '#393939',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                  borderBottom:
-                    idx === options.length - 1 ? 'none' : '1px solid #f0f0f0',
-                  background: value === optValue ? '#27235C' : '#FFFFFF',
-                  fontWeight: value === optValue ? 600 : 400,
-                  borderRadius: idx === options.length - 1 ? '0 0 7px 7px' : '0',
-                  fontFamily: 'Poppins, sans-serif',
-                }}
+                className={`msm-dd-item ${
+                  selected ? "msm-dd-item--selected" : ""
+                }`}
                 onClick={() => handleSelect(optValue)}
-                onMouseEnter={(e) => {
-                  if (value !== optValue) {
-                    e.currentTarget.style.background = '#27235C';
-                    e.currentTarget.style.color = '#FFFFFF';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (value !== optValue) {
-                    e.currentTarget.style.background = '#FFFFFF';
-                    e.currentTarget.style.color = '#393939';
-                  }
-                }}
               >
                 {optLabel}
               </li>
@@ -180,35 +113,33 @@ const ManagerSelectionModal = ({
   onUpdate,
   isSubmitting,
   message,
-  // pagination
   itemsPerPage,
   onPageSizeChange,
   totalItems,
 }) => {
   useEffect(() => {
     if (show) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [show]);
 
-  // UPDATED search handlers (same behavior as other pages)
   const handleSearch = () => {
     if (!searchTerm.trim()) return;
     setActiveSearchTerm(searchTerm.trim());
   };
 
   const handleCancelSearch = () => {
-    setSearchTerm('');
-    setActiveSearchTerm('');
+    setSearchTerm("");
+    setActiveSearchTerm("");
   };
 
   const handleSearchKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       e.preventDefault();
       handleSearch();
     }
@@ -217,9 +148,9 @@ const ManagerSelectionModal = ({
   if (!show) return null;
 
   const getSelectedManager = () => {
-    if (activeTab === 'resource') return selectedResourceOwner;
-    if (activeTab === 'l1') return selectedL1Approver;
-    if (activeTab === 'l2') return selectedL2Approver;
+    if (activeTab === "resource") return selectedResourceOwner;
+    if (activeTab === "l1") return selectedL1Approver;
+    if (activeTab === "l2") return selectedL2Approver;
     return null;
   };
 
@@ -228,11 +159,11 @@ const ManagerSelectionModal = ({
     return selected?.employeeMasterId === emp.employeeMasterId;
   };
 
-  const roleOptions = ['All', ...uniqueRoles];
-  const departmentOptions = ['All', ...uniqueDepartments];
+  const roleOptions = ["All", ...uniqueRoles];
+  const departmentOptions = ["All", ...uniqueDepartments];
 
   const safeTotal =
-    typeof totalItems === 'number' ? totalItems : paginatedManagers.length;
+    typeof totalItems === "number" ? totalItems : paginatedManagers.length;
   const perPage = itemsPerPage || paginatedManagers.length || 1;
   const startIndex = safeTotal === 0 ? 0 : (currentPage - 1) * perPage + 1;
   const endIndex =
@@ -240,165 +171,39 @@ const ManagerSelectionModal = ({
 
   const modalContent = (
     <>
-      <style>
-        {`
-          @keyframes dropdownFadeIn {
-            from { opacity: 0; transform: translateY(-8px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
+      <div className="msm-overlay" onClick={onClose} />
 
-          .custom-radio {
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            width: 16px;
-            height: 16px;
-            border: 1.5px solid #B7BACE;
-            border-radius: 50%;
-            outline: none;
-            cursor: pointer;
-            position: relative;
-            background-color: #FFFFFF;
-            transition: all 0.2s ease;
-            margin: 0;
-            padding: 0;
-            flex-shrink: 0;
-            display: inline-block;
-            vertical-align: middle;
-          }
-
-          .custom-radio:hover { border-color: #524F7D; }
-
-          .custom-radio:checked {
-            border-color: #27235C;
-            background-color: #27235C;
-            box-shadow: inset 0 0 0 2.5px #FFFFFF;
-          }
-
-          .custom-radio:focus { outline: none; }
-        `}
-      </style>
-
-      {/* Backdrop */}
-      <div
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.7)',
-          zIndex: 10000,
-        }}
-        onClick={onClose}
-      />
-
-      {/* Modal Container */}
-      <div
-        style={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          zIndex: 10001,
-          width: '950px',
-          maxWidth: '90vw',
-          maxHeight: '85vh',
-          fontFamily: 'Poppins, sans-serif',
-        }}
-      >
-        <div
-          style={{
-            borderRadius: '12px',
-            border: 'none',
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4)',
-            overflow: 'hidden',
-            maxHeight: '85vh',
-            display: 'flex',
-            flexDirection: 'column',
-            backgroundColor: 'white',
-            fontFamily: 'Poppins, sans-serif',
-          }}
-        >
-          {/* Header */}
-          <div
-            style={{
-              backgroundColor: '#25235c',
-              borderBottom: 'none',
-              padding: '1.25rem 1.5rem',
-              color: 'white',
-              flexShrink: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              fontFamily: 'Poppins, sans-serif',
-            }}
-          >
-            <h5
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                margin: 0,
-                fontSize: '1.1rem',
-                fontWeight: 600,
-                color: 'white',
-                fontFamily: 'Poppins, sans-serif',
-              }}
-            >
-              <UserCog size={20} style={{ color: 'white' }} />
-              <span>Edit Reporting Managers - {project?.projectName}</span>
+      <div className="msm-modal-shell">
+        <div className="msm-modal-card">
+          <div className="msm-modal-header">
+            <h5 className="msm-modal-title">
+              <UserCog size={20} />
+              <span>
+                Edit Reporting Managers
+                {project?.projectName && ` - ${project.projectName}`}
+              </span>
             </h5>
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
               aria-label="Close"
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: 'white',
-                fontSize: '1.5rem',
-                cursor: 'pointer',
-                padding: '0.25rem',
-                lineHeight: 1,
-                opacity: 0.9,
-              }}
+              className="msm-modal-close"
             >
               <X size={22} />
             </button>
           </div>
 
-          {/* Body */}
-          <div
-            style={{
-              padding: '1.25rem 1.5rem',
-              backgroundColor: '#f8f9fa',
-              overflowY: 'auto',
-              flex: 1,
-              fontFamily: 'Poppins, sans-serif',
-            }}
-          >
+          <div className="msm-body">
             {message && (
               <div
-                className={`alert alert-${
-                  message.type === 'success' ? 'success' : 'danger'
-                } d-flex align-items-center gap-2 mb-3`}
-                style={{
-                  borderRadius: '8px',
-                  border: 'none',
-                  padding: '0.75rem 1rem',
-                  fontSize: '0.875rem',
-                  backgroundColor:
-                    message.type === 'success'
-                      ? 'rgba(36, 161, 72, 0.1)'
-                      : 'rgba(224, 25, 80, 0.1)',
-                  color: message.type === 'success' ? '#24A148' : '#E01950',
-                  textAlign: 'left',
-                  fontFamily: 'Poppins, sans-serif',
-                }}
+                className={`msm-alert ${
+                  message.type === "success"
+                    ? "msm-alert--success"
+                    : "msm-alert--error"
+                }`}
               >
-                {message.type === 'success' ? (
+                {message.type === "success" ? (
                   <CheckCircle size={18} />
                 ) : (
                   <AlertCircle size={18} />
@@ -407,60 +212,18 @@ const ManagerSelectionModal = ({
               </div>
             )}
 
-            {/* Tabs */}
-            <ul
-              className="nav nav-pills mb-3"
-              style={{
-                borderBottom: 'none',
-                gap: '0.5rem',
-                fontFamily: 'Poppins, sans-serif',
-              }}
-            >
+            <ul className="nav nav-pills mb-3 msm-tab-list">
               <li className="nav-item">
                 <button
-                  className={`nav-link ${
-                    activeTab === 'resource' ? 'active' : ''
+                  type="button"
+                  className={`nav-link msm-tab ${
+                    activeTab === "resource" ? "active" : ""
                   }`}
-                  onClick={() => setActiveTab('resource')}
-                  style={{
-                    fontSize: '0.875rem',
-                    fontWeight: 600,
-                    borderRadius: '8px',
-                    padding: '0.5rem 1rem',
-                    backgroundColor:
-                      activeTab === 'resource'
-                        ? 'var(--color-primary-1)'
-                        : 'white',
-                    color: activeTab === 'resource' ? 'white' : '#6b7280',
-                    border:
-                      activeTab === 'resource'
-                        ? 'none'
-                        : '1px solid #d1d5db',
-                    transition: 'all 0.2s ease',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.4rem',
-                    fontFamily: 'Poppins, sans-serif',
-                  }}
+                  onClick={() => setActiveTab("resource")}
                 >
-                  Resource Owner{' '}
+                  <span>Resource Owner</span>
                   {selectedResourceOwner && (
-                    <span
-                      style={{
-                        backgroundColor:
-                          activeTab === 'resource'
-                            ? 'rgba(255,255,255,0.3)'
-                            : '#10b981',
-                        color: 'white',
-                        fontSize: '0.65rem',
-                        borderRadius: '50%',
-                        width: '16px',
-                        height: '16px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
+                    <span className="msm-tab-badge">
                       <CheckCircle size={10} />
                     </span>
                   )}
@@ -468,43 +231,15 @@ const ManagerSelectionModal = ({
               </li>
               <li className="nav-item">
                 <button
-                  className={`nav-link ${activeTab === 'l1' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('l1')}
-                  style={{
-                    fontSize: '0.875rem',
-                    fontWeight: 600,
-                    borderRadius: '8px',
-                    padding: '0.5rem 1rem',
-                    backgroundColor:
-                      activeTab === 'l1' ? 'var(--color-primary-1)' : 'white',
-                    color: activeTab === 'l1' ? 'white' : '#6b7280',
-                    border:
-                      activeTab === 'l1' ? 'none' : '1px solid #d1d5db',
-                    transition: 'all 0.2s ease',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.4rem',
-                    fontFamily: 'Poppins, sans-serif',
-                  }}
+                  type="button"
+                  className={`nav-link msm-tab ${
+                    activeTab === "l1" ? "active" : ""
+                  }`}
+                  onClick={() => setActiveTab("l1")}
                 >
-                  L1 Approver{' '}
+                  <span>L1 Approver</span>
                   {selectedL1Approver && (
-                    <span
-                      style={{
-                        backgroundColor:
-                          activeTab === 'l1'
-                            ? 'rgba(255,255,255,0.3)'
-                            : '#10b981',
-                        color: 'white',
-                        fontSize: '0.65rem',
-                        borderRadius: '50%',
-                        width: '16px',
-                        height: '16px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
+                    <span className="msm-tab-badge">
                       <CheckCircle size={10} />
                     </span>
                   )}
@@ -512,43 +247,15 @@ const ManagerSelectionModal = ({
               </li>
               <li className="nav-item">
                 <button
-                  className={`nav-link ${activeTab === 'l2' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('l2')}
-                  style={{
-                    fontSize: '0.875rem',
-                    fontWeight: 600,
-                    borderRadius: '8px',
-                    padding: '0.5rem 1rem',
-                    backgroundColor:
-                      activeTab === 'l2' ? 'var(--color-primary-1)' : 'white',
-                    color: activeTab === 'l2' ? 'white' : '#6b7280',
-                    border:
-                      activeTab === 'l2' ? 'none' : '1px solid #d1d5db',
-                    transition: 'all 0.2s ease',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.4rem',
-                    fontFamily: 'Poppins, sans-serif',
-                  }}
+                  type="button"
+                  className={`nav-link msm-tab ${
+                    activeTab === "l2" ? "active" : ""
+                  }`}
+                  onClick={() => setActiveTab("l2")}
                 >
-                  L2 Approver{' '}
+                  <span>L2 Approver</span>
                   {selectedL2Approver && (
-                    <span
-                      style={{
-                        backgroundColor:
-                          activeTab === 'l2'
-                            ? 'rgba(255,255,255,0.3)'
-                            : '#10b981',
-                        color: 'white',
-                        fontSize: '0.65rem',
-                        borderRadius: '50%',
-                        width: '16px',
-                        height: '16px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
+                    <span className="msm-tab-badge">
                       <CheckCircle size={10} />
                     </span>
                   )}
@@ -556,53 +263,21 @@ const ManagerSelectionModal = ({
               </li>
             </ul>
 
-            {/* Current Selection */}
-            <div
-              className="alert alert-info d-flex align-items-start gap-2 mb-3"
-              style={{
-                borderRadius: '8px',
-                border: 'none',
-                padding: '0.875rem',
-                backgroundColor: 'rgba(13, 110, 253, 0.1)',
-                color: '#084298',
-                textAlign: 'left',
-                fontFamily: 'Poppins, sans-serif',
-              }}
-            >
-              <Info size={18} className="flex-shrink-0 mt-1" />
-              <div style={{ textAlign: 'left' }}>
-                <strong
-                  style={{
-                    fontSize: '0.875rem',
-                    fontFamily: 'Poppins, sans-serif',
-                  }}
-                >
+            <div className="alert alert-info d-flex align-items-start gap-2 mb-3 msm-current-banner">
+              <Info size={18} className="msm-info-icon" />
+              <div className="msm-current-content">
+                <strong className="msm-current-label">
                   Current Selection:
                 </strong>
                 <div className="mt-1">
                   {getSelectedManager() ? (
-                    <span
-                      className="badge"
-                      style={{
-                        fontSize: '0.8rem',
-                        padding: '0.4rem 0.65rem',
-                        backgroundColor: '#10b981',
-                        color: 'white',
-                        fontFamily: 'Poppins, sans-serif',
-                      }}
-                    >
-                      {getSelectedManager().firstName}{' '}
-                      {getSelectedManager().lastName} -{' '}
+                    <span className="badge msm-current-badge">
+                      {getSelectedManager().firstName}{" "}
+                      {getSelectedManager().lastName} -{" "}
                       {getSelectedManager().roleName}
                     </span>
                   ) : (
-                    <span
-                      className="text-muted"
-                      style={{
-                        fontSize: '0.8rem',
-                        fontFamily: 'Poppins, sans-serif',
-                      }}
-                    >
+                    <span className="text-muted msm-current-none">
                       None selected
                     </span>
                   )}
@@ -610,119 +285,37 @@ const ManagerSelectionModal = ({
               </div>
             </div>
 
-            {/* Search + Filters */}
             <div className="row g-2 mb-3">
               <div className="col-md-6">
-                <div
-                  style={{
-                    position: 'relative',
-                    display: 'flex',
-                    alignItems: 'center',
-                  }}
-                >
-                  <Search
-                    size={16}
-                    style={{
-                      position: 'absolute',
-                      left: '0.875rem',
-                      color: '#6b7280',
-                      pointerEvents: 'none',
-                      zIndex: 2,
-                    }}
-                  />
+                <div className="msm-search-wrapper">
+                  <Search size={16} className="msm-search-icon" />
                   <input
                     type="text"
-                    className="form-control text-start"
+                    className="form-control text-start msm-search-input"
                     placeholder="Search by name..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     onKeyPress={handleSearchKeyPress}
-                    style={{
-                      fontSize: '0.875rem',
-                      border: '1px solid #d1d5db',
-                      padding: '0.5rem 0.75rem 0.5rem 2.5rem',
-                      borderRadius: '8px',
-                      width: '100%',
-                      paddingRight: '7.5rem',
-                      fontFamily: 'Poppins, sans-serif',
-                    }}
                   />
-
-                  {/* Search / Cancel button – same style as other pages */}
-                 {activeSearchTerm ? (
-  <button
-    type="button"
-    onClick={handleCancelSearch}
-    style={{
-      position: 'absolute',
-      right: '3px',
-      top: '3px',
-      bottom: '3px',
-      background: '#6b7280',
-      border: '1px solid #6b7280',
-      color: 'white',
-      borderRadius: '0 8px 8px 0',
-      padding: '0 1rem',
-      fontSize: '0.8rem',
-      fontWeight: 600,
-      cursor: 'pointer',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '0.4rem',
-      zIndex: 1,
-      transition: 'all 0.2s ease',
-      whiteSpace: 'nowrap',
-      fontFamily: 'Poppins, sans-serif',
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.background = '#4b5563';
-      e.currentTarget.style.borderColor = '#4b5563';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.background = '#6b7280';
-      e.currentTarget.style.borderColor = '#6b7280';
-    }}
-  >
-    <X size={14} />
-    Cancel
-  </button>
-) : (
-  <button
-    type="button"
-    onClick={handleSearch}
-    style={{
-      position: 'absolute',
-      right: '3px',
-      top: '3px',
-      bottom: '3px',
-      background: '#252267',
-      border: 'none',
-      color: 'white',
-      borderRadius: '0 8px 8px 0',
-      padding: '0 1rem',
-      fontSize: '0.8rem',
-      fontWeight: 600,
-      cursor: 'pointer',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '0.4rem',
-      zIndex: 1,
-      transition: 'all 0.2s ease',
-      whiteSpace: 'nowrap',
-      fontFamily: 'Poppins, sans-serif',
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.background = '#1f1b5a';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.background = '#252267';
-    }}
-  >
-    <Search size={14} />
-    Search
-  </button>
-)}
-
+                  {activeSearchTerm ? (
+                    <button
+                      type="button"
+                      onClick={handleCancelSearch}
+                      className="msm-search-btn msm-search-btn--cancel"
+                    >
+                      <X size={14} />
+                      <span>Cancel</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleSearch}
+                      className="msm-search-btn"
+                    >
+                      <Search size={14} />
+                      <span>Search</span>
+                    </button>
+                  )}
                 </div>
               </div>
               <div className="col-md-3">
@@ -743,74 +336,14 @@ const ManagerSelectionModal = ({
               </div>
             </div>
 
-            {/* Manager List Table */}
-            <div
-              className="table-responsive"
-              style={{
-                minHeight: '300px',
-                borderRadius: '8px',
-                border: '1px solid #e5e7eb',
-                backgroundColor: 'white',
-              }}
-            >
-              <table
-                className="table table-hover mb-0"
-                style={{ fontFamily: 'Poppins, sans-serif' }}
-              >
-                <thead
-                  className="table-light"
-                  style={{
-                    position: 'sticky',
-                    top: 0,
-                    zIndex: 10,
-                  }}
-                >
-                  <tr style={{ textAlign: 'left' }}>
-                    <th
-                      style={{
-                        width: '50px',
-                        fontSize: '0.8rem',
-                        padding: '0.75rem',
-                        fontWeight: 600,
-                        textAlign: 'left',
-                        fontFamily: 'Poppins, sans-serif',
-                      }}
-                    >
-                      Select
-                    </th>
-                    <th
-                      style={{
-                        fontSize: '0.8rem',
-                        padding: '0.75rem',
-                        fontWeight: 600,
-                        textAlign: 'left',
-                        fontFamily: 'Poppins, sans-serif',
-                      }}
-                    >
-                      Employee Name
-                    </th>
-                    <th
-                      style={{
-                        fontSize: '0.8rem',
-                        padding: '0.75rem',
-                        fontWeight: 600,
-                        textAlign: 'left',
-                        fontFamily: 'Poppins, sans-serif',
-                      }}
-                    >
-                      Role
-                    </th>
-                    <th
-                      style={{
-                        fontSize: '0.8rem',
-                        padding: '0.75rem',
-                        fontWeight: 600,
-                        textAlign: 'left',
-                        fontFamily: 'Poppins, sans-serif',
-                      }}
-                    >
-                      Department
-                    </th>
+            <div className="table-responsive msm-table-wrapper">
+              <table className="table table-hover mb-0 msm-table">
+                <thead className="table-light msm-thead">
+                  <tr>
+                    <th className="msm-th msm-th--select">Select</th>
+                    <th className="msm-th">Employee Name</th>
+                    <th className="msm-th">Role</th>
+                    <th className="msm-th">Department</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -818,15 +351,11 @@ const ManagerSelectionModal = ({
                     <tr>
                       <td
                         colSpan="4"
-                        className="text-center py-4 text-muted"
-                        style={{
-                          fontSize: '0.875rem',
-                          fontFamily: 'Poppins, sans-serif',
-                        }}
+                        className="text-center py-4 text-muted msm-empty-text"
                       >
                         {activeSearchTerm
-                          ? 'No employees found matching your search'
-                          : 'No employees found'}
+                          ? "No employees found matching your search"
+                          : "No employees found"}
                       </td>
                     </tr>
                   ) : (
@@ -835,64 +364,32 @@ const ManagerSelectionModal = ({
                       return (
                         <tr
                           key={emp.employeeMasterId}
-                          className={selected ? 'table-active' : ''}
-                          style={{
-                            cursor: 'pointer',
-                            transition: 'background-color 0.15s ease',
-                          }}
+                          className={`msm-row ${
+                            selected ? "msm-row--selected" : ""
+                          }`}
                           onClick={() => onManagerSelect(emp)}
                         >
                           <td
                             onClick={(e) => e.stopPropagation()}
-                            style={{
-                              padding: '0.75rem',
-                              textAlign: 'left',
-                              verticalAlign: 'middle',
-                            }}
+                            className="msm-td msm-td--select"
                           >
                             <input
                               type="radio"
-                              className="custom-radio"
+                              className="msm-radio"
                               name={`manager-${activeTab}`}
                               checked={selected}
                               onChange={() => onManagerSelect(emp)}
                             />
                           </td>
-                          <td
-                            style={{
-                              fontSize: '0.875rem',
-                              padding: '0.75rem',
-                              textAlign: 'left',
-                              fontFamily: 'Poppins, sans-serif',
-                              verticalAlign: 'middle',
-                            }}
-                          >
-                            <span style={{ fontWeight: 500 }}>
+                          <td className="msm-td msm-td--name">
+                            <span className="msm-name">
                               {emp.firstName} {emp.lastName}
                             </span>
                           </td>
-                          <td
-                            style={{
-                              fontSize: '0.875rem',
-                              padding: '0.75rem',
-                              color: '#6b7280',
-                              textAlign: 'left',
-                              fontFamily: 'Poppins, sans-serif',
-                              verticalAlign: 'middle',
-                            }}
-                          >
+                          <td className="msm-td msm-td--muted">
                             {emp.roleName}
                           </td>
-                          <td
-                            style={{
-                              fontSize: '0.875rem',
-                              padding: '0.75rem',
-                              color: '#6b7280',
-                              textAlign: 'left',
-                              fontFamily: 'Poppins, sans-serif',
-                              verticalAlign: 'middle',
-                            }}
-                          >
+                          <td className="msm-td msm-td--muted">
                             {emp.departmentName}
                           </td>
                         </tr>
@@ -903,72 +400,39 @@ const ManagerSelectionModal = ({
               </table>
             </div>
 
-            {/* Pagination – aligned like ProjectList */}
             {totalPages > 1 && (
-              <div
-                className="prj-list-pagination-container mt-3 pt-2"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '1rem',
-                  flexWrap: 'wrap',
-                }}
-              >
-                {/* Left: page size */}
-                <div
-                  className="prj-list-pagination-left"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.35rem',
-                  }}
-                >
-                  <span className="prj-list-pagination-label">Show</span>
+              <div className="msm-pagination">
+                <div className="msm-pagination-left">
+                  <span className="msm-pagination-label">Show</span>
                   <select
-                    className="prj-list-page-size-select"
+                    className="msm-page-size-select"
                     value={itemsPerPage}
-                    onChange={(e) => onPageSizeChange(Number(e.target.value))}
-                    style={{ minWidth: '72px' }}
+                    onChange={(e) =>
+                      onPageSizeChange(Number(e.target.value))
+                    }
                   >
                     <option value={5}>5</option>
                     <option value={10}>10</option>
                     <option value={25}>25</option>
                   </select>
-                  <span className="prj-list-pagination-label">entries</span>
+                  <span className="msm-pagination-label">entries</span>
                 </div>
 
-                {/* Center: status text */}
-                <div
-                  className="prj-list-pagination-center"
-                  style={{
-                    flex: 1,
-                    textAlign: 'center',
-                    minWidth: '180px',
-                  }}
-                >
-                  <span className="prj-list-pagination-status">
+                <div className="msm-pagination-center">
+                  <span className="msm-pagination-status">
                     Showing {startIndex} to {endIndex} of {safeTotal} entries
                   </span>
                 </div>
 
-                {/* Right: page controls */}
-                <div
-                  className="prj-list-pagination-right"
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                    minWidth: '140px',
-                  }}
-                >
-                  <ul className="prj-list-pagination-list">
+                <div className="msm-pagination-right">
+                  <ul className="msm-page-list">
                     <li
-                      className={`prj-list-page-item ${
-                        currentPage === 1 ? 'disabled' : ''
+                      className={`msm-page-item ${
+                        currentPage === 1 ? "disabled" : ""
                       }`}
                     >
                       <button
-                        className="prj-list-page-link prj-list-page-arrow"
+                        className="msm-page-link msm-page-arrow"
                         onClick={() => goToPage(currentPage - 1)}
                         disabled={currentPage === 1}
                       >
@@ -976,22 +440,22 @@ const ManagerSelectionModal = ({
                       </button>
                     </li>
                     {getPageNumbers().map((page, index) =>
-                      page === '...' ? (
+                      page === "..." ? (
                         <li
                           key={`mgr-ellipsis-${index}`}
-                          className="prj-list-page-ellipsis"
+                          className="msm-page-ellipsis"
                         >
-                          <span className="prj-list-page-dots">...</span>
+                          <span className="msm-page-dots">...</span>
                         </li>
                       ) : (
                         <li
                           key={`mgr-${page}`}
-                          className={`prj-list-page-item ${
-                            currentPage === page ? 'active' : ''
+                          className={`msm-page-item ${
+                            currentPage === page ? "active" : ""
                           }`}
                         >
                           <button
-                            className="prj-list-page-link"
+                            className="msm-page-link"
                             onClick={() => goToPage(page)}
                           >
                             {page}
@@ -1000,12 +464,12 @@ const ManagerSelectionModal = ({
                       )
                     )}
                     <li
-                      className={`prj-list-page-item ${
-                        currentPage === totalPages ? 'disabled' : ''
+                      className={`msm-page-item ${
+                        currentPage === totalPages ? "disabled" : ""
                       }`}
                     >
                       <button
-                        className="prj-list-page-link prj-list-page-arrow"
+                        className="msm-page-link msm-page-arrow"
                         onClick={() => goToPage(currentPage + 1)}
                         disabled={currentPage === totalPages}
                       >
@@ -1018,40 +482,11 @@ const ManagerSelectionModal = ({
             )}
           </div>
 
-          {/* Footer */}
-          <div
-            style={{
-              padding: '1rem 1.5rem',
-              borderTop: '1px solid #e5e7eb',
-              backgroundColor: 'white',
-              display: 'flex',
-              justifyContent: 'flex-end',
-              gap: '0.75rem',
-              flexShrink: 0,
-              fontFamily: 'Poppins, sans-serif',
-            }}
-          >
+          <div className="msm-footer">
             <button
               type="button"
               onClick={onClose}
-              style={{
-                fontSize: '0.875rem',
-                fontWeight: 600,
-                padding: '0.5rem 1.25rem',
-                borderRadius: '8px',
-                backgroundColor: '#6b7280',
-                border: 'none',
-                color: 'white',
-                transition: 'all 0.2s ease',
-                cursor: 'pointer',
-                fontFamily: 'Poppins, sans-serif',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#4b5563';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#6b7280';
-              }}
+              className="msm-btn msm-btn--secondary"
             >
               Cancel
             </button>
@@ -1059,42 +494,11 @@ const ManagerSelectionModal = ({
               type="button"
               onClick={onUpdate}
               disabled={isSubmitting}
-              style={{
-                fontSize: '0.875rem',
-                fontWeight: 600,
-                padding: '0.5rem 1.5rem',
-                borderRadius: '8px',
-                background: 'var(--gradient-primary)',
-                border: 'none',
-                color: 'white',
-                boxShadow: '0 4px 12px rgba(192, 38, 211, 0.3)',
-                transition: 'all 0.2s ease',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.4rem',
-                opacity: isSubmitting ? 0.7 : 1,
-                cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                fontFamily: 'Poppins, sans-serif',
-              }}
-              onMouseEnter={(e) => {
-                if (!isSubmitting) {
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow =
-                    '0 6px 16px rgba(192, 38, 211, 0.4)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow =
-                  '0 4px 12px rgba(192, 38, 211, 0.3)';
-              }}
+              className="msm-btn msm-btn--primary"
             >
               {isSubmitting ? (
                 <>
-                  <span
-                    className="spinner-border spinner-border-sm"
-                    style={{ width: '14px', height: '14px' }}
-                  />
+                  <span className="spinner-border spinner-border-sm msm-btn-spinner" />
                   Updating...
                 </>
               ) : (

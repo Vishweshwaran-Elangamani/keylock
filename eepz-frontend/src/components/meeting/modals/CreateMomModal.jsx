@@ -638,8 +638,6 @@ const CreateMomModal = ({ meetingData, onClose }) => {
     </svg>
   </span>
 </button>
-
-
                               {assignOpenIndex === index && (
                                 <div style={listContainerStyle}>
                                   {(loadingEmployees ? [] : employees).map(

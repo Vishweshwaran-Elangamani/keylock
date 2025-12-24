@@ -1,9 +1,6 @@
 .delete-modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
@@ -22,13 +19,13 @@
 }
 
 .delete-modal-container {
-  background: white;
+  background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   max-width: 500px;
   width: 90%;
   animation: deleteModalSlideIn 0.2s ease-out;
-  border: 2px solid #27235C;
+  border: 2px solid #27235c;
 }
 
 @keyframes deleteModalSlideIn {
@@ -52,8 +49,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 1.25rem 1.5rem;
-  border-bottom: none;
-  background-color: #27235C;
+  background-color: #27235c;
   border-radius: 10px 10px 0 0;
 }
 
@@ -188,7 +184,7 @@
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
@@ -217,7 +213,6 @@
 .delete-btn-confirm {
   background: linear-gradient(90deg, #dc2626 0%, #991b1b 100%);
   color: #ffffff;
-  border: none;
   box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
 }
 

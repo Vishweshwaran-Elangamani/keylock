@@ -8,7 +8,7 @@ import {
   Activity,
 } from "lucide-react";
 import projectService from "../../services/project_management/projectService";
-import "../../styles/projectmanagement/ProjectManagementDashboard.css";
+import "../../styles/projectmanagement/components/ProjectManagementDashboard.css";
 
 const ProjectManagementDashboard = () => {
   const navigate = useNavigate();
@@ -54,9 +54,7 @@ const ProjectManagementDashboard = () => {
 
   return (
     <div className="pm-dashboard">
-      {/* Statistics Cards */}
       <div className="pm-dashboard__stats-grid">
-        {/* Total Projects Card */}
         <div className="pm-dashboard__stat-card pm-dashboard__stat-card--primary">
           <div className="pm-dashboard__stat-icon pm-dashboard__stat-icon--primary">
             <FolderKanban size={32} />
@@ -73,7 +71,6 @@ const ProjectManagementDashboard = () => {
           </div>
         </div>
 
-        {/* Active Projects Card */}
         <div className="pm-dashboard__stat-card pm-dashboard__stat-card--success">
           <div className="pm-dashboard__stat-icon pm-dashboard__stat-icon--success">
             <Activity size={32} />
@@ -90,7 +87,6 @@ const ProjectManagementDashboard = () => {
           </div>
         </div>
 
-        {/* Total Employees Card */}
         <div className="pm-dashboard__stat-card pm-dashboard__stat-card--info">
           <div className="pm-dashboard__stat-icon pm-dashboard__stat-icon--info">
             <Users size={32} />
@@ -107,7 +103,6 @@ const ProjectManagementDashboard = () => {
           </div>
         </div>
 
-        {/* Managed Projects Card */}
         <div className="pm-dashboard__stat-card pm-dashboard__stat-card--accent">
           <div className="pm-dashboard__stat-icon pm-dashboard__stat-icon--accent">
             <UserCog size={32} />
@@ -125,7 +120,6 @@ const ProjectManagementDashboard = () => {
         </div>
       </div>
 
-      {/* Main Action Card */}
       <div className="pm-dashboard__main-card">
         <div className="pm-dashboard__main-content">
           <FolderKanban size={64} className="pm-dashboard__main-icon" />
@@ -140,14 +134,14 @@ const ProjectManagementDashboard = () => {
               onClick={() => navigate("/hr/dashboard/projectmgmt/create")}
             >
               <FolderPlus size={20} />
-              Create New Project
+              <span>Create New Project</span>
             </button>
             <button
               className="pm-dashboard__btn pm-dashboard__btn--secondary"
               onClick={() => navigate("/hr/dashboard/projectmgmt/list")}
             >
               <FolderKanban size={20} />
-              Manage Projects
+              <span>Manage Projects</span>
             </button>
           </div>
         </div>
