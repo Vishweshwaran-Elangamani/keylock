@@ -80,7 +80,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     }).ToList();
 
                     await _momRepository.ShareMomAsync(sharings);
-                    Console.WriteLine($"✅ Auto-shared MOM {createdMom.Momid} '{createdMom.MeetingTitle}' with {uniqueEmployeeIds.Count} employees");
+                    Console.WriteLine($" Auto-shared MOM {createdMom.Momid} '{createdMom.MeetingTitle}' with {uniqueEmployeeIds.Count} employees");
                 }
             }
 
@@ -187,7 +187,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     }).ToList();
 
                     await _momRepository.ShareMomAsync(sharings);
-                    Console.WriteLine($"✅ Auto-shared updated MOM {existingMom.Momid} with {uniqueEmployeeIds.Count} employees");
+                    Console.WriteLine($" Auto-shared updated MOM {existingMom.Momid} with {uniqueEmployeeIds.Count} employees");
                 }
             }
 
