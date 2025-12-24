@@ -1,4 +1,5 @@
 ﻿namespace Relevantz.EEPZ.Data.Tests;
+using NUnit.Framework;
 
 public class Tests
 {

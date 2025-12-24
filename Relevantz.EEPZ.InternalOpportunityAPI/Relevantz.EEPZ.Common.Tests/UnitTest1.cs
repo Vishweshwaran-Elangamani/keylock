@@ -1,4 +1,5 @@
 ﻿namespace Relevantz.EEPZ.Common.Tests;
+using NUnit.Framework;
 
 public class Tests
 {
