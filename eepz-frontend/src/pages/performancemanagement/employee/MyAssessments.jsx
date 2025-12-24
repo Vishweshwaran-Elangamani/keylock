@@ -440,7 +440,7 @@ function MyAssessments() {
   if (loading) {
     return (
       <div className="empassper-container">
-        <Toaster position="top-right" richColors />
+        <Toaster position="top-right"  />
         <div className="empassper-loading-state">
           <div className="spinner-border"></div>
           <p>Loading assessments...</p>

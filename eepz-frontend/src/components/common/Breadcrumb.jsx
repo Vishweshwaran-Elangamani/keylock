@@ -5,7 +5,6 @@ const Breadcrumb = ({ items }) => {
   const navigate = useNavigate();
 
   const handleHomeClick = () => {
-    // If there's a previous item in the breadcrumb, go to it
     if (items.length > 1 && items[items.length - 2].path) {
       navigate(items[items.length - 2].path);
     } else {

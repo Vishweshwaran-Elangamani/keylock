@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getDeptHeadApprovedNominations } from "../../../services/performancemanagement/api/nominationapi";
+import Breadcrumb from "../../../components/common/Breadcrumb"; 
 import "../../../styles/performancemanagement/hr/TopPerformers.css";
 
 export default function TopPerformers() {
@@ -12,6 +13,13 @@ export default function TopPerformers() {
 
   const user = JSON.parse(localStorage.getItem("user"));
   const deptHeadId = user ? user.empId : null;
+
+  
+  const breadcrumbItems = [
+    { label: "Dashboard", path: "/depthead/dashboard" },
+    { label: "Top Performers" }
+  ];
+
   useEffect(() => {
     if (!deptHeadId) {
       navigate("/depthead/login");
@@ -19,7 +27,6 @@ export default function TopPerformers() {
     }
     fetchNominations();
   }, [deptHeadId]);
-
 
   const fetchNominations = async () => {
     try {
@@ -35,19 +42,16 @@ export default function TopPerformers() {
     }
   };
 
-
   const handleViewDetails = (e, nomination) => {
     e.stopPropagation();
     setSelectedNomination(nomination);
     setShowModal(true);
   };
 
-
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedNomination(null);
   };
-
 
   const getInitials = (nominee) => {
     if (!nominee) return "NA";
@@ -63,22 +67,17 @@ export default function TopPerformers() {
     return param.parameterValue;
   };
 
-
   const renderDetailsModal = () => {
     if (!showModal || !selectedNomination) return null;
 
     return (
       <div className="dtp-modal-backdrop" onClick={handleCloseModal}>
         <div className="dtp-modal-dialog" onClick={(e) => e.stopPropagation()}>
-
-
           <div className="dtp-modal-header">
             <h2 className="dtp-modal-title">Nomination Details</h2>
           </div>
 
-
           <div className="dtp-modal-body">
-
             <div className="dtp-detail-row">
               <div className="dtp-detail-col">
                 <label className="dtp-detail-label">NOMINEE NAME</label>
@@ -88,7 +87,6 @@ export default function TopPerformers() {
                 <label className="dtp-detail-label">REWARD TYPE</label>
                 <p className="dtp-detail-value">{selectedNomination.rewardType.rewardName}</p>
               </div>
-             
             </div>
 
             <div className="dtp-detail-row">
@@ -100,7 +98,6 @@ export default function TopPerformers() {
                 {selectedNomination.justification}
               </div>
             </div>
-
 
             {selectedNomination.parameterValues && selectedNomination.parameterValues.length > 0 && (
               <div className="dtp-detail-section">
@@ -120,7 +117,6 @@ export default function TopPerformers() {
             )}
           </div>
 
-
           <div className="dtp-modal-footer">
             <button className="dtp-btn-close" onClick={handleCloseModal}>
               Close
@@ -130,7 +126,6 @@ export default function TopPerformers() {
       </div>
     );
   };
-
 
   if (loading) {
     return (
@@ -143,15 +138,12 @@ export default function TopPerformers() {
     );
   }
 
-
   return (
     <div className="dtp-page">
       <div className="dtp-container">
-
+        <Breadcrumb items={breadcrumbItems} />
 
         <div className="dtp-header">
-
-
           <h1 className="dtp-page-title">Top Performers</h1>
           <p className="dtp-page-description">
             {nominations.length} Approved Nominations
@@ -170,7 +162,6 @@ export default function TopPerformers() {
           <div className="dtp-grid">
             {nominations.map((nomination) => (
               <div key={nomination.nominationId} className="dtp-nomination-card">
-
                 <div className="dtp-employee-section">
                   <div className="dtp-avatar">
                     {getInitials(nomination.nominee)}

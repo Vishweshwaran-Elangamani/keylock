@@ -963,7 +963,7 @@ function TeamLeadPage() {
  
   return (
     <div className="tl-page">
-      <Toaster position="top-right" richColors />
+      <Toaster position="top-right"  />
  
       <div className="hrfcper-top-bar compact">
            <Breadcrumb
