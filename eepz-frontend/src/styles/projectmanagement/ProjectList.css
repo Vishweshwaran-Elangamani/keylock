@@ -230,12 +230,14 @@
   opacity: 0 !important;
   transition: all 0.3s ease !important;
   z-index: 1000 !important;
+  text-align: left;
 }
 
 .prj-list-dropdown-open .prj-list-custom-dropdown-options {
   max-height: 300px !important;
   opacity: 1 !important;
   overflow-y: auto !important;
+  text-align: left;
 }
 
 .prj-list-custom-option {

@@ -19,7 +19,6 @@ import ManagerEscalationModal from "../../components/sla/modals/ManagerEscalatio
 import ResolveEscalationModal from "../../components/sla/modals/ResolveEscalationModal";
 import { formatDate } from "../../utils/sla/dateFormatter";
 import "../../styles/sla/ManagerSLADashboard.css";
-
 const MgrSelect = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
   const selected = options.find((o) => o.value === value) || options[0];
@@ -31,18 +30,25 @@ const MgrSelect = ({ value, onChange, options }) => {
         className={`mgr-select-control ${open ? "open" : ""}`}
         onClick={() => setOpen((p) => !p)}
       >
-        <span className="mgr-select-value">{selected.label}</span>
+        <span
+          className="mgr-select-value"
+          style={{ textAlign: "left", width: "100%" }}
+        >
+          {selected.label}
+        </span>
+
+        {/* UPDATED ONLY THIS PART */}
         <span className={`mgr-select-icon ${open ? "open" : ""}`}>
           <svg
-            width="18"
-            height="18"
+            width="16"
+            height="16"
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
             <polyline
               points="6 9 12 15 18 9"
-              stroke="currentColor"
+              stroke="#9CA3AF"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -59,6 +65,7 @@ const MgrSelect = ({ value, onChange, options }) => {
               className={`mgr-select-option ${
                 opt.value === value ? "selected" : ""
               }`}
+              style={{ textAlign: "left" }}
               onClick={() => {
                 onChange(opt.value);
                 setOpen(false);
@@ -72,6 +79,7 @@ const MgrSelect = ({ value, onChange, options }) => {
     </div>
   );
 };
+
 
 const statusOptionsMy = [
   { value: "All", label: "All Status" },

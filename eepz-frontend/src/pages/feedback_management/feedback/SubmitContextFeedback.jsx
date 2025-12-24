@@ -51,7 +51,27 @@ const CustomSelect = ({
         disabled={disabled}
       >
         <span className="ctx-dropdown-value">{displayLabel}</span>
-        <span className="ctx-dropdown-arrow">{isOpen ? "▴" : "▾"}</span>
+        <span className="ctx-dropdown-arrow">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            style={{
+              transition: "transform 0.2s ease",
+              transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+              display: "block",
+            }}
+          >
+            <polyline
+              points="6 9 12 15 18 9"
+              fill="none"
+              stroke={PRIMARY}
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </span>
       </button>
       {isOpen && (
         <ul className="ctx-dropdown-list">
@@ -405,7 +425,8 @@ export default function SubmitContextFeedback() {
         display: "flex",
         justifyContent: "center",
         padding: "1.25rem 1rem",
-        fontFamily: "'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif",
+        fontFamily:
+          "'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif",
       }}
     >
       <div
@@ -505,7 +526,11 @@ export default function SubmitContextFeedback() {
             <div className="flex-grow-1">
               <p
                 className="mb-0"
-                style={{ fontSize: "0.875rem", color: "#991b1b", fontFamily: "inherit" }}
+                style={{
+                  fontSize: "0.875rem",
+                  color: "#991b1b",
+                  fontFamily: "inherit",
+                }}
               >
                 {error}
               </p>
@@ -538,7 +563,11 @@ export default function SubmitContextFeedback() {
             />
             <p
               className="mb-0 flex-grow-1"
-              style={{ fontSize: "0.875rem", color: "#166534", fontFamily: "inherit" }}
+              style={{
+                fontSize: "0.875rem",
+                color: "#166534",
+                fontFamily: "inherit",
+              }}
             >
               {successMsg}
             </p>
@@ -616,7 +645,10 @@ export default function SubmitContextFeedback() {
         {/* Loading */}
         {loadingData && (
           <div className="card border-0 shadow-sm" style={{ borderRadius: "10px" }}>
-            <div className="card-body text-center py-5" style={{ fontFamily: "inherit" }}>
+            <div
+              className="card-body text-center py-5"
+              style={{ fontFamily: "inherit" }}
+            >
               <Loader
                 size={40}
                 className="mb-3 animate-spin"
@@ -639,13 +671,20 @@ export default function SubmitContextFeedback() {
         {/* Goal feedback */}
         {!loadingData && activeTab === "goal" && (
           <div className="card border-0 shadow-sm" style={{ borderRadius: "10px" }}>
-            <div className="card-body" style={{ padding: "1.5rem", fontFamily: "inherit" }}>
+            <div
+              className="card-body"
+              style={{ padding: "1.5rem", fontFamily: "inherit" }}
+            >
               <form onSubmit={submitGoal}>
                 {/* Goal dropdown */}
                 <div className="mb-4">
                   <label
                     className="form-label fw-semibold mb-2 left-label"
-                    style={{ fontSize: "0.875rem", color: "#0f172a", fontFamily: "inherit" }}
+                    style={{
+                      fontSize: "0.875rem",
+                      color: "#0f172a",
+                      fontFamily: "inherit",
+                    }}
                   >
                     Select Organization Goal <span className="text-danger">*</span>
                   </label>
@@ -709,7 +748,11 @@ export default function SubmitContextFeedback() {
                 <div className="mb-4">
                   <label
                     className="form-label fw-semibold mb-2 left-label"
-                    style={{ fontSize: "0.875rem", color: "#0f172a", fontFamily: "inherit" }}
+                    style={{
+                      fontSize: "0.875rem",
+                      color: "#0f172a",
+                      fontFamily: "inherit",
+                    }}
                   >
                     Rating <span className="text-danger">*</span>
                   </label>
@@ -722,7 +765,9 @@ export default function SubmitContextFeedback() {
                       fontFamily: "inherit",
                     }}
                   >
-                    <div className="d-flex gap-1">{renderStars(goalForm.rating)}</div>
+                    <div className="d-flex gap-1">
+                      {renderStars(goalForm.rating)}
+                    </div>
                     <span
                       style={{
                         fontSize: "0.875rem",
@@ -740,7 +785,11 @@ export default function SubmitContextFeedback() {
                 <div className="mb-4">
                   <label
                     className="form-label fw-semibold mb-2 left-label"
-                    style={{ fontSize: "0.875rem", color: "#0f172a", fontFamily: "inherit" }}
+                    style={{
+                      fontSize: "0.875rem",
+                      color: "#0f172a",
+                      fontFamily: "inherit",
+                    }}
                   >
                     Feedback Comments <span className="text-danger">*</span>
                   </label>
@@ -862,13 +911,20 @@ export default function SubmitContextFeedback() {
         {/* Context feedback */}
         {!loadingData && activeTab === "context" && (
           <div className="card border-0 shadow-sm" style={{ borderRadius: "10px" }}>
-            <div className="card-body" style={{ padding: "1.5rem", fontFamily: "inherit" }}>
+            <div
+              className="card-body"
+              style={{ padding: "1.5rem", fontFamily: "inherit" }}
+            >
               <form onSubmit={submitContext}>
                 {/* Recipient dropdown */}
                 <div className="mb-4">
                   <label
                     className="form-label fw-semibold mb-2 left-label"
-                    style={{ fontSize: "0.875rem", color: "#0f172a", fontFamily: "inherit" }}
+                    style={{
+                      fontSize: "0.875rem",
+                      color: "#0f172a",
+                      fontFamily: "inherit",
+                    }}
                   >
                     Select Recipient <span className="text-danger">*</span>
                   </label>
@@ -919,7 +975,13 @@ export default function SubmitContextFeedback() {
                     >
                       {selectedEmployee.firstName} {selectedEmployee.lastName}
                     </div>
-                    <small style={{ fontSize: "0.75rem", color: "#64748b", fontFamily: "inherit" }}>
+                    <small
+                      style={{
+                        fontSize: "0.75rem",
+                        color: "#64748b",
+                        fontFamily: "inherit",
+                      }}
+                    >
                       {selectedEmployee.email}
                     </small>
                   </div>
@@ -929,7 +991,11 @@ export default function SubmitContextFeedback() {
                 <div className="mb-4">
                   <label
                     className="form-label fw-semibold mb-2 left-label"
-                    style={{ fontSize: "0.875rem", color: "#0f172a", fontFamily: "inherit" }}
+                    style={{
+                      fontSize: "0.875rem",
+                      color: "#0f172a",
+                      fontFamily: "inherit",
+                    }}
                   >
                     Project Context <span className="text-danger">*</span>
                   </label>
@@ -959,7 +1025,11 @@ export default function SubmitContextFeedback() {
                 <div className="mb-4">
                   <label
                     className="form-label fw-semibold mb-2 left-label"
-                    style={{ fontSize: "0.875rem", color: "#0f172a", fontFamily: "inherit" }}
+                    style={{
+                      fontSize: "0.875rem",
+                      color: "#0f172a",
+                      fontFamily: "inherit",
+                    }}
                   >
                     Feedback Content <span className="text-danger">*</span>
                   </label>

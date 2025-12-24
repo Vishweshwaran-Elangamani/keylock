@@ -1,13 +1,11 @@
-// src/pages/feedback_management/feedback/SubmitMentorFeedback.jsx
-
-import React, { useMemo, useState, useEffect, useCallback, useRef } from "react";
-import {
-  CheckCircle,
-  Send,
-  AlertTriangle,
-  Loader,
-  Star,
-} from "lucide-react";
+import React, {
+  useMemo,
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+} from "react";
+import { CheckCircle, Send, AlertTriangle, Loader, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   mentorFeedbackApi,
@@ -28,10 +26,32 @@ const getFeedbackDashboardPath = (roleName) => {
   return routes[roleName] || "/hr/dashboard/feedback";
 };
 
-// PRIMARY color to match other dropdowns
 const PRIMARY = "#27235C";
 
-/** Reusable custom select (same behavior as your Business Unit dropdown) */
+const DropdownIcon = ({ open }) => (
+  <svg
+    width="18"              
+    height="18"           
+    viewBox="0 0 24 24"
+    style={{
+      transition: "transform 0.2s ease",
+      transform: open ? "rotate(180deg)" : "rotate(0deg)",
+      display: "block",
+    }}
+  >
+    <polyline
+      points="6 9 12 15 18 9"
+      fill="none"
+      stroke={PRIMARY}
+      strokeWidth="2.4"     
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+
+/** Reusable custom select */
 const CustomSelect = ({
   name,
   value,
@@ -76,11 +96,9 @@ const CustomSelect = ({
             : { cursor: "pointer" }
         }
       >
-        <span className="prj-dropdown-value">
-          {getDisplayValue()}
-        </span>
+        <span className="prj-dropdown-value">{getDisplayValue()}</span>
         <span className="prj-dropdown-arrow">
-          {isOpen ? "▴" : "▾"}
+          <DropdownIcon open={isOpen} />
         </span>
       </div>
       {isOpen && (
@@ -133,7 +151,7 @@ export default function SubmitMentorFeedback() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // Fetch employee map using service
+  // Fetch employee map
   const fetchEmployeeMap = useCallback(async (signal) => {
     setLoadingEmployees(true);
     try {
@@ -158,13 +176,12 @@ export default function SubmitMentorFeedback() {
     }
   }, []);
 
-  // Fetch SME list using service
+  // Fetch SME list
   const fetchSmeList = useCallback(
     async (signal) => {
       if (Object.keys(employeeMap).length === 0 && !loadingEmployees) return;
 
       setLoadingSme(true);
-
       try {
         const response = await smeApi.getActive();
 
@@ -209,7 +226,7 @@ export default function SubmitMentorFeedback() {
     return () => abortController.abort();
   }, [fetchEmployeeMap]);
 
-  // Fetch SMEs after employees are loaded
+  // Fetch SMEs after employees
   useEffect(() => {
     if (Object.keys(employeeMap).length === 0) return;
     const abortController = new AbortController();
@@ -239,7 +256,7 @@ export default function SubmitMentorFeedback() {
     [smeList]
   );
 
-  // Handle form submission using service
+  // Submit
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault();
@@ -301,12 +318,10 @@ export default function SubmitMentorFeedback() {
     [smeDetails, form, user?.empId]
   );
 
-  // Handle star rating click
   const handleStarClick = useCallback((rating) => {
     setForm((prev) => ({ ...prev, rating }));
   }, []);
 
-  // Render star rating component
   const renderStars = () => {
     return [...Array(5)].map((_, index) => {
       const rating = index + 1;
@@ -337,7 +352,6 @@ export default function SubmitMentorFeedback() {
     form.feedbackComments.length <= 5000;
   const isLoading = loadingSme || loadingEmployees;
 
-  // Get role-based dashboard path
   const feedbackDashboardPath = user?.roleName
     ? getFeedbackDashboardPath(user.roleName)
     : "/hr/dashboard/feedback";
@@ -358,7 +372,6 @@ export default function SubmitMentorFeedback() {
           maxWidth: "1200px",
         }}
       >
-        {/* ========== BREADCRUMB ========== */}
         <FeedbackBreadcrumb
           items={[
             { label: "Feedback Management", path: feedbackDashboardPath },
@@ -366,10 +379,9 @@ export default function SubmitMentorFeedback() {
           ]}
         />
 
-        {/* BACK BUTTON & HEADER */}
         <div className="d-flex align-items-center gap-3 mb-4"></div>
 
-        {/* ALERTS */}
+        {/* Alerts */}
         {error && (
           <div
             className="alert alert-danger d-flex align-items-start gap-2 mb-4"
@@ -434,11 +446,11 @@ export default function SubmitMentorFeedback() {
           </div>
         )}
 
-        {/* MAIN CARD */}
+        {/* Card */}
         <div className="card border-0 shadow-sm" style={{ borderRadius: "12px" }}>
           <div className="card-body" style={{ padding: "2rem" }}>
             <form onSubmit={handleSubmit} noValidate>
-              {/* SELECT SME */}
+              {/* SME select */}
               <div className="mb-4" style={{ textAlign: "left" }}>
                 <label
                   htmlFor="smeSelect"
@@ -461,7 +473,6 @@ export default function SubmitMentorFeedback() {
                   )}
                 </label>
 
-                {/* Custom dropdown to match your sample image */}
                 <CustomSelect
                   name="smeId"
                   value={form.smeId}
@@ -496,10 +507,9 @@ export default function SubmitMentorFeedback() {
                 </div>
               </div>
 
-              {/* CONDITIONAL FIELDS */}
               {smeDetails && (
                 <div style={{ textAlign: "left" }}>
-                  {/* SME DETAILS */}
+                  {/* SME details */}
                   <div
                     className="mb-4 p-4"
                     style={{
@@ -595,7 +605,7 @@ export default function SubmitMentorFeedback() {
                     </div>
                   </div>
 
-                  {/* RATING */}
+                  {/* Rating */}
                   <div className="mb-4" style={{ textAlign: "left" }}>
                     <label
                       className="form-label fw-semibold mb-2"
@@ -640,7 +650,7 @@ export default function SubmitMentorFeedback() {
                     </div>
                   </div>
 
-                  {/* FEEDBACK COMMENTS */}
+                  {/* Comments */}
                   <div className="mb-4" style={{ textAlign: "left" }}>
                     <label
                       htmlFor="feedbackComments"
@@ -701,65 +711,63 @@ export default function SubmitMentorFeedback() {
                     </div>
                   </div>
 
-                  {/* ANONYMOUS CHECKBOX */}
-                <div className="mb-4" style={{ textAlign: "left" }}>
-  <div
-    className="form-check p-3"
-    style={{
-      backgroundColor: "#f8fafc",
-      borderRadius: "10px",
-      border: "1.5px solid #e2e8f0",
-      // make the box flex so checkbox can sit slightly outside
-      display: "flex",
-      alignItems: "flex-start",
-    }}
-  >
-    <input
-      type="checkbox"
-      className="form-check-input"
-      id="anonCheck"
-      checked={form.isAnonymous}
-      onChange={(e) =>
-        setForm((prev) => ({
-          ...prev,
-          isAnonymous: e.target.checked,
-        }))
-      }
-      disabled={loading}
-      style={{
-        borderRadius: "4px",
-        width: "18px",
-        height: "18px",
-        marginLeft: "-8px",   // pull checkbox left outside the box
-        marginTop: "2px",
-      }}
-    />
-    <label
-      className="form-check-label"
-      htmlFor="anonCheck"
-      style={{
-        fontSize: "0.938rem",
-        textAlign: "left",
-        marginLeft: "0.75rem",
-      }}
-    >
-      Submit anonymously
-      <div
-        className="form-text"
-        style={{
-          fontSize: "0.813rem",
-          marginTop: "0.25rem",
-          textAlign: "left",
-        }}
-      >
-        Your identity will be hidden from the mentor
-      </div>
-    </label>
-  </div>
-</div>
+                  {/* Anonymous checkbox */}
+                  <div className="mb-4" style={{ textAlign: "left" }}>
+                    <div
+                      className="form-check p-3"
+                      style={{
+                        backgroundColor: "#f8fafc",
+                        borderRadius: "10px",
+                        border: "1.5px solid #e2e8f0",
+                        display: "flex",
+                        alignItems: "flex-start",
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        className="form-check-input"
+                        id="anonCheck"
+                        checked={form.isAnonymous}
+                        onChange={(e) =>
+                          setForm((prev) => ({
+                            ...prev,
+                            isAnonymous: e.target.checked,
+                          }))
+                        }
+                        disabled={loading}
+                        style={{
+                          borderRadius: "4px",
+                          width: "18px",
+                          height: "18px",
+                          marginLeft: "-8px",
+                          marginTop: "2px",
+                        }}
+                      />
+                      <label
+                        className="form-check-label"
+                        htmlFor="anonCheck"
+                        style={{
+                          fontSize: "0.938rem",
+                          textAlign: "left",
+                          marginLeft: "0.75rem",
+                        }}
+                      >
+                        Submit anonymously
+                        <div
+                          className="form-text"
+                          style={{
+                            fontSize: "0.813rem",
+                            marginTop: "0.25rem",
+                            textAlign: "left",
+                          }}
+                        >
+                          Your identity will be hidden from the mentor
+                        </div>
+                      </label>
+                    </div>
+                  </div>
 
-
-                  {/* SUBMIT BUTTON */}
+                  {/* Submit */}
                   <button
                     type="submit"
                     className="btn btn-lg w-100 d-flex align-items-center justify-content-center gap-2"
@@ -812,7 +820,6 @@ export default function SubmitMentorFeedback() {
         .animate-spin { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        /* Custom dropdown styles to match your Business Unit / Compliance dropdowns */
         .prj-dropdown-wrapper {
           position: relative;
           width: 100%;
@@ -847,11 +854,13 @@ export default function SubmitMentorFeedback() {
           font-weight: 400;
         }
 
-        .prj-dropdown-arrow {
-          color: #6b7280;
-          margin-left: 0.5rem;
-          font-size: 0.85rem;
-        }
+       .prj-dropdown-arrow {
+         margin-left: 0.5rem;
+         display: flex;
+         align-items: center;
+         justifyContent: center;
+}
+
 
         .prj-dropdown-list {
           position: absolute;

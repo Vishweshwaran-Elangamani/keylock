@@ -503,13 +503,15 @@ const CreateProject = () => {
                 const optValue = opt.value ?? opt;
                 const optLabel = opt.label ?? opt;
                 return (
-                  <li 
-                    key={idx} 
-                    className={`prj-dropdown-option ${value === optValue ? 'selected' : ''}`}
+                  <li
+                  key={idx}
+                   className={`prj-dropdown-option ${value === optValue ? 'selected' : ''}`}
                     onClick={() => handleSelect(optValue)}
-                  >
-                    {optLabel}
-                  </li>
+                  style={{ textAlign: 'left' }}   // added
+                 >
+                 {optLabel}
+                </li>
+
                 );
               })}
             </ul>
@@ -554,13 +556,15 @@ const CreateProject = () => {
         {isOpen && (
           <ul className="prj-custom-filter-list">
             {options.map((opt, idx) => (
-              <li 
-                key={idx} 
-                className={`prj-custom-filter-option ${value === opt ? 'selected' : ''}`}
-                onClick={() => handleSelect(opt)}
-              >
-                {opt}
-              </li>
+              <li
+              key={idx}
+             className={`prj-custom-filter-option ${value === opt ? 'selected' : ''}`}
+              onClick={() => handleSelect(opt)}
+             style={{ textAlign: 'left' }}   // added
+          >
+         {opt}
+        </li>
+
             ))}
           </ul>
         )}

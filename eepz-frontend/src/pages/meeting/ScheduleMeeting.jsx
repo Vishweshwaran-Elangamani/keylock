@@ -243,11 +243,12 @@ const ScheduleMeeting = () => {
     width: "100%",
     maxHeight: "260px",
     overflowY: "auto",
+    textAlign: "left",
   };
 
   const dropdownItemStyle = (active) => ({
     padding: "10px 16px",
-    textAlign: "center",
+    textAlign: "left", // changed from center to left
     cursor: "pointer",
     backgroundColor: active ? PRIMARY : "#ffffff",
     color: active ? "#ffffff" : "#111827",
@@ -495,7 +496,17 @@ const ScheduleMeeting = () => {
                           setMeetingTypeOpen((prev) => !prev)
                         }
                       >
-                        <span>{formData.meetingType}</span>
+                        <span
+                          style={{
+                            flex: 1,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                            textAlign: "left", // left align selected label
+                          }}
+                        >
+                          {formData.meetingType}
+                        </span>
                         {meetingTypeOpen ? (
                           <ChevronUp size={18} color="#6B7280" />
                         ) : (
@@ -525,8 +536,9 @@ const ScheduleMeeting = () => {
                               }}
                               onMouseLeave={(e) => {
                                 const active = opt === formData.meetingType;
-                                e.currentTarget.style.backgroundColor =
-                                  active ? PRIMARY : "#ffffff";
+                                e.currentTarget.style.backgroundColor = active
+                                  ? PRIMARY
+                                  : "#ffffff";
                                 e.currentTarget.style.color = active
                                   ? "#ffffff"
                                   : "#111827";
@@ -591,7 +603,15 @@ const ScheduleMeeting = () => {
                             setOneOnOneOpen((prev) => !prev)
                           }
                         >
-                          <span>
+                          <span
+                            style={{
+                              flex: 1,
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                              textAlign: "left", // left align selected label
+                            }}
+                          >
                             {(() => {
                               const id =
                                 formData.participantEmployeeIds[0];
@@ -879,18 +899,19 @@ const ScheduleMeeting = () => {
                           </button>
 
                           {calendarOpen && (
-                          <div
-                            style={{
-                           position: "absolute",
-                           right: -250,
-                           top: "calc(100% + 4px)",
-                           backgroundColor: "white",
-                          borderRadius: 12,
-                          boxShadow: "0 14px 40px rgba(15, 23, 42, 0.18)",
-                          border: "1px solid #e5e7eb",
-                          zIndex: 9999,
-                          width: 280,
-                        }}
+                            <div
+                              style={{
+                                position: "absolute",
+                                right: -250,
+                                top: "calc(100% + 4px)",
+                                backgroundColor: "white",
+                                borderRadius: 12,
+                                boxShadow:
+                                  "0 14px 40px rgba(15, 23, 42, 0.18)",
+                                border: "1px solid #e5e7eb",
+                                zIndex: 9999,
+                                width: 280,
+                              }}
                             >
                               <div
                                 style={{
@@ -959,7 +980,6 @@ const ScheduleMeeting = () => {
                                   </div>
                                 ))}
                               </div>
-
                               <div
                                 style={{
                                   display: "grid",
@@ -1032,7 +1052,6 @@ const ScheduleMeeting = () => {
                                   );
                                 })}
                               </div>
-
                               <div
                                 style={{
                                   padding: "0.45rem 0.9rem 0.7rem",
@@ -1090,7 +1109,15 @@ const ScheduleMeeting = () => {
                             setDurationOpen((prev) => !prev)
                           }
                         >
-                          <span>
+                          <span
+                            style={{
+                              flex: 1,
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                              textAlign: "left", // left align selected label
+                            }}
+                          >
                             {
                               durationOptions.find(
                                 (d) => d.value === formData.duration
@@ -1127,8 +1154,9 @@ const ScheduleMeeting = () => {
                                 onMouseLeave={(e) => {
                                   const active =
                                     opt.value === formData.duration;
-                                  e.currentTarget.style.backgroundColor =
-                                    active ? PRIMARY : "#ffffff";
+                                  e.currentTarget.style.backgroundColor = active
+                                    ? PRIMARY
+                                    : "#ffffff";
                                   e.currentTarget.style.color = active
                                     ? "#ffffff"
                                     : "#111827";
@@ -1192,7 +1220,9 @@ const ScheduleMeeting = () => {
               </div>
             </div>
 
-            <div className="d-flex gap-3 justify-content-end">
+          
+
+            <div className="d-flex gap-3 justify-content-end mt-4">
               <button
                 type="button"
                 className="btn btn-secondary px-4 d-flex align-items-center gap-2"

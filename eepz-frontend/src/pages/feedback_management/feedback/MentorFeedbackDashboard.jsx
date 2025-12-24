@@ -273,7 +273,27 @@ export default function MentorFeedbackDashboard() {
           <span className="sme-dropdown-placeholder">
             {selectedLabel}
           </span>
-          <span className="sme-dropdown-arrow">▾</span>
+          <span className="sme-dropdown-arrow">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              style={{
+                transition: "transform 0.2s ease",
+                transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+                display: "block",
+              }}
+            >
+              <polyline
+                points="6 9 12 15 18 9"
+                fill="none"
+                stroke="#27235C"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
         </button>
 
         {isOpen && (
@@ -432,37 +452,36 @@ export default function MentorFeedbackDashboard() {
         </div>
       )}
 
-     <div className="row g-3 mb-3">
-  {[
-    {
-      label: "Total Feedback",
-      value: stats.total,
-      icon: MessageSquare,
-      bgColor: "#EEF2FF",
-      iconColor: "#3B82F6",
-    },
-    {
-      label: "Average Rating",
-      value: stats.avgRating,
-      icon: Star,
-      bgColor: "#FEF3C7",
-      iconColor: "#E2B93B",
-    },
-  ].map(({ label, value, icon: Icon, bgColor, iconColor }) => (
-    <div key={label} className="col-xl-3 col-lg-4 col-md-6 col-sm-6">
-      <div className="sme-sla-stat-card">
-        <div className="sme-sla-stat-icon" style={{ backgroundColor: bgColor }}>
-          <Icon size={28} color={iconColor} strokeWidth={2.5} />
-        </div>
-        <div>
-          <h3 className="sme-sla-stat-value">{value}</h3>
-          <p className="sme-sla-stat-label">{label}</p>
-        </div>
+      <div className="row g-3 mb-3">
+        {[
+          {
+            label: "Total Feedback",
+            value: stats.total,
+            icon: MessageSquare,
+            bgColor: "#EEF2FF",
+            iconColor: "#3B82F6",
+          },
+          {
+            label: "Average Rating",
+            value: stats.avgRating,
+            icon: Star,
+            bgColor: "#FEF3C7",
+            iconColor: "#E2B93B",
+          },
+        ].map(({ label, value, icon: Icon, bgColor, iconColor }) => (
+          <div key={label} className="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+            <div className="sme-sla-stat-card">
+              <div className="sme-sla-stat-icon" style={{ backgroundColor: bgColor }}>
+                <Icon size={28} color={iconColor} strokeWidth={2.5} />
+              </div>
+              <div>
+                <h3 className="sme-sla-stat-value">{value}</h3>
+                <p className="sme-sla-stat-label">{label}</p>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
-    </div>
-  ))}
-</div>
-
 
       {/* FILTERS CARD – custom dropdowns */}
       <div className="sme-sla-filters-card">

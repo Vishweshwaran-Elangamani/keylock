@@ -50,7 +50,6 @@ export default function CreateFeedbackForm() {
     { value: "EvaluationForm", label: "Evaluation" },
   ];
 
-  // Close type dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (!e.target.closest(".feedback-custom-select")) {
@@ -61,175 +60,182 @@ export default function CreateFeedbackForm() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // ========= Custom Select =========
-  const CustomSelect = ({ value, onChange, options, placeholder, disabled }) => {
-    const selectRef = useRef(null);
-    const dropdownRef = useRef(null);
-    const selectedOption = options.find((opt) => opt.value === value);
-    const [dropdownPosition, setDropdownPosition] = useState({
-      top: 0,
-      left: 0,
-      width: 0,
-    });
-    const [isHovered, setIsHovered] = useState(false);
-    const [hoveredOption, setHoveredOption] = useState(null);
 
-    useEffect(() => {
-      if (openDropdown && selectRef.current) {
-        const rect = selectRef.current.getBoundingClientRect();
-        setDropdownPosition({
-          top: rect.bottom + window.scrollY + 4,
-          left: rect.left + window.scrollX,
-          width: rect.width,
-        });
-      }
-    }, [openDropdown]);
+ // inside CreateFeedbackForm.jsx, keep everything else the same
 
-    const triggerStyles = {
-      width: "100%",
-      padding: "0.75rem 2.75rem 0.75rem 1rem",
-      background: disabled
-        ? "#F3F4F6"
-        : isHovered && !disabled
-        ? "#F9FAFB"
-        : "white",
-      border: "1.5px solid",
-      borderColor: openDropdown
-        ? PRIMARY
-        : isHovered && !disabled
-        ? "#9CA3AF"
-        : "#E5E7EB",
-      borderRadius: "8px",
-      fontSize: "1rem",
-      color: disabled ? "#9CA3AF" : "#6B7280",
-      cursor: disabled ? "not-allowed" : "pointer",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      transition: "all 0.2s ease",
-      textAlign: "left",
-      fontWeight: 400,
-      lineHeight: 1.5,
-      minHeight: "48px",
-      position: "relative",
-      boxShadow: openDropdown ? "0 0 0 3px rgba(39, 35, 92, 0.1)" : "none",
-      fontFamily: "Poppins, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-    };
+const CustomSelect = ({ value, onChange, options, placeholder, disabled }) => {
+  const selectRef = useRef(null);
+  const dropdownRef = useRef(null);
+  const selectedOption = options.find((opt) => opt.value === value);
+  const [dropdownPosition, setDropdownPosition] = useState({
+    top: 0,
+    left: 0,
+    width: 0,
+  });
+  const [isHovered, setIsHovered] = useState(false);
+  const [hoveredOption, setHoveredOption] = useState(null);
 
-    const valueStyles = {
-      flex: 1,
-      overflow: "hidden",
-      textOverflow: "ellipsis",
-      whiteSpace: "nowrap",
-      color: value ? "#374151" : "#9CA3AF",
-    };
+  useEffect(() => {
+    if (openDropdown && selectRef.current) {
+      const rect = selectRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY + 4,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+      });
+    }
+  }, [openDropdown]);
 
-    const iconStyles = {
-      position: "absolute",
-      right: "1rem",
-      transition: "transform 0.2s ease",
-      color: openDropdown ? PRIMARY : "#6B7280",
-      flexShrink: 0,
-      pointerEvents: "none",
-      transform: openDropdown ? "rotate(180deg)" : "rotate(0deg)",
-    };
-
-    const dropdownStyles = {
-      position: "fixed",
-      top: `${dropdownPosition.top}px`,
-      left: `${dropdownPosition.left}px`,
-      width: `${dropdownPosition.width}px`,
-      background: "white",
-      border: "1.5px solid #E5E7EB",
-      borderRadius: "8px",
-      boxShadow:
-        "0 10px 30px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08)",
-      zIndex: 9999,
-      maxHeight: "280px",
-      overflowY: "auto",
-      animation: "feedbackDropdownFadeIn 0.15s ease",
-      marginTop: "4px",
-      fontFamily: "Poppins, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-    };
-
-    const getOptionStyles = (optionValue) => ({
-      padding: "0.75rem 1rem",
-      cursor: "pointer",
-      fontSize: "0.9rem",
-      color:
-        value === optionValue || hoveredOption === optionValue
-          ? "#FFFFFF"
-          : "#374151",
-      transition: "all 0.12s ease",
-      borderBottom: "1px solid #F3F4F6",
-      background:
-        value === optionValue || hoveredOption === optionValue
-          ? PRIMARY
-          : "white",
-      fontWeight: value === optionValue ? 600 : 400,
-      lineHeight: 1.5,
-    });
-
-    return (
-      <div
-        className="feedback-custom-select"
-        ref={selectRef}
-        style={{ position: "relative", width: "100%" }}
-      >
-        <button
-          type="button"
-          style={triggerStyles}
-          onClick={() => !disabled && setOpenDropdown(!openDropdown)}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          disabled={disabled}
-        >
-          <span style={valueStyles}>
-            {selectedOption?.label || placeholder}
-          </span>
-          <ChevronDown size={18} style={iconStyles} strokeWidth={2} />
-        </button>
-        {openDropdown && !disabled && (
-          <div ref={dropdownRef} style={dropdownStyles}>
-            {options.map((option, index) => (
-              <div
-                key={option.value}
-                style={{
-                  ...getOptionStyles(option.value),
-                  borderTopLeftRadius: index === 0 ? "6px" : "0",
-                  borderTopRightRadius: index === 0 ? "6px" : "0",
-                  borderBottomLeftRadius:
-                    index === options.length - 1 ? "6px" : "0",
-                  borderBottomRightRadius:
-                    index === options.length - 1 ? "6px" : "0",
-                  borderBottom:
-                    index === options.length - 1
-                      ? "none"
-                      : "1px solid #F3F4F6",
-                }}
-                onClick={() => {
-                  onChange(option.value);
-                  setOpenDropdown(false);
-                }}
-                onMouseEnter={() => setHoveredOption(option.value)}
-                onMouseLeave={() => setHoveredOption(null)}
-              >
-                {option.label}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    );
+  const triggerStyles = {
+    width: "100%",
+    padding: "0.75rem 2.75rem 0.75rem 1rem",
+    background: disabled
+      ? "#F3F4F6"
+      : isHovered && !disabled
+      ? "#F9FAFB"
+      : "white",
+    border: "1.5px solid",
+    borderColor: openDropdown
+      ? PRIMARY
+      : isHovered && !disabled
+      ? "#9CA3AF"
+      : "#E5E7EB",
+    borderRadius: "8px",
+    fontSize: "1rem",
+    color: disabled ? "#9CA3AF" : "#6B7280",
+    cursor: disabled ? "not-allowed" : "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    transition: "all 0.2s ease",
+    textAlign: "left", // keep button content left
+    fontWeight: 400,
+    lineHeight: 1.5,
+    minHeight: "48px",
+    position: "relative",
+    boxShadow: openDropdown ? "0 0 0 3px rgba(39, 35, 92, 0.1)" : "none",
+    fontFamily:
+      "Poppins, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
   };
 
-  // ========= Calendar state for deadline =========
+  const valueStyles = {
+    flex: 1,
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    color: value ? "#374151" : "#9CA3AF",
+    textAlign: "left",              // NEW: left align selected text
+  };
+
+  const iconStyles = {
+    position: "absolute",
+    right: "1rem",
+    transition: "transform 0.2s ease",
+    color: openDropdown ? PRIMARY : "#6B7280",
+    flexShrink: 0,
+    pointerEvents: "none",
+    transform: openDropdown ? "rotate(180deg)" : "rotate(0deg)",
+  };
+
+  const dropdownStyles = {
+    position: "fixed",
+    top: `${dropdownPosition.top}px`,
+    left: `${dropdownPosition.left}px`,
+    width: `${dropdownPosition.width}px`,
+    background: "white",
+    border: "1.5px solid #E5E7EB",
+    borderRadius: "8px",
+    boxShadow:
+      "0 10px 30px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08)",
+    zIndex: 9999,
+    maxHeight: "280px",
+    overflowY: "auto",
+    animation: "feedbackDropdownFadeIn 0.15s ease",
+    marginTop: "4px",
+    fontFamily:
+      "Poppins, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  };
+
+  const getOptionStyles = (optionValue) => ({
+    padding: "0.75rem 1rem",
+    cursor: "pointer",
+    fontSize: "0.9rem",
+    color:
+      value === optionValue || hoveredOption === optionValue
+        ? "#FFFFFF"
+        : "#374151",
+    transition: "all 0.12s ease",
+    borderBottom: "1px solid #F3F4F6",
+    background:
+      value === optionValue || hoveredOption === optionValue
+        ? PRIMARY
+        : "white",
+    fontWeight: value === optionValue ? 600 : 400,
+    lineHeight: 1.5,
+    textAlign: "left",              // NEW: left align each option
+  });
+
+  return (
+    <div
+      className="feedback-custom-select"
+      ref={selectRef}
+      style={{ position: "relative", width: "100%" }}
+    >
+      <button
+        type="button"
+        style={triggerStyles}
+        onClick={() => !disabled && setOpenDropdown(!openDropdown)}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        disabled={disabled}
+      >
+        <span style={valueStyles}>
+          {selectedOption?.label || placeholder}
+        </span>
+        <ChevronDown size={18} style={iconStyles} strokeWidth={2} />
+      </button>
+
+      {openDropdown && !disabled && (
+        <div ref={dropdownRef} style={dropdownStyles}>
+          {options.map((option, index) => (
+            <div
+              key={option.value}
+              style={{
+                ...getOptionStyles(option.value),
+                borderTopLeftRadius: index === 0 ? "6px" : "0",
+                borderTopRightRadius: index === 0 ? "6px" : "0",
+                borderBottomLeftRadius:
+                  index === options.length - 1 ? "6px" : "0",
+                borderBottomRightRadius:
+                  index === options.length - 1 ? "6px" : "0",
+                borderBottom:
+                  index === options.length - 1
+                    ? "none"
+                    : "1px solid #F3F4F6",
+              }}
+              onClick={() => {
+                onChange(option.value);
+                setOpenDropdown(false);
+              }}
+              onMouseEnter={() => setHoveredOption(option.value)}
+              onMouseLeave={() => setHoveredOption(null)}
+            >
+              {option.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+
   const [calendarOpen, setCalendarOpen] = useState(false);
   const calendarRef = useRef(null);
   const [calendarMonth, setCalendarMonth] = useState(null);
   const [calendarYear, setCalendarYear] = useState(null);
 
-  // Close calendar on outside click
+
   useEffect(() => {
     const handler = (e) => {
       if (
@@ -290,18 +296,7 @@ export default function CreateFeedbackForm() {
   const selectedDate = form.deadline ? new Date(form.deadline) : null;
 
   const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    "January","February","March","April","May","June", "July", "August", "September","October", "November", "December",
   ];
   const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 

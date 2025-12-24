@@ -377,7 +377,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
         </div>
 
         <form onSubmit={handleSubmit}>
-          {/* Meeting info */}
+        
           <div className="card bg-light border-0 mb-4">
             <div className="card-body p-3">
               <h6 className="fw-semibold mb-3 text-muted small">
@@ -430,7 +430,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
             </div>
           </div>
 
-          {/* Comments */}
+       
           <div className="mb-4">
             <label className="form-label fw-semibold d-flex align-items-center gap-2">
               <i className="bi bi-chat-left-text"></i>
@@ -447,7 +447,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
             />
           </div>
 
-          {/* Discussion Points */}
+         
           <div className="mb-4">
             <div className="d-flex justify-content-between align-items-center mb-3">
               <label className="form-label fw-semibold mb-0 d-flex align-items-center gap-2">
@@ -520,7 +520,6 @@ const CreateMomModal = ({ meetingData, onClose }) => {
             )}
           </div>
 
-          {/* Action Items with custom dropdowns + calendar */}
           <div className="mb-4">
             <div className="d-flex justify-content-between align-items-center mb-3">
               <label className="form-label fw-semibold mb-0 d-flex align-items-center gap-2">
@@ -586,7 +585,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                         </div>
 
                         <div className="row g-2">
-                          {/* Assign To – custom dropdown */}
+                         
                           <div className="col-md-5">
                             <label className="form-label small fw-semibold text-muted d-flex align-items-center gap-1">
                               <i className="bi bi-person-circle"></i>
@@ -596,32 +595,50 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                               ref={(el) => (assignRefs.current[index] = el)}
                               style={{ position: "relative" }}
                             >
-                              <button
-                                type="button"
-                                style={dropdownTriggerStyle}
-                                onClick={() =>
-                                  setAssignOpenIndex(
-                                    assignOpenIndex === index ? null : index
-                                  )
-                                }
-                              >
-                                <span
-                                  style={{
-                                    overflow: "hidden",
-                                    textOverflow: "ellipsis",
-                                    whiteSpace: "nowrap",
-                                  }}
-                                >
-                                  {item.assignedToEmployeeId
-                                    ? getEmployeeName(
-                                        item.assignedToEmployeeId
-                                      ) || "Select employee..."
-                                    : loadingEmployees
-                                    ? "Loading..."
-                                    : "Select employee..."}
-                                </span>
-                                <i className="bi bi-chevron-down" />
-                              </button>
+                             <button
+  type="button"
+  style={dropdownTriggerStyle}
+  onClick={() =>
+    setAssignOpenIndex(assignOpenIndex === index ? null : index)
+  }
+>
+  <span
+    style={{
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+    }}
+  >
+    {item.assignedToEmployeeId
+      ? getEmployeeName(item.assignedToEmployeeId) || "Select employee..."
+      : loadingEmployees
+      ? "Loading..."
+      : "Select employee..."}
+  </span>
+  <span style={{ display: "inline-flex", marginLeft: "0.25rem" }}>
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      style={{
+        transition: "transform 0.2s ease",
+        transform:
+          assignOpenIndex === index ? "rotate(180deg)" : "rotate(0deg)",
+        display: "block",
+      }}
+    >
+      <polyline
+        points="6 9 12 15 18 9"
+        fill="none"
+        stroke={PRIMARY}
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  </span>
+</button>
+
 
                               {assignOpenIndex === index && (
                                 <div style={listContainerStyle}>
@@ -700,7 +717,6 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                               )}
                           </div>
 
-                          {/* Due Date – custom calendar */}
                           <div className="col-md-4">
                             <label className="form-label small fw-semibold text-muted d-flex align-items-center gap-1">
                               <i className="bi bi-calendar-event"></i>
@@ -979,65 +995,74 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                             )}
                           </div>
 
-                          {/* Status – custom dropdown rounded like screenshot */}
                           <div className="col-md-3">
-                            <label className="form-label small fw-semibold text-muted">
-                              Status
-                            </label>
-                            <div
-                              ref={(el) => (statusRefs.current[index] = el)}
-                              style={{ position: "relative" }}
-                            >
-                              <button
-                                type="button"
-                                style={dropdownTriggerStyle}
-                                onClick={() =>
-                                  setStatusOpenIndex(
-                                    statusOpenIndex === index ? null : index
-                                  )
-                                }
-                              >
-                                <span>{item.status}</span>
-                                <i className="bi bi-chevron-down" />
-                              </button>
-                              {statusOpenIndex === index && (
-                                <div style={listContainerStyle}>
-                                  {["Pending", "Completed"].map((st) => {
-                                    const active = st === item.status;
-                                    return (
-                                      <div
-                                        key={st}
-                                        style={itemStyle(active)}
-                                        onClick={() => {
-                                          handleActionItemChange(
-                                            index,
-                                            "status",
-                                            st
-                                          );
-                                          setStatusOpenIndex(null);
-                                        }}
-                                        onMouseEnter={(e) => {
-                                          e.currentTarget.style.backgroundColor =
-                                            PRIMARY;
-                                          e.currentTarget.style.color =
-                                            "#ffffff";
-                                        }}
-                                        onMouseLeave={(e) => {
-                                          e.currentTarget.style.backgroundColor =
-                                            active ? PRIMARY : "#ffffff";
-                                          e.currentTarget.style.color = active
-                                            ? "#ffffff"
-                                            : "#111827";
-                                        }}
-                                      >
-                                        {st}
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                              )}
-                            </div>
-                          </div>
+  <label className="form-label small fw-semibold text-muted">
+    Status
+  </label>
+  <div
+    ref={(el) => (statusRefs.current[index] = el)}
+    style={{ position: "relative" }}
+  >
+    <button
+      type="button"
+      style={dropdownTriggerStyle}
+      onClick={() =>
+        setStatusOpenIndex(statusOpenIndex === index ? null : index)
+      }
+    >
+      <span>{item.status}</span>
+      <span style={{ display: "inline-flex", marginLeft: "0.25rem" }}>
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          style={{
+            transition: "transform 0.2s ease",
+            transform: statusOpenIndex === index ? "rotate(180deg)" : "rotate(0deg)",
+            display: "block",
+          }}
+        >
+          <polyline
+            points="6 9 12 15 18 9"
+            fill="none"
+            stroke={PRIMARY}
+            strokeWidth="2.4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </span>
+    </button>
+    {statusOpenIndex === index && (
+      <div style={listContainerStyle}>
+        {["Pending", "Completed"].map((st) => {
+          const active = st === item.status;
+          return (
+            <div
+              key={st}
+              style={itemStyle(active)}
+              onClick={() => {
+                handleActionItemChange(index, "status", st);
+                setStatusOpenIndex(null);
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = PRIMARY;
+                e.currentTarget.style.color = "#ffffff";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = active ? PRIMARY : "#ffffff";
+                e.currentTarget.style.color = active ? "#ffffff" : "#111827";
+              }}
+            >
+              {st}
+            </div>
+          );
+        })}
+      </div>
+    )}
+  </div>
+</div>
+
                         </div>
 
                         <div className="mt-3 pt-3 border-top">

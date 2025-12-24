@@ -278,76 +278,82 @@ const HRSLADashboard = () => {
   };
 
   // Custom Select Component
-  const CustomSelect = ({ value, onChange, options, placeholder, name }) => {
-    const selectRef = useRef(null);
-    const dropdownRef = useRef(null);
-    const isOpen = openDropdown === name;
-    const selectedOption = options.find((opt) => opt.value === value);
-    const [dropdownPosition, setDropdownPosition] = useState({
-      top: 0,
-      left: 0,
-      width: 0,
-    });
+const CustomSelect = ({ value, onChange, options, placeholder, name }) => {
+  const selectRef = useRef(null);
+  const dropdownRef = useRef(null);
+  const isOpen = openDropdown === name;
+  const selectedOption = options.find((opt) => opt.value === value);
+  const [dropdownPosition, setDropdownPosition] = useState({
+    top: 0,
+    left: 0,
+    width: 0,
+  });
 
-    useEffect(() => {
-      if (isOpen && selectRef.current) {
-        const rect = selectRef.current.getBoundingClientRect();
-        setDropdownPosition({
-          top: rect.bottom + window.scrollY + 4,
-          left: rect.left + window.scrollX,
-          width: rect.width,
-        });
-      }
-    }, [isOpen]);
+  useEffect(() => {
+    if (isOpen && selectRef.current) {
+      const rect = selectRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY + 4,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+      });
+    }
+  }, [isOpen]);
 
-    return (
-      <div className="hr-sla-custom-select" ref={selectRef}>
-        <button
-          type="button"
-          className={`hr-sla-custom-select-trigger ${
-            selectedOption && selectedOption.value !== "All" ? "has-value" : ""
-          }`}
-          onClick={() => setOpenDropdown(isOpen ? null : name)}
+  return (
+    <div className="hr-sla-custom-select" ref={selectRef}>
+      <button
+        type="button"
+        className={`hr-sla-custom-select-trigger ${
+          selectedOption && selectedOption.value !== "All" ? "has-value" : ""
+        }`}
+        onClick={() => setOpenDropdown(isOpen ? null : name)}
+      >
+        <span
+          className="hr-sla-custom-select-value"
+          style={{ textAlign: "left", width: "100%" }} 
         >
-          <span className="hr-sla-custom-select-value">
-            {selectedOption?.label || placeholder}
-          </span>
-          <ChevronDown
-            size={18}
-            className={`hr-sla-custom-select-icon ${isOpen ? "open" : ""}`}
-            strokeWidth={2}
-          />
-        </button>
-        {isOpen && (
-          <div
-            ref={dropdownRef}
-            className="hr-sla-custom-select-dropdown"
-            style={{
-              position: "fixed",
-              top: `${dropdownPosition.top}px`,
-              left: `${dropdownPosition.left}px`,
-              width: `${dropdownPosition.width}px`,
-            }}
-          >
-            {options.map((option) => (
-              <div
-                key={option.value}
-                className={`hr-sla-custom-select-option ${
-                  value === option.value ? "selected" : ""
-                }`}
-                onClick={() => {
-                  onChange(option.value);
-                  setOpenDropdown(null);
-                }}
-              >
-                {option.label}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  };
+          {selectedOption?.label || placeholder}
+        </span>
+        <ChevronDown
+          size={18}
+          className={`hr-sla-custom-select-icon ${isOpen ? "open" : ""}`}
+          strokeWidth={2}
+        />
+      </button>
+
+      {isOpen && (
+        <div
+          ref={dropdownRef}
+          className="hr-sla-custom-select-dropdown"
+          style={{
+            position: "fixed",
+            top: `${dropdownPosition.top}px`,
+            left: `${dropdownPosition.left}px`,
+            width: `${dropdownPosition.width}px`,
+          }}
+        >
+          {options.map((option) => (
+            <div
+              key={option.value}
+              className={`hr-sla-custom-select-option ${
+                value === option.value ? "selected" : ""
+              }`}
+              onClick={() => {
+                onChange(option.value);
+                setOpenDropdown(null);
+              }}
+              style={{ textAlign: "left" }}           
+            >
+              {option.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 
   const statusOptions = [
     { value: "All", label: "All Status" },

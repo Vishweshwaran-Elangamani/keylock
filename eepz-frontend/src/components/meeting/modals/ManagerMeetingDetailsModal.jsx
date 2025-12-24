@@ -60,7 +60,7 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
+     
         <div
           style={{
             padding: "1.5rem",
@@ -113,9 +113,8 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
           </button>
         </div>
 
-        {/* Body */}
         <div style={{ padding: "1.5rem" }}>
-          {/* Attendance Stats */}
+       
           <div
             style={{
               backgroundColor: "#f9fafb",
@@ -195,7 +194,7 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
             </div>
           </div>
 
-          {/* Meeting Link */}
+ 
           {meeting.meetingLink && (
             <div style={{ marginBottom: "1.5rem" }}>
               <div
@@ -247,7 +246,7 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
             </div>
           )}
 
-          {/* Participants */}
+       
           <h6
             style={{
               fontWeight: 600,
@@ -341,24 +340,6 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
                         </small>
                       )}
                     </div>
-                    <span
-                      style={{
-                        padding: "0.25rem 0.75rem",
-                        borderRadius: "9999px",
-                        fontSize: "0.75rem",
-                        fontWeight: 600,
-                        backgroundColor:
-                          p.rsvpStatus === "Accepted"
-                            ? "#10b981"
-                            : p.rsvpStatus === "Declined"
-                            ? "#ef4444"
-                            : "#f59e0b",
-                        color:
-                          p.rsvpStatus === "Pending" ? "#000" : "#fff",
-                      }}
-                    >
-                      {p.rsvpStatus}
-                    </span>
                   </div>
                 </div>
               ))}
@@ -366,7 +347,7 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
           )}
         </div>
 
-        {/* Footer */}
+   
         <div
           style={{
             backgroundColor: "#f9fafb",

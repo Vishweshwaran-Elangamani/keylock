@@ -267,9 +267,7 @@ const HRMomDashboard = () => {
             </div>
           </div>
         </div>
-
-        {/* Table + Pagination */}
-        <div className="card">
+        
           <div className="card-body p-0">
             <div className="mom-table-wrapper">
               <table className="table mom-table mb-0">
@@ -523,7 +521,7 @@ const HRMomDashboard = () => {
                 </div>
               )}
           </div>
-        </div>
+       
       </div>
     </div>
   );
