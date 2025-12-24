@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Common.Entities;
  
-namespace Relevantz.EEPZ.Core.IService
+namespace Relevantz.EEPZ.Core.Services.Interface
 {
     /// <summary>
     /// Service interface for managing goal attachments with MongoDB GridFS storage
