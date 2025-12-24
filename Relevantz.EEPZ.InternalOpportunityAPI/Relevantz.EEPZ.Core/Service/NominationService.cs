@@ -41,7 +41,7 @@ namespace Relevantz.EEPZ.Core.Service
                 }
 
                 var managerUserId = await _nominationRepository.GetManagerFromProjectAsync(employeeId);
-                
+
                 if (managerUserId == null)
                 {
                     Console.WriteLine($"[Service] No manager from project, trying ReportingManagerEmployeeId");
@@ -122,7 +122,7 @@ namespace Relevantz.EEPZ.Core.Service
                 }
 
                 var nomineeL2ManagerUserId = await _nominationRepository.GetManagerFromProjectAsync(request.NomineeEmployeeId);
-                
+
                 if (nomineeL2ManagerUserId == null)
                 {
                     nomineeL2ManagerUserId = await _nominationRepository.GetManagerFromReportingHierarchyAsync(request.NomineeEmployeeId);
@@ -133,7 +133,7 @@ namespace Relevantz.EEPZ.Core.Service
                 }
 
                 var nomineeDeptHeadUserId = await _nominationRepository.GetDeptHeadFromProjectAsync(request.NomineeEmployeeId);
-                
+
                 if (nomineeDeptHeadUserId == null)
                 {
                     nomineeDeptHeadUserId = await _nominationRepository.GetFirstAvailableDeptHeadAsync();
@@ -143,7 +143,7 @@ namespace Relevantz.EEPZ.Core.Service
                 {
                     throw new Exception("Cannot find L2 Manager for nominee. Please contact HR.");
                 }
-                
+
                 if (nomineeDeptHeadUserId == null)
                 {
                     throw new Exception("Cannot find DeptHead for nominee. Please contact HR.");
@@ -563,7 +563,6 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
 
-        // ✅ UPDATED: DeptHead Review - ALL FIELDS OPTIONAL
         public async Task<NominationResponseDto> DepartmentHeadReviewAsync(int nominationId, int deptHeadId, DepartmentHeadReviewRequestDto request)
         {
             try
@@ -585,14 +584,12 @@ namespace Relevantz.EEPZ.Core.Service
                 {
                     Console.WriteLine($"[Service] Processing Approval");
 
-                    // ✅ All fields optional with defaults
                     nomination.DeptHeadReviewRemarks = request.ReviewRemarks ?? "Approved";
                     nomination.DeptHeadReviewedAt = DateTime.UtcNow;
                     nomination.DeptHeadStatus = "Approved";
                     nomination.CurrentApprovalLevel = 3;
                     nomination.Status = "Approved_By_DeptHead";
 
-                    // ✅ Add review metrics ONLY if values provided
                     if (request.MeritScore.HasValue || request.DiversityScore.HasValue || request.ConflictOfInterest.HasValue)
                     {
                         var metric = new Nominationreviewmetric
@@ -601,7 +598,7 @@ namespace Relevantz.EEPZ.Core.Service
                             ReviewedByUserId = deptHeadId,
                             MeritScore = request.MeritScore ?? 0,
                             DiversityScore = request.DiversityScore ?? 0,
-                            ConflictOfInterest = request.ConflictOfInterest ?? false, // ✅ Fixed
+                            ConflictOfInterest = request.ConflictOfInterest ?? false,
                             ReviewNotes = request.ReviewNotes ?? "",
                             ReviewedAt = DateTime.UtcNow
                         };
@@ -644,13 +641,13 @@ namespace Relevantz.EEPZ.Core.Service
 
                     return _mapper.Map<NominationResponseDto>(updated);
                 }
-                else // Rejected
+                else
                 {
                     Console.WriteLine($"[Service] Processing Rejection");
 
-                    // ✅ Use default text if remarks empty
-                    string remarks = string.IsNullOrWhiteSpace(request.ReviewRemarks) 
-                        ? "Rejected by Department Head" 
+
+                    string remarks = string.IsNullOrWhiteSpace(request.ReviewRemarks)
+                        ? "Rejected by Department Head"
                         : request.ReviewRemarks;
 
                     nomination.DeptHeadReviewRemarks = remarks;

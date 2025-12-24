@@ -18,8 +18,6 @@ namespace eepzbackend.Controllers
             _logger = logger;
         }
 
-        // ========== CORE SLA OPERATIONS (10 endpoints) ==========
-
         /// <summary>
         /// Get all SLAs
         /// </summary>

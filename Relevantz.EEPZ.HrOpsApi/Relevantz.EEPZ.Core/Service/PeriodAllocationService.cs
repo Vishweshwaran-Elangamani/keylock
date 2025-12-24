@@ -127,7 +127,7 @@ namespace Relevantz.EEPZ.Core.Service
 
                 // Calculate other periods' total
                 var otherPeriodsTotal = await _context.Budgetperiodallocations
-                    .Where(p => p.BudgetId == periodAllocation.BudgetId 
+                    .Where(p => p.BudgetId == periodAllocation.BudgetId
                              && p.PeriodAllocationId != request.PeriodAllocationId)
                     .SumAsync(p => p.AllocatedAmount);
 
@@ -146,7 +146,7 @@ namespace Relevantz.EEPZ.Core.Service
                 // Recalculate utilization percentage
                 if (periodAllocation.AllocatedAmount > 0)
                 {
-                    periodAllocation.UtilizationPercentage = 
+                    periodAllocation.UtilizationPercentage =
                         (periodAllocation.UtilizedAmount / periodAllocation.AllocatedAmount) * 100;
                 }
 
@@ -189,8 +189,8 @@ namespace Relevantz.EEPZ.Core.Service
 
                 // Check if any HR allocations exist for this period
                 var hasSubAllocations = await _context.Budgetallocations
-                    .AnyAsync(a => a.BudgetId == periodAllocation.BudgetId 
-                                && a.Period == periodAllocation.Period 
+                    .AnyAsync(a => a.BudgetId == periodAllocation.BudgetId
+                                && a.Period == periodAllocation.Period
                                 && a.PeriodYear == periodAllocation.PeriodYear);
 
                 if (hasSubAllocations)
@@ -319,8 +319,8 @@ namespace Relevantz.EEPZ.Core.Service
 
             // Count sub-allocations for this period
             var subAllocationCount = await _context.Budgetallocations
-                .CountAsync(a => a.BudgetId == periodAllocation.BudgetId 
-                              && a.Period == periodAllocation.Period 
+                .CountAsync(a => a.BudgetId == periodAllocation.BudgetId
+                              && a.Period == periodAllocation.Period
                               && a.PeriodYear == periodAllocation.PeriodYear);
 
             return new PeriodAllocationResponseDto

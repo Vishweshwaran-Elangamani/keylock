@@ -2,9 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace eepzbackend.Controllers
 {
-    /// <summary>
-    /// Partial class containing SLA administrative/management endpoints
-    /// </summary>
+
     public partial class SlaController
     {
         /// <summary>

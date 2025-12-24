@@ -25,8 +25,7 @@ public partial class Nominationparameter
 
     public DateTime CreatedAt { get; set; }
 
-    public virtual ICollection<Nominationparametervalue> Nominationparametervalues { get; set; } =
-        new List<Nominationparametervalue>();
+    public virtual ICollection<Nominationparametervalue> Nominationparametervalues { get; set; } = new List<Nominationparametervalue>();
 
     public virtual Rewardtype RewardType { get; set; } = null!;
 }

@@ -255,7 +255,7 @@ namespace Relevantz.EEPZ.Core.Service
                 }
 
                 user.PasswordHash = _passwordService.HashPassword(request.NewPassword);
-                user.IsFirstLogin = false; 
+                user.IsFirstLogin = false;
                 user.UpdatedAt = DateTime.UtcNow;
 
                 await _userAuthRepository.UpdateAsync(user);

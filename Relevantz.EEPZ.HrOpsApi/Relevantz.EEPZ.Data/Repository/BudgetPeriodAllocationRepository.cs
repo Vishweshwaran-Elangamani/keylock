@@ -75,8 +75,8 @@ namespace Relevantz.EEPZ.Data.Repository
             return await _context.Budgetperiodallocations
                 .Include(p => p.Budget)
                     .ThenInclude(b => b.Department)
-                .FirstOrDefaultAsync(p => p.BudgetId == budgetId 
-                    && p.Period == period 
+                .FirstOrDefaultAsync(p => p.BudgetId == budgetId
+                    && p.Period == period
                     && p.PeriodYear == periodYear);
         }
     }

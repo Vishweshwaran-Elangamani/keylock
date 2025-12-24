@@ -6,10 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
-    /// <summary>
-    /// Repository implementation for ManagerReviewComments entity
-    /// Handles manager reviews on team/org goals
-    /// </summary>
+
     public class ManagerReviewRepository : IManagerReviewRepository
     {
         private readonly EEPZDbContext _context;

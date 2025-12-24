@@ -3,11 +3,14 @@ using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repositories.Interface;
+using Serilog;
 
 namespace Relevantz.EEPZ.Data.Repositories.Implementations
 {
     public class LnDAssignmentRepository : ILnDAssignmentRepository
     {
+        #region Dependencies
+
         private readonly EEPZDbContext _context;
 
         public LnDAssignmentRepository(EEPZDbContext context)
@@ -15,14 +18,18 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             _context = context;
         }
 
-        /// <summary>
-        /// Get all assignments that are overdue (past deadline and not completed)
-        /// </summary>
+        #endregion
+
+        #region Overdue Management
+
+        /// <summary>Gets all assignments that are overdue (past deadline and not completed).</summary>
         public async Task<List<Lndassignment>> GetOverdueAssignmentsAsync()
         {
             var today = DateTime.Now.Date;
 
-            return await _context
+            Log.Debug("GetOverdueAssignmentsAsync called. Today={Today}", today);
+
+            var assignments = await _context
                 .Lndassignments.Include(a => a.MenteeEmployee)
                 .Include(a => a.Sme)
                 .Include(a => a.Skill)
@@ -33,14 +40,24 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                     && a.Status != LnDConstants.ASSIGNMENT_STATUS.OVERDUE
                 )
                 .ToListAsync();
+
+            Log.Information("GetOverdueAssignmentsAsync completed. OverdueCount={Count}", assignments.Count);
+
+            return assignments;
         }
 
-        /// <summary>
-        /// Mark assignments as overdue
-        /// </summary>
+        /// <summary>Marks assignments as overdue and updates status in database.</summary>
         public async Task<int> MarkAssignmentsAsOverdueAsync()
         {
+            Log.Information("MarkAssignmentsAsOverdueAsync started");
+
             var overdueAssignments = await GetOverdueAssignmentsAsync();
+
+            if (overdueAssignments.Count == 0)
+            {
+                Log.Information("MarkAssignmentsAsOverdueAsync: No overdue assignments found");
+                return 0;
+            }
 
             foreach (var assignment in overdueAssignments)
             {
@@ -49,12 +66,23 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             }
 
             _context.Lndassignments.UpdateRange(overdueAssignments);
-            return await _context.SaveChangesAsync();
+            var count = await _context.SaveChangesAsync();
+
+            Log.Information("MarkAssignmentsAsOverdueAsync completed. MarkedCount={Count}", count);
+
+            return count;
         }
 
+        #endregion
+
+        #region Assignment Retrieval
+
+        /// <summary>Gets a single assignment by ID with all related entities including mentee, SME, and skill.</summary>
         public async Task<Lndassignment?> GetAssignmentByIdAsync(int assignmentId)
         {
-            return await _context
+            Log.Debug("GetAssignmentByIdAsync called. AssignmentId={AssignmentId}", assignmentId);
+
+            var assignment = await _context
                 .Lndassignments.Include(a => a.MenteeEmployee)
                 .ThenInclude(e => e.Userprofile)
                 .Include(a => a.Sme)
@@ -62,19 +90,21 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .ThenInclude(e => e.Userprofile)
                 .Include(a => a.Skill)
                 .FirstOrDefaultAsync(a => a.AssignmentId == assignmentId);
-        }
 
-        public async Task<Lndassignment> AddAssignmentAsync(Lndassignment assignment)
-        {
-            _context.Lndassignments.Add(assignment);
+            if (assignment == null)
+            {
+                Log.Warning("GetAssignmentByIdAsync: Assignment not found. AssignmentId={AssignmentId}", assignmentId);
+            }
+            else
+            {
+                Log.Debug("GetAssignmentByIdAsync succeeded. AssignmentId={AssignmentId}, Status={Status}",
+                    assignmentId, assignment.Status);
+            }
+
             return assignment;
         }
 
-        public async Task UpdateAssignmentAsync(Lndassignment assignment)
-        {
-            _context.Lndassignments.Update(assignment);
-        }
-
+        /// <summary>Gets paginated assignments for a mentee with filtering and search capabilities.</summary>
         public async Task<(List<Lndassignment> Items, int TotalCount)> GetMyAssignmentsAsync(
             int employeeId,
             string? statusFilter,
@@ -85,6 +115,11 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             int pageSize
         )
         {
+            Log.Information(
+                "GetMyAssignmentsAsync called. EmployeeId={EmployeeId}, StatusFilter={StatusFilter}, Page={PageNumber}",
+                employeeId, statusFilter ?? "all", pageNumber
+            );
+
             var query = _context
                 .Lndassignments.Include(a => a.MenteeEmployee)
                 .ThenInclude(e => e.Userprofile)
@@ -133,9 +168,15 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 
+            Log.Information(
+                "GetMyAssignmentsAsync completed. EmployeeId={EmployeeId}, ReturnedCount={Count}, TotalCount={TotalCount}",
+                employeeId, items.Count, totalCount
+            );
+
             return (items, totalCount);
         }
 
+        /// <summary>Gets paginated assignments for a manager's team with filtering and search capabilities.</summary>
         public async Task<(List<Lndassignment> Items, int TotalCount)> GetTeamAssignmentsAsync(
             int managerId,
             string? statusFilter,
@@ -146,13 +187,20 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             int pageSize
         )
         {
+            Log.Information(
+                "GetTeamAssignmentsAsync called. ManagerId={ManagerId}, StatusFilter={StatusFilter}, Page={PageNumber}",
+                managerId, statusFilter ?? "all", pageNumber
+            );
+
             var query = _context
-                .Lndassignments.Include(a => a.MenteeEmployee)
+                .Lndassignments
+                .Include(a => a.MenteeEmployee)
                 .ThenInclude(e => e.Userprofile)
                 .Include(a => a.Sme)
                 .ThenInclude(s => s.Employee)
                 .ThenInclude(e => e.Userprofile)
                 .Include(a => a.Skill)
+                .Include(a => a.Lndapprovals)
                 .Where(a => a.MenteeEmployee.ReportingManagerEmployeeId == managerId);
 
             if (!string.IsNullOrEmpty(statusFilter))
@@ -223,7 +271,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                         ? query.OrderBy(a => a.CompletionRating ?? 0)
                         : query.OrderByDescending(a => a.CompletionRating ?? 0),
 
-                    _ => query.OrderByDescending(a => a.CreatedOn), // Default sort
+                    _ => query.OrderByDescending(a => a.CreatedOn),
                 };
             }
             else
@@ -235,9 +283,27 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 
+            foreach (var item in items)
+            {
+                var latestApproval = item.Lndapprovals
+                    .OrderByDescending(ap => ap.UpdatedOn)
+                    .FirstOrDefault();
+
+                if (latestApproval != null && !string.IsNullOrEmpty(latestApproval.Notes))
+                {
+                    item.CompletionNotes = latestApproval.Notes;
+                }
+            }
+
+            Log.Information(
+                "GetTeamAssignmentsAsync completed. ManagerId={ManagerId}, ReturnedCount={Count}, TotalCount={TotalCount}",
+                managerId, items.Count, totalCount
+            );
+
             return (items, totalCount);
         }
 
+        /// <summary>Gets paginated assignments where employee is the assigned SME with filtering and search.</summary>
         public async Task<(List<Lndassignment> Items, int TotalCount)> GetSmeAssignmentsAsync(
             int smeEmployeeId,
             string? statusFilter,
@@ -248,6 +314,11 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             int pageSize
         )
         {
+            Log.Information(
+                "GetSmeAssignmentsAsync called. SmeEmployeeId={SmeEmployeeId}, StatusFilter={StatusFilter}, Page={PageNumber}",
+                smeEmployeeId, statusFilter ?? "all", pageNumber
+            );
+
             var query = _context
                 .Lndassignments.Include(a => a.MenteeEmployee)
                 .ThenInclude(e => e.Userprofile)
@@ -317,9 +388,15 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 
+            Log.Information(
+                "GetSmeAssignmentsAsync completed. SmeEmployeeId={SmeEmployeeId}, ReturnedCount={Count}, TotalCount={TotalCount}",
+                smeEmployeeId, items.Count, totalCount
+            );
+
             return (items, totalCount);
         }
 
+        /// <summary>Gets all team assignments for Excel export without pagination.</summary>
         public async Task<List<Lndassignment>> GetAllTeamAssignmentsForExportAsync(
             int managerId,
             string? statusFilter,
@@ -328,6 +405,11 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             string? sortOrder
         )
         {
+            Log.Information(
+                "GetAllTeamAssignmentsForExportAsync called. ManagerId={ManagerId}, StatusFilter={StatusFilter}",
+                managerId, statusFilter ?? "all"
+            );
+
             var query = _context
                 .Lndassignments.Include(a => a.MenteeEmployee)
                 .ThenInclude(e => e.Userprofile)
@@ -364,9 +446,53 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             query = ApplyAssignmentSorting(query, sortField, sortOrder);
 
-            return await query.ToListAsync();
+            var items = await query.ToListAsync();
+
+            Log.Information(
+                "GetAllTeamAssignmentsForExportAsync completed. ManagerId={ManagerId}, TotalCount={Count}",
+                managerId, items.Count
+            );
+
+            return items;
         }
 
+        #endregion
+
+        #region Assignment Modifications
+
+        /// <summary>Adds a new assignment to the database context (requires SaveChanges).</summary>
+        public async Task<Lndassignment> AddAssignmentAsync(Lndassignment assignment)
+        {
+            Log.Information(
+                "AddAssignmentAsync called. MenteeId={MenteeId}, SmeId={SmeId}, SkillId={SkillId}",
+                assignment.MenteeEmployeeId, assignment.SmeId, assignment.SkillId
+            );
+
+            _context.Lndassignments.Add(assignment);
+
+            Log.Debug("AddAssignmentAsync: Assignment added to context. Pending SaveChanges");
+
+            return assignment;
+        }
+
+        /// <summary>Updates an existing assignment in the database context (requires SaveChanges).</summary>
+        public async Task UpdateAssignmentAsync(Lndassignment assignment)
+        {
+            Log.Information(
+                "UpdateAssignmentAsync called. AssignmentId={AssignmentId}, Status={Status}",
+                assignment.AssignmentId, assignment.Status
+            );
+
+            _context.Lndassignments.Update(assignment);
+
+            Log.Debug("UpdateAssignmentAsync: Assignment updated in context. Pending SaveChanges");
+        }
+
+        #endregion
+
+        #region Private Helpers
+
+        /// <summary>Applies sorting logic to assignment queries based on sort field and order.</summary>
         private IQueryable<Lndassignment> ApplyAssignmentSorting(
             IQueryable<Lndassignment> query,
             string? sortField,
@@ -405,9 +531,6 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             };
         }
 
-        public async Task<int> SaveChangesAsync()
-        {
-            return await _context.SaveChangesAsync();
-        }
+        #endregion
     }
 }

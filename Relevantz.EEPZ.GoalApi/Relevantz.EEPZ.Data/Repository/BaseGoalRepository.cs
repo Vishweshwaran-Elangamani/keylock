@@ -12,13 +12,13 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
     public class BaseGoalRepository : IBaseGoalRepository
     {
-        private readonly EEPZDbContext _db;
-        private readonly IWebHostEnvironment environment;
+        private readonly EEPZDbContext _db;    
+        private readonly IWebHostEnvironment environment;    
 
         public BaseGoalRepository(EEPZDbContext db, IWebHostEnvironment _environment)
         {
-            _db = db;
-            environment = _environment;
+            _db = db;   
+            environment = _environment;   
         }
 
         public async Task<Employeedetailsmaster?> GetEmployeeDetailsByMasterIdAsync(
@@ -39,7 +39,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     .AsNoTracking()
                     .FirstOrDefaultAsync(e => e.EmployeeMasterId == employeeMasterId);
 
-                if (result == null)
+                if (result == null)  
                 {
                     Log.Warning(
                         "[GetEmployeeDetailsByMasterIdAsync] EDM not found for {ID}",

@@ -3,10 +3,7 @@ using Relevantz.EEPZ.Common.DTOs.Response;
 
 namespace Relevantz.EEPZ.Core.Services.Interfaces
 {
-    /// <summary>
-    /// Service interface for Organization-Level Goal Feedback
-    /// Uses Feedback table filtered by Goal.GoalType = "Organization"
-    /// </summary>
+
     public interface IOrgGoalFeedbackService
     {
         Task<OrgGoalFeedbackResponseDto> CreateOrgGoalFeedbackAsync(CreateOrgGoalFeedbackRequestDto dto);

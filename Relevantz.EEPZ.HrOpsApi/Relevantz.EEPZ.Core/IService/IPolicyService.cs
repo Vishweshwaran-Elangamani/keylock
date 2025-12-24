@@ -11,12 +11,12 @@ namespace Relevantz.EEPZ.Core.IService
         Task<ApiResponseDto<List<PolicyResponseDto>>> GetAllPoliciesAsync();
         Task<ApiResponseDto<List<PolicyResponseDto>>> GetActivePoliciesAsync();
         Task<ApiResponseDto<List<PolicyResponseDto>>> GetInactivePoliciesAsync();
-        Task<ApiResponseDto<List<PolicyResponseDto>>> GetPublishedPoliciesAsync(); //  NEW
-        Task<ApiResponseDto<List<PolicyResponseDto>>> GetDraftPoliciesAsync(); //  NEW
+        Task<ApiResponseDto<List<PolicyResponseDto>>> GetPublishedPoliciesAsync();
+        Task<ApiResponseDto<List<PolicyResponseDto>>> GetDraftPoliciesAsync();
         Task<ApiResponseDto<PolicyResponseDto>> GetPolicyByIdAsync(int policyId);
         Task<ApiResponseDto<PolicyResponseDto>> UpdatePolicyAsync(int policyId, UpdatePolicyRequestDto request);
         Task<ApiResponseDto<bool>> DeletePolicyAsync(int policyId);
         Task<ApiResponseDto<PolicyResponseDto>> UnpublishPolicyAsync(int policyId, int userId);
-        Task<ApiResponseDto<string>> PublishPolicyAsync(int policyId, int publishedBy); //  NEW
+        Task<ApiResponseDto<string>> PublishPolicyAsync(int policyId, int publishedBy);
     }
 }

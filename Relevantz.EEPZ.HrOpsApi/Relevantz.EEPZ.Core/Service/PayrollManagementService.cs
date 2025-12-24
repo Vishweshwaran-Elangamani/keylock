@@ -5,14 +5,14 @@ using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.IRepository;
 using Relevantz.EEPZ.Core.IService;
 using Microsoft.EntityFrameworkCore;
- 
+
 namespace Relevantz.EEPZ.Core.Service
 {
     public class PayrollManagementService : IPayrollManagementService
     {
         private readonly IPayrollManagementRepository _payrollRepository;
         private readonly EEPZDbContext _context;
- 
+
         public PayrollManagementService(
             IPayrollManagementRepository payrollRepository,
             EEPZDbContext context)
@@ -20,14 +20,14 @@ namespace Relevantz.EEPZ.Core.Service
             _payrollRepository = payrollRepository;
             _context = context;
         }
- 
+
         public async Task<ApiResponseDto<PayrollResponseDto>> CreatePayrollAsync(CreatePayrollRequestDto request)
         {
             try
             {
                 Console.WriteLine($"Creating payroll for EmployeeUserId: {request.EmployeeUserId}");
- 
- 
+
+
                 var hasPending = await _payrollRepository.HasPendingPayrollAsync(request.EmployeeUserId);
                 if (hasPending)
                 {
@@ -35,13 +35,13 @@ namespace Relevantz.EEPZ.Core.Service
                     return ApiResponseDto<PayrollResponseDto>.FailureResponse(
                         "Employee already has a pending payroll. Please wait for approval.");
                 }
- 
+
                 decimal incrementPercentage = 0;
                 if (request.OldSalary > 0)
                 {
                     incrementPercentage = ((request.NewSalary - request.OldSalary) / request.OldSalary) * 100;
                 }
- 
+
                 var payroll = new Payroll
                 {
                     EmployeeUserId = request.EmployeeUserId,
@@ -55,11 +55,11 @@ namespace Relevantz.EEPZ.Core.Service
                     Notes = request.Notes,
                     CreatedAt = DateTime.UtcNow
                 };
- 
+
                 var createdPayroll = await _payrollRepository.CreateAsync(payroll);
- 
+
                 var response = await BuildPayrollResponse(createdPayroll.PayrollId);
- 
+
                 Console.WriteLine($"Payroll created successfully with PayrollId: {createdPayroll.PayrollId}");
                 return ApiResponseDto<PayrollResponseDto>.SuccessResponse(
                     response,
@@ -72,41 +72,41 @@ namespace Relevantz.EEPZ.Core.Service
                     "An error occurred while creating payroll");
             }
         }
- 
+
         public async Task<ApiResponseDto<PayrollResponseDto>> UpdatePayrollAsync(UpdatePayrollRequestDto request)
         {
             try
             {
                 Console.WriteLine($"Updating payroll with PayrollId: {request.PayrollId}");
- 
+
                 var payroll = await _payrollRepository.GetByIdAsync(request.PayrollId);
                 if (payroll == null)
                 {
                     Console.WriteLine($"Payroll not found: {request.PayrollId}");
                     return ApiResponseDto<PayrollResponseDto>.FailureResponse("Payroll not found");
                 }
- 
+
                 if (payroll.Status != "Pending")
                 {
                     Console.WriteLine($"Cannot update payroll with status: {payroll.Status}");
                     return ApiResponseDto<PayrollResponseDto>.FailureResponse(
                         "Only pending payrolls can be updated");
                 }
- 
+
                 payroll.NewSalary = request.NewSalary;
                 payroll.EffectiveDate = request.EffectiveDate;
                 payroll.Notes = request.Notes;
- 
+
                 if (payroll.OldSalary > 0)
                 {
                     payroll.IncrementPercentage = ((payroll.NewSalary - payroll.OldSalary) / payroll.OldSalary) * 100;
                 }
- 
+
                 var updatedPayroll = await _payrollRepository.UpdateAsync(payroll);
- 
+
                 // Build response
                 var response = await BuildPayrollResponse(updatedPayroll.PayrollId);
- 
+
                 Console.WriteLine($"Payroll updated successfully: {request.PayrollId}");
                 return ApiResponseDto<PayrollResponseDto>.SuccessResponse(
                     response,
@@ -119,27 +119,27 @@ namespace Relevantz.EEPZ.Core.Service
                     "An error occurred while updating payroll");
             }
         }
- 
+
         public async Task<ApiResponseDto<PayrollResponseDto>> ApprovePayrollAsync(ApprovePayrollRequestDto request)
         {
             try
             {
                 Console.WriteLine($"Approving payroll with PayrollId: {request.PayrollId}");
- 
+
                 var payroll = await _payrollRepository.GetByIdAsync(request.PayrollId);
                 if (payroll == null)
                 {
                     Console.WriteLine($"Payroll not found: {request.PayrollId}");
                     return ApiResponseDto<PayrollResponseDto>.FailureResponse("Payroll not found");
                 }
- 
+
                 if (payroll.Status != "Pending")
                 {
                     Console.WriteLine($"Payroll already {payroll.Status}");
                     return ApiResponseDto<PayrollResponseDto>.FailureResponse(
                         $"Payroll is already {payroll.Status.ToLower()}");
                 }
- 
+
                 payroll.Status = "Approved";
                 payroll.ApprovedByUserId = request.ApprovedByUserId;
                 payroll.ApprovedAt = DateTime.UtcNow;
@@ -147,11 +147,11 @@ namespace Relevantz.EEPZ.Core.Service
                 {
                     payroll.Notes = request.Notes;
                 }
- 
+
                 var approvedPayroll = await _payrollRepository.UpdateAsync(payroll);
- 
+
                 var response = await BuildPayrollResponse(approvedPayroll.PayrollId);
- 
+
                 Console.WriteLine($"Payroll approved successfully: {request.PayrollId}");
                 return ApiResponseDto<PayrollResponseDto>.SuccessResponse(
                     response,
@@ -164,33 +164,33 @@ namespace Relevantz.EEPZ.Core.Service
                     "An error occurred while approving payroll");
             }
         }
- 
+
         public async Task<ApiResponseDto<PayrollResponseDto>> ProcessPayrollAsync(int payrollId)
         {
             try
             {
                 Console.WriteLine($"Processing payroll with PayrollId: {payrollId}");
- 
+
                 var payroll = await _payrollRepository.GetByIdAsync(payrollId);
                 if (payroll == null)
                 {
                     Console.WriteLine($"Payroll not found: {payrollId}");
                     return ApiResponseDto<PayrollResponseDto>.FailureResponse("Payroll not found");
                 }
- 
+
                 if (payroll.Status != "Approved")
                 {
                     Console.WriteLine($"Payroll status is {payroll.Status}, not Approved");
                     return ApiResponseDto<PayrollResponseDto>.FailureResponse(
                         "Only approved payrolls can be processed");
                 }
- 
+
                 payroll.Status = "Processed";
- 
+
                 var processedPayroll = await _payrollRepository.UpdateAsync(payroll);
- 
+
                 var response = await BuildPayrollResponse(processedPayroll.PayrollId);
- 
+
                 Console.WriteLine($"Payroll processed successfully: {payrollId}");
                 return ApiResponseDto<PayrollResponseDto>.SuccessResponse(
                     response,
@@ -203,20 +203,20 @@ namespace Relevantz.EEPZ.Core.Service
                     "An error occurred while processing payroll");
             }
         }
- 
+
         public async Task<ApiResponseDto<PayrollResponseDto>> GetPayrollByIdAsync(int payrollId)
         {
             try
             {
                 Console.WriteLine($"Fetching payroll with PayrollId: {payrollId}");
- 
+
                 var payroll = await _payrollRepository.GetByIdAsync(payrollId);
                 if (payroll == null)
                 {
                     Console.WriteLine($"Payroll not found: {payrollId}");
                     return ApiResponseDto<PayrollResponseDto>.FailureResponse("Payroll not found");
                 }
- 
+
                 var response = await BuildPayrollResponse(payrollId);
                 return ApiResponseDto<PayrollResponseDto>.SuccessResponse(
                     response,
@@ -229,21 +229,21 @@ namespace Relevantz.EEPZ.Core.Service
                     "An error occurred while fetching payroll");
             }
         }
- 
+
         public async Task<ApiResponseDto<List<PayrollResponseDto>>> GetAllPayrollsAsync()
         {
             try
             {
                 Console.WriteLine("Fetching all payrolls");
- 
+
                 var payrolls = await _payrollRepository.GetAllAsync();
                 var response = new List<PayrollResponseDto>();
- 
+
                 foreach (var payroll in payrolls)
                 {
                     response.Add(await BuildPayrollResponse(payroll.PayrollId));
                 }
- 
+
                 return ApiResponseDto<List<PayrollResponseDto>>.SuccessResponse(
                     response,
                     $"Retrieved {response.Count} payrolls");
@@ -255,21 +255,21 @@ namespace Relevantz.EEPZ.Core.Service
                     "An error occurred while fetching payrolls");
             }
         }
- 
+
         public async Task<ApiResponseDto<List<PayrollResponseDto>>> GetPayrollsByEmployeeAsync(int EmployeeUserId)
         {
             try
             {
                 Console.WriteLine($"Fetching payrolls for EmployeeUserId: {EmployeeUserId}");
- 
+
                 var payrolls = await _payrollRepository.GetByEmployeeUserIdAsync(EmployeeUserId);
                 var response = new List<PayrollResponseDto>();
- 
+
                 foreach (var payroll in payrolls)
                 {
                     response.Add(await BuildPayrollResponse(payroll.PayrollId));
                 }
- 
+
                 return ApiResponseDto<List<PayrollResponseDto>>.SuccessResponse(
                     response,
                     $"Retrieved {response.Count} payrolls for employee");
@@ -281,21 +281,21 @@ namespace Relevantz.EEPZ.Core.Service
                     "An error occurred while fetching payrolls");
             }
         }
- 
+
         public async Task<ApiResponseDto<List<PayrollResponseDto>>> GetPayrollsByStatusAsync(string status)
         {
             try
             {
                 Console.WriteLine($"Fetching payrolls with Status: {status}");
- 
+
                 var payrolls = await _payrollRepository.GetByStatusAsync(status);
                 var response = new List<PayrollResponseDto>();
- 
+
                 foreach (var payroll in payrolls)
                 {
                     response.Add(await BuildPayrollResponse(payroll.PayrollId));
                 }
- 
+
                 return ApiResponseDto<List<PayrollResponseDto>>.SuccessResponse(
                     response,
                     $"Retrieved {response.Count} payrolls with status: {status}");
@@ -307,7 +307,7 @@ namespace Relevantz.EEPZ.Core.Service
                     "An error occurred while fetching payrolls");
             }
         }
- 
+
         private async Task<PayrollResponseDto> BuildPayrollResponse(int payrollId)
         {
             var payroll = await _context.Payrolls
@@ -343,7 +343,7 @@ namespace Relevantz.EEPZ.Core.Service
                     p.ApprovedAt
                 })
                 .FirstOrDefaultAsync();
- 
+
             return new PayrollResponseDto
             {
                 PayrollId = payroll.PayrollId,
@@ -365,8 +365,7 @@ namespace Relevantz.EEPZ.Core.Service
             };
         }
     }
- 
- 
+
+
 }
- 
- 
+

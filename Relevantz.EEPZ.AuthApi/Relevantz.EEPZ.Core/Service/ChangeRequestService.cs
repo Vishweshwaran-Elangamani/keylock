@@ -136,7 +136,7 @@ namespace Relevantz.EEPZ.Core.Service
                     Status = Constants.RequestStatuses.Pending,
                     RequestedByUserId = userId,
                     RequestedAt = DateTime.UtcNow,
-                    CurrentPassword = user.PasswordHash 
+                    CurrentPassword = user.PasswordHash
                 };
 
                 await _changeRequestRepository.CreateAsync(changeRequest);

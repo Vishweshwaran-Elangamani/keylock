@@ -13,8 +13,6 @@ namespace Relevantz.EEPZ.Core.Service
             _emailService = emailService;
         }
 
-        // ========== EXISTING METHODS (NO DUPLICATES) ==========
-
         public async Task SendNominationCreatedEmailAsync(string recipientEmail, string employeeName, string opportunityName, string nominatedByName)
         {
             var subject = "You have been nominated for an internal opportunity";
@@ -73,23 +71,20 @@ namespace Relevantz.EEPZ.Core.Service
 
         public async Task SendManagerReviewEmailAsync(string recipientEmail, int nominationId, string nomineeName)
         {
-            // Placeholder for future implementation
+
             await Task.CompletedTask;
         }
 
         public async Task SendDeptHeadReviewEmailAsync(string recipientEmail, int nominationId, string nomineeName)
         {
-            // Placeholder for future implementation
             await Task.CompletedTask;
         }
 
         public async Task SendPromotionApprovedEmailAsync(string recipientEmail, string employeeName, string newRole, decimal newSalary)
         {
-            // Placeholder for future implementation
             await Task.CompletedTask;
         }
 
-        // ========== ✅ NEW METHODS - L2 MANAGER REVIEW ==========
 
         public async Task SendL2ReviewRequestEmailAsync(string l2Email, string l2Name, string nomineeName, string opportunityName)
         {
@@ -147,8 +142,6 @@ namespace Relevantz.EEPZ.Core.Service
             await _emailService.SendEmailAsync(nomineeEmail, subject, htmlBody);
             Console.WriteLine($"[NotificationService] L2 Rejected email sent to {nomineeEmail}");
         }
-
-        // ========== ✅ NEW METHODS - DEPT HEAD REVIEW ==========
 
         public async Task SendDeptHeadReviewRequestEmailAsync(string deptHeadEmail, string deptHeadName, string nomineeName, string opportunityName)
         {
@@ -244,8 +237,6 @@ namespace Relevantz.EEPZ.Core.Service
             await _emailService.SendEmailAsync(nomineeEmail, subject, htmlBody);
             Console.WriteLine($"[NotificationService] DeptHead Rejection Notification sent to Nominee: {nomineeEmail}");
         }
-
-        // ========== ✅ NEW METHODS - L2 RE-REVIEW ==========
 
         public async Task SendL2ReApprovedEmailAsync(string nomineeEmail, string nomineeName, string opportunityName, string l2Name)
         {

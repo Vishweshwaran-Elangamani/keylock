@@ -87,7 +87,7 @@ namespace Relevantz.EEPZ.Data.Repository
         {
             var employeeDetails = await _context.Employeedetailsmasters
                 .FirstOrDefaultAsync(edm => edm.EmployeeId == employeeId);
-            
+
             if (employeeDetails == null)
                 return false;
 

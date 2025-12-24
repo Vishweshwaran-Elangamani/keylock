@@ -7,7 +7,7 @@ using ILogger = Microsoft.Extensions.Logging.ILogger;
 using Relevantz.EEPZ.Core.IService;
 namespace Relevantz.EEPZ.Api.Controllers.Goals
 {
-    [Route("api/goal-attachments")]
+    [Route("api/goal-attachments")]  
     public class GoalAttachmentsController : BaseGoalController
     {
         protected readonly IGoalAttachmentService _service;
@@ -112,7 +112,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// List all attachments for a goal
         /// </summary>
-        [HttpGet("{goalId:int}")]
+        [HttpGet("{goalId:int}")]  
         public async Task<IActionResult> ListAttachments(int goalId)
         {
             try

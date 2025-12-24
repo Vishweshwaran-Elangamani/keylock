@@ -1,26 +1,29 @@
-using Relevantz.EEPZ.Common.Entities;
+
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Relevantz.EEPZ.Data.DBContexts;
-using Relevantz.EEPZ.Common.DTOs.Request; 
+using Microsoft.Extensions.Logging;
+using Relevantz.EEPZ.Common.DTOs.Request;
+using Relevantz.EEPZ.Common.DTOs.Response;
+using Relevantz.EEPZ.Core.Services.Interfaces;
+using Serilog;
 
 namespace eepzbackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    // [Authorize(Roles ="HR")]
+    // [Authorize(Roles = "HR")]
     public class EmployeeManagementController : ControllerBase
     {
-        private readonly EEPZDbContext _context;
+        private readonly IEmployeeService _employeeService;
+        private readonly ILogger<EmployeeManagementController> _logger;
 
-        public EmployeeManagementController(EEPZDbContext context)
+        public EmployeeManagementController(IEmployeeService employeeService, ILogger<EmployeeManagementController> logger)
         {
-            _context = context;
+            _employeeService = employeeService;
+            _logger = logger;
         }
 
         /// <summary>
-        /// Get all active employees with their details
-        /// Used for Resource Owner dropdown
+        /// Get all active employees with their details. Used for Resource Owner dropdown
         /// </summary>
         [HttpGet("all")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -29,44 +32,20 @@ namespace eepzbackend.Controllers
         {
             try
             {
-                var employees = await _context.Employeedetailsmasters
-                    .Include(e => e.Employee)
-                        .ThenInclude(e => e.Userprofile)
-                    .Include(e => e.Employee)
-                        .ThenInclude(e => e.Userauthentication)
-                    .Include(e => e.Role)
-                    .Include(e => e.Department)
-                    .Where(e => e.Employee.IsActive == true)
-                    .OrderBy(e => e.Employee.Userprofile.FirstName)
-                    .Select(e => new
-                    {
-                        e.EmployeeMasterId,
-                        e.EmployeeId,
-                        EmployeeCompanyId = e.Employee.EmployeeCompanyId,
-                        FirstName = e.Employee.Userprofile.FirstName,
-                        LastName = e.Employee.Userprofile.LastName,
-                        Email = e.Employee.Userauthentication.Email,
-                        RoleName = e.Role.RoleName,
-                        DepartmentName = e.Department.DepartmentName
-                    })
-                    .ToListAsync();
-
-                return Ok(new { success = true, data = employees });
+                _logger.LogInformation("HR requested all active employees");
+                var result = await _employeeService.GetAllEmployeesAsync();
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = "Failed to retrieve employees",
-                    error = ex.Message
-                });
+                _logger.LogError(ex, "Controller failed to retrieve all employees");
+                Log.Error(ex, "EmployeeRetrievalController: Failed to retrieve all employees");
+                return StatusCode(500, new { success = false, message = "Failed to retrieve employees", error = ex.Message });
             }
         }
 
         /// <summary>
-        /// Get only managers/senior roles for approver dropdowns
-        /// Used for L1 and L2 Approver dropdowns
+        /// Get only managers/senior roles for approver dropdowns. Used for L1 and L2 Approver dropdowns
         /// </summary>
         [HttpGet("managers")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -75,53 +54,15 @@ namespace eepzbackend.Controllers
         {
             try
             {
-                var managerRoles = new[]
-                {
-                    "Project Manager",
-                    "Team Lead",
-                    "Technical Architect",
-                    "HR Manager",
-                    "Senior Software Engineer",
-                    "Senior Manager",
-                    "Director",
-                    "Vice President",
-                    "CTO",
-                    "CEO"
-                };
-
-                var managers = await _context.Employeedetailsmasters
-                    .Include(e => e.Employee)
-                        .ThenInclude(e => e.Userprofile)
-                    .Include(e => e.Employee)
-                        .ThenInclude(e => e.Userauthentication)
-                    .Include(e => e.Role)
-                    .Include(e => e.Department)
-                    .Where(e => e.Employee.IsActive == true &&
-                               managerRoles.Contains(e.Role.RoleName))
-                    .OrderBy(e => e.Employee.Userprofile.FirstName)
-                    .Select(e => new
-                    {
-                        e.EmployeeMasterId,
-                        e.EmployeeId,
-                        EmployeeCompanyId = e.Employee.EmployeeCompanyId,
-                        FirstName = e.Employee.Userprofile.FirstName,
-                        LastName = e.Employee.Userprofile.LastName,
-                        Email = e.Employee.Userauthentication.Email,
-                        RoleName = e.Role.RoleName,
-                        DepartmentName = e.Department.DepartmentName
-                    })
-                    .ToListAsync();
-
-                return Ok(new { success = true, data = managers });
+                _logger.LogInformation("HR requested manager employees for approver dropdowns");
+                var result = await _employeeService.GetManagersAsync();
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = "Failed to retrieve managers",
-                    error = ex.Message
-                });
+                _logger.LogError(ex, "Controller failed to retrieve managers");
+                Log.Error(ex, "EmployeeRetrievalController: Failed to retrieve managers");
+                return StatusCode(500, new { success = false, message = "Failed to retrieve managers", error = ex.Message });
             }
         }
 
@@ -136,47 +77,19 @@ namespace eepzbackend.Controllers
         {
             try
             {
-                var employee = await _context.Employeedetailsmasters
-                    .Include(e => e.Employee)
-                        .ThenInclude(e => e.Userprofile)
-                    .Include(e => e.Employee)
-                        .ThenInclude(e => e.Userauthentication)
-                    .Include(e => e.Role)
-                    .Include(e => e.Department)
-                    .Where(e => e.EmployeeMasterId == employeeMasterId)
-                    .Select(e => new
-                    {
-                        e.EmployeeMasterId,
-                        e.EmployeeId,
-                        EmployeeCompanyId = e.Employee.EmployeeCompanyId,
-                        FirstName = e.Employee.Userprofile.FirstName,
-                        LastName = e.Employee.Userprofile.LastName,
-                        Email = e.Employee.Userauthentication.Email,
-                        RoleName = e.Role.RoleName,
-                        DepartmentName = e.Department.DepartmentName,
-                        IsActive = e.Employee.IsActive
-                    })
-                    .FirstOrDefaultAsync();
+                _logger.LogInformation("HR requested employee details for ID: {EmployeeMasterId}", employeeMasterId);
+                var result = await _employeeService.GetEmployeeByIdAsync(employeeMasterId);
+                
+                if (!result.Success && result.Data == null)
+                    return NotFound(result);
 
-                if (employee == null)
-                {
-                    return NotFound(new
-                    {
-                        success = false,
-                        message = "Employee not found"
-                    });
-                }
-
-                return Ok(new { success = true, data = employee });
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = "Failed to retrieve employee",
-                    error = ex.Message
-                });
+                _logger.LogError(ex, "Controller failed to retrieve employee {EmployeeMasterId}", employeeMasterId);
+                Log.Error(ex, "EmployeeRetrievalController: Failed to retrieve employee {EmployeeMasterId}", employeeMasterId);
+                return StatusCode(500, new { success = false, message = "Failed to retrieve employee", error = ex.Message });
             }
         }
 
@@ -185,59 +98,25 @@ namespace eepzbackend.Controllers
         /// </summary>
         [HttpGet("search")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> SearchEmployees([FromQuery] string query)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(query))
-                {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = "Search query is required"
-                    });
-                }
+                _logger.LogInformation("HR requested employee search with query: {SearchQuery}", query);
+                var result = await _employeeService.SearchEmployeesAsync(query);
+                
+                if (!result.Success && result.Message == "Search query is required")
+                    return BadRequest(result);
 
-                var searchTerm = query.ToLower();
-
-                var employees = await _context.Employeedetailsmasters
-                    .Include(e => e.Employee)
-                        .ThenInclude(e => e.Userprofile)
-                    .Include(e => e.Employee)
-                        .ThenInclude(e => e.Userauthentication)
-                    .Include(e => e.Role)
-                    .Include(e => e.Department)
-                    .Where(e => e.Employee.IsActive == true &&
-                               (e.Employee.Userprofile.FirstName.ToLower().Contains(searchTerm) ||
-                                e.Employee.Userprofile.LastName.ToLower().Contains(searchTerm) ||
-                                e.Employee.EmployeeCompanyId.ToLower().Contains(searchTerm) ||
-                                e.Employee.Userauthentication.Email.ToLower().Contains(searchTerm)))
-                    .OrderBy(e => e.Employee.Userprofile.FirstName)
-                    .Take(50) 
-                    .Select(e => new
-                    {
-                        e.EmployeeMasterId,
-                        e.EmployeeId,
-                        EmployeeCompanyId = e.Employee.EmployeeCompanyId,
-                        FirstName = e.Employee.Userprofile.FirstName,
-                        LastName = e.Employee.Userprofile.LastName,
-                        Email = e.Employee.Userauthentication.Email,
-                        RoleName = e.Role.RoleName,
-                        DepartmentName = e.Department.DepartmentName
-                    })
-                    .ToListAsync();
-
-                return Ok(new { success = true, data = employees, count = employees.Count });
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = "Failed to search employees",
-                    error = ex.Message
-                });
+                _logger.LogError(ex, "Controller failed to search employees with query: {SearchQuery}", query);
+                Log.Error(ex, "EmployeeRetrievalController: Failed to search employees");
+                return StatusCode(500, new { success = false, message = "Failed to search employees", error = ex.Message });
             }
         }
 
@@ -251,38 +130,15 @@ namespace eepzbackend.Controllers
         {
             try
             {
-                var employees = await _context.Employeedetailsmasters
-                    .Include(e => e.Employee)
-                        .ThenInclude(e => e.Userprofile)
-                    .Include(e => e.Employee)
-                        .ThenInclude(e => e.Userauthentication)
-                    .Include(e => e.Role)
-                    .Include(e => e.Department)
-                    .Where(e => e.Employee.IsActive == true && e.DepartmentId == departmentId)
-                    .OrderBy(e => e.Employee.Userprofile.FirstName)
-                    .Select(e => new
-                    {
-                        e.EmployeeMasterId,
-                        e.EmployeeId,
-                        EmployeeCompanyId = e.Employee.EmployeeCompanyId,
-                        FirstName = e.Employee.Userprofile.FirstName,
-                        LastName = e.Employee.Userprofile.LastName,
-                        Email = e.Employee.Userauthentication.Email,
-                        RoleName = e.Role.RoleName,
-                        DepartmentName = e.Department.DepartmentName
-                    })
-                    .ToListAsync();
-
-                return Ok(new { success = true, data = employees, count = employees.Count });
+                _logger.LogInformation("HR requested employees for department ID: {DepartmentId}", departmentId);
+                var result = await _employeeService.GetEmployeesByDepartmentAsync(departmentId);
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = "Failed to retrieve employees by department",
-                    error = ex.Message
-                });
+                _logger.LogError(ex, "Controller failed to retrieve employees for department {DepartmentId}", departmentId);
+                Log.Error(ex, "EmployeeRetrievalController: Failed to retrieve department employees");
+                return StatusCode(500, new { success = false, message = "Failed to retrieve employees by department", error = ex.Message });
             }
         }
 
@@ -296,44 +152,20 @@ namespace eepzbackend.Controllers
         {
             try
             {
-                var employees = await _context.Employeedetailsmasters
-                    .Include(e => e.Employee)
-                        .ThenInclude(e => e.Userprofile)
-                    .Include(e => e.Employee)
-                        .ThenInclude(e => e.Userauthentication)
-                    .Include(e => e.Role)
-                    .Include(e => e.Department)
-                    .Where(e => e.Employee.IsActive == true && e.RoleId == roleId)
-                    .OrderBy(e => e.Employee.Userprofile.FirstName)
-                    .Select(e => new
-                    {
-                        e.EmployeeMasterId,
-                        e.EmployeeId,
-                        EmployeeCompanyId = e.Employee.EmployeeCompanyId,
-                        FirstName = e.Employee.Userprofile.FirstName,
-                        LastName = e.Employee.Userprofile.LastName,
-                        Email = e.Employee.Userauthentication.Email,
-                        RoleName = e.Role.RoleName,
-                        DepartmentName = e.Department.DepartmentName
-                    })
-                    .ToListAsync();
-
-                return Ok(new { success = true, data = employees, count = employees.Count });
+                _logger.LogInformation("HR requested employees for role ID: {RoleId}", roleId);
+                var result = await _employeeService.GetEmployeesByRoleAsync(roleId);
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = "Failed to retrieve employees by role",
-                    error = ex.Message
-                });
+                _logger.LogError(ex, "Controller failed to retrieve employees for role {RoleId}", roleId);
+                Log.Error(ex, "EmployeeRetrievalController: Failed to retrieve role employees");
+                return StatusCode(500, new { success = false, message = "Failed to retrieve employees by role", error = ex.Message });
             }
         }
 
         /// <summary>
-        /// Get all departments
-        /// Used for Department dropdown in project forms
+        /// Get all departments. Used for Department dropdown in project forms
         /// </summary>
         [HttpGet("departments")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -342,33 +174,20 @@ namespace eepzbackend.Controllers
         {
             try
             {
-                var departments = await _context.Set<Department>()
-                    .OrderBy(d => d.DepartmentName)
-                    .Select(d => new
-                    {
-                        d.DepartmentId,
-                        d.DepartmentName,
-                        d.BudgetAllocated,
-                        d.CostCenter
-                    })
-                    .ToListAsync();
-
-                return Ok(new { success = true, data = departments });
+                _logger.LogInformation("HR requested all departments");
+                var result = await _employeeService.GetAllDepartmentsAsync();
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = "Failed to retrieve departments",
-                    error = ex.Message
-                });
+                _logger.LogError(ex, "Controller failed to retrieve departments");
+                Log.Error(ex, "EmployeeRetrievalController: Failed to retrieve departments");
+                return StatusCode(500, new { success = false, message = "Failed to retrieve departments", error = ex.Message });
             }
         }
 
         /// <summary>
-        /// Get all business units (distinct from existing projects)
-        /// Used for Business Unit dropdown in project forms
+        /// Get all business units (distinct from existing projects). Used for Business Unit dropdown in project forms
         /// </summary>
         [HttpGet("business-units")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -377,43 +196,20 @@ namespace eepzbackend.Controllers
         {
             try
             {
-                var businessUnits = await _context.Projects
-                    .Where(p => !string.IsNullOrEmpty(p.BusinessUnit))
-                    .Select(p => p.BusinessUnit!)
-                    .Distinct()
-                    .OrderBy(bu => bu)
-                    .ToListAsync();
-
-                if (!businessUnits.Any())
-                {
-                    businessUnits = new List<string>
-                    {
-                        "Information Technology",
-                        "Human Resources",
-                        "Finance",
-                        "Operations",
-                        "Sales and Marketing",
-                        "Customer Service",
-                        "Research and Development"
-                    };
-                }
-
-                return Ok(new { success = true, data = businessUnits });
+                _logger.LogInformation("HR requested all business units");
+                var result = await _employeeService.GetAllBusinessUnitsAsync();
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = "Failed to retrieve business units",
-                    error = ex.Message
-                });
+                _logger.LogError(ex, "Controller failed to retrieve business units");
+                Log.Error(ex, "EmployeeRetrievalController: Failed to retrieve business units");
+                return StatusCode(500, new { success = false, message = "Failed to retrieve business units", error = ex.Message });
             }
         }
 
         /// <summary>
-        /// Get employees with null reporting manager (Initial Stage Employees)
-        /// Excludes employees already mapped to resource pool
+        /// Get employees with null reporting manager (Initial Stage Employees). Excludes employees already mapped to resource pool
         /// </summary>
         [HttpGet("initial-stage")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -422,54 +218,15 @@ namespace eepzbackend.Controllers
         {
             try
             {
-                var resourcePoolProject = await _context.Projects
-                    .FirstOrDefaultAsync(p => p.ProjectName.ToLower() == "org.rz.resourcepool");
-
-                var resourcePoolProjectId = resourcePoolProject?.ProjectId;
-
-                var mappedEmployeeMasterIds = new List<int>();
-                if (resourcePoolProjectId.HasValue)
-                {
-                    mappedEmployeeMasterIds = await _context.Projectemployees
-                        .Where(pe => pe.ProjectId == resourcePoolProjectId.Value)
-                        .Select(pe => pe.EmployeeId) 
-                        .ToListAsync();
-                }
-
-                var employees = await _context.Employeedetailsmasters
-                    .Include(e => e.Employee)
-                        .ThenInclude(e => e.Userprofile)
-                    .Include(e => e.Employee)
-                        .ThenInclude(e => e.Userauthentication)
-                    .Include(e => e.Role)
-                    .Include(e => e.Department)
-                    .Where(e => e.Employee.IsActive == true && 
-                               e.Employee.ReportingManagerEmployeeId == null && 
-                               !mappedEmployeeMasterIds.Contains(e.EmployeeMasterId))
-                    .OrderBy(e => e.Employee.Userprofile.FirstName)
-                    .Select(e => new
-                    {
-                        e.EmployeeMasterId,
-                        e.EmployeeId,
-                        EmployeeCompanyId = e.Employee.EmployeeCompanyId,
-                        FirstName = e.Employee.Userprofile.FirstName,
-                        LastName = e.Employee.Userprofile.LastName,
-                        Email = e.Employee.Userauthentication.Email,
-                        RoleName = e.Role.RoleName,
-                        DepartmentName = e.Department.DepartmentName
-                    })
-                    .ToListAsync();
-
-                return Ok(new { success = true, data = employees, count = employees.Count });
+                _logger.LogInformation("HR requested initial stage employees");
+                var result = await _employeeService.GetInitialStageEmployeesAsync();
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = "Failed to retrieve initial stage employees",
-                    error = ex.Message
-                });
+                _logger.LogError(ex, "Controller failed to retrieve initial stage employees");
+                Log.Error(ex, "EmployeeRetrievalController: Failed to retrieve initial stage employees");
+                return StatusCode(500, new { success = false, message = "Failed to retrieve initial stage employees", error = ex.Message });
             }
         }
 
@@ -485,113 +242,15 @@ namespace eepzbackend.Controllers
         {
             try
             {
-                if (request.EmployeeMasterIds == null || !request.EmployeeMasterIds.Any())
-                {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = "No employees provided to map"
-                    });
-                }
-
-                var resourcePoolProject = await _context.Projects
-                    .Include(p => p.L2approverEmployee)
-                        .ThenInclude(e => e.Employee)
-                    .FirstOrDefaultAsync(p => p.ProjectName.ToLower() == "org.rz.resourcepool");
-
-                if (resourcePoolProject == null)
-                {
-                    return NotFound(new
-                    {
-                        success = false,
-                        message = "Resource pool project 'org.rz.resourcepool' not found. Please create it first."
-                    });
-                }
-
-                if (!resourcePoolProject.L2approverEmployeeId.HasValue)
-                {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = "Resource pool project does not have L2 Approver assigned"
-                    });
-                }
-
-                var l2ApproverEmployeeId = resourcePoolProject.L2approverEmployee?.EmployeeId;
-                if (!l2ApproverEmployeeId.HasValue)
-                {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = "Invalid L2 Approver configuration for resource pool"
-                    });
-                }
-
-                var mappedCount = 0;
-                var errorsList = new List<string>();
-
-                foreach (var empMasterId in request.EmployeeMasterIds)
-                {
-                    var employeeDetails = await _context.Employeedetailsmasters
-                        .Include(e => e.Employee)
-                        .FirstOrDefaultAsync(e => e.EmployeeMasterId == empMasterId);
-
-                    if (employeeDetails == null)
-                    {
-                        errorsList.Add($"Employee with ID {empMasterId} not found");
-                        continue;
-                    }
-
-                    var existingMapping = await _context.Projectemployees
-                        .AnyAsync(pe => pe.ProjectId == resourcePoolProject.ProjectId && 
-                                      pe.EmployeeId == empMasterId); 
-
-                    if (!existingMapping)
-                    {
-                        var projectEmployee = new Projectemployee
-                        {
-                            ProjectId = resourcePoolProject.ProjectId,
-                            EmployeeId = empMasterId,  
-                            AssignedAt = DateTime.UtcNow,
-                            IsPrimary = true 
-                        };
-
-                        _context.Projectemployees.Add(projectEmployee);
-
-                        var employee = employeeDetails.Employee;
-                        if (employee != null)
-                        {
-                            employee.ReportingManagerEmployeeId = l2ApproverEmployeeId.Value;
-                            employee.UpdatedAt = DateTime.UtcNow;
-                            _context.Entry(employee).State = EntityState.Modified;
-                        }
-
-                        mappedCount++;
-                    }
-                }
-
-                await _context.SaveChangesAsync();
-
-                return Ok(new
-                {
-                    success = true,
-                    message = $"Successfully mapped {mappedCount} employees to resource pool",
-                    data = new
-                    {
-                        mappedCount,
-                        totalRequested = request.EmployeeMasterIds.Count,
-                        errors = errorsList
-                    }
-                });
+                _logger.LogInformation("HR requested mapping {EmployeeCount} employees to resource pool", request.EmployeeMasterIds?.Count ?? 0);
+                var result = await _employeeService.MapEmployeesToResourcePoolAsync(request.EmployeeMasterIds ?? new List<int>());
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = "Failed to map employees to resource pool",
-                    error = ex.Message
-                });
+                _logger.LogError(ex, "Controller failed to map employees to resource pool");
+                Log.Error(ex, "EmployeeRetrievalController: Failed to map employees to resource pool");
+                return StatusCode(500, new { success = false, message = "Failed to map employees to resource pool", error = ex.Message });
             }
         }
 
@@ -606,38 +265,19 @@ namespace eepzbackend.Controllers
         {
             try
             {
-                var department = await _context.Set<Department>()
-                    .Where(d => d.DepartmentId == departmentId)
-                    .Select(d => new
-                    {
-                        d.DepartmentId,
-                        d.DepartmentName,
-                        d.BudgetAllocated,
-                        d.CostCenter,
-                        d.CreatedAt,
-                        d.UpdatedAt
-                    })
-                    .FirstOrDefaultAsync();
+                _logger.LogInformation("HR requested department details for ID: {DepartmentId}", departmentId);
+                var result = await _employeeService.GetDepartmentByIdAsync(departmentId);
+                
+                if (!result.Success && result.Data == null)
+                    return NotFound(result);
 
-                if (department == null)
-                {
-                    return NotFound(new
-                    {
-                        success = false,
-                        message = "Department not found"
-                    });
-                }
-
-                return Ok(new { success = true, data = department });
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = "Failed to retrieve department",
-                    error = ex.Message
-                });
+                _logger.LogError(ex, "Controller failed to retrieve department {DepartmentId}", departmentId);
+                Log.Error(ex, "EmployeeRetrievalController: Failed to retrieve department {DepartmentId}", departmentId);
+                return StatusCode(500, new { success = false, message = "Failed to retrieve department", error = ex.Message });
             }
         }
     }

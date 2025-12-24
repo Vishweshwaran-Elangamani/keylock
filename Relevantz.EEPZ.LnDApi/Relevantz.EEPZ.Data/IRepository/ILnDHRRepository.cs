@@ -30,6 +30,6 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
             int pageNumber,
             int pageSize
         );
-        Task<int> SaveChangesAsync();
+        
     }
 }

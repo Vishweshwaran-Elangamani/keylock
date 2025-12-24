@@ -25,6 +25,5 @@ public partial class Organizationwideobjective
 
     public virtual Department? Department { get; set; }
 
-    public virtual ICollection<Organizationgoalfeedback> Organizationgoalfeedbacks { get; set; } =
-        new List<Organizationgoalfeedback>();
+    public virtual ICollection<Organizationgoalfeedback> Organizationgoalfeedbacks { get; set; } = new List<Organizationgoalfeedback>();
 }

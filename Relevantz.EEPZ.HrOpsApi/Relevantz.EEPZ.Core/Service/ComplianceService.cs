@@ -5,11 +5,11 @@ using Relevantz.EEPZ.Core.IService;
 
 namespace Relevantz.EEPZ.Core.Service
 {
-   public class ComplianceService : IComplianceService
+    public class ComplianceService : IComplianceService
     {
         private readonly IPolicyRepository _policyRepository;
         private readonly IViolationRepository _violationRepository;
- 
+
         public ComplianceService(
             IPolicyRepository policyRepository,
             IViolationRepository violationRepository)
@@ -17,7 +17,7 @@ namespace Relevantz.EEPZ.Core.Service
             _policyRepository = policyRepository;
             _violationRepository = violationRepository;
         }
- 
+
         public async Task<ApiResponseDto<ComplianceOverviewDto>> GetComplianceOverviewAsync()
         {
             var totalPolicies = await _policyRepository.GetTotalPoliciesCountAsync();
@@ -25,7 +25,7 @@ namespace Relevantz.EEPZ.Core.Service
             var totalViolations = await _violationRepository.GetTotalViolationsCountAsync();
             var activeViolations = await _violationRepository.GetActiveViolationsCountAsync();
             var resolvedViolations = await _violationRepository.GetResolvedViolationsCountAsync();
- 
+
             var overview = new ComplianceOverviewDto
             {
                 TotalPolicies = totalPolicies,
@@ -38,10 +38,10 @@ namespace Relevantz.EEPZ.Core.Service
                     ? ((double)(totalViolations - activeViolations) / totalViolations) * 100
                     : 100
             };
- 
+
             return ApiResponseDto<ComplianceOverviewDto>.SuccessResponse(overview);
         }
     }
- 
- 
+
+
 }

@@ -13,9 +13,8 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ===================================
+
 // Configure Serilog
-// ===================================
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
@@ -33,9 +32,9 @@ builder.Services.AddEndpointsApiExplorer();
 // Configure Swagger with JWT
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo 
-    { 
-        Title = "EEPZ Internal Opportunities API", 
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "EEPZ Internal Opportunities API",
         Version = "v1",
         Description = "Internal Opportunities, Nominations, Promotions & Manager Tracking API"
     });
@@ -114,9 +113,8 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// ============================================================================
+
 // REGISTER NEW REPOSITORIES (Internal Opportunities Module)
-// ============================================================================
 builder.Services.AddScoped<IInternalOpportunityRepository, InternalOpportunityRepository>();
 builder.Services.AddScoped<INominationRepository, NominationRepository>();
 builder.Services.AddScoped<IManagerNominationTrackingRepository, ManagerNominationTrackingRepository>();
@@ -124,18 +122,17 @@ builder.Services.AddScoped<INominationReviewMetricRepository, NominationReviewMe
 builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
 builder.Services.AddScoped<IPromotionHistoryRepository, PromotionHistoryRepository>();
 
-// ============================================================================
+
 // REGISTER NEW SERVICES (Internal Opportunities Module)
-// ============================================================================
+
 builder.Services.AddScoped<IInternalOpportunityService, InternalOpportunityService>();
 builder.Services.AddScoped<INominationService, NominationService>();
 builder.Services.AddScoped<IPromotionService, PromotionService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 
-// ============================================================================
+
 // CONFIGURE AUTOMAPPER
-// ============================================================================
 var mapperConfig = new MapperConfiguration(mc =>
 {
     mc.AddProfile(new InternalOpportunitiesMappingProfile());
@@ -143,9 +140,9 @@ var mapperConfig = new MapperConfiguration(mc =>
 
 builder.Services.AddSingleton(mapperConfig.CreateMapper());
 
-// ============================================================================
+
 // CONFIGURE CORS
-// ============================================================================
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -158,16 +155,15 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// ============================================================================
 // VERIFY DATABASE CONNECTION
-// ============================================================================
+
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<EEPZDbContext>();
-        
+
         if (await context.Database.CanConnectAsync())
         {
             Log.Information("Database connection established successfully");
@@ -183,9 +179,9 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// ============================================================================
+
 // CONFIGURE HTTP REQUEST PIPELINE
-// ============================================================================
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -220,7 +216,7 @@ app.MapControllers();
 app.MapGet("/health", async (EEPZDbContext dbContext, IConfiguration config) =>
 {
     bool dbConnected = false;
-    
+
     try
     {
         dbConnected = await dbContext.Database.CanConnectAsync();
@@ -237,14 +233,14 @@ app.MapGet("/health", async (EEPZDbContext dbContext, IConfiguration config) =>
         service = "EEPZ Internal Opportunities API",
         version = "v1.0",
         environment = builder.Environment.EnvironmentName,
-        
+
         database = new
         {
             connected = dbConnected,
             provider = "MySQL (Pomelo EF Core 8.0)",
             connectionStringName = "DefaultConnection"
         },
-        
+
         endpoints = new
         {
             total = 32,
@@ -256,14 +252,14 @@ app.MapGet("/health", async (EEPZDbContext dbContext, IConfiguration config) =>
                 "Promotions (11)"
             }
         },
-        
+
         authentication = new
         {
             enabled = true,
             type = "JWT Bearer",
             issuerConfigured = !string.IsNullOrEmpty(config["Jwt:Issuer"])
         },
-        
+
         features = new
         {
             autoMapperEnabled = true,
@@ -278,7 +274,7 @@ try
     Log.Information("EEPZ Internal Opportunities API Server Started Successfully");
     Log.Information("Authentication: JWT Bearer Token Enabled");
     Log.Information("Environment: {Environment}", app.Environment.EnvironmentName);
-    
+
     app.Run();
 }
 catch (Exception ex)

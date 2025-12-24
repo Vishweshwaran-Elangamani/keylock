@@ -15,14 +15,11 @@ public partial class MasterSkill
 
     public virtual ICollection<Lndapproval> Lndapprovals { get; set; } = new List<Lndapproval>();
 
-    public virtual ICollection<Lndassignment> Lndassignments { get; set; } =
-        new List<Lndassignment>();
+    public virtual ICollection<Lndassignment> Lndassignments { get; set; } = new List<Lndassignment>();
 
-    public virtual ICollection<Lndemployeeskillmapper> Lndemployeeskillmappers { get; set; } =
-        new List<Lndemployeeskillmapper>();
+    public virtual ICollection<Lndemployeeskillmapper> Lndemployeeskillmappers { get; set; } = new List<Lndemployeeskillmapper>();
 
     public virtual ICollection<Lndsme> Lndsmes { get; set; } = new List<Lndsme>();
 
-    public virtual ICollection<Mentorfeedbacktracking> Mentorfeedbacktrackings { get; set; } =
-        new List<Mentorfeedbacktracking>();
+    public virtual ICollection<Mentorfeedbacktracking> Mentorfeedbacktrackings { get; set; } = new List<Mentorfeedbacktracking>();
 }

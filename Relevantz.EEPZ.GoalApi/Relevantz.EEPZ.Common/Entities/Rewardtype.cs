@@ -23,9 +23,7 @@ public partial class Rewardtype
 
     public virtual Userauthentication? CreatedByNavigation { get; set; }
 
-    public virtual ICollection<Nominationparameter> Nominationparameters { get; set; } =
-        new List<Nominationparameter>();
+    public virtual ICollection<Nominationparameter> Nominationparameters { get; set; } = new List<Nominationparameter>();
 
-    public virtual ICollection<Recognitiondetail> Recognitiondetails { get; set; } =
-        new List<Recognitiondetail>();
+    public virtual ICollection<Recognitiondetail> Recognitiondetails { get; set; } = new List<Recognitiondetail>();
 }

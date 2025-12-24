@@ -75,14 +75,14 @@ namespace Relevantz.EEPZ.Data.Repository
         public async Task<bool> DepartmentNameExistsAsync(string departmentName, int? excludeDepartmentId = null)
         {
             return await _context.Departments
-                .AnyAsync(d => d.DepartmentName == departmentName && 
+                .AnyAsync(d => d.DepartmentName == departmentName &&
                               (excludeDepartmentId == null || d.DepartmentId != excludeDepartmentId));
         }
 
         public async Task<bool> DepartmentCodeExistsAsync(string departmentCode, int? excludeDepartmentId = null)
         {
             return await _context.Departments
-                .AnyAsync(d => d.DepartmentCode == departmentCode && 
+                .AnyAsync(d => d.DepartmentCode == departmentCode &&
                               (excludeDepartmentId == null || d.DepartmentId != excludeDepartmentId));
         }
 
@@ -115,7 +115,7 @@ namespace Relevantz.EEPZ.Data.Repository
         {
             var allChildren = new List<Department>();
             var directChildren = await GetChildDepartmentsAsync(parentDepartmentId);
-            
+
             allChildren.AddRange(directChildren);
 
             foreach (var child in directChildren)
@@ -155,7 +155,7 @@ namespace Relevantz.EEPZ.Data.Repository
             while (currentDepartment != null)
             {
                 hierarchy.Insert(0, currentDepartment);
-                
+
                 if (currentDepartment.ParentDepartmentId == null)
                     break;
 
@@ -259,7 +259,7 @@ namespace Relevantz.EEPZ.Data.Repository
             return await _context.Departments
                 .Include(d => d.ParentDepartment)
                 .Include(d => d.HodEmployee)
-                .Where(d => d.DepartmentName.Contains(searchTerm) || 
+                .Where(d => d.DepartmentName.Contains(searchTerm) ||
                            d.DepartmentCode.Contains(searchTerm) ||
                            (d.Description != null && d.Description.Contains(searchTerm)))
                 .OrderBy(d => d.DepartmentName)

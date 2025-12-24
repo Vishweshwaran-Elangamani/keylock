@@ -3,11 +3,14 @@ using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repositories.Interface;
+using Serilog;
 
 namespace Relevantz.EEPZ.Data.Repositories.Implementations
 {
     public class LnDApprovalRepository : ILnDApprovalRepository
     {
+        #region Dependencies
+
         private readonly EEPZDbContext _context;
 
         public LnDApprovalRepository(EEPZDbContext context)
@@ -15,9 +18,19 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             _context = context;
         }
 
+        #endregion
+
+        #region Approval Retrieval
+
+        /// <summary>
+        /// Gets a single approval by ID with all related entities including employees, skill, attachment, and assignment.
+        /// Returns null if approval is not found.
+        /// </summary>
         public async Task<Lndapproval?> GetApprovalByIdAsync(int approvalId)
         {
-            return await _context
+            Log.Debug("GetApprovalByIdAsync called. ApprovalId={ApprovalId}", approvalId);
+
+            var approval = await _context
                 .Lndapprovals.Include(a => a.RequesterEmployee)
                 .ThenInclude(e => e.Userprofile)
                 .Include(a => a.ApproverEmployee)
@@ -28,29 +41,76 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .ThenInclude(a => a.MenteeEmployee)
                 .ThenInclude(e => e.Userprofile)
                 .FirstOrDefaultAsync(a => a.ApprovalId == approvalId);
+
+            if (approval == null)
+            {
+                Log.Warning("GetApprovalByIdAsync: Approval not found. ApprovalId={ApprovalId}", approvalId);
+            }
+            else
+            {
+                Log.Debug("GetApprovalByIdAsync succeeded. ApprovalId={ApprovalId}, ApprovalType={ApprovalType}, Status={Status}",
+                    approvalId, approval.ApprovalType, approval.Status);
+            }
+
+            return approval;
         }
 
+        /// <summary>
+        /// Checks if a pending SME registration approval exists for the given employee and skill.
+        /// Returns null if no pending approval is found.
+        /// </summary>
         public async Task<Lndapproval?> GetPendingSmeRegistrationAsync(int employeeId, int skillId)
         {
-            return await _context.Lndapprovals.FirstOrDefaultAsync(a =>
+            Log.Debug("GetPendingSmeRegistrationAsync called. EmployeeId={EmployeeId}, SkillId={SkillId}",
+                employeeId, skillId);
+
+            var approval = await _context.Lndapprovals.FirstOrDefaultAsync(a =>
                 a.RequesterEmployeeId == employeeId
                 && a.SkillId == skillId
                 && a.ApprovalType == LnDConstants.APPROVAL_TYPE.SME_REGISTRATION
                 && a.Status == LnDConstants.APPROVAL_STATUS.PENDING
             );
-        }
 
-        public async Task<Lndapproval> AddApprovalAsync(Lndapproval approval)
-        {
-            _context.Lndapprovals.Add(approval);
+            if (approval != null)
+            {
+                Log.Debug("GetPendingSmeRegistrationAsync: Found pending approval. ApprovalId={ApprovalId}",
+                    approval.ApprovalId);
+            }
+
             return approval;
         }
 
-        public async Task UpdateApprovalAsync(Lndapproval approval)
+        /// <summary>
+        /// Gets pending approval for an assignment by assignment ID and approval type.
+        /// Returns null if no pending approval exists.
+        /// </summary>
+        public async Task<Lndapproval?> GetPendingAssignmentApprovalAsync(
+            int assignmentId,
+            string approvalType
+        )
         {
-            _context.Lndapprovals.Update(approval);
+            Log.Debug("GetPendingAssignmentApprovalAsync called. AssignmentId={AssignmentId}, ApprovalType={ApprovalType}",
+                assignmentId, approvalType);
+
+            var approval = await _context.Lndapprovals.FirstOrDefaultAsync(a =>
+                a.AssignmentId == assignmentId
+                && a.ApprovalType == approvalType
+                && a.Status == LnDConstants.APPROVAL_STATUS.PENDING
+            );
+
+            if (approval != null)
+            {
+                Log.Debug("GetPendingAssignmentApprovalAsync: Found pending approval. ApprovalId={ApprovalId}",
+                    approval.ApprovalId);
+            }
+
+            return approval;
         }
 
+        /// <summary>
+        /// Gets paginated approvals assigned to an employee as approver with filtering, sorting, and search.
+        /// Returns list of approvals and total count for pagination.
+        /// </summary>
         public async Task<(List<Lndapproval> Items, int TotalCount)> GetMyApprovalsAsync(
             int employeeId,
             string? approvalType,
@@ -62,6 +122,11 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             string? searchTerm
         )
         {
+            Log.Information(
+                "GetMyApprovalsAsync called. EmployeeId={EmployeeId}, ApprovalType={ApprovalType}, Status={Status}, Page={PageNumber}, PageSize={PageSize}, SearchTerm={SearchTerm}",
+                employeeId, approvalType ?? "all", status ?? "all", pageNumber, pageSize, searchTerm ?? "none"
+            );
+
             var query = _context
                 .Lndapprovals.Include(a => a.RequesterEmployee)
                 .ThenInclude(e => e.Userprofile)
@@ -154,9 +219,18 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 
+            Log.Information(
+                "GetMyApprovalsAsync completed. EmployeeId={EmployeeId}, ReturnedItems={ItemCount}, TotalCount={TotalCount}",
+                employeeId, items.Count, totalCount
+            );
+
             return (items, totalCount);
         }
 
+        /// <summary>
+        /// Gets complete approval history for an employee as requester or approver with filtering and pagination.
+        /// Supports role-based filtering (requester/approver/all) and full-text search.
+        /// </summary>
         public async Task<(List<Lndapproval> Items, int TotalCount)> GetApprovalHistoryAsync(
             int employeeId,
             string? approvalType,
@@ -169,6 +243,11 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             int pageSize
         )
         {
+            Log.Information(
+                "GetApprovalHistoryAsync called. EmployeeId={EmployeeId}, Role={Role}, ApprovalType={ApprovalType}, Status={Status}, Page={PageNumber}",
+                employeeId, role ?? "all", approvalType ?? "all", status ?? "all", pageNumber
+            );
+
             var query = _context
                 .Lndapprovals.Include(a => a.RequesterEmployee)
                 .ThenInclude(e => e.Userprofile)
@@ -240,9 +319,102 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 
+            Log.Information(
+                "GetApprovalHistoryAsync completed. EmployeeId={EmployeeId}, ReturnedItems={ItemCount}, TotalCount={TotalCount}",
+                employeeId, items.Count, totalCount
+            );
+
             return (items, totalCount);
         }
 
+        #endregion
+
+        #region Approval Modifications
+
+        /// <summary>
+        /// Adds a new approval to the database context.
+        /// Requires SaveChanges to be called separately to persist.
+        /// </summary>
+        public async Task<Lndapproval> AddApprovalAsync(Lndapproval approval)
+        {
+            Log.Information(
+                "AddApprovalAsync called. ApprovalType={ApprovalType}, RequesterEmployeeId={RequesterEmployeeId}, ApproverEmployeeId={ApproverEmployeeId}",
+                approval.ApprovalType, approval.RequesterEmployeeId, approval.ApproverEmployeeId
+            );
+
+            _context.Lndapprovals.Add(approval);
+
+            Log.Debug("AddApprovalAsync: Approval added to context. Pending SaveChanges");
+
+            return approval;
+        }
+
+        /// <summary>
+        /// Updates an existing approval in the database context.
+        /// Requires SaveChanges to be called separately to persist.
+        /// </summary>
+        public async Task UpdateApprovalAsync(Lndapproval approval)
+        {
+            Log.Information(
+                "UpdateApprovalAsync called. ApprovalId={ApprovalId}, Status={Status}",
+                approval.ApprovalId, approval.Status
+            );
+
+            _context.Lndapprovals.Update(approval);
+
+            Log.Debug("UpdateApprovalAsync: Approval updated in context. Pending SaveChanges");
+        }
+
+        #endregion
+
+        #region Attachment Operations
+
+        /// <summary>
+        /// Adds a new attachment to the database context.
+        /// Requires SaveChanges to be called separately to persist.
+        /// </summary>
+        public async Task<Lndattachment> AddAttachmentAsync(Lndattachment attachment)
+        {
+            Log.Information(
+                "AddAttachmentAsync called. FileName={FileName}, AttachmentType={AttachmentType}, FileSize={FileSize}",
+                attachment.FileName, attachment.AttachmentType, attachment.FileSize
+            );
+
+            _context.Lndattachments.Add(attachment);
+
+            Log.Debug("AddAttachmentAsync: Attachment added to context. Pending SaveChanges");
+
+            return attachment; 
+        }
+
+        /// <summary>
+        /// Gets an attachment by ID.
+        /// Returns null if attachment is not found.
+        /// </summary>
+        public async Task<Lndattachment?> GetAttachmentByIdAsync(int attachmentId)
+        {
+            Log.Debug("GetAttachmentByIdAsync called. AttachmentId={AttachmentId}", attachmentId);
+
+            var attachment = await _context.Lndattachments.FirstOrDefaultAsync(a =>
+                a.AttachmentId == attachmentId
+            );
+
+            if (attachment == null)
+            {
+                Log.Warning("GetAttachmentByIdAsync: Attachment not found. AttachmentId={AttachmentId}", attachmentId);
+            }
+
+            return attachment; 
+        }
+
+        #endregion
+
+        #region Private Helpers  
+
+        /// <summary>
+        /// Applies sorting logic to approval queries based on sort field and order.
+        /// Defaults to descending order by UpdatedOn/RequestedOn if no field is specified.
+        /// </summary>
         private IQueryable<Lndapproval> ApplyApprovalSorting(
             IQueryable<Lndapproval> query,
             string? sortField,
@@ -299,34 +471,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             };
         }
 
-        public async Task<Lndapproval?> GetPendingAssignmentApprovalAsync(
-            int assignmentId,
-            string approvalType
-        )
-        {
-            return await _context.Lndapprovals.FirstOrDefaultAsync(a =>
-                a.AssignmentId == assignmentId
-                && a.ApprovalType == approvalType
-                && a.Status == LnDConstants.APPROVAL_STATUS.PENDING
-            );
-        }
-
-        public async Task<Lndattachment> AddAttachmentAsync(Lndattachment attachment)
-        {
-            _context.Lndattachments.Add(attachment);
-            return attachment;
-        }
-
-        public async Task<Lndattachment?> GetAttachmentByIdAsync(int attachmentId)
-        {
-            return await _context.Lndattachments.FirstOrDefaultAsync(a =>
-                a.AttachmentId == attachmentId
-            );
-        }
-
-        public async Task<int> SaveChangesAsync()
-        {
-            return await _context.SaveChangesAsync();
-        }
+        #endregion
     }
-}
+}   
+
+
+

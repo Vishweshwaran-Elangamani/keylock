@@ -154,7 +154,7 @@ namespace Relevantz.EEPZ.Common.DTOs
 
     // ==================== ATTACHMENT DTOs ====================
 
-    public class FileUploadResponseDto
+    public class FileUploadResponseDto 
     {
         public int AttachmentId { get; set; }
         public string AttachmentTitle { get; set; } = default!;
@@ -176,7 +176,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public DateTime? AttachedOn { get; set; }
         public bool IsProofOfCompletion { get; set; }
         public int? LinkedApprovalId { get; set; }
-    }
+    }     
 
     // ==================== COMMENT DTOs ====================
 

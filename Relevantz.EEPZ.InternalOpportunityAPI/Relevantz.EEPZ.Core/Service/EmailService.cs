@@ -38,8 +38,8 @@ namespace Relevantz.EEPZ.Core.Service
                 await client.ConnectAsync(
     _configuration["SmtpSettings:Host"],
     int.Parse(_configuration["SmtpSettings:Port"] ?? "587"),
-    _configuration["SmtpSettings:EnableSsl"] == "true" 
-        ? SecureSocketOptions.StartTls 
+    _configuration["SmtpSettings:EnableSsl"] == "true"
+        ? SecureSocketOptions.StartTls
         : SecureSocketOptions.None);
 
 

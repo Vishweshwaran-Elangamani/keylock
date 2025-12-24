@@ -6,7 +6,6 @@ namespace Relevantz.EEPZ.Core.IService
 {
     public interface IDepartmentService
     {
-        // Basic CRUD operations
         Task<ApiResponseDto<DepartmentResponseDto>> CreateDepartmentAsync(CreateDepartmentRequestDto request);
         Task<ApiResponseDto<DepartmentResponseDto>> UpdateDepartmentAsync(UpdateDepartmentRequestDto request);
         Task<ApiResponseDto<DepartmentResponseDto>> GetDepartmentByIdAsync(int departmentId);

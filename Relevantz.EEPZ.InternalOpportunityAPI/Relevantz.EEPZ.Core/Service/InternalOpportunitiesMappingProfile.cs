@@ -37,11 +37,11 @@ namespace Relevantz.EEPZ.Core.Service
             // Promotion Mappings
             CreateMap<Promotion, PromotionResponseDto>()
     .ForMember(dest => dest.EmployeeName, opt => opt.MapFrom(src => src.EmployeeUser.Email ?? "N/A"))
-    .ForMember(dest => dest.OpportunityName, opt => opt.MapFrom(src => 
-        src.Nomination != null && src.Nomination.Opportunity != null 
-            ? src.Nomination.Opportunity.OpportunityName 
+    .ForMember(dest => dest.OpportunityName, opt => opt.MapFrom(src =>
+        src.Nomination != null && src.Nomination.Opportunity != null
+            ? src.Nomination.Opportunity.OpportunityName
             : "N/A"))
-    .ForMember(dest => dest.NominationType, opt => opt.MapFrom(src => 
+    .ForMember(dest => dest.NominationType, opt => opt.MapFrom(src =>
         src.Nomination != null ? src.Nomination.NominationType : null));
 
             CreateMap<Promotion, PromotionDetailResponseDto>()

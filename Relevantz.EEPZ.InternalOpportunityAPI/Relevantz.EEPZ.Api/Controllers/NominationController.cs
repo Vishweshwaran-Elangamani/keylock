@@ -33,7 +33,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 NominationValidator.ValidateSelfNomination(request);
 
-                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) 
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)
                                   ?? User.FindFirst("sub");
 
                 if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId) || userId == 0)
@@ -68,7 +68,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 NominationValidator.ValidateManagerNomination(request);
 
-                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) 
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)
                                   ?? User.FindFirst("sub");
 
                 if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int managerId) || managerId == 0)
@@ -118,7 +118,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             try
             {
-                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) 
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)
                                   ?? User.FindFirst("sub");
 
                 if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId) || userId == 0)
@@ -149,7 +149,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             try
             {
-                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) 
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)
                                   ?? User.FindFirst("sub");
 
                 if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId) || userId == 0)
@@ -178,7 +178,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             try
             {
-                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) 
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)
                                   ?? User.FindFirst("sub");
 
                 if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int managerId) || managerId == 0)
@@ -207,7 +207,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             try
             {
-                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) 
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)
                                   ?? User.FindFirst("sub");
 
                 if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int managerId) || managerId == 0)
@@ -236,7 +236,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             try
             {
-                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) 
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)
                                   ?? User.FindFirst("sub");
 
                 if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int deptHeadId) || deptHeadId == 0)
@@ -288,7 +288,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 NominationValidator.ValidateManagerReview(request);
 
-                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) 
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)
                                   ?? User.FindFirst("sub");
 
                 if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int managerId) || managerId == 0)
@@ -333,7 +333,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 Console.WriteLine($"[Controller] Request.DiversityScore: {request?.DiversityScore?.ToString() ?? "NULL"}");
                 Console.WriteLine($"[Controller] Request.ConflictOfInterest: {request?.ConflictOfInterest?.ToString() ?? "NULL"}");
 
-                // ✅ Validate only Action field
                 if (request == null)
                 {
                     return BadRequest(new { message = "Request body is required" });
@@ -349,8 +348,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                     return BadRequest(new { message = "Action must be 'Approved' or 'Rejected'" });
                 }
 
-                // ✅ Get user ID from token
-                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) 
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)
                                   ?? User.FindFirst("sub");
 
                 if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int deptHeadId) || deptHeadId == 0)
@@ -390,7 +388,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             try
             {
-                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) 
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)
                                   ?? User.FindFirst("sub");
 
                 if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId) || userId == 0)

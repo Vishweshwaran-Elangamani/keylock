@@ -8,7 +8,7 @@ using Relevantz.EEPZ.Common.Entities;
 
 namespace Relevantz.EEPZ.Api.Controllers
 {
-   [Route("api/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class FundAllocationController : ControllerBase
     {
@@ -777,13 +777,13 @@ namespace Relevantz.EEPZ.Api.Controllers
                 if (allocation == null)
                 {
                     Console.WriteLine($"Allocation not found: {request.AllocationId}");
-                    
+
                     // DEBUG: Check what allocations exist
                     var existingAllocations = await _context.Budgetallocations
                         .Select(a => a.AllocationId)
                         .ToListAsync();
                     Console.WriteLine($"Existing AllocationIds: {string.Join(", ", existingAllocations)}");
-                    
+
                     return NotFound(new
                     {
                         success = false,
@@ -815,10 +815,10 @@ namespace Relevantz.EEPZ.Api.Controllers
                 // Update allocation
                 allocation.UtilizedAmount = request.UtilizedAmount;
                 allocation.UtilizationPercentage = request.UtilizationPercentage;
-                
+
                 if (!string.IsNullOrEmpty(request.Notes))
                     allocation.Notes = request.Notes;
-                    
+
                 allocation.UpdatedAt = DateTime.UtcNow;
 
                 _context.Budgetallocations.Update(allocation);
@@ -886,57 +886,58 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
         [HttpGet("by-budget/{budgetId}")]
-public async Task<IActionResult> GetAllocationsByBudget(int budgetId)
-{
-    try {
-        Console.WriteLine($" Getting allocations for budget: {budgetId}");
-
-        var allocations = await _context.Budgetallocations
-            .AsNoTracking()  
-            .Where(a => a.BudgetId == budgetId)
-            .Select(a => new
+        public async Task<IActionResult> GetAllocationsByBudget(int budgetId)
+        {
+            try
             {
-                a.AllocationId,
-                a.BudgetId,
-                a.DepartmentId,
-                DepartmentName = a.Department != null ? a.Department.DepartmentName : "Unknown",
-                a.EmployeeUserId,
-                EmployeeEmail = a.EmployeeUser != null ? a.EmployeeUser.Email : null,
-                a.AllocationType,
-                a.Amount,
-                a.GoalStatus,
-                a.Notes,
-                a.AllocatedByUserId,
-                AllocatedByEmail = a.AllocatedByUser != null ? a.AllocatedByUser.Email : "Unknown",
-                a.AllocatedAt,
-                a.UtilizedAmount,
-                a.UtilizationPercentage,
-                a.UpdatedAt,
-                a.Period,
-                a.PeriodYear  
-            })
-            .ToListAsync();
+                Console.WriteLine($" Getting allocations for budget: {budgetId}");
 
-        Console.WriteLine($"Found {allocations.Count} allocations for budget {budgetId}");
+                var allocations = await _context.Budgetallocations
+                    .AsNoTracking()
+                    .Where(a => a.BudgetId == budgetId)
+                    .Select(a => new
+                    {
+                        a.AllocationId,
+                        a.BudgetId,
+                        a.DepartmentId,
+                        DepartmentName = a.Department != null ? a.Department.DepartmentName : "Unknown",
+                        a.EmployeeUserId,
+                        EmployeeEmail = a.EmployeeUser != null ? a.EmployeeUser.Email : null,
+                        a.AllocationType,
+                        a.Amount,
+                        a.GoalStatus,
+                        a.Notes,
+                        a.AllocatedByUserId,
+                        AllocatedByEmail = a.AllocatedByUser != null ? a.AllocatedByUser.Email : "Unknown",
+                        a.AllocatedAt,
+                        a.UtilizedAmount,
+                        a.UtilizationPercentage,
+                        a.UpdatedAt,
+                        a.Period,
+                        a.PeriodYear
+                    })
+                    .ToListAsync();
 
-        return Ok(new
-        {
-            success = true,
-            message = $"Retrieved {allocations.Count} allocations",
-            data = allocations
-        });
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error getting allocations: {ex.Message}");
-        return StatusCode(500, new
-        {
-            success = false,
-            message = "An error occurred while fetching allocations",
-            data = (object)null
-        });
-    }
-}
+                Console.WriteLine($"Found {allocations.Count} allocations for budget {budgetId}");
+
+                return Ok(new
+                {
+                    success = true,
+                    message = $"Retrieved {allocations.Count} allocations",
+                    data = allocations
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting allocations: {ex.Message}");
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "An error occurred while fetching allocations",
+                    data = (object)null
+                });
+            }
+        }
 
 
     }

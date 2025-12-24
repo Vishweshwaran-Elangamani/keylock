@@ -106,8 +106,8 @@ namespace Relevantz.EEPZ.Core.Service
             int goalId,
             IFormFile file,
             string title,
-            int currentUserEmployeeMasterId
-        )
+            int currentUserEmployeeMasterId 
+        ) 
         {
             var goal = await _baseRepo.GetGoalByIdAsync(goalId);
             if (goal == null)
@@ -370,6 +370,7 @@ namespace Relevantz.EEPZ.Core.Service
                 throw;
             }
         }
+
 
         public async Task<GoalAttachment> GetAttachmentAsync(int attachmentId)
         {

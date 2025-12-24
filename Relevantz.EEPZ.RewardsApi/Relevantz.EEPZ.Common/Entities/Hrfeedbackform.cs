@@ -25,6 +25,5 @@ public partial class Hrfeedbackform
 
     public virtual Userauthentication CreatedByHr { get; set; } = null!;
 
-    public virtual ICollection<Hrfeedbackformresponse> Hrfeedbackformresponses { get; set; } =
-        new List<Hrfeedbackformresponse>();
+    public virtual ICollection<Hrfeedbackformresponse> Hrfeedbackformresponses { get; set; } = new List<Hrfeedbackformresponse>();
 }

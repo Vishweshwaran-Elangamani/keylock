@@ -22,9 +22,9 @@ namespace Relevantz.EEPZ.Data.Repository
         public async Task<Otp?> GetValidOtpAsync(string email, string otpCode, string otpType)
         {
             return await _context.Otps
-                .FirstOrDefaultAsync(o => 
-                    o.Email == email && 
-                    o.OtpCode == otpCode && 
+                .FirstOrDefaultAsync(o =>
+                    o.Email == email &&
+                    o.OtpCode == otpCode &&
                     o.OtpType == otpType &&
                     o.IsUsed == false &&
                     o.ExpiresAt > DateTime.UtcNow);
@@ -76,8 +76,8 @@ namespace Relevantz.EEPZ.Data.Repository
         public async Task<int> GetUnusedOtpCountAsync(string email, string otpType, DateTime fromTime)
         {
             return await _context.Otps
-                .CountAsync(o => 
-                    o.Email == email && 
+                .CountAsync(o =>
+                    o.Email == email &&
                     o.OtpType == otpType &&
                     o.IsUsed == false &&
                     o.CreatedAt >= fromTime);

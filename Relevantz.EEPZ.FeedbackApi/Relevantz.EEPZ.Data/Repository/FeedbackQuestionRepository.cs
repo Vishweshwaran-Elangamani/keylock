@@ -7,10 +7,6 @@ using Relevantz.EEPZ.Data.DBContexts;
 
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
-    /// <summary>
-    /// Repository implementation for FeedbackQuestion entity
-    /// Manages reusable question templates
-    /// </summary>
     public class FeedbackQuestionRepository : IFeedbackQuestionRepository
     {
         private readonly EEPZDbContext _context;

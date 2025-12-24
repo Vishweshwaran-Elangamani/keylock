@@ -22,8 +22,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             _userManagementService = userManagementService;
         }
 
-        // ==================== PROFILE ENDPOINTS ====================
-
         /// <summary>
         /// Get current logged-in user's profile
         /// GET: api/User/profile
@@ -142,19 +140,21 @@ namespace Relevantz.EEPZ.Api.Controllers
                 var allowedTypes = new[] { "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp" };
                 if (!allowedTypes.Contains(ProfilePhoto.ContentType.ToLower()))
                 {
-                    return BadRequest(new { 
-                        success = false, 
-                        message = "Invalid file type. Only JPEG, PNG, GIF, and WEBP images are allowed." 
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "Invalid file type. Only JPEG, PNG, GIF, and WEBP images are allowed."
                     });
                 }
 
                 // Validate file size (5MB max)
-                const long maxFileSize = 5 * 1024 * 1024; 
+                const long maxFileSize = 5 * 1024 * 1024;
                 if (ProfilePhoto.Length > maxFileSize)
                 {
-                    return BadRequest(new { 
-                        success = false, 
-                        message = $"File size exceeds maximum limit of 5MB. Your file is {ProfilePhoto.Length / 1024 / 1024:F2}MB." 
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = $"File size exceeds maximum limit of 5MB. Your file is {ProfilePhoto.Length / 1024 / 1024:F2}MB."
                     });
                 }
 
@@ -183,15 +183,14 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 Console.WriteLine($"Error uploading photo: {ex.Message}");
                 Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                return StatusCode(500, new { 
-                    success = false, 
-                    message = "An error occurred while uploading photo", 
-                    error = ex.Message 
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "An error occurred while uploading photo",
+                    error = ex.Message
                 });
             }
         }
-
-        // ==================== USER MANAGEMENT ENDPOINTS ====================
 
         [HttpPost("create")]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserRequestDto request)
@@ -203,9 +202,9 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return BadRequest(result);
 
             return Ok(result);
-        }       
+        }
 
-        [HttpPut("update")] 
+        [HttpPut("update")]
         public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequestDto request)
         {
             var updatedByUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
@@ -215,7 +214,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return BadRequest(result);
 
             return Ok(result);
-        } 
+        }
 
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetUserById(int userId)
@@ -226,7 +225,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return NotFound(result);
 
             return Ok(result);
-        }       
+        }
 
         [HttpGet("all")]
         public async Task<IActionResult> GetAllUsers()
@@ -280,7 +279,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 return StatusCode(500, new { message = ex.Message });
             }
-        } 
+        }
 
         [HttpPost("assign-role-department")]
         public async Task<IActionResult> AssignRoleAndDepartment([FromBody] AssignRoleDepartmentRequestDto request)

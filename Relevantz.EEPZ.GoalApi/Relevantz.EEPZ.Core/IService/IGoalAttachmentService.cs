@@ -9,14 +9,12 @@ namespace Relevantz.EEPZ.Core.IService
     /// </summary>
     public interface IGoalAttachmentService
     {
-        /// <summary>
-        /// Upload a file attachment to a goal
-        /// </summary>
-        /// <param name="goalId">The goal ID to attach the file to</param>
-        /// <param name="file">The file to upload</param>
-        /// <param name="title">Title/description for the attachment</param>
-        /// <param name="currentUserEmployeeMasterId">Current user's employee master ID</param>
-        /// <returns>File upload response with MongoDB ObjectId</returns>
+        Task<(byte[] fileBytes, string contentType, string fileName)?> PreviewFileAsync(
+            int attachmentId,
+            int currentUserEmployeeMasterId
+        ); 
+        Task<List<GoalAttachment>> ListAttachmentsAsync(int goalId);
+        Task<GoalAttachment> GetAttachmentAsync(int attachmentId);
         Task<FileUploadResponseDto> UploadFileAsync(
             int goalId,
             IFormFile file,

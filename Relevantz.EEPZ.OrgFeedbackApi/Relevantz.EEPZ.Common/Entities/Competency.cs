@@ -15,8 +15,7 @@ public partial class Competency
 
     public int? DisplayOrder { get; set; }
 
-    public virtual ICollection<Assessmentdetail> Assessmentdetails { get; set; } =
-        new List<Assessmentdetail>();
+    public virtual ICollection<Assessmentdetail> Assessmentdetails { get; set; } = new List<Assessmentdetail>();
 
     public virtual Assessmentform Form { get; set; } = null!;
 }

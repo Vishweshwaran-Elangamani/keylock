@@ -55,13 +55,13 @@ namespace Relevantz.EEPZ.Api.Controllers
                 var userRole = GetCurrentUserRole();
 
                 _logger.LogInformation(
-                    "🟢 Create Form Request | UserId: {UserId} | Role: {Role}",
+                    "Create Form Request | UserId: {UserId} | Role: {Role}",
                     userId, userRole
                 );
 
                 if (!ModelState.IsValid)
                 {
-                    _logger.LogWarning("❌ Invalid form data provided");
+                    _logger.LogWarning(" Invalid form data provided");
                     return BadRequest(new { success = false, message = "Invalid form data", errors = ModelState });
                 }
 
@@ -69,21 +69,21 @@ namespace Relevantz.EEPZ.Api.Controllers
 
                 if (result.Success)
                 {
-                    _logger.LogInformation("✅ Form created successfully | FormId: {FormId}", result.Data?.FormId);
+                    _logger.LogInformation(" Form created successfully | FormId: {FormId}", result.Data?.FormId);
                     return Ok(result);
                 }
 
-                _logger.LogWarning("❌ Form creation failed: {Message}", result.Message);
+                _logger.LogWarning(" Form creation failed: {Message}", result.Message);
                 return BadRequest(result);
             }
             catch (UnauthorizedAccessException ex)
             {
-                _logger.LogError("❌ Unauthorized access: {Message}", ex.Message);
+                _logger.LogError(" Unauthorized access: {Message}", ex.Message);
                 return Unauthorized(new { success = false, message = "Unauthorized access" });
             }
             catch (Exception ex)
             {
-                _logger.LogError("❌ Error creating form: {Exception}", ex);
+                _logger.LogError(" Error creating form: {Exception}", ex);
                 return StatusCode(500, new 
                 { 
                     success = false, 
@@ -101,7 +101,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 var userId = GetCurrentUserId();
 
                 _logger.LogInformation(
-                    "🔍 Get Form By Id Request | UserId: {UserId} | FormId: {FormId}",
+                    "Get Form By Id Request | UserId: {UserId} | FormId: {FormId}",
                     userId, formId
                 );
 
@@ -114,16 +114,16 @@ namespace Relevantz.EEPZ.Api.Controllers
 
                 if (result.Success)
                 {
-                    _logger.LogInformation("✅ Form retrieved successfully | FormId: {FormId}", formId);
+                    _logger.LogInformation(" Form retrieved successfully | FormId: {FormId}", formId);
                     return Ok(result);
                 }
 
-                _logger.LogWarning("❌ Form not found | FormId: {FormId}", formId);
+                _logger.LogWarning(" Form not found | FormId: {FormId}", formId);
                 return NotFound(result);
             }
             catch (Exception ex)
             {
-                _logger.LogError("❌ Error retrieving form: {Exception}", ex);
+                _logger.LogError(" Error retrieving form: {Exception}", ex);
                 return StatusCode(500, new 
                 { 
                     success = false, 
@@ -142,7 +142,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 var userRole = GetCurrentUserRole();
 
                 _logger.LogInformation(
-                    "📋 Get All Forms Request | UserId: {UserId} | Role: {Role}",
+                    "Get All Forms Request | UserId: {UserId} | Role: {Role}",
                     userId, userRole
                 );
 
@@ -150,17 +150,17 @@ namespace Relevantz.EEPZ.Api.Controllers
 
                 if (result.Success)
                 {
-                    _logger.LogInformation("✅ All forms retrieved successfully | Count: {Count}", 
+                    _logger.LogInformation(" All forms retrieved successfully | Count: {Count}", 
                         result.Data?.Count ?? 0);
                     return Ok(result);
                 }
 
-                _logger.LogWarning("❌ Failed to retrieve forms: {Message}", result.Message);
+                _logger.LogWarning(" Failed to retrieve forms: {Message}", result.Message);
                 return BadRequest(result);
             }
             catch (Exception ex)
             {
-                _logger.LogError("❌ Error retrieving all forms: {Exception}", ex);
+                _logger.LogError(" Error retrieving all forms: {Exception}", ex);
                 return StatusCode(500, new 
                 { 
                     success = false, 
@@ -180,7 +180,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 var userRole = GetCurrentUserRole();
 
                 _logger.LogInformation(
-                    "✏️ Update Form Request | UserId: {UserId} | Role: {Role} | FormId: {FormId}",
+                    "Update Form Request | UserId: {UserId} | Role: {Role} | FormId: {FormId}",
                     userId, userRole, formId
                 );
 
@@ -198,21 +198,21 @@ namespace Relevantz.EEPZ.Api.Controllers
 
                 if (result.Success)
                 {
-                    _logger.LogInformation("✅ Form updated successfully | FormId: {FormId}", formId);
+                    _logger.LogInformation(" Form updated successfully | FormId: {FormId}", formId);
                     return Ok(result);
                 }
 
-                _logger.LogWarning("❌ Form update failed: {Message}", result.Message);
+                _logger.LogWarning(" Form update failed: {Message}", result.Message);
                 return BadRequest(result);
             }
             catch (UnauthorizedAccessException ex)
             {
-                _logger.LogError("❌ Unauthorized access: {Message}", ex.Message);
+                _logger.LogError(" Unauthorized access: {Message}", ex.Message);
                 return Unauthorized(new { success = false, message = "Unauthorized access" });
             }
             catch (Exception ex)
             {
-                _logger.LogError("❌ Error updating form: {Exception}", ex);
+                _logger.LogError(" Error updating form: {Exception}", ex);
                 return StatusCode(500, new 
                 { 
                     success = false, 
@@ -232,7 +232,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 var userRole = GetCurrentUserRole();
 
                 _logger.LogInformation(
-                    "❌ Delete Form Request | UserId: {UserId} | Role: {Role} | FormId: {FormId}",
+                    " Delete Form Request | UserId: {UserId} | Role: {Role} | FormId: {FormId}",
                     userId, userRole, formId
                 );
 
@@ -245,21 +245,21 @@ namespace Relevantz.EEPZ.Api.Controllers
 
                 if (result.Success)
                 {
-                    _logger.LogInformation("✅ Form deleted successfully | FormId: {FormId}", formId);
+                    _logger.LogInformation(" Form deleted successfully | FormId: {FormId}", formId);
                     return Ok(result);
                 }
 
-                _logger.LogWarning("❌ Form deletion failed: {Message}", result.Message);
+                _logger.LogWarning(" Form deletion failed: {Message}", result.Message);
                 return BadRequest(result);
             }
             catch (UnauthorizedAccessException ex)
             {
-                _logger.LogError("❌ Unauthorized access: {Message}", ex.Message);
+                _logger.LogError(" Unauthorized access: {Message}", ex.Message);
                 return Unauthorized(new { success = false, message = "Unauthorized access" });
             }
             catch (Exception ex)
             {
-                _logger.LogError("❌ Error deleting form: {Exception}", ex);
+                _logger.LogError(" Error deleting form: {Exception}", ex);
                 return StatusCode(500, new 
                 { 
                     success = false, 
@@ -279,7 +279,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 var userRole = GetCurrentUserRole();
 
                 _logger.LogInformation(
-                    "🗑️ Delete Draft Request | UserId: {UserId} | Role: {Role} | AssignmentId: {AssignmentId}",
+                    "Delete Draft Request | UserId: {UserId} | Role: {Role} | AssignmentId: {AssignmentId}",
                     userId, userRole, assignmentId
                 );
 
@@ -292,21 +292,21 @@ namespace Relevantz.EEPZ.Api.Controllers
 
                 if (result.Success)
                 {
-                    _logger.LogInformation("✅ Draft deleted successfully | AssignmentId: {AssignmentId}", assignmentId);
+                    _logger.LogInformation(" Draft deleted successfully | AssignmentId: {AssignmentId}", assignmentId);
                     return Ok(result);
                 }
 
-                _logger.LogWarning("❌ Draft deletion failed: {Message}", result.Message);
+                _logger.LogWarning(" Draft deletion failed: {Message}", result.Message);
                 return BadRequest(result);
             }
             catch (UnauthorizedAccessException ex)
             {
-                _logger.LogError("❌ Unauthorized access: {Message}", ex.Message);
+                _logger.LogError(" Unauthorized access: {Message}", ex.Message);
                 return Unauthorized(new { success = false, message = "Unauthorized access" });
             }
             catch (Exception ex)
             {
-                _logger.LogError("❌ Error deleting draft: {Exception}", ex);
+                _logger.LogError(" Error deleting draft: {Exception}", ex);
                 return StatusCode(500, new 
                 { 
                     success = false, 

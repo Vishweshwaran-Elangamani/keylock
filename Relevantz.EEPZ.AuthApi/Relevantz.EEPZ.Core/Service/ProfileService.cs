@@ -125,40 +125,40 @@ namespace Relevantz.EEPZ.Core.Service
                 }
 
                 // Update profile information - only if values are provided
-                if (!string.IsNullOrEmpty(request.FirstName)) 
+                if (!string.IsNullOrEmpty(request.FirstName))
                     profile.FirstName = request.FirstName;
-                
-                if (request.MiddleName != null) 
+
+                if (request.MiddleName != null)
                     profile.MiddleName = request.MiddleName;
-                
-                if (!string.IsNullOrEmpty(request.LastName)) 
+
+                if (!string.IsNullOrEmpty(request.LastName))
                     profile.LastName = request.LastName;
-                
-                if (request.CallingName != null) 
+
+                if (request.CallingName != null)
                     profile.CallingName = request.CallingName;
-                
-                if (!string.IsNullOrEmpty(request.Gender)) 
+
+                if (!string.IsNullOrEmpty(request.Gender))
                     profile.Gender = request.Gender;
-                
-                if (request.DateOfBirthOfficial.HasValue) 
+
+                if (request.DateOfBirthOfficial.HasValue)
                     profile.DateOfBirthOfficial = request.DateOfBirthOfficial;
-                
-                if (request.DateOfBirthActual.HasValue) 
+
+                if (request.DateOfBirthActual.HasValue)
                     profile.DateOfBirthActual = request.DateOfBirthActual;
-                
-                if (request.MobileNumber != null) 
+
+                if (request.MobileNumber != null)
                     profile.MobileNumber = request.MobileNumber;
-                
-                if (request.AlternateNumber != null) 
+
+                if (request.AlternateNumber != null)
                     profile.AlternateNumber = request.AlternateNumber;
-                
-                if (request.PersonalEmail != null) 
+
+                if (request.PersonalEmail != null)
                     profile.PersonalEmail = request.PersonalEmail;
-                
-                if (request.MaritalStatus != null) 
+
+                if (request.MaritalStatus != null)
                     profile.MaritalStatus = request.MaritalStatus;
-                
-                if (request.Nationality != null) 
+
+                if (request.Nationality != null)
                     profile.Nationality = request.Nationality;
 
                 // Profile photo upload with optimization and MongoDB storage
@@ -171,9 +171,9 @@ namespace Relevantz.EEPZ.Core.Service
                     {
                         using var imageStream = request.ProfilePhoto.OpenReadStream();
                         using var image = await Image.LoadAsync(imageStream);
-                        
+
                         EEPZBusinessLog.Information($"Original image dimensions: {image.Width}x{image.Height}");
-                        
+
                         // Resize to max 300x300 for profile photos
                         if (image.Width > 300 || image.Height > 300)
                         {
@@ -182,10 +182,10 @@ namespace Relevantz.EEPZ.Core.Service
                                 Size = new Size(300, 300),
                                 Mode = ResizeMode.Max
                             }));
-                            
+
                             EEPZBusinessLog.Information($"Resized image dimensions: {image.Width}x{image.Height}");
                         }
-                        
+
                         // Compress as JPEG with quality 85
                         using var ms = new MemoryStream();
                         await image.SaveAsJpegAsync(ms, new JpegEncoder { Quality = 85 });

@@ -266,13 +266,14 @@ services:
   rewards-api:
     build: ./Relevantz.EEPZ.RewardsApi
     container_name: eepz-rewards-api
-    restart: always
+    restart: always    
     ports:
-      - "5114:5114"
-    environment:
+      - "5114:5114"      
+    environment:      
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5114
+
     depends_on:
       mysql:
         condition: service_healthy
@@ -324,3 +325,4 @@ volumes:
 networks:
   eepz-network:
     driver: bridge
+   

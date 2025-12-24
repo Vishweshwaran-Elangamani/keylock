@@ -26,12 +26,12 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
             string? searchTerm,
             string? sortField,
             string? sortOrder,
-            int pageNumber,
+            int pageNumber, 
             int pageSize
-        );
+        );            
         Task<Lndapproval?> GetPendingAssignmentApprovalAsync(int assignmentId, string approvalType);
         Task<Lndattachment> AddAttachmentAsync(Lndattachment attachment);
         Task<Lndattachment?> GetAttachmentByIdAsync(int attachmentId);
-        Task<int> SaveChangesAsync();
-    }
+         
+    }   
 }

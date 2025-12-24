@@ -59,13 +59,11 @@ public partial class Nomination
 
     public virtual Userauthentication? L2managerUser { get; set; }
 
-    public virtual ICollection<Managernominationtracking> Managernominationtrackings { get; set; } =
-        new List<Managernominationtracking>();
+    public virtual ICollection<Managernominationtracking> Managernominationtrackings { get; set; } = new List<Managernominationtracking>();
 
     public virtual Userauthentication NominatedByUser { get; set; } = null!;
 
-    public virtual ICollection<Nominationreviewmetric> Nominationreviewmetrics { get; set; } =
-        new List<Nominationreviewmetric>();
+    public virtual ICollection<Nominationreviewmetric> Nominationreviewmetrics { get; set; } = new List<Nominationreviewmetric>();
 
     public virtual Userauthentication NomineeUser { get; set; } = null!;
 

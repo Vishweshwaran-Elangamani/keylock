@@ -1,66 +1,56 @@
 using Microsoft.AspNetCore.Mvc;
-
-using Microsoft.EntityFrameworkCore;
-
-using Relevantz.EEPZ.Data.DBContexts;
+using Relevantz.EEPZ.Common.DTOs.Response;
+using Relevantz.EEPZ.Core.Services.Interfaces;
+using System.Threading.Tasks;
 
 namespace eepzbackend.Controllers
-
 {
-
     [ApiController]
-
     [Route("api/[controller]")]
-
     public class UserProfilesController : ControllerBase
-
     {
+        private readonly IUserProfilesService _userProfilesService;
+        private readonly ILogger<UserProfilesController> _logger;
 
-        private readonly EEPZDbContext _context;
-
-        public UserProfilesController(EEPZDbContext context)
-
+        public UserProfilesController(
+            IUserProfilesService userProfilesService,
+            ILogger<UserProfilesController> logger)
         {
-
-            _context = context;
-
+            _userProfilesService = userProfilesService;
+            _logger = logger;
         }
 
         [HttpGet("all")]
-
         public async Task<IActionResult> GetAllUserProfiles()
-
         {
+            try
+            {
+                var result = await _userProfilesService.GetAllUserProfilesAsync();
 
-            var users = await _context.Userprofiles
-
-                .Select(u => new
-
+                if (result.Success)
                 {
+                    return Ok(new
+                    {
+                        success = true,
+                        data = result.Data
+                    });
+                }
 
-                    u.ProfileId,
-
-                    u.EmployeeId,
-
-                    u.FirstName,
-
-                    u.LastName,
-
-                    u.PersonalEmail,
-
-                    u.Gender,
-
-                    u.MobileNumber
-
-                })
-
-                .ToListAsync();
-
-            return Ok(new { success = true, data = users });
-
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = string.Join(", ", result.Errors)
+                });
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError($"Error in GetAllUserProfiles: {ex.Message}");
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
         }
-
     }
-
 }
-

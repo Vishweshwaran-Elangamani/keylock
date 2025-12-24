@@ -21,13 +21,11 @@ namespace Relevantz.EEPZ.Api.Controllers
             _departmentService = departmentService;
         }
 
-        // ==================== ROLE ENDPOINTS ====================
-
         [HttpPost("role/create")]
         public async Task<IActionResult> CreateRole([FromBody] CreateRoleRequestDto request)
         {
             var result = await _roleService.CreateRoleAsync(request);
-            
+
             if (!result.Success)
                 return BadRequest(result);
 
@@ -38,7 +36,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> UpdateRole([FromBody] UpdateRoleRequestDto request)
         {
             var result = await _roleService.UpdateRoleAsync(request);
-            
+
             if (!result.Success)
                 return BadRequest(result);
 
@@ -49,7 +47,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> GetRoleById(int roleId)
         {
             var result = await _roleService.GetRoleByIdAsync(roleId);
-            
+
             if (!result.Success)
                 return NotFound(result);
 
@@ -67,21 +65,19 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> DeleteRole(int roleId)
         {
             var result = await _roleService.DeleteRoleAsync(roleId);
-            
+
             if (!result.Success)
                 return BadRequest(result);
 
             return Ok(result);
         }
 
-        // ==================== DEPARTMENT ENDPOINTS (EXISTING - UNCHANGED) ====================
-
         [HttpPost("department/create")]
         [AllowAnonymous]
         public async Task<IActionResult> CreateDepartment([FromBody] CreateDepartmentRequestDto request)
         {
             var result = await _departmentService.CreateDepartmentAsync(request);
-           
+
             if (!result.Success)
                 return BadRequest(result);
 
@@ -93,7 +89,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> UpdateDepartment([FromBody] UpdateDepartmentRequestDto request)
         {
             var result = await _departmentService.UpdateDepartmentAsync(request);
-           
+
             if (!result.Success)
                 return BadRequest(result);
 
@@ -105,7 +101,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> GetDepartmentById(int departmentId)
         {
             var result = await _departmentService.GetDepartmentByIdAsync(departmentId);
-           
+
             if (!result.Success)
                 return NotFound(result);
 
@@ -125,7 +121,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> DeleteDepartment(int departmentId)
         {
             var result = await _departmentService.DeleteDepartmentAsync(departmentId);
-           
+
             if (!result.Success)
                 return BadRequest(result);
 
@@ -139,7 +135,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> GetDepartmentHierarchyTree([FromQuery] int? rootDepartmentId = null)
         {
             var result = await _departmentService.GetDepartmentHierarchyTreeAsync(rootDepartmentId);
-            
+
             if (!result.Success)
                 return BadRequest(result);
 
@@ -151,7 +147,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> GetChildDepartments(int departmentId)
         {
             var result = await _departmentService.GetChildDepartmentsAsync(departmentId);
-            
+
             if (!result.Success)
                 return BadRequest(result);
 
@@ -171,7 +167,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> GetDepartmentPath(int departmentId)
         {
             var result = await _departmentService.GetDepartmentPathAsync(departmentId);
-            
+
             if (!result.Success)
                 return NotFound(result);
 
@@ -201,7 +197,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> UpdateDepartmentStatus(int departmentId, [FromBody] UpdateStatusRequestDto request)
         {
             var result = await _departmentService.UpdateDepartmentStatusAsync(departmentId, request.Status);
-            
+
             if (!result.Success)
                 return BadRequest(result);
 
@@ -223,7 +219,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> AssignHod(int departmentId, [FromBody] AssignHodRequestDto request)
         {
             var result = await _departmentService.AssignHodAsync(departmentId, request.HodEmployeeId);
-            
+
             if (!result.Success)
                 return BadRequest(result);
 
@@ -235,7 +231,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> RemoveHod(int departmentId)
         {
             var result = await _departmentService.RemoveHodAsync(departmentId);
-            
+
             if (!result.Success)
                 return BadRequest(result);
 
@@ -260,7 +256,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> GetDepartmentByCode(string departmentCode)
         {
             var result = await _departmentService.GetDepartmentByCodeAsync(departmentCode);
-            
+
             if (!result.Success)
                 return NotFound(result);
 

@@ -96,15 +96,14 @@ namespace Relevantz.EEPZ.Data.Repository
 
         public async Task<bool> IsUsernameAlreadyExistsAsync(string username, int excludeUserId)
         {
-            // Username doesn't exist in Userauthentication - always return false
             return await Task.FromResult(false);
         }
 
         public async Task<bool> IsEmployeeCompanyIdExistsAsync(string employeeCompanyId, int excludeEmployeeId)
         {
             return await _context.Employees
-                .AnyAsync(e => e.EmployeeCompanyId == employeeCompanyId && 
-                              e.EmployeeId != excludeEmployeeId && 
+                .AnyAsync(e => e.EmployeeCompanyId == employeeCompanyId &&
+                              e.EmployeeId != excludeEmployeeId &&
                               e.IsActive == true);
         }
     }

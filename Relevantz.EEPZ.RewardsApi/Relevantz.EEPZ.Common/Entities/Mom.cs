@@ -51,11 +51,9 @@ public partial class Mom
 
     public virtual Meeting? Meeting { get; set; }
 
-    public virtual ICollection<Momactionitem> Momactionitems { get; set; } =
-        new List<Momactionitem>();
+    public virtual ICollection<Momactionitem> Momactionitems { get; set; } = new List<Momactionitem>();
 
-    public virtual ICollection<Momdiscussionpoint> Momdiscussionpoints { get; set; } =
-        new List<Momdiscussionpoint>();
+    public virtual ICollection<Momdiscussionpoint> Momdiscussionpoints { get; set; } = new List<Momdiscussionpoint>();
 
     public virtual ICollection<Momsharing> Momsharings { get; set; } = new List<Momsharing>();
 

@@ -47,8 +47,8 @@ namespace Relevantz.EEPZ.Core.Service
                 if (!string.IsNullOrEmpty(request.Period) && request.PeriodYear.HasValue)
                 {
                     var periodAllocation = await _context.Budgetperiodallocations
-                        .FirstOrDefaultAsync(p => p.BudgetId == request.BudgetId 
-                                                && p.Period == request.Period 
+                        .FirstOrDefaultAsync(p => p.BudgetId == request.BudgetId
+                                                && p.Period == request.Period
                                                 && p.PeriodYear == request.PeriodYear.Value);
 
                     if (periodAllocation == null)
@@ -60,8 +60,8 @@ namespace Relevantz.EEPZ.Core.Service
 
                     // Check if amount exceeds period allocation
                     var periodSubAllocationsTotal = await _context.Budgetallocations
-                        .Where(a => a.BudgetId == request.BudgetId 
-                                 && a.Period == request.Period 
+                        .Where(a => a.BudgetId == request.BudgetId
+                                 && a.Period == request.Period
                                  && a.PeriodYear == request.PeriodYear)
                         .SumAsync(a => a.Amount);
 
@@ -91,8 +91,8 @@ namespace Relevantz.EEPZ.Core.Service
                     UtilizedAmount = 0,
                     UtilizationPercentage = 0,
                     UpdatedAt = DateTime.UtcNow,
-                    Period = request.Period, 
-                    PeriodYear = request.PeriodYear  
+                    Period = request.Period,
+                    PeriodYear = request.PeriodYear
                 };
 
                 var createdAllocation = await _fundAllocationRepository.CreateAsync(allocation);
@@ -100,7 +100,7 @@ namespace Relevantz.EEPZ.Core.Service
                 var response = await BuildFundAllocationResponse(createdAllocation.AllocationId);
 
                 Console.WriteLine($" Service: Fund allocation created with AllocationId: {createdAllocation.AllocationId}");
-               
+
                 return ApiResponseDto<FundAllocationResponseDto>.SuccessResponse(
                     response,
                     "Fund allocation created successfully");
@@ -291,70 +291,70 @@ namespace Relevantz.EEPZ.Core.Service
         }
 
         private async Task<FundAllocationResponseDto> BuildFundAllocationResponse(int allocationId)
-{
-    var allocation = await _context.Budgetallocations
-        .Where(b => b.AllocationId == allocationId)
-        .Select(b => new
         {
-            b.AllocationId,
-            b.BudgetId,
-            b.DepartmentId,
-            DepartmentName = _context.Departments
-                .Where(d => d.DepartmentId == b.DepartmentId)
-                .Select(d => d.DepartmentName)
-                .FirstOrDefault() ?? "Unknown",
-            b.EmployeeUserId,
-            EmployeeEmail = b.EmployeeUserId.HasValue
-                ? _context.Userauthentications
-                    .Where(u => u.UserId == b.EmployeeUserId)
-                    .Select(u => u.Email)
-                    .FirstOrDefault()
-                : null,
-            b.AllocationType,
-            b.Amount,
-            b.GoalStatus,
-            b.Notes,
-            b.AllocatedByUserId,
-            AllocatedByEmail = _context.Userauthentications
-                .Where(u => u.UserId == b.AllocatedByUserId)
-                .Select(u => u.Email)
-                .FirstOrDefault() ?? "Unknown",
-            b.AllocatedAt,
-            b.UtilizedAmount,
-            b.UtilizationPercentage,
-            b.UpdatedAt,
-            b.Period,
-            b.PeriodYear
-        })
-        .FirstOrDefaultAsync();
+            var allocation = await _context.Budgetallocations
+                .Where(b => b.AllocationId == allocationId)
+                .Select(b => new
+                {
+                    b.AllocationId,
+                    b.BudgetId,
+                    b.DepartmentId,
+                    DepartmentName = _context.Departments
+                        .Where(d => d.DepartmentId == b.DepartmentId)
+                        .Select(d => d.DepartmentName)
+                        .FirstOrDefault() ?? "Unknown",
+                    b.EmployeeUserId,
+                    EmployeeEmail = b.EmployeeUserId.HasValue
+                        ? _context.Userauthentications
+                            .Where(u => u.UserId == b.EmployeeUserId)
+                            .Select(u => u.Email)
+                            .FirstOrDefault()
+                        : null,
+                    b.AllocationType,
+                    b.Amount,
+                    b.GoalStatus,
+                    b.Notes,
+                    b.AllocatedByUserId,
+                    AllocatedByEmail = _context.Userauthentications
+                        .Where(u => u.UserId == b.AllocatedByUserId)
+                        .Select(u => u.Email)
+                        .FirstOrDefault() ?? "Unknown",
+                    b.AllocatedAt,
+                    b.UtilizedAmount,
+                    b.UtilizationPercentage,
+                    b.UpdatedAt,
+                    b.Period,
+                    b.PeriodYear
+                })
+                .FirstOrDefaultAsync();
 
-    if (allocation == null)
-    {
-        throw new Exception($"Fund allocation with ID {allocationId} not found");
-    }
+            if (allocation == null)
+            {
+                throw new Exception($"Fund allocation with ID {allocationId} not found");
+            }
 
-    return new FundAllocationResponseDto
-    {
-        AllocationId = allocation.AllocationId,
-        BudgetId = allocation.BudgetId ?? 0,  
-        DepartmentId = allocation.DepartmentId,
-        DepartmentName = allocation.DepartmentName,
-        EmployeeUserId = allocation.EmployeeUserId,
-        EmployeeEmail = allocation.EmployeeEmail,
-        AllocationType = allocation.AllocationType ?? "Unknown",
-        Amount = allocation.Amount,
-        GoalStatus = allocation.GoalStatus,
-        Notes = allocation.Notes,
-        AllocatedByUserId = allocation.AllocatedByUserId,
-        AllocatedByEmail = allocation.AllocatedByEmail,
-        AllocatedAt = allocation.AllocatedAt,
-        UtilizedAmount = allocation.UtilizedAmount ?? 0,
-        UtilizationPercentage = allocation.UtilizationPercentage ?? 0,
-        UpdatedAt = allocation.UpdatedAt,
-        Period = allocation.Period,
-        PeriodYear = allocation.PeriodYear
-    };
-}
+            return new FundAllocationResponseDto
+            {
+                AllocationId = allocation.AllocationId,
+                BudgetId = allocation.BudgetId ?? 0,
+                DepartmentId = allocation.DepartmentId,
+                DepartmentName = allocation.DepartmentName,
+                EmployeeUserId = allocation.EmployeeUserId,
+                EmployeeEmail = allocation.EmployeeEmail,
+                AllocationType = allocation.AllocationType ?? "Unknown",
+                Amount = allocation.Amount,
+                GoalStatus = allocation.GoalStatus,
+                Notes = allocation.Notes,
+                AllocatedByUserId = allocation.AllocatedByUserId,
+                AllocatedByEmail = allocation.AllocatedByEmail,
+                AllocatedAt = allocation.AllocatedAt,
+                UtilizedAmount = allocation.UtilizedAmount ?? 0,
+                UtilizationPercentage = allocation.UtilizationPercentage ?? 0,
+                UpdatedAt = allocation.UpdatedAt,
+                Period = allocation.Period,
+                PeriodYear = allocation.PeriodYear
+            };
+        }
 
     }
 }

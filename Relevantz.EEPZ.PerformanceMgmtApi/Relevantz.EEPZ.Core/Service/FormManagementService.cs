@@ -1,42 +1,30 @@
 using Microsoft.EntityFrameworkCore;
-using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Relevantz.EEPZ.Data.Repository.Interfaces;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
-
     public class FormManagementService : IFormManagementService
     {
-        private readonly EEPZDbContext _context;
+        private readonly IFormManagementRepository _repository;
 
-        public FormManagementService(EEPZDbContext context)
+        public FormManagementService(IFormManagementRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
         public async Task<ApiResponse<FormResponseDto>> CreateFormAsync(CreateFormRequestDto request)
         {
             try
             {
-
-                var creator = await _context.Userauthentications
-                    .Include(u => u.Employee)
-                    .FirstOrDefaultAsync(u => u.UserId == request.CreatedBy);
-
+                var creator = await _repository.GetUserWithEmployeeAsync(request.CreatedBy);
                 if (creator == null)
                     return ApiResponse<FormResponseDto>.ErrorResponse("User not found");
 
-                var creatorDetails = await _context.Employeedetailsmasters
-                    .Include(d => d.Role)
-                    .FirstOrDefaultAsync(d => d.EmployeeId == creator.EmployeeId);
-
+                var creatorDetails = await _repository.GetEmployeeDetailsWithRoleAsync(creator.EmployeeId);
                 if (creatorDetails == null || creatorDetails.Role == null ||
                     !string.Equals(creatorDetails.Role.RoleCode, "HR", StringComparison.OrdinalIgnoreCase))
                 {
@@ -58,8 +46,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     CreatedAt = DateTime.UtcNow
                 };
 
-                _context.Assessmentforms.Add(form);
-                await _context.SaveChangesAsync();
+                await _repository.AddFormAsync(form);
 
                 var competencies = request.Competencies.Select(c => new Competency
                 {
@@ -69,14 +56,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     DisplayOrder = c.DisplayOrder ?? 0
                 }).ToList();
 
-                _context.Competencies.AddRange(competencies);
-                await _context.SaveChangesAsync();
+                await _repository.AddCompetenciesAsync(competencies);
 
-                var createdForm = await _context.Assessmentforms
-                    .Include(f => f.CreatedByNavigation)
-                    .Include(f => f.Competencies)
-                    .FirstOrDefaultAsync(f => f.FormId == form.FormId);
-
+                var createdForm = await _repository.GetFormByIdWithCompetenciesAsync(form.FormId);
                 var response = MapToFormResponse(createdForm!);
                 return ApiResponse<FormResponseDto>.SuccessResponse(response, "Form created successfully");
             }
@@ -90,25 +72,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             try
             {
-
-                var form = await _context.Assessmentforms
-                    .Include(f => f.Competencies)
-                    .FirstOrDefaultAsync(f => f.FormId == formId);
-
+                var form = await _repository.GetFormByIdWithCompetenciesAsync(formId);
                 if (form == null)
                     return ApiResponse<FormResponseDto>.ErrorResponse("Form not found");
 
-                var creator = await _context.Userauthentications
-                    .Include(u => u.Employee)
-                    .FirstOrDefaultAsync(u => u.UserId == request.CreatedBy);
-
+                var creator = await _repository.GetUserWithEmployeeAsync(request.CreatedBy);
                 if (creator == null)
                     return ApiResponse<FormResponseDto>.ErrorResponse("User not found");
 
-                var creatorDetails = await _context.Employeedetailsmasters
-                    .Include(d => d.Role)
-                    .FirstOrDefaultAsync(d => d.EmployeeId == creator.EmployeeId);
-
+                var creatorDetails = await _repository.GetEmployeeDetailsWithRoleAsync(creator.EmployeeId);
                 if (creatorDetails == null || creatorDetails.Role == null ||
                     !string.Equals(creatorDetails.Role.RoleCode, "HR", StringComparison.OrdinalIgnoreCase))
                 {
@@ -124,7 +96,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 form.CreatedBy = request.CreatedBy;
                 form.CreatedAt = DateTime.UtcNow;
 
-                _context.Competencies.RemoveRange(form.Competencies);
+                await _repository.DeleteCompetenciesByFormIdAsync(formId);
 
                 var newCompetencies = request.Competencies.Select(c => new Competency
                 {
@@ -134,14 +106,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     DisplayOrder = c.DisplayOrder ?? 0
                 }).ToList();
 
-                _context.Competencies.AddRange(newCompetencies);
-                await _context.SaveChangesAsync();
+                await _repository.AddCompetenciesAsync(newCompetencies);
 
-                var updatedForm = await _context.Assessmentforms
-                    .Include(f => f.CreatedByNavigation)
-                    .Include(f => f.Competencies)
-                    .FirstOrDefaultAsync(f => f.FormId == form.FormId);
-
+                var updatedForm = await _repository.GetFormByIdWithCompetenciesAsync(formId);
                 var response = new FormResponseDto
                 {
                     FormId = updatedForm!.FormId,
@@ -172,11 +139,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             try
             {
-                var form = await _context.Assessmentforms
-                    .Include(f => f.CreatedByNavigation)
-                    .Include(f => f.Competencies)
-                    .FirstOrDefaultAsync(f => f.FormId == formId);
-
+                var form = await _repository.GetFormByIdWithCompetenciesAsync(formId);
                 if (form == null)
                     return ApiResponse<FormResponseDto>.ErrorResponse("Form not found");
 
@@ -193,37 +156,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             try
             {
-                var forms = await _context.Assessmentforms
-                    .Include(f => f.CreatedByNavigation)
-                    .Include(f => f.Competencies)
-                    .OrderByDescending(f => f.CreatedAt)
-                    .ToListAsync();
-
+                var forms = await _repository.GetAllFormsWithDetailsAsync();
                 if (!forms.Any())
                     return ApiResponse<List<FormResponseDto>>.ErrorResponse("No forms found");
-
-                var response = forms.Select(f => MapToFormResponse(f)).ToList();
-                return ApiResponse<List<FormResponseDto>>.SuccessResponse(response);
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse<List<FormResponseDto>>.ErrorResponse($"Error fetching forms: {ex.Message}");
-            }
-        }
-
-        public async Task<ApiResponse<List<FormResponseDto>>> GetFormsByTypeAsync(string formType)
-        {
-            try
-            {
-                var forms = await _context.Assessmentforms
-                    .Include(f => f.CreatedByNavigation)
-                    .Include(f => f.Competencies)
-                    .Where(f => f.Type == formType)
-                    .OrderByDescending(f => f.CreatedAt)
-                    .ToListAsync();
-
-                if (!forms.Any())
-                    return ApiResponse<List<FormResponseDto>>.ErrorResponse($"No forms found of type: {formType}");
 
                 var response = forms.Select(f => MapToFormResponse(f)).ToList();
                 return ApiResponse<List<FormResponseDto>>.SuccessResponse(response);
@@ -238,19 +173,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             try
             {
-                var form = await _context.Assessmentforms
-                    .Include(f => f.Assignments)
-                    .FirstOrDefaultAsync(f => f.FormId == formId);
-
+                var form = await _repository.GetFormForDeleteAsync(formId);
                 if (form == null)
                     return ApiResponse<bool>.ErrorResponse("Form not found");
 
                 if (form.Assignments.Any())
                     return ApiResponse<bool>.ErrorResponse("Cannot delete form with active assignments");
 
-                _context.Assessmentforms.Remove(form);
-                await _context.SaveChangesAsync();
-
+                await _repository.DeleteFormAsync(form);
                 return ApiResponse<bool>.SuccessResponse(true, "Form deleted successfully");
             }
             catch (Exception ex)
@@ -263,109 +193,16 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             try
             {
-                var draft = await _context.Assignments
-                    .FirstOrDefaultAsync(a => a.AssignmentId == assignmentId && a.Action == "Save as Draft");
-
+                var draft = await _repository.GetDraftByAssignmentIdAsync(assignmentId);
                 if (draft == null)
                     return ApiResponse<bool>.ErrorResponse("Draft not found");
 
-                _context.Assignments.Remove(draft);
-                await _context.SaveChangesAsync();
-
+                await _repository.DeleteDraftAsync(assignmentId);
                 return ApiResponse<bool>.SuccessResponse(true, "Draft deleted successfully");
             }
             catch (Exception ex)
             {
                 return ApiResponse<bool>.ErrorResponse($"Error deleting draft: {ex.Message}");
-            }
-        }
-
-        public async Task<ApiResponse<List<FormResponseDto>>> GetFormsByCreatorAsync(int createdBy)
-        {
-            try
-            {
-                var forms = await _context.Assessmentforms
-                    .Include(f => f.CreatedByNavigation)
-                    .Include(f => f.Competencies)
-                    .Where(f => f.CreatedBy == createdBy)
-                    .OrderByDescending(f => f.CreatedAt)
-                    .ToListAsync();
-
-                if (!forms.Any())
-                    return ApiResponse<List<FormResponseDto>>.ErrorResponse("No forms found for this creator");
-
-                var response = forms.Select(f => MapToFormResponse(f)).ToList();
-                return ApiResponse<List<FormResponseDto>>.SuccessResponse(response);
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse<List<FormResponseDto>>.ErrorResponse($"Error fetching forms: {ex.Message}");
-            }
-        }
-
-        public async Task<ApiResponse<FormResponseDto>> CloneFormAsync(int formIdToClone, int createdBy)
-        {
-            try
-            {
-
-                var originalForm = await _context.Assessmentforms
-                    .Include(f => f.Competencies)
-                    .FirstOrDefaultAsync(f => f.FormId == formIdToClone);
-
-                if (originalForm == null)
-                    return ApiResponse<FormResponseDto>.ErrorResponse("Original form not found");
-
-                var creator = await _context.Userauthentications
-                    .Include(u => u.Employee)
-                    .FirstOrDefaultAsync(u => u.UserId == createdBy);
-
-                if (creator == null)
-                    return ApiResponse<FormResponseDto>.ErrorResponse("User not found");
-
-                var creatorDetails = await _context.Employeedetailsmasters
-                    .Include(d => d.Role)
-                    .FirstOrDefaultAsync(d => d.EmployeeId == creator.EmployeeId);
-
-                if (creatorDetails == null || creatorDetails.Role == null ||
-                    !string.Equals(creatorDetails.Role.RoleCode, "HR", StringComparison.OrdinalIgnoreCase))
-                {
-                    return ApiResponse<FormResponseDto>.ErrorResponse("Only HR users can clone forms.");
-                }
-
-                var newForm = new Assessmentform
-                {
-                    Name = $"{originalForm.Name} (Copy)",
-                    Type = originalForm.Type,
-                    DeliveryEnablement = originalForm.DeliveryEnablement,
-                    CreatedBy = createdBy,
-                    CreatedAt = DateTime.UtcNow
-                };
-
-                _context.Assessmentforms.Add(newForm);
-                await _context.SaveChangesAsync();
-
-                var newCompetencies = originalForm.Competencies.Select(c => new Competency
-                {
-                    FormId = newForm.FormId,
-                    Name = c.Name,
-                    Description = c.Description,
-                    DisplayOrder = c.DisplayOrder
-                }).ToList();
-
-                _context.Competencies.AddRange(newCompetencies);
-                await _context.SaveChangesAsync();
-
-                var clonedForm = await _context.Assessmentforms
-                    .Include(f => f.CreatedByNavigation)
-                    .Include(f => f.Competencies)
-                    .FirstOrDefaultAsync(f => f.FormId == newForm.FormId);
-
-                var response = MapToFormResponse(clonedForm!);
-                return ApiResponse<FormResponseDto>.SuccessResponse(response, "Form cloned successfully");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse<FormResponseDto>.ErrorResponse($"Error cloning form: {ex.Message}");
             }
         }
 
@@ -394,5 +231,3 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
     }
 }
-
- 

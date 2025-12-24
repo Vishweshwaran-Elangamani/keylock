@@ -173,7 +173,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                 );
                 return StatusCode(500, response);
             }
-        }
+        }  
 
         /// <summary>
         /// Get cascading progress for a user (includes subordinate progress)

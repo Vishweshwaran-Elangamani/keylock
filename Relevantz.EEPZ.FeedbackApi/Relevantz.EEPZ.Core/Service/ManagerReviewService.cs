@@ -7,10 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
-    /// <summary>
-    /// Service implementation for ManagerReviewComments business logic
-    /// Handles manager reviews on team/org goals
-    /// </summary>
+
     public class ManagerReviewService : IManagerReviewService
     {
         private readonly IManagerReviewRepository _reviewRepo;

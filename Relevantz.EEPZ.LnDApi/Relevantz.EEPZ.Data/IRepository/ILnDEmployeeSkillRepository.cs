@@ -36,6 +36,6 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
             int pageSize
         );
         Task<List<int>> GetExistingSkillMappingsAsync(int employeeId, List<int> skillIds);
-        Task<int> SaveChangesAsync();
+          
     }
 }

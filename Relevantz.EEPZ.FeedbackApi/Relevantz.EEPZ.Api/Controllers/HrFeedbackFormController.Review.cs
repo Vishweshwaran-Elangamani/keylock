@@ -4,12 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EepzBackend.Controllers
 {
-    /// <summary>
-    /// Partial class containing HR review and form distribution endpoints
-    /// </summary>
+
     public partial class HrFeedbackFormController
     {
-        // ========== REVIEW & DISTRIBUTION ENDPOINTS (3 endpoints) ==========
+        
 
         /// <summary>
         /// HR reviews a submitted form response

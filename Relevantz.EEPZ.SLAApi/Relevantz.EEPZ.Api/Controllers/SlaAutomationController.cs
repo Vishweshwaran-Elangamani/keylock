@@ -30,10 +30,7 @@ namespace eepzbackend.Controllers
         /// <summary>
         /// Send SLA reminders for Day -2 (2 days before deadline)
         /// </summary>
-       
-      /// <summary>
-/// Send SLA reminders for Day -2 (2 days before deadline)
-/// </summary>
+
 [HttpPost("send-reminders/day-minus-2")]
 public async Task<IActionResult> SendRemindersDayMinus2()
 {
@@ -180,7 +177,7 @@ public async Task<IActionResult> SendRemindersDayMinus2()
         {
             try
             {
-                _logger.LogInformation("🔔 Starting Day 0 SLA reminders...");
+                _logger.LogInformation("Starting Day 0 SLA reminders...");
 
                 var slas = await _slaRepository.GetSlasDueInDaysAsync(0);
                 int emailsSent = 0;
@@ -218,7 +215,7 @@ public async Task<IActionResult> SendRemindersDayMinus2()
                     catch (Exception ex)
                     {
                         emailsFailed++;
-                        _logger.LogError(ex, "❌ Failed to send Day 0 reminder for SLA {SlaId}", sla.Slaid);
+                        _logger.LogError(ex, "Failed to send Day 0 reminder for SLA {SlaId}", sla.Slaid);
                     }
                 }
 
@@ -248,7 +245,7 @@ public async Task<IActionResult> SendRemindersDayMinus2()
         {
             try
             {
-                _logger.LogInformation("🔔 Starting all SLA reminders...");
+                _logger.LogInformation("Starting all SLA reminders...");
 
                 var result2Days = await SendRemindersDayMinus2();
                 var result1Day = await SendRemindersDayMinus1();
@@ -335,14 +332,14 @@ public async Task<IActionResult> SendRemindersDayMinus2()
                                 escalationsCreated++;
                                 sla.Status = "Escalated - Level 1";
                                 await _slaRepository.UpdateSlaAsync(sla);
-                                _logger.LogInformation("✅ SLA {SlaId} escalated to manager", sla.Slaid);
+                                _logger.LogInformation("SLA {SlaId} escalated to manager", sla.Slaid);
                             }
                         }
                     }
                     catch (Exception ex)
                     {
                         failures++;
-                        _logger.LogError(ex, "❌ Failed to escalate SLA {SlaId} to manager", sla.Slaid);
+                        _logger.LogError(ex, "Failed to escalate SLA {SlaId} to manager", sla.Slaid);
                     }
                 }
 
@@ -377,7 +374,7 @@ public async Task<IActionResult> SendRemindersDayMinus2()
         {
             try
             {
-                _logger.LogInformation("🔐 Starting auto-closure of completed SLAs...");
+                _logger.LogInformation("Starting auto-closure of completed SLAs...");
 
                 var completedSlas = await _slaRepository.GetCompletedSlasAsync();
                 int closedCount = 0;
@@ -412,13 +409,13 @@ public async Task<IActionResult> SendRemindersDayMinus2()
                                 }
                             }
 
-                            _logger.LogInformation("✅ SLA {SlaId} auto-closed", sla.Slaid);
+                            _logger.LogInformation("SLA {SlaId} auto-closed", sla.Slaid);
                         }
                     }
                     catch (Exception ex)
                     {
                         failures++;
-                        _logger.LogError(ex, "❌ Failed to auto-close SLA {SlaId}", sla.Slaid);
+                        _logger.LogError(ex, "Failed to auto-close SLA {SlaId}", sla.Slaid);
                     }
                 }
 
@@ -452,7 +449,7 @@ public async Task<IActionResult> SendRemindersDayMinus2()
         {
             try
             {
-                _logger.LogInformation("🔄 Starting full SLA automation cycle...");
+                _logger.LogInformation("Starting full SLA automation cycle...");
 
                 await SendAllReminders();
 
@@ -489,7 +486,7 @@ public async Task<IActionResult> SendRemindersDayMinus2()
         {
             try
             {
-                _logger.LogInformation("📊 Fetching automation status...");
+                _logger.LogInformation("Fetching automation status...");
 
                 var totalSlas = await _slaRepository.GetAllSlasAsync();
                 var openSlas = totalSlas.Where(s => s.Status == "Open").ToList();
@@ -535,7 +532,7 @@ public async Task<IActionResult> GetAutomationLogs([FromQuery] int days = 7)
 {
     try
     {
-        _logger.LogInformation("📋 Fetching automation logs for last {Days} days", days);
+        _logger.LogInformation("Fetching automation logs for last {Days} days", days);
 
         var cutoffDate = DateTime.Now.AddDays(-days);
 
@@ -595,7 +592,7 @@ public async Task<IActionResult> CreatePerformanceFormSlas()
 {
     try
     {
-        _logger.LogInformation("📋 Creating Performance Form SLAs...");
+        _logger.LogInformation("Creating Performance Form SLAs...");
 
         var startTime = DateTime.Now;
         var allSlas = await _slaRepository.GetAllSlasAsync();
@@ -719,7 +716,7 @@ public async Task<IActionResult> CreatePerformanceFormSlas()
         return Ok(new ApiResponse<object>
         {
             Success = true,
-            Message = $"✅ Created: {slasCreated}, Skipped: {slasSkipped}",
+            Message = $"Created: {slasCreated}, Skipped: {slasSkipped}",
             Data = new
             {
                 ExecutionSummary = new

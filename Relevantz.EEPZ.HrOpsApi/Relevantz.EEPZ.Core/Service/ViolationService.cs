@@ -10,21 +10,21 @@ using Relevantz.EEPZ.Core.IService;
 
 namespace Relevantz.EEPZ.Core.Service
 {
-   public class ViolationService : IViolationService
+    public class ViolationService : IViolationService
     {
         private readonly IViolationRepository _violationRepository;
- 
+
         public ViolationService(IViolationRepository violationRepository)
         {
             _violationRepository = violationRepository;
         }
- 
+
         public async Task<ApiResponseDto<ViolationResponseDto>> ReportViolationAsync(ReportViolationRequestDto request, int reportedByUserId)
         {
             var violation = new Policyviolation
             {
                 EmployeeUserId = request.EmployeeUserId,
-               
+
                 PolicyId = request.PolicyId,
                 ViolationType = request.ViolationType,
                 Description = request.Description,
@@ -34,23 +34,23 @@ namespace Relevantz.EEPZ.Core.Service
                 ReportedDate = DateOnly.FromDateTime(DateTime.Now),
                 EscalatedToUserId = request.EscalatedToUserId
             };
- 
+
             var createdViolation = await _violationRepository.CreateViolationAsync(violation);
-           
+
             // Reload with includes
             var fullViolation = await _violationRepository.GetViolationByIdAsync(createdViolation.ViolationId);
             var response = MapToResponseDto(fullViolation!);
-           
+
             return ApiResponseDto<ViolationResponseDto>.SuccessResponse(response, "Violation reported successfully");
         }
- 
+
         public async Task<ApiResponseDto<List<ViolationResponseDto>>> GetAllViolationsAsync()
         {
             var violations = await _violationRepository.GetAllViolationsAsync();
             var response = violations.Select(MapToResponseDto).ToList();
             return ApiResponseDto<List<ViolationResponseDto>>.SuccessResponse(response);
         }
- 
+
         public async Task<ApiResponseDto<ViolationResponseDto>> GetViolationByIdAsync(int violationId)
         {
             var violation = await _violationRepository.GetViolationByIdAsync(violationId);
@@ -58,25 +58,25 @@ namespace Relevantz.EEPZ.Core.Service
             {
                 return ApiResponseDto<ViolationResponseDto>.ErrorResponse("Violation not found");
             }
- 
+
             var response = MapToResponseDto(violation);
             return ApiResponseDto<ViolationResponseDto>.SuccessResponse(response);
         }
- 
+
         public async Task<ApiResponseDto<List<ViolationResponseDto>>> GetViolationsByEmployeeAsync(int EmployeeUserId)
         {
             var violations = await _violationRepository.GetViolationsByEmployeeAsync(EmployeeUserId);
             var response = violations.Select(MapToResponseDto).ToList();
             return ApiResponseDto<List<ViolationResponseDto>>.SuccessResponse(response);
         }
- 
+
         public async Task<ApiResponseDto<List<ViolationResponseDto>>> GetViolationsByPolicyAsync(int policyId)
         {
             var violations = await _violationRepository.GetViolationsByPolicyAsync(policyId);
             var response = violations.Select(MapToResponseDto).ToList();
             return ApiResponseDto<List<ViolationResponseDto>>.SuccessResponse(response);
         }
- 
+
         public async Task<ApiResponseDto<ViolationResponseDto>> ResolveViolationAsync(int violationId, ResolveViolationRequestDto request)
         {
             var result = await _violationRepository.ResolveViolationAsync(violationId, request.ResolutionNotes);
@@ -84,26 +84,26 @@ namespace Relevantz.EEPZ.Core.Service
             {
                 return ApiResponseDto<ViolationResponseDto>.ErrorResponse("Violation not found");
             }
- 
+
             var violation = await _violationRepository.GetViolationByIdAsync(violationId);
             var response = MapToResponseDto(violation!);
             return ApiResponseDto<ViolationResponseDto>.SuccessResponse(response, "Violation resolved successfully");
         }
- 
+
         public async Task<ApiResponseDto<ViolationStatsDto>> GetViolationStatsAsync()
         {
             var bySeverity = await _violationRepository.GetViolationCountBySeverityAsync();
             var byStatus = await _violationRepository.GetViolationCountByStatusAsync();
- 
+
             var stats = new ViolationStatsDto
             {
                 BySeverity = bySeverity,
                 ByStatus = byStatus
             };
- 
+
             return ApiResponseDto<ViolationStatsDto>.SuccessResponse(stats);
         }
- 
+
         private ViolationResponseDto MapToResponseDto(Policyviolation violation)
         {
             return new ViolationResponseDto
@@ -130,5 +130,5 @@ namespace Relevantz.EEPZ.Core.Service
             };
         }
     }
- 
+
 }

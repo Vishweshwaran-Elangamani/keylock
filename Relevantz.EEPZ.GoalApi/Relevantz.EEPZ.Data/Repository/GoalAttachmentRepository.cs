@@ -13,12 +13,12 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
     public class GoalAttachmentRepository : IGoalAttachmentRepository
     {
         private readonly EEPZDbContext _db;
-        private readonly IWebHostEnvironment environment;
+        private readonly IWebHostEnvironment environment;   
 
         public GoalAttachmentRepository(EEPZDbContext db, IWebHostEnvironment _environment)
         {
             _db = db;
-            environment = _environment;
+            environment = _environment;      
         }
 
         public async Task AddAttachmentAsync(GoalAttachment attachment)
@@ -210,3 +210,4 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         }
     }
 }
+    

@@ -2,9 +2,6 @@ namespace Relevantz.EEPZ.Common.Utils
 {
     public static class Constants
     {
-         
-        // EMPLOYMENT TYPES - Contract/Employment Status
-         
         public static class EmploymentTypes
         {
             public const string Permanent = "Permanent";
@@ -14,9 +11,6 @@ namespace Relevantz.EEPZ.Common.Utils
             public const string Probation = "Probation";
         }
 
-         
-        // EMPLOYMENT STATUSES - Current Status
-         
         public static class EmploymentStatuses
         {
             public const string Active = "Active";
@@ -26,21 +20,15 @@ namespace Relevantz.EEPZ.Common.Utils
             public const string Retired = "Retired";
         }
 
-         
-        // EMPLOYEE TYPES - Full/Part Time
-         
         public static class EmployeeTypes
         {
-            public const string FullTime = "FullTime";      
-            public const string PartTime = "PartTime";      
+            public const string FullTime = "FullTime";
+            public const string PartTime = "PartTime";
             public const string Contract = "Contract";
             public const string Intern = "Intern";
             public const string Consultant = "Consultant";
         }
 
-         
-        // GENDERS
-         
         public static class Genders
         {
             public const string Male = "Male";
@@ -49,9 +37,6 @@ namespace Relevantz.EEPZ.Common.Utils
             public const string PreferNotToSay = "PreferNotToSay";
         }
 
-         
-        // USER STATUSES
-         
         public static class UserStatuses
         {
             public const string Active = "Active";
@@ -59,9 +44,6 @@ namespace Relevantz.EEPZ.Common.Utils
             public const string Locked = "Locked";
         }
 
-         
-        // ROLES
-         
         public static class Roles
         {
             public const string Admin = "Admin";
@@ -71,18 +53,12 @@ namespace Relevantz.EEPZ.Common.Utils
             public const string Finance = "Finance";
         }
 
-         
-        // OTP TYPES
-         
         public static class OtpTypes
         {
             public const string Login2FA = "Login2FA";
             public const string ForgotPassword = "ForgotPassword";
         }
 
-         
-        // CHANGE REQUEST TYPES
-         
         public static class ChangeTypes
         {
             public const string Email = "Email";
@@ -92,9 +68,6 @@ namespace Relevantz.EEPZ.Common.Utils
             public const string Username = "Username";
         }
 
-         
-        // REQUEST STATUSES
-         
         public static class RequestStatuses
         {
             public const string Pending = "Pending";
@@ -103,9 +76,6 @@ namespace Relevantz.EEPZ.Common.Utils
             public const string Cancelled = "Cancelled";
         }
 
-         
-        // MESSAGES
-         
         public static class Messages
         {
             // Authentication

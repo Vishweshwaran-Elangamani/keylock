@@ -514,8 +514,8 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
             {
                 DepartmentId = departmentId,
                 Period = period,
-                PeriodStartDate = periodStartDate,   // ✅ DateOnly
-                PeriodEndDate = periodEndDate,       // ✅ DateOnly
+                PeriodStartDate = periodStartDate,   
+                PeriodEndDate = periodEndDate,       
                 TotalSlas = totalSlas,
                 OnTimeSlas = onTimeSlas,
                 BreachedSlas = breachedSlas,
@@ -529,8 +529,8 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
         else
         {
             // Update existing compliance record
-            compliance.PeriodStartDate = periodStartDate;   // ✅ DateOnly
-            compliance.PeriodEndDate = periodEndDate;       // ✅ DateOnly
+            compliance.PeriodStartDate = periodStartDate;   
+            compliance.PeriodEndDate = periodEndDate;      
             compliance.TotalSlas = totalSlas;
             compliance.OnTimeSlas = onTimeSlas;
             compliance.BreachedSlas = breachedSlas;

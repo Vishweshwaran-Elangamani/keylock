@@ -96,7 +96,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         ResponseMessages.Codes.GOAL_CHECKLIST_INSUFFICIENT,
                         "Goal must have at least 3 valid checklist items with titles."
                     );
-                }
+                }   
 
                 // AUTO-ASSIGN self goal checklist items FIRST (before validation)
                 if (dto.GoalType == GOAL_TYPE.SELF)
