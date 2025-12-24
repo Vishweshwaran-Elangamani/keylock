@@ -8,10 +8,7 @@ using Relevantz.EEPZ.Common.Entities;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
-    /// <summary>
-    /// Service implementation for Feedback business logic
-    /// Handles all feedback operations with validation and mapping
-    /// </summary>
+
     public class FeedbackService : IFeedbackService
     {
         private readonly IFeedbackRepository _feedbackRepo;

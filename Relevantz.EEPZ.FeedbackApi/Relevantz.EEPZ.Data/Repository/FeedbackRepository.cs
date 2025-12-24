@@ -6,10 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
-    /// <summary>
-    /// Repository implementation for Feedback entity
-    /// Handles all database operations for feedback management
-    /// </summary>
+
     public class FeedbackRepository : IFeedbackRepository
     {
         private readonly EEPZDbContext _context;

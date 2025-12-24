@@ -1,4 +1,5 @@
     using Relevantz.EEPZ.Common.DTOs.Request;
+    using Microsoft.AspNetCore.Authorization;
     using Relevantz.EEPZ.Core.Services.Interfaces;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
@@ -202,7 +203,7 @@ public async Task<IActionResult> MapEmployeesToProject(int projectId, [FromBody]
             if (resourcePoolMappings.Any())
             {
                 _context.Projectemployees.RemoveRange(resourcePoolMappings);
-                Console.WriteLine($"🗑️ Removed {resourcePoolMappings.Count} employee(s) from resource pool");
+                Console.WriteLine($"Removed {resourcePoolMappings.Count} employee(s) from resource pool");
                 await _context.SaveChangesAsync();
             }
         }
@@ -217,7 +218,7 @@ public async Task<IActionResult> MapEmployeesToProject(int projectId, [FromBody]
             if (allOtherProjectMappings.Any())
             {
                 _context.Projectemployees.RemoveRange(allOtherProjectMappings);
-                Console.WriteLine($"🗑️ Removed {allOtherProjectMappings.Count} employee mapping(s) from other projects");
+                Console.WriteLine($"Removed {allOtherProjectMappings.Count} employee mapping(s) from other projects");
                 await _context.SaveChangesAsync();
             }
         }

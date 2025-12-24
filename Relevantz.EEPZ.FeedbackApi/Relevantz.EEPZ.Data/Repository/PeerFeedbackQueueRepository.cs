@@ -6,10 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
-    /// <summary>
-    /// Repository implementation for PeerFeedbackQueue entity
-    /// Manages peer feedback quality control workflow
-    /// </summary>
+
     public class PeerFeedbackQueueRepository : IPeerFeedbackQueueRepository
     {
         private readonly EEPZDbContext _context;

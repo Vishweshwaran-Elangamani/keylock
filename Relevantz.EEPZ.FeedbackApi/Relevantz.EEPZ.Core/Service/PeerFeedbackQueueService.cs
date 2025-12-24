@@ -7,10 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
-    /// <summary>
-    /// Service implementation for PeerFeedbackQueue business logic
-    /// Manages peer feedback quality control workflow
-    /// </summary>
+
     public class PeerFeedbackQueueService : IPeerFeedbackQueueService
     {
         private readonly IPeerFeedbackQueueRepository _queueRepo;

@@ -33,8 +33,9 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
 Log.Information("Database configured with migrations assembly: Relevantz.EEPZ.Data");
 
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
-
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 
 Log.Information("Dependency Injection configured - 1 repository, 1 service");
 

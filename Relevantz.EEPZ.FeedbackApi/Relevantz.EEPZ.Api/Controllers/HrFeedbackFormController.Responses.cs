@@ -4,12 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EepzBackend.Controllers
 {
-    /// <summary>
-    /// Partial class containing HR feedback form response management endpoints
-    /// </summary>
+
     public partial class HrFeedbackFormController
     {
-        // ========== RESPONSE MANAGEMENT ENDPOINTS (8 endpoints) ==========
+        
 
         /// <summary>
         /// Create a new form response (employee submits feedback)

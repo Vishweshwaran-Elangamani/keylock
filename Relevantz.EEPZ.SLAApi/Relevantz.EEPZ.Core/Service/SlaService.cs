@@ -76,7 +76,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         int escalatedId = request.EscalatedToEmployeeId ?? 0;
         int submittedId = request.SubmittedByEmployeeId ?? 0;
 
-        // ✅ Instead of calling stored procedure, use EF Core
+
         var escalation = new Slaescalation
         {
             Slaid = request.Slaid,
@@ -640,12 +640,12 @@ public async Task<ApiResponse<CreateSlaResponse>> CreateSla(CreateSlaRequest req
                 if (sla == null)
                     return new ApiResponse<SlaResponse> { Success = false, Message = "SLA not found" };
 
-                _logger.LogInformation($"🔍 SLA from repo - EmployeeId: {sla.EmployeeId}, Employee: {sla.Employee?.EmployeeId}, Userprofile: {sla.Employee?.Userprofile?.FirstName}");
+                _logger.LogInformation($"SLA from repo - EmployeeId: {sla.EmployeeId}, Employee: {sla.Employee?.EmployeeId}, Userprofile: {sla.Employee?.Userprofile?.FirstName}");
 
                 var employeeName = GetEmployeeName(sla.Employee);
                 var departmentName = sla.Department?.DepartmentName ?? string.Empty;
 
-                _logger.LogInformation($"📝 Mapped - EmployeeName: '{employeeName}', DepartmentName: '{departmentName}'");
+                _logger.LogInformation($"Mapped - EmployeeName: '{employeeName}', DepartmentName: '{departmentName}'");
 
                 return new ApiResponse<SlaResponse>
                 {

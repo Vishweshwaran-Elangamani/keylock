@@ -8,10 +8,7 @@ using Relevantz.EEPZ.Data.DBContexts;
 
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
-    /// <summary>
-    /// Repository implementation for HrFeedbackForm and HrFeedbackFormResponse entities
-    /// Manages HR form templates and employee responses
-    /// </summary>
+
     public class HrFeedbackFormRepository : IHrFeedbackFormRepository
     {
         private readonly EEPZDbContext _context;

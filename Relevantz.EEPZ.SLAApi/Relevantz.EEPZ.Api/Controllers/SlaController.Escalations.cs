@@ -3,9 +3,7 @@ using Relevantz.EEPZ.Common.DTOs.Request;
 
 namespace eepzbackend.Controllers
 {
-    /// <summary>
-    /// Partial class containing SLA escalation-related endpoints
-    /// </summary>
+
     public partial class SlaController
     {
         /// <summary>
