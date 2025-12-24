@@ -1,5 +1,6 @@
 import { useState } from "react";
 import policyService from "../../../services/hr_operations/hr/policyService";
+import "../../../styles/hr_operations/hr/AddPolicyModal.css";
 
 const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
   const [formData, setFormData] = useState({
@@ -135,74 +136,13 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
 
   return (
     <>
-      {/* Blurred Backdrop */}
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(39,35,92,0.4)",
-          backdropFilter: "blur(8px)",
-          WebkitBackdropFilter: "blur(8px)",
-          zIndex: 1040,
-        }}
-        onClick={onClose}
-      />
+      <div className="apm-backdrop" onClick={onClose} />
 
-      {/* Modal Container with Scroll */}
-      <div
-        style={{
-          position: "fixed",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: "95%",
-          maxWidth: "800px",
-          maxHeight: "85vh",
-          zIndex: 1050,
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <div
-          style={{
-            borderRadius: "0.5rem",
-            background: "#fff",
-            boxShadow: "0 8px 28px rgba(0,0,0,0.22)",
-            overflow: "hidden",
-            width: "100%",
-            maxHeight: "85vh",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
+      <div className="apm-modal-container">
+        <div className="apm-modal-dialog">
           {/* HEADER - Fixed */}
-          <div
-            style={{
-              background: "#27235C",
-              color: "#fff",
-              padding: "13px 15px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              fontSize: "15px",
-              fontWeight: 600,
-              borderRadius: "0.5rem 0.5rem 0 0",
-              flexShrink: 0,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                color: "#fff",
-                fontSize: 15,
-                fontWeight: 600,
-              }}
-            >
+          <div className="apm-modal-header">
+            <div className="apm-header-title">
               <i className="bi bi-plus-circle"></i>
               Create New Policy
             </div>
@@ -211,85 +151,31 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
               onClick={onClose}
               disabled={loading || uploadingDoc}
               aria-label="Close"
-              style={{
-                background: "none",
-                border: "none",
-                color: "#fff",
-                fontSize: 18,
-                cursor: loading || uploadingDoc ? "not-allowed" : "pointer",
-                opacity: loading || uploadingDoc ? 0.7 : 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              className="apm-close-button"
             >
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
 
           {/* BODY - Scrollable */}
-          <form
-            onSubmit={handleSubmit}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              flex: 1,
-              overflow: "hidden",
-            }}
-          >
-            <div
-              style={{
-                padding: "20px",
-                background: "#fff",
-                textAlign: "left",
-                overflowY: "auto",
-                flex: 1,
-              }}
-            >
+          <form onSubmit={handleSubmit} className="apm-form">
+            <div className="apm-modal-body">
               {errors.submit && (
-                <div
-                  style={{
-                    borderRadius: 8,
-                    padding: "10px 14px",
-                    marginBottom: 16,
-                    display: "flex",
-                    alignItems: "center",
-                    fontSize: 13,
-                    background: "linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)",
-                    border: "2px solid #ef4444",
-                    color: "#991b1b",
-                  }}
-                >
-                  <i className="bi bi-exclamation-triangle-fill" style={{ marginRight: 8, color: "#ef4444" }}></i>
+                <div className="apm-error-banner">
+                  <i className="bi bi-exclamation-triangle-fill apm-error-icon"></i>
                   {errors.submit}
                 </div>
               )}
 
               {/* Two Column Grid */}
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: 20,
-                  marginBottom: 0,
-                }}
-              >
+              <div className="apm-two-column-grid">
                 {/* LEFT COLUMN */}
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <div className="apm-column-left">
                   {/* Policy Name */}
-                  <div>
-                    <label
-                      style={{
-                        fontWeight: 600,
-                        fontSize: 13,
-                        color: "#334155",
-                        marginBottom: 6,
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 4,
-                      }}
-                    >
-                      Policy Name <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                  <div className="apm-form-group">
+                    <label className="apm-form-label">
+                      Policy Name{" "}
+                      <span className="apm-required-asterisk">*</span>
                     </label>
                     <input
                       type="text"
@@ -297,52 +183,27 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                       placeholder="Enter policy name"
                       value={formData.policyName}
                       onChange={handleChange}
-                      style={{
-                        width: "100%",
-                        border: errors.policyName ? "1px solid #ef4444" : "1px solid #cbd5e1",
-                        borderRadius: 6,
-                        padding: "8px 10px",
-                        fontSize: 13,
-                        background: "#fff",
-                        color: "#22223b",
-                      }}
+                      className={`apm-form-input ${
+                        errors.policyName ? "error" : ""
+                      }`}
                     />
                     {errors.policyName && (
-                      <div style={{ color: "#ef4444", fontSize: 11, marginTop: 4 }}>
-                        {errors.policyName}
-                      </div>
+                      <div className="apm-form-error">{errors.policyName}</div>
                     )}
                   </div>
 
                   {/* Category */}
-                  <div>
-                    <label
-                      style={{
-                        fontWeight: 600,
-                        fontSize: 13,
-                        color: "#334155",
-                        marginBottom: 6,
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 4,
-                      }}
-                    >
-                      Category <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                  <div className="apm-form-group">
+                    <label className="apm-form-label">
+                      Category <span className="apm-required-asterisk">*</span>
                     </label>
                     <select
                       name="category"
                       value={formData.category}
                       onChange={handleChange}
-                      style={{
-                        width: "100%",
-                        border: errors.category ? "1px solid #ef4444" : "1px solid #cbd5e1",
-                        borderRadius: 6,
-                        padding: "8px 10px",
-                        fontSize: 13,
-                        background: "#fff",
-                        color: "#22223b",
-                        cursor: "pointer",
-                      }}
+                      className={`apm-form-input apm-form-select ${
+                        errors.category ? "error" : ""
+                      }`}
                     >
                       <option value="" disabled>
                         Select Category
@@ -354,39 +215,18 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                       ))}
                     </select>
                     {errors.category && (
-                      <div style={{ color: "#ef4444", fontSize: 11, marginTop: 4 }}>
-                        {errors.category}
-                      </div>
+                      <div className="apm-form-error">{errors.category}</div>
                     )}
                   </div>
 
                   {/* Status */}
-                  <div>
-                    <label
-                      style={{
-                        fontWeight: 600,
-                        fontSize: 13,
-                        color: "#334155",
-                        marginBottom: 6,
-                        display: "block",
-                      }}
-                    >
-                      Status
-                    </label>
+                  <div className="apm-form-group">
+                    <label className="apm-form-label-block">Status</label>
                     <select
                       name="status"
                       value={formData.status}
                       onChange={handleChange}
-                      style={{
-                        width: "100%",
-                        border: "1px solid #cbd5e1",
-                        borderRadius: 6,
-                        padding: "8px 10px",
-                        fontSize: 13,
-                        background: "#fff",
-                        color: "#22223b",
-                        cursor: "pointer",
-                      }}
+                      className="apm-form-input apm-form-select"
                     >
                       {statuses.map((st) => (
                         <option key={st} value={st}>
@@ -394,36 +234,19 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                         </option>
                       ))}
                     </select>
-                    <small
-                      style={{
-                        fontSize: 11,
-                        color: "#64748b",
-                        marginTop: 2,
-                        fontStyle: "italic",
-                        display: "block",
-                      }}
-                    >
+                    <small className="apm-form-hint">
                       Draft by default (publish later)
                     </small>
                   </div>
                 </div>
 
                 {/* RIGHT COLUMN */}
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <div className="apm-column-right">
                   {/* Description */}
-                  <div>
-                    <label
-                      style={{
-                        fontWeight: 600,
-                        fontSize: 13,
-                        color: "#334155",
-                        marginBottom: 6,
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 4,
-                      }}
-                    >
-                      Description <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                  <div className="apm-form-group">
+                    <label className="apm-form-label">
+                      Description{" "}
+                      <span className="apm-required-asterisk">*</span>
                     </label>
                     <textarea
                       rows={3}
@@ -431,39 +254,18 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                       placeholder="Enter policy description"
                       value={formData.description}
                       onChange={handleChange}
-                      style={{
-                        width: "100%",
-                        border: errors.description ? "1px solid #ef4444" : "1px solid #cbd5e1",
-                        borderRadius: 6,
-                        padding: "8px 10px",
-                        fontSize: 13,
-                        background: "#fff",
-                        color: "#22223b",
-                        resize: "vertical",
-                        minHeight: 80,
-                        maxHeight: 120,
-                        fontFamily: "inherit",
-                        lineHeight: 1.4,
-                      }}
+                      className={`apm-form-input apm-form-textarea ${
+                        errors.description ? "error" : ""
+                      }`}
                     />
                     {errors.description && (
-                      <div style={{ color: "#ef4444", fontSize: 11, marginTop: 4 }}>
-                        {errors.description}
-                      </div>
+                      <div className="apm-form-error">{errors.description}</div>
                     )}
                   </div>
 
                   {/* Compliance Guidance */}
-                  <div>
-                    <label
-                      style={{
-                        fontWeight: 600,
-                        fontSize: 13,
-                        color: "#334155",
-                        marginBottom: 6,
-                        display: "block",
-                      }}
-                    >
+                  <div className="apm-form-group">
+                    <label className="apm-form-label-block">
                       Compliance Guidance
                     </label>
                     <textarea
@@ -472,62 +274,21 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                       placeholder="Enter compliance guidance (optional)"
                       value={formData.complianceGuidance}
                       onChange={handleChange}
-                      style={{
-                        width: "100%",
-                        border: "1px solid #cbd5e1",
-                        borderRadius: 6,
-                        padding: "8px 10px",
-                        fontSize: 13,
-                        background: "#fff",
-                        color: "#22223b",
-                        resize: "vertical",
-                        minHeight: 80,
-                        maxHeight: 120,
-                        fontFamily: "inherit",
-                        lineHeight: 1.4,
-                      }}
+                      className="apm-form-input apm-form-textarea"
                     />
                   </div>
                 </div>
               </div>
 
               {/* DOCUMENT SECTION */}
-              <div
-                style={{
-                  border: "1px solid #e5e7eb",
-                  borderRadius: 8,
-                  background: "#f9fafb",
-                  padding: "16px",
-                  marginTop: 20,
-                }}
-              >
-                <label
-                  style={{
-                    fontWeight: 600,
-                    marginBottom: 12,
-                    color: "#334155",
-                    fontSize: 13,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                  }}
-                >
-                  <i className="bi bi-file-earmark-text" style={{ fontSize: 14 }}></i>
+              <div className="apm-document-section">
+                <label className="apm-document-label">
+                  <i className="bi bi-file-earmark-text apm-document-label-icon"></i>
                   Attach Policy Document (Optional)
                 </label>
 
                 {/* Three Button Group */}
-                <div
-                  style={{
-                    display: "flex",
-                    width: "100%",
-                    marginBottom: "12px",
-                    borderRadius: 6,
-                    overflow: "hidden",
-                    border: "1px solid #cbd5e1",
-                    background: "#fff",
-                  }}
-                >
+                <div className="apm-button-group">
                   <button
                     type="button"
                     onClick={() => {
@@ -536,24 +297,12 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                       setDocumentLink("");
                       setDocumentName("");
                     }}
-                    style={{
-                      flex: 1,
-                      padding: "10px 12px",
-                      border: "none",
-                      background: documentType === "none" ? "#27235C" : "#fff",
-                      color: documentType === "none" ? "white" : "#6c757d",
-                      fontWeight: 600,
-                      fontSize: 13,
-                      cursor: "pointer",
-                      borderRight: "1px solid #cbd5e1",
-                      transition: "all 0.2s",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 6,
-                    }}
+                    className={`apm-button-group-item ${
+                      documentType === "none" ? "active" : ""
+                    }`}
                   >
-                    <i className="bi bi-x-circle" style={{ fontSize: 14 }}></i> No Document
+                    <i className="bi bi-x-circle apm-button-group-icon"></i> No
+                    Document
                   </button>
                   <button
                     type="button"
@@ -562,24 +311,12 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                       setDocumentLink("");
                       setDocumentName("");
                     }}
-                    style={{
-                      flex: 1,
-                      padding: "10px 12px",
-                      border: "none",
-                      background: documentType === "upload" ? "#27235C" : "#fff",
-                      color: documentType === "upload" ? "white" : "#6c757d",
-                      fontWeight: 600,
-                      fontSize: 13,
-                      cursor: "pointer",
-                      borderRight: "1px solid #cbd5e1",
-                      transition: "all 0.2s",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 6,
-                    }}
+                    className={`apm-button-group-item ${
+                      documentType === "upload" ? "active" : ""
+                    }`}
                   >
-                    <i className="bi bi-cloud-upload" style={{ fontSize: 14 }}></i> Upload File
+                    <i className="bi bi-cloud-upload apm-button-group-icon"></i>{" "}
+                    Upload File
                   </button>
                   <button
                     type="button"
@@ -587,56 +324,20 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                       setDocumentType("link");
                       setSelectedFile(null);
                     }}
-                    style={{
-                      flex: 1,
-                      padding: "10px 12px",
-                      border: "none",
-                      background: documentType === "link" ? "#27235C" : "#fff",
-                      color: documentType === "link" ? "white" : "#6c757d",
-                      fontWeight: 600,
-                      fontSize: 13,
-                      cursor: "pointer",
-                      transition: "all 0.2s",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 6,
-                    }}
+                    className={`apm-button-group-item ${
+                      documentType === "link" ? "active" : ""
+                    }`}
                   >
-                    <i className="bi bi-link-45deg" style={{ fontSize: 14 }}></i> Add Link
+                    <i className="bi bi-link-45deg apm-button-group-icon"></i>{" "}
+                    Add Link
                   </button>
                 </div>
 
                 {/* Upload File Section */}
                 {documentType === "upload" && (
-                  <div style={{ marginTop: 12 }}>
-                    <label
-                      htmlFor="file-upload"
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: 8,
-                        padding: "12px",
-                        border: "2px dashed #cbd5e1",
-                        borderRadius: 8,
-                        background: "#fff",
-                        cursor: "pointer",
-                        transition: "all 0.2s ease",
-                        fontSize: 13,
-                        color: "#64748b",
-                        fontWeight: 500,
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.borderColor = "#97247E";
-                        e.currentTarget.style.background = "#faf5ff";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.borderColor = "#cbd5e1";
-                        e.currentTarget.style.background = "#fff";
-                      }}
-                    >
-                      <i className="bi bi-cloud-upload" style={{ fontSize: 20 }}></i>
+                  <div className="apm-upload-container">
+                    <label htmlFor="file-upload" className="apm-upload-label">
+                      <i className="bi bi-cloud-upload apm-upload-icon"></i>
                       <span>Click to upload or drag and drop</span>
                     </label>
                     <input
@@ -644,55 +345,22 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                       type="file"
                       accept=".pdf,.doc,.docx"
                       onChange={handleFileChange}
-                      style={{
-                        display: "none",
-                      }}
+                      className="apm-upload-input"
                     />
-                    <small
-                      style={{
-                        fontSize: 11,
-                        color: "#64748b",
-                        display: "block",
-                        marginTop: 8,
-                        textAlign: "center",
-                        fontStyle: "italic",
-                      }}
-                    >
+                    <small className="apm-upload-hint">
                       Supported: PDF, DOC, DOCX (Max 5MB)
                     </small>
 
-                    {/* Selected File Display - Green */}
+                    {/* Selected File Display */}
                     {selectedFile && (
-                      <div
-                        style={{
-                          marginTop: 12,
-                          padding: "12px 14px",
-                          fontSize: 13,
-                          borderRadius: 8,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          background: "linear-gradient(135deg, #dcfce7 0%, #d1fae5 100%)",
-                          border: "2px solid #86efac",
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 10,
-                            color: "#166534",
-                          }}
-                        >
-                          <i
-                            className="bi bi-file-earmark-check-fill"
-                            style={{ fontSize: 20, color: "#16a34a" }}
-                          ></i>
+                      <div className="apm-selected-file">
+                        <div className="apm-selected-file-info">
+                          <i className="bi bi-file-earmark-check-fill apm-selected-file-icon"></i>
                           <div>
-                            <div style={{ fontWeight: 700, fontSize: 14 }}>
+                            <div className="apm-selected-file-name">
                               {selectedFile.name}
                             </div>
-                            <div style={{ fontSize: 11, color: "#15803d", marginTop: 2 }}>
+                            <div className="apm-selected-file-size">
                               {(selectedFile.size / 1024).toFixed(2)} KB
                             </div>
                           </div>
@@ -700,25 +368,8 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                         <button
                           type="button"
                           onClick={() => setSelectedFile(null)}
-                          style={{
-                            background: "none",
-                            border: "none",
-                            color: "#dc2626",
-                            cursor: "pointer",
-                            padding: "4px 8px",
-                            borderRadius: 4,
-                            transition: "all 0.2s",
-                            display: "flex",
-                            alignItems: "center",
-                            fontSize: 18,
-                          }}
+                          className="apm-remove-file-button"
                           title="Remove file"
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.background = "#fee2e2";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.background = "none";
-                          }}
                         >
                           <i className="bi bi-x-circle-fill"></i>
                         </button>
@@ -729,73 +380,43 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
 
                 {/* Link Section */}
                 {documentType === "link" && (
-                  <div style={{ marginTop: 12 }}>
-                    <div style={{ marginBottom: 12 }}>
-                      <label
-                        style={{
-                          fontWeight: 600,
-                          fontSize: 13,
-                          color: "#334155",
-                          marginBottom: 6,
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 4,
-                        }}
-                      >
-                        Document URL <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                  <div className="apm-link-container">
+                    <div className="apm-link-group">
+                      <label className="apm-form-label">
+                        Document URL{" "}
+                        <span className="apm-required-asterisk">*</span>
                       </label>
                       <input
                         type="url"
                         placeholder="https://drive.google.com/file/d/..."
                         value={documentLink}
                         onChange={(e) => setDocumentLink(e.target.value)}
-                        style={{
-                          width: "100%",
-                          border: errors.documentLink ? "1px solid #ef4444" : "1px solid #cbd5e1",
-                          borderRadius: 6,
-                          padding: "8px 10px",
-                          fontSize: 13,
-                          background: "#fff",
-                          color: "#22223b",
-                        }}
+                        className={`apm-form-input ${
+                          errors.documentLink ? "error" : ""
+                        }`}
                       />
                       {errors.documentLink && (
-                        <div style={{ color: "#ef4444", fontSize: 11, marginTop: 4 }}>
+                        <div className="apm-form-error">
                           {errors.documentLink}
                         </div>
                       )}
                     </div>
-                    <div>
-                      <label
-                        style={{
-                          fontWeight: 600,
-                          fontSize: 13,
-                          color: "#334155",
-                          marginBottom: 6,
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 4,
-                        }}
-                      >
-                        Document Name <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                    <div className="apm-link-group">
+                      <label className="apm-form-label">
+                        Document Name{" "}
+                        <span className="apm-required-asterisk">*</span>
                       </label>
                       <input
                         type="text"
                         placeholder="e.g., Policy Document.pdf"
                         value={documentName}
                         onChange={(e) => setDocumentName(e.target.value)}
-                        style={{
-                          width: "100%",
-                          border: errors.documentName ? "1px solid #ef4444" : "1px solid #cbd5e1",
-                          borderRadius: 6,
-                          padding: "8px 10px",
-                          fontSize: 13,
-                          background: "#fff",
-                          color: "#22223b",
-                        }}
+                        className={`apm-form-input ${
+                          errors.documentName ? "error" : ""
+                        }`}
                       />
                       {errors.documentName && (
-                        <div style={{ color: "#ef4444", fontSize: 11, marginTop: 4 }}>
+                        <div className="apm-form-error">
                           {errors.documentName}
                         </div>
                       )}
@@ -806,44 +427,12 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
             </div>
 
             {/* FOOTER - Fixed */}
-            <div
-              style={{
-                padding: "10px 15px",
-                borderTop: "1px solid #e2e8f0",
-                background: "#fff",
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: 8,
-                borderBottomLeftRadius: "0.5rem",
-                borderBottomRightRadius: "0.5rem",
-                flexShrink: 0,
-              }}
-            >
+            <div className="apm-modal-footer">
               <button
                 type="button"
                 onClick={onClose}
                 disabled={loading || uploadingDoc}
-                style={{
-                  background: "#6c757d",
-                  border: "none",
-                  color: "#fff",
-                  fontWeight: 600,
-                  padding: "7px 12px",
-                  fontSize: 12,
-                  borderRadius: 5,
-                  cursor: loading || uploadingDoc ? "not-allowed" : "pointer",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  opacity: loading || uploadingDoc ? 0.7 : 1,
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  if (!loading && !uploadingDoc) e.target.style.background = "#5a6268";
-                }}
-                onMouseLeave={(e) => {
-                  if (!loading && !uploadingDoc) e.target.style.background = "#6c757d";
-                }}
+                className="apm-btn-cancel"
               >
                 Cancel
               </button>
@@ -851,72 +440,17 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
               <button
                 type="submit"
                 disabled={loading || uploadingDoc}
-                style={{
-                  background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                  border: "none",
-                  color: "#fff",
-                  fontWeight: 600,
-                  padding: "7px 12px",
-                  fontSize: 12,
-                  borderRadius: 5,
-                  boxShadow: "0 2px 8px rgba(151,36,126,0.25)",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  cursor: loading || uploadingDoc ? "not-allowed" : "pointer",
-                  opacity: loading || uploadingDoc ? 0.85 : 1,
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  if (!loading && !uploadingDoc) e.target.style.opacity = 0.93;
-                }}
-                onMouseLeave={(e) => {
-                  if (!loading && !uploadingDoc) e.target.style.opacity = 1;
-                }}
+                className="apm-btn-submit"
               >
                 {uploadingDoc ? (
                   <>
-                    <span
-                      style={{
-                        width: 14,
-                        height: 14,
-                        border: "2px solid #fff",
-                        borderTop: "2px solid #E01950",
-                        borderRadius: "50%",
-                        animation: "spin 0.7s linear infinite",
-                        display: "inline-block",
-                        marginRight: 6,
-                      }}
-                    />
+                    <span className="apm-spinner" />
                     Uploading Document...
-                    <style>{`
-                      @keyframes spin {
-                        0% { transform: rotate(0deg);}
-                        100% { transform: rotate(360deg);}
-                      }
-                    `}</style>
                   </>
                 ) : loading ? (
                   <>
-                    <span
-                      style={{
-                        width: 14,
-                        height: 14,
-                        border: "2px solid #fff",
-                        borderTop: "2px solid #E01950",
-                        borderRadius: "50%",
-                        animation: "spin 0.7s linear infinite",
-                        display: "inline-block",
-                        marginRight: 6,
-                      }}
-                    />
+                    <span className="apm-spinner" />
                     Creating...
-                    <style>{`
-                      @keyframes spin {
-                        0% { transform: rotate(0deg);}
-                        100% { transform: rotate(360deg);}
-                      }
-                    `}</style>
                   </>
                 ) : (
                   <>

@@ -1,0 +1,433 @@
+/* ==================== MODAL STYLING ==================== */
+.dhrm-modal .modal-header {
+    background: #27235c;
+    color: #fff;
+    border-bottom: none;
+    padding: 13px 15px;
+  }
+  
+  .dhrm-modal .modal-title {
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+  }
+  
+  .dhrm-modal .btn-close {
+    filter: brightness(0) invert(1);
+  }
+  
+  .dhrm-modal .modal-body {
+    padding: 20px;
+    background: #fff;
+  }
+  
+  .dhrm-modal .modal-footer {
+    padding: 10px 15px;
+    border-top: 1px solid #e2e8f0;
+    background: #fff;
+  }
+  
+  /* ==================== ALERT BANNER ==================== */
+  .dhrm-alert-danger {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border: 2px solid #ef4444;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    color: #991b1b;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .dhrm-alert-icon {
+    margin-right: 8px;
+    color: #ef4444;
+  }
+  
+  /* ==================== NOMINATION INFO ==================== */
+  .dhrm-approval-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+  }
+  
+  .dhrm-info-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .dhrm-info-card label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0;
+  }
+  
+  .dhrm-info-card span {
+    font-size: 14px;
+    font-weight: 600;
+    color: #27235c;
+  }
+  
+  /* ==================== FAVORITISM CHECK ALERT ==================== */
+  .dhrm-favoritism-alert {
+    padding: 16px;
+    border-radius: 8px;
+    border-width: 2px;
+    border-style: solid;
+    margin-bottom: 20px;
+  }
+  
+  .dhrm-favoritism-alert.high-risk {
+    background-color: #fee2e2;
+    border-color: #ef4444;
+  }
+  
+  .dhrm-favoritism-alert.medium-risk {
+    background-color: #fef3c7;
+    border-color: #f59e0b;
+  }
+  
+  .dhrm-favoritism-alert.low-risk {
+    background-color: #d1fae5;
+    border-color: #10b981;
+  }
+  
+  .dhrm-favoritism-alert.no-risk {
+    background-color: #cffafe;
+    border-color: #06b6d4;
+  }
+  
+  .dhrm-favoritism-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .dhrm-favoritism-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+  
+  .dhrm-favoritism-icon.high-risk {
+    color: #ef4444;
+  }
+  
+  .dhrm-favoritism-icon.medium-risk {
+    color: #f59e0b;
+  }
+  
+  .dhrm-favoritism-icon.low-risk {
+    color: #10b981;
+  }
+  
+  .dhrm-favoritism-icon.no-risk {
+    color: #06b6d4;
+  }
+  
+  .dhrm-favoritism-title {
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  
+  .dhrm-favoritism-title.high-risk {
+    color: #ef4444;
+  }
+  
+  .dhrm-favoritism-title.medium-risk {
+    color: #f59e0b;
+  }
+  
+  .dhrm-favoritism-title.low-risk {
+    color: #10b981;
+  }
+  
+  .dhrm-favoritism-title.no-risk {
+    color: #06b6d4;
+  }
+  
+  .dhrm-favoritism-risk {
+    margin-top: 4px;
+    margin-bottom: 0;
+  }
+  
+  .dhrm-risk-level {
+    font-weight: 700;
+  }
+  
+  .dhrm-risk-level.high-risk {
+    color: #ef4444;
+  }
+  
+  .dhrm-risk-level.medium-risk {
+    color: #f59e0b;
+  }
+  
+  .dhrm-risk-level.low-risk {
+    color: #10b981;
+  }
+  
+  .dhrm-risk-level.no-risk {
+    color: #06b6d4;
+  }
+  
+  .dhrm-risk-factors {
+    display: block;
+    margin-top: 8px;
+    font-size: 12px;
+  }
+  
+  .dhrm-risk-factor {
+    display: block;
+  }
+  
+  /* ==================== PROMOTION DETAILS ==================== */
+  .dhrm-details-section {
+    background-color: #f0fdf4;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 1px solid #bbf7d0;
+  }
+  
+  .dhrm-details-heading {
+    font-size: 14px;
+    font-weight: 700;
+    color: #166534;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .dhrm-details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .dhrm-detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #fff;
+    border-radius: 6px;
+    border: 1px solid #d1fae5;
+  }
+  
+  .dhrm-detail-item label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 0;
+  }
+  
+  .dhrm-detail-item span {
+    font-size: 13px;
+    font-weight: 600;
+    color: #27235c;
+  }
+  
+  .dhrm-detail-salary {
+    font-weight: 600;
+    color: #27235c;
+  }
+  
+  .dhrm-detail-increment {
+    font-weight: 600;
+    color: #166534;
+  }
+  
+  .dhrm-detail-percent {
+    font-weight: 600;
+    color: #0369a1;
+  }
+  
+  .dhrm-detail-justification {
+    font-size: 12px;
+  }
+  
+  /* ==================== FORM GROUPS ==================== */
+  .dhrm-form-group {
+    margin-bottom: 16px;
+  }
+  
+  .dhrm-form-label {
+    font-weight: 600;
+    font-size: 13px;
+    color: #334155;
+    margin-bottom: 6px;
+    display: block;
+  }
+  
+  .dhrm-required {
+    color: #ef4444;
+  }
+  
+  .dhrm-textarea {
+    resize: vertical;
+    min-height: 80px;
+    max-height: 150px;
+    font-family: inherit;
+    line-height: 1.4;
+    width: 100%;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 13px;
+    background: #fff;
+    color: #22223b;
+  }
+  
+  .dhrm-textarea:focus {
+    outline: none;
+    border-color: #27235c;
+    box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+  }
+  
+  /* ==================== INFO ALERT ==================== */
+  .dhrm-info-alert {
+    padding: 12px 16px;
+    background: #dbeafe;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    color: #1e40af;
+    font-size: 13px;
+  }
+  
+  .dhrm-info-icon {
+    margin-right: 8px;
+    color: #3b82f6;
+  }
+  
+  .dhrm-info-title {
+    font-weight: 700;
+  }
+  
+  .dhrm-info-text {
+    margin-top: 8px;
+    margin-bottom: 0;
+    font-size: 12px;
+  }
+  
+  /* ==================== BUTTONS ==================== */
+  .dhrm-btn-cancel {
+    background: #6c757d;
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 7px 12px;
+    font-size: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+  
+  .dhrm-btn-cancel:hover {
+    background: #5a6268;
+    color: #fff;
+  }
+  
+  .dhrm-btn-reject {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    font-weight: 600;
+    padding: 7px 12px;
+    font-size: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+  
+  .dhrm-btn-reject:hover:not(:disabled) {
+    background-color: #dc2626;
+    color: white;
+  }
+  
+  .dhrm-btn-reject:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+  
+  .dhrm-btn-approve {
+    background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 7px 12px;
+    font-size: 12px;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(151, 36, 126, 0.25);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .dhrm-btn-approve:hover:not(:disabled) {
+    opacity: 0.93;
+    color: #fff;
+  }
+  
+  .dhrm-btn-approve:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+  
+  .dhrm-btn-back {
+    background: #6c757d;
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 7px 12px;
+    font-size: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+  
+  .dhrm-btn-back:hover {
+    background: #5a6268;
+    color: #fff;
+  }
+  
+  /* ==================== SPINNER ==================== */
+  .dhrm-spinner {
+    width: 14px;
+    height: 14px;
+    margin-right: 8px;
+  }
+  
+  /* ==================== RESPONSIVE ==================== */
+  @media (max-width: 768px) {
+    .dhrm-approval-info {
+      grid-template-columns: 1fr;
+    }
+  
+    .dhrm-details-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  

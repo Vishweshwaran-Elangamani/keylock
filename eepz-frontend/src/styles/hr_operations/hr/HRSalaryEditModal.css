@@ -1,0 +1,322 @@
+/* ==================== MODAL STYLING ==================== */
+.hsem-modal .modal-header {
+    background: #27235c;
+    color: #fff;
+    border-bottom: none;
+    padding: 13px 15px;
+  }
+  
+  .hsem-modal .modal-title {
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+  }
+  
+  .hsem-modal .btn-close {
+    filter: brightness(0) invert(1);
+  }
+  
+  .hsem-modal .modal-body {
+    padding: 20px;
+    background: #fff;
+  }
+  
+  .hsem-modal .modal-footer {
+    padding: 10px 15px;
+    border-top: 1px solid #e2e8f0;
+    background: #fff;
+  }
+  
+  /* ==================== ALERT BANNER ==================== */
+  .hsem-alert-danger {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border: 2px solid #ef4444;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    color: #991b1b;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .hsem-alert-icon {
+    margin-right: 8px;
+    color: #ef4444;
+  }
+  
+  /* ==================== INFO CARDS ==================== */
+  .hsem-approval-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+  }
+  
+  .hsem-approval-info.green-bg {
+    background-color: #f0fdf4;
+  }
+  
+  .hsem-approval-info.blue-bg {
+    background-color: #e0e7ff;
+    margin-top: 16px;
+  }
+  
+  .hsem-info-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .hsem-info-card label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0;
+  }
+  
+  .hsem-info-card span {
+    font-size: 14px;
+    font-weight: 600;
+    color: #27235c;
+  }
+  
+  .hsem-current-salary {
+    font-weight: 600;
+    color: #666;
+  }
+  
+  .hsem-proposed-salary {
+    font-weight: 600;
+    color: #27235c;
+  }
+  
+  .hsem-info-card-small {
+    font-size: 12px;
+  }
+  
+  /* ==================== FORM GROUP ==================== */
+  .hsem-form-group {
+    margin-bottom: 16px;
+  }
+  
+  .hsem-form-label {
+    font-weight: 600;
+    font-size: 13px;
+    color: #334155;
+    margin-bottom: 6px;
+    display: block;
+  }
+  
+  .hsem-required-asterisk {
+    color: #ef4444;
+  }
+  
+  .hsem-form-input {
+    width: 100%;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 13px;
+    background: #fff;
+    color: #22223b;
+  }
+  
+  .hsem-form-input:focus {
+    outline: none;
+    border-color: #27235c;
+    box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+  }
+  
+  .hsem-form-hint {
+    color: #64748b;
+    font-size: 11px;
+    margin-top: 4px;
+    display: block;
+  }
+  
+  /* ==================== AUTO-CALCULATED SUMMARY ==================== */
+  .hsem-details-section {
+    background-color: #fef3c7;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 1px solid #fde68a;
+  }
+  
+  .hsem-details-heading {
+    font-size: 14px;
+    font-weight: 700;
+    color: #92400e;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .hsem-details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .hsem-detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #fff;
+    border-radius: 6px;
+    border: 1px solid #fde68a;
+  }
+  
+  .hsem-detail-item label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 0;
+  }
+  
+  .hsem-detail-item span {
+    font-size: 13px;
+    font-weight: 600;
+  }
+  
+  .hsem-new-salary-value {
+    font-weight: 600;
+    color: #27235c;
+  }
+  
+  .hsem-increment-positive {
+    font-weight: 600;
+    color: #166534;
+  }
+  
+  .hsem-increment-negative {
+    font-weight: 600;
+    color: #991b1b;
+  }
+  
+  .hsem-increment-percent {
+    font-weight: 600;
+    color: #0369a1;
+    font-size: 18px;
+  }
+  
+  /* ==================== VALIDATION WARNING ==================== */
+  .hsem-validation-warning {
+    margin-top: 16px;
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border: 2px solid #ef4444;
+    border-radius: 8px;
+    padding: 12px 14px;
+    color: #991b1b;
+    font-size: 13px;
+  }
+  
+  .hsem-validation-warning-icon {
+    margin-right: 8px;
+    color: #ef4444;
+  }
+  
+  .hsem-validation-warning-text {
+    margin-top: 4px;
+    margin-bottom: 0;
+    font-size: 12px;
+  }
+  
+  /* ==================== INFO ALERT ==================== */
+  .hsem-info-alert {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: #dbeafe;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    color: #1e40af;
+    font-size: 13px;
+  }
+  
+  .hsem-info-icon {
+    margin-right: 8px;
+    color: #3b82f6;
+  }
+  
+  .hsem-info-list {
+    margin-top: 8px;
+    margin-bottom: 0;
+    font-size: 12px;
+    padding-left: 20px;
+  }
+  
+  /* ==================== BUTTONS ==================== */
+  .hsem-btn-cancel {
+    background: #6c757d;
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 7px 12px;
+    font-size: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+  
+  .hsem-btn-cancel:hover {
+    background: #5a6268;
+    color: #fff;
+  }
+  
+  .hsem-btn-submit {
+    background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 7px 12px;
+    font-size: 12px;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(151, 36, 126, 0.25);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .hsem-btn-submit:hover:not(:disabled) {
+    opacity: 0.93;
+    color: #fff;
+  }
+  
+  .hsem-btn-submit:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+  
+  /* ==================== SPINNER ==================== */
+  .hsem-spinner {
+    width: 14px;
+    height: 14px;
+    margin-right: 8px;
+  }
+  
+  /* ==================== RESPONSIVE ==================== */
+  @media (max-width: 768px) {
+    .hsem-approval-info {
+      grid-template-columns: 1fr;
+    }
+  
+    .hsem-details-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  

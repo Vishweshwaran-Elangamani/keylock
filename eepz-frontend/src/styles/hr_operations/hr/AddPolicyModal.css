@@ -1,0 +1,464 @@
+/* ==================== BACKDROP ==================== */
+.apm-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(39, 35, 92, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1040;
+  }
+  
+  /* ==================== MODAL CONTAINER ==================== */
+  .apm-modal-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 95%;
+    max-width: 800px;
+    max-height: 85vh;
+    z-index: 1050;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* ==================== MODAL DIALOG ==================== */
+  .apm-modal-dialog {
+    border-radius: 0.5rem;
+    background: #fff;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
+    overflow: hidden;
+    width: 100%;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* ==================== HEADER ==================== */
+  .apm-modal-header {
+    background: #27235c;
+    color: #fff;
+    padding: 13px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 0.5rem 0.5rem 0 0;
+    flex-shrink: 0;
+  }
+  
+  .apm-header-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  
+  .apm-close-button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .apm-close-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  
+  /* ==================== BODY ==================== */
+  .apm-modal-body {
+    padding: 20px;
+    background: #fff;
+    text-align: left;
+    overflow-y: auto;
+    flex: 1;
+  }
+  
+  .apm-form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+  }
+  
+  /* ==================== ERROR BANNER ==================== */
+  .apm-error-banner {
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border: 2px solid #ef4444;
+    color: #991b1b;
+  }
+  
+  .apm-error-icon {
+    margin-right: 8px;
+    color: #ef4444;
+  }
+  
+  /* ==================== TWO COLUMN GRID ==================== */
+  .apm-two-column-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 0;
+  }
+  
+  .apm-column-left {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .apm-column-right {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  /* ==================== FORM GROUPS ==================== */
+  .apm-form-group {
+    /* Base group styling */
+  }
+  
+  .apm-form-label {
+    font-weight: 600;
+    font-size: 13px;
+    color: #334155;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .apm-form-label-block {
+    font-weight: 600;
+    font-size: 13px;
+    color: #334155;
+    margin-bottom: 6px;
+    display: block;
+  }
+  
+  .apm-required-asterisk {
+    color: #ef4444;
+    font-weight: 700;
+  }
+  
+  /* ==================== FORM INPUTS ==================== */
+  .apm-form-input {
+    width: 100%;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 13px;
+    background: #fff;
+    color: #22223b;
+  }
+  
+  .apm-form-input:focus {
+    outline: none;
+    border-color: #27235c;
+    box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+  }
+  
+  .apm-form-input.error {
+    border: 1px solid #ef4444;
+  }
+  
+  .apm-form-select {
+    cursor: pointer;
+  }
+  
+  .apm-form-textarea {
+    resize: vertical;
+    min-height: 80px;
+    max-height: 120px;
+    font-family: inherit;
+    line-height: 1.4;
+  }
+  
+  .apm-form-error {
+    color: #ef4444;
+    font-size: 11px;
+    margin-top: 4px;
+  }
+  
+  .apm-form-hint {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 2px;
+    font-style: italic;
+    display: block;
+  }
+  
+  /* ==================== DOCUMENT SECTION ==================== */
+  .apm-document-section {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #f9fafb;
+    padding: 16px;
+    margin-top: 20px;
+  }
+  
+  .apm-document-label {
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #334155;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .apm-document-label-icon {
+    font-size: 14px;
+  }
+  
+  /* ==================== THREE BUTTON GROUP ==================== */
+  .apm-button-group {
+    display: flex;
+    width: 100%;
+    margin-bottom: 12px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #cbd5e1;
+    background: #fff;
+  }
+  
+  .apm-button-group-item {
+    flex: 1;
+    padding: 10px 12px;
+    border: none;
+    background: #fff;
+    color: #6c757d;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    border-right: 1px solid #cbd5e1;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  
+  .apm-button-group-item:last-child {
+    border-right: none;
+  }
+  
+  .apm-button-group-item.active {
+    background: #27235c;
+    color: white;
+  }
+  
+  .apm-button-group-icon {
+    font-size: 14px;
+  }
+  
+  /* ==================== FILE UPLOAD ==================== */
+  .apm-upload-container {
+    margin-top: 12px;
+  }
+  
+  .apm-upload-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    border: 2px dashed #cbd5e1;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 500;
+  }
+  
+  .apm-upload-label:hover {
+    border-color: #97247e;
+    background: #faf5ff;
+  }
+  
+  .apm-upload-icon {
+    font-size: 20px;
+  }
+  
+  .apm-upload-input {
+    display: none;
+  }
+  
+  .apm-upload-hint {
+    font-size: 11px;
+    color: #64748b;
+    display: block;
+    margin-top: 8px;
+    text-align: center;
+    font-style: italic;
+  }
+  
+  /* ==================== SELECTED FILE DISPLAY ==================== */
+  .apm-selected-file {
+    margin-top: 12px;
+    padding: 12px 14px;
+    font-size: 13px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #dcfce7 0%, #d1fae5 100%);
+    border: 2px solid #86efac;
+  }
+  
+  .apm-selected-file-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #166534;
+  }
+  
+  .apm-selected-file-icon {
+    font-size: 20px;
+    color: #16a34a;
+  }
+  
+  .apm-selected-file-name {
+    font-weight: 700;
+    font-size: 14px;
+  }
+  
+  .apm-selected-file-size {
+    font-size: 11px;
+    color: #15803d;
+    margin-top: 2px;
+  }
+  
+  .apm-remove-file-button {
+    background: none;
+    border: none;
+    color: #dc2626;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+  }
+  
+  .apm-remove-file-button:hover {
+    background: #fee2e2;
+  }
+  
+  /* ==================== LINK SECTION ==================== */
+  .apm-link-container {
+    margin-top: 12px;
+  }
+  
+  .apm-link-group {
+    margin-bottom: 12px;
+  }
+  
+  .apm-link-group:last-child {
+    margin-bottom: 0;
+  }
+  
+  /* ==================== FOOTER ==================== */
+  .apm-modal-footer {
+    padding: 10px 15px;
+    border-top: 1px solid #e2e8f0;
+    background: #fff;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+    flex-shrink: 0;
+  }
+  
+  /* ==================== BUTTONS ==================== */
+  .apm-btn-cancel {
+    background: #6c757d;
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 7px 12px;
+    font-size: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+  
+  .apm-btn-cancel:hover:not(:disabled) {
+    background: #5a6268;
+  }
+  
+  .apm-btn-cancel:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  
+  .apm-btn-submit {
+    background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 7px 12px;
+    font-size: 12px;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(151, 36, 126, 0.25);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .apm-btn-submit:hover:not(:disabled) {
+    opacity: 0.93;
+  }
+  
+  .apm-btn-submit:disabled {
+    cursor: not-allowed;
+    opacity: 0.85;
+  }
+  
+  /* ==================== SPINNER ==================== */
+  .apm-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #fff;
+    border-top: 2px solid #e01950;
+    border-radius: 50%;
+    animation: apm-spin 0.7s linear infinite;
+    display: inline-block;
+    margin-right: 6px;
+  }
+  
+  @keyframes apm-spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  

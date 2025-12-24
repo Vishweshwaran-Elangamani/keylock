@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import ExportService from "../../../../services/auth/exportService";
 import BulkOperationService from "../../../../services/auth/bulkOperationService";
 import { toast } from "sonner";
+import "../../../../styles/auth/bulk_operations/BulkOperationsModal.css";
 
 const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
   const [activeTab, setActiveTab] = useState("import");
@@ -193,18 +194,34 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
         });
 
         if (data.failureCount === 0) {
+          // Enhanced success message for complete success
           toast.success(
-            `✓ Successfully imported all ${data.successCount} users!`,
-            { duration: 5000 }
+            ` ${data.successCount} user${
+              data.successCount !== 1 ? "s" : ""
+            } added successfully!`,
+            {
+              duration: 6000,
+              description:
+                "All records have been imported and are now active in the system.",
+            }
           );
         } else if (data.successCount > 0) {
+          // Partial success message
+          toast.success(
+            `✓ ${data.successCount} user${
+              data.successCount !== 1 ? "s" : ""
+            } added successfully!`,
+            { duration: 5000 }
+          );
           toast.warning(
-            `⚠ ${data.successCount} imported, ${data.failureCount} failed. Scroll down to see details.`,
+            `⚠ ${data.failureCount} record${
+              data.failureCount !== 1 ? "s" : ""
+            } failed. Check details below.`,
             { duration: 8000 }
           );
         } else {
           toast.error(
-            `✗ All ${data.totalRecords} records failed. Scroll down to see all errors.`,
+            `✗ All ${data.totalRecords} records failed. Review errors below.`,
             { duration: 8000 }
           );
         }
@@ -271,290 +288,67 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
 
   return (
     <>
-      {/* Custom Backdrop */}
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(39, 35, 92, 0.4)",
-          backdropFilter: "blur(8px)",
-          WebkitBackdropFilter: "blur(8px)",
-          zIndex: 1040,
-          transition: "all 0.3s ease",
-        }}
-        onClick={handleClose}
-      />
+      <div className="bom-backdrop" onClick={handleClose} />
 
-      {/* Modal Wrapper */}
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 1050,
-          padding: "20px",
-        }}
-      >
-        {/* Modal Dialog */}
-        <div
-          style={{
-            width: "100%",
-            maxWidth: "800px",
-            maxHeight: "90vh",
-            display: "flex",
-            flexDirection: "column",
-            borderRadius: "0.5rem",
-            overflow: "hidden",
-            boxShadow: "0 10px 40px rgba(0, 0, 0, 0.3)",
-            backgroundColor: "#ffffff",
-          }}
-        >
-          {/* Modal Header */}
-          <div
-            style={{
-              background: "#27235C",
-              color: "#ffffff",
-              padding: "16px 20px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexShrink: 0,
-            }}
-          >
-            <div
-              style={{
-                fontSize: "16px",
-                fontWeight: "600",
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                color: "#ffffff",
-              }}
-            >
+      <div className="bom-modal-wrapper">
+        <div className="bom-modal-dialog">
+          <div className="bom-modal-header">
+            <div className="bom-modal-header-title">
               <i className="bi bi-database"></i>
               Bulk Operations
             </div>
-            <button
-              onClick={handleClose}
-              style={{
-                background: "transparent",
-                border: "none",
-                color: "#ffffff",
-                fontSize: "20px",
-                cursor: "pointer",
-                padding: "0",
-                width: "24px",
-                height: "24px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
+            <button onClick={handleClose} className="bom-close-button">
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
 
-          {/* Tabs Container */}
-          <div
-            style={{
-              display: "flex",
-              borderBottom: "2px solid #e5e7eb",
-              backgroundColor: "#f9fafb",
-            }}
-          >
+          <div className="bom-tabs-container">
             <button
               onClick={() => setActiveTab("import")}
-              style={{
-                flex: 1,
-                padding: "12px 20px",
-                fontSize: "14px",
-                fontWeight: "600",
-                border: "none",
-                background: activeTab === "import" ? "#ffffff" : "transparent",
-                color: activeTab === "import" ? "#27235C" : "#64748b",
-                borderBottom:
-                  activeTab === "import"
-                    ? "3px solid #27235C"
-                    : "3px solid transparent",
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-              }}
+              className={`bom-tab-button ${
+                activeTab === "import" ? "active" : ""
+              }`}
             >
               <i className="bi bi-download"></i>
               Import Users
             </button>
             <button
               onClick={() => setActiveTab("export")}
-              style={{
-                flex: 1,
-                padding: "12px 20px",
-                fontSize: "14px",
-                fontWeight: "600",
-                border: "none",
-                background: activeTab === "export" ? "#ffffff" : "transparent",
-                color: activeTab === "export" ? "#27235C" : "#64748b",
-                borderBottom:
-                  activeTab === "export"
-                    ? "3px solid #27235C"
-                    : "3px solid transparent",
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-              }}
+              className={`bom-tab-button ${
+                activeTab === "export" ? "active" : ""
+              }`}
             >
               <i className="bi bi-upload"></i>
               Export Data
             </button>
           </div>
 
-          {/* Modal Body */}
-          <div
-            style={{
-              padding: "20px",
-              overflowY: "auto",
-              flex: 1,
-              backgroundColor: "#ffffff",
-              maxHeight: "calc(90vh - 200px)",
-            }}
-          >
-            {/* EXPORT TAB */}
+          <div className="bom-modal-body">
             {activeTab === "export" && (
               <div>
-                {/* Section Header - CENTERED */}
-                <div
-                  style={{
-                    textAlign: "center",
-                    marginBottom: "32px",
-                  }}
-                >
-                  <p style={{ fontSize: "13px", color: "#64748b", margin: 0 }}>
-                    <i
-                      className="bi bi-file-earmark-spreadsheet"
-                      style={{ fontSize: "24px", color: "#27235C" }}
-                    ></i>
+                <div className="bom-export-section-header">
+                  <p className="bom-export-section-description">
+                    <i className="bi bi-file-earmark-spreadsheet bom-export-section-icon"></i>
                     Download data in Excel format for backup or analysis
                   </p>
                 </div>
 
-                {/* Export Cards Grid - CENTERED */}
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    gap: "24px",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  {/* Users Export Card */}
-                  <div
-                    style={{
-                      width: "320px",
-                      border: "2px solid #27235C",
-                      borderRadius: "12px",
-                      padding: "24px",
-                      background:
-                        "linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)",
-                      transition: "all 0.2s ease",
-                      boxShadow: "0 2px 8px rgba(39,35,92,0.1)",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.boxShadow =
-                        "0 6px 20px rgba(39,35,92,0.2)";
-                      e.currentTarget.style.transform = "translateY(-2px)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.boxShadow =
-                        "0 2px 8px rgba(39,35,92,0.1)";
-                      e.currentTarget.style.transform = "translateY(0)";
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: "56px",
-                        height: "56px",
-                        borderRadius: "50%",
-                        background:
-                          "linear-gradient(135deg, #27235C 0%, #1e1a47 100%)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        marginBottom: "20px",
-                      }}
-                    >
-                      <i
-                        className="bi bi-people"
-                        style={{ fontSize: "28px", color: "#ffffff" }}
-                      ></i>
+                <div className="bom-export-cards-grid">
+                  <div className="bom-export-card">
+                    <div className="bom-export-card-icon">
+                      <i className="bi bi-people bom-export-card-icon-image"></i>
                     </div>
-                    <h6
-                      style={{
-                        fontSize: "16px",
-                        fontWeight: "600",
-                        color: "#1e293b",
-                        marginBottom: "8px",
-                      }}
-                    >
-                      Users
-                    </h6>
-                    <p
-                      style={{
-                        fontSize: "13px",
-                        color: "#64748b",
-                        marginBottom: "20px",
-                        lineHeight: "1.5",
-                      }}
-                    >
+                    <h6 className="bom-export-card-title">Users</h6>
+                    <p className="bom-export-card-description">
                       Export all users and their information
                     </p>
                     <button
                       onClick={() => handleExport("users")}
                       disabled={exportingUsers}
-                      style={{
-                        width: "100%",
-                        padding: "12px 20px",
-                        fontSize: "14px",
-                        fontWeight: "600",
-                        borderRadius: "8px",
-                        border: "none",
-                        background:
-                          "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                        color: "#ffffff",
-                        cursor: exportingUsers ? "not-allowed" : "pointer",
-                        transition: "all 0.2s ease",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "8px",
-                        boxShadow: "0 2px 8px rgba(151, 36, 126, 0.25)",
-                      }}
+                      className="bom-export-button"
                     >
                       {exportingUsers ? (
-                        <span
-                          style={{
-                            width: "16px",
-                            height: "16px",
-                            border: "2px solid #ffffff",
-                            borderTopColor: "transparent",
-                            borderRadius: "50%",
-                            animation: "spin 0.6s linear infinite",
-                            display: "inline-block",
-                          }}
-                        />
+                        <span className="bom-spinner" />
                       ) : (
                         <i className="bi bi-download"></i>
                       )}
@@ -562,101 +356,21 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                     </button>
                   </div>
 
-                  {/* Complete Export Card - Featured with Pink Gradient */}
-                  <div
-                    style={{
-                      width: "320px",
-                      border: "2px solid #27235C",
-                      borderRadius: "12px",
-                      padding: "24px",
-                      background:
-                        "linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)",
-                      transition: "all 0.2s ease",
-                      boxShadow: "0 2px 8px rgba(39,35,92,0.1)",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.boxShadow =
-                        "0 6px 20px rgba(39,35,92,0.2)";
-                      e.currentTarget.style.transform = "translateY(-2px)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.boxShadow =
-                        "0 2px 8px rgba(39,35,92,0.1)";
-                      e.currentTarget.style.transform = "translateY(0)";
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: "56px",
-                        height: "56px",
-                        borderRadius: "50%",
-                        background:
-                          "linear-gradient(135deg, #27235C 0%, #1e1a47 100%)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        marginBottom: "20px",
-                      }}
-                    >
-                      <i
-                        className="bi bi-database"
-                        style={{ fontSize: "28px", color: "#ffffff" }}
-                      ></i>
+                  <div className="bom-export-card">
+                    <div className="bom-export-card-icon">
+                      <i className="bi bi-database bom-export-card-icon-image"></i>
                     </div>
-                    <h6
-                      style={{
-                        fontSize: "16px",
-                        fontWeight: "600",
-                        color: "#1e293b",
-                        marginBottom: "8px",
-                      }}
-                    >
-                      Complete Export
-                    </h6>
-                    <p
-                      style={{
-                        fontSize: "13px",
-                        color: "#64748b",
-                        marginBottom: "20px",
-                        lineHeight: "1.5",
-                      }}
-                    >
+                    <h6 className="bom-export-card-title">Complete Export</h6>
+                    <p className="bom-export-card-description">
                       Export everything in one file with multiple sheets
                     </p>
                     <button
                       onClick={() => handleExport("all")}
                       disabled={exportingAll}
-                      style={{
-                        width: "100%",
-                        padding: "12px 20px",
-                        fontSize: "14px",
-                        fontWeight: "600",
-                        borderRadius: "8px",
-                        border: "none",
-                        background:
-                          "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                        color: "#ffffff",
-                        cursor: exportingAll ? "not-allowed" : "pointer",
-                        transition: "all 0.2s ease",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "8px",
-                        boxShadow: "0 2px 8px rgba(151, 36, 126, 0.25)",
-                      }}
+                      className="bom-export-button"
                     >
                       {exportingAll ? (
-                        <span
-                          style={{
-                            width: "16px",
-                            height: "16px",
-                            border: "2px solid #ffffff",
-                            borderTopColor: "transparent",
-                            borderRadius: "50%",
-                            animation: "spin 0.6s linear infinite",
-                            display: "inline-block",
-                          }}
-                        />
+                        <span className="bom-spinner" />
                       ) : (
                         <i className="bi bi-download"></i>
                       )}
@@ -667,60 +381,17 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
               </div>
             )}
 
-            {/* IMPORT TAB */}
             {activeTab === "import" && (
               <div>
-                {/* Template Download Section */}
-                <div
-                  style={{
-                    padding: "16px",
-                    background: "#f0f9ff",
-                    border: "1px solid #bae6fd",
-                    borderRadius: "8px",
-                    marginBottom: "20px",
-                    textAlign: "center",
-                  }}
-                >
+                <div className="bom-template-download-section">
                   <button
                     onClick={handleDownloadTemplate}
                     disabled={isDownloadingTemplate}
-                    style={{
-                      padding: "10px 20px",
-                      fontSize: "14px",
-                      fontWeight: "600",
-                      borderRadius: "6px",
-                      border: "none",
-                      background: "#0ea5e9",
-                      color: "#ffffff",
-                      cursor: isDownloadingTemplate ? "not-allowed" : "pointer",
-                      transition: "all 0.2s ease",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "8px",
-                      marginBottom: "8px",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isDownloadingTemplate)
-                        e.target.style.background = "#0284c7";
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isDownloadingTemplate)
-                        e.target.style.background = "#0ea5e9";
-                    }}
+                    className="bom-template-download-button"
                   >
                     {isDownloadingTemplate ? (
                       <>
-                        <span
-                          style={{
-                            width: "14px",
-                            height: "14px",
-                            border: "2px solid #ffffff",
-                            borderTopColor: "transparent",
-                            borderRadius: "50%",
-                            animation: "spin 0.6s linear infinite",
-                            display: "inline-block",
-                          }}
-                        />
+                        <span className="bom-spinner-small" />
                         Downloading...
                       </>
                     ) : (
@@ -730,53 +401,19 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                       </>
                     )}
                   </button>
-                  <small
-                    style={{
-                      fontSize: "12px",
-                      color: "#0369a1",
-                      display: "block",
-                    }}
-                  >
+                  <small className="bom-template-download-small">
                     Download the template, fill in user details, and upload it
                     below
                   </small>
                 </div>
 
-                {/* Info Alert - LEFT ALIGNED */}
-                <div
-                  style={{
-                    padding: "12px 16px",
-                    backgroundColor: "#d1ecf1",
-                    border: "1px solid #bee5eb",
-                    borderRadius: "8px",
-                    display: "flex",
-                    alignItems: "flex-start",
-                    gap: "12px",
-                    fontSize: "13px",
-                    color: "#0c5460",
-                    marginBottom: "20px",
-                  }}
-                >
-                  <i
-                    className="bi bi-info-circle-fill"
-                    style={{
-                      fontSize: "20px",
-                      flexShrink: 0,
-                      marginTop: "2px",
-                    }}
-                  ></i>
-                  <div style={{ textAlign: "left" }}>
-                    <strong style={{ display: "block", marginBottom: "8px" }}>
+                <div className="bom-info-alert">
+                  <i className="bi bi-info-circle-fill bom-info-alert-icon"></i>
+                  <div className="bom-info-alert-content">
+                    <strong className="bom-info-alert-title">
                       Excel Format Requirements:
                     </strong>
-                    <ul
-                      style={{
-                        margin: 0,
-                        paddingLeft: "20px",
-                        lineHeight: "1.6",
-                        textAlign: "left",
-                      }}
-                    >
+                    <ul className="bom-info-alert-list">
                       <li>
                         Required columns: EmployeeCompanyId, Email, FirstName,
                         LastName, Role, Department
@@ -788,95 +425,37 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                   </div>
                 </div>
 
-                {/* File Upload */}
-                <div style={{ marginBottom: "20px" }}>
+                <div className="bom-file-upload-section">
                   <input
                     ref={fileInputRef}
                     type="file"
                     accept=".xlsx,.xls"
                     onChange={handleFileSelect}
-                    style={{ display: "none" }}
+                    className="bom-file-upload-input"
                   />
                   <button
                     onClick={handleFileUploadClick}
-                    style={{
-                      width: "100%",
-                      padding: "40px 20px",
-                      border: "2px dashed #cbd5e1",
-                      borderRadius: "8px",
-                      background: "#f9fafb",
-                      cursor: "pointer",
-                      transition: "all 0.2s ease",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      gap: "12px",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.borderColor = "#27235C";
-                      e.target.style.background = "#f0f9ff";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.borderColor = "#cbd5e1";
-                      e.target.style.background = "#f9fafb";
-                    }}
+                    className="bom-file-upload-button"
                   >
-                    <i
-                      className="bi bi-cloud-upload"
-                      style={{ fontSize: "48px", color: "#64748b" }}
-                    ></i>
-                    <span
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: "600",
-                        color: "#1e293b",
-                      }}
-                    >
+                    <i className="bi bi-cloud-upload bom-file-upload-icon"></i>
+                    <span className="bom-file-upload-text">
                       Click to select Excel file
                     </span>
-                    <small style={{ fontSize: "12px", color: "#64748b" }}>
+                    <small className="bom-file-upload-small">
                       Supported: .xlsx, .xls (Max 5MB)
                     </small>
                   </button>
                 </div>
 
-                {/* Selected File Display - CENTERED */}
                 {selectedFile && (
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      marginBottom: "20px",
-                    }}
-                  >
-                    <div
-                      style={{
-                        maxWidth: "400px",
-                        width: "100%",
-                        padding: "12px 16px",
-                        background: "#f0fdf4",
-                        border: "1px solid #86efac",
-                        borderRadius: "8px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "12px",
-                      }}
-                    >
-                      <i
-                        className="bi bi-file-earmark-excel-fill"
-                        style={{ fontSize: "32px", color: "#22c55e" }}
-                      ></i>
-                      <div style={{ flex: 1 }}>
-                        <div
-                          style={{
-                            fontSize: "14px",
-                            fontWeight: "600",
-                            color: "#166534",
-                          }}
-                        >
+                  <div className="bom-selected-file-wrapper">
+                    <div className="bom-selected-file-container">
+                      <i className="bi bi-file-earmark-excel-fill bom-selected-file-icon"></i>
+                      <div className="bom-selected-file-info">
+                        <div className="bom-selected-file-name">
                           {selectedFile.name}
                         </div>
-                        <div style={{ fontSize: "12px", color: "#15803d" }}>
+                        <div className="bom-selected-file-size">
                           {(selectedFile.size / 1024).toFixed(2)} KB
                         </div>
                       </div>
@@ -888,17 +467,7 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                             fileInputRef.current.value = "";
                           }
                         }}
-                        style={{
-                          background: "transparent",
-                          border: "none",
-                          color: "#dc2626",
-                          fontSize: "20px",
-                          cursor: "pointer",
-                          padding: "4px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
+                        className="bom-remove-file-button"
                       >
                         <i className="bi bi-x"></i>
                       </button>
@@ -906,50 +475,16 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                   </div>
                 )}
 
-                {/* Import Button - CENTERED */}
                 {selectedFile && (
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      marginBottom: "20px",
-                    }}
-                  >
+                  <div className="bom-import-button-wrapper">
                     <button
                       onClick={handleBulkImport}
                       disabled={loading}
-                      style={{
-                        width: "300px",
-                        padding: "12px 20px",
-                        fontSize: "14px",
-                        fontWeight: "600",
-                        borderRadius: "6px",
-                        border: "none",
-                        background:
-                          "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                        color: "#ffffff",
-                        cursor: loading ? "not-allowed" : "pointer",
-                        transition: "all 0.2s ease",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "8px",
-                        boxShadow: "0 2px 8px rgba(151, 36, 126, 0.25)",
-                      }}
+                      className="bom-import-button"
                     >
                       {loading ? (
                         <>
-                          <span
-                            style={{
-                              width: "16px",
-                              height: "16px",
-                              border: "2px solid #ffffff",
-                              borderTopColor: "transparent",
-                              borderRadius: "50%",
-                              animation: "spin 0.6s linear infinite",
-                              display: "inline-block",
-                            }}
-                          />
+                          <span className="bom-spinner" />
                           Processing...
                         </>
                       ) : (
@@ -962,578 +497,240 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                   </div>
                 )}
 
-                {/* Upload Results */}
                 {uploadResult && (
-                  <div
-                    style={{
-                      border: "1px solid #e5e7eb",
-                      borderRadius: "8px",
-                      padding: "20px",
-                      background: "#ffffff",
-                      marginTop: "20px",
-                    }}
-                  >
-                    <h6
-                      style={{
-                        fontSize: "15px",
-                        fontWeight: "600",
-                        color: "#1e293b",
-                        marginBottom: "16px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                      }}
-                    >
+                  <div className="bom-upload-results-container">
+                    <h6 className="bom-upload-results-title">
                       <i className="bi bi-bar-chart-fill"></i>
                       Import Results
                     </h6>
 
-                    {/* Stats Grid */}
-                    <div
-                      style={{
-                        display: "grid",
-                        gridTemplateColumns: "repeat(3, 1fr)",
-                        gap: "12px",
-                        marginBottom: "20px",
-                      }}
-                    >
-                      <div
-                        style={{
-                          padding: "16px",
-                          background: "#f9fafb",
-                          borderRadius: "6px",
-                          textAlign: "center",
-                        }}
-                      >
-                        <i
-                          className="bi bi-file-earmark-text"
-                          style={{
-                            fontSize: "24px",
-                            color: "#64748b",
-                            marginBottom: "8px",
-                          }}
-                        ></i>
-                        <div
-                          style={{
-                            fontSize: "24px",
-                            fontWeight: "700",
-                            color: "#1e293b",
-                          }}
-                        >
+                    <div className="bom-stats-grid">
+                      <div className="bom-stat-card bom-stat-card-total">
+                        <i className="bi bi-file-earmark-text bom-stat-icon bom-stat-icon-total"></i>
+                        <div className="bom-stat-value bom-stat-value-total">
                           {uploadResult.totalRecords}
                         </div>
-                        <div style={{ fontSize: "12px", color: "#64748b" }}>
+                        <div className="bom-stat-label bom-stat-label-total">
                           Total Records
                         </div>
                       </div>
-                      <div
-                        style={{
-                          padding: "16px",
-                          background: "#f0fdf4",
-                          borderRadius: "6px",
-                          textAlign: "center",
-                        }}
-                      >
-                        <i
-                          className="bi bi-check-circle-fill"
-                          style={{
-                            fontSize: "24px",
-                            color: "#22c55e",
-                            marginBottom: "8px",
-                          }}
-                        ></i>
-                        <div
-                          style={{
-                            fontSize: "24px",
-                            fontWeight: "700",
-                            color: "#166534",
-                          }}
-                        >
+                      <div className="bom-stat-card bom-stat-card-success">
+                        <i className="bi bi-check-circle-fill bom-stat-icon bom-stat-icon-success"></i>
+                        <div className="bom-stat-value bom-stat-value-success">
                           {uploadResult.successCount}
                         </div>
-                        <div style={{ fontSize: "12px", color: "#166534" }}>
+                        <div className="bom-stat-label bom-stat-label-success">
                           Successful
                         </div>
                       </div>
-                      <div
-                        style={{
-                          padding: "16px",
-                          background: "#fef2f2",
-                          borderRadius: "6px",
-                          textAlign: "center",
-                        }}
-                      >
-                        <i
-                          className="bi bi-x-circle-fill"
-                          style={{
-                            fontSize: "24px",
-                            color: "#ef4444",
-                            marginBottom: "8px",
-                          }}
-                        ></i>
-                        <div
-                          style={{
-                            fontSize: "24px",
-                            fontWeight: "700",
-                            color: "#dc2626",
-                          }}
-                        >
+                      <div className="bom-stat-card bom-stat-card-failed">
+                        <i className="bi bi-x-circle-fill bom-stat-icon bom-stat-icon-failed"></i>
+                        <div className="bom-stat-value bom-stat-value-failed">
                           {uploadResult.failureCount}
                         </div>
-                        <div style={{ fontSize: "12px", color: "#dc2626" }}>
+                        <div className="bom-stat-label bom-stat-label-failed">
                           Failed
                         </div>
                       </div>
                     </div>
-                    {/* Success Details Section - ADD THIS */}
+
                     {uploadResult.successCount > 0 &&
                       uploadResult.failureCount === 0 && (
-                        <div
-                          className="success-details-bulk"
-                          style={{
-                            border: "1px solid #86efac",
-                            borderRadius: "8px",
-                            background: "#f0fdf4",
-                            padding: "16px",
-                            marginTop: "20px",
-                          }}
-                        >
-                          {/* Success Header - CENTERED */}
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              gap: "8px",
-                              marginBottom: "12px",
-                            }}
-                          >
-                            <i
-                              className="bi bi-check-circle-fill"
-                              style={{ fontSize: "20px", color: "#22c55e" }}
-                            ></i>
-                            <span
-                              style={{
-                                fontSize: "14px",
-                                fontWeight: "600",
-                                color: "#166534",
-                              }}
-                            >
-                              Import Successful
+                        <div className="bom-success-details-container">
+                          <div className="bom-success-details-header">
+                            <i className="bi bi-check-circle-fill bom-success-details-icon"></i>
+                            <span className="bom-success-details-title">
+                              Users Added Successfully
                             </span>
                           </div>
-
-                          {/* Success Summary - CENTERED */}
-                          <div
-                            style={{
-                              padding: "12px",
-                              background: "#dcfce7",
-                              border: "1px solid #86efac",
-                              borderRadius: "6px",
-                              textAlign: "center",
-                            }}
-                          >
-                            <strong
-                              style={{
-                                display: "block",
-                                marginBottom: "4px",
-                                fontSize: "13px",
-                                color: "#166534",
-                              }}
-                            >
-                              ✓ {uploadResult.successCount} user
-                              {uploadResult.successCount !== 1 ? "s" : ""}{" "}
-                              imported successfully!
+                          <div className="bom-success-details-summary">
+                            <strong className="bom-success-details-summary-title">
+                              {uploadResult.successCount} user
+                              {uploadResult.successCount !== 1 ? "s" : ""} have
+                              been successfully added to the system!
                             </strong>
-                            <p
-                              style={{
-                                margin: 0,
-                                fontSize: "12px",
-                                color: "#15803d",
-                              }}
-                            >
-                              All records have been processed and added to the
-                              system.
+                            <p className="bom-success-details-summary-text">
+                              All records have been processed and the users are
+                              now active. They can log in and access their
+                              accounts immediately.
                             </p>
                           </div>
                         </div>
                       )}
 
-                    {/* Errors Section */}
-                    {uploadResult.errors && uploadResult.errors.length > 0 && (
-                      <div
-                        className="error-details-bulk"
-                        style={{
-                          border: "1px solid #fee2e2",
-                          borderRadius: "8px",
-                          background: "#fef2f2",
-                          padding: "16px",
-                        }}
-                      >
-                        {/* Error Header - CENTERED */}
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            gap: "8px",
-                            marginBottom: "12px",
-                          }}
-                        >
-                          <i
-                            className="bi bi-exclamation-triangle-fill"
-                            style={{ fontSize: "20px", color: "#dc2626" }}
-                          ></i>
-                          <span
-                            style={{
-                              fontSize: "14px",
-                              fontWeight: "600",
-                              color: "#991b1b",
-                            }}
-                          >
-                            Detailed Error Information
-                          </span>
-                        </div>
-
-                        {/* Error Summary - CENTERED */}
-                        <div
-                          style={{
-                            padding: "12px",
-                            background: "#fff7ed",
-                            border: "1px solid #fed7aa",
-                            borderRadius: "6px",
-                            marginBottom: "16px",
-                            textAlign: "center",
-                          }}
-                        >
-                          <strong
-                            style={{
-                              display: "block",
-                              marginBottom: "4px",
-                              fontSize: "13px",
-                              color: "#9a3412",
-                            }}
-                          >
-                            {uploadResult.failureCount} record
-                            {uploadResult.failureCount !== 1 ? "s" : ""} failed
-                            to import
-                          </strong>
-                          <p
-                            style={{
-                              margin: 0,
-                              fontSize: "12px",
-                              color: "#9a3412",
-                            }}
-                          >
-                            Review each error below. Format: Row number (Email)
-                            - Error description
-                          </p>
-                        </div>
-
-                        {/* Error Categories */}
-                        {uploadResult.categorizedErrors ? (
-                          <div>
-                            {/* Duplicate Emails */}
-                            {uploadResult.categorizedErrors.duplicateEmails
-                              .length > 0 && (
-                              <details
-                                open
-                                style={{
-                                  marginBottom: "12px",
-                                  border: "1px solid #fecaca",
-                                  borderRadius: "6px",
-                                  background: "#ffffff",
-                                }}
-                              >
-                                <summary
-                                  style={{
-                                    padding: "12px",
-                                    cursor: "pointer",
-                                    fontWeight: "600",
-                                    fontSize: "13px",
-                                    color: "#dc2626",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "space-between",
-                                  }}
-                                >
-                                  <div
-                                    style={{
-                                      display: "flex",
-                                      alignItems: "center",
-                                      gap: "8px",
-                                    }}
-                                  >
-                                    <i className="bi bi-envelope-x-fill"></i>
-                                    <span>Duplicate Email Addresses</span>
-                                    <span
-                                      style={{
-                                        padding: "2px 8px",
-                                        borderRadius: "12px",
-                                        background: "#fee2e2",
-                                        fontSize: "11px",
-                                        fontWeight: "700",
-                                      }}
-                                    >
-                                      {
-                                        uploadResult.categorizedErrors
-                                          .duplicateEmails.length
-                                      }
-                                    </span>
-                                  </div>
-                                  <i className="bi bi-chevron-down"></i>
-                                </summary>
-                                <div style={{ padding: "0 12px 12px 12px" }}>
-                                  <ul
-                                    style={{
-                                      margin: 0,
-                                      padding: 0,
-                                      listStyle: "none",
-                                    }}
-                                  >
-                                    {uploadResult.categorizedErrors.duplicateEmails.map(
-                                      (error, index) => (
-                                        <li
-                                          key={`dup-${index}`}
-                                          style={{
-                                            padding: "8px 12px",
-                                            marginBottom: "8px",
-                                            background: "#fef2f2",
-                                            border: "1px solid #fecaca",
-                                            borderRadius: "4px",
-                                            fontSize: "12px",
-                                            color: "#991b1b",
-                                            display: "flex",
-                                            alignItems: "flex-start",
-                                            gap: "8px",
-                                          }}
-                                        >
-                                          <i
-                                            className="bi bi-envelope-x"
-                                            style={{
-                                              flexShrink: 0,
-                                              marginTop: "2px",
-                                            }}
-                                          ></i>
-                                          <span>{error}</span>
-                                        </li>
-                                      )
-                                    )}
-                                  </ul>
-                                </div>
-                              </details>
-                            )}
-
-                            {/* Validation Errors */}
-                            {uploadResult.categorizedErrors.validationErrors
-                              .length > 0 && (
-                              <details
-                                open
-                                style={{
-                                  marginBottom: "12px",
-                                  border: "1px solid #fed7aa",
-                                  borderRadius: "6px",
-                                  background: "#ffffff",
-                                }}
-                              >
-                                <summary
-                                  style={{
-                                    padding: "12px",
-                                    cursor: "pointer",
-                                    fontWeight: "600",
-                                    fontSize: "13px",
-                                    color: "#ea580c",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "space-between",
-                                  }}
-                                >
-                                  <div
-                                    style={{
-                                      display: "flex",
-                                      alignItems: "center",
-                                      gap: "8px",
-                                    }}
-                                  >
-                                    <i className="bi bi-exclamation-circle-fill"></i>
-                                    <span>Data Validation Errors</span>
-                                    <span
-                                      style={{
-                                        padding: "2px 8px",
-                                        borderRadius: "12px",
-                                        background: "#ffedd5",
-                                        fontSize: "11px",
-                                        fontWeight: "700",
-                                      }}
-                                    >
-                                      {
-                                        uploadResult.categorizedErrors
-                                          .validationErrors.length
-                                      }
-                                    </span>
-                                  </div>
-                                  <i className="bi bi-chevron-down"></i>
-                                </summary>
-                                <div style={{ padding: "0 12px 12px 12px" }}>
-                                  <ul
-                                    style={{
-                                      margin: 0,
-                                      padding: 0,
-                                      listStyle: "none",
-                                    }}
-                                  >
-                                    {uploadResult.categorizedErrors.validationErrors.map(
-                                      (error, index) => (
-                                        <li
-                                          key={`val-${index}`}
-                                          style={{
-                                            padding: "8px 12px",
-                                            marginBottom: "8px",
-                                            background: "#fffbeb",
-                                            border: "1px solid #fed7aa",
-                                            borderRadius: "4px",
-                                            fontSize: "12px",
-                                            color: "#9a3412",
-                                            display: "flex",
-                                            alignItems: "flex-start",
-                                            gap: "8px",
-                                          }}
-                                        >
-                                          <i
-                                            className="bi bi-x-circle"
-                                            style={{
-                                              flexShrink: 0,
-                                              marginTop: "2px",
-                                            }}
-                                          ></i>
-                                          <span>{error}</span>
-                                        </li>
-                                      )
-                                    )}
-                                  </ul>
-                                </div>
-                              </details>
-                            )}
-
-                            {/* Other Errors */}
-                            {uploadResult.categorizedErrors.otherErrors.length >
-                              0 && (
-                              <details
-                                open
-                                style={{
-                                  border: "1px solid #bfdbfe",
-                                  borderRadius: "6px",
-                                  background: "#ffffff",
-                                }}
-                              >
-                                <summary
-                                  style={{
-                                    padding: "12px",
-                                    cursor: "pointer",
-                                    fontWeight: "600",
-                                    fontSize: "13px",
-                                    color: "#2563eb",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "space-between",
-                                  }}
-                                >
-                                  <div
-                                    style={{
-                                      display: "flex",
-                                      alignItems: "center",
-                                      gap: "8px",
-                                    }}
-                                  >
-                                    <i className="bi bi-info-circle-fill"></i>
-                                    <span>Other Issues</span>
-                                    <span
-                                      style={{
-                                        padding: "2px 8px",
-                                        borderRadius: "12px",
-                                        background: "#dbeafe",
-                                        fontSize: "11px",
-                                        fontWeight: "700",
-                                      }}
-                                    >
-                                      {
-                                        uploadResult.categorizedErrors
-                                          .otherErrors.length
-                                      }
-                                    </span>
-                                  </div>
-                                  <i className="bi bi-chevron-down"></i>
-                                </summary>
-                                <div style={{ padding: "0 12px 12px 12px" }}>
-                                  <ul
-                                    style={{
-                                      margin: 0,
-                                      padding: 0,
-                                      listStyle: "none",
-                                    }}
-                                  >
-                                    {uploadResult.categorizedErrors.otherErrors.map(
-                                      (error, index) => (
-                                        <li
-                                          key={`other-${index}`}
-                                          style={{
-                                            padding: "8px 12px",
-                                            marginBottom: "8px",
-                                            background: "#eff6ff",
-                                            border: "1px solid #bfdbfe",
-                                            borderRadius: "4px",
-                                            fontSize: "12px",
-                                            color: "#1e40af",
-                                            display: "flex",
-                                            alignItems: "flex-start",
-                                            gap: "8px",
-                                          }}
-                                        >
-                                          <i
-                                            className="bi bi-info-circle"
-                                            style={{
-                                              flexShrink: 0,
-                                              marginTop: "2px",
-                                            }}
-                                          ></i>
-                                          <span>{error}</span>
-                                        </li>
-                                      )
-                                    )}
-                                  </ul>
-                                </div>
-                              </details>
-                            )}
+                    {uploadResult.successCount > 0 &&
+                      uploadResult.failureCount > 0 && (
+                        <div className="bom-success-details-container bom-partial-success">
+                          <div className="bom-success-details-header">
+                            <i className="bi bi-check-circle-fill bom-success-details-icon"></i>
+                            <span className="bom-success-details-title">
+                              Partial Success
+                            </span>
                           </div>
-                        ) : (
-                          <ul
-                            style={{ margin: 0, padding: 0, listStyle: "none" }}
-                          >
-                            {uploadResult.errors.map((error, index) => (
-                              <li
-                                key={index}
-                                style={{
-                                  padding: "8px 12px",
-                                  marginBottom: "8px",
-                                  background: "#fef2f2",
-                                  border: "1px solid #fecaca",
-                                  borderRadius: "4px",
-                                  fontSize: "12px",
-                                  color: "#991b1b",
-                                  display: "flex",
-                                  alignItems: "flex-start",
-                                  gap: "8px",
-                                }}
-                              >
-                                <i
-                                  className="bi bi-x-circle"
-                                  style={{ flexShrink: 0, marginTop: "2px" }}
-                                ></i>
-                                <span>{error}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        )}
+                          <div className="bom-success-details-summary">
+                            <strong className="bom-success-details-summary-title">
+                              ✓ {uploadResult.successCount} user
+                              {uploadResult.successCount !== 1 ? "s" : ""} added
+                              successfully!
+                            </strong>
+                            <p className="bom-success-details-summary-text">
+                              These users have been added and are now active in
+                              the system. Review the errors below for failed
+                              records.
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                    {uploadResult.errors && uploadResult.errors.length > 0 && (
+                      <div className="error-details-bulk">
+                        <div className="bom-error-details-container">
+                          <div className="bom-error-details-header">
+                            <i className="bi bi-exclamation-triangle-fill bom-error-details-icon"></i>
+                            <span className="bom-error-details-title">
+                              Detailed Error Information
+                            </span>
+                          </div>
+
+                          <div className="bom-error-summary">
+                            <strong className="bom-error-summary-title">
+                              {uploadResult.failureCount} record
+                              {uploadResult.failureCount !== 1 ? "s" : ""}{" "}
+                              failed to import
+                            </strong>
+                            <p className="bom-error-summary-text">
+                              Review each error below. Format: Row number
+                              (Email) - Error description
+                            </p>
+                          </div>
+
+                          {uploadResult.categorizedErrors ? (
+                            <div>
+                              {uploadResult.categorizedErrors.duplicateEmails
+                                .length > 0 && (
+                                <details
+                                  open
+                                  className="bom-error-category bom-error-category-duplicate"
+                                >
+                                  <summary className="bom-error-category-summary bom-error-category-summary-duplicate">
+                                    <div className="bom-error-category-summary-content">
+                                      <i className="bi bi-envelope-x-fill"></i>
+                                      <span>Duplicate Email Addresses</span>
+                                      <span className="bom-error-category-badge bom-error-category-badge-duplicate">
+                                        {
+                                          uploadResult.categorizedErrors
+                                            .duplicateEmails.length
+                                        }
+                                      </span>
+                                    </div>
+                                    <i className="bi bi-chevron-down"></i>
+                                  </summary>
+                                  <div className="bom-error-category-content">
+                                    <ul className="bom-error-list">
+                                      {uploadResult.categorizedErrors.duplicateEmails.map(
+                                        (error, index) => (
+                                          <li
+                                            key={`dup-${index}`}
+                                            className="bom-error-list-item bom-error-list-item-duplicate"
+                                          >
+                                            <i className="bi bi-envelope-x bom-error-list-item-icon"></i>
+                                            <span>{error}</span>
+                                          </li>
+                                        )
+                                      )}
+                                    </ul>
+                                  </div>
+                                </details>
+                              )}
+
+                              {uploadResult.categorizedErrors.validationErrors
+                                .length > 0 && (
+                                <details
+                                  open
+                                  className="bom-error-category bom-error-category-validation"
+                                >
+                                  <summary className="bom-error-category-summary bom-error-category-summary-validation">
+                                    <div className="bom-error-category-summary-content">
+                                      <i className="bi bi-exclamation-circle-fill"></i>
+                                      <span>Data Validation Errors</span>
+                                      <span className="bom-error-category-badge bom-error-category-badge-validation">
+                                        {
+                                          uploadResult.categorizedErrors
+                                            .validationErrors.length
+                                        }
+                                      </span>
+                                    </div>
+                                    <i className="bi bi-chevron-down"></i>
+                                  </summary>
+                                  <div className="bom-error-category-content">
+                                    <ul className="bom-error-list">
+                                      {uploadResult.categorizedErrors.validationErrors.map(
+                                        (error, index) => (
+                                          <li
+                                            key={`val-${index}`}
+                                            className="bom-error-list-item bom-error-list-item-validation"
+                                          >
+                                            <i className="bi bi-x-circle bom-error-list-item-icon"></i>
+                                            <span>{error}</span>
+                                          </li>
+                                        )
+                                      )}
+                                    </ul>
+                                  </div>
+                                </details>
+                              )}
+
+                              {uploadResult.categorizedErrors.otherErrors
+                                .length > 0 && (
+                                <details
+                                  open
+                                  className="bom-error-category bom-error-category-other"
+                                >
+                                  <summary className="bom-error-category-summary bom-error-category-summary-other">
+                                    <div className="bom-error-category-summary-content">
+                                      <i className="bi bi-info-circle-fill"></i>
+                                      <span>Other Issues</span>
+                                      <span className="bom-error-category-badge bom-error-category-badge-other">
+                                        {
+                                          uploadResult.categorizedErrors
+                                            .otherErrors.length
+                                        }
+                                      </span>
+                                    </div>
+                                    <i className="bi bi-chevron-down"></i>
+                                  </summary>
+                                  <div className="bom-error-category-content">
+                                    <ul className="bom-error-list">
+                                      {uploadResult.categorizedErrors.otherErrors.map(
+                                        (error, index) => (
+                                          <li
+                                            key={`other-${index}`}
+                                            className="bom-error-list-item bom-error-list-item-other"
+                                          >
+                                            <i className="bi bi-info-circle bom-error-list-item-icon"></i>
+                                            <span>{error}</span>
+                                          </li>
+                                        )
+                                      )}
+                                    </ul>
+                                  </div>
+                                </details>
+                              )}
+                            </div>
+                          ) : (
+                            <ul className="bom-error-list">
+                              {uploadResult.errors.map((error, index) => (
+                                <li
+                                  key={index}
+                                  className="bom-error-list-item bom-error-list-item-duplicate"
+                                >
+                                  <i className="bi bi-x-circle bom-error-list-item-icon"></i>
+                                  <span>{error}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -1542,62 +739,14 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
             )}
           </div>
 
-          {/* Modal Footer */}
-          <div
-            style={{
-              padding: "12px 20px",
-              borderTop: "1px solid #e2e8f0",
-              background: "#ffffff",
-              flexShrink: 0,
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "8px",
-              borderBottomLeftRadius: "12px",
-              borderBottomRightRadius: "12px",
-            }}
-          >
-            <button
-              onClick={handleClose}
-              style={{
-                background: "#6c757d",
-                borderColor: "#6c757d",
-                color: "#ffffff",
-                fontWeight: "600",
-                padding: "8px 16px",
-                fontSize: "13px",
-                borderRadius: "6px",
-                border: "none",
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.background = "#5a6268";
-                e.target.style.borderColor = "#5a6268";
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.background = "#6c757d";
-                e.target.style.borderColor = "#6c757d";
-              }}
-            >
+          <div className="bom-modal-footer">
+            <button onClick={handleClose} className="bom-footer-close-button">
               <i className="bi bi-x-circle"></i>
               Close
             </button>
           </div>
         </div>
       </div>
-
-      {/* Keyframe Animation for Spinner */}
-      <style>
-        {`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}
-      </style>
     </>
   );
 };

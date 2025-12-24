@@ -1,0 +1,400 @@
+/* ==================== BACKDROP ==================== */
+.upam-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(39, 35, 92, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1040;
+  }
+  
+  /* ==================== MODAL CONTAINER ==================== */
+  .upam-modal-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 95%;
+    max-width: 800px;
+    max-height: 75vh;
+    z-index: 1050;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* ==================== MODAL DIALOG ==================== */
+  .upam-modal-dialog {
+    border-radius: 0.5rem;
+    background: #fff;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
+    overflow: hidden;
+    width: 100%;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* ==================== HEADER ==================== */
+  .upam-modal-header {
+    background: #27235c;
+    color: #fff;
+    padding: 13px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 0.5rem 0.5rem 0 0;
+    flex-shrink: 0;
+  }
+  
+  .upam-header-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  
+  .upam-close-button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .upam-close-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  
+  .upam-close-button:hover:not(:disabled) {
+    opacity: 0.8;
+  }
+  
+  /* ==================== FORM ==================== */
+  .upam-form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+  }
+  
+  /* ==================== BODY ==================== */
+  .upam-modal-body {
+    padding: 20px;
+    background: #fff;
+    text-align: left;
+    overflow-y: auto;
+    flex: 1;
+  }
+  
+  /* ==================== CURRENT STATUS CARD ==================== */
+  .upam-status-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #f9fafb;
+    padding: 1rem;
+    margin-bottom: 16px;
+  }
+  
+  .upam-status-heading {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 12px 0;
+  }
+  
+  .upam-status-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  
+  .upam-status-item label {
+    font-size: 11px;
+    color: #64748b;
+    display: block;
+    margin-bottom: 4px;
+  }
+  
+  .upam-status-item span {
+    font-size: 15px;
+    font-weight: 600;
+    color: #334155;
+  }
+  
+  .upam-status-item.utilized span {
+    color: #dc3545;
+  }
+  
+  .upam-status-item.available {
+    background: #dcfce7;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #86efac;
+  }
+  
+  .upam-status-item.available label {
+    color: #166534;
+    font-weight: 600;
+  }
+  
+  .upam-status-item.available span {
+    color: #166534;
+    font-weight: 700;
+  }
+  
+  /* ==================== WARNING BOX ==================== */
+  .upam-warning-box {
+    padding: 12px 16px;
+    background: #fff3cd;
+    border: 1px solid #ffecb5;
+    border-radius: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    color: #664d03;
+    margin-bottom: 16px;
+  }
+  
+  .upam-warning-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  
+  .upam-warning-title {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+  
+  .upam-warning-text {
+    margin: 0;
+  }
+  
+  /* ==================== FORM GROUPS ==================== */
+  .upam-form-group {
+    margin-bottom: 16px;
+  }
+  
+  .upam-form-label {
+    font-weight: 600;
+    font-size: 13px;
+    color: #334155;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .upam-form-label-block {
+    font-weight: 600;
+    font-size: 13px;
+    color: #334155;
+    margin-bottom: 6px;
+    display: block;
+  }
+  
+  .upam-required-asterisk {
+    color: #ef4444;
+    font-weight: 700;
+  }
+  
+  /* ==================== FORM INPUTS ==================== */
+  .upam-form-input {
+    width: 100%;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 13px;
+    background: #fff;
+    color: #22223b;
+  }
+  
+  .upam-form-input:focus {
+    outline: none;
+    border-color: #27235c;
+    box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+  }
+  
+  .upam-form-input.error {
+    border: 1px solid #ef4444;
+  }
+  
+  .upam-form-textarea {
+    resize: vertical;
+    min-height: 80px;
+    max-height: 120px;
+    font-family: inherit;
+    line-height: 1.4;
+  }
+  
+  .upam-form-error {
+    color: #ef4444;
+    font-size: 12px;
+    margin-top: 4px;
+  }
+  
+  /* ==================== VALIDATION FEEDBACK ==================== */
+  .upam-validation-feedback {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+  }
+  
+  .upam-validation-success {
+    font-size: 11px;
+    color: #22c55e;
+  }
+  
+  .upam-amount-change-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+  }
+  
+  .upam-amount-change-badge.positive {
+    background: #198754;
+  }
+  
+  .upam-amount-change-badge.negative {
+    background: #dc3545;
+  }
+  
+  /* ==================== FOOTER ==================== */
+  .upam-modal-footer {
+    padding: 10px 15px;
+    border-top: 1px solid #e2e8f0;
+    background: #fff;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+    flex-shrink: 0;
+  }
+  
+  /* ==================== BUTTONS ==================== */
+  .upam-btn-cancel {
+    background: #6c757d;
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 7px 12px;
+    font-size: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .upam-btn-cancel:hover:not(:disabled) {
+    background: #5a6268;
+  }
+  
+  .upam-btn-cancel:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  
+  .upam-btn-submit {
+    background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 7px 12px;
+    font-size: 12px;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(151, 36, 126, 0.25);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .upam-btn-submit:hover:not(:disabled) {
+    opacity: 0.93;
+  }
+  
+  .upam-btn-submit:disabled {
+    cursor: not-allowed;
+    opacity: 0.85;
+  }
+  
+  /* ==================== SPINNER ==================== */
+  .upam-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #fff;
+    border-top: 2px solid #e01950;
+    border-radius: 50%;
+    animation: upam-spin 0.7s linear infinite;
+    display: inline-block;
+    margin-right: 6px;
+  }
+  
+  @keyframes upam-spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* ==================== RESPONSIVE ==================== */
+  @media (max-width: 1024px) {
+    .upam-status-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .upam-modal-container {
+      width: 90%;
+    }
+  
+    .upam-modal-body {
+      padding: 16px;
+    }
+  
+    .upam-status-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .upam-validation-feedback {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .upam-modal-footer {
+      flex-direction: column;
+    }
+  
+    .upam-btn-cancel,
+    .upam-btn-submit {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  

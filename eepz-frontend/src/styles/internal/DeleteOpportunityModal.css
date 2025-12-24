@@ -1,0 +1,229 @@
+/* ==================== BACKDROP ==================== */
+.dom-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(39, 35, 92, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1040;
+    transition: all 0.3s ease;
+  }
+  
+  /* ==================== MODAL WRAPPER ==================== */
+  .dom-modal-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+    padding: 20px;
+  }
+  
+  /* ==================== MODAL DIALOG ==================== */
+  .dom-modal-dialog {
+    width: 100%;
+    max-width: 500px;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    background-color: #ffffff;
+  }
+  
+  /* ==================== HEADER ==================== */
+  .dom-modal-header {
+    background: #27235c;
+    color: #ffffff;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  
+  .dom-header-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #ffffff;
+  }
+  
+  .dom-warning-icon {
+    color: #ef4444;
+  }
+  
+  .dom-close-button {
+    filter: brightness(0) invert(1);
+    opacity: 1;
+  }
+  
+  .dom-close-button:disabled {
+    opacity: 0.5;
+  }
+  
+  /* ==================== BODY ==================== */
+  .dom-modal-body {
+    padding: 24px;
+    background-color: #ffffff;
+  }
+  
+  .dom-confirmation-text {
+    font-size: 14px;
+    color: #334155;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+  
+  .dom-opportunity-name {
+    color: #1e293b;
+    font-weight: 700;
+  }
+  
+  /* ==================== WARNING BOX ==================== */
+  .dom-warning-box {
+    padding: 12px 16px;
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    color: #991b1b;
+  }
+  
+  .dom-warning-box-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  
+  /* ==================== FOOTER ==================== */
+  .dom-modal-footer {
+    padding: 12px 20px;
+    border-top: 1px solid #e2e8f0;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+  }
+  
+  /* ==================== BUTTONS ==================== */
+  .dom-btn-cancel {
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #6c757d;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+  
+  .dom-btn-cancel:hover:not(:disabled) {
+    background: #5a6268;
+  }
+  
+  .dom-btn-cancel:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+  
+  .dom-btn-delete {
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #ef4444;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
+    min-width: 110px;
+    justify-content: center;
+  }
+  
+  .dom-btn-delete:hover:not(:disabled) {
+    background: #dc2626;
+  }
+  
+  .dom-btn-delete:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+  
+  /* ==================== SPINNER ==================== */
+  .dom-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #ffffff;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: dom-spin 0.6s linear infinite;
+    display: inline-block;
+  }
+  
+  @keyframes dom-spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* ==================== RESPONSIVE ==================== */
+  @media (max-width: 768px) {
+    .dom-modal-wrapper {
+      padding: 10px;
+    }
+  
+    .dom-modal-dialog {
+      max-width: 100%;
+    }
+  
+    .dom-modal-body {
+      padding: 20px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .dom-modal-header {
+      padding: 12px 16px;
+    }
+  
+    .dom-header-title {
+      font-size: 14px;
+    }
+  
+    .dom-modal-footer {
+      flex-direction: column;
+    }
+  
+    .dom-btn-cancel,
+    .dom-btn-delete {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  

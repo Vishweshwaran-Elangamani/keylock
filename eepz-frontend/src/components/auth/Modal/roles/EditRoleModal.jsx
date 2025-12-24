@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import roleService from "../../../../services/auth/roleService";
 import { toast } from "sonner";
+import "../../../../styles/auth/roles/EditRoleModal.css";
 
 const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -100,67 +101,13 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
 
   return (
     <>
-      {/* Backdrop */}
-      <div
-        style={{
-          position: "fixed",
-          top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: "rgba(39,35,92,0.4)",
-          backdropFilter: "blur(8px)",
-          WebkitBackdropFilter: "blur(8px)",
-          zIndex: 1040,
-        }}
-        onClick={onClose}
-      />
+      <div className="erm-backdrop" onClick={onClose} />
 
-      {/* Centered Modal */}
-      <div
-        style={{
-          position: "fixed",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: "95%",
-          maxWidth: "590px",
-          zIndex: 1050,
-        }}
-      >
-        <div
-          style={{
-            borderRadius: "0.5rem",
-            background: "#fff",
-            boxShadow: "0 8px 28px rgba(0,0,0,0.22)",
-            overflow: "hidden",
-            width: "100%",
-            
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
+      <div className="erm-modal-container">
+        <div className="erm-modal-dialog">
           {/* HEADER */}
-          <div
-            style={{
-              background: "#27235C",
-              color: "#fff",
-              padding: "13px 15px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              fontSize: "15px",
-              fontWeight: 600,
-              borderRadius: "0.5rem 0.5rem 0 0",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                color: "#fff",
-                fontSize: "15px",
-                fontWeight: 600,
-              }}
-            >
+          <div className="erm-modal-header">
+            <div className="erm-header-title">
               <i className="bi bi-pencil-square"></i>
               Edit Role
             </div>
@@ -169,71 +116,32 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
               onClick={onClose}
               disabled={loading}
               aria-label="Close"
-              style={{
-                background: "none",
-                border: "none",
-                color: "#fff",
-                fontSize: 18,
-                cursor: loading ? "not-allowed" : "pointer",
-                opacity: loading ? 0.7 : 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              className="erm-close-button"
             >
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
 
           {/* BODY/FORM */}
-          <form onSubmit={handleSubmit} style={{ margin: 0 }}>
-            <div style={{ padding: "16px 15px 6px 15px", background: "#fff" }}>
+          <form onSubmit={handleSubmit} className="erm-form">
+            <div className="erm-modal-body">
               {role?.isSystemRole && (
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginBottom: 8,
-                    background: "#fef3c7",
-                    color: "#dc973a",
-                    padding: "6px 8px",
-                    borderRadius: 4,
-                    fontSize: 13,
-                    gap: 7,
-                    textAlign: "center"
-                  }}
-                >
+                <div className="erm-system-warning">
                   <i className="bi bi-exclamation-triangle-fill"></i>
                   <div>
-                    <strong>Warning:</strong>{" "}
-                    This is a system role. Changes may affect core functionality.
+                    <strong>Warning:</strong> This is a system role. Changes may
+                    affect core functionality.
                   </div>
                 </div>
               )}
 
               {/* 2 column layout */}
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: 12,
-                }}
-              >
+              <div className="erm-two-column">
                 {/* LEFT COLUMN */}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                    <label
-                      style={{
-                        fontWeight: 600,
-                        fontSize: 13,
-                        color: "#334155",
-                        marginBottom: 3,
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 4,
-                      }}
-                    >
-                      Role Name <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                <div className="erm-column-left">
+                  <div className="erm-form-group">
+                    <label className="erm-form-label">
+                      Role Name <span className="erm-required-asterisk">*</span>
                     </label>
                     <input
                       type="text"
@@ -243,36 +151,18 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
                       onChange={handleChange}
                       maxLength={50}
                       disabled={loading}
-                      style={{
-                        border: errors.roleName
-                          ? "1px solid #dc3545"
-                          : "1px solid #cbd5e1",
-                        borderRadius: 6,
-                        padding: "8px 10px",
-                        fontSize: 13,
-                        background: "#fff",
-                        color: "#22223b",
-                      }}
+                      className={`erm-form-input ${
+                        errors.roleName ? "error" : ""
+                      }`}
                     />
                     {errors.roleName && (
-                      <div style={{ color: "#dc3545", fontSize: 11, marginTop: 2 }}>
-                        {errors.roleName}
-                      </div>
+                      <div className="erm-form-error">{errors.roleName}</div>
                     )}
                   </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 3, marginTop: 6 }}>
-                    <label
-                      style={{
-                        fontWeight: 600,
-                        fontSize: 13,
-                        color: "#334155",
-                        marginBottom: 3,
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 4,
-                      }}
-                    >
-                      Role Code <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+
+                  <div className="erm-form-group erm-form-group-spaced">
+                    <label className="erm-form-label">
+                      Role Code <span className="erm-required-asterisk">*</span>
                     </label>
                     <input
                       type="text"
@@ -282,39 +172,22 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
                       onChange={handleChange}
                       maxLength={20}
                       disabled={loading}
-                      style={{
-                        border: errors.roleCode
-                          ? "1px solid #dc3545"
-                          : "1px solid #cbd5e1",
-                        borderRadius: 6,
-                        padding: "8px 10px",
-                        fontSize: 13,
-                        background: "#fff",
-                        color: "#22223b",
-                      }}
+                      className={`erm-form-input ${
+                        errors.roleCode ? "error" : ""
+                      }`}
                     />
                     {errors.roleCode && (
-                      <div style={{ color: "#dc3545", fontSize: 11, marginTop: 2 }}>
-                        {errors.roleCode}
-                      </div>
+                      <div className="erm-form-error">{errors.roleCode}</div>
                     )}
                   </div>
                 </div>
+
                 {/* RIGHT COLUMN */}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-                    <label
-                      style={{
-                        fontWeight: 600,
-                        fontSize: 13,
-                        color: "#334155",
-                        marginBottom: 3,
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 4,
-                      }}
-                    >
-                      Description <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                <div className="erm-column-right">
+                  <div className="erm-form-group-full-height">
+                    <label className="erm-form-label">
+                      Description{" "}
+                      <span className="erm-required-asterisk">*</span>
                     </label>
                     <textarea
                       name="description"
@@ -324,143 +197,52 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
                       rows={8}
                       maxLength={255}
                       disabled={loading}
-                      style={{
-                        border: errors.description
-                          ? "1px solid #dc3545"
-                          : "1px solid #cbd5e1",
-                        borderRadius: 6,
-                        padding: "8px 10px",
-                        fontSize: 13,
-                        background: "#fff",
-                        color: "#22223b",
-                        resize: "vertical",
-                        minHeight: 90,
-                        maxHeight: 130,
-                        fontFamily: "inherit",
-                        lineHeight: 1.4,
-                        marginBottom: 3,
-                      }}
+                      className={`erm-form-input erm-form-textarea ${
+                        errors.description ? "error" : ""
+                      }`}
                     />
                     {errors.description && (
-                      <div style={{ color: "#dc3545", fontSize: 11, marginBottom: 3 }}>
+                      <div className="erm-form-error-desc">
                         {errors.description}
                       </div>
                     )}
-                    <small style={{ color: "#64748b", fontSize: 11 }}>
+                    <small className="erm-char-count">
                       {formData.description.length}/255 characters
                     </small>
                   </div>
                 </div>
               </div>
+
               {/* Info Alert */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  background: "#f1f5f9",
-                  color: "#64748b",
-                  borderRadius: 4,
-                  fontSize: 12,
-                  padding: "5px 8px",
-                  gap: 5,
-                  marginTop: 10,
-                }}
-              >
+              <div className="erm-info-alert">
                 <i className="bi bi-info-circle"></i>
                 <small>All fields are required for updating the role</small>
               </div>
             </div>
+
             {/* FOOTER */}
-            <div
-              style={{
-                padding: "10px 15px",
-                borderTop: "1px solid #e2e8f0",
-                background: "#fff",
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: 8,
-                borderBottomLeftRadius: "0.5rem",
-                borderBottomRightRadius: "0.5rem",
-              }}
-            >
+            <div className="erm-modal-footer">
               {/* Cancel Button */}
               <button
                 type="button"
                 onClick={onClose}
                 disabled={loading}
-                style={{
-                  background: "#6c757d",
-                  border: "none",
-                  color: "#fff",
-                  fontWeight: 600,
-                  padding: "7px 12px",
-                  fontSize: 12,
-                  borderRadius: 5,
-                  cursor: loading ? "not-allowed" : "pointer",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  opacity: loading ? 0.7 : 1,
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={e => {
-                  if (!loading) e.target.style.background = "#5a6268";
-                }}
-                onMouseLeave={e => {
-                  if (!loading) e.target.style.background = "#6c757d";
-                }}
+                className="erm-btn-cancel"
               >
                 <i className="bi bi-x-circle"></i>
                 Cancel
               </button>
+
               {/* Update Button */}
               <button
                 type="submit"
                 disabled={loading}
-                style={{
-                  background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                  border: "none",
-                  color: "#fff",
-                  fontWeight: 600,
-                  padding: "7px 12px",
-                  fontSize: 12,
-                  borderRadius: 5,
-                  boxShadow: "0 2px 8px rgba(151,36,126,0.25)",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  cursor: loading ? "not-allowed" : "pointer",
-                  opacity: loading ? 0.85 : 1,
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={e => {
-                  if (!loading) e.target.style.opacity = 0.93;
-                }}
-                onMouseLeave={e => {
-                  if (!loading) e.target.style.opacity = 1;
-                }}
+                className="erm-btn-submit"
               >
                 {loading ? (
                   <>
-                    <span
-                      style={{
-                        width: 14,
-                        height: 14,
-                        border: "2px solid #fff",
-                        borderTop: "2px solid #E01950",
-                        borderRadius: "50%",
-                        animation: "spin 0.7s linear infinite",
-                        display: "inline-block",
-                        marginRight: 6,
-                      }}
-                    />
+                    <span className="erm-spinner" />
                     Updating...
-                    <style>{`
-                      @keyframes spin {
-                        0% { transform: rotate(0deg);}
-                        100% { transform: rotate(360deg);}
-                      }
-                    `}</style>
                   </>
                 ) : (
                   <>

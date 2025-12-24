@@ -3,6 +3,7 @@ import { Spinner, CloseButton } from "react-bootstrap";
 import departmentService from "../../../../services/auth/departmentService";
 import userService from "../../../../services/auth/userService";
 import { toast } from "sonner";
+import "../../../../styles/auth/department/EditDepartmentModal.css";
 
 const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -55,7 +56,8 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
       if (usersResponse.success) {
         // Filter only users with Department Head role (RoleCode === "DEPT_HEAD")
         const filteredHeads = (usersResponse.data || []).filter(
-          (user) => user.roleName === "Department Head"  && user.status === "Active"
+          (user) =>
+            user.roleName === "Department Head" && user.status === "Active"
         );
         setDepartmentHeads(filteredHeads);
       }
@@ -91,11 +93,12 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
         description: formData.description.trim() || null,
         status: formData.status,
         // IMPORTANT: Always send these fields (even if unchanged)
-        parentDepartmentId: 
-          formData.parentDepartmentId === "" || formData.parentDepartmentId === null
+        parentDepartmentId:
+          formData.parentDepartmentId === "" ||
+          formData.parentDepartmentId === null
             ? null
             : parseInt(formData.parentDepartmentId),
-        hodEmployeeId: 
+        hodEmployeeId:
           formData.hodEmployeeId === "" || formData.hodEmployeeId === null
             ? null
             : parseInt(formData.hodEmployeeId),
@@ -129,126 +132,66 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
 
   return (
     <>
-      {/* Backdrop */}
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(39,35,92,0.4)",
-          backdropFilter: "blur(8px)",
-          WebkitBackdropFilter: "blur(8px)",
-          zIndex: 1040,
-        }}
-        onClick={onClose}
-      />
+      <div className="edm-backdrop" onClick={onClose} />
 
-      {/* Modal */}
-      <div
-        style={{
-          position: "fixed",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: "95%",
-          maxWidth: "550px",
-          maxHeight: "90vh",
-          overflowY: "auto",
-          zIndex: 1050,
-        }}
-      >
-        <div
-          style={{
-            borderRadius: "0.5rem",
-            background: "#fff",
-            boxShadow: "0 8px 28px rgba(0,0,0,0.22)",
-            overflow: "hidden",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
+      <div className="edm-modal-container">
+        <div className="edm-modal-dialog">
           {/* Header */}
-          <div
-            style={{
-              background: "#27235C",
-              color: "#fff",
-              padding: "13px 15px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              fontSize: "15px",
-              fontWeight: 600,
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div className="edm-modal-header">
+            <div className="edm-header-title">
               <i className="bi bi-pencil-square"></i>
               Edit Department
             </div>
             <CloseButton
               onClick={onClose}
               variant="white"
-              style={{ filter: "brightness(0) invert(1)", opacity: 1 }}
+              className="edm-close-button"
               disabled={loading}
             />
           </div>
 
           {/* Body */}
-          <form onSubmit={handleSubmit} autoComplete="off" style={{ margin: 0 }}>
-            <div style={{ padding: "16px 15px", background: "#fff" }}>
+          <form onSubmit={handleSubmit} autoComplete="off" className="edm-form">
+            <div className="edm-modal-body">
               {loadingDropdowns ? (
-                <div style={{ textAlign: "center", padding: "20px" }}>
+                <div className="edm-loading-container">
                   <Spinner animation="border" size="sm" />
-                  <p style={{ marginTop: "10px", fontSize: "13px", color: "#64748b" }}>
-                    Loading form data...
-                  </p>
+                  <p className="edm-loading-text">Loading form data...</p>
                 </div>
               ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <div className="edm-form-content">
                   {/* Row 1: Department Name & Code (READ-ONLY) */}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                      <label style={labelStyle}>Department Name</label>
+                  <div className="edm-form-row">
+                    <div className="edm-form-group">
+                      <label className="edm-form-label">Department Name</label>
                       <input
                         type="text"
                         value={formData.departmentName}
                         disabled
-                        style={{
-                          ...inputStyle,
-                          background: "#f1f5f9",
-                          color: "#64748b",
-                          cursor: "not-allowed",
-                        }}
+                        className="edm-form-input edm-form-input-readonly"
                       />
-                      <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2 }}>
+                      <div className="edm-readonly-hint">
                         <i className="bi bi-lock-fill"></i> Cannot be edited
                       </div>
                     </div>
 
-                    <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                      <label style={labelStyle}>Department Code</label>
+                    <div className="edm-form-group">
+                      <label className="edm-form-label">Department Code</label>
                       <input
                         type="text"
                         value={formData.departmentCode}
                         disabled
-                        style={{
-                          ...inputStyle,
-                          background: "#f1f5f9",
-                          color: "#64748b",
-                          cursor: "not-allowed",
-                          textTransform: "uppercase",
-                        }}
+                        className="edm-form-input edm-form-input-readonly edm-form-input-uppercase"
                       />
-                      <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2 }}>
+                      <div className="edm-readonly-hint">
                         <i className="bi bi-lock-fill"></i> Cannot be edited
                       </div>
                     </div>
                   </div>
 
                   {/* Row 2: Description (EDITABLE) */}
-                  <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                    <label style={labelStyle}>Description</label>
+                  <div className="edm-form-row-full">
+                    <label className="edm-form-label">Description</label>
                     <textarea
                       name="description"
                       placeholder="Brief description of the department"
@@ -257,75 +200,82 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
                       disabled={loading}
                       maxLength={255}
                       rows={2}
-                      style={{
-                        ...inputStyle,
-                        resize: "vertical",
-                        minHeight: "60px",
-                      }}
+                      className="edm-form-input edm-form-textarea"
                     />
                   </div>
 
                   {/* Row 3: Status & Parent Department (EDITABLE) */}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                      <label style={labelStyle}>Status</label>
+                  <div className="edm-form-row">
+                    <div className="edm-form-group">
+                      <label className="edm-form-label">Status</label>
                       <select
                         name="status"
                         value={formData.status}
                         onChange={handleChange}
                         disabled={loading}
-                        style={inputStyle}
+                        className="edm-form-input"
                       >
-                        <option value="Active">✅ Active</option>
-                        <option value="Inactive">⏸️ Inactive</option>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
                       </select>
                     </div>
 
-                    <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                      <label style={labelStyle}>Parent Department</label>
+                    <div className="edm-form-group">
+                      <label className="edm-form-label">
+                        Parent Department
+                      </label>
                       <select
                         name="parentDepartmentId"
                         value={formData.parentDepartmentId}
                         onChange={handleChange}
                         disabled={loading}
-                        style={inputStyle}
+                        className="edm-form-input"
                       >
-                        <option value="">🏢 None (Root Department)</option>
+                        <option value="">-- None (Root Department) --</option>
                         {departments.map((dept) => (
-                          <option key={dept.departmentId} value={dept.departmentId}>
+                          <option
+                            key={dept.departmentId}
+                            value={dept.departmentId}
+                          >
                             {dept.departmentName} ({dept.departmentCode})
                           </option>
                         ))}
                       </select>
-                      <div style={{ fontSize: 10, color: "#64748b", marginTop: 2 }}>
-                        <i className="bi bi-info-circle"></i> Select "None" to remove parent
+                      <div className="edm-info-hint">
+                        <i className="bi bi-info-circle"></i> Select "None" to
+                        remove parent
                       </div>
                     </div>
                   </div>
 
                   {/* Row 4: HOD (EDITABLE - Department Heads Only) */}
-                  <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                    <label style={labelStyle}>Head of Department (HOD)</label>
+                  <div className="edm-form-row-full">
+                    <label className="edm-form-label">
+                      Head of Department (HOD)
+                    </label>
                     <select
                       name="hodEmployeeId"
                       value={formData.hodEmployeeId}
                       onChange={handleChange}
                       disabled={loading}
-                      style={inputStyle}
+                      className="edm-form-input"
                     >
-                      <option value="">👤 None (No HOD Assigned)</option>
+                      <option value="">-- None (No HOD Assigned) --</option>
                       {departmentHeads.map((emp) => (
                         <option key={emp.employeeId} value={emp.employeeId}>
-                          {emp.firstName} {emp.lastName} ({emp.employeeCompanyId})
+                          {emp.firstName} {emp.lastName} (
+                          {emp.employeeCompanyId})
                         </option>
                       ))}
                     </select>
-                    <div style={{ fontSize: 10, color: "#64748b", marginTop: 2 }}>
-                      <i className="bi bi-info-circle"></i> Select "None" to remove current HOD
+                    <div className="edm-info-hint">
+                      <i className="bi bi-info-circle"></i> Select "None" to
+                      remove current HOD
                     </div>
                     {departmentHeads.length === 0 && !loadingDropdowns && (
-                      <div style={{ fontSize: 11, color: "#f59e0b", marginTop: 4 }}>
-                        <i className="bi bi-exclamation-triangle"></i> No employees with "Department Head" role found
+                      <div className="edm-warning-hint">
+                        <i className="bi bi-exclamation-triangle"></i> No
+                        employees with "Department Head" role found
                       </div>
                     )}
                   </div>
@@ -334,21 +284,12 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
             </div>
 
             {/* Footer */}
-            <div
-              style={{
-                padding: "10px 15px",
-                borderTop: "1px solid #e2e8f0",
-                background: "#fff",
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: 8,
-              }}
-            >
+            <div className="edm-modal-footer">
               <button
                 type="button"
                 onClick={onClose}
                 disabled={loading}
-                style={cancelButtonStyle}
+                className="edm-btn-cancel"
               >
                 <i className="bi bi-x-circle"></i>
                 Cancel
@@ -356,7 +297,7 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
               <button
                 type="submit"
                 disabled={loading || loadingDropdowns}
-                style={submitButtonStyle}
+                className="edm-btn-submit"
               >
                 {loading ? (
                   <>
@@ -376,57 +317,6 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
       </div>
     </>
   );
-};
-
-// Shared Styles
-const labelStyle = {
-  fontWeight: 600,
-  fontSize: 13,
-  color: "#334155",
-  marginBottom: 3,
-  display: "flex",
-  alignItems: "center",
-  gap: 4,
-};
-
-const inputStyle = {
-  border: "1px solid #cbd5e1",
-  borderRadius: 6,
-  padding: "8px 10px",
-  fontSize: 13,
-  background: "#fff",
-  color: "#22223b",
-};
-
-const cancelButtonStyle = {
-  background: "#6c757d",
-  border: "none",
-  color: "#fff",
-  fontWeight: 600,
-  padding: "7px 12px",
-  fontSize: 12,
-  borderRadius: 5,
-  cursor: "pointer",
-  display: "inline-flex",
-  alignItems: "center",
-  gap: 6,
-  transition: "all 0.2s ease",
-};
-
-const submitButtonStyle = {
-  background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-  border: "none",
-  color: "#fff",
-  fontWeight: 600,
-  padding: "7px 12px",
-  fontSize: 12,
-  borderRadius: 5,
-  boxShadow: "0 2px 8px rgba(151, 36, 126, 0.25)",
-  display: "inline-flex",
-  alignItems: "center",
-  gap: 6,
-  cursor: "pointer",
-  transition: "all 0.2s ease",
 };
 
 export default EditDepartmentModal;

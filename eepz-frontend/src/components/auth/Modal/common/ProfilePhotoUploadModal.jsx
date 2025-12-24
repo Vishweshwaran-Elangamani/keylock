@@ -1,22 +1,29 @@
 import React, { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import EmployeeProfileService from "../../../../services/auth/EmployeeProfileService";
+import "../../../../styles/common/ProfilePhotoUploadModal.css";
 
 function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
-  
+
   // Image positioning states
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  
+
   const imageRef = useRef(null);
 
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-  const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+  const ALLOWED_FILE_TYPES = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/gif",
+    "image/webp",
+  ];
 
   const validateFile = (file) => {
     if (!file) return { valid: false, error: "No file selected" };
@@ -76,16 +83,16 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
     setDragging(true);
     setDragStart({
       x: e.clientX - position.x,
-      y: e.clientY - position.y
+      y: e.clientY - position.y,
     });
   };
 
   const handleMouseMove = (e) => {
     if (!dragging) return;
-    
+
     const newX = e.clientX - dragStart.x;
     const newY = e.clientY - dragStart.y;
-    
+
     setPosition({ x: newX, y: newY });
   };
 
@@ -99,17 +106,17 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
     setDragging(true);
     setDragStart({
       x: touch.clientX - position.x,
-      y: touch.clientY - position.y
+      y: touch.clientY - position.y,
     });
   };
 
   const handleTouchMove = (e) => {
     if (!dragging) return;
     const touch = e.touches[0];
-    
+
     const newX = touch.clientX - dragStart.x;
     const newY = touch.clientY - dragStart.y;
-    
+
     setPosition({ x: newX, y: newY });
   };
 
@@ -122,9 +129,9 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
   // ========================
   const getCroppedImage = async () => {
     return new Promise((resolve) => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
       const size = 300; // Output size
       canvas.width = size;
       canvas.height = size;
@@ -132,7 +139,7 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
       const img = new Image();
       img.onload = () => {
         const containerSize = 160; // Preview container size
-        
+
         // Draw circular clipped image
         ctx.beginPath();
         ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
@@ -144,17 +151,17 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
           containerSize / img.width,
           containerSize / img.height
         );
-        
+
         const scaledWidth = img.width * scale;
         const scaledHeight = img.height * scale;
-        
+
         // Calculate centered position with offset
         const offsetX = (containerSize - scaledWidth) / 2 + position.x;
         const offsetY = (containerSize - scaledHeight) / 2 + position.y;
 
         // Scale up for output
         const outputScale = size / containerSize;
-        
+
         ctx.drawImage(
           img,
           offsetX * outputScale,
@@ -163,9 +170,13 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
           scaledHeight * outputScale
         );
 
-        canvas.toBlob((blob) => {
-          resolve(blob);
-        }, 'image/jpeg', 0.9);
+        canvas.toBlob(
+          (blob) => {
+            resolve(blob);
+          },
+          "image/jpeg",
+          0.9
+        );
       };
       img.src = preview;
     });
@@ -184,14 +195,16 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
     try {
       const croppedBlob = await getCroppedImage();
       const croppedFile = new File([croppedBlob], selectedFile.name, {
-        type: 'image/jpeg'
+        type: "image/jpeg",
       });
 
       const formData = new FormData();
       formData.append("ProfilePhoto", croppedFile);
 
       toast.loading("Uploading photo...");
-      const response = await EmployeeProfileService.updateProfilePhoto(formData);
+      const response = await EmployeeProfileService.updateProfilePhoto(
+        formData
+      );
 
       toast.dismiss();
 
@@ -224,52 +237,13 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
 
   return (
     <>
-      {/* Backdrop */}
-      <div
-        style={{
-          position: "fixed",
-          top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: "rgba(39,35,92,0.4)",
-          backdropFilter: "blur(8px)",
-          WebkitBackdropFilter: "blur(8px)",
-          zIndex: 1040,
-        }}
-        onClick={onClose}
-      />
+      <div className="ppum-backdrop" onClick={onClose} />
 
-      {/* Modal */}
-      <div
-        style={{
-          position: "fixed",
-          top: "50%", left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: "95%",
-          maxWidth: "420px",
-          zIndex: 1050,
-        }}
-      >
-        <div
-          style={{
-            borderRadius: "0.5rem",
-            background: "#fff",
-            boxShadow: "0 8px 28px rgba(0,0,0,0.22)",
-            overflow: "hidden",
-          }}
-        >
+      <div className="ppum-modal-container">
+        <div className="ppum-modal-dialog">
           {/* HEADER */}
-          <div
-            style={{
-              background: "#27235C",
-              color: "#fff",
-              padding: "12px 15px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              fontSize: "15px",
-              fontWeight: 600,
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div className="ppum-modal-header">
+            <div className="ppum-header-title">
               <i className="bi bi-camera-fill"></i>
               Add Profile Picture
             </div>
@@ -277,14 +251,7 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
               type="button"
               onClick={onClose}
               disabled={uploading}
-              style={{
-                background: "none",
-                border: "none",
-                color: "#fff",
-                fontSize: 18,
-                cursor: uploading ? "not-allowed" : "pointer",
-                opacity: uploading ? 0.7 : 1,
-              }}
+              className="ppum-close-button"
             >
               <i className="bi bi-x-lg"></i>
             </button>
@@ -292,25 +259,15 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
 
           {/* BODY */}
           <form onSubmit={handleSubmit}>
-            <div style={{ padding: "20px 15px", background: "#fff", textAlign: "center" }}>
-              
+            <div className="ppum-modal-body">
               {/* Preview Section with Drag */}
               {preview ? (
-                <div style={{ marginBottom: 16 }}>
+                <div className="ppum-preview-section">
                   {/* Circular Image Preview - Draggable */}
-                  <div 
-                    style={{
-                      width: 160,
-                      height: 160,
-                      borderRadius: "50%",
-                      overflow: "hidden",
-                      margin: "0 auto 12px",
-                      border: "4px solid #27235C",
-                      boxShadow: "0 4px 12px rgba(39,35,92,0.2)",
-                      position: "relative",
-                      cursor: dragging ? "grabbing" : "grab",
-                      userSelect: "none",
-                    }}
+                  <div
+                    className={`ppum-preview-container ${
+                      dragging ? "dragging" : "draggable"
+                    }`}
                     onMouseDown={handleMouseDown}
                     onMouseMove={handleMouseMove}
                     onMouseUp={handleMouseUp}
@@ -319,81 +276,50 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
                     onTouchMove={handleTouchMove}
                     onTouchEnd={handleTouchEnd}
                   >
-                    <img 
+                    <img
                       ref={imageRef}
-                      src={preview} 
-                      alt="Preview" 
+                      src={preview}
+                      alt="Preview"
                       draggable={false}
+                      className="ppum-preview-image"
                       style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
                         transform: `translate(${position.x}px, ${position.y}px)`,
-                        pointerEvents: "none",
                       }}
                     />
                   </div>
 
                   {/* Drag Instruction */}
-                  <p style={{
-                    fontSize: 11,
-                    color: "#64748b",
-                    margin: "0 0 8px 0",
-                  }}>
+                  <p className="ppum-drag-instruction">
                     <i className="bi bi-hand-index"></i> Drag to reposition
                   </p>
 
                   {/* File Info */}
-                  <p style={{
-                    fontSize: 13,
-                    color: "#334155",
-                    margin: "4px 0",
-                    fontWeight: 500,
-                    wordBreak: "break-word",
-                  }}>
-                    {selectedFile?.name}
-                  </p>
-                  <p style={{
-                    fontSize: 12,
-                    color: "#64748b",
-                    margin: 0,
-                  }}>
+                  <p className="ppum-file-name">{selectedFile?.name}</p>
+                  <p className="ppum-file-size">
                     {(selectedFile?.size / 1024).toFixed(2)} KB
                   </p>
                 </div>
               ) : (
                 /* Upload Area */
-                <div 
-                  style={{
-                    border: dragActive ? "3px dashed #27235C" : "3px dashed #cbd5e1",
-                    borderRadius: 12,
-                    padding: "30px 20px",
-                    background: dragActive ? "#f8f9fa" : "#f9fafb",
-                    cursor: "pointer",
-                    transition: "all 0.3s ease",
-                  }}
+                <div
+                  className={`ppum-upload-area ${
+                    dragActive ? "drag-active" : ""
+                  } ${uploading ? "disabled" : ""}`}
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
                 >
-                  <label 
-                    htmlFor="photo-upload" 
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      gap: 10,
-                      cursor: uploading ? "not-allowed" : "pointer",
-                    }}
+                  <label
+                    htmlFor="photo-upload"
+                    className={`ppum-upload-label ${
+                      uploading ? "disabled" : ""
+                    }`}
                   >
-                    <i 
-                      className="bi bi-cloud-upload" 
-                      style={{ fontSize: 42, color: "#27235C" }}
-                    ></i>
-                    <span style={{ fontSize: 14, fontWeight: 600, color: "#334155" }}>
+                    <i className="bi bi-cloud-upload ppum-upload-icon"></i>
+                    <span className="ppum-upload-text">
                       Choose Image or Drag & Drop
                     </span>
-                    <span style={{ fontSize: 11, color: "#64748b" }}>
+                    <span className="ppum-upload-hint">
                       JPEG, PNG, GIF, WEBP (Max 5MB)
                     </span>
                   </label>
@@ -403,98 +329,40 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
                     accept="image/*"
                     onChange={handleFileChange}
                     disabled={uploading}
-                    style={{ display: "none" }}
+                    className="ppum-upload-input"
                   />
                 </div>
               )}
 
               {/* Info */}
-              <div style={{
-                display: "flex",
-                alignItems: "center",
-                background: "#f1f5f9",
-                color: "#64748b",
-                borderRadius: 6,
-                fontSize: 11,
-                padding: "6px 8px",
-                gap: 6,
-                marginTop: 12,
-              }}>
+              <div className="ppum-info-box">
                 <i className="bi bi-info-circle"></i>
-                <small>Image will be automatically optimized for best performance</small>
+                <small>
+                  Image will be automatically optimized for best performance
+                </small>
               </div>
             </div>
 
             {/* FOOTER */}
-            <div style={{
-              padding: "10px 15px",
-              borderTop: "1px solid #e2e8f0",
-              background: "#fff",
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: 8,
-            }}>
+            <div className="ppum-modal-footer">
               <button
                 type="button"
                 onClick={onClose}
                 disabled={uploading}
-                style={{
-                  background: "#6c757d",
-                  border: "none",
-                  color: "#fff",
-                  fontWeight: 600,
-                  padding: "7px 12px",
-                  fontSize: 12,
-                  borderRadius: 5,
-                  cursor: uploading ? "not-allowed" : "pointer",
-                  opacity: uploading ? 0.7 : 1,
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={e => {
-                  if (!uploading) e.target.style.background = "#5a6268";
-                }}
-                onMouseLeave={e => {
-                  if (!uploading) e.target.style.background = "#6c757d";
-                }}
+                className="ppum-btn-cancel"
               >
                 <i className="bi bi-x-circle"></i> Cancel
               </button>
-              
+
               <button
                 type="submit"
                 disabled={!selectedFile || uploading}
-                style={{
-                  background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                  border: "none",
-                  color: "#fff",
-                  fontWeight: 600,
-                  padding: "7px 12px",
-                  fontSize: 12,
-                  borderRadius: 5,
-                  boxShadow: "0 2px 8px rgba(151,36,126,0.25)",
-                  cursor: (!selectedFile || uploading) ? "not-allowed" : "pointer",
-                  opacity: (!selectedFile || uploading) ? 0.7 : 1,
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={e => {
-                  if (selectedFile && !uploading) e.target.style.opacity = 0.93;
-                }}
-                onMouseLeave={e => {
-                  if (selectedFile && !uploading) e.target.style.opacity = 1;
-                }}
+                className="ppum-btn-upload"
               >
                 {uploading ? (
                   <>
-                    <span style={{
-                      width: 14, height: 14,
-                      border: "2px solid #fff",
-                      borderTop: "2px solid #E01950",
-                      borderRadius: "50%",
-                      animation: "spin 0.7s linear infinite",
-                      display: "inline-block",
-                    }} />
+                    <span className="ppum-spinner" />
                     Uploading...
-                    <style>{`@keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);}}`}</style>
                   </>
                 ) : (
                   <>

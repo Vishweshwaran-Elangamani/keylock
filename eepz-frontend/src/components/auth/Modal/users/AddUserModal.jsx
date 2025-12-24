@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import userService from "../../../../services/auth/userService";
 import { toast } from "sonner";
- 
+import "../../../../styles/auth/user/AddUserModal.css";
+
 const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
   const [formData, setFormData] = useState({
     firstName: "",
@@ -20,27 +21,27 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
- 
+
   useEffect(() => {
     const fetchNextEmployeeId = async () => {
       try {
         const response = await userService.getNextEmployeeCompanyId();
         if (response.success) {
-          setFormData(prev => ({
+          setFormData((prev) => ({
             ...prev,
-            employeeCompanyId: response.data
+            employeeCompanyId: response.data,
           }));
         }
       } catch (error) {
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
-          employeeCompanyId: ""
+          employeeCompanyId: "",
         }));
       }
     };
     if (show) fetchNextEmployeeId();
   }, [show]);
- 
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "employeeCompanyId") {
@@ -52,40 +53,54 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
     }
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
- 
+
   const validateForm = () => {
     const newErrors = {};
-   
+
     // First Name validation
-    if (!formData.firstName.trim()) newErrors.firstName = "First name is required";
-    else if (formData.firstName.trim().length < 2) newErrors.firstName = "First name must be at least 2 characters";
-    else if (!/^[a-zA-Z\s]+$/.test(formData.firstName.trim())) newErrors.firstName = "First name must contain only letters";
- 
+    if (!formData.firstName.trim())
+      newErrors.firstName = "First name is required";
+    else if (formData.firstName.trim().length < 2)
+      newErrors.firstName = "First name must be at least 2 characters";
+    else if (!/^[a-zA-Z\s]+$/.test(formData.firstName.trim()))
+      newErrors.firstName = "First name must contain only letters";
+
     // Last Name validation
     if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
-    else if (formData.lastName.trim().length < 2) newErrors.lastName = "Last name must be at least 2 characters";
-    else if (!/^[a-zA-Z\s]+$/.test(formData.lastName.trim())) newErrors.lastName = "Last name must contain only letters";
- 
+    else if (formData.lastName.trim().length < 2)
+      newErrors.lastName = "Last name must be at least 2 characters";
+    else if (!/^[a-zA-Z\s]+$/.test(formData.lastName.trim()))
+      newErrors.lastName = "Last name must contain only letters";
+
     // Employee Company ID validation
-    if (!formData.employeeCompanyId.trim()) newErrors.employeeCompanyId = "Employee Company ID is required";
-    else if (!/^\d+$/.test(formData.employeeCompanyId.trim())) newErrors.employeeCompanyId = "Employee Company ID must contain only numbers";
+    if (!formData.employeeCompanyId.trim())
+      newErrors.employeeCompanyId = "Employee Company ID is required";
+    else if (!/^\d+$/.test(formData.employeeCompanyId.trim()))
+      newErrors.employeeCompanyId =
+        "Employee Company ID must contain only numbers";
     else {
       const idNumber = parseInt(formData.employeeCompanyId.trim());
-      if (idNumber < 1000) newErrors.employeeCompanyId = "Employee Company ID must be ≥ 1000 and must be unique (i.e., not previously used)";
-      else if (idNumber > 999999) newErrors.employeeCompanyId = "Employee Company ID must be less than 1000000";
+      if (idNumber < 1000)
+        newErrors.employeeCompanyId =
+          "Employee Company ID must be ≥ 1000 and must be unique (i.e., not previously used)";
+      else if (idNumber > 999999)
+        newErrors.employeeCompanyId =
+          "Employee Company ID must be less than 1000000";
     }
- 
+
     // Email validation
     if (!formData.email.trim()) newErrors.email = "Email is required";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) newErrors.email = "Please enter a valid email address";
- 
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim()))
+      newErrors.email = "Please enter a valid email address";
+
     // Mobile Number validation - NOW REQUIRED
     if (!formData.mobileNumber.trim()) {
       newErrors.mobileNumber = "Mobile number is required";
     } else if (!/^[6-9][0-9]{9}$/.test(formData.mobileNumber.trim())) {
-      newErrors.mobileNumber = "Phone number must start with 6-9 and be exactly 10 digits";
+      newErrors.mobileNumber =
+        "Phone number must start with 6-9 and be exactly 10 digits";
     }
- 
+
     // Date of Birth validation - NOW REQUIRED
     if (!formData.dateOfBirthOfficial) {
       newErrors.dateOfBirthOfficial = "Date of birth is required";
@@ -93,27 +108,32 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
       const dob = new Date(formData.dateOfBirthOfficial);
       const today = new Date();
       const age = today.getFullYear() - dob.getFullYear();
-      if (dob > today) newErrors.dateOfBirthOfficial = "Date of birth cannot be in the future";
-      else if (age < 18) newErrors.dateOfBirthOfficial = "User must be at least 18 years old";
-      else if (age > 100) newErrors.dateOfBirthOfficial = "Please enter a valid date of birth";
+      if (dob > today)
+        newErrors.dateOfBirthOfficial = "Date of birth cannot be in the future";
+      else if (age < 18)
+        newErrors.dateOfBirthOfficial = "User must be at least 18 years old";
+      else if (age > 100)
+        newErrors.dateOfBirthOfficial = "Please enter a valid date of birth";
     }
- 
+
     // Gender validation - NOW REQUIRED
     if (!formData.gender) newErrors.gender = "Gender is required";
- 
+
     // Employment Type validation - NOW REQUIRED
-    if (!formData.employmentType) newErrors.employmentType = "Employment type is required";
- 
+    if (!formData.employmentType)
+      newErrors.employmentType = "Employment type is required";
+
     // Role validation
     if (!formData.roleId) newErrors.roleId = "Role is required";
-   
+
     // Department validation
-    if (!formData.departmentId) newErrors.departmentId = "Department is required";
-   
+    if (!formData.departmentId)
+      newErrors.departmentId = "Department is required";
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
- 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) {
@@ -151,7 +171,9 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
       };
       const response = await userService.createUser(payload);
       if (response.success) {
-        toast.success("User created successfully! Temporary password sent to email.");
+        toast.success(
+          "User created successfully! Temporary password sent to email."
+        );
         setFormData({
           firstName: "",
           lastName: "",
@@ -175,69 +197,25 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
-        error.message ||
-        "Failed to create user"
+          error.message ||
+          "Failed to create user"
       );
     } finally {
       setLoading(false);
     }
   };
- 
+
   if (!show) return null;
- 
+
   return (
     <>
-      {/* Blurred Blue Backdrop */}
-      <div
-        style={{
-          position: "fixed",
-          top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: "rgba(39,35,92,0.4)",
-          backdropFilter: "blur(8px)",
-          WebkitBackdropFilter: "blur(8px)",
-          zIndex: 1040,
-        }}
-        onClick={onHide}
-      />
-      <div
-        style={{
-          position: "fixed",
-          top: "50%", left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: "97%",
-          maxWidth: "800px",
-          zIndex: 1050,
-        }}
-      >
-        <div
-          style={{
-            borderRadius: "0.5rem",
-            background: "#fff",
-            boxShadow: "0 8px 28px rgba(0,0,0,0.22)",
-            overflow: "hidden",
-            width: "100%",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
+      <div className="aum-backdrop" onClick={onHide} />
+
+      <div className="aum-modal-container">
+        <div className="aum-modal-dialog">
           {/* HEADER */}
-          <div
-            style={{
-              background: "#27235C",
-              color: "#fff",
-              padding: "13px 15px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              fontSize: "15px",
-              fontWeight: 600,
-              borderRadius: "0.5rem 0.5rem 0 0",
-            }}
-          >
-            <div style={{
-              display: "flex", alignItems: "center", gap: 8,
-              color: "#fff", fontSize: 15, fontWeight: 600,
-            }}>
+          <div className="aum-modal-header">
+            <div className="aum-header-title">
               <i className="bi bi-person-plus-fill"></i>
               Add New User
             </div>
@@ -246,29 +224,20 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
               onClick={onHide}
               disabled={loading}
               aria-label="Close"
-              style={{
-                background: "none",
-                border: "none",
-                color: "#fff",
-                fontSize: 18,
-                cursor: loading ? "not-allowed" : "pointer",
-                opacity: loading ? 0.7 : 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            ><i className="bi bi-x-lg"></i></button>
+              className="aum-close-button"
+            >
+              <i className="bi bi-x-lg"></i>
+            </button>
           </div>
+
           {/* BODY/FORM */}
-          <form onSubmit={handleSubmit} style={{ margin: 0 }}>
-            <div style={{ padding: "14px 15px 6px 15px", background: "#fff", textAlign: "left"}}>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 9 }}>
+          <form onSubmit={handleSubmit} className="aum-form">
+            <div className="aum-modal-body">
+              <div className="aum-form-grid">
                 {/* First Name */}
-                <div style={{ flex: 1, minWidth: "47%" }}>
-                  <label style={{
-                    fontWeight: 600, fontSize: 13, color: "#334155", marginBottom: 2, display: "block"
-                  }}>
-                    First Name <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                <div className="aum-form-group">
+                  <label className="aum-form-label">
+                    First Name <span className="aum-required-asterisk">*</span>
                   </label>
                   <input
                     type="text"
@@ -277,24 +246,19 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                     value={formData.firstName}
                     onChange={handleChange}
                     maxLength={100}
-                    style={{
-                      width: "100%",
-                      border: errors.firstName ? "1px solid #dc3545" : "1px solid #cbd5e1",
-                      borderRadius: 6,
-                      padding: "8px 9px",
-                      fontSize: 13,
-                      background: "#fff",
-                      color: "#22223b",
-                    }}
+                    className={`aum-form-input ${
+                      errors.firstName ? "error" : ""
+                    }`}
                   />
-                  {errors.firstName && <div style={{ color: "#dc3545", fontSize: 11 }}>{errors.firstName}</div>}
+                  {errors.firstName && (
+                    <div className="aum-form-error">{errors.firstName}</div>
+                  )}
                 </div>
+
                 {/* Last Name */}
-                <div style={{ flex: 1, minWidth: "47%" }}>
-                  <label style={{
-                    fontWeight: 600, fontSize: 13, color: "#334155", marginBottom: 2, display: "block"
-                  }}>
-                    Last Name <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                <div className="aum-form-group">
+                  <label className="aum-form-label">
+                    Last Name <span className="aum-required-asterisk">*</span>
                   </label>
                   <input
                     type="text"
@@ -303,24 +267,19 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                     value={formData.lastName}
                     onChange={handleChange}
                     maxLength={100}
-                    style={{
-                      width: "100%",
-                      border: errors.lastName ? "1px solid #dc3545" : "1px solid #cbd5e1",
-                      borderRadius: 6,
-                      padding: "8px 9px",
-                      fontSize: 13,
-                      background: "#fff",
-                      color: "#22223b",
-                    }}
+                    className={`aum-form-input ${
+                      errors.lastName ? "error" : ""
+                    }`}
                   />
-                  {errors.lastName && <div style={{ color: "#dc3545", fontSize: 11 }}>{errors.lastName}</div>}
+                  {errors.lastName && (
+                    <div className="aum-form-error">{errors.lastName}</div>
+                  )}
                 </div>
+
                 {/* Employee Company Id */}
-                <div style={{ flex: 1, minWidth: "47%" }}>
-                  <label style={{
-                    fontWeight: 600, fontSize: 13, color: "#334155", marginBottom: 2, display: "block"
-                  }}>
-                    Employee ID <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                <div className="aum-form-group">
+                  <label className="aum-form-label">
+                    Employee ID <span className="aum-required-asterisk">*</span>
                   </label>
                   <input
                     type="text"
@@ -329,27 +288,24 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                     value={formData.employeeCompanyId}
                     onChange={handleChange}
                     maxLength={6}
-                    style={{
-                      width: "100%",
-                      border: errors.employeeCompanyId ? "1px solid #dc3545" : "1px solid #cbd5e1",
-                      borderRadius: 6,
-                      padding: "8px 9px",
-                      fontSize: 13,
-                      background: "#fff",
-                      color: "#22223b",
-                    }}
+                    className={`aum-form-input ${
+                      errors.employeeCompanyId ? "error" : ""
+                    }`}
                   />
-                  {errors.employeeCompanyId && <div style={{ color: "#dc3545", fontSize: 11 }}>{errors.employeeCompanyId}</div>}
-                  <small style={{ color: "#64748b", fontSize: 11 }}>
+                  {errors.employeeCompanyId && (
+                    <div className="aum-form-error">
+                      {errors.employeeCompanyId}
+                    </div>
+                  )}
+                  <small className="aum-form-hint">
                     Must be numeric and start from 1000 or higher
                   </small>
                 </div>
+
                 {/* Email */}
-                <div style={{ flex: 1, minWidth: "47%" }}>
-                  <label style={{
-                    fontWeight: 600, fontSize: 13, color: "#334155", marginBottom: 2, display: "block"
-                  }}>
-                    Email <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                <div className="aum-form-group">
+                  <label className="aum-form-label">
+                    Email <span className="aum-required-asterisk">*</span>
                   </label>
                   <input
                     type="email"
@@ -358,32 +314,20 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                     value={formData.email}
                     onChange={handleChange}
                     maxLength={255}
-                    style={{
-                      width: "100%",
-                      border: errors.email ? "1px solid #dc3545" : "1px solid #cbd5e1",
-                      borderRadius: 6,
-                      padding: "8px 9px",
-                      fontSize: 13,
-                      background: "#fff",
-                      color: "#22223b",
-                    }}
+                    className={`aum-form-input ${errors.email ? "error" : ""}`}
                   />
-                  {errors.email && <div style={{ color: "#dc3545", fontSize: 11 }}>{errors.email}</div>}
+                  {errors.email && (
+                    <div className="aum-form-error">{errors.email}</div>
+                  )}
                 </div>
+
                 {/* Mobile Number - NOW REQUIRED */}
-                <div style={{ flex: 1, minWidth: "47%" }}>
-                  <label style={{
-                    fontWeight: 600, fontSize: 13, color: "#334155", marginBottom: 2, display: "block"
-                  }}>
-                    Mobile <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                <div className="aum-form-group">
+                  <label className="aum-form-label">
+                    Mobile <span className="aum-required-asterisk">*</span>
                   </label>
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <span style={{
-                      background: "#f3f4f6", border: "1px solid #cbd5e1",
-                      borderRadius: "6px 0 0 6px",
-                      color: "#64748b",
-                      padding: "8px 6px 8px 10px", fontSize: 13
-                    }}>+91</span>
+                  <div className="aum-phone-wrapper">
+                    <span className="aum-phone-prefix">+91</span>
                     <input
                       type="tel"
                       name="mobileNumber"
@@ -391,29 +335,24 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                       value={formData.mobileNumber}
                       onChange={handleChange}
                       maxLength={10}
-                      style={{
-                        borderTop: errors.mobileNumber ? "1px solid #dc3545" : "1px solid #cbd5e1",
-                        borderRight: errors.mobileNumber ? "1px solid #dc3545" : "1px solid #cbd5e1",
-                        borderBottom: errors.mobileNumber ? "1px solid #dc3545" : "1px solid #cbd5e1",
-                        borderLeft: "none",
-                        borderRadius: "0 6px 6px 0",
-                        fontSize: 13,
-                        background: "#fff",
-                        color: "#22223b",
-                        padding: "8px 9px",
-                        width: "100%",
-                      }}
+                      className={`aum-phone-input ${
+                        errors.mobileNumber ? "error" : ""
+                      }`}
                     />
                   </div>
-                  {errors.mobileNumber && <div style={{ color: "#dc3545", fontSize: 11 }}>{errors.mobileNumber}</div>}
-                  <small style={{ color: "#64748b", fontSize: 11 }}>Must start with 6-9 (10 digits)</small>
+                  {errors.mobileNumber && (
+                    <div className="aum-form-error">{errors.mobileNumber}</div>
+                  )}
+                  <small className="aum-form-hint">
+                    Must start with 6-9 (10 digits)
+                  </small>
                 </div>
+
                 {/* Date of Birth - NOW REQUIRED */}
-                <div style={{ flex: 1, minWidth: "47%" }}>
-                  <label style={{
-                    fontWeight: 600, fontSize: 13, color: "#334155", marginBottom: 2, display: "block"
-                  }}>
-                    Date of Birth <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                <div className="aum-form-group">
+                  <label className="aum-form-label">
+                    Date of Birth{" "}
+                    <span className="aum-required-asterisk">*</span>
                   </label>
                   <input
                     type="date"
@@ -421,227 +360,155 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                     placeholder="dd/mm/yyyy"
                     value={formData.dateOfBirthOfficial}
                     onChange={handleChange}
-                    style={{
-                      width: "100%",
-                      border: errors.dateOfBirthOfficial ? "1px solid #dc3545" : "1px solid #cbd5e1",
-                      borderRadius: 6,
-                      padding: "8px 9px",
-                      fontSize: 13,
-                      background: "#fff",
-                      color: "#22223b",
-                    }}
+                    className={`aum-form-input ${
+                      errors.dateOfBirthOfficial ? "error" : ""
+                    }`}
                   />
-                  {errors.dateOfBirthOfficial && <div style={{ color: "#dc3545", fontSize: 11 }}>{errors.dateOfBirthOfficial}</div>}
-                  <small style={{ color: "#64748b", fontSize: 11 }}>Must be 18+ years old</small>
+                  {errors.dateOfBirthOfficial && (
+                    <div className="aum-form-error">
+                      {errors.dateOfBirthOfficial}
+                    </div>
+                  )}
+                  <small className="aum-form-hint">Must be 18+ years old</small>
                 </div>
+
                 {/* Gender - NOW REQUIRED */}
-                <div style={{ flex: 1, minWidth: "47%" }}>
-                  <label style={{
-                    fontWeight: 600, fontSize: 13, color: "#334155", marginBottom: 2, display: "block"
-                  }}>
-                    Gender <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                <div className="aum-form-group">
+                  <label className="aum-form-label">
+                    Gender <span className="aum-required-asterisk">*</span>
                   </label>
                   <select
                     name="gender"
                     value={formData.gender}
                     onChange={handleChange}
-                    style={{
-                      width: "100%",
-                      border: errors.gender ? "1px solid #dc3545" : "1px solid #cbd5e1",
-                      borderRadius: 6,
-                      fontSize: 13,
-                      background: "#fff",
-                      color: "#22223b",
-                      padding: "8px 9px"
-                    }}>
-                    <option value="" disabled>Select Gender</option>
+                    className={`aum-form-input ${errors.gender ? "error" : ""}`}
+                  >
+                    <option value="" disabled>
+                      Select Gender
+                    </option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
                     <option value="PreferNotToSay">Prefer not to say</option>
                   </select>
-                  {errors.gender && <div style={{ color: "#dc3545", fontSize: 11 }}>{errors.gender}</div>}
+                  {errors.gender && (
+                    <div className="aum-form-error">{errors.gender}</div>
+                  )}
                 </div>
+
                 {/* Employment Type - NOW REQUIRED */}
-                <div style={{ flex: 1, minWidth: "47%" }}>
-                  <label style={{
-                    fontWeight: 600, fontSize: 13, color: "#334155", marginBottom: 2, display: "block"
-                  }}>
-                    Employment Type <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                <div className="aum-form-group">
+                  <label className="aum-form-label">
+                    Employment Type{" "}
+                    <span className="aum-required-asterisk">*</span>
                   </label>
                   <select
                     name="employmentType"
                     value={formData.employmentType}
                     onChange={handleChange}
-                    style={{
-                      width: "100%",
-                      border: errors.employmentType ? "1px solid #dc3545" : "1px solid #cbd5e1",
-                      borderRadius: 6,
-                      fontSize: 13,
-                      background: "#fff",
-                      color: "#22223b",
-                      padding: "8px 9px"
-                    }}>
-                    <option value="" disabled>Select Employment Type</option>
+                    className={`aum-form-input ${
+                      errors.employmentType ? "error" : ""
+                    }`}
+                  >
+                    <option value="" disabled>
+                      Select Employment Type
+                    </option>
                     <option value="Permanent">Permanent</option>
                     <option value="Contract">Contract</option>
                     <option value="Temporary">Temporary</option>
                     <option value="Intern">Intern</option>
                     <option value="Probation">Probation</option>
                   </select>
-                  {errors.employmentType && <div style={{ color: "#dc3545", fontSize: 11 }}>{errors.employmentType}</div>}
+                  {errors.employmentType && (
+                    <div className="aum-form-error">
+                      {errors.employmentType}
+                    </div>
+                  )}
                 </div>
-                {/* Role -  ADMIN ROLE EXCLUDED */}
-                <div style={{ flex: 1, minWidth: "47%" }}>
-                  <label style={{
-                    fontWeight: 600, fontSize: 13, color: "#334155", marginBottom: 2, display: "block"
-                  }}>
-                    Role <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+
+                {/* Role - ADMIN ROLE EXCLUDED */}
+                <div className="aum-form-group">
+                  <label className="aum-form-label">
+                    Role <span className="aum-required-asterisk">*</span>
                   </label>
                   <select
                     name="roleId"
                     value={formData.roleId}
                     onChange={handleChange}
-                    style={{
-                      width: "100%",
-                      border: errors.roleId ? "1px solid #dc3545" : "1px solid #cbd5e1",
-                      borderRadius: 6,
-                      fontSize: 13,
-                      background: "#fff",
-                      color: "#22223b",
-                      padding: "8px 9px",
-                    }}>
-                    <option value="" disabled>Select Role</option>
-                    {roles.filter(role => role.roleName !== "Admin").map((role) => (
-                      <option key={role.roleId} value={role.roleId}>
-                        {role.roleName}
-                      </option>
-                    ))}
+                    className={`aum-form-input ${errors.roleId ? "error" : ""}`}
+                  >
+                    <option value="" disabled>
+                      Select Role
+                    </option>
+                    {roles
+                      .filter((role) => role.roleName !== "Admin")
+                      .map((role) => (
+                        <option key={role.roleId} value={role.roleId}>
+                          {role.roleName}
+                        </option>
+                      ))}
                   </select>
-                  {errors.roleId && <div style={{ color: "#dc3545", fontSize: 11 }}>{errors.roleId}</div>}
+                  {errors.roleId && (
+                    <div className="aum-form-error">{errors.roleId}</div>
+                  )}
                 </div>
+
                 {/* Department */}
-                <div style={{ flex: 1, minWidth: "47%" }}>
-                  <label style={{
-                    fontWeight: 600, fontSize: 13, color: "#334155", marginBottom: 2, display: "block"
-                  }}>
-                    Department <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                <div className="aum-form-group">
+                  <label className="aum-form-label">
+                    Department <span className="aum-required-asterisk">*</span>
                   </label>
                   <select
                     name="departmentId"
                     value={formData.departmentId}
                     onChange={handleChange}
-                    style={{
-                      width: "100%",
-                      border: errors.departmentId ? "1px solid #dc3545" : "1px solid #cbd5e1",
-                      borderRadius: 6,
-                      fontSize: 13,
-                      background: "#fff",
-                      color: "#22223b",
-                      padding: "8px 9px",
-                    }}>
-                    <option value="" disabled>Select Department</option>
+                    className={`aum-form-input ${
+                      errors.departmentId ? "error" : ""
+                    }`}
+                  >
+                    <option value="" disabled>
+                      Select Department
+                    </option>
                     {departments.map((dept) => (
                       <option key={dept.departmentId} value={dept.departmentId}>
                         {dept.departmentName}
                       </option>
                     ))}
                   </select>
-                  {errors.departmentId && <div style={{ color: "#dc3545", fontSize: 11 }}>{errors.departmentId}</div>}
+                  {errors.departmentId && (
+                    <div className="aum-form-error">{errors.departmentId}</div>
+                  )}
                 </div>
               </div>
+
               {/* Info Alert */}
-              <div style={{
-                display: "flex", alignItems: "center", background: "#f1f5f9",
-                color: "#64748b", borderRadius: 4, fontSize: 12, padding: "5px 8px", gap: 5, marginTop: 10
-              }}>
+              <div className="aum-info-alert">
                 <i className="bi bi-info-circle"></i>
-                <small>Password is automatically generated and sent to user's email</small>
+                <small>
+                  Password is automatically generated and sent to user's email
+                </small>
               </div>
             </div>
+
             {/* FOOTER */}
-            <div style={{
-              padding: "10px 15px",
-              borderTop: "1px solid #e2e8f0",
-              background: "#fff",
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: 8,
-              borderBottomLeftRadius: "0.5rem",
-              borderBottomRightRadius: "0.5rem",
-            }}>
+            <div className="aum-modal-footer">
               <button
                 type="button"
                 onClick={onHide}
                 disabled={loading}
-                style={{
-                  background: "#6c757d",
-                  border: "none",
-                  color: "#fff",
-                  fontWeight: 600,
-                  padding: "7px 12px",
-                  fontSize: 12,
-                  borderRadius: 5,
-                  cursor: loading ? "not-allowed" : "pointer",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  opacity: loading ? 0.7 : 1,
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={e => {
-                  if (!loading) e.target.style.background = "#5a6268";
-                }}
-                onMouseLeave={e => {
-                  if (!loading) e.target.style.background = "#6c757d";
-                }}
+                className="aum-btn-cancel"
               >
                 <i className="bi bi-x-circle"></i> Cancel
               </button>
+
               <button
                 type="submit"
                 disabled={loading}
-                style={{
-                  background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                  border: "none",
-                  color: "#fff",
-                  fontWeight: 600,
-                  padding: "7px 12px",
-                  fontSize: 12,
-                  borderRadius: 5,
-                  boxShadow: "0 2px 8px rgba(151,36,126,0.25)",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  cursor: loading ? "not-allowed" : "pointer",
-                  opacity: loading ? 0.85 : 1,
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={e => {
-                  if (!loading) e.target.style.opacity = 0.93;
-                }}
-                onMouseLeave={e => {
-                  if (!loading) e.target.style.opacity = 1;
-                }}
+                className="aum-btn-submit"
               >
                 {loading ? (
                   <>
-                    <span style={{
-                      width: 14,
-                      height: 14,
-                      border: "2px solid #fff",
-                      borderTop: "2px solid #E01950",
-                      borderRadius: "50%",
-                      animation: "spin 0.7s linear infinite",
-                      display: "inline-block",
-                      marginRight: 6,
-                    }} />
+                    <span className="aum-spinner" />
                     Adding...
-                    <style>{`
-                      @keyframes spin {
-                        0% { transform: rotate(0deg);}
-                        100% { transform: rotate(360deg);}
-                      }
-                    `}</style>
                   </>
                 ) : (
                   <>
@@ -656,5 +523,5 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
     </>
   );
 };
- 
+
 export default AddUserModal;

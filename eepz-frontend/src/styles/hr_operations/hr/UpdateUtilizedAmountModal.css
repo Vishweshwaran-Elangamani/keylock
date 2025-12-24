@@ -1,0 +1,340 @@
+/* ==================== MODAL OVERRIDES ==================== */
+.uuam-modal .modal-header {
+    background: #27235c;
+    color: #fff;
+    border-bottom: none;
+    padding: 13px 15px;
+  }
+  
+  .uuam-modal .modal-title {
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+  }
+  
+  .uuam-modal .btn-close {
+    filter: brightness(0) invert(1);
+  }
+  
+  .uuam-modal .modal-body {
+    padding: 20px;
+    background: #f8fafc;
+  }
+  
+  .uuam-modal .modal-footer {
+    padding: 10px 15px;
+    border-top: 1px solid #e2e8f0;
+    background: #fff;
+  }
+  
+  /* ==================== BUDGET INFO GRID ==================== */
+  .uuam-budget-info {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 16px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+  }
+  
+  .uuam-info-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .uuam-info-card label {
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 600;
+  }
+  
+  .uuam-info-card span {
+    font-size: 14px;
+    color: #1e293b;
+    font-weight: 600;
+  }
+  
+  /* ==================== FORM GRID ==================== */
+  .uuam-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .uuam-current-value {
+    padding: 10px 12px;
+    background-color: #f0f0f0;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+  }
+  
+  /* ==================== DETAILS SECTION ==================== */
+  .uuam-details-section {
+    background: #fff;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+  
+  .uuam-details-section.summary {
+    background: #f0fdf4;
+  }
+  
+  .uuam-details-heading {
+    font-size: 14px;
+    font-weight: 700;
+    color: #27235c;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  /* ==================== ALLOCATIONS TABLE ==================== */
+  .uuam-table-container {
+    overflow-x: auto;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  
+  .uuam-table {
+    width: 100%;
+    margin-bottom: 0;
+    font-size: 12px;
+    border-collapse: collapse;
+  }
+  
+  .uuam-table thead th {
+    background: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    padding: 8px;
+    text-align: left;
+    border-bottom: 2px solid #e2e8f0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  
+  .uuam-table tbody td {
+    padding: 8px;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: middle;
+  }
+  
+  .uuam-table tbody tr:hover {
+    background: #f8fafc;
+  }
+  
+  .uuam-type-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    background-color: #dbeafe;
+    color: #0c4a6e;
+  }
+  
+  .uuam-status-text {
+    font-size: 10px;
+    font-weight: 600;
+  }
+  
+  .uuam-status-text.approved {
+    color: #166534;
+  }
+  
+  .uuam-status-text.other {
+    color: #92400e;
+  }
+  
+  .uuam-total-allocations {
+    padding: 8px 12px;
+    background-color: #f8fafc;
+    border-left: 4px solid #27235c;
+    margin-top: 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  
+  /* ==================== SUMMARY GRID ==================== */
+  .uuam-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  
+  .uuam-summary-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 12px;
+    background: #f8fafc;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+  }
+  
+  .uuam-summary-item label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0;
+  }
+  
+  .uuam-summary-item span {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+  }
+  
+  .uuam-summary-item span.utilized {
+    font-weight: 600;
+    color: #27235c;
+  }
+  
+  .uuam-summary-item span.remaining-positive {
+    font-weight: 600;
+    color: #166534;
+  }
+  
+  .uuam-summary-item span.remaining-negative {
+    font-weight: 600;
+    color: #991b1b;
+  }
+  
+  .uuam-summary-item span.percentage {
+    font-weight: 600;
+  }
+  
+  /* ==================== PROGRESS BAR ==================== */
+  .uuam-progress-container {
+    margin-top: 12px;
+    background-color: #ffffff;
+    border-radius: 6px;
+    padding: 8px;
+  }
+  
+  .uuam-progress-bar {
+    width: 100%;
+    height: 24px;
+    background-color: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  .uuam-progress-fill {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #ffffff;
+    transition: width 0.3s ease, background-color 0.3s ease;
+  }
+  
+  .uuam-progress-fill.critical {
+    background-color: #ef4444;
+  }
+  
+  .uuam-progress-fill.warning {
+    background-color: #f59e0b;
+  }
+  
+  .uuam-progress-fill.good {
+    background-color: #10b981;
+  }
+  
+  .uuam-progress-fill.normal {
+    background-color: #3b82f6;
+  }
+  
+  /* ==================== EXCEEDED WARNING ==================== */
+  .uuam-exceeded-alert {
+    margin-top: 16px;
+  }
+  
+  .uuam-exceeded-alert p {
+    margin-top: 4px;
+    margin-bottom: 0;
+    font-size: 12px;
+  }
+  
+  /* ==================== BUTTONS ==================== */
+  .uuam-btn-submit {
+    background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 7px 12px;
+    font-size: 12px;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(151, 36, 126, 0.25);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+  
+  .uuam-btn-submit:hover:not(:disabled) {
+    opacity: 0.93;
+    background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
+    color: #fff;
+  }
+  
+  .uuam-btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  /* ==================== RESPONSIVE ==================== */
+  @media (max-width: 1024px) {
+    .uuam-budget-info {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  
+    .uuam-summary-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .uuam-form-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .uuam-budget-info,
+    .uuam-summary-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .uuam-modal .modal-body {
+      padding: 16px;
+    }
+  
+    .uuam-details-section {
+      padding: 12px;
+    }
+  }
+  

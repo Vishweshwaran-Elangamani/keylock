@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Modal } from "react-bootstrap";
 import { toast } from "sonner";
-import budgetAllocationService from "../../../services/hr_operations/hr/budgetAllocationService";
-import { formatCurrency } from "../../../utils/auth/currencyFormatter";
+import budgetAllocationService from "../../../../services/hr_operations/hr/budgetAllocationService";
+import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
+import "../../../../styles/hr_operations/hr/AllocateByCategoryModal.css";
 
 const AllocateByCategoryModal = ({
   show,
@@ -100,7 +101,6 @@ const AllocateByCategoryModal = ({
         allocatedByUserId: currentUserId, // Logged-in user ID
       };
 
-      
       // Call backend API to create the allocation
       const response = await budgetAllocationService.createBudgetAllocation(
         allocationData
@@ -137,7 +137,7 @@ const AllocateByCategoryModal = ({
       // Success toast
       toast.success("Budget allocation created successfully");
     } catch (err) {
-      console.error(" Error creating allocation:", err);
+      console.error("Error creating allocation:", err);
       const message =
         err.response?.data?.message ||
         err.message ||
@@ -167,8 +167,8 @@ const AllocateByCategoryModal = ({
   const remainingBudget = (budget.allocatedAmount || 0) - totalAlreadyAllocated;
 
   return (
-    <Modal show={show} onHide={handleClose} size="lg" className="promo-modal">
-      <Modal.Header closeButton className="promo-modal-header">
+    <Modal show={show} onHide={handleClose} size="lg" className="abcm-modal">
+      <Modal.Header closeButton>
         <Modal.Title>
           <i className="bi bi-plus-circle me-2"></i>
           Allocate Budget by Category
@@ -176,7 +176,7 @@ const AllocateByCategoryModal = ({
       </Modal.Header>
 
       <form onSubmit={handleSubmit}>
-        <Modal.Body className="promo-modal-body">
+        <Modal.Body>
           {/* Show old-style error alert for form validation fallback */}
           {error && (
             <div className="alert alert-danger" role="alert">
@@ -186,36 +186,40 @@ const AllocateByCategoryModal = ({
           )}
 
           {/* Budget info display */}
-          <div className="promo-approval-info">
-            <div className="promo-info-card">
+          <div className="abcm-approval-info">
+            <div className="abcm-info-card">
               <label>Department:</label>
               <span>{budget?.departmentName || "Unknown"}</span>
             </div>
-            <div className="promo-info-card">
+            <div className="abcm-info-card">
               <label>Fiscal Year:</label>
               <span>{budget?.fiscalYear}</span>
             </div>
-            <div className="promo-info-card">
+            <div className="abcm-info-card">
               <label>Allocated Budget:</label>
               <span>{formatCurrency(budget?.allocatedAmount)}</span>
             </div>
-            <div className="promo-info-card">
+            <div className="abcm-info-card">
               <label>Utilized:</label>
-              <span style={{ color: "#ef4444" }}>
+              <span className="abcm-info-utilized">
                 {formatCurrency(budget?.utilizedAmount)}
               </span>
             </div>
           </div>
 
           {/* Form inputs grid */}
-          <div className="promo-form-grid">
-            <div className="promo-form-column">
+          <div className="abcm-form-grid">
+            <div className="abcm-form-column">
               <div className="mb-3">
-                <label htmlFor="allocationType" className="form-label">
-                  Allocation Type <span className="text-danger">*</span>
+                <label
+                  htmlFor="allocationType"
+                  className="form-label abcm-form-label"
+                >
+                  Allocation Type{" "}
+                  <span className="text-danger abcm-required">*</span>
                 </label>
                 <select
-                  className="form-select"
+                  className="form-select abcm-form-control abcm-form-select"
                   id="allocationType"
                   name="allocationType"
                   value={formData.allocationType}
@@ -231,14 +235,15 @@ const AllocateByCategoryModal = ({
               </div>
             </div>
 
-            <div className="promo-form-column">
+            <div className="abcm-form-column">
               <div className="mb-3">
-                <label htmlFor="amount" className="form-label">
-                  Amount (Rs.) <span className="text-danger">*</span>
+                <label htmlFor="amount" className="form-label abcm-form-label">
+                  Amount (Rs.){" "}
+                  <span className="text-danger abcm-required">*</span>
                 </label>
                 <input
                   type="number"
-                  className="form-control"
+                  className="form-control abcm-form-control"
                   id="amount"
                   name="amount"
                   value={formData.amount}
@@ -248,7 +253,7 @@ const AllocateByCategoryModal = ({
                   min="0"
                   required
                 />
-                <small className="form-text text-muted">
+                <small className="form-text text-muted abcm-form-hint">
                   Remaining budget: {formatCurrency(remainingBudget)}
                   {totalAlreadyAllocated > 0 &&
                     ` (Already allocated: ${formatCurrency(
@@ -261,12 +266,15 @@ const AllocateByCategoryModal = ({
 
           {/* Allocation name input with placeholder */}
           <div className="mb-3">
-            <label htmlFor="allocationName" className="form-label">
+            <label
+              htmlFor="allocationName"
+              className="form-label abcm-form-label"
+            >
               Allocation Name (optional)
             </label>
             <input
               type="text"
-              className="form-control"
+              className="form-control abcm-form-control"
               id="allocationName"
               name="allocationName"
               value={formData.allocationName}
@@ -277,11 +285,11 @@ const AllocateByCategoryModal = ({
 
           {/* Notes textarea */}
           <div className="mb-3">
-            <label htmlFor="notes" className="form-label">
+            <label htmlFor="notes" className="form-label abcm-form-label">
               Notes
             </label>
             <textarea
-              className="form-control promo-textarea-full"
+              className="form-control abcm-form-control abcm-textarea-full"
               id="notes"
               name="notes"
               value={formData.notes}
@@ -292,38 +300,33 @@ const AllocateByCategoryModal = ({
           </div>
 
           {/* Budget Summary display */}
-          <div
-            className="promo-details-section"
-            style={{ backgroundColor: "#f0fdf4" }}
-          >
-            <h6 className="promo-details-heading">Budget Summary</h6>
-            <div className="promo-details-grid">
-              <div className="promo-detail-item">
+          <div className="abcm-details-section">
+            <h6 className="abcm-details-heading">Budget Summary</h6>
+            <div className="abcm-details-grid">
+              <div className="abcm-detail-item">
                 <label>Allocated Budget:</label>
                 <span>{formatCurrency(budget?.allocatedAmount)}</span>
               </div>
-              <div className="promo-detail-item">
+              <div className="abcm-detail-item">
                 <label>Already Allocated:</label>
-                <span style={{ fontWeight: "600", color: "#f59e0b" }}>
+                <span className="abcm-detail-allocated">
                   {formatCurrency(totalAlreadyAllocated)}
                 </span>
               </div>
-              <div className="promo-detail-item">
+              <div className="abcm-detail-item">
                 <label>This Allocation:</label>
-                <span style={{ fontWeight: "600", color: "#27235C" }}>
+                <span className="abcm-detail-this-allocation">
                   {formatCurrency(formData.amount)}
                 </span>
               </div>
-              <div className="promo-detail-item">
+              <div className="abcm-detail-item">
                 <label>Remaining after:</label>
                 <span
-                  style={{
-                    fontWeight: "600",
-                    color:
-                      remainingBudget - (parseFloat(formData.amount) || 0) >= 0
-                        ? "#166534"
-                        : "#991b1b",
-                  }}
+                  className={
+                    remainingBudget - (parseFloat(formData.amount) || 0) >= 0
+                      ? "abcm-detail-remaining-positive"
+                      : "abcm-detail-remaining-negative"
+                  }
                 >
                   {formatCurrency(
                     remainingBudget - (parseFloat(formData.amount) || 0)
@@ -335,16 +338,12 @@ const AllocateByCategoryModal = ({
 
           {/* Warning if amount exceeds remaining budget */}
           {parseFloat(formData.amount) > remainingBudget && (
-            <div
-              className="alert alert-danger"
-              role="alert"
-              style={{ marginTop: "16px" }}
-            >
-              <i className="bi bi-exclamation-triangle-fill me-2"></i>
-              <strong>AMOUNT EXCEEDS REMAINING BUDGET!</strong>
-              <p
-                style={{ marginTop: "4px", marginBottom: 0, fontSize: "12px" }}
-              >
+            <div className="abcm-alert-danger" role="alert">
+              <i className="bi bi-exclamation-triangle-fill abcm-alert-icon"></i>
+              <strong className="abcm-alert-strong">
+                AMOUNT EXCEEDS REMAINING BUDGET!
+              </strong>
+              <p className="abcm-alert-text">
                 Allocation amount (Rs.{" "}
                 {parseFloat(formData.amount).toLocaleString("en-IN")}) exceeds
                 remaining budget (Rs.{remainingBudget.toLocaleString("en-IN")})
@@ -353,23 +352,23 @@ const AllocateByCategoryModal = ({
           )}
         </Modal.Body>
 
-        <Modal.Footer className="promo-modal-footer">
+        <Modal.Footer>
           <button
             type="button"
-            className="btn btn-secondary"
+            className="btn abcm-btn-cancel"
             onClick={handleClose}
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="btn promo-btn-submit"
+            className="btn abcm-btn-submit"
             disabled={loading || parseFloat(formData.amount) > remainingBudget}
           >
             {loading ? (
               <>
                 <span
-                  className="spinner-border spinner-border-sm me-2"
+                  className="spinner-border spinner-border-sm abcm-spinner"
                   role="status"
                 ></span>
                 Creating...

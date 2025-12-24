@@ -1,4 +1,5 @@
-import { Modal, Button, CloseButton, Spinner } from "react-bootstrap";
+import React from "react";
+import "../../../styles/hr_operations/hr/ReminderEmailModal.css";
 
 const ReminderEmailModal = ({
   show,
@@ -12,69 +13,13 @@ const ReminderEmailModal = ({
 
   return (
     <>
-      {/* Blurred Backdrop */}
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(39,35,92,0.4)",
-          backdropFilter: "blur(8px)",
-          WebkitBackdropFilter: "blur(8px)",
-          zIndex: 1040,
-        }}
-        onClick={onHide}
-      />
+      <div className="rem-backdrop" onClick={onHide} />
 
-      {/* Modal Container */}
-      <div
-        style={{
-          position: "fixed",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: "95%",
-          maxWidth: "500px",
-          zIndex: 1050,
-        }}
-      >
-        <div
-          style={{
-            borderRadius: "0.5rem",
-            background: "#fff",
-            boxShadow: "0 8px 28px rgba(0,0,0,0.22)",
-            overflow: "hidden",
-            width: "100%",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
+      <div className="rem-modal-container">
+        <div className="rem-modal-dialog">
           {/* HEADER */}
-          <div
-            style={{
-              background: "#27235C",
-              color: "#fff",
-              padding: "13px 15px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              fontSize: "15px",
-              fontWeight: 600,
-              borderRadius: "0.5rem 0.5rem 0 0",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                color: "#fff",
-                fontSize: 15,
-                fontWeight: 600,
-              }}
-            >
+          <div className="rem-modal-header">
+            <div className="rem-header-title">
               <i className="bi bi-envelope-fill"></i>
               Send Career Goals Reminder
             </div>
@@ -83,92 +28,34 @@ const ReminderEmailModal = ({
               onClick={onHide}
               disabled={sendingReminder}
               aria-label="Close"
-              style={{
-                background: "none",
-                border: "none",
-                color: "#fff",
-                fontSize: 18,
-                cursor: sendingReminder ? "not-allowed" : "pointer",
-                opacity: sendingReminder ? 0.7 : 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              className="rem-close-button"
             >
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
 
           {/* BODY */}
-          <div
-            style={{
-              padding: "20px",
-              background: "#fff",
-              textAlign: "left",
-            }}
-          >
-            <p
-              style={{
-                fontSize: 13,
-                color: "#475569",
-                lineHeight: 1.6,
-                marginBottom: 8,
-              }}
-            >
-              Send goal-setting reminder to:
-            </p>
-            <div
-              style={{
-                fontSize: 14,
-                fontWeight: 600,
-                color: "#1e293b",
-                marginBottom: 16,
-                padding: 12,
-                background: "#f1f5f9",
-                borderRadius: 6,
-                border: "1px solid #e2e8f0",
-              }}
-            >
+          <div className="rem-modal-body">
+            <p className="rem-label">Send goal-setting reminder to:</p>
+            <div className="rem-email-box">
               {reminderTargetUser?.email ?? reminderTargetUser?.Email}
             </div>
 
             {/* Reminder Result */}
             {reminderResult && (
               <div
-                style={{
-                  padding: "12px 16px",
-                  borderRadius: 8,
-                  marginTop: 16,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  fontSize: 13,
-                  fontWeight: 500,
-                  background:
-                    reminderResult.successful > 0
-                      ? "linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)"
-                      : "linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)",
-                  border:
-                    reminderResult.successful > 0
-                      ? "2px solid #10b981"
-                      : "2px solid #ef4444",
-                  color: reminderResult.successful > 0 ? "#166534" : "#991b1b",
-                }}
+                className={`rem-result-message ${
+                  reminderResult.successful > 0 ? "success" : "error"
+                }`}
               >
                 {reminderResult.successful > 0 ? (
                   <>
-                    <i
-                      className="bi bi-check-circle-fill"
-                      style={{ fontSize: 16, color: "#10b981" }}
-                    ></i>
+                    <i className="bi bi-check-circle-fill rem-result-icon"></i>
                     <span>Reminder sent successfully!</span>
                   </>
                 ) : (
                   <>
-                    <i
-                      className="bi bi-x-circle-fill"
-                      style={{ fontSize: 16, color: "#ef4444" }}
-                    ></i>
+                    <i className="bi bi-x-circle-fill rem-result-icon"></i>
                     <span>Failed to send reminder</span>
                   </>
                 )}
@@ -177,43 +64,12 @@ const ReminderEmailModal = ({
           </div>
 
           {/* FOOTER */}
-          <div
-            style={{
-              padding: "10px 15px",
-              borderTop: "1px solid #e2e8f0",
-              background: "#fff",
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: 8,
-              borderBottomLeftRadius: "0.5rem",
-              borderBottomRightRadius: "0.5rem",
-            }}
-          >
+          <div className="rem-modal-footer">
             <button
               type="button"
               onClick={onHide}
               disabled={sendingReminder}
-              style={{
-                background: "#6c757d",
-                border: "none",
-                color: "#fff",
-                fontWeight: 600,
-                padding: "7px 12px",
-                fontSize: 12,
-                borderRadius: 5,
-                cursor: sendingReminder ? "not-allowed" : "pointer",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                opacity: sendingReminder ? 0.7 : 1,
-                transition: "all 0.2s ease",
-              }}
-              onMouseEnter={(e) => {
-                if (!sendingReminder) e.target.style.background = "#5a6268";
-              }}
-              onMouseLeave={(e) => {
-                if (!sendingReminder) e.target.style.background = "#6c757d";
-              }}
+              className="rem-btn-close"
             >
               Close
             </button>
@@ -222,50 +78,12 @@ const ReminderEmailModal = ({
               type="button"
               onClick={onSendReminder}
               disabled={sendingReminder}
-              style={{
-                background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                border: "none",
-                color: "#fff",
-                fontWeight: 600,
-                padding: "7px 12px",
-                fontSize: 12,
-                borderRadius: 5,
-                boxShadow: "0 2px 8px rgba(151,36,126,0.25)",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                cursor: sendingReminder ? "not-allowed" : "pointer",
-                opacity: sendingReminder ? 0.85 : 1,
-                transition: "all 0.2s ease",
-              }}
-              onMouseEnter={(e) => {
-                if (!sendingReminder) e.target.style.opacity = 0.93;
-              }}
-              onMouseLeave={(e) => {
-                if (!sendingReminder) e.target.style.opacity = 1;
-              }}
+              className="rem-btn-send"
             >
               {sendingReminder ? (
                 <>
-                  <span
-                    style={{
-                      width: 14,
-                      height: 14,
-                      border: "2px solid #fff",
-                      borderTop: "2px solid #E01950",
-                      borderRadius: "50%",
-                      animation: "spin 0.7s linear infinite",
-                      display: "inline-block",
-                      marginRight: 6,
-                    }}
-                  />
+                  <span className="rem-spinner" />
                   Sending...
-                  <style>{`
-                    @keyframes spin {
-                      0% { transform: rotate(0deg);}
-                      100% { transform: rotate(360deg);}
-                    }
-                  `}</style>
                 </>
               ) : (
                 <>

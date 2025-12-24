@@ -1,0 +1,291 @@
+/* ==================== MODAL STYLING ==================== */
+.abcm-modal .modal-header {
+    background: #27235c;
+    color: #fff;
+    border-bottom: none;
+    padding: 13px 15px;
+  }
+  
+  .abcm-modal .modal-title {
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+  }
+  
+  .abcm-modal .btn-close {
+    filter: brightness(0) invert(1);
+  }
+  
+  .abcm-modal .modal-body {
+    padding: 20px;
+    background: #fff;
+  }
+  
+  .abcm-modal .modal-footer {
+    padding: 10px 15px;
+    border-top: 1px solid #e2e8f0;
+    background: #fff;
+  }
+  
+  /* ==================== BUDGET INFO DISPLAY ==================== */
+  .abcm-approval-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+  }
+  
+  .abcm-info-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .abcm-info-card label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0;
+  }
+  
+  .abcm-info-card span {
+    font-size: 14px;
+    font-weight: 600;
+    color: #27235c;
+  }
+  
+  .abcm-info-utilized {
+    color: #ef4444 !important;
+  }
+  
+  /* ==================== FORM GRID ==================== */
+  .abcm-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .abcm-form-column {
+    /* Column styling */
+  }
+  
+  /* ==================== FORM LABELS ==================== */
+  .abcm-form-label {
+    font-weight: 600;
+    font-size: 13px;
+    color: #334155;
+    margin-bottom: 6px;
+  }
+  
+  .abcm-required {
+    color: #ef4444;
+  }
+  
+  /* ==================== FORM INPUTS ==================== */
+  .abcm-form-control {
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 13px;
+    background: #fff;
+    color: #22223b;
+  }
+  
+  .abcm-form-control:focus {
+    outline: none;
+    border-color: #27235c;
+    box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+  }
+  
+  .abcm-form-select {
+    cursor: pointer;
+  }
+  
+  .abcm-form-hint {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 4px;
+    display: block;
+  }
+  
+  .abcm-textarea-full {
+    resize: vertical;
+    min-height: 80px;
+    max-height: 150px;
+    font-family: inherit;
+    line-height: 1.4;
+  }
+  
+  /* ==================== BUDGET SUMMARY SECTION ==================== */
+  .abcm-details-section {
+    background-color: #f0fdf4;
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 16px;
+    border: 1px solid #bbf7d0;
+  }
+  
+  .abcm-details-heading {
+    font-size: 14px;
+    font-weight: 700;
+    color: #166534;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .abcm-details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .abcm-detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #fff;
+    border-radius: 6px;
+    border: 1px solid #d1fae5;
+  }
+  
+  .abcm-detail-item label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 0;
+  }
+  
+  .abcm-detail-item span {
+    font-size: 13px;
+    font-weight: 600;
+    color: #27235c;
+  }
+  
+  .abcm-detail-allocated {
+    font-weight: 600;
+    color: #f59e0b;
+  }
+  
+  .abcm-detail-this-allocation {
+    font-weight: 600;
+    color: #27235c;
+  }
+  
+  .abcm-detail-remaining-positive {
+    font-weight: 600;
+    color: #166534;
+  }
+  
+  .abcm-detail-remaining-negative {
+    font-weight: 600;
+    color: #991b1b;
+  }
+  
+  /* ==================== ALERT STYLING ==================== */
+  .abcm-alert-danger {
+    margin-top: 16px;
+    padding: 12px 14px;
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border: 2px solid #ef4444;
+    border-radius: 8px;
+    color: #991b1b;
+    font-size: 13px;
+  }
+  
+  .abcm-alert-icon {
+    margin-right: 8px;
+    color: #ef4444;
+  }
+  
+  .abcm-alert-strong {
+    font-weight: 700;
+    display: block;
+    margin-bottom: 4px;
+  }
+  
+  .abcm-alert-text {
+    margin-top: 4px;
+    margin-bottom: 0;
+    font-size: 12px;
+  }
+  
+  /* ==================== BUTTONS ==================== */
+  .abcm-btn-cancel {
+    background: #6c757d;
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 7px 12px;
+    font-size: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+  
+  .abcm-btn-cancel:hover {
+    background: #5a6268;
+    color: #fff;
+  }
+  
+  .abcm-btn-submit {
+    background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 7px 12px;
+    font-size: 12px;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(151, 36, 126, 0.25);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .abcm-btn-submit:hover:not(:disabled) {
+    opacity: 0.93;
+    color: #fff;
+  }
+  
+  .abcm-btn-submit:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+  
+  /* ==================== SPINNER ==================== */
+  .abcm-spinner {
+    width: 14px;
+    height: 14px;
+    margin-right: 8px;
+  }
+  
+  /* ==================== RESPONSIVE ==================== */
+  @media (max-width: 768px) {
+    .abcm-form-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .abcm-details-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .abcm-approval-info {
+      grid-template-columns: 1fr;
+    }
+  }
+  

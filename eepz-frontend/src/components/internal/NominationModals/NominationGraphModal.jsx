@@ -14,6 +14,7 @@ import {
 } from "chart.js";
 import nominationService from "../../../services/internal/nominationService";
 import { toast } from "sonner";
+import "../../../styles/internal/NominationGraphModal.css";
 
 ChartJS.register(
   CategoryScale,
@@ -43,7 +44,7 @@ const NominationGraphModal = ({ show, onHide }) => {
   useEffect(() => {
     if (show) {
       fetchAnalytics();
-      
+
       // Auto-refresh every 5 seconds
       const intervalId = setInterval(() => {
         fetchAnalytics();
@@ -59,13 +60,13 @@ const NominationGraphModal = ({ show, onHide }) => {
   const fetchAnalytics = async () => {
     setLoading(true);
     const response = await nominationService.getMyNominationAnalytics();
-    
+
     if (response.success) {
       const newData = response.data;
       // Only update if data changed
       if (JSON.stringify(analytics) !== JSON.stringify(newData)) {
         setAnalytics(newData);
-        setChartKey(prev => prev + 1); // Force chart re-render
+        setChartKey((prev) => prev + 1); // Force chart re-render
       }
     } else {
       toast.error("Failed to load analytics");
@@ -199,173 +200,41 @@ const NominationGraphModal = ({ show, onHide }) => {
 
   return (
     <>
-      {/* Custom Backdrop with Blur Effect */}
-      <div
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(39, 35, 92, 0.4)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
-          zIndex: 1040,
-          transition: 'all 0.3s ease'
-        }}
-        onClick={onHide}
-      />
+      <div className="ngm-backdrop" onClick={onHide} />
 
-      {/* Modal Wrapper */}
-      <div
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1050,
-          padding: '20px'
-        }}
-      >
-        {/* Modal Dialog - Large Size for Charts */}
-        <div
-          style={{
-            width: '100%',
-            maxWidth: '800px',
-            maxHeight: '80vh',
-            display: 'flex',
-            flexDirection: 'column',
-            borderRadius: '0.5rem',
-            overflow: 'hidden',
-            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.3)',
-            backgroundColor: '#ffffff'
-          }}
-        >
-          {/* Modal Header - Navy Blue Theme */}
-          <div
-            style={{
-              background: '#27235C',
-              color: '#ffffff',
-              padding: '16px 20px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexShrink: 0
-            }}
-          >
-            <div
-              style={{
-                fontSize: '16px',
-                fontWeight: '600',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                color: '#ffffff'
-              }}
-            >
+      <div className="ngm-modal-wrapper">
+        <div className="ngm-modal-dialog">
+          {/* Modal Header */}
+          <div className="ngm-modal-header">
+            <div className="ngm-header-title">
               <i className="bi bi-bar-chart-fill"></i>
               Nomination Analytics
             </div>
             <button
               onClick={onHide}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: '#ffffff',
-                fontSize: '20px',
-                cursor: 'pointer',
-                padding: '0',
-                width: '24px',
-                height: '24px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
+              className="ngm-close-button"
+              aria-label="Close"
             >
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
 
           {/* Modal Body */}
-          <div
-            style={{
-              padding: '20px',
-              overflowY: 'auto',
-              flex: 1,
-              backgroundColor: '#ffffff',
-              maxHeight: 'calc(90vh - 140px)'
-            }}
-          >
+          <div className="ngm-modal-body">
             {loading && !analytics ? (
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '60px 20px',
-                  textAlign: 'center'
-                }}
-              >
-                <div
-                  style={{
-                    width: '48px',
-                    height: '48px',
-                    border: '4px solid #e5e7eb',
-                    borderTopColor: '#27235C',
-                    borderRadius: '50%',
-                    animation: 'spin 0.8s linear infinite',
-                    marginBottom: '16px'
-                  }}
-                />
-                <p style={{ fontSize: '14px', color: '#64748b', margin: 0 }}>
-                  Loading analytics...
-                </p>
+              <div className="ngm-loading">
+                <div className="ngm-spinner" />
+                <p className="ngm-loading-text">Loading analytics...</p>
               </div>
             ) : analytics ? (
               <>
                 {/* Chart Type Selector */}
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    gap: '12px',
-                    marginBottom: '24px',
-                    flexWrap: 'wrap'
-                  }}
-                >
+                <div className="ngm-chart-selector">
                   <button
                     onClick={() => setChartType("bar")}
-                    style={{
-                      padding: '10px 20px',
-                      fontSize: '13px',
-                      fontWeight: '600',
-                      borderRadius: '6px',
-                      border: chartType === "bar" ? '2px solid #27235C' : '1px solid #cbd5e1',
-                      background: chartType === "bar" ? '#27235C' : '#ffffff',
-                      color: chartType === "bar" ? '#ffffff' : '#334155',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px'
-                    }}
-                    onMouseEnter={(e) => {
-                      if (chartType !== "bar") {
-                        e.target.style.borderColor = '#27235C';
-                        e.target.style.color = '#27235C';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (chartType !== "bar") {
-                        e.target.style.borderColor = '#cbd5e1';
-                        e.target.style.color = '#334155';
-                      }
-                    }}
+                    className={`ngm-chart-btn ${
+                      chartType === "bar" ? "active" : ""
+                    }`}
                   >
                     <i className="bi bi-bar-chart-fill"></i>
                     Bar Chart
@@ -373,32 +242,9 @@ const NominationGraphModal = ({ show, onHide }) => {
 
                   <button
                     onClick={() => setChartType("pie")}
-                    style={{
-                      padding: '10px 20px',
-                      fontSize: '13px',
-                      fontWeight: '600',
-                      borderRadius: '6px',
-                      border: chartType === "pie" ? '2px solid #27235C' : '1px solid #cbd5e1',
-                      background: chartType === "pie" ? '#27235C' : '#ffffff',
-                      color: chartType === "pie" ? '#ffffff' : '#334155',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px'
-                    }}
-                    onMouseEnter={(e) => {
-                      if (chartType !== "pie") {
-                        e.target.style.borderColor = '#27235C';
-                        e.target.style.color = '#27235C';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (chartType !== "pie") {
-                        e.target.style.borderColor = '#cbd5e1';
-                        e.target.style.color = '#334155';
-                      }
-                    }}
+                    className={`ngm-chart-btn ${
+                      chartType === "pie" ? "active" : ""
+                    }`}
                   >
                     <i className="bi bi-pie-chart-fill"></i>
                     Pie Chart
@@ -406,32 +252,9 @@ const NominationGraphModal = ({ show, onHide }) => {
 
                   <button
                     onClick={() => setChartType("line")}
-                    style={{
-                      padding: '10px 20px',
-                      fontSize: '13px',
-                      fontWeight: '600',
-                      borderRadius: '6px',
-                      border: chartType === "line" ? '2px solid #27235C' : '1px solid #cbd5e1',
-                      background: chartType === "line" ? '#27235C' : '#ffffff',
-                      color: chartType === "line" ? '#ffffff' : '#334155',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px'
-                    }}
-                    onMouseEnter={(e) => {
-                      if (chartType !== "line") {
-                        e.target.style.borderColor = '#27235C';
-                        e.target.style.color = '#27235C';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (chartType !== "line") {
-                        e.target.style.borderColor = '#cbd5e1';
-                        e.target.style.color = '#334155';
-                      }
-                    }}
+                    className={`ngm-chart-btn ${
+                      chartType === "line" ? "active" : ""
+                    }`}
                   >
                     <i className="bi bi-graph-up"></i>
                     Line Graph
@@ -439,111 +262,47 @@ const NominationGraphModal = ({ show, onHide }) => {
                 </div>
 
                 {/* Chart Container */}
-                <div
-                  style={{
-                    height: '400px',
-                    position: 'relative',
-                    padding: '20px',
-                    background: '#ffffff',
-                    borderRadius: '8px',
-                    border: '1px solid #e5e7eb'
-                  }}
-                >
+                <div className="ngm-chart-container">
                   {chartType === "bar" && (
-                    <Bar key={chartKey} data={getChartData()} options={barOptions} />
+                    <Bar
+                      key={chartKey}
+                      data={getChartData()}
+                      options={barOptions}
+                    />
                   )}
                   {chartType === "pie" && (
-                    <Pie key={chartKey} data={getChartData()} options={pieOptions} />
+                    <Pie
+                      key={chartKey}
+                      data={getChartData()}
+                      options={pieOptions}
+                    />
                   )}
                   {chartType === "line" && (
-                    <Line key={chartKey} data={getChartData()} options={lineOptions} />
+                    <Line
+                      key={chartKey}
+                      data={getChartData()}
+                      options={lineOptions}
+                    />
                   )}
                 </div>
               </>
             ) : (
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '60px 20px',
-                  textAlign: 'center'
-                }}
-              >
-                <i 
-                  className="bi bi-inbox" 
-                  style={{ 
-                    fontSize: '64px', 
-                    color: '#cbd5e1',
-                    marginBottom: '16px'
-                  }}
-                ></i>
-                <p style={{ fontSize: '14px', color: '#64748b', margin: 0 }}>
-                  No analytics data available
-                </p>
+              <div className="ngm-empty-state">
+                <i className="bi bi-inbox ngm-empty-icon"></i>
+                <p className="ngm-empty-text">No analytics data available</p>
               </div>
             )}
           </div>
 
           {/* Modal Footer */}
-          <div
-            style={{
-              padding: '12px 20px',
-              borderTop: '1px solid #e2e8f0',
-              background: '#ffffff',
-              flexShrink: 0,
-              display: 'flex',
-              justifyContent: 'flex-end',
-              gap: '8px',
-              borderBottomLeftRadius: '12px',
-              borderBottomRightRadius: '12px'
-            }}
-          >
-            {/* Close Button */}
-            <button
-              type="button"
-              onClick={onHide}
-              style={{
-                background: '#6c757d',
-                borderColor: '#6c757d',
-                color: '#ffffff',
-                fontWeight: '600',
-                padding: '8px 16px',
-                fontSize: '13px',
-                borderRadius: '6px',
-                border: 'none',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.background = '#5a6268';
-                e.target.style.borderColor = '#5a6268';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.background = '#6c757d';
-                e.target.style.borderColor = '#6c757d';
-              }}
-            >
+          <div className="ngm-modal-footer">
+            <button type="button" onClick={onHide} className="ngm-btn-close">
               <i className="bi bi-x-circle"></i>
               Close
             </button>
           </div>
         </div>
       </div>
-
-      {/* Keyframe Animation for Spinner */}
-      <style>
-        {`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}
-      </style>
     </>
   );
 };

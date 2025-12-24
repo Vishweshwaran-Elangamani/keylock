@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import budgetAllocationService from "../../../services/hr_operations/hr/budgetAllocationService";
 import { formatCurrency } from "../../../utils/auth/currencyFormatter";
 import { toast } from "sonner";
+import "../../../styles/hr_operations/hr/CreateBudgetModal.css";
 
 const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
   const [formData, setFormData] = useState({
@@ -124,69 +125,13 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
 
   return (
     <>
-      {/* Blurred Backdrop */}
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(39,35,92,0.4)",
-          backdropFilter: "blur(8px)",
-          WebkitBackdropFilter: "blur(8px)",
-          zIndex: 1040,
-        }}
-        onClick={handleClose}
-      />
+      <div className="cbm-backdrop" onClick={handleClose} />
 
-      {/* Modal Container */}
-      <div
-        style={{
-          position: "fixed",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: "97%",
-          maxWidth: "800px",
-          zIndex: 1050,
-        }}
-      >
-        <div
-          style={{
-            borderRadius: "0.5rem",
-            background: "#fff",
-            boxShadow: "0 8px 28px rgba(0,0,0,0.22)",
-            overflow: "hidden",
-            width: "100%",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
+      <div className="cbm-modal-container">
+        <div className="cbm-modal-dialog">
           {/* HEADER */}
-          <div
-            style={{
-              background: "#27235C",
-              color: "#fff",
-              padding: "13px 15px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              fontSize: "15px",
-              fontWeight: 600,
-              borderRadius: "0.5rem 0.5rem 0 0",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                color: "#fff",
-                fontSize: 15,
-                fontWeight: 600,
-              }}
-            >
+          <div className="cbm-modal-header">
+            <div className="cbm-header-title">
               <i className="bi bi-plus-circle"></i>
               Add Department Budget
             </div>
@@ -195,61 +140,28 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
               onClick={handleClose}
               disabled={loading}
               aria-label="Close"
-              style={{
-                background: "none",
-                border: "none",
-                color: "#fff",
-                fontSize: 18,
-                cursor: loading ? "not-allowed" : "pointer",
-                opacity: loading ? 0.7 : 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              className="cbm-close-button"
             >
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
 
           {/* BODY/FORM */}
-          <form onSubmit={handleSubmit} style={{ margin: 0 }}>
-            <div
-              style={{
-                padding: "14px 15px 6px 15px",
-                background: "#fff",
-                textAlign: "left",
-              }}
-            >
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 9 }}>
+          <form onSubmit={handleSubmit} className="cbm-form">
+            <div className="cbm-modal-body">
+              <div className="cbm-form-grid">
                 {/* Department */}
-                <div style={{ flex: 1, minWidth: "47%" }}>
-                  <label
-                    style={{
-                      fontWeight: 600,
-                      fontSize: 13,
-                      color: "#334155",
-                      marginBottom: 2,
-                      display: "block",
-                    }}
-                  >
-                    Department{" "}
-                    <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                <div className="cbm-form-group">
+                  <label className="cbm-form-label">
+                    Department <span className="cbm-required-asterisk">*</span>
                   </label>
                   <select
                     name="departmentId"
                     value={formData.departmentId}
                     onChange={handleChange}
-                    style={{
-                      width: "100%",
-                      border: errors.departmentId
-                        ? "1px solid #dc3545"
-                        : "1px solid #cbd5e1",
-                      borderRadius: 6,
-                      fontSize: 13,
-                      background: "#fff",
-                      color: "#22223b",
-                      padding: "8px 9px",
-                    }}
+                    className={`cbm-form-input ${
+                      errors.departmentId ? "error" : ""
+                    }`}
                   >
                     <option value="">Select Department</option>
                     {departments.map((dept) => (
@@ -259,41 +171,22 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
                     ))}
                   </select>
                   {errors.departmentId && (
-                    <div style={{ color: "#dc3545", fontSize: 11 }}>
-                      {errors.departmentId}
-                    </div>
+                    <div className="cbm-form-error">{errors.departmentId}</div>
                   )}
                 </div>
 
                 {/* Fiscal Year */}
-                <div style={{ flex: 1, minWidth: "47%" }}>
-                  <label
-                    style={{
-                      fontWeight: 600,
-                      fontSize: 13,
-                      color: "#334155",
-                      marginBottom: 2,
-                      display: "block",
-                    }}
-                  >
-                    Fiscal Year{" "}
-                    <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                <div className="cbm-form-group">
+                  <label className="cbm-form-label">
+                    Fiscal Year <span className="cbm-required-asterisk">*</span>
                   </label>
                   <select
                     name="fiscalYear"
                     value={formData.fiscalYear}
                     onChange={handleChange}
-                    style={{
-                      width: "100%",
-                      border: errors.fiscalYear
-                        ? "1px solid #dc3545"
-                        : "1px solid #cbd5e1",
-                      borderRadius: 6,
-                      fontSize: 13,
-                      background: "#fff",
-                      color: "#22223b",
-                      padding: "8px 9px",
-                    }}
+                    className={`cbm-form-input ${
+                      errors.fiscalYear ? "error" : ""
+                    }`}
                   >
                     {years.map((year) => (
                       <option key={year} value={year}>
@@ -302,25 +195,15 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
                     ))}
                   </select>
                   {errors.fiscalYear && (
-                    <div style={{ color: "#dc3545", fontSize: 11 }}>
-                      {errors.fiscalYear}
-                    </div>
+                    <div className="cbm-form-error">{errors.fiscalYear}</div>
                   )}
                 </div>
 
                 {/* Total Budget */}
-                <div style={{ flex: 1, minWidth: "47%" }}>
-                  <label
-                    style={{
-                      fontWeight: 600,
-                      fontSize: 13,
-                      color: "#334155",
-                      marginBottom: 2,
-                      display: "block",
-                    }}
-                  >
+                <div className="cbm-form-group">
+                  <label className="cbm-form-label">
                     Total Budget (₹){" "}
-                    <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                    <span className="cbm-required-asterisk">*</span>
                   </label>
                   <input
                     type="number"
@@ -330,41 +213,21 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
                     onChange={handleChange}
                     step="0.01"
                     min="0"
-                    style={{
-                      width: "100%",
-                      border: errors.totalBudget
-                        ? "1px solid #dc3545"
-                        : "1px solid #cbd5e1",
-                      borderRadius: 6,
-                      padding: "8px 9px",
-                      fontSize: 13,
-                      background: "#fff",
-                      color: "#22223b",
-                    }}
+                    className={`cbm-form-input ${
+                      errors.totalBudget ? "error" : ""
+                    }`}
                   />
                   {errors.totalBudget && (
-                    <div style={{ color: "#dc3545", fontSize: 11 }}>
-                      {errors.totalBudget}
-                    </div>
+                    <div className="cbm-form-error">{errors.totalBudget}</div>
                   )}
-                  <small style={{ color: "#64748b", fontSize: 11 }}>
+                  <small className="cbm-form-hint">
                     Total budget allocated to this department
                   </small>
                 </div>
 
                 {/* Allocated Amount */}
-                <div style={{ flex: 1, minWidth: "47%" }}>
-                  <label
-                    style={{
-                      fontWeight: 600,
-                      fontSize: 13,
-                      color: "#334155",
-                      marginBottom: 2,
-                      display: "block",
-                    }}
-                  >
-                    Allocated Amount (₹)
-                  </label>
+                <div className="cbm-form-group">
+                  <label className="cbm-form-label">Allocated Amount (₹)</label>
                   <input
                     type="number"
                     name="allocatedAmount"
@@ -373,24 +236,16 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
                     onChange={handleChange}
                     step="0.01"
                     min="0"
-                    style={{
-                      width: "100%",
-                      border: errors.allocatedAmount
-                        ? "1px solid #dc3545"
-                        : "1px solid #cbd5e1",
-                      borderRadius: 6,
-                      padding: "8px 9px",
-                      fontSize: 13,
-                      background: "#fff",
-                      color: "#22223b",
-                    }}
+                    className={`cbm-form-input ${
+                      errors.allocatedAmount ? "error" : ""
+                    }`}
                   />
                   {errors.allocatedAmount && (
-                    <div style={{ color: "#dc3545", fontSize: 11 }}>
+                    <div className="cbm-form-error">
                       {errors.allocatedAmount}
                     </div>
                   )}
-                  <small style={{ color: "#64748b", fontSize: 11 }}>
+                  <small className="cbm-form-hint">
                     Defaults to total budget if left empty
                   </small>
                 </div>
@@ -398,84 +253,34 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
 
               {/* Budget Summary */}
               {formData.totalBudget && (
-                <div
-                  style={{
-                    background:
-                      "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)",
-                    border: "2px solid #10b981",
-                    borderRadius: 8,
-                    padding: 14,
-                    marginTop: 12,
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      color: "#065f46",
-                      fontSize: 14,
-                      fontWeight: 700,
-                      marginBottom: 10,
-                    }}
-                  >
-                    <i
-                      className="bi bi-cash-stack"
-                      style={{ fontSize: 18 }}
-                    ></i>
+                <div className="cbm-budget-summary">
+                  <div className="cbm-summary-header">
+                    <i className="bi bi-cash-stack cbm-summary-icon"></i>
                     <span>Budget Summary</span>
                   </div>
 
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns:
-                        "repeat(auto-fit, minmax(200px, 1fr))",
-                      gap: 10,
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        fontSize: 13,
-                        color: "#047857",
-                      }}
-                    >
-                      <label style={{ fontWeight: 600 }}>Total Budget:</label>
-                      <span style={{ fontWeight: 700 }}>
+                  <div className="cbm-summary-grid">
+                    <div className="cbm-summary-item">
+                      <label className="cbm-summary-label">Total Budget:</label>
+                      <span className="cbm-summary-value">
                         {formatCurrency(formData.totalBudget)}
                       </span>
                     </div>
 
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        fontSize: 13,
-                        color: "#047857",
-                      }}
-                    >
-                      <label style={{ fontWeight: 600 }}>
+                    <div className="cbm-summary-item">
+                      <label className="cbm-summary-label">
                         Allocated Amount:
                       </label>
-                      <span style={{ fontWeight: 700 }}>
+                      <span className="cbm-summary-value">
                         {formatCurrency(
                           formData.allocatedAmount || formData.totalBudget
                         )}
                       </span>
                     </div>
 
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        fontSize: 13,
-                        color: "#047857",
-                      }}
-                    >
-                      <label style={{ fontWeight: 600 }}>Remaining:</label>
-                      <span style={{ fontWeight: 700 }}>
+                    <div className="cbm-summary-item">
+                      <label className="cbm-summary-label">Remaining:</label>
+                      <span className="cbm-summary-value">
                         {formatCurrency(
                           (formData.totalBudget || 0) -
                             (formData.allocatedAmount ||
@@ -490,43 +295,12 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
             </div>
 
             {/* FOOTER */}
-            <div
-              style={{
-                padding: "10px 15px",
-                borderTop: "1px solid #e2e8f0",
-                background: "#fff",
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: 8,
-                borderBottomLeftRadius: "0.5rem",
-                borderBottomRightRadius: "0.5rem",
-              }}
-            >
+            <div className="cbm-modal-footer">
               <button
                 type="button"
                 onClick={handleClose}
                 disabled={loading}
-                style={{
-                  background: "#6c757d",
-                  border: "none",
-                  color: "#fff",
-                  fontWeight: 600,
-                  padding: "7px 12px",
-                  fontSize: 12,
-                  borderRadius: 5,
-                  cursor: loading ? "not-allowed" : "pointer",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  opacity: loading ? 0.7 : 1,
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  if (!loading) e.target.style.background = "#5a6268";
-                }}
-                onMouseLeave={(e) => {
-                  if (!loading) e.target.style.background = "#6c757d";
-                }}
+                className="cbm-btn-cancel"
               >
                 <i className="bi bi-x-circle"></i> Cancel
               </button>
@@ -534,51 +308,12 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
               <button
                 type="submit"
                 disabled={loading}
-                style={{
-                  background:
-                    "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                  border: "none",
-                  color: "#fff",
-                  fontWeight: 600,
-                  padding: "7px 12px",
-                  fontSize: 12,
-                  borderRadius: 5,
-                  boxShadow: "0 2px 8px rgba(151,36,126,0.25)",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  cursor: loading ? "not-allowed" : "pointer",
-                  opacity: loading ? 0.85 : 1,
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  if (!loading) e.target.style.opacity = 0.93;
-                }}
-                onMouseLeave={(e) => {
-                  if (!loading) e.target.style.opacity = 1;
-                }}
+                className="cbm-btn-submit"
               >
                 {loading ? (
                   <>
-                    <span
-                      style={{
-                        width: 14,
-                        height: 14,
-                        border: "2px solid #fff",
-                        borderTop: "2px solid #E01950",
-                        borderRadius: "50%",
-                        animation: "spin 0.7s linear infinite",
-                        display: "inline-block",
-                        marginRight: 6,
-                      }}
-                    />
+                    <span className="cbm-spinner" />
                     Creating...
-                    <style>{`
-                      @keyframes spin {
-                        0% { transform: rotate(0deg);}
-                        100% { transform: rotate(360deg);}
-                      }
-                    `}</style>
                   </>
                 ) : (
                   <>

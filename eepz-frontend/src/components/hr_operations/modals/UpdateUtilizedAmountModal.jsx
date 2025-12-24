@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Modal } from "react-bootstrap";
 import budgetAllocationService from "../../../services/hr_operations/hr/budgetAllocationService";
 import { formatCurrency } from "../../../utils/auth/currencyFormatter";
+import "../../../styles/hr_operations/hr/UpdateUtilizedAmountModal.css";
 
 const UpdateUtilizedAmountModal = ({
   show,
@@ -37,7 +38,7 @@ const UpdateUtilizedAmountModal = ({
         );
       setAllocations(response.data || []);
     } catch (err) {
-      console.error(" Error fetching allocations:", err);
+      console.error("Error fetching allocations:", err);
     }
   };
 
@@ -55,7 +56,7 @@ const UpdateUtilizedAmountModal = ({
     setError(null);
 
     try {
-      //  VALIDATIONS
+      // VALIDATIONS
       if (!formData.utilizedAmount || parseFloat(formData.utilizedAmount) < 0) {
         setError("Utilized amount must be zero or greater");
         setLoading(false);
@@ -65,7 +66,7 @@ const UpdateUtilizedAmountModal = ({
       const utilizedAmount = parseFloat(formData.utilizedAmount);
       const allocatedAmount = budget.allocatedAmount || 0;
 
-      //  Validate: cannot exceed allocated amount
+      // Validate: cannot exceed allocated amount
       if (utilizedAmount > allocatedAmount) {
         setError(
           `Utilized amount (₹${utilizedAmount.toLocaleString(
@@ -85,7 +86,7 @@ const UpdateUtilizedAmountModal = ({
       onUtilizedUpdated();
       handleClose();
     } catch (err) {
-      console.error(" Error updating utilized amount:", err);
+      console.error("Error updating utilized amount:", err);
       setError(err.message || "Failed to update utilized amount");
     } finally {
       setLoading(false);
@@ -113,15 +114,17 @@ const UpdateUtilizedAmountModal = ({
     (budget.allocatedAmount || 0) - (parseFloat(formData.utilizedAmount) || 0);
 
   const getProgressColor = (percentage) => {
-    if (percentage >= 90) return "#ef4444";
-    if (percentage >= 75) return "#f59e0b";
-    if (percentage >= 50) return "#10b981";
-    return "#3b82f6";
+    if (percentage >= 90) return "critical";
+    if (percentage >= 75) return "warning";
+    if (percentage >= 50) return "good";
+    return "normal";
   };
 
+  const progressColorClass = getProgressColor(utilizationPercentage);
+
   return (
-    <Modal show={show} onHide={handleClose} size="lg" className="promo-modal">
-      <Modal.Header closeButton className="promo-modal-header">
+    <Modal show={show} onHide={handleClose} size="lg" className="uuam-modal">
+      <Modal.Header closeButton>
         <Modal.Title>
           <i className="bi bi-pencil me-2"></i>
           Update Utilized Amount
@@ -129,7 +132,7 @@ const UpdateUtilizedAmountModal = ({
       </Modal.Header>
 
       <form onSubmit={handleSubmit}>
-        <Modal.Body className="promo-modal-body">
+        <Modal.Body>
           {error && (
             <div className="alert alert-danger" role="alert">
               <i className="bi bi-exclamation-triangle-fill me-2"></i>
@@ -137,50 +140,40 @@ const UpdateUtilizedAmountModal = ({
             </div>
           )}
 
-          {/*  BUDGET INFO */}
-          <div className="promo-approval-info">
-            <div className="promo-info-card">
+          {/* BUDGET INFO */}
+          <div className="uuam-budget-info">
+            <div className="uuam-info-card">
               <label>Department:</label>
               <span>{budget?.departmentName || "Unknown"}</span>
             </div>
-            <div className="promo-info-card">
+            <div className="uuam-info-card">
               <label>Fiscal Year:</label>
               <span>{budget?.fiscalYear}</span>
             </div>
-            <div className="promo-info-card">
+            <div className="uuam-info-card">
               <label>Total Budget:</label>
               <span>{formatCurrency(budget?.totalBudget)}</span>
             </div>
-            <div className="promo-info-card">
+            <div className="uuam-info-card">
               <label>Allocated Amount:</label>
               <span>{formatCurrency(budget?.allocatedAmount)}</span>
             </div>
           </div>
 
-          {/*  CURRENT vs NEW */}
-          <div className="promo-form-grid">
-            <div className="promo-form-column">
+          {/* CURRENT vs NEW */}
+          <div className="uuam-form-grid">
+            <div>
               <div className="mb-3">
                 <label htmlFor="currentUtilized" className="form-label">
                   Current Utilized Amount
                 </label>
-                <div
-                  style={{
-                    padding: "10px 12px",
-                    backgroundColor: "#f0f0f0",
-                    border: "1px solid #cbd5e1",
-                    borderRadius: "6px",
-                    fontSize: "14px",
-                    fontWeight: "600",
-                    color: "#1e293b",
-                  }}
-                >
+                <div className="uuam-current-value">
                   {formatCurrency(budget?.utilizedAmount)}
                 </div>
               </div>
             </div>
 
-            <div className="promo-form-column">
+            <div>
               <div className="mb-3">
                 <label htmlFor="utilizedAmount" className="form-label">
                   New Utilized Amount (₹) <span className="text-danger">*</span>
@@ -205,24 +198,15 @@ const UpdateUtilizedAmountModal = ({
             </div>
           </div>
 
-          {/*  ALLOCATIONS BREAKDOWN */}
+          {/* ALLOCATIONS BREAKDOWN */}
           {allocations.length > 0 && (
-            <div className="promo-details-section">
-              <h6 className="promo-details-heading"> Allocations Breakdown</h6>
-              <div
-                style={{
-                  overflowX: "auto",
-                  maxHeight: "200px",
-                  overflowY: "auto",
-                }}
-              >
-                <table
-                  className="promo-table"
-                  style={{
-                    marginBottom: 0,
-                    fontSize: "12px",
-                  }}
-                >
+            <div className="uuam-details-section">
+              <h6 className="uuam-details-heading">
+                <i className="bi bi-list-ul"></i>
+                Allocations Breakdown
+              </h6>
+              <div className="uuam-table-container">
+                <table className="uuam-table">
                   <thead>
                     <tr>
                       <th>Type</th>
@@ -235,17 +219,7 @@ const UpdateUtilizedAmountModal = ({
                     {allocations.map((alloc) => (
                       <tr key={alloc.allocationId}>
                         <td>
-                          <span
-                            style={{
-                              display: "inline-block",
-                              padding: "2px 6px",
-                              borderRadius: "3px",
-                              fontSize: "10px",
-                              fontWeight: "600",
-                              backgroundColor: "#dbeafe",
-                              color: "#0c4a6e",
-                            }}
-                          >
+                          <span className="uuam-type-badge">
                             {alloc.allocationType}
                           </span>
                         </td>
@@ -255,14 +229,11 @@ const UpdateUtilizedAmountModal = ({
                         </td>
                         <td>
                           <span
-                            style={{
-                              fontSize: "10px",
-                              fontWeight: "600",
-                              color:
-                                alloc.goalStatus === "Approved"
-                                  ? "#166534"
-                                  : "#92400e",
-                            }}
+                            className={`uuam-status-text ${
+                              alloc.goalStatus === "Approved"
+                                ? "approved"
+                                : "other"
+                            }`}
                           >
                             {alloc.goalStatus}
                           </span>
@@ -272,57 +243,55 @@ const UpdateUtilizedAmountModal = ({
                   </tbody>
                 </table>
               </div>
-              <div
-                style={{
-                  padding: "8px 12px",
-                  backgroundColor: "#f8fafc",
-                  borderLeft: "4px solid #27235C",
-                  marginTop: "8px",
-                  borderRadius: "4px",
-                  fontSize: "12px",
-                  fontWeight: "600",
-                }}
-              >
+              <div className="uuam-total-allocations">
                 <strong>Total Allocations:</strong>{" "}
                 {formatCurrency(getTotalAllocations())}
               </div>
             </div>
           )}
 
-          {/*  UTILIZATION SUMMARY */}
-          <div
-            className="promo-details-section"
-            style={{ backgroundColor: "#f0fdf4" }}
-          >
-            <h6 className="promo-details-heading"> Utilization Summary</h6>
-            <div className="promo-details-grid">
-              <div className="promo-detail-item">
+          {/* UTILIZATION SUMMARY */}
+          <div className="uuam-details-section summary">
+            <h6 className="uuam-details-heading">
+              <i className="bi bi-graph-up"></i>
+              Utilization Summary
+            </h6>
+            <div className="uuam-summary-grid">
+              <div className="uuam-summary-item">
                 <label>Allocated Budget:</label>
                 <span>{formatCurrency(budget?.allocatedAmount)}</span>
               </div>
-              <div className="promo-detail-item">
+              <div className="uuam-summary-item">
                 <label>To Be Utilized:</label>
-                <span style={{ fontWeight: "600", color: "#27235C" }}>
+                <span className="utilized">
                   {formatCurrency(formData.utilizedAmount)}
                 </span>
               </div>
-              <div className="promo-detail-item">
+              <div className="uuam-summary-item">
                 <label>Remaining:</label>
                 <span
-                  style={{
-                    fontWeight: "600",
-                    color: remainingBudget >= 0 ? "#166534" : "#991b1b",
-                  }}
+                  className={
+                    remainingBudget >= 0
+                      ? "remaining-positive"
+                      : "remaining-negative"
+                  }
                 >
                   {formatCurrency(remainingBudget)}
                 </span>
               </div>
-              <div className="promo-detail-item">
+              <div className="uuam-summary-item">
                 <label>Utilization %:</label>
                 <span
+                  className="percentage"
                   style={{
-                    fontWeight: "600",
-                    color: getProgressColor(utilizationPercentage),
+                    color:
+                      progressColorClass === "critical"
+                        ? "#ef4444"
+                        : progressColorClass === "warning"
+                        ? "#f59e0b"
+                        : progressColorClass === "good"
+                        ? "#10b981"
+                        : "#3b82f6",
                   }}
                 >
                   {utilizationPercentage}%
@@ -331,34 +300,12 @@ const UpdateUtilizedAmountModal = ({
             </div>
 
             {/* Progress bar */}
-            <div
-              style={{
-                marginTop: "12px",
-                backgroundColor: "#ffffff",
-                borderRadius: "6px",
-                padding: "8px",
-              }}
-            >
-              <div
-                style={{
-                  width: "100%",
-                  height: "24px",
-                  backgroundColor: "#e2e8f0",
-                  borderRadius: "4px",
-                  overflow: "hidden",
-                }}
-              >
+            <div className="uuam-progress-container">
+              <div className="uuam-progress-bar">
                 <div
+                  className={`uuam-progress-fill ${progressColorClass}`}
                   style={{
                     width: `${Math.min(utilizationPercentage, 100)}%`,
-                    height: "100%",
-                    backgroundColor: getProgressColor(utilizationPercentage),
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "11px",
-                    fontWeight: "600",
-                    color: "#ffffff",
                   }}
                 >
                   {utilizationPercentage > 10 && `${utilizationPercentage}%`}
@@ -367,19 +314,16 @@ const UpdateUtilizedAmountModal = ({
             </div>
           </div>
 
-          {/*  VALIDATION WARNING */}
+          {/* VALIDATION WARNING */}
           {parseFloat(formData.utilizedAmount) >
             (budget?.allocatedAmount || 0) && (
             <div
-              className="alert alert-danger"
+              className="alert alert-danger uuam-exceeded-alert"
               role="alert"
-              style={{ marginTop: "16px" }}
             >
               <i className="bi bi-exclamation-triangle-fill me-2"></i>
-              <strong> EXCEEDED BUDGET!</strong>
-              <p
-                style={{ marginTop: "4px", marginBottom: 0, fontSize: "12px" }}
-              >
+              <strong>EXCEEDED BUDGET!</strong>
+              <p>
                 Utilized amount (₹
                 {parseFloat(formData.utilizedAmount).toLocaleString("en-IN")})
                 exceeds allocated budget (₹
@@ -389,7 +333,7 @@ const UpdateUtilizedAmountModal = ({
           )}
         </Modal.Body>
 
-        <Modal.Footer className="promo-modal-footer">
+        <Modal.Footer>
           <button
             type="button"
             className="btn btn-secondary"
@@ -399,7 +343,7 @@ const UpdateUtilizedAmountModal = ({
           </button>
           <button
             type="submit"
-            className="btn promo-btn-submit"
+            className="btn uuam-btn-submit"
             disabled={
               loading ||
               parseFloat(formData.utilizedAmount) >

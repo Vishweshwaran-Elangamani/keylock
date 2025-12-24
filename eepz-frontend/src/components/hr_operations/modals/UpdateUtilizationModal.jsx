@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import budgetAllocationService from "../../../services/hr_operations/hr/budgetAllocationService";
 import { formatCurrency } from "../../../utils/auth/currencyFormatter";
+import "../../../styles/hr_operations/hr/UpdateUtilizationModal.css";
 
 const UpdateUtilizationModal = ({
   show,
@@ -92,78 +93,26 @@ const UpdateUtilizationModal = ({
   );
   const remainingAmount = (allocation?.amount || 0) - currentUtilizedAmount;
 
+  const getUtilizationClass = (percentage) => {
+    if (percentage >= 100) return "critical";
+    if (percentage >= 75) return "warning";
+    if (percentage >= 50) return "good";
+    return "normal";
+  };
+
+  const utilizationClass = getUtilizationClass(currentUtilizationPercentage);
+
   if (!show) return null;
 
   return (
     <>
-      {/* Blurred Backdrop */}
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(39,35,92,0.4)",
-          backdropFilter: "blur(8px)",
-          WebkitBackdropFilter: "blur(8px)",
-          zIndex: 1040,
-        }}
-        onClick={handleClose}
-      />
+      <div className="uum-backdrop" onClick={handleClose} />
 
-      {/* Modal Container */}
-      <div
-        style={{
-          position: "fixed",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: "95%",
-          maxWidth: "800px",
-          maxHeight: "75vh",
-          zIndex: 1050,
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <div
-          style={{
-            borderRadius: "0.5rem",
-            background: "#fff",
-            boxShadow: "0 8px 28px rgba(0,0,0,0.22)",
-            overflow: "hidden",
-            width: "100%",
-            maxHeight: "85vh",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
+      <div className="uum-modal-container">
+        <div className="uum-modal-dialog">
           {/* HEADER - Fixed */}
-          <div
-            style={{
-              background: "#27235C",
-              color: "#fff",
-              padding: "13px 15px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              fontSize: "15px",
-              fontWeight: 600,
-              borderRadius: "0.5rem 0.5rem 0 0",
-              flexShrink: 0,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                color: "#fff",
-                fontSize: 15,
-                fontWeight: 600,
-              }}
-            >
+          <div className="uum-modal-header">
+            <div className="uum-header-title">
               <i className="bi bi-pencil-square"></i>
               Update Utilization
             </div>
@@ -172,177 +121,45 @@ const UpdateUtilizationModal = ({
               onClick={handleClose}
               disabled={loading}
               aria-label="Close"
-              style={{
-                background: "none",
-                border: "none",
-                color: "#fff",
-                fontSize: 18,
-                cursor: loading ? "not-allowed" : "pointer",
-                opacity: loading ? 0.7 : 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              className="uum-close-button"
             >
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
 
           {/* BODY - Scrollable */}
-          <form
-            onSubmit={handleSubmit}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              flex: 1,
-              overflow: "hidden",
-            }}
-          >
-            <div
-              style={{
-                padding: "20px",
-                background: "#fff",
-                textAlign: "left",
-                overflowY: "auto",
-                flex: 1,
-              }}
-            >
+          <form onSubmit={handleSubmit} className="uum-form">
+            <div className="uum-modal-body">
               {error && (
-                <div
-                  style={{
-                    borderRadius: 8,
-                    padding: "10px 14px",
-                    marginBottom: 16,
-                    display: "flex",
-                    alignItems: "center",
-                    fontSize: 13,
-                    background: "linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)",
-                    border: "2px solid #ef4444",
-                    color: "#991b1b",
-                  }}
-                >
-                  <i
-                    className="bi bi-exclamation-triangle-fill"
-                    style={{ marginRight: 8, color: "#ef4444" }}
-                  ></i>
+                <div className="uum-error-alert">
+                  <i className="bi bi-exclamation-triangle-fill uum-error-icon"></i>
                   {error}
                 </div>
               )}
 
               {/* Allocation Info Grid */}
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: 12,
-                  marginBottom: 20,
-                  padding: "16px",
-                  background: "#f8fafc",
-                  borderRadius: 8,
-                  border: "1px solid #e2e8f0",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 4,
-                  }}
-                >
-                  <label
-                    style={{
-                      fontSize: 12,
-                      color: "#64748b",
-                      fontWeight: 600,
-                    }}
-                  >
-                    Allocation Name:
-                  </label>
-                  <span
-                    style={{
-                      fontSize: 14,
-                      color: "#1e293b",
-                      fontWeight: 700,
-                    }}
-                  >
+              <div className="uum-allocation-info">
+                <div className="uum-info-item">
+                  <label className="uum-info-label">Allocation Name:</label>
+                  <span className="uum-info-value">
                     {allocation?.allocationName}
                   </span>
                 </div>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 4,
-                  }}
-                >
-                  <label
-                    style={{
-                      fontSize: 12,
-                      color: "#64748b",
-                      fontWeight: 600,
-                    }}
-                  >
-                    Type:
-                  </label>
-                  <span
-                    style={{
-                      fontSize: 14,
-                      color: "#1e293b",
-                      fontWeight: 600,
-                    }}
-                  >
+                <div className="uum-info-item">
+                  <label className="uum-info-label">Type:</label>
+                  <span className="uum-info-value type">
                     {allocation?.allocationType}
                   </span>
                 </div>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 4,
-                  }}
-                >
-                  <label
-                    style={{
-                      fontSize: 12,
-                      color: "#64748b",
-                      fontWeight: 600,
-                    }}
-                  >
-                    Allocated Amount:
-                  </label>
-                  <span
-                    style={{
-                      fontSize: 14,
-                      color: "#1e293b",
-                      fontWeight: 600,
-                    }}
-                  >
+                <div className="uum-info-item">
+                  <label className="uum-info-label">Allocated Amount:</label>
+                  <span className="uum-info-value">
                     {formatCurrency(allocation?.amount)}
                   </span>
                 </div>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 4,
-                  }}
-                >
-                  <label
-                    style={{
-                      fontSize: 12,
-                      color: "#64748b",
-                      fontWeight: 600,
-                    }}
-                  >
-                    Current Utilization:
-                  </label>
-                  <span
-                    style={{
-                      fontSize: 14,
-                      color: "#ef4444",
-                      fontWeight: 600,
-                    }}
-                  >
+                <div className="uum-info-item">
+                  <label className="uum-info-label">Current Utilization:</label>
+                  <span className="uum-info-value current-utilization">
                     {formatCurrency(allocation?.utilizedAmount || 0)} (
                     {allocation?.utilizationPercentage || 0}%)
                   </span>
@@ -350,21 +167,10 @@ const UpdateUtilizationModal = ({
               </div>
 
               {/* Utilized Amount Input */}
-              <div style={{ marginBottom: 16 }}>
-                <label
-                  htmlFor="utilizedAmount"
-                  style={{
-                    fontWeight: 600,
-                    fontSize: 13,
-                    color: "#334155",
-                    marginBottom: 6,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 4,
-                  }}
-                >
+              <div className="uum-form-group">
+                <label htmlFor="utilizedAmount" className="uum-form-label">
                   Utilized Amount (Rs.){" "}
-                  <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                  <span className="uum-required-asterisk">*</span>
                 </label>
                 <input
                   type="number"
@@ -377,41 +183,16 @@ const UpdateUtilizationModal = ({
                   min="0"
                   max={allocation?.amount || 0}
                   required
-                  style={{
-                    width: "100%",
-                    border: "1px solid #cbd5e1",
-                    borderRadius: 6,
-                    padding: "8px 10px",
-                    fontSize: 13,
-                    background: "#fff",
-                    color: "#22223b",
-                  }}
+                  className="uum-form-input"
                 />
-                <small
-                  style={{
-                    fontSize: 11,
-                    color: "#64748b",
-                    marginTop: 4,
-                    fontStyle: "italic",
-                    display: "block",
-                  }}
-                >
+                <small className="uum-form-hint">
                   Maximum: {formatCurrency(allocation?.amount)} (100%)
                 </small>
               </div>
 
               {/* Notes Textarea */}
-              <div style={{ marginBottom: 20 }}>
-                <label
-                  htmlFor="notes"
-                  style={{
-                    fontWeight: 600,
-                    fontSize: 13,
-                    color: "#334155",
-                    marginBottom: 6,
-                    display: "block",
-                  }}
-                >
+              <div className="uum-form-group notes">
+                <label htmlFor="notes" className="uum-form-label-block">
                   Notes (Optional)
                 </label>
                 <textarea
@@ -421,167 +202,46 @@ const UpdateUtilizationModal = ({
                   onChange={handleChange}
                   placeholder="Add notes about this utilization update"
                   rows="3"
-                  style={{
-                    width: "100%",
-                    border: "1px solid #cbd5e1",
-                    borderRadius: 6,
-                    padding: "8px 10px",
-                    fontSize: 13,
-                    background: "#fff",
-                    color: "#22223b",
-                    resize: "vertical",
-                    minHeight: 80,
-                    maxHeight: 120,
-                    fontFamily: "inherit",
-                    lineHeight: 1.4,
-                  }}
+                  className="uum-form-input uum-form-textarea"
                 />
               </div>
 
               {/* Utilization Summary Section */}
-              <div
-                style={{
-                  border: "1px solid #e5e7eb",
-                  borderRadius: 8,
-                  background:
-                    currentUtilizationPercentage >= 100
-                      ? "#fef2f2"
-                      : currentUtilizationPercentage >= 75
-                      ? "#fef3c7"
-                      : "#f0fdf4",
-                  padding: "16px",
-                }}
-              >
-                <h6
-                  style={{
-                    fontWeight: 700,
-                    fontSize: 14,
-                    color: "#1e293b",
-                    marginBottom: 12,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                  }}
-                >
-                  Utilization Summary
-                </h6>
+              <div className={`uum-summary-section ${utilizationClass}`}>
+                <h6 className="uum-summary-heading">Utilization Summary</h6>
 
                 {/* Summary Grid */}
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: 12,
-                    marginBottom: 16,
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 4,
-                    }}
-                  >
-                    <label
-                      style={{
-                        fontSize: 12,
-                        color: "#64748b",
-                        fontWeight: 600,
-                      }}
-                    >
+                <div className="uum-summary-grid">
+                  <div className="uum-summary-item">
+                    <label className="uum-summary-label">
                       Allocated Amount:
                     </label>
-                    <span
-                      style={{
-                        fontSize: 14,
-                        color: "#1e293b",
-                        fontWeight: 600,
-                      }}
-                    >
+                    <span className="uum-summary-value">
                       {formatCurrency(allocation?.amount)}
                     </span>
                   </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 4,
-                    }}
-                  >
-                    <label
-                      style={{
-                        fontSize: 12,
-                        color: "#64748b",
-                        fontWeight: 600,
-                      }}
-                    >
+                  <div className="uum-summary-item">
+                    <label className="uum-summary-label">
                       Utilized Amount:
                     </label>
-                    <span
-                      style={{
-                        fontSize: 14,
-                        color: "#ef4444",
-                        fontWeight: 600,
-                      }}
-                    >
+                    <span className="uum-summary-value utilized">
                       {formatCurrency(currentUtilizedAmount)}
                     </span>
                   </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 4,
-                    }}
-                  >
-                    <label
-                      style={{
-                        fontSize: 12,
-                        color: "#64748b",
-                        fontWeight: 600,
-                      }}
-                    >
-                      Utilization %:
-                    </label>
+                  <div className="uum-summary-item">
+                    <label className="uum-summary-label">Utilization %:</label>
                     <span
-                      style={{
-                        fontWeight: 700,
-                        fontSize: 18,
-                        color:
-                          currentUtilizationPercentage >= 100
-                            ? "#991b1b"
-                            : currentUtilizationPercentage >= 75
-                            ? "#f59e0b"
-                            : currentUtilizationPercentage >= 50
-                            ? "#10b981"
-                            : "#3b82f6",
-                      }}
+                      className={`uum-summary-value percentage ${utilizationClass}`}
                     >
                       {currentUtilizationPercentage}%
                     </span>
                   </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 4,
-                    }}
-                  >
-                    <label
-                      style={{
-                        fontSize: 12,
-                        color: "#64748b",
-                        fontWeight: 600,
-                      }}
-                    >
-                      Remaining:
-                    </label>
+                  <div className="uum-summary-item">
+                    <label className="uum-summary-label">Remaining:</label>
                     <span
-                      style={{
-                        fontSize: 14,
-                        fontWeight: 600,
-                        color: remainingAmount >= 0 ? "#166534" : "#991b1b",
-                      }}
+                      className={`uum-summary-value remaining ${
+                        remainingAmount >= 0 ? "positive" : "negative"
+                      }`}
                     >
                       {formatCurrency(remainingAmount)}
                     </span>
@@ -589,45 +249,18 @@ const UpdateUtilizationModal = ({
                 </div>
 
                 {/* Progress Bar */}
-                <div style={{ marginTop: 16 }}>
-                  <div
-                    style={{
-                      position: "relative",
-                      height: 24,
-                      background: "#e5e7eb",
-                      borderRadius: 4,
-                      overflow: "hidden",
-                    }}
-                  >
+                <div className="uum-progress-container">
+                  <div className="uum-progress-bar">
                     <div
+                      className={`uum-progress-fill ${utilizationClass}`}
                       style={{
-                        position: "absolute",
-                        left: 0,
-                        top: 0,
-                        height: "100%",
-                        width: `${Math.min(currentUtilizationPercentage, 100)}%`,
-                        backgroundColor:
-                          currentUtilizationPercentage >= 100
-                            ? "#ef4444"
-                            : currentUtilizationPercentage >= 75
-                            ? "#f59e0b"
-                            : currentUtilizationPercentage >= 50
-                            ? "#10b981"
-                            : "#3b82f6",
-                        transition: "width 0.3s ease",
+                        width: `${Math.min(
+                          currentUtilizationPercentage,
+                          100
+                        )}%`,
                       }}
                     ></div>
-                    <span
-                      style={{
-                        position: "relative",
-                        display: "block",
-                        textAlign: "center",
-                        lineHeight: "24px",
-                        fontWeight: 700,
-                        fontSize: 12,
-                        color: "#1e293b",
-                      }}
-                    >
+                    <span className="uum-progress-text">
                       {currentUtilizationPercentage}%
                     </span>
                   </div>
@@ -636,139 +269,43 @@ const UpdateUtilizationModal = ({
 
               {/* Exceeded Warning */}
               {currentUtilizedAmount > (allocation?.amount || 0) && (
-                <div
-                  style={{
-                    borderRadius: 8,
-                    padding: "12px 14px",
-                    marginTop: 16,
-                    display: "flex",
-                    flexDirection: "column",
-                    fontSize: 13,
-                    background: "linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)",
-                    border: "2px solid #ef4444",
-                    color: "#991b1b",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", marginBottom: 4 }}>
-                    <i
-                      className="bi bi-exclamation-triangle-fill"
-                      style={{ marginRight: 8, color: "#ef4444" }}
-                    ></i>
+                <div className="uum-exceeded-warning">
+                  <div className="uum-exceeded-header">
+                    <i className="bi bi-exclamation-triangle-fill uum-exceeded-icon"></i>
                     <strong>UTILIZED AMOUNT EXCEEDS ALLOCATION!</strong>
                   </div>
-                  <p style={{ margin: 0, fontSize: 12 }}>
+                  <p className="uum-exceeded-text">
                     Utilized amount (Rs.
-                    {currentUtilizedAmount.toLocaleString("en-IN")}) exceeds allocated
-                    amount (Rs.{(allocation?.amount || 0).toLocaleString("en-IN")})
+                    {currentUtilizedAmount.toLocaleString("en-IN")}) exceeds
+                    allocated amount (Rs.
+                    {(allocation?.amount || 0).toLocaleString("en-IN")})
                   </p>
                 </div>
               )}
             </div>
 
             {/* FOOTER - Fixed */}
-            <div
-              style={{
-                padding: "10px 15px",
-                borderTop: "1px solid #e2e8f0",
-                background: "#fff",
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: 8,
-                borderBottomLeftRadius: "0.5rem",
-                borderBottomRightRadius: "0.5rem",
-                flexShrink: 0,
-              }}
-            >
+            <div className="uum-modal-footer">
               <button
                 type="button"
                 onClick={handleClose}
                 disabled={loading}
-                style={{
-                  background: "#6c757d",
-                  border: "none",
-                  color: "#fff",
-                  fontWeight: 600,
-                  padding: "7px 12px",
-                  fontSize: 12,
-                  borderRadius: 5,
-                  cursor: loading ? "not-allowed" : "pointer",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  opacity: loading ? 0.7 : 1,
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  if (!loading) e.target.style.background = "#5a6268";
-                }}
-                onMouseLeave={(e) => {
-                  if (!loading) e.target.style.background = "#6c757d";
-                }}
+                className="uum-btn-cancel"
               >
                 Cancel
               </button>
 
               <button
                 type="submit"
-                disabled={loading || currentUtilizedAmount > (allocation?.amount || 0)}
-                style={{
-                  background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                  border: "none",
-                  color: "#fff",
-                  fontWeight: 600,
-                  padding: "7px 12px",
-                  fontSize: 12,
-                  borderRadius: 5,
-                  boxShadow: "0 2px 8px rgba(151,36,126,0.25)",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  cursor:
-                    loading || currentUtilizedAmount > (allocation?.amount || 0)
-                      ? "not-allowed"
-                      : "pointer",
-                  opacity:
-                    loading || currentUtilizedAmount > (allocation?.amount || 0)
-                      ? 0.85
-                      : 1,
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  if (
-                    !loading &&
-                    !(currentUtilizedAmount > (allocation?.amount || 0))
-                  )
-                    e.target.style.opacity = 0.93;
-                }}
-                onMouseLeave={(e) => {
-                  if (
-                    !loading &&
-                    !(currentUtilizedAmount > (allocation?.amount || 0))
-                  )
-                    e.target.style.opacity = 1;
-                }}
+                disabled={
+                  loading || currentUtilizedAmount > (allocation?.amount || 0)
+                }
+                className="uum-btn-submit"
               >
                 {loading ? (
                   <>
-                    <span
-                      style={{
-                        width: 14,
-                        height: 14,
-                        border: "2px solid #fff",
-                        borderTop: "2px solid #E01950",
-                        borderRadius: "50%",
-                        animation: "spin 0.7s linear infinite",
-                        display: "inline-block",
-                        marginRight: 6,
-                      }}
-                    />
+                    <span className="uum-spinner" />
                     Updating...
-                    <style>{`
-                      @keyframes spin {
-                        0% { transform: rotate(0deg);}
-                        100% { transform: rotate(360deg);}
-                      }
-                    `}</style>
                   </>
                 ) : (
                   <>

@@ -1,0 +1,273 @@
+/* ==================== BACKDROP ==================== */
+.ppm-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(39, 35, 92, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1040;
+  }
+  
+  /* ==================== MODAL CONTAINER ==================== */
+  .ppm-modal-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 95%;
+    max-width: 500px;
+    z-index: 1050;
+  }
+  
+  /* ==================== MODAL DIALOG ==================== */
+  .ppm-modal-dialog {
+    border-radius: 0.5rem;
+    background: #fff;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
+    overflow: hidden;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* ==================== HEADER ==================== */
+  .ppm-modal-header {
+    background: #27235c;
+    color: #fff;
+    padding: 13px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 0.5rem 0.5rem 0 0;
+  }
+  
+  .ppm-header-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  
+  .ppm-close-button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .ppm-close-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  
+  .ppm-close-button:hover:not(:disabled) {
+    opacity: 0.8;
+  }
+  
+  /* ==================== BODY ==================== */
+  .ppm-modal-body {
+    padding: 20px;
+    background: #fff;
+    text-align: left;
+  }
+  
+  /* ==================== MESSAGES ==================== */
+  .ppm-main-message {
+    font-size: 14px;
+    color: #334155;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  
+  .ppm-info-message {
+    font-size: 13px;
+    color: #475569;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+  
+  /* ==================== POLICY INFO BOX ==================== */
+  .ppm-policy-info-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .ppm-policy-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .ppm-policy-name {
+    font-size: 15px;
+    color: #1e293b;
+    font-weight: 600;
+  }
+  
+  .ppm-policy-category {
+    font-size: 13px;
+    color: #64748b;
+  }
+  
+  .ppm-category-icon {
+    margin-right: 6px;
+  }
+  
+  .ppm-policy-description {
+    font-size: 13px;
+    color: #475569;
+    margin-top: 4px;
+  }
+  
+  /* ==================== SUCCESS INFO BOX ==================== */
+  .ppm-success-info {
+    display: flex;
+    align-items: flex-start;
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+    border: 2px solid #10b981;
+    color: #166534;
+    border-radius: 6px;
+    font-size: 12px;
+    padding: 10px 12px;
+    gap: 8px;
+    font-weight: 500;
+  }
+  
+  .ppm-success-icon {
+    font-size: 16px;
+    margin-top: 2px;
+    color: #10b981;
+  }
+  
+  .ppm-success-note-label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+  
+  /* ==================== FOOTER ==================== */
+  .ppm-modal-footer {
+    padding: 10px 15px;
+    border-top: 1px solid #e2e8f0;
+    background: #fff;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+  }
+  
+  /* ==================== BUTTONS ==================== */
+  .ppm-btn-cancel {
+    background: #6c757d;
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 7px 12px;
+    font-size: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+  
+  .ppm-btn-cancel:hover:not(:disabled) {
+    background: #5a6268;
+  }
+  
+  .ppm-btn-cancel:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  
+  .ppm-btn-publish {
+    background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 7px 12px;
+    font-size: 12px;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(151, 36, 126, 0.25);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 120px;
+    justify-content: center;
+  }
+  
+  .ppm-btn-publish:hover:not(:disabled) {
+    opacity: 0.93;
+  }
+  
+  .ppm-btn-publish:disabled {
+    cursor: not-allowed;
+    opacity: 0.85;
+  }
+  
+  /* ==================== SPINNER ==================== */
+  .ppm-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #fff;
+    border-top: 2px solid #e01950;
+    border-radius: 50%;
+    animation: ppm-spin 0.7s linear infinite;
+    display: inline-block;
+    margin-right: 6px;
+  }
+  
+  @keyframes ppm-spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* ==================== RESPONSIVE ==================== */
+  @media (max-width: 768px) {
+    .ppm-modal-container {
+      width: 90%;
+    }
+  
+    .ppm-modal-body {
+      padding: 16px;
+    }
+  
+    .ppm-policy-info-box {
+      padding: 12px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .ppm-modal-footer {
+      flex-direction: column;
+    }
+  
+    .ppm-btn-cancel,
+    .ppm-btn-publish {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  

@@ -1,4 +1,4 @@
-/* Career Goals - Complete Stylesheet */
+/* Career Goals - Complete Stylesheet with Responsive Table Fixes */
 
 .cg-root {
   padding: 20px 24px 64px 24px;
@@ -29,7 +29,9 @@
   margin: 0;
 }
 
-/* SUMMARY CARDS */
+/*  
+   SUMMARY CARDS
+*/
 .cg-summary-cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -126,7 +128,9 @@
   line-height: 1;
 }
 
-/* FILTER SECTION */
+/*  
+   FILTER SECTION
+*/
 .cag-filter-section {
   padding: 1rem 1.5rem;
   background: #ffffff;
@@ -173,7 +177,7 @@
   align-items: center;
   justify-content: center;
   padding-left: 0.75rem;
-  padding-right: 0.5rem;
+  padding-right: 0.50rem;
   height: 100%;
   color: #a0aec0;
   background: transparent !important;
@@ -220,35 +224,13 @@
 }
 
 .cg-search-btn:hover {
-  background: #1f1c4b;
-}
-
-/* Old search input class (kept for safety) */
-.cg-filter-search {
-  width: 100%;
-  padding: 0.5rem 0.75rem 0.5rem 2.5rem;
-  border: 1px solid #ced4da;
-  border-radius: 8px;
-  font-size: 14px;
-  background: #ffffff;
-  color: #212529;
-  transition: all 0.2s ease;
-}
-
-.cg-filter-search::placeholder {
-  color: #a0aec0;
-}
-
-.cg-filter-search:focus {
-  outline: none;
-  border-color: #27235c;
-  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+  background: #1f1c4b !important;
 }
 
 /* Base select style (still used for width/height) */
 .cg-filter-select {
-  min-width: 160px;
-  max-width: 180px;
+  min-width: 140px;
+  max-width: 160px;
   padding: 0.5rem 0.75rem;
   border: 1px solid #ced4da;
   border-radius: 4px;
@@ -393,7 +375,9 @@
   background: #1a1842;
 }
 
-/* ANALYTICS CARD */
+/*  
+   ANALYTICS CARD
+*/
 .cg-analytics-card {
   margin-bottom: 1rem;
   border-radius: 12px;
@@ -410,30 +394,44 @@
   align-items: center;
 }
 
-/* TABLE */
+/*  
+   TABLE - OPTIMIZED FOR FIT
+*/
 .cg-table-container {
   background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
   border: 1px solid #e5e7eb;
-  overflow: hidden;
+  overflow-x: auto;
   margin-bottom: 1.25rem;
 }
 
 .cg-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9375rem;
+  font-size: 0.8125rem;
+  table-layout: fixed;
+  min-width: 100%;
 }
+
+/* Specific column widths for better control */
+.cg-table thead th:nth-child(1) { width: 40px; }
+.cg-table thead th:nth-child(2) { width: 95px; }
+.cg-table thead th:nth-child(3) { width: 140px; }
+.cg-table thead th:nth-child(4) { width: 130px; }
+.cg-table thead th:nth-child(5) { width: 190px; }
+.cg-table thead th:nth-child(6) { width: 110px; }
+.cg-table thead th:nth-child(7) { width: 180px; }
+.cg-table thead th:nth-child(8) { width: 90px; }
 
 .cg-table thead th {
   background: #27235c;
   color: #ffffff;
   font-weight: 600;
-  font-size: 0.875rem;
-  letter-spacing: 0.05em;
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
-  padding: 1rem 1.25rem;
+  padding: 0.65rem 0.75rem;
   border-bottom: 3px solid #1a1842;
   white-space: nowrap;
   text-align: left;
@@ -441,12 +439,15 @@
 }
 
 .cg-table tbody td {
-  padding: 1rem 1.25rem;
+  padding: 0.65rem 0.75rem;
   border-bottom: 1px solid #e5e7eb;
-  font-size: 14px;
+  font-size: 0.8125rem;
   color: #334155;
   vertical-align: middle;
   text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cg-table tbody tr:last-child td {
@@ -457,8 +458,16 @@
   background: rgba(39, 35, 92, 0.03);
 }
 
+/* Allow wrapping for specific columns */
+.cg-table tbody td:nth-child(3),
+.cg-table tbody td:nth-child(7) {
+  white-space: normal;
+  word-wrap: break-word;
+  line-height: 1.4;
+}
+
 .cg-text-center {
-  text-align: center;
+  text-align: center !important;
 }
 
 .cg-actions-header {
@@ -466,17 +475,20 @@
 }
 
 .cg-email-cell {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: #64748b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* Days Badge */
+/* Days Badge - More compact */
 .cg-days-badge {
   display: inline-flex;
   align-items: center;
-  padding: 0.375rem 0.875rem;
+  padding: 0.25rem 0.5rem;
   border-radius: 50px;
-  font-size: 0.8125rem;
+  font-size: 0.7rem;
   font-weight: 600;
   border: 1px solid;
 }
@@ -499,25 +511,25 @@
   border-color: rgba(59, 130, 246, 0.3);
 }
 
-/* Action Buttons */
+/* Action Buttons - More compact */
 .action-buttons {
   display: flex;
-  justify-content: flex-start;
-  gap: 0.5rem;
+  justify-content: center;
+  gap: 0.35rem;
 }
 
 .action-btn {
-  width: 36px;
-  height: 36px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
+  border-radius: 6px;
   border: 1px solid;
   background: transparent;
   cursor: pointer;
   transition: all 0.12s ease;
-  font-size: 0.9375rem;
+  font-size: 0.8125rem;
 }
 
 .action-btn-edit {
@@ -561,7 +573,9 @@
   font-size: 1rem;
 }
 
-/* PAGINATION */
+/*  
+   PAGINATION
+*/
 .pagination-container {
   display: flex;
   justify-content: space-between;
@@ -653,7 +667,17 @@
   pointer-events: none;
 }
 
-/* RESPONSIVE DESIGN */
+/*  
+   RESPONSIVE DESIGN
+*/
+@media (max-width: 1400px) {
+  .cg-table thead th:nth-child(2) { width: 85px; }
+  .cg-table thead th:nth-child(3) { width: 130px; }
+  .cg-table thead th:nth-child(4) { width: 120px; }
+  .cg-table thead th:nth-child(5) { width: 170px; }
+  .cg-table thead th:nth-child(7) { width: 160px; }
+}
+
 @media (max-width: 1200px) {
   .cg-summary-cards {
     grid-template-columns: repeat(2, 1fr);
@@ -661,6 +685,14 @@
 
   .cg-filter-row-single {
     flex-wrap: wrap;
+  }
+  
+  .cg-table-container {
+    overflow-x: auto;
+  }
+  
+  .cg-table {
+    min-width: 1000px;
   }
 }
 
@@ -696,12 +728,8 @@
     justify-content: center;
   }
 
-  .cg-table-container {
-    overflow-x: auto;
-  }
-
   .cg-table {
-    min-width: 1200px;
+    min-width: 900px;
   }
 
   .pagination-container {
@@ -736,12 +764,12 @@
   }
 
   .cg-table {
-    min-width: 900px;
+    min-width: 800px;
   }
 
   .action-btn {
-    width: 32px;
-    height: 32px;
-    font-size: 0.875rem;
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
   }
 }

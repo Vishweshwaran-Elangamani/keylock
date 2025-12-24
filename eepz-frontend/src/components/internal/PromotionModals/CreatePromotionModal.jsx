@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import promotionService from "../../../services/internal/promotionService";
 import internalOpportunityService from "../../../services/internal/internalOpportunityService";
 import { toast } from "sonner";
-import "../../../styles/internal/NominationModal.css";
+import "../../../styles/internal/CreatePromotionModal.css";
 
 const CreatePromotionModal = ({
   show,
@@ -174,201 +174,210 @@ const CreatePromotionModal = ({
 
   return (
     <>
-      <div className="modal-backdrop-custom"></div>
-      <div className="modal-wrapper-custom">
-        <div className="modal-dialog-custom modal-dialog-large">
-          <div className="modal-content-custom">
-            <div className="modal-header-custom">
-              <h5 className="modal-title-custom">
-                <i className="bi bi-arrow-up-circle"></i>
-                Create Promotion
-              </h5>
+      <div className="cpm-backdrop" onClick={onHide} />
+
+      <div className="cpm-modal-wrapper">
+        <div className="cpm-modal-dialog">
+          {/* Modal Header */}
+          <div className="cpm-modal-header">
+            <h5 className="cpm-header-title">
+              <i className="bi bi-arrow-up-circle"></i>
+              Create Promotion
+            </h5>
+            <button
+              type="button"
+              className="cpm-close-button"
+              onClick={onHide}
+              disabled={loading}
+            >
+              <i className="bi bi-x-lg"></i>
+            </button>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="cpm-form">
+            {/* Modal Body */}
+            <div className="cpm-modal-body">
+              <div className="cpm-form-grid">
+                {/* Select Approved Nomination - Full Width */}
+                <div className="cpm-form-group full-width">
+                  <label className="cpm-form-label">
+                    Select Approved Nomination{" "}
+                    <span className="cpm-required-asterisk">*</span>
+                  </label>
+                  <select
+                    name="nominationId"
+                    className={`cpm-form-select ${
+                      errors.nominationId ? "is-invalid" : ""
+                    }`}
+                    value={formData.nominationId}
+                    onChange={handleNominationChange}
+                  >
+                    <option value="">-- Choose a Nomination --</option>
+                    {approvedNominations.map((nom) => (
+                      <option key={nom.nominationId} value={nom.nominationId}>
+                        {nom.nomineeName} - {nom.opportunityName}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.nominationId && (
+                    <div className="cpm-form-error">{errors.nominationId}</div>
+                  )}
+                </div>
+
+                {/* Info Section - Conditional */}
+                {selectedNomination && (
+                  <div className="cpm-info-section">
+                    <p>
+                      <strong>Nominee:</strong> {selectedNomination.nomineeName}
+                    </p>
+                    <p>
+                      <strong>Opportunity:</strong>{" "}
+                      {selectedNomination.opportunityName}
+                    </p>
+                  </div>
+                )}
+
+                {/* Department - Full Width */}
+                <div className="cpm-form-group full-width">
+                  <label className="cpm-form-label">
+                    Department <span className="cpm-required-asterisk">*</span>
+                  </label>
+                  <select
+                    name="departmentId"
+                    className={`cpm-form-select ${
+                      errors.departmentId ? "is-invalid" : ""
+                    }`}
+                    value={formData.departmentId}
+                    onChange={handleChange}
+                  >
+                    <option value="">-- Select Department --</option>
+                    {departments.map((dept) => (
+                      <option key={dept.departmentId} value={dept.departmentId}>
+                        {dept.departmentName}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.departmentId && (
+                    <div className="cpm-form-error">{errors.departmentId}</div>
+                  )}
+                </div>
+
+                {/* Current Role */}
+                <div className="cpm-form-group">
+                  <label className="cpm-form-label">
+                    Current Role{" "}
+                    <span className="cpm-required-asterisk">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="oldRole"
+                    className={`cpm-form-input ${
+                      errors.oldRole ? "is-invalid" : ""
+                    }`}
+                    placeholder="Enter current role"
+                    value={formData.oldRole}
+                    onChange={handleChange}
+                  />
+                  {errors.oldRole && (
+                    <div className="cpm-form-error">{errors.oldRole}</div>
+                  )}
+                </div>
+
+                {/* New Role */}
+                <div className="cpm-form-group">
+                  <label className="cpm-form-label">
+                    New Role <span className="cpm-required-asterisk">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="newRole"
+                    className={`cpm-form-input ${
+                      errors.newRole ? "is-invalid" : ""
+                    }`}
+                    placeholder="Enter new role"
+                    value={formData.newRole}
+                    onChange={handleChange}
+                  />
+                  {errors.newRole && (
+                    <div className="cpm-form-error">{errors.newRole}</div>
+                  )}
+                </div>
+
+                {/* Promotion Date - Full Width */}
+                <div className="cpm-form-group full-width">
+                  <label className="cpm-form-label">
+                    Promotion Date{" "}
+                    <span className="cpm-required-asterisk">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    name="promotionDate"
+                    className={`cpm-form-input ${
+                      errors.promotionDate ? "is-invalid" : ""
+                    }`}
+                    value={formData.promotionDate}
+                    onChange={handleChange}
+                  />
+                  {errors.promotionDate && (
+                    <div className="cpm-form-error">{errors.promotionDate}</div>
+                  )}
+                </div>
+
+                {/* Justification - Full Width */}
+                <div className="cpm-form-group full-width">
+                  <label className="cpm-form-label">
+                    Justification{" "}
+                    <span className="cpm-required-asterisk">*</span>
+                  </label>
+                  <textarea
+                    name="justification"
+                    className={`cpm-form-textarea ${
+                      errors.justification ? "is-invalid" : ""
+                    }`}
+                    placeholder="Enter justification for this promotion..."
+                    value={formData.justification}
+                    onChange={handleChange}
+                    rows={4}
+                    maxLength={500}
+                  />
+                  {errors.justification && (
+                    <div className="cpm-form-error">{errors.justification}</div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="cpm-modal-footer">
               <button
                 type="button"
-                className="modal-close-btn"
+                className="cpm-btn-cancel"
                 onClick={onHide}
                 disabled={loading}
               >
-                <i className="bi bi-x-lg"></i>
+                <i className="bi bi-x-circle"></i>
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="cpm-btn-submit"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <span className="cpm-spinner"></span>
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <i className="bi bi-check-circle"></i>
+                    Create Promotion
+                  </>
+                )}
               </button>
             </div>
-
-            <form onSubmit={handleSubmit}>
-              <div className="modal-body-custom">
-                <div className="form-grid">
-                  <div className="form-group-custom full-width">
-                    <label className="form-label-custom">
-                      Select Approved Nomination{" "}
-                      <span className="required-mark">*</span>
-                    </label>
-                    <select
-                      name="nominationId"
-                      className={`form-select-custom ${
-                        errors.nominationId ? "is-invalid" : ""
-                      }`}
-                      value={formData.nominationId}
-                      onChange={handleNominationChange}
-                    >
-                      <option value="">-- Choose a Nomination --</option>
-                      {approvedNominations.map((nom) => (
-                        <option key={nom.nominationId} value={nom.nominationId}>
-                          {nom.nomineeName} - {nom.opportunityName}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.nominationId && (
-                      <div className="error-message">{errors.nominationId}</div>
-                    )}
-                  </div>
-
-                  {selectedNomination && (
-                    <div className="info-section">
-                      <p>
-                        <strong>Nominee:</strong>{" "}
-                        {selectedNomination.nomineeName}
-                      </p>
-                      <p>
-                        <strong>Opportunity:</strong>{" "}
-                        {selectedNomination.opportunityName}
-                      </p>
-                    </div>
-                  )}
-
-                  <div className="form-group-custom full-width">
-                    <label className="form-label-custom">
-                      Department <span className="required-mark">*</span>
-                    </label>
-                    <select
-                      name="departmentId"
-                      className={`form-select-custom ${
-                        errors.departmentId ? "is-invalid" : ""
-                      }`}
-                      value={formData.departmentId}
-                      onChange={handleChange}
-                    >
-                      <option value="">-- Select Department --</option>
-                      {departments.map((dept) => (
-                        <option
-                          key={dept.departmentId}
-                          value={dept.departmentId}
-                        >
-                          {dept.departmentName}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.departmentId && (
-                      <div className="error-message">{errors.departmentId}</div>
-                    )}
-                  </div>
-
-                  <div className="form-group-custom">
-                    <label className="form-label-custom">
-                      Current Role <span className="required-mark">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="oldRole"
-                      className={`form-input-custom ${
-                        errors.oldRole ? "is-invalid" : ""
-                      }`}
-                      placeholder="Enter current role"
-                      value={formData.oldRole}
-                      onChange={handleChange}
-                    />
-                    {errors.oldRole && (
-                      <div className="error-message">{errors.oldRole}</div>
-                    )}
-                  </div>
-
-                  <div className="form-group-custom">
-                    <label className="form-label-custom">
-                      New Role <span className="required-mark">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="newRole"
-                      className={`form-input-custom ${
-                        errors.newRole ? "is-invalid" : ""
-                      }`}
-                      placeholder="Enter new role"
-                      value={formData.newRole}
-                      onChange={handleChange}
-                    />
-                    {errors.newRole && (
-                      <div className="error-message">{errors.newRole}</div>
-                    )}
-                  </div>
-
-                  <div className="form-group-custom full-width">
-                    <label className="form-label-custom">
-                      Promotion Date <span className="required-mark">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      name="promotionDate"
-                      className={`form-input-custom ${
-                        errors.promotionDate ? "is-invalid" : ""
-                      }`}
-                      value={formData.promotionDate}
-                      onChange={handleChange}
-                    />
-                    {errors.promotionDate && (
-                      <div className="error-message">
-                        {errors.promotionDate}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="form-group-custom full-width">
-                    <label className="form-label-custom">
-                      Justification <span className="required-mark">*</span>
-                    </label>
-                    <textarea
-                      name="justification"
-                      className={`form-textarea-custom ${
-                        errors.justification ? "is-invalid" : ""
-                      }`}
-                      placeholder="Enter justification for this promotion..."
-                      value={formData.justification}
-                      onChange={handleChange}
-                      rows={4}
-                      maxLength={500}
-                    />
-                    {errors.justification && (
-                      <div className="error-message">
-                        {errors.justification}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="modal-footer-custom">
-                <button
-                  type="button"
-                  className="btn-cancel"
-                  onClick={onHide}
-                  disabled={loading}
-                >
-                  <i className="bi bi-x-circle"></i>
-                  Cancel
-                </button>
-                <button type="submit" className="btn-submit" disabled={loading}>
-                  {loading ? (
-                    <>
-                      <span className="spinner-custom"></span>
-                      Creating...
-                    </>
-                  ) : (
-                    <>
-                      <i className="bi bi-check-circle"></i>
-                      Create Promotion
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
+          </form>
         </div>
       </div>
     </>

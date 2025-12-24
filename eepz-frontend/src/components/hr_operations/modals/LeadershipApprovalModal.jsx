@@ -215,7 +215,7 @@ const LeadershipApproval = () => {
                   <td>{p.oldRole || "N/A"}</td>
 
                   <td>
-                    <strong style={{ color: "#10b981" }}>
+                    <strong className="leadership-new-role">
                       {p.newRole || "N/A"}
                     </strong>
                   </td>

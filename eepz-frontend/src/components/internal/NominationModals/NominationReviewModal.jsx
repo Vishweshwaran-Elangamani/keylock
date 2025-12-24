@@ -1,6 +1,7 @@
 import { useState } from "react";
 import nominationService from "../../../services/internal/nominationService";
 import { toast } from "sonner";
+import "../../../styles/internal/NominationReviewModal.css";
 
 const NominationReviewModal = ({
   show,
@@ -132,237 +133,69 @@ const NominationReviewModal = ({
 
   return (
     <>
-      {/* Custom Backdrop with Blur Effect */}
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(39, 35, 92, 0.4)",
-          backdropFilter: "blur(8px)",
-          WebkitBackdropFilter: "blur(8px)",
-          zIndex: 1040,
-          transition: "all 0.3s ease",
-        }}
-        onClick={onHide}
-      />
+      <div className="nrm-backdrop" onClick={onHide} />
 
-      {/* Modal Wrapper */}
-      <div
-        style={{
-          position: "fixed",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: "95%",
-          maxWidth: "800px",
-          maxHeight: "75vh",
-          zIndex: 1050,
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <div
-          style={{
-            borderRadius: "0.5rem",
-            background: "#fff",
-            boxShadow: "0 8px 28px rgba(0,0,0,0.22)",
-            overflow: "hidden",
-            width: "100%",
-            maxHeight: "85vh",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
+      <div className="nrm-modal-wrapper">
+        <div className="nrm-modal-dialog">
           {/* HEADER - Fixed */}
-          <div
-            style={{
-              background: "#27235C",
-              color: "#fff",
-              padding: "13px 15px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              fontSize: "15px",
-              fontWeight: 600,
-              borderRadius: "0.5rem 0.5rem 0 0",
-              flexShrink: 0,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                color: "#fff",
-                fontSize: 15,
-                fontWeight: 600,
-              }}
-            >
+          <div className="nrm-modal-header">
+            <div className="nrm-header-title">
               <i className="bi bi-clipboard-check"></i>
-              Review Nomination - {isDepartmentHead ? "Department Head" : "Manager"}
+              Review Nomination -{" "}
+              {isDepartmentHead ? "Department Head" : "Manager"}
             </div>
             <button
               type="button"
               onClick={onHide}
               disabled={loading}
               aria-label="Close"
-              style={{
-                background: "none",
-                border: "none",
-                color: "#fff",
-                fontSize: 18,
-                cursor: loading ? "not-allowed" : "pointer",
-                opacity: loading ? 0.7 : 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              className="nrm-close-button"
             >
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
 
           {/* BODY - Scrollable */}
-          <form
-            onSubmit={handleSubmit}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              flex: 1,
-              overflow: "hidden",
-            }}
-          >
-            <div
-              style={{
-                padding: "20px",
-                background: "#fff",
-                textAlign: "left",
-                overflowY: "auto",
-                flex: 1,
-              }}
-            >
+          <form onSubmit={handleSubmit} className="nrm-form">
+            <div className="nrm-modal-body">
               {/* Info Section - Rearranged Layout */}
-              <div
-                style={{
-                  border: "1px solid #e5e7eb",
-                  borderRadius: "8px",
-                  background: "#f9fafb",
-                  padding: "16px",
-                  marginBottom: "20px",
-                }}
-              >
+              <div className="nrm-info-section">
                 <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: "16px",
-                    marginBottom: nomination.justification ? "16px" : 0,
-                  }}
+                  className={`nrm-info-grid ${
+                    !nomination.justification ? "no-justification" : ""
+                  }`}
                 >
                   {/* LEFT COLUMN */}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                  <div className="nrm-info-column">
                     {/* Opportunity */}
-                    <div style={{ textAlign: "left" }}>
-                      <label
-                        style={{
-                          fontSize: "12px",
-                          color: "#6c757d",
-                          fontWeight: 600,
-                          display: "block",
-                          marginBottom: "4px",
-                        }}
-                      >
-                        Opportunity:
-                      </label>
-                      <p
-                        style={{
-                          margin: 0,
-                          fontSize: "14px",
-                          color: "#334155",
-                          fontWeight: 600,
-                        }}
-                      >
+                    <div className="nrm-info-item">
+                      <label className="nrm-info-label">Opportunity:</label>
+                      <p className="nrm-info-value">
                         {nomination.opportunityName}
                       </p>
                     </div>
 
                     {/* Nominated By */}
-                    <div style={{ textAlign: "left" }}>
-                      <label
-                        style={{
-                          fontSize: "12px",
-                          color: "#6c757d",
-                          fontWeight: 600,
-                          display: "block",
-                          marginBottom: "4px",
-                        }}
-                      >
-                        Nominated By:
-                      </label>
-                      <p
-                        style={{
-                          margin: 0,
-                          fontSize: "14px",
-                          color: "#334155",
-                          fontWeight: 600,
-                        }}
-                      >
+                    <div className="nrm-info-item">
+                      <label className="nrm-info-label">Nominated By:</label>
+                      <p className="nrm-info-value">
                         {nomination.nominatedByName}
                       </p>
                     </div>
                   </div>
 
                   {/* RIGHT COLUMN */}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                  <div className="nrm-info-column">
                     {/* Nominee */}
-                    <div style={{ textAlign: "left" }}>
-                      <label
-                        style={{
-                          fontSize: "12px",
-                          color: "#6c757d",
-                          fontWeight: 600,
-                          display: "block",
-                          marginBottom: "4px",
-                        }}
-                      >
-                        Nominee:
-                      </label>
-                      <p
-                        style={{
-                          margin: 0,
-                          fontSize: "14px",
-                          color: "#334155",
-                          fontWeight: 600,
-                        }}
-                      >
-                        {nomination.nomineeName}
-                      </p>
+                    <div className="nrm-info-item">
+                      <label className="nrm-info-label">Nominee:</label>
+                      <p className="nrm-info-value">{nomination.nomineeName}</p>
                     </div>
 
                     {/* Type */}
-                    <div style={{ textAlign: "left" }}>
-                      <label
-                        style={{
-                          fontSize: "12px",
-                          color: "#6c757d",
-                          fontWeight: 600,
-                          display: "block",
-                          marginBottom: "4px",
-                        }}
-                      >
-                        Type:
-                      </label>
-                      <p
-                        style={{
-                          margin: 0,
-                          fontSize: "14px",
-                          color: "#334155",
-                          fontWeight: 600,
-                        }}
-                      >
+                    <div className="nrm-info-item">
+                      <label className="nrm-info-label">Type:</label>
+                      <p className="nrm-info-value">
                         {nomination.nominationType}
                       </p>
                     </div>
@@ -371,76 +204,34 @@ const NominationReviewModal = ({
 
                 {/* Justification - Full Width */}
                 {nomination.justification && (
-                  <div style={{ textAlign: "left" }}>
-                    <label
-                      style={{
-                        fontSize: "12px",
-                        color: "#6c757d",
-                        fontWeight: 600,
-                        display: "block",
-                        marginBottom: "6px",
-                      }}
-                    >
-                      Justification:
-                    </label>
-                    <p
-                      style={{
-                        margin: 0,
-                        padding: "8px 12px",
-                        backgroundColor: "#ffffff",
-                        borderRadius: "6px",
-                        border: "1px solid #e5e7eb",
-                        lineHeight: "1.5",
-                        fontSize: "13px",
-                        color: "#374151",
-                        textAlign: "center",
-                      }}
-                    >
+                  <div className="nrm-justification">
+                    <label className="nrm-info-label">Justification:</label>
+                    <p className="nrm-justification-text">
                       {nomination.justification}
                     </p>
                   </div>
                 )}
               </div>
 
-              {/* Decision Field with Blue Color */}
-              <div style={{ marginBottom: "16px" }}>
-                <label
-                  style={{
-                    fontWeight: 600,
-                    fontSize: 13,
-                    color: "#334155",
-                    marginBottom: 6,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 4,
-                  }}
-                >
-                  Decision <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+              {/* Decision Field */}
+              <div className="nrm-form-group">
+                <label className="nrm-form-label">
+                  Decision <span className="nrm-required-asterisk">*</span>
                 </label>
                 <select
                   name="action"
                   value={formData.action}
                   onChange={handleChange}
-                  style={{
-                    width: "100%",
-                    border: errors.action ? "1px solid #ef4444" : "1px solid #cbd5e1",
-                    borderRadius: 6,
-                    padding: "8px 10px",
-                    fontSize: 13,
-                    background: "#fff",
-                    color: formData.action ? "#27235C" : "#6c757d",
-                    fontWeight: formData.action ? 600 : 400,
-                    cursor: "pointer",
-                  }}
+                  className={`nrm-form-select ${
+                    formData.action ? "has-value" : "placeholder"
+                  } ${errors.action ? "error" : ""}`}
                 >
                   <option value="">-- Select Action --</option>
                   <option value="Approved">Approve</option>
                   <option value="Rejected">Reject</option>
                 </select>
                 {errors.action && (
-                  <div style={{ color: "#ef4444", fontSize: 11, marginTop: 4 }}>
-                    {errors.action}
-                  </div>
+                  <div className="nrm-form-error">{errors.action}</div>
                 )}
               </div>
 
@@ -448,29 +239,12 @@ const NominationReviewModal = ({
               {isDepartmentHead && formData.action === "Approved" && (
                 <>
                   {/* Merit and Diversity Scores Row */}
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr 1fr",
-                      gap: 20,
-                      marginBottom: 16,
-                    }}
-                  >
+                  <div className="nrm-two-column-grid">
                     {/* Merit Score */}
-                    <div>
-                      <label
-                        style={{
-                          fontWeight: 600,
-                          fontSize: 13,
-                          color: "#334155",
-                          marginBottom: 6,
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 4,
-                        }}
-                      >
+                    <div className="nrm-form-group">
+                      <label className="nrm-form-label">
                         Merit Score (0-100){" "}
-                        <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                        <span className="nrm-required-asterisk">*</span>
                       </label>
                       <input
                         type="number"
@@ -481,40 +255,22 @@ const NominationReviewModal = ({
                         min="0"
                         max="100"
                         step="0.01"
-                        style={{
-                          width: "100%",
-                          border: errors.meritScore
-                            ? "1px solid #ef4444"
-                            : "1px solid #cbd5e1",
-                          borderRadius: 6,
-                          padding: "8px 10px",
-                          fontSize: 13,
-                          background: "#fff",
-                          color: "#22223b",
-                        }}
+                        className={`nrm-form-input ${
+                          errors.meritScore ? "error" : ""
+                        }`}
                       />
                       {errors.meritScore && (
-                        <div style={{ color: "#ef4444", fontSize: 11, marginTop: 4 }}>
+                        <div className="nrm-form-error">
                           {errors.meritScore}
                         </div>
                       )}
                     </div>
 
                     {/* Diversity Score */}
-                    <div>
-                      <label
-                        style={{
-                          fontWeight: 600,
-                          fontSize: 13,
-                          color: "#334155",
-                          marginBottom: 6,
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 4,
-                        }}
-                      >
+                    <div className="nrm-form-group">
+                      <label className="nrm-form-label">
                         Diversity Score (0-100){" "}
-                        <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                        <span className="nrm-required-asterisk">*</span>
                       </label>
                       <input
                         type="number"
@@ -525,20 +281,12 @@ const NominationReviewModal = ({
                         min="0"
                         max="100"
                         step="0.01"
-                        style={{
-                          width: "100%",
-                          border: errors.diversityScore
-                            ? "1px solid #ef4444"
-                            : "1px solid #cbd5e1",
-                          borderRadius: 6,
-                          padding: "8px 10px",
-                          fontSize: 13,
-                          background: "#fff",
-                          color: "#22223b",
-                        }}
+                        className={`nrm-form-input ${
+                          errors.diversityScore ? "error" : ""
+                        }`}
                       />
                       {errors.diversityScore && (
-                        <div style={{ color: "#ef4444", fontSize: 11, marginTop: 4 }}>
+                        <div className="nrm-form-error">
                           {errors.diversityScore}
                         </div>
                       )}
@@ -546,99 +294,50 @@ const NominationReviewModal = ({
                   </div>
 
                   {/* Conflict of Interest */}
-                  <div style={{ marginBottom: 16 }}>
-                    <label
-                      style={{
-                        fontWeight: 600,
-                        fontSize: 13,
-                        color: "#334155",
-                        marginBottom: 6,
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 4,
-                      }}
-                    >
+                  <div className="nrm-form-group">
+                    <label className="nrm-form-label">
                       Conflict of Interest{" "}
-                      <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                      <span className="nrm-required-asterisk">*</span>
                     </label>
                     <select
                       name="conflictOfInterest"
                       value={formData.conflictOfInterest}
                       onChange={handleChange}
-                      style={{
-                        width: "100%",
-                        border: errors.conflictOfInterest
-                          ? "1px solid #ef4444"
-                          : "1px solid #cbd5e1",
-                        borderRadius: 6,
-                        padding: "8px 10px",
-                        fontSize: 13,
-                        background: "#fff",
-                        color: formData.conflictOfInterest ? "#27235C" : "#6c757d",
-                        fontWeight: formData.conflictOfInterest ? 600 : 400,
-                        cursor: "pointer",
-                      }}
+                      className={`nrm-form-select ${
+                        formData.conflictOfInterest
+                          ? "has-value"
+                          : "placeholder"
+                      } ${errors.conflictOfInterest ? "error" : ""}`}
                     >
                       <option value="">-- Select --</option>
                       <option value="false">No</option>
                       <option value="true">Yes</option>
                     </select>
                     {errors.conflictOfInterest && (
-                      <div style={{ color: "#ef4444", fontSize: 11, marginTop: 4 }}>
+                      <div className="nrm-form-error">
                         {errors.conflictOfInterest}
                       </div>
                     )}
                   </div>
 
                   {/* Review Notes */}
-                  <div style={{ marginBottom: 16 }}>
-                    <label
-                      style={{
-                        fontWeight: 600,
-                        fontSize: 13,
-                        color: "#334155",
-                        marginBottom: 6,
-                        display: "block",
-                      }}
-                    >
-                      Review Notes
-                    </label>
+                  <div className="nrm-form-group">
+                    <label className="nrm-form-label block">Review Notes</label>
                     <textarea
                       name="reviewNotes"
                       placeholder="Additional notes about the review..."
                       value={formData.reviewNotes}
                       onChange={handleChange}
                       rows={3}
-                      style={{
-                        width: "100%",
-                        border: "1px solid #cbd5e1",
-                        borderRadius: 6,
-                        padding: "8px 10px",
-                        fontSize: 13,
-                        background: "#fff",
-                        color: "#22223b",
-                        resize: "vertical",
-                        minHeight: 80,
-                        maxHeight: 120,
-                        fontFamily: "inherit",
-                        lineHeight: 1.4,
-                      }}
+                      className="nrm-form-textarea small"
                     />
                   </div>
                 </>
               )}
 
               {/* Remarks */}
-              <div style={{ marginBottom: 16 }}>
-                <label
-                  style={{
-                    fontWeight: 600,
-                    fontSize: 13,
-                    color: "#334155",
-                    marginBottom: 6,
-                    display: "block",
-                  }}
-                >
+              <div className="nrm-form-group">
+                <label className="nrm-form-label block">
                   {formData.action === "Rejected" ? "Rejection " : ""}Remarks
                 </label>
                 <textarea
@@ -647,63 +346,18 @@ const NominationReviewModal = ({
                   value={formData.remarks}
                   onChange={handleChange}
                   rows={4}
-                  style={{
-                    width: "100%",
-                    border: "1px solid #cbd5e1",
-                    borderRadius: 6,
-                    padding: "8px 10px",
-                    fontSize: 13,
-                    background: "#fff",
-                    color: "#22223b",
-                    resize: "vertical",
-                    minHeight: 100,
-                    maxHeight: 150,
-                    fontFamily: "inherit",
-                    lineHeight: 1.4,
-                  }}
+                  className="nrm-form-textarea medium"
                 />
               </div>
             </div>
 
             {/* FOOTER - Fixed */}
-            <div
-              style={{
-                padding: "10px 15px",
-                borderTop: "1px solid #e2e8f0",
-                background: "#fff",
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: 8,
-                borderBottomLeftRadius: "0.5rem",
-                borderBottomRightRadius: "0.5rem",
-                flexShrink: 0,
-              }}
-            >
+            <div className="nrm-modal-footer">
               <button
                 type="button"
                 onClick={onHide}
                 disabled={loading}
-                style={{
-                  background: "#6c757d",
-                  border: "none",
-                  color: "#fff",
-                  fontWeight: 600,
-                  padding: "7px 12px",
-                  fontSize: 12,
-                  borderRadius: 5,
-                  cursor: loading ? "not-allowed" : "pointer",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  opacity: loading ? 0.7 : 1,
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  if (!loading) e.target.style.background = "#5a6268";
-                }}
-                onMouseLeave={(e) => {
-                  if (!loading) e.target.style.background = "#6c757d";
-                }}
+                className="nrm-btn-cancel"
               >
                 <i className="bi bi-x-circle"></i>
                 Cancel
@@ -712,50 +366,12 @@ const NominationReviewModal = ({
               <button
                 type="submit"
                 disabled={loading}
-                style={{
-                  background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                  border: "none",
-                  color: "#fff",
-                  fontWeight: 600,
-                  padding: "7px 12px",
-                  fontSize: 12,
-                  borderRadius: 5,
-                  boxShadow: "0 2px 8px rgba(151,36,126,0.25)",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  cursor: loading ? "not-allowed" : "pointer",
-                  opacity: loading ? 0.85 : 1,
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  if (!loading) e.target.style.opacity = 0.93;
-                }}
-                onMouseLeave={(e) => {
-                  if (!loading) e.target.style.opacity = 1;
-                }}
+                className="nrm-btn-submit"
               >
                 {loading ? (
                   <>
-                    <span
-                      style={{
-                        width: 14,
-                        height: 14,
-                        border: "2px solid #fff",
-                        borderTop: "2px solid #E01950",
-                        borderRadius: "50%",
-                        animation: "spin 0.7s linear infinite",
-                        display: "inline-block",
-                        marginRight: 6,
-                      }}
-                    />
+                    <span className="nrm-spinner" />
                     Submitting...
-                    <style>{`
-                      @keyframes spin {
-                        0% { transform: rotate(0deg);}
-                        100% { transform: rotate(360deg);}
-                      }
-                    `}</style>
                   </>
                 ) : (
                   <>

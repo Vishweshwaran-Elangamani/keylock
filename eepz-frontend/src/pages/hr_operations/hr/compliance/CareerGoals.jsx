@@ -649,7 +649,7 @@ const CareerGoals = () => {
                     <td>{emp.employeeName ?? emp.EmployeeName}</td>
                     <td>{emp.departmentName ?? emp.DepartmentName}</td>
                     <td className="cg-email-cell">{emp.email ?? emp.Email}</td>
-                    <td>
+                    <td className="cg-text-center">
                       <span
                         className={`cg-days-badge ${
                           (emp.daysWithoutGoals ?? emp.DaysWithoutGoals) > 30

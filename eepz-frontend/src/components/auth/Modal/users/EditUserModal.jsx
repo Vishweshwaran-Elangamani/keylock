@@ -21,6 +21,7 @@
 import { useState, useEffect } from "react";
 import userService from "../../../../services/auth/userService";
 import { toast } from "sonner";
+import "../../../../styles/auth/user/EditUserModal.css";
 
 const EditUserModal = ({
   show,
@@ -144,13 +145,15 @@ const EditUserModal = ({
       const today = new Date();
 
       if (confirmDate > today) {
-        newErrors.confirmationDate = "Confirmation date cannot be in the future";
+        newErrors.confirmationDate =
+          "Confirmation date cannot be in the future";
       }
 
       if (user?.joiningDate) {
         const joiningDate = new Date(user.joiningDate);
         if (confirmDate < joiningDate) {
-          newErrors.confirmationDate = "Confirmation date must be after joining date";
+          newErrors.confirmationDate =
+            "Confirmation date must be after joining date";
         }
       }
     }
@@ -202,7 +205,8 @@ const EditUserModal = ({
       const managerId = parseInt(formData.reportingManagerEmployeeId);
 
       if (isNaN(managerId) || managerId < 1) {
-        newErrors.reportingManagerEmployeeId = "Manager ID must be a valid positive number";
+        newErrors.reportingManagerEmployeeId =
+          "Manager ID must be a valid positive number";
       }
     }
 
@@ -274,71 +278,15 @@ const EditUserModal = ({
 
   return (
     <>
-      {/* Blurred Backdrop */}
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(39,35,92,0.4)",
-          backdropFilter: "blur(8px)",
-          WebkitBackdropFilter: "blur(8px)",
-          zIndex: 1040,
-        }}
-        onClick={onHide}
-      />
+      <div className="eum-backdrop" onClick={onHide} />
 
-      {/* Modal Container */}
-      <div
-        style={{
-          position: "fixed",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: "97%",
-          maxWidth: "800px",
-          zIndex: 1050,
-        }}
-      >
-        <div
-          style={{
-            borderRadius: "0.5rem",
-            background: "#fff",
-            boxShadow: "0 8px 28px rgba(0,0,0,0.22)",
-            overflow: "hidden",
-            width: "100%",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
+      <div className="eum-modal-container">
+        <div className="eum-modal-dialog">
           {/* ======================== */}
           {/* MODAL HEADER */}
           {/* ======================== */}
-          <div
-            style={{
-              background: "#27235C",
-              color: "#fff",
-              padding: "13px 15px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              fontSize: "15px",
-              fontWeight: 600,
-              borderRadius: "0.5rem 0.5rem 0 0",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                color: "#fff",
-                fontSize: 15,
-                fontWeight: 600,
-              }}
-            >
+          <div className="eum-modal-header">
+            <div className="eum-header-title">
               <i className="bi bi-pencil-square"></i>
               Edit User - {user?.firstName} {user?.lastName}
             </div>
@@ -347,17 +295,7 @@ const EditUserModal = ({
               onClick={onHide}
               disabled={loading}
               aria-label="Close"
-              style={{
-                background: "none",
-                border: "none",
-                color: "#fff",
-                fontSize: 18,
-                cursor: loading ? "not-allowed" : "pointer",
-                opacity: loading ? 0.7 : 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              className="eum-close-button"
             >
               <i className="bi bi-x-lg"></i>
             </button>
@@ -366,44 +304,22 @@ const EditUserModal = ({
           {/* ======================== */}
           {/* MODAL BODY - FORM */}
           {/* ======================== */}
-          <form onSubmit={handleSubmit} style={{ margin: 0 }}>
-            <div
-              style={{
-                padding: "14px 15px 6px 15px",
-                background: "#fff",
-                textAlign: "left",
-              }}
-            >
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 9 }}>
+          <form onSubmit={handleSubmit} className="eum-form">
+            <div className="eum-modal-body">
+              <div className="eum-form-grid">
                 {/* Employment Type Field (Required) */}
-                <div style={{ flex: 1, minWidth: "47%" }}>
-                  <label
-                    style={{
-                      fontWeight: 600,
-                      fontSize: 13,
-                      color: "#334155",
-                      marginBottom: 2,
-                      display: "block",
-                    }}
-                  >
+                <div className="eum-form-group">
+                  <label className="eum-form-label">
                     Employment Type{" "}
-                    <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                    <span className="eum-required-asterisk">*</span>
                   </label>
                   <select
                     name="employmentType"
                     value={formData.employmentType}
                     onChange={handleChange}
-                    style={{
-                      width: "100%",
-                      border: errors.employmentType
-                        ? "1px solid #dc3545"
-                        : "1px solid #cbd5e1",
-                      borderRadius: 6,
-                      fontSize: 13,
-                      background: "#fff",
-                      color: "#22223b",
-                      padding: "8px 9px",
-                    }}
+                    className={`eum-form-input ${
+                      errors.employmentType ? "error" : ""
+                    }`}
                   >
                     <option value="">Select Employment Type</option>
                     <option value="Permanent">Permanent</option>
@@ -413,108 +329,35 @@ const EditUserModal = ({
                     <option value="Probation">Probation</option>
                   </select>
                   {errors.employmentType && (
-                    <div style={{ color: "#dc3545", fontSize: 11 }}>
+                    <div className="eum-form-error">
                       {errors.employmentType}
                     </div>
                   )}
                 </div>
 
-                {/* Employment Status Field (Required) */}
-                {/*<div style={{ flex: 1, minWidth: "47%" }}>
-                  <label
-                    style={{
-                      fontWeight: 600,
-                      fontSize: 13,
-                      color: "#334155",
-                      marginBottom: 2,
-                      display: "block",
-                    }}
-                  >
-                    Employment Status{" "}
-                    <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
-                  </label>
-                  <select
-                    name="employmentStatus"
-                    value={formData.employmentStatus}
-                    onChange={handleChange}
-                    style={{
-                      width: "100%",
-                      border: errors.employmentStatus
-                        ? "1px solid #dc3545"
-                        : "1px solid #cbd5e1",
-                      borderRadius: 6,
-                      fontSize: 13,
-                      background: "#fff",
-                      color: "#22223b",
-                      padding: "8px 9px",
-                    }}
-                  >
-                    <option value="">Select Status</option>
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                    <option value="OnLeave">On Leave</option>
-                    <option value="Terminated">Terminated</option>
-                  </select>
-                  {errors.employmentStatus && (
-                    <div style={{ color: "#dc3545", fontSize: 11 }}>
-                      {errors.employmentStatus}
-                    </div>
-                  )}
-                </div>*/}
-
                 {/* Exit Date Field (Optional) */}
-                <div style={{ flex: 1, minWidth: "47%" }}>
-                  <label
-                    style={{
-                      fontWeight: 600,
-                      fontSize: 13,
-                      color: "#334155",
-                      marginBottom: 2,
-                      display: "block",
-                    }}
-                  >
-                    Exit Date
-                  </label>
+                <div className="eum-form-group">
+                  <label className="eum-form-label">Exit Date</label>
                   <input
                     type="date"
                     name="exitDate"
                     value={formData.exitDate}
                     onChange={handleChange}
-                    style={{
-                      width: "100%",
-                      border: errors.exitDate
-                        ? "1px solid #dc3545"
-                        : "1px solid #cbd5e1",
-                      borderRadius: 6,
-                      padding: "8px 9px",
-                      fontSize: 13,
-                      background: "#fff",
-                      color: "#22223b",
-                    }}
+                    className={`eum-form-input ${
+                      errors.exitDate ? "error" : ""
+                    }`}
                   />
                   {errors.exitDate && (
-                    <div style={{ color: "#dc3545", fontSize: 11 }}>
-                      {errors.exitDate}
-                    </div>
+                    <div className="eum-form-error">{errors.exitDate}</div>
                   )}
-                  <small style={{ color: "#64748b", fontSize: 11 }}>
+                  <small className="eum-form-hint">
                     Must be after joining/confirmation date
                   </small>
                 </div>
 
                 {/* Work Location Field (Optional) */}
-                <div style={{ flex: 1, minWidth: "47%" }}>
-                  <label
-                    style={{
-                      fontWeight: 600,
-                      fontSize: 13,
-                      color: "#334155",
-                      marginBottom: 2,
-                      display: "block",
-                    }}
-                  >
-                    Work Location
-                  </label>
+                <div className="eum-form-group">
+                  <label className="eum-form-label">Work Location</label>
                   <input
                     type="text"
                     name="workLocation"
@@ -522,57 +365,29 @@ const EditUserModal = ({
                     value={formData.workLocation}
                     onChange={handleChange}
                     maxLength={100}
-                    style={{
-                      width: "100%",
-                      border: errors.workLocation
-                        ? "1px solid #dc3545"
-                        : "1px solid #cbd5e1",
-                      borderRadius: 6,
-                      padding: "8px 9px",
-                      fontSize: 13,
-                      background: "#fff",
-                      color: "#22223b",
-                    }}
+                    className={`eum-form-input ${
+                      errors.workLocation ? "error" : ""
+                    }`}
                   />
                   {errors.workLocation && (
-                    <div style={{ color: "#dc3545", fontSize: 11 }}>
-                      {errors.workLocation}
-                    </div>
+                    <div className="eum-form-error">{errors.workLocation}</div>
                   )}
-                  <small style={{ color: "#64748b", fontSize: 11 }}>
-                    Minimum 2 characters
-                  </small>
+                  <small className="eum-form-hint">Minimum 2 characters</small>
                 </div>
 
                 {/* Employee Type Field (Required) */}
-                <div style={{ flex: 1, minWidth: "47%" }}>
-                  <label
-                    style={{
-                      fontWeight: 600,
-                      fontSize: 13,
-                      color: "#334155",
-                      marginBottom: 2,
-                      display: "block",
-                    }}
-                  >
+                <div className="eum-form-group">
+                  <label className="eum-form-label">
                     Employee Type{" "}
-                    <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                    <span className="eum-required-asterisk">*</span>
                   </label>
                   <select
                     name="employeeType"
                     value={formData.employeeType}
                     onChange={handleChange}
-                    style={{
-                      width: "100%",
-                      border: errors.employeeType
-                        ? "1px solid #dc3545"
-                        : "1px solid #cbd5e1",
-                      borderRadius: 6,
-                      fontSize: 13,
-                      background: "#fff",
-                      color: "#22223b",
-                      padding: "8px 9px",
-                    }}
+                    className={`eum-form-input ${
+                      errors.employeeType ? "error" : ""
+                    }`}
                   >
                     <option value="">Select Employee Type</option>
                     <option value="FullTime">Full Time</option>
@@ -580,25 +395,13 @@ const EditUserModal = ({
                     <option value="Consultant">Consultant</option>
                   </select>
                   {errors.employeeType && (
-                    <div style={{ color: "#dc3545", fontSize: 11 }}>
-                      {errors.employeeType}
-                    </div>
+                    <div className="eum-form-error">{errors.employeeType}</div>
                   )}
                 </div>
 
                 {/* Notice Period Field (Optional) */}
-                <div style={{ flex: 1, minWidth: "47%" }}>
-                  <label
-                    style={{
-                      fontWeight: 600,
-                      fontSize: 13,
-                      color: "#334155",
-                      marginBottom: 2,
-                      display: "block",
-                    }}
-                  >
-                    Notice Period (Days)
-                  </label>
+                <div className="eum-form-group">
+                  <label className="eum-form-label">Notice Period (Days)</label>
                   <input
                     type="number"
                     name="noticePeriodDays"
@@ -607,48 +410,25 @@ const EditUserModal = ({
                     onChange={handleChange}
                     min="0"
                     max="365"
-                    style={{
-                      width: "100%",
-                      border: errors.noticePeriodDays
-                        ? "1px solid #dc3545"
-                        : "1px solid #cbd5e1",
-                      borderRadius: 6,
-                      padding: "8px 9px",
-                      fontSize: 13,
-                      background: "#fff",
-                      color: "#22223b",
-                    }}
+                    className={`eum-form-input ${
+                      errors.noticePeriodDays ? "error" : ""
+                    }`}
                   />
                   {errors.noticePeriodDays && (
-                    <div style={{ color: "#dc3545", fontSize: 11 }}>
+                    <div className="eum-form-error">
                       {errors.noticePeriodDays}
                     </div>
                   )}
-                  <small style={{ color: "#64748b", fontSize: 11 }}>
-                    Maximum 365 days
-                  </small>
+                  <small className="eum-form-hint">Maximum 365 days</small>
                 </div>
               </div>
 
               {/* Info Alert */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  background: "#f1f5f9",
-                  color: "#64748b",
-                  borderRadius: 4,
-                  fontSize: 12,
-                  padding: "5px 8px",
-                  gap: 5,
-                  marginTop: 10,
-                }}
-              >
+              <div className="eum-info-alert">
                 <i className="bi bi-info-circle"></i>
                 <small>
                   Fields marked with{" "}
-                  <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span> are
-                  required
+                  <span className="eum-info-asterisk">*</span> are required
                 </small>
               </div>
             </div>
@@ -656,44 +436,13 @@ const EditUserModal = ({
             {/* ======================== */}
             {/* MODAL FOOTER - ACTION BUTTONS */}
             {/* ======================== */}
-            <div
-              style={{
-                padding: "10px 15px",
-                borderTop: "1px solid #e2e8f0",
-                background: "#fff",
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: 8,
-                borderBottomLeftRadius: "0.5rem",
-                borderBottomRightRadius: "0.5rem",
-              }}
-            >
+            <div className="eum-modal-footer">
               {/* Cancel Button */}
               <button
                 type="button"
                 onClick={onHide}
                 disabled={loading}
-                style={{
-                  background: "#6c757d",
-                  border: "none",
-                  color: "#fff",
-                  fontWeight: 600,
-                  padding: "7px 12px",
-                  fontSize: 12,
-                  borderRadius: 5,
-                  cursor: loading ? "not-allowed" : "pointer",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  opacity: loading ? 0.7 : 1,
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  if (!loading) e.target.style.background = "#5a6268";
-                }}
-                onMouseLeave={(e) => {
-                  if (!loading) e.target.style.background = "#6c757d";
-                }}
+                className="eum-btn-cancel"
               >
                 <i className="bi bi-x-circle"></i> Cancel
               </button>
@@ -702,51 +451,12 @@ const EditUserModal = ({
               <button
                 type="submit"
                 disabled={loading}
-                style={{
-                  background:
-                    "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                  border: "none",
-                  color: "#fff",
-                  fontWeight: 600,
-                  padding: "7px 12px",
-                  fontSize: 12,
-                  borderRadius: 5,
-                  boxShadow: "0 2px 8px rgba(151,36,126,0.25)",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  cursor: loading ? "not-allowed" : "pointer",
-                  opacity: loading ? 0.85 : 1,
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  if (!loading) e.target.style.opacity = 0.93;
-                }}
-                onMouseLeave={(e) => {
-                  if (!loading) e.target.style.opacity = 1;
-                }}
+                className="eum-btn-submit"
               >
                 {loading ? (
                   <>
-                    <span
-                      style={{
-                        width: 14,
-                        height: 14,
-                        border: "2px solid #fff",
-                        borderTop: "2px solid #E01950",
-                        borderRadius: "50%",
-                        animation: "spin 0.7s linear infinite",
-                        display: "inline-block",
-                        marginRight: 6,
-                      }}
-                    />
+                    <span className="eum-spinner" />
                     Updating...
-                    <style>{`
-                      @keyframes spin {
-                        0% { transform: rotate(0deg);}
-                        100% { transform: rotate(360deg);}
-                      }
-                    `}</style>
                   </>
                 ) : (
                   <>

@@ -1,0 +1,225 @@
+/* ==================== BACKDROP ==================== */
+.dcm-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(39, 35, 92, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1040;
+    transition: all 0.3s ease;
+  }
+  
+  /* ==================== MODAL CONTAINER (COMPACT) ==================== */
+  .dcm-modal-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 95%;
+    max-width: 400px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    z-index: 1050;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
+    background-color: #fff;
+  }
+  
+  /* ==================== HEADER ==================== */
+  .dcm-modal-header {
+    background: #27235c;
+    color: #fff;
+    padding: 12px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 0.5rem 0.5rem 0 0;
+  }
+  
+  .dcm-header-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #fff;
+  }
+  
+  .dcm-close-button {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .dcm-close-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+  
+  /* ==================== BODY ==================== */
+  .dcm-modal-body {
+    padding: 14px;
+    background: #fff;
+    overflow-y: auto;
+    flex: 1;
+    border: none;
+  }
+  
+  .dcm-message {
+    font-size: 13px;
+    color: #334155;
+    margin-bottom: 10px;
+    line-height: 1.5;
+    text-align: center;
+  }
+  
+  /* ==================== ITEM NAME BOX ==================== */
+  .dcm-item-box {
+    padding: 8px 10px;
+    background-color: #fee2e2;
+    border: 1px solid #fecaca;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  
+  .dcm-item-name {
+    font-size: 13px;
+    color: #991b1b;
+    font-weight: 700;
+  }
+  
+  /* ==================== WARNING BOX ==================== */
+  .dcm-warning-box {
+    padding: 8px 10px;
+    background-color: #fff3cd;
+    border: 1px solid #ffecb5;
+    border-radius: 5px;
+    font-size: 12px;
+    color: #664d03;
+    text-align: center;
+  }
+  
+  .dcm-warning-header {
+    margin-bottom: 2px;
+  }
+  
+  .dcm-warning-icon {
+    font-size: 14px;
+    margin-right: 5px;
+  }
+  
+  .dcm-warning-text {
+    margin: 0;
+  }
+  
+  /* ==================== FOOTER ==================== */
+  .dcm-modal-footer {
+    padding: 10px 14px;
+    border-top: 1px solid #e2e8f0;
+    background: #fff;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
+  
+  /* ==================== BUTTONS ==================== */
+  .dcm-btn-cancel {
+    background: #6c757d;
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 7px 12px;
+    font-size: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .dcm-btn-cancel:hover:not(:disabled) {
+    background: #5a6268;
+  }
+  
+  .dcm-btn-cancel:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+  
+  .dcm-btn-delete {
+    background: #dc3545;
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 7px 12px;
+    font-size: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .dcm-btn-delete:hover:not(:disabled) {
+    background: #bb2d3b;
+  }
+  
+  .dcm-btn-delete:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+  
+  /* ==================== SPINNER ==================== */
+  .dcm-spinner {
+    width: 12px;
+    height: 12px;
+    border: 2px solid #fff;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: dcm-spin 0.6s linear infinite;
+    display: inline-block;
+  }
+  
+  @keyframes dcm-spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* ==================== RESPONSIVE ==================== */
+  @media (max-width: 480px) {
+    .dcm-modal-container {
+      width: 90%;
+    }
+  
+    .dcm-modal-footer {
+      flex-direction: column;
+    }
+  
+    .dcm-btn-cancel,
+    .dcm-btn-delete {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  

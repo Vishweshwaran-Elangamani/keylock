@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Modal } from "react-bootstrap";
 import { toast } from "sonner";
 import careerProgressionService from "../../../services/hr_operations/hr/careerProgressionService";
+import "../../../styles/hr_operations/hr/HRSalaryEditModal.css";
 
 const HRSalaryEditModal = ({ show, nomination, onHide, onSalaryUpdated }) => {
   const [newSalary, setNewSalary] = useState(nomination?.newSalary || "");
@@ -37,7 +38,7 @@ const HRSalaryEditModal = ({ show, nomination, onHide, onSalaryUpdated }) => {
       onSalaryUpdated();
       handleClose();
     } catch (err) {
-      console.error(" Error updating salary:", err);
+      console.error("Error updating salary:", err);
       setError(err.message || "Failed to update salary");
       showToast("Error", err.message || "Failed to update salary", "danger");
     } finally {
@@ -82,7 +83,7 @@ const HRSalaryEditModal = ({ show, nomination, onHide, onSalaryUpdated }) => {
     }).format(amount);
   };
 
-  //  AUTO-CALCULATE
+  // AUTO-CALCULATE
   const currentSalary = nomination?.oldSalary || 0;
   const proposedNewSalary = parseFloat(newSalary) || 0;
   const increment = proposedNewSalary - currentSalary;
@@ -90,8 +91,8 @@ const HRSalaryEditModal = ({ show, nomination, onHide, onSalaryUpdated }) => {
     currentSalary > 0 ? ((increment / currentSalary) * 100).toFixed(2) : 0;
 
   return (
-    <Modal show={show} onHide={handleClose} size="lg" className="promo-modal">
-      <Modal.Header closeButton className="promo-modal-header">
+    <Modal show={show} onHide={handleClose} size="lg" className="hsem-modal">
+      <Modal.Header closeButton>
         <Modal.Title>
           <i className="bi bi-pencil me-2"></i>
           Edit Salary & Finalize Promotion
@@ -99,21 +100,21 @@ const HRSalaryEditModal = ({ show, nomination, onHide, onSalaryUpdated }) => {
       </Modal.Header>
 
       <form onSubmit={handleSubmit}>
-        <Modal.Body className="promo-modal-body">
+        <Modal.Body>
           {error && (
-            <div className="alert alert-danger" role="alert">
-              <i className="bi bi-exclamation-triangle-fill me-2"></i>
+            <div className="hsem-alert-danger" role="alert">
+              <i className="bi bi-exclamation-triangle-fill hsem-alert-icon"></i>
               {error}
             </div>
           )}
 
-          {/*  EMPLOYEE DETAILS */}
-          <div className="promo-approval-info">
-            <div className="promo-info-card">
+          {/* EMPLOYEE DETAILS */}
+          <div className="hsem-approval-info">
+            <div className="hsem-info-card">
               <label>Employee:</label>
               <span>{nomination?.employeeName}</span>
             </div>
-            <div className="promo-info-card">
+            <div className="hsem-info-card">
               <label>Current Role → New Role:</label>
               <span>
                 {nomination?.currentRole} → {nomination?.newRole}
@@ -121,33 +122,31 @@ const HRSalaryEditModal = ({ show, nomination, onHide, onSalaryUpdated }) => {
             </div>
           </div>
 
-          {/*  SALARY COMPARISON */}
-          <div
-            className="promo-approval-info"
-            style={{ backgroundColor: "#f0fdf4" }}
-          >
-            <div className="promo-info-card">
+          {/* SALARY COMPARISON */}
+          <div className="hsem-approval-info green-bg">
+            <div className="hsem-info-card">
               <label>Current Salary:</label>
-              <span style={{ fontWeight: "600", color: "#666" }}>
+              <span className="hsem-current-salary">
                 {formatCurrency(currentSalary)}
               </span>
             </div>
-            <div className="promo-info-card">
+            <div className="hsem-info-card">
               <label>Originally Proposed Salary:</label>
-              <span style={{ fontWeight: "600", color: "#27235C" }}>
+              <span className="hsem-proposed-salary">
                 {formatCurrency(nomination?.newSalary || 0)}
               </span>
             </div>
           </div>
 
-          {/*  SALARY EDIT INPUT */}
-          <div className="mb-3">
-            <label htmlFor="newSalary" className="form-label">
-              Edit New Salary (₹) <span className="text-danger">*</span>
+          {/* SALARY EDIT INPUT */}
+          <div className="hsem-form-group">
+            <label htmlFor="newSalary" className="hsem-form-label">
+              Edit New Salary (₹){" "}
+              <span className="hsem-required-asterisk">*</span>
             </label>
             <input
               type="number"
-              className="form-control"
+              className="hsem-form-input"
               id="newSalary"
               value={newSalary}
               onChange={handleSalaryChange}
@@ -156,104 +155,79 @@ const HRSalaryEditModal = ({ show, nomination, onHide, onSalaryUpdated }) => {
               min="0"
               required
             />
-            <small className="form-text text-muted">
+            <small className="hsem-form-hint">
               Minimum: {formatCurrency(currentSalary + 1000)} (Must be higher
               than current)
             </small>
           </div>
 
-          {/*  AUTO-CALCULATED SUMMARY */}
-          <div
-            className="promo-details-section"
-            style={{ backgroundColor: "#fef3c7" }}
-          >
-            <h6 className="promo-details-heading"> Auto-Calculated Summary</h6>
-            <div className="promo-details-grid">
-              <div className="promo-detail-item">
+          {/* AUTO-CALCULATED SUMMARY */}
+          <div className="hsem-details-section">
+            <h6 className="hsem-details-heading">Auto-Calculated Summary</h6>
+            <div className="hsem-details-grid">
+              <div className="hsem-detail-item">
                 <label>Current Salary:</label>
                 <span>{formatCurrency(currentSalary)}</span>
               </div>
-              <div className="promo-detail-item">
+              <div className="hsem-detail-item">
                 <label>New Salary (Edited):</label>
-                <span style={{ fontWeight: "600", color: "#27235C" }}>
+                <span className="hsem-new-salary-value">
                   {formatCurrency(proposedNewSalary)}
                 </span>
               </div>
-              <div className="promo-detail-item">
+              <div className="hsem-detail-item">
                 <label>Increment Amount:</label>
                 <span
-                  style={{
-                    fontWeight: "600",
-                    color: increment > 0 ? "#166534" : "#991b1b",
-                  }}
+                  className={
+                    increment > 0
+                      ? "hsem-increment-positive"
+                      : "hsem-increment-negative"
+                  }
                 >
                   {increment > 0 ? "+" : ""}
                   {formatCurrency(increment)}
                 </span>
               </div>
-              <div className="promo-detail-item">
+              <div className="hsem-detail-item">
                 <label>Increment %:</label>
-                <span
-                  style={{
-                    fontWeight: "600",
-                    color: "#0369a1",
-                    fontSize: "18px",
-                  }}
-                >
+                <span className="hsem-increment-percent">
                   {incrementPercent}%
                 </span>
               </div>
             </div>
           </div>
 
-          {/*  VALIDATION WARNING */}
+          {/* VALIDATION WARNING */}
           {newSalary && parseFloat(newSalary) <= currentSalary && (
-            <div
-              className="alert alert-danger"
-              role="alert"
-              style={{ marginTop: "16px" }}
-            >
-              <i className="bi bi-exclamation-triangle-fill me-2"></i>
-              <strong> INVALID SALARY!</strong>
-              <p
-                style={{
-                  marginTop: "4px",
-                  marginBottom: 0,
-                  fontSize: "12px",
-                }}
-              >
+            <div className="hsem-validation-warning" role="alert">
+              <i className="bi bi-exclamation-triangle-fill hsem-validation-warning-icon"></i>
+              <strong>INVALID SALARY!</strong>
+              <p className="hsem-validation-warning-text">
                 New salary must be higher than current salary (
                 {formatCurrency(currentSalary)})
               </p>
             </div>
           )}
 
-          {/*  APPROVAL NOTES */}
-          <div
-            className="promo-approval-info"
-            style={{ backgroundColor: "#e0e7ff", marginTop: "16px" }}
-          >
-            <div className="promo-info-card">
+          {/* APPROVAL NOTES */}
+          <div className="hsem-approval-info blue-bg">
+            <div className="hsem-info-card">
               <label>Department Head Approval:</label>
-              <span style={{ fontSize: "12px" }}> Approved</span>
+              <span className="hsem-info-card-small">Approved</span>
             </div>
-            <div className="promo-info-card">
+            <div className="hsem-info-card">
               <label>Justification:</label>
-              <span style={{ fontSize: "12px" }}>
+              <span className="hsem-info-card-small">
                 {nomination?.justification}
               </span>
             </div>
           </div>
 
-          {/*  INFO ALERT */}
-          <div
-            className="alert alert-info"
-            role="alert"
-            style={{ marginTop: "16px" }}
-          >
-            <i className="bi bi-info-circle me-2"></i>
+          {/* INFO ALERT */}
+          <div className="hsem-info-alert" role="alert">
+            <i className="bi bi-info-circle hsem-info-icon"></i>
             <strong>HR Instructions:</strong>
-            <ol style={{ marginTop: "8px", marginBottom: 0, fontSize: "12px" }}>
+            <ol className="hsem-info-list">
               <li>Review the proposed salary from Department Head</li>
               <li>Adjust salary if needed (increment % auto-calculates)</li>
               <li>Once approved, click Submit to send to Leadership</li>
@@ -263,17 +237,17 @@ const HRSalaryEditModal = ({ show, nomination, onHide, onSalaryUpdated }) => {
           </div>
         </Modal.Body>
 
-        <Modal.Footer className="promo-modal-footer">
+        <Modal.Footer>
           <button
             type="button"
-            className="btn btn-secondary"
+            className="btn hsem-btn-cancel"
             onClick={handleClose}
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="btn promo-btn-submit"
+            className="btn hsem-btn-submit"
             disabled={
               loading || !newSalary || parseFloat(newSalary) <= currentSalary
             }
@@ -281,7 +255,7 @@ const HRSalaryEditModal = ({ show, nomination, onHide, onSalaryUpdated }) => {
             {loading ? (
               <>
                 <span
-                  className="spinner-border spinner-border-sm me-2"
+                  className="spinner-border spinner-border-sm hsem-spinner"
                   role="status"
                 ></span>
                 Updating...

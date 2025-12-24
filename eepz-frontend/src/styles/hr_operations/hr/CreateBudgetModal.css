@@ -1,0 +1,279 @@
+/* ==================== BACKDROP ==================== */
+.cbm-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(39, 35, 92, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1040;
+  }
+  
+  /* ==================== MODAL CONTAINER ==================== */
+  .cbm-modal-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 97%;
+    max-width: 800px;
+    z-index: 1050;
+  }
+  
+  /* ==================== MODAL DIALOG ==================== */
+  .cbm-modal-dialog {
+    border-radius: 0.5rem;
+    background: #fff;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
+    overflow: hidden;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* ==================== HEADER ==================== */
+  .cbm-modal-header {
+    background: #27235c;
+    color: #fff;
+    padding: 13px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 0.5rem 0.5rem 0 0;
+  }
+  
+  .cbm-header-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  
+  .cbm-close-button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .cbm-close-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  
+  /* ==================== BODY ==================== */
+  .cbm-modal-body {
+    padding: 14px 15px 6px 15px;
+    background: #fff;
+    text-align: left;
+  }
+  
+  .cbm-form {
+    margin: 0;
+  }
+  
+  /* ==================== FORM GRID ==================== */
+  .cbm-form-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+  }
+  
+  /* ==================== FORM GROUPS ==================== */
+  .cbm-form-group {
+    flex: 1;
+    min-width: 47%;
+  }
+  
+  .cbm-form-label {
+    font-weight: 600;
+    font-size: 13px;
+    color: #334155;
+    margin-bottom: 2px;
+    display: block;
+  }
+  
+  .cbm-required-asterisk {
+    color: #ef4444;
+    font-weight: 700;
+  }
+  
+  /* ==================== FORM INPUTS ==================== */
+  .cbm-form-input {
+    width: 100%;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 8px 9px;
+    font-size: 13px;
+    background: #fff;
+    color: #22223b;
+  }
+  
+  .cbm-form-input:focus {
+    outline: none;
+    border-color: #27235c;
+    box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+  }
+  
+  .cbm-form-input.error {
+    border: 1px solid #dc3545;
+  }
+  
+  .cbm-form-error {
+    color: #dc3545;
+    font-size: 11px;
+  }
+  
+  .cbm-form-hint {
+    color: #64748b;
+    font-size: 11px;
+  }
+  
+  /* ==================== BUDGET SUMMARY ==================== */
+  .cbm-budget-summary {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border: 2px solid #10b981;
+    border-radius: 8px;
+    padding: 14px;
+    margin-top: 12px;
+  }
+  
+  .cbm-summary-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #065f46;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  
+  .cbm-summary-icon {
+    font-size: 18px;
+  }
+  
+  .cbm-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+  }
+  
+  .cbm-summary-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #047857;
+  }
+  
+  .cbm-summary-label {
+    font-weight: 600;
+  }
+  
+  .cbm-summary-value {
+    font-weight: 700;
+  }
+  
+  /* ==================== FOOTER ==================== */
+  .cbm-modal-footer {
+    padding: 10px 15px;
+    border-top: 1px solid #e2e8f0;
+    background: #fff;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+  }
+  
+  /* ==================== BUTTONS ==================== */
+  .cbm-btn-cancel {
+    background: #6c757d;
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 7px 12px;
+    font-size: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+  
+  .cbm-btn-cancel:hover:not(:disabled) {
+    background: #5a6268;
+  }
+  
+  .cbm-btn-cancel:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  
+  .cbm-btn-submit {
+    background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 7px 12px;
+    font-size: 12px;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(151, 36, 126, 0.25);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .cbm-btn-submit:hover:not(:disabled) {
+    opacity: 0.93;
+  }
+  
+  .cbm-btn-submit:disabled {
+    cursor: not-allowed;
+    opacity: 0.85;
+  }
+  
+  /* ==================== SPINNER ==================== */
+  .cbm-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #fff;
+    border-top: 2px solid #e01950;
+    border-radius: 50%;
+    animation: cbm-spin 0.7s linear infinite;
+    display: inline-block;
+    margin-right: 6px;
+  }
+  
+  @keyframes cbm-spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* ==================== RESPONSIVE ==================== */
+  @media (max-width: 768px) {
+    .cbm-form-group {
+      min-width: 100%;
+    }
+  
+    .cbm-summary-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  

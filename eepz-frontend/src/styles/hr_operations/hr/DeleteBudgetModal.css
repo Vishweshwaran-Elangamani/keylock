@@ -1,4 +1,4 @@
-/* Blurred Backdrop */
+/* ==================== BACKDROP ==================== */
 .delete-budget-backdrop {
   position: fixed;
   top: 0;
@@ -11,19 +11,18 @@
   z-index: 1040;
 }
 
-/* Modal Wrapper */
+/* ==================== MODAL WRAPPER ==================== */
 .delete-budget-modal-wrapper {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 95%;
-  max-width: 550px;
+  max-width: 600px;
   z-index: 1050;
 }
 
-
-/* Modal Container */
+/* ==================== MODAL CONTAINER ==================== */
 .delete-budget-modal-container {
   border-radius: 0.5rem;
   background: #fff;
@@ -34,9 +33,9 @@
   flex-direction: column;
 }
 
-/* Modal Header */
+/* ==================== HEADER ==================== */
 .delete-budget-modal-header {
-  background: #27235c;
+  background: #dc2626;
   color: #fff;
   padding: 13px 15px;
   display: flex;
@@ -68,28 +67,27 @@
   transition: opacity 0.2s ease;
 }
 
-.delete-budget-close-btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
 .delete-budget-close-btn:hover:not(:disabled) {
   opacity: 0.8;
 }
 
-/* Modal Body */
+.delete-budget-close-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ==================== BODY ==================== */
 .delete-budget-modal-body {
-  padding: 20px 15px;
+  padding: 20px;
   background: #fff;
   text-align: left;
 }
 
 .delete-budget-confirmation-text {
-  font-size: 15px;
+  font-size: 14px;
   color: #334155;
-  margin-bottom: 16px;
   line-height: 1.6;
-  text-align: center;
+  margin-bottom: 16px;
 }
 
 .delete-budget-highlight {
@@ -97,79 +95,86 @@
   font-weight: 700;
 }
 
-/* Warning Box */
+/* ==================== WARNING BOX ==================== */
 .delete-budget-warning-box {
-  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
   border: 2px solid #dc2626;
   border-radius: 8px;
-  padding: 14px;
-  margin-bottom: 14px;
-  text-align: center;
+  padding: 16px;
+  margin-bottom: 20px;
 }
 
 .delete-budget-warning-header {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 8px;
-  color: #dc2626;
-  font-size: 14px;
+  color: #991b1b;
+  font-size: 15px;
   font-weight: 700;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .delete-budget-warning-header i {
   font-size: 18px;
+  color: #dc2626;
 }
 
 .delete-budget-warning-text {
   font-size: 13px;
-  color: #7f1d1d;
-  margin-bottom: 8px;
+  color: #991b1b;
+  margin-bottom: 12px;
   line-height: 1.5;
 }
 
 .delete-budget-warning-list {
-  font-size: 13px;
+  margin: 0;
+  padding-left: 20px;
+  list-style: disc;
   color: #991b1b;
-  margin-left: 20px;
-  margin-bottom: 0;
-  padding-left: 0;
-  line-height: 1.7;
-  text-align: left;
-  list-style-position: inside;
+  font-size: 13px;
+}
+
+.delete-budget-warning-list strong {
+  display: block;
+  margin-bottom: 8px;
 }
 
 .delete-budget-warning-list li {
   margin-bottom: 4px;
+  line-height: 1.4;
 }
 
-/* Input Section */
+/* ==================== INPUT SECTION ==================== */
 .delete-budget-input-section {
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 .delete-budget-input-label {
-  display: block;
-  font-size: 14px;
+  font-weight: 600;
+  font-size: 13px;
   color: #334155;
   margin-bottom: 8px;
-  font-weight: 500;
+  display: block;
 }
 
 .delete-budget-confirm-keyword {
   color: #dc2626;
   font-weight: 700;
-  font-style: italic;
+  background: #fee2e2;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
 }
 
 .delete-budget-input {
   width: 100%;
-  padding: 10px 12px;
   border: 2px solid #cbd5e1;
   border-radius: 6px;
+  padding: 10px 12px;
   font-size: 14px;
-  color: #334155;
+  background: #fff;
+  color: #1e293b;
+  font-weight: 500;
   transition: all 0.2s ease;
 }
 
@@ -180,23 +185,36 @@
 }
 
 .delete-budget-input:disabled {
-  background-color: #f1f5f9;
+  background: #f1f5f9;
   cursor: not-allowed;
+  opacity: 0.6;
 }
 
-/* Info Alert */
+.delete-budget-input::placeholder {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* ==================== INFO ALERT ==================== */
 .delete-budget-info-alert {
+  padding: 10px 12px;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 6px;
   display: flex;
   align-items: center;
-  background: #f1f5f9;
-  color: #64748b;
-  border-radius: 4px;
+  gap: 8px;
   font-size: 12px;
-  padding: 8px 10px;
-  gap: 6px;
+  color: #075985;
 }
 
-/* Modal Footer */
+.delete-budget-info-alert i {
+  font-size: 14px;
+  color: #0284c7;
+  flex-shrink: 0;
+}
+
+/* ==================== FOOTER ==================== */
 .delete-budget-modal-footer {
   padding: 10px 15px;
   border-top: 1px solid #e2e8f0;
@@ -208,20 +226,24 @@
   border-bottom-right-radius: 0.5rem;
 }
 
-/* Cancel Button */
+/* ==================== BUTTONS ==================== */
 .delete-budget-btn-cancel {
   background: #6c757d;
   border: none;
   color: #fff;
   font-weight: 600;
-  padding: 7px 12px;
-  font-size: 12px;
-  border-radius: 5px;
+  padding: 8px 14px;
+  font-size: 13px;
+  border-radius: 6px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   transition: all 0.2s ease;
+}
+
+.delete-budget-btn-cancel:hover:not(:disabled) {
+  background: #5a6268;
 }
 
 .delete-budget-btn-cancel:disabled {
@@ -229,44 +251,42 @@
   opacity: 0.7;
 }
 
-.delete-budget-btn-cancel:hover:not(:disabled) {
-  background: #5a6268;
-}
-
-/* Delete Button */
 .delete-budget-btn-delete {
-  background: linear-gradient(90deg, #e63946 0%, #d62828 100%);
+  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
   border: none;
   color: #fff;
-  font-weight: 600;
-  padding: 7px 12px;
-  font-size: 12px;
-  border-radius: 5px;
-  box-shadow: 0 2px 8px rgba(230, 57, 70, 0.25);
+  font-weight: 700;
+  padding: 8px 16px;
+  font-size: 13px;
+  border-radius: 6px;
+  cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  cursor: pointer;
   transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
 }
 
 .delete-budget-btn-delete:hover:not(:disabled):not(.disabled) {
-  opacity: 0.93;
+  background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
 }
 
 .delete-budget-btn-delete:disabled,
 .delete-budget-btn-delete.disabled {
   cursor: not-allowed;
   opacity: 0.5;
-  background: #e63946;
+  transform: none;
+  box-shadow: none;
 }
 
-/* Spinner */
+/* ==================== SPINNER ==================== */
 .delete-budget-spinner {
   width: 14px;
   height: 14px;
   border: 2px solid #fff;
-  border-top: 2px solid #d62828;
+  border-top: 2px solid transparent;
   border-radius: 50%;
   animation: delete-budget-spin 0.7s linear infinite;
   display: inline-block;
@@ -279,5 +299,26 @@
   }
   100% {
     transform: rotate(360deg);
+  }
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 576px) {
+  .delete-budget-modal-wrapper {
+    width: 90%;
+  }
+
+  .delete-budget-modal-body {
+    padding: 16px;
+  }
+
+  .delete-budget-modal-footer {
+    flex-direction: column;
+  }
+
+  .delete-budget-btn-cancel,
+  .delete-budget-btn-delete {
+    width: 100%;
+    justify-content: center;
   }
 }

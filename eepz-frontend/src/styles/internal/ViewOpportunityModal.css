@@ -1,0 +1,285 @@
+/* ==================== BACKDROP ==================== */
+.vom-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(39, 35, 92, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1040;
+  }
+  
+  /* ==================== MODAL WRAPPER ==================== */
+  .vom-modal-wrapper {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 95%;
+    max-width: 800px;
+    max-height: 75vh;
+    z-index: 1050;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* ==================== MODAL DIALOG ==================== */
+  .vom-modal-dialog {
+    border-radius: 0.5rem;
+    background: #ffffff;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
+    overflow: hidden;
+    width: 100%;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* ==================== HEADER ==================== */
+  .vom-modal-header {
+    background: #27235c;
+    color: #ffffff;
+    padding: 13px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 0.5rem 0.5rem 0 0;
+    flex-shrink: 0;
+  }
+  
+  .vom-header-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  
+  .vom-close-btn {
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: opacity 0.2s ease;
+  }
+  
+  .vom-close-btn:hover {
+    opacity: 0.8;
+  }
+  
+  /* ==================== BODY ==================== */
+  .vom-modal-body {
+    padding: 20px;
+    background: #ffffff;
+    text-align: left;
+    overflow-y: auto;
+    flex: 1;
+  }
+  
+  /* ==================== TITLE SECTION ==================== */
+  .vom-title-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    gap: 16px;
+  }
+  
+  .vom-title-content {
+    flex: 1;
+  }
+  
+  .vom-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    margin-bottom: 8px;
+  }
+  
+  .vom-department {
+    font-size: 13px;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .vom-status-badge {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  
+  /* ==================== KEY INFO GRID ==================== */
+  .vom-info-box {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #f9fafb;
+    padding: 1rem;
+    margin-bottom: 20px;
+  }
+  
+  .vom-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  
+  .vom-info-item-label {
+    font-size: 11px;
+    color: #64748b;
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  
+  .vom-info-item-value {
+    font-size: 14px;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  /* ==================== CONTENT SECTIONS ==================== */
+  .vom-section {
+    margin-bottom: 20px;
+  }
+  
+  .vom-section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .vom-section-content {
+    padding: 12px 16px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #475569;
+    line-height: 1.6;
+  }
+  
+  /* ==================== INFO ALERT ==================== */
+  .vom-info-alert {
+    padding: 12px 16px;
+    background: #d1ecf1;
+    border: 1px solid #bee5eb;
+    border-radius: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    color: #0c5460;
+  }
+  
+  .vom-info-alert-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  
+  .vom-info-alert-title {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+  
+  .vom-info-alert-text {
+    margin: 0;
+  }
+  
+  /* ==================== FOOTER ==================== */
+  .vom-modal-footer {
+    padding: 10px 15px;
+    border-top: 1px solid #e2e8f0;
+    background: #ffffff;
+    display: flex;
+    justify-content: flex-end;
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+    flex-shrink: 0;
+  }
+  
+  .vom-btn-close {
+    background: #6c757d;
+    border: none;
+    color: #ffffff;
+    font-weight: 600;
+    padding: 7px 12px;
+    font-size: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .vom-btn-close:hover {
+    background: #5a6268;
+  }
+  
+  /* ==================== RESPONSIVE ==================== */
+  @media (max-width: 768px) {
+    .vom-modal-wrapper {
+      width: 100%;
+      padding: 10px;
+    }
+  
+    .vom-modal-body {
+      padding: 16px;
+    }
+  
+    .vom-info-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .vom-title-section {
+      flex-direction: column;
+      gap: 12px;
+    }
+  
+    .vom-status-badge {
+      align-self: flex-start;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .vom-modal-header {
+      padding: 10px 12px;
+    }
+  
+    .vom-header-title {
+      font-size: 14px;
+    }
+  
+    .vom-title {
+      font-size: 16px;
+    }
+  
+    .vom-modal-footer {
+      padding: 8px 12px;
+    }
+  }
+  

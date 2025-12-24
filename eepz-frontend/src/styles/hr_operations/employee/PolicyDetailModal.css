@@ -1,0 +1,343 @@
+/* ==================== BACKDROP ==================== */
+.pdm-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(39, 35, 92, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1040;
+  }
+  
+  /* ==================== MODAL CONTAINER ==================== */
+  .pdm-modal-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 95%;
+    max-width: 800px;
+    max-height: 75vh;
+    z-index: 1050;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* ==================== MODAL DIALOG ==================== */
+  .pdm-modal-dialog {
+    border-radius: 0.5rem;
+    background: #fff;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
+    overflow: hidden;
+    width: 100%;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* ==================== HEADER ==================== */
+  .pdm-modal-header {
+    background: #27235c;
+    color: #fff;
+    padding: 13px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 0.5rem 0.5rem 0 0;
+    flex-shrink: 0;
+  }
+  
+  .pdm-header-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  
+  .pdm-close-button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .pdm-close-button:hover {
+    opacity: 0.8;
+  }
+  
+  /* ==================== BODY ==================== */
+  .pdm-modal-body {
+    padding: 20px;
+    background: #fff;
+    text-align: left;
+    overflow-y: auto;
+    flex: 1;
+  }
+  
+  /* ==================== BADGES ==================== */
+  .pdm-badges-container {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  
+  .pdm-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  
+  .pdm-badge-icon {
+    margin-right: 6px;
+    font-size: 11px;
+  }
+  
+  .pdm-badge-category {
+    background: rgba(151, 36, 126, 0.1);
+    color: #97247e;
+    border: 1px solid rgba(151, 36, 126, 0.3);
+  }
+  
+  .pdm-badge-published {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+  
+  /* ==================== SECTIONS ==================== */
+  .pdm-section {
+    margin-bottom: 24px;
+  }
+  
+  .pdm-section-heading {
+    font-size: 13px;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .pdm-section-icon {
+    font-size: 14px;
+    color: #64748b;
+  }
+  
+  /* ==================== DESCRIPTION SECTION ==================== */
+  .pdm-description-text {
+    margin: 0;
+    font-size: 14px;
+    color: #475569;
+    line-height: 1.6;
+    background: #f8fafc;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+  }
+  
+  /* ==================== COMPLIANCE GUIDANCE SECTION ==================== */
+  .pdm-compliance-text {
+    margin: 0;
+    font-size: 14px;
+    color: #475569;
+    line-height: 1.6;
+    background: #fef3c7;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #fcd34d;
+    border-left: 4px solid #f59e0b;
+  }
+  
+  /* ==================== DOCUMENT SECTION ==================== */
+  .pdm-document-section {
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
+  }
+  
+  .pdm-document-heading {
+    font-size: 13px;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .pdm-document-icon {
+    font-size: 16px;
+    color: #0284c7;
+  }
+  
+  .pdm-document-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    background: #fff;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid #93c5fd;
+  }
+  
+  .pdm-document-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .pdm-file-icon {
+    font-size: 24px;
+    color: #dc2626;
+  }
+  
+  .pdm-document-name {
+    font-size: 14px;
+    color: #1e293b;
+    display: block;
+  }
+  
+  .pdm-document-size {
+    color: #64748b;
+    font-size: 12px;
+    display: block;
+    margin-top: 2px;
+  }
+  
+  .pdm-download-button {
+    background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 8px 14px;
+    font-size: 12px;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(151, 36, 126, 0.25);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .pdm-download-button:hover {
+    opacity: 0.93;
+    transform: translateY(-1px);
+  }
+  
+  /* ==================== PUBLISHED DATE INFO ==================== */
+  .pdm-published-info {
+    padding: 12px 14px;
+    background: #f1f5f9;
+    border-radius: 6px;
+    border-left: 3px solid #97247e;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .pdm-calendar-icon {
+    font-size: 16px;
+    color: #64748b;
+  }
+  
+  .pdm-published-label {
+    color: #64748b;
+    font-size: 11px;
+    display: block;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .pdm-published-date {
+    color: #334155;
+    font-size: 13px;
+    display: block;
+    margin-top: 2px;
+  }
+  
+  /* ==================== FOOTER ==================== */
+  .pdm-modal-footer {
+    padding: 10px 15px;
+    border-top: 1px solid #e2e8f0;
+    background: #fff;
+    display: flex;
+    justify-content: flex-end;
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+    flex-shrink: 0;
+  }
+  
+  /* ==================== BUTTONS ==================== */
+  .pdm-btn-close {
+    background: #6c757d;
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 7px 12px;
+    font-size: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .pdm-btn-close:hover {
+    background: #5a6268;
+  }
+  
+  /* ==================== RESPONSIVE ==================== */
+  @media (max-width: 768px) {
+    .pdm-modal-container {
+      width: 90%;
+    }
+  
+    .pdm-document-card {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .pdm-download-button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .pdm-modal-body {
+      padding: 16px;
+    }
+  
+    .pdm-badges-container {
+      flex-direction: column;
+    }
+  
+    .pdm-badge {
+      justify-content: center;
+    }
+  }
+  

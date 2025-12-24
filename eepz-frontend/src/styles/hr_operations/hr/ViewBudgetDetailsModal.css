@@ -1,0 +1,477 @@
+/* ==================== BACKDROP ==================== */
+.vbdm-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(39, 35, 92, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1040;
+  }
+  
+  /* ==================== MODAL CONTAINER ==================== */
+  .vbdm-modal-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 87%;
+    max-width: 900px;
+    max-height: 80vh;
+    z-index: 1050;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* ==================== MODAL DIALOG ==================== */
+  .vbdm-modal-dialog {
+    border-radius: 0.5rem;
+    background: #fff;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
+    overflow: hidden;
+    width: 100%;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* ==================== HEADER ==================== */
+  .vbdm-modal-header {
+    background: #27235c;
+    color: #fff;
+    padding: 13px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 0.5rem 0.5rem 0 0;
+    flex-shrink: 0;
+  }
+  
+  .vbdm-header-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  
+  .vbdm-close-button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .vbdm-close-button:hover {
+    opacity: 0.8;
+  }
+  
+  /* ==================== BODY ==================== */
+  .vbdm-modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+  }
+  
+  /* ==================== ERROR ALERT ==================== */
+  .vbdm-error-alert {
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    background-color: #fee2e2;
+    border: 1px solid #fca5a5;
+    border-radius: 0.375rem;
+    color: #991b1b;
+    font-size: 14px;
+  }
+  
+  .vbdm-error-icon {
+    margin-right: 8px;
+  }
+  
+  /* ==================== BUDGET INFO GRID ==================== */
+  .vbdm-budget-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  
+  .vbdm-info-card {
+    background: #f8fafc;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+  }
+  
+  .vbdm-info-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 4px;
+  }
+  
+  .vbdm-info-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+  }
+  
+  /* ==================== BUDGET SUMMARY ==================== */
+  .vbdm-budget-summary {
+    background-color: #f0fdf4;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+  
+  .vbdm-summary-heading {
+    font-size: 14px;
+    font-weight: 700;
+    color: #166534;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .vbdm-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  
+  .vbdm-summary-item label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #065f46;
+    margin-bottom: 4px;
+  }
+  
+  .vbdm-summary-item span {
+    font-size: 16px;
+    font-weight: 700;
+    color: #166534;
+  }
+  
+  .vbdm-summary-item span.utilized {
+    color: #ef4444;
+  }
+  
+  .vbdm-summary-item span.percentage-high {
+    color: #ef4444;
+  }
+  
+  .vbdm-summary-item span.percentage-normal {
+    color: #10b981;
+  }
+  
+  /* ==================== ALLOCATION BREAKDOWN ==================== */
+  .vbdm-allocation-section {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 20px;
+  }
+  
+  .vbdm-allocation-heading {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  /* ==================== LOADING STATE ==================== */
+  .vbdm-loading {
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .vbdm-spinner {
+    width: 3rem;
+    height: 3rem;
+  }
+  
+  .vbdm-spinner-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+  
+  /* ==================== EMPTY STATE ==================== */
+  .vbdm-empty-state {
+    text-align: center;
+    padding: 20px;
+    color: #94a3b8;
+  }
+  
+  .vbdm-empty-state p {
+    margin: 0;
+  }
+  
+  /* ==================== ALLOCATION TYPE ==================== */
+  .vbdm-type-section {
+    margin-bottom: 20px;
+  }
+  
+  .vbdm-type-heading {
+    font-size: 13px;
+    font-weight: 700;
+    color: #27235c;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  /* ==================== ALLOCATION TABLE ==================== */
+  .vbdm-table-container {
+    overflow-x: auto;
+  }
+  
+  .vbdm-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 0;
+    font-size: 12px;
+  }
+  
+  .vbdm-table thead tr {
+    background-color: #f8fafc;
+  }
+  
+  .vbdm-table th {
+    padding: 10px;
+    text-align: left;
+    font-weight: 600;
+    color: #475569;
+    border-bottom: 2px solid #cbd5e1;
+  }
+  
+  .vbdm-table td {
+    padding: 10px;
+  }
+  
+  .vbdm-table tbody tr {
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  .vbdm-table tbody tr:hover {
+    background-color: #f8fafc;
+  }
+  
+  .vbdm-status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  
+  .vbdm-status-badge.approved {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+  
+  .vbdm-status-badge.pending {
+    background-color: #fef3c7;
+    color: #92400e;
+  }
+  
+  /* ==================== SUBTOTAL BAR ==================== */
+  .vbdm-subtotal-bar {
+    padding: 8px 12px;
+    background-color: #f8fafc;
+    border-left: 4px solid #27235c;
+    margin-top: 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  
+  /* ==================== TOTAL BAR ==================== */
+  .vbdm-total-bar {
+    padding: 12px;
+    background-color: #f0fdf4;
+    border: 2px solid #10b981;
+    border-radius: 6px;
+    margin-top: 16px;
+  }
+  
+  .vbdm-total-label {
+    color: #166534;
+    font-weight: 600;
+  }
+  
+  .vbdm-total-value {
+    float: right;
+    color: #166534;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  
+  /* ==================== BUDGET STATUS ==================== */
+  .vbdm-budget-status {
+    padding: 20px;
+    border-radius: 8px;
+  }
+  
+  .vbdm-budget-status.positive {
+    background-color: #f0fdf4;
+  }
+  
+  .vbdm-budget-status.negative {
+    background-color: #fee2e2;
+  }
+  
+  .vbdm-status-heading {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .vbdm-status-heading.positive {
+    color: #166534;
+  }
+  
+  .vbdm-status-heading.negative {
+    color: #991b1b;
+  }
+  
+  .vbdm-status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  
+  .vbdm-status-item label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  
+  .vbdm-status-item.positive label {
+    color: #065f46;
+  }
+  
+  .vbdm-status-item.negative label {
+    color: #7f1d1d;
+  }
+  
+  .vbdm-status-item span {
+    font-size: 16px;
+    font-weight: 700;
+  }
+  
+  .vbdm-status-item.positive span {
+    color: #166534;
+  }
+  
+  .vbdm-status-item.negative span {
+    color: #991b1b;
+  }
+  
+  .vbdm-status-item span.usage-high {
+    color: #991b1b;
+  }
+  
+  .vbdm-status-item span.usage-normal {
+    color: #166534;
+  }
+  
+  /* ==================== FOOTER ==================== */
+  .vbdm-modal-footer {
+    padding: 10px 15px;
+    border-top: 1px solid #e2e8f0;
+    background: #fff;
+    display: flex;
+    justify-content: flex-end;
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+    flex-shrink: 0;
+  }
+  
+  /* ==================== BUTTONS ==================== */
+  .vbdm-btn-close {
+    background: #6c757d;
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 7px 12px;
+    font-size: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+  
+  .vbdm-btn-close:hover {
+    background: #5a6268;
+  }
+  
+  /* ==================== RESPONSIVE ==================== */
+  @media (max-width: 1024px) {
+    .vbdm-modal-container {
+      width: 90%;
+    }
+  
+    .vbdm-budget-info,
+    .vbdm-summary-grid,
+    .vbdm-status-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .vbdm-modal-body {
+      padding: 16px;
+    }
+  
+    .vbdm-budget-info,
+    .vbdm-summary-grid,
+    .vbdm-status-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .vbdm-budget-summary,
+    .vbdm-allocation-section,
+    .vbdm-budget-status {
+      padding: 16px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .vbdm-modal-container {
+      width: 95%;
+    }
+  
+    .vbdm-table {
+      font-size: 11px;
+    }
+  
+    .vbdm-table th,
+    .vbdm-table td {
+      padding: 8px;
+    }
+  }
+  

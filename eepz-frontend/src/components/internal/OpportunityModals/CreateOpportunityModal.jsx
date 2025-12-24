@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { CloseButton } from "react-bootstrap";
 import internalOpportunityService from "../../../services/internal/internalOpportunityService";
 import { toast } from "sonner";
+import "../../../styles/internal/CreateOpportunityModal.css";
 
 const CreateOpportunityModal = ({
   show,
@@ -45,7 +46,8 @@ const CreateOpportunityModal = ({
     if (!formData.opportunityName.trim()) {
       newErrors.opportunityName = "Opportunity name is required";
     } else if (formData.opportunityName.trim().length < 5) {
-      newErrors.opportunityName = "Opportunity name must be at least 5 characters";
+      newErrors.opportunityName =
+        "Opportunity name must be at least 5 characters";
     }
 
     if (!formData.departmentId) {
@@ -102,7 +104,9 @@ const CreateOpportunityModal = ({
         status: formData.status,
       };
 
-      const response = await internalOpportunityService.createOpportunity(payload);
+      const response = await internalOpportunityService.createOpportunity(
+        payload
+      );
 
       if (response.success || response.data) {
         toast.success("Opportunity created successfully!");
@@ -152,121 +156,32 @@ const CreateOpportunityModal = ({
 
   return (
     <>
-      {/* Backdrop with Blur */}
-      <div
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(39, 35, 92, 0.4)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
-          zIndex: 1040,
-          transition: 'all 0.3s ease'
-        }}
-        onClick={handleClose}
-      />
+      <div className="com-backdrop" onClick={handleClose} />
 
-      {/* Modal Wrapper */}
-      <div
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1050,
-          padding: '20px'
-        }}
-      >
-        {/* Modal Dialog */}
-        <div
-          style={{
-            width: '100%',
-            maxWidth: '800px',
-            maxHeight: '85vh',
-            display: 'flex',
-            flexDirection: 'column',
-            borderRadius: '0.5rem',
-            overflow: 'hidden',
-            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.3)',
-            backgroundColor: '#ffffff'
-          }}
-        >
+      <div className="com-modal-wrapper">
+        <div className="com-modal-dialog">
           {/* Modal Header */}
-          <div
-            style={{
-              background: '#27235C',
-              color: '#ffffff',
-              padding: '16px 20px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexShrink: 0
-            }}
-          >
-            <div
-              style={{
-                fontSize: '16px',
-                fontWeight: '600',
-                margin: 0,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                color: '#ffffff'
-              }}
-            >
+          <div className="com-modal-header">
+            <div className="com-header-title">
               <i className="bi bi-briefcase-fill"></i>
               Create Internal Opportunity
             </div>
             <CloseButton
               onClick={handleClose}
               variant="white"
-              style={{
-                filter: 'brightness(0) invert(1)',
-                opacity: 1
-              }}
+              className="com-close-button"
             />
           </div>
 
-          {/* Form - Scrollable Body */}
-          <form 
-            onSubmit={handleSubmit} 
-            style={{ 
-              display: 'flex', 
-              flexDirection: 'column', 
-              flex: 1,
-              overflow: 'hidden'
-            }}
-          >
-            {/* Modal Body - Scrollable */}
-            <div
-              style={{
-                padding: '20px',
-                overflowY: 'auto',
-                flex: 1,
-                backgroundColor: '#ffffff',
-                maxHeight: 'calc(85vh - 140px)'
-              }}
-            >
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="com-form">
+            {/* Modal Body */}
+            <div className="com-modal-body">
               {/* Opportunity Name - Full Width */}
-              <div style={{ marginBottom: '16px' }}>
-                <label
-                  style={{
-                    display: 'block',
-                    fontWeight: '600',
-                    fontSize: '13px',
-                    color: '#334155',
-                    marginBottom: '6px',
-                    textAlign: 'left'
-                  }}
-                >
-                  Opportunity Name <span style={{ color: '#ef4444', fontWeight: '700' }}>*</span>
+              <div className="com-form-group">
+                <label className="com-form-label">
+                  Opportunity Name{" "}
+                  <span className="com-required-asterisk">*</span>
                 </label>
                 <input
                   type="text"
@@ -275,87 +190,29 @@ const CreateOpportunityModal = ({
                   value={formData.opportunityName}
                   onChange={handleChange}
                   maxLength={200}
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    fontSize: '13px',
-                    border: errors.opportunityName ? '1px solid #ef4444' : '1px solid #cbd5e1',
-                    borderRadius: '6px',
-                    outline: 'none',
-                    transition: 'all 0.2s ease',
-                    backgroundColor: '#ffffff'
-                  }}
-                  onFocus={(e) => {
-                    if (!errors.opportunityName) {
-                      e.target.style.borderColor = '#27235C';
-                      e.target.style.boxShadow = '0 0 0 0.2rem rgba(39, 35, 92, 0.25)';
-                    }
-                  }}
-                  onBlur={(e) => {
-                    if (!errors.opportunityName) {
-                      e.target.style.borderColor = '#cbd5e1';
-                      e.target.style.boxShadow = 'none';
-                    }
-                  }}
+                  className={`com-form-input ${
+                    errors.opportunityName ? "error" : ""
+                  }`}
                 />
                 {errors.opportunityName && (
-                  <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>
-                    {errors.opportunityName}
-                  </div>
+                  <div className="com-form-error">{errors.opportunityName}</div>
                 )}
               </div>
 
               {/* Department and Deadline Row */}
-              <div 
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '20px',
-                  marginBottom: '16px'
-                }}
-              >
+              <div className="com-two-column-grid">
                 {/* Department */}
-                <div>
-                  <label
-                    style={{
-                      display: 'block',
-                      fontWeight: '600',
-                      fontSize: '13px',
-                      color: '#334155',
-                      marginBottom: '6px',
-                      textAlign: 'left'
-                    }}
-                  >
-                    Department <span style={{ color: '#ef4444', fontWeight: '700' }}>*</span>
+                <div className="com-form-group">
+                  <label className="com-form-label">
+                    Department <span className="com-required-asterisk">*</span>
                   </label>
                   <select
                     name="departmentId"
                     value={formData.departmentId}
                     onChange={handleChange}
-                    style={{
-                      width: '100%',
-                      padding: '8px 10px',
-                      fontSize: '13px',
-                      border: errors.departmentId ? '1px solid #ef4444' : '1px solid #cbd5e1',
-                      borderRadius: '6px',
-                      outline: 'none',
-                      cursor: 'pointer',
-                      backgroundColor: '#ffffff',
-                      transition: 'all 0.2s ease',
-                      textAlign: 'left'
-                    }}
-                    onFocus={(e) => {
-                      if (!errors.departmentId) {
-                        e.target.style.borderColor = '#27235C';
-                        e.target.style.boxShadow = '0 0 0 0.2rem rgba(39, 35, 92, 0.25)';
-                      }
-                    }}
-                    onBlur={(e) => {
-                      if (!errors.departmentId) {
-                        e.target.style.borderColor = '#cbd5e1';
-                        e.target.style.boxShadow = 'none';
-                      }
-                    }}
+                    className={`com-form-select ${
+                      errors.departmentId ? "error" : ""
+                    }`}
                   >
                     <option value="">Select Department</option>
                     {departments.map((dept) => (
@@ -365,25 +222,15 @@ const CreateOpportunityModal = ({
                     ))}
                   </select>
                   {errors.departmentId && (
-                    <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>
-                      {errors.departmentId}
-                    </div>
+                    <div className="com-form-error">{errors.departmentId}</div>
                   )}
                 </div>
 
                 {/* Deadline */}
-                <div>
-                  <label
-                    style={{
-                      display: 'block',
-                      fontWeight: '600',
-                      fontSize: '13px',
-                      color: '#334155',
-                      marginBottom: '6px',
-                      textAlign: 'left'
-                    }}
-                  >
-                    Application Deadline <span style={{ color: '#ef4444', fontWeight: '700' }}>*</span>
+                <div className="com-form-group">
+                  <label className="com-form-label">
+                    Application Deadline{" "}
+                    <span className="com-required-asterisk">*</span>
                   </label>
                   <input
                     type="date"
@@ -392,55 +239,25 @@ const CreateOpportunityModal = ({
                     onChange={handleChange}
                     min={minDate}
                     max={maxDate}
-                    style={{
-                      width: '100%',
-                      padding: '8px 10px',
-                      fontSize: '13px',
-                      border: errors.deadline ? '1px solid #ef4444' : '1px solid #cbd5e1',
-                      borderRadius: '6px',
-                      outline: 'none',
-                      cursor: 'pointer',
-                      backgroundColor: '#ffffff',
-                      transition: 'all 0.2s ease'
-                    }}
-                    onFocus={(e) => {
-                      if (!errors.deadline) {
-                        e.target.style.borderColor = '#27235C';
-                        e.target.style.boxShadow = '0 0 0 0.2rem rgba(39, 35, 92, 0.25)';
-                      }
-                    }}
-                    onBlur={(e) => {
-                      if (!errors.deadline) {
-                        e.target.style.borderColor = '#cbd5e1';
-                        e.target.style.boxShadow = 'none';
-                      }
-                    }}
+                    className={`com-form-input ${
+                      errors.deadline ? "error" : ""
+                    }`}
                   />
                   {errors.deadline && (
-                    <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>
-                      {errors.deadline}
-                    </div>
+                    <div className="com-form-error">{errors.deadline}</div>
                   )}
-                  <small style={{ fontSize: '11px', color: '#64748b', marginTop: '2px', display: 'block', fontStyle: 'italic', textAlign: 'left' }}>
-                    Select a date between {new Date(minDate).toLocaleDateString()} and{" "}
+                  <small className="com-form-hint">
+                    Select a date between{" "}
+                    {new Date(minDate).toLocaleDateString()} and{" "}
                     {new Date(maxDate).toLocaleDateString()}
                   </small>
                 </div>
               </div>
 
               {/* Description - Full Width */}
-              <div style={{ marginBottom: '16px' }}>
-                <label
-                  style={{
-                    display: 'block',
-                    fontWeight: '600',
-                    fontSize: '13px',
-                    color: '#334155',
-                    marginBottom: '6px',
-                    textAlign: 'left'
-                  }}
-                >
-                  Description <span style={{ color: '#ef4444', fontWeight: '700' }}>*</span>
+              <div className="com-form-group">
+                <label className="com-form-label">
+                  Description <span className="com-required-asterisk">*</span>
                 </label>
                 <textarea
                   name="description"
@@ -449,54 +266,19 @@ const CreateOpportunityModal = ({
                   onChange={handleChange}
                   rows={4}
                   maxLength={1000}
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    fontSize: '13px',
-                    border: errors.description ? '1px solid #ef4444' : '1px solid #cbd5e1',
-                    borderRadius: '6px',
-                    outline: 'none',
-                    resize: 'vertical',
-                    fontFamily: 'inherit',
-                    lineHeight: '1.4',
-                    backgroundColor: '#ffffff',
-                    transition: 'all 0.2s ease',
-                    minHeight: '80px',
-                    maxHeight: '120px'
-                  }}
-                  onFocus={(e) => {
-                    if (!errors.description) {
-                      e.target.style.borderColor = '#27235C';
-                      e.target.style.boxShadow = '0 0 0 0.2rem rgba(39, 35, 92, 0.25)';
-                    }
-                  }}
-                  onBlur={(e) => {
-                    if (!errors.description) {
-                      e.target.style.borderColor = '#cbd5e1';
-                      e.target.style.boxShadow = 'none';
-                    }
-                  }}
+                  className={`com-form-textarea ${
+                    errors.description ? "error" : ""
+                  }`}
                 />
                 {errors.description && (
-                  <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>
-                    {errors.description}
-                  </div>
+                  <div className="com-form-error">{errors.description}</div>
                 )}
               </div>
 
               {/* Requirements - Full Width */}
-              <div style={{ marginBottom: '16px' }}>
-                <label
-                  style={{
-                    display: 'block',
-                    fontWeight: '600',
-                    fontSize: '13px',
-                    color: '#334155',
-                    marginBottom: '6px',
-                    textAlign: 'left'
-                  }}
-                >
-                  Requirements <span style={{ color: '#ef4444', fontWeight: '700' }}>*</span>
+              <div className="com-form-group">
+                <label className="com-form-label">
+                  Requirements <span className="com-required-asterisk">*</span>
                 </label>
                 <textarea
                   name="requirements"
@@ -505,55 +287,18 @@ const CreateOpportunityModal = ({
                   onChange={handleChange}
                   rows={3}
                   maxLength={500}
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    fontSize: '13px',
-                    border: errors.requirements ? '1px solid #ef4444' : '1px solid #cbd5e1',
-                    borderRadius: '6px',
-                    outline: 'none',
-                    resize: 'vertical',
-                    fontFamily: 'inherit',
-                    lineHeight: '1.4',
-                    backgroundColor: '#ffffff',
-                    transition: 'all 0.2s ease',
-                    minHeight: '80px',
-                    maxHeight: '120px'
-                  }}
-                  onFocus={(e) => {
-                    if (!errors.requirements) {
-                      e.target.style.borderColor = '#27235C';
-                      e.target.style.boxShadow = '0 0 0 0.2rem rgba(39, 35, 92, 0.25)';
-                    }
-                  }}
-                  onBlur={(e) => {
-                    if (!errors.requirements) {
-                      e.target.style.borderColor = '#cbd5e1';
-                      e.target.style.boxShadow = 'none';
-                    }
-                  }}
+                  className={`com-form-textarea ${
+                    errors.requirements ? "error" : ""
+                  }`}
                 />
                 {errors.requirements && (
-                  <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>
-                    {errors.requirements}
-                  </div>
+                  <div className="com-form-error">{errors.requirements}</div>
                 )}
               </div>
 
               {/* Eligibility Criteria - Full Width */}
-              <div style={{ marginBottom: '16px' }}>
-                <label
-                  style={{
-                    display: 'block',
-                    fontWeight: '600',
-                    fontSize: '13px',
-                    color: '#334155',
-                    marginBottom: '6px',
-                    textAlign: 'left'
-                  }}
-                >
-                  Eligibility Criteria
-                </label>
+              <div className="com-form-group">
+                <label className="com-form-label">Eligibility Criteria</label>
                 <textarea
                   name="eligibilityCriteria"
                   placeholder="Define eligibility criteria (optional)..."
@@ -561,80 +306,22 @@ const CreateOpportunityModal = ({
                   onChange={handleChange}
                   rows={2}
                   maxLength={500}
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    fontSize: '13px',
-                    border: '1px solid #cbd5e1',
-                    borderRadius: '6px',
-                    outline: 'none',
-                    resize: 'vertical',
-                    fontFamily: 'inherit',
-                    lineHeight: '1.4',
-                    backgroundColor: '#ffffff',
-                    transition: 'all 0.2s ease',
-                    minHeight: '80px',
-                    maxHeight: '120px'
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = '#27235C';
-                    e.target.style.boxShadow = '0 0 0 0.2rem rgba(39, 35, 92, 0.25)';
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = '#cbd5e1';
-                    e.target.style.boxShadow = 'none';
-                  }}
+                  className="com-form-textarea"
                 />
               </div>
 
               {/* Status and Info Row */}
-              <div 
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '250px 1fr',
-                  gap: '20px',
-                  marginBottom: '16px',
-                  alignItems: 'start'
-                }}
-              >
+              <div className="com-status-row">
                 {/* Status - Left Side */}
-                <div>
-                  <label
-                    style={{
-                      display: 'block',
-                      fontWeight: '600',
-                      fontSize: '13px',
-                      color: '#334155',
-                      marginBottom: '6px',
-                      textAlign: 'left'
-                    }}
-                  >
-                    Status <span style={{ color: '#ef4444', fontWeight: '700' }}>*</span>
+                <div className="com-form-group">
+                  <label className="com-form-label">
+                    Status <span className="com-required-asterisk">*</span>
                   </label>
                   <select
                     name="status"
                     value={formData.status}
                     onChange={handleChange}
-                    style={{
-                      width: '100%',
-                      padding: '8px 10px',
-                      fontSize: '13px',
-                      border: '1px solid #cbd5e1',
-                      borderRadius: '6px',
-                      outline: 'none',
-                      cursor: 'pointer',
-                      backgroundColor: '#ffffff',
-                      transition: 'all 0.2s ease',
-                      textAlign: 'left'
-                    }}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = '#27235C';
-                      e.target.style.boxShadow = '0 0 0 0.2rem rgba(39, 35, 92, 0.25)';
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = '#cbd5e1';
-                      e.target.style.boxShadow = 'none';
-                    }}
+                    className="com-form-select"
                   >
                     <option value="Active">Active</option>
                     <option value="Pending">Pending</option>
@@ -643,120 +330,35 @@ const CreateOpportunityModal = ({
                 </div>
 
                 {/* Info Alert - Right Side */}
-                <div
-                  style={{
-                    padding: '12px 16px',
-                    backgroundColor: '#f0f9ff',
-                    border: '1px solid #bae6fd',
-                    borderRadius: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    fontSize: '12px',
-                    color: '#0369a1',
-                    marginTop: '20px' // Aligns with select field
-                  }}
-                >
-                  <i 
-                    className="bi bi-info-circle-fill" 
-                    style={{ 
-                      fontSize: '16px',
-                      flexShrink: 0,
-                      color: '#0284c7'
-                    }}
-                  ></i>
-                  <span style={{ lineHeight: '1.4' }}>
-                    Employees will be able to view and apply for active opportunities
+                <div className="com-info-alert">
+                  <i className="bi bi-info-circle-fill com-info-icon"></i>
+                  <span className="com-info-text">
+                    Employees will be able to view and apply for active
+                    opportunities
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Modal Footer - Fixed */}
-            <div
-              style={{
-                padding: '12px 20px',
-                borderTop: '1px solid #e2e8f0',
-                background: '#ffffff',
-                flexShrink: 0,
-                display: 'flex',
-                justifyContent: 'flex-end',
-                gap: '8px',
-                borderBottomLeftRadius: '12px',
-                borderBottomRightRadius: '12px'
-              }}
-            >
-              {/* Close Button */}
+            {/* Modal Footer */}
+            <div className="com-modal-footer">
               <button
                 type="button"
                 onClick={handleClose}
                 disabled={loading}
-                style={{
-                  background: '#6c757d',
-                  borderColor: '#6c757d',
-                  color: '#ffffff',
-                  fontWeight: '600',
-                  padding: '8px 16px',
-                  fontSize: '13px',
-                  borderRadius: '6px',
-                  border: 'none',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  opacity: loading ? 0.65 : 1,
-                  transition: 'all 0.2s ease',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-                onMouseEnter={(e) => {
-                  if (!loading) {
-                    e.target.style.background = '#5a6268';
-                    e.target.style.borderColor = '#5a6268';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!loading) {
-                    e.target.style.background = '#6c757d';
-                    e.target.style.borderColor = '#6c757d';
-                  }
-                }}
+                className="com-btn-cancel"
               >
                 Cancel
               </button>
-              
-              {/* Create Opportunity Button */}
+
               <button
                 type="submit"
                 disabled={loading}
-                style={{
-                  background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
-                  border: 'none',
-                  color: '#ffffff',
-                  padding: '8px 16px',
-                  fontWeight: '600',
-                  fontSize: '13px',
-                  borderRadius: '6px',
-                  transition: 'all 0.12s ease',
-                  boxShadow: '0 2px 8px rgba(151, 36, 126, 0.25)',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  opacity: loading ? 0.65 : 1,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
+                className="com-btn-submit"
               >
                 {loading ? (
                   <>
-                    <span
-                      style={{
-                        width: '14px',
-                        height: '14px',
-                        border: '2px solid #ffffff',
-                        borderTopColor: 'transparent',
-                        borderRadius: '50%',
-                        animation: 'spin 0.6s linear infinite',
-                        display: 'inline-block'
-                      }}
-                    />
+                    <span className="com-spinner" />
                     Creating...
                   </>
                 ) : (
@@ -770,16 +372,6 @@ const CreateOpportunityModal = ({
           </form>
         </div>
       </div>
-
-      {/* Keyframe Animation for Spinner */}
-      <style>
-        {`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}
-      </style>
     </>
   );
 };

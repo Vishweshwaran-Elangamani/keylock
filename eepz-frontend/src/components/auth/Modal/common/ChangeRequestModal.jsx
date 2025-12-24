@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import ChangeRequestService from "../../../../services/auth/changeRequestService";
+import "../../../../styles/auth/common/ChangeRequestModal.css";
 
 const ChangeRequestModal = ({
   show,
@@ -155,73 +156,16 @@ const ChangeRequestModal = ({
 
   if (!show) return null;
 
+  // PENDING REQUEST VIEW
   if (hasPendingRequest) {
     return (
       <>
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(39,35,92,0.4)",
-            backdropFilter: "blur(8px)",
-            WebkitBackdropFilter: "blur(8px)",
-            zIndex: 1040,
-          }}
-          onClick={handleClose}
-        />
+        <div className="crm-backdrop" onClick={handleClose} />
 
-        <div
-          style={{
-            position: "fixed",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            maxWidth: "600px",
-            maxHeight: "75vh",
-            zIndex: 1050,
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <div
-            style={{
-              borderRadius: "0.5rem",
-              background: "#fff",
-              boxShadow: "0 8px 28px rgba(0,0,0,0.22)",
-              overflow: "hidden",
-              width: "100%",
-              maxHeight: "85vh",
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            <div
-              style={{
-                background: "#27235C",
-                color: "#fff",
-                padding: "13px 15px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                fontSize: "15px",
-                fontWeight: 600,
-                borderRadius: "0.5rem 0.5rem 0 0",
-                flexShrink: 0,
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  color: "#fff",
-                  fontSize: 15,
-                  fontWeight: 600,
-                }}
-              >
+        <div className="crm-modal-container crm-modal-container-pending">
+          <div className="crm-modal-dialog">
+            <div className="crm-modal-header">
+              <div className="crm-header-title">
                 <i className="bi bi-exclamation-circle"></i>
                 Request Account Change
               </div>
@@ -230,131 +174,50 @@ const ChangeRequestModal = ({
                 onClick={handleClose}
                 disabled={isLoading}
                 aria-label="Close"
-                style={{
-                  background: "none",
-                  border: "none",
-                  color: "#fff",
-                  fontSize: 18,
-                  cursor: isLoading ? "not-allowed" : "pointer",
-                  opacity: isLoading ? 0.7 : 1,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                className="crm-close-button"
               >
                 <i className="bi bi-x-lg"></i>
               </button>
             </div>
 
-            <div
-              style={{
-                padding: "20px",
-                background: "#fff",
-                textAlign: "left",
-                overflowY: "auto",
-                flex: 1,
-              }}
-            >
-              <div
-                style={{
-                  background: "#fef2f2",
-                  border: "1px solid #fecaca",
-                  borderRadius: 8,
-                  padding: 16,
-                  marginBottom: 24,
-                  color: "#b91c1c",
-                  display: "flex",
-                  gap: 12,
-                  fontSize: 14,
-                  alignItems: "flex-start",
-                }}
-              >
-                <i
-                  className="bi bi-exclamation-triangle-fill"
-                  style={{ fontSize: 20, flexShrink: 0 }}
-                ></i>
+            <div className="crm-modal-body">
+              <div className="crm-alert-danger">
+                <i className="bi bi-exclamation-triangle-fill crm-alert-icon"></i>
                 <div>
-                  <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 4 }}>
+                  <div className="crm-alert-title">
                     You already have a pending email change request.
                   </div>
-                  <div style={{ fontSize: 13, margin: 0 }}>
-                    Please wait for admin approval or cancel the existing request.
+                  <div className="crm-alert-message">
+                    Please wait for admin approval or cancel the existing
+                    request.
                   </div>
                 </div>
               </div>
 
-              <div style={{ marginBottom: 24 }}>
-                <div
-                  style={{
-                    fontSize: 14,
-                    fontWeight: 600,
-                    marginBottom: 12,
-                    color: "#334155",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 6,
-                  }}
-                >
+              <div className="crm-info-section">
+                <div className="crm-info-title">
                   <i className="bi bi-info-circle"></i>
                   What can you do?
                 </div>
-                <ul
-                  style={{
-                    margin: 0,
-                    paddingLeft: 24,
-                    color: "#64748b",
-                    fontSize: 13,
-                    lineHeight: 1.6,
-                  }}
-                >
+                <ul className="crm-info-list">
                   <li>
-                    Wait for the administrator to review your pending email change
-                    request
+                    Wait for the administrator to review your pending email
+                    change request
                   </li>
                   <li>Cancel your pending request using the button below</li>
                   <li>
-                    After cancellation, you can submit a new email change request
+                    After cancellation, you can submit a new email change
+                    request
                   </li>
                 </ul>
               </div>
             </div>
 
-            <div
-              style={{
-                padding: "10px 15px",
-                borderTop: "1px solid #e2e8f0",
-                background: "#fff",
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: 8,
-                borderBottomLeftRadius: "0.5rem",
-                borderBottomRightRadius: "0.5rem",
-                flexShrink: 0,
-              }}
-            >
+            <div className="crm-modal-footer">
               <button
                 type="button"
                 onClick={handleClose}
-                style={{
-                  background: "#6c757d",
-                  border: "none",
-                  color: "#fff",
-                  fontWeight: 600,
-                  padding: "7px 12px",
-                  fontSize: 12,
-                  borderRadius: 5,
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.background = "#5a6268";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.background = "#6c757d";
-                }}
+                className="crm-btn-cancel"
               >
                 <i className="bi bi-check2"></i> Close
               </button>
@@ -363,50 +226,12 @@ const ChangeRequestModal = ({
                 type="button"
                 onClick={handleCancelRequest}
                 disabled={isLoading}
-                style={{
-                  background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                  border: "none",
-                  color: "#fff",
-                  fontWeight: 600,
-                  padding: "7px 12px",
-                  fontSize: 12,
-                  borderRadius: 5,
-                  boxShadow: "0 2px 8px rgba(151,36,126,0.25)",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  cursor: isLoading ? "not-allowed" : "pointer",
-                  opacity: isLoading ? 0.85 : 1,
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  if (!isLoading) e.target.style.opacity = 0.93;
-                }}
-                onMouseLeave={(e) => {
-                  if (!isLoading) e.target.style.opacity = 1;
-                }}
+                className="crm-btn-primary"
               >
                 {isLoading ? (
                   <>
-                    <span
-                      style={{
-                        width: 14,
-                        height: 14,
-                        border: "2px solid #fff",
-                        borderTop: "2px solid #E01950",
-                        borderRadius: "50%",
-                        animation: "spin 0.7s linear infinite",
-                        display: "inline-block",
-                        marginRight: 6,
-                      }}
-                    />
+                    <span className="crm-spinner" />
                     Cancelling Request...
-                    <style>{`
-                      @keyframes spin {
-                        0% { transform: rotate(0deg);}
-                        100% { transform: rotate(360deg);}
-                      }
-                    `}</style>
                   </>
                 ) : (
                   <>
@@ -421,72 +246,15 @@ const ChangeRequestModal = ({
     );
   }
 
+  // FORM VIEW
   return (
     <>
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(39,35,92,0.4)",
-          backdropFilter: "blur(8px)",
-          WebkitBackdropFilter: "blur(8px)",
-          zIndex: 1040,
-        }}
-        onClick={handleClose}
-      />
+      <div className="crm-backdrop" onClick={handleClose} />
 
-      <div
-        style={{
-          position: "fixed",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: "95%",
-          maxWidth: "700px",
-          maxHeight: "85vh",
-          zIndex: 1050,
-          flexDirection: "column",
-        }}
-      >
-        <div
-          style={{
-            borderRadius: "0.5rem",
-            background: "#fff",
-            boxShadow: "0 8px 28px rgba(0,0,0,0.22)",
-            overflow: "hidden",
-            width: "100%",
-            maxHeight: "85vh",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <div
-            style={{
-              background: "#27235C",
-              color: "#fff",
-              padding: "13px 15px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              fontSize: "15px",
-              fontWeight: 600,
-              borderRadius: "0.5rem 0.5rem 0 0",
-              flexShrink: 0,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                color: "#fff",
-                fontSize: 15,
-                fontWeight: 600,
-              }}
-            >
+      <div className="crm-modal-container">
+        <div className="crm-modal-dialog">
+          <div className="crm-modal-header">
+            <div className="crm-header-title">
               <i className="bi bi-pencil-square"></i>
               Request Account Change
             </div>
@@ -494,103 +262,40 @@ const ChangeRequestModal = ({
               type="button"
               onClick={handleClose}
               aria-label="Close"
-              style={{
-                background: "none",
-                border: "none",
-                color: "#fff",
-                fontSize: 18,
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              className="crm-close-button"
             >
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
 
-          <form
-            onSubmit={handleSubmit}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              flex: 1,
-              overflow: "hidden",
-            }}
-          >
-            <div
-              style={{
-                padding: "20px",
-                background: "#fff",
-                textAlign: "left",
-                overflowY: "auto",
-                flex: 1,
-              }}
-            >
-              <div
-                style={{
-                  background: "#f0f9ff",
-                  border: "1px solid #bae6fd",
-                  borderRadius: 8,
-                  padding: 16,
-                  marginBottom: 24,
-                  display: "flex",
-                  gap: 12,
-                  color: "#0369a1",
-                  fontSize: 14,
-                }}
-              >
-                <i
-                  className="bi bi-info-circle-fill"
-                  style={{ fontSize: 20, flexShrink: 0 }}
-                ></i>
+          <form onSubmit={handleSubmit} className="crm-form">
+            <div className="crm-modal-body">
+              <div className="crm-alert-info">
+                <i className="bi bi-info-circle-fill crm-alert-icon"></i>
                 <div>
-                  <strong>Note:</strong> You can only request to change your email to a <strong>Gmail address (@gmail.com)</strong>. Your current password is required for security verification. Your request will be sent to admin for approval. You can only have one pending request at a time.
+                  <strong>Note:</strong> You can only request to change your
+                  email to a <strong>Gmail address (@gmail.com)</strong>. Your
+                  current password is required for security verification. Your
+                  request will be sent to admin for approval. You can only have
+                  one pending request at a time.
                 </div>
               </div>
 
-              <div style={{ marginBottom: 20 }}>
-                <label
-                  style={{
-                    display: "block",
-                    fontWeight: 600,
-                    color: "#334155",
-                    fontSize: 14,
-                    marginBottom: 6,
-                  }}
-                >
-                  Current Email Address
-                </label>
+              <div className="crm-form-group">
+                <label className="crm-form-label">Current Email Address</label>
                 <input
                   type="text"
                   value={currentEmail}
                   disabled
                   readOnly
-                  style={{
-                    width: "100%",
-                    padding: 10,
-                    fontSize: 14,
-                    borderRadius: 6,
-                    border: "1px solid #d0d0d0",
-                    background: "#f0f0f0",
-                    color: "#666",
-                    cursor: "not-allowed",
-                  }}
+                  className="crm-form-input"
                 />
               </div>
 
-              <div style={{ marginBottom: 20 }}>
-                <label
-                  style={{
-                    display: "block",
-                    fontWeight: 600,
-                    color: "#334155",
-                    fontSize: 14,
-                    marginBottom: 6,
-                  }}
-                >
+              <div className="crm-form-group">
+                <label className="crm-form-label">
                   New Gmail Address{" "}
-                  <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                  <span className="crm-required-asterisk">*</span>
                 </label>
                 <input
                   type="email"
@@ -600,43 +305,20 @@ const ChangeRequestModal = ({
                   onChange={(e) =>
                     setFormData({ ...formData, newEmail: e.target.value })
                   }
-                  style={{
-                    width: "100%",
-                    padding: 10,
-                    fontSize: 14,
-                    borderRadius: 6,
-                    border: "1px solid #cbd5e1",
-                    transition: "all 0.2s ease",
-                    outline: "none",
-                  }}
+                  className="crm-form-input"
                 />
-                <small
-                  style={{
-                    color: "#64748b",
-                    fontSize: 12,
-                    marginTop: 4,
-                    display: "block",
-                  }}
-                >
+                <small className="crm-form-help">
                   <i className="bi bi-envelope" style={{ marginRight: 4 }}></i>
                   Only Gmail addresses (@gmail.com) are allowed
                 </small>
               </div>
 
-              <div style={{ marginBottom: 20 }}>
-                <label
-                  style={{
-                    display: "block",
-                    fontWeight: 600,
-                    color: "#334155",
-                    fontSize: 14,
-                    marginBottom: 6,
-                  }}
-                >
+              <div className="crm-form-group">
+                <label className="crm-form-label">
                   Current Password{" "}
-                  <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                  <span className="crm-required-asterisk">*</span>
                 </label>
-                <div style={{ position: "relative" }}>
+                <div className="crm-password-wrapper">
                   <input
                     type={showPassword ? "text" : "password"}
                     value={formData.currentPassword}
@@ -649,65 +331,37 @@ const ChangeRequestModal = ({
                     placeholder="Enter your current password for verification"
                     required
                     minLength={6}
-                    style={{
-                      width: "100%",
-                      padding: 10,
-                      paddingRight: 45,
-                      fontSize: 14,
-                      borderRadius: 6,
-                      border: "1px solid #cbd5e1",
-                      transition: "all 0.2s ease",
-                      outline: "none",
-                    }}
+                    className="crm-form-input crm-password-input"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    style={{
-                      position: "absolute",
-                      right: 10,
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      color: "#666",
-                      fontSize: 18,
-                      padding: 5,
-                    }}
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    className="crm-password-toggle"
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
                   >
                     <i
-                      className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}
+                      className={`bi ${
+                        showPassword ? "bi-eye-slash" : "bi-eye"
+                      }`}
                     ></i>
                   </button>
                 </div>
-                <small
-                  style={{
-                    color: "#64748b",
-                    fontSize: 12,
-                    marginTop: 4,
-                    display: "block",
-                  }}
-                >
-                  <i className="bi bi-shield-lock" style={{ marginRight: 4 }}></i>
+                <small className="crm-form-help">
+                  <i
+                    className="bi bi-shield-lock"
+                    style={{ marginRight: 4 }}
+                  ></i>
                   Your password is required to verify this change request for
                   security purposes
                 </small>
               </div>
 
-              <div style={{ marginBottom: 20 }}>
-                <label
-                  style={{
-                    display: "block",
-                    fontWeight: 600,
-                    color: "#334155",
-                    fontSize: 14,
-                    marginBottom: 6,
-                  }}
-                >
+              <div className="crm-form-group">
+                <label className="crm-form-label">
                   Reason for Change{" "}
-                  <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                  <span className="crm-required-asterisk">*</span>
                 </label>
                 <textarea
                   required
@@ -719,73 +373,25 @@ const ChangeRequestModal = ({
                   onChange={(e) =>
                     setFormData({ ...formData, reason: e.target.value })
                   }
-                  style={{
-                    width: "100%",
-                    padding: 10,
-                    fontSize: 14,
-                    borderRadius: 6,
-                    border: "1px solid #cbd5e1",
-                    transition: "all 0.2s ease",
-                    outline: "none",
-                    resize: "vertical",
-                    minHeight: 80,
-                    maxHeight: 120,
-                  }}
+                  className="crm-form-textarea"
                 ></textarea>
-                <small
-                  style={{
-                    color: "#64748b",
-                    fontSize: 12,
-                    marginTop: 4,
-                    display: "block",
-                  }}
-                >
+                <small className="crm-char-count">
                   {formData.reason.length}/1000 characters
-                  {formData.reason.length > 0 && formData.reason.length < 10 && (
-                    <span style={{ color: "#dc3545", marginLeft: 8 }}>
-                      (Minimum 10 characters required)
-                    </span>
-                  )}
+                  {formData.reason.length > 0 &&
+                    formData.reason.length < 10 && (
+                      <span className="crm-char-count-error">
+                        (Minimum 10 characters required)
+                      </span>
+                    )}
                 </small>
               </div>
             </div>
 
-            <div
-              style={{
-                padding: "10px 15px",
-                borderTop: "1px solid #e2e8f0",
-                background: "#fff",
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: 8,
-                borderBottomLeftRadius: "0.5rem",
-                borderBottomRightRadius: "0.5rem",
-                flexShrink: 0,
-              }}
-            >
+            <div className="crm-modal-footer">
               <button
                 type="button"
                 onClick={handleClose}
-                style={{
-                  background: "#6c757d",
-                  border: "none",
-                  color: "#fff",
-                  fontWeight: 600,
-                  padding: "7px 12px",
-                  fontSize: 12,
-                  borderRadius: 5,
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.background = "#5a6268";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.background = "#6c757d";
-                }}
+                className="crm-btn-cancel"
               >
                 <i className="bi bi-x-circle"></i> Cancel
               </button>
@@ -798,54 +404,7 @@ const ChangeRequestModal = ({
                   formData.currentPassword.trim().length < 6 ||
                   formData.reason.length < 10
                 }
-                style={{
-                  background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                  border: "none",
-                  color: "#fff",
-                  fontWeight: 600,
-                  padding: "7px 12px",
-                  fontSize: 12,
-                  borderRadius: 5,
-                  boxShadow: "0 2px 8px rgba(151,36,126,0.25)",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  cursor:
-                    !formData.newEmail.trim() ||
-                    !formData.currentPassword.trim() ||
-                    formData.currentPassword.trim().length < 6 ||
-                    formData.reason.length < 10
-                      ? "not-allowed"
-                      : "pointer",
-                  opacity:
-                    !formData.newEmail.trim() ||
-                    !formData.currentPassword.trim() ||
-                    formData.currentPassword.trim().length < 6 ||
-                    formData.reason.length < 10
-                      ? 0.6
-                      : 1,
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  if (
-                    formData.newEmail.trim() &&
-                    formData.currentPassword.trim() &&
-                    formData.currentPassword.trim().length >= 6 &&
-                    formData.reason.length >= 10
-                  ) {
-                    e.target.style.opacity = 0.93;
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (
-                    formData.newEmail.trim() &&
-                    formData.currentPassword.trim() &&
-                    formData.currentPassword.trim().length >= 6 &&
-                    formData.reason.length >= 10
-                  ) {
-                    e.target.style.opacity = 1;
-                  }
-                }}
+                className="crm-btn-primary"
               >
                 <i className="bi bi-send"></i> Submit Request
               </button>

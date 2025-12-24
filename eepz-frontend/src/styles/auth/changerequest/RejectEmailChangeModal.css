@@ -1,0 +1,328 @@
+/* ==================== BACKDROP ==================== */
+.recm-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(39, 35, 92, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1040;
+  }
+  
+  /* ==================== MODAL CONTAINER ==================== */
+  .recm-modal-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 95%;
+    max-width: 700px;
+    max-height: 75vh;
+    z-index: 1050;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* ==================== MODAL DIALOG ==================== */
+  .recm-modal-dialog {
+    border-radius: 0.5rem;
+    background: #fff;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
+    overflow: hidden;
+    width: 100%;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* ==================== HEADER ==================== */
+  .recm-modal-header {
+    background: #27235c;
+    color: #fff;
+    padding: 13px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 0.5rem 0.5rem 0 0;
+    flex-shrink: 0;
+  }
+  
+  .recm-header-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  
+  .recm-close-button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .recm-close-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  
+  /* ==================== BODY ==================== */
+  .recm-modal-body {
+    padding: 20px;
+    background: #fff;
+    text-align: left;
+    overflow-y: auto;
+    flex: 1;
+  }
+  
+  /* ==================== REQUEST DETAILS BOX ==================== */
+  .recm-details-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .recm-details-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .recm-details-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .recm-detail-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+  }
+  
+  .recm-detail-label {
+    color: #64748b;
+    font-weight: 600;
+  }
+  
+  .recm-detail-value {
+    text-align: right;
+  }
+  
+  .recm-detail-value strong {
+    color: #1e293b;
+  }
+  
+  .recm-email-current {
+    background: #fef3c7;
+    color: #92400e;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  
+  .recm-email-new {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  
+  .recm-date-value {
+    color: #1e293b;
+  }
+  
+  /* ==================== REASON SECTION ==================== */
+  .recm-reason-section {
+    margin-top: 8px;
+  }
+  
+  .recm-reason-label {
+    color: #64748b;
+    font-weight: 600;
+    font-size: 13px;
+    display: block;
+    margin-bottom: 6px;
+  }
+  
+  .recm-reason-box {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 13px;
+    color: #475569;
+    line-height: 1.6;
+  }
+  
+  /* ==================== REMARKS SECTION ==================== */
+  .recm-remarks-section {
+    margin-bottom: 16px;
+  }
+  
+  .recm-remarks-label {
+    font-weight: 600;
+    font-size: 13px;
+    color: #334155;
+    margin-bottom: 6px;
+    display: block;
+  }
+  
+  .recm-required-asterisk {
+    color: #ef4444;
+    font-weight: 700;
+  }
+  
+  .recm-remarks-textarea {
+    width: 100%;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 13px;
+    background: #fff;
+    color: #22223b;
+    resize: vertical;
+  }
+  
+  .recm-remarks-textarea:focus {
+    outline: none;
+    border-color: #27235c;
+  }
+  
+  .recm-remarks-textarea:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  .recm-char-count {
+    color: #64748b;
+    font-size: 11px;
+  }
+  
+  /* ==================== WARNING ALERT ==================== */
+  .recm-warning-alert {
+    display: flex;
+    align-items: flex-start;
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    border: 2px solid #dc2626;
+    color: #7f1d1d;
+    border-radius: 6px;
+    font-size: 12px;
+    padding: 10px 12px;
+    gap: 8px;
+  }
+  
+  .recm-warning-icon {
+    font-size: 16px;
+    margin-top: 2px;
+    color: #dc2626;
+  }
+  
+  .recm-warning-content strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #991b1b;
+  }
+  
+  /* ==================== FOOTER ==================== */
+  .recm-modal-footer {
+    padding: 10px 15px;
+    border-top: 1px solid #e2e8f0;
+    background: #fff;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+    flex-shrink: 0;
+  }
+  
+  /* ==================== BUTTONS ==================== */
+  .recm-btn-cancel {
+    background: #6c757d;
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 7px 12px;
+    font-size: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+  
+  .recm-btn-cancel:hover:not(:disabled) {
+    background: #5a6268;
+  }
+  
+  .recm-btn-cancel:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  
+  .recm-btn-reject {
+    background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 7px 12px;
+    font-size: 12px;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(151, 36, 126, 0.25);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .recm-btn-reject:hover:not(:disabled) {
+    opacity: 0.93;
+  }
+  
+  .recm-btn-reject:disabled {
+    cursor: not-allowed;
+    opacity: 0.85;
+  }
+  
+  /* ==================== SPINNER ==================== */
+  .recm-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #fff;
+    border-top: 2px solid #e01950;
+    border-radius: 50%;
+    animation: recm-spin 0.7s linear infinite;
+    display: inline-block;
+    margin-right: 6px;
+  }
+  
+  @keyframes recm-spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  

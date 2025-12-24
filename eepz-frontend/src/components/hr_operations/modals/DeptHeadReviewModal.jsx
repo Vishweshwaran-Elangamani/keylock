@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Modal } from "react-bootstrap";
 import { toast } from "sonner";
 import carearProgressionService from "../../../services/hr_operations/hr/careerProgressionService";
+import "../../../styles/hr_operations/hr/DeptHeadReviewModal.css";
 
 const DeptHeadReviewModal = ({
   show,
@@ -30,7 +31,7 @@ const DeptHeadReviewModal = ({
       onReviewSubmitted();
       handleClose();
     } catch (err) {
-      console.error(" Error approving:", err);
+      console.error("Error approving:", err);
       setError(err.message || "Failed to approve nomination");
       showToast("Error", err.message || "Failed to approve", "danger");
     } finally {
@@ -57,7 +58,7 @@ const DeptHeadReviewModal = ({
       onReviewSubmitted();
       handleClose();
     } catch (err) {
-      console.error(" Error rejecting:", err);
+      console.error("Error rejecting:", err);
       setError(err.message || "Failed to reject nomination");
       showToast("Error", err.message || "Failed to reject", "danger");
     } finally {
@@ -104,16 +105,17 @@ const DeptHeadReviewModal = ({
     }).format(amount);
   };
 
-  //  FAVORITISM LOGIC
+  // FAVORITISM LOGIC
   const getFavoritismRiskLevel = () => {
-    if (!favoritism) return { level: "UNKNOWN", color: "#6b7280" };
+    if (!favoritism) return { level: "UNKNOWN", className: "" };
 
     const riskScore = favoritism.riskScore || 0;
 
-    if (riskScore >= 75) return { level: " HIGH RISK", color: "#ef4444" };
-    if (riskScore >= 50) return { level: " MEDIUM RISK", color: "#f59e0b" };
-    if (riskScore >= 25) return { level: " LOW RISK", color: "#10b981" };
-    return { level: " NO RISK", color: "#06b6d4" };
+    if (riskScore >= 75) return { level: "HIGH RISK", className: "high-risk" };
+    if (riskScore >= 50)
+      return { level: "MEDIUM RISK", className: "medium-risk" };
+    if (riskScore >= 25) return { level: "LOW RISK", className: "low-risk" };
+    return { level: "NO RISK", className: "no-risk" };
   };
 
   const riskLevel = getFavoritismRiskLevel();
@@ -124,75 +126,66 @@ const DeptHeadReviewModal = ({
       : 0;
 
   return (
-    <Modal show={show} onHide={handleClose} size="lg" className="promo-modal">
-      <Modal.Header closeButton className="promo-modal-header">
+    <Modal show={show} onHide={handleClose} size="lg" className="dhrm-modal">
+      <Modal.Header closeButton>
         <Modal.Title>
           <i className="bi bi-eye me-2"></i>
           Department Head Review - Promotion Request
         </Modal.Title>
       </Modal.Header>
 
-      <Modal.Body className="promo-modal-body">
+      <Modal.Body>
         {error && (
-          <div className="alert alert-danger" role="alert">
-            <i className="bi bi-exclamation-triangle-fill me-2"></i>
+          <div className="dhrm-alert-danger" role="alert">
+            <i className="bi bi-exclamation-triangle-fill dhrm-alert-icon"></i>
             {error}
           </div>
         )}
 
-        {/*  NOMINATION DETAILS */}
-        <div className="promo-approval-info">
-          <div className="promo-info-card">
+        {/* NOMINATION DETAILS */}
+        <div className="dhrm-approval-info">
+          <div className="dhrm-info-card">
             <label>Employee:</label>
             <span>{nomination.employeeName}</span>
           </div>
-          <div className="promo-info-card">
+          <div className="dhrm-info-card">
             <label>Current Role:</label>
             <span>{nomination.currentRole}</span>
           </div>
-          <div className="promo-info-card">
+          <div className="dhrm-info-card">
             <label>New Role:</label>
             <span>{nomination.newRole}</span>
           </div>
-          <div className="promo-info-card">
+          <div className="dhrm-info-card">
             <label>Current Salary:</label>
             <span>{formatCurrency(nomination.oldSalary)}</span>
           </div>
         </div>
 
-        {/*  FAVORITISM CHECK - CRITICAL */}
-        <div
-          className="alert"
-          style={{
-            backgroundColor: riskLevel.level.includes("HIGH")
-              ? "#fee2e2"
-              : riskLevel.level.includes("MEDIUM")
-              ? "#fef3c7"
-              : "#d1fae5",
-            borderColor: riskLevel.color,
-            borderWidth: "2px",
-            borderStyle: "solid",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+        {/* FAVORITISM CHECK - CRITICAL */}
+        <div className={`dhrm-favoritism-alert ${riskLevel.className}`}>
+          <div className="dhrm-favoritism-content">
             <i
-              className="bi bi-shield-exclamation"
-              style={{ fontSize: "24px", color: riskLevel.color }}
+              className={`bi bi-shield-exclamation dhrm-favoritism-icon ${riskLevel.className}`}
             ></i>
             <div>
-              <strong style={{ color: riskLevel.color }}>
+              <strong
+                className={`dhrm-favoritism-title ${riskLevel.className}`}
+              >
                 FAVORITISM CHECK
               </strong>
-              <p style={{ marginTop: "4px", marginBottom: 0 }}>
+              <p className="dhrm-favoritism-risk">
                 Risk Level:{" "}
-                <strong style={{ color: riskLevel.color }}>
+                <strong className={`dhrm-risk-level ${riskLevel.className}`}>
                   {riskLevel.level}
                 </strong>
               </p>
               {favoritism && favoritism.riskFactors && (
-                <small style={{ display: "block", marginTop: "8px" }}>
+                <small className="dhrm-risk-factors">
                   {favoritism.riskFactors.map((factor, idx) => (
-                    <div key={idx}>• {factor}</div>
+                    <div key={idx} className="dhrm-risk-factor">
+                      • {factor}
+                    </div>
                   ))}
                 </small>
               )}
@@ -200,48 +193,43 @@ const DeptHeadReviewModal = ({
           </div>
         </div>
 
-        {/*  PROMOTION DETAILS */}
-        <div
-          className="promo-details-section"
-          style={{ backgroundColor: "#f0fdf4" }}
-        >
-          <h6 className="promo-details-heading"> Promotion Details</h6>
-          <div className="promo-details-grid">
-            <div className="promo-detail-item">
+        {/* PROMOTION DETAILS */}
+        <div className="dhrm-details-section">
+          <h6 className="dhrm-details-heading">Promotion Details</h6>
+          <div className="dhrm-details-grid">
+            <div className="dhrm-detail-item">
               <label>Proposed New Salary:</label>
-              <span style={{ fontWeight: "600", color: "#27235C" }}>
+              <span className="dhrm-detail-salary">
                 {formatCurrency(nomination.newSalary)}
               </span>
             </div>
-            <div className="promo-detail-item">
+            <div className="dhrm-detail-item">
               <label>Salary Increment:</label>
-              <span style={{ fontWeight: "600", color: "#166534" }}>
+              <span className="dhrm-detail-increment">
                 +{formatCurrency(increment)}
               </span>
             </div>
-            <div className="promo-detail-item">
+            <div className="dhrm-detail-item">
               <label>Increment %:</label>
-              <span style={{ fontWeight: "600", color: "#0369a1" }}>
-                {incrementPercent}%
-              </span>
+              <span className="dhrm-detail-percent">{incrementPercent}%</span>
             </div>
-            <div className="promo-detail-item">
+            <div className="dhrm-detail-item">
               <label>Justification:</label>
-              <span style={{ fontSize: "12px" }}>
+              <span className="dhrm-detail-justification">
                 {nomination.justification}
               </span>
             </div>
           </div>
         </div>
 
-        {/*  APPROVAL COMMENTS */}
+        {/* APPROVAL COMMENTS */}
         {!decision && (
-          <div className="mb-3">
-            <label htmlFor="approvalComments" className="form-label">
+          <div className="dhrm-form-group">
+            <label htmlFor="approvalComments" className="dhrm-form-label">
               Approval Comments (Optional)
             </label>
             <textarea
-              className="form-control promo-textarea-full"
+              className="dhrm-textarea"
               id="approvalComments"
               value={approvalComments}
               onChange={(e) => setApprovalComments(e.target.value)}
@@ -251,14 +239,14 @@ const DeptHeadReviewModal = ({
           </div>
         )}
 
-        {/*  REJECTION REASON */}
+        {/* REJECTION REASON */}
         {decision === "reject" && (
-          <div className="mb-3">
-            <label htmlFor="rejectionReason" className="form-label">
-              Rejection Reason <span className="text-danger">*</span>
+          <div className="dhrm-form-group">
+            <label htmlFor="rejectionReason" className="dhrm-form-label">
+              Rejection Reason <span className="dhrm-required">*</span>
             </label>
             <textarea
-              className="form-control promo-textarea-full"
+              className="dhrm-textarea"
               id="rejectionReason"
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
@@ -269,11 +257,11 @@ const DeptHeadReviewModal = ({
           </div>
         )}
 
-        {/*  INFO ALERT */}
-        <div className="alert alert-info" role="alert">
-          <i className="bi bi-info-circle me-2"></i>
-          <strong>Your Role:</strong>
-          <p style={{ marginTop: "8px", marginBottom: 0, fontSize: "12px" }}>
+        {/* INFO ALERT */}
+        <div className="dhrm-info-alert" role="alert">
+          <i className="bi bi-info-circle dhrm-info-icon"></i>
+          <strong className="dhrm-info-title">Your Role:</strong>
+          <p className="dhrm-info-text">
             As Department Head, you review the promotion based on employee
             performance, budget feasibility, and fairness. The favoritism check
             helps ensure fair promotion practices.
@@ -281,10 +269,10 @@ const DeptHeadReviewModal = ({
         </div>
       </Modal.Body>
 
-      <Modal.Footer className="promo-modal-footer">
+      <Modal.Footer>
         <button
           type="button"
-          className="btn btn-secondary"
+          className="btn dhrm-btn-cancel"
           onClick={handleClose}
         >
           Cancel
@@ -294,12 +282,7 @@ const DeptHeadReviewModal = ({
           <>
             <button
               type="button"
-              className="btn"
-              style={{
-                backgroundColor: "#ef4444",
-                color: "white",
-                border: "none",
-              }}
+              className="btn dhrm-btn-reject"
               onClick={() => setDecision("reject")}
             >
               <i className="bi bi-x-circle me-2"></i>
@@ -307,7 +290,7 @@ const DeptHeadReviewModal = ({
             </button>
             <button
               type="button"
-              className="btn promo-btn-submit"
+              className="btn dhrm-btn-approve"
               onClick={handleApprove}
               disabled={loading}
             >
@@ -321,26 +304,21 @@ const DeptHeadReviewModal = ({
           <>
             <button
               type="button"
-              className="btn btn-secondary"
+              className="btn dhrm-btn-back"
               onClick={() => setDecision("")}
             >
               Back
             </button>
             <button
               type="button"
-              className="btn"
-              style={{
-                backgroundColor: "#ef4444",
-                color: "white",
-                border: "none",
-              }}
+              className="btn dhrm-btn-reject"
               onClick={handleReject}
               disabled={loading || !rejectionReason.trim()}
             >
               {loading ? (
                 <>
                   <span
-                    className="spinner-border spinner-border-sm me-2"
+                    className="spinner-border spinner-border-sm dhrm-spinner"
                     role="status"
                   ></span>
                   Rejecting...

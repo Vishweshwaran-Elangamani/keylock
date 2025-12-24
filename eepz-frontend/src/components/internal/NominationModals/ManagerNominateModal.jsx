@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import nominationService from "../../../services/internal/nominationService";
 import userService from "../../../services/auth/userService";
 import { toast } from "sonner";
+import "../../../styles/internal/ManagerNominateModal.css";
 
 const ManagerNominateModal = ({
   show,
@@ -130,185 +131,60 @@ const ManagerNominateModal = ({
 
   return (
     <>
-      {/* Custom Backdrop with Blur Effect */}
-      <div
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(39, 35, 92, 0.4)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
-          zIndex: 1040,
-          transition: 'all 0.3s ease'
-        }}
-        onClick={onHide}
-      />
+      <div className="mgnm-backdrop" onClick={onHide} />
 
-      {/* Modal Wrapper */}
-      <div
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1050,
-          padding: '20px'
-        }}
-      >
-        {/* Modal Dialog - Compact Size from Image */}
-        <div
-          style={{
-            width: '100%',
-            maxWidth: '650px',
-            maxHeight: '85vh',
-            display: 'flex',
-            flexDirection: 'column',
-            borderRadius: '0.5rem',
-            overflow: 'hidden',
-            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.3)',
-            backgroundColor: '#ffffff'
-          }}
-        >
-          {/* Modal Header - Navy Blue Theme (AddPolicy) */}
-          <div
-            style={{
-              background: '#27235C',
-              color: '#ffffff',
-              padding: '16px 20px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexShrink: 0
-            }}
-          >
-            <div
-              style={{
-                fontSize: '16px',
-                fontWeight: '600',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                color: '#ffffff'
-              }}
-            >
+      <div className="mgnm-modal-wrapper">
+        <div className="mgnm-modal-dialog">
+          {/* Modal Header */}
+          <div className="mgnm-modal-header">
+            <div className="mgnm-header-title">
               <i className="bi bi-person-plus"></i>
               Nominate Team Member
             </div>
             <button
               onClick={onHide}
               disabled={loading}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: '#ffffff',
-                fontSize: '20px',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                padding: '0',
-                width: '24px',
-                height: '24px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                opacity: loading ? 0.5 : 1
-              }}
+              className="mgnm-close-button"
+              aria-label="Close"
             >
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
 
-          {/* Form - Scrollable Body */}
-          <form 
-            onSubmit={handleSubmit}
-            style={{ 
-              display: 'flex', 
-              flexDirection: 'column', 
-              flex: 1,
-              overflow: 'hidden'
-            }}
-          >
-            {/* Modal Body - Compact Padding */}
-            <div
-              style={{
-                padding: '16px 20px',
-                overflowY: 'auto',
-                flex: 1,
-                backgroundColor: '#ffffff',
-                maxHeight: 'calc(85vh - 120px)'
-              }}
-            >
-              {/* Info Section - Compact */}
-              <div
-                style={{
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '6px',
-                  background: '#f0f9ff',
-                  padding: '12px 16px',
-                  marginBottom: '16px'
-                }}
-              >
-                <p style={{ fontSize: '13px', color: '#334155', marginBottom: '6px' }}>
-                  <strong style={{ fontWeight: '600' }}>Opportunity:</strong> {opportunity.opportunityName}
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="mgnm-form">
+            {/* Modal Body */}
+            <div className="mgnm-modal-body">
+              {/* Info Section */}
+              <div className="mgnm-info-section">
+                <p className="mgnm-info-item">
+                  <span className="mgnm-info-label">Opportunity:</span>{" "}
+                  {opportunity.opportunityName}
                 </p>
-                <p style={{ fontSize: '13px', color: '#334155', marginBottom: '6px' }}>
-                  <strong style={{ fontWeight: '600' }}>Department:</strong> {opportunity.departmentName}
+                <p className="mgnm-info-item">
+                  <span className="mgnm-info-label">Department:</span>{" "}
+                  {opportunity.departmentName}
                 </p>
-                <p style={{ fontSize: '13px', color: '#334155', marginBottom: 0 }}>
-                  <strong style={{ fontWeight: '600' }}>Deadline:</strong>{" "}
+                <p className="mgnm-info-item">
+                  <span className="mgnm-info-label">Deadline:</span>{" "}
                   {new Date(opportunity.deadline).toLocaleDateString()}
                 </p>
               </div>
 
               {/* Select Team Member */}
-              <div style={{ marginBottom: '12px' }}>
-                <label
-                  style={{
-                    fontWeight: '600',
-                    fontSize: '13px',
-                    color: '#334155',
-                    marginBottom: '6px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px'
-                  }}
-                >
+              <div className="mgnm-form-group">
+                <label className="mgnm-form-label">
                   Select Team Member{" "}
-                  <span style={{ color: '#ef4444', fontWeight: '700' }}>*</span>
+                  <span className="mgnm-required-asterisk">*</span>
                 </label>
                 <select
                   name="employeeId"
                   value={formData.employeeId}
                   onChange={handleChange}
                   disabled={loadingEmployees}
-                  style={{
-                    width: '100%',
-                    border: errors.employeeId ? '1px solid #ef4444' : '1px solid #cbd5e1',
-                    borderRadius: '6px',
-                    padding: '8px 10px',
-                    fontSize: '13px',
-                    transition: 'all 0.2s ease',
-                    cursor: loadingEmployees ? 'not-allowed' : 'pointer',
-                    backgroundColor: '#ffffff',
-                    color: '#334155'
-                  }}
-                  onFocus={(e) => {
-                    if (!errors.employeeId) {
-                      e.target.style.borderColor = '#27235C';
-                      e.target.style.boxShadow = '0 0 0 0.2rem rgba(39, 35, 92, 0.25)';
-                    }
-                  }}
-                  onBlur={(e) => {
-                    if (!errors.employeeId) {
-                      e.target.style.borderColor = '#cbd5e1';
-                      e.target.style.boxShadow = 'none';
-                    }
-                  }}
+                  className={`mgnm-form-select ${
+                    errors.employeeId ? "error" : ""
+                  }`}
                 >
                   <option value="" disabled>
                     {loadingEmployees
@@ -322,27 +198,15 @@ const ManagerNominateModal = ({
                   ))}
                 </select>
                 {errors.employeeId && (
-                  <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>
-                    {errors.employeeId}
-                  </div>
+                  <div className="mgnm-form-error">{errors.employeeId}</div>
                 )}
               </div>
 
               {/* Justification Field */}
-              <div style={{ marginBottom: '12px' }}>
-                <label
-                  style={{
-                    fontWeight: '600',
-                    fontSize: '13px',
-                    color: '#334155',
-                    marginBottom: '6px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px'
-                  }}
-                >
+              <div className="mgnm-form-group">
+                <label className="mgnm-form-label">
                   Why is this team member a good fit?{" "}
-                  <span style={{ color: '#ef4444', fontWeight: '700' }}>*</span>
+                  <span className="mgnm-required-asterisk">*</span>
                 </label>
                 <textarea
                   name="justification"
@@ -351,135 +215,45 @@ const ManagerNominateModal = ({
                   onChange={handleChange}
                   rows={4}
                   maxLength={1000}
-                  style={{
-                    width: '100%',
-                    border: errors.justification ? '1px solid #ef4444' : '1px solid #cbd5e1',
-                    borderRadius: '6px',
-                    padding: '8px 10px',
-                    fontSize: '13px',
-                    transition: 'all 0.2s ease',
-                    resize: 'vertical',
-                    minHeight: '100px',
-                    maxHeight: '180px',
-                    fontFamily: 'inherit',
-                    lineHeight: '1.4',
-                    backgroundColor: '#ffffff'
-                  }}
-                  onFocus={(e) => {
-                    if (!errors.justification) {
-                      e.target.style.borderColor = '#27235C';
-                      e.target.style.boxShadow = '0 0 0 0.2rem rgba(39, 35, 92, 0.25)';
-                    }
-                  }}
-                  onBlur={(e) => {
-                    if (!errors.justification) {
-                      e.target.style.borderColor = '#cbd5e1';
-                      e.target.style.boxShadow = 'none';
-                    }
-                  }}
+                  className={`mgnm-form-textarea ${
+                    errors.justification ? "error" : ""
+                  }`}
                 />
                 {errors.justification && (
-                  <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>
-                    {errors.justification}
-                  </div>
+                  <div className="mgnm-form-error">{errors.justification}</div>
                 )}
-                <small style={{ fontSize: '11px', color: '#64748b', marginTop: '4px', display: 'block' }}>
+                <small className="mgnm-form-hint">
                   {formData.justification.length}/1000 characters
-                  {formData.justification.length >= 50 && !errors.justification && (
-                    <span style={{ color: '#22c55e', marginLeft: '8px' }}>
-                      ✓ Minimum length met
-                    </span>
-                  )}
+                  {formData.justification.length >= 50 &&
+                    !errors.justification && (
+                      <span className="mgnm-char-success">
+                        ✓ Minimum length met
+                      </span>
+                    )}
                 </small>
               </div>
             </div>
 
-            {/* Modal Footer - Compact */}
-            <div
-              style={{
-                padding: '10px 20px',
-                borderTop: '1px solid #e2e8f0',
-                background: '#ffffff',
-                flexShrink: 0,
-                display: 'flex',
-                justifyContent: 'flex-end',
-                gap: '8px',
-                borderBottomLeftRadius: '12px',
-                borderBottomRightRadius: '12px'
-              }}
-            >
-              {/* Cancel Button */}
+            {/* Modal Footer */}
+            <div className="mgnm-modal-footer">
               <button
                 type="button"
                 onClick={onHide}
                 disabled={loading}
-                style={{
-                  background: '#6c757d',
-                  borderColor: '#6c757d',
-                  color: '#ffffff',
-                  fontWeight: '600',
-                  padding: '7px 14px',
-                  fontSize: '13px',
-                  borderRadius: '6px',
-                  border: 'none',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  opacity: loading ? 0.65 : 1,
-                  transition: 'all 0.2s ease',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-                onMouseEnter={(e) => {
-                  if (!loading) {
-                    e.target.style.background = '#5a6268';
-                    e.target.style.borderColor = '#5a6268';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!loading) {
-                    e.target.style.background = '#6c757d';
-                    e.target.style.borderColor = '#6c757d';
-                  }
-                }}
+                className="mgnm-btn-cancel"
               >
                 <i className="bi bi-x-circle"></i>
                 Cancel
               </button>
 
-              {/* Nominate Button */}
               <button
                 type="submit"
                 disabled={loading}
-                style={{
-                  background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
-                  border: 'none',
-                  color: '#ffffff',
-                  padding: '7px 14px',
-                  fontWeight: '600',
-                  fontSize: '13px',
-                  borderRadius: '6px',
-                  transition: 'all 0.12s ease',
-                  boxShadow: '0 2px 8px rgba(151, 36, 126, 0.25)',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  opacity: loading ? 0.65 : 1,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
+                className="mgnm-btn-submit"
               >
                 {loading ? (
                   <>
-                    <span
-                      style={{
-                        width: '14px',
-                        height: '14px',
-                        border: '2px solid #ffffff',
-                        borderTopColor: 'transparent',
-                        borderRadius: '50%',
-                        animation: 'spin 0.6s linear infinite',
-                        display: 'inline-block'
-                      }}
-                    />
+                    <span className="mgnm-spinner" />
                     Nominating...
                   </>
                 ) : (
@@ -493,16 +267,6 @@ const ManagerNominateModal = ({
           </form>
         </div>
       </div>
-
-      {/* Keyframe Animation for Spinner */}
-      <style>
-        {`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}
-      </style>
     </>
   );
 };

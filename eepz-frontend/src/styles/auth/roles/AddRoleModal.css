@@ -1,500 +1,250 @@
-/* ===================================================================
-   ADD ROLE MODAL STYLES
-   Uses standard modal class naming pattern (custom suffix)
-   =================================================================== */
-
-/* ========================
-   MODAL BACKDROP
-   ======================== */
-.modal-backdrop-custom {
+/* ==================== BACKDROP ==================== */
+.arm-backdrop {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
+  background-color: rgba(39, 35, 92, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1040;
+}
+
+/* ==================== MODAL CONTAINER ==================== */
+.arm-modal-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 95%;
+  max-width: 590px;
   z-index: 1050;
-  animation: fadeIn 0.2s ease-in-out;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* ========================
-   MODAL WRAPPER
-   ======================== */
-.modal-wrapper-custom {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1055;
-  padding: 1rem;
-  overflow-y: auto;
-  animation: slideUp 0.3s ease-out;
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ========================
-   MODAL DIALOG
-   ======================== */
-.modal-dialog-custom {
-  width: 100%;
-  max-width: 700px;
-  margin: auto;
-}
-
-/* ========================
-   MODAL CONTENT
-   ======================== */
-.modal-content-custom {
-  background: #FFFFFF;
-  border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+/* ==================== MODAL DIALOG ==================== */
+.arm-modal-dialog {
+  border-radius: 0.5rem;
+  background: #fff;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
   overflow: hidden;
-  border: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
 }
 
-/* ========================
-   MODAL HEADER
-   ======================== */
-.modal-header-custom {
-  background: linear-gradient(90deg, #97247E 0%, #E01950 100%);
-  padding: 1.5rem 2rem;
+/* ==================== HEADER ==================== */
+.arm-modal-header {
+  background: #27235c;
+  color: #fff;
+  padding: 13px 15px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: none;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 0.5rem 0.5rem 0 0;
 }
 
-.modal-title-custom {
+.arm-header-title {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  color: #FFFFFF;
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0;
-  letter-spacing: -0.01em;
+  gap: 8px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
 }
 
-.modal-title-custom i {
-  font-size: 1.5rem;
-}
-
-.modal-close-btn {
-  background: rgba(255, 255, 255, 0.2);
+.arm-close-button {
+  background: none;
   border: none;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #FFFFFF;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 1rem;
 }
 
-.modal-close-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.3);
-  transform: rotate(90deg);
-}
-
-.modal-close-btn:disabled {
-  opacity: 0.5;
+.arm-close-button:disabled {
   cursor: not-allowed;
+  opacity: 0.7;
 }
 
-/* ========================
-   MODAL BODY
-   ======================== */
-.modal-body-custom {
-  padding: 2rem;
-  max-height: calc(100vh - 280px);
-  overflow-y: auto;
+/* ==================== BODY ==================== */
+.arm-modal-body {
+  padding: 16px 15px 6px 15px;
+  background: #fff;
 }
 
-/* Custom Scrollbar */
-.modal-body-custom::-webkit-scrollbar {
-  width: 6px;
+.arm-form {
+  margin: 0;
 }
 
-.modal-body-custom::-webkit-scrollbar-track {
-  background: #f8f9fa;
-  border-radius: 10px;
-}
-
-.modal-body-custom::-webkit-scrollbar-thumb {
-  background: #97247E;
-  border-radius: 10px;
-}
-
-.modal-body-custom::-webkit-scrollbar-thumb:hover {
-  background: #E01950;
-}
-
-/* ========================
-   FORM GRID
-   ======================== */
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
-}
-
-.form-group-full {
-  grid-column: 1 / -1;
-}
-
-/* ========================
-   FORM GROUP
-   ======================== */
-.form-group-custom {
+/* ==================== FORM CONTENT ==================== */
+.arm-form-content {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 10px;
+  margin-bottom: 4px;
 }
 
-/* ========================
-   FORM LABEL
-   ======================== */
-.form-label-custom {
-  font-size: 0.875rem;
+/* ==================== FORM GROUPS ==================== */
+.arm-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.arm-form-label {
   font-weight: 600;
-  color: #27235c;
-  margin: 0;
+  font-size: 13px;
+  color: #334155;
+  margin-bottom: 3px;
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 4px;
 }
 
-.required-mark {
-  color: #dc3545;
+.arm-required-asterisk {
+  color: #ef4444;
   font-weight: 700;
 }
 
-/* ========================
-   FORM INPUT
-   ======================== */
-.form-input-custom {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  font-size: 0.9375rem;
-  color: #212529;
-  background: #FFFFFF;
-  transition: all 0.2s ease;
-  font-family: inherit;
+/* ==================== FORM INPUTS ==================== */
+.arm-form-input {
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+  background: #fff;
+  color: #22223b;
 }
 
-.form-input-custom:focus {
+.arm-form-input:focus {
   outline: none;
-  border-color: #97247E;
-  box-shadow: 0 0 0 3px rgba(151, 36, 126, 0.1);
+  border-color: #27235c;
+  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
 }
 
-.form-input-custom::placeholder {
-  color: #6c757d;
-}
-
-.form-input-custom.is-invalid {
-  border-color: #dc3545;
-}
-
-.form-input-custom.is-invalid:focus {
-  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
-}
-
-.form-input-custom:disabled {
-  background: #f8f9fa;
-  cursor: not-allowed;
+.arm-form-input:disabled {
   opacity: 0.6;
+  cursor: not-allowed;
 }
 
-/* ========================
-   FORM TEXTAREA
-   ======================== */
-.form-textarea-custom {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  font-size: 0.9375rem;
-  color: #212529;
-  background: #FFFFFF;
-  transition: all 0.2s ease;
-  font-family: inherit;
+.arm-form-input.error {
+  border: 1px solid #dc3545;
+}
+
+.arm-form-textarea {
   resize: vertical;
-  min-height: 100px;
+  min-height: 60px;
+  max-height: 120px;
+  font-family: inherit;
+  line-height: 1.4;
 }
 
-.form-textarea-custom:focus {
-  outline: none;
-  border-color: #97247E;
-  box-shadow: 0 0 0 3px rgba(151, 36, 126, 0.1);
-}
-
-.form-textarea-custom::placeholder {
-  color: #6c757d;
-}
-
-.form-textarea-custom.is-invalid {
-  border-color: #dc3545;
-}
-
-.form-textarea-custom.is-invalid:focus {
-  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
-}
-
-.form-textarea-custom:disabled {
-  background: #f8f9fa;
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-/* ========================
-   ERROR MESSAGE
-   ======================== */
-.error-message {
+.arm-form-error {
   color: #dc3545;
-  font-size: 0.8125rem;
-  margin-top: 0.25rem;
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.arm-char-count {
+  color: #64748b;
+  font-size: 11px;
+}
+
+/* ==================== INFO ALERT ==================== */
+.arm-info-alert {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  font-weight: 500;
+  background: #f1f5f9;
+  color: #64748b;
+  border-radius: 4px;
+  font-size: 12px;
+  padding: 5px 8px;
+  gap: 5px;
 }
 
-.error-message::before {
-  content: '\F33A';
-  font-family: 'bootstrap-icons';
-  font-size: 0.875rem;
-}
-
-/* ========================
-   HELPER TEXT
-   ======================== */
-.helper-text {
-  color: #6c757d;
-  font-size: 0.8125rem;
-  margin-top: 0.25rem;
-  display: block;
-}
-
-/* ========================
-   INFO ALERT
-   ======================== */
-.info-alert {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  padding: 1rem 1.25rem;
-  background: rgba(151, 36, 126, 0.08);
-  border: 1px solid rgba(151, 36, 126, 0.2);
-  border-radius: 10px;
-  margin-top: 1.5rem;
-  color: #97247E;
-}
-
-.info-alert i {
-  font-size: 1.25rem;
-  flex-shrink: 0;
-  margin-top: 0.125rem;
-}
-
-.info-alert small {
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.5;
-}
-
-/* ========================
-   MODAL FOOTER
-   ======================== */
-.modal-footer-custom {
-  padding: 1.5rem 2rem;
-  background: #f8f9fa;
-  border-top: 1px solid #e5e7eb;
+/* ==================== FOOTER ==================== */
+.arm-modal-footer {
+  padding: 10px 15px;
+  border-top: 1px solid #e2e8f0;
+  background: #fff;
   display: flex;
   justify-content: flex-end;
-  gap: 0.75rem;
+  gap: 8px;
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
 }
 
-/* ========================
-   BUTTONS
-   ======================== */
-.btn-cancel,
-.btn-submit {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 1.2rem;
-  border-radius: 10px;
+/* ==================== BUTTONS ==================== */
+.arm-btn-cancel {
+  background: #6c757d;
+  border: none;
+  color: #fff;
   font-weight: 600;
-  font-size: 0.9375rem;
-  transition: all 0.12s ease;
-  border: none;
+  padding: 7px 12px;
+  font-size: 12px;
+  border-radius: 5px;
   cursor: pointer;
-  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
 }
 
-.btn-cancel {
-  background: transparent;
-  color: #6c757d;
-  border: 1px solid #e5e7eb;
+.arm-btn-cancel:hover:not(:disabled) {
+  background: #5a6268;
 }
 
-.btn-cancel:hover:not(:disabled) {
-  background: #f8f9fa;
-  border-color: #6c757d;
-  color: #212529;
-}
-
-.btn-submit {
-  background: linear-gradient(90deg, #97247E 0%, #E01950 100%);
-  color: white;
-  border: none;
-  box-shadow: 0 2px 8px rgba(151, 36, 126, 0.3);
-}
-
-.btn-submit:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(151, 36, 126, 0.4);
-}
-
-.btn-cancel:disabled,
-.btn-submit:disabled {
-  opacity: 0.6;
+.arm-btn-cancel:disabled {
   cursor: not-allowed;
-  transform: none !important;
+  opacity: 0.7;
 }
 
-.btn-cancel i,
-.btn-submit i {
-  font-size: 1rem;
+.arm-btn-submit {
+  background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  padding: 7px 12px;
+  font-size: 12px;
+  border-radius: 5px;
+  box-shadow: 0 2px 8px rgba(151, 36, 126, 0.25);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-/* ========================
-   SPINNER
-   ======================== */
-.spinner-custom {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #FFFFFF;
+.arm-btn-submit:hover:not(:disabled) {
+  opacity: 0.93;
+}
+
+.arm-btn-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+/* ==================== SPINNER ==================== */
+.arm-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid #fff;
+  border-top: 2px solid #e01950;
   border-radius: 50%;
-  animation: spin 0.6s linear infinite;
+  animation: arm-spin 0.7s linear infinite;
+  display: inline-block;
+  margin-right: 6px;
 }
 
-@keyframes spin {
-  to {
+@keyframes arm-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
     transform: rotate(360deg);
   }
-}
-
-/* ========================
-   RESPONSIVE DESIGN
-   ======================== */
-@media (max-width: 768px) {
-  .modal-wrapper-custom {
-    padding: 0.5rem;
-  }
-
-  .modal-dialog-custom {
-    max-width: 100%;
-  }
-
-  .modal-header-custom {
-    padding: 1.25rem 1.5rem;
-  }
-
-  .modal-title-custom {
-    font-size: 1.125rem;
-  }
-
-  .modal-body-custom {
-    padding: 1.5rem;
-    max-height: calc(100vh - 260px);
-  }
-
-  .form-grid {
-    grid-template-columns: 1fr;
-    gap: 1.25rem;
-  }
-
-  .modal-footer-custom {
-    padding: 1.25rem 1.5rem;
-    flex-direction: column-reverse;
-  }
-
-  .btn-cancel,
-  .btn-submit {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-@media (max-width: 480px) {
-  .modal-header-custom {
-    padding: 1rem 1.25rem;
-  }
-
-  .modal-title-custom {
-    font-size: 1rem;
-  }
-
-  .modal-title-custom i {
-    font-size: 1.25rem;
-  }
-
-  .modal-body-custom {
-    padding: 1.25rem;
-  }
-
-  .form-input-custom,
-  .form-textarea-custom {
-    padding: 0.625rem 0.875rem;
-    font-size: 0.875rem;
-  }
-
-  .modal-footer-custom {
-    padding: 1rem 1.25rem;
-  }
-}
-
-/* ========================
-   ACCESSIBILITY
-   ======================== */
-.form-input-custom:focus-visible,
-.form-textarea-custom:focus-visible,
-.btn-cancel:focus-visible,
-.btn-submit:focus-visible,
-.modal-close-btn:focus-visible {
-  outline: 2px solid #97247E;
-  outline-offset: 2px;
 }
