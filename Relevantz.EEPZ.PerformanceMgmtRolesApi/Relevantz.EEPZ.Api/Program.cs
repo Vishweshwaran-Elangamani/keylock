@@ -14,14 +14,14 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ============ SHARED UPLOADS PATH CONFIGURATION ============
+
 var sharedUploadsPath = Path.GetFullPath(Path.Combine(
-    Directory.GetCurrentDirectory(), 
-    "..", "..", 
+    Directory.GetCurrentDirectory(),
+    "..", "..",
     "SharedUploads"
 ));
 
-// Ensure shared directory exists
+
 if (!Directory.Exists(sharedUploadsPath))
 {
     Directory.CreateDirectory(sharedUploadsPath);
@@ -32,10 +32,10 @@ else
     Console.WriteLine($"Shared uploads directory exists at: {sharedUploadsPath}");
 }
 
-// Register shared path as singleton for DI
+
 builder.Services.AddSingleton(new FileUploadSettings { UploadPath = sharedUploadsPath });
 
-// ============ SERILOG CONFIGURATION ============
+
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
@@ -46,11 +46,11 @@ builder.Host.UseSerilog();
 Log.Information("Starting EEPZ Performance Management Application...");
 Log.Information("Shared Uploads Path: {Path}", sharedUploadsPath);
 
-// ============ CORE SERVICES ============
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// ============ SWAGGER CONFIGURATION ============
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -88,12 +88,12 @@ builder.Services.AddSwaggerGen(options =>
     options.CustomSchemaIds(type => type.FullName.Replace("+", "."));
 });
 
-// ============ DATABASE CONFIGURATION ============
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<EEPZDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-// ============ JWT AUTHENTICATION ============
+
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey not configured");
 
@@ -137,11 +137,11 @@ builder.Services.AddAuthentication(options =>
             }
             return Task.CompletedTask;
         },
-        
+
         OnAuthenticationFailed = context =>
         {
             Log.Error("Authentication failed: {Message}", context.Exception.Message);
-            
+
             if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
             {
                 Log.Warning("Token expired");
@@ -151,19 +151,19 @@ builder.Services.AddAuthentication(options =>
             {
                 Log.Error("Signature validation failed - Check JWT SecretKey!");
             }
-            
+
             return Task.CompletedTask;
         },
-        
+
         OnTokenValidated = context =>
         {
             Log.Information("Token validated successfully");
-            
+
             var claims = context.Principal?.Claims.Select(c => $"{c.Type}={c.Value}");
             Log.Debug("All Claims: {Claims}", string.Join(" | ", claims ?? new List<string>()));
-            
+
             var roleClaim = context.Principal?.FindFirst(ClaimTypes.Role);
-            
+
             if (roleClaim != null)
             {
                 Log.Information("Role found: {Role}", roleClaim.Value);
@@ -172,10 +172,10 @@ builder.Services.AddAuthentication(options =>
             {
                 Log.Warning("No role claim found in token");
             }
-            
+
             return Task.CompletedTask;
         },
-        
+
         OnChallenge = context =>
         {
             Log.Warning("Authentication Challenge: {Error} - {ErrorDescription}", context.Error, context.ErrorDescription);
@@ -186,27 +186,34 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// ============ DEPENDENCY INJECTION ============
-builder.Services.AddScoped<IFormManagementService, FormManagementService>();
-builder.Services.AddScoped<IAppraisalProcessService, AppraisalProcessService>();
-builder.Services.AddScoped<ISelfAssessmentService, SelfAssessmentService>();
-builder.Services.AddScoped<IManagerReviewRepository, ManagerReviewRepository>();
-builder.Services.AddScoped<ILeadershipRepository, LeadershipRepository>();
-builder.Services.AddScoped<ILeadershipService, LeadershipService>();
-// Service
+
+
+builder.Services.AddScoped<Relevantz.EEPZ.Data.Repository.Interfaces.IApproverRepository,
+                           Relevantz.EEPZ.Data.Repository.Implementations.ApproverRepository>();
+builder.Services.AddScoped<Relevantz.EEPZ.Core.Services.Interfaces.IApproverService,
+                           Relevantz.EEPZ.Core.Services.Implementations.ApproverService>();
+
+
+builder.Services.AddScoped<Relevantz.EEPZ.Data.Repository.Interfaces.IReviewerRepository,
+                           Relevantz.EEPZ.Data.Repository.Implementations.ReviewerRepository>();
+builder.Services.AddScoped<Relevantz.EEPZ.Core.Services.Interfaces.IReviewerService,
+                           Relevantz.EEPZ.Core.Services.Implementations.ReviewerService>();
+
+
 builder.Services.AddScoped<IDeptHeadApprovalsService, DeptHeadApprovalsService>();
 
-// Repository
+
 builder.Services.AddScoped<IDeptHeadApprovalsRepository, DeptHeadApprovalsRepository>();
 builder.Services.AddScoped<IDeptHeadApprovalsService, DeptHeadApprovalsService>();
- 
-// Repository
+
+
 builder.Services.AddScoped<IDeptHeadApprovalsRepository, DeptHeadApprovalsRepository>();
 builder.Services.AddScoped<IEmployeesRepository, EmployeesRepository>();
 builder.Services.AddScoped<IEmployeesService, EmployeesService>();
 
 
-// ============ CORS CONFIGURATION ============
+
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -218,10 +225,10 @@ builder.Services.AddCors(options =>
     });
 });
 
-// ============ BUILD APPLICATION ============
+
 var app = builder.Build();
 
-// ============ HTTP REQUEST PIPELINE ============
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -247,7 +254,7 @@ app.UseAuthorization();
 app.MapControllers();
 try
 {
-    Log.Information("EEPZ Performance Management API started successfully on port 5113");
+    Log.Information("EEPZ Performance Management API started successfully on port 5222");
     app.Run();
 }
 catch (Exception ex)
@@ -260,8 +267,9 @@ finally
     Log.CloseAndFlush();
 }
 
-// Simple settings class
+
 public class FileUploadSettings
 {
     public string UploadPath { get; set; } = string.Empty;
 }
+
