@@ -5,10 +5,11 @@
   padding: 24px;
   background: #fff;
 }
- 
+
 .cg-breadcrumbs {
   margin-bottom: 2.5rem;
 }
+
 .cg-breadcrumb {
   display: flex;
   align-items: center;
@@ -17,6 +18,7 @@
   margin: 0;
   font-size: 1rem;
 }
+
 .cg-breadcrumb-item {
   display: flex;
   align-items: center;
@@ -28,23 +30,26 @@
   user-select: none;
   transition: color 0.13s;
 }
+
 .cg-breadcrumb-item i {
   font-size: 1.13em;
   color: #97247e;
 }
-.cg-breadcrumb-item + .cg-breadcrumb-item:before {
+
+.cg-breadcrumb-item+.cg-breadcrumb-item:before {
   content: ">";
   margin: 0 0.7em;
   color: #b687b6;
   font-weight: 700;
   font-size: 1.07em;
 }
+
 .cg-breadcrumb-item.active {
   color: #97247e;
   font-weight: 700;
   cursor: default;
 }
- 
+
 .manageracknowledgment-title {
   font-size: 24px;
   font-weight: 700;
@@ -52,18 +57,18 @@
   margin-bottom: 16px;
   text-align: left;
 }
- 
+
 .manageracknowledgment-table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
 }
- 
+
 .manageracknowledgment-table thead {
   background: #27235c;
   color: #fff;
 }
- 
+
 .manageracknowledgment-table th,
 .manageracknowledgment-table td {
   padding: 12px 16px;
@@ -71,20 +76,20 @@
   font-size: 15px;
   word-wrap: break-word;
 }
- 
+
 .manageracknowledgment-table th {
   font-weight: 600;
   text-transform: uppercase;
 }
- 
+
 .manageracknowledgment-table td {
   color: #2c3e50;
 }
- 
+
 .manageracknowledgment-table tr:hover {
   background: rgba(39, 35, 92, 0.03);
 }
- 
+
 
 .manageracknowledgment-pagination-container {
   display: flex;
@@ -94,36 +99,36 @@
   border-top: 1px solid #e5e7eb;
   margin-top: 16px;
 }
- 
+
 .manageracknowledgment-pagination-info {
   display: flex;
   gap: 0.5rem;
 }
- 
+
 .manageracknowledgment-pagination-label {
   color: #6c757d;
 }
- 
+
 .manageracknowledgment-pagination-select {
   padding: 0.375rem 0.75rem;
   border: 1px solid #e5e7eb;
   border-radius: 4px;
 }
- 
+
 .manageracknowledgment-pagination-status {
   color: #6c757d;
 }
- 
+
 .manageracknowledgment-pagination {
   display: flex;
   list-style: none;
   gap: 0.375rem;
 }
- 
+
 .manageracknowledgment-page-item {
   list-style: none;
 }
- 
+
 .manageracknowledgment-page-link {
   display: flex;
   align-items: center;
@@ -139,30 +144,30 @@
   cursor: pointer;
   transition: all 0.12s ease;
 }
- 
+
 .manageracknowledgment-page-link:hover:not(:disabled) {
   background: rgba(39, 35, 92, 0.05);
   border-color: #27235c;
   color: #27235c;
 }
- 
+
 .manageracknowledgment-page-item.active .manageracknowledgment-page-link {
   background: #27235c;
   color: #fff;
 }
- 
+
 .manageracknowledgment-page-item.disabled .manageracknowledgment-page-link {
   opacity: 0.5;
   cursor: not-allowed;
 }
- 
+
 @media (max-width: 768px) {
   .manageracknowledgment-pagination-container {
     flex-direction: column;
     gap: 1rem;
   }
 }
- 
+
 .manageracknowledgment-fullpage {
   width: 100%;
   max-width: 1200px;
@@ -170,10 +175,11 @@
   padding: 24px;
   background: #fff;
 }
- 
+
 .cg-breadcrumbs {
   margin-bottom: 2.5rem;
 }
+
 .cg-breadcrumb {
   display: flex;
   align-items: center;
@@ -182,6 +188,7 @@
   margin: 0;
   font-size: 1rem;
 }
+
 .cg-breadcrumb-item {
   display: flex;
   align-items: center;
@@ -193,23 +200,26 @@
   user-select: none;
   transition: color 0.13s;
 }
+
 .cg-breadcrumb-item i {
   font-size: 1.13em;
   color: #97247e;
 }
-.cg-breadcrumb-item + .cg-breadcrumb-item:before {
+
+.cg-breadcrumb-item+.cg-breadcrumb-item:before {
   content: ">";
   margin: 0 0.7em;
   color: #b687b6;
   font-weight: 700;
   font-size: 1.07em;
 }
+
 .cg-breadcrumb-item.active {
   color: #97247e;
   font-weight: 700;
   cursor: default;
 }
- 
+
 .manageracknowledgment-title {
   font-size: 24px;
   font-weight: 700;
@@ -217,18 +227,18 @@
   margin-bottom: 16px;
   text-align: left;
 }
- 
+
 .manageracknowledgment-table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
 }
- 
+
 .manageracknowledgment-table thead {
   background: #27235c;
   color: #fff;
 }
- 
+
 .manageracknowledgment-table th,
 .manageracknowledgment-table td {
   padding: 12px 16px;
@@ -236,20 +246,20 @@
   font-size: 15px;
   word-wrap: break-word;
 }
- 
+
 .manageracknowledgment-table th {
   font-weight: 600;
   text-transform: uppercase;
 }
- 
+
 .manageracknowledgment-table td {
   color: #2c3e50;
 }
- 
+
 .manageracknowledgment-table tr:hover {
   background: rgba(39, 35, 92, 0.03);
 }
- 
+
 .manageracknowledgment-pagination-container {
   display: flex;
   justify-content: space-between;
@@ -258,36 +268,36 @@
   border-top: 1px solid #e5e7eb;
   margin-top: 16px;
 }
- 
+
 .manageracknowledgment-pagination-info {
   display: flex;
   gap: 0.5rem;
 }
- 
+
 .manageracknowledgment-pagination-label {
   color: #6c757d;
 }
- 
+
 .manageracknowledgment-pagination-select {
   padding: 0.375rem 0.75rem;
   border: 1px solid #e5e7eb;
   border-radius: 4px;
 }
- 
+
 .manageracknowledgment-pagination-status {
   color: #6c757d;
 }
- 
+
 .manageracknowledgment-pagination {
   display: flex;
   list-style: none;
   gap: 0.375rem;
 }
- 
+
 .manageracknowledgment-page-item {
   list-style: none;
 }
- 
+
 .manageracknowledgment-page-link {
   display: flex;
   align-items: center;
@@ -303,28 +313,26 @@
   cursor: pointer;
   transition: all 0.12s ease;
 }
- 
+
 .manageracknowledgment-page-link:hover:not(:disabled) {
   background: rgba(39, 35, 92, 0.05);
   border-color: #27235c;
   color: #27235c;
 }
- 
+
 .manageracknowledgment-page-item.active .manageracknowledgment-page-link {
   background: #27235c;
   color: #fff;
 }
- 
+
 .manageracknowledgment-page-item.disabled .manageracknowledgment-page-link {
   opacity: 0.5;
   cursor: not-allowed;
 }
- 
+
 @media (max-width: 768px) {
   .manageracknowledgment-pagination-container {
     flex-direction: column;
     gap: 1rem;
   }
 }
- 
-   

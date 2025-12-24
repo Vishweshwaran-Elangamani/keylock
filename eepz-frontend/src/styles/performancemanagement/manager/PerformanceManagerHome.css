@@ -1,34 +1,33 @@
-
 .managerperfromancehome-container {
   padding: 24px;
   min-height: 60vh;
   background: #f8f9fa;
 }
- 
+
 
 .managerperfromancehome-main-title {
   font-size: 1.75rem;
   font-weight: 700;
   color: #27235c;
-  text-align: left; 
+  text-align: left;
   margin: 0 0 2rem 0;
-  padding-left: 4px; 
+  padding-left: 4px;
 }
- 
+
 
 .managerperfromancehome-cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
-  margin-top: 8px; 
+  margin-top: 8px;
 }
- 
+
 
 .managerperfromancehome-card-admin {
   background: #ffffff;
   border-radius: 12px;
   padding: 1.5rem;
-  border: 1px solid #97247E; 
+  border: 1px solid #97247E;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
@@ -37,7 +36,7 @@
   position: relative;
   overflow: hidden;
 }
- 
+
 .managerperfromancehome-card-admin::before {
   content: '';
   position: absolute;
@@ -49,17 +48,17 @@
   opacity: 0;
   transition: opacity 0.3s ease;
 }
- 
+
 .managerperfromancehome-card-admin:hover::before {
   opacity: 1;
 }
- 
+
 .managerperfromancehome-card-admin:hover {
   transform: translateX(8px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
   border-color: #97247e;
 }
- 
+
 .managerperfromancehome-card-icon {
   width: 56px;
   height: 56px;
@@ -69,30 +68,30 @@
   justify-content: center;
   font-size: 1.75rem;
   color: #ffffff;
-  background: #97247e; 
+  background: #97247e;
   flex-shrink: 0;
-  margin: 0; 
+  margin: 0;
   align-self: flex-start;
 }
- 
+
 .managerperfromancehome-card-content {
   flex: 1;
 }
- 
+
 .managerperfromancehome-card-title {
   font-size: 1.125rem;
   font-weight: 700;
   color: #27235c;
   margin: 0 0 0.5rem 0;
 }
- 
+
 .managerperfromancehome-card-description {
   font-size: 0.875rem;
   color: #6c757d;
   margin: 0 0 0.75rem 0;
   line-height: 1.5;
 }
- 
+
 .managerperfromancehome-card-arrow {
   position: absolute;
   right: 1.5rem;
@@ -109,31 +108,30 @@
   transform: translateX(-10px);
   transition: all 0.3s ease;
 }
- 
+
 .managerperfromancehome-card-admin:hover .managerperfromancehome-card-arrow {
   opacity: 1;
   transform: translateX(0);
 }
- 
+
 @media (max-width: 1400px) {
   .managerperfromancehome-cards-grid {
     grid-template-columns: 1fr;
   }
 }
- 
+
 @media (max-width: 1024px) {
   .managerperfromancehome-cards-grid {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   }
 }
- 
+
 @media (max-width: 768px) {
   .managerperfromancehome-card-title {
     font-size: 1rem;
   }
+
   .managerperfromancehome-cards-grid {
     grid-template-columns: 1fr;
   }
 }
- 
- 

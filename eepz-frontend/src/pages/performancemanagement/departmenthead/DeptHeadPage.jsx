@@ -71,7 +71,6 @@ export default function DeptHeadPage() {
     return () => clearInterval(refreshInterval);
   }, []);
 
-  // Fixed: Added appliedSearch to dependency array
   useEffect(() => {
     applyFilters();
   }, [pendingRequests, approvedRequests, activeTab, appliedSearch, filterProject]);
@@ -208,14 +207,12 @@ export default function DeptHeadPage() {
     setCurrentPage(1);
   };
 
-  // Fixed: Clear all filters and reset UI
   const handleClearFilters = () => {
     setSearchTerm("");
     setAppliedSearch("");
     setFilterProject("");
   };
 
-  // Fixed: Handle search button click
   const handleSearchClick = () => {
     setAppliedSearch(searchTerm);
   };
@@ -406,16 +403,17 @@ export default function DeptHeadPage() {
 
   const renderApproveModal = () => {
     if (!showApproveModal || !selectedEmployee) return null;
-
+  
     return (
       <>
         <div className="dp-modal-backdrop"></div>
         <div className="dp-modal-wrapper">
           <div className="dp-modal-dialog dp-modal-bordered">
+            {/* Header - Fixed color issue */}
             <div className="dp-modal-header dp-modal-header-primary">
               <div className="dp-modal-title">
                 <i className="bi bi-check-circle-fill"></i>
-                Approve Employee Assessment
+                <span>Approve Employee Assessment</span>
               </div>
               <button
                 type="button"
@@ -427,7 +425,8 @@ export default function DeptHeadPage() {
                 <i className="bi bi-x-lg"></i>
               </button>
             </div>
-
+  
+            {/* Body - WITHOUT footer inside */}
             <div className="dp-modal-body">
               <div className="dp-details-box">
                 <h6 className="dp-details-title">
@@ -487,39 +486,41 @@ export default function DeptHeadPage() {
                   The employee will be notified via system notification.
                 </div>
               </div>
-              <div className="dp-modal-footer dp-modal-footer-primary">
-                <button
-                  type="button"
-                  className="dp-btn-cancel"
-                  onClick={handleModalClose}
-                  disabled={approvingEmployeeId}
-                >
-                  <i className="bi bi-x-circle"></i> Cancel
-                </button>
-                <button
-                  type="button"
-                  className="dp-btn-submit dp-btn-success"
-                  onClick={handleApproveSubmit}
-                  disabled={approvingEmployeeId}
-                >
-                  {approvingEmployeeId ? (
-                    <>
-                      <span className="dp-spinner"></span> Approving...
-                    </>
-                  ) : (
-                    <>
-                      <i className="bi bi-check-circle"></i> Approve Assessment
-                    </>
-                  )}
-                </button>
-              </div>
+            </div>
+  
+            {/* Footer - OUTSIDE body, fixed negative margins */}
+            <div className="dp-modal-footer dp-modal-footer-approve">
+              <button
+                type="button"
+                className="dp-btn-cancel"
+                onClick={handleModalClose}
+                disabled={approvingEmployeeId}
+              >
+                <i className="bi bi-x-circle"></i> Cancel
+              </button>
+              <button
+                type="button"
+                className="dp-btn-submit dp-btn-success"
+                onClick={handleApproveSubmit}
+                disabled={approvingEmployeeId}
+              >
+                {approvingEmployeeId ? (
+                  <>
+                    <span className="dp-spinner"></span> Approving...
+                  </>
+                ) : (
+                  <>
+                    <i className="bi bi-check-circle"></i> Approve Assessment
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>
       </>
     );
   };
-
+  
   const renderDetailsModal = () => {
     if (!showDetailsModal || !selectedEmployee) return null;
 
@@ -761,10 +762,7 @@ export default function DeptHeadPage() {
     );
   }
 
-  // Check if filters are active
   const hasActiveFilters = appliedSearch || filterProject;
-
-  // Around line 750 in your return statement, remove the hasActiveFilters check and replace with:
 
 return (
   <div className="dp-page">
@@ -845,10 +843,6 @@ return (
         </select>
       </div>
     </div>
-
-    {/* Rest of your code remains the same... */}
-
-
       <div className="dp-table-card dp-table-card-bordered">
         <div className="dp-table-wrapper">
           {activeTab === "pending" ? (

@@ -9,8 +9,8 @@
 
 .pmhr-fc-header {
   display: flex;
-    flex-direction: column;   
-  align-items: center;  
+  flex-direction: column;
+  align-items: center;
   gap: 2rem;
   margin-bottom: 1.25rem;
 }
@@ -19,7 +19,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  align-self: flex-start; 
+  align-self: flex-start;
 }
 
 .pmhr-fc-breadcrumb {
@@ -75,6 +75,7 @@
   font-size: 0.9rem;
   color: #6b7280;
 }
+
 .pmhr-fc-step-center {
   display: flex;
   justify-content: center;
@@ -84,7 +85,7 @@
 .pmhr-fc-step-indicator {
   display: flex;
   align-items: center;
-  justify-content: center; 
+  justify-content: center;
   gap: 60px;
   position: relative;
   padding: 0.5rem 1rem;
@@ -182,6 +183,7 @@
   flex-direction: column;
   width: 100%;
 }
+
 .pmhr-fc-info-text {
   margin: 0.5rem 0 0.25rem 0;
   font-size: 0.85rem;
@@ -191,12 +193,12 @@
 
 .pmhr-fc-form-container {
   width: 100%;
-  max-width: 950px;        
-  margin: 0 auto;          
+  max-width: 950px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 0;
-  border: 1px solid #27235c;  
+  border: 1px solid #27235c;
   border-radius: 10px;
   background: #ffffff;
 }
@@ -530,6 +532,7 @@
 .pmhr-fc-comp-body .pmhr-fc-form-group {
   margin-bottom: 0;
 }
+
 .pmhr-fc-alert-warning {
   display: flex;
   align-items: center;

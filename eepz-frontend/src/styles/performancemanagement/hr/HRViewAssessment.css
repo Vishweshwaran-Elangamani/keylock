@@ -879,7 +879,7 @@
   font-weight: 700;
   cursor: default;
 }
-/* Table - ALL LEFT ALIGNED */
+
 .hrvasspm-table th {
   text-align: left !important;
 }
@@ -904,13 +904,12 @@
   text-align: left !important;
 }
 
-/* Action Buttons - Left Aligned */
 .hrvasspm-action-buttons {
   justify-content: flex-start !important;
 }
 
-/* Mobile - Maintain Left Alignment */
 @media (max-width: 768px) {
+
   .hrvasspm-table th,
   .hrvasspm-table td {
     text-align: left !important;

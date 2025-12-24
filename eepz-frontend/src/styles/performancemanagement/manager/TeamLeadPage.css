@@ -216,7 +216,7 @@ body { font-family: 'Segoe UI', 'Roboto', sans-serif; color: var(--text); backgr
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  border: 1.5px solid #27235c;   /* outline color */
+  border: 1.5px solid #27235c;   
   background: #ffffff;
   display: inline-flex;
   align-items: center;
@@ -228,7 +228,7 @@ body { font-family: 'Segoe UI', 'Roboto', sans-serif; color: var(--text); backgr
 
 .tl-icon-btn i {
   font-size: 18px;
-  color: #27235c;                 /* icon color */
+  color: #27235c;                 
 }
 
 .tl-icon-btn:hover {
