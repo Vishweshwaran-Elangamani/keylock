@@ -1,6 +1,7 @@
 import axios from 'axios';
  
 const API_BASE_URL = import.meta.env.VITE_SLA_API_URL;
+const API_EMP = import.meta.env.VITE_PROJECT_API_URL
  
 const slaApi = axios.create({
   baseURL: `${API_BASE_URL}/api/Sla`,
@@ -9,7 +10,7 @@ const slaApi = axios.create({
 });
  
 const employeeApi = axios.create({
-  baseURL: `${API_BASE_URL}/api/EmployeeManagement`,
+  baseURL: `${API_EMP}/api/EmployeeManagement`,
   headers: { 'Content-Type': 'application/json' },
   timeout: 30000,
 });
