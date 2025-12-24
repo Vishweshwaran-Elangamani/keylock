@@ -68,7 +68,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         {
             try
             {
-                C(
+                Log.Information(
                     "[GetAttachmentByIdAsync] Fetching attachment {AttachmentId}",
                     attachmentId
                 );
