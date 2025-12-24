@@ -11,20 +11,24 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
     {
         private readonly ILnDSmeRepository _smeRepository;
         private readonly ILnDEmployeeSkillRepository _skillRepository;
-        private readonly ILnDApprovalRepository _approvalRepository;
-        private readonly IFileStorageService _fileStorage;
+        private readonly ILnDApprovalRepository _approvalRepository; 
+        private readonly IFileStorageService _fileStorage; 
+
+        private readonly ILnDBaseRepository _baseRepository; 
 
         public LnDSmeService(
             ILnDSmeRepository smeRepository,
             ILnDEmployeeSkillRepository skillRepository,
             ILnDApprovalRepository approvalRepository,
-            IFileStorageService fileStorage
+            IFileStorageService fileStorage,
+            ILnDBaseRepository baseRepository
         )
         {
             _smeRepository = smeRepository;
             _skillRepository = skillRepository;
             _approvalRepository = approvalRepository;
             _fileStorage = fileStorage;
+            _baseRepository = baseRepository;
         }
 
         public async Task<ApiResponse<bool>> CheckIfEmployeeIsSme(int employeeId)
@@ -46,7 +50,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-        public async Task<ApiResponse<int>> ApplyToBecomeSme(
+        public async Task<ApiResponse<int>> ApplyToBecomeSme(   
             int employeeId,
             BecomeSmeRequest request
         )
@@ -76,7 +80,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     {
                         Success = false,
                         Message = "You are already an active SME for this skill",
-                    };
+                    };          
 
                 var pendingApproval = await _approvalRepository.GetPendingSmeRegistrationAsync(
                     employeeId,
@@ -106,7 +110,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
 
                 await _approvalRepository.AddAttachmentAsync(attachment);
-                await _approvalRepository.SaveChangesAsync();
+                await _baseRepository.SaveChangesAsync();
 
                 var approval = new Lndapproval
                 {
@@ -120,7 +124,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
 
                 await _approvalRepository.AddApprovalAsync(approval);
-                await _approvalRepository.SaveChangesAsync();
+                await _baseRepository.SaveChangesAsync();
 
                 return new ApiResponse<int>
                 {

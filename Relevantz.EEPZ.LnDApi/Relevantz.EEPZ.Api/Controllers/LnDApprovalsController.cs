@@ -20,7 +20,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             _approvalService = approvalService;
         }
 
-        [HttpGet("my-approvals")]
+        [HttpGet("my-approvals")] 
         public async Task<IActionResult> GetMyApprovals(
             [FromQuery] string? approvalType,
             [FromQuery] string? status,
@@ -53,7 +53,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             var result = await _approvalService.ProcessApproval(approverId, request);
 
             return result.Success ? Ok(result) : BadRequest(result);
-        }
+        } 
 
         /// <summary>
         /// Get complete approval history for the logged-in user (as requester or approver)
@@ -89,30 +89,30 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// <summary>
         /// Get detailed approval information including all attachments
         /// </summary>
-        [HttpGet("{approvalId}/details")]
+        [HttpGet("{approvalId}/details")] 
         public async Task<IActionResult> GetApprovalDetails(int approvalId)
         {
             var employeeId = GetCurrentEmployeeId();
             var result = await _approvalService.GetApprovalDetails(employeeId, approvalId);
 
             return result.Success ? Ok(result) : BadRequest(result);
-        }
+        }  
 
         /// <summary>
         /// Download attachment file from approval history
         /// </summary>
-        [HttpGet("{approvalId}/download")]
+        [HttpGet("{approvalId}/download")]    
         public async Task<IActionResult> DownloadApprovalAttachment(int approvalId)
         {
             var employeeId = GetCurrentEmployeeId();
             var result = await _approvalService.GetApprovalAttachment(employeeId, approvalId);
 
             if (!result.Success)
-                return BadRequest(result);
+                return BadRequest(result); 
 
             var fileBytes = result.Data.FileBytes;
             var fileName = result.Data.FileName;
-            var contentType = result.Data.ContentType;
+            var contentType = result.Data.ContentType; 
 
             Response.Headers.Add("Access-Control-Expose-Headers", "Content-Disposition");
 
@@ -138,7 +138,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             return File(fileBytes, contentType, fileName);
         }
 
-        [HttpGet("{approvalId}/attachment/preview")]
+        [HttpGet("{approvalId}/attachment/preview")] 
         public async Task<IActionResult> PreviewApprovalAttachment(int approvalId)
         {
             var employeeId = GetCurrentEmployeeId();
@@ -155,8 +155,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             );
         }
 
-        [HttpGet("assignments/{assignmentId}/proof/preview")]
-        public async Task<IActionResult> PreviewAssignmentProof(int assignmentId)
+        [HttpGet("assignments/{assignmentId}/proof/preview")] 
+        public async Task<IActionResult> PreviewAssignmentProof(int assignmentId) 
         {
             var employeeId = GetCurrentEmployeeId();
             var result = await _approvalService.PreviewAssignmentProof(employeeId, assignmentId);

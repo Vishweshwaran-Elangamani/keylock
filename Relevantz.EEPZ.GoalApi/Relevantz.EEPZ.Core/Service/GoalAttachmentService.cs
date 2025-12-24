@@ -92,8 +92,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             int goalId,
             IFormFile file,
             string title,
-            int currentUserEmployeeMasterId
-        )
+            int currentUserEmployeeMasterId 
+        ) 
         {
             var goal = await _baseRepo.GetGoalByIdAsync(goalId);
             if (goal == null)
@@ -110,7 +110,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             // Validate file size (10MB limit)
             const long maxFileSize = 10 * 1024 * 1024;
-            if (file.Length > maxFileSize)
+            if (file.Length > maxFileSize)  
                 throw new InvalidOperationException("File size exceeds maximum limit of 10MB");
 
             // Validate file extension
@@ -302,6 +302,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         public async Task<List<GoalAttachment>> ListAttachmentsAsync(int goalId) =>
             await _repo.GetAttachmentsByGoalAsync(goalId);
+
 
         public async Task<GoalAttachment> GetAttachmentAsync(int attachmentId)
         {

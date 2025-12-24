@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.DTOs;
-using Relevantz.EEPZ.Core.Services.Interface;
+using Relevantz.EEPZ.Core.Services.Interface;                     
 
 namespace Relevantz.EEPZ.Api.Controllers.LnD
 {

@@ -4,6 +4,7 @@ using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repositories.Interface;
 
+
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
     public class LnDEmployeeSkillService : ILnDEmployeeSkillService
@@ -11,13 +12,17 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private readonly ILnDEmployeeSkillRepository _repository;
         private readonly ILnDSmeRepository _smeRepository;
 
+        private readonly ILnDBaseRepository _baseRepository;
+
         public LnDEmployeeSkillService(
             ILnDEmployeeSkillRepository repository,
-            ILnDSmeRepository smeRepository
+            ILnDSmeRepository smeRepository,
+            ILnDBaseRepository baseRepository
         )
         {
             _repository = repository;
             _smeRepository = smeRepository;
+            _baseRepository = baseRepository;
         }
 
         public async Task<
@@ -228,7 +233,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
 
                 var savedMapper = await _repository.AddEmployeeSkillAsync(mapper);
-                await _repository.SaveChangesAsync();
+                await _baseRepository.SaveChangesAsync();
 
                 return new ApiResponse<EmployeeSkillDto>
                 {
@@ -317,7 +322,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 if (newMappings.Any())
                 {
                     await _repository.AddEmployeeSkillsAsync(newMappings);
-                    await _repository.SaveChangesAsync();
+                    await _baseRepository.SaveChangesAsync();
 
                     results = newMappings
                         .Select(m => new EmployeeSkillDto
@@ -358,7 +363,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         public async Task<ApiResponse<EmployeeSkillDto>> UpdateEmployeeSkillRating(
             int managerId,
             UpdateSkillRatingRequest request
-        )
+        )   
         {
             try
             {
@@ -387,7 +392,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
 
                 await _repository.UpdateEmployeeSkillAsync(mapper);
-                await _repository.SaveChangesAsync();
+                await _baseRepository.SaveChangesAsync();
 
                 return new ApiResponse<EmployeeSkillDto>
                 {
@@ -445,7 +450,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
 
                 await _repository.DeleteEmployeeSkillAsync(mapper);
-                await _repository.SaveChangesAsync();
+                await _baseRepository.SaveChangesAsync();
 
                 return new ApiResponse<bool>
                 {

@@ -10,9 +10,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
     {
         private readonly ILnDHRRepository _hrRepository;
 
-        public LnDHRService(ILnDHRRepository hrRepository)
+        private readonly ILnDBaseRepository _baseRepository; 
+
+        public LnDHRService(ILnDHRRepository hrRepository, ILnDBaseRepository baseRepsitory)
         {
             _hrRepository = hrRepository;
+            _baseRepository = baseRepsitory;
         }
 
         public async Task<

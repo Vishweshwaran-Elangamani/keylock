@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Data.DBContexts;
-using Relevantz.EEPZ.Data.Repositories.Interface;
+using Relevantz.EEPZ.Data.Repositories.Interface;     
 
 namespace Relevantz.EEPZ.Data.Repositories.Implementations
 {
@@ -137,22 +137,24 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         public async Task<(List<Lndassignment> Items, int TotalCount)> GetTeamAssignmentsAsync(
-            int managerId,
-            string? statusFilter,
-            string? searchTerm,
-            string? sortField,
-            string? sortOrder,
-            int pageNumber,
-            int pageSize
-        )
+     int managerId,
+     string? statusFilter,
+     string? searchTerm,
+     string? sortField,
+     string? sortOrder,
+     int pageNumber,
+     int pageSize
+ )
         {
             var query = _context
-                .Lndassignments.Include(a => a.MenteeEmployee)
+                .Lndassignments
+                .Include(a => a.MenteeEmployee)
                 .ThenInclude(e => e.Userprofile)
                 .Include(a => a.Sme)
                 .ThenInclude(s => s.Employee)
                 .ThenInclude(e => e.Userprofile)
                 .Include(a => a.Skill)
+                .Include(a => a.Lndapprovals)
                 .Where(a => a.MenteeEmployee.ReportingManagerEmployeeId == managerId);
 
             if (!string.IsNullOrEmpty(statusFilter))
@@ -223,7 +225,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                         ? query.OrderBy(a => a.CompletionRating ?? 0)
                         : query.OrderByDescending(a => a.CompletionRating ?? 0),
 
-                    _ => query.OrderByDescending(a => a.CreatedOn), // Default sort
+                    _ => query.OrderByDescending(a => a.CreatedOn),
                 };
             }
             else
@@ -235,8 +237,22 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 
+
+            foreach (var item in items)
+            {
+                var latestApproval = item.Lndapprovals
+                    .OrderByDescending(ap => ap.UpdatedOn)
+                    .FirstOrDefault();
+
+                if (latestApproval != null && !string.IsNullOrEmpty(latestApproval.Notes))
+                {
+                    item.CompletionNotes = latestApproval.Notes;
+                }
+            }
+
             return (items, totalCount);
         }
+
 
         public async Task<(List<Lndassignment> Items, int TotalCount)> GetSmeAssignmentsAsync(
             int smeEmployeeId,
@@ -405,9 +421,8 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             };
         }
 
-        public async Task<int> SaveChangesAsync()
-        {
-            return await _context.SaveChangesAsync();
-        }
+
     }
 }
+
+

@@ -27,7 +27,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .Include(a => a.Assignment)
                 .ThenInclude(a => a.MenteeEmployee)
                 .ThenInclude(e => e.Userprofile)
-                .FirstOrDefaultAsync(a => a.ApprovalId == approvalId);
+                .FirstOrDefaultAsync(a => a.ApprovalId == approvalId);   
         }
 
         public async Task<Lndapproval?> GetPendingSmeRegistrationAsync(int employeeId, int skillId)
@@ -313,20 +313,17 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         public async Task<Lndattachment> AddAttachmentAsync(Lndattachment attachment)
         {
-            _context.Lndattachments.Add(attachment);
-            return attachment;
+            _context.Lndattachments.Add(attachment);   
+            return attachment;  
         }
 
         public async Task<Lndattachment?> GetAttachmentByIdAsync(int attachmentId)
         {
             return await _context.Lndattachments.FirstOrDefaultAsync(a =>
                 a.AttachmentId == attachmentId
-            );
-        }
+            );      
+        }             
 
-        public async Task<int> SaveChangesAsync()
-        {
-            return await _context.SaveChangesAsync();
-        }
+        
     }
 }

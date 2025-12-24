@@ -7,7 +7,7 @@ using Relevantz.EEPZ.Core.Services.Interface;
 namespace Relevantz.EEPZ.Api.Controllers.LnD
 {
     /// <summary>
-    /// Employee Skills Management
+    /// Employee Skills Management 
     /// </summary>
     [ApiController]
     [Route("api/lnd-skills")]

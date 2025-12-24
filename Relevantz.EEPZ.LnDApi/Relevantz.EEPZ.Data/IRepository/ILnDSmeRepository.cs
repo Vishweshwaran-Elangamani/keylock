@@ -23,6 +23,6 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
         );
         Task<List<Lndsme>> GetAllActiveSmesForExportAsync(string? searchTerm);
         Task<Lndsme?> GetSmeFromEmployeeId(Dictionary<string, object> assignmentDetails);
-        Task<int> SaveChangesAsync();
+        
     }
-}
+} 

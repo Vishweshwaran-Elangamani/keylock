@@ -11,6 +11,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
     {
         private readonly EEPZDbContext _context;
 
+
         public LnDSmeRepository(EEPZDbContext context)
         {
             _context = context;
@@ -191,9 +192,6 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             return await _context.Lndsmes.FirstOrDefaultAsync(s => s.EmployeeId == SmeEmployeeId);
         }
 
-        public async Task<int> SaveChangesAsync()
-        {
-            return await _context.SaveChangesAsync();
-        }
+                        
     }
 }

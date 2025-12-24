@@ -15,17 +15,21 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private readonly ILnDApprovalRepository _approvalRepository;
         private readonly IFileStorageService _fileStorage;
 
+        private readonly ILnDBaseRepository _baseRepository;
+
         public LnDAssignmentService(
             ILnDAssignmentRepository assignmentRepository,
             ILnDEmployeeSkillRepository skillRepository,
             ILnDApprovalRepository approvalRepository,
-            IFileStorageService fileStorage
+            IFileStorageService fileStorage,
+            ILnDBaseRepository baseRepository
         )
         {
             _assignmentRepository = assignmentRepository;
             _skillRepository = skillRepository;
             _approvalRepository = approvalRepository;
             _fileStorage = fileStorage;
+            _baseRepository = baseRepository;
         }
 
         public async Task<ApiResponse<int>> CheckAndMarkOverdueAssignments()
@@ -105,7 +109,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
 
                 await _approvalRepository.AddApprovalAsync(approval);
-                await _approvalRepository.SaveChangesAsync();
+                await _baseRepository.SaveChangesAsync();
 
                 return new ApiResponse<int>
                 {
@@ -211,14 +215,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         public async Task<ApiResponse<PaginatedResponse<AssignmentDto>>> GetTeamAssignments(
-            int managerId,
-            string? statusFilter,
-            string? searchTerm,
-            string? sortField,
-            string? sortOrder,
-            int pageNumber,
-            int pageSize
-        )
+      int managerId,
+      string? statusFilter,
+      string? searchTerm,
+      string? sortField,
+      string? sortOrder,
+      int pageNumber,
+      int pageSize
+  )
         {
             try
             {
@@ -289,11 +293,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<PaginatedResponse<AssignmentDto>>
                 {
                     Success = false,
-                    Message = "An error occurred",
+                    Message = "An error occurred while retrieving team assignments",
                     Errors = new List<string> { ex.Message },
                 };
             }
         }
+
 
         public async Task<ApiResponse<PaginatedResponse<AssignmentDto>>> GetSmeAssignments(
             int smeEmployeeId,
@@ -404,7 +409,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
 
                 await _approvalRepository.AddAttachmentAsync(attachment);
-                await _approvalRepository.SaveChangesAsync();
+                await _baseRepository.SaveChangesAsync();
 
                 assignment.ProofFilePath = filePath;
                 assignment.CompletionNotes = request.CompletionNotes;
@@ -426,7 +431,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 await _approvalRepository.AddApprovalAsync(approval);
                 await _assignmentRepository.UpdateAssignmentAsync(assignment);
-                await _assignmentRepository.SaveChangesAsync();
+                await _baseRepository.SaveChangesAsync();
 
                 return new ApiResponse<bool>
                 {
@@ -512,7 +517,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     await _approvalRepository.UpdateApprovalAsync(pendingApproval);
                 }
 
-                await _assignmentRepository.SaveChangesAsync();
+                await _baseRepository.SaveChangesAsync();
 
                 return new ApiResponse<bool>
                 {

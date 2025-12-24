@@ -77,7 +77,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Approve or reject an approval request
         /// </summary>
-        [HttpPut("{approvalId:int}")]
+        [HttpPut("{approvalId:int}")]  
         [Authorize(
             Roles = $"{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD},{USER_ROLE.LEADERSHIP}"
         )]

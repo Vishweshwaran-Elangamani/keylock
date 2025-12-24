@@ -156,7 +156,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             var result = await _assignmentService.UploadCompletionProof(employeeId, request);
 
             return result.Success ? Ok(result) : BadRequest(result);
-        }
+        } 
+
 
         [HttpPost("complete")]
         public async Task<IActionResult> CompleteAssignment(
@@ -168,5 +169,6 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             return result.Success ? Ok(result) : BadRequest(result);
         }
-    }
+    }  
 }
+              

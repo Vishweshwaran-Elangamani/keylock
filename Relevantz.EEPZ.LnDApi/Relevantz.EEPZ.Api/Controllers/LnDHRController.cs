@@ -134,6 +134,6 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             );
 
             return result.Success ? Ok(result) : BadRequest(result);
-        }
+        }  
     }
 }

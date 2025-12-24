@@ -55,7 +55,7 @@ namespace Relevantz.EEPZ.Common.DTOs
     public class BecomeSmeRequest
     {
         public int SkillId { get; set; }
-        public IFormFile ProofDocument { get; set; }
+        public IFormFile ProofDocument { get; set; }  
     }
 
     public class SmeRequestDto

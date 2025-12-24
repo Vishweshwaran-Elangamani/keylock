@@ -48,7 +48,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 ".txt" => "text/plain",
                 _ => "application/octet-stream",
             };
-        }
+        }  
+
 
         public async Task<string> SaveFileAsync(IFormFile file, string subFolder)
         {
@@ -103,4 +104,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return $"/{filePath}";
         }
     }
-}
+}          
+
+
+

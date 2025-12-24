@@ -14,17 +14,21 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private readonly ILnDAssignmentRepository _assignmentRepository;
         private readonly IFileStorageService _fileStorage;
 
+        private readonly ILnDBaseRepository _baseRepository;
+
         public LnDApprovalService(
             ILnDApprovalRepository approvalRepository,
             ILnDSmeRepository smeRepository,
             ILnDAssignmentRepository assignmentRepository,
-            IFileStorageService fileStorage
+            IFileStorageService fileStorage,
+            ILnDBaseRepository baseRepository
         )
         {
             _approvalRepository = approvalRepository;
             _smeRepository = smeRepository;
             _assignmentRepository = assignmentRepository;
             _fileStorage = fileStorage;
+            _baseRepository = baseRepository;
         }
 
         public async Task<ApiResponse<PaginatedResponse<ApprovalDto>>> GetMyApprovals(
@@ -178,7 +182,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                             {
                                 deadline = deadlineElement.GetDateTime();
                             }
-                        }
+                        }    
 
                         var assignment = new Lndassignment
                         {
@@ -260,7 +264,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
 
                 await _approvalRepository.UpdateApprovalAsync(approval);
-                await _approvalRepository.SaveChangesAsync();
+                await _baseRepository.SaveChangesAsync();
 
                 return new ApiResponse<bool>
                 {
@@ -281,6 +285,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
             }
         }
+
 
         public async Task<ApiResponse<PaginatedResponse<ApprovalDto>>> GetApprovalHistory(
             int employeeId,
@@ -359,6 +364,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
             }
         }
+
 
         public async Task<ApiResponse<ApprovalDetailsDto>> GetApprovalDetails(
             int employeeId,
@@ -450,8 +456,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<ApprovalDetailsDto>
                 {
                     Success = false,
-                    Message = "An error occurred while retrieving approval details",
-                    Errors = new List<string> { ex.Message },
+                    Message = "An error occurred while retrieving approval details",          
+                    Errors = new List<string> { ex.Message },  
                 };
             }
         }
@@ -530,7 +536,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 ".txt" => "text/plain",
                 _ => "application/octet-stream",
             };
-        }
+        }     
 
         public async Task<ApiResponse<FileDownloadDto>> GetAssignmentProof(
             int employeeId,
@@ -541,7 +547,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 var assignment = await _assignmentRepository.GetAssignmentByIdAsync(assignmentId);
 
-                if (
+                if(
                     assignment == null
                     || (
                         assignment.MenteeEmployeeId != employeeId
@@ -563,7 +569,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     };
 
                 var fileBytes = await _fileStorage.GetFileAsync(assignment.ProofFilePath);
-                var fileName = Path.GetFileName(assignment.ProofFilePath);
+                var fileName = Path.GetFileName(assignment.ProofFilePath);        
 
                 return new ApiResponse<FileDownloadDto>
                 {
@@ -587,6 +593,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
             }
         }
+
 
         public async Task<ApiResponse<FileDownloadDto>> PreviewApprovalAttachment(
             int employeeId,
@@ -618,8 +625,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     };
 
                 var (fileBytes, contentType, fileName) = await _fileStorage.GetFileForPreviewAsync(
-                    approval.Attachment.FilePath
-                );
+                    approval.Attachment.FilePath  
+                ); 
 
                 return new ApiResponse<FileDownloadDto>
                 {
@@ -632,7 +639,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         FileSize = fileBytes.Length,
                     },
                 };
-            }
+            }  
             catch (Exception ex)
             {
                 return new ApiResponse<FileDownloadDto>

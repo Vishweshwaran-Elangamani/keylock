@@ -35,7 +35,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
             string? sortOrder,
             int pageNumber,
             int pageSize
-        );
+        );      
         Task<List<Lndassignment>> GetAllTeamAssignmentsForExportAsync(
             int managerId,
             string? statusFilter,
@@ -43,6 +43,6 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
             string? sortField,
             string? sortOrder
         );
-        Task<int> SaveChangesAsync();
+        
     }
 }

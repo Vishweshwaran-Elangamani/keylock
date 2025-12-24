@@ -243,6 +243,7 @@ builder.Services.AddScoped<ILnDSmeRepository, LnDSmeRepository>();
 builder.Services.AddScoped<ILnDAssignmentRepository, LnDAssignmentRepository>();
 builder.Services.AddScoped<ILnDApprovalRepository, LnDApprovalRepository>();
 builder.Services.AddScoped<ILnDHRRepository, LnDHRRepository>();
+builder.Services.AddScoped<ILnDBaseRepository,LnDBaseRepository>();
 
 // LnD Services
 builder.Services.AddScoped<ILnDEmployeeSkillService, LnDEmployeeSkillService>();

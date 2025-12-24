@@ -94,7 +94,7 @@ namespace Relevantz.EEPZ.Common.Constants
         /// </summary>
         public static class FILE_STORAGE
         {
-            public const string SME_PROOFS = "sme-proofs";
+            public const string SME_PROOFS = "sme-proofs";  
             public const string COMPLETION_PROOFS = "completion-proofs";
         }
 
