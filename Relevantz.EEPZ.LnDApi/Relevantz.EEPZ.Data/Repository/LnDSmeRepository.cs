@@ -4,44 +4,118 @@ using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repositories.Interface;
+using Serilog;
 
 namespace Relevantz.EEPZ.Data.Repositories.Implementations
 {
     public class LnDSmeRepository : ILnDSmeRepository
     {
-        private readonly EEPZDbContext _context;
+        #region Dependencies
 
+        private readonly EEPZDbContext _context;
 
         public LnDSmeRepository(EEPZDbContext context)
         {
             _context = context;
         }
 
+        #endregion
+
+        #region SME Status Queries
+
+        /// <summary>Checks if an employee has any active SME status.</summary>
         public async Task<bool> IsEmployeeSmeAsync(int employeeId)
         {
-            return await _context.Lndsmes.AnyAsync(s =>
+            Log.Debug("IsEmployeeSmeAsync called. EmployeeId={EmployeeId}", employeeId);
+
+            var isSme = await _context.Lndsmes.AnyAsync(s =>
                 s.EmployeeId == employeeId && s.IsActive == true
             );
+
+            Log.Information(
+                "IsEmployeeSmeAsync completed. EmployeeId={EmployeeId}, IsSme={IsSme}",
+                employeeId, isSme
+            );
+
+            return isSme;
         }
 
+        /// <summary>Gets an active SME record for a specific employee and skill combination.</summary>
         public async Task<Lndsme?> GetActiveSmeAsync(int employeeId, int skillId)
         {
-            return await _context.Lndsmes.FirstOrDefaultAsync(s =>
+            Log.Debug(
+                "GetActiveSmeAsync called. EmployeeId={EmployeeId}, SkillId={SkillId}",
+                employeeId, skillId
+            );
+
+            var sme = await _context.Lndsmes.FirstOrDefaultAsync(s =>
                 s.EmployeeId == employeeId && s.SkillId == skillId && s.IsActive == true
             );
-        }
 
-        public async Task<Lndsme> AddSmeAsync(Lndsme sme)
-        {
-            _context.Lndsmes.Add(sme);
+            if (sme == null)
+            {
+                Log.Debug(
+                    "GetActiveSmeAsync: Active SME not found. EmployeeId={EmployeeId}, SkillId={SkillId}",
+                    employeeId, skillId
+                );
+            }
+            else
+            {
+                Log.Debug(
+                    "GetActiveSmeAsync: Active SME found. SmeId={SmeId}, EmployeeId={EmployeeId}, SkillId={SkillId}",
+                    sme.SmeId, employeeId, skillId
+                );
+            }
+
             return sme;
         }
 
-        public async Task UpdateSmeAsync(Lndsme sme)
+        /// <summary>Gets an SME record by employee ID from assignment details dictionary.</summary>
+        public async Task<Lndsme?> GetSmeFromEmployeeId(
+            Dictionary<string, object> assignmentDetails
+        )
         {
-            _context.Lndsmes.Update(sme);
+            var smeIdElement = (JsonElement)assignmentDetails["SmeId"];
+            int SmeEmployeeId = smeIdElement.GetInt32();
+
+            Log.Debug("GetSmeFromEmployeeId called. SmeEmployeeId={SmeEmployeeId}", SmeEmployeeId);
+
+            var sme = await _context.Lndsmes.FirstOrDefaultAsync(s => s.EmployeeId == SmeEmployeeId);
+
+            if (sme == null)
+            {
+                Log.Warning("GetSmeFromEmployeeId: SME not found. SmeEmployeeId={SmeEmployeeId}", SmeEmployeeId);
+            }
+
+            return sme;
         }
 
+        #endregion
+
+        #region SME Assignment Queries   
+
+        /// <summary>Gets in-progress assignment count for a specific SME.</summary>
+        public async Task<int> GetSmeInProgressAssignmentCountAsync(int smeId)
+        {
+            Log.Debug("GetSmeInProgressAssignmentCountAsync called. SmeId={SmeId}", smeId);  
+
+            var count = await _context.Lndassignments.CountAsync(a =>
+                a.SmeId == smeId && a.Status == LnDConstants.ASSIGNMENT_STATUS.IN_PROGRESS
+            );
+
+            Log.Debug(
+                "GetSmeInProgressAssignmentCountAsync completed. SmeId={SmeId}, InProgressCount={Count}",
+                smeId, count
+            );
+
+            return count;
+        }
+
+        #endregion
+
+        #region SME Retrieval
+
+        /// <summary>Gets paginated available SMEs for a skill filtered by max assignment limit.</summary>
         public async Task<(
             List<Lndsme> Items,
             int TotalCount
@@ -53,6 +127,11 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             int maxAssignments
         )
         {
+            Log.Information(
+                "GetAvailableSmesWithAssignmentCountsAsync called. SkillId={SkillId}, SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}, MaxAssignments={MaxAssignments}",
+                skillId, searchTerm ?? "none", pageNumber, pageSize, maxAssignments
+            );
+
             var query = _context
                 .Lndsmes.Include(s => s.Employee)
                 .ThenInclude(e => e.Userprofile)
@@ -69,9 +148,19 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 })
                 .ToListAsync();
 
+            Log.Debug(
+                "GetAvailableSmesWithAssignmentCountsAsync: Retrieved {Count} SMEs from database",
+                smesWithCounts.Count
+            );
+
             var availableSmesWithCounts = smesWithCounts
                 .Where(sc => sc.InProgressCount < maxAssignments)
                 .ToList();
+
+            Log.Debug(
+                "GetAvailableSmesWithAssignmentCountsAsync: Filtered to {Count} available SMEs (below max assignments)",
+                availableSmesWithCounts.Count
+            );
 
             if (!string.IsNullOrEmpty(searchTerm))
             {
@@ -96,22 +185,26 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .Select(sc => sc.Sme)
                 .ToList();
 
+            Log.Information(
+                "GetAvailableSmesWithAssignmentCountsAsync completed. SkillId={SkillId}, ReturnedCount={Count}, TotalCount={TotalCount}",
+                skillId, items.Count, totalCount
+            );
+
             return (items, totalCount);
         }
 
-        public async Task<int> GetSmeInProgressAssignmentCountAsync(int smeId)
-        {
-            return await _context.Lndassignments.CountAsync(a =>
-                a.SmeId == smeId && a.Status == LnDConstants.ASSIGNMENT_STATUS.IN_PROGRESS
-            );
-        }
-
+        /// <summary>Gets paginated all active SMEs with employee and department details.</summary>
         public async Task<(List<Lndsme> Items, int TotalCount)> GetAllActiveSmesAsync(
             string? searchTerm,
             int pageNumber,
             int pageSize
         )
         {
+            Log.Information(
+                "GetAllActiveSmesAsync called. SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
+                searchTerm ?? "none", pageNumber, pageSize
+            );
+
             var query = _context
                 .Lndsmes.Where(s => s.IsActive.Value)
                 .Include(s => s.Employee)
@@ -146,11 +239,22 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .Take(pageSize)
                 .ToListAsync();
 
+            Log.Information(
+                "GetAllActiveSmesAsync completed. ReturnedCount={Count}, TotalCount={TotalCount}",
+                items.Count, totalCount
+            );
+
             return (items, totalCount);
         }
 
+        /// <summary>Gets all active SMEs for Excel export without pagination.</summary>
         public async Task<List<Lndsme>> GetAllActiveSmesForExportAsync(string? searchTerm)
         {
+            Log.Information(
+                "GetAllActiveSmesForExportAsync called. SearchTerm={SearchTerm}",
+                searchTerm ?? "none"
+            );
+
             var query = _context
                 .Lndsmes.Where(s => s.IsActive.Value)
                 .Include(s => s.Employee)
@@ -176,22 +280,51 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 );
             }
 
-            return await query
+            var items = await query
                 .OrderBy(s => s.Employee.Userprofile.FirstName)
                 .ThenBy(s => s.Employee.Userprofile.LastName)
                 .ToListAsync();
+
+            Log.Information(
+                "GetAllActiveSmesForExportAsync completed. TotalCount={Count}",
+                items.Count
+            );
+
+            return items;
         }
 
-        public async Task<Lndsme?> GetSmeFromEmployeeId(
-            Dictionary<string, object> assignmentDetails
-        )
+        #endregion
+
+        #region SME Modifications
+
+        /// <summary>Adds a new SME record to the database context (requires SaveChanges).</summary>
+        public async Task<Lndsme> AddSmeAsync(Lndsme sme)
         {
-            var smeIdElement = (JsonElement)assignmentDetails["SmeId"];
-            int SmeEmployeeId = smeIdElement.GetInt32();
+            Log.Information(
+                "AddSmeAsync called. EmployeeId={EmployeeId}, SkillId={SkillId}",
+                sme.EmployeeId, sme.SkillId
+            );
 
-            return await _context.Lndsmes.FirstOrDefaultAsync(s => s.EmployeeId == SmeEmployeeId);
+            _context.Lndsmes.Add(sme);
+
+            Log.Debug("AddSmeAsync: SME added to context. Pending SaveChanges");
+
+            return sme;
         }
 
-                        
+        /// <summary>Updates an existing SME record in the database context (requires SaveChanges).</summary>
+        public async Task UpdateSmeAsync(Lndsme sme)
+        {
+            Log.Information(
+                "UpdateSmeAsync called. SmeId={SmeId}, EmployeeId={EmployeeId}, SkillId={SkillId}, IsActive={IsActive}",
+                sme.SmeId, sme.EmployeeId, sme.SkillId, sme.IsActive
+            );
+
+            _context.Lndsmes.Update(sme);
+
+            Log.Debug("UpdateSmeAsync: SME updated in context. Pending SaveChanges");
+        }
+
+        #endregion
     }
-}
+}     

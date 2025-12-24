@@ -3,11 +3,14 @@ using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repositories.Interface;
+using Serilog;
 
 namespace Relevantz.EEPZ.Data.Repositories.Implementations
 {
     public class LnDEmployeeSkillRepository : ILnDEmployeeSkillRepository
     {
+        #region Dependencies
+
         private readonly EEPZDbContext _context;
 
         public LnDEmployeeSkillRepository(EEPZDbContext context)
@@ -15,16 +18,31 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             _context = context;
         }
 
+        #endregion
+
+        #region Employee Queries
+
+        /// <summary>Gets an employee by ID with profile, authentication, and department details.</summary>
         public async Task<Employee?> GetEmployeeByIdAsync(int employeeId)
         {
-            return await _context
+            Log.Debug("GetEmployeeByIdAsync called. EmployeeId={EmployeeId}", employeeId);
+
+            var employee = await _context
                 .Employees.Include(e => e.Userprofile)
                 .Include(e => e.Userauthentication)
                 .Include(e => e.Employeedetailsmasters)
                 .ThenInclude(ed => ed.Department)
                 .FirstOrDefaultAsync(e => e.EmployeeId == employeeId);
+
+            if (employee == null)
+            {
+                Log.Warning("GetEmployeeByIdAsync: Employee not found. EmployeeId={EmployeeId}", employeeId);
+            }
+
+            return employee;
         }
 
+        /// <summary>Gets paginated subordinate employees with search across name, email, and department.</summary>
         public async Task<(List<Employee> Items, int TotalCount)> GetSubordinateEmployeesAsync(
             int managerId,
             string? searchTerm,
@@ -32,6 +50,11 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             int pageSize
         )
         {
+            Log.Information(
+                "GetSubordinateEmployeesAsync called. ManagerId={ManagerId}, SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
+                managerId, searchTerm ?? "none", pageNumber, pageSize
+            );
+
             IQueryable<Employee> query = _context
                 .Employees.Include(e => e.Userprofile)
                 .Include(e => e.Userauthentication)
@@ -71,19 +94,50 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .Take(pageSize)
                 .ToListAsync();
 
+            Log.Information(
+                "GetSubordinateEmployeesAsync completed. ManagerId={ManagerId}, ReturnedCount={Count}, TotalCount={TotalCount}",
+                managerId, items.Count, totalCount
+            );
+
             return (items, totalCount);
         }
 
+        #endregion
+
+        #region Skill Queries
+
+        /// <summary>Gets all skills ordered by skill name.</summary>
         public async Task<List<MasterSkill>> GetAllSkillsAsync()
         {
-            return await _context.MasterSkills.OrderBy(s => s.SkillName).ToListAsync();
+            Log.Debug("GetAllSkillsAsync called");
+
+            var skills = await _context.MasterSkills.OrderBy(s => s.SkillName).ToListAsync();
+
+            Log.Information("GetAllSkillsAsync completed. SkillCount={Count}", skills.Count);
+
+            return skills;
         }
 
+        /// <summary>Gets a single skill by ID.</summary>
         public async Task<MasterSkill?> GetSkillByIdAsync(int skillId)
         {
-            return await _context.MasterSkills.FirstOrDefaultAsync(s => s.SkillId == skillId);
+            Log.Debug("GetSkillByIdAsync called. SkillId={SkillId}", skillId);
+
+            var skill = await _context.MasterSkills.FirstOrDefaultAsync(s => s.SkillId == skillId);
+
+            if (skill == null)
+            {
+                Log.Warning("GetSkillByIdAsync: Skill not found. SkillId={SkillId}", skillId);
+            }
+
+            return skill;
         }
 
+        #endregion
+
+        #region Skill Mapping Queries
+
+        /// <summary>Gets paginated subordinate skill mappings with optional employee filter and search.</summary>
         public async Task<(
             List<Lndemployeeskillmapper> Items,
             int TotalCount
@@ -96,6 +150,11 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             int pageSize
         )
         {
+            Log.Information(
+                "GetSubordinateSkillsAsync called. ManagerId={ManagerId}, EmployeeId={EmployeeId}, SearchTerm={SearchTerm}, SortBy={SortBy}, Page={PageNumber}",
+                managerId, employeeId?.ToString() ?? "all", searchTerm ?? "none", sortBy ?? "default", pageNumber
+            );
+
             var query = _context
                 .Lndemployeeskillmappers.Include(m => m.Employee)
                 .ThenInclude(e => e.Userprofile)
@@ -126,59 +185,15 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             var totalCount = await query.CountAsync();
             var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 
+            Log.Information(
+                "GetSubordinateSkillsAsync completed. ManagerId={ManagerId}, ReturnedCount={Count}, TotalCount={TotalCount}",
+                managerId, items.Count, totalCount
+            );
+
             return (items, totalCount);
         }
 
-        public async Task<Lndemployeeskillmapper?> GetEmployeeSkillMappingAsync(
-            int employeeId,
-            int skillId
-        )
-        {
-            return await _context
-                .Lndemployeeskillmappers.Include(m => m.Employee)
-                .ThenInclude(e => e.Userprofile)
-                .Include(m => m.Skill)
-                .FirstOrDefaultAsync(m => m.EmployeeId == employeeId && m.SkillId == skillId);
-        }
-
-        public async Task<Lndemployeeskillmapper?> GetEmployeeSkillMappingByIdAsync(int mapperId)
-        {
-            return await _context
-                .Lndemployeeskillmappers.Include(m => m.Employee)
-                .ThenInclude(e => e.Userprofile)
-                .Include(m => m.Skill)
-                .FirstOrDefaultAsync(m => m.MapperId == mapperId);
-        }
-
-        public async Task<Lndemployeeskillmapper> AddEmployeeSkillAsync(
-            Lndemployeeskillmapper mapper
-        )
-        {
-            _context.Lndemployeeskillmappers.Add(mapper);
-            await _context.SaveChangesAsync();
-
-            return (await GetEmployeeSkillMappingByIdAsync(mapper.MapperId))!;
-        }
-
-        public async Task<List<Lndemployeeskillmapper>> AddEmployeeSkillsAsync(
-            List<Lndemployeeskillmapper> mappers
-        )
-        {
-            _context.Lndemployeeskillmappers.AddRange(mappers);
-            await _context.SaveChangesAsync();
-            return mappers;
-        }
-
-        public async Task UpdateEmployeeSkillAsync(Lndemployeeskillmapper mapper)
-        {
-            _context.Lndemployeeskillmappers.Update(mapper);
-        }
-
-        public async Task DeleteEmployeeSkillAsync(Lndemployeeskillmapper mapper)
-        {
-            _context.Lndemployeeskillmappers.Remove(mapper);
-        }
-
+        /// <summary>Gets paginated skill mappings for a specific employee.</summary>
         public async Task<(List<Lndemployeeskillmapper> Items, int TotalCount)> GetMySkillsAsync(
             int employeeId,
             string? searchTerm,
@@ -186,6 +201,11 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             int pageSize
         )
         {
+            Log.Information(
+                "GetMySkillsAsync called. EmployeeId={EmployeeId}, SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
+                employeeId, searchTerm ?? "none", pageNumber, pageSize
+            );
+
             var query = _context
                 .Lndemployeeskillmappers.Include(m => m.Employee)
                 .ThenInclude(e => e.Userprofile)
@@ -205,22 +225,159 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .Take(pageSize)
                 .ToListAsync();
 
+            Log.Information(
+                "GetMySkillsAsync completed. EmployeeId={EmployeeId}, ReturnedCount={Count}, TotalCount={TotalCount}",
+                employeeId, items.Count, totalCount
+            );
+
             return (items, totalCount);
         }
 
+        /// <summary>Gets a skill mapping by employee ID and skill ID.</summary>
+        public async Task<Lndemployeeskillmapper?> GetEmployeeSkillMappingAsync(
+            int employeeId,
+            int skillId
+        )
+        {
+            Log.Debug(
+                "GetEmployeeSkillMappingAsync called. EmployeeId={EmployeeId}, SkillId={SkillId}",
+                employeeId, skillId
+            );
+
+            var mapping = await _context
+                .Lndemployeeskillmappers.Include(m => m.Employee)
+                .ThenInclude(e => e.Userprofile)
+                .Include(m => m.Skill)
+                .FirstOrDefaultAsync(m => m.EmployeeId == employeeId && m.SkillId == skillId);
+
+            if (mapping == null)
+            {
+                Log.Debug(
+                    "GetEmployeeSkillMappingAsync: Mapping not found. EmployeeId={EmployeeId}, SkillId={SkillId}",
+                    employeeId, skillId
+                );
+            }
+
+            return mapping;
+        }
+
+        /// <summary>Gets a skill mapping by mapper ID.</summary>
+        public async Task<Lndemployeeskillmapper?> GetEmployeeSkillMappingByIdAsync(int mapperId)
+        {
+            Log.Debug("GetEmployeeSkillMappingByIdAsync called. MapperId={MapperId}", mapperId);
+
+            var mapping = await _context
+                .Lndemployeeskillmappers.Include(m => m.Employee)
+                .ThenInclude(e => e.Userprofile)
+                .Include(m => m.Skill)
+                .FirstOrDefaultAsync(m => m.MapperId == mapperId);
+
+            if (mapping == null)
+            {
+                Log.Warning("GetEmployeeSkillMappingByIdAsync: Mapping not found. MapperId={MapperId}", mapperId);
+            }
+
+            return mapping;
+        }
+
+        /// <summary>Gets existing skill IDs for an employee from a list of skill IDs.</summary>
         public async Task<List<int>> GetExistingSkillMappingsAsync(
             int employeeId,
             List<int> skillIds
         )
         {
-            return await _context
+            Log.Debug(
+                "GetExistingSkillMappingsAsync called. EmployeeId={EmployeeId}, SkillIdsCount={Count}",
+                employeeId, skillIds.Count
+            );
+
+            var existingSkillIds = await _context
                 .Lndemployeeskillmappers.Where(m =>
                     m.EmployeeId == employeeId && skillIds.Contains(m.SkillId)
                 )
                 .Select(m => m.SkillId)
                 .ToListAsync();
+
+            Log.Debug(
+                "GetExistingSkillMappingsAsync completed. EmployeeId={EmployeeId}, ExistingCount={Count}",
+                employeeId, existingSkillIds.Count
+            );
+
+            return existingSkillIds;
         }
 
-        
+        #endregion
+
+        #region Skill Mapping Modifications
+
+        /// <summary>Adds a single skill mapping and returns the saved entity with generated ID.</summary>
+        public async Task<Lndemployeeskillmapper> AddEmployeeSkillAsync(
+            Lndemployeeskillmapper mapper
+        )
+        {
+            Log.Information(
+                "AddEmployeeSkillAsync called. EmployeeId={EmployeeId}, SkillId={SkillId}, Rating={Rating}",
+                mapper.EmployeeId, mapper.SkillId, mapper.Rating
+            );
+
+            _context.Lndemployeeskillmappers.Add(mapper);
+            await _context.SaveChangesAsync();
+
+            Log.Information(
+                "AddEmployeeSkillAsync completed. MapperId={MapperId}, EmployeeId={EmployeeId}, SkillId={SkillId}",
+                mapper.MapperId, mapper.EmployeeId, mapper.SkillId
+            );
+
+            return (await GetEmployeeSkillMappingByIdAsync(mapper.MapperId))!;
+        }
+
+        /// <summary>Adds multiple skill mappings in bulk and returns the saved entities.</summary>
+        public async Task<List<Lndemployeeskillmapper>> AddEmployeeSkillsAsync(
+            List<Lndemployeeskillmapper> mappers
+        )
+        {
+            Log.Information(
+                "AddEmployeeSkillsAsync called. MappingsCount={Count}",
+                mappers.Count
+            );
+
+            _context.Lndemployeeskillmappers.AddRange(mappers);
+            await _context.SaveChangesAsync();
+
+            Log.Information(
+                "AddEmployeeSkillsAsync completed. SavedCount={Count}",
+                mappers.Count
+            );
+
+            return mappers;
+        }
+
+        /// <summary>Updates an existing skill mapping in the database context (requires SaveChanges).</summary>
+        public async Task UpdateEmployeeSkillAsync(Lndemployeeskillmapper mapper)
+        {
+            Log.Information(
+                "UpdateEmployeeSkillAsync called. MapperId={MapperId}, EmployeeId={EmployeeId}, SkillId={SkillId}, Rating={Rating}",
+                mapper.MapperId, mapper.EmployeeId, mapper.SkillId, mapper.Rating
+            );
+
+            _context.Lndemployeeskillmappers.Update(mapper);
+
+            Log.Debug("UpdateEmployeeSkillAsync: Mapper updated in context. Pending SaveChanges");
+        }
+
+        /// <summary>Deletes a skill mapping from the database context (requires SaveChanges).</summary>
+        public async Task DeleteEmployeeSkillAsync(Lndemployeeskillmapper mapper)
+        {
+            Log.Information(
+                "DeleteEmployeeSkillAsync called. MapperId={MapperId}, EmployeeId={EmployeeId}, SkillId={SkillId}",
+                mapper.MapperId, mapper.EmployeeId, mapper.SkillId
+            );
+
+            _context.Lndemployeeskillmappers.Remove(mapper);
+
+            Log.Debug("DeleteEmployeeSkillAsync: Mapper removed from context. Pending SaveChanges");
+        }
+
+        #endregion
     }
 }
