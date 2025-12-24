@@ -5,9 +5,9 @@ using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using Relevantz.EEPZ.Common.Configuration;
 using Relevantz.EEPZ.Common.DTOs;
-using Relevantz.EEPZ.Core.Services.Interface;
+using Relevantz.EEPZ.Core.IService;
 
-namespace Relevantz.EEPZ.Core.Services.Implementations
+namespace Relevantz.EEPZ.Core.Service
 {
     public class FileStorageService : IFileStorageService
     {

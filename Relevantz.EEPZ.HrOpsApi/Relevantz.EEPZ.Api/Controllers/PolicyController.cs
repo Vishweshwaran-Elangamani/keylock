@@ -1,3 +1,4 @@
+
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -13,11 +14,17 @@ namespace Relevantz.EEPZ.Api.Controllers
     public class PolicyController : ControllerBase
     {
         private readonly IPolicyService _policyService;
+        private readonly IMongoDbService _mongoDbService;  // ADDED
         private readonly ILogger<PolicyController> _logger;
 
-        public PolicyController(IPolicyService policyService, ILogger<PolicyController> logger)
+        //UPDATED CONSTRUCTOR
+        public PolicyController(
+            IPolicyService policyService, 
+            IMongoDbService mongoDbService,  // ADDED
+            ILogger<PolicyController> logger)
         {
             _policyService = policyService;
+            _mongoDbService = mongoDbService;  // ADDED
             _logger = logger;
         }
 
@@ -199,102 +206,125 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Upload document - Stores in MongoDB instead of local filesystem
+        /// </summary>
         [HttpPost("upload-document")]
-[Authorize(Roles = "Admin,HR")]
-public async Task<IActionResult> UploadDocument([FromForm] IFormFile? file, [FromForm] string? documentUrl, [FromForm] string? documentName, [FromForm] string? documentType)
-{
-    try
-    {
-        // Validate inputs
-        if (string.IsNullOrEmpty(documentType) || (documentType != "link" && documentType != "upload"))
-            return BadRequest(new { success = false, message = "Document type must be 'link' or 'upload'" });
-
-        // Handle File Upload
-        if (documentType == "upload")
+        [Authorize(Roles = "Admin,HR")]
+        public async Task<IActionResult> UploadDocument(
+            [FromForm] IFormFile? file, 
+            [FromForm] string? documentUrl, 
+            [FromForm] string? documentName, 
+            [FromForm] string? documentType)
         {
-            if (file == null || file.Length == 0)
-                return BadRequest(new { success = false, message = "No file uploaded" });
-
-            // Validate file type
-            var allowedExtensions = new[] { ".pdf", ".doc", ".docx" };
-            var extension = Path.GetExtension(file.FileName).ToLower();
-            if (!allowedExtensions.Contains(extension))
-                return BadRequest(new { success = false, message = "Only PDF, DOC, DOCX files allowed" });
-
-            // Validate file size (5MB max)
-            const long maxFileSize = 5 * 1024 * 1024;
-            if (file.Length > maxFileSize)
-                return BadRequest(new { success = false, message = "File size must be less than 5MB" });
-
-            // Create uploads directory
-            var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "policies");
-            Directory.CreateDirectory(uploadsPath);
-
-            // Generate unique filename
-            var uniqueFileName = $"{Guid.NewGuid()}{extension}";
-            var filePath = Path.Combine(uploadsPath, uniqueFileName);
-            
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            try
             {
-                await file.CopyToAsync(stream);
+                // Validate inputs
+                if (string.IsNullOrEmpty(documentType) || (documentType != "link" && documentType != "upload"))
+                    return BadRequest(new { success = false, message = "Document type must be 'link' or 'upload'" });
+
+                // Get user ID for audit trail
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                    ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+                if (!int.TryParse(userIdClaim, out int userId))
+                    return Unauthorized(new { success = false, message = "Invalid user authentication" });
+
+                //  Handle File Upload - MONGODB STORAGE
+                if (documentType == "upload")
+                {
+                    if (file == null || file.Length == 0)
+                        return BadRequest(new { success = false, message = "No file uploaded" });
+
+                    // Validate file type
+                    var allowedExtensions = new[] { ".pdf", ".doc", ".docx" };
+                    var extension = Path.GetExtension(file.FileName).ToLower();
+                    if (!allowedExtensions.Contains(extension))
+                        return BadRequest(new { success = false, message = "Only PDF, DOC, DOCX files allowed" });
+
+                    // Validate file size (5MB max)
+                    const long maxFileSize = 5 * 1024 * 1024;
+                    if (file.Length > maxFileSize)
+                        return BadRequest(new { success = false, message = "File size must be less than 5MB" });
+
+                    //  Read file into byte array
+                    byte[] fileData;
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await file.CopyToAsync(memoryStream);
+                        fileData = memoryStream.ToArray();
+                    }
+
+                    // Determine content type
+                    var contentType = extension switch
+                    {
+                        ".pdf" => "application/pdf",
+                        ".doc" => "application/msword",
+                        ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        _ => "application/octet-stream"
+                    };
+
+                    //  Upload to MongoDB and get the ObjectId
+                    var fileId = await _mongoDbService.UploadFileAsync(
+                        fileData, 
+                        file.FileName, 
+                        contentType, 
+                        file.Length, 
+                        userId
+                    );
+
+                    _logger.LogInformation($" Document uploaded to MongoDB: {file.FileName} (ID: {fileId}, Size: {file.Length} bytes)");
+
+                    //  Return MongoDB ObjectId as documentUrl
+                    return Ok(new
+                    {
+                        success = true,
+                        message = "File uploaded successfully to MongoDB",
+                        data = new
+                        {
+                            documentUrl = fileId,  // MongoDB ObjectId
+                            documentName = file.FileName,
+                            documentSize = file.Length,
+                            documentSizeFormatted = FormatFileSize(file.Length),
+                            documentType = "upload"
+                        }
+                    });
+                }
+                else if (documentType == "link")
+                {
+                    if (string.IsNullOrEmpty(documentUrl))
+                        return BadRequest(new { success = false, message = "Document URL is required for links" });
+
+                    if (string.IsNullOrEmpty(documentName))
+                        return BadRequest(new { success = false, message = "Document name is required" });
+
+                    if (!Uri.TryCreate(documentUrl, UriKind.Absolute, out _))
+                        return BadRequest(new { success = false, message = "Invalid URL format" });
+
+                    _logger.LogInformation($" Document link added: {documentUrl}");
+
+                    return Ok(new
+                    {
+                        success = true,
+                        message = "Document link added successfully",
+                        data = new
+                        {
+                            documentUrl = documentUrl,
+                            documentName = documentName,
+                            documentSize = (long?)null,
+                            documentType = "link"
+                        }
+                    });
+                }
+
+                return BadRequest(new { success = false, message = "Invalid request" });
             }
-
-            // FIXED: Return relative path (frontend will convert to document endpoint)
-            var fileUrl = $"/uploads/policies/{uniqueFileName}";
-            var fileName = file.FileName;
-
-            _logger.LogInformation($"Document uploaded: {uniqueFileName} (Size: {file.Length} bytes)");
-
-            return Ok(new
+            catch (Exception ex)
             {
-                success = true,
-                message = "File uploaded successfully",
-                data = new
-                {
-                    documentUrl = fileUrl,  // Relative path
-                    documentName = fileName,
-                    documentSize = file.Length,
-                    documentSizeFormatted = FormatFileSize(file.Length),
-                    documentType = "upload"
-                }
-            });
+                _logger.LogError($"Error uploading document: {ex.Message}");
+                return StatusCode(500, new { success = false, message = "Document upload failed" });
+            }
         }
-        else if (documentType == "link")
-        {
-            if (string.IsNullOrEmpty(documentUrl))
-                return BadRequest(new { success = false, message = "Document URL is required for links" });
-
-            if (string.IsNullOrEmpty(documentName))
-                return BadRequest(new { success = false, message = "Document name is required" });
-
-            if (!Uri.TryCreate(documentUrl, UriKind.Absolute, out _))
-                return BadRequest(new { success = false, message = "Invalid URL format" });
-
-            _logger.LogInformation($"🔗 Document link added: {documentUrl}");
-
-            return Ok(new
-            {
-                success = true,
-                message = "Document link added successfully",
-                data = new
-                {
-                    documentUrl = documentUrl,
-                    documentName = documentName,
-                    documentSize = (long?)null,
-                    documentType = "link"
-                }
-            });
-        }
-
-        return BadRequest(new { success = false, message = "Invalid request" });
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError($"Error uploading document: {ex.Message}");
-        return StatusCode(500, new { success = false, message = "Document upload failed" });
-    }
-}
-
 
         /// <summary>
         /// Publish policy (make visible to all employees) - HR ONLY
@@ -322,6 +352,28 @@ public async Task<IActionResult> UploadDocument([FromForm] IFormFile? file, [Fro
             {
                 _logger.LogError($" Error publishing policy: {ex.Message}");
                 return StatusCode(500, new { success = false, message = "Failed to publish policy" });
+            }
+        }
+
+        /// <summary>
+        /// Unpublish policy - HR ONLY
+        /// </summary>
+        [HttpPost("unpublish/{policyId}")]
+        [Authorize(Roles = "Admin,HR")]
+        public async Task<IActionResult> UnpublishPolicy(int policyId)
+        {
+            try
+            {
+                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+                var response = await _policyService.UnpublishPolicyAsync(policyId, userId);
+
+                _logger.LogInformation($" Policy {policyId} unpublished by user {userId}");
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($" Error unpublishing policy: {ex.Message}");
+                return BadRequest(new { message = "Failed to unpublish policy" });
             }
         }
 
@@ -356,6 +408,47 @@ public async Task<IActionResult> UploadDocument([FromForm] IFormFile? file, [Fro
             }
         }
 
+        /// <summary>
+        /// Serve/Download document from MongoDB - All authenticated users
+        /// </summary>
+        [HttpGet("document/{fileId}")]
+        public async Task<IActionResult> GetPolicyDocument(string fileId)
+        {
+            try
+            {
+                // Validate fileId to prevent injection attacks
+                if (string.IsNullOrEmpty(fileId) || fileId.Contains("..") || fileId.Length != 24)
+                {
+                    _logger.LogWarning($" Invalid file ID attempt: {fileId}");
+                    return BadRequest(new { success = false, message = "Invalid file ID" });
+                }
+
+                //  Retrieve document from MongoDB
+                var document = await _mongoDbService.GetFileAsync(fileId);
+
+                if (document == null)
+                {
+                    _logger.LogWarning($"Document not found in MongoDB: {fileId}");
+                    return NotFound(new { success = false, message = "Document not found" });
+                }
+
+                _logger.LogInformation($"Serving document from MongoDB: {document.OriginalFileName} (ID: {fileId})");
+
+                // Return file for download/inline viewing
+                return File(
+                    document.FileData, 
+                    document.ContentType, 
+                    document.OriginalFileName, 
+                    enableRangeProcessing: true
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error serving document {fileId}: {ex.Message}");
+                return StatusCode(500, new { success = false, message = "Error retrieving document" });
+            }
+        }
+
         private string FormatFileSize(long bytes)
         {
             string[] sizes = { "B", "KB", "MB", "GB" };
@@ -368,78 +461,5 @@ public async Task<IActionResult> UploadDocument([FromForm] IFormFile? file, [Fro
             }
             return $"{len:0.##} {sizes[order]}";
         }
-        [HttpPost("unpublish/{policyId}")]
-        public async Task<IActionResult> UnpublishPolicy(int policyId)
-        {
-            try
-            {
-                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-                var response = await _policyService.UnpublishPolicyAsync(policyId, userId);
-
-                _logger.LogInformation($" Policy {policyId} unpublished by user {userId}");
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($" Error unpublishing policy: {ex.Message}");
-                return BadRequest(new { message = "Failed to unpublish policy" });
-            }
-        }
-        /// <summary>
-        /// Serve/Download uploaded policy document - All authenticated users
-        /// </summary>
-        [HttpGet("document/{fileName}")]
-        public IActionResult GetPolicyDocument(string fileName)
-        {
-            try
-            {
-                // Validate filename to prevent directory traversal attacks
-                if (string.IsNullOrEmpty(fileName) || fileName.Contains(".."))
-                {
-                    _logger.LogWarning($" Invalid filename attempt: {fileName}");
-                    return BadRequest(new { success = false, message = "Invalid filename" });
-                }
-
-                // Same path where files are uploaded
-                var filePath = Path.Combine(
-                    Directory.GetCurrentDirectory(),
-                    "wwwroot",
-                    "uploads",
-                    "policies",
-                    fileName
-                );
-
-                if (!System.IO.File.Exists(filePath))
-                {
-                    _logger.LogWarning($" Document not found: {fileName}");
-                    return NotFound(new { success = false, message = "Document not found" });
-                }
-
-                // Read file
-                var fileBytes = System.IO.File.ReadAllBytes(filePath);
-
-                // Determine content type based on extension
-                var extension = Path.GetExtension(fileName).ToLower();
-                var contentType = extension switch
-                {
-                    ".pdf" => "application/pdf",
-                    ".doc" => "application/msword",
-                    ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                    _ => "application/octet-stream"
-                };
-
-                _logger.LogInformation($"Serving document: {fileName} ({contentType})");
-
-                // Return file (enables both inline view and download)
-                return File(fileBytes, contentType, fileName, enableRangeProcessing: true);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($" Error serving document {fileName}: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "Error retrieving document" });
-            }
-        }
-
     }
-
 }

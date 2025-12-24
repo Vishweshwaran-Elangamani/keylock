@@ -12,7 +12,9 @@ using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repository.Implementations;
 using Relevantz.EEPZ.Data.Repository.Interface;
-
+using Relevantz.EEPZ.Core.IService;
+using Relevantz.EEPZ.Core.Service;
+using Relevantz.EEPZ.Common.Configuration;
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
 
@@ -217,7 +219,12 @@ builder.Services.AddScoped<IGoalAttachmentService, GoalAttachmentService>();
 builder.Services.AddScoped<IGoalInteractionService, GoalInteractionService>();
 builder.Services.AddScoped<IGoalProgressService, GoalProgressService>();
 builder.Services.AddScoped<IGoalService, GoalService>();
+// Configure MongoDB Settings
+builder.Services.Configure<MongoDbSettings>(
+    builder.Configuration.GetSection("MongoDbSettings"));
 
+// Register File Storage Service (MongoDB GridFS)
+builder.Services.AddSingleton<IFileStorageService, FileStorageService>();
 // Configure CORS
 builder.Services.AddCors(options =>
 {

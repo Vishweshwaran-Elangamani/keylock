@@ -137,6 +137,8 @@ builder.Services.AddScoped<ICareerProgressionService, CareerProgressionService>(
 builder.Services.AddScoped<IFundAllocationRepository, FundAllocationRepository>();
 builder.Services.AddScoped<IFundAllocationService, FundAllocationService>();
 builder.Services.AddScoped<ISlaEscalationRepository, SlaEscalationRepository>();
+//mongo service for the file storage
+builder.Services.AddScoped<IMongoDbService, MongoDbService>();
 
 // ---------- CORS ----------
 builder.Services.AddCors(options =>

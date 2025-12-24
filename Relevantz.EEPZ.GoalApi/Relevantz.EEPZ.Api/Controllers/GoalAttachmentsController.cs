@@ -4,7 +4,7 @@ using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Core.Services.Interface;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
-
+using Relevantz.EEPZ.Core.IService;
 namespace Relevantz.EEPZ.Api.Controllers.Goals
 {
     [Route("api/goal-attachments")]

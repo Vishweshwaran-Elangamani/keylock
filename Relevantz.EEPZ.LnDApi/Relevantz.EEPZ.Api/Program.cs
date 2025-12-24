@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Relevantz.EEPZ.Common.Configuration;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Core.Services.Implementations;
 using Relevantz.EEPZ.Core.Services.Interface;
@@ -12,8 +13,10 @@ using Relevantz.EEPZ.Data.Repositories.Implementations;
 using Relevantz.EEPZ.Data.Repositories.Interface;
 using Serilog;
 
+
 var builder = WebApplication.CreateBuilder(args);
 Console.WriteLine("Building EEPZ Backend........");
+
 
 // ===================================
 // Configure Serilog for Logging
@@ -30,11 +33,14 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft.EntityFrameworkCore", Serilog.Events.LogEventLevel.Warning)
     .CreateLogger();
 
+
 builder.Host.UseSerilog();
+
 
 // ===================================
 // Add Services to Container
 // ===================================
+
 
 // Add Controllers with JSON Options
 builder
@@ -60,7 +66,9 @@ builder
             .CamelCase;
     });
 
+
 builder.Services.AddEndpointsApiExplorer();
+
 
 // ===================================
 // Configure Swagger with JWT Support
@@ -77,6 +85,7 @@ builder.Services.AddSwaggerGen(options =>
         }
     );
 
+
     options.AddSecurityDefinition(
         "Bearer",
         new OpenApiSecurityScheme
@@ -90,6 +99,7 @@ builder.Services.AddSwaggerGen(options =>
                 "Enter 'Bearer' [space] and then your valid JWT token.\n\nExample: \"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"",
         }
     );
+
 
     options.AddSecurityRequirement(
         new OpenApiSecurityRequirement
@@ -109,10 +119,12 @@ builder.Services.AddSwaggerGen(options =>
     );
 });
 
+
 // ===================================
 // Configure MySQL Database
 // ===================================
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
 
 if (string.IsNullOrEmpty(connectionString))
 {
@@ -121,6 +133,7 @@ if (string.IsNullOrEmpty(connectionString))
         "Database connection string 'DefaultConnection' not found."
     );
 }
+
 
 // Register EEPZDbContext (the main context used by LnDService)
 builder.Services.AddDbContext<EEPZDbContext>(options =>
@@ -139,6 +152,7 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
         }
     );
 
+
     // Enable sensitive data logging only in development
     if (builder.Environment.IsDevelopment())
     {
@@ -147,29 +161,29 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
     }
 });
 
-// Register EEPZDbContext (for legacy/backward compatibility)
-builder.Services.AddDbContext<EEPZDbContext>(options =>
-{
-    options.UseMySql(
-        connectionString,
-        ServerVersion.AutoDetect(connectionString),
-        mysqlOptions =>
-        {
-            mysqlOptions.EnableRetryOnFailure(
-                maxRetryCount: 5,
-                maxRetryDelay: TimeSpan.FromSeconds(30),
-                errorNumbersToAdd: null
-            );
-            mysqlOptions.CommandTimeout(60);
-        }
-    );
 
-    if (builder.Environment.IsDevelopment())
-    {
-        options.EnableSensitiveDataLogging();
-        options.EnableDetailedErrors();
-    }
-});
+// ===================================
+// Configure MongoDB Settings
+// ===================================
+builder.Services.Configure<MongoDbSettings>(
+    builder.Configuration.GetSection("MongoDbSettings"));
+
+
+// Validate MongoDB Configuration
+var mongoConfig = builder.Configuration.GetSection("MongoDbSettings");
+var mongoConnectionString = mongoConfig["ConnectionString"];
+var mongoDatabaseName = mongoConfig["DatabaseName"];
+
+
+if (string.IsNullOrEmpty(mongoConnectionString))
+{
+    Log.Warning("MongoDB connection string is not configured. File storage will not work!");
+}
+else
+{
+    Log.Information($"MongoDB configured - Database: {mongoDatabaseName}");
+}
+
 
 // ===================================
 // Configure JWT Authentication
@@ -177,11 +191,13 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["SecretKey"];
 
+
 if (string.IsNullOrEmpty(secretKey))
 {
     Log.Fatal("JWT SecretKey is not configured!");
     throw new InvalidOperationException("JWT SecretKey not found in configuration.");
 }
+
 
 builder
     .Services.AddAuthentication(options =>
@@ -202,6 +218,7 @@ builder
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
             ClockSkew = TimeSpan.Zero,
         };
+
 
         options.Events = new JwtBearerEvents
         {
@@ -224,18 +241,26 @@ builder
         };
     });
 
+
 builder.Services.AddAuthorization();
+
 
 // ===================================
 // Register Application Services (DI)
 // ===================================
 
+
+// ============================================
+// File Storage Service - MongoDB GridFS
+// ============================================
+builder.Services.AddSingleton<IFileStorageService, FileStorageService>();
+Log.Information("File Storage Service registered with MongoDB GridFS");
+
+
 // ============================================
 // LnD Module - Complete Registration
 // ============================================
 
-// File Storage Service
-builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 
 // LnD Repositories
 builder.Services.AddScoped<ILnDEmployeeSkillRepository, LnDEmployeeSkillRepository>();
@@ -244,12 +269,18 @@ builder.Services.AddScoped<ILnDAssignmentRepository, LnDAssignmentRepository>();
 builder.Services.AddScoped<ILnDApprovalRepository, LnDApprovalRepository>();
 builder.Services.AddScoped<ILnDHRRepository, LnDHRRepository>();
 
+
 // LnD Services
 builder.Services.AddScoped<ILnDEmployeeSkillService, LnDEmployeeSkillService>();
 builder.Services.AddScoped<ILnDSmeService, LnDSmeService>();
 builder.Services.AddScoped<ILnDAssignmentService, LnDAssignmentService>();
 builder.Services.AddScoped<ILnDApprovalService, LnDApprovalService>();
 builder.Services.AddScoped<ILnDHRService, LnDHRService>();
+
+
+// File Migration Service (Optional - for migrating existing files)
+// builder.Services.AddScoped<FileStorageMigrationService>();
+
 
 builder.Services.AddCors(options =>
 {
@@ -260,6 +291,7 @@ builder.Services.AddCors(options =>
             policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
         }
     );
+
 
     // Production CORS policy (more restrictive)
     options.AddPolicy(
@@ -279,10 +311,12 @@ builder.Services.AddCors(options =>
     );
 });
 
+
 // ===================================
 // Add HTTP Client
 // ===================================
 builder.Services.AddHttpClient();
+
 
 // ===================================
 // Configure Session (if needed)
@@ -296,24 +330,30 @@ builder.Services.AddSession(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 });
 
+
 // ===================================
 // Add Memory Cache
 // ===================================
 builder.Services.AddMemoryCache();
+
 
 // ===================================
 // Build Application
 // ===================================
 var app = builder.Build();
 
+
 Log.Information("EEPZ Backend Application Starting...");
+
 
 // ===================================
 // Configure HTTP Request Pipeline
 // ===================================
 
+
 // Enable CORS
 app.UseCors("AllowAll");
+
 
 // Enable Swagger
 if (app.Environment.IsDevelopment())
@@ -325,6 +365,7 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = "swagger";
         c.DocumentTitle = "EEPZ Learning and Development API Documentation";
     });
+
 
     Log.Information("Swagger UI enabled at: /swagger");
 }
@@ -339,6 +380,7 @@ else
     });
 }
 
+
 // Enable Serilog Request Logging
 app.UseSerilogRequestLogging(options =>
 {
@@ -351,31 +393,27 @@ app.UseSerilogRequestLogging(options =>
     };
 });
 
+
 // HTTPS Redirection
 app.UseHttpsRedirection();
 
-// Static Files for File Storage (wwwroot folder)
-app.UseStaticFiles(
-    new StaticFileOptions
-    {
-        ServeUnknownFileTypes = false,
-        OnPrepareResponse = ctx =>
-        {
-            // Add security headers for static files
-            ctx.Context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
-        },
-    }
-);
+
+// NOTE: Static files middleware removed as files are now stored in MongoDB GridFS
+// No longer using wwwroot for file storage
+
 
 // Enable Session
 app.UseSession();
+
 
 // Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
+
 // Map Controllers
 app.MapControllers();
+
 
 // ===================================
 // Global Exception Handler
@@ -387,11 +425,14 @@ app.UseExceptionHandler(errorApp =>
         context.Response.StatusCode = StatusCodes.Status500InternalServerError;
         context.Response.ContentType = "application/json";
 
+
         var exceptionHandlerPathFeature =
             context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerPathFeature>();
         var exception = exceptionHandlerPathFeature?.Error;
 
+
         Log.Error(exception, "Unhandled exception occurred: {Message}", exception?.Message);
+
 
         var response = new
         {
@@ -401,9 +442,11 @@ app.UseExceptionHandler(errorApp =>
             stackTrace = app.Environment.IsDevelopment() ? exception?.StackTrace : null,
         };
 
+
         await context.Response.WriteAsJsonAsync(response);
     });
 });
+
 
 // ===================================
 // Database Migration and Initialization
@@ -412,37 +455,38 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
 
+
     try
     {
-        var EEPZDbContext = services.GetRequiredService<EEPZDbContext>();
+        var eepzDbContext = services.GetRequiredService<EEPZDbContext>();
+
 
         // Ensure database connection is working
-        if (EEPZDbContext.Database.CanConnect())
+        if (eepzDbContext.Database.CanConnect())
         {
-            Log.Information("EEPZDbContext - Database connection established successfully.");
+            Log.Information("EEPZDbContext - MySQL database connection established successfully.");
         }
         else
         {
-            Log.Error("EEPZDbContext - Failed to connect to the database!");
+            Log.Error("EEPZDbContext - Failed to connect to the MySQL database!");
         }
 
-        // Also check EEPZDbContext
+
+        // Test MongoDB Connection
         try
         {
-            var appDbContext = services.GetRequiredService<EEPZDbContext>();
-            if (appDbContext.Database.CanConnect())
-            {
-                Log.Information("EEPZDbContext - Database connection established successfully.");
-            }
+            var fileStorageService = services.GetRequiredService<IFileStorageService>();
+            Log.Information("MongoDB GridFS File Storage Service initialized successfully.");
         }
         catch (Exception ex)
         {
-            Log.Warning($"EEPZDbContext connection check skipped: {ex.Message}");
+            Log.Error(ex, "Failed to initialize MongoDB GridFS: {Message}", ex.Message);
         }
     }
     catch (Exception ex)
     {
-        Log.Error(ex, "An error occurred while migrating the database: {Message}", ex.Message);
+        Log.Error(ex, "An error occurred during database initialization: {Message}", ex.Message);
+
 
         if (app.Environment.IsDevelopment())
         {
@@ -451,35 +495,6 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// ===================================
-// Create Required Directories
-// ===================================
-try
-{
-    var webRootPath = app.Environment.WebRootPath;
-
-    if (!string.IsNullOrEmpty(webRootPath))
-    {
-        var uploadsPath = Path.Combine(webRootPath, "uploads");
-        var smeProofsPath = Path.Combine(uploadsPath, "sme-proofs");
-        var completionProofsPath = Path.Combine(uploadsPath, "completion-proofs");
-
-        Directory.CreateDirectory(smeProofsPath);
-        Directory.CreateDirectory(completionProofsPath);
-
-        Log.Information("File upload directories created successfully.");
-        Log.Information($"SME Proofs: {smeProofsPath}");
-        Log.Information($"Completion Proofs: {completionProofsPath}");
-    }
-    else
-    {
-        Log.Warning("WebRootPath is null. Static files may not work correctly.");
-    }
-}
-catch (Exception ex)
-{
-    Log.Error(ex, "Failed to create upload directories: {Message}", ex.Message);
-}
 
 // ===================================
 // Application Startup
@@ -491,9 +506,12 @@ try
     Log.Information($"Environment: {app.Environment.EnvironmentName}");
     Log.Information($"Content Root: {app.Environment.ContentRootPath}");
     Log.Information($"Web Root: {app.Environment.WebRootPath}");
+    Log.Information("File Storage: MongoDB GridFS");
     Log.Information("========================================");
 
+
     app.Run();
+
 
     Log.Information("EEPZ Backend Application Stopped Gracefully");
 }
