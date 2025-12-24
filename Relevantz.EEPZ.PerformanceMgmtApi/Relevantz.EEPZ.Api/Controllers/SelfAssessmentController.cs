@@ -238,7 +238,6 @@ namespace PerformanceManagement.Controllers
                 if (string.IsNullOrWhiteSpace(attachment.FilePath))
                     return NotFound(new { success = false, message = "File path missing." });
 
-                // Get file from repository - let service handle file logic
                 var basePath = new ConfigurationBuilder()
                     .AddJsonFile("appsettings.json")
                     .Build()["FileStorage:BasePath"] ?? @"D:\Capstone\Backend Push\Backend\eepz\SharedUploads";

@@ -14,14 +14,12 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ============ SHARED UPLOADS PATH CONFIGURATION ============
 var sharedUploadsPath = Path.GetFullPath(Path.Combine(
     Directory.GetCurrentDirectory(), 
     "..", "..", 
     "SharedUploads"
 ));
 
-// Ensure shared directory exists
 if (!Directory.Exists(sharedUploadsPath))
 {
     Directory.CreateDirectory(sharedUploadsPath);
@@ -32,10 +30,8 @@ else
     Console.WriteLine($"Shared uploads directory exists at: {sharedUploadsPath}");
 }
 
-// Register shared path as singleton for DI
 builder.Services.AddSingleton(new FileUploadSettings { UploadPath = sharedUploadsPath });
 
-// ============ SERILOG CONFIGURATION ============
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
@@ -46,11 +42,9 @@ builder.Host.UseSerilog();
 Log.Information("Starting EEPZ Performance Management Application...");
 Log.Information("Shared Uploads Path: {Path}", sharedUploadsPath);
 
-// ============ CORE SERVICES ============
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// ============ SWAGGER CONFIGURATION ============
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -88,12 +82,10 @@ builder.Services.AddSwaggerGen(options =>
     options.CustomSchemaIds(type => type.FullName.Replace("+", "."));
 });
 
-// ============ DATABASE CONFIGURATION ============
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<EEPZDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-// ============ JWT AUTHENTICATION ============
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey not configured");
 
@@ -186,53 +178,41 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// ============ DEPENDENCY INJECTION ============
 builder.Services.AddScoped<IFormManagementService, FormManagementService>();
 
 builder.Services.AddScoped<ISelfAssessmentService, SelfAssessmentService>();
-// Repositories
 builder.Services.AddScoped<Relevantz.EEPZ.Data.Repository.Interfaces.IAssessmentDetailsRepository,
                            Relevantz.EEPZ.Data.Repository.Implementations.AssessmentDetailsRepository>();
 
-// Services
 builder.Services.AddScoped<Relevantz.EEPZ.Core.Services.Interfaces.IAssessmentDetailsService,
                            Relevantz.EEPZ.Core.Services.Implementations.AssessmentDetailsService>();
 
 
-// Assignments Repository
 builder.Services.AddScoped<Relevantz.EEPZ.Data.Repository.Interfaces.IAssignmentsRepository,
                            Relevantz.EEPZ.Data.Repository.Implementations.AssignmentsRepository>();
 
-// Assignments Service
 builder.Services.AddScoped<Relevantz.EEPZ.Core.Services.Interfaces.IAssignmentsService,
                            Relevantz.EEPZ.Core.Services.Implementations.AssignmentsService>();
 
-// FormProgressTracker Repository
 builder.Services.AddScoped<Relevantz.EEPZ.Data.Repository.Interfaces.IFormProgressTrackerRepository,
                            Relevantz.EEPZ.Data.Repository.Implementations.FormProgressTrackerRepository>();
 
-// FormProgressTracker Service
 builder.Services.AddScoped<Relevantz.EEPZ.Core.Services.Interfaces.IFormProgressTrackerService,
                            Relevantz.EEPZ.Core.Services.Implementations.FormProgressTrackerService>();
 
-// FormManagement Repository
 builder.Services.AddScoped<Relevantz.EEPZ.Data.Repository.Interfaces.IFormManagementRepository,
                            Relevantz.EEPZ.Data.Repository.Implementations.FormManagementRepository>();
 
-// FormManagement Service (update existing to use repository)
 builder.Services.AddScoped<Relevantz.EEPZ.Core.Services.Interfaces.IFormManagementService,
                            Relevantz.EEPZ.Core.Services.Implementations.FormManagementService>();
 
-// SelfAssessment Repository
 builder.Services.AddScoped<Relevantz.EEPZ.Data.Repository.Interfaces.ISelfAssessmentRepository,
                            Relevantz.EEPZ.Data.Repository.Implementations.SelfAssessmentRepository>();
 
-// SelfAssessment Service
 builder.Services.AddScoped<Relevantz.EEPZ.Core.Services.Interfaces.ISelfAssessmentService,
                            Relevantz.EEPZ.Core.Services.Implementations.SelfAssessmentService>();
 
 
-// ============ CORS CONFIGURATION ============
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -244,10 +224,8 @@ builder.Services.AddCors(options =>
     });
 });
 
-// ============ BUILD APPLICATION ============
 var app = builder.Build();
 
-// ============ HTTP REQUEST PIPELINE ============
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -286,7 +264,6 @@ finally
     Log.CloseAndFlush();
 }
 
-// Simple settings class
 public class FileUploadSettings
 {
     public string UploadPath { get; set; } = string.Empty;

@@ -23,7 +23,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _repository = repository;
             _configuration = configuration;
             
-            // Use shared uploads path from configuration
             var basePath = _configuration["FileStorage:BasePath"] ?? @"D:\Capstone\Backend Push\Backend\eepz\SharedUploads";
             _uploadBasePath = Path.Combine(basePath, "assessments");
             
@@ -346,7 +345,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 await File.WriteAllBytesAsync(fullPath, bytes);
 
-                // Save WITHOUT "uploads\" prefix - just the relative path
                 return Path.Combine("assessments", assessmentId.ToString(), uniqueFileName);
             }
             catch (Exception ex)

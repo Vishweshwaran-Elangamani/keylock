@@ -11,7 +11,6 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         Task UpsertTrackerAsync(Formprogresstracker tracker);
         Task ReloadTrackerAsync(Formprogresstracker tracker);
 
-        // Supporting data
         Task<List<Userauthentication>> GetUsersByUserIdsAsync(List<int> userIds);
         Task<List<Userprofile>> GetUserProfilesByEmployeeIdsAsync(List<int> employeeIds);
         Task<List<Employee>> GetEmployeesByEmployeeIdsAsync(List<int> employeeIds);

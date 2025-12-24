@@ -185,10 +185,8 @@ builder.Services.AddScoped<IHRNominationRepository, HRNominationRepository>();
 builder.Services.AddScoped<IHRNominationService, HRNominationService>();
 builder.Services.AddScoped<IManagerNominationRepository, ManagerNominationRepository>();
 builder.Services.AddScoped<IManagerNominationService, ManagerNominationService>();
-
-
-
-
+builder.Services.AddScoped<IEmployeeNominationRepository, EmployeeNominationRepository>();
+builder.Services.AddScoped<IEmployeeNominationService, EmployeeNominationService>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
