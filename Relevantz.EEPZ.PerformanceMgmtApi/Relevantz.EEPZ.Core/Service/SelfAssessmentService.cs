@@ -1,9 +1,8 @@
-using Microsoft.EntityFrameworkCore;
-using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.Services.Interfaces;
+using Relevantz.EEPZ.Data.Repository.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,45 +14,39 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 {
     public class SelfAssessmentService : ISelfAssessmentService
     {
-        private readonly EEPZDbContext _context;
-private readonly IConfiguration _configuration;
-private readonly string _uploadBasePath; 
+        private readonly ISelfAssessmentRepository _repository;
+        private readonly IConfiguration _configuration;
+        private readonly string _uploadBasePath;
 
-public SelfAssessmentService(EEPZDbContext context, IConfiguration configuration)
-{
-    _context = context;
-    _configuration = configuration;
-    
-    // Use shared uploads path from configuration
-    var basePath = _configuration["FileStorage:BasePath"] ?? @"D:\Capstone\Backend Push\Backend\eepz\SharedUploads";
-    _uploadBasePath = Path.Combine(basePath, "assessments");
-    
-    if (!Directory.Exists(_uploadBasePath))
-    {
-        Directory.CreateDirectory(_uploadBasePath);
-    }
-}
-
+        public SelfAssessmentService(ISelfAssessmentRepository repository, IConfiguration configuration)
+        {
+            _repository = repository;
+            _configuration = configuration;
+            
+            // Use shared uploads path from configuration
+            var basePath = _configuration["FileStorage:BasePath"] ?? @"D:\Capstone\Backend Push\Backend\eepz\SharedUploads";
+            _uploadBasePath = Path.Combine(basePath, "assessments");
+            
+            if (!Directory.Exists(_uploadBasePath))
+            {
+                Directory.CreateDirectory(_uploadBasePath);
+            }
+        }
 
         public async Task<ApiResponse<SelfAssessmentResponseDto>> SubmitSelfAssessmentAsync(SubmitSelfAssessmentRequestDto request)
         {
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            await _repository.BeginTransactionAsync();
             try
             {
-                var form = await _context.Assessmentforms
-                    .Include(f => f.Competencies)
-                    .FirstOrDefaultAsync(f => f.FormId == request.FormId);
-
+                var form = await _repository.GetFormWithCompetenciesAsync(request.FormId);
                 if (form == null)
                     return ApiResponse<SelfAssessmentResponseDto>.ErrorResponse("Form not found");
 
-                var userAuth = await _context.Userauthentications.FindAsync(request.UserId);
+                var userAuth = await _repository.GetUserByIdAsync(request.UserId);
                 if (userAuth == null)
                     return ApiResponse<SelfAssessmentResponseDto>.ErrorResponse("User not found or inactive");
 
-                var existingAssessment = await _context.Selfassessments
-                    .FirstOrDefaultAsync(sa => sa.FormId == request.FormId && sa.EmployeeId == request.UserId);
-
+                var existingAssessment = await _repository.GetAssessmentForUpsertAsync(request.FormId, request.UserId);
                 Selfassessment assessment;
 
                 if (existingAssessment != null)
@@ -61,12 +54,7 @@ public SelfAssessmentService(EEPZDbContext context, IConfiguration configuration
                     existingAssessment.Status = request.Status;
                     existingAssessment.SubmittedAt = request.Status == "Submitted" ? DateTime.Now : existingAssessment.SubmittedAt;
                     assessment = existingAssessment;
-
-                    
-                    var existingDetails = await _context.Assessmentdetails
-                        .Where(ad => ad.AssessmentId == existingAssessment.AssessmentId)
-                        .ToListAsync();
-                    _context.Assessmentdetails.RemoveRange(existingDetails);
+                    await _repository.DeleteAssessmentDetailsAsync(existingAssessment.AssessmentId);
                 }
                 else
                 {
@@ -77,12 +65,9 @@ public SelfAssessmentService(EEPZDbContext context, IConfiguration configuration
                         Status = request.Status,
                         SubmittedAt = request.Status == "Submitted" ? DateTime.Now : null
                     };
-                    _context.Selfassessments.Add(assessment);
+                    await _repository.UpsertSelfAssessmentAsync(assessment);
                 }
 
-                await _context.SaveChangesAsync();
-
-                
                 var details = request.AssessmentDetails.Select(d => new Assessmentdetail
                 {
                     AssessmentId = assessment.AssessmentId,
@@ -91,22 +76,16 @@ public SelfAssessmentService(EEPZDbContext context, IConfiguration configuration
                     EmployeeComments = d.EmployeeComments
                 }).ToList();
 
-                _context.Assessmentdetails.AddRange(details);
-                await _context.SaveChangesAsync();
+                await _repository.AddAssessmentDetailsAsync(details);
 
-                
                 if (request.Attachments != null && request.Attachments.Any())
                 {
                     await ProcessAttachmentsAsync(assessment.AssessmentId, request.UserId, request.Attachments);
                 }
 
-                
                 if (request.Status == "Submitted")
                 {
-                    var assignment = await _context.Assignments
-                        .Include(a => a.Formprogresstrackers)
-                        .FirstOrDefaultAsync(a => a.FormId == request.FormId && a.EmployeeId == request.UserId);
-
+                    var assignment = await _repository.GetAssignmentWithProgressAsync(request.FormId, request.UserId);
                     var progress = assignment?.Formprogresstrackers.FirstOrDefault();
                     if (progress != null)
                     {
@@ -114,120 +93,30 @@ public SelfAssessmentService(EEPZDbContext context, IConfiguration configuration
                         progress.EmployeeCompleted = true;
                         progress.SentToManager = true;
                         progress.LastUpdated = DateTime.Now;
-                        await _context.SaveChangesAsync();
+                        await _repository.UpdateProgressTrackerAsync(progress);
                     }
                 }
 
-                await transaction.CommitAsync();
+                await _repository.CommitTransactionAsync();
 
                 var responseData = await GetSelfAssessmentAsync(assessment.AssessmentId);
                 return responseData;
             }
             catch (Exception ex)
             {
-                await transaction.RollbackAsync();
+                await _repository.RollbackTransactionAsync();
                 return ApiResponse<SelfAssessmentResponseDto>.ErrorResponse($"Error submitting assessment: {ex.Message}");
-            }
-        }
-
-        
-        private async Task ProcessAttachmentsAsync(int assessmentId, int userId, List<AttachmentRequestDto> attachments)
-        {
-            var savedAttachments = new List<Selfassessmentattachment>();
-
-            foreach (var attachment in attachments)
-            {
-                string filePath = attachment.FilePath ?? string.Empty;
-
-                
-                if (!string.IsNullOrEmpty(attachment.Base64Content))
-                {
-                    filePath = await SaveFileFromBase64Async(
-                        assessmentId, 
-                        attachment.FileName, 
-                        attachment.Base64Content
-                    );
-                }
-
-                var dbAttachment = new Selfassessmentattachment
-                {
-                    AssessmentId = assessmentId,
-                    UploadedBy = userId,
-                    FileName = attachment.FileName,
-                    FilePath = filePath,
-                    FileType = attachment.FileType,
-                    FileSize = attachment.FileSize,
-                    AttachmentNote = attachment.AttachmentNote,
-                    DisplayOrder = attachment.DisplayOrder ?? 0,
-                    UploadedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now
-                };
-
-                savedAttachments.Add(dbAttachment);
-            }
-
-            if (savedAttachments.Any())
-            {
-                _context.Selfassessmentattachments.AddRange(savedAttachments);
-                await _context.SaveChangesAsync();
-            }
-        }
-
-        
-        private async Task<string> SaveFileFromBase64Async(int assessmentId, string fileName, string base64Content)
-        {
-            try
-            {
-                
-                var base64Data = base64Content;
-                if (base64Content.Contains(","))
-                {
-                    base64Data = base64Content.Split(',')[1];
-                }
-
-                var bytes = Convert.FromBase64String(base64Data);
-                
-                
-                var assessmentDir = Path.Combine(_uploadBasePath, assessmentId.ToString());
-                if (!Directory.Exists(assessmentDir))
-                {
-                    Directory.CreateDirectory(assessmentDir);
-                }
-
-                
-                var fileExtension = Path.GetExtension(fileName);
-                var uniqueFileName = $"{Guid.NewGuid()}{fileExtension}";
-                var fullPath = Path.Combine(assessmentDir, uniqueFileName);
-
-                await File.WriteAllBytesAsync(fullPath, bytes);
-
-                
-                // Save WITHOUT "uploads\" prefix - just the relative path
-return Path.Combine("assessments", assessmentId.ToString(), uniqueFileName);
-
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error saving file {fileName}: {ex.Message}");
             }
         }
 
         public async Task<ApiResponse<List<SelfAssessmentResponseDto>>> GetAssessmentsByUserAsync(int userId)
         {
-            var result = new ApiResponse<List<SelfAssessmentResponseDto>>();
-
             try
             {
-                var assessments = await _context.Selfassessments
-                    .Where(a => a.EmployeeId == userId)
-                    .Include(a => a.Form)
-                    .ToListAsync();
-
+                var assessments = await _repository.GetSelfAssessmentsByUserAsync(userId);
                 if (assessments == null || !assessments.Any())
                 {
-                    result.Success = true;
-                    result.Data = new List<SelfAssessmentResponseDto>();
-                    return result;
+                    return ApiResponse<List<SelfAssessmentResponseDto>>.SuccessResponse(new List<SelfAssessmentResponseDto>());
                 }
 
                 var dtoList = assessments.Select(a => new SelfAssessmentResponseDto
@@ -238,31 +127,19 @@ return Path.Combine("assessments", assessmentId.ToString(), uniqueFileName);
                     SubmittedAt = a.SubmittedAt
                 }).ToList();
 
-                result.Success = true;
-                result.Data = dtoList;
+                return ApiResponse<List<SelfAssessmentResponseDto>>.SuccessResponse(dtoList);
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Errors.Add("Failed to retrieve assessments.");
-                result.Errors.Add(ex.Message);
+                return ApiResponse<List<SelfAssessmentResponseDto>>.ErrorResponse($"Failed to retrieve assessments: {ex.Message}");
             }
-
-            return result;
         }
 
         public async Task<ApiResponse<SelfAssessmentResponseDto>> GetSelfAssessmentAsync(int assessmentId)
         {
             try
             {
-                var assessment = await _context.Selfassessments
-                    .Include(sa => sa.Form)
-                    .Include(sa => sa.Employee)
-                    .Include(sa => sa.Assessmentdetails)
-                        .ThenInclude(ad => ad.Competency)
-                    .Include(sa => sa.Selfassessmentattachments) 
-                    .FirstOrDefaultAsync(sa => sa.AssessmentId == assessmentId);
-
+                var assessment = await _repository.GetSelfAssessmentByIdWithDetailsAsync(assessmentId);
                 if (assessment == null)
                     return ApiResponse<SelfAssessmentResponseDto>.ErrorResponse("Assessment not found");
 
@@ -279,14 +156,7 @@ return Path.Combine("assessments", assessmentId.ToString(), uniqueFileName);
         {
             try
             {
-                var assessment = await _context.Selfassessments
-                    .Include(sa => sa.Form)
-                    .Include(sa => sa.Employee)
-                    .Include(sa => sa.Assessmentdetails)
-                        .ThenInclude(ad => ad.Competency)
-                    .Include(sa => sa.Selfassessmentattachments) 
-                    .FirstOrDefaultAsync(sa => sa.FormId == formId && sa.EmployeeId == userId);
-
+                var assessment = await _repository.GetSelfAssessmentByFormAndUserWithDetailsAsync(formId, userId);
                 if (assessment == null)
                     return ApiResponse<SelfAssessmentResponseDto>.ErrorResponse("Assessment not found");
 
@@ -303,16 +173,7 @@ return Path.Combine("assessments", assessmentId.ToString(), uniqueFileName);
         {
             try
             {
-                var query = _context.Selfassessments
-                    .Include(sa => sa.Form)
-                    .Include(sa => sa.Employee)
-                    .Include(sa => sa.Assessmentdetails)
-                    .AsQueryable();
-
-                if (!string.IsNullOrEmpty(status))
-                    query = query.Where(sa => sa.Status == status);
-
-                var assessments = await query.OrderByDescending(sa => sa.SubmittedAt).ToListAsync();
+                var assessments = await _repository.GetAllSelfAssessmentsWithDetailsAsync(status);
 
                 var response = new ViewSubmittedFormsResponseDto
                 {
@@ -347,11 +208,9 @@ return Path.Combine("assessments", assessmentId.ToString(), uniqueFileName);
         {
             try
             {
-                var assessment = await _context.Selfassessments.FindAsync(assessmentId);
+                var assessment = await _repository.GetAssessmentForStatusUpdateAsync(assessmentId);
                 if (assessment == null)
-                {
                     return ApiResponse<bool>.ErrorResponse("Assessment not found");
-                }
 
                 assessment.Status = status;
                 if (status == "Submitted")
@@ -359,7 +218,7 @@ return Path.Combine("assessments", assessmentId.ToString(), uniqueFileName);
                     assessment.SubmittedAt = DateTime.Now;
                 }
 
-                await _context.SaveChangesAsync();
+                await _repository.SaveChangesAsync();
                 return ApiResponse<bool>.SuccessResponse(true, "Status updated successfully");
             }
             catch (Exception ex)
@@ -368,16 +227,11 @@ return Path.Combine("assessments", assessmentId.ToString(), uniqueFileName);
             }
         }
 
-        
         public async Task<ApiResponse<List<AttachmentResponseDto>>> GetAssessmentAttachmentsAsync(int assessmentId)
         {
             try
             {
-                var attachments = await _context.Selfassessmentattachments
-                    .Where(a => a.AssessmentId == assessmentId)
-                    .OrderBy(a => a.DisplayOrder)
-                    .ThenBy(a => a.UploadedAt)
-                    .ToListAsync();
+                var attachments = await _repository.GetAttachmentsByAssessmentIdAsync(assessmentId);
 
                 var response = attachments.Select(a => new AttachmentResponseDto
                 {
@@ -400,42 +254,104 @@ return Path.Combine("assessments", assessmentId.ToString(), uniqueFileName);
             }
         }
 
-        
         public async Task<ApiResponse<bool>> DeleteAttachmentAsync(int attachmentId)
         {
             try
             {
-                var attachment = await _context.Selfassessmentattachments.FindAsync(attachmentId);
+                var attachment = await _repository.GetAttachmentByIdAsync(attachmentId);
                 if (attachment == null)
-                {
                     return ApiResponse<bool>.ErrorResponse("Attachment not found");
+
+                if (!string.IsNullOrEmpty(attachment.FilePath))
+                {
+                    var basePath = _configuration["FileStorage:BasePath"] ?? @"D:\Capstone\Backend Push\Backend\eepz\SharedUploads";
+                    var cleanPath = attachment.FilePath
+                        .Replace("uploads\\", "", StringComparison.OrdinalIgnoreCase)
+                        .Replace("uploads/", "", StringComparison.OrdinalIgnoreCase)
+                        .TrimStart('\\', '/');
+                    
+                    var fullPath = Path.Combine(basePath, cleanPath);
+                    if (File.Exists(fullPath))
+                    {
+                        File.Delete(fullPath);
+                    }
                 }
 
-                
-                if (!string.IsNullOrEmpty(attachment.FilePath))
-{
-    var basePath = _configuration["FileStorage:BasePath"] ?? @"D:\Capstone\Backend Push\Backend\eepz\SharedUploads";
-    var cleanPath = attachment.FilePath
-        .Replace("uploads\\", "", StringComparison.OrdinalIgnoreCase)
-        .Replace("uploads/", "", StringComparison.OrdinalIgnoreCase)
-        .TrimStart('\\', '/');
-    
-    var fullPath = Path.Combine(basePath, cleanPath);
-    if (File.Exists(fullPath))
-    {
-        File.Delete(fullPath);
-    }
-}
-
-
-                _context.Selfassessmentattachments.Remove(attachment);
-                await _context.SaveChangesAsync();
-
+                await _repository.DeleteAttachmentAsync(attachmentId);
                 return ApiResponse<bool>.SuccessResponse(true, "Attachment deleted successfully");
             }
             catch (Exception ex)
             {
                 return ApiResponse<bool>.ErrorResponse($"Error deleting attachment: {ex.Message}");
+            }
+        }
+
+        private async Task ProcessAttachmentsAsync(int assessmentId, int userId, List<AttachmentRequestDto> attachments)
+        {
+            var savedAttachments = new List<Selfassessmentattachment>();
+
+            foreach (var attachment in attachments)
+            {
+                string filePath = attachment.FilePath ?? string.Empty;
+
+                if (!string.IsNullOrEmpty(attachment.Base64Content))
+                {
+                    filePath = await SaveFileFromBase64Async(assessmentId, attachment.FileName, attachment.Base64Content);
+                }
+
+                var dbAttachment = new Selfassessmentattachment
+                {
+                    AssessmentId = assessmentId,
+                    UploadedBy = userId,
+                    FileName = attachment.FileName,
+                    FilePath = filePath,
+                    FileType = attachment.FileType,
+                    FileSize = attachment.FileSize,
+                    AttachmentNote = attachment.AttachmentNote,
+                    DisplayOrder = attachment.DisplayOrder ?? 0,
+                    UploadedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
+                };
+
+                savedAttachments.Add(dbAttachment);
+            }
+
+            if (savedAttachments.Any())
+            {
+                await _repository.AddAttachmentsAsync(savedAttachments);
+            }
+        }
+
+        private async Task<string> SaveFileFromBase64Async(int assessmentId, string fileName, string base64Content)
+        {
+            try
+            {
+                var base64Data = base64Content;
+                if (base64Content.Contains(","))
+                {
+                    base64Data = base64Content.Split(',')[1];
+                }
+
+                var bytes = Convert.FromBase64String(base64Data);
+
+                var assessmentDir = Path.Combine(_uploadBasePath, assessmentId.ToString());
+                if (!Directory.Exists(assessmentDir))
+                {
+                    Directory.CreateDirectory(assessmentDir);
+                }
+
+                var fileExtension = Path.GetExtension(fileName);
+                var uniqueFileName = $"{Guid.NewGuid()}{fileExtension}";
+                var fullPath = Path.Combine(assessmentDir, uniqueFileName);
+
+                await File.WriteAllBytesAsync(fullPath, bytes);
+
+                // Save WITHOUT "uploads\" prefix - just the relative path
+                return Path.Combine("assessments", assessmentId.ToString(), uniqueFileName);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error saving file {fileName}: {ex.Message}");
             }
         }
 
@@ -461,7 +377,6 @@ return Path.Combine("assessments", assessmentId.ToString(), uniqueFileName);
                     EmployeeRating = ad.EmployeeRating,
                     EmployeeComments = ad.EmployeeComments
                 }).ToList(),
-                
                 Attachments = assessment.Selfassessmentattachments?.Select(a => new AttachmentResponseDto
                 {
                     AttachmentId = a.AttachmentId,
@@ -473,7 +388,7 @@ return Path.Combine("assessments", assessmentId.ToString(), uniqueFileName);
                     DisplayOrder = a.DisplayOrder,
                     UploadedAt = a.UploadedAt,
                     UploadedBy = a.UploadedBy
-                }).OrderBy(a => a.DisplayOrder).ToList()
+                }).OrderBy(a => a.DisplayOrder).ToList() ?? new List<AttachmentResponseDto>()
             };
         }
     }

@@ -27,21 +27,27 @@ public partial class Department
 
     public DateTime? UpdatedAt { get; set; }
 
-    public virtual ICollection<Budgetallocation> Budgetallocations { get; set; } = new List<Budgetallocation>();
+    public virtual ICollection<Budgetallocation> Budgetallocations { get; set; } =
+        new List<Budgetallocation>();
 
-    public virtual ICollection<Departmentbudget> Departmentbudgets { get; set; } = new List<Departmentbudget>();
+    public virtual ICollection<Departmentbudget> Departmentbudgets { get; set; } =
+        new List<Departmentbudget>();
 
-    public virtual ICollection<Employeedetailsmaster> Employeedetailsmasters { get; set; } = new List<Employeedetailsmaster>();
+    public virtual ICollection<Employeedetailsmaster> Employeedetailsmasters { get; set; } =
+        new List<Employeedetailsmaster>();
 
     public virtual ICollection<Engagement> Engagements { get; set; } = new List<Engagement>();
 
     public virtual Employee? HodEmployee { get; set; }
 
-    public virtual ICollection<Internalopportunity> Internalopportunities { get; set; } = new List<Internalopportunity>();
+    public virtual ICollection<Internalopportunity> Internalopportunities { get; set; } =
+        new List<Internalopportunity>();
 
-    public virtual ICollection<Department> InverseParentDepartment { get; set; } = new List<Department>();
+    public virtual ICollection<Department> InverseParentDepartment { get; set; } =
+        new List<Department>();
 
-    public virtual ICollection<Organizationwideobjective> Organizationwideobjectives { get; set; } = new List<Organizationwideobjective>();
+    public virtual ICollection<Organizationwideobjective> Organizationwideobjectives { get; set; } =
+        new List<Organizationwideobjective>();
 
     public virtual Department? ParentDepartment { get; set; }
 
@@ -49,11 +55,13 @@ public partial class Department
 
     public virtual ICollection<Promotion> Promotions { get; set; } = new List<Promotion>();
 
-    public virtual ICollection<Recognitiondetail> Recognitiondetails { get; set; } = new List<Recognitiondetail>();
+    public virtual ICollection<Recognitiondetail> Recognitiondetails { get; set; } =
+        new List<Recognitiondetail>();
 
     public virtual ICollection<Risk> Risks { get; set; } = new List<Risk>();
 
-    public virtual ICollection<Slacompliance> Slacompliances { get; set; } = new List<Slacompliance>();
+    public virtual ICollection<Slacompliance> Slacompliances { get; set; } =
+        new List<Slacompliance>();
 
     public virtual ICollection<Sla> Slas { get; set; } = new List<Sla>();
 }

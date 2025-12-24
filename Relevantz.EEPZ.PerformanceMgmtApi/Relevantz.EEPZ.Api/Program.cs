@@ -6,8 +6,8 @@ using Relevantz.EEPZ.Core.Services.Implementations;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using System.Security.Claims;
 using System.Text;
-using Relevantz.EEPZ.Data.Repository.Interfaces;
-using Relevantz.EEPZ.Data.Repository.Implementations;
+
+
 using Relevantz.EEPZ.Data.DBContexts;
 using System.IdentityModel.Tokens.Jwt;
 using Serilog;
@@ -188,11 +188,49 @@ builder.Services.AddAuthorization();
 
 // ============ DEPENDENCY INJECTION ============
 builder.Services.AddScoped<IFormManagementService, FormManagementService>();
-builder.Services.AddScoped<IAppraisalProcessService, AppraisalProcessService>();
+
 builder.Services.AddScoped<ISelfAssessmentService, SelfAssessmentService>();
-builder.Services.AddScoped<IManagerReviewRepository, ManagerReviewRepository>();
-builder.Services.AddScoped<ILeadershipRepository, LeadershipRepository>();
-builder.Services.AddScoped<ILeadershipService, LeadershipService>();
+// Repositories
+builder.Services.AddScoped<Relevantz.EEPZ.Data.Repository.Interfaces.IAssessmentDetailsRepository,
+                           Relevantz.EEPZ.Data.Repository.Implementations.AssessmentDetailsRepository>();
+
+// Services
+builder.Services.AddScoped<Relevantz.EEPZ.Core.Services.Interfaces.IAssessmentDetailsService,
+                           Relevantz.EEPZ.Core.Services.Implementations.AssessmentDetailsService>();
+
+
+// Assignments Repository
+builder.Services.AddScoped<Relevantz.EEPZ.Data.Repository.Interfaces.IAssignmentsRepository,
+                           Relevantz.EEPZ.Data.Repository.Implementations.AssignmentsRepository>();
+
+// Assignments Service
+builder.Services.AddScoped<Relevantz.EEPZ.Core.Services.Interfaces.IAssignmentsService,
+                           Relevantz.EEPZ.Core.Services.Implementations.AssignmentsService>();
+
+// FormProgressTracker Repository
+builder.Services.AddScoped<Relevantz.EEPZ.Data.Repository.Interfaces.IFormProgressTrackerRepository,
+                           Relevantz.EEPZ.Data.Repository.Implementations.FormProgressTrackerRepository>();
+
+// FormProgressTracker Service
+builder.Services.AddScoped<Relevantz.EEPZ.Core.Services.Interfaces.IFormProgressTrackerService,
+                           Relevantz.EEPZ.Core.Services.Implementations.FormProgressTrackerService>();
+
+// FormManagement Repository
+builder.Services.AddScoped<Relevantz.EEPZ.Data.Repository.Interfaces.IFormManagementRepository,
+                           Relevantz.EEPZ.Data.Repository.Implementations.FormManagementRepository>();
+
+// FormManagement Service (update existing to use repository)
+builder.Services.AddScoped<Relevantz.EEPZ.Core.Services.Interfaces.IFormManagementService,
+                           Relevantz.EEPZ.Core.Services.Implementations.FormManagementService>();
+
+// SelfAssessment Repository
+builder.Services.AddScoped<Relevantz.EEPZ.Data.Repository.Interfaces.ISelfAssessmentRepository,
+                           Relevantz.EEPZ.Data.Repository.Implementations.SelfAssessmentRepository>();
+
+// SelfAssessment Service
+builder.Services.AddScoped<Relevantz.EEPZ.Core.Services.Interfaces.ISelfAssessmentService,
+                           Relevantz.EEPZ.Core.Services.Implementations.SelfAssessmentService>();
+
 
 // ============ CORS CONFIGURATION ============
 builder.Services.AddCors(options =>
