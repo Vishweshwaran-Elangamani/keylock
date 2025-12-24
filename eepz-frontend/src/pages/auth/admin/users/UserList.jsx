@@ -12,6 +12,101 @@ import { FaSearch } from "react-icons/fa";
 import { Form } from "react-bootstrap";
 import "../../../../styles/auth/user/UserList.css";
 
+const RoleDropdown = ({ value, onChange, roles }) => {
+  const [open, setOpen] = useState(false);
+
+  const allOptions = [
+    { label: "All Roles", value: "" },
+    ...roles
+      .filter((role) => role.roleName !== "Admin")
+      .map((role) => ({ label: role.roleName, value: role.roleName })),
+  ];
+  const selected = allOptions.find((o) => o.value === value) || allOptions[0];
+
+  const handleSelect = (val) => {
+    onChange({ target: { value: val } });
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="filter-select custom-ul-dropdown"
+      tabIndex={0}
+      onBlur={() => setOpen(false)}
+      onClick={() => setOpen((prev) => !prev)}
+      style={{ position: "relative" }}
+    >
+      <div className="custom-ul-selected">
+        {selected.label}
+        <span className="custom-ul-arrow" />
+      </div>
+      {open && (
+        <div className="custom-ul-menu">
+          {allOptions.map((opt) => (
+            <div
+              key={opt.value || "all-roles"}
+              className={
+                "custom-ul-option" +
+                (opt.value === value ? " custom-ul-option-active" : "")
+              }
+              onMouseDown={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const StatusDropdown = ({ value, onChange }) => {
+  const [open, setOpen] = useState(false);
+
+  const allOptions = [
+    { label: "All Status", value: "" },
+    { label: "Active", value: "Active" },
+    { label: "Inactive", value: "Inactive" },
+  ];
+  const selected = allOptions.find((o) => o.value === value) || allOptions[0];
+
+  const handleSelect = (val) => {
+    onChange({ target: { value: val } });
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="filter-select custom-ul-dropdown"
+      tabIndex={0}
+      onBlur={() => setOpen(false)}
+      onClick={() => setOpen((prev) => !prev)}
+      style={{ position: "relative" }}
+    >
+      <div className="custom-ul-selected">
+        {selected.label}
+        <span className="custom-ul-arrow" />
+      </div>
+      {open && (
+        <div className="custom-ul-menu">
+          {allOptions.map((opt) => (
+            <div
+              key={opt.value || "all-status"}
+              className={
+                "custom-ul-option" +
+                (opt.value === value ? " custom-ul-option-active" : "")
+              }
+              onMouseDown={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 /**
  * UserList Component
  * Main admin user management listing, filtering, and modal launching.
@@ -45,7 +140,6 @@ const UserList = () => {
     fetchData();
   }, []);
 
-  //  FIXED: Use activeSearchTerm instead of searchTerm
   useEffect(() => {
     filterUsers();
   }, [users, activeSearchTerm, selectedRole, selectedStatus]);
@@ -109,12 +203,10 @@ const UserList = () => {
     setCurrentPage(1);
   };
 
-  //  NEW: Handle search button click
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
   };
 
-  //  FIXED: Clear all filters including activeSearchTerm
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
@@ -298,31 +390,17 @@ const UserList = () => {
             </div>
 
             {/* Role Filter - EXCLUDE ADMIN ROLE */}
-            <select
-              className="filter-select"
+            <RoleDropdown
               value={selectedRole}
               onChange={(e) => setSelectedRole(e.target.value)}
-            >
-              <option value="">All Roles</option>
-              {roles
-                .filter((role) => role.roleName !== "Admin")
-                .map((role) => (
-                  <option key={role.roleId} value={role.roleName}>
-                    {role.roleName}
-                  </option>
-                ))}
-            </select>
+              roles={roles}
+            />
 
             {/* Status Filter */}
-            <select
-              className="filter-select"
+            <StatusDropdown
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-            >
-              <option value="">All Status</option>
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
-            </select>
+            />
 
             {/* Clear Filters Button */}
             <button className="btn-clear-filters" onClick={clearFilters}>

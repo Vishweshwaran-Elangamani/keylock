@@ -11,23 +11,115 @@ import { Form } from "react-bootstrap";
 import "../../../../styles/hr_operations/hr/BudgetAllocation.css";
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
 
+const YearDropdown = ({ value, onChange, options }) => {
+  const [open, setOpen] = useState(false);
+  const allOptions = [{ label: "All Years", value: "all" }, ...options];
+  const selected = allOptions.find((o) => o.value === value) || allOptions[0];
+
+  const handleSelect = (val) => {
+    onChange({ target: { name: "year", value: val } });
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="budget-filter-select custom-year-dropdown"
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+      style={{ position: "relative" }}
+    >
+      <div
+        className="custom-year-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {selected.label}
+        <span className="custom-year-arrow" />
+      </div>
+      {open && (
+        <div className="custom-year-menu">
+          {allOptions.map((opt) => (
+            <div
+              key={opt.value}
+              className={
+                "custom-year-option" +
+                (opt.value === value ? " custom-year-option-active" : "")
+              }
+              onClick={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const DepartmentDropdown = ({ value, onChange, options }) => {
+  const [open, setOpen] = useState(false);
+  const allOptions = [
+    { label: "All Departments", value: "" },
+    ...options.map((dept) => ({ label: dept, value: dept })),
+  ];
+  const selected = allOptions.find((o) => o.value === value) || allOptions[0];
+
+  const handleSelect = (val) => {
+    onChange({ target: { name: "department", value: val } });
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="budget-filter-select custom-department-dropdown"
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+      style={{ position: "relative" }}
+    >
+      <div
+        className="custom-department-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {selected.label}
+        <span className="custom-department-arrow" />
+      </div>
+      {open && (
+        <div className="custom-department-menu">
+          {allOptions.map((opt) => (
+            <div
+              key={opt.value || "all-dept"}
+              className={
+                "custom-department-option" +
+                (opt.value === value ? " custom-department-option-active" : "")
+              }
+              onClick={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const BudgetAllocation = () => {
   const [budgets, setBudgets] = useState([]);
   const [filteredBudgets, setFilteredBudgets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedBudget, setSelectedBudget] = useState(null);
+
   const [viewType, setViewType] = useState("table");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  //  UPDATED: Two-state search approach
-  const [searchTerm, setSearchTerm] = useState(""); // What user types
-  const [activeSearchTerm, setActiveSearchTerm] = useState(""); // Used for filtering
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeSearchTerm, setActiveSearchTerm] = useState("");
 
   const [filters, setFilters] = useState({
     year: "all",
@@ -43,14 +135,12 @@ const BudgetAllocation = () => {
   const userRole = localStorage.getItem("userRole");
   const isLeadership = userRole === "Leadership";
 
-  useEffect(() => {
-  }, [userRole]);
+  useEffect(() => {}, [userRole]);
 
   useEffect(() => {
     fetchBudgets();
   }, []);
 
-  //  UPDATED: Include activeSearchTerm in dependencies
   useEffect(() => {
     applyFilters();
     setCurrentPage(1);
@@ -81,10 +171,10 @@ const BudgetAllocation = () => {
     const departments = [
       ...new Set(data.map((b) => b.departmentName).filter(Boolean)),
     ].sort();
+
     setFilterOptions({ years, departments });
   };
 
-  //  UPDATED: Use activeSearchTerm for filtering
   const applyFilters = () => {
     let filtered = budgets;
 
@@ -119,12 +209,10 @@ const BudgetAllocation = () => {
     }));
   };
 
-  //  NEW: Handle search button click
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
   };
 
-  //  UPDATED: Clear all filters including activeSearchTerm
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
@@ -273,6 +361,7 @@ const BudgetAllocation = () => {
               <div className="summary-card-label">Total Budget</div>
             </div>
           </div>
+
           <div className="budget-summary-card allocated">
             <div className="summary-card-icon">
               <i className="bi bi-cash-stack"></i>
@@ -284,6 +373,7 @@ const BudgetAllocation = () => {
               <div className="summary-card-label">Total Allocated</div>
             </div>
           </div>
+
           <div className="budget-summary-card utilized">
             <div className="summary-card-icon">
               <i className="bi bi-graph-up-arrow"></i>
@@ -298,10 +388,8 @@ const BudgetAllocation = () => {
         </div>
       )}
 
-      {/*  UPDATED: Filter Section with Search Button */}
       <div className="budget-filter-section">
         <div className="budget-filter-row-single">
-          {/*  NEW: Search with Button */}
           <div className="budget-search-input">
             <div className="budget-search-inner">
               <span className="budget-search-icon">
@@ -329,33 +417,20 @@ const BudgetAllocation = () => {
             </div>
           </div>
 
-          <select
-            name="year"
+          <YearDropdown
             value={filters.year}
             onChange={handleFilterChange}
-            className="budget-filter-select"
-          >
-            <option value="all">All Years</option>
-            {filterOptions.years.map((year) => (
-              <option key={year} value={year}>
-                {year}
-              </option>
-            ))}
-          </select>
+            options={filterOptions.years.map((year) => ({
+              label: year.toString(),
+              value: year.toString(),
+            }))}
+          />
 
-          <select
-            name="department"
+          <DepartmentDropdown
             value={filters.department}
             onChange={handleFilterChange}
-            className="budget-filter-select"
-          >
-            <option value="">All Departments</option>
-            {filterOptions.departments.map((dept) => (
-              <option key={dept} value={dept}>
-                {dept}
-              </option>
-            ))}
-          </select>
+            options={filterOptions.departments}
+          />
 
           <button className="budget-clear-btn" onClick={clearFilters}>
             Clear Filters
@@ -368,8 +443,7 @@ const BudgetAllocation = () => {
 
           {isLeadership && (
             <button className="budget-btn-create" onClick={handleCreateBudget}>
-              <i className="bi bi-plus-circle"></i>
-              Add Budget
+              <i className="bi bi-plus-circle"></i> Add Budget
             </button>
           )}
         </div>
@@ -378,11 +452,7 @@ const BudgetAllocation = () => {
       {filteredBudgets.length === 0 ? (
         <div className="budget-alert-empty">
           <i className="bi bi-inbox"></i>
-          <p>
-            {searchTerm || filters.year !== "all" || filters.department
-              ? "No budgets found matching your filters"
-              : "No department budgets configured"}
-          </p>
+          <p>No budget available</p>
         </div>
       ) : viewType === "card" ? (
         <>
@@ -400,6 +470,7 @@ const BudgetAllocation = () => {
                     <p className="budget-card-year">{budget.fiscalYear}</p>
                   </div>
                 </div>
+
                 <div className="budget-card-body">
                   <div className="budget-card-row">
                     <span className="budget-card-label">Total Budget</span>
@@ -432,12 +503,15 @@ const BudgetAllocation = () => {
                     </span>
                   </div>
                   <div className="budget-card-row">
-                    <span className="budget-card-label">Avg Cost/Employee</span>
+                    <span className="budget-card-label">
+                      Avg Cost/Employee
+                    </span>
                     <span className="budget-card-value">
                       {formatCurrency(budget.avgCostPerEmployee)}
                     </span>
                   </div>
                 </div>
+
                 {isLeadership && (
                   <div className="budget-card-actions">
                     <button
@@ -510,7 +584,10 @@ const BudgetAllocation = () => {
                     .filter((page) => {
                       if (totalPages <= 7) return true;
                       if (page === 1 || page === totalPages) return true;
-                      if (page >= currentPage - 1 && page <= currentPage + 1)
+                      if (
+                        page >= currentPage - 1 &&
+                        page <= currentPage + 1
+                      )
                         return true;
                       return false;
                     })
@@ -681,7 +758,10 @@ const BudgetAllocation = () => {
                     .filter((page) => {
                       if (totalPages <= 7) return true;
                       if (page === 1 || page === totalPages) return true;
-                      if (page >= currentPage - 1 && page <= currentPage + 1)
+                      if (
+                        page >= currentPage - 1 &&
+                        page <= currentPage + 1
+                      )
                         return true;
                       return false;
                     })

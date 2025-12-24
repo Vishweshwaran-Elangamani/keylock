@@ -12,6 +12,57 @@ import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
 import "../../styles/internal/NominationManagement.css";
 
+/* Custom status dropdown for nominations (same behavior as sample) */
+const NominationStatusDropdown = ({ value, onChange }) => {
+  const [open, setOpen] = useState(false);
+
+  const options = [
+    { label: "All Status", value: "" },
+    { label: "Pending", value: "Pending" },
+    { label: "Approved", value: "Approved" },
+    { label: "Rejected", value: "Rejected" },
+  ];
+
+  const selected = options.find((o) => o.value === value) || options[0];
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="filter-select custom-status-dropdown"
+      tabIndex={0}
+      onBlur={() => setOpen(false)}
+      onClick={() => setOpen((prev) => !prev)}
+      style={{ position: "relative" }}
+    >
+      <div className="custom-status-selected">
+        {selected.label}
+        <span className="custom-status-arrow" />
+      </div>
+
+      {open && (
+        <div className="custom-status-menu">
+          {options.map((opt) => (
+            <div
+              key={opt.value || "all"}
+              className={
+                "custom-status-option" +
+                (opt.value === value ? " custom-status-option-active" : "")
+              }
+              onMouseDown={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const NominationManagement = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -25,7 +76,8 @@ const NominationManagement = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [showSelfNominateModal, setShowSelfNominateModal] = useState(false);
-  const [showManagerNominateModal, setShowManagerNominateModal] = useState(false);
+  const [showManagerNominateModal, setShowManagerNominateModal] =
+    useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showGraphModal, setShowGraphModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -82,7 +134,7 @@ const NominationManagement = () => {
     if (searchInputRef.current) searchInputRef.current.value = "";
   };
 
-  // ✅ UPDATED: role-based API selection (MAIN CHANGE)
+  // role-based API selection
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -91,16 +143,13 @@ const NominationManagement = () => {
       console.log("[NominationManagement] Role:", user?.role);
 
       if (user?.role === "Manager") {
-        // Manager dashboard – only items waiting for manager review
         nominationsResponse = await nominationService.getPendingManagerReview();
       } else if (user?.role === "Department Head") {
-        // Dept head dashboard – only items waiting for dept head review
-        nominationsResponse = await nominationService.getPendingDeptHeadReview();
+        nominationsResponse =
+          await nominationService.getPendingDeptHeadReview();
       } else if (user?.role === "HR" || user?.role === "Admin") {
-        // HR/Admin – can see all nominations
         nominationsResponse = await nominationService.getAllNominations();
       } else {
-        // ✅ Employee – must see ONLY own nominations
         nominationsResponse = await nominationService.getMyNominations();
       }
 
@@ -111,10 +160,7 @@ const NominationManagement = () => {
         const data = Array.isArray(nominationsResponse.data)
           ? nominationsResponse.data
           : [];
-        console.log(
-          "[NominationManagement] nominations count:",
-          data.length
-        );
+        console.log("[NominationManagement] nominations count:", data.length);
         setNominations(data);
       } else {
         toast.error(
@@ -383,17 +429,11 @@ const NominationManagement = () => {
               Clear Filters
             </button>
 
-            {/* Status Filter */}
-            <select
-              className="filter-select"
+            {/* Status Filter (custom dropdown) */}
+            <NominationStatusDropdown
               value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-            >
-              <option value="">All Status</option>
-              <option value="Pending">Pending</option>
-              <option value="Approved">Approved</option>
-              <option value="Rejected">Rejected</option>
-            </select>
+              onChange={(val) => setSelectedStatus(val)}
+            />
           </div>
 
           <div className="filters-actions">
@@ -485,7 +525,9 @@ const NominationManagement = () => {
                             .includes("pending") && (
                             <button
                               className="action-btn action-btn-edit"
-                              onClick={() => handleReviewNomination(nomination)}
+                              onClick={() =>
+                                handleReviewNomination(nomination)
+                              }
                               title="Review Nomination"
                             >
                               <i className="bi bi-pencil"></i>
@@ -529,13 +571,20 @@ const NominationManagement = () => {
 
             <div className="pagination-status">
               Showing {(currentPage - 1) * rowsPerPage + 1} to{" "}
-              {Math.min(currentPage * rowsPerPage, filteredNominations.length)}{" "}
+              {Math.min(
+                currentPage * rowsPerPage,
+                filteredNominations.length
+              )}{" "}
               of {filteredNominations.length} entries
             </div>
 
             <nav className="pagination-nav">
               <ul className="pagination">
-                <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                <li
+                  className={`page-item ${
+                    currentPage === 1 ? "disabled" : ""
+                  }`}
+                >
                   <button
                     className="page-link"
                     onClick={() =>

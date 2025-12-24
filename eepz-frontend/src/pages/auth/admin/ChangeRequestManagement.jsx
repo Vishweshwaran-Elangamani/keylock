@@ -8,6 +8,53 @@ import ApproveEmailChangeModal from "../../../components/auth/Modal/changereques
 import RejectEmailChangeModal from "../../../components/auth/Modal/changerequest/RejectEmailChangeModal";
 import "../../../styles/auth/admin/ChangeRequestManagement.css";
 
+/* Custom Status Dropdown Component */
+const StatusDropdown = ({ value, onChange, options }) => {
+  const [open, setOpen] = useState(false);
+
+  const allOptions = [{ label: "All Status", value: "" }, ...options];
+  const selected = allOptions.find((o) => o.value === value) || allOptions[0];
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="crm-filter-select custom-status-dropdown"
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+      style={{ position: "relative" }}
+    >
+      <div
+        className="custom-status-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {selected.label}
+        <span className="custom-status-arrow" />
+      </div>
+
+      {open && (
+        <div className="custom-status-menu">
+          {allOptions.map((opt) => (
+            <div
+              key={opt.value || "all-status"}
+              className={
+                "custom-status-option" +
+                (opt.value === value ? " custom-status-option-active" : "")
+              }
+              onClick={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Separate component for Pending Requests
 const PendingRequests = ({
   requests,
@@ -100,7 +147,7 @@ const PendingRequests = ({
       {/* FILTERS CARD */}
       <div className="crm-filters-card">
         <div className="crm-filters-content">
-          {/*  UPDATED: Search with Button */}
+          {/* Search with Button */}
           <div className="crm-search-box">
             <div className="crm-search-inner">
               <span className="crm-search-icon">
@@ -418,12 +465,20 @@ const AllRequests = ({
     return pages;
   };
 
+  // Status options for dropdown
+  const statusOptions = [
+    { label: "Pending", value: "Pending" },
+    { label: "Approved", value: "Approved" },
+    { label: "Rejected", value: "Rejected" },
+    { label: "Cancelled", value: "Cancelled" },
+  ];
+
   return (
     <>
       {/* FILTERS CARD */}
       <div className="crm-filters-card">
         <div className="crm-filters-content">
-          {/*  UPDATED: Search with Button */}
+          {/* Search with Button */}
           <div className="crm-search-box">
             <div className="crm-search-inner">
               <span className="crm-search-icon">
@@ -451,17 +506,12 @@ const AllRequests = ({
             </div>
           </div>
 
-          <select
-            className="crm-filter-select"
+          {/* Custom Status Dropdown */}
+          <StatusDropdown
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-          >
-            <option value="">All Status</option>
-            <option value="Pending">Pending</option>
-            <option value="Approved">Approved</option>
-            <option value="Rejected">Rejected</option>
-            <option value="Cancelled">Cancelled</option>
-          </select>
+            onChange={(val) => setFilterStatus(val)}
+            options={statusOptions}
+          />
 
           <input
             type="date"
@@ -682,29 +732,25 @@ const AllRequests = ({
 const ChangeRequestManagement = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(null);
 
-  //  UPDATED: Two-state search approach
-  const [searchTerm, setSearchTerm] = useState(""); // What user types
-  const [activeSearchTerm, setActiveSearchTerm] = useState(""); // Used for filtering
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeSearchTerm, setActiveSearchTerm] = useState("");
 
-  // Filter States
   const [filterStatus, setFilterStatus] = useState("");
   const [filterDate, setFilterDate] = useState("");
 
-  // Pagination States
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Modal States
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [processing, setProcessing] = useState(false);
 
-  // Get active tab based on current route
   const getActiveTab = () => {
     const path = location.pathname;
     if (path.includes("/pending")) return "pending";
@@ -714,12 +760,10 @@ const ChangeRequestManagement = () => {
 
   const [activeTab, setActiveTab] = useState(getActiveTab());
 
-  // Update active tab when route changes
   useEffect(() => {
     setActiveTab(getActiveTab());
   }, [location.pathname]);
 
-  // Define tabs
   const tabs = [
     {
       key: "pending",
@@ -735,13 +779,11 @@ const ChangeRequestManagement = () => {
     },
   ];
 
-  // FETCH ALL REQUESTS ONLY ONCE ON MOUNT
   useEffect(() => {
     fetchRequests();
     const refreshInterval = setInterval(() => {
       fetchRequests(true);
     }, 30000000);
-
     return () => clearInterval(refreshInterval);
   }, []);
 
@@ -769,12 +811,10 @@ const ChangeRequestManagement = () => {
     }
   };
 
-  //  NEW: Handle search button click
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
   };
 
-  //  UPDATED: Clear all filters including activeSearchTerm
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
@@ -782,7 +822,6 @@ const ChangeRequestManagement = () => {
     setFilterDate("");
   };
 
-  // TAB SWITCHING HANDLER
   const handleTabChange = (tab) => {
     setActiveTab(tab.key);
     navigate(tab.path);
@@ -790,7 +829,6 @@ const ChangeRequestManagement = () => {
     setCurrentPage(1);
   };
 
-  // Updated Process Click Handler
   const handleProcessClick = (request, action) => {
     setSelectedRequest(request);
     if (action === "Approved") {
@@ -801,7 +839,6 @@ const ChangeRequestManagement = () => {
     toast.info(`Processing email change request #${request.requestId}`);
   };
 
-  // Approve Handler
   const handleApprove = async (adminRemarks) => {
     try {
       setProcessing(true);
@@ -844,7 +881,6 @@ const ChangeRequestManagement = () => {
     }
   };
 
-  // Reject Handler
   const handleReject = async (adminRemarks) => {
     try {
       setProcessing(true);
@@ -921,7 +957,6 @@ const ChangeRequestManagement = () => {
     return name.substring(0, 2).toUpperCase();
   };
 
-  // Get current tab label for breadcrumb
   const getCurrentTabLabel = () => {
     const currentTab = tabs.find((tab) => tab.key === activeTab);
     return currentTab ? currentTab.label : "Pending Requests";
@@ -1001,7 +1036,7 @@ const ChangeRequestManagement = () => {
         </div>
       </div>
 
-      {/* TAB NAVIGATION BAR - HR OPS PILL STYLE */}
+      {/* TAB NAVIGATION BAR */}
       <div className="crm-request-tabs">
         {tabs.map((tab) => (
           <button

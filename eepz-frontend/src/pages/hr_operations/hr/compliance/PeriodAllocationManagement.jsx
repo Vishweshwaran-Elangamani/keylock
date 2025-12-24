@@ -10,6 +10,170 @@ import DeleteConfirmationModal from "../../../../components/hr_operations/modals
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
 import "../../../../styles/hr_operations/hr/PeriodAllocation.css";
 
+/* Custom Budget Dropdown */
+const BudgetDropdown = ({ budgets, selectedBudget, onChange }) => {
+  const [open, setOpen] = useState(false);
+
+  const handleSelect = (budget) => {
+    onChange(budget);
+    setOpen(false);
+  };
+
+  if (budgets.length === 0) {
+    return (
+      <div className="period-budget-dropdown-empty">
+        No budgets available
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="period-filter-select period-budget-dropdown-custom"
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+      style={{ position: "relative" }}
+    >
+      <div
+        className="custom-budget-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {selectedBudget ? (
+          <span>
+            {selectedBudget.departmentName} - FY {selectedBudget.fiscalYear} (
+            {formatCurrency(selectedBudget.totalBudget)})
+          </span>
+        ) : (
+          <span>Select a budget</span>
+        )}
+        <span className="custom-budget-arrow" />
+      </div>
+
+      {open && (
+        <div className="custom-budget-menu">
+          {budgets.map((budget) => (
+            <div
+              key={budget.budgetId}
+              className={
+                "custom-budget-option" +
+                (selectedBudget?.budgetId === budget.budgetId
+                  ? " custom-budget-option-active"
+                  : "")
+              }
+              onClick={() => handleSelect(budget)}
+            >
+              {budget.departmentName} - FY {budget.fiscalYear} (
+              {formatCurrency(budget.totalBudget)})
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* Custom Year Dropdown */
+const YearDropdown = ({ value, onChange, years }) => {
+  const [open, setOpen] = useState(false);
+
+  const allOptions = [
+    { label: "All Years", value: "all" },
+    ...years.map((year) => ({ label: year.toString(), value: year.toString() })),
+  ];
+
+  const selected = allOptions.find((o) => o.value === value) || allOptions[0];
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="period-filter-select custom-year-dropdown"
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+      style={{ position: "relative" }}
+    >
+      <div
+        className="custom-year-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {selected.label}
+        <span className="custom-year-arrow" />
+      </div>
+
+      {open && (
+        <div className="custom-year-menu">
+          {allOptions.map((opt) => (
+            <div
+              key={opt.value}
+              className={
+                "custom-year-option" +
+                (opt.value === value ? " custom-year-option-active" : "")
+              }
+              onClick={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* Custom Period Dropdown */
+const PeriodDropdown = ({ value, onChange, periods }) => {
+  const [open, setOpen] = useState(false);
+
+  const allOptions = [
+    { label: "All Periods", value: "" },
+    ...periods.map((period) => ({ label: period, value: period })),
+  ];
+
+  const selected = allOptions.find((o) => o.value === value) || allOptions[0];
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="period-filter-select custom-period-dropdown"
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+      style={{ position: "relative" }}
+    >
+      <div
+        className="custom-period-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {selected.label}
+        <span className="custom-period-arrow" />
+      </div>
+
+      {open && (
+        <div className="custom-period-menu">
+          {allOptions.map((opt) => (
+            <div
+              key={opt.value || "all-periods"}
+              className={
+                "custom-period-option" +
+                (opt.value === value ? " custom-period-option-active" : "")
+              }
+              onClick={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const PeriodAllocationManagement = () => {
   const [budgets, setBudgets] = useState([]);
   const [selectedBudget, setSelectedBudget] = useState(null);
@@ -30,7 +194,7 @@ const PeriodAllocationManagement = () => {
   const [periodToDelete, setPeriodToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // View & Pagination States (viewType kept even if unused)
+  // View & Pagination States
   const [viewType, setViewType] = useState("table");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -41,15 +205,15 @@ const PeriodAllocationManagement = () => {
     direction: "asc",
   });
 
-  // Filters (year + period only)
+  // Filters
   const [filters, setFilters] = useState({
     year: "all",
     period: "",
   });
 
-  // Search: input text vs applied search
+  // Search
   const [searchInput, setSearchInput] = useState("");
-  const [searchTerm, setSearchTerm] = useState(""); // only this is used for filtering
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Filter Options
   const [filterOptions, setFilterOptions] = useState({
@@ -67,7 +231,6 @@ const PeriodAllocationManagement = () => {
     }
   }, [selectedBudget]);
 
-  // Re-run filters whenever data, filters, sort, or APPLIED searchTerm changes
   useEffect(() => {
     applyFilters();
     setCurrentPage(1);
@@ -129,7 +292,6 @@ const PeriodAllocationManagement = () => {
   const applyFilters = () => {
     let filtered = periodAllocations;
 
-    // Search filter uses ONLY searchTerm (applied search)
     if (searchTerm.trim()) {
       const query = searchTerm.toLowerCase();
       filtered = filtered.filter((p) => {
@@ -140,19 +302,16 @@ const PeriodAllocationManagement = () => {
       });
     }
 
-    // Year filter
     if (filters.year !== "all") {
       filtered = filtered.filter(
         (p) => p.periodYear === parseInt(filters.year)
       );
     }
 
-    // Period filter
     if (filters.period) {
       filtered = filtered.filter((p) => p.period === filters.period);
     }
 
-    // Apply sorting
     if (sortConfig.key) {
       filtered.sort((a, b) => {
         let aValue = a[sortConfig.key];
@@ -198,20 +357,10 @@ const PeriodAllocationManagement = () => {
     );
   };
 
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  // Only update the textbox, not the filter
   const handleSearchInputChange = (e) => {
     setSearchInput(e.target.value);
   };
 
-  // When Search button is clicked, apply the text as active filter
   const handleSearchClick = () => {
     setSearchTerm(searchInput.trim());
   };
@@ -280,7 +429,6 @@ const PeriodAllocationManagement = () => {
     toast.success("Period allocations exported successfully");
   };
 
-  // PAGINATION LOGIC
   const totalPages = Math.ceil(filteredPeriods.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -352,7 +500,6 @@ const PeriodAllocationManagement = () => {
     }
   };
 
-  // Calculate summary statistics
   const summaryStats = {
     totalAllocated: filteredPeriods.reduce(
       (sum, p) => sum + (p.allocatedAmount || 0),
@@ -385,7 +532,6 @@ const PeriodAllocationManagement = () => {
         </div>
       )}
 
-      {/* SUMMARY STATISTICS CARDS */}
       {filteredPeriods.length > 0 && (
         <div className="period-summary-cards">
           <div className="period-summary-card total">
@@ -426,31 +572,13 @@ const PeriodAllocationManagement = () => {
         </div>
       )}
 
-      {/* INTEGRATED FILTER BAR */}
       <div className="period-filter-section">
-        {/* First Row */}
         <div className="period-filter-row-top">
-          <select
-            className="period-filter-select period-budget-dropdown"
-            value={selectedBudget?.budgetId || ""}
-            onChange={(e) => {
-              const budget = budgets.find(
-                (b) => b.budgetId === parseInt(e.target.value)
-              );
-              setSelectedBudget(budget);
-            }}
-          >
-            {budgets.length === 0 ? (
-              <option value="">No budgets available</option>
-            ) : (
-              budgets.map((budget) => (
-                <option key={budget.budgetId} value={budget.budgetId}>
-                  {budget.departmentName} - FY {budget.fiscalYear} (
-                  {formatCurrency(budget.totalBudget)})
-                </option>
-              ))
-            )}
-          </select>
+          <BudgetDropdown
+            budgets={budgets}
+            selectedBudget={selectedBudget}
+            onChange={setSelectedBudget}
+          />
 
           <div className="period-filter-actions-right">
             <button className="period-btn-export" onClick={exportToCSV}>
@@ -465,9 +593,7 @@ const PeriodAllocationManagement = () => {
           </div>
         </div>
 
-        {/* Second Row */}
         <div className="period-filter-row-bottom">
-          {/* Combined search bar (icon + input + button) */}
           <div className="period-search-input-wrapper">
             <div className="period-search-inner">
               <span className="period-search-icon">
@@ -491,33 +617,21 @@ const PeriodAllocationManagement = () => {
             </div>
           </div>
 
-          <select
-            name="year"
+          <YearDropdown
             value={filters.year}
-            onChange={handleFilterChange}
-            className="period-filter-select"
-          >
-            <option value="all">All Years</option>
-            {filterOptions.years.map((year) => (
-              <option key={year} value={year}>
-                {year}
-              </option>
-            ))}
-          </select>
+            onChange={(val) =>
+              setFilters((prev) => ({ ...prev, year: val }))
+            }
+            years={filterOptions.years}
+          />
 
-          <select
-            name="period"
+          <PeriodDropdown
             value={filters.period}
-            onChange={handleFilterChange}
-            className="period-filter-select"
-          >
-            <option value="">All Periods</option>
-            {filterOptions.periods.map((period) => (
-              <option key={period} value={period}>
-                {period}
-              </option>
-            ))}
-          </select>
+            onChange={(val) =>
+              setFilters((prev) => ({ ...prev, period: val }))
+            }
+            periods={filterOptions.periods}
+          />
 
           <button className="period-clear-btn" onClick={clearFilters}>
             Clear Filters
@@ -531,7 +645,6 @@ const PeriodAllocationManagement = () => {
 
       {selectedBudget && (
         <>
-          {/* CONTENT */}
           {filteredPeriods.length === 0 ? (
             <div className="period-alert-empty">
               <i className="bi bi-inbox"></i>
@@ -543,7 +656,6 @@ const PeriodAllocationManagement = () => {
             </div>
           ) : (
             <>
-              {/* TABLE VIEW */}
               <div className="period-table-container">
                 <table className="period-table">
                   <thead>
@@ -622,7 +734,6 @@ const PeriodAllocationManagement = () => {
                 </table>
               </div>
 
-              {/* PAGINATION - ALWAYS SHOW WHEN DATA EXISTS */}
               {filteredPeriods.length > 0 && (
                 <div className="pagination-container">
                   <div className="pagination-info">
@@ -734,7 +845,6 @@ const PeriodAllocationManagement = () => {
         </>
       )}
 
-      {/* MODALS */}
       {showCreatePeriodModal && (
         <CreatePeriodAllocationModal
           budget={selectedBudget}

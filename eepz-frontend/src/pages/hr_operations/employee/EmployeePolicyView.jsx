@@ -5,6 +5,99 @@ import Breadcrumb from "../../../components/common/Breadcrumb";
 import { toast } from "sonner";
 import "../../../styles/hr_operations/employee/EmployeePolicy.css";
 
+/* Custom Category Dropdown Component */
+const CategoryDropdown = ({ value, onChange, categories }) => {
+  const [open, setOpen] = useState(false);
+
+  const selected = categories.find((cat) => cat === value) || categories[0];
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="filter-select-epd custom-category-dropdown-epd"
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+      style={{ position: "relative" }}
+    >
+      <div
+        className="custom-category-selected-epd"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {selected}
+        <span className="custom-category-arrow-epd" />
+      </div>
+
+      {open && (
+        <div className="custom-category-menu-epd">
+          {categories.map((cat) => (
+            <div
+              key={cat}
+              className={
+                "custom-category-option-epd" +
+                (cat === value ? " custom-category-option-active-epd" : "")
+              }
+              onClick={() => handleSelect(cat)}
+            >
+              {cat}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* Custom Date Filter Dropdown Component */
+const DateFilterDropdown = ({ value, onChange, dateFilters }) => {
+  const [open, setOpen] = useState(false);
+
+  const selected =
+    dateFilters.find((filter) => filter.value === value) || dateFilters[0];
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="filter-select-epd custom-date-dropdown-epd"
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+      style={{ position: "relative" }}
+    >
+      <div
+        className="custom-date-selected-epd"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {selected.label}
+        <span className="custom-date-arrow-epd" />
+      </div>
+
+      {open && (
+        <div className="custom-date-menu-epd">
+          {dateFilters.map((filter) => (
+            <div
+              key={filter.value}
+              className={
+                "custom-date-option-epd" +
+                (filter.value === value ? " custom-date-option-active-epd" : "")
+              }
+              onClick={() => handleSelect(filter.value)}
+            >
+              {filter.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const EmployeePolicyView = () => {
   const [policies, setPolicies] = useState([]);
   const [filteredPolicies, setFilteredPolicies] = useState([]);
@@ -68,10 +161,12 @@ const EmployeePolicyView = () => {
 
   const isWithinDateRange = (publishedDate) => {
     if (selectedDateFilter === "All") return true;
+
     const published = new Date(publishedDate);
     const now = new Date();
     const diffTime = Math.abs(now - published);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
     switch (selectedDateFilter) {
       case "Today":
         return diffDays === 0;
@@ -92,6 +187,7 @@ const EmployeePolicyView = () => {
 
   const applyFilters = () => {
     let filtered = policies;
+
     if (searchTerm.trim()) {
       filtered = filtered.filter(
         (p) =>
@@ -100,10 +196,13 @@ const EmployeePolicyView = () => {
           p.description?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
+
     if (selectedCategory !== "All") {
       filtered = filtered.filter((p) => p.category === selectedCategory);
     }
+
     filtered = filtered.filter((p) => isWithinDateRange(p.publishedAt));
+
     setFilteredPolicies(filtered);
     setCurrentPage(1);
   };
@@ -111,19 +210,19 @@ const EmployeePolicyView = () => {
   const handleSearchInput = (e) => {
     setSearchTerm(e.target.value);
   };
-  
+
   const handleSearchKeyDown = (e) => {
     if (e.key === "Enter") {
       applyFilters();
       if (searchInputRef.current) searchInputRef.current.blur();
     }
   };
-  
+
   const handleSearchButton = () => {
     applyFilters();
     if (searchInputRef.current) searchInputRef.current.blur();
   };
-  
+
   const handleClearSearch = () => {
     setSearchTerm("");
     setTimeout(() => applyFilters(), 0);
@@ -180,6 +279,7 @@ const EmployeePolicyView = () => {
       ...new Set(filteredPolicies.map((p) => p.category)),
     ].length;
     const withDocuments = filteredPolicies.filter((p) => p.documentUrl).length;
+
     return { totalPolicies, uniqueCategories, withDocuments };
   };
 
@@ -193,6 +293,7 @@ const EmployeePolicyView = () => {
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
+
     if (totalPages <= maxPagesToShow) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -253,6 +354,7 @@ const EmployeePolicyView = () => {
             <div className="stat-label-epd">Total Policies</div>
           </div>
         </div>
+
         <div className="stat-card-epd stat-categories-epd">
           <div className="stat-icon-epd">
             <i className="bi bi-folder-fill"></i>
@@ -262,6 +364,7 @@ const EmployeePolicyView = () => {
             <div className="stat-label-epd">Categories</div>
           </div>
         </div>
+
         <div className="stat-card-epd stat-documents-epd">
           <div className="stat-icon-epd">
             <i className="bi bi-file-earmark-pdf-fill"></i>
@@ -311,29 +414,19 @@ const EmployeePolicyView = () => {
           </div>
         </div>
 
-        <select
+        {/* Custom Category Dropdown */}
+        <CategoryDropdown
           value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          className="filter-select-epd"
-        >
-          {categories.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
+          onChange={(val) => setSelectedCategory(val)}
+          categories={categories}
+        />
 
-        <select
+        {/* Custom Date Filter Dropdown */}
+        <DateFilterDropdown
           value={selectedDateFilter}
-          onChange={(e) => setSelectedDateFilter(e.target.value)}
-          className="filter-select-epd"
-        >
-          {dateFilters.map((filter) => (
-            <option key={filter.value} value={filter.value}>
-              {filter.label}
-            </option>
-          ))}
-        </select>
+          onChange={(val) => setSelectedDateFilter(val)}
+          dateFilters={dateFilters}
+        />
 
         <button className="btn-clear-epd" onClick={clearFilters}>
           Clear Filters
@@ -358,9 +451,7 @@ const EmployeePolicyView = () => {
 
         <div className="results-count-inline-epd">
           Showing{" "}
-          {viewMode === "table"
-            ? currentItems.length
-            : filteredPolicies.length}{" "}
+          {viewMode === "table" ? currentItems.length : filteredPolicies.length}{" "}
           of {filteredPolicies.length} policies
         </div>
       </div>
@@ -422,7 +513,8 @@ const EmployeePolicyView = () => {
                             width: "36px",
                             height: "36px",
                             borderRadius: "8px",
-                            background: "linear-gradient(135deg, #27235c 0%, #1f1c4b 100%)",
+                            background:
+                              "linear-gradient(135deg, #27235c 0%, #1f1c4b 100%)",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
@@ -431,12 +523,15 @@ const EmployeePolicyView = () => {
                             boxShadow: "0 2px 8px rgba(39, 35, 92, 0.3)",
                           }}
                         >
-                          <i className={`bi ${getCategoryIcon(policy.category)}`}></i>
+                          <i
+                            className={`bi ${getCategoryIcon(policy.category)}`}
+                          ></i>
                         </div>
                         <span
                           className="badge"
                           style={{
-                            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                            background:
+                              "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                             fontSize: "10px",
                             fontWeight: 600,
                             padding: "0.35rem 0.6rem",
@@ -455,7 +550,8 @@ const EmployeePolicyView = () => {
                             fontWeight: 600,
                             padding: "0.35rem 0.6rem",
                             borderRadius: "6px",
-                            background: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+                            background:
+                              "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
                             color: "#ffffff",
                             boxShadow: "0 2px 8px rgba(79, 172, 254, 0.3)",
                             display: "flex",
@@ -463,8 +559,7 @@ const EmployeePolicyView = () => {
                             gap: "0.25rem",
                           }}
                         >
-                          <i className="bi bi-file-earmark-pdf"></i>
-                          PDF
+                          <i className="bi bi-file-earmark-pdf"></i> PDF
                         </span>
                       )}
                     </div>
@@ -582,13 +677,15 @@ const EmployeePolicyView = () => {
                         fontSize: "0.95rem",
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.background = "rgba(13, 110, 253, 0.1)";
+                        e.currentTarget.style.background =
+                          "rgba(13, 110, 253, 0.1)";
                         e.currentTarget.style.borderColor = "#0d6efd";
                         e.currentTarget.style.transform = "translateY(-2px)";
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.background = "transparent";
-                        e.currentTarget.style.borderColor = "rgba(13, 110, 253, 0.3)";
+                        e.currentTarget.style.borderColor =
+                          "rgba(13, 110, 253, 0.3)";
                         e.currentTarget.style.transform = "translateY(0)";
                       }}
                     >
@@ -635,13 +732,10 @@ const EmployeePolicyView = () => {
                           <td>
                             {policy.documentUrl ? (
                               <span className="badge-document-epd">
-                                <i className="bi bi-file-earmark-pdf"></i>
-                                Available
+                                <i className="bi bi-file-earmark-pdf"></i> Available
                               </span>
                             ) : (
-                              <span className="badge-no-document-epd">
-                                None
-                              </span>
+                              <span className="badge-no-document-epd">None</span>
                             )}
                           </td>
                           <td>{formatDate(policy.publishedAt)}</td>
@@ -661,6 +755,7 @@ const EmployeePolicyView = () => {
                     </tbody>
                   </table>
                 </div>
+
                 {/* PAGINATION */}
                 {filteredPolicies.length > 0 && (
                   <div className="pagination-container">
@@ -681,11 +776,13 @@ const EmployeePolicyView = () => {
                       </select>
                       <span className="pagination-label">entries</span>
                     </div>
+
                     <div className="pagination-status">
                       Showing {indexOfFirstItem + 1} to{" "}
                       {Math.min(indexOfLastItem, filteredPolicies.length)} of{" "}
                       {filteredPolicies.length} entries
                     </div>
+
                     <nav className="pagination-nav">
                       <ul className="pagination">
                         <li
@@ -703,6 +800,7 @@ const EmployeePolicyView = () => {
                             <i className="bi bi-chevron-left"></i>
                           </button>
                         </li>
+
                         {getPageNumbers().map((page, index) => (
                           <li
                             key={index}
@@ -721,6 +819,7 @@ const EmployeePolicyView = () => {
                             </button>
                           </li>
                         ))}
+
                         <li
                           className={`page-item ${
                             currentPage === totalPages ? "disabled" : ""

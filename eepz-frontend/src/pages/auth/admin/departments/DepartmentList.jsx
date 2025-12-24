@@ -10,6 +10,53 @@ import { FaSearch } from "react-icons/fa";
 import { Form } from "react-bootstrap";
 import "../../../../styles/auth/department/DepartmentList.css";
 
+const StatusDropdown = ({ value, onChange }) => {
+  const [open, setOpen] = useState(false);
+
+  const allOptions = [
+    { label: "All Status", value: "All" },
+    { label: "Active", value: "Active" },
+    { label: "Inactive", value: "Inactive" },
+  ];
+  const selected = allOptions.find((o) => o.value === value) || allOptions[0];
+
+  const handleSelect = (val) => {
+    onChange({ target: { value: val } });
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="dlm-status-select custom-dlm-dropdown"
+      tabIndex={0}
+      onBlur={() => setOpen(false)}
+      onClick={() => setOpen((prev) => !prev)}
+      style={{ position: "relative" }}
+    >
+      <div className="custom-dlm-selected">
+        {selected.label}
+        <span className="custom-dlm-arrow" />
+      </div>
+      {open && (
+        <div className="custom-dlm-menu">
+          {allOptions.map((opt) => (
+            <div
+              key={opt.value}
+              className={
+                "custom-dlm-option" +
+                (opt.value === value ? " custom-dlm-option-active" : "")
+              }
+              onMouseDown={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const DepartmentList = () => {
   const navigate = useNavigate();
   const [departments, setDepartments] = useState([]);
@@ -296,18 +343,13 @@ const DepartmentList = () => {
 
         {/* Status Filter */}
         <div className="dlm-status-filter">
-          <select
-            className="dlm-status-select"
+          <StatusDropdown
             value={statusFilter}
             onChange={(e) => {
               setStatusFilter(e.target.value);
               setCurrentPage(1);
             }}
-          >
-            <option value="All">All Status</option>
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
-          </select>
+          />
         </div>
 
         {/* Clear Filters */}
@@ -554,8 +596,7 @@ const DepartmentList = () => {
                             style={{ color: "#97247E" }}
                           ></i>
                           <span>
-                            HOD:{" "}
-                            {dept.hodEmployeeName || "Not assigned"}
+                            HOD: {dept.hodEmployeeName || "Not assigned"}
                           </span>
                         </div>
 
@@ -636,8 +677,7 @@ const DepartmentList = () => {
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          border:
-                            "1px solid rgba(13, 110, 253, 0.3)",
+                          border: "1px solid rgba(13, 110, 253, 0.3)",
                           borderRadius: "8px",
                           background: "transparent",
                           color: "#0d6efd",
@@ -649,15 +689,13 @@ const DepartmentList = () => {
                           e.currentTarget.style.background =
                             "rgba(13, 110, 253, 0.1)";
                           e.currentTarget.style.borderColor = "#0d6efd";
-                          e.currentTarget.style.transform =
-                            "translateY(-2px)";
+                          e.currentTarget.style.transform = "translateY(-2px)";
                         }}
                         onMouseLeave={(e) => {
                           e.currentTarget.style.background = "transparent";
                           e.currentTarget.style.borderColor =
                             "rgba(13, 110, 253, 0.3)";
-                          e.currentTarget.style.transform =
-                            "translateY(0)";
+                          e.currentTarget.style.transform = "translateY(0)";
                         }}
                       >
                         <i className="bi bi-pencil-square"></i>
@@ -684,15 +722,13 @@ const DepartmentList = () => {
                           e.currentTarget.style.background =
                             "rgba(220, 53, 69, 0.1)";
                           e.currentTarget.style.borderColor = "#dc3545";
-                          e.currentTarget.style.transform =
-                            "translateY(-2px)";
+                          e.currentTarget.style.transform = "translateY(-2px)";
                         }}
                         onMouseLeave={(e) => {
                           e.currentTarget.style.background = "transparent";
                           e.currentTarget.style.borderColor =
                             "rgba(220, 53, 69, 0.3)";
-                          e.currentTarget.style.transform =
-                            "translateY(0)";
+                          e.currentTarget.style.transform = "translateY(0)";
                         }}
                       >
                         <i className="bi bi-trash3"></i>
@@ -737,9 +773,7 @@ const DepartmentList = () => {
                       >
                         <button
                           onClick={() =>
-                            setCurrentPage((prev) =>
-                              Math.max(prev - 1, 1)
-                            )
+                            setCurrentPage((prev) => Math.max(prev - 1, 1))
                           }
                           disabled={currentPage === 1}
                         >
@@ -752,14 +786,11 @@ const DepartmentList = () => {
                           key={index}
                           className={`dlm-page-item ${
                             page === currentPage ? "active" : ""
-                          } ${
-                            typeof page !== "number" ? "disabled" : ""
-                          }`}
+                          } ${typeof page !== "number" ? "disabled" : ""}`}
                         >
                           <button
                             onClick={() =>
-                              typeof page === "number" &&
-                              setCurrentPage(page)
+                              typeof page === "number" && setCurrentPage(page)
                             }
                             disabled={typeof page !== "number"}
                           >
@@ -830,9 +861,7 @@ const DepartmentList = () => {
                         </td>
                         <td>{dept.hodEmployeeName || "Not assigned"}</td>
                         <td>
-                          {dept.hasChildren
-                            ? dept.childDepartmentCount
-                            : "−"}
+                          {dept.hasChildren ? dept.childDepartmentCount : "−"}
                         </td>
                         <td>{formatDate(dept.createdAt)}</td>
                         <td>
@@ -893,9 +922,7 @@ const DepartmentList = () => {
                     >
                       <button
                         onClick={() =>
-                          setCurrentPage((prev) =>
-                            Math.max(prev - 1, 1)
-                          )
+                          setCurrentPage((prev) => Math.max(prev - 1, 1))
                         }
                         disabled={currentPage === 1}
                       >
@@ -908,14 +935,11 @@ const DepartmentList = () => {
                         key={index}
                         className={`dlm-page-item ${
                           page === currentPage ? "active" : ""
-                        } ${
-                          typeof page !== "number" ? "disabled" : ""
-                        }`}
+                        } ${typeof page !== "number" ? "disabled" : ""}`}
                       >
                         <button
                           onClick={() =>
-                            typeof page === "number" &&
-                            setCurrentPage(page)
+                            typeof page === "number" && setCurrentPage(page)
                           }
                           disabled={typeof page !== "number"}
                         >

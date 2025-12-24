@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../../contexts/auth/AuthContext";
 import internalOpportunityService from "../../services/internal/internalOpportunityService";
@@ -13,6 +14,57 @@ import { toast } from "sonner";
 import { FaSearch } from "react-icons/fa";
 import { Form } from "react-bootstrap";
 import "../../styles/internal/InternalOpportunityManagement.css";
+
+/* Simple custom status dropdown with #27235c hover */
+const StatusDropdown = ({ value, onChange }) => {
+  const [open, setOpen] = useState(false);
+
+  const options = [
+    { label: "All Status", value: "" },
+    { label: "Active", value: "Active" },
+    { label: "Closed", value: "Closed" },
+    { label: "Pending", value: "Pending" },
+  ];
+
+  const selected = options.find((o) => o.value === value) || options[0];
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="filter-select custom-status-dropdown"
+      tabIndex={0}
+      onBlur={() => setOpen(false)}
+      onClick={() => setOpen((prev) => !prev)}
+      style={{ position: "relative" }}
+    >
+      <div className="custom-status-selected">
+        {selected.label}
+        <span className="custom-status-arrow">▾</span>
+      </div>
+
+      {open && (
+        <div className="custom-status-menu">
+          {options.map((opt) => (
+            <div
+              key={opt.value || "all"}
+              className={
+                "custom-status-option" +
+                (opt.value === value ? " custom-status-option-active" : "")
+              }
+              onMouseDown={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const InternalOpportunityManagement = () => {
   const { user } = useAuth();
@@ -344,16 +396,10 @@ const InternalOpportunityManagement = () => {
           </div>
 
           {(isHR || isEmployee || isManager) && (
-            <select
-              className="filter-select"
+            <StatusDropdown
               value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-            >
-              <option value="">All Status</option>
-              <option value="Active">Active</option>
-              <option value="Closed">Closed</option>
-              <option value="Pending">Pending</option>
-            </select>
+              onChange={(val) => setSelectedStatus(val)}
+            />
           )}
 
           <button className="btn-clear" onClick={clearFilters}>
@@ -435,7 +481,9 @@ const InternalOpportunityManagement = () => {
                           <>
                             <button
                               className="action-btn action-btn-edit"
-                              onClick={() => handleEditOpportunity(opportunity)}
+                              onClick={() =>
+                                handleEditOpportunity(opportunity)
+                              }
                               title="Edit Opportunity"
                             >
                               <i className="bi bi-pencil"></i>
@@ -475,7 +523,9 @@ const InternalOpportunityManagement = () => {
                             </button>
                             <button
                               className="action-btn action-btn-nominate-team"
-                              onClick={() => handleManagerNominate(opportunity)}
+                              onClick={() =>
+                                handleManagerNominate(opportunity)
+                              }
                               title="Nominate Team Member"
                             >
                               <i className="bi bi-person-plus"></i>
@@ -533,7 +583,9 @@ const InternalOpportunityManagement = () => {
             <nav className="pagination-nav">
               <ul className="pagination">
                 <li
-                  className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                  className={`page-item ${
+                    currentPage === 1 ? "disabled" : ""
+                  }`}
                 >
                   <button
                     className="page-link"

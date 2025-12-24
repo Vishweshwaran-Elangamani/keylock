@@ -19,7 +19,6 @@
   gap: 1rem;
 }
 
-
 .ci-loading-container p {
   color: #64748b;
   font-size: 1rem;
@@ -140,6 +139,61 @@
 
 .ci-filter-select:hover {
   border-color: #27235c;
+}
+
+/* Custom dropdown styling shared with other pages */
+.custom-status-dropdown {
+  position: relative;
+  padding: 0;
+  border-radius: 4px;
+}
+
+.custom-status-selected {
+  padding: 0.5rem 2rem 0.5rem 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+}
+
+.custom-status-arrow {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #111827;
+  border-bottom: 2px solid #111827;
+  pointer-events: none;
+}
+
+.custom-status-menu {
+  position: absolute;
+  top: 100%;
+  left: -1px;
+  right: -1px;
+  background: #ffffff;
+  border: 1px solid #ced4da;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  z-index: 10;
+}
+
+.custom-status-option {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  display: block;
+  text-align: left;
+}
+
+.custom-status-option:hover {
+  background-color: #27235c;
+  color: #ffffff;
+}
+
+.custom-status-option-active {
+  background-color: #f3f4f6;
 }
 
 /* Clear Button */

@@ -6,6 +6,103 @@ import violationService from "../../../../services/hr_operations/hr/violationSer
 import EscalationDetailModal from "../../../../components/hr_operations/modals/EscalationDetailModal";
 import "../../../../styles/hr_operations/hr/ComplianceIssues.css";
 
+const StatusDropdown = ({ value, onChange }) => {
+  const [open, setOpen] = useState(false);
+
+  const options = [
+    { label: "All Status", value: "" },
+    { label: "Open", value: "Open" },
+    { label: "Pending", value: "Pending" },
+    { label: "Resolved", value: "Resolved" },
+  ];
+
+  const selected = options.find((o) => o.value === value) || options[0];
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="ci-filter-select custom-status-dropdown"
+      tabIndex={0}
+      onBlur={() => setOpen(false)}
+      onClick={() => setOpen((prev) => !prev)}
+      style={{ position: "relative" }}
+    >
+      <div className="custom-status-selected">
+        {selected.label}
+        <span className="custom-status-arrow" />
+      </div>
+      {open && (
+        <div className="custom-status-menu">
+          {options.map((opt) => (
+            <div
+              key={opt.value || "all-status"}
+              className={
+                "custom-status-option" +
+                (opt.value === value ? " custom-status-option-active" : "")
+              }
+              onMouseDown={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const LevelDropdown = ({ value, onChange }) => {
+  const [open, setOpen] = useState(false);
+
+  const options = [
+    { label: "All Levels", value: "" },
+    { label: "L1", value: "L1" },
+    { label: "L2", value: "L2" },
+  ];
+
+  const selected = options.find((o) => o.value === value) || options[0];
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="ci-filter-select custom-status-dropdown"
+      tabIndex={0}
+      onBlur={() => setOpen(false)}
+      onClick={() => setOpen((prev) => !prev)}
+      style={{ position: "relative" }}
+    >
+      <div className="custom-status-selected">
+        {selected.label}
+        <span className="custom-status-arrow" />
+      </div>
+      {open && (
+        <div className="custom-status-menu">
+          {options.map((opt) => (
+            <div
+              key={opt.value || "all-levels"}
+              className={
+                "custom-status-option" +
+                (opt.value === value ? " custom-status-option-active" : "")
+              }
+              onMouseDown={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const ComplianceIssues = () => {
   // ===== STATE MANAGEMENT =====
   const [slaEscalations, setSlaEscalations] = useState([]);
@@ -222,26 +319,12 @@ const ComplianceIssues = () => {
             </div>
           </div>
 
-          <select
-            className="ci-filter-select"
+          <StatusDropdown
             value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-          >
-            <option value="">All Status</option>
-            <option value="Open">Open</option>
-            <option value="Pending">Pending</option>
-            <option value="Resolved">Resolved</option>
-          </select>
+            onChange={setSelectedStatus}
+          />
 
-          <select
-            className="ci-filter-select"
-            value={selectedLevel}
-            onChange={(e) => setSelectedLevel(e.target.value)}
-          >
-            <option value="">All Levels</option>
-            <option value="L1">L1</option>
-            <option value="L2">L2</option>
-          </select>
+          <LevelDropdown value={selectedLevel} onChange={setSelectedLevel} />
 
           <Button
             variant="outline-secondary"
@@ -260,7 +343,9 @@ const ComplianceIssues = () => {
               <i className="bi bi-grid-3x3-gap-fill"></i>
             </button>
             <button
-              className={`ci-view-btn ${viewMode === "table" ? "active" : ""}`}
+              className={`ci-view-btn ${
+                viewMode === "table" ? "active" : ""
+              }`}
               onClick={() => setViewMode("table")}
               title="Table View"
             >
@@ -399,8 +484,11 @@ const ComplianceIssues = () => {
 
                     <div className="pagination-status">
                       Showing {indexOfFirstItem + 1} to{" "}
-                      {Math.min(indexOfLastItem, filteredEscalations.length)} of{" "}
-                      {filteredEscalations.length} entries
+                      {Math.min(
+                        indexOfLastItem,
+                        filteredEscalations.length
+                      )}{" "}
+                      of {filteredEscalations.length} entries
                     </div>
 
                     <nav className="pagination-nav">
@@ -564,8 +652,11 @@ const ComplianceIssues = () => {
 
                     <div className="pagination-status">
                       Showing {indexOfFirstItem + 1} to{" "}
-                      {Math.min(indexOfLastItem, filteredEscalations.length)} of{" "}
-                      {filteredEscalations.length} entries
+                      {Math.min(
+                        indexOfLastItem,
+                        filteredEscalations.length
+                      )}{" "}
+                      of {filteredEscalations.length} entries
                     </div>
 
                     <nav className="pagination-nav">

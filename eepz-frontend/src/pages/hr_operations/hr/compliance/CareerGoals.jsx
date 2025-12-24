@@ -41,6 +41,104 @@ const COLORS = [
   "#EF4444",
 ];
 
+/* Custom dropdown for departments */
+const DepartmentDropdown = ({ value, onChange, options }) => {
+  const [open, setOpen] = useState(false);
+
+  const list = [{ label: "All Departments", value: "" }, ...options.map((o) => ({
+    label: o,
+    value: o,
+  }))];
+
+  const selected = list.find((o) => o.value === value) || list[0];
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="cg-filter-select custom-status-dropdown"
+      tabIndex={0}
+      onBlur={() => setOpen(false)}
+      onClick={() => setOpen((prev) => !prev)}
+      style={{ position: "relative" }}
+    >
+      <div className="custom-status-selected">
+        {selected.label}
+        <span className="custom-status-arrow" />
+      </div>
+      {open && (
+        <div className="custom-status-menu">
+          {list.map((opt) => (
+            <div
+              key={opt.value || "all-departments"}
+              className={
+                "custom-status-option" +
+                (opt.value === value ? " custom-status-option-active" : "")
+              }
+              onMouseDown={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* Custom dropdown for days filter */
+const DaysDropdown = ({ value, onChange }) => {
+  const [open, setOpen] = useState(false);
+
+  const options = [
+    { label: "All Days", value: "" },
+    { label: "0-7 days", value: "0-7" },
+    { label: "8-30 days", value: "8-30" },
+    { label: "30+ days", value: "30+" },
+  ];
+
+  const selected = options.find((o) => o.value === value) || options[0];
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="cg-filter-select custom-status-dropdown"
+      tabIndex={0}
+      onBlur={() => setOpen(false)}
+      onClick={() => setOpen((prev) => !prev)}
+      style={{ position: "relative" }}
+    >
+      <div className="custom-status-selected">
+        {selected.label}
+        <span className="custom-status-arrow" />
+      </div>
+      {open && (
+        <div className="custom-status-menu">
+          {options.map((opt) => (
+            <div
+              key={opt.value || "all-days"}
+              className={
+                "custom-status-option" +
+                (opt.value === value ? " custom-status-option-active" : "")
+              }
+              onMouseDown={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const CareerGoals = () => {
   const [withoutGoals, setWithoutGoals] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -245,7 +343,9 @@ const CareerGoals = () => {
         includeGoalSuggestions: true,
       })
       .then((res) => {
-        toast(`Reminder sent successfully! Sent to ${selectedEmployees.length} employee(s).`);
+        toast(
+          `Reminder sent successfully! Sent to ${selectedEmployees.length} employee(s).`
+        );
         setBulkReminderModal(false);
         setSelectedEmployees([]);
         setSelectAll(false);
@@ -402,29 +502,13 @@ const CareerGoals = () => {
             </div>
           </div>
 
-          <select
-            className="cg-filter-select"
+          <DepartmentDropdown
             value={departmentFilter}
-            onChange={(e) => setDepartmentFilter(e.target.value)}
-          >
-            <option value="">All Departments</option>
-            {uniqueDepartments.map((dept) => (
-              <option key={dept} value={dept}>
-                {dept}
-              </option>
-            ))}
-          </select>
+            onChange={setDepartmentFilter}
+            options={uniqueDepartments}
+          />
 
-          <select
-            className="cg-filter-select"
-            value={daysFilter}
-            onChange={(e) => setDaysFilter(e.target.value)}
-          >
-            <option value="">All Days</option>
-            <option value="0-7">0-7 days</option>
-            <option value="8-30">8-30 days</option>
-            <option value="30+">30+ days</option>
-          </select>
+          <DaysDropdown value={daysFilter} onChange={setDaysFilter} />
 
           <button className="cg-clear-btn" onClick={clearFilters}>
             Clear Filters
@@ -652,7 +736,9 @@ const CareerGoals = () => {
           <nav className="pagination-nav">
             <ul className="pagination">
               <li
-                className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                className={`page-item ${
+                  currentPage === 1 ? "disabled" : ""
+                }`}
               >
                 <button
                   className="page-link"

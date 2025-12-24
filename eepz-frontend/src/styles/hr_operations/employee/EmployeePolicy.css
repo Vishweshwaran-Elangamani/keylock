@@ -545,3 +545,186 @@
   .table-epd th,
   .table-epd td { padding: 0.75rem 1rem; font-size: 0.875rem; }
 }
+
+/* ========================================
+   CUSTOM CATEGORY DROPDOWN - EPD
+======================================== */
+.custom-category-dropdown-epd {
+  position: relative;
+  padding: 0;
+  border-radius: 4px;
+  user-select: none;
+}
+
+.custom-category-selected-epd {
+  padding: 0.5rem 2rem 0.5rem 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+.custom-category-arrow-epd {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #111827;
+  border-bottom: 2px solid #111827;
+  pointer-events: none;
+  transition: transform 0.2s ease;
+}
+
+.custom-category-dropdown-epd:focus-within .custom-category-arrow-epd {
+  transform: translateY(-25%) rotate(225deg);
+}
+
+.custom-category-menu-epd {
+  position: absolute;
+  top: calc(100% - 1px);
+  left: -1px;
+  right: -1px;
+  background: #ffffff;
+  border: 1px solid #ced4da;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+  animation: dropdownFadeIn 0.15s ease-out;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.custom-category-option-epd {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  display: block;
+  text-align: left;
+  transition: all 0.12s ease;
+  font-size: 14px;
+  color: #111827;
+}
+
+.custom-category-option-epd:hover {
+  background-color: #27235c;
+  color: #ffffff;
+}
+
+.custom-category-option-epd:first-child:hover {
+  border-radius: 0;
+}
+
+.custom-category-option-epd:last-child {
+  border-radius: 0 0 3px 3px;
+}
+
+.custom-category-option-active-epd {
+  background-color: #f3f4f6;
+  font-weight: 600;
+}
+
+.custom-category-option-active-epd:hover {
+  background-color: #27235c;
+  color: #ffffff;
+}
+
+/* ========================================
+   CUSTOM DATE FILTER DROPDOWN - EPD
+======================================== */
+.custom-date-dropdown-epd {
+  position: relative;
+  padding: 0;
+  border-radius: 4px;
+  user-select: none;
+}
+
+.custom-date-selected-epd {
+  padding: 0.5rem 2rem 0.5rem 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+.custom-date-arrow-epd {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #111827;
+  border-bottom: 2px solid #111827;
+  pointer-events: none;
+  transition: transform 0.2s ease;
+}
+
+.custom-date-dropdown-epd:focus-within .custom-date-arrow-epd {
+  transform: translateY(-25%) rotate(225deg);
+}
+
+.custom-date-menu-epd {
+  position: absolute;
+  top: calc(100% - 1px);
+  left: -1px;
+  right: -1px;
+  background: #ffffff;
+  border: 1px solid #ced4da;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+  animation: dropdownFadeIn 0.15s ease-out;
+}
+
+.custom-date-option-epd {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  display: block;
+  text-align: left;
+  transition: all 0.12s ease;
+  font-size: 14px;
+  color: #111827;
+}
+
+.custom-date-option-epd:hover {
+  background-color: #27235c;
+  color: #ffffff;
+}
+
+.custom-date-option-epd:first-child:hover {
+  border-radius: 0;
+}
+
+.custom-date-option-epd:last-child {
+  border-radius: 0 0 3px 3px;
+}
+
+.custom-date-option-active-epd {
+  background-color: #f3f4f6;
+  font-weight: 600;
+}
+
+.custom-date-option-active-epd:hover {
+  background-color: #27235c;
+  color: #ffffff;
+}

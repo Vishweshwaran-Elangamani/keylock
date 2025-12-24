@@ -161,8 +161,6 @@
 /* ========================================
    SEARCH BAR WITH BUTTON - NEW
 ======================================== */
-
-
 .budget-search-input {
   position: relative;
   min-width: 250px;
@@ -234,7 +232,7 @@
   justify-content: center;
   white-space: nowrap;
   transition: all 0.15s ease;
-  border-radius: 0px 0px 4px;
+  border-radius: 0 4px 4px 0;
 }
 
 .budget-search-btn:hover {
@@ -244,7 +242,6 @@
 /* ========================================
    CLEAR FILTERS BUTTON - WHITE BACKGROUND, BLACK OUTLINE
 ======================================== */
-
 .budget-clear-btn {
   white-space: nowrap;
   padding: 0.5rem 1rem;
@@ -288,6 +285,189 @@
   outline: none;
   border-color: #27235c;
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+}
+
+/* ========================================
+   CUSTOM YEAR DROPDOWN
+======================================== */
+.custom-year-dropdown {
+  position: relative;
+  padding: 0;
+  border-radius: 4px;
+  user-select: none;
+}
+
+.custom-year-selected {
+  padding: 0.5rem 2rem 0.5rem 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+.custom-year-arrow {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #111827;
+  border-bottom: 2px solid #111827;
+  pointer-events: none;
+  transition: transform 0.2s ease;
+}
+
+.custom-year-dropdown:focus-within .custom-year-arrow {
+  transform: translateY(-25%) rotate(225deg);
+}
+
+.custom-year-menu {
+  position: absolute;
+  top: calc(100% - 1px);
+  left: -1px;
+  right: -1px;
+  background: #ffffff;
+  border: 1px solid #ced4da;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+  animation: dropdownFadeIn 0.15s ease-out;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.custom-year-option {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  display: block;
+  text-align: left;
+  transition: all 0.12s ease;
+  font-size: 14px;
+  color: #111827;
+}
+
+.custom-year-option:hover {
+  background-color: #27235c;
+  color: #ffffff;
+}
+
+.custom-year-option:first-child:hover {
+  border-radius: 0;
+}
+
+.custom-year-option:last-child {
+  border-radius: 0 0 3px 3px;
+}
+
+.custom-year-option-active {
+  background-color: #f3f4f6;
+  font-weight: 600;
+}
+
+.custom-year-option-active:hover {
+  background-color: #27235c;
+  color: #ffffff;
+}
+
+/* ========================================
+   CUSTOM DEPARTMENT DROPDOWN
+======================================== */
+.custom-department-dropdown {
+  position: relative;
+  padding: 0;
+  border-radius: 4px;
+  user-select: none;
+}
+
+.custom-department-selected {
+  padding: 0.5rem 2rem 0.5rem 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+.custom-department-arrow {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #111827;
+  border-bottom: 2px solid #111827;
+  pointer-events: none;
+  transition: transform 0.2s ease;
+}
+
+.custom-department-dropdown:focus-within .custom-department-arrow {
+  transform: translateY(-25%) rotate(225deg);
+}
+
+.custom-department-menu {
+  position: absolute;
+  top: calc(100% - 1px);
+  left: -1px;
+  right: -1px;
+  background: #ffffff;
+  border: 1px solid #ced4da;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+  animation: dropdownFadeIn 0.15s ease-out;
+}
+
+.custom-department-option {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  display: block;
+  text-align: left;
+  transition: all 0.12s ease;
+  font-size: 14px;
+  color: #111827;
+}
+
+.custom-department-option:hover {
+  background-color: #27235c;
+  color: #ffffff;
+}
+
+.custom-department-option:first-child:hover {
+  border-radius: 0;
+}
+
+.custom-department-option:last-child {
+  border-radius: 0 0 3px 3px;
+}
+
+.custom-department-option-active {
+  background-color: #f3f4f6;
+  font-weight: 600;
+}
+
+.custom-department-option-active:hover {
+  background-color: #27235c;
+  color: #ffffff;
 }
 
 .budget-btn-create {
@@ -796,7 +976,9 @@
   }
 
   .budget-search-input,
-  .budget-filter-select {
+  .budget-filter-select,
+  .custom-year-dropdown,
+  .custom-department-dropdown {
     width: 100%;
     max-width: 100%;
   }
