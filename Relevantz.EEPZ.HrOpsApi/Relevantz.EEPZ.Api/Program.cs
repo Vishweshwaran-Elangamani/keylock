@@ -12,9 +12,7 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ===================================
 // Configure Serilog
-// ===================================
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
@@ -29,7 +27,7 @@ Log.Information("Starting EEPZ HR Operations Microservice...");
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// ---------- JWT AUTHENTICATION ----------
+// JWT AUTHENTICATION
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT Secret Key not configured");
 
@@ -70,7 +68,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// ---------- SWAGGER ----------
+// SWAGGER
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
@@ -106,21 +104,18 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// ---------- DATABASE ----------
+// DATABASE
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<EEPZDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-// ---------- REPOSITORIES & SERVICES ----------
-// Sprint 2
+// REPOSITORIES & SERVICES
 builder.Services.AddScoped<IPolicyRepository, PolicyRepository>();
 builder.Services.AddScoped<IViolationRepository, ViolationRepository>();
 builder.Services.AddScoped<IPolicyService, PolicyService>();
 builder.Services.AddScoped<IViolationService, ViolationService>();
 builder.Services.AddScoped<IComplianceService, ComplianceService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
-
-// Sprint 3
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<ICostMappingRepository, CostMappingRepository>();
 builder.Services.AddScoped<ICostMappingService, CostMappingService>();
@@ -138,7 +133,7 @@ builder.Services.AddScoped<IFundAllocationRepository, FundAllocationRepository>(
 builder.Services.AddScoped<IFundAllocationService, FundAllocationService>();
 builder.Services.AddScoped<ISlaEscalationRepository, SlaEscalationRepository>();
 
-// ---------- CORS ----------
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -211,7 +206,7 @@ app.MapControllers();
 app.MapGet("/health", async (EEPZDbContext dbContext, IConfiguration config) =>
 {
     bool dbConnected = false;
-    
+
     try
     {
         dbConnected = await dbContext.Database.CanConnectAsync();
@@ -228,14 +223,14 @@ app.MapGet("/health", async (EEPZDbContext dbContext, IConfiguration config) =>
         service = "EEPZ HR Operations Microservice",
         version = "v1.0",
         environment = builder.Environment.EnvironmentName,
-        
+
         database = new
         {
             connected = dbConnected,
             provider = "MySQL (Pomelo EF Core 8.0)",
             connectionStringName = "DefaultConnection"
         },
-        
+
         endpoints = new
         {
             total = 57,
@@ -248,14 +243,14 @@ app.MapGet("/health", async (EEPZDbContext dbContext, IConfiguration config) =>
                 "Violation (12)"
             }
         },
-        
+
         authentication = new
         {
             enabled = true,
             type = "JWT Bearer",
             issuerConfigured = !string.IsNullOrEmpty(config["Jwt:Issuer"])
         },
-        
+
         cors = "AllowAll Enabled",
         swagger = app.Environment.IsDevelopment()
     });
@@ -267,7 +262,7 @@ try
     Log.Information("Authentication: JWT Bearer Token Enabled");
     Log.Information("Endpoints: 16 Total");
     Log.Information("Environment: {Environment}", app.Environment.EnvironmentName);
-    
+
     app.Run();
 }
 catch (Exception ex)

@@ -70,9 +70,9 @@ namespace Relevantz.EEPZ.Core.Service
                 // Generate temporary password
                 var temporaryPassword = _passwordService.GenerateTemporaryPassword();
                 var hashedPassword = _passwordService.HashPassword(temporaryPassword);
-                Console.WriteLine($"🔐 Generated Temp Password: {temporaryPassword}");
-                Console.WriteLine($"🔒 Hashed Password Length: {hashedPassword.Length}");
-                
+                Console.WriteLine($"Generated Temp Password: {temporaryPassword}");
+                Console.WriteLine($"Hashed Password Length: {hashedPassword.Length}");
+
                 // Create User Authentication
                 var userAuth = new Userauthentication
                 {
@@ -294,7 +294,6 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
 
-        // ⭐ NEW METHOD - Get employees by manager
         public async Task<ApiResponseDto<List<UserResponseDto>>> GetEmployeesByManagerAsync(int managerId)
         {
             try
@@ -314,7 +313,7 @@ namespace Relevantz.EEPZ.Core.Service
 
                 // Get user authentication data for these employees
                 var userResponses = new List<UserResponseDto>();
-                
+
                 foreach (var employee in reportingEmployees)
                 {
                     var userAuth = await _userAuthRepository.GetByEmployeeIdAsync(employee.EmployeeId);
@@ -326,7 +325,7 @@ namespace Relevantz.EEPZ.Core.Service
 
                 EEPZBusinessLog.Information($"Retrieved {userResponses.Count} employees for manager: {managerId}");
                 return ApiResponseDto<List<UserResponseDto>>.SuccessResponse(
-                    userResponses, 
+                    userResponses,
                     $"Found {userResponses.Count} employees"
                 );
             }

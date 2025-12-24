@@ -28,9 +28,9 @@ namespace Relevantz.EEPZ.Data.Repository
 
                 _context.Promotions.Add(promotion);
                 await _context.SaveChangesAsync();
-                
+
                 Console.WriteLine($"  Promotion created: PromotionId={promotion.PromotionId}, NominationId={promotion.NominationId}");
-                
+
                 return promotion;
             }
             catch (Exception ex)
@@ -168,9 +168,9 @@ namespace Relevantz.EEPZ.Data.Repository
                 promotion.UpdatedAt = DateTime.UtcNow;
                 _context.Promotions.Update(promotion);
                 await _context.SaveChangesAsync();
-                
+
                 Console.WriteLine($"  Promotion updated: PromotionId={promotion.PromotionId}");
-                
+
                 return promotion;
             }
             catch (Exception ex)
@@ -190,9 +190,9 @@ namespace Relevantz.EEPZ.Data.Repository
 
                 _context.Promotions.Remove(promotion);
                 await _context.SaveChangesAsync();
-                
+
                 Console.WriteLine($"  Promotion deleted: PromotionId={id}");
-                
+
                 return true;
             }
             catch (Exception ex)
@@ -240,11 +240,11 @@ namespace Relevantz.EEPZ.Data.Repository
                 throw;
             }
         }
-public async Task AddPromotionHistoryAsync(Promotionhistory history)
-{
-    _context.Promotionhistories.Add(history);
-    await _context.SaveChangesAsync();
-}
+        public async Task AddPromotionHistoryAsync(Promotionhistory history)
+        {
+            _context.Promotionhistories.Add(history);
+            await _context.SaveChangesAsync();
+        }
 
 
     }

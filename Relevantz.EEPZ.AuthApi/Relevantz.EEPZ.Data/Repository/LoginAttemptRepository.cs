@@ -51,8 +51,8 @@ namespace Relevantz.EEPZ.Data.Repository
         public async Task<int> GetFailedAttemptsCountAsync(string email, DateTime fromTime)
         {
             return await _context.Loginattempts
-                .CountAsync(la => 
-                    la.Email == email && 
+                .CountAsync(la =>
+                    la.Email == email &&
                     !la.IsSuccessful &&
                     la.AttemptTime >= fromTime);
         }
@@ -61,8 +61,8 @@ namespace Relevantz.EEPZ.Data.Repository
         {
             var fromTime = DateTime.UtcNow.AddMinutes(-minutes);
             return await _context.Loginattempts
-                .Where(la => 
-                    la.Email == email && 
+                .Where(la =>
+                    la.Email == email &&
                     !la.IsSuccessful &&
                     la.AttemptTime >= fromTime)
                 .OrderByDescending(la => la.AttemptTime)

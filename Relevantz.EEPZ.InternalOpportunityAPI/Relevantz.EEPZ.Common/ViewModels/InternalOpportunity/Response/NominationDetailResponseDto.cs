@@ -19,34 +19,34 @@ namespace Relevantz.EEPZ.Common.ViewModels.Nomination.Response
         public string Justification { get; set; }
         public string Status { get; set; }
         public DateTime SubmittedAt { get; set; }
-        
-                public int CurrentApprovalLevel { get; set; }
-        
-        
+
+        public int CurrentApprovalLevel { get; set; }
+
+
         public L1ManagerReviewDetailDto L1ManagerReview { get; set; }
-        
-        
+
+
         public L2ManagerReviewDetailDto L2ManagerReview { get; set; }
-        
-        
+
+
         public DepartmentHeadReviewDetailDto DepartmentHeadReview { get; set; }
-        
-        
+
+
         [Obsolete("Use L1ManagerReview and L2ManagerReview instead")]
         public ManagerReviewDetailDto ManagerReview { get; set; }
     }
 
-    
+
     public class L1ManagerReviewDetailDto
     {
         public int? L1ManagerUserId { get; set; }
         public string L1ManagerName { get; set; }
         public string ReviewRemarks { get; set; }
-        public string Status { get; set; } 
+        public string Status { get; set; }
         public DateTime? ReviewedAt { get; set; }
     }
 
-    
+
     public class L2ManagerReviewDetailDto
     {
         public int? L2ManagerUserId { get; set; }

@@ -38,8 +38,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             _logger = logger;
         }
 
-        // ==================== GOAL TRACKING ENDPOINTS ====================
-
         /// <summary>
         /// Get overall compliance overview - HR ONLY
         /// </summary>
@@ -51,86 +49,86 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-/// Get employees who have not set any goals
-/// Excludes Admin users and current logged-in user
-/// </summary>
-[HttpGet("goal-tracking/employees-without-goals")]
-public async Task<IActionResult> GetEmployeesWithoutGoals()
-{
-    try
-    {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-            ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
-            ?? User.FindFirst("sub")?.Value;
-
-        int? currentUserId = null;
-        if (!string.IsNullOrEmpty(userIdClaim) && int.TryParse(userIdClaim, out int parsedUserId))
+        /// Get employees who have not set any goals
+        /// Excludes Admin users and current logged-in user
+        /// </summary>
+        [HttpGet("goal-tracking/employees-without-goals")]
+        public async Task<IActionResult> GetEmployeesWithoutGoals()
         {
-            currentUserId = parsedUserId;
-            _logger.LogInformation($"Current logged-in user ID: {currentUserId}");
-        }
-        else
-        {
-            _logger.LogWarning("Unable to extract user ID from JWT token");
-        }
-
-        var allUsers = _context.Userauthentications
-            .Include(u => u.Employee)
-                .ThenInclude(e => e.Userprofile)
-            .Include(u => u.Employee)
-                .ThenInclude(e => e.Employeedetailsmasters)
-                    .ThenInclude(ed => ed.Department)
-            .Include(u => u.Employee)
-                .ThenInclude(e => e.Employeedetailsmasters)
-                    .ThenInclude(ed => ed.Role)
-            .Where(u => u.Status == "Active")
-            .ToList();
-
-        var employeesWithGoals = await _context.Goals
-            .Where(g => g.CreatedBy != null)
-            .Select(g => g.CreatedBy)
-            .Distinct()
-            .ToListAsync();
-
-        var usersWithoutGoals = allUsers
-            .Where(u => !employeesWithGoals.Contains(u.EmployeeId)
-                     && (!currentUserId.HasValue || u.UserId != currentUserId.Value)
-                     && !u.Employee.Employeedetailsmasters.Any(ed => ed.Role.RoleName == "Admin"))
-            .Select(u => new EmployeeWithoutGoalsDto
+            try
             {
-                UserId = u.UserId,
-                EmployeeUserId = u.EmployeeId,
-                Email = u.Email,
-                EmployeeCompanyId = u.Employee?.EmployeeCompanyId,
-                DaysWithoutGoals = (DateTime.Now - u.CreatedAt).Days,
-                RecommendedAction = "Encourage goal setting for career development",
-                EmployeeName = u.Employee?.Userprofile != null
-                    ? $"{u.Employee.Userprofile.FirstName} {u.Employee.Userprofile.LastName}"
-                    : string.Empty,
-                DepartmentName = u.Employee?.Employeedetailsmasters
-                    .FirstOrDefault()?.Department?.DepartmentName ?? string.Empty
-            })
-            .ToList();
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                    ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
+                    ?? User.FindFirst("sub")?.Value;
 
-        _logger.LogInformation($"Found {usersWithoutGoals.Count} employees without goals (excluding Admins and user ID: {currentUserId})");
+                int? currentUserId = null;
+                if (!string.IsNullOrEmpty(userIdClaim) && int.TryParse(userIdClaim, out int parsedUserId))
+                {
+                    currentUserId = parsedUserId;
+                    _logger.LogInformation($"Current logged-in user ID: {currentUserId}");
+                }
+                else
+                {
+                    _logger.LogWarning("Unable to extract user ID from JWT token");
+                }
 
-        return Ok(new
-        {
-            success = true,
-            message = $"Found {usersWithoutGoals.Count} employees without goals",
-            data = new
-            {
-                totalEmployeesWithoutGoals = usersWithoutGoals.Count,
-                employees = usersWithoutGoals
+                var allUsers = _context.Userauthentications
+                    .Include(u => u.Employee)
+                        .ThenInclude(e => e.Userprofile)
+                    .Include(u => u.Employee)
+                        .ThenInclude(e => e.Employeedetailsmasters)
+                            .ThenInclude(ed => ed.Department)
+                    .Include(u => u.Employee)
+                        .ThenInclude(e => e.Employeedetailsmasters)
+                            .ThenInclude(ed => ed.Role)
+                    .Where(u => u.Status == "Active")
+                    .ToList();
+
+                var employeesWithGoals = await _context.Goals
+                    .Where(g => g.CreatedBy != null)
+                    .Select(g => g.CreatedBy)
+                    .Distinct()
+                    .ToListAsync();
+
+                var usersWithoutGoals = allUsers
+                    .Where(u => !employeesWithGoals.Contains(u.EmployeeId)
+                             && (!currentUserId.HasValue || u.UserId != currentUserId.Value)
+                             && !u.Employee.Employeedetailsmasters.Any(ed => ed.Role.RoleName == "Admin"))
+                    .Select(u => new EmployeeWithoutGoalsDto
+                    {
+                        UserId = u.UserId,
+                        EmployeeUserId = u.EmployeeId,
+                        Email = u.Email,
+                        EmployeeCompanyId = u.Employee?.EmployeeCompanyId,
+                        DaysWithoutGoals = (DateTime.Now - u.CreatedAt).Days,
+                        RecommendedAction = "Encourage goal setting for career development",
+                        EmployeeName = u.Employee?.Userprofile != null
+                            ? $"{u.Employee.Userprofile.FirstName} {u.Employee.Userprofile.LastName}"
+                            : string.Empty,
+                        DepartmentName = u.Employee?.Employeedetailsmasters
+                            .FirstOrDefault()?.Department?.DepartmentName ?? string.Empty
+                    })
+                    .ToList();
+
+                _logger.LogInformation($"Found {usersWithoutGoals.Count} employees without goals (excluding Admins and user ID: {currentUserId})");
+
+                return Ok(new
+                {
+                    success = true,
+                    message = $"Found {usersWithoutGoals.Count} employees without goals",
+                    data = new
+                    {
+                        totalEmployeesWithoutGoals = usersWithoutGoals.Count,
+                        employees = usersWithoutGoals
+                    }
+                });
             }
-        });
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError($"Error getting employees without goals: {ex.Message}");
-        return StatusCode(500, new { success = false, message = ex.Message });
-    }
-}
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error getting employees without goals: {ex.Message}");
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
 
 
         /// <summary>
@@ -427,7 +425,7 @@ public async Task<IActionResult> GetEmployeesWithoutGoals()
                                 error = "Email delivery failed"
                             });
                         }
-                        
+
                         await Task.Delay(100);
                     }
 
@@ -534,7 +532,7 @@ public async Task<IActionResult> GetEmployeesWithoutGoals()
             try
             {
                 var totalGoals = await _context.Goals.CountAsync();
-               
+
                 var completedGoals = await _context.Goals
                     .CountAsync(g => g.Goalstatus == "completed");
 
@@ -585,15 +583,13 @@ public async Task<IActionResult> GetEmployeesWithoutGoals()
             }
         }
 
-        // ==================== DEPARTMENT ENDPOINTS ====================
-
         [HttpGet("department/all")]
         public async Task<IActionResult> GetAllDepartments()
         {
             try
             {
                 Console.WriteLine(" Backend: Getting all departments");
-               
+
                 var departments = await _context.Departments
                     .AsNoTracking()
                     .OrderBy(d => d.DepartmentName)
@@ -658,8 +654,6 @@ public async Task<IActionResult> GetEmployeesWithoutGoals()
             }
         }
 
-        // ==================== EMPLOYEE POLICY ENDPOINTS ====================
-
         [HttpGet("policy/published")]
         [Authorize]
         public async Task<IActionResult> GetPublishedPolicies()
@@ -668,13 +662,13 @@ public async Task<IActionResult> GetEmployeesWithoutGoals()
             {
                 var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
                 var userRole = User.FindFirst(ClaimTypes.Role)?.Value ?? "Unknown";
-               
+
                 _logger.LogInformation($" User {userId} (Role: {userRole}) fetching published policies");
 
                 var response = await _policyService.GetPublishedPoliciesAsync();
-               
+
                 _logger.LogInformation($" Returned {response.Data?.Count ?? 0} published policies to user {userId}");
-               
+
                 return Ok(response);
             }
             catch (Exception ex)
@@ -692,9 +686,9 @@ public async Task<IActionResult> GetEmployeesWithoutGoals()
             {
                 var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
                 var userRole = User.FindFirst(ClaimTypes.Role)?.Value ?? "Unknown";
-               
+
                 _logger.LogInformation($" User {userId} (Role: {userRole}) requesting policy {policyId}");
-               
+
                 var response = await _policyService.GetPolicyByIdAsync(policyId);
 
                 if (!response.Success)

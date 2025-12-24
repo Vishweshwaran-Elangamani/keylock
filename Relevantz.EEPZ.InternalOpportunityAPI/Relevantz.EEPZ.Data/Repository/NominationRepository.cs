@@ -113,7 +113,6 @@ namespace Relevantz.EEPZ.Data.Repository
             }
         }
 
-        // ✅ FIXED: GetByEmployeeAsync - Show ONLY logged-in user's nominations
         public async Task<List<Nomination>> GetByEmployeeAsync(int employeeUserId)
         {
             try
@@ -135,14 +134,12 @@ namespace Relevantz.EEPZ.Data.Repository
                     .Include(n => n.DeptHeadUser)
                         .ThenInclude(u => u.Employee)
                             .ThenInclude(e => e.Userprofile)
-                    // ✅ CRITICAL: Filter by NomineeUserId ONLY
                     .Where(n => n.NomineeUserId == employeeUserId)
                     .OrderByDescending(n => n.SubmittedAt)
                     .ToListAsync();
 
                 Console.WriteLine($"[Repository] Found {nominations.Count} nominations for user {employeeUserId}");
-                
-                // ✅ Log each nomination for debugging
+
                 foreach (var nom in nominations)
                 {
                     Console.WriteLine($"  - Nomination {nom.NominationId}: Nominee={nom.NomineeUser?.Email}, Opportunity={nom.Opportunity?.OpportunityName}, Status={nom.Status}");

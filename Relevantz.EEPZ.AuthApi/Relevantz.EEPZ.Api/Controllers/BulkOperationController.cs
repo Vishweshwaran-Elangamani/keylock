@@ -53,7 +53,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             // File validation
             var allowedExtensions = new[] { ".xlsx", ".xls" };
             var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
-            
+
             if (!allowedExtensions.Contains(fileExtension))
                 return BadRequest(new { success = false, message = "Only .xlsx and .xls files are allowed" });
 
@@ -64,10 +64,10 @@ namespace Relevantz.EEPZ.Api.Controllers
 
 
             var performedByUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-            
+
             using var stream = file.OpenReadStream();
             var result = await _bulkOperationService.BulkCreateUsersFromExcelAsync(stream, performedByUserId);
-            
+
             return Ok(result);
         }
 
@@ -78,9 +78,9 @@ namespace Relevantz.EEPZ.Api.Controllers
             try
             {
                 var fileBytes = _bulkOperationService.GenerateExcelTemplate();
-                
+
                 var fileName = $"BulkUserImportTemplate_{DateTime.UtcNow:yyyyMMddHHmmss}.xlsx";
-                
+
                 return File(
                     fileBytes,
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -104,9 +104,9 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 var fileBytes = await _exportService.ExportRolesToExcelAsync();
                 var fileName = $"Roles_Export_{DateTime.UtcNow:yyyyMMdd_HHmmss}.xlsx";
-                
-                return File(fileBytes, 
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
+
+                return File(fileBytes,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     fileName);
             }
             catch (Exception ex)
@@ -126,9 +126,9 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 var fileBytes = await _exportService.ExportDepartmentsToExcelAsync();
                 var fileName = $"Departments_Export_{DateTime.UtcNow:yyyyMMdd_HHmmss}.xlsx";
-                
-                return File(fileBytes, 
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
+
+                return File(fileBytes,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     fileName);
             }
             catch (Exception ex)
@@ -148,9 +148,9 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 var fileBytes = await _exportService.ExportUsersToExcelAsync();
                 var fileName = $"Users_Export_{DateTime.UtcNow:yyyyMMdd_HHmmss}.xlsx";
-                
-                return File(fileBytes, 
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
+
+                return File(fileBytes,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     fileName);
             }
             catch (Exception ex)
@@ -170,9 +170,9 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 var fileBytes = await _exportService.ExportAllDataToExcelAsync();
                 var fileName = $"EEPZ_Complete_Export_{DateTime.UtcNow:yyyyMMdd_HHmmss}.xlsx";
-                
-                return File(fileBytes, 
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
+
+                return File(fileBytes,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     fileName);
             }
             catch (Exception ex)

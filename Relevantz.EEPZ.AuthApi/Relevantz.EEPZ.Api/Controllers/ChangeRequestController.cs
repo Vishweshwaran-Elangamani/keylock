@@ -28,7 +28,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
             var result = await _changeRequestService.SubmitChangeRequestAsync(userId, request);
-            
+
             if (!result.Success)
                 return BadRequest(result);
 
@@ -43,7 +43,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             var adminUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
             var result = await _changeRequestService.ProcessChangeRequestAsync(request, adminUserId);
-            
+
             if (!result.Success)
                 return BadRequest(result);
 
@@ -84,7 +84,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
             var result = await _changeRequestService.CancelChangeRequestAsync(userId, requestId);
-            
+
             if (!result.Success)
                 return BadRequest(result);
 

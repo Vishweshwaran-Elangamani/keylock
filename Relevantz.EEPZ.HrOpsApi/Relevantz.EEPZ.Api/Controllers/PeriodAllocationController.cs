@@ -24,10 +24,10 @@ namespace Relevantz.EEPZ.Api.Controllers
             try
             {
                 var result = await _periodAllocationService.CreatePeriodAllocationAsync(request);
-                
+
                 if (!result.Success)
                     return BadRequest(result);
-                
+
                 return Ok(result);
             }
             catch (Exception ex)
@@ -51,10 +51,10 @@ namespace Relevantz.EEPZ.Api.Controllers
             try
             {
                 var result = await _periodAllocationService.UpdatePeriodAllocationAsync(request);
-                
+
                 if (!result.Success)
                     return BadRequest(result);
-                
+
                 return Ok(result);
             }
             catch (Exception ex)
@@ -78,10 +78,10 @@ namespace Relevantz.EEPZ.Api.Controllers
             try
             {
                 var result = await _periodAllocationService.DeletePeriodAllocationAsync(periodAllocationId);
-                
+
                 if (!result.Success)
                     return BadRequest(result);
-                
+
                 return Ok(result);
             }
             catch (Exception ex)
@@ -105,10 +105,10 @@ namespace Relevantz.EEPZ.Api.Controllers
             try
             {
                 var result = await _periodAllocationService.GetPeriodAllocationByIdAsync(periodAllocationId);
-                
+
                 if (!result.Success)
                     return NotFound(result);
-                
+
                 return Ok(result);
             }
             catch (Exception ex)

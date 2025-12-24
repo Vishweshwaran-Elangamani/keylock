@@ -24,7 +24,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
 
         public int? HodEmployeeId { get; set; }
 
-        // Legacy fields - kept for backward compatibility
         public decimal? BudgetAllocated { get; set; }
 
         [StringLength(50)]

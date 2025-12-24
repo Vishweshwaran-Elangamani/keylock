@@ -4,7 +4,7 @@ using MimeKit;
 using Microsoft.Extensions.Configuration;
 using Relevantz.EEPZ.Core.IService;
 using Microsoft.Extensions.Logging;
- 
+
 namespace Relevantz.EEPZ.Core.Service
 {
     public class EmailService : IEmailService
@@ -415,13 +415,13 @@ namespace Relevantz.EEPZ.Core.Service
                 }
             </style>
         ";
- 
+
         public EmailService(IConfiguration configuration, ILogger<EmailService> logger)
         {
             _configuration = configuration;
             _logger = logger;
         }
- 
+
         public async Task<bool> SendGoalReminderEmailAsync(
             string toEmail,
             string userName,
@@ -436,7 +436,7 @@ namespace Relevantz.EEPZ.Core.Service
                 ));
                 emailMessage.To.Add(new MailboxAddress(userName, toEmail));
                 emailMessage.Subject = "Set Your Career Development Goals";
- 
+
                 // Build email body
                 var bodyBuilder = new BodyBuilder
                 {
@@ -444,7 +444,7 @@ namespace Relevantz.EEPZ.Core.Service
                     TextBody = GenerateGoalReminderText(userName, goalSuggestions)
                 };
                 emailMessage.Body = bodyBuilder.ToMessageBody();
- 
+
                 // Send email
                 using var smtpClient = new SmtpClient();
                 await smtpClient.ConnectAsync(
@@ -452,15 +452,15 @@ namespace Relevantz.EEPZ.Core.Service
                     int.Parse(_configuration["SmtpSettings:Port"]),
                     SecureSocketOptions.StartTls
                 );
- 
+
                 await smtpClient.AuthenticateAsync(
                     _configuration["SmtpSettings:Username"],
                     _configuration["SmtpSettings:Password"]
                 );
- 
+
                 await smtpClient.SendAsync(emailMessage);
                 await smtpClient.DisconnectAsync(true);
- 
+
                 _logger.LogInformation($"Goal reminder email sent successfully to {toEmail}");
                 return true;
             }
@@ -470,7 +470,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return false;
             }
         }
- 
+
         public async Task<bool> SendBulkGoalRemindersAsync(List<(string email, string name)> recipients)
         {
             var successCount = 0;
@@ -478,15 +478,15 @@ namespace Relevantz.EEPZ.Core.Service
             {
                 var result = await SendGoalReminderEmailAsync(email, name, new List<string>());
                 if (result) successCount++;
- 
+
                 // Add small delay to avoid rate limiting
                 await Task.Delay(100);
             }
- 
+
             _logger.LogInformation($"Bulk reminders sent: {successCount}/{recipients.Count} successful");
             return successCount == recipients.Count;
         }
- 
+
         private string GenerateGoalReminderHtml(string userName, List<string> goalSuggestions)
         {
             var suggestionsHtml = string.Empty;
@@ -499,7 +499,7 @@ namespace Relevantz.EEPZ.Core.Service
                     </div>"
                 ));
             }
- 
+
             return $@"
 <!DOCTYPE html>
 <html lang=""en"">
@@ -601,7 +601,7 @@ namespace Relevantz.EEPZ.Core.Service
 </body>
 </html>";
         }
- 
+
         private string GenerateGoalReminderText(string userName, List<string> goalSuggestions)
         {
             var suggestionsText = string.Empty;
@@ -610,7 +610,7 @@ namespace Relevantz.EEPZ.Core.Service
                 suggestionsText = "\n\nGOAL SUGGESTIONS FOR YOU:\n" +
                     string.Join("\n", goalSuggestions.Select((s, i) => $"{i + 1}. {s}"));
             }
- 
+
             return $@"
 CAREER DEVELOPMENT GOALS REQUIRED
 

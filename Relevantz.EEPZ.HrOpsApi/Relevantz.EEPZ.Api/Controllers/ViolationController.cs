@@ -12,7 +12,7 @@ namespace Relevantz.EEPZ.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize] 
+    [Authorize]
     public class ViolationController : ControllerBase
     {
         private readonly IViolationService _violationService;
@@ -172,7 +172,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             try
             {
-                // Get user ID from JWT (for audit trail)
+                // Get user ID from JWT
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                     ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
 

@@ -17,7 +17,7 @@ namespace Relevantz.EEPZ.Core.Service
 
         public DepartmentService(
             IDepartmentRepository departmentRepository,
-            IEmployeeRepository employeeRepository,EEPZDbContext context)
+            IEmployeeRepository employeeRepository, EEPZDbContext context)
         {
             _departmentRepository = departmentRepository;
             _employeeRepository = employeeRepository;
@@ -100,109 +100,107 @@ namespace Relevantz.EEPZ.Core.Service
         }
 
         public async Task<ApiResponseDto<DepartmentResponseDto>> UpdateDepartmentAsync(UpdateDepartmentRequestDto request)
-{
-    try
-    {
-        var department = await _departmentRepository.GetByIdAsync(request.DepartmentId);
-        if (department == null)
         {
-            return ApiResponseDto<DepartmentResponseDto>.FailureResponse(Constants.Messages.DepartmentNotFound);
-        }
-
-        // Validate department name uniqueness (excluding current department)
-        if (request.DepartmentName != null && request.DepartmentName != department.DepartmentName)
-        {
-            if (await _departmentRepository.DepartmentNameExistsAsync(request.DepartmentName, request.DepartmentId))
+            try
             {
-                return ApiResponseDto<DepartmentResponseDto>.FailureResponse("Department name already exists");
-            }
-        }
-
-        // Validate department code uniqueness (excluding current department)
-        if (request.DepartmentCode != null && request.DepartmentCode != department.DepartmentCode)
-        {
-            if (await _departmentRepository.DepartmentCodeExistsAsync(request.DepartmentCode, request.DepartmentId))
-            {
-                return ApiResponseDto<DepartmentResponseDto>.FailureResponse("Department code already exists");
-            }
-        }
-
-        // Validate parent department and prevent circular reference
-        if (request.ParentDepartmentId.HasValue)
-        {
-            if (request.ParentDepartmentId == request.DepartmentId)
-            {
-                return ApiResponseDto<DepartmentResponseDto>.FailureResponse("Department cannot be its own parent");
-            }
-
-            var parentDepartment = await _departmentRepository.GetByIdAsync(request.ParentDepartmentId.Value);
-            if (parentDepartment == null)
-            {
-                return ApiResponseDto<DepartmentResponseDto>.FailureResponse("Parent department not found");
-            }
-
-            // Check for circular reference
-            if (await _departmentRepository.IsCircularReferenceAsync(request.DepartmentId, request.ParentDepartmentId.Value))
-            {
-                return ApiResponseDto<DepartmentResponseDto>.FailureResponse("Circular reference detected. A department cannot be a parent of its own ancestor.");
-            }
-        }
-
-        // Validate HOD employee (only if not null)
-        if (request.HodEmployeeId.HasValue)
-        {
-            var hodEmployee = await _employeeRepository.GetByIdAsync(request.HodEmployeeId.Value);
-            if (hodEmployee == null)
-            {
-                return ApiResponseDto<DepartmentResponseDto>.FailureResponse("HOD employee not found");
-            }
-
-            if (hodEmployee.EmploymentStatus != "Active")
-            {
-                return ApiResponseDto<DepartmentResponseDto>.FailureResponse("HOD employee must be in active status");
-            }
-        }
-
-        // Validate status change
-        if (request.Status != null && request.Status != department.Status)
-        {
-            if (request.Status == "Inactive")
-            {
-                // Check if department has active child departments
-                var childDepartments = await _departmentRepository.GetChildDepartmentsAsync(request.DepartmentId);
-                if (childDepartments.Any(c => c.Status == "Active"))
+                var department = await _departmentRepository.GetByIdAsync(request.DepartmentId);
+                if (department == null)
                 {
-                    return ApiResponseDto<DepartmentResponseDto>.FailureResponse("Cannot inactivate department with active child departments");
+                    return ApiResponseDto<DepartmentResponseDto>.FailureResponse(Constants.Messages.DepartmentNotFound);
                 }
+
+                // Validate department name uniqueness (excluding current department)
+                if (request.DepartmentName != null && request.DepartmentName != department.DepartmentName)
+                {
+                    if (await _departmentRepository.DepartmentNameExistsAsync(request.DepartmentName, request.DepartmentId))
+                    {
+                        return ApiResponseDto<DepartmentResponseDto>.FailureResponse("Department name already exists");
+                    }
+                }
+
+                // Validate department code uniqueness (excluding current department)
+                if (request.DepartmentCode != null && request.DepartmentCode != department.DepartmentCode)
+                {
+                    if (await _departmentRepository.DepartmentCodeExistsAsync(request.DepartmentCode, request.DepartmentId))
+                    {
+                        return ApiResponseDto<DepartmentResponseDto>.FailureResponse("Department code already exists");
+                    }
+                }
+
+                // Validate parent department and prevent circular reference
+                if (request.ParentDepartmentId.HasValue)
+                {
+                    if (request.ParentDepartmentId == request.DepartmentId)
+                    {
+                        return ApiResponseDto<DepartmentResponseDto>.FailureResponse("Department cannot be its own parent");
+                    }
+
+                    var parentDepartment = await _departmentRepository.GetByIdAsync(request.ParentDepartmentId.Value);
+                    if (parentDepartment == null)
+                    {
+                        return ApiResponseDto<DepartmentResponseDto>.FailureResponse("Parent department not found");
+                    }
+
+                    // Check for circular reference
+                    if (await _departmentRepository.IsCircularReferenceAsync(request.DepartmentId, request.ParentDepartmentId.Value))
+                    {
+                        return ApiResponseDto<DepartmentResponseDto>.FailureResponse("Circular reference detected. A department cannot be a parent of its own ancestor.");
+                    }
+                }
+
+                // Validate HOD employee (only if not null)
+                if (request.HodEmployeeId.HasValue)
+                {
+                    var hodEmployee = await _employeeRepository.GetByIdAsync(request.HodEmployeeId.Value);
+                    if (hodEmployee == null)
+                    {
+                        return ApiResponseDto<DepartmentResponseDto>.FailureResponse("HOD employee not found");
+                    }
+
+                    if (hodEmployee.EmploymentStatus != "Active")
+                    {
+                        return ApiResponseDto<DepartmentResponseDto>.FailureResponse("HOD employee must be in active status");
+                    }
+                }
+
+                // Validate status change
+                if (request.Status != null && request.Status != department.Status)
+                {
+                    if (request.Status == "Inactive")
+                    {
+                        // Check if department has active child departments
+                        var childDepartments = await _departmentRepository.GetChildDepartmentsAsync(request.DepartmentId);
+                        if (childDepartments.Any(c => c.Status == "Active"))
+                        {
+                            return ApiResponseDto<DepartmentResponseDto>.FailureResponse("Cannot inactivate department with active child departments");
+                        }
+                    }
+                }
+
+                if (request.DepartmentName != null) department.DepartmentName = request.DepartmentName;
+                if (request.DepartmentCode != null) department.DepartmentCode = request.DepartmentCode;
+                if (request.Description != null) department.Description = request.Description;
+                if (request.Status != null) department.Status = request.Status;
+
+                department.ParentDepartmentId = request.ParentDepartmentId;
+                department.HodEmployeeId = request.HodEmployeeId;
+
+                if (request.BudgetAllocated.HasValue) department.BudgetAllocated = request.BudgetAllocated;
+                if (request.CostCenter != null) department.CostCenter = request.CostCenter;
+
+                await _departmentRepository.UpdateAsync(department);
+
+                var response = await MapToDepartmentResponseAsync(department);
+                EEPZBusinessLog.Information($"Department updated: DepartmentId {request.DepartmentId}");
+
+                return ApiResponseDto<DepartmentResponseDto>.SuccessResponse(response, Constants.Messages.DepartmentUpdatedSuccess);
+            }
+            catch (Exception ex)
+            {
+                EEPZBusinessLog.Error($"Error updating department: DepartmentId {request.DepartmentId}", ex);
+                return ApiResponseDto<DepartmentResponseDto>.FailureResponse("An error occurred while updating department");
             }
         }
-
-        // ✅ UPDATE FIELDS (FIXED)
-        if (request.DepartmentName != null) department.DepartmentName = request.DepartmentName;
-        if (request.DepartmentCode != null) department.DepartmentCode = request.DepartmentCode;
-        if (request.Description != null) department.Description = request.Description;
-        if (request.Status != null) department.Status = request.Status;
-        
-        // ✅ ALWAYS UPDATE THESE FIELDS (EVEN IF NULL) - THIS IS THE FIX!
-        department.ParentDepartmentId = request.ParentDepartmentId;
-        department.HodEmployeeId = request.HodEmployeeId;
-        
-        if (request.BudgetAllocated.HasValue) department.BudgetAllocated = request.BudgetAllocated;
-        if (request.CostCenter != null) department.CostCenter = request.CostCenter;
-
-        await _departmentRepository.UpdateAsync(department);
-
-        var response = await MapToDepartmentResponseAsync(department);
-        EEPZBusinessLog.Information($"Department updated: DepartmentId {request.DepartmentId}");
-
-        return ApiResponseDto<DepartmentResponseDto>.SuccessResponse(response, Constants.Messages.DepartmentUpdatedSuccess);
-    }
-    catch (Exception ex)
-    {
-        EEPZBusinessLog.Error($"Error updating department: DepartmentId {request.DepartmentId}", ex);
-        return ApiResponseDto<DepartmentResponseDto>.FailureResponse("An error occurred while updating department");
-    }
-}
 
 
         public async Task<ApiResponseDto<DepartmentResponseDto>> GetDepartmentByIdAsync(int departmentId)
@@ -653,89 +651,89 @@ namespace Relevantz.EEPZ.Core.Service
         #region Helper Methods
 
         private async Task<DepartmentResponseDto> MapToDepartmentResponseAsync(Department department)
-{
-    var childCount = await _departmentRepository.GetChildCountAsync(department.DepartmentId);
-
-    // Get HOD employee name from Userprofile
-    string? hodEmployeeName = null;
-    if (department.HodEmployee != null)
-    {
-        var hodUserProfile = await _context.Userprofiles
-            .FirstOrDefaultAsync(up => up.EmployeeId == department.HodEmployee.EmployeeId);
-        
-        if (hodUserProfile != null)
         {
-            hodEmployeeName = $"{hodUserProfile.FirstName} {hodUserProfile.LastName}";
-        }
-    }
+            var childCount = await _departmentRepository.GetChildCountAsync(department.DepartmentId);
 
-    return new DepartmentResponseDto
-    {
-        DepartmentId = department.DepartmentId,
-        DepartmentName = department.DepartmentName,
-        DepartmentCode = department.DepartmentCode,
-        Description = department.Description,
-        Status = department.Status,
-        ParentDepartmentId = department.ParentDepartmentId,
-        ParentDepartmentName = department.ParentDepartment?.DepartmentName,
-        HodEmployeeId = department.HodEmployeeId,
-        HodEmployeeName = hodEmployeeName,
-        HodEmployeeCompanyId = department.HodEmployee?.EmployeeCompanyId,
-        BudgetAllocated = department.BudgetAllocated,
-        CostCenter = department.CostCenter,
-        CreatedAt = department.CreatedAt,
-        UpdatedAt = department.UpdatedAt,
-        ChildDepartmentCount = childCount,
-        HasChildren = childCount > 0
-    };
-}
+            // Get HOD employee name from Userprofile
+            string? hodEmployeeName = null;
+            if (department.HodEmployee != null)
+            {
+                var hodUserProfile = await _context.Userprofiles
+                    .FirstOrDefaultAsync(up => up.EmployeeId == department.HodEmployee.EmployeeId);
+
+                if (hodUserProfile != null)
+                {
+                    hodEmployeeName = $"{hodUserProfile.FirstName} {hodUserProfile.LastName}";
+                }
+            }
+
+            return new DepartmentResponseDto
+            {
+                DepartmentId = department.DepartmentId,
+                DepartmentName = department.DepartmentName,
+                DepartmentCode = department.DepartmentCode,
+                Description = department.Description,
+                Status = department.Status,
+                ParentDepartmentId = department.ParentDepartmentId,
+                ParentDepartmentName = department.ParentDepartment?.DepartmentName,
+                HodEmployeeId = department.HodEmployeeId,
+                HodEmployeeName = hodEmployeeName,
+                HodEmployeeCompanyId = department.HodEmployee?.EmployeeCompanyId,
+                BudgetAllocated = department.BudgetAllocated,
+                CostCenter = department.CostCenter,
+                CreatedAt = department.CreatedAt,
+                UpdatedAt = department.UpdatedAt,
+                ChildDepartmentCount = childCount,
+                HasChildren = childCount > 0
+            };
+        }
 
 
         private async Task<List<DepartmentHierarchyResponseDto>> BuildHierarchyTreeAsync(List<Department> departments, int level)
-{
-    var result = new List<DepartmentHierarchyResponseDto>();
-
-    foreach (var dept in departments)
-    {
-        var childDepartments = await _departmentRepository.GetChildDepartmentsAsync(dept.DepartmentId);
-        var children = await BuildHierarchyTreeAsync(childDepartments, level + 1);
-
-        // Get HOD employee name from Userprofile
-        string? hodEmployeeName = null;
-        if (dept.HodEmployee != null)
         {
-            var hodUserProfile = await _context.Userprofiles
-                .FirstOrDefaultAsync(up => up.EmployeeId == dept.HodEmployee.EmployeeId);
-            
-            if (hodUserProfile != null)
+            var result = new List<DepartmentHierarchyResponseDto>();
+
+            foreach (var dept in departments)
             {
-                hodEmployeeName = $"{hodUserProfile.FirstName} {hodUserProfile.LastName}";
+                var childDepartments = await _departmentRepository.GetChildDepartmentsAsync(dept.DepartmentId);
+                var children = await BuildHierarchyTreeAsync(childDepartments, level + 1);
+
+                // Get HOD employee name from Userprofile
+                string? hodEmployeeName = null;
+                if (dept.HodEmployee != null)
+                {
+                    var hodUserProfile = await _context.Userprofiles
+                        .FirstOrDefaultAsync(up => up.EmployeeId == dept.HodEmployee.EmployeeId);
+
+                    if (hodUserProfile != null)
+                    {
+                        hodEmployeeName = $"{hodUserProfile.FirstName} {hodUserProfile.LastName}";
+                    }
+                }
+
+                var hierarchyDto = new DepartmentHierarchyResponseDto
+                {
+                    DepartmentId = dept.DepartmentId,
+                    DepartmentName = dept.DepartmentName,
+                    DepartmentCode = dept.DepartmentCode,
+                    Description = dept.Description,
+                    Status = dept.Status,
+                    ParentDepartmentId = dept.ParentDepartmentId,
+                    HodEmployeeId = dept.HodEmployeeId,
+                    HodEmployeeName = hodEmployeeName,
+                    Level = level,
+                    HierarchyPath = await BuildHierarchyPathAsync(dept.DepartmentId),
+                    Children = children,
+                    TotalChildCount = await CountAllDescendantsAsync(dept.DepartmentId),
+                    CreatedAt = dept.CreatedAt,
+                    UpdatedAt = dept.UpdatedAt
+                };
+
+                result.Add(hierarchyDto);
             }
+
+            return result;
         }
-
-        var hierarchyDto = new DepartmentHierarchyResponseDto
-        {
-            DepartmentId = dept.DepartmentId,
-            DepartmentName = dept.DepartmentName,
-            DepartmentCode = dept.DepartmentCode,
-            Description = dept.Description,
-            Status = dept.Status,
-            ParentDepartmentId = dept.ParentDepartmentId,
-            HodEmployeeId = dept.HodEmployeeId,
-            HodEmployeeName = hodEmployeeName,
-            Level = level,
-            HierarchyPath = await BuildHierarchyPathAsync(dept.DepartmentId),
-            Children = children,
-            TotalChildCount = await CountAllDescendantsAsync(dept.DepartmentId),
-            CreatedAt = dept.CreatedAt,
-            UpdatedAt = dept.UpdatedAt
-        };
-
-        result.Add(hierarchyDto);
-    }
-
-    return result;
-}
 
 
         private async Task<string> BuildHierarchyPathAsync(int departmentId)

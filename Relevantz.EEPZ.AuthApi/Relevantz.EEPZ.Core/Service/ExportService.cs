@@ -245,16 +245,16 @@ namespace Relevantz.EEPZ.Core.Service
 
                 using var package = new ExcelPackage();
 
-                // ===== ROLES SHEET =====
+                // ROLES SHEET
                 var rolesSheet = package.Workbook.Worksheets.Add("Roles");
-                
+
                 // Header
                 rolesSheet.Cells[1, 1].Value = "Role ID";
                 rolesSheet.Cells[1, 2].Value = "Role Name";
                 rolesSheet.Cells[1, 3].Value = "Role Code";
                 rolesSheet.Cells[1, 4].Value = "Description";
                 rolesSheet.Cells[1, 5].Value = "Is System Role";
-                
+
                 // Style Header
                 using (var range = rolesSheet.Cells[1, 1, 1, 5])
                 {
@@ -278,13 +278,13 @@ namespace Relevantz.EEPZ.Core.Service
                 rolesSheet.Cells[rolesSheet.Dimension.Address].AutoFitColumns();
 
                 var deptSheet = package.Workbook.Worksheets.Add("Departments");
-                
+
                 // Header
                 deptSheet.Cells[1, 1].Value = "Department ID";
                 deptSheet.Cells[1, 2].Value = "Department Name";
                 deptSheet.Cells[1, 3].Value = "Budget Allocated";
                 deptSheet.Cells[1, 4].Value = "Cost Center";
-                
+
                 // Style Header
                 using (var range = deptSheet.Cells[1, 1, 1, 4])
                 {
@@ -306,9 +306,9 @@ namespace Relevantz.EEPZ.Core.Service
                 }
                 deptSheet.Cells[deptSheet.Dimension.Address].AutoFitColumns();
 
-                // ===== USERS SHEET =====
+                // USERS SHEET
                 var usersSheet = package.Workbook.Worksheets.Add("Users");
-                
+
                 // Header
                 usersSheet.Cells[1, 1].Value = "User ID";
                 usersSheet.Cells[1, 2].Value = "Employee Company ID";
@@ -320,7 +320,7 @@ namespace Relevantz.EEPZ.Core.Service
                 usersSheet.Cells[1, 8].Value = "Department";
                 usersSheet.Cells[1, 9].Value = "Status";
                 usersSheet.Cells[1, 10].Value = "Is Active";
-                
+
                 // Style Header
                 using (var range = usersSheet.Cells[1, 1, 1, 10])
                 {

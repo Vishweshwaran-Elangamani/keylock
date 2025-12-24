@@ -6,22 +6,22 @@ using Relevantz.EEPZ.Data.IRepository;
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Common.Utils;
 using Microsoft.EntityFrameworkCore;
- 
+
 namespace Relevantz.EEPZ.Core.Service
 {
-   public class CostMappingService : ICostMappingService
+    public class CostMappingService : ICostMappingService
     {
         private readonly ICostMappingRepository _costMappingRepository;
         private readonly IDepartmentRepository _departmentRepository;
         private readonly EEPZDbContext _context;
- 
+
         public CostMappingService(ICostMappingRepository costMappingRepository, IDepartmentRepository departmentRepository, EEPZDbContext context)
         {
             _costMappingRepository = costMappingRepository;
             _departmentRepository = departmentRepository;
             _context = context;
         }
- 
+
         public async Task<ApiResponseDto<HeadcountResponseDto>> GetDepartmentHeadcountAsync(int departmentId)
         {
             try
@@ -44,7 +44,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<HeadcountResponseDto>.FailureResponse("An error occurred while fetching headcount");
             }
         }
- 
+
         public async Task<ApiResponseDto<CostMappingResponseDto>> CreateCostMappingAsync(CreateCostMappingRequestDto request)
         {
             try
@@ -97,7 +97,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<CostMappingResponseDto>.FailureResponse("An error occurred while creating cost mapping");
             }
         }
- 
+
         public async Task<ApiResponseDto<CostMappingResponseDto>> UpdateCostMappingAsync(UpdateCostMappingRequestDto request)
         {
             try
@@ -128,7 +128,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<CostMappingResponseDto>.FailureResponse("An error occurred while updating cost mapping");
             }
         }
- 
+
         public async Task<ApiResponseDto<CostMappingResponseDto>> GetCostMappingByIdAsync(int budgetId)
         {
             try
@@ -149,7 +149,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<CostMappingResponseDto>.FailureResponse("An error occurred while fetching cost mapping");
             }
         }
- 
+
         public async Task<ApiResponseDto<List<CostMappingResponseDto>>> GetAllCostMappingsAsync()
         {
             try
@@ -165,7 +165,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<List<CostMappingResponseDto>>.FailureResponse("An error occurred while fetching cost mappings");
             }
         }
- 
+
         public async Task<ApiResponseDto<List<CostMappingResponseDto>>> GetCostMappingsByDepartmentAsync(int departmentId)
         {
             try
@@ -181,7 +181,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<List<CostMappingResponseDto>>.FailureResponse("An error occurred while fetching cost mappings");
             }
         }
- 
+
         public async Task<ApiResponseDto<List<CostMappingResponseDto>>> GetCostMappingsByFiscalYearAsync(int fiscalYear)
         {
             try
@@ -197,7 +197,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<List<CostMappingResponseDto>>.FailureResponse("An error occurred while fetching cost mappings");
             }
         }
- 
+
         public async Task<ApiResponseDto<bool>> DeleteCostMappingAsync(int budgetId)
         {
             try
@@ -223,19 +223,18 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<bool>.FailureResponse("An error occurred while deleting cost mapping");
             }
         }
- 
+
         private CostMappingResponseDto MapToCostMappingResponse(Departmentbudget budget)
         {
             return new CostMappingResponseDto { BudgetId = budget.BudgetId, DepartmentId = budget.DepartmentId, DepartmentName = budget.Department?.DepartmentName ?? "Unknown", FiscalYear = budget.FiscalYear, TotalBudget = budget.TotalBudget, AllocatedAmount = budget.AllocatedAmount ?? 0, UtilizedAmount = budget.UtilizedAmount ?? 0, UtilizationPercentage = budget.UtilizationPercentage ?? 0, Headcount = budget.Headcount ?? 0, AvgCostPerEmployee = budget.AvgCostPerEmployee ?? 0, CreatedAt = budget.CreatedAt, UpdatedAt = budget.UpdatedAt };
         }
- 
+
         private async Task<int> GetCurrentHeadcountAsync(int departmentId)
         {
             return await _context.Employeedetailsmasters.Where(edm => edm.DepartmentId == departmentId).Select(edm => edm.EmployeeId).Distinct().CountAsync();
         }
     }
- 
- 
+
+
 }
- 
- 
+

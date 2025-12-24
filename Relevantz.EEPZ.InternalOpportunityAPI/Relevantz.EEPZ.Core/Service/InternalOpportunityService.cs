@@ -62,22 +62,22 @@ namespace Relevantz.EEPZ.Core.Service
 
             if (!string.IsNullOrEmpty(request.OpportunityName))
                 opportunity.OpportunityName = request.OpportunityName;
-            
+
             if (request.DepartmentId.HasValue)
                 opportunity.DepartmentId = request.DepartmentId.Value;
-            
+
             if (!string.IsNullOrEmpty(request.Description))
                 opportunity.Description = request.Description;
-            
+
             if (!string.IsNullOrEmpty(request.Requirements))
                 opportunity.Requirements = request.Requirements;
-            
+
             if (!string.IsNullOrEmpty(request.EligibilityCriteria))
                 opportunity.EligibilityCriteria = request.EligibilityCriteria;
-            
+
             if (request.Deadline.HasValue && request.Deadline != default)
                 opportunity.Deadline = request.Deadline.Value;
-            
+
             if (!string.IsNullOrEmpty(request.Status))
                 opportunity.Status = request.Status;
 
@@ -107,7 +107,7 @@ namespace Relevantz.EEPZ.Core.Service
                 opportunities = opportunities.Where(x => x.DepartmentId == filter.DepartmentId).ToList();
 
             if (!string.IsNullOrEmpty(filter.SearchTerm))
-                opportunities = opportunities.Where(x => 
+                opportunities = opportunities.Where(x =>
                     x.OpportunityName.Contains(filter.SearchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
 
             var totalCount = opportunities.Count();
@@ -135,7 +135,7 @@ namespace Relevantz.EEPZ.Core.Service
                 opportunities = opportunities.Where(x => x.DepartmentId == filter.DepartmentId).ToList();
 
             if (!string.IsNullOrEmpty(filter.SearchTerm))
-                opportunities = opportunities.Where(x => 
+                opportunities = opportunities.Where(x =>
                     x.OpportunityName.Contains(filter.SearchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
 
             var totalCount = opportunities.Count();

@@ -298,7 +298,7 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 context.Userprofiles.Add(adminProfile);
                 await context.SaveChangesAsync();
                 Console.WriteLine(
-                    $"   Created admin profile: {adminProfile.FirstName} {adminProfile.LastName}"
+                    $" Created admin profile: {adminProfile.FirstName} {adminProfile.LastName}"
                 );
 
                 // Assign Role and Department to Admin

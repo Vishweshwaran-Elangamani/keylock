@@ -42,7 +42,7 @@ namespace Relevantz.EEPZ.Core.Service
 
                 // VALIDATION 2: Get and validate nomination
                 var nomination = await _nominationRepository.GetByIdAsync(request.NominationId);
-                
+
                 if (nomination == null)
                 {
                     throw new Exception($"Nomination ID {request.NominationId} not found");
@@ -67,7 +67,7 @@ namespace Relevantz.EEPZ.Core.Service
                     throw new Exception($"Promotion already exists for Nomination ID {request.NominationId}");
                 }
 
-                Console.WriteLine($"✓ All validations passed for NominationId={request.NominationId}");
+                Console.WriteLine($"All validations passed for NominationId={request.NominationId}");
 
                 // Create promotion
                 var promotion = new Promotion
@@ -87,10 +87,10 @@ namespace Relevantz.EEPZ.Core.Service
                 };
 
                 var created = await _promotionRepository.CreateAsync(promotion);
-                
+
                 // Load related data for response
                 var response = await GetPromotionByIdAsync(created.PromotionId);
-                
+
                 return response;
             }
             catch (Exception ex)
@@ -127,7 +127,7 @@ namespace Relevantz.EEPZ.Core.Service
             try
             {
                 var promotions = await _promotionRepository.GetAllAsync();
-                
+
                 var responses = promotions.Select(p => new PromotionResponseDto
                 {
                     PromotionId = p.PromotionId,
@@ -161,7 +161,7 @@ namespace Relevantz.EEPZ.Core.Service
             try
             {
                 var promotions = await _promotionRepository.GetByEmployeeAsync(employeeUserId);
-                
+
                 var responses = promotions.Select(p => new PromotionResponseDto
                 {
                     PromotionId = p.PromotionId,
@@ -189,7 +189,7 @@ namespace Relevantz.EEPZ.Core.Service
             try
             {
                 var promotions = await _promotionRepository.GetPendingHrApprovalAsync();
-                
+
                 var responses = promotions.Select(p => new PromotionResponseDto
                 {
                     PromotionId = p.PromotionId,
@@ -216,145 +216,145 @@ namespace Relevantz.EEPZ.Core.Service
         }
 
         // HR Approve - moves to leadership
-public async Task<PromotionResponseDto> ApprovePromotionAsync(int promotionId, int approvedByUserId, string remarks)
-{
-    try
-    {
-        var promotion = await _promotionRepository.GetByIdAsync(promotionId);
-        if (promotion == null)
-            throw new Exception("Promotion not found");
-
-        // Set to "hr_approved" instead of "approved"
-        promotion.Status = PromotionStatusConstants.HrApproved;
-        promotion.ApprovedByUserId = approvedByUserId;
-        promotion.ApprovedAt = DateTime.UtcNow;
-        promotion.Justification = $"{promotion.Justification}\n[HR Approved: {remarks}]";
-
-        var updated = await _promotionRepository.UpdateAsync(promotion);
-
-        Console.WriteLine($"✓ Promotion HR approved: PromotionId={promotionId} → Pending Leadership");
-
-        return await GetPromotionByIdAsync(updated.PromotionId);
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($" Error in ApprovePromotionAsync: {ex.Message}");
-        throw;
-    }
-}
-
-// Get promotions pending leadership approval
-public async Task<List<PromotionResponseDto>> GetPendingLeadershipApprovalAsync()
-{
-    try
-    {
-        Console.WriteLine("Service: Getting promotions pending leadership approval");
-
-        var promotions = await _promotionRepository.GetPendingLeadershipApprovalAsync();
-        
-        var responses = promotions.Select(p => new PromotionResponseDto
+        public async Task<PromotionResponseDto> ApprovePromotionAsync(int promotionId, int approvedByUserId, string remarks)
         {
-            PromotionId = p.PromotionId,
-            EmployeeUserId = p.EmployeeUserId,
-            EmployeeName = p.EmployeeUser?.Email,
-            NominationId = p.NominationId,
-            OpportunityName = p.Nomination?.Opportunity?.OpportunityName,
-            OldRole = p.OldRole,
-            NewRole = p.NewRole,
-            OldSalary = p.OldSalary,
-            NewSalary = p.NewSalary,
-            PromotionDate = p.PromotionDate,
-            Status = p.Status,
-            CreatedAt = p.CreatedAt
-        }).ToList();
+            try
+            {
+                var promotion = await _promotionRepository.GetByIdAsync(promotionId);
+                if (promotion == null)
+                    throw new Exception("Promotion not found");
 
-        return responses;
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($" Error in GetPendingLeadershipApprovalAsync: {ex.Message}");
-        throw;
-    }
-}
+                // Set to "hr_approved" instead of "approved"
+                promotion.Status = PromotionStatusConstants.HrApproved;
+                promotion.ApprovedByUserId = approvedByUserId;
+                promotion.ApprovedAt = DateTime.UtcNow;
+                promotion.Justification = $"{promotion.Justification}\n[HR Approved: {remarks}]";
 
-// Leadership approves promotion (FINAL)
-public async Task<PromotionResponseDto> ApprovePromotionByLeadershipAsync(int promotionId, int approvedByUserId, string remarks)
-{
-    try
-    {
-        var promotion = await _promotionRepository.GetByIdAsync(promotionId);
-        if (promotion == null)
-            throw new Exception("Promotion not found");
+                var updated = await _promotionRepository.UpdateAsync(promotion);
 
-        if (promotion.Status != PromotionStatusConstants.HrApproved)
-        {
-            throw new Exception($"Cannot approve. Promotion status is '{promotion.Status}'. Must be 'hr_approved'.");
+                Console.WriteLine($"✓ Promotion HR approved: PromotionId={promotionId} → Pending Leadership");
+
+                return await GetPromotionByIdAsync(updated.PromotionId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($" Error in ApprovePromotionAsync: {ex.Message}");
+                throw;
+            }
         }
 
-        // FINAL STATUS: approved
-        promotion.Status = PromotionStatusConstants.Approved;
-        promotion.ApprovedByUserId = approvedByUserId;
-        promotion.ApprovedAt = DateTime.UtcNow;
-        promotion.Justification = $"{promotion.Justification}\n[Leadership Final Approval: {remarks}]";
+        // Get promotions pending leadership approval
+        public async Task<List<PromotionResponseDto>> GetPendingLeadershipApprovalAsync()
+        {
+            try
+            {
+                Console.WriteLine("Service: Getting promotions pending leadership approval");
 
-        var updated = await _promotionRepository.UpdateAsync(promotion);
+                var promotions = await _promotionRepository.GetPendingLeadershipApprovalAsync();
+
+                var responses = promotions.Select(p => new PromotionResponseDto
+                {
+                    PromotionId = p.PromotionId,
+                    EmployeeUserId = p.EmployeeUserId,
+                    EmployeeName = p.EmployeeUser?.Email,
+                    NominationId = p.NominationId,
+                    OpportunityName = p.Nomination?.Opportunity?.OpportunityName,
+                    OldRole = p.OldRole,
+                    NewRole = p.NewRole,
+                    OldSalary = p.OldSalary,
+                    NewSalary = p.NewSalary,
+                    PromotionDate = p.PromotionDate,
+                    Status = p.Status,
+                    CreatedAt = p.CreatedAt
+                }).ToList();
+
+                return responses;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($" Error in GetPendingLeadershipApprovalAsync: {ex.Message}");
+                throw;
+            }
+        }
+
+        // Leadership approves promotion (FINAL)
+        public async Task<PromotionResponseDto> ApprovePromotionByLeadershipAsync(int promotionId, int approvedByUserId, string remarks)
+        {
+            try
+            {
+                var promotion = await _promotionRepository.GetByIdAsync(promotionId);
+                if (promotion == null)
+                    throw new Exception("Promotion not found");
+
+                if (promotion.Status != PromotionStatusConstants.HrApproved)
+                {
+                    throw new Exception($"Cannot approve. Promotion status is '{promotion.Status}'. Must be 'hr_approved'.");
+                }
+
+                // FINAL STATUS: approved
+                promotion.Status = PromotionStatusConstants.Approved;
+                promotion.ApprovedByUserId = approvedByUserId;
+                promotion.ApprovedAt = DateTime.UtcNow;
+                promotion.Justification = $"{promotion.Justification}\n[Leadership Final Approval: {remarks}]";
+
+                var updated = await _promotionRepository.UpdateAsync(promotion);
 
                 Console.WriteLine($"✓ Promotion FINAL approved by Leadership: PromotionId={promotionId} → APPROVED");
-        // At the end of ApprovePromotionByLeadershipAsync:
+                // At the end of ApprovePromotionByLeadershipAsync:
 
-var history = new Promotionhistory
-{
-    EmployeeUserId = promotion.EmployeeUserId,
-    PromotionId = promotion.PromotionId,
-    FromRole = promotion.OldRole,
-    ToRole = promotion.NewRole,
-    SalaryChange = promotion.NewSalary - (promotion.OldSalary ?? 0),
-    PromotionDate = promotion.PromotionDate,
-    RecordedAt = DateTime.UtcNow
-};
-await _promotionRepository.AddPromotionHistoryAsync(history);
+                var history = new Promotionhistory
+                {
+                    EmployeeUserId = promotion.EmployeeUserId,
+                    PromotionId = promotion.PromotionId,
+                    FromRole = promotion.OldRole,
+                    ToRole = promotion.NewRole,
+                    SalaryChange = promotion.NewSalary - (promotion.OldSalary ?? 0),
+                    PromotionDate = promotion.PromotionDate,
+                    RecordedAt = DateTime.UtcNow
+                };
+                await _promotionRepository.AddPromotionHistoryAsync(history);
 
 
-        return await GetPromotionByIdAsync(updated.PromotionId);
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($" Error in ApprovePromotionByLeadershipAsync: {ex.Message}");
-        throw;
-    }
-}
-
-// Leadership rejects promotion
-public async Task<PromotionResponseDto> RejectPromotionByLeadershipAsync(int promotionId, int rejectedByUserId, string remarks)
-{
-    try
-    {
-        var promotion = await _promotionRepository.GetByIdAsync(promotionId);
-        if (promotion == null)
-            throw new Exception("Promotion not found");
-
-        if (promotion.Status != PromotionStatusConstants.HrApproved)
-        {
-            throw new Exception($"Cannot reject. Promotion status is '{promotion.Status}'. Must be 'hr_approved'.");
+                return await GetPromotionByIdAsync(updated.PromotionId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($" Error in ApprovePromotionByLeadershipAsync: {ex.Message}");
+                throw;
+            }
         }
 
-        promotion.Status = PromotionStatusConstants.Rejected;
-        promotion.ApprovedByUserId = rejectedByUserId;
-        promotion.ApprovedAt = DateTime.UtcNow;
-        promotion.Justification = $"{promotion.Justification}\n[Leadership Rejected: {remarks}]";
+        // Leadership rejects promotion
+        public async Task<PromotionResponseDto> RejectPromotionByLeadershipAsync(int promotionId, int rejectedByUserId, string remarks)
+        {
+            try
+            {
+                var promotion = await _promotionRepository.GetByIdAsync(promotionId);
+                if (promotion == null)
+                    throw new Exception("Promotion not found");
 
-        var updated = await _promotionRepository.UpdateAsync(promotion);
+                if (promotion.Status != PromotionStatusConstants.HrApproved)
+                {
+                    throw new Exception($"Cannot reject. Promotion status is '{promotion.Status}'. Must be 'hr_approved'.");
+                }
 
-        Console.WriteLine($" Promotion rejected by Leadership: PromotionId={promotionId}");
+                promotion.Status = PromotionStatusConstants.Rejected;
+                promotion.ApprovedByUserId = rejectedByUserId;
+                promotion.ApprovedAt = DateTime.UtcNow;
+                promotion.Justification = $"{promotion.Justification}\n[Leadership Rejected: {remarks}]";
 
-        return await GetPromotionByIdAsync(updated.PromotionId);
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($" Error in RejectPromotionByLeadershipAsync: {ex.Message}");
-        throw;
-    }
-}
+                var updated = await _promotionRepository.UpdateAsync(promotion);
+
+                Console.WriteLine($" Promotion rejected by Leadership: PromotionId={promotionId}");
+
+                return await GetPromotionByIdAsync(updated.PromotionId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($" Error in RejectPromotionByLeadershipAsync: {ex.Message}");
+                throw;
+            }
+        }
 
 
         public async Task<PromotionResponseDto> RejectPromotionAsync(int promotionId, int rejectedByUserId)
@@ -387,7 +387,7 @@ public async Task<PromotionResponseDto> RejectPromotionByLeadershipAsync(int pro
             try
             {
                 var history = await _promotionRepository.GetPromotionHistoryByEmployeeAsync(employeeUserId);
-                
+
                 var responses = history.Select(h => new PromotionResponseDto
                 {
                     OldRole = h.FromRole,

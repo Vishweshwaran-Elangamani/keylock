@@ -38,11 +38,11 @@ namespace Relevantz.EEPZ.Core.Service
             var minLength = _configuration.GetValue<int>("PasswordSettings:MinimumLength", 8);
 
             return PasswordHelper.ValidatePasswordStrength(
-                password, 
-                requireUppercase, 
-                requireLowercase, 
-                requireDigit, 
-                requireSpecialChar, 
+                password,
+                requireUppercase,
+                requireLowercase,
+                requireDigit,
+                requireSpecialChar,
                 minLength);
         }
     }

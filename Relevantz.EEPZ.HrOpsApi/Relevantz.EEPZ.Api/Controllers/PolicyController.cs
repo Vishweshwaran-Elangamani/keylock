@@ -200,100 +200,100 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         [HttpPost("upload-document")]
-[Authorize(Roles = "Admin,HR")]
-public async Task<IActionResult> UploadDocument([FromForm] IFormFile? file, [FromForm] string? documentUrl, [FromForm] string? documentName, [FromForm] string? documentType)
-{
-    try
-    {
-        // Validate inputs
-        if (string.IsNullOrEmpty(documentType) || (documentType != "link" && documentType != "upload"))
-            return BadRequest(new { success = false, message = "Document type must be 'link' or 'upload'" });
-
-        // Handle File Upload
-        if (documentType == "upload")
+        [Authorize(Roles = "Admin,HR")]
+        public async Task<IActionResult> UploadDocument([FromForm] IFormFile? file, [FromForm] string? documentUrl, [FromForm] string? documentName, [FromForm] string? documentType)
         {
-            if (file == null || file.Length == 0)
-                return BadRequest(new { success = false, message = "No file uploaded" });
-
-            // Validate file type
-            var allowedExtensions = new[] { ".pdf", ".doc", ".docx" };
-            var extension = Path.GetExtension(file.FileName).ToLower();
-            if (!allowedExtensions.Contains(extension))
-                return BadRequest(new { success = false, message = "Only PDF, DOC, DOCX files allowed" });
-
-            // Validate file size (5MB max)
-            const long maxFileSize = 5 * 1024 * 1024;
-            if (file.Length > maxFileSize)
-                return BadRequest(new { success = false, message = "File size must be less than 5MB" });
-
-            // Create uploads directory
-            var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "policies");
-            Directory.CreateDirectory(uploadsPath);
-
-            // Generate unique filename
-            var uniqueFileName = $"{Guid.NewGuid()}{extension}";
-            var filePath = Path.Combine(uploadsPath, uniqueFileName);
-            
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            try
             {
-                await file.CopyToAsync(stream);
+                // Validate inputs
+                if (string.IsNullOrEmpty(documentType) || (documentType != "link" && documentType != "upload"))
+                    return BadRequest(new { success = false, message = "Document type must be 'link' or 'upload'" });
+
+                // Handle File Upload
+                if (documentType == "upload")
+                {
+                    if (file == null || file.Length == 0)
+                        return BadRequest(new { success = false, message = "No file uploaded" });
+
+                    // Validate file type
+                    var allowedExtensions = new[] { ".pdf", ".doc", ".docx" };
+                    var extension = Path.GetExtension(file.FileName).ToLower();
+                    if (!allowedExtensions.Contains(extension))
+                        return BadRequest(new { success = false, message = "Only PDF, DOC, DOCX files allowed" });
+
+                    // Validate file size (5MB max)
+                    const long maxFileSize = 5 * 1024 * 1024;
+                    if (file.Length > maxFileSize)
+                        return BadRequest(new { success = false, message = "File size must be less than 5MB" });
+
+                    // Create uploads directory
+                    var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "policies");
+                    Directory.CreateDirectory(uploadsPath);
+
+                    // Generate unique filename
+                    var uniqueFileName = $"{Guid.NewGuid()}{extension}";
+                    var filePath = Path.Combine(uploadsPath, uniqueFileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    // Return relative path (frontend will convert to document endpoint)
+                    var fileUrl = $"/uploads/policies/{uniqueFileName}";
+                    var fileName = file.FileName;
+
+                    _logger.LogInformation($"Document uploaded: {uniqueFileName} (Size: {file.Length} bytes)");
+
+                    return Ok(new
+                    {
+                        success = true,
+                        message = "File uploaded successfully",
+                        data = new
+                        {
+                            documentUrl = fileUrl,  // Relative path
+                            documentName = fileName,
+                            documentSize = file.Length,
+                            documentSizeFormatted = FormatFileSize(file.Length),
+                            documentType = "upload"
+                        }
+                    });
+                }
+                else if (documentType == "link")
+                {
+                    if (string.IsNullOrEmpty(documentUrl))
+                        return BadRequest(new { success = false, message = "Document URL is required for links" });
+
+                    if (string.IsNullOrEmpty(documentName))
+                        return BadRequest(new { success = false, message = "Document name is required" });
+
+                    if (!Uri.TryCreate(documentUrl, UriKind.Absolute, out _))
+                        return BadRequest(new { success = false, message = "Invalid URL format" });
+
+                    _logger.LogInformation($"🔗 Document link added: {documentUrl}");
+
+                    return Ok(new
+                    {
+                        success = true,
+                        message = "Document link added successfully",
+                        data = new
+                        {
+                            documentUrl = documentUrl,
+                            documentName = documentName,
+                            documentSize = (long?)null,
+                            documentType = "link"
+                        }
+                    });
+                }
+
+                return BadRequest(new { success = false, message = "Invalid request" });
             }
-
-            // FIXED: Return relative path (frontend will convert to document endpoint)
-            var fileUrl = $"/uploads/policies/{uniqueFileName}";
-            var fileName = file.FileName;
-
-            _logger.LogInformation($"Document uploaded: {uniqueFileName} (Size: {file.Length} bytes)");
-
-            return Ok(new
+            catch (Exception ex)
             {
-                success = true,
-                message = "File uploaded successfully",
-                data = new
-                {
-                    documentUrl = fileUrl,  // Relative path
-                    documentName = fileName,
-                    documentSize = file.Length,
-                    documentSizeFormatted = FormatFileSize(file.Length),
-                    documentType = "upload"
-                }
-            });
+                _logger.LogError($"Error uploading document: {ex.Message}");
+                return StatusCode(500, new { success = false, message = "Document upload failed" });
+            }
         }
-        else if (documentType == "link")
-        {
-            if (string.IsNullOrEmpty(documentUrl))
-                return BadRequest(new { success = false, message = "Document URL is required for links" });
-
-            if (string.IsNullOrEmpty(documentName))
-                return BadRequest(new { success = false, message = "Document name is required" });
-
-            if (!Uri.TryCreate(documentUrl, UriKind.Absolute, out _))
-                return BadRequest(new { success = false, message = "Invalid URL format" });
-
-            _logger.LogInformation($"🔗 Document link added: {documentUrl}");
-
-            return Ok(new
-            {
-                success = true,
-                message = "Document link added successfully",
-                data = new
-                {
-                    documentUrl = documentUrl,
-                    documentName = documentName,
-                    documentSize = (long?)null,
-                    documentType = "link"
-                }
-            });
-        }
-
-        return BadRequest(new { success = false, message = "Invalid request" });
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError($"Error uploading document: {ex.Message}");
-        return StatusCode(500, new { success = false, message = "Document upload failed" });
-    }
-}
 
 
         /// <summary>

@@ -4,7 +4,6 @@ namespace Relevantz.EEPZ.Data.IRepository
 {
     public interface IDepartmentRepository
     {
-        // Basic CRUD operations
         Task<Department?> GetByIdAsync(int departmentId);
         Task<Department?> GetByNameAsync(string departmentName);
         Task<Department?> GetByCodeAsync(string departmentCode);

@@ -56,7 +56,7 @@ namespace Relevantz.EEPZ.Data.Repository
         {
             var refreshToken = await _context.Refreshtokens
                 .FirstOrDefaultAsync(rt => rt.Token == token);
-            
+
             if (refreshToken != null)
             {
                 refreshToken.IsRevoked = true;

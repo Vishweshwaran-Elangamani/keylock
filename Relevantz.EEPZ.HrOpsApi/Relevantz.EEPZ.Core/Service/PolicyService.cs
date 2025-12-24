@@ -12,17 +12,17 @@ using Microsoft.Extensions.Logging;
 
 namespace Relevantz.EEPZ.Core.Service
 {
-   public class PolicyService : IPolicyService
+    public class PolicyService : IPolicyService
     {
         private readonly IPolicyRepository _policyRepository;
         private readonly ILogger<PolicyService> _logger;
- 
+
         public PolicyService(IPolicyRepository policyRepository, ILogger<PolicyService> logger)
         {
             _policyRepository = policyRepository;
             _logger = logger;
         }
- 
+
         public async Task<ApiResponseDto<PolicyResponseDto>> CreatePolicyAsync(CreatePolicyRequestDto request, int createdByUserId)
         {
             try
@@ -32,7 +32,7 @@ namespace Relevantz.EEPZ.Core.Service
                 {
                     return ApiResponseDto<PolicyResponseDto>.ErrorResponse("Policy name already exists");
                 }
- 
+
                 var policy = new Organizationalpolicy
                 {
                     PolicyName = request.PolicyName,
@@ -47,10 +47,10 @@ namespace Relevantz.EEPZ.Core.Service
                     DocumentSize = request.DocumentSize,
                     DocumentUploadedAt = !string.IsNullOrEmpty(request.DocumentUrl) ? DateTime.Now : null
                 };
- 
+
                 var createdPolicy = await _policyRepository.CreatePolicyAsync(policy);
                 _logger.LogInformation($" Policy created: {createdPolicy.PolicyName} (ID: {createdPolicy.PolicyId}) by user {createdByUserId}");
- 
+
                 var response = MapToResponseDto(createdPolicy);
                 return ApiResponseDto<PolicyResponseDto>.SuccessResponse(response, "Policy created successfully");
             }
@@ -60,7 +60,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<PolicyResponseDto>.ErrorResponse("Failed to create policy");
             }
         }
- 
+
         public async Task<ApiResponseDto<List<PolicyResponseDto>>> GetAllPoliciesAsync()
         {
             try
@@ -75,7 +75,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<List<PolicyResponseDto>>.ErrorResponse("Failed to fetch policies");
             }
         }
- 
+
         public async Task<ApiResponseDto<List<PolicyResponseDto>>> GetActivePoliciesAsync()
         {
             try
@@ -90,7 +90,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<List<PolicyResponseDto>>.ErrorResponse("Failed to fetch policies");
             }
         }
- 
+
         public async Task<ApiResponseDto<List<PolicyResponseDto>>> GetInactivePoliciesAsync()
         {
             try
@@ -120,7 +120,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<List<PolicyResponseDto>>.ErrorResponse("Failed to fetch policies");
             }
         }
- 
+
         public async Task<ApiResponseDto<List<PolicyResponseDto>>> GetDraftPoliciesAsync()
         {
             try
@@ -135,7 +135,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<List<PolicyResponseDto>>.ErrorResponse("Failed to fetch policies");
             }
         }
- 
+
         public async Task<ApiResponseDto<PolicyResponseDto>> GetPolicyByIdAsync(int policyId)
         {
             try
@@ -145,7 +145,7 @@ namespace Relevantz.EEPZ.Core.Service
                 {
                     return ApiResponseDto<PolicyResponseDto>.ErrorResponse("Policy not found");
                 }
- 
+
                 var response = MapToResponseDto(policy);
                 return ApiResponseDto<PolicyResponseDto>.SuccessResponse(response);
             }
@@ -155,7 +155,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<PolicyResponseDto>.ErrorResponse("Failed to fetch policy");
             }
         }
- 
+
         public async Task<ApiResponseDto<PolicyResponseDto>> UpdatePolicyAsync(int policyId, UpdatePolicyRequestDto request)
         {
             try
@@ -165,7 +165,7 @@ namespace Relevantz.EEPZ.Core.Service
                 {
                     return ApiResponseDto<PolicyResponseDto>.ErrorResponse("Policy not found");
                 }
- 
+
                 // Check for duplicate name if name is being updated
                 if (!string.IsNullOrEmpty(request.PolicyName) && request.PolicyName != policy.PolicyName)
                 {
@@ -174,23 +174,23 @@ namespace Relevantz.EEPZ.Core.Service
                         return ApiResponseDto<PolicyResponseDto>.ErrorResponse("Policy name already exists");
                     }
                 }
- 
+
                 // Update only provided fields
                 if (!string.IsNullOrEmpty(request.PolicyName))
                     policy.PolicyName = request.PolicyName;
- 
+
                 if (!string.IsNullOrEmpty(request.Category))
                     policy.Category = request.Category;
- 
+
                 if (request.Description != null)
                     policy.Description = request.Description;
- 
+
                 if (request.ComplianceGuidance != null)
                     policy.ComplianceGuidance = request.ComplianceGuidance;
- 
+
                 if (!string.IsNullOrEmpty(request.Status))
                     policy.Status = request.Status;
- 
+
                 if (!string.IsNullOrEmpty(request.DocumentUrl))
                 {
                     policy.DocumentUrl = request.DocumentUrl;
@@ -199,10 +199,10 @@ namespace Relevantz.EEPZ.Core.Service
                     policy.DocumentSize = request.DocumentSize;
                     policy.DocumentUploadedAt = DateTime.Now;
                 }
- 
+
                 var updatedPolicy = await _policyRepository.UpdatePolicyAsync(policy);
                 _logger.LogInformation($" Policy updated: {updatedPolicy.PolicyName} (ID: {updatedPolicy.PolicyId})");
- 
+
                 var response = MapToResponseDto(updatedPolicy);
                 return ApiResponseDto<PolicyResponseDto>.SuccessResponse(response, "Policy updated successfully");
             }
@@ -212,7 +212,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<PolicyResponseDto>.ErrorResponse("Failed to update policy");
             }
         }
- 
+
         //  Publish policy (make visible to all employees)
         public async Task<ApiResponseDto<string>> PublishPolicyAsync(int policyId, int publishedBy)
         {
@@ -223,20 +223,20 @@ namespace Relevantz.EEPZ.Core.Service
                 {
                     return ApiResponseDto<string>.ErrorResponse("Policy not found");
                 }
- 
+
                 if (policy.IsPublished)
                 {
                     return ApiResponseDto<string>.ErrorResponse("Policy is already published");
                 }
- 
+
                 policy.IsPublished = true;
                 policy.PublishedAt = DateTime.Now;
                 policy.PublishedBy = publishedBy;
                 policy.UpdatedAt = DateTime.Now;
- 
+
                 await _policyRepository.UpdatePolicyAsync(policy);
                 _logger.LogInformation($" Policy published: {policy.PolicyName} (ID: {policy.PolicyId}) by user {publishedBy}");
- 
+
                 return ApiResponseDto<string>.SuccessResponse(
                     "Policy published successfully",
                     "Policy is now visible to all employees"
@@ -248,7 +248,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<string>.ErrorResponse("Failed to publish policy");
             }
         }
- 
+
         public async Task<ApiResponseDto<bool>> DeletePolicyAsync(int policyId)
         {
             try
@@ -258,7 +258,7 @@ namespace Relevantz.EEPZ.Core.Service
                 {
                     return ApiResponseDto<bool>.ErrorResponse("Policy not found");
                 }
- 
+
                 _logger.LogInformation($" Policy deleted (marked as inactive): ID {policyId}");
                 return ApiResponseDto<bool>.SuccessResponse(true, "Policy deleted successfully");
             }
@@ -268,7 +268,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<bool>.ErrorResponse("Failed to delete policy");
             }
         }
- 
+
         private PolicyResponseDto MapToResponseDto(Organizationalpolicy policy)
         {
             return new PolicyResponseDto
@@ -301,7 +301,7 @@ namespace Relevantz.EEPZ.Core.Service
         {
             if (!bytes.HasValue || bytes.Value == 0)
                 return null;
- 
+
             string[] sizes = { "B", "KB", "MB", "GB" };
             double len = bytes.Value;
             int order = 0;
@@ -313,36 +313,36 @@ namespace Relevantz.EEPZ.Core.Service
             return $"{len:0.##} {sizes[order]}";
         }
         public async Task<ApiResponseDto<PolicyResponseDto>> UnpublishPolicyAsync(int policyId, int userId)
-{
-    try
-    {
-        var policy = await _policyRepository.GetPolicyByIdAsync(policyId);
- 
-        if (policy == null)
         {
-            return ApiResponseDto<PolicyResponseDto>.ErrorResponse("Policy not found");
+            try
+            {
+                var policy = await _policyRepository.GetPolicyByIdAsync(policyId);
+
+                if (policy == null)
+                {
+                    return ApiResponseDto<PolicyResponseDto>.ErrorResponse("Policy not found");
+                }
+
+                policy.IsPublished = false;
+                policy.PublishedAt = null;
+                policy.PublishedBy = null;
+                policy.UpdatedAt = DateTime.Now;
+
+                await _policyRepository.UpdatePolicyAsync(policy);
+
+                _logger.LogInformation($" Policy {policyId} unpublished successfully");
+
+                var response = MapToResponseDto(policy);
+                return ApiResponseDto<PolicyResponseDto>.SuccessResponse(response, "Policy unpublished successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($" Error unpublishing policy: {ex.Message}");
+                return ApiResponseDto<PolicyResponseDto>.ErrorResponse("Failed to unpublish policy");
+            }
         }
 
-        policy.IsPublished = false;
-        policy.PublishedAt = null;
-        policy.PublishedBy = null;
-        policy.UpdatedAt = DateTime.Now;
+    }
 
-        await _policyRepository.UpdatePolicyAsync(policy);
- 
-        _logger.LogInformation($" Policy {policyId} unpublished successfully");
 
-        var response = MapToResponseDto(policy);
-        return ApiResponseDto<PolicyResponseDto>.SuccessResponse(response, "Policy unpublished successfully");
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError($" Error unpublishing policy: {ex.Message}");
-        return ApiResponseDto<PolicyResponseDto>.ErrorResponse("Failed to unpublish policy");
-    }
-}
- 
-    }
- 
- 
 }

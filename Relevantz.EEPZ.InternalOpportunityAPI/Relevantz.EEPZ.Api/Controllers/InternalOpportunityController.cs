@@ -20,7 +20,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             _opportunityService = opportunityService;
         }
-        
+
         [HttpGet]
         public async Task<IActionResult> GetAllOpportunities()
         {
@@ -43,7 +43,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 InternalOpportunityValidator.ValidateCreate(request);
 
-                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ?? 
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ??
                                  User.FindFirst("sub");
 
                 if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId) || userId <= 0)
