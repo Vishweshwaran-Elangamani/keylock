@@ -34,7 +34,6 @@ export default function ManagerDashboard() {
         console.info("SUCCESS:", message);
         break;
       case "info":
-        console.log("INFO:", message);
         break;
       case "warning":
         toast(message, options);

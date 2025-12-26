@@ -198,11 +198,7 @@ const nominationService = {
         url += `?status=${encodeURIComponent(status)}`;
       }
 
-      console.log("Fetching nomination history:", url);
-
       const response = await internalApi.get(url);
-
-      console.log("Nomination History Response:", response.data);
 
       return {
         success: true,
@@ -229,9 +225,6 @@ const nominationService = {
 
       const nominations = response.data;
 
-      console.log("=== ALL NOMINATIONS DEBUG ===");
-      console.log("Total nominations fetched:", nominations.length);
-
       const totalCount = nominations.length;
 
       const normalize = (status) => {
@@ -252,14 +245,6 @@ const nominationService = {
       const rejectedCount = nominations.filter((n) =>
         normalize(n.status).includes("rejected")
       ).length;
-
-      console.log("=== FINAL COUNTS ===");
-      console.log({
-        totalNominations: totalCount,
-        approved: approvedCount,
-        pending: pendingCount,
-        rejected: rejectedCount,
-      });
 
       return {
         success: true,

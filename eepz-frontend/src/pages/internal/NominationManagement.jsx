@@ -140,8 +140,6 @@ const NominationManagement = () => {
       setLoading(true);
       let nominationsResponse;
 
-      console.log("[NominationManagement] Role:", user?.role);
-
       if (user?.role === "Manager") {
         nominationsResponse = await nominationService.getPendingManagerReview();
       } else if (user?.role === "Department Head") {
@@ -160,7 +158,6 @@ const NominationManagement = () => {
         const data = Array.isArray(nominationsResponse.data)
           ? nominationsResponse.data
           : [];
-        console.log("[NominationManagement] nominations count:", data.length);
         setNominations(data);
       } else {
         toast.error(
