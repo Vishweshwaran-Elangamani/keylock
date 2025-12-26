@@ -557,7 +557,7 @@ const TeamAssignments = () => {
                         }`}
                       >
                         <strong className={styles.notesLabel}>
-                          Completion Notes:
+                          Approver Comments:
                         </strong>
                         {assignment.completionNotes}
                       </div>

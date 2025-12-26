@@ -2,7 +2,7 @@
   from { opacity: 0; }
   to { opacity: 1; }
 }
- 
+
 @keyframes slideUp {
   from {
     opacity: 0;
@@ -13,7 +13,7 @@
     transform: translateY(0);
   }
 }
- 
+
 .backdrop {
   position: fixed;
   top: 0;
@@ -29,7 +29,6 @@
   animation: fadeIn 0.2s ease-in-out;
 }
  
-/* Modal is a flex column: header (top), body (scrollable), footer (bottom) */
 .modal {
   background: #fff;
   border-radius: 12px;
@@ -42,41 +41,10 @@
   flex-direction: column;
 }
  
-/* Make only body scroll, not the whole modal */
-.body {
-  padding: 1.5rem;
-  overflow-y: auto;
-  max-height: calc(90vh - 1.5rem - 60px - 56px); /* adjust for header/footer heights */
+.modal::-webkit-scrollbar {
+  display: none;
 }
  
-/* hide native scrollbar width helpers */
-.modal {
-  scrollbar-width: none;
-  ms-overflow-style: none;
-}
- 
-/* Scrollbar styling on the scrollable body only */
-/* Firefox */
-.body {
-  scrollbar-width: thin;
-  scrollbar-color: rgb(39, 35, 92) transparent;
-}
- 
-/* WebKit (Chrome, Edge, Safari) */
-.body::-webkit-scrollbar {
-  width: 6px;
-}
- 
-.body::-webkit-scrollbar-track {
-  background: transparent;
-}
- 
-.body::-webkit-scrollbar-thumb {
-  background-color: rgb(39, 35, 92); /* same as header background */
-  border-radius: 999px;
-}
- 
-/* Header stays at top of modal (no scrolling) */
 .header {
   padding: 1.5rem;
   border-bottom: 1px solid #e5e7eb;
@@ -86,13 +54,13 @@
   align-items: center;
   flex-shrink: 0; /* prevent shrinking when body scrolls */
 }
- 
+
 .headerTitle {
   margin: 0;
   font-weight: 600;
   color: white;
 }
- 
+
 .btnClose {
   border: none;
   width: 36px;
@@ -108,9 +76,13 @@
   transition: all 0.2s;
   flex-shrink: 0;
 }
- 
+
 .btnClose:hover {
   color: red;
+}
+ 
+.body {
+  padding: 1.5rem;
 }
  
 .assignmentInfo {
@@ -120,26 +92,26 @@
   border-radius: 8px;
   margin-bottom: 1.5rem;
 }
- 
+
 .infoLabel {
   font-size: 0.875rem;
   color: #6c757d;
   margin: 0 0 0.25rem 0;
 }
- 
+
 .infoValue {
   font-size: 1rem;
   font-weight: 600;
   color: #212529;
   margin: 0 0 0.75rem 0;
 }
- 
+
 .infoValueSmall {
   composes: infoValue;
   font-size: 0.9375rem;
   font-weight: 500;
 }
- 
+
 .alert {
   padding: 1rem;
   background: #d1fae5;
@@ -149,29 +121,29 @@
   display: flex;
   gap: 0.75rem;
 }
- 
+
 .alertIcon {
   flex-shrink: 0;
 }
- 
+
 .alertTitle {
   font-size: 0.875rem;
   color: #065f46;
   margin: 0 0 0.25rem 0;
   font-weight: 600;
 }
- 
+
 .alertText {
   font-size: 0.8125rem;
   color: #065f46;
   margin: 0;
   line-height: 1.5;
 }
- 
+
 .smeNotesContainer {
   margin-bottom: 10px;
 }
- 
+
 .smeNotesLabel {
   font-size: 0.875rem;
   font-weight: 600;
@@ -179,7 +151,7 @@
   margin-bottom: 10px;
   display: block;
 }
- 
+
 .smeNotesContent {
   padding: 0.75rem;
   border: 1px solid rgba(39, 35, 92, 0.66);
@@ -188,7 +160,7 @@
   font-size: 0.875rem;
   color: #212529;
 }
- 
+
 .ratingLabel {
   font-size: 0.875rem;
   font-weight: 600;
@@ -197,12 +169,12 @@
   margin-bottom: 10px;
   display: block;
 }
- 
+
 .ratingCurrent {
   color: inherit;
   font-weight: 700;
 }
- 
+
 .ratingButtons {
   display: flex;
   justify-content: space-between;
@@ -210,7 +182,7 @@
   flex-wrap: wrap;
   margin-bottom: 0.5rem;
 }
- 
+
 .ratingBtn {
   width: 36px;
   height: 36px;
@@ -226,39 +198,39 @@
   background: #f8f9fa;
   color: #212529;
 }
- 
+
 .ratingBtnActive {
   composes: ratingBtn;
 }
- 
+
 .ratingBtnLow {
   composes: ratingBtnActive;
   border: 2px solid #dc3545;
   background: #dc3545;
   color: #fff;
 }
- 
+
 .ratingBtnMedium {
   composes: ratingBtnActive;
   border: 2px solid #0d6efd;
   background: #0d6efd;
   color: #fff;
-}
- 
+} 
+
 .ratingBtnHigh {
   composes: ratingBtnActive;
   border: 2px solid #198754;
   background: #198754;
   color: #fff;
-}
- 
+} 
+
 .ratingLabelText {
   text-align: center;
   margin-top: 10px;
   font-size: 0.8125rem;
   font-weight: 500;
 }
- 
+
 .notesLabel {
   font-size: 0.875rem;
   font-weight: 600;
@@ -267,7 +239,7 @@
   margin-bottom: 10px;
   display: block;
 }
- 
+
 .notesTextarea {
   width: 100%;
   padding: 0.75rem;
@@ -278,12 +250,12 @@
   resize: vertical;
   font-family: inherit;
 }
- 
+
 .notesTextarea:focus {
   border-color: #97247e;
   box-shadow: 0 0 0 3px rgba(151, 36, 126, 0.1);
 }
- 
+
 .footer {
   padding: 1rem 1.5rem;
   border-top: 1px solid #e5e7eb;
@@ -292,7 +264,7 @@
   justify-content: flex-end;
   flex-shrink: 0; /* keep footer visible */
 }
- 
+
 .btnCancel {
   padding: 0.625rem 1.25rem;
   border: 1px solid #e5e7eb;
@@ -303,12 +275,12 @@
   background: #fff;
   color: #6c757d;
 }
- 
+
 .btnCancel:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
- 
+
 .btnSubmit {
   padding: 0.625rem 1.25rem;
   border: none;
@@ -321,42 +293,43 @@
   gap: 0.5rem;
   transition: all 0.2s;
 }
- 
+
 .btnSubmitEnabled {
   composes: btnSubmit;
   background: #198754;
   color: #fff;
 }
- 
+
 .btnSubmitEnabled:hover {
   filter: brightness(105%);
 }
- 
+
 .btnSubmit:disabled {
   background: #e5e7eb;
   color: #6c757d;
   cursor: not-allowed;
 }
- 
+
 .loadingSpinner {
   width: 16px;
   height: 16px;
 }
- 
+
 .required {
   color: #dc3545;
 }
- 
+
 @media (max-width: 576px) {
   .ratingButtons {
     justify-content: center;
   }
- 
+
   .ratingBtn {
     width: 32px;
     height: 32px;
     font-size: 12px;
   }
 }
+ 
  
  

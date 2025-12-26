@@ -57,7 +57,7 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
       }
     } catch (error) {
       console.error("Failed to fetch employee skills:", error);
-      toast.error("Failed to load employee skills");
+      toast.error("Failed to load employee skills");  
     } finally {
       setLoading(false);
     }
@@ -73,7 +73,7 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
         "", // no status filter, we'll filter in hasOngoingAssignments
         employee.employeeName,
         "",
-        "desc"
+        "desc"    
       );
 
       if (response.data.success) {
