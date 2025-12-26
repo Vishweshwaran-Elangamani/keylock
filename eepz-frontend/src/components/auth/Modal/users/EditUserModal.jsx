@@ -1,24 +1,7 @@
-/**
- * EditUserModal Component
- *
- * A modal component for editing employment and work-related details of existing users.
- * Features:
- * - Edit employment type, status, dates, and work details
- * - Comprehensive date validation (confirmation, exit dates)
- * - Real-time validation with error feedback
- * - Prevents invalid date combinations (e.g., exit before joining)
- * - Toast notifications using Sonner for success/error feedback
- * - Loading state during API operations
- *
- * @param {boolean} show - Controls modal visibility
- * @param {function} onHide - Callback to close the modal
- * @param {function} onUserUpdated - Callback after successful update
- * @param {Object} user - User object containing current user details
- * @param {Array} roles - List of available roles (not used in this component)
- * @param {Array} departments - List of available departments (not used in this component)
- */
 
-import { useState, useEffect } from "react";
+
+
+import { useState, useEffect, useRef } from "react";
 import userService from "../../../../services/auth/userService";
 import { toast } from "sonner";
 import "../../../../styles/auth/user/EditUserModal.css";
@@ -35,10 +18,6 @@ const EditUserModal = ({
   // STATE MANAGEMENT
   // ========================
 
-  /**
-   * Form data state - stores all editable employment fields
-   * Pre-populated with user's current data when modal opens
-   */
   const [formData, setFormData] = useState({
     userId: "",
     employmentType: "",
@@ -52,27 +31,13 @@ const EditUserModal = ({
     status: "",
   });
 
-  /**
-   * Loading state - tracks form submission status
-   * Used to disable buttons and show loading indicator
-   */
   const [loading, setLoading] = useState(false);
-
-  /**
-   * Errors state - stores validation error messages for each field
-   * Key = field name, Value = error message
-   */
   const [errors, setErrors] = useState({});
 
   // ========================
   // EFFECTS
   // ========================
 
-  /**
-   * Effect: Populate form data when user prop changes
-   * Runs when modal opens with a new user or user data updates
-   * Converts ISO date strings to YYYY-MM-DD format for date inputs
-   */
   useEffect(() => {
     if (user) {
       setFormData({
@@ -96,12 +61,6 @@ const EditUserModal = ({
   // EVENT HANDLERS
   // ========================
 
-  /**
-   * Handles input field changes
-   * Updates form data and clears field-specific errors
-   *
-   * @param {Event} e - Input change event
-   */
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -119,27 +78,100 @@ const EditUserModal = ({
   };
 
   // ========================
+  // CUSTOM DROPDOWN COMPONENT
+  // ========================
+
+  const CustomDropdown = ({ options, value, onChange, placeholder, error, name }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef(null);
+
+    const toggleDropdown = () => setIsOpen(!isOpen);
+
+    const handleSelect = (selectedValue) => {
+      onChange({ target: { name, value: selectedValue } });
+      setIsOpen(false);
+    };
+
+    useEffect(() => {
+      const handleClickOutside = (event) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+          setIsOpen(false);
+        }
+      };
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const selectedOption = options.find((opt) => opt.value === value);
+
+    return (
+      <div
+        ref={dropdownRef}
+        className={`eum-custom-dropdown ${isOpen ? "active" : ""} ${error ? "error" : ""}`}
+      >
+        <div
+          className="eum-custom-dropdown-selected"
+          onClick={toggleDropdown}
+          tabIndex={0}
+        >
+          <span className={`eum-custom-dropdown-text ${!selectedOption ? "placeholder" : ""}`}>
+            {selectedOption ? selectedOption.label : placeholder}
+          </span>
+          <span className={`eum-custom-dropdown-arrow ${isOpen ? "open" : ""}`}></span>
+        </div>
+
+        {isOpen && (
+          <div className="eum-custom-dropdown-menu">
+            {options.map((option) => (
+              <div
+                key={option.value}
+                className={`eum-custom-dropdown-option ${
+                  value === option.value ? "selected" : ""
+                }`}
+                onClick={() => handleSelect(option.value)}
+              >
+                {option.label}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // ========================
+  // DROPDOWN OPTIONS
+  // ========================
+
+  const employmentTypeOptions = [
+    { value: "Permanent", label: "Permanent" },
+    { value: "Contract", label: "Contract" },
+    { value: "Temporary", label: "Temporary" },
+    { value: "Intern", label: "Intern" },
+    { value: "Probation", label: "Probation" },
+  ];
+
+  const employeeTypeOptions = [
+    { value: "FullTime", label: "Full Time" },
+    { value: "PartTime", label: "Part Time" },
+    { value: "Consultant", label: "Consultant" },
+  ];
+
+  // ========================
   // FORM VALIDATION
   // ========================
 
-  /**
-   * Validates all form fields before submission
-   * @returns {boolean} - True if form is valid, false otherwise
-   */
   const validateForm = () => {
     const newErrors = {};
 
-    // Employment Type Validation (Required)
     if (!formData.employmentType) {
       newErrors.employmentType = "Employment type is required";
     }
 
-    // Employment Status Validation (Required)
     if (!formData.employmentStatus) {
       newErrors.employmentStatus = "Employment status is required";
     }
 
-    // Confirmation Date Validation (Optional but must be valid if provided)
     if (formData.confirmationDate) {
       const confirmDate = new Date(formData.confirmationDate);
       const today = new Date();
@@ -158,7 +190,6 @@ const EditUserModal = ({
       }
     }
 
-    // Exit Date Validation (Optional but must be valid if provided)
     if (formData.exitDate) {
       const exitDate = new Date(formData.exitDate);
 
@@ -177,19 +208,16 @@ const EditUserModal = ({
       }
     }
 
-    // Work Location Validation (Optional but must be valid if provided)
     if (formData.workLocation.trim()) {
       if (formData.workLocation.trim().length < 2) {
         newErrors.workLocation = "Work location must be at least 2 characters";
       }
     }
 
-    // Employee Type Validation (Required)
     if (!formData.employeeType) {
       newErrors.employeeType = "Employee type is required";
     }
 
-    // Notice Period Validation (Optional but must be valid if provided)
     if (formData.noticePeriodDays) {
       const noticePeriod = parseInt(formData.noticePeriodDays);
 
@@ -200,7 +228,6 @@ const EditUserModal = ({
       }
     }
 
-    // Reporting Manager ID Validation (Optional but must be valid if provided)
     if (formData.reportingManagerEmployeeId) {
       const managerId = parseInt(formData.reportingManagerEmployeeId);
 
@@ -218,10 +245,6 @@ const EditUserModal = ({
   // FORM SUBMISSION
   // ========================
 
-  /**
-   * Handles form submission
-   * @param {Event} e - Form submit event
-   */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -282,9 +305,7 @@ const EditUserModal = ({
 
       <div className="eum-modal-container">
         <div className="eum-modal-dialog">
-          {/* ======================== */}
           {/* MODAL HEADER */}
-          {/* ======================== */}
           <div className="eum-modal-header">
             <div className="eum-header-title">
               <i className="bi bi-pencil-square"></i>
@@ -301,33 +322,24 @@ const EditUserModal = ({
             </button>
           </div>
 
-          {/* ======================== */}
           {/* MODAL BODY - FORM */}
-          {/* ======================== */}
           <form onSubmit={handleSubmit} className="eum-form">
             <div className="eum-modal-body">
               <div className="eum-form-grid">
-                {/* Employment Type Field (Required) */}
+                {/* Employment Type Field (Required) - CUSTOM DROPDOWN */}
                 <div className="eum-form-group">
                   <label className="eum-form-label">
                     Employment Type{" "}
                     <span className="eum-required-asterisk">*</span>
                   </label>
-                  <select
+                  <CustomDropdown
                     name="employmentType"
+                    options={employmentTypeOptions}
                     value={formData.employmentType}
                     onChange={handleChange}
-                    className={`eum-form-input ${
-                      errors.employmentType ? "error" : ""
-                    }`}
-                  >
-                    <option value="">Select Employment Type</option>
-                    <option value="Permanent">Permanent</option>
-                    <option value="Contract">Contract</option>
-                    <option value="Temporary">Temporary</option>
-                    <option value="Intern">Intern</option>
-                    <option value="Probation">Probation</option>
-                  </select>
+                    placeholder="Select Employment Type"
+                    error={errors.employmentType}
+                  />
                   {errors.employmentType && (
                     <div className="eum-form-error">
                       {errors.employmentType}
@@ -375,25 +387,20 @@ const EditUserModal = ({
                   <small className="eum-form-hint">Minimum 2 characters</small>
                 </div>
 
-                {/* Employee Type Field (Required) */}
+                {/* Employee Type Field (Required) - CUSTOM DROPDOWN */}
                 <div className="eum-form-group">
                   <label className="eum-form-label">
                     Employee Type{" "}
                     <span className="eum-required-asterisk">*</span>
                   </label>
-                  <select
+                  <CustomDropdown
                     name="employeeType"
+                    options={employeeTypeOptions}
                     value={formData.employeeType}
                     onChange={handleChange}
-                    className={`eum-form-input ${
-                      errors.employeeType ? "error" : ""
-                    }`}
-                  >
-                    <option value="">Select Employee Type</option>
-                    <option value="FullTime">Full Time</option>
-                    <option value="PartTime">Part Time</option>
-                    <option value="Consultant">Consultant</option>
-                  </select>
+                    placeholder="Select Employee Type"
+                    error={errors.employeeType}
+                  />
                   {errors.employeeType && (
                     <div className="eum-form-error">{errors.employeeType}</div>
                   )}
@@ -405,7 +412,7 @@ const EditUserModal = ({
                   <input
                     type="number"
                     name="noticePeriodDays"
-                    placeholder="Enter notice period"
+                    placeholder="30"
                     value={formData.noticePeriodDays}
                     onChange={handleChange}
                     min="0"
@@ -433,11 +440,8 @@ const EditUserModal = ({
               </div>
             </div>
 
-            {/* ======================== */}
             {/* MODAL FOOTER - ACTION BUTTONS */}
-            {/* ======================== */}
             <div className="eum-modal-footer">
-              {/* Cancel Button */}
               <button
                 type="button"
                 onClick={onHide}
@@ -447,7 +451,6 @@ const EditUserModal = ({
                 <i className="bi bi-x-circle"></i> Cancel
               </button>
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={loading}

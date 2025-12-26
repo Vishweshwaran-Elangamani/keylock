@@ -1,7 +1,74 @@
-import { useState } from "react";
+
+
+
+import { useState, useEffect, useRef } from "react";
 import nominationService from "../../../services/internal/nominationService";
 import { toast } from "sonner";
 import "../../../styles/internal/NominationReviewModal.css";
+
+// Custom Dropdown Component
+const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const selectedOption = options.find((opt) => opt.value === value);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+
+  const handleSelect = (optionValue) => {
+    onChange({ target: { name, value: optionValue } });
+    setIsOpen(false);
+  };
+
+  return (
+    <div
+      ref={dropdownRef}
+      className={`nrm-custom-dropdown ${error ? "error" : ""}`}
+    >
+      <div
+        className="nrm-custom-dropdown-selected"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span className={`nrm-custom-dropdown-text ${!selectedOption ? "placeholder" : ""}`}>
+          {selectedOption ? selectedOption.label : placeholder}
+        </span>
+        <span className={`nrm-custom-dropdown-arrow ${isOpen ? "open" : ""}`}>
+          <i className="bi bi-chevron-down"></i>
+        </span>
+      </div>
+
+      {isOpen && (
+        <div className="nrm-custom-dropdown-menu">
+          {options.map((option) => (
+            <div
+              key={option.value}
+              className={`nrm-custom-dropdown-option ${
+                value === option.value ? "selected" : ""
+              }`}
+              onClick={() => handleSelect(option.value)}
+            >
+              {option.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const NominationReviewModal = ({
   show,
@@ -23,6 +90,20 @@ const NominationReviewModal = ({
   const [errors, setErrors] = useState({});
 
   const isDepartmentHead = userRole === "Department Head";
+
+  // Decision options
+  const decisionOptions = [
+    { label: "-- Select Action --", value: "" },
+    { label: "Approve", value: "Approved" },
+    { label: "Reject", value: "Rejected" },
+  ];
+
+  // Conflict of Interest options
+  const conflictOptions = [
+    { label: "-- Select --", value: "" },
+    { label: "No", value: "false" },
+    { label: "Yes", value: "true" },
+  ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -213,23 +294,19 @@ const NominationReviewModal = ({
                 )}
               </div>
 
-              {/* Decision Field */}
+              {/* Decision Field - Custom Dropdown */}
               <div className="nrm-form-group">
                 <label className="nrm-form-label">
                   Decision <span className="nrm-required-asterisk">*</span>
                 </label>
-                <select
+                <CustomDropdown
                   name="action"
                   value={formData.action}
                   onChange={handleChange}
-                  className={`nrm-form-select ${
-                    formData.action ? "has-value" : "placeholder"
-                  } ${errors.action ? "error" : ""}`}
-                >
-                  <option value="">-- Select Action --</option>
-                  <option value="Approved">Approve</option>
-                  <option value="Rejected">Reject</option>
-                </select>
+                  options={decisionOptions}
+                  placeholder="-- Select Action --"
+                  error={errors.action}
+                />
                 {errors.action && (
                   <div className="nrm-form-error">{errors.action}</div>
                 )}
@@ -293,26 +370,20 @@ const NominationReviewModal = ({
                     </div>
                   </div>
 
-                  {/* Conflict of Interest */}
+                  {/* Conflict of Interest - Custom Dropdown */}
                   <div className="nrm-form-group">
                     <label className="nrm-form-label">
                       Conflict of Interest{" "}
                       <span className="nrm-required-asterisk">*</span>
                     </label>
-                    <select
+                    <CustomDropdown
                       name="conflictOfInterest"
                       value={formData.conflictOfInterest}
                       onChange={handleChange}
-                      className={`nrm-form-select ${
-                        formData.conflictOfInterest
-                          ? "has-value"
-                          : "placeholder"
-                      } ${errors.conflictOfInterest ? "error" : ""}`}
-                    >
-                      <option value="">-- Select --</option>
-                      <option value="false">No</option>
-                      <option value="true">Yes</option>
-                    </select>
+                      options={conflictOptions}
+                      placeholder="-- Select --"
+                      error={errors.conflictOfInterest}
+                    />
                     {errors.conflictOfInterest && (
                       <div className="nrm-form-error">
                         {errors.conflictOfInterest}

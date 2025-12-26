@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+
+
+import { useState, useEffect, useRef } from "react";
 import { Spinner, CloseButton } from "react-bootstrap";
 import departmentService from "../../../../services/auth/departmentService";
 import userService from "../../../../services/auth/userService";
@@ -63,6 +65,195 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
     }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
+
+  // ========================
+  // CUSTOM DROPDOWN COMPONENT
+  // ========================
+
+  const CustomDropdown = ({
+    options,
+    value,
+    onChange,
+    placeholder,
+    error,
+    name,
+    disabled,
+  }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef(null);
+
+    const toggleDropdown = () => {
+      if (!disabled) {
+        setIsOpen(!isOpen);
+      }
+    };
+
+    const handleSelect = (selectedValue) => {
+      onChange({ target: { name, value: selectedValue } });
+      setIsOpen(false);
+    };
+
+    useEffect(() => {
+      const handleClickOutside = (event) => {
+        if (
+          dropdownRef.current &&
+          !dropdownRef.current.contains(event.target)
+        ) {
+          setIsOpen(false);
+        }
+      };
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const selectedOption = options.find((opt) => opt.value === value);
+
+    return (
+      <div
+        ref={dropdownRef}
+        style={{
+          position: "relative",
+          width: "100%",
+          userSelect: "none",
+          zIndex: isOpen ? 1000 : 10,
+        }}
+        className={`adm-custom-dropdown ${isOpen ? "active" : ""} ${
+          error ? "error" : ""
+        } ${disabled ? "disabled" : ""}`}
+      >
+        <div
+          style={{
+            padding: "8px 2rem 8px 10px",
+            display: "flex",
+            alignItems: "center",
+            position: "relative",
+            fontSize: "13px",
+            border: `1px solid ${
+              error ? "#dc3545" : isOpen ? "#27235c" : "#cbd5e1"
+            }`,
+            borderRadius: "6px",
+            backgroundColor: "#ffffff",
+            cursor: disabled ? "not-allowed" : "pointer",
+            minHeight: "37px",
+            color: "#334155",
+            opacity: disabled ? 0.6 : 1,
+            transition: "all 0.2s ease",
+          }}
+          className="adm-custom-dropdown-selected"
+          onClick={toggleDropdown}
+          tabIndex={disabled ? -1 : 0}
+        >
+          <span
+            style={{
+              flex: 1,
+              color: selectedOption ? "#334155" : "#9ca3af",
+              textAlign: "left",
+              fontWeight: 400,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+            className={`adm-custom-dropdown-text ${
+              !selectedOption ? "placeholder" : ""
+            }`}
+          >
+            {selectedOption ? selectedOption.label : placeholder}
+          </span>
+          <span
+            style={{
+              position: "absolute",
+              right: "0.75rem",
+              top: "50%",
+              transform: isOpen
+                ? "translateY(-25%) rotate(-135deg)"
+                : "translateY(-50%) rotate(45deg)",
+              width: "7px",
+              height: "7px",
+              borderRight: "2px solid #64748b",
+              borderBottom: "2px solid #64748b",
+              pointerEvents: "none",
+              transition: "transform 0.2s ease",
+            }}
+            className={`adm-custom-dropdown-arrow ${isOpen ? "open" : ""}`}
+          ></span>
+        </div>
+
+        {isOpen && (
+          <div
+            style={{
+              position: "absolute",
+              top: "calc(100% + 4px)",
+              left: 0,
+              right: 0,
+              background: "#ffffff",
+              border: "1px solid #cbd5e1",
+              borderRadius: "6px",
+              boxShadow: "0 8px 20px rgba(0, 0, 0, 0.25)",
+              zIndex: 10000,
+              maxHeight: "220px",
+              overflowY: "auto",
+            }}
+            className="adm-custom-dropdown-menu"
+          >
+            {options.map((option) => (
+              <div
+                key={option.value}
+                style={{
+                  padding: "9px 12px",
+                  fontSize: "13px",
+                  color: "#334155",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  backgroundColor: "#ffffff",
+                  transition: "all 0.15s ease",
+                  borderBottom: "1px solid #f1f5f9",
+                }}
+                className={`adm-custom-dropdown-option ${
+                  value === option.value ? "selected" : ""
+                }`}
+                onClick={() => handleSelect(option.value)}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = "#27235c";
+                  e.target.style.color = "#ffffff";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = "#ffffff";
+                  e.target.style.color = "#334155";
+                }}
+              >
+                {option.label}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // ========================
+  // DROPDOWN OPTIONS
+  // ========================
+
+  const statusOptions = [
+    { value: "Active", label: "Active" },
+    { value: "Inactive", label: "Inactive" },
+  ];
+
+  const parentDepartmentOptions = [
+    { value: "", label: "-- None (Root Department) --" },
+    ...departments.map((dept) => ({
+      value: dept.departmentId.toString(),
+      label: `${dept.departmentName} (${dept.departmentCode})`,
+    })),
+  ];
+
+  const hodOptions = [
+    { value: "", label: "-- Select HOD --" },
+    ...departmentHeads.map((emp) => ({
+      value: emp.employeeId.toString(),
+      label: `${emp.firstName} ${emp.lastName} (${emp.employeeCompanyId})`,
+    })),
+  ];
 
   const validateForm = () => {
     const newErrors = {};
@@ -231,70 +422,52 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
                     />
                   </div>
 
-                  {/* Row 3: Status & Parent Department */}
+                  {/* Row 3: Status & Parent Department - CUSTOM DROPDOWNS */}
                   <div className="adm-form-row">
-                    {/* Status */}
+                    {/* Status - CUSTOM DROPDOWN */}
                     <div className="adm-form-group">
                       <label className="adm-form-label">
                         Status <span className="adm-required-asterisk">*</span>
                       </label>
-                      <select
+                      <CustomDropdown
                         name="status"
+                        options={statusOptions}
                         value={formData.status}
                         onChange={handleChange}
+                        placeholder="Select Status"
                         disabled={loading}
-                        className="adm-form-input"
-                      >
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                      </select>
+                      />
                     </div>
 
-                    {/* Parent Department */}
+                    {/* Parent Department - CUSTOM DROPDOWN */}
                     <div className="adm-form-group">
                       <label className="adm-form-label">
                         Parent Department
                       </label>
-                      <select
+                      <CustomDropdown
                         name="parentDepartmentId"
+                        options={parentDepartmentOptions}
                         value={formData.parentDepartmentId || ""}
                         onChange={handleChange}
+                        placeholder="-- None (Root Department) --"
                         disabled={loading}
-                        className="adm-form-input"
-                      >
-                        <option value="">-- None (Root Department) --</option>
-                        {departments.map((dept) => (
-                          <option
-                            key={dept.departmentId}
-                            value={dept.departmentId}
-                          >
-                            {dept.departmentName} ({dept.departmentCode})
-                          </option>
-                        ))}
-                      </select>
+                      />
                     </div>
                   </div>
 
-                  {/* Row 4: HOD (Department Heads Only - Frontend Filtered) */}
+                  {/* Row 4: HOD - CUSTOM DROPDOWN */}
                   <div className="adm-form-row-full">
                     <label className="adm-form-label">
                       Head of Department (HOD)
                     </label>
-                    <select
+                    <CustomDropdown
                       name="hodEmployeeId"
+                      options={hodOptions}
                       value={formData.hodEmployeeId || ""}
                       onChange={handleChange}
+                      placeholder="-- Select HOD --"
                       disabled={loading}
-                      className="adm-form-input"
-                    >
-                      <option value="">-- Select HOD --</option>
-                      {departmentHeads.map((emp) => (
-                        <option key={emp.employeeId} value={emp.employeeId}>
-                          {emp.firstName} {emp.lastName} (
-                          {emp.employeeCompanyId})
-                        </option>
-                      ))}
-                    </select>
+                    />
                     {departmentHeads.length === 0 && !loadingDropdowns && (
                       <div className="adm-info-message">
                         <i className="bi bi-info-circle"></i> No employees with

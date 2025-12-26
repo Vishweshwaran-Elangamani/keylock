@@ -1,8 +1,70 @@
-import React, { useState, useEffect } from "react";
+
+import React, { useState, useEffect, useRef } from "react";
 import nominationService from "../../services/internal/nominationService";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
 import "../../styles/internal/NominationHistory.css";
+
+// Custom Dropdown Component
+const CustomDropdown = ({ value, onChange, options, placeholder, name }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const selectedOption = options.find((opt) => opt.value === value);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+
+  const handleSelect = (optionValue) => {
+    onChange({ target: { name, value: optionValue } });
+    setIsOpen(false);
+  };
+
+  return (
+    <div ref={dropdownRef} className="nha-custom-dropdown">
+      <div
+        className="nha-custom-dropdown-selected"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span className="nha-custom-dropdown-text">
+          {selectedOption ? selectedOption.label : placeholder}
+        </span>
+        <span className={`nha-custom-dropdown-arrow ${isOpen ? "open" : ""}`}>
+          <i className="bi bi-chevron-down"></i>
+        </span>
+      </div>
+
+      {isOpen && (
+        <div className="nha-custom-dropdown-menu">
+          {options.map((option) => (
+            <div
+              key={option.value}
+              className={`nha-custom-dropdown-option ${
+                value === option.value ? "selected" : ""
+              }`}
+              onClick={() => handleSelect(option.value)}
+            >
+              {option.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const NominationHistory = () => {
   const [historyData, setHistoryData] = useState(null);
@@ -143,6 +205,22 @@ const NominationHistory = () => {
     return pages;
   };
 
+  // Status filter options
+  const statusOptions = [
+    { label: "All Status", value: "" },
+    { label: "Approved", value: "Approved" },
+    { label: "Rejected", value: "Rejected" },
+    { label: "Withdrawn", value: "Withdrawn" },
+  ];
+
+  // Rows per page options
+  const rowsPerPageOptions = [
+    { label: "5", value: "5" },
+    { label: "10", value: "10" },
+    { label: "25", value: "25" },
+    { label: "50", value: "50" },
+  ];
+
   if (loading) {
     return (
       <div className="nha-loading-container">
@@ -267,16 +345,13 @@ const NominationHistory = () => {
             />
           </div>
 
-          <select
-            className="nha-filter-select"
+          <CustomDropdown
+            name="statusFilter"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            <option value="">All Status</option>
-            <option value="Approved">Approved</option>
-            <option value="Rejected">Rejected</option>
-            <option value="Withdrawn">Withdrawn</option>
-          </select>
+            options={statusOptions}
+            placeholder="All Status"
+          />
 
           <button className="btn-clear-nha" onClick={clearFilters}>
             Clear Filters
@@ -440,19 +515,16 @@ const NominationHistory = () => {
           <div className="pagination-container">
             <div className="pagination-info">
               <span className="pagination-label">Show</span>
-              <select
-                className="pagination-select"
-                value={rowsPerPage}
+              <CustomDropdown
+                name="rowsPerPage"
+                value={rowsPerPage.toString()}
                 onChange={(e) => {
                   setRowsPerPage(Number(e.target.value));
                   setCurrentPage(1);
                 }}
-              >
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-              </select>
+                options={rowsPerPageOptions}
+                placeholder="5"
+              />
               <span className="pagination-label">entries</span>
             </div>
 

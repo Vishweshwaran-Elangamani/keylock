@@ -18,7 +18,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   width: 95%;
-  max-width: 550px;
+  max-width: 650px;
   max-height: 90vh;
   overflow-y: auto;
   z-index: 1050;
@@ -29,7 +29,7 @@
   border-radius: 0.5rem;
   background: #fff;
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   flex-direction: column;
 }
@@ -59,8 +59,9 @@
 
 /* ==================== BODY ==================== */
 .adm-modal-body {
-  padding: 16px 15px;
+  padding: 20px 18px;
   background: #fff;
+  overflow: visible;
 }
 
 .adm-form {
@@ -70,7 +71,7 @@
 /* ==================== LOADING STATE ==================== */
 .adm-loading-container {
   text-align: center;
-  padding: 20px;
+  padding: 30px 20px;
 }
 
 .adm-loading-text {
@@ -83,33 +84,33 @@
 .adm-form-content {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 18px;
 }
 
 .adm-form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 16px;
 }
 
 .adm-form-row-full {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 5px;
 }
 
 /* ==================== FORM GROUPS ==================== */
 .adm-form-group {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 5px;
 }
 
 .adm-form-label {
   font-weight: 600;
   font-size: 13px;
-  color: #334155;
-  margin-bottom: 3px;
+  color: #64748b;
+  margin-bottom: 4px;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -124,10 +125,15 @@
 .adm-form-input {
   border: 1px solid #cbd5e1;
   border-radius: 6px;
-  padding: 8px 10px;
+  padding: 10px 12px;
   font-size: 13px;
   background: #fff;
-  color: #22223b;
+  color: #334155;
+  min-height: 42px;
+}
+
+.adm-form-input::placeholder {
+  color: #9ca3af;
 }
 
 .adm-form-input:focus {
@@ -151,30 +157,189 @@
 
 .adm-form-textarea {
   resize: vertical;
-  min-height: 60px;
+  min-height: 70px;
 }
 
 .adm-form-error {
   color: #dc3545;
   font-size: 11px;
-  margin-top: 2px;
+  margin-top: 4px;
+}
+
+/* ==================== CUSTOM DROPDOWN ==================== */
+.adm-custom-dropdown {
+  position: relative;
+  width: 100%;
+  user-select: none;
+  z-index: 10;
+}
+
+.adm-custom-dropdown-selected {
+  padding: 10px 2.5rem 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  font-size: 13px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background-color: #ffffff !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 42px;
+  color: #334155;
+}
+
+.adm-custom-dropdown-selected:hover {
+  border-color: #94a3b8;
+}
+
+.adm-custom-dropdown.disabled .adm-custom-dropdown-selected {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.adm-custom-dropdown.error .adm-custom-dropdown-selected {
+  border-color: #dc3545 !important;
+}
+
+.adm-custom-dropdown-selected:focus,
+.adm-custom-dropdown.active .adm-custom-dropdown-selected {
+  border-color: #27235c;
+  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+  outline: none;
+}
+
+.adm-custom-dropdown.error .adm-custom-dropdown-selected:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+.adm-custom-dropdown-text {
+  flex: 1;
+  color: #334155;
+  text-align: left;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.adm-custom-dropdown-text.placeholder {
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+.adm-custom-dropdown-arrow {
+  position: absolute;
+  right: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid #64748b;
+  border-bottom: 2px solid #64748b;
+  pointer-events: none;
+  transition: transform 0.2s ease;
+}
+
+.adm-custom-dropdown-arrow.open {
+  transform: translateY(-25%) rotate(-135deg);
+}
+
+.adm-custom-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  z-index: 10000;
+  max-height: 220px;
+  overflow-y: auto;
+  animation: adm-dropdown-fade-in 0.15s ease-out;
+}
+
+@keyframes adm-dropdown-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.adm-custom-dropdown-option {
+  padding: 10px 12px;
+  font-size: 13px;
+  color: #334155 !important;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.adm-custom-dropdown-option:last-child {
+  border-bottom: none;
+}
+
+.adm-custom-dropdown-option:hover {
+  background-color: #27235c !important;
+  color: #ffffff !important;
+}
+
+.adm-custom-dropdown-option.selected {
+  background-color: #ffffff !important;
+  font-weight: 600;
+  color: #334155 !important;
+}
+
+.adm-custom-dropdown-option.selected:hover {
+  background-color: #27235c !important;
+  color: #ffffff !important;
+}
+
+.adm-custom-dropdown-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.adm-custom-dropdown-menu::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 6px;
+}
+
+.adm-custom-dropdown-menu::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 6px;
+}
+
+.adm-custom-dropdown-menu::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 /* ==================== INFO MESSAGE ==================== */
 .adm-info-message {
   font-size: 11px;
   color: #f59e0b;
-  margin-top: 2px;
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 /* ==================== FOOTER ==================== */
 .adm-modal-footer {
-  padding: 10px 15px;
+  padding: 14px 18px;
   border-top: 1px solid #e2e8f0;
   background: #fff;
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 10px;
 }
 
 /* ==================== BUTTONS ==================== */
@@ -183,7 +348,7 @@
   border: none;
   color: #fff;
   font-weight: 600;
-  padding: 7px 12px;
+  padding: 9px 16px;
   font-size: 12px;
   border-radius: 5px;
   cursor: pointer;
@@ -207,7 +372,7 @@
   border: none;
   color: #fff;
   font-weight: 600;
-  padding: 7px 12px;
+  padding: 9px 16px;
   font-size: 12px;
   border-radius: 5px;
   box-shadow: 0 2px 8px rgba(151, 36, 126, 0.25);
@@ -225,4 +390,16 @@
 .adm-btn-submit:disabled {
   cursor: not-allowed;
   opacity: 0.7;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+  .adm-modal-container {
+    width: 95%;
+    max-width: 100%;
+  }
+
+  .adm-form-row {
+    grid-template-columns: 1fr;
+  }
 }

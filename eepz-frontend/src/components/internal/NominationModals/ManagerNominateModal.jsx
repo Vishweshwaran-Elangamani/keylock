@@ -1,8 +1,83 @@
-import { useState, useEffect } from "react";
+
+
+
+import { useState, useEffect, useRef, useMemo } from "react";
 import nominationService from "../../../services/internal/nominationService";
 import userService from "../../../services/auth/userService";
 import { toast } from "sonner";
 import "../../../styles/internal/ManagerNominateModal.css";
+
+// Custom Dropdown Component
+const CustomDropdown = ({ value, onChange, options, placeholder, name, error, disabled }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const selectedOption = options.find((opt) => opt.value === value);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+
+  const handleSelect = (optionValue) => {
+    if (!disabled) {
+      onChange({ target: { name, value: optionValue } });
+      setIsOpen(false);
+    }
+  };
+
+  const handleToggle = () => {
+    if (!disabled) {
+      setIsOpen(!isOpen);
+    }
+  };
+
+  return (
+    <div
+      ref={dropdownRef}
+      className={`mgnm-custom-dropdown ${error ? "error" : ""} ${disabled ? "disabled" : ""}`}
+    >
+      <div
+        className="mgnm-custom-dropdown-selected"
+        onClick={handleToggle}
+      >
+        <span className="mgnm-custom-dropdown-text">
+          {selectedOption ? selectedOption.label : placeholder}
+        </span>
+        <span className={`mgnm-custom-dropdown-arrow ${isOpen ? "open" : ""}`}>
+          <i className="bi bi-chevron-down"></i>
+        </span>
+      </div>
+
+      {isOpen && !disabled && (
+        <div className="mgnm-custom-dropdown-menu">
+          {options.map((option) => (
+            <div
+              key={option.value}
+              className={`mgnm-custom-dropdown-option ${
+                value === option.value ? "selected" : ""
+              }`}
+              onClick={() => handleSelect(option.value)}
+            >
+              {option.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const ManagerNominateModal = ({
   show,
@@ -60,6 +135,14 @@ const ManagerNominateModal = ({
       setLoadingEmployees(false);
     }
   };
+
+  // Prepare employee options for dropdown
+  const employeeOptions = useMemo(() => {
+    return employees.map((emp) => ({
+      label: `${emp.firstName} ${emp.lastName}`,
+      value: emp.userId.toString(),
+    }));
+  }, [employees]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -171,32 +254,25 @@ const ManagerNominateModal = ({
                 </p>
               </div>
 
-              {/* Select Team Member */}
+              {/* Select Team Member - Custom Dropdown */}
               <div className="mgnm-form-group">
                 <label className="mgnm-form-label">
                   Select Team Member{" "}
                   <span className="mgnm-required-asterisk">*</span>
                 </label>
-                <select
+                <CustomDropdown
                   name="employeeId"
                   value={formData.employeeId}
                   onChange={handleChange}
-                  disabled={loadingEmployees}
-                  className={`mgnm-form-select ${
-                    errors.employeeId ? "error" : ""
-                  }`}
-                >
-                  <option value="" disabled>
-                    {loadingEmployees
+                  options={employeeOptions}
+                  placeholder={
+                    loadingEmployees
                       ? "Loading team members..."
-                      : "-- Choose a team member --"}
-                  </option>
-                  {employees.map((emp) => (
-                    <option key={emp.userId} value={emp.userId}>
-                      {emp.firstName} {emp.lastName}
-                    </option>
-                  ))}
-                </select>
+                      : "-- Choose a team member --"
+                  }
+                  disabled={loadingEmployees}
+                  error={errors.employeeId}
+                />
                 {errors.employeeId && (
                   <div className="mgnm-form-error">{errors.employeeId}</div>
                 )}

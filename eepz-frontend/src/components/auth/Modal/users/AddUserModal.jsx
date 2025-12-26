@@ -1,7 +1,72 @@
-import { useState, useEffect } from "react";
+
+
+
+import { useState, useEffect, useRef } from "react";
 import userService from "../../../../services/auth/userService";
 import { toast } from "sonner";
 import "../../../../styles/auth/user/AddUserModal.css";
+
+// Custom Dropdown Component
+const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const selectedOption = options.find((opt) => opt.value === value);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+
+  const handleSelect = (optionValue) => {
+    onChange({ target: { name, value: optionValue } });
+    setIsOpen(false);
+  };
+
+  return (
+    <div
+      ref={dropdownRef}
+      className={`aum-custom-dropdown ${error ? "error" : ""}`}
+    >
+      <div
+        className="aum-custom-dropdown-selected"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span className={`aum-custom-dropdown-text ${!selectedOption ? "placeholder" : ""}`}>
+          {selectedOption ? selectedOption.label : placeholder}
+        </span>
+        <span className={`aum-custom-dropdown-arrow ${isOpen ? "open" : ""}`} />
+      </div>
+
+      {isOpen && (
+        <div className="aum-custom-dropdown-menu">
+          {options.map((option) => (
+            <div
+              key={option.value}
+              className={`aum-custom-dropdown-option ${
+                value === option.value ? "selected" : ""
+              }`}
+              onClick={() => handleSelect(option.value)}
+            >
+              {option.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
   const [formData, setFormData] = useState({
@@ -21,6 +86,38 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
+  // Dropdown options
+  const genderOptions = [
+    { label: "Select Gender", value: "" },
+    { label: "Male", value: "Male" },
+    { label: "Female", value: "Female" },
+    { label: "Prefer not to say", value: "PreferNotToSay" },
+  ];
+
+  const employmentTypeOptions = [
+    { label: "Select Employment Type", value: "" },
+    { label: "Permanent", value: "Permanent" },
+    { label: "Contract", value: "Contract" },
+    { label: "Temporary", value: "Temporary" },
+    { label: "Intern", value: "Intern" },
+    { label: "Probation", value: "Probation" },
+  ];
+
+  const roleOptions = [
+    { label: "Select Role", value: "" },
+    ...roles
+      .filter((role) => role.roleName !== "Admin")
+      .map((role) => ({ label: role.roleName, value: role.roleId.toString() })),
+  ];
+
+  const departmentOptions = [
+    { label: "Select Department", value: "" },
+    ...departments.map((dept) => ({
+      label: dept.departmentName,
+      value: dept.departmentId.toString(),
+    })),
+  ];
 
   useEffect(() => {
     const fetchNextEmployeeId = async () => {
@@ -57,7 +154,6 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
   const validateForm = () => {
     const newErrors = {};
 
-    // First Name validation
     if (!formData.firstName.trim())
       newErrors.firstName = "First name is required";
     else if (formData.firstName.trim().length < 2)
@@ -65,14 +161,12 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
     else if (!/^[a-zA-Z\s]+$/.test(formData.firstName.trim()))
       newErrors.firstName = "First name must contain only letters";
 
-    // Last Name validation
     if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
     else if (formData.lastName.trim().length < 2)
       newErrors.lastName = "Last name must be at least 2 characters";
     else if (!/^[a-zA-Z\s]+$/.test(formData.lastName.trim()))
       newErrors.lastName = "Last name must contain only letters";
 
-    // Employee Company ID validation
     if (!formData.employeeCompanyId.trim())
       newErrors.employeeCompanyId = "Employee Company ID is required";
     else if (!/^\d+$/.test(formData.employeeCompanyId.trim()))
@@ -88,12 +182,10 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
           "Employee Company ID must be less than 1000000";
     }
 
-    // Email validation
     if (!formData.email.trim()) newErrors.email = "Email is required";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim()))
       newErrors.email = "Please enter a valid email address";
 
-    // Mobile Number validation - NOW REQUIRED
     if (!formData.mobileNumber.trim()) {
       newErrors.mobileNumber = "Mobile number is required";
     } else if (!/^[6-9][0-9]{9}$/.test(formData.mobileNumber.trim())) {
@@ -101,7 +193,6 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
         "Phone number must start with 6-9 and be exactly 10 digits";
     }
 
-    // Date of Birth validation - NOW REQUIRED
     if (!formData.dateOfBirthOfficial) {
       newErrors.dateOfBirthOfficial = "Date of birth is required";
     } else {
@@ -116,17 +207,13 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
         newErrors.dateOfBirthOfficial = "Please enter a valid date of birth";
     }
 
-    // Gender validation - NOW REQUIRED
     if (!formData.gender) newErrors.gender = "Gender is required";
 
-    // Employment Type validation - NOW REQUIRED
     if (!formData.employmentType)
       newErrors.employmentType = "Employment type is required";
 
-    // Role validation
     if (!formData.roleId) newErrors.roleId = "Role is required";
 
-    // Department validation
     if (!formData.departmentId)
       newErrors.departmentId = "Department is required";
 
@@ -321,7 +408,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                   )}
                 </div>
 
-                {/* Mobile Number - NOW REQUIRED */}
+                {/* Mobile Number */}
                 <div className="aum-form-group">
                   <label className="aum-form-label">
                     Mobile <span className="aum-required-asterisk">*</span>
@@ -348,7 +435,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                   </small>
                 </div>
 
-                {/* Date of Birth - NOW REQUIRED */}
+                {/* Date of Birth */}
                 <div className="aum-form-group">
                   <label className="aum-form-label">
                     Date of Birth{" "}
@@ -372,52 +459,38 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                   <small className="aum-form-hint">Must be 18+ years old</small>
                 </div>
 
-                {/* Gender - NOW REQUIRED */}
+                {/* Gender - Custom Dropdown */}
                 <div className="aum-form-group">
                   <label className="aum-form-label">
                     Gender <span className="aum-required-asterisk">*</span>
                   </label>
-                  <select
+                  <CustomDropdown
                     name="gender"
                     value={formData.gender}
                     onChange={handleChange}
-                    className={`aum-form-input ${errors.gender ? "error" : ""}`}
-                  >
-                    <option value="" disabled>
-                      Select Gender
-                    </option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="PreferNotToSay">Prefer not to say</option>
-                  </select>
+                    options={genderOptions}
+                    placeholder="Select Gender"
+                    error={errors.gender}
+                  />
                   {errors.gender && (
                     <div className="aum-form-error">{errors.gender}</div>
                   )}
                 </div>
 
-                {/* Employment Type - NOW REQUIRED */}
+                {/* Employment Type - Custom Dropdown */}
                 <div className="aum-form-group">
                   <label className="aum-form-label">
                     Employment Type{" "}
                     <span className="aum-required-asterisk">*</span>
                   </label>
-                  <select
+                  <CustomDropdown
                     name="employmentType"
                     value={formData.employmentType}
                     onChange={handleChange}
-                    className={`aum-form-input ${
-                      errors.employmentType ? "error" : ""
-                    }`}
-                  >
-                    <option value="" disabled>
-                      Select Employment Type
-                    </option>
-                    <option value="Permanent">Permanent</option>
-                    <option value="Contract">Contract</option>
-                    <option value="Temporary">Temporary</option>
-                    <option value="Intern">Intern</option>
-                    <option value="Probation">Probation</option>
-                  </select>
+                    options={employmentTypeOptions}
+                    placeholder="Select Employment Type"
+                    error={errors.employmentType}
+                  />
                   {errors.employmentType && (
                     <div className="aum-form-error">
                       {errors.employmentType}
@@ -425,55 +498,37 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                   )}
                 </div>
 
-                {/* Role - ADMIN ROLE EXCLUDED */}
+                {/* Role - Custom Dropdown */}
                 <div className="aum-form-group">
                   <label className="aum-form-label">
                     Role <span className="aum-required-asterisk">*</span>
                   </label>
-                  <select
+                  <CustomDropdown
                     name="roleId"
                     value={formData.roleId}
                     onChange={handleChange}
-                    className={`aum-form-input ${errors.roleId ? "error" : ""}`}
-                  >
-                    <option value="" disabled>
-                      Select Role
-                    </option>
-                    {roles
-                      .filter((role) => role.roleName !== "Admin")
-                      .map((role) => (
-                        <option key={role.roleId} value={role.roleId}>
-                          {role.roleName}
-                        </option>
-                      ))}
-                  </select>
+                    options={roleOptions}
+                    placeholder="Select Role"
+                    error={errors.roleId}
+                  />
                   {errors.roleId && (
                     <div className="aum-form-error">{errors.roleId}</div>
                   )}
                 </div>
 
-                {/* Department */}
+                {/* Department - Custom Dropdown */}
                 <div className="aum-form-group">
                   <label className="aum-form-label">
                     Department <span className="aum-required-asterisk">*</span>
                   </label>
-                  <select
+                  <CustomDropdown
                     name="departmentId"
                     value={formData.departmentId}
                     onChange={handleChange}
-                    className={`aum-form-input ${
-                      errors.departmentId ? "error" : ""
-                    }`}
-                  >
-                    <option value="" disabled>
-                      Select Department
-                    </option>
-                    {departments.map((dept) => (
-                      <option key={dept.departmentId} value={dept.departmentId}>
-                        {dept.departmentName}
-                      </option>
-                    ))}
-                  </select>
+                    options={departmentOptions}
+                    placeholder="Select Department"
+                    error={errors.departmentId}
+                  />
                   {errors.departmentId && (
                     <div className="aum-form-error">{errors.departmentId}</div>
                   )}

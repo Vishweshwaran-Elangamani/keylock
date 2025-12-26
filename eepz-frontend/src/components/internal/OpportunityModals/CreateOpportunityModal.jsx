@@ -1,8 +1,73 @@
-import { useState, useMemo } from "react";
+
+import { useState, useMemo, useRef, useEffect } from "react";
 import { CloseButton } from "react-bootstrap";
 import internalOpportunityService from "../../../services/internal/internalOpportunityService";
 import { toast } from "sonner";
 import "../../../styles/internal/CreateOpportunityModal.css";
+
+// Custom Dropdown Component
+const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const selectedOption = options.find((opt) => opt.value === value);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+
+  const handleSelect = (optionValue) => {
+    onChange({ target: { name, value: optionValue } });
+    setIsOpen(false);
+  };
+
+  return (
+    <div
+      ref={dropdownRef}
+      className={`com-custom-dropdown ${error ? "error" : ""}`}
+    >
+      <div
+        className="com-custom-dropdown-selected"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span className="com-custom-dropdown-text">
+          {selectedOption ? selectedOption.label : placeholder}
+        </span>
+        <span className={`com-custom-dropdown-arrow ${isOpen ? "open" : ""}`}>
+          <i className="bi bi-chevron-down"></i>
+        </span>
+      </div>
+
+      {isOpen && (
+        <div className="com-custom-dropdown-menu">
+          {options.map((option) => (
+            <div
+              key={option.value}
+              className={`com-custom-dropdown-option ${
+                value === option.value ? "selected" : ""
+              }`}
+              onClick={() => handleSelect(option.value)}
+            >
+              {option.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const CreateOpportunityModal = ({
   show,
@@ -31,6 +96,21 @@ const CreateOpportunityModal = ({
     const max = `${aprilDeadlineYear}-04-30`;
     return { minDate: min, maxDate: max };
   }, []);
+
+  // Prepare department options
+  const departmentOptions = useMemo(() => {
+    return departments.map((dept) => ({
+      label: dept.departmentName,
+      value: dept.departmentId.toString(),
+    }));
+  }, [departments]);
+
+  // Status options
+  const statusOptions = [
+    { label: "Active", value: "Active" },
+    { label: "Pending", value: "Pending" },
+    { label: "Closed", value: "Closed" },
+  ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -201,26 +281,19 @@ const CreateOpportunityModal = ({
 
               {/* Department and Deadline Row */}
               <div className="com-two-column-grid">
-                {/* Department */}
+                {/* Department - Custom Dropdown */}
                 <div className="com-form-group">
                   <label className="com-form-label">
                     Department <span className="com-required-asterisk">*</span>
                   </label>
-                  <select
+                  <CustomDropdown
                     name="departmentId"
                     value={formData.departmentId}
                     onChange={handleChange}
-                    className={`com-form-select ${
-                      errors.departmentId ? "error" : ""
-                    }`}
-                  >
-                    <option value="">Select Department</option>
-                    {departments.map((dept) => (
-                      <option key={dept.departmentId} value={dept.departmentId}>
-                        {dept.departmentName}
-                      </option>
-                    ))}
-                  </select>
+                    options={departmentOptions}
+                    placeholder="Select Department"
+                    error={errors.departmentId}
+                  />
                   {errors.departmentId && (
                     <div className="com-form-error">{errors.departmentId}</div>
                   )}
@@ -312,21 +385,19 @@ const CreateOpportunityModal = ({
 
               {/* Status and Info Row */}
               <div className="com-status-row">
-                {/* Status - Left Side */}
+                {/* Status - Custom Dropdown */}
                 <div className="com-form-group">
                   <label className="com-form-label">
                     Status <span className="com-required-asterisk">*</span>
                   </label>
-                  <select
+                  <CustomDropdown
                     name="status"
                     value={formData.status}
                     onChange={handleChange}
-                    className="com-form-select"
-                  >
-                    <option value="Active">Active</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Closed">Closed</option>
-                  </select>
+                    options={statusOptions}
+                    placeholder="Select Status"
+                    error={errors.status}
+                  />
                 </div>
 
                 {/* Info Alert - Right Side */}
