@@ -228,14 +228,15 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
 
               {/* Notes */}
               <div className="afpm-form-group">
-                <label className="afpm-form-label-block">Notes</label>
-                <textarea
+                <label className="afpm-form-label-block">Allocation Name<span className="afpm-required-asterisk">*</span></label>
+                <input 
+                type="text"
                   name="notes"
                   value={formData.notes}
                   onChange={handleChange}
-                  placeholder="Add notes about this sub-allocation (optional)"
-                  rows={3}
-                  className="afpm-form-input afpm-form-textarea"
+                  placeholder="Enter Allocation Name" 
+                  className="afpm-form-input"                 
+                  required
                 />
               </div>
 
