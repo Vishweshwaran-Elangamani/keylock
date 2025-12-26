@@ -1,0 +1,457 @@
+.managermom-page {
+  background-color: #f5f7fb;
+  min-height: 100vh;
+}
+
+.managermom-container {
+  padding: 16px 24px 24px;
+}
+
+/* loading */
+
+.managermom-loading {
+  min-height: 100vh;
+  background-color: #f5f7fb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.managermom-loading-spinner {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* top stat cards – same size as HR cards */
+
+.managermom-stat-card {
+  border-radius: 12px;
+  border: 2px solid #1b2344;
+  background-color: #ffffff;
+  height: 100px;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  padding: 0;
+  box-shadow: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease,
+    transform 0.2s ease;
+  cursor: pointer;
+}
+
+.managermom-stat-card:hover {
+  border-color: #0f62fe;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
+  transform: translateY(-2px);
+}
+
+.managermom-stat-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 22px;
+}
+
+.managermom-stat-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.managermom-stat-icon-pending {
+  background-color: #fef3c7;
+}
+
+.managermom-stat-icon-submitted {
+  background-color: #d1fae5;
+}
+
+.managermom-stat-icon-reviews {
+  background-color: #dbeafe;
+}
+
+.managermom-stat-icon-peer {
+  background-color: #f3e8ff;
+}
+
+.managermom-stat-icon-glyph {
+  font-size: 22px;
+}
+
+.managermom-stat-icon-pending .managermom-stat-icon-glyph {
+  color: #d97706;
+}
+
+.managermom-stat-icon-submitted .managermom-stat-icon-glyph {
+  color: #059669;
+}
+
+.managermom-stat-icon-reviews .managermom-stat-icon-glyph {
+  color: #2563eb;
+}
+
+.managermom-stat-icon-peer .managermom-stat-icon-glyph {
+  color: #9333ea;
+}
+
+.managermom-stat-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.managermom-stat-count {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.managermom-stat-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+/* toolbar */
+
+.managermom-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* toggle buttons styled like reference */
+
+.managermom-toggle-btn {
+  font-weight: 500;
+  font-size: 0.875rem;
+  border-radius: 999px;
+  border: 1px solid #2563eb;
+  color: #2563eb;
+  background-color: #ffffff;
+  padding: 6px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.15s ease, color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.managermom-toggle-btn i {
+  font-size: 0.95rem;
+}
+
+.managermom-toggle-active {
+  background: linear-gradient(90deg, #3b3b82 0%, #4b4fb0 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(59, 59, 130, 0.35);
+  border-color: transparent;
+}
+
+.managermom-toolbar .btn-group .managermom-toggle-btn:first-child {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+.managermom-toolbar .btn-group .managermom-toggle-btn:last-child {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.managermom-toolbar-right {
+  display: flex;
+  gap: 8px;
+}
+
+.managermom-schedule-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 500;
+  font-size: 0.875rem;
+  background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
+  color: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.managermom-schedule-btn i {
+  font-size: 1rem;
+}
+
+.managermom-schedule-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(151, 36, 126, 0.3);
+}
+
+/* upcoming card */
+
+.managermom-upcoming-card {
+  border-radius: 12px;
+  border: 1px solid #27235c;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+}
+
+.managermom-upcoming-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.managermom-upcoming-title {
+  margin: 0;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.managermom-upcoming-count {
+  background-color: #3b3b82;
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+}
+
+/* table shell */
+
+.managermom-table-shell {
+  border: 2px solid #27235c;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.managermom-table {
+  margin-bottom: 0;
+}
+
+.managermom-table thead tr {
+  background-color: #27235c;
+}
+
+.managermom-table thead th {
+  color: #ffffff;
+  padding: 16px 12px;
+  background-color: #27235c;
+  border-bottom: none;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.managermom-table tbody td {
+  padding: 12px;
+}
+
+.managermom-table-row {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.managermom-table-row:hover {
+  background-color: #f8f9fa;
+}
+
+/* meeting title cell */
+
+.managermom-meeting-title-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.managermom-meeting-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background-color: #e3f2fd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.managermom-meeting-avatar-icon {
+  color: #1976d2;
+}
+
+/* type badge */
+
+.managermom-type-badge {
+  background-color: #f9fafb;
+  color: #111827;
+  border: 1px solid #e5e7eb;
+  font-size: 0.75rem;
+}
+
+/* attendance */
+
+.managermom-attendance {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.managermom-progress {
+  width: 60px;
+  height: 6px;
+}
+
+/* table view empty */
+
+.managermom-empty-cell {
+  text-align: center;
+  padding: 40px 16px;
+  color: #6b7280;
+}
+
+.managermom-empty-icon {
+  font-size: 2rem;
+}
+
+.managermom-empty-text {
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
+/* table view action button */
+
+.managermom-view-btn {
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+}
+
+/* card view */
+
+.managermom-empty-card-wrapper {
+  text-align: center;
+  padding: 40px 16px;
+  color: #6b7280;
+}
+
+.managermom-meeting-card {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 12px;
+  border: 1px solid #27235c;
+}
+
+.managermom-meeting-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
+}
+
+.managermom-meeting-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.managermom-card-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  background-color: #e3f2fd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.managermom-card-avatar-icon {
+  font-size: 1.15rem;
+  color: #1976d2;
+}
+
+.managermom-meeting-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.managermom-card-progress {
+  width: 80px;
+  height: 8px;
+}
+
+/* responsive */
+
+@media (max-width: 992px) {
+  .managermom-container {
+    padding: 14px 16px 20px;
+  }
+
+  .managermom-table-wrapper {
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .managermom-container {
+    padding: 12px 12px 18px;
+  }
+
+  .managermom-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .managermom-table thead th,
+  .managermom-table tbody td {
+    padding: 10px 12px;
+    font-size: 0.75rem;
+  }
+
+  .managermom-stat-card {
+    height: 92px;
+  }
+
+  .managermom-stat-inner {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .managermom-stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+  }
+
+  .managermom-stat-count {
+    font-size: 1.4rem;
+  }
+
+  .managermom-stat-label {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .managermom-container {
+    padding: 10px 10px 16px;
+  }
+
+  .managermom-stat-inner {
+    padding: 12px 14px;
+  }
+}

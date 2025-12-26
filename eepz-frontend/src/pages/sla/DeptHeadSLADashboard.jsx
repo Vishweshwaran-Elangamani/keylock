@@ -6,14 +6,13 @@ import {
   CheckCircle,
   AlertCircle,
   Eye,
-  Search,
   X,
   Clock,
 } from "lucide-react";
 import { toast } from "sonner";
 import slaService from "../../services/sla/slaService";
 import Breadcrumb from "../../components/sla/common/Breadcrumbs";
-import "../../styles/sla/DeptHeadSLADashboard.css";
+import "../../styles/sla/components/DeptHeadSLADashboard.css";
 
 const DeptHeadSLADashboard = () => {
   const navigate = useNavigate();
@@ -32,7 +31,6 @@ const DeptHeadSLADashboard = () => {
   const [resolutionComments, setResolutionComments] = useState("");
   const [approvingEscalation, setApprovingEscalation] = useState(false);
 
-  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
@@ -232,7 +230,6 @@ const DeptHeadSLADashboard = () => {
 
   const stats = calculateStats();
 
-  // Pagination helpers
   const safeTotal = filteredL2Escalations.length;
   const totalPages = Math.max(1, Math.ceil(safeTotal / itemsPerPage));
   const startIndex = safeTotal === 0 ? 0 : (currentPage - 1) * itemsPerPage;
@@ -273,8 +270,8 @@ const DeptHeadSLADashboard = () => {
     return (
       <div className="dh-sla-loading-wrapper">
         <div className="dh-sla-loading-content">
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading...</span>
+          <div className="dh-sla-spinner-border" role="status">
+            <span className="dh-sla-sr-only">Loading...</span>
           </div>
         </div>
       </div>
@@ -297,14 +294,10 @@ const DeptHeadSLADashboard = () => {
         </div>
       )}
 
-      {/* Stats Grid */}
       <div className="dh-sla-stats-grid">
         <div className="dh-sla-stat-card">
-          <div
-            className="dh-sla-stat-icon-wrapper"
-            style={{ backgroundColor: "#E8F1FF" }}
-          >
-            <FileText size={24} style={{ color: "#5B93FF" }} />
+          <div className="dh-sla-stat-icon-wrapper dh-sla-stat-icon-total">
+            <FileText size={24} />
           </div>
           <div className="dh-sla-stat-content">
             <h3 className="dh-sla-stat-value">{stats.total}</h3>
@@ -313,11 +306,8 @@ const DeptHeadSLADashboard = () => {
         </div>
 
         <div className="dh-sla-stat-card">
-          <div
-            className="dh-sla-stat-icon-wrapper"
-            style={{ backgroundColor: "#D1FAE5" }}
-          >
-            <Calendar size={24} style={{ color: "#10B981" }} />
+          <div className="dh-sla-stat-icon-wrapper dh-sla-stat-icon-month">
+            <Calendar size={24} />
           </div>
           <div className="dh-sla-stat-content">
             <h3 className="dh-sla-stat-value">{stats.resolved}</h3>
@@ -326,11 +316,8 @@ const DeptHeadSLADashboard = () => {
         </div>
 
         <div className="dh-sla-stat-card">
-          <div
-            className="dh-sla-stat-icon-wrapper"
-            style={{ backgroundColor: "#FEF3C7" }}
-          >
-            <CheckCircle size={24} style={{ color: "#F59E0B" }} />
+          <div className="dh-sla-stat-icon-wrapper dh-sla-stat-icon-action">
+            <CheckCircle size={24} />
           </div>
           <div className="dh-sla-stat-content">
             <h3 className="dh-sla-stat-value">{stats.pending}</h3>
@@ -339,11 +326,8 @@ const DeptHeadSLADashboard = () => {
         </div>
 
         <div className="dh-sla-stat-card">
-          <div
-            className="dh-sla-stat-icon-wrapper"
-            style={{ backgroundColor: "#FEE2E2" }}
-          >
-            <AlertCircle size={24} style={{ color: "#EF4444" }} />
+          <div className="dh-sla-stat-icon-wrapper dh-sla-stat-icon-overdue">
+            <AlertCircle size={24} />
           </div>
           <div className="dh-sla-stat-content">
             <h3 className="dh-sla-stat-value">{stats.rejected}</h3>
@@ -352,9 +336,8 @@ const DeptHeadSLADashboard = () => {
         </div>
       </div>
 
-      {/* Table with HR-style pagination */}
-      <div className="dh-sla-table-wrapper hr-sla-table-container">
-        <div className="table-responsive">
+      <div className="dh-sla-table-wrapper">
+        <div className="dh-sla-table-responsive">
           <table className="dh-sla-table">
             <thead className="dh-sla-table-header">
               <tr>
@@ -458,13 +441,12 @@ const DeptHeadSLADashboard = () => {
           </table>
         </div>
 
-        {/* HR-style Pagination Footer */}
         {safeTotal > 0 && (
-          <div className="hr-sla-pagination-footer">
-            <div className="hr-sla-pagination-left">
-              <span className="hr-sla-pagination-text">Show</span>
+          <div className="dh-sla-pagination-footer">
+            <div className="dh-sla-pagination-left">
+              <span className="dh-sla-pagination-text">Show</span>
               <select
-                className="hr-sla-pagination-dropdown"
+                className="dh-sla-pagination-dropdown"
                 value={itemsPerPage}
                 onChange={(e) => {
                   setItemsPerPage(Number(e.target.value));
@@ -475,29 +457,29 @@ const DeptHeadSLADashboard = () => {
                 <option value={10}>10</option>
                 <option value={25}>25</option>
               </select>
-              <span className="hr-sla-pagination-text">entries</span>
+              <span className="dh-sla-pagination-text">entries</span>
             </div>
 
-            <div className="hr-sla-pagination-center">
-              <span className="hr-sla-pagination-status">
+            <div className="dh-sla-pagination-center">
+              <span className="dh-sla-pagination-status">
                 Showing {safeTotal === 0 ? 0 : startIndex + 1} to {endIndex} of{" "}
                 {safeTotal} entries
               </span>
             </div>
 
-            <div className="hr-sla-pagination-right">
-              <ul className="hr-sla-pagination-list">
+            <div className="dh-sla-pagination-right">
+              <ul className="dh-sla-pagination-list">
                 <li
-                  className={`hr-sla-page-item ${
+                  className={`dh-sla-page-item ${
                     currentPage === 1 ? "disabled" : ""
                   }`}
                 >
                   <button
-                    className="hr-sla-page-link hr-sla-page-arrow"
+                    className="dh-sla-page-link dh-sla-page-arrow"
                     onClick={() => goToPage(currentPage - 1)}
                     disabled={currentPage === 1}
                   >
-                    <span className="hr-sla-arrow-icon">‹</span>
+                    <span className="dh-sla-arrow-icon">‹</span>
                   </button>
                 </li>
 
@@ -505,19 +487,19 @@ const DeptHeadSLADashboard = () => {
                   page === "..." ? (
                     <li
                       key={`ellipsis-${idx}`}
-                      className="hr-sla-page-item disabled"
+                      className="dh-sla-page-item disabled"
                     >
-                      <span className="hr-sla-page-link">…</span>
+                      <span className="dh-sla-page-link">…</span>
                     </li>
                   ) : (
                     <li
                       key={page}
-                      className={`hr-sla-page-item ${
+                      className={`dh-sla-page-item ${
                         currentPage === page ? "active" : ""
                       }`}
                     >
                       <button
-                        className="hr-sla-page-link"
+                        className="dh-sla-page-link"
                         onClick={() => goToPage(page)}
                       >
                         {page}
@@ -527,16 +509,16 @@ const DeptHeadSLADashboard = () => {
                 )}
 
                 <li
-                  className={`hr-sla-page-item ${
+                  className={`dh-sla-page-item ${
                     currentPage === totalPages ? "disabled" : ""
                   }`}
                 >
                   <button
-                    className="hr-sla-page-link hr-sla-page-arrow"
+                    className="dh-sla-page-link dh-sla-page-arrow"
                     onClick={() => goToPage(currentPage + 1)}
                     disabled={currentPage === totalPages}
                   >
-                    <span className="hr-sla-arrow-icon">›</span>
+                    <span className="dh-sla-arrow-icon">›</span>
                   </button>
                 </li>
               </ul>
@@ -545,7 +527,6 @@ const DeptHeadSLADashboard = () => {
         )}
       </div>
 
-      {/* Resolution Modal */}
       {showResolutionModal && selectedEscalation && (
         <>
           <div
@@ -595,8 +576,7 @@ const DeptHeadSLADashboard = () => {
 
                 <div className="dh-sla-form-group">
                   <label className="dh-sla-form-label">
-                    Approval Comments{" "}
-                    <span className="dh-sla-required">*</span>
+                    Approval Comments <span className="dh-sla-required">*</span>
                   </label>
                   <textarea
                     className="dh-sla-textarea"

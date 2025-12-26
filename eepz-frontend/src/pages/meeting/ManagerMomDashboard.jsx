@@ -8,6 +8,7 @@ import toastr from "toastr";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import ManagerMeetingDetailsModal from "../../components/meeting/modals/ManagerMeetingDetailsModal";
+import "../../styles/mom/components/ManagerMomDashboard.css";
 
 const ManagerMomDashboard = () => {
   const navigate = useNavigate();
@@ -35,7 +36,6 @@ const ManagerMomDashboard = () => {
     const interval = setInterval(() => {
       loadDashboardData(true);
     }, 30000);
-
     return () => clearInterval(interval);
   }, []);
 
@@ -47,13 +47,17 @@ const ManagerMomDashboard = () => {
         setRefreshing(true);
       }
 
-      const [myMomsRes, meetingsRes, employeesRes, actionItemsAssignedByMeRes] =
-        await Promise.all([
-          momService.getMyMoms(),
-          meetingService.getMyMeetings(),
-          employeeService.getAllEmployees(),
-          momService.getActionItemsAssignedByMe(),
-        ]);
+      const [
+        myMomsRes,
+        meetingsRes,
+        employeesRes,
+        actionItemsAssignedByMeRes,
+      ] = await Promise.all([
+        momService.getMyMoms(),
+        meetingService.getMyMeetings(),
+        employeeService.getAllEmployees(),
+        momService.getActionItemsAssignedByMe(),
+      ]);
 
       if (employeesRes.success && employeesRes.data) {
         const nameMap = {};
@@ -84,8 +88,9 @@ const ManagerMomDashboard = () => {
       const meetingsWithRsvp = await Promise.all(
         (meetingsRes.data || []).map(async (meeting) => {
           try {
-            const rsvpSummaryResponse =
-              await rsvpService.getMeetingRsvpSummary(meeting.meetingId);
+            const rsvpSummaryResponse = await rsvpService.getMeetingRsvpSummary(
+              meeting.meetingId
+            );
             const rsvpSummary = rsvpSummaryResponse.data;
             return {
               ...meeting,
@@ -165,11 +170,10 @@ const ManagerMomDashboard = () => {
 
   if (loading) {
     return (
-      <div className="d-flex justify-content-center align-items-center min-vh-100">
+      <div className="managermom-loading">
         <div
-          className="spinner-border text-primary"
+          className="spinner-border text-primary managermom-loading-spinner"
           role="status"
-          style={{ width: "3rem", height: "3rem" }}
         >
           <span className="visually-hidden">Loading...</span>
         </div>
@@ -178,500 +182,279 @@ const ManagerMomDashboard = () => {
   }
 
   return (
-    <div
-      className="container-fluid px-4 py-4"
-      style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}
-    >
-      {/* Statistics Cards */}
-      <div className="row g-3 mb-4">
-        <StatCard
-          icon="bi-clock"
-          bgColor="#FEF3C7"
-          iconColor="#D97706"
-          count={stats.teamMomsCount}
-          label="Pending Forms"
-        />
-        <StatCard
-          icon="bi-check-circle"
-          bgColor="#D1FAE5"
-          iconColor="#059669"
-          count={stats.oneOnOnesCount}
-          label="Submitted Forms"
-        />
-        <StatCard
-          icon="bi-star"
-          bgColor="#DBEAFE"
-          iconColor="#2563EB"
-          count={stats.overdueActionsCount}
-          label="Reviews Received"
-        />
-        <StatCard
-          icon="bi-people"
-          bgColor="#F3E8FF"
-          iconColor="#9333EA"
-          count={stats.totalMeetingsCount}
-          label="Peer Feedback"
-        />
-      </div>
-
-      <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
-        <div className="btn-group" role="group">
-          <button
-            type="button"
-            className={`btn ${
-              showTableView ? "btn-primary" : "btn-outline-primary"
-            }`}
-            onClick={() => setShowTableView(true)}
-            style={{ fontWeight: "500" }}
-          >
-            <i className="bi bi-table me-1"></i>
-            Table View
-          </button>
-          <button
-            type="button"
-            className={`btn ${
-              !showTableView ? "btn-primary" : "btn-outline-primary"
-            }`}
-            onClick={() => setShowTableView(false)}
-            style={{ fontWeight: "500" }}
-          >
-            <i className="bi bi-grid-3x3-gap me-1"></i>
-            Card View
-          </button>
+    <div className="managermom-page">
+      <div className="managermom-container">
+        <div className="row g-3 mb-4">
+          <StatCard
+            icon="bi-clock"
+            variant="pending"
+            count={stats.teamMomsCount}
+            label="Pending Forms"
+          />
+          <StatCard
+            icon="bi-check-circle"
+            variant="submitted"
+            count={stats.oneOnOnesCount}
+            label="Submitted Forms"
+          />
+          <StatCard
+            icon="bi-star"
+            variant="reviews"
+            count={stats.overdueActionsCount}
+            label="Reviews Received"
+          />
+          <StatCard
+            icon="bi-people"
+            variant="peer"
+            count={stats.totalMeetingsCount}
+            label="Peer Feedback"
+          />
         </div>
 
-        <div className="d-flex gap-2">
-          <button
-            className="btn d-flex align-items-center gap-2 px-3 py-2"
-            onClick={() => navigate("/manager/dashboard/meetmom/schedule")}
-            style={{
-              background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-              color: "#fff",
-              border: "none",
-              fontWeight: "500",
-              transition: "all 0.2s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.opacity = "0.9";
-              e.currentTarget.style.transform = "translateY(-1px)";
-              e.currentTarget.style.boxShadow =
-                "0 4px 12px rgba(151, 36, 126, 0.3)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.opacity = "1";
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "none";
-            }}
-          >
-            <i className="bi bi-calendar-plus"></i>
-            Schedule Meeting
-          </button>
-        </div>
-      </div>
-
-      {/* Upcoming Meetings */}
-      <div
-        className="card shadow-sm mb-4"
-        style={{ border: "1px solid #27235c", borderRadius: "12px" }}
-      >
-        <div className="card-body">
-          <div className="d-flex justify-content-between align-items-center mb-4">
-            <h5
-              className="card-title fw-semibold mb-0"
-              style={{ color: "#1e293b" }}
+        <div className="managermom-toolbar">
+          <div className="btn-group" role="group">
+            <button
+              type="button"
+              className={`btn managermom-toggle-btn ${
+                showTableView ? "managermom-toggle-active" : ""
+              }`}
+              onClick={() => setShowTableView(true)}
             >
-              Upcoming Meetings
-            </h5>
-            <span className="badge bg-primary rounded-pill">
-              {upcomingMeetings.length} Meetings
-            </span>
+              <i className="bi bi-table me-1"></i>
+              Table View
+            </button>
+            <button
+              type="button"
+              className={`btn managermom-toggle-btn ${
+                !showTableView ? "managermom-toggle-active" : ""
+              }`}
+              onClick={() => setShowTableView(false)}
+            >
+              <i className="bi bi-grid-3x3-gap me-1"></i>
+              Card View
+            </button>
           </div>
 
-          {showTableView ? (
-            <div
-              style={{
-                border: "2px solid #27235c",
-                borderRadius: "12px",
-                overflow: "hidden",
-              }}
+          <div className="managermom-toolbar-right">
+            <button
+              className="btn managermom-schedule-btn"
+              onClick={() => navigate("/manager/dashboard/meetmom/schedule")}
             >
-              <div className="table-responsive">
-                <table
-                  className="table align-middle"
-                  style={{ marginBottom: 0 }}
-                >
-                  <thead>
-                    <tr style={{ backgroundColor: "#27235c" }}>
-                      <th
-                        className="fw-semibold text-uppercase"
-                        style={{
-                          color: "#ffffff",
-                          padding: "16px 12px",
-                          backgroundColor: "#27235c",
-                          borderBottom: "none",
-                          fontSize: "0.75rem",
-                          letterSpacing: "0.5px",
-                        }}
-                      >
-                        MEETING TITLE
-                      </th>
-                      <th
-                        className="fw-semibold text-uppercase"
-                        style={{
-                          color: "#ffffff",
-                          padding: "16px 12px",
-                          backgroundColor: "#27235c",
-                          borderBottom: "none",
-                          fontSize: "0.75rem",
-                          letterSpacing: "0.5px",
-                        }}
-                      >
-                        DATE & TIME
-                      </th>
-                      <th
-                        className="fw-semibold text-uppercase"
-                        style={{
-                          color: "#ffffff",
-                          padding: "16px 12px",
-                          backgroundColor: "#27235c",
-                          borderBottom: "none",
-                          fontSize: "0.75rem",
-                          letterSpacing: "0.5px",
-                        }}
-                      >
-                        TYPE
-                      </th>
-                      <th
-                        className="fw-semibold text-uppercase"
-                        style={{
-                          color: "#ffffff",
-                          padding: "16px 12px",
-                          backgroundColor: "#27235c",
-                          borderBottom: "none",
-                          fontSize: "0.75rem",
-                          letterSpacing: "0.5px",
-                        }}
-                      >
-                        ATTENDANCE
-                      </th>
-                      <th
-                        className="fw-semibold text-uppercase"
-                        style={{
-                          color: "#ffffff",
-                          padding: "16px 12px",
-                          backgroundColor: "#27235c",
-                          borderBottom: "none",
-                          fontSize: "0.75rem",
-                          letterSpacing: "0.5px",
-                        }}
-                      >
-                        STATUS
-                      </th>
-                      <th
-                        className="fw-semibold text-uppercase"
-                        style={{
-                          color: "#ffffff",
-                          padding: "16px 12px",
-                          backgroundColor: "#27235c",
-                          borderBottom: "none",
-                          fontSize: "0.75rem",
-                          letterSpacing: "0.5px",
-                        }}
-                      >
-                        ACTIONS
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {upcomingMeetings.length === 0 ? (
+              <i className="bi bi-calendar-plus"></i>
+              Schedule Meeting
+            </button>
+          </div>
+        </div>
+
+        <div className="card managermom-upcoming-card">
+          <div className="card-body">
+            <div className="managermom-upcoming-header">
+              <h5 className="managermom-upcoming-title">Upcoming Meetings</h5>
+              <span className="badge managermom-upcoming-count">
+                {upcomingMeetings.length} Meetings
+              </span>
+            </div>
+
+            {showTableView ? (
+              <div className="managermom-table-shell">
+                <div className="table-responsive">
+                  <table className="table align-middle managermom-table">
+                    <thead>
                       <tr>
-                        <td colSpan="6" className="text-center py-5 text-muted">
-                          <i
-                            className="bi bi-calendar-x"
-                            style={{ fontSize: "2rem" }}
-                          ></i>
-                          <p className="mt-2 mb-0">No upcoming meetings</p>
-                        </td>
+                        <th>Meeting Title</th>
+                        <th>Date &amp; Time</th>
+                        <th>Type</th>
+                        <th>Attendance</th>
+                        <th>Status</th>
+                        <th>Actions</th>
                       </tr>
-                    ) : (
-                      upcomingMeetings.map((meeting) => (
-                        <tr
-                          key={meeting.meetingId}
-                          style={{
-                            cursor: "pointer",
-                            transition: "background-color 0.2s",
-                          }}
-                          onClick={() => openMeetingDetails(meeting)}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = "#f8f9fa";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor =
-                              "transparent";
-                          }}
-                        >
-                          <td style={{ padding: "12px" }}>
-                            <div className="d-flex align-items-center gap-2">
-                              <div
-                                className="rounded-circle d-flex align-items-center justify-content-center"
-                                style={{
-                                  width: "36px",
-                                  height: "36px",
-                                  backgroundColor: "#e3f2fd",
-                                }}
-                              >
-                                <i
-                                  className="bi bi-calendar-event"
-                                  style={{ color: "#1976d2" }}
-                                ></i>
-                              </div>
-                              <span className="fw-semibold">
-                                {meeting.meetingTitle}
-                              </span>
-                            </div>
-                          </td>
-                          <td style={{ padding: "12px" }}>
-                            <span className="text-muted">
-                              <i className="bi bi-clock me-1"></i>
-                              {formatDateTime(meeting.meetingDate)}
-                            </span>
-                          </td>
-                          <td style={{ padding: "12px" }}>
-                            <span className="badge bg-light text-dark border">
-                              {meeting.meetingType || "General"}
-                            </span>
-                          </td>
-                          <td style={{ padding: "12px" }}>
-                            <div className="d-flex align-items-center gap-2">
-                              <div
-                                className="progress"
-                                style={{ width: "60px", height: "6px" }}
-                              >
-                                <div
-                                  className="progress-bar bg-success"
-                                  role="progressbar"
-                                  style={{
-                                    width: `${
-                                      meeting.rsvpTotalInvitations > 0
-                                        ? (meeting.rsvpAcceptedCount /
-                                            meeting.rsvpTotalInvitations) *
-                                          100
-                                        : 0
-                                    }%`,
-                                  }}
-                                ></div>
-                              </div>
-                              <small className="text-muted">
-                                {meeting.rsvpAcceptedCount}/
-                                {meeting.rsvpTotalInvitations}
-                              </small>
-                            </div>
-                          </td>
-                          <td style={{ padding: "12px" }}>
-                            {meeting.rsvpAcceptedCount ===
-                              meeting.rsvpTotalInvitations &&
-                            meeting.rsvpTotalInvitations > 0 ? (
-                              <span className="badge bg-success">
-                                All Accepted
-                              </span>
-                            ) : meeting.rsvpAcceptedCount > 0 ? (
-                              <span className="badge bg-warning text-dark">
-                                Pending
-                              </span>
-                            ) : (
-                              <span className="badge bg-secondary">
-                                No Response
-                              </span>
-                            )}
-                          </td>
-                          <td style={{ padding: "12px" }}>
-                            <button
-                              className="btn btn-sm btn-outline-primary"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                openMeetingDetails(meeting);
-                              }}
-                            >
-                              <i className="bi bi-eye me-1"></i>
-                              View
-                            </button>
+                    </thead>
+                    <tbody>
+                      {upcomingMeetings.length === 0 ? (
+                        <tr>
+                          <td colSpan="6" className="managermom-empty-cell">
+                            <i className="bi bi-calendar-x managermom-empty-icon"></i>
+                            <p className="managermom-empty-text">
+                              No upcoming meetings
+                            </p>
                           </td>
                         </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          ) : (
-            <div className="row g-3">
-              {upcomingMeetings.length === 0 ? (
-                <div className="col-12 text-center py-5 text-muted">
-                  <i
-                    className="bi bi-calendar-x"
-                    style={{ fontSize: "2rem" }}
-                  ></i>
-                  <p className="mt-2 mb-0">No upcoming meetings</p>
+                      ) : (
+                        upcomingMeetings.map((meeting) => (
+                          <tr
+                            key={meeting.meetingId}
+                            className="managermom-table-row"
+                            onClick={() => openMeetingDetails(meeting)}
+                          >
+                            <td>
+                              <div className="managermom-meeting-title-cell">
+                                <div className="managermom-meeting-avatar">
+                                  <i className="bi bi-calendar-event managermom-meeting-avatar-icon"></i>
+                                </div>
+                                <span className="fw-semibold">
+                                  {meeting.meetingTitle}
+                                </span>
+                              </div>
+                            </td>
+                            <td>
+                              <span className="text-muted">
+                                <i className="bi bi-clock me-1"></i>
+                                {formatDateTime(meeting.meetingDate)}
+                              </span>
+                            </td>
+                            <td>
+                              <span className="badge managermom-type-badge">
+                                {meeting.meetingType || "General"}
+                              </span>
+                            </td>
+                            <td>
+                              <div className="managermom-attendance">
+                                <div className="progress managermom-progress">
+                                  <div
+                                    className="progress-bar bg-success"
+                                    role="progressbar"
+                                    style={{
+                                      width: `${
+                                        meeting.rsvpTotalInvitations > 0
+                                          ? (meeting.rsvpAcceptedCount /
+                                              meeting.rsvpTotalInvitations) *
+                                            100
+                                          : 0
+                                      }%`,
+                                    }}
+                                  ></div>
+                                </div>
+                                <small className="text-muted">
+                                  {meeting.rsvpAcceptedCount}/
+                                  {meeting.rsvpTotalInvitations}
+                                </small>
+                              </div>
+                            </td>
+                            <td>
+                              {meeting.rsvpAcceptedCount ===
+                                meeting.rsvpTotalInvitations &&
+                              meeting.rsvpTotalInvitations > 0 ? (
+                                <span className="badge bg-success">
+                                  All Accepted
+                                </span>
+                              ) : meeting.rsvpAcceptedCount > 0 ? (
+                                <span className="badge bg-warning text-dark">
+                                  Pending
+                                </span>
+                              ) : (
+                                <span className="badge bg-secondary">
+                                  No Response
+                                </span>
+                              )}
+                            </td>
+                            <td>
+                              <button
+                                className="btn btn-sm managermom-view-btn"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openMeetingDetails(meeting);
+                                }}
+                              >
+                                <i className="bi bi-eye me-1"></i>
+                                View
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
                 </div>
-              ) : (
-                upcomingMeetings.map((meeting) => (
-                  <div key={meeting.meetingId} className="col-lg-4 col-md-6">
+              </div>
+            ) : (
+              <div className="row g-3">
+                {upcomingMeetings.length === 0 ? (
+                  <div className="col-12 managermom-empty-card-wrapper">
+                    <i className="bi bi-calendar-x managermom-empty-icon"></i>
+                    <p className="managermom-empty-text">No upcoming meetings</p>
+                  </div>
+                ) : (
+                  upcomingMeetings.map((meeting) => (
                     <div
-                      className="card h-100 shadow-sm"
-                      style={{
-                        cursor: "pointer",
-                        transition: "transform 0.2s",
-                        border: "1px solid #27235c",
-                      }}
-                      onClick={() => openMeetingDetails(meeting)}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.transform = "translateY(-4px)")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.transform = "translateY(0)")
-                      }
+                      key={meeting.meetingId}
+                      className="col-lg-4 col-md-6"
                     >
-                      <div className="card-body">
-                        <div className="d-flex align-items-start justify-content-between mb-3">
-                          <div
-                            className="rounded-circle d-flex align-items-center justify-content-center"
-                            style={{
-                              width: "48px",
-                              height: "48px",
-                              backgroundColor: "#e3f2fd",
-                              flexShrink: 0,
-                            }}
-                          >
-                            <i
-                              className="bi bi-calendar-event fs-5"
-                              style={{ color: "#1976d2" }}
-                            ></i>
-                          </div>
-                          <span className="badge bg-light text-dark border">
-                            {meeting.meetingType || "General"}
-                          </span>
-                        </div>
-                        <h6 className="card-title fw-semibold mb-2">
-                          {meeting.meetingTitle}
-                        </h6>
-                        <p className="text-muted small mb-3">
-                          <i className="bi bi-clock me-1"></i>
-                          {formatDateTime(meeting.meetingDate)}
-                        </p>
-                        <div className="d-flex justify-content-between align-items-center">
-                          <div>
-                            <small className="text-muted">Attendance</small>
-                            <div className="fw-semibold">
-                              {meeting.rsvpAcceptedCount}/
-                              {meeting.rsvpTotalInvitations}
+                      <div
+                        className="card h-100 managermom-meeting-card"
+                        onClick={() => openMeetingDetails(meeting)}
+                      >
+                        <div className="card-body">
+                          <div className="managermom-meeting-card-header">
+                            <div className="managermom-card-avatar">
+                              <i className="bi bi-calendar-event managermom-card-avatar-icon"></i>
                             </div>
+                            <span className="badge managermom-type-badge">
+                              {meeting.meetingType || "General"}
+                            </span>
                           </div>
-                          <div
-                            className="progress"
-                            style={{ width: "80px", height: "8px" }}
-                          >
-                            <div
-                              className="progress-bar bg-success"
-                              role="progressbar"
-                              style={{
-                                width: `${
-                                  meeting.rsvpTotalInvitations > 0
-                                    ? (meeting.rsvpAcceptedCount /
-                                        meeting.rsvpTotalInvitations) *
-                                      100
-                                    : 0
-                                }%`,
-                              }}
-                            ></div>
+                          <h6 className="card-title fw-semibold mb-2">
+                            {meeting.meetingTitle}
+                          </h6>
+                          <p className="text-muted small mb-3">
+                            <i className="bi bi-clock me-1"></i>
+                            {formatDateTime(meeting.meetingDate)}
+                          </p>
+                          <div className="managermom-meeting-card-footer">
+                            <div>
+                              <small className="text-muted">Attendance</small>
+                              <div className="fw-semibold">
+                                {meeting.rsvpAcceptedCount}/
+                                {meeting.rsvpTotalInvitations}
+                              </div>
+                            </div>
+                            <div className="progress managermom-card-progress">
+                              <div
+                                className="progress-bar bg-success"
+                                role="progressbar"
+                                style={{
+                                  width: `${
+                                    meeting.rsvpTotalInvitations > 0
+                                      ? (meeting.rsvpAcceptedCount /
+                                          meeting.rsvpTotalInvitations) *
+                                        100
+                                      : 0
+                                  }%`,
+                                }}
+                              ></div>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))
-              )}
-            </div>
-          )}
+                  ))
+                )}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Modal Component */}
-      {selectedMeeting && (
-        <ManagerMeetingDetailsModal
-          meeting={selectedMeeting}
-          onClose={closeMeetingDetails}
-        />
-      )}
+        {selectedMeeting && (
+          <ManagerMeetingDetailsModal
+            meeting={selectedMeeting}
+            onClose={closeMeetingDetails}
+          />
+        )}
+      </div>
     </div>
   );
 };
 
-const StatCard = ({ icon, bgColor, iconColor, count, label, sublabel }) => (
-  <div className="col-lg-3 col-md-6">
-    <div
-      className="card shadow-sm h-100"
-      style={{
-        border: "1.5px solid #27235c",
-        borderRadius: "16px",
-        transition: "all 0.2s ease",
-        cursor: "pointer",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-2px)";
-        e.currentTarget.style.borderColor = "#0f62fe";
-        e.currentTarget.style.boxShadow = "0 4px 12px rgba(39, 35, 92, 0.1)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "translateY(0)";
-        e.currentTarget.style.borderColor = "#27235c";
-        e.currentTarget.style.boxShadow = "0 1px 3px rgba(0, 0, 0, 0.05)";
-      }}
-    >
-      <div 
-        className="card-body d-flex align-items-center px-4 py-3" 
-        style={{ minHeight: "80px", gap: "1.5rem" }}
-      >
-        {/* Icon - Left */}
-        <div
-          className="rounded d-flex align-items-center justify-content-center"
-          style={{
-            width: "48px",
-            height: "48px",
-            backgroundColor: bgColor,
-            flexShrink: 0,
-            borderRadius: "12px",
-          }}
-        >
-          <i className={`${icon}`} style={{ color: iconColor, fontSize: "22px" }}></i>
+const StatCard = ({ icon, variant, count, label }) => (
+  <div className="col-lg-3 col-md-6 col-sm-6">
+    <div className="managermom-stat-card">
+      <div className="managermom-stat-inner">
+        <div className={`managermom-stat-icon managermom-stat-icon-${variant}`}>
+          <i className={`${icon} managermom-stat-icon-glyph`}></i>
         </div>
-        
-        {/* Number - Center Left */}
-        <h3
-          className="fw-bold mb-0"
-          style={{ 
-            fontSize: "2.25rem", 
-            color: "#0f172a", 
-            lineHeight: 1,
-            flexShrink: 0,
-          }}
-        >
-          {count}
-        </h3>
-        
-        {/* Label - Right */}
-        <p
-          className="mb-0 fw-semibold text-uppercase"
-          style={{
-            fontSize: "0.95rem",
-            color: "#6B7280",
-            letterSpacing: "0.5px",
-            lineHeight: 1.3,
-            whiteSpace: "nowrap",
-            marginLeft: "auto",
-          }}
-        >
-          {label}
-        </p>
+        <div className="managermom-stat-center">
+          <div className="managermom-stat-count">{count}</div>
+          <div className="managermom-stat-label">{label}</div>
+        </div>
       </div>
     </div>
   </div>

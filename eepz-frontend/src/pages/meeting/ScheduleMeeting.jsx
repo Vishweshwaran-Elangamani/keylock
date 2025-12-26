@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { employeeApi } from "../../services/feedbackmanagement/feedbackApi";
+import "../../styles/mom/components/ScheduleMeeting.css";
 
 const PRIMARY = "#27235C";
 
@@ -218,50 +219,6 @@ const ScheduleMeeting = () => {
     { value: "3", label: "3 hours" },
   ];
 
-  const dropdownButtonStyle = {
-    width: "100%",
-    textAlign: "left",
-    borderRadius: "10px",
-    border: "1px solid #E5E7EB",
-    backgroundColor: "#ffffff",
-    padding: "0.6rem 0.85rem",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    fontSize: "0.95rem",
-    color: "#111827",
-  };
-
-  const dropdownMenuStyle = {
-    position: "absolute",
-    zIndex: 20,
-    backgroundColor: "#ffffff",
-    borderRadius: "0 0 12px 12px",
-    boxShadow: "0 18px 40px rgba(15, 23, 42, 0.18)",
-    marginTop: "2px",
-    overflow: "hidden",
-    width: "100%",
-    maxHeight: "260px",
-    overflowY: "auto",
-    textAlign: "left",
-  };
-
-  const dropdownItemStyle = (active) => ({
-    padding: "10px 16px",
-    textAlign: "left", // changed from center to left
-    cursor: "pointer",
-    backgroundColor: active ? PRIMARY : "#ffffff",
-    color: active ? "#ffffff" : "#111827",
-    fontWeight: active ? 600 : 400,
-    borderBottom: "1px solid #F3F4F6",
-    fontSize: "0.95rem",
-  });
-
-  const dropdownItemHoverStyle = {
-    backgroundColor: PRIMARY,
-    color: "#ffffff",
-  };
-
   const formatDisplayDate = (iso) => {
     if (!iso) return "";
     const d = new Date(iso);
@@ -307,7 +264,9 @@ const ScheduleMeeting = () => {
 
   const { cells, month, year } = getCalendarMatrix();
   const today = new Date();
-  const selectedDate = formData.meetingDate ? new Date(formData.meetingDate) : null;
+  const selectedDate = formData.meetingDate
+    ? new Date(formData.meetingDate)
+    : null;
 
   const monthNames = [
     "January",
@@ -372,105 +331,32 @@ const ScheduleMeeting = () => {
   };
 
   return (
-    <div
-      className="container-fluid px-4 py-4"
-      style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}
-    >
+    <div className="container-fluid sched-page">
       <div className="row justify-content-center">
         <div className="col-lg-10 col-xl-9">
-          <nav aria-label="breadcrumb" className="mb-4">
-            <ol
-              className="breadcrumb mb-0 d-flex align-items-center"
-              style={{ backgroundColor: "transparent", padding: 0, margin: 0 }}
-            >
+          <nav aria-label="breadcrumb" className="sched-breadcrumb-nav">
+            <ol className="breadcrumb mb-0 d-flex align-items-center sched-breadcrumb">
               <li className="breadcrumb-item d-flex align-items-center">
                 <button
                   onClick={() => navigate("/manager/dashboard/")}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "#97247E",
-                    cursor: "pointer",
-                    padding: 0,
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                    fontSize: "0.875rem",
-                    fontWeight: 500,
-                    textDecoration: "none",
-                    transition: "color 0.2s ease",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.color = "#7a1d65")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.color = "#97247E")
-                  }
+                  className="sched-breadcrumb-link"
                 >
                   <Home size={16} />
                   Dashboard
                 </button>
               </li>
-              <li
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  color: "#97247E",
-                  margin: "0 8px",
-                  fontSize: "1rem",
-                }}
-              >
-                /
-              </li>
+              <li className="sched-breadcrumb-separator">/</li>
               <li className="breadcrumb-item d-flex align-items-center">
                 <button
                   onClick={() => navigate("/manager/dashboard/meetmom")}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "#97247E",
-                    cursor: "pointer",
-                    padding: 0,
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                    fontSize: "0.875rem",
-                    fontWeight: 500,
-                    textDecoration: "none",
-                    transition: "color 0.2s ease",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.color = "#7a1d65")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.color = "#97247E")
-                  }
+                  className="sched-breadcrumb-link"
                 >
                   Meeting and MoM
                 </button>
               </li>
-              <li
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  color: "#97247E",
-                  margin: "0 8px",
-                  fontSize: "1rem",
-                }}
-              >
-                /
-              </li>
-              <li
-                className="breadcrumb-item active d-flex align-items-center"
-                aria-current="page"
-              >
-                <span
-                  style={{
-                    color: "#1e293b",
-                    fontSize: "0.875rem",
-                    fontWeight: 600,
-                  }}
-                >
+              <li className="sched-breadcrumb-separator">/</li>
+              <li className="breadcrumb-item active d-flex align-items-center">
+                <span className="sched-breadcrumb-current">
                   Schedule Meeting
                 </span>
               </li>
@@ -485,26 +371,15 @@ const ScheduleMeeting = () => {
                     <label className="form-label fw-semibold d-flex align-items-center gap-2">
                       <Users size={20} /> Meeting Type
                     </label>
-                    <div
-                      ref={meetingTypeRef}
-                      style={{ position: "relative" }}
-                    >
+                    <div ref={meetingTypeRef} className="sched-dropdown-wrap">
                       <button
                         type="button"
-                        style={dropdownButtonStyle}
+                        className="sched-dropdown-btn"
                         onClick={() =>
                           setMeetingTypeOpen((prev) => !prev)
                         }
                       >
-                        <span
-                          style={{
-                            flex: 1,
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                            textAlign: "left", // left align selected label
-                          }}
-                        >
+                        <span className="sched-dropdown-label">
                           {formData.meetingType}
                         </span>
                         {meetingTypeOpen ? (
@@ -514,39 +389,27 @@ const ScheduleMeeting = () => {
                         )}
                       </button>
                       {meetingTypeOpen && (
-                        <div style={dropdownMenuStyle}>
-                          {meetingTypeOptions.map((opt) => (
-                            <div
-                              key={opt}
-                              style={dropdownItemStyle(
-                                opt === formData.meetingType
-                              )}
-                              onClick={() => {
-                                setFormData((prev) => ({
-                                  ...prev,
-                                  meetingType: opt,
-                                }));
-                                setMeetingTypeOpen(false);
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor =
-                                  dropdownItemHoverStyle.backgroundColor;
-                                e.currentTarget.style.color =
-                                  dropdownItemHoverStyle.color;
-                              }}
-                              onMouseLeave={(e) => {
-                                const active = opt === formData.meetingType;
-                                e.currentTarget.style.backgroundColor = active
-                                  ? PRIMARY
-                                  : "#ffffff";
-                                e.currentTarget.style.color = active
-                                  ? "#ffffff"
-                                  : "#111827";
-                              }}
-                            >
-                              {opt}
-                            </div>
-                          ))}
+                        <div className="sched-dropdown-menu">
+                          {meetingTypeOptions.map((opt) => {
+                            const active = opt === formData.meetingType;
+                            return (
+                              <div
+                                key={opt}
+                                className={`sched-dropdown-item${
+                                  active ? " sched-dropdown-item-active" : ""
+                                }`}
+                                onClick={() => {
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    meetingType: opt,
+                                  }));
+                                  setMeetingTypeOpen(false);
+                                }}
+                              >
+                                {opt}
+                              </div>
+                            );
+                          })}
                         </div>
                       )}
                     </div>
@@ -562,10 +425,9 @@ const ScheduleMeeting = () => {
                       name="meetingTitle"
                       value={formData.meetingTitle}
                       onChange={handleInputChange}
-                      className="form-control"
+                      className="form-control sched-input"
                       placeholder="Enter meeting title..."
                       required
-                      style={{ fontSize: "1rem", padding: "0.6rem 0.75rem" }}
                     />
                   </div>
 
@@ -576,42 +438,29 @@ const ScheduleMeeting = () => {
                       <span className="text-danger">*</span>
                     </label>
 
-                    <div className="input-group mb-3">
-                      <span className="input-group-text bg-white border-end-0">
+                    <div className="input-group mb-3 sched-search-group">
+                      <span className="input-group-text bg-white border-end-0 sched-search-icon">
                         <Search size={20} className="text-muted" />
                       </span>
                       <input
                         type="text"
-                        className="form-control border-start-0 ps-0"
+                        className="form-control border-start-0 ps-0 sched-input"
                         placeholder="Search employees..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        style={{
-                          boxShadow: "none",
-                          fontSize: "1rem",
-                          padding: "0.6rem 0.75rem",
-                        }}
                       />
                     </div>
 
                     {formData.meetingType === "One-on-One" ? (
-                      <div ref={oneOnOneRef} style={{ position: "relative" }}>
+                      <div ref={oneOnOneRef} className="sched-dropdown-wrap">
                         <button
                           type="button"
-                          style={dropdownButtonStyle}
+                          className="sched-dropdown-btn"
                           onClick={() =>
                             setOneOnOneOpen((prev) => !prev)
                           }
                         >
-                          <span
-                            style={{
-                              flex: 1,
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
-                              textAlign: "left", // left align selected label
-                            }}
-                          >
+                          <span className="sched-dropdown-label">
                             {(() => {
                               const id =
                                 formData.participantEmployeeIds[0];
@@ -635,16 +484,9 @@ const ScheduleMeeting = () => {
                           )}
                         </button>
                         {oneOnOneOpen && (
-                          <div style={dropdownMenuStyle}>
+                          <div className="sched-dropdown-menu">
                             {filteredEmployees.length === 0 ? (
-                              <div
-                                style={{
-                                  padding: "10px 16px",
-                                  textAlign: "center",
-                                  fontSize: "0.95rem",
-                                  color: "#6B7280",
-                                }}
-                              >
+                              <div className="sched-dropdown-empty">
                                 No employees found
                               </div>
                             ) : (
@@ -655,25 +497,16 @@ const ScheduleMeeting = () => {
                                 return (
                                   <div
                                     key={emp.employeeId}
-                                    style={dropdownItemStyle(active)}
+                                    className={`sched-dropdown-item${
+                                      active
+                                        ? " sched-dropdown-item-active"
+                                        : ""
+                                    }`}
                                     onClick={() => {
                                       handleOneOnOneChange(
                                         emp.employeeId
                                       );
                                       setOneOnOneOpen(false);
-                                    }}
-                                    onMouseEnter={(e) => {
-                                      e.currentTarget.style.backgroundColor =
-                                        dropdownItemHoverStyle.backgroundColor;
-                                      e.currentTarget.style.color =
-                                        dropdownItemHoverStyle.color;
-                                    }}
-                                    onMouseLeave={(e) => {
-                                      e.currentTarget.style.backgroundColor =
-                                        active ? PRIMARY : "#ffffff";
-                                      e.currentTarget.style.color = active
-                                        ? "#ffffff"
-                                        : "#111827";
                                     }}
                                   >
                                     {emp.firstName} {emp.lastName}{" "}
@@ -688,36 +521,17 @@ const ScheduleMeeting = () => {
                       </div>
                     ) : (
                       <>
-                        <div
-                          className="border rounded"
-                          style={{ maxHeight: 160, overflowY: "auto" }}
-                        >
+                        <div className="border rounded sched-multi-list">
                           <table className="table table-hover mb-0">
-                            <thead
-                              className="table-light"
-                              style={{
-                                position: "sticky",
-                                top: 0,
-                                zIndex: 1,
-                              }}
-                            >
+                            <thead className="table-light sched-table-head">
                               <tr>
-                                <th
-                                  style={{ width: 60, fontSize: "1rem" }}
-                                  className="text-start"
-                                >
+                                <th className="text-start sched-th-select">
                                   Select
                                 </th>
-                                <th
-                                  className="text-start"
-                                  style={{ fontSize: "1rem" }}
-                                >
+                                <th className="text-start sched-th">
                                   Name
                                 </th>
-                                <th
-                                  className="text-start"
-                                  style={{ fontSize: "1rem" }}
-                                >
+                                <th className="text-start sched-th">
                                   Role
                                 </th>
                               </tr>
@@ -727,8 +541,7 @@ const ScheduleMeeting = () => {
                                 <tr>
                                   <td
                                     colSpan={3}
-                                    className="text-center py-2 text-muted"
-                                    style={{ fontSize: "1rem" }}
+                                    className="text-center py-2 text-muted sched-td"
                                   >
                                     No employees found
                                   </td>
@@ -738,14 +551,16 @@ const ScheduleMeeting = () => {
                                   <tr
                                     key={emp.employeeId}
                                     onClick={() =>
-                                      handleCheckboxChange(emp.employeeId)
+                                      handleCheckboxChange(
+                                        emp.employeeId
+                                      )
                                     }
-                                    style={{ cursor: "pointer" }}
+                                    className="sched-row-click"
                                   >
                                     <td className="text-start">
                                       <div className="form-check">
                                         <input
-                                          className="form-check-input"
+                                          className="form-check-input sched-check"
                                           type="checkbox"
                                           checked={formData.participantEmployeeIds.includes(
                                             emp.employeeId
@@ -758,21 +573,14 @@ const ScheduleMeeting = () => {
                                           onClick={(e) =>
                                             e.stopPropagation()
                                           }
-                                          style={{ width: 18, height: 18 }}
                                         />
                                       </div>
                                     </td>
-                                    <td
-                                      className="text-start"
-                                      style={{ fontSize: "1rem" }}
-                                    >
+                                    <td className="text-start sched-td">
                                       {emp.firstName} {emp.lastName}
                                     </td>
                                     <td className="text-start">
-                                      <span
-                                        className="badge bg-light text-dark border"
-                                        style={{ fontSize: "0.9rem" }}
-                                      >
+                                      <span className="badge bg-light text-dark border sched-role-badge">
                                         {emp.roleName ||
                                           emp.departmentName ||
                                           "-"}
@@ -784,10 +592,7 @@ const ScheduleMeeting = () => {
                             </tbody>
                           </table>
                         </div>
-                        <div
-                          className="alert alert-info mt-3 mb-0 d-flex align-items-center gap-2"
-                          style={{ fontSize: "1rem" }}
-                        >
+                        <div className="alert alert-info mt-3 mb-0 d-flex align-items-center gap-2 sched-selected-alert">
                           <Check size={20} />
                           <span>
                             <strong>
@@ -813,28 +618,23 @@ const ScheduleMeeting = () => {
                         </label>
                         <div
                           ref={calendarRef}
-                          style={{ position: "relative", width: "100%" }}
+                          className="sched-date-wrap"
                         >
                           <input
                             type="text"
                             readOnly
-                            value={formatDisplayDate(formData.meetingDate)}
+                            value={formatDisplayDate(
+                              formData.meetingDate
+                            )}
                             onClick={() => {
                               ensureCalendarMonthYear();
                               setCalendarOpen((o) => !o);
                             }}
                             disabled={loading}
                             placeholder="Select date"
-                            style={{
-                              width: "100%",
-                              padding: "0.6rem 2.5rem 0.6rem 0.75rem",
-                              borderRadius: 8,
-                              border: "1px solid #d1d5db",
-                              fontSize: "0.95rem",
-                              boxSizing: "border-box",
-                              cursor: loading ? "not-allowed" : "pointer",
-                              backgroundColor: loading ? "#f3f4f6" : "white",
-                            }}
+                            className={`sched-date-input${
+                              loading ? " sched-date-input-disabled" : ""
+                            }`}
                           />
                           <button
                             type="button"
@@ -843,16 +643,7 @@ const ScheduleMeeting = () => {
                               setCalendarOpen((o) => !o);
                             }}
                             disabled={loading}
-                            style={{
-                              position: "absolute",
-                              top: "50%",
-                              right: 10,
-                              transform: "translateY(-50%)",
-                              border: "none",
-                              background: "transparent",
-                              cursor: loading ? "not-allowed" : "pointer",
-                              padding: 0,
-                            }}
+                            className="sched-date-icon-btn"
                           >
                             <svg
                               width="18"
@@ -899,95 +690,38 @@ const ScheduleMeeting = () => {
                           </button>
 
                           {calendarOpen && (
-                            <div
-                              style={{
-                                position: "absolute",
-                                right: -250,
-                                top: "calc(100% + 4px)",
-                                backgroundColor: "white",
-                                borderRadius: 12,
-                                boxShadow:
-                                  "0 14px 40px rgba(15, 23, 42, 0.18)",
-                                border: "1px solid #e5e7eb",
-                                zIndex: 9999,
-                                width: 280,
-                              }}
-                            >
-                              <div
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "space-between",
-                                  padding: "0.5rem 0.9rem",
-                                  borderBottom: "1px solid #e5e7eb",
-                                  backgroundColor: "#ffffff",
-                                }}
-                              >
+                            <div className="sched-calendar">
+                              <div className="sched-calendar-header">
                                 <button
                                   type="button"
                                   onClick={goPrevMonth}
-                                  style={{
-                                    border: "none",
-                                    background: "transparent",
-                                    cursor: "pointer",
-                                    padding: 4,
-                                  }}
+                                  className="sched-calendar-nav"
                                 >
                                   <ChevronLeft size={16} />
                                 </button>
-                                <span
-                                  style={{
-                                    fontWeight: 600,
-                                    fontSize: "0.9rem",
-                                    color: "#111827",
-                                  }}
-                                >
+                                <span className="sched-calendar-title">
                                   {monthNames[month]} {year}
                                 </span>
                                 <button
                                   type="button"
                                   onClick={goNextMonth}
-                                  style={{
-                                    border: "none",
-                                    background: "transparent",
-                                    cursor: "pointer",
-                                    padding: 4,
-                                  }}
+                                  className="sched-calendar-nav"
                                 >
                                   <ChevronRight size={16} />
                                 </button>
                               </div>
 
-                              <div
-                                style={{
-                                  display: "grid",
-                                  gridTemplateColumns: "repeat(7, 1fr)",
-                                  padding: "0.35rem 0.9rem 0.2rem",
-                                  gap: 4,
-                                  fontSize: "0.75rem",
-                                  color: "#6b7280",
-                                }}
-                              >
+                              <div className="sched-calendar-weekdays">
                                 {weekdays.map((w) => (
                                   <div
                                     key={w}
-                                    style={{
-                                      textAlign: "center",
-                                      padding: "0.25rem 0",
-                                    }}
+                                    className="sched-calendar-weekday"
                                   >
                                     {w}
                                   </div>
                                 ))}
                               </div>
-                              <div
-                                style={{
-                                  display: "grid",
-                                  gridTemplateColumns: "repeat(7, 1fr)",
-                                  padding: "0.15rem 0.9rem 0.6rem",
-                                  gap: 4,
-                                }}
-                              >
+                              <div className="sched-calendar-grid">
                                 {cells.map((c, idx) => {
                                   const cellDate = new Date(
                                     year,
@@ -996,8 +730,10 @@ const ScheduleMeeting = () => {
                                   );
                                   const isToday =
                                     c.current &&
-                                    cellDate.getDate() === today.getDate() &&
-                                    cellDate.getMonth() === today.getMonth() &&
+                                    cellDate.getDate() ===
+                                      today.getDate() &&
+                                    cellDate.getMonth() ===
+                                      today.getMonth() &&
                                     cellDate.getFullYear() ===
                                       today.getFullYear();
 
@@ -1011,35 +747,20 @@ const ScheduleMeeting = () => {
                                     cellDate.getFullYear() ===
                                       selectedDate.getFullYear();
 
-                                  const baseStyle = {
-                                    textAlign: "center",
-                                    padding: "0.4rem 0",
-                                    borderRadius: 8,
-                                    cursor: c.current ? "pointer" : "default",
-                                    fontSize: "0.8rem",
-                                  };
-
-                                  let bg = "transparent";
-                                  let color = c.current
-                                    ? "#111827"
-                                    : "#d1d5db";
-
-                                  if (isToday) {
-                                    bg = "rgba(39,35,92,0.08)";
-                                  }
-                                  if (isSelected) {
-                                    bg = PRIMARY;
-                                    color = "#ffffff";
-                                  }
+                                  const classes = [
+                                    "sched-calendar-cell",
+                                    !c.current && "sched-calendar-cell-out",
+                                    isToday && "sched-calendar-cell-today",
+                                    isSelected &&
+                                      "sched-calendar-cell-selected",
+                                  ]
+                                    .filter(Boolean)
+                                    .join(" ");
 
                                   return (
                                     <div
                                       key={idx}
-                                      style={{
-                                        ...baseStyle,
-                                        backgroundColor: bg,
-                                        color,
-                                      }}
+                                      className={classes}
                                       onClick={() =>
                                         handleSelectCalendarDay(
                                           c.day,
@@ -1052,24 +773,11 @@ const ScheduleMeeting = () => {
                                   );
                                 })}
                               </div>
-                              <div
-                                style={{
-                                  padding: "0.45rem 0.9rem 0.7rem",
-                                  borderTop: "1px solid #e5e7eb",
-                                  textAlign: "right",
-                                }}
-                              >
+                              <div className="sched-calendar-footer">
                                 <button
                                   type="button"
                                   onClick={goToday}
-                                  style={{
-                                    border: "none",
-                                    background: "transparent",
-                                    color: PRIMARY,
-                                    fontSize: "0.8rem",
-                                    fontWeight: 600,
-                                    cursor: "pointer",
-                                  }}
+                                  className="sched-calendar-today"
                                 >
                                   Today
                                 </button>
@@ -1078,6 +786,7 @@ const ScheduleMeeting = () => {
                           )}
                         </div>
                       </div>
+
                       <div className="col-lg-6">
                         <label className="form-label fw-semibold d-flex align-items-center gap-2">
                           <Clock size={20} /> Meeting Time{" "}
@@ -1088,36 +797,25 @@ const ScheduleMeeting = () => {
                           name="meetingTime"
                           value={formData.meetingTime}
                           onChange={handleInputChange}
-                          className="form-control"
+                          className="form-control sched-input"
                           required
-                          style={{
-                            fontSize: "1rem",
-                            padding: "0.6rem 0.75rem",
-                          }}
                         />
                       </div>
                     </div>
+
                     <div className="mt-3" ref={durationRef}>
                       <label className="form-label fw-semibold d-flex align-items-center gap-2">
                         <Clock size={20} /> Duration
                       </label>
-                      <div style={{ position: "relative" }}>
+                      <div className="sched-dropdown-wrap">
                         <button
                           type="button"
-                          style={dropdownButtonStyle}
+                          className="sched-dropdown-btn"
                           onClick={() =>
                             setDurationOpen((prev) => !prev)
                           }
                         >
-                          <span
-                            style={{
-                              flex: 1,
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
-                              textAlign: "left", // left align selected label
-                            }}
-                          >
+                          <span className="sched-dropdown-label">
                             {
                               durationOptions.find(
                                 (d) => d.value === formData.duration
@@ -1131,40 +829,30 @@ const ScheduleMeeting = () => {
                           )}
                         </button>
                         {durationOpen && (
-                          <div style={dropdownMenuStyle}>
-                            {durationOptions.map((opt) => (
-                              <div
-                                key={opt.value}
-                                style={dropdownItemStyle(
-                                  opt.value === formData.duration
-                                )}
-                                onClick={() => {
-                                  setFormData((prev) => ({
-                                    ...prev,
-                                    duration: opt.value,
-                                  }));
-                                  setDurationOpen(false);
-                                }}
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.backgroundColor =
-                                    dropdownItemHoverStyle.backgroundColor;
-                                  e.currentTarget.style.color =
-                                    dropdownItemHoverStyle.color;
-                                }}
-                                onMouseLeave={(e) => {
-                                  const active =
-                                    opt.value === formData.duration;
-                                  e.currentTarget.style.backgroundColor = active
-                                    ? PRIMARY
-                                    : "#ffffff";
-                                  e.currentTarget.style.color = active
-                                    ? "#ffffff"
-                                    : "#111827";
-                                }}
-                              >
-                                {opt.label}
-                              </div>
-                            ))}
+                          <div className="sched-dropdown-menu">
+                            {durationOptions.map((opt) => {
+                              const active =
+                                opt.value === formData.duration;
+                              return (
+                                <div
+                                  key={opt.value}
+                                  className={`sched-dropdown-item${
+                                    active
+                                      ? " sched-dropdown-item-active"
+                                      : ""
+                                  }`}
+                                  onClick={() => {
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      duration: opt.value,
+                                    }));
+                                    setDurationOpen(false);
+                                  }}
+                                >
+                                  {opt.label}
+                                </div>
+                              );
+                            })}
                           </div>
                         )}
                       </div>
@@ -1181,23 +869,19 @@ const ScheduleMeeting = () => {
                         name="meetingLink"
                         value={formData.meetingLink}
                         onChange={handleInputChange}
-                        className="form-control"
+                        className="form-control sched-input"
                         placeholder="Enter meeting link or generate one..."
-                        style={{
-                          fontSize: "1rem",
-                          padding: "0.6rem 0.75rem",
-                        }}
                       />
                       <button
                         type="button"
                         onClick={generateTeamsLink}
-                        className="btn btn-outline-primary d-flex align-items-center gap-2"
-                        style={{ fontSize: "1rem" }}
+                        className="btn btn-outline-primary d-flex align-items-center gap-2 sched-generate-btn"
                       >
                         <Plus size={20} /> Generate
                       </button>
                     </div>
                   </div>
+
                   <div className="col-md-6">
                     <label className="form-label fw-semibold d-flex align-items-center gap-2">
                       <FileText size={20} /> Agenda
@@ -1206,81 +890,51 @@ const ScheduleMeeting = () => {
                       name="agenda"
                       value={formData.agenda}
                       onChange={handleInputChange}
-                      className="form-control"
+                      className="form-control sched-textarea"
                       rows={4}
                       placeholder="Enter meeting agenda and topics to discuss..."
-                      style={{
-                        fontSize: "1rem",
-                        padding: "0.6rem 0.75rem",
-                        minHeight: 90,
-                      }}
                     />
                   </div>
                 </div>
               </div>
             </div>
 
-          
-
-            <div className="d-flex gap-3 justify-content-end mt-4">
-              <button
-                type="button"
-                className="btn btn-secondary px-4 d-flex align-items-center gap-2"
-                onClick={() => navigate(-1)}
-                style={{ fontSize: "1rem", fontWeight: 500 }}
-              >
-                <X size={20} /> Cancel
-              </button>
-              <button
-                type="submit"
-                className="btn px-4 d-flex align-items-center gap-2"
-                disabled={loading}
-                style={{
-                  background:
-                    "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                  color: "#fff",
-                  border: "none",
-                  fontSize: "1rem",
-                  fontWeight: 500,
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.opacity = "0.9";
-                  e.currentTarget.style.transform = "translateY(-1px)";
-                  e.currentTarget.style.boxShadow =
-                    "0 4px 12px rgba(151, 36, 126, 0.3)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.opacity = "1";
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "none";
-                }}
-              >
-                {loading ? (
-                  <>
-                    <span
-                      className="spinner-border spinner-border-sm"
-                      role="status"
-                      aria-hidden="true"
-                    ></span>
-                    Scheduling...
-                  </>
-                ) : (
-                  <>
-                    <CalendarIcon size={20} />
-                    Schedule Meeting
-                  </>
-                )}
-              </button>
-            </div>
+              
+                <div className="d-flex gap-3 justify-content-end mt-4">
+                  <button
+                    type="button"
+                    className="btn btn-secondary px-4 d-flex align-items-center gap-2 sched-cancel-btn"
+                    onClick={() => navigate(-1)}
+                  >
+                    <X size={20} /> Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn px-4 d-flex align-items-center gap-2 sched-submit-btn"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <span
+                          className="spinner-border spinner-border-sm"
+                          role="status"
+                          aria-hidden="true"
+                        ></span>
+                        Scheduling...
+                      </>
+                    ) : (
+                      <>
+                        <CalendarIcon size={20} />
+                        Schedule Meeting
+                      </>
+                    )}
+                  </button>
+                </div>
+              
+            
           </form>
         </div>
       </div>
-      <style>{`
-        .breadcrumb-item + .breadcrumb-item::before {
-          display: none;
-        }
-      `}</style>
     </div>
   );
 };

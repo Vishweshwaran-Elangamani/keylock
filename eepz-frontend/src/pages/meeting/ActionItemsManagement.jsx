@@ -5,6 +5,7 @@ import toastr from "toastr";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import "../../styles/mom/components/ActionItemsManagement.css";
 
 const PRIMARY = "#5E4B9A";
 
@@ -14,10 +15,8 @@ const ActionItemsManagement = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
   const [employeeMap, setEmployeeMap] = useState({});
-
-  // Search states
-  const [searchInput, setSearchInput] = useState(""); // what user types
-  const [searchTerm, setSearchTerm] = useState("");   // committed search
+  const [searchInput, setSearchInput] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
@@ -108,426 +107,220 @@ const ActionItemsManagement = () => {
 
   if (loading) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center min-vh-100"
-        style={{ backgroundColor: "#f8f9fa" }}
-      >
-        <div className="text-center">
+      <div className="aim-loading">
+        <div className="aim-loading-inner">
           <div
-            className="spinner-border text-primary mb-3"
+            className="spinner-border text-primary mb-3 aim-loading-spinner"
             role="status"
-            style={{ width: "3rem", height: "3rem" }}
           >
             <span className="visually-hidden">Loading...</span>
           </div>
-          <p className="text-muted fw-medium">Loading action items...</p>
+          <p className="aim-loading-text">Loading action items...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div
-      className="container-fluid px-4 py-4"
-      style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}
-    >
-      {/* Breadcrumb */}
-      <nav aria-label="breadcrumb" className="mb-3">
-        <ol
-          className="breadcrumb mb-0 d-flex align-items-center"
-          style={{
-            backgroundColor: "transparent",
-            padding: 0,
-            margin: 0,
-          }}
-        >
-          <li
-            className="breadcrumb-item"
-            style={{ display: "flex", alignItems: "center" }}
-          >
-            <button
-              onClick={() => navigate("/employee/dashboard/")}
-              style={{
-                background: "none",
-                border: "none",
-                color: "#97247E",
-                cursor: "pointer",
-                padding: 0,
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                fontSize: "0.875rem",
-                fontWeight: 500,
-                textDecoration: "none",
-                transition: "color 0.2s ease",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
-            >
-              <i className="bi bi-house-door" style={{ fontSize: "1rem" }}></i>
-              Dashboard
-            </button>
-          </li>
-          <li
-            style={{
-              display: "flex",
-              alignItems: "center",
-              color: "#97247E",
-              margin: "0 8px",
-              fontSize: "1rem",
-            }}
-          >
-            /
-          </li>
-
-          <li
-            className="breadcrumb-item"
-            style={{ display: "flex", alignItems: "center" }}
-          >
-            <button
-              onClick={() => navigate("/employee/dashboard/meetmom")}
-              style={{
-                background: "none",
-                border: "none",
-                color: "#97247E",
-                cursor: "pointer",
-                padding: 0,
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                fontSize: "0.875rem",
-                fontWeight: 500,
-                textDecoration: "none",
-                transition: "color 0.2s ease",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
-            >
-              Meetings and MoM
-            </button>
-          </li>
-          <li
-            style={{
-              display: "flex",
-              alignItems: "center",
-              color: "#97247E",
-              margin: "0 8px",
-              fontSize: "1rem",
-            }}
-          >
-            /
-          </li>
-          <li
-            className="breadcrumb-item active"
-            aria-current="page"
-            style={{
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <span
-              style={{
-                color: "#1e293b",
-                fontSize: "0.875rem",
-                fontWeight: 600,
-              }}
-            >
-              Action Items
-            </span>
-          </li>
-        </ol>
-      </nav>
-
-      {/* Stat cards */}
-      <div className="row g-3 mb-4">
-        <div className="col-lg-3 col-md-6">
-          <div
-            className="card shadow-sm h-100"
-            onClick={() => setFilter("all")}
-            style={{
-              cursor: "pointer",
-              transition: "all 0.2s",
-              border: "1px solid #27235c",
-              borderRadius: "12px",
-            }}
-          >
-            <div className="card-body d-flex align-items-center p-3">
-              <div
-                className="rounded-circle d-flex align-items-center justify-content-center me-3"
-                style={{
-                  width: "50px",
-                  height: "50px",
-                  backgroundColor: "#e3f2fd",
-                  flexShrink: 0,
-                }}
+    <div className="aim-page">
+      <div className="aim-container container-fluid px-4 py-4">
+        <nav aria-label="breadcrumb" className="aim-breadcrumb">
+          <ol className="breadcrumb mb-0 d-flex align-items-center aim-breadcrumb-list">
+            <li className="breadcrumb-item aim-breadcrumb-item">
+              <button
+                onClick={() => navigate("/employee/dashboard/")}
+                className="aim-breadcrumb-link aim-breadcrumb-home"
               >
-                <i
-                  className="bi bi-card-checklist fs-4"
-                  style={{ color: "#1976d2" }}
-                ></i>
-              </div>
-              <div>
-                <h4
-                  className="fw-bold mb-0"
-                  style={{ fontSize: "1.5rem", color: "#1e293b" }}
-                >
-                  {stats.total}
-                </h4>
-                <p className="text-muted mb-0 small fw-medium">Total Tasks</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-lg-3 col-md-6">
-          <div
-            className="card shadow-sm h-100"
-            onClick={() => setFilter("overdue")}
-            style={{
-              cursor: "pointer",
-              transition: "all 0.2s",
-              border: "1px solid #27235c",
-              borderRadius: "12px",
-            }}
-          >
-            <div className="card-body d-flex align-items-center p-3">
-              <div
-                className="rounded-circle d-flex align-items-center justify-content-center me-3"
-                style={{
-                  width: "50px",
-                  height: "50px",
-                  backgroundColor: "#ffebee",
-                  flexShrink: 0,
-                }}
+                <i className="bi bi-house-door"></i>
+                Dashboard
+              </button>
+            </li>
+            <li className="aim-breadcrumb-separator">/</li>
+            <li className="breadcrumb-item aim-breadcrumb-item">
+              <button
+                onClick={() => navigate("/employee/dashboard/meetmom")}
+                className="aim-breadcrumb-link"
               >
-                <i
-                  className="bi bi-exclamation-triangle fs-4"
-                  style={{ color: "#d32f2f" }}
-                ></i>
-              </div>
-              <div>
-                <h4
-                  className="fw-bold mb-0"
-                  style={{ fontSize: "1.5rem", color: "#1e293b" }}
-                >
-                  {stats.overdue}
-                </h4>
-                <p className="text-muted mb-0 small fw-medium">Overdue</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+                Meetings and MoM
+              </button>
+            </li>
+            <li className="aim-breadcrumb-separator">/</li>
+            <li
+              className="breadcrumb-item active aim-breadcrumb-item"
+              aria-current="page"
+            >
+              <span className="aim-breadcrumb-current">Action Items</span>
+            </li>
+          </ol>
+        </nav>
 
-      {/* Search + count */}
-      <div
-        className="card shadow-sm mb-4"
-        style={{ border: "1px solid #27235c" }}
-      >
-        <div className="card-body py-3">
-          <div className="row g-3 align-items-center">
-            <div className="col-lg-9">
-              <div
-                className="d-flex align-items-stretch"
-                style={{
-                  borderRadius: "9999px",
-                  overflow: "hidden",
-                  border: "1px solid #CBD5E1",
-                  backgroundColor: "#ffffff",
-                }}
-              >
-                <span
-                  className="d-flex align-items-center justify-content-center px-3"
-                  style={{ color: "#9CA3AF" }}
-                >
-                  <i className="bi bi-search" />
-                </span>
-
-                <input
-                  type="text"
-                  className="form-control border-0"
-                  style={{
-                    boxShadow: "none",
-                    borderRadius: 0,
-                    fontSize: "0.9rem",
-                  }}
-                  placeholder="Search action items..."
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleSearchClick();
-                  }}
-                />
-
-                {isSearching ? (
-                  <button
-                    type="button"
-                    onClick={handleCancelClick}
-                    style={{
-                      border: "none",
-                      outline: "none",
-                      padding: "0 18px",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "6px",
-                      backgroundColor: "#5F6472",
-                      color: "#ffffff",
-                      fontSize: "0.85rem",
-                      fontWeight: 600,
-                      borderRadius: "9999px",
-                    }}
-                  >
-                    <i className="bi bi-x" />
-                    Cancel
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={handleSearchClick}
-                    style={{
-                      border: "none",
-                      outline: "none",
-                      padding: "0 18px",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "6px",
-                      backgroundColor: PRIMARY,
-                      color: "#ffffff",
-                      fontSize: "0.85rem",
-                      fontWeight: 600,
-                      borderRadius: "9999px",
-                    }}
-                  >
-                    <i className="bi bi-search" />
-                    Search
-                  </button>
-                )}
-              </div>
-            </div>
-            <div className="col-lg-3 text-end">
-              <span className="badge bg-light text-dark fw-medium">
-                Showing {filteredItems.length} of {actionItems.length} tasks
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Action item cards */}
-      <div className="row">
-        <div className="col-12">
-          {filteredItems.length === 0 ? (
+        <div className="row g-3 mb-4">
+          <div className="col-lg-3 col-md-6">
             <div
-              className="card shadow-sm"
-              style={{ border: "1px solid #27235c" }}
+              className="card aim-stat-card"
+              onClick={() => setFilter("all")}
             >
-              <div className="card-body text-center py-5">
-                <div
-                  className="mb-3"
-                  style={{ fontSize: "4rem", opacity: 0.3 }}
-                >
-                  <i className="bi bi-inbox"></i>
+              <div className="card-body aim-stat-card-body">
+                <div className="aim-stat-icon aim-stat-icon-total">
+                  <i className="bi bi-card-checklist"></i>
                 </div>
-                <h5 className="fw-semibold text-muted mb-2">
-                  No action items found
-                </h5>
-                <p className="text-muted mb-0">
-                  {searchTerm
-                    ? "Try adjusting your search criteria"
-                    : "You have no action items assigned"}
-                </p>
+                <div className="aim-stat-text">
+                  <h4 className="aim-stat-value">{stats.total}</h4>
+                  <p className="aim-stat-label">Total Tasks</p>
+                </div>
               </div>
             </div>
-          ) : (
-            <div className="row g-3">
-              {filteredItems.map((item) => {
-                const overdueStatus = isOverdue(item);
-                const meetingTitle = getMeetingTitle(item);
+          </div>
 
-                return (
-                  <div key={item.actionItemId} className="col-lg-6 col-xl-4">
-                    <div
-                      className="card shadow-sm h-100"
-                      style={{
-                        transition: "all 0.2s",
-                        border: "1px solid #27235c",
-                        borderRadius: "12px",
-                      }}
-                      onMouseOver={(e) => {
-                        e.currentTarget.style.transform = "translateY(-5px)";
-                        e.currentTarget.style.boxShadow =
-                          "0 0.5rem 1rem rgba(0, 0, 0, 0.15)";
-                      }}
-                      onMouseOut={(e) => {
-                        e.currentTarget.style.transform = "translateY(0)";
-                        e.currentTarget.style.boxShadow =
-                          "0 0.125rem 0.25rem rgba(0, 0, 0, 0.075)";
-                      }}
+          <div className="col-lg-3 col-md-6">
+            <div
+              className="card aim-stat-card"
+              onClick={() => setFilter("overdue")}
+            >
+              <div className="card-body aim-stat-card-body">
+                <div className="aim-stat-icon aim-stat-icon-overdue">
+                  <i className="bi bi-exclamation-triangle"></i>
+                </div>
+                <div className="aim-stat-text">
+                  <h4 className="aim-stat-value">{stats.overdue}</h4>
+                  <p className="aim-stat-label">Overdue</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="card aim-search-card">
+          <div className="card-body aim-search-card-body">
+            <div className="row g-3 align-items-center">
+              <div className="col-lg-9">
+                <div className="aim-search-shell">
+                  <span className="aim-search-icon">
+                    <i className="bi bi-search" />
+                  </span>
+
+                  <input
+                    type="text"
+                    className="form-control aim-search-input"
+                    placeholder="Search action items..."
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleSearchClick();
+                    }}
+                  />
+
+                  {isSearching ? (
+                    <button
+                      type="button"
+                      onClick={handleCancelClick}
+                      className="aim-search-btn aim-search-btn-cancel"
                     >
-                      <div
-                        className="card-body p-4"
-                        style={{ fontSize: "0.95rem" }}
-                      >
-                        <h6
-                          className="fw-semibold mb-3"
-                          style={{ fontSize: "1rem" }}
-                        >
-                          {item.taskDescription}
-                        </h6>
+                      <i className="bi bi-x" />
+                      Cancel
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleSearchClick}
+                      className="aim-search-btn aim-search-btn-primary"
+                    >
+                      <i className="bi bi-search" />
+                      Search
+                    </button>
+                  )}
+                </div>
+              </div>
+              <div className="col-lg-3 text-lg-end">
+                <span className="aim-count-badge">
+                  Showing {filteredItems.length} of {actionItems.length} tasks
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-                        <div
-                          className="mb-3 p-2 rounded"
-                          style={{ backgroundColor: "#f8f9fa" }}
-                        >
-                          <small className="text-muted d-flex align-items-center gap-2">
-                            <i className="bi bi-calendar-event text-primary"></i>
-                            <strong>Meeting:</strong> {meetingTitle}
-                          </small>
-                        </div>
+        <div className="row">
+          <div className="col-12">
+            {filteredItems.length === 0 ? (
+              <div className="card aim-empty-card">
+                <div className="card-body text-center py-5">
+                  <div className="aim-empty-icon-wrapper">
+                    <i className="bi bi-inbox"></i>
+                  </div>
+                  <h5 className="aim-empty-title">
+                    No action items found
+                  </h5>
+                  <p className="aim-empty-text">
+                    {searchTerm
+                      ? "Try adjusting your search criteria"
+                      : "You have no action items assigned"}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="row g-3">
+                {filteredItems.map((item) => {
+                  const overdueStatus = isOverdue(item);
+                  const meetingTitle = getMeetingTitle(item);
 
-                        <div className="d-flex flex-column gap-2">
-                          <div className="d-flex align-items-center gap-2 text-muted small">
-                            <i className="bi bi-calendar3 text-danger"></i>
-                            <strong>Due Date:</strong>
-                            <span
-                              className={
-                                overdueStatus ? "text-danger fw-semibold" : ""
-                              }
-                            >
-                              {new Date(item.dueDate).toLocaleDateString(
-                                "en-US",
-                                {
+                  return (
+                    <div
+                      key={item.actionItemId}
+                      className="col-lg-6 col-xl-4"
+                    >
+                      <div className="card aim-item-card h-100">
+                        <div className="card-body aim-item-card-body">
+                          <h6 className="aim-item-title">
+                            {item.taskDescription}
+                          </h6>
+
+                          <div className="aim-item-meeting">
+                            <small className="aim-item-meeting-text">
+                              <i className="bi bi-calendar-event text-primary"></i>
+                              <strong>Meeting:</strong> {meetingTitle}
+                            </small>
+                          </div>
+
+                          <div className="aim-item-meta">
+                            <div className="aim-item-meta-row">
+                             
+                              <strong>Due Date:</strong>
+                              <span
+                                className={
+                                  overdueStatus
+                                    ? "aim-item-due-overdue"
+                                    : ""
+                                }
+                              >
+                                {new Date(
+                                  item.dueDate
+                                ).toLocaleDateString("en-US", {
                                   year: "numeric",
                                   month: "short",
                                   day: "numeric",
-                                }
-                              )}
-                            </span>
-                          </div>
-
-                          {item.assignedByEmployeeName && (
-                            <div className="d-flex align-items-center gap-2 text-muted small">
-                              <i className="bi bi-person-circle text-success"></i>
-                              <strong>Assigned by:</strong>
-                              <span>{item.assignedByEmployeeName}</span>
+                                })}
+                              </span>
                             </div>
-                          )}
+
+                            {item.assignedByEmployeeName && (
+                              <div className="aim-item-meta-row">
+                               
+                                <strong>Assigned by:</strong>
+                                <span>{item.assignedByEmployeeName}</span>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
       </div>
-
-      <style>{`
-        .breadcrumb-item + .breadcrumb-item::before {
-          display: none;
-        }
-      `}</style>
     </div>
   );
 };

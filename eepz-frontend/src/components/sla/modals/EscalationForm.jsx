@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { X, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import slaService from "../../../services/sla/slaService";
-import "../../../styles/sla/EscalationForm.css";
+import "../../../styles/sla/modals/EscalationForm.css";
 
 const EscalationForm = ({ sla, onClose, onSuccess }) => {
   const [selectedReason, setSelectedReason] = useState("");
@@ -152,127 +152,62 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
 
   return (
     <div
-      className="modal show d-block"
-      style={{
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
-        zIndex: 1055,
-      }}
+      className="esc-overlay modal show d-block"
       onClick={onClose}
     >
       <div
-        className="modal-dialog modal-dialog-centered"
-        style={{ maxWidth: "500px" }}
+        className="esc-dialog modal-dialog modal-dialog-centered"
         onClick={(e) => e.stopPropagation()}
       >
-        <div
-          className="modal-content"
-          style={{
-            borderRadius: "16px",
-            border: "none",
-            overflow: "hidden",
-            boxShadow: "0 10px 40px rgba(0,0,0,0.15)",
-          }}
-        >
-          {/* Header */}
-          <div
-            style={{
-              background: "#3E3A64",
-              padding: "1.25rem 1.5rem",
-              borderBottom: "none",
-            }}
-          >
-            <div className="d-flex justify-content-between align-items-center">
-              <div className="d-flex align-items-center gap-2">
-                <div
-                  style={{
-                    width: "28px",
-                    height: "28px",
-                    borderRadius: "50%",
-                    background: "rgba(255,255,255,0.15)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <AlertCircle size={16} color="#FCD34D" />
-                </div>
-                <h5
-                  className="mb-0 fw-bold"
-                  style={{
-                    color: "#fff",
-                    fontSize: "1rem",
-                    letterSpacing: "-0.01em",
-                  }}
-                >
-                  Add Escalation
-                </h5>
+        <div className="esc-modal modal-content">
+          <div className="esc-header">
+            <div className="esc-header-main">
+              <div className="esc-header-icon-wrapper">
+                <AlertCircle size={16} className="esc-header-icon" />
               </div>
-              <button
-                onClick={onClose}
-                disabled={submitting}
-                style={{
-                  background: "transparent",
-                  border: "none",
-                  cursor: "pointer",
-                  padding: "4px",
-                  opacity: 0.8,
-                  transition: "opacity 0.2s",
-                  borderRadius: "4px",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.opacity = "1";
-                  e.currentTarget.style.background = "rgba(255,255,255,0.1)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.opacity = "0.8";
-                  e.currentTarget.style.background = "transparent";
-                }}
-              >
-                <X size={20} color="#fff" />
-              </button>
+              <h5 className="esc-header-title">Add Escalation</h5>
             </div>
+            <button
+              onClick={onClose}
+              disabled={submitting}
+              className="esc-close-btn"
+            >
+              <X size={20} />
+            </button>
           </div>
 
-          {/* Body */}
-          <div style={{ padding: "1.5rem" }}>
+          <div className="esc-body">
             {loadingManager ? (
-              <div className="text-center py-4">
+              <div className="esc-loading">
                 <div
-                  className="spinner-border text-primary"
+                  className="spinner-border text-primary esc-loading-spinner"
                   role="status"
-                  style={{ width: "2.5rem", height: "2.5rem" }}
                 >
                   <span className="visually-hidden">Loading...</span>
                 </div>
-                <p
-                  className="text-muted mt-3 mb-0"
-                  style={{ fontSize: "0.875rem" }}
-                >
+                <p className="esc-loading-text">
                   Loading escalation details...
                 </p>
               </div>
             ) : managerError ? (
               <div>
-                <div
-                  className="alert alert-danger d-flex align-items-start gap-3"
-                  style={{ borderRadius: "8px" }}
-                >
+                <div className="esc-manager-error alert alert-danger d-flex align-items-start gap-3">
                   <AlertCircle
                     size={20}
-                    className="flex-shrink-0"
-                    style={{ marginTop: "2px" }}
+                    className="flex-shrink-0 esc-manager-error-icon"
                   />
                   <div>
-                    <strong className="d-block mb-1">Manager Not Found</strong>
+                    <strong className="d-block mb-1">
+                      Manager Not Found
+                    </strong>
                     <small>{managerError}</small>
                   </div>
                 </div>
-                <div className="text-center mt-3">
+                <div className="esc-manager-error-footer text-center mt-3">
                   <button
                     type="button"
-                    className="btn btn-secondary"
+                    className="esc-btn esc-btn-secondary btn btn-secondary"
                     onClick={onClose}
-                    style={{ borderRadius: "8px" }}
                   >
                     Close
                   </button>
@@ -280,47 +215,13 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
               </div>
             ) : (
               <form onSubmit={handleSubmit}>
-                {/* Goal */}
-                <div
-                  className="mb-3"
-                  style={{
-                    background: "#F3F4F6",
-                    padding: "0.75rem 1rem",
-                    borderRadius: "8px",
-                    border: "1px solid #E5E7EB",
-                  }}
-                >
-                  <label
-                    style={{
-                      fontSize: "0.75rem",
-                      fontWeight: 600,
-                      color: "#6B7280",
-                      marginBottom: "0.25rem",
-                      display: "block",
-                    }}
-                  >
-                    Goal:
-                  </label>
-                  <div
-                    style={{
-                      fontSize: "0.875rem",
-                      color: "#1F2937",
-                      fontWeight: 500,
-                    }}
-                  >
-                    {sla.slatype}
-                  </div>
+                <div className="esc-goal">
+                  <label className="esc-goal-label">Goal:</label>
+                  <div className="esc-goal-value">{sla.slatype}</div>
                 </div>
 
-                {/* Deadline */}
-                <div className="mb-3">
-                  <small
-                    style={{
-                      fontSize: "0.813rem",
-                      color: "#DC2626",
-                      fontWeight: 500,
-                    }}
-                  >
+                <div className="esc-deadline">
+                  <small className="esc-deadline-text">
                     Deadline:{" "}
                     {new Date(sla.deadline).toLocaleDateString("en-US", {
                       year: "numeric",
@@ -330,41 +231,24 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                   </small>
                 </div>
 
-                {/* Manager info */}
                 {managerName && (
-                  <div
-                    className="alert d-flex align-items-start gap-2 mb-3"
-                    style={{
-                      borderRadius: "8px",
-                      background: "#EFF6FF",
-                      border: "1px solid #BFDBFE",
-                      padding: "0.75rem",
-                    }}
-                  >
+                  <div className="esc-manager-info alert d-flex align-items-start gap-2 mb-3">
                     <AlertCircle
                       size={16}
-                      color="#2563EB"
-                      style={{ marginTop: "2px", flexShrink: 0 }}
+                      className="esc-manager-info-icon"
                     />
-                    <small style={{ color: "#1E40AF", fontSize: "0.813rem" }}>
+                    <small className="esc-manager-info-text">
                       This will be escalated to <strong>{managerName}</strong>
                     </small>
                   </div>
                 )}
 
-                {/* Reason dropdown styled like screenshot */}
-                <div className="mb-3">
+                <div className="esc-field">
                   <label
                     htmlFor="reason"
-                    style={{
-                      fontSize: "0.875rem",
-                      fontWeight: 600,
-                      color: "#374151",
-                      marginBottom: "0.5rem",
-                      display: "block",
-                    }}
+                    className="esc-label"
                   >
-                    Reason <span style={{ color: "#DC2626" }}>*</span>
+                    Reason <span className="esc-required">*</span>
                   </label>
                   <div className="esc-select-wrapper">
                     <select
@@ -387,23 +271,16 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                   </div>
                 </div>
 
-                {/* Comment */}
-                <div className="mb-2">
+                <div className="esc-field esc-comment-field">
                   <label
                     htmlFor="details"
-                    style={{
-                      fontSize: "0.875rem",
-                      fontWeight: 600,
-                      color: "#374151",
-                      marginBottom: "0.5rem",
-                      display: "block",
-                    }}
+                    className="esc-label"
                   >
-                    Your Comment <span style={{ color: "#DC2626" }}>*</span>
+                    Your Comment <span className="esc-required">*</span>
                   </label>
                   <textarea
                     id="details"
-                    className="form-control"
+                    className="esc-textarea form-control"
                     placeholder="Write your comment here..."
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
@@ -412,106 +289,40 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                     rows={3}
                     disabled={submitting}
                     maxLength={500}
-                    style={{
-                      borderRadius: "8px",
-                      border: "1px solid #D1D5DB",
-                      padding: "0.625rem 0.875rem",
-                      fontSize: "0.875rem",
-                      resize: "none",
-                      outline: "none",
-                      transition: "all 0.2s",
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "#3B82F6";
-                      e.currentTarget.style.boxShadow =
-                        "0 0 0 3px rgba(59,130,246,0.1)";
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = "#D1D5DB";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
                   />
-                  <div className="d-flex justify-content-between align-items-center mt-1">
-                    <small
-                      style={{
-                        color: "#9CA3AF",
-                        fontSize: "0.75rem",
-                        fontStyle: "italic",
-                      }}
-                    >
+                  <div className="esc-comment-meta d-flex justify-content-between align-items-center mt-1">
+                    <small className="esc-comment-hint">
                       ⓘ Press Ctrl+Enter to submit quickly
                     </small>
-                    <small
-                      style={{
-                        color: "#9CA3AF",
-                        fontSize: "0.75rem",
-                      }}
-                    >
+                    <small className="esc-comment-count">
                       {description.length}/500
                     </small>
                   </div>
                 </div>
 
-                {/* Info */}
-                <div
-                  style={{
-                    background: "#DBEAFE",
-                    padding: "0.75rem",
-                    borderRadius: "8px",
-                    marginTop: "1rem",
-                    display: "flex",
-                    alignItems: "start",
-                    gap: "0.5rem",
-                    border: "1px solid #BFDBFE",
-                  }}
-                >
+                <div className="esc-level-info">
                   <AlertCircle
                     size={16}
-                    color="#2563EB"
-                    style={{ marginTop: "2px", flexShrink: 0 }}
+                    className="esc-level-info-icon"
                   />
-                  <small
-                    style={{
-                      color: "#1E40AF",
-                      fontSize: "0.813rem",
-                      lineHeight: "1.4",
-                    }}
-                  >
+                  <small className="esc-level-info-text">
                     <strong>Level 1 (L1)</strong> escalation to your manager for
                     immediate review.
                   </small>
                 </div>
 
-                {/* Footer buttons */}
-                <div
-                  style={{
-                    marginTop: "1.25rem",
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    gap: "0.75rem",
-                  }}
-                >
+                <div className="esc-footer">
                   <button
                     type="button"
-                    className="btn"
+                    className="esc-btn esc-btn-cancel btn"
                     onClick={onClose}
                     disabled={submitting}
-                    style={{
-                      borderRadius: "8px",
-                      padding: "0.5rem 1.25rem",
-                      fontSize: "0.875rem",
-                      fontWeight: 500,
-                      border: "1px solid #D1D5DB",
-                      background: "#fff",
-                      color: "#6B7280",
-                      transition: "all 0.2s",
-                    }}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="btn d-flex align-items-center gap-2"
+                    className="esc-btn esc-btn-submit btn d-flex align-items-center gap-2"
                     disabled={
                       submitting ||
                       loadingManager ||
@@ -519,33 +330,16 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                       !selectedReason ||
                       description.trim().length < 10
                     }
-                    style={{
-                      borderRadius: "8px",
-                      padding: "0.5rem 1.5rem",
-                      fontSize: "0.875rem",
-                      fontWeight: 500,
-                      background: "#C2185B",
-                      color: "#fff",
-                      border: "none",
-                      transition: "all 0.2s",
-                      opacity:
-                        submitting ||
-                        loadingManager ||
-                        !managerId ||
-                        !selectedReason ||
-                        description.trim().length < 10
-                          ? 0.6
-                          : 1,
-                    }}
                   >
                     {submitting ? (
                       <>
-                        <span className="spinner-border spinner-border-sm" />
+                        <span className="spinner-border spinner-border-sm esc-submit-spinner" />
                         <span>Posting...</span>
                       </>
                     ) : (
                       <>
                         <svg
+                          className="esc-submit-icon"
                           width="14"
                           height="14"
                           viewBox="0 0 24 24"

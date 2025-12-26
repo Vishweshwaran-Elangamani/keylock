@@ -10,7 +10,7 @@ import {
   User,
   Calendar,
 } from "lucide-react";
-import "../../../styles/sla/SLAHistoryTimeline.css";
+import "../../../styles/sla/components/SLAHistoryTimeline.css";
 
 const SLAHistoryTimeline = ({ history }) => {
   const getIconAndColor = (changeType) => {

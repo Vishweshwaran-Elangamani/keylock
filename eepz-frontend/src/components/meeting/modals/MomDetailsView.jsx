@@ -1,78 +1,31 @@
-import React from 'react';
+import React from "react";
+import "../../../styles/mom/modals/MomDetailsView.css";
 
-const PRIMARY = '#27235C';
+const PRIMARY = "#27235C";
 
 const MomDetailsView = ({ mom, onClose }) => {
+  if (!mom) return null;
+
   return (
     <div
-      className="modal fade show d-block"
+      className="mdv-overlay modal fade show d-block"
       tabIndex="-1"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        backgroundColor: 'rgba(15, 23, 42, 0.25)',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
-        zIndex: 1060,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
       onClick={onClose}
     >
-      {/* Centered container */}
       <div
-        style={{
-          position: 'absolute',
-          top: '50%',
-          left: '53%',
-          transform: 'translate(-50%, -50%)',
-          width: '100%',
-          maxWidth: '720px',
-          maxHeight: '90vh',
-        }}
+        className="mdv-dialog"
         onClick={(e) => e.stopPropagation()}
       >
-        <div
-          className="modal-content border-0 shadow-lg"
-          style={{ borderRadius: '16px', overflow: 'hidden' }}
-        >
-          {/* HEADER */}
-          <div
-            className="modal-header border-0"
-            style={{
-              padding: '1.25rem 1.5rem 0.75rem',
-              backgroundColor: PRIMARY,
-            }}
-          >
+        <div className="mdv-content modal-content border-0 shadow-lg">
+          <div className="mdv-header modal-header border-0">
             <div>
-              <h5
-                className="modal-title fw-bold mb-1"
-                style={{
-                  color: '#ffffff',
-                  fontSize: '1.4rem',
-                  lineHeight: 1.2,
-                }}
-              >
+              <h5 className="mdv-title modal-title fw-bold mb-1">
                 {mom.meetingTitle}
               </h5>
-
-              <span
-                style={{
-                  display: 'inline-block',
-                  backgroundColor: PRIMARY,
-                  color: '#ffffff',
-                  borderRadius: '9999px',
-                  fontSize: '0.8rem',
-                  fontWeight: 600,
-                  padding: '0.2rem 0.9rem',
-                  border: '1px solid rgba(255,255,255,0.4)',
-                }}
-              >
+              <span className="mdv-type-pill">
                 {mom.meetingType}
               </span>
             </div>
-
             <button
               type="button"
               className="btn-close btn-close-white"
@@ -81,24 +34,10 @@ const MomDetailsView = ({ mom, onClose }) => {
             ></button>
           </div>
 
-          {/* BODY */}
-          <div
-            className="modal-body"
-            style={{
-              padding: '1.25rem 1.5rem 1rem',
-              maxHeight: 'calc(90vh - 170px)',
-              overflowY: 'auto',
-            }}
-          >
-            <div
-              className="card bg-light border-0 mb-4"
-              style={{ borderRadius: '18px' }}
-            >
+          <div className="mdv-body modal-body">
+            <div className="mdv-info-card card bg-light border-0 mb-4">
               <div className="card-body p-4">
-                <h6
-                  className="fw-semibold mb-4"
-                  style={{ color: PRIMARY, fontSize: '0.95rem' }}
-                >
+                <h6 className="mdv-info-title fw-semibold mb-4">
                   Meeting Information
                 </h6>
                 <div className="row g-4">
@@ -107,10 +46,7 @@ const MomDetailsView = ({ mom, onClose }) => {
                       Meeting Date:
                     </small>
                     <div className="fw-semibold d-flex align-items-center gap-2">
-                      <i
-                        className="bi bi-calendar3"
-                        style={{ color: PRIMARY }}
-                      ></i>
+                      <i className="bi bi-calendar3 mdv-icon-primary"></i>
                       {new Date(mom.meetingDate).toLocaleString()}
                     </div>
                   </div>
@@ -124,8 +60,7 @@ const MomDetailsView = ({ mom, onClose }) => {
                         href={mom.meetingLink}
                         target="_blank"
                         rel="noreferrer"
-                        className="fw-semibold d-flex align-items-center gap-2"
-                        style={{ color: PRIMARY, textDecoration: 'none' }}
+                        className="mdv-link fw-semibold d-flex align-items-center gap-2"
                       >
                         <i className="bi bi-link-45deg"></i>
                         Join Meeting
@@ -139,11 +74,8 @@ const MomDetailsView = ({ mom, onClose }) => {
                       Attendees:
                     </small>
                     <div className="fw-semibold d-flex align-items-center gap-2">
-                      <i
-                        className="bi bi-people"
-                        style={{ color: PRIMARY }}
-                      ></i>
-                      {mom.attendees || 'N/A'}
+                      <i className="bi bi-people mdv-icon-primary"></i>
+                      {mom.attendees || "N/A"}
                     </div>
                   </div>
 
@@ -151,14 +83,8 @@ const MomDetailsView = ({ mom, onClose }) => {
                     <small className="text-muted d-block mb-1">
                       Submitted by:
                     </small>
-                    <div
-                      className="fw-semibold d-flex align-items-center"
-                      style={{ gap: '6px' }}
-                    >
-                      <i
-                        className="bi bi-person-circle"
-                        style={{ color: PRIMARY }}
-                      ></i>
+                    <div className="fw-semibold d-flex align-items-center mdv-submitter">
+                      <i className="bi bi-person-circle mdv-icon-primary"></i>
                       <span>
                         {mom.submittedByEmployeeName} ({mom.submittedByRole})
                       </span>
@@ -170,24 +96,18 @@ const MomDetailsView = ({ mom, onClose }) => {
 
             {mom.commentsObservations && (
               <div className="mb-4">
-                <h6
-                  className="fw-semibold mb-3 d-flex align-items-center gap-2"
-                  style={{ color: PRIMARY }}
-                >
+                <h6 className="mdv-section-title fw-semibold mb-3 d-flex align-items-center gap-2">
                   <i className="bi bi-chat-left-text"></i>
-                  Comments & Observations
+                  Comments &amp; Observations
                 </h6>
-                <div className="alert alert-secondary mb-0">
+                <div className="mdv-comments alert alert-secondary mb-0">
                   {mom.commentsObservations}
                 </div>
               </div>
             )}
 
             <div className="mb-4">
-              <h6
-                className="fw-semibold mb-3 d-flex align-items-center gap-2"
-                style={{ color: PRIMARY }}
-              >
+              <h6 className="mdv-section-title fw-semibold mb-3 d-flex align-items-center gap-2">
                 <i className="bi bi-chat-dots"></i>
                 Discussion Points
                 {mom.discussionPoints?.length > 0 && (
@@ -201,10 +121,9 @@ const MomDetailsView = ({ mom, onClose }) => {
                   {mom.discussionPoints.map((dp, index) => (
                     <div
                       key={index}
-                      className="p-3 rounded d-flex align-items-start gap-3"
-                      style={{ backgroundColor: '#f8f9fa' }}
+                      className="mdv-discussion-item p-3 rounded d-flex align-items-start gap-3"
                     >
-                      <span className="">{dp.pointText}</span>
+                      <span>{dp.pointText}</span>
                     </div>
                   ))}
                 </div>
@@ -216,10 +135,7 @@ const MomDetailsView = ({ mom, onClose }) => {
             </div>
 
             <div className="mb-4">
-              <h6
-                className="fw-semibold mb-3 d-flex align-items-center gap-2"
-                style={{ color: PRIMARY }}
-              >
+              <h6 className="mdv-section-title fw-semibold mb-3 d-flex align-items-center gap-2">
                 <i className="bi bi-check2-square"></i>
                 Action Items
                 {mom.actionItems?.length > 0 && (
@@ -233,11 +149,7 @@ const MomDetailsView = ({ mom, onClose }) => {
                   {mom.actionItems.map((ai, index) => (
                     <div
                       key={index}
-                      className="p-3 rounded"
-                      style={{
-                        backgroundColor: '#f8f9fa',
-                        border: '1px solid #e9ecef',
-                      }}
+                      className="mdv-action-item p-3 rounded"
                     >
                       <div className="d-flex justify-content-between align-items-start mb-3">
                         <h6 className="fw-semibold mb-0">
@@ -248,17 +160,17 @@ const MomDetailsView = ({ mom, onClose }) => {
                         <div className="col-md-6">
                           <small className="text-muted d-flex align-items-center gap-2">
                             <i className="bi bi-person-circle text-primary"></i>
-                            <strong>Assigned to:</strong>{' '}
-                            {ai.assignedToEmployeeName || 'N/A'}
+                            <strong>Assigned to:</strong>{" "}
+                            {ai.assignedToEmployeeName || "N/A"}
                           </small>
                         </div>
                         <div className="col-md-6">
                           <small className="text-muted d-flex align-items-center gap-2">
                             <i className="bi bi-calendar-event text-danger"></i>
-                            <strong>Due Date:</strong>{' '}
+                            <strong>Due Date:</strong>{" "}
                             {ai.dueDate
                               ? new Date(ai.dueDate).toLocaleDateString()
-                              : 'N/A'}
+                              : "N/A"}
                           </small>
                         </div>
                       </div>
@@ -273,28 +185,11 @@ const MomDetailsView = ({ mom, onClose }) => {
             </div>
           </div>
 
-          {/* FOOTER – Close button aligned to right, styled like Cancel */}
-          <div
-            className="modal-footer border-0"
-            style={{
-              padding: '1rem 1.5rem 1.5rem',
-              backgroundColor: '#ffffff',
-              justifyContent: 'flex-end',
-            }}
-          >
+          <div className="mdv-footer modal-footer border-0">
             <button
               type="button"
               onClick={onClose}
-              style={{
-                backgroundColor: '#4B5563', // same tone as Cancel
-                border: 'none',
-                color: '#ffffff',
-                borderRadius: '9999px',
-                padding: '0.6rem 1.8rem',
-                minWidth: '120px',
-                fontWeight: 600,
-                fontSize: '0.9rem',
-              }}
+              className="mdv-close-btn"
             >
               Close
             </button>

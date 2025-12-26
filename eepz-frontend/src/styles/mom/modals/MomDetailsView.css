@@ -1,0 +1,135 @@
+.mdv-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 1060;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.mdv-dialog {
+  position: relative;
+  width: 100%;
+  max-width: 720px;
+  max-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mdv-content {
+  border-radius: 16px;
+  overflow: hidden;
+  width: 100%;
+  
+}
+
+
+.mdv-header {
+  padding: 1.25rem 1.5rem 0.75rem;
+  background-color: #27235c;
+}
+
+.mdv-title {
+  color: #ffffff;
+  font-size: 1.4rem;
+  line-height: 1.2;
+}
+
+.mdv-type-pill {
+  display: inline-block;
+  background-color: #27235c;
+  color: #ffffff;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.2rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* body */
+
+.mdv-body {
+  padding: 1.25rem 1.5rem 1rem;
+  max-height: calc(90vh - 170px);
+  overflow-y: auto;
+}
+
+
+.mdv-info-card {
+  border-radius: 18px;
+}
+
+.mdv-info-title {
+  color: #27235c;
+  font-size: 0.95rem;
+}
+
+.mdv-icon-primary {
+  color: #27235c;
+}
+
+.mdv-link {
+  color: #27235c;
+  text-decoration: none;
+}
+
+
+.mdv-submitter {
+  gap: 6px;
+}
+
+
+.mdv-section-title {
+  color: #27235c;
+}
+
+
+.mdv-discussion-item {
+  background-color: #f8f9fa;
+}
+
+
+.mdv-action-item {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+}
+
+
+.mdv-footer {
+  padding: 1rem 1.5rem 1.5rem;
+  background-color: #ffffff;
+  justify-content: flex-end;
+}
+
+.mdv-close-btn {
+  background-color: #4b5563;
+  border: none;
+  color: #ffffff;
+  border-radius: 9999px;
+  padding: 0.6rem 1.8rem;
+  min-width: 120px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .mdv-body {
+    padding-inline: 1.25rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .mdv-overlay {
+    padding: 10px;
+  }
+
+  .mdv-body {
+    padding-inline: 1rem;
+  }
+}

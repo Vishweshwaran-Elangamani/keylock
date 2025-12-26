@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
@@ -18,7 +18,8 @@ import slaService, { dateHelpers } from "../../services/sla/slaService";
 import ManagerEscalationModal from "../../components/sla/modals/ManagerEscalationModal";
 import ResolveEscalationModal from "../../components/sla/modals/ResolveEscalationModal";
 import { formatDate } from "../../utils/sla/dateFormatter";
-import "../../styles/sla/ManagerSLADashboard.css";
+import "../../styles/sla/components/ManagerSLADashboard.css";
+
 const MgrSelect = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
   const selected = options.find((o) => o.value === value) || options[0];
@@ -30,14 +31,7 @@ const MgrSelect = ({ value, onChange, options }) => {
         className={`mgr-select-control ${open ? "open" : ""}`}
         onClick={() => setOpen((p) => !p)}
       >
-        <span
-          className="mgr-select-value"
-          style={{ textAlign: "left", width: "100%" }}
-        >
-          {selected.label}
-        </span>
-
-        {/* UPDATED ONLY THIS PART */}
+        <span className="mgr-select-value">{selected.label}</span>
         <span className={`mgr-select-icon ${open ? "open" : ""}`}>
           <svg
             width="16"
@@ -65,7 +59,6 @@ const MgrSelect = ({ value, onChange, options }) => {
               className={`mgr-select-option ${
                 opt.value === value ? "selected" : ""
               }`}
-              style={{ textAlign: "left" }}
               onClick={() => {
                 onChange(opt.value);
                 setOpen(false);
@@ -79,7 +72,6 @@ const MgrSelect = ({ value, onChange, options }) => {
     </div>
   );
 };
-
 
 const statusOptionsMy = [
   { value: "All", label: "All Status" },
@@ -107,11 +99,9 @@ const ManagerSLADashboard = () => {
 
   const [mySLAs, setMySLAs] = useState([]);
   const [managerEscalations, setManagerEscalations] = useState([]);
-  const [filteredSlas, setFilteredSlas] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [currentPage, setCurrentPage] = useState(1);
-  // this is only used by Team Escalation table; My Escalation uses fixed 9
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -131,17 +121,6 @@ const ManagerSLADashboard = () => {
   useEffect(() => {
     loadData();
   }, []);
-
-  useEffect(() => {
-    applyFilters();
-  }, [
-    mySLAs,
-    managerEscalations,
-    activeSearchTerm,
-    statusFilter,
-    complianceFilter,
-    activeTab,
-  ]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -185,13 +164,9 @@ const ManagerSLADashboard = () => {
     }
   };
 
-  const getTabData = () => {
-    if (activeTab === "team-escalation") return managerEscalations;
-    return mySLAs;
-  };
-
-  const applyFilters = () => {
-    let result = getTabData();
+  const filteredSlas = useMemo(() => {
+    let result =
+      activeTab === "team-escalation" ? managerEscalations : mySLAs;
 
     if (activeTab === "my-escalation") {
       if (activeSearchTerm) {
@@ -230,8 +205,15 @@ const ManagerSLADashboard = () => {
       }
     }
 
-    setFilteredSlas(result);
-  };
+    return result;
+  }, [
+    mySLAs,
+    managerEscalations,
+    activeSearchTerm,
+    statusFilter,
+    complianceFilter,
+    activeTab,
+  ]);
 
   const handleSearch = () => {
     if (!searchTerm.trim()) return;
@@ -324,16 +306,17 @@ const ManagerSLADashboard = () => {
 
   const stats = calculateStats();
 
-  // pagination: team tab uses itemsPerPage; my tab fixed 9
   const isTeamTab = activeTab === "team-escalation";
   const pageSize = isTeamTab ? itemsPerPage : 9;
 
   const safeTotal = filteredSlas.length;
   const totalPages = Math.max(1, Math.ceil(safeTotal / pageSize));
-  const startIndex =
-    safeTotal === 0 ? 0 : (currentPage - 1) * pageSize;
+  
+  const validCurrentPage = Math.min(currentPage, totalPages);
+
+  const startIndex = safeTotal === 0 ? 0 : (validCurrentPage - 1) * pageSize;
   const endIndex =
-    safeTotal === 0 ? 0 : Math.min(currentPage * pageSize, safeTotal);
+    safeTotal === 0 ? 0 : Math.min(validCurrentPage * pageSize, safeTotal);
   const paginatedData = filteredSlas.slice(startIndex, endIndex);
 
   const goToPage = (page) => {
@@ -347,18 +330,19 @@ const ManagerSLADashboard = () => {
 
     if (totalPages <= maxPagesToShow) {
       for (let i = 1; i <= totalPages; i++) pages.push(i);
-    } else if (currentPage <= 3) {
+    } else if (validCurrentPage <= 3) {
       for (let i = 1; i <= 4; i++) pages.push(i);
       pages.push("...");
       pages.push(totalPages);
-    } else if (currentPage >= totalPages - 2) {
+    } else if (validCurrentPage >= totalPages - 2) {
       pages.push(1);
       pages.push("...");
       for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
     } else {
       pages.push(1);
       pages.push("...");
-      for (let i = currentPage - 1; i <= currentPage + 1; i++) pages.push(i);
+      for (let i = validCurrentPage - 1; i <= validCurrentPage + 1; i++)
+        pages.push(i);
       pages.push("...");
       pages.push(totalPages);
     }
@@ -367,13 +351,10 @@ const ManagerSLADashboard = () => {
 
   if (loading) {
     return (
-      <div className="mgr-sla-wrapper h-100 d-flex align-items-center justify-content-center">
-        <div className="text-center">
-          <div
-            className="spinner-border text-primary"
-            style={{ width: "3rem", height: "3rem" }}
-          ></div>
-          <p className="text-muted mt-3">Loading SLA data...</p>
+      <div className="mgr-sla-wrapper mgr-sla-loading-wrapper">
+        <div className="mgr-sla-loading-content">
+          <div className="mgr-sla-spinner"></div>
+          <p className="mgr-sla-loading-text">Loading SLA data...</p>
         </div>
       </div>
     );
@@ -381,10 +362,9 @@ const ManagerSLADashboard = () => {
 
   return (
     <div className="mgr-sla-wrapper">
-      {/* Breadcrumb */}
-      <nav aria-label="breadcrumb" className="mb-3">
-        <ol className="breadcrumb mb-0 p-3 rounded mgr-sla-breadcrumb">
-          <li className="breadcrumb-item">
+      <nav aria-label="breadcrumb" className="mgr-sla-breadcrumb-nav">
+        <ol className="mgr-sla-breadcrumb-list">
+          <li className="mgr-sla-breadcrumb-item">
             <a
               href="#"
               onClick={(e) => {
@@ -395,57 +375,59 @@ const ManagerSLADashboard = () => {
             >
               <Home size={14} /> Dashboard
             </a>
+            /
           </li>
-          <li className="breadcrumb-item">
+          <li className="mgr-sla-breadcrumb-item">
             <span className="mgr-sla-breadcrumb">SLA Compliance</span>
           </li>
-          <li className="breadcrumb-item active" aria-current="page">
+          /
+          <li className="mgr-sla-breadcrumb-item mgr-sla-breadcrumb-item-active">
             <span className="mgr-sla-breadcrumb-active">Manager</span>
           </li>
         </ol>
       </nav>
 
-      {/* Stats */}
-      <div className="row g-3 mb-3">
+      <div className="mgr-sla-stats-grid">
         {[
           {
             label: "Total SLAs",
             value: stats.total,
             icon: Users,
-            bgColor: "#EEF2FF",
-            iconColor: "#3B82F6",
+            bgColor: "mgr-sla-stat-bg-total",
+            iconColor: "mgr-sla-stat-icon-total",
           },
           {
             label: "Open",
             value: stats.open,
             icon: Clock,
-            bgColor: "#E0E7FF",
-            iconColor: "#4F46E5",
+            bgColor: "mgr-sla-stat-bg-open",
+            iconColor: "mgr-sla-stat-icon-open",
           },
           {
             label: "In Progress",
             value: stats.inProgress,
             icon: Zap,
-            bgColor: "#FEF3C7",
-            iconColor: "#D97706",
+            bgColor: "mgr-sla-stat-bg-inprogress",
+            iconColor: "mgr-sla-stat-icon-inprogress",
           },
           {
             label: "Closed",
             value: stats.closed,
             icon: CheckCircle,
-            bgColor: "#DCFCE7",
-            iconColor: "#16A34A",
+            bgColor: "mgr-sla-stat-bg-closed",
+            iconColor: "mgr-sla-stat-icon-closed",
           },
         ].map(({ label, value, icon: Icon, bgColor, iconColor }) => (
-          <div key={label} className="col-lg-3 col-md-6 col-sm-6">
+          <div key={label} className="mgr-sla-stat-col">
             <div className="mgr-sla-stat-card">
-              <div
-                className="mgr-sla-stat-icon"
-                style={{ backgroundColor: bgColor }}
-              >
-                <Icon size={28} color={iconColor} strokeWidth={2.5} />
+              <div className={`mgr-sla-stat-icon-wrapper ${bgColor}`}>
+                <Icon
+                  className={`mgr-sla-stat-icon ${iconColor}`}
+                  size={28}
+                  strokeWidth={2.5}
+                />
               </div>
-              <div>
+              <div className="mgr-sla-stat-text">
                 <h3 className="mgr-sla-stat-value">{value}</h3>
                 <p className="mgr-sla-stat-label">{label}</p>
               </div>
@@ -454,15 +436,14 @@ const ManagerSLADashboard = () => {
         ))}
       </div>
 
-      {/* Filters */}
       <div className="mgr-sla-filters-card">
-        <div className="row g-3 align-items-center">
-          <div className="col-lg-4 col-md-6">
+        <div className="mgr-sla-filters-row">
+          <div className="mgr-sla-filter-col-search">
             <div className="mgr-sla-search-wrapper">
               <Search size={16} className="mgr-sla-search-icon" />
               <input
                 type="text"
-                className="form-control mgr-sla-search-input"
+                className="mgr-sla-search-input"
                 placeholder={
                   activeTab === "team-escalation"
                     ? "Search by reason or employee..."
@@ -494,7 +475,7 @@ const ManagerSLADashboard = () => {
             </div>
           </div>
 
-          <div className="col-lg-2 col-md-6">
+          <div className="mgr-sla-filter-col-status">
             <MgrSelect
               value={statusFilter}
               onChange={setStatusFilter}
@@ -507,7 +488,7 @@ const ManagerSLADashboard = () => {
           </div>
 
           {activeTab === "my-escalation" && (
-            <div className="col-lg-2 col-md-6">
+            <div className="mgr-sla-filter-col-compliance">
               <MgrSelect
                 value={complianceFilter}
                 onChange={setComplianceFilter}
@@ -517,15 +498,14 @@ const ManagerSLADashboard = () => {
           )}
 
           <div
-            className={`col-lg-${
-              activeTab === "my-escalation" ? "4" : "6"
-            } col-md-12`}
+            className={`mgr-sla-filter-col-actions ${
+              activeTab === "my-escalation"
+                ? "mgr-sla-filter-col-actions-narrow"
+                : ""
+            }`}
           >
             <div className="mgr-sla-filter-actions">
-              <button
-                className="btn btn-outline-secondary mgr-sla-btn-clear"
-                onClick={clearFilters}
-              >
+              <button className="mgr-sla-btn-clear" onClick={clearFilters}>
                 <Filter size={16} />
                 Clear Filters
               </button>
@@ -534,7 +514,6 @@ const ManagerSLADashboard = () => {
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="mgr-sla-tabs-wrapper">
         <div className="mgr-sla-tabs-container">
           {[
@@ -554,136 +533,133 @@ const ManagerSLADashboard = () => {
         </div>
       </div>
 
-      {/* Content */}
-      <div className="mgr-sla-table-wrapper">
-        {filteredSlas.length === 0 ? (
-          <div className="mgr-sla-empty-state-standalone">
-            <FileText size={64} className="mgr-sla-empty-icon" />
-            <p className="mgr-sla-empty-text">
-              No{" "}
-              {activeTab === "team-escalation" ? "team escalations" : "SLAs"}{" "}
-              found
-            </p>
-            {searchTerm ||
-            statusFilter !== "All" ||
-            complianceFilter !== "All" ? (
-              <button
-                className="btn btn-outline-primary mt-2"
-                onClick={clearFilters}
-              >
-                Clear Filters
-              </button>
-            ) : null}
-          </div>
-        ) : activeTab === "my-escalation" ? (
-          <>
-            <div className="row g-3">
-              {paginatedData.map((sla) => {
-                const daysRemaining = dateHelpers.daysRemaining(sla.deadline);
-                return (
-                  <div key={sla.slaid} className="col-lg-4 col-md-6">
-                    <div className="mgr-escalation-card">
-                      <div className="mgr-escalation-card-header">
-                        <div className="mgr-escalation-icon-wrapper">
-                          <Zap size={24} className="mgr-escalation-icon" />
-                        </div>
-                        <div className="mgr-escalation-title-wrapper">
-                          <h6 className="mgr-escalation-title">
-                            {sla.slatype || "Sample SLA"}
-                          </h6>
-                        </div>
-                        <span
-                          className={`mgr-escalation-status-badge ${getStatusBadgeClass(
-                            sla.status
-                          )}`}
-                        >
-                          {sla.status === "InProgress"
-                            ? "INPROGRESS"
-                            : sla.status?.toUpperCase()}
+      {filteredSlas.length === 0 ? (
+        <div className="mgr-sla-empty-state-standalone">
+          <FileText size={64} className="mgr-sla-empty-icon" />
+          <p className="mgr-sla-empty-text">
+            No {activeTab === "team-escalation" ? "team escalations" : "SLAs"}{" "}
+            found
+          </p>
+          {searchTerm ||
+          statusFilter !== "All" ||
+          complianceFilter !== "All" ? (
+            <button
+              className="mgr-sla-btn-clear-filters-empty"
+              onClick={clearFilters}
+            >
+              Clear Filters
+            </button>
+          ) : null}
+        </div>
+      ) : activeTab === "my-escalation" ? (
+        <>
+          <div className="mgr-sla-escalation-grid">
+            {paginatedData.map((sla) => {
+              const daysRemaining = dateHelpers.daysRemaining(sla.deadline);
+              return (
+                <div key={sla.slaid} className="mgr-sla-escalation-col">
+                  <div className="mgr-escalation-card">
+                    <div className="mgr-escalation-card-header">
+                      <div className="mgr-escalation-icon-wrapper">
+                        <Zap size={24} className="mgr-escalation-icon" />
+                      </div>
+                      <div className="mgr-escalation-title-wrapper">
+                        <h6 className="mgr-escalation-title">
+                          {sla.slatype || "Sample SLA"}
+                        </h6>
+                      </div>
+                      <span
+                        className={`mgr-escalation-status-badge ${getStatusBadgeClass(
+                          sla.status
+                        )}`}
+                      >
+                        {sla.status === "InProgress"
+                          ? "INPROGRESS"
+                          : sla.status?.toUpperCase()}
+                      </span>
+                    </div>
+
+                    <div className="mgr-escalation-card-body">
+                      <div className="mgr-escalation-info-row">
+                        <span className="mgr-escalation-label">Deadline</span>
+                        <span className="mgr-escalation-value">
+                          {dateHelpers.formatDeadline(sla.deadline)}
                         </span>
                       </div>
 
-                      <div className="mgr-escalation-card-body">
-                        <div className="mgr-escalation-info-row">
-                          <span className="mgr-escalation-label">Deadline</span>
-                          <span className="mgr-escalation-value">
-                            {dateHelpers.formatDeadline(sla.deadline)}
-                          </span>
-                        </div>
+                      <div className="mgr-escalation-info-row">
+                        <span className="mgr-escalation-label">
+                          Days Remaining
+                        </span>
+                        <span
+                          className={`mgr-escalation-value ${
+                            daysRemaining < 0
+                              ? "mgr-escalation-value-danger"
+                              : daysRemaining <= 3
+                              ? "mgr-escalation-value-warning"
+                              : "mgr-escalation-value-success"
+                          }`}
+                        >
+                          {Math.abs(daysRemaining)} days
+                        </span>
+                      </div>
 
+                      <div className="mgr-escalation-info-row">
+                        <span className="mgr-escalation-label">
+                          Assigned To
+                        </span>
+                        <span className="mgr-escalation-value mgr-text-truncate">
+                          {sla.assignedToName ? (
+                            <span className="mgr-sla-assigned-name">
+                              {sla.assignedToName}
+                            </span>
+                          ) : (
+                            <span className="mgr-sla-not-assigned">
+                              Not assigned
+                            </span>
+                          )}
+                        </span>
+                      </div>
+
+                      {sla.complianceStatus && (
                         <div className="mgr-escalation-info-row">
                           <span className="mgr-escalation-label">
-                            Days Remaining
+                            Compliance
                           </span>
                           <span
-                            className={`mgr-escalation-value ${
-                              daysRemaining < 0
-                                ? "text-danger"
-                                : daysRemaining <= 3
-                                ? "text-warning"
-                                : "text-success"
+                            className={`mgr-compliance-badge ${
+                              sla.complianceStatus === "OnTime"
+                                ? "mgr-compliance-ontime"
+                                : "mgr-compliance-breached"
                             }`}
                           >
-                            {Math.abs(daysRemaining)} days
+                            {sla.complianceStatus}
                           </span>
                         </div>
+                      )}
+                    </div>
 
-                        <div className="mgr-escalation-info-row">
-                          <span className="mgr-escalation-label">
-                            Assigned To
-                          </span>
-                          <span className="mgr-escalation-value mgr-text-truncate">
-                            {sla.assignedToName ? (
-                              <span className="mgr-sla-assigned-name">
-                                {sla.assignedToName}
-                              </span>
-                            ) : (
-                              <span className="mgr-sla-not-assigned">
-                                Not assigned
-                              </span>
-                            )}
-                          </span>
-                        </div>
-
-                        {sla.complianceStatus && (
-                          <div className="mgr-escalation-info-row">
-                            <span className="mgr-escalation-label">
-                              Compliance
-                            </span>
-                            <span
-                              className={`mgr-compliance-badge ${
-                                sla.complianceStatus === "OnTime"
-                                  ? "mgr-compliance-ontime"
-                                  : "mgr-compliance-breached"
-                              }`}
-                            >
-                              {sla.complianceStatus}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="mgr-escalation-card-footer">
-                        <button
-                          className="mgr-escalation-view-btn"
-                          onClick={() => handleRowClick(sla.slaid)}
-                        >
-                          <Eye size={16} />
-                          View Details
-                        </button>
-                      </div>
+                    <div className="mgr-escalation-card-footer">
+                      <button
+                        className="mgr-escalation-view-btn"
+                        onClick={() => handleRowClick(sla.slaid)}
+                      >
+                        <Eye size={16} />
+                        View Details
+                      </button>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-            {/* if you want card pagination controls, you can add them here */}
-          </>
-        ) : (
-          <>
-            <div className="mgr-sla-table-container hr-sla-table-container">
-              <div className="table-responsive">
-                <table className="table table-hover mb-0 mgr-sla-table">
+                </div>
+              );
+            })}
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="mgr-sla-table-wrapper">
+            <div className="mgr-sla-table-container">
+              <div className="mgr-sla-table-responsive">
+                <table className="mgr-sla-table">
                   <thead className="mgr-sla-table-header">
                     <tr>
                       <th>Employee</th>
@@ -739,7 +715,7 @@ const ManagerSLADashboard = () => {
                         <td>
                           <div className="mgr-sla-actions">
                             <button
-                              className="btn btn-sm mgr-sla-action-btn mgr-sla-action-view"
+                              className="mgr-sla-action-btn mgr-sla-action-view"
                               onClick={(e) => handleViewClick(e, esc.slaid)}
                               title="View details"
                             >
@@ -748,17 +724,15 @@ const ManagerSLADashboard = () => {
                             {esc.escalationStatus !== "Resolved" && (
                               <>
                                 <button
-                                  className="btn btn-sm mgr-sla-action-btn mgr-sla-action-escalate"
+                                  className="mgr-sla-action-btn mgr-sla-action-escalate"
                                   onClick={(e) => handleEscalateClick(e, esc)}
                                   title="Escalate to Department Head"
                                 >
                                   <Send size={16} />
                                 </button>
                                 <button
-                                  className="btn btn-sm mgr-sla-action-btn mgr-sla-action-resolve"
-                                  onClick={(e) =>
-                                    handleResolveClick(e, esc)
-                                  }
+                                  className="mgr-sla-action-btn mgr-sla-action-resolve"
+                                  onClick={(e) => handleResolveClick(e, esc)}
                                   title="Resolve escalation"
                                 >
                                   <CheckCircle size={16} />
@@ -774,11 +748,11 @@ const ManagerSLADashboard = () => {
               </div>
 
               {safeTotal > 0 && (
-                <div className="hr-sla-pagination-footer">
-                  <div className="hr-sla-pagination-left">
-                    <span className="hr-sla-pagination-text">Show</span>
+                <div className="mgr-sla-pagination-footer">
+                  <div className="mgr-sla-pagination-left">
+                    <span className="mgr-sla-pagination-text">Show</span>
                     <select
-                      className="hr-sla-pagination-dropdown"
+                      className="mgr-sla-pagination-dropdown"
                       value={itemsPerPage}
                       onChange={(e) => {
                         setItemsPerPage(Number(e.target.value));
@@ -789,29 +763,29 @@ const ManagerSLADashboard = () => {
                       <option value={10}>10</option>
                       <option value={25}>25</option>
                     </select>
-                    <span className="hr-sla-pagination-text">entries</span>
+                    <span className="mgr-sla-pagination-text">entries</span>
                   </div>
 
-                  <div className="hr-sla-pagination-center">
-                    <span className="hr-sla-pagination-status">
+                  <div className="mgr-sla-pagination-center">
+                    <span className="mgr-sla-pagination-status">
                       Showing {safeTotal === 0 ? 0 : startIndex + 1} to{" "}
                       {endIndex} of {safeTotal} entries
                     </span>
                   </div>
 
-                  <div className="hr-sla-pagination-right">
-                    <ul className="hr-sla-pagination-list">
+                  <div className="mgr-sla-pagination-right">
+                    <ul className="mgr-sla-pagination-list">
                       <li
-                        className={`hr-sla-page-item ${
-                          currentPage === 1 ? "disabled" : ""
+                        className={`mgr-sla-page-item ${
+                          validCurrentPage === 1 ? "disabled" : ""
                         }`}
                       >
                         <button
-                          className="hr-sla-page-link hr-sla-page-arrow"
-                          onClick={() => goToPage(currentPage - 1)}
-                          disabled={currentPage === 1}
+                          className="mgr-sla-page-link mgr-sla-page-arrow"
+                          onClick={() => goToPage(validCurrentPage - 1)}
+                          disabled={validCurrentPage === 1}
                         >
-                          <span className="hr-sla-arrow-icon">‹</span>
+                          <span className="mgr-sla-arrow-icon">‹</span>
                         </button>
                       </li>
 
@@ -819,19 +793,19 @@ const ManagerSLADashboard = () => {
                         page === "..." ? (
                           <li
                             key={`ellipsis-${idx}`}
-                            className="hr-sla-page-item disabled"
+                            className="mgr-sla-page-item disabled"
                           >
-                            <span className="hr-sla-page-link">…</span>
+                            <span className="mgr-sla-page-link">…</span>
                           </li>
                         ) : (
                           <li
                             key={page}
-                            className={`hr-sla-page-item ${
-                              currentPage === page ? "active" : ""
+                            className={`mgr-sla-page-item ${
+                              validCurrentPage === page ? "active" : ""
                             }`}
                           >
                             <button
-                              className="hr-sla-page-link"
+                              className="mgr-sla-page-link"
                               onClick={() => goToPage(page)}
                             >
                               {page}
@@ -841,16 +815,16 @@ const ManagerSLADashboard = () => {
                       )}
 
                       <li
-                        className={`hr-sla-page-item ${
-                          currentPage === totalPages ? "disabled" : ""
+                        className={`mgr-sla-page-item ${
+                          validCurrentPage === totalPages ? "disabled" : ""
                         }`}
                       >
                         <button
-                          className="hr-sla-page-link hr-sla-page-arrow"
-                          onClick={() => goToPage(currentPage + 1)}
-                          disabled={currentPage === totalPages}
+                          className="mgr-sla-page-link mgr-sla-page-arrow"
+                          onClick={() => goToPage(validCurrentPage + 1)}
+                          disabled={validCurrentPage === totalPages}
                         >
-                          <span className="hr-sla-arrow-icon">›</span>
+                          <span className="mgr-sla-arrow-icon">›</span>
                         </button>
                       </li>
                     </ul>
@@ -858,11 +832,10 @@ const ManagerSLADashboard = () => {
                 </div>
               )}
             </div>
-          </>
-        )}
-      </div>
+          </div>
+        </>
+      )}
 
-      {/* Modals */}
       {showEscalationModal && selectedSLAForEscalation && (
         <ManagerEscalationModal
           review={selectedSLAForEscalation}

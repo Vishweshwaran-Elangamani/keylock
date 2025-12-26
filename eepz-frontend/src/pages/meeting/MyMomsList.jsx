@@ -8,9 +8,12 @@ import {
   Users,
   Link as LinkIcon,
   CheckCircle,
+  Clock,
   Edit,
   Trash2,
   Eye,
+  Plus,
+  ArrowLeft,
   MessageSquare,
   AlertTriangle,
   Share2,
@@ -18,24 +21,21 @@ import {
   X,
 } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "../../styles/mom/components/MyMomsLists.css";
 
-const PRIMARY = "#27235C"; // primary blue
+const PRIMARY = "#27235C";
 
 const MyMomsList = () => {
   const [moms, setMoms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedMom, setSelectedMom] = useState(null);
-
   const [showShareModal, setShowShareModal] = useState(false);
   const [shareModalMom, setShareModalMom] = useState(null);
   const [employees, setEmployees] = useState([]);
   const [selectedEmployees, setSelectedEmployees] = useState([]);
-
-  // search states for Share MOM modal
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchMode, setSearchMode] = useState(false); // false = show Search, true = show Cancel
-
+  const [searchMode, setSearchMode] = useState(false);
   const [sharingLoading, setSharingLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -157,7 +157,26 @@ const MyMomsList = () => {
         </span>
       );
     }
-    return null;
+    switch (status) {
+      case "Completed":
+        return (
+          <span className="badge bg-success d-inline-flex align-items-center gap-1">
+            <CheckCircle size={14} /> Completed
+          </span>
+        );
+      case "Pending":
+        return (
+          <span className="badge bg-warning text-dark d-inline-flex align-items-center gap-1">
+            <Clock size={14} /> Pending
+          </span>
+        );
+      default:
+        return (
+          <span className="badge bg-secondary d-inline-flex align-items-center gap-1">
+            {status}
+          </span>
+        );
+    }
   };
 
   const formatDateTime = (dateString) => {
@@ -172,7 +191,6 @@ const MyMomsList = () => {
     });
   };
 
-  // apply filter only when searchTerm is set (after clicking Search)
   const filteredEmployees = employees.filter((emp) => {
     if (!searchTerm.trim()) return true;
     const haystack = `${emp.firstName} ${emp.lastName} ${emp.email} ${emp.departmentName}`.toLowerCase();
@@ -181,11 +199,10 @@ const MyMomsList = () => {
 
   if (loading) {
     return (
-      <div className="d-flex justify-content-center align-items-center min-vh-100">
+      <div className="mm2-loading">
         <div
-          className="spinner-border text-primary"
+          className="spinner-border text-primary mm2-loading-spinner"
           role="status"
-          style={{ width: "3rem", height: "3rem" }}
         >
           <span className="visually-hidden">Loading...</span>
         </div>
@@ -194,120 +211,36 @@ const MyMomsList = () => {
   }
 
   return (
-    <div
-      className="container-fluid px-4 py-4"
-      style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}
-    >
+    <div className="mm2-page">
       <div className="row justify-content-center">
         <div className="col-12 col-xl-11">
-          {/* Breadcrumb */}
-          <nav aria-label="breadcrumb" className="mb-3">
-            <ol
-              className="breadcrumb mb-0 d-flex align-items-center"
-              style={{
-                backgroundColor: "transparent",
-                padding: 0,
-                margin: 0,
-              }}
-            >
-              <li
-                className="breadcrumb-item"
-                style={{ display: "flex", alignItems: "center" }}
-              >
+          <nav aria-label="breadcrumb" className="mm2-breadcrumb-nav">
+            <ol className="breadcrumb mb-0 d-flex align-items-center mm2-breadcrumb">
+              <li className="breadcrumb-item mm2-breadcrumb-item">
                 <button
                   onClick={() => navigate("/employee/dashboard")}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "#97247E",
-                    cursor: "pointer",
-                    padding: 0,
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "6px",
-                    fontSize: "0.875rem",
-                    fontWeight: 500,
-                    textDecoration: "none",
-                    transition: "color 0.2s ease",
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
+                  className="mm2-breadcrumb-link"
                 >
-                  <i className="bi bi-house-door" style={{ fontSize: "1rem" }}></i>
+                  <i className="bi bi-house-door mm2-breadcrumb-home"></i>
                   Dashboard
                 </button>
               </li>
-              <li
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  color: "#97247E",
-                  margin: "0 8px",
-                  fontSize: "1rem",
-                }}
-              >
-                /
-              </li>
-
-              <li
-                className="breadcrumb-item"
-                style={{ display: "flex", alignItems: "center" }}
-              >
+              <li className="mm2-breadcrumb-separator">/</li>
+              <li className="breadcrumb-item mm2-breadcrumb-item">
                 <button
                   onClick={() => navigate("/employee/dashboard/meetmom")}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "#97247E",
-                    cursor: "pointer",
-                    padding: 0,
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "6px",
-                    fontSize: "0.875rem",
-                    fontWeight: 500,
-                    textDecoration: "none",
-                    transition: "color 0.2s ease",
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
+                  className="mm2-breadcrumb-link"
                 >
                   Meetings and MoM
                 </button>
               </li>
-              <li
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  color: "#97247E",
-                  margin: "0 8px",
-                  fontSize: "1rem",
-                }}
-              >
-                /
-              </li>
-              <li
-                className="breadcrumb-item active"
-                aria-current="page"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <span
-                  style={{
-                    color: "#1e293b",
-                    fontSize: "0.875rem",
-                    fontWeight: 600,
-                  }}
-                >
-                  My MoMs
-                </span>
+              <li className="mm2-breadcrumb-separator">/</li>
+              <li className="breadcrumb-item active mm2-breadcrumb-item">
+                <span className="mm2-breadcrumb-current">My MoMs</span>
               </li>
             </ol>
           </nav>
 
-          {/* Count */}
           {moms.length > 0 && (
             <div className="alert alert-info d-flex align-items-center gap-2 mb-4">
               <FileText size={20} />
@@ -318,52 +251,41 @@ const MyMomsList = () => {
             </div>
           )}
 
-          {/* Empty */}
           {moms.length === 0 ? (
-            <div className="card border-0 shadow-sm">
-              <div className="card-body text-center py-5">
-                <div
-                  className="rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
-                  style={{
-                    width: "80px",
-                    height: "80px",
-                    backgroundColor: "#e3f2fd",
-                  }}
-                >
-                  <FileText size={40} style={{ color: "#1976d2" }} />
+            <div className="card border-0 shadow-sm mm2-empty-card">
+              <div className="card-body text-center">
+                <div className="mm2-empty-icon">
+                  <FileText size={40} className="mm2-empty-icon-svg" />
                 </div>
                 <h5 className="fw-semibold mb-2">No MOMs Yet</h5>
                 <p className="text-muted mb-4">
                   You haven't submitted any meeting minutes yet.
                 </p>
+                <button
+                  className="btn btn-primary d-flex align-items-center gap-2 mx-auto"
+                  onClick={() => navigate("/mom/create")}
+                >
+                  <Plus size={18} />
+                  Create Your First MOM
+                </button>
               </div>
             </div>
           ) : (
             <div className="row g-3">
               {moms.map((mom) => (
                 <div key={mom.momId} className="col-12">
-                  <div className="card border-0 shadow-sm h-100">
-                    <div className="card-body p-4">
+                  <div className="card border-0 shadow-sm h-100 mm2-mom-card">
+                    <div className="card-body mm2-mom-body">
                       <div className="row align-items-start">
                         <div className="col-auto d-none d-md-block">
-                          <div
-                            className="rounded-circle d-flex align-items-center justify-content-center"
-                            style={{
-                              width: "60px",
-                              height: "60px",
-                              backgroundColor: "#e3f2fd",
-                            }}
-                          >
-                            <FileText size={28} style={{ color: "#1976d2" }} />
+                          <div className="mm2-mom-icon">
+                            <FileText size={28} className="mm2-mom-icon-svg" />
                           </div>
                         </div>
 
                         <div className="col">
-                          <div className="d-flex justify-content-between align-items-start mb-2 flex-wrap gap-2">
-                            <h5
-                              className="fw-bold mb-0"
-                              style={{ color: "#1e293b" }}
-                            >
+                          <div className="mm2-mom-header">
+                            <h5 className="mm2-mom-title">
                               {mom.meetingTitle}
                             </h5>
                             {getMeetingTypeBadge(mom.meetingType)}
@@ -371,29 +293,16 @@ const MyMomsList = () => {
 
                           <div className="row g-3 mb-3">
                             <div className="col-md-4">
-                              <div className="d-flex align-items-start gap-2">
+                              <div className="mm2-info-row">
                                 <Calendar
                                   size={18}
-                                  className="text-primary mt-1"
-                                  style={{ flexShrink: 0 }}
+                                  className="mm2-info-icon text-primary"
                                 />
-                                <div>
-                                  <div
-                                    className="text-muted fw-medium"
-                                    style={{
-                                      fontSize: "0.8rem",
-                                      textAlign: "left",
-                                    }}
-                                  >
+                                <div className="mm2-info-text">
+                                  <div className="mm2-info-label">
                                     Meeting Date
                                   </div>
-                                  <div
-                                    className="fw-semibold"
-                                    style={{
-                                      fontSize: "0.95rem",
-                                      color: "#1e293b",
-                                    }}
-                                  >
+                                  <div className="mm2-info-value">
                                     {formatDateTime(mom.meetingDate)}
                                   </div>
                                 </div>
@@ -401,29 +310,16 @@ const MyMomsList = () => {
                             </div>
 
                             <div className="col-md-4">
-                              <div className="d-flex align-items-start gap-2">
+                              <div className="mm2-info-row">
                                 <Users
                                   size={18}
-                                  className="text-primary mt-1"
-                                  style={{ flexShrink: 0 }}
+                                  className="mm2-info-icon text-primary"
                                 />
-                                <div>
-                                  <div
-                                    className="text-muted fw-medium"
-                                    style={{
-                                      fontSize: "0.8rem",
-                                      textAlign: "left",
-                                    }}
-                                  >
+                                <div className="mm2-info-text">
+                                  <div className="mm2-info-label">
                                     Attendees
                                   </div>
-                                  <div
-                                    className="fw-semibold"
-                                    style={{
-                                      fontSize: "0.95rem",
-                                      color: "#1e293b",
-                                    }}
-                                  >
+                                  <div className="mm2-info-value">
                                     {mom.attendees || "N/A"}
                                   </div>
                                 </div>
@@ -431,29 +327,16 @@ const MyMomsList = () => {
                             </div>
 
                             <div className="col-md-4">
-                              <div className="d-flex align-items-start gap-2">
+                              <div className="mm2-info-row">
                                 <Users
                                   size={18}
-                                  className="text-primary mt-1"
-                                  style={{ flexShrink: 0 }}
+                                  className="mm2-info-icon text-primary"
                                 />
-                                <div>
-                                  <div
-                                    className="text-muted fw-medium"
-                                    style={{
-                                      fontSize: "0.8rem",
-                                      textAlign: "left",
-                                    }}
-                                  >
+                                <div className="mm2-info-text">
+                                  <div className="mm2-info-label">
                                     Submitted by
                                   </div>
-                                  <div
-                                    className="fw-semibold"
-                                    style={{
-                                      fontSize: "0.95rem",
-                                      color: "#1e293b",
-                                    }}
-                                  >
+                                  <div className="mm2-info-value">
                                     {mom.submittedByEmployeeName} (
                                     {mom.submittedByRole})
                                   </div>
@@ -462,7 +345,7 @@ const MyMomsList = () => {
                             </div>
                           </div>
 
-                          <div className="d-flex gap-2 flex-wrap">
+                          <div className="mm2-actions-row">
                             <button
                               className="btn btn-sm btn-outline-primary d-flex align-items-center gap-2"
                               onClick={() => openMomDetails(mom)}
@@ -507,55 +390,25 @@ const MyMomsList = () => {
             </div>
           )}
 
-          {/* Share Modal - PROPERLY CENTERED */}
+          {/* SHARE MODAL */}
           {showShareModal && shareModalMom && (
             <div
-              className="modal fade show d-block"
+              className="modal fade show d-block mm2-modal-backdrop"
               tabIndex="-1"
-              style={{
-                position: "fixed",
-                inset: 0,
-                backgroundColor: "rgba(0,0,0,0.6)",
-                backdropFilter: "blur(8px)",
-                WebkitBackdropFilter: "blur(8px)",
-                zIndex: 1050,
-              }}
               onClick={closeShareModal}
             >
               <div
-                style={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  width: "80%",
-                  maxWidth: "900px",
-                }}
+                className="modal-dialog modal-dialog-scrollable modal-xl modal-dialog-centered mm2-modal-dialog mm2-share-dialog"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div
-                  className="border-0 shadow"
-                  style={{
-                    borderRadius: "12px",
-                    overflow: "hidden",
-                    backgroundColor: "#fff",
-                  }}
-                >
+                <div className="modal-content border-0 shadow mm2-modal-content">
                   <div
-                    style={{
-                      backgroundColor: PRIMARY,
-                      color: "#fff",
-                      padding: "0.75rem 1rem",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
+                    className="mm2-modal-header"
+                    style={{ backgroundColor: PRIMARY }}
                   >
-                    <div>
-                      <h5 className="fw-bold mb-1" style={{ color: "#ffffff" }}>
-                        Share MOM
-                      </h5>
-                      <p className="text-light small mb-0">
+                    <div className="mm2-modal-header-left">
+                      <h5 className="mm2-modal-title">Share MOM</h5>
+                      <p className="mm2-modal-subtitle">
                         {shareModalMom.meetingTitle}
                       </p>
                     </div>
@@ -566,34 +419,15 @@ const MyMomsList = () => {
                     ></button>
                   </div>
 
-                  <div className="modal-body">
+                  <div className="modal-body mm2-modal-body">
                     <div className="mb-3">
-                      <div
-                        className="d-flex"
-                        style={{
-                          borderRadius: "999px",
-                          border: "1px solid #e2e8f0",
-                          overflow: "hidden",
-                          backgroundColor: "#fff",
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            padding: "0 12px",
-                            color: "#9ca3af",
-                          }}
-                        >
+                      <div className="mm2-search-shell">
+                        <div className="mm2-search-icon">
                           <Search size={18} />
                         </div>
                         <input
                           type="text"
-                          className="form-control border-0"
-                          style={{
-                            boxShadow: "none",
-                            borderRadius: 0,
-                          }}
+                          className="form-control mm2-search-input"
                           placeholder="Search by employee name"
                           value={searchInput}
                           onChange={(e) => setSearchInput(e.target.value)}
@@ -601,20 +435,10 @@ const MyMomsList = () => {
                         {!searchMode ? (
                           <button
                             type="button"
+                            className="mm2-search-action mm2-search-btn"
                             onClick={() => {
                               setSearchTerm(searchInput.trim());
                               setSearchMode(true);
-                            }}
-                            style={{
-                              border: "none",
-                              padding: "0 18px",
-                              backgroundColor: "#5c4ba8",
-                              color: "#ffffff",
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "8px",
-                              fontWeight: 600,
-                              cursor: "pointer",
                             }}
                           >
                             <Search size={16} />
@@ -623,21 +447,11 @@ const MyMomsList = () => {
                         ) : (
                           <button
                             type="button"
+                            className="mm2-search-action mm2-cancel-btn"
                             onClick={() => {
                               setSearchInput("");
                               setSearchTerm("");
                               setSearchMode(false);
-                            }}
-                            style={{
-                              border: "none",
-                              padding: "0 18px",
-                              backgroundColor: "#6b7280",
-                              color: "#ffffff",
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "8px",
-                              fontWeight: 600,
-                              cursor: "pointer",
                             }}
                           >
                             <X size={16} />
@@ -657,7 +471,7 @@ const MyMomsList = () => {
                       </div>
                     )}
 
-                    <div style={{ maxHeight: "400px", overflowY: "auto" }}>
+                    <div className="mm2-employee-list-wrap">
                       {filteredEmployees.length === 0 ? (
                         <div className="text-center py-4 text-muted">
                           No employees found
@@ -667,23 +481,21 @@ const MyMomsList = () => {
                           {filteredEmployees.map((employee) => (
                             <label
                               key={employee.employeeId}
-                              className="list-group-item list-group-item-action d-flex align-items-center gap-3"
-                              style={{ cursor: "pointer" }}
+                              className="list-group-item list-group-item-action mm2-employee-item"
                             >
                               <input
                                 type="checkbox"
-                                className="form-check-input m-0"
+                                className="form-check-input mm2-employee-check"
                                 checked={selectedEmployees.includes(
                                   employee.employeeId
                                 )}
                                 onChange={() =>
-                                  toggleEmployeeSelection(employee.employeeId)
+                                  toggleEmployeeSelection(
+                                    employee.employeeId
+                                  )
                                 }
                               />
-                              <div
-                                className="flex-grow-1"
-                                style={{ textAlign: "left" }}
-                              >
+                              <div className="mm2-employee-text">
                                 <div className="fw-semibold">
                                   {employee.firstName} {employee.lastName}
                                 </div>
@@ -699,7 +511,7 @@ const MyMomsList = () => {
                     </div>
                   </div>
 
-                  <div className="modal-footer">
+                  <div className="modal-footer mm2-modal-footer">
                     <button
                       className="btn btn-danger px-4"
                       onClick={closeShareModal}
@@ -708,30 +520,11 @@ const MyMomsList = () => {
                       Cancel
                     </button>
                     <button
-                      className="btn px-4 d-flex align-items-center gap-2"
+                      className="btn px-4 d-flex align-items-center gap-2 mm2-share-btn"
                       onClick={handleShareMom}
                       disabled={
                         selectedEmployees.length === 0 || sharingLoading
                       }
-                      style={{
-                        background:
-                          "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                        color: "#fff",
-                        border: "none",
-                        fontWeight: "500",
-                        transition: "all 0.2s ease",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.opacity = "0.9";
-                        e.currentTarget.style.transform = "translateY(-1px)";
-                        e.currentTarget.style.boxShadow =
-                          "0 4px 12px rgba(151, 36, 126, 0.3)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.opacity = "1";
-                        e.currentTarget.style.transform = "translateY(0)";
-                        e.currentTarget.style.boxShadow = "none";
-                      }}
                     >
                       <Share2 size={16} />
                       {sharingLoading
@@ -744,56 +537,27 @@ const MyMomsList = () => {
             </div>
           )}
 
-        
+          {/* DETAIL MODAL */}
           {selectedMom && (
             <div
-              className="modal fade show d-block"
+              className="modal fade show d-block mm2-modal-backdrop"
               tabIndex="-1"
-              style={{
-                position: "fixed",
-                inset: 0,
-                backgroundColor: "rgba(0,0,0,0.6)",
-                backdropFilter: "blur(8px)",
-                WebkitBackdropFilter: "blur(8px)",
-                zIndex: 1055,
-              }}
               onClick={closeMomDetails}
             >
               <div
-                style={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "58%",
-                  transform: "translate(-50%, -50%)",
-                  width: "80%",
-                  maxWidth: "900px",
-                }}
+                className="modal-dialog modal-dialog-scrollable modal-xl modal-dialog-centered mm2-modal-dialog"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="modal-content border-0 shadow">
+                <div className="modal-content border-0 shadow mm2-modal-content">
                   <div
-                    className="border-0 pb-0"
-                    style={{
-                      textAlign: "left",
-                      backgroundColor: PRIMARY,
-                      color: "#fff",
-                      padding: "0.75rem 1rem",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
+                    className="mm2-detail-header"
+                    style={{ backgroundColor: PRIMARY }}
                   >
-                    <div className="flex-grow-1">
-                      <h5
-                        className="fw-bold mb-1"
-                        style={{ textAlign: "left", color: "#ffffff" }}
-                      >
+                    <div className="mm2-modal-header-left flex-grow-1">
+                      <h5 className="mm2-detail-title">
                         {selectedMom.meetingTitle}
                       </h5>
-                      <p
-                        className="small mb-0"
-                        style={{ textAlign: "left", color: "#e2e8f0" }}
-                      >
+                      <p className="mm2-detail-subtitle">
                         {getMeetingTypeBadge(selectedMom.meetingType)}
                       </p>
                     </div>
@@ -804,38 +568,41 @@ const MyMomsList = () => {
                     ></button>
                   </div>
 
-                  <div
-                    className="modal-body"
-                    style={{ textAlign: "left", backgroundColor: "#fff" }}
-                  >
+                  <div className="modal-body mm2-detail-body">
                     <div className="card bg-light border-0 mb-4">
-                      <div className="card-body" style={{ textAlign: "left" }}>
-                        <h6 className="fw-semibold mb-3" style={{ textAlign: "left" }}>
+                      <div className="card-body">
+                        <h6 className="fw-semibold mb-3">
                           Meeting Information
                         </h6>
                         <div className="row g-3">
                           <div className="col-md-6">
-                            <div className="d-flex align-items-center gap-2 mb-2">
+                            <div className="mm2-detail-row">
                               <Calendar size={16} className="text-primary" />
-                              <small className="text-muted">Meeting Date:</small>
+                              <small className="text-muted">
+                                Meeting Date:
+                              </small>
                             </div>
-                            <div className="fw-semibold" style={{ textAlign: "left" }}>
+                            <div className="fw-semibold">
                               {formatDateTime(selectedMom.meetingDate)}
                             </div>
                           </div>
 
                           {selectedMom.meetingLink && (
                             <div className="col-md-6">
-                              <div className="d-flex align-items-center gap-2 mb-2">
-                                <LinkIcon size={16} className="text-primary" />
-                                <small className="text-muted">Meeting Link:</small>
+                              <div className="mm2-detail-row">
+                                <LinkIcon
+                                  size={16}
+                                  className="text-primary"
+                                />
+                                <small className="text-muted">
+                                  Meeting Link:
+                                </small>
                               </div>
                               <a
                                 href={selectedMom.meetingLink}
                                 target="_blank"
                                 rel="noreferrer"
                                 className="text-primary text-decoration-none d-flex align-items-center gap-1"
-                                style={{ textAlign: "left" }}
                               >
                                 Join Meeting <LinkIcon size={14} />
                               </a>
@@ -843,21 +610,23 @@ const MyMomsList = () => {
                           )}
 
                           <div className="col-md-6">
-                            <div className="d-flex align-items-center gap-2 mb-2">
+                            <div className="mm2-detail-row">
                               <Users size={16} className="text-primary" />
                               <small className="text-muted">Attendees:</small>
                             </div>
-                            <div className="fw-semibold" style={{ textAlign: "left" }}>
+                            <div className="fw-semibold">
                               {selectedMom.attendees || "N/A"}
                             </div>
                           </div>
 
                           <div className="col-md-6">
-                            <div className="d-flex align-items-center gap-2 mb-2">
+                            <div className="mm2-detail-row">
                               <Users size={16} className="text-primary" />
-                              <small className="text-muted">Submitted by:</small>
+                              <small className="text-muted">
+                                Submitted by:
+                              </small>
                             </div>
-                            <div className="fw-semibold" style={{ textAlign: "left" }}>
+                            <div className="fw-semibold">
                               {selectedMom.submittedByEmployeeName} (
                               {selectedMom.submittedByRole})
                             </div>
@@ -868,52 +637,28 @@ const MyMomsList = () => {
 
                     {selectedMom.commentsObservations && (
                       <div className="mb-4">
-                        <h6
-                          className="fw-semibold mb-3 d-flex align-items-center gap-2"
-                          style={{ textAlign: "left" }}
-                        >
-                          <MessageSquare size={18} />
-                          Comments & Observations
+                        <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2">
+                          Comments &amp; Observations
                         </h6>
-                        <div
-                          className="alert alert-secondary mb-0"
-                          style={{ textAlign: "left" }}
-                        >
+                        <div className="alert alert-secondary mb-0">
                           {selectedMom.commentsObservations}
                         </div>
                       </div>
                     )}
 
                     <div className="mb-4">
-                      <h6
-                        className="fw-semibold mb-3 d-flex align-items-center gap-2"
-                        style={{ textAlign: "left" }}
-                      >
-                        <MessageSquare size={18} />
+                      <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2">
                         Discussion Points
                       </h6>
                       {selectedMom.discussionPoints?.length > 0 ? (
                         <div className="list-group">
-                          {selectedMom.discussionPoints.map((dp, index) => (
+                          {selectedMom.discussionPoints.map((dp) => (
                             <div
                               key={dp.pointId}
                               className="list-group-item border-0 bg-light mb-2 rounded"
-                              style={{ textAlign: "left" }}
                             >
                               <div className="d-flex gap-2">
-                                <span
-                                  className="badge bg-primary rounded-circle"
-                                  style={{
-                                    width: "24px",
-                                    height: "24px",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                  }}
-                                >
-                                  {index + 1}
-                                </span>
-                                <span className="flex-grow-1" style={{ textAlign: "left" }}>
+                                <span className="flex-grow-1">
                                   {dp.pointText}
                                 </span>
                               </div>
@@ -921,20 +666,14 @@ const MyMomsList = () => {
                           ))}
                         </div>
                       ) : (
-                        <div
-                          className="alert alert-info mb-0"
-                          style={{ textAlign: "left" }}
-                        >
+                        <div className="alert alert-info mb-0">
                           No discussion points recorded
                         </div>
                       )}
                     </div>
 
                     <div className="mb-4">
-                      <h6
-                        className="fw-semibold mb-3 d-flex align-items-center gap-2"
-                        style={{ textAlign: "left" }}
-                      >
+                      <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2">
                         <CheckCircle size={18} />
                         Action Items
                       </h6>
@@ -944,33 +683,24 @@ const MyMomsList = () => {
                             <div
                               key={ai.actionItemId}
                               className="list-group-item border-0 bg-light mb-2 rounded"
-                              style={{ textAlign: "left" }}
                             >
                               <div className="d-flex justify-content-between align-items-start mb-2">
-                                <h6
-                                  className="mb-0 fw-semibold"
-                                  style={{ textAlign: "left" }}
-                                >
+                                <h6 className="mb-0 fw-semibold">
                                   {ai.taskDescription}
                                 </h6>
-                                {getStatusBadge(ai.status, ai.isOverdue)}
                               </div>
                               <div className="row g-2 mt-2">
                                 <div className="col-md-6">
-                                  <small className="text-muted">Assigned to:</small>
-                                  <div
-                                    className="fw-semibold"
-                                    style={{ textAlign: "left" }}
-                                  >
+                                  <small className="text-muted">
+                                    Assigned to:
+                                  </small>
+                                  <div className="fw-semibold">
                                     {ai.assignedToEmployeeName}
                                   </div>
                                 </div>
                                 <div className="col-md-6">
                                   <small className="text-muted">Due Date:</small>
-                                  <div
-                                    className="fw-semibold"
-                                    style={{ textAlign: "left" }}
-                                  >
+                                  <div className="fw-semibold">
                                     {ai.dueDate || "N/A"}
                                   </div>
                                 </div>
@@ -979,46 +709,27 @@ const MyMomsList = () => {
                           ))}
                         </div>
                       ) : (
-                        <div
-                          className="alert alert-info mb-0"
-                          style={{ textAlign: "left" }}
-                        >
+                        <div className="alert alert-info mb-0">
                           No action items recorded
                         </div>
                       )}
                     </div>
                   </div>
 
-                  <div className="modal-footer border-0">
-                    <button className="btn btn-danger px-4" onClick={closeMomDetails}>
+                  <div className="modal-footer border-0 mm2-modal-footer">
+                    <button
+                      className="btn btn-danger px-4"
+                      onClick={closeMomDetails}
+                    >
                       <X size={16} className="me-2" />
                       Close
                     </button>
                     {selectedMom.isEditable && (
                       <button
-                        className="btn px-4 d-flex align-items-center gap-2"
+                        className="btn btn-primary d-flex align-items-center gap-2"
                         onClick={() => {
                           closeMomDetails();
                           navigate(`/mom/edit/${selectedMom.momId}`);
-                        }}
-                        style={{
-                          background:
-                            "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                          color: "#fff",
-                          border: "none",
-                          fontWeight: "500",
-                          transition: "all 0.2s ease",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.opacity = "0.9";
-                          e.currentTarget.style.transform = "translateY(-1px)";
-                          e.currentTarget.style.boxShadow =
-                            "0 4px 12px rgba(151, 36, 126, 0.3)";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.opacity = "1";
-                          e.currentTarget.style.transform = "translateY(0)";
-                          e.currentTarget.style.boxShadow = "none";
                         }}
                       >
                         <Edit size={16} />
@@ -1030,15 +741,8 @@ const MyMomsList = () => {
               </div>
             </div>
           )}
-
         </div>
       </div>
-
-      <style>{`
-        .breadcrumb-item + .breadcrumb-item::before {
-          display: none;
-        }
-      `}</style>
     </div>
   );
 };

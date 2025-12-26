@@ -440,6 +440,7 @@ const ResourcePoolMapping = () => {
               <Home size={14} />
               <span>Dashboard</span>
             </button>
+            /
           </li>
           <li className="breadcrumb-item">
             <button
@@ -451,6 +452,7 @@ const ResourcePoolMapping = () => {
             >
               <span>Projects</span>
             </button>
+            /
           </li>
           <li
             className="breadcrumb-item active"

@@ -1,74 +1,32 @@
 import React, { useState } from "react";
 import CreateMomModal from "./CreateMomModal";
+import "../../../styles/mom/modals/MeetingDetailsModal.css";
 
 const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
   const [showCreateMom, setShowCreateMom] = useState(false);
 
   const toggleCreateMom = () => setShowCreateMom(!showCreateMom);
 
+  if (!meeting) return null;
+
   return (
     <>
       <div
-        className="modal fade show d-block"
+        className="mdm-overlay modal fade show d-block"
         tabIndex="-1"
-        style={{
-          position: "fixed",
-          inset: 0, 
-          zIndex: 1050,
-          backgroundColor: "rgba(0,0,0,0.5)",
-          backdropFilter: "blur(4px)",
-          display: "flex",
-          alignItems: "center", 
-          justifyContent: "center", 
-          overflowY: "auto",
-        }}
         onClick={onClose}
       >
         <div
-          className="modal-dialog"
-          style={{
-            margin: 0, 
-            width: "100%",
-            maxWidth: "960px", 
-            maxHeight: "100vh",
-            display: "flex",
-            marginLeft:"200px"
-          }}
+          className="mdm-dialog modal-dialog"
           onClick={(e) => e.stopPropagation()}
         >
-          <div
-            className="modal-content border-0 shadow-lg"
-            style={{
-              borderRadius: "12px",
-              overflow: "hidden",
-               maxWidth: "800px", 
-              alignSelf: "center",
-            }}
-          >
-            {/* Header */}
-            <div
-              className="modal-header border-0"
-              style={{
-                backgroundColor: "#3C3668",
-                padding: "1.5rem",
-                textAlign: "left",
-              }}
-            >
-              <div style={{ textAlign: "left" }}>
-                <h5
-                  className="modal-title fw-bold mb-2"
-                  style={{
-                    color: "white",
-                    fontSize: "1.25rem",
-                    textAlign: "left",
-                  }}
-                >
+          <div className="mdm-content modal-content border-0 shadow-lg">
+            <div className="mdm-header modal-header border-0">
+              <div className="mdm-header-text">
+                <h5 className="mdm-title modal-title fw-bold mb-2">
                   {meeting.meetingTitle}
                 </h5>
-                <span
-                  className="badge bg-light text-primary"
-                  style={{ fontSize: "0.85rem" }}
-                >
+                <span className="mdm-type-badge badge bg-light text-primary">
                   {meeting.meetingType}
                 </span>
               </div>
@@ -79,33 +37,17 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
               ></button>
             </div>
 
-            {/* Body */}
-            <div
-              className="modal-body"
-              style={{
-                padding: "2rem",
-                textAlign: "left",
-                maxHeight: "calc(90vh - 180px)",
-                overflowY: "auto",
-              }}
-            >
-              {/* Date & Time and Attendees Row */}
+            <div className="mdm-body modal-body">
               <div className="row g-3 mb-4">
                 <div className="col-md-6">
-                  <div
-                    className="p-3 rounded"
-                    style={{ backgroundColor: "#f8f9fa", textAlign: "left" }}
-                  >
+                  <div className="mdm-info-card p-3 rounded">
                     <div className="d-flex align-items-center gap-2 mb-2">
                       <i className="bi bi-calendar3 text-primary"></i>
                       <small className="text-muted fw-semibold">
-                        Date & Time
+                        Date &amp; Time
                       </small>
                     </div>
-                    <span
-                      className="d-block fw-medium"
-                      style={{ textAlign: "left" }}
-                    >
+                    <span className="d-block fw-medium">
                       {new Date(meeting.meetingDate).toLocaleString("en-US", {
                         year: "numeric",
                         month: "short",
@@ -117,37 +59,23 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
                   </div>
                 </div>
                 <div className="col-md-6">
-                  <div
-                    className="p-3 rounded"
-                    style={{ backgroundColor: "#f8f9fa", textAlign: "left" }}
-                  >
+                  <div className="mdm-info-card p-3 rounded">
                     <div className="d-flex align-items-center gap-2 mb-2">
                       <i className="bi bi-people text-success"></i>
                       <small className="text-muted fw-semibold">
                         Attendees
                       </small>
                     </div>
-                    <span
-                      className="d-block fw-medium"
-                      style={{ textAlign: "left" }}
-                    >
+                    <span className="d-block fw-medium">
                       {meeting.attendees || "Not specified"}
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Meeting Link Section */}
               {meeting.meetingLink && (
                 <div className="mb-4">
-                  <div
-                    className="p-3 rounded"
-                    style={{
-                      backgroundColor: "#e3f2fd",
-                      border: "1px solid #bbdefb",
-                      textAlign: "left",
-                    }}
-                  >
+                  <div className="mdm-link-card p-3 rounded">
                     <div className="d-flex align-items-center gap-2 mb-2">
                       <i className="bi bi-link-45deg text-primary"></i>
                       <small className="text-muted fw-semibold">
@@ -158,49 +86,31 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
                       href={meeting.meetingLink}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-primary text-decoration-none d-flex align-items-center gap-2 fw-medium"
-                      style={{ textAlign: "left" }}
+                      className="mdm-link text-primary text-decoration-none d-flex align-items-center gap-2 fw-medium"
                     >
-                      Join Meeting{" "}
+                      Join Meeting
                       <i className="bi bi-box-arrow-up-right small"></i>
                     </a>
                   </div>
                 </div>
               )}
 
-              {/* Comments & Observations Section */}
               {meeting.commentsObservations && (
                 <div className="mb-4">
-                  <h6
-                    className="fw-semibold mb-3 d-flex align-items-center gap-2"
-                    style={{ textAlign: "left" }}
-                  >
+                  <h6 className="mdm-section-title fw-semibold mb-3 d-flex align-items-center gap-2">
                     <i className="bi bi-chat-left-text text-info"></i>
-                    Comments & Observations
+                    Comments &amp; Observations
                   </h6>
-                  <div
-                    className="p-3 rounded"
-                    style={{
-                      backgroundColor: "#f8f9fa",
-                      borderLeft: "4px solid #17a2b8",
-                      textAlign: "left",
-                    }}
-                  >
-                    <p className="mb-0" style={{ textAlign: "left" }}>
-                      {meeting.commentsObservations}
-                    </p>
+                  <div className="mdm-comments-card p-3 rounded">
+                    <p className="mb-0">{meeting.commentsObservations}</p>
                   </div>
                 </div>
               )}
 
-              {/* Discussion Points Section */}
               {meeting.discussionPoints &&
                 meeting.discussionPoints.length > 0 && (
                   <div className="mb-4">
-                    <h6
-                      className="fw-semibold mb-3 d-flex align-items-center gap-2"
-                      style={{ textAlign: "left" }}
-                    >
+                    <h6 className="mdm-section-title fw-semibold mb-3 d-flex align-items-center gap-2">
                       <i className="bi bi-chat-dots text-warning"></i>
                       Discussion Points
                       <span className="badge bg-light text-dark">
@@ -211,32 +121,18 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
                       {meeting.discussionPoints.map((dp, i) => (
                         <div
                           key={i}
-                          className="p-3 rounded d-flex align-items-start gap-3"
-                          style={{
-                            backgroundColor: "#f8f9fa",
-                            textAlign: "left",
-                          }}
+                          className="mdm-discussion-card p-3 rounded d-flex align-items-start gap-3"
                         >
-                       
-                          <span
-                            className="flex-grow-1"
-                            style={{ textAlign: "left" }}
-                          >
-                            {dp.pointText}
-                          </span>
+                          <span className="flex-grow-1">{dp.pointText}</span>
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
 
-              {/* Action Items Section */}
               {meeting.actionItems && meeting.actionItems.length > 0 && (
                 <div className="mb-4">
-                  <h6
-                    className="fw-semibold mb-3 d-flex align-items-center gap-2"
-                    style={{ textAlign: "left" }}
-                  >
+                  <h6 className="mdm-section-title fw-semibold mb-3 d-flex align-items-center gap-2">
                     <i className="bi bi-check2-square text-success"></i>
                     Action Items
                     <span className="badge bg-light text-dark">
@@ -247,25 +143,14 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
                     {meeting.actionItems.map((ai, i) => (
                       <div
                         key={i}
-                        className="p-3 rounded"
-                        style={{
-                          backgroundColor: "#f8f9fa",
-                          border: "1px solid #e9ecef",
-                          textAlign: "left",
-                        }}
+                        className="mdm-action-card p-3 rounded"
                       >
                         <div className="d-flex justify-content-between align-items-start mb-3">
-                          <h6
-                            className="fw-semibold mb-0 flex-grow-1 pe-2"
-                            style={{ textAlign: "left" }}
-                          >
+                          <h6 className="fw-semibold mb-0 flex-grow-1 pe-2">
                             {ai.taskDescription}
                           </h6>
                         </div>
-                        <div
-                          className="d-flex flex-wrap gap-3 text-muted small"
-                          style={{ textAlign: "left" }}
-                        >
+                        <div className="mdm-action-meta d-flex flex-wrap gap-3 text-muted small">
                           <span className="d-flex align-items-center gap-2">
                             <i className="bi bi-person-circle text-primary"></i>
                             <span>
@@ -290,15 +175,9 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
                 </div>
               )}
 
-              {/* Create MOM Button */}
               <button
-                className="btn btn-outline-primary w-100 py-2 d-flex align-items-center justify-content-center gap-2 shadow-sm"
+                className="mdm-create-mom-btn btn btn-outline-primary w-100 py-2 d-flex align-items-center justify-content-center gap-2 shadow-sm"
                 onClick={toggleCreateMom}
-                style={{
-                  transition: "all 0.2s",
-                  borderRadius: "8px",
-                  textAlign: "center",
-                }}
               >
                 <i
                   className={`bi ${
@@ -310,27 +189,15 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
                   : "Create MOM for this Meeting"}
               </button>
 
-              {/* Conditional Create MOM Modal */}
               {showCreateMom && (
                 <CreateMomModal meetingData={meeting} onClose={toggleCreateMom} />
               )}
             </div>
 
-            {/* Footer */}
-            <div
-              className="modal-footer border-0"
-              style={{
-                padding: "1rem 2rem",
-                backgroundColor: "#f8f9fa",
-              }}
-            >
+            <div className="mdm-footer modal-footer border-0">
               <button
-                className="btn btn-secondary px-4"
+                className="mdm-close-btn btn btn-secondary px-4"
                 onClick={onClose}
-                style={{
-                  borderRadius: "8px",
-                  padding: "0.5rem 1.5rem",
-                }}
               >
                 Close
               </button>
@@ -338,12 +205,6 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
           </div>
         </div>
       </div>
-
-      <style>{`
-        .modal.show.d-block {
-          display: flex !important;
-        }
-      `}</style>
     </>
   );
 };

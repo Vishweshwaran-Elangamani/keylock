@@ -1,0 +1,832 @@
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/poppins/v21/pxiEyp8kv8JHgFVrJJnecnFHGPezSQ.woff2)
+    format("woff2");
+  unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF,
+    U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/poppins/v21/pxiEyp8kv8JHgFVrJJfecnFHGPc.woff2)
+    format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191,
+    U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+.hrmom-wrapper,
+.hrmom-wrapper * {
+  font-family: "Poppins", sans-serif;
+}
+
+.hrmom-wrapper {
+  padding: 1.25rem 1.75rem;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.hrmom-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.hrmom-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hrmom-spinner-container {
+  text-align: center;
+}
+
+.hrmom-loading-spinner {
+  width: 3rem;
+  height: 3rem;
+}
+
+.hrmom-loading-text {
+  color: #6c757d;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+
+/* BREADCRUMB UPDATED */
+
+.hrmom-breadcrumb-nav {
+  margin-bottom: 1.25rem;
+}
+
+.hrmom-breadcrumb {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  font-size: 0.85rem;
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* remove default Bootstrap divider */
+.hrmom-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+  display: none;
+}
+
+.hrmom-breadcrumb-item {
+  display: flex;
+  align-items: center;
+}
+
+.hrmom-breadcrumb-link {
+  color: #97247e;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  transition: color 0.2s;
+  font-weight: 500;
+}
+
+.hrmom-breadcrumb-link:hover {
+  color: #7a1d66;
+  text-decoration: none;
+}
+
+.hrmom-breadcrumb-slash {
+  color: #97247e;
+  margin: 0 4px;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.hrmom-breadcrumb-active {
+  color: #7a1d66;
+  font-weight: 600;
+}
+
+/* buttons / error */
+
+.hrmom-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.hrmom-btn-primary {
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+.hrmom-btn-primary:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+}
+
+.hrmom-error-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 2.25rem 1.75rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 2px solid #27235c;
+}
+
+.hrmom-error-icon {
+  color: #ef4444;
+  margin-bottom: 0.75rem;
+}
+
+.hrmom-error-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1.25rem;
+}
+
+/* stats */
+
+.hrmom-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.85rem;
+  margin-bottom: 1.1rem;
+}
+
+.hrmom-stat-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 2px solid #27235c;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.hrmom-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.hrmom-stat-content {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.hrmom-stat-icon {
+  flex-shrink: 0;
+}
+
+.hrmom-stat-icon-info {
+  color: #06b6d4;
+}
+
+.hrmom-stat-icon-success {
+  color: #10b981;
+}
+
+.hrmom-stat-icon-danger {
+  color: #ef4444;
+}
+
+.hrmom-stat-info {
+  text-align: left;
+}
+
+.hrmom-stat-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1;
+  margin-bottom: 0.15rem;
+}
+
+.hrmom-stat-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+/* meeting card */
+
+.hrmom-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 2px solid #27235c;
+  margin-bottom: 1.1rem;
+  overflow: hidden;
+}
+
+.hrmom-card.hrmom-comments-card,
+.hrmom-card.hrmom-discussion-card,
+.hrmom-card.hrmom-actions-card {
+  margin-bottom: 0.9rem;
+}
+
+.hrmom-card-header {
+  padding: 0.9rem 1.1rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.hrmom-card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.hrmom-card-body {
+  padding: 1rem;
+}
+
+.hrmom-meeting-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  margin-bottom: 1.1rem;
+}
+
+.hrmom-meeting-icon-wrapper {
+  flex-shrink: 0;
+}
+
+.hrmom-meeting-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #e3f2fd;
+  color: #1976d2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hrmom-meeting-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 0.4rem;
+}
+
+.hrmom-meeting-badges {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.hrmom-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.hrmom-badge-icon {
+  gap: 0.35rem;
+}
+
+.hrmom-badge-primary {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.hrmom-badge-success {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.hrmom-badge-info {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.hrmom-badge-warning {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.hrmom-badge-danger {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.hrmom-badge-secondary {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.hrmom-badge-light {
+  background: #f8f9fa;
+  color: #1e293b;
+  border: 1px solid #e2e8f0;
+}
+
+.hrmom-meeting-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.1rem;
+}
+
+.hrmom-detail-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+.hrmom-detail-icon {
+  color: #3b82f6;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.hrmom-detail-content {
+  text-align: left;
+}
+
+.hrmom-detail-label {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #64748b;
+  margin-bottom: 0.15rem;
+}
+
+.hrmom-detail-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.hrmom-detail-value-sm {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.hrmom-detail-meta {
+  display: block;
+  font-size: 0.72rem;
+  color: #64748b;
+  margin-top: 0.15rem;
+}
+
+.hrmom-detail-link {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.86rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: color 0.2s;
+}
+
+.hrmom-detail-link:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+/* comments */
+
+.hrmom-comments-box {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 0.7rem 0.85rem;
+  white-space: pre-wrap;
+  font-size: 0.9rem;
+  color: #1e293b;
+  line-height: 1.4;
+  text-align: left;
+}
+
+/* two column layout */
+
+.hrmom-two-column-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.hrmom-two-column-grid .hrmom-card {
+  margin-bottom: 0;
+}
+
+/* discussion list */
+
+.hrmom-discussion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.hrmom-discussion-item {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.hrmom-discussion-number {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #3b82f6;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.hrmom-discussion-content {
+  text-align: left;
+  flex: 1;
+}
+
+.hrmom-discussion-text {
+  font-size: 0.9rem;
+  color: #1e293b;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.hrmom-discussion-time {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.7rem;
+  color: #64748b;
+  margin-top: 0.35rem;
+}
+
+/* action items */
+
+.hrmom-action-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.hrmom-action-item {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+}
+
+.hrmom-action-item-header {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.hrmom-action-item-number {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #10b981;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.hrmom-action-item-content {
+  flex: 1;
+}
+
+.hrmom-action-item-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1e293b;
+  line-height: 1.35;
+}
+
+.hrmom-action-item-notes {
+  display: block;
+  color: #64748b;
+  margin-top: 0.2rem;
+  font-size: 0.72rem;
+}
+
+.hrmom-action-item-details {
+  display: flex;
+  gap: 1.1rem;
+  margin-bottom: 0.45rem;
+  padding-left: 2.3rem;
+}
+
+.hrmom-action-item-detail {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.hrmom-action-item-badges {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  padding-left: 2.3rem;
+}
+
+.hrmom-date-overdue {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+/* empty state */
+
+.hrmom-empty-state {
+  padding: 1.2rem;
+  text-align: center;
+  background: #f8f9fa;
+  border-radius: 8px;
+  color: #64748b;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* list table styles (unchanged) */
+
+.hrmom-list-shell {
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  padding: 0;
+  overflow: hidden;
+}
+
+.hrmom-list-table {
+  width: 100%;
+  margin-bottom: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.hrmom-list-table thead tr {
+  background-color: #27235c;
+}
+
+.hrmom-list-table thead th {
+  padding: 18px 24px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ffffff;
+  border-bottom: none;
+}
+
+.hrmom-list-table tbody tr {
+  border-bottom: 1px solid #eef1f6;
+}
+
+.hrmom-list-table tbody td {
+  padding: 22px 24px;
+  font-size: 0.9rem;
+  color: #111827;
+  vertical-align: middle;
+}
+
+.hrmom-list-meeting-cell {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.hrmom-list-doc-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background-color: #e3f2fd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1976d2;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.hrmom-list-meeting-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hrmom-list-meeting-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.hrmom-list-type-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background-color: #f3f4ff;
+  color: #27235c;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.hrmom-list-submitted-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.hrmom-list-submitted-role {
+  font-size: 0.78rem;
+  color: #9ca3af;
+}
+
+.hrmom-list-metric-pill {
+  min-width: 64px;
+  height: 36px;
+  border-radius: 12px;
+  background-color: #e9f3ff;
+  color: #2563eb;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.hrmom-list-metric-pill i {
+  font-size: 0.9rem;
+}
+
+.hrmom-list-view-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background-color: #27235c;
+  border: none;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.hrmom-list-view-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(39, 35, 92, 0.4);
+}
+
+/* responsiveness */
+
+@media (max-width: 992px) {
+  .hrmom-wrapper {
+    padding: 1rem;
+  }
+
+  .hrmom-meeting-details {
+    grid-template-columns: 1fr;
+  }
+
+  .hrmom-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .hrmom-two-column-grid {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  .hrmom-two-column-grid .hrmom-card {
+    margin-bottom: 0.6rem;
+  }
+
+  .hrmom-list-table thead th,
+  .hrmom-list-table tbody td {
+    padding: 16px 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hrmom-wrapper {
+    padding: 0.75rem;
+  }
+
+  .hrmom-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hrmom-stat-card {
+    padding: 1rem;
+  }
+
+  .hrmom-discussion-item {
+    flex-direction: column;
+  }
+
+  .hrmom-action-item-details {
+    flex-direction: column;
+    gap: 0.4rem;
+    padding-left: 2.3rem;
+  }
+
+  .hrmom-list-table {
+    font-size: 0.82rem;
+  }
+
+  .hrmom-list-table tbody td {
+    padding: 14px 12px;
+  }
+
+  .hrmom-list-meeting-title {
+    font-size: 0.9rem;
+  }
+
+  .hrmom-list-metric-pill {
+    min-width: 56px;
+    height: 32px;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .hrmom-meeting-header {
+    flex-direction: column;
+  }
+
+  .hrmom-action-item-details {
+    padding-left: 0;
+  }
+
+  .hrmom-action-item-badges {
+    padding-left: 0;
+  }
+
+  .hrmom-list-shell {
+    border-radius: 12px;
+  }
+}
+
+/* wrapper scroll behavior */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.hrmom-wrapper {
+  margin: 0;
+  padding: 1.25rem 1.75rem;
+  min-height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.hrmom-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  max-height: calc(100vh - 2.5rem);
+  overflow-y: auto;
+}
+
+/* hide scrollbar track for inner container on webkit browsers */
+.hrmom-container::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}

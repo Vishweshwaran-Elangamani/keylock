@@ -1,0 +1,170 @@
+.momd-page {
+  min-height: 100vh;
+  background-color: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.momd-center {
+  justify-content: center;
+  align-items: center;
+}
+
+.momd-loading-text {
+  font-size: 0.95rem;
+  color: #4b5563;
+}
+
+.momd-card {
+  width: 100%;
+  max-width: 900px;
+  border-radius: 16px;
+  overflow: hidden;
+  background-color: #ffffff;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
+  display: flex;
+  flex-direction: column;
+}
+
+.momd-header {
+  color: #ffffff;
+  padding: 1.5rem 2rem;
+}
+
+.momd-header-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.momd-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.momd-type-badge {
+  background-color: #ffffff;
+  color: #27235c;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.8rem;
+  font-weight: 600;
+}
+
+.momd-body {
+  padding: 1.75rem 2rem 2rem;
+}
+
+.momd-section {
+  margin-bottom: 1.5rem;
+}
+
+.momd-section:last-of-type {
+  margin-bottom: 0;
+}
+
+.momd-section-top {
+  margin-bottom: 1.75rem;
+}
+
+.momd-section-title {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+
+.momd-field {
+  margin-bottom: 0.4rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  font-size: 0.95rem;
+}
+
+.momd-field-label {
+  font-weight: 600;
+  color: #111827;
+}
+
+.momd-field-value {
+  color: #374151;
+}
+
+.momd-link {
+  color: #2563eb;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+
+.momd-comments-box {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.75rem 0.9rem;
+  background-color: #f9fafb;
+  font-size: 0.95rem;
+  color: #111827;
+}
+
+
+.momd-list {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.momd-list-item {
+  margin-bottom: 0.25rem;
+  font-size: 0.95rem;
+  color: #111827;
+}
+
+.momd-list-item:last-of-type {
+  margin-bottom: 0;
+}
+
+.momd-muted-text {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+@media (max-width: 768px) {
+  .momd-page {
+    padding: 1.5rem 1rem;
+    align-items: flex-start;
+  }
+
+  .momd-card {
+    border-radius: 12px;
+  }
+
+  .momd-header {
+    padding: 1.25rem 1.25rem;
+  }
+
+  .momd-body {
+    padding: 1.25rem 1.25rem 1.5rem;
+  }
+
+  .momd-title {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .momd-page {
+    padding: 1rem 0.75rem;
+  }
+
+  .momd-body {
+    padding: 1.1rem 1rem 1.25rem;
+  }
+
+  .momd-field {
+    flex-direction: column;
+  }
+}

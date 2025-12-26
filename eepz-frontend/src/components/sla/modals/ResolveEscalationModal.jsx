@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { CheckCircle, X, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
-import "../../../styles/sla/ResolveEscalationModal.css";
+import "../../../styles/sla/modals/ResolveEscalationModal.css";
 
 const ResolveEscalationModal = ({ escalation, onClose, onResolve }) => {
   const [resolutionComments, setResolutionComments] = useState("");
@@ -36,7 +36,10 @@ const ResolveEscalationModal = ({ escalation, onClose, onResolve }) => {
 
   return (
     <>
-      <div className="resolve-modal-backdrop" onClick={() => !loading && onClose()} />
+      <div
+        className="resolve-modal-backdrop"
+        onClick={() => !loading && onClose()}
+      />
       <div className="resolve-modal-wrapper">
         <div className="resolve-modal-container">
           <div className="resolve-modal-header">
@@ -57,7 +60,10 @@ const ResolveEscalationModal = ({ escalation, onClose, onResolve }) => {
                 <div>
                   <p>{error}</p>
                 </div>
-                <button onClick={() => setError(null)} className="resolve-error-close">
+                <button
+                  onClick={() => setError(null)}
+                  className="resolve-error-close"
+                >
                   <X size={16} />
                 </button>
               </div>
@@ -72,13 +78,16 @@ const ResolveEscalationModal = ({ escalation, onClose, onResolve }) => {
               </div>
               <div className="resolve-info-row">
                 <span className="resolve-info-label">Reason:</span>
-                <span className="resolve-info-value">{escalation.reason}</span>
+                <span className="resolve-info-value">
+                  {escalation.reason}
+                </span>
               </div>
             </div>
 
             <div className="resolve-form-group">
               <label className="resolve-form-label">
-                Resolution Comments <span className="resolve-required">*</span>
+                Resolution Comments
+                <span className="resolve-required">*</span>
               </label>
               <textarea
                 className="resolve-textarea"

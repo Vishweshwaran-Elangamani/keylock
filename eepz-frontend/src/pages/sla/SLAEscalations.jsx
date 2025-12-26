@@ -14,6 +14,7 @@ import {
 import { toast } from "sonner";
 import slaService from "../../services/sla/slaService";
 import { formatDate, formatDateTime } from "../../utils/sla/dateFormatter";
+import "./SLAEscalations.css";
 
 const SLAEscalations = () => {
   const { slaid } = useParams();
@@ -118,38 +119,41 @@ const SLAEscalations = () => {
     }
   };
 
+  const getStatusBadgeClass = (status) => {
+    switch (status) {
+      case "Resolved":
+        return "sla-escalation-status-badge-resolved";
+      case "Dismissed":
+        return "sla-escalation-status-badge-dismissed";
+      case "Escalated":
+        return "sla-escalation-status-badge-escalated";
+      default:
+        return "sla-escalation-status-badge-pending";
+    }
+  };
+
   if (loading) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "400px" }}
-      >
-        <div className="spinner-border text-primary" />
+      <div className="sla-escalations-loading">
+        <div className="sla-escalations-spinner" />
       </div>
     );
   }
 
   return (
-    <div className="container-fluid">
-      {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <div className="d-flex align-items-center gap-3">
+    <div className="sla-escalations-wrapper">
+      <div className="sla-escalations-header">
+        <div className="sla-escalations-header-content">
           <button
-            className="btn btn-outline-secondary rounded-circle"
+            className="sla-escalations-back-btn"
             onClick={() => navigate(-1)}
-            style={{ width: "40px", height: "40px", padding: 0 }}
           >
             <ArrowLeft size={20} />
           </button>
-          <div>
-            <h2
-              className="fw-bold mb-1"
-              style={{ color: "var(--color-primary-1)" }}
-            >
-              SLA Escalations
-            </h2>
+          <div className="sla-escalations-title-wrapper">
+            <h2 className="sla-escalations-title">SLA Escalations</h2>
             {sla && (
-              <p className="text-muted mb-0">
+              <p className="sla-escalations-subtitle">
                 {sla.slatype} - {sla.employeeName}
               </p>
             )}
@@ -157,22 +161,18 @@ const SLAEscalations = () => {
         </div>
       </div>
 
-      {error && <div className="alert alert-danger">{error}</div>}
+      {error && <div className="sla-escalations-error">{error}</div>}
 
-      {/* Escalations List */}
       {escalations.length === 0 ? (
-        <div
-          className="card border-0 shadow-sm text-center py-5"
-          style={{ borderRadius: "12px" }}
-        >
-          <div className="card-body">
-            <AlertTriangle size={64} className="text-muted mb-3" />
-            <h5 className="text-muted">No Escalations</h5>
-            <p className="text-muted mb-0">This SLA has no escalations</p>
-          </div>
+        <div className="sla-escalations-empty-card">
+          <AlertTriangle size={64} className="sla-escalations-empty-icon" />
+          <h5 className="sla-escalations-empty-title">No Escalations</h5>
+          <p className="sla-escalations-empty-text">
+            This SLA has no escalations
+          </p>
         </div>
       ) : (
-        <div className="row g-4">
+        <div className="sla-escalations-grid">
           {escalations.map((escalation, index) => {
             const levelColors = getEscalationLevelColor(
               escalation.escalationLevel
@@ -180,235 +180,202 @@ const SLAEscalations = () => {
             const isExpanded = selectedEscalation === escalation.escalationId;
 
             return (
-              <div key={escalation.escalationId} className="col-12">
-                <div
-                  className="card border-0 shadow-sm"
-                  style={{ borderRadius: "12px" }}
-                >
-                  <div className="card-body p-4">
-                    {/* Header */}
-                    <div className="d-flex justify-content-between align-items-start mb-3">
-                      <div className="d-flex align-items-center gap-3">
-                        <div
-                          className="rounded-circle d-flex align-items-center justify-content-center"
-                          style={{
-                            width: "48px",
-                            height: "48px",
-                            backgroundColor: levelColors.bg,
-                          }}
-                        >
-                          {getStatusIcon(escalation.escalationStatus)}
-                        </div>
-                        <div>
-                          <div className="d-flex align-items-center gap-2 mb-1">
-                            <h5 className="mb-0 fw-bold">
-                              {escalation.reason}
-                            </h5>
-                            <span
-                              className="badge"
-                              style={{
-                                backgroundColor: levelColors.bg,
-                                color: levelColors.text,
-                                border: `1px solid ${levelColors.text}30`,
-                              }}
-                            >
-                              {escalation.escalationLevel}
-                            </span>
-                          </div>
-                          <p className="text-muted mb-0 small">
-                            {escalation.description}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="text-end">
-                        <span
-                          className={`badge ${
-                            escalation.escalationStatus === "Resolved"
-                              ? "bg-success"
-                              : escalation.escalationStatus === "Dismissed"
-                              ? "bg-secondary"
-                              : escalation.escalationStatus === "Escalated"
-                              ? "bg-warning"
-                              : "bg-primary"
-                          }`}
-                        >
-                          {escalation.escalationStatus}
-                        </span>
-                        <div className="text-muted small mt-2">
-                          Escalation #{index + 1}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Details Grid */}
-                    <div className="row g-4 mb-3">
-                      <div className="col-md-3">
-                        <div className="d-flex align-items-start gap-2">
-                          <User size={16} className="text-muted mt-1" />
-                          <div>
-                            <small className="text-muted d-block">
-                              Escalated To
-                            </small>
-                            <strong className="small">
-                              {escalation.escalatedTo}
-                            </strong>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="col-md-3">
-                        <div className="d-flex align-items-start gap-2">
-                          <User size={16} className="text-muted mt-1" />
-                          <div>
-                            <small className="text-muted d-block">
-                              Submitted By
-                            </small>
-                            <strong className="small">
-                              {escalation.submittedBy}
-                            </strong>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="col-md-3">
-                        <div className="d-flex align-items-start gap-2">
-                          <Calendar size={16} className="text-muted mt-1" />
-                          <div>
-                            <small className="text-muted d-block">
-                              Submitted At
-                            </small>
-                            <strong className="small">
-                              {formatDateTime(escalation.submittedAt)}
-                            </strong>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="col-md-3">
-                        <div className="d-flex align-items-start gap-2">
-                          <Clock size={16} className="text-muted mt-1" />
-                          <div>
-                            <small className="text-muted d-block">
-                              Escalation Deadline
-                            </small>
-                            <strong className="small">
-                              {formatDate(escalation.escalationDeadline)}
-                            </strong>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Resolution Section */}
-                    {escalation.resolvedAt && (
+              <div key={escalation.escalationId} className="sla-escalation-card">
+                <div className="sla-escalation-card-body">
+                  <div className="sla-escalation-header">
+                    <div className="sla-escalation-header-left">
                       <div
-                        className="alert alert-success mb-0 d-flex align-items-start gap-3"
-                        style={{ borderRadius: "8px" }}
+                        className="sla-escalation-icon-wrapper"
+                        style={{ backgroundColor: levelColors.bg }}
                       >
-                        <CheckCircle
-                          size={20}
-                          className="text-success mt-1 flex-shrink-0"
-                        />
-                        <div className="flex-grow-1">
-                          <div className="d-flex justify-content-between align-items-start mb-2">
-                            <strong className="d-block">Resolution</strong>
-                            <small className="text-muted">
-                              Resolved by {escalation.resolvedBy} on{" "}
-                              {formatDateTime(escalation.resolvedAt)}
-                            </small>
-                          </div>
-                          <p className="mb-0 small">
-                            {escalation.resolutionComments}
-                          </p>
-                        </div>
+                        {getStatusIcon(escalation.escalationStatus)}
                       </div>
-                    )}
-
-                    {/* Resolve Button */}
-                    {escalation.escalationStatus === "Pending" && (
-                      <div className="mt-3">
-                        <button
-                          className="btn btn-outline-success btn-sm d-flex align-items-center gap-2"
-                          onClick={() =>
-                            setSelectedEscalation(
-                              isExpanded ? null : escalation.escalationId
-                            )
-                          }
-                          style={{ borderRadius: "8px" }}
-                        >
-                          <MessageSquare size={14} />
-                          {isExpanded ? "Cancel" : "Resolve Escalation"}
-                        </button>
-
-                        {/* Resolution Form */}
-                        {isExpanded && (
-                          <div
-                            className="mt-3 p-3 border rounded"
-                            style={{ borderRadius: "8px" }}
+                      <div className="sla-escalation-header-content">
+                        <div className="sla-escalation-title-row">
+                          <h5 className="sla-escalation-title">
+                            {escalation.reason}
+                          </h5>
+                          <span
+                            className="sla-escalation-level-badge"
+                            style={{
+                              backgroundColor: levelColors.bg,
+                              color: levelColors.text,
+                              border: `1px solid ${levelColors.text}30`,
+                            }}
                           >
-                            <h6 className="fw-semibold mb-3">
-                              Resolve Escalation
-                            </h6>
-
-                            <div className="mb-3">
-                              <label className="form-label small fw-semibold">
-                                Status
-                              </label>
-                              <select
-                                className="form-select"
-                                value={resolutionForm.escalationStatus}
-                                onChange={(e) =>
-                                  setResolutionForm({
-                                    ...resolutionForm,
-                                    escalationStatus: e.target.value,
-                                  })
-                                }
-                                style={{ borderRadius: "8px" }}
-                              >
-                                <option value="Resolved">Resolved</option>
-                                <option value="Dismissed">Dismissed</option>
-                                <option value="Escalated">
-                                  Escalate Further
-                                </option>
-                              </select>
-                            </div>
-
-                            <div className="mb-3">
-                              <label className="form-label small fw-semibold">
-                                Resolution Comments
-                              </label>
-                              <textarea
-                                className="form-control"
-                                rows="3"
-                                value={resolutionForm.resolutionComments}
-                                onChange={(e) =>
-                                  setResolutionForm({
-                                    ...resolutionForm,
-                                    resolutionComments: e.target.value,
-                                  })
-                                }
-                                placeholder="Provide details about the resolution..."
-                                style={{ borderRadius: "8px" }}
-                              />
-                            </div>
-
-                            <button
-                              className="btn btn-success d-flex align-items-center gap-2"
-                              onClick={() =>
-                                handleResolveEscalation(escalation.escalationId)
-                              }
-                              disabled={!resolutionForm.resolutionComments}
-                              style={{ borderRadius: "8px" }}
-                            >
-                              <CheckCircle size={16} />
-                              Submit Resolution
-                            </button>
-                          </div>
-                        )}
+                            {escalation.escalationLevel}
+                          </span>
+                        </div>
+                        <p className="sla-escalation-description">
+                          {escalation.description}
+                        </p>
                       </div>
-                    )}
+                    </div>
+
+                    <div className="sla-escalation-header-right">
+                      <span
+                        className={`sla-escalation-status-badge ${getStatusBadgeClass(
+                          escalation.escalationStatus
+                        )}`}
+                      >
+                        {escalation.escalationStatus}
+                      </span>
+                      <div className="sla-escalation-number">
+                        Escalation #{index + 1}
+                      </div>
+                    </div>
                   </div>
+
+                  <div className="sla-escalation-details-grid">
+                    <div className="sla-escalation-detail-item">
+                      <User size={16} className="sla-escalation-detail-icon" />
+                      <div className="sla-escalation-detail-content">
+                        <small className="sla-escalation-detail-label">
+                          Escalated To
+                        </small>
+                        <strong className="sla-escalation-detail-value">
+                          {escalation.escalatedTo}
+                        </strong>
+                      </div>
+                    </div>
+
+                    <div className="sla-escalation-detail-item">
+                      <User size={16} className="sla-escalation-detail-icon" />
+                      <div className="sla-escalation-detail-content">
+                        <small className="sla-escalation-detail-label">
+                          Submitted By
+                        </small>
+                        <strong className="sla-escalation-detail-value">
+                          {escalation.submittedBy}
+                        </strong>
+                      </div>
+                    </div>
+
+                    <div className="sla-escalation-detail-item">
+                      <Calendar
+                        size={16}
+                        className="sla-escalation-detail-icon"
+                      />
+                      <div className="sla-escalation-detail-content">
+                        <small className="sla-escalation-detail-label">
+                          Submitted At
+                        </small>
+                        <strong className="sla-escalation-detail-value">
+                          {formatDateTime(escalation.submittedAt)}
+                        </strong>
+                      </div>
+                    </div>
+
+                    <div className="sla-escalation-detail-item">
+                      <Clock size={16} className="sla-escalation-detail-icon" />
+                      <div className="sla-escalation-detail-content">
+                        <small className="sla-escalation-detail-label">
+                          Escalation Deadline
+                        </small>
+                        <strong className="sla-escalation-detail-value">
+                          {formatDate(escalation.escalationDeadline)}
+                        </strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  {escalation.resolvedAt && (
+                    <div className="sla-escalation-resolution-alert">
+                      <CheckCircle
+                        size={20}
+                        className="sla-escalation-resolution-icon"
+                      />
+                      <div className="sla-escalation-resolution-content">
+                        <div className="sla-escalation-resolution-header">
+                          <strong className="sla-escalation-resolution-title">
+                            Resolution
+                          </strong>
+                          <small className="sla-escalation-resolution-meta">
+                            Resolved by {escalation.resolvedBy} on{" "}
+                            {formatDateTime(escalation.resolvedAt)}
+                          </small>
+                        </div>
+                        <p className="sla-escalation-resolution-text">
+                          {escalation.resolutionComments}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {escalation.escalationStatus === "Pending" && (
+                    <div className="sla-escalation-actions">
+                      <button
+                        className="sla-escalation-resolve-btn"
+                        onClick={() =>
+                          setSelectedEscalation(
+                            isExpanded ? null : escalation.escalationId
+                          )
+                        }
+                      >
+                        <MessageSquare size={14} />
+                        {isExpanded ? "Cancel" : "Resolve Escalation"}
+                      </button>
+
+                      {isExpanded && (
+                        <div className="sla-escalation-form-wrapper">
+                          <h6 className="sla-escalation-form-title">
+                            Resolve Escalation
+                          </h6>
+
+                          <div className="sla-escalation-form-group">
+                            <label className="sla-escalation-form-label">
+                              Status
+                            </label>
+                            <select
+                              className="sla-escalation-form-select"
+                              value={resolutionForm.escalationStatus}
+                              onChange={(e) =>
+                                setResolutionForm({
+                                  ...resolutionForm,
+                                  escalationStatus: e.target.value,
+                                })
+                              }
+                            >
+                              <option value="Resolved">Resolved</option>
+                              <option value="Dismissed">Dismissed</option>
+                              <option value="Escalated">
+                                Escalate Further
+                              </option>
+                            </select>
+                          </div>
+
+                          <div className="sla-escalation-form-group">
+                            <label className="sla-escalation-form-label">
+                              Resolution Comments
+                            </label>
+                            <textarea
+                              className="sla-escalation-form-textarea"
+                              rows="3"
+                              value={resolutionForm.resolutionComments}
+                              onChange={(e) =>
+                                setResolutionForm({
+                                  ...resolutionForm,
+                                  resolutionComments: e.target.value,
+                                })
+                              }
+                              placeholder="Provide details about the resolution..."
+                            />
+                          </div>
+
+                          <button
+                            className="sla-escalation-submit-btn"
+                            onClick={() =>
+                              handleResolveEscalation(escalation.escalationId)
+                            }
+                            disabled={!resolutionForm.resolutionComments}
+                          >
+                            <CheckCircle size={16} />
+                            Submit Resolution
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             );

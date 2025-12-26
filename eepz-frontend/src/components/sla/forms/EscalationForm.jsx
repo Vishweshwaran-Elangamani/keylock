@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { X, Send, AlertCircle, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import slaService from "../../../services/sla/slaService";
-import "../../../styles/sla/EscalationForm.css";
+import "../../../styles/sla/components/EscalationForm.css";
 
 const EscalationForm = ({ sla, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -143,7 +143,7 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                 </div>
               </div>
 
-              {/* Reason dropdown (custom, like Department screenshot) */}
+              
               <div className="esc-form-group">
                 <label className="esc-form-label">
                   Reason <span className="esc-required">*</span>

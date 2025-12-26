@@ -21,8 +21,9 @@ import {
   X,
 } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "../../styles/mom/components/MyMomsList.css";
 
-const PRIMARY = "#27235C"; // primary blue
+const PRIMARY = "#27235C";
 
 const MyMomsList = () => {
   const [moms, setMoms] = useState([]);
@@ -197,12 +198,8 @@ const MyMomsList = () => {
 
   if (loading) {
     return (
-      <div className="d-flex justify-content-center align-items-center min-vh-100">
-        <div
-          className="spinner-border text-primary"
-          role="status"
-          style={{ width: "3rem", height: "3rem" }}
-        >
+      <div className="mml-loading-wrapper">
+        <div className="spinner-border text-primary mml-loading-spinner" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
       </div>
@@ -210,44 +207,38 @@ const MyMomsList = () => {
   }
 
   return (
-    <div
-      className="container-fluid px-4 py-4"
-      style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}
-    >
+    <div className="mml-page">
       <div className="row justify-content-center">
         <div className="col-12 col-xl-11">
-          {/* PAGE HEADER – primary blue */}
           <div
-            className="mb-4 rounded-3 shadow-sm d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 px-4 py-3"
-            style={{ backgroundColor: PRIMARY, color: "#ffffff" }}
+            className="mml-header card shadow-sm"
+            style={{ backgroundColor: PRIMARY }}
           >
-            <div className="d-flex align-items-center gap-3">
-              <button
-                className="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                onClick={() => navigate(-1)}
-                style={{ width: "40px", height: "40px", flexShrink: 0 }}
-              >
-                <ArrowLeft size={20} />
-              </button>
-              <div className="text-md-start text-center">
-                <h2 className="fw-bold mb-1" style={{ fontSize: "1.75rem" }}>
-                  My MOMs
-                </h2>
-                <p className="mb-0" style={{ fontSize: "0.95rem" }}>
-                  View and manage your meeting minutes
-                </p>
+            <div className="mml-header-inner">
+              <div className="mml-header-left">
+                <button
+                  className="btn btn-light mml-back-btn"
+                  onClick={() => navigate(-1)}
+                >
+                  <ArrowLeft size={20} />
+                </button>
+                <div className="mml-header-text">
+                  <h2 className="mml-header-title">My MOMs</h2>
+                  <p className="mml-header-subtitle">
+                    View and manage your meeting minutes
+                  </p>
+                </div>
               </div>
+              <button
+                className="btn btn-light mml-header-create-btn"
+                onClick={() => navigate("/mom/create")}
+              >
+                <Plus size={18} />
+                <span className="mml-header-create-text">Create New MOM</span>
+              </button>
             </div>
-            <button
-              className="btn btn-light d-flex align-items-center gap-2 px-4"
-              onClick={() => navigate("/mom/create")}
-            >
-              <Plus size={18} />
-              <span style={{ color: PRIMARY }}>Create New MOM</span>
-            </button>
           </div>
 
-          {/* MOMs Count Badge */}
           {moms.length > 0 && (
             <div className="alert alert-info d-flex align-items-center gap-2 mb-4">
               <FileText size={20} />
@@ -258,19 +249,11 @@ const MyMomsList = () => {
             </div>
           )}
 
-          {/* Empty State */}
           {moms.length === 0 ? (
-            <div className="card border-0 shadow-sm">
-              <div className="card-body text-center py-5">
-                <div
-                  className="rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
-                  style={{
-                    width: "80px",
-                    height: "80px",
-                    backgroundColor: "#e3f2fd",
-                  }}
-                >
-                  <FileText size={40} style={{ color: "#1976d2" }} />
+            <div className="card border-0 shadow-sm mml-empty-card">
+              <div className="card-body text-center">
+                <div className="mml-empty-icon">
+                  <FileText size={40} className="mml-empty-icon-svg" />
                 </div>
                 <h5 className="fw-semibold mb-2">No MOMs Yet</h5>
                 <p className="text-muted mb-4">
@@ -286,37 +269,21 @@ const MyMomsList = () => {
               </div>
             </div>
           ) : (
-            /* MOMs List */
             <div className="row g-3">
               {moms.map((mom) => (
                 <div key={mom.momId} className="col-12">
-                  <div className="card border-0 shadow-sm h-100">
-                    <div className="card-body p-4">
+                  <div className="card border-0 shadow-sm h-100 mml-mom-card">
+                    <div className="card-body mml-mom-card-body">
                       <div className="row align-items-start">
-                        {/* MOM Icon */}
                         <div className="col-auto d-none d-md-block">
-                          <div
-                            className="rounded-circle d-flex align-items-center justify-content-center"
-                            style={{
-                              width: "60px",
-                              height: "60px",
-                              backgroundColor: "#e3f2fd",
-                            }}
-                          >
-                            <FileText
-                              size={28}
-                              style={{ color: "#1976d2" }}
-                            />
+                          <div className="mml-mom-icon">
+                            <FileText size={28} className="mml-mom-icon-svg" />
                           </div>
                         </div>
 
-                        {/* MOM Details */}
                         <div className="col">
-                          <div className="d-flex justify-content-between align-items-start mb-2 flex-wrap gap-2">
-                            <h5
-                              className="fw-bold mb-0"
-                              style={{ color: "#1e293b" }}
-                            >
+                          <div className="mml-mom-header-row">
+                            <h5 className="mml-mom-title">
                               {mom.meetingTitle}
                             </h5>
                             {getMeetingTypeBadge(mom.meetingType)}
@@ -324,26 +291,16 @@ const MyMomsList = () => {
 
                           <div className="row g-3 mb-3">
                             <div className="col-md-4">
-                              <div className="d-flex align-items-start gap-2">
+                              <div className="mml-info-row">
                                 <Calendar
                                   size={18}
-                                  className="text-primary mt-1"
-                                  style={{ flexShrink: 0 }}
+                                  className="mml-info-icon text-primary"
                                 />
-                                <div style={{ textAlign: "left" }}>
-                                  <div
-                                    className="text-muted fw-medium"
-                                    style={{ fontSize: "0.8rem" }}
-                                  >
+                                <div className="mml-info-text">
+                                  <div className="mml-info-label">
                                     Meeting Date
                                   </div>
-                                  <div
-                                    className="fw-semibold"
-                                    style={{
-                                      fontSize: "0.95rem",
-                                      color: "#1e293b",
-                                    }}
-                                  >
+                                  <div className="mml-info-value">
                                     {formatDateTime(mom.meetingDate)}
                                   </div>
                                 </div>
@@ -351,26 +308,16 @@ const MyMomsList = () => {
                             </div>
 
                             <div className="col-md-4">
-                              <div className="d-flex align-items-start gap-2">
+                              <div className="mml-info-row">
                                 <Users
                                   size={18}
-                                  className="text-primary mt-1"
-                                  style={{ flexShrink: 0 }}
+                                  className="mml-info-icon text-primary"
                                 />
-                                <div style={{ textAlign: "left" }}>
-                                  <div
-                                    className="text-muted fw-medium"
-                                    style={{ fontSize: "0.8rem" }}
-                                  >
+                                <div className="mml-info-text">
+                                  <div className="mml-info-label">
                                     Attendees
                                   </div>
-                                  <div
-                                    className="fw-semibold"
-                                    style={{
-                                      fontSize: "0.95rem",
-                                      color: "#1e293b",
-                                    }}
-                                  >
+                                  <div className="mml-info-value">
                                     {mom.attendees || "N/A"}
                                   </div>
                                 </div>
@@ -378,26 +325,16 @@ const MyMomsList = () => {
                             </div>
 
                             <div className="col-md-4">
-                              <div className="d-flex align-items-start gap-2">
+                              <div className="mml-info-row">
                                 <Users
                                   size={18}
-                                  className="text-primary mt-1"
-                                  style={{ flexShrink: 0 }}
+                                  className="mml-info-icon text-primary"
                                 />
-                                <div style={{ textAlign: "left" }}>
-                                  <div
-                                    className="text-muted fw-medium"
-                                    style={{ fontSize: "0.8rem" }}
-                                  >
+                                <div className="mml-info-text">
+                                  <div className="mml-info-label">
                                     Submitted by
                                   </div>
-                                  <div
-                                    className="fw-semibold"
-                                    style={{
-                                      fontSize: "0.95rem",
-                                      color: "#1e293b",
-                                    }}
-                                  >
+                                  <div className="mml-info-value">
                                     {mom.submittedByEmployeeName} (
                                     {mom.submittedByRole})
                                   </div>
@@ -406,8 +343,7 @@ const MyMomsList = () => {
                             </div>
                           </div>
 
-                          {/* Action Buttons */}
-                          <div className="d-flex gap-2 flex-wrap">
+                          <div className="mml-actions-row">
                             <button
                               className="btn btn-sm btn-outline-primary d-flex align-items-center gap-2"
                               onClick={() => openMomDetails(mom)}
@@ -452,42 +388,26 @@ const MyMomsList = () => {
             </div>
           )}
 
-          {/* Share Modal – header primary blue */}
           {showShareModal && shareModalMom && (
             <div
-              className="modal fade show d-block"
+              className="modal fade show d-block mml-modal-backdrop"
               tabIndex="-1"
-              style={{
-                backgroundColor: "rgba(0,0,0,0.5)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
               onClick={closeShareModal}
             >
               <div
-                className="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered"
+                className="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered mml-modal-dialog"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="modal-content border-0 shadow">
+                <div className="modal-content border-0 shadow mml-modal-content">
                   <div
-                    className="modal-header"
-                    style={{
-                      backgroundColor: PRIMARY,
-                      color: "#ffffff",
-                    }}
+                    className="modal-header mml-modal-header"
+                    style={{ backgroundColor: PRIMARY }}
                   >
                     <div>
-                      <h5
-                        className="modal-title fw-bold mb-1"
-                        style={{ color: "#ffffff" }}
-                      >
+                      <h5 className="modal-title fw-bold mb-1 mml-modal-title">
                         Share MOM
                       </h5>
-                      <p
-                        className="small mb-0"
-                        style={{ color: "#ffffff" }}
-                      >
+                      <p className="small mb-0 mml-modal-subtitle">
                         {shareModalMom.meetingTitle}
                       </p>
                     </div>
@@ -498,23 +418,22 @@ const MyMomsList = () => {
                     ></button>
                   </div>
 
-                  <div className="modal-body" style={{ textAlign: "left" }}>
-                    {/* Search Bar */}
+                  <div className="modal-body mml-modal-body">
                     <div className="mb-3">
-                      <div className="input-group">
-                        <span className="input-group-text bg-light border-end-0">
+                      <div className="input-group mml-search-group">
+                        <span className="input-group-text mml-search-icon">
                           <Search size={18} />
                         </span>
                         <input
                           type="text"
-                          className="form-control border-start-0"
+                          className="form-control mml-search-input"
                           placeholder="Search employees by name, email, or department..."
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
                         />
                         {searchTerm && (
                           <button
-                            className="btn btn-light border"
+                            className="btn btn-light mml-search-clear"
                             onClick={() => setSearchTerm("")}
                           >
                             <X size={18} />
@@ -523,19 +442,17 @@ const MyMomsList = () => {
                       </div>
                     </div>
 
-                    {/* Selected Count */}
                     {selectedEmployees.length > 0 && (
                       <div className="alert alert-info d-flex align-items-center gap-2 mb-3">
                         <Users size={18} />
                         <span>
-                          <strong>{selectedEmployees.length}</strong>{" "}
-                          employee(s) selected
+                          <strong>{selectedEmployees.length}</strong> employee(s)
+                          selected
                         </span>
                       </div>
                     )}
 
-                    {/* Employee List */}
-                    <div style={{ maxHeight: "400px", overflowY: "auto" }}>
+                    <div className="mml-employee-list-wrapper">
                       {filteredEmployees.length === 0 ? (
                         <div className="text-center py-4 text-muted">
                           No employees found
@@ -545,13 +462,11 @@ const MyMomsList = () => {
                           {filteredEmployees.map((employee) => (
                             <label
                               key={employee.employeeId}
-                              className="list-group-item list-group-item-action d-flex align-items-start gap-3 py-3"
-                              style={{ cursor: "pointer", textAlign: "left" }}
+                              className="list-group-item list-group-item-action mml-employee-item"
                             >
                               <input
                                 type="checkbox"
-                                className="form-check-input mt-1"
-                                style={{ flexShrink: 0 }}
+                                className="form-check-input mml-employee-checkbox"
                                 checked={selectedEmployees.includes(
                                   employee.employeeId
                                 )}
@@ -561,7 +476,7 @@ const MyMomsList = () => {
                                   )
                                 }
                               />
-                              <div className="flex-grow-1">
+                              <div className="mml-employee-text">
                                 <div className="fw-semibold">
                                   {employee.firstName} {employee.lastName}
                                 </div>
@@ -577,7 +492,7 @@ const MyMomsList = () => {
                     </div>
                   </div>
 
-                  <div className="modal-footer">
+                  <div className="modal-footer mml-modal-footer">
                     <button
                       className="btn btn-secondary"
                       onClick={closeShareModal}
@@ -602,38 +517,23 @@ const MyMomsList = () => {
             </div>
           )}
 
-         
           {selectedMom && (
             <div
-              className="modal fade show d-block"
+              className="modal fade show d-block mml-modal-backdrop"
               tabIndex="-1"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-               
-              }}
               onClick={closeMomDetails}
             >
               <div
-                className="modal-dialog modal-dialog-scrollable modal-xl modal-dialog-centered"
+                className="modal-dialog modal-dialog-scrollable modal-xl modal-dialog-centered mml-modal-dialog"
                 onClick={(e) => e.stopPropagation()}
-                
-
               >
-                <div className="modal-content border-0 shadow">
+                <div className="modal-content border-0 shadow mml-modal-content">
                   <div
-                    className="modal-header border-0"
-                    style={{
-                      backgroundColor: PRIMARY,
-                      color: "#ffffff",
-                    }}
+                    className="modal-header border-0 mml-modal-header"
+                    style={{ backgroundColor: PRIMARY }}
                   >
                     <div>
-                      <h5
-                        className="modal-title fw-bold mb-1"
-                        style={{ color: "#ffffff" }}
-                      >
+                      <h5 className="modal-title fw-bold mb-1 mml-modal-title">
                         {selectedMom.meetingTitle}
                       </h5>
                       <div className="small">
@@ -647,8 +547,7 @@ const MyMomsList = () => {
                     ></button>
                   </div>
 
-                  <div className="modal-body">
-                  
+                  <div className="modal-body mml-modal-body">
                     <div className="card bg-light border-0 mb-4">
                       <div className="card-body">
                         <h6 className="fw-semibold mb-3">
@@ -656,8 +555,11 @@ const MyMomsList = () => {
                         </h6>
                         <div className="row g-3">
                           <div className="col-md-6">
-                            <div className="d-flex align-items-center gap-2 mb-2">
-                              <Calendar size={16} className="text-primary" />
+                            <div className="mml-detail-row">
+                              <Calendar
+                                size={16}
+                                className="text-primary"
+                              />
                               <small className="text-muted">
                                 Meeting Date:
                               </small>
@@ -669,7 +571,7 @@ const MyMomsList = () => {
 
                           {selectedMom.meetingLink && (
                             <div className="col-md-6">
-                              <div className="d-flex align-items-center gap-2 mb-2">
+                              <div className="mml-detail-row">
                                 <LinkIcon
                                   size={16}
                                   className="text-primary"
@@ -690,7 +592,7 @@ const MyMomsList = () => {
                           )}
 
                           <div className="col-md-6">
-                            <div className="d-flex align-items-center gap-2 mb-2">
+                            <div className="mml-detail-row">
                               <Users size={16} className="text-primary" />
                               <small className="text-muted">Attendees:</small>
                             </div>
@@ -700,7 +602,7 @@ const MyMomsList = () => {
                           </div>
 
                           <div className="col-md-6">
-                            <div className="d-flex align-items-center gap-2 mb-2">
+                            <div className="mml-detail-row">
                               <Users size={16} className="text-primary" />
                               <small className="text-muted">
                                 Submitted by:
@@ -718,7 +620,7 @@ const MyMomsList = () => {
                     {selectedMom.commentsObservations && (
                       <div className="mb-4">
                         <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2">
-                          <MessageSquare size={18} />
+                        
                           Comments & Observations
                         </h6>
                         <div className="alert alert-secondary mb-0">
@@ -729,7 +631,7 @@ const MyMomsList = () => {
 
                     <div className="mb-4">
                       <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2">
-                        <MessageSquare size={18} />
+                     
                         Discussion Points
                       </h6>
                       {selectedMom.discussionPoints?.length > 0 ? (
@@ -740,16 +642,7 @@ const MyMomsList = () => {
                               className="list-group-item border-0 bg-light mb-2 rounded"
                             >
                               <div className="d-flex gap-2">
-                                <span
-                                  className="badge bg-primary rounded-circle"
-                                  style={{
-                                    width: "24px",
-                                    height: "24px",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                  }}
-                                >
+                                <span className="mml-discussion-index">
                                   {index + 1}
                                 </span>
                                 <span className="flex-grow-1">
@@ -766,10 +659,9 @@ const MyMomsList = () => {
                       )}
                     </div>
 
-                    {/* Action Items */}
                     <div className="mb-4">
                       <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2">
-                        <CheckCircle size={18} />
+                      
                         Action Items
                       </h6>
                       {selectedMom.actionItems?.length > 0 ? (
@@ -828,7 +720,7 @@ const MyMomsList = () => {
                     </div>
                   </div>
 
-                  <div className="modal-footer border-0">
+                  <div className="modal-footer border-0 mml-modal-footer">
                     <button
                       className="btn btn-secondary"
                       onClick={closeMomDetails}

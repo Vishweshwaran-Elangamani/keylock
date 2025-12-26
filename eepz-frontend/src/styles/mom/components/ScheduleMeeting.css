@@ -1,0 +1,413 @@
+.sched-page {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  padding: 1.5rem 1.25rem;
+}
+
+/* Breadcrumb */
+
+.sched-breadcrumb-nav {
+  margin-bottom: 1rem;
+}
+
+.sched-breadcrumb {
+  background-color: transparent;
+  padding: 0;
+  margin: 0;
+}
+
+.sched-breadcrumb-link {
+  background: none;
+  border: none;
+  color: #97247e;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.sched-breadcrumb-link:hover {
+  color: #7a1d65;
+}
+
+.sched-breadcrumb-separator {
+  display: flex;
+  align-items: center;
+  color: #97247e;
+  margin: 0 8px;
+  font-size: 1rem;
+}
+
+.sched-breadcrumb-current {
+  color: #1e293b;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+  display: none;
+}
+
+/* Header */
+
+.sched-header-card {
+  background: linear-gradient(135deg, #27235c 0%, #4338ca 100%);
+  border-radius: 0.75rem;
+  color: #ffffff;
+}
+
+.sched-header-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sched-header-title {
+  margin: 0 0 0.15rem 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.sched-header-subtitle {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #e5e7eb;
+}
+
+/* Generic inputs */
+
+.sched-input {
+  font-size: 1rem;
+  padding: 0.6rem 0.75rem;
+}
+
+.sched-textarea {
+  font-size: 1rem;
+  padding: 0.6rem 0.75rem;
+  min-height: 90px;
+}
+
+/* Dropdowns (type, one-on-one, duration) */
+
+.sched-dropdown-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.sched-dropdown-btn {
+  width: 100%;
+  text-align: left;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  padding: 0.6rem 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  color: #111827;
+}
+
+.sched-dropdown-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sched-dropdown-menu {
+  position: absolute;
+  z-index: 20;
+  background-color: #ffffff;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+  margin-top: 2px;
+  overflow: hidden;
+  width: 100%;
+  max-height: 260px;
+  overflow-y: auto;
+  text-align: left;
+}
+
+.sched-dropdown-item {
+  padding: 10px 16px;
+  cursor: pointer;
+  background-color: #ffffff;
+  color: #111827;
+  font-weight: 400;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 0.95rem;
+}
+
+.sched-dropdown-item:hover {
+  background-color: #27235c;
+  color: #ffffff;
+}
+
+.sched-dropdown-item-active {
+  background-color: #27235c;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.sched-dropdown-empty {
+  padding: 10px 16px;
+  text-align: center;
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
+/* Multi-select table */
+
+.sched-multi-list {
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.sched-table-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.sched-th-select {
+  width: 60px;
+  font-size: 1rem;
+}
+
+.sched-th {
+  font-size: 1rem;
+}
+
+.sched-td {
+  font-size: 1rem;
+}
+
+.sched-row-click {
+  cursor: pointer;
+}
+
+.sched-check {
+  width: 18px;
+  height: 18px;
+}
+
+.sched-role-badge {
+  font-size: 0.9rem;
+}
+
+.sched-selected-alert {
+  font-size: 1rem;
+}
+
+/* Search */
+
+.sched-search-group .sched-search-icon {
+  padding-right: 0.25rem;
+}
+
+/* Date picker */
+
+.sched-date-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.sched-date-input {
+  width: 100%;
+  padding: 0.6rem 2.5rem 0.6rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+  cursor: pointer;
+  background-color: #ffffff;
+}
+
+.sched-date-input-disabled {
+  cursor: not-allowed;
+  background-color: #f3f4f6;
+}
+
+.sched-date-icon-btn {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.sched-date-icon-btn:disabled {
+  cursor: not-allowed;
+}
+
+/* Calendar popup */
+
+.sched-calendar {
+  position: absolute;
+  right: -250px;
+  top: calc(100% + 4px);
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 14px 40px rgba(15, 23, 42, 0.18);
+  border: 1px solid #e5e7eb;
+  z-index: 9999;
+  width: 280px;
+}
+
+.sched-calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.9rem;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #ffffff;
+}
+
+.sched-calendar-nav {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.sched-calendar-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #111827;
+}
+
+.sched-calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 0.35rem 0.9rem 0.2rem;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.sched-calendar-weekday {
+  text-align: center;
+  padding: 0.25rem 0;
+}
+
+.sched-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 0.15rem 0.9rem 0.6rem;
+  gap: 4px;
+}
+
+.sched-calendar-cell {
+  text-align: center;
+  padding: 0.4rem 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  background-color: transparent;
+  color: #111827;
+}
+
+.sched-calendar-cell-out {
+  cursor: default;
+  color: #d1d5db;
+}
+
+.sched-calendar-cell-today {
+  background-color: rgba(39, 35, 92, 0.08);
+}
+
+.sched-calendar-cell-selected {
+  background-color: #27235c;
+  color: #ffffff;
+}
+
+.sched-calendar-footer {
+  padding: 0.45rem 0.9rem 0.7rem;
+  border-top: 1px solid #e5e7eb;
+  text-align: right;
+}
+
+.sched-calendar-today {
+  border: none;
+  background: transparent;
+  color: #27235c;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Meeting link & agenda */
+
+.sched-generate-btn {
+  font-size: 1rem;
+}
+
+/* Reminder & footer actions */
+
+.sched-reminder-select {
+  min-width: 160px;
+}
+
+.sched-cancel-btn {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.sched-submit-btn {
+  background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
+  color: #fff;
+  border: none;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.sched-submit-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(151, 36, 126, 0.3);
+}
+
+.sched-submit-btn:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+  .sched-page {
+    padding: 1.25rem 1rem;
+  }
+
+  .sched-header-title {
+    font-size: 1.4rem;
+  }
+
+  .sched-calendar {
+    right: 0;
+  }
+}
+
+@media (max-width: 576px) {
+  .sched-page {
+    padding: 1rem 0.75rem;
+  }
+
+  .sched-header-title {
+    font-size: 1.3rem;
+  }
+}

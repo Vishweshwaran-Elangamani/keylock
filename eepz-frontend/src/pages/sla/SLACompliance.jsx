@@ -19,6 +19,7 @@ import {
   getComplianceSummary,
   getComplianceRating,
 } from "../../utils/sla/slaCalculations";
+import "../../styles/sla/components/SLACompliance.css";
 
 const SLACompliance = () => {
   const [allSLAs, setAllSLAs] = useState([]);
@@ -193,27 +194,24 @@ const SLACompliance = () => {
   };
 
   return (
-    <div className="container-fluid">
-      {/* Page header */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <p className="text-muted mb-0" style={{ fontSize: "14px" }}>
+    <div className="sla-compliance-wrapper">
+      <div className="sla-compliance-header">
+        <div className="sla-compliance-header-text">
+          <p className="sla-compliance-subtitle">
             Department-wise SLA compliance metrics (Based on Closed SLAs)
           </p>
         </div>
-        <div className="d-flex gap-2">
+        <div className="sla-compliance-actions">
           <button
-            className="btn btn-outline-primary d-flex align-items-center gap-2"
+            className="sla-compliance-btn sla-compliance-btn-primary"
             onClick={fetchAllData}
-            style={{ borderRadius: "8px" }}
           >
             <RefreshCw size={16} />
             Refresh
           </button>
           <button
-            className="btn btn-outline-secondary d-flex align-items-center gap-2"
+            className="sla-compliance-btn sla-compliance-btn-secondary"
             onClick={handleExportReport}
-            style={{ borderRadius: "8px" }}
           >
             <Download size={16} />
             Export
@@ -221,479 +219,137 @@ const SLACompliance = () => {
         </div>
       </div>
 
-      {/* Overall Stats Cards */}
-      <div className="row g-3 mb-4">
-        {/* Total Escalations */}
-        <div className="col-lg-3 col-md-6">
-          <div
-            className="card h-100"
-            style={{
-              borderRadius: "16px",
-              border: "1.5px solid #27235C",
-              backgroundColor: "#FFFFFF",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-              padding: "1.5rem",
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: "1rem",
-              transition: "all 0.2s ease",
-              cursor: "pointer",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.borderColor = "#0F62FE";
-              e.currentTarget.style.boxShadow =
-                "0 4px 12px rgba(39, 35, 92, 0.1)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.borderColor = "#27235C";
-              e.currentTarget.style.boxShadow =
-                "0 1px 3px rgba(0,0,0,0.05)";
-            }}
-          >
-            <div
-              className="d-flex align-items-center justify-content-center"
-              style={{
-                width: "56px",
-                height: "56px",
-                borderRadius: "12px",
-                backgroundColor: "#E8F1FF",
-                flexShrink: 0,
-              }}
-            >
-              <Users size={24} style={{ color: "#5B93FF" }} />
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <h2
-                className="fw-bold mb-1"
-                style={{
-                  fontSize: "2rem",
-                  color: "#0f172a",
-                  lineHeight: "1",
-                  margin: "0",
-                }}
-              >
-                {stats.totalSLAs}
-              </h2>
-              <p
-                className="mb-0"
-                style={{
-                  fontSize: "0.75rem",
-                  color: "#64748b",
-                  fontWeight: "600",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.5px",
-                }}
-              >
-                Total Escalations
-              </p>
-            </div>
+      <div className="sla-compliance-stats-grid">
+        <div className="sla-compliance-stat-card">
+          <div className="sla-compliance-stat-icon-wrapper sla-compliance-stat-icon-blue">
+            <Users size={24} />
+          </div>
+          <div className="sla-compliance-stat-content">
+            <h2 className="sla-compliance-stat-value">{stats.totalSLAs}</h2>
+            <p className="sla-compliance-stat-label">Total Escalations</p>
           </div>
         </div>
 
-        {/* Approved */}
-        <div className="col-lg-3 col-md-6">
-          <div
-            className="card h-100"
-            style={{
-              borderRadius: "16px",
-              border: "1.5px solid #27235C",
-              backgroundColor: "#FFFFFF",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-              padding: "1.5rem",
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: "1rem",
-              transition: "all 0.2s ease",
-              cursor: "pointer",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.borderColor = "#0F62FE";
-              e.currentTarget.style.boxShadow =
-                "0 4px 12px rgba(39, 35, 92, 0.1)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.borderColor = "#27235C";
-              e.currentTarget.style.boxShadow =
-                "0 1px 3px rgba(0,0,0,0.05)";
-            }}
-          >
-            <div
-              className="d-flex align-items-center justify-content-center"
-              style={{
-                width: "56px",
-                height: "56px",
-                borderRadius: "12px",
-                backgroundColor: "#D1FAE5",
-                flexShrink: 0,
-              }}
-            >
-              <CheckCircle size={24} style={{ color: "#10B981" }} />
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <h2
-                className="fw-bold mb-1"
-                style={{
-                  fontSize: "2rem",
-                  color: "#0f172a",
-                  lineHeight: "1",
-                  margin: "0",
-                }}
-              >
-                {stats.closedSLAs}
-              </h2>
-              <p
-                className="mb-0"
-                style={{
-                  fontSize: "0.75rem",
-                  color: "#64748b",
-                  fontWeight: "600",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.5px",
-                }}
-              >
-                Approved
-              </p>
-            </div>
+        <div className="sla-compliance-stat-card">
+          <div className="sla-compliance-stat-icon-wrapper sla-compliance-stat-icon-green">
+            <CheckCircle size={24} />
+          </div>
+          <div className="sla-compliance-stat-content">
+            <h2 className="sla-compliance-stat-value">{stats.closedSLAs}</h2>
+            <p className="sla-compliance-stat-label">Approved</p>
           </div>
         </div>
 
-        {/* Pending */}
-        <div className="col-lg-3 col-md-6">
-          <div
-            className="card h-100"
-            style={{
-              borderRadius: "16px",
-              border: "1.5px solid #27235C",
-              backgroundColor: "#FFFFFF",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-              padding: "1.5rem",
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: "1rem",
-              transition: "all 0.2s ease",
-              cursor: "pointer",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.borderColor = "#0F62FE";
-              e.currentTarget.style.boxShadow =
-                "0 4px 12px rgba(39, 35, 92, 0.1)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.borderColor = "#27235C";
-              e.currentTarget.style.boxShadow =
-                "0 1px 3px rgba(0,0,0,0.05)";
-            }}
-          >
-            <div
-              className="d-flex align-items-center justify-content-center"
-              style={{
-                width: "56px",
-                height: "56px",
-                borderRadius: "12px",
-                backgroundColor: "#FEF3C7",
-                flexShrink: 0,
-              }}
-            >
-              <Clock size={24} style={{ color: "#F59E0B" }} />
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <h2
-                className="fw-bold mb-1"
-                style={{
-                  fontSize: "2rem",
-                  color: "#0f172a",
-                  lineHeight: "1",
-                  margin: "0",
-                }}
-              >
-                {stats.openSLAs}
-              </h2>
-              <p
-                className="mb-0"
-                style={{
-                  fontSize: "0.75rem",
-                  color: "#64748b",
-                  fontWeight: "600",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.5px",
-                }}
-              >
-                Pending
-              </p>
-            </div>
+        <div className="sla-compliance-stat-card">
+          <div className="sla-compliance-stat-icon-wrapper sla-compliance-stat-icon-yellow">
+            <Clock size={24} />
+          </div>
+          <div className="sla-compliance-stat-content">
+            <h2 className="sla-compliance-stat-value">{stats.openSLAs}</h2>
+            <p className="sla-compliance-stat-label">Pending</p>
           </div>
         </div>
 
-        {/* Rejected */}
-        <div className="col-lg-3 col-md-6">
-          <div
-            className="card h-100"
-            style={{
-              borderRadius: "16px",
-              border: "1.5px solid #27235C",
-              backgroundColor: "#FFFFFF",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-              padding: "1.5rem",
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: "1rem",
-              transition: "all 0.2s ease",
-              cursor: "pointer",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.borderColor = "#0F62FE";
-              e.currentTarget.style.boxShadow =
-                "0 4px 12px rgba(39, 35, 92, 0.1)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.borderColor = "#27235C";
-              e.currentTarget.style.boxShadow =
-                "0 1px 3px rgba(0,0,0,0.05)";
-            }}
-          >
-            <div
-              className="d-flex align-items-center justify-content-center"
-              style={{
-                width: "56px",
-                height: "56px",
-                borderRadius: "12px",
-                backgroundColor: "#FEE2E2",
-                flexShrink: 0,
-              }}
-            >
-              <AlertCircle size={24} style={{ color: "#EF4444" }} />
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <h2
-                className="fw-bold mb-1"
-                style={{
-                  fontSize: "2rem",
-                  color: "#0f172a",
-                  lineHeight: "1",
-                  margin: "0",
-                }}
-              >
-                {stats.breachedSLAs}
-              </h2>
-              <p
-                className="mb-0"
-                style={{
-                  fontSize: "0.75rem",
-                  color: "#64748b",
-                  fontWeight: "600",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.5px",
-                }}
-              >
-                Rejected
-              </p>
-            </div>
+        <div className="sla-compliance-stat-card">
+          <div className="sla-compliance-stat-icon-wrapper sla-compliance-stat-icon-red">
+            <AlertCircle size={24} />
+          </div>
+          <div className="sla-compliance-stat-content">
+            <h2 className="sla-compliance-stat-value">{stats.breachedSLAs}</h2>
+            <p className="sla-compliance-stat-label">Rejected</p>
           </div>
         </div>
       </div>
 
-      {/* View Mode Toggle */}
-      <div className="mb-4" style={{ padding: "1rem 0" }}>
-        <div className="btn-group" role="group">
+      <div className="sla-compliance-view-toggle-wrapper">
+        <div className="sla-compliance-view-toggle">
           <button
-            type="button"
-            className={`btn ${
-              viewMode === "cards" ? "btn-primary" : "btn-outline-primary"
+            className={`sla-compliance-toggle-btn ${
+              viewMode === "cards" ? "sla-compliance-toggle-btn-active" : ""
             }`}
             onClick={() => setViewMode("cards")}
-            style={{ borderRadius: "8px 0 0 8px", padding: "0.75rem 1.5rem" }}
           >
-            <PieChart size={16} className="me-2" />
+            <PieChart size={16} />
             Cards View
           </button>
           <button
-            type="button"
-            className={`btn ${
-              viewMode === "table" ? "btn-primary" : "btn-outline-primary"
+            className={`sla-compliance-toggle-btn ${
+              viewMode === "table" ? "sla-compliance-toggle-btn-active" : ""
             }`}
             onClick={() => setViewMode("table")}
-            style={{ borderRadius: "0 8px 8px 0", padding: "0.75rem 1.5rem" }}
           >
-            <BarChart3 size={16} className="me-2" />
+            <BarChart3 size={16} />
             Table View
           </button>
         </div>
       </div>
 
-      {/* Error Alert */}
       {error && (
-        <div
-          className="alert alert-warning alert-dismissible fade show"
-          role="alert"
-        >
-          <AlertCircle size={18} className="me-2" />
-          {error}
+        <div className="sla-compliance-alert">
+          <AlertCircle size={18} className="sla-compliance-alert-icon" />
+          <span className="sla-compliance-alert-text">{error}</span>
           <button
-            type="button"
-            className="btn-close"
+            className="sla-compliance-alert-close"
             onClick={() => setError(null)}
-          />
+          >
+            ×
+          </button>
         </div>
       )}
 
-      {/* Loading State */}
       {loading ? (
-        <div className="text-center py-5">
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>
-          <p className="text-muted mt-3">Loading compliance data...</p>
+        <div className="sla-compliance-loading">
+          <div className="sla-compliance-spinner" />
+          <p className="sla-compliance-loading-text">
+            Loading compliance data...
+          </p>
         </div>
       ) : (
         <>
-          {/* Cards View */}
           {viewMode === "cards" && (
-            <div className="row g-4">
+            <div className="sla-compliance-cards-grid">
               {sortedData.map((compliance) => (
-                <div
+                <ComplianceCard
                   key={compliance.complianceId}
-                  className="col-md-6 col-lg-4"
-                >
-                  <ComplianceCard
-                    compliance={compliance}
-                    slaData={allSLAs.filter(
-                      (sla) => sla.departmentId === compliance.departmentId
-                    )}
-                    showActions={false}
-                  />
-                </div>
+                  compliance={compliance}
+                  slaData={allSLAs.filter(
+                    (sla) => sla.departmentId === compliance.departmentId
+                  )}
+                  showActions={false}
+                />
               ))}
             </div>
           )}
 
-        
           {viewMode === "table" && (
-            <div
-              className="card shadow-sm"
-              style={{
-                borderRadius: "16px",
-                border: "1.5px solid #27235C",
-                overflow: "hidden",
-              }}
-            >
-              <div className="table-responsive">
-                <table
-                  className="table mb-0"
-                  style={{
-                    borderCollapse: "separate",
-                    borderSpacing: 0,
-                  }}
-                >
-                  <thead>
-                    <tr
-                      style={{
-                        backgroundColor: "#27235C",
-                        color: "#FFFFFF",
-                        fontSize: "14px",
-                        fontWeight: 600,
-                      }}
-                    >
-                      <th
-                        style={{
-                          padding: "1rem 1.5rem",
-                          textAlign: "left",
-                          whiteSpace: "nowrap",
-                           backgroundColor: "#27235C",
-                           color:"white"
-                        }}
-                      >
-                        Department
-                      </th>
-                      <th
-                        style={{
-                          padding: "1rem 1.5rem",
-                          textAlign: "center",
-                            backgroundColor: "#27235C",
-                            color:"white"
-                        }}
-                      >
+            <div className="sla-compliance-table-card">
+              <div className="sla-compliance-table-responsive">
+                <table className="sla-compliance-table">
+                  <thead className="sla-compliance-table-header">
+                    <tr>
+                      <th>Department</th>
+                      <th className="sla-compliance-table-header-center">
                         Total
                       </th>
-                      <th
-                        style={{
-                          padding: "1rem 1.5rem",
-                          textAlign: "center",
-                           backgroundColor: "#27235C",
-                            color:"white"
-                        }}
-                      >
+                      <th className="sla-compliance-table-header-center">
                         Closed
                       </th>
-                      <th
-                        style={{
-                          padding: "1rem 1.5rem",
-                          textAlign: "center",
-                           backgroundColor: "#27235C",
-                          color:"white"
-                        }}
-                      >
+                      <th className="sla-compliance-table-header-center">
                         Open
                       </th>
-                      <th
-                        style={{
-                          padding: "1rem 1.5rem",
-                          textAlign: "center",
-                           backgroundColor: "#27235C",
-                          color:"white"
-                        }}
-                      >
+                      <th className="sla-compliance-table-header-center">
                         On‑Time
                       </th>
-                      <th
-                        style={{
-                          padding: "1rem 1.5rem",
-                          textAlign: "center",
-                          backgroundColor: "#27235C",
-                          color:"white"
-                        }}
-                      >
+                      <th className="sla-compliance-table-header-center">
                         Breached
                       </th>
-                      <th
-                        style={{
-                          padding: "1rem 1.5rem",
-                          textAlign: "center",
-                          backgroundColor: "#27235C",
-                          color:"white"
-                        }}
-                      >
+                      <th className="sla-compliance-table-header-center">
                         Extended
                       </th>
-                      <th
-                        style={{
-                          padding: "1rem 1.5rem",
-                          textAlign: "center",
-                          backgroundColor: "#27235C",
-                          color:"white"
-                        }}
-                      >
+                      <th className="sla-compliance-table-header-center">
                         Compliance
                       </th>
-                      <th
-                        style={{
-                          padding: "1rem 1.5rem",
-                          textAlign: "center",
-                          backgroundColor: "#27235C",
-                          color:"white"
-                        }}
-                      >
+                      <th className="sla-compliance-table-header-center">
                         Rating
                       </th>
                     </tr>
@@ -706,226 +362,75 @@ const SLACompliance = () => {
                       const ratingColor = ratingObj.color;
 
                       return (
-                        <tr
-                          key={dept.complianceId}
-                          style={{
-                            fontSize: "14px",
-                            color: "#111827",
-                            borderTop: "1px solid #E5E7EB",
-                          }}
-                        >
-                          {/* Department */}
-                          <td
-                            style={{
-                              padding: "1.1rem 1.5rem",
-                              textAlign: "left",
-                              fontWeight: 600,
-                            }}
-                          >
+                        <tr key={dept.complianceId}>
+                          <td className="sla-compliance-table-dept-name">
                             {dept.departmentName}
                           </td>
 
-                          {/* Total */}
-                          <td
-                            style={{
-                              padding: "1.1rem 1.5rem",
-                              textAlign: "center",
-                            }}
-                          >
+                          <td className="sla-compliance-table-cell-center">
                             {dept.totalSlas}
                           </td>
 
-                          {/* Closed pill */}
-                          <td
-                            style={{
-                              padding: "1.1rem 1.5rem",
-                              textAlign: "center",
-                            }}
-                          >
-                            <span
-                              style={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                minWidth: 32,
-                                height: 24,
-                                borderRadius: 999,
-                                backgroundColor: "#16A34A1A",
-                                color: "#15803D",
-                                fontSize: "13px",
-                                fontWeight: 600,
-                              }}
-                            >
+                          <td className="sla-compliance-table-cell-center">
+                            <span className="sla-compliance-pill sla-compliance-pill-closed">
                               {dept.closedSlas}
                             </span>
                           </td>
 
-                          {/* Open pill */}
-                          <td
-                            style={{
-                              padding: "1.1rem 1.5rem",
-                              textAlign: "center",
-                            }}
-                          >
-                            <span
-                              style={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                minWidth: 32,
-                                height: 24,
-                                borderRadius: 999,
-                                backgroundColor: "#0EA5E91A",
-                                color: "#0284C7",
-                                fontSize: "13px",
-                                fontWeight: 600,
-                              }}
-                            >
+                          <td className="sla-compliance-table-cell-center">
+                            <span className="sla-compliance-pill sla-compliance-pill-open">
                               {dept.openSlas}
                             </span>
                           </td>
 
-                          {/* On‑Time pill */}
-                          <td
-                            style={{
-                              padding: "1.1rem 1.5rem",
-                              textAlign: "center",
-                            }}
-                          >
-                            <span
-                              style={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                minWidth: 32,
-                                height: 24,
-                                borderRadius: 999,
-                                backgroundColor: "#22C55E1A",
-                                color: "#16A34A",
-                                fontSize: "13px",
-                                fontWeight: 600,
-                              }}
-                            >
+                          <td className="sla-compliance-table-cell-center">
+                            <span className="sla-compliance-pill sla-compliance-pill-ontime">
                               {dept.onTimeSlas}
                             </span>
                           </td>
 
-                          {/* Breached pill */}
-                          <td
-                            style={{
-                              padding: "1.1rem 1.5rem",
-                              textAlign: "center",
-                            }}
-                          >
-                            <span
-                              style={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                minWidth: 32,
-                                height: 24,
-                                borderRadius: 999,
-                                backgroundColor: "#EF44441A",
-                                color: "#DC2626",
-                                fontSize: "13px",
-                                fontWeight: 600,
-                              }}
-                            >
+                          <td className="sla-compliance-table-cell-center">
+                            <span className="sla-compliance-pill sla-compliance-pill-breached">
                               {dept.breachedSlas}
                             </span>
                           </td>
 
-                          {/* Extended pill */}
-                          <td
-                            style={{
-                              padding: "1.1rem 1.5rem",
-                              textAlign: "center",
-                            }}
-                          >
-                            <span
-                              style={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                minWidth: 32,
-                                height: 24,
-                                borderRadius: 999,
-                                backgroundColor: "#FACC151A",
-                                color: "#CA8A04",
-                                fontSize: "13px",
-                                fontWeight: 600,
-                              }}
-                            >
+                          <td className="sla-compliance-table-cell-center">
+                            <span className="sla-compliance-pill sla-compliance-pill-extended">
                               {dept.extendedSlas}
                             </span>
                           </td>
 
-                          {/* Compliance bar + % */}
-                          <td
-                            style={{
-                              padding: "1.1rem 1.5rem",
-                              textAlign: "center",
-                            }}
-                          >
-                            <div
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                gap: 8,
-                              }}
-                            >
-                              <div
-                                style={{
-                                  width: 110,
-                                  height: 6,
-                                  borderRadius: 999,
-                                  backgroundColor: "#E5E7EB",
-                                  overflow: "hidden",
-                                }}
-                              >
+                          <td className="sla-compliance-table-cell-center">
+                            <div className="sla-compliance-progress-wrapper">
+                              <div className="sla-compliance-progress-bar">
                                 <div
+                                  className="sla-compliance-progress-fill"
                                   style={{
                                     width: `${Math.min(
                                       100,
                                       dept.compliancePercentage
                                     )}%`,
-                                    height: "100%",
                                     backgroundColor: ratingColor,
                                   }}
                                 />
                               </div>
                               <span
-                                style={{
-                                  fontWeight: 700,
-                                  fontSize: "13px",
-                                  color: ratingColor,
-                                }}
+                                className="sla-compliance-progress-text"
+                                style={{ color: ratingColor }}
                               >
                                 {dept.compliancePercentage.toFixed(1)}%
                               </span>
                             </div>
                           </td>
 
-                          {/* Rating pill */}
-                          <td
-                            style={{
-                              padding: "1.1rem 1.5rem",
-                              textAlign: "center",
-                            }}
-                          >
+                          <td className="sla-compliance-table-cell-center">
                             <span
+                              className="sla-compliance-rating-pill"
                               style={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                padding: "3px 12px",
-                                borderRadius: 999,
-                                fontSize: "12px",
-                                fontWeight: 600,
                                 backgroundColor: `${ratingColor}15`,
                                 color: ratingColor,
-                                border: `1px solid ${ratingColor}40`,
+                                borderColor: `${ratingColor}40`,
                               }}
                             >
                               {dept.complianceRating}
@@ -942,39 +447,11 @@ const SLACompliance = () => {
         </>
       )}
 
-      {/* Empty State */}
       {!loading && sortedData.length === 0 && (
-        <div
-          className="d-flex flex-column align-items-center justify-content-center text-center"
-          style={{
-            minHeight: "400px",
-            padding: "60px 20px",
-          }}
-        >
-          <FileText
-            size={48}
-            className="mb-3"
-            style={{
-              strokeWidth: 1.5,
-              color: "#9CA3AF",
-            }}
-          />
-          <h5
-            className="fw-semibold mb-2"
-            style={{
-              fontSize: "18px",
-              color: "#374151",
-            }}
-          >
-            No Compliance Data
-          </h5>
-          <p
-            className="mb-0"
-            style={{
-              fontSize: "14px",
-              color: "#6B7280",
-            }}
-          >
+        <div className="sla-compliance-empty">
+          <FileText size={48} className="sla-compliance-empty-icon" />
+          <h5 className="sla-compliance-empty-title">No Compliance Data</h5>
+          <p className="sla-compliance-empty-text">
             No SLA data available to display
           </p>
         </div>

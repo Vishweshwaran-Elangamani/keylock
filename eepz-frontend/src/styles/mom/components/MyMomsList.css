@@ -1,0 +1,310 @@
+.mml-page {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  padding: 1.5rem 1.25rem;
+}
+
+.mml-loading-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mml-loading-spinner {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Header */
+
+.mml-header {
+  border: 0;
+  border-radius: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.mml-header-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.9rem 1.5rem;
+}
+
+.mml-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.mml-back-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mml-header-text {
+  text-align: left;
+}
+
+.mml-header-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0 0 0.15rem 0;
+  color: #ffffff;
+}
+
+.mml-header-subtitle {
+  font-size: 0.95rem;
+  margin: 0;
+  color: #e5e7eb;
+}
+
+.mml-header-create-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding-inline: 1.3rem;
+  align-self: flex-start;
+}
+
+.mml-header-create-text {
+  color: #27235c;
+  font-weight: 600;
+}
+
+/* Empty state */
+
+.mml-empty-card {
+  margin-top: 0.5rem;
+}
+
+.mml-empty-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 999px;
+  background-color: #e3f2fd;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+}
+
+.mml-empty-icon-svg {
+  color: #1976d2;
+}
+
+/* MOM cards */
+
+.mml-mom-card-body {
+  padding: 1.5rem 1.5rem;
+}
+
+.mml-mom-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 999px;
+  background-color: #e3f2fd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mml-mom-icon-svg {
+  color: #1976d2;
+}
+
+.mml-mom-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.mml-mom-title {
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+/* Info rows */
+
+.mml-info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.mml-info-icon {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.mml-info-text {
+  text-align: left;
+}
+
+.mml-info-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.mml-info-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* Actions */
+
+.mml-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Modals shared */
+
+.mml-modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+.mml-modal-dialog {
+  margin: 0;
+}
+
+.mml-modal-content {
+  border-radius: 0.75rem;
+}
+
+.mml-modal-header {
+  color: #ffffff;
+}
+
+.mml-modal-title {
+  color: #ffffff;
+}
+
+.mml-modal-subtitle {
+  color: #ffffff;
+}
+
+.mml-modal-body {
+  text-align: left;
+}
+
+/* Share modal specifics */
+
+.mml-search-group {
+  overflow: hidden;
+}
+
+.mml-search-icon {
+  background-color: #f3f4f6;
+  border-right: 0;
+}
+
+.mml-search-input {
+  border-left: 0;
+}
+
+.mml-search-clear {
+  border-left: 0;
+}
+
+.mml-employee-list-wrapper {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.mml-employee-item {
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.mml-employee-checkbox {
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
+.mml-employee-text {
+  flex: 1;
+}
+
+/* Details modal */
+
+.mml-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.mml-discussion-index {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background-color: #0d6efd;
+  color: #ffffff;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Responsive */
+
+@media (min-width: 768px) {
+  .mml-header-inner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .mml-header-create-btn {
+    align-self: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .mml-page {
+    padding: 1.25rem 1rem;
+  }
+
+  .mml-mom-card-body {
+    padding: 1.25rem 1.25rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .mml-page {
+    padding: 1rem 0.75rem;
+  }
+
+  .mml-header-title {
+    font-size: 1.45rem;
+  }
+
+  .mml-mom-title {
+    font-size: 1rem;
+  }
+
+  .mml-info-row {
+    align-items: flex-start;
+  }
+}

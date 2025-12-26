@@ -1,0 +1,117 @@
+.rsvp-sum-page {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  padding: 1.5rem 1.25rem;
+}
+
+/* Loading */
+
+.rsvp-sum-loading {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rsvp-sum-spinner {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Header */
+
+.rsvp-sum-header {
+  margin-bottom: 1.5rem;
+}
+
+.rsvp-sum-back-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.rsvp-sum-title {
+  color: #1e293b;
+  font-size: 1.75rem;
+}
+
+.rsvp-sum-subtitle {
+  font-size: 0.95rem;
+}
+
+/* Stat cards */
+
+.rsvp-sum-stat-card {
+  border-radius: 0.75rem;
+}
+
+.rsvp-sum-stat-number {
+  color: #1e293b;
+}
+
+/* Breakdown */
+
+.rsvp-sum-breakdown-card {
+  border-radius: 0.75rem;
+}
+
+.rsvp-sum-progress {
+  height: 30px;
+}
+
+/* Participants */
+
+.rsvp-sum-participants-card {
+  border-radius: 0.75rem;
+}
+
+.rsvp-sum-participants-icon {
+  opacity: 0.3;
+}
+
+.rsvp-sum-th {
+  color: #64748b;
+}
+
+.rsvp-sum-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background-color: #e3f2fd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.rsvp-sum-avatar-icon {
+  color: #1976d2;
+}
+
+.rsvp-sum-comment-icon {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+  .rsvp-sum-page {
+    padding: 1.25rem 1rem;
+  }
+
+  .rsvp-sum-title {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .rsvp-sum-page {
+    padding: 1rem 0.75rem;
+  }
+
+  .rsvp-sum-header {
+    gap: 0.75rem;
+  }
+}

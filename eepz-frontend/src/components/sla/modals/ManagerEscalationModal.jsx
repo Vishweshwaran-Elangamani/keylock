@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { X, Send, AlertTriangle, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import slaService from "../../../services/sla/slaService";
+import "../../../styles/sla/modals/ManagerEscalationModal.css";
 
 const MgrSelect = ({ value, onChange, options, placeholder }) => {
   const [open, setOpen] = useState(false);
@@ -11,19 +12,18 @@ const MgrSelect = ({ value, onChange, options, placeholder }) => {
     <div className="mgr-select">
       <button
         type="button"
-        className={`mgr-select-control ${open ? "open" : ""}`}
+        className={`mgr-select-control ${open ? "mgr-select-control--open" : ""}`}
         onClick={() => setOpen((p) => !p)}
       >
         <span className="mgr-select-value">
           {selected ? selected.label : placeholder}
         </span>
-        <span className={`mgr-select-icon ${open ? "open" : ""}`}>
+        <span className={`mgr-select-icon ${open ? "mgr-select-icon--open" : ""}`}>
           <svg
             width="18"
             height="18"
             viewBox="0 0 24 24"
             fill="none"
-            xmlns="http://www.w3.org/2000/svg"
           >
             <polyline
               points="6 9 12 15 18 9"
@@ -39,7 +39,7 @@ const MgrSelect = ({ value, onChange, options, placeholder }) => {
       {open && (
         <div className="mgr-select-menu">
           <div
-            className="mgr-select-option selected"
+            className="mgr-select-option mgr-select-option--selected"
             onClick={() => {
               onChange("");
               setOpen(false);
@@ -98,14 +98,14 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
         );
         if (pendingL2Escalation) setAlreadyEscalated(true);
       }
-    } catch (error) {}
+    } catch {}
   };
 
   const fetchDepartmentHead = async () => {
     setFetchingDeptHead(true);
     try {
       const user = JSON.parse(localStorage.getItem("user"));
-      if (!user.departmentName) {
+      if (!user?.departmentName) {
         setDeptHead(null);
         setFetchingDeptHead(false);
         return;
@@ -115,14 +115,13 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
         const deptHeadInSameDepartment = response.data.find(
           (emp) =>
             emp.departmentName === user.departmentName &&
-            (emp.roleName === "Department Head" ||
-              emp.role === "Department Head")
+            (emp.roleName === "Department Head" || emp.role === "Department Head")
         );
         setDeptHead(deptHeadInSameDepartment || null);
       } else {
         setDeptHead(null);
       }
-    } catch (error) {
+    } catch {
       setDeptHead(null);
     } finally {
       setFetchingDeptHead(false);
@@ -171,36 +170,13 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
 
   if (fetchingDeptHead) {
     return (
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(0, 0, 0, 0.7)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 1050,
-          backdropFilter: "blur(4px)",
-        }}
-      >
-        <div
-          style={{
-            backgroundColor: "white",
-            borderRadius: "12px",
-            padding: "2rem",
-            textAlign: "center",
-            maxWidth: "320px",
-          }}
-        >
+      <div className="mgr-overlay mgr-overlay--center-only">
+        <div className="mgr-loading-card">
           <div
-            className="spinner-border text-primary mb-3"
+            className="spinner-border text-primary mgr-loading-spinner"
             role="status"
-            style={{ width: "2.5rem", height: "2.5rem" }}
           />
-          <p style={{ margin: 0, color: "#6B7280", fontSize: "0.875rem" }}>
+          <p className="mgr-loading-text">
             Loading escalation details...
           </p>
         </div>
@@ -210,134 +186,39 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
 
   if (alreadyEscalated) {
     return (
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(0, 0, 0, 0.7)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 1050,
-          backdropFilter: "blur(4px)",
-        }}
-        onClick={onClose}
-      >
+      <div className="mgr-overlay" onClick={onClose}>
         <div
-          style={{
-            backgroundColor: "white",
-            borderRadius: "12px",
-            width: "90%",
-            maxWidth: "420px",
-            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.4)",
-            overflow: "hidden",
-          }}
+          className="mgr-modal mgr-modal--small"
           onClick={(e) => e.stopPropagation()}
         >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "1.25rem 1.5rem",
-              backgroundColor: "#3c3862",
-              borderBottom: "none",
-            }}
-          >
-            <h5
-              style={{
-                margin: 0,
-                fontWeight: 600,
-                fontSize: "1.1rem",
-                color: "white",
-                textAlign: "left",
-              }}
-            >
-              Already Escalated
-            </h5>
+          <div className="mgr-modal-header mgr-modal-header--primary">
+            <h5 className="mgr-modal-title">Already Escalated</h5>
             <button
+              className="mgr-close-btn"
               onClick={onClose}
-              style={{
-                border: "none",
-                backgroundColor: "transparent",
-                cursor: "pointer",
-                padding: "0.5rem",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                opacity: 0.8,
-                transition: "opacity 0.2s ease",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
-              onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.8")}
             >
-              <X size={24} color="white" />
+              <X size={24} />
             </button>
           </div>
 
-          <div
-            style={{
-              padding: "2rem",
-              backgroundColor: "#f8f9fa",
-              textAlign: "center",
-            }}
-          >
+          <div className="mgr-modal-body mgr-modal-body--center">
             <AlertTriangle
               size={48}
-              style={{ color: "#F59E0B", marginBottom: "1rem" }}
+              className="mgr-icon-warning"
             />
-            <h6
-              style={{
-                fontWeight: 600,
-                color: "#111827",
-                marginBottom: "0.75rem",
-              }}
-            >
+            <h6 className="mgr-modal-subtitle">
               Escalation Already Pending
             </h6>
-            <p
-              style={{
-                margin: 0,
-                color: "#6B7280",
-                fontSize: "0.875rem",
-                textAlign: "center",
-              }}
-            >
+            <p className="mgr-modal-text">
               This SLA has already been escalated to the Department Head and is
               awaiting response.
             </p>
           </div>
 
-          <div
-            style={{
-              padding: "1rem 1.5rem",
-              borderTop: "1px solid #e5e7eb",
-              backgroundColor: "white",
-            }}
-          >
+          <div className="mgr-modal-footer mgr-modal-footer--single">
             <button
+              className="mgr-btn mgr-btn--close-full"
               onClick={onClose}
-              style={{
-                width: "100%",
-                padding: "0.625rem 1.25rem",
-                border: "none",
-                backgroundColor: "#6b7280",
-                color: "white",
-                borderRadius: "8px",
-                cursor: "pointer",
-                fontSize: "0.875rem",
-                fontWeight: 600,
-                transition: "all 0.2s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#4b5563";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#6b7280";
-              }}
             >
               Close
             </button>
@@ -349,133 +230,38 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
 
   if (!deptHead) {
     return (
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(0, 0, 0, 0.7)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 1050,
-          backdropFilter: "blur(4px)",
-        }}
-        onClick={onClose}
-      >
+      <div className="mgr-overlay" onClick={onClose}>
         <div
-          style={{
-            backgroundColor: "white",
-            borderRadius: "12px",
-            width: "90%",
-            maxWidth: "420px",
-            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.4)",
-            overflow: "hidden",
-          }}
+          className="mgr-modal mgr-modal--small"
           onClick={(e) => e.stopPropagation()}
         >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "1.25rem 1.5rem",
-              backgroundColor: "#3c3862",
-              borderBottom: "none",
-            }}
-          >
-            <h5
-              style={{
-                margin: 0,
-                fontWeight: 600,
-                fontSize: "1.1rem",
-                color: "white",
-                textAlign: "left",
-              }}
-            >
-              Error
-            </h5>
+          <div className="mgr-modal-header mgr-modal-header--primary">
+            <h5 className="mgr-modal-title">Error</h5>
             <button
+              className="mgr-close-btn"
               onClick={onClose}
-              style={{
-                border: "none",
-                backgroundColor: "transparent",
-                cursor: "pointer",
-                padding: "0.5rem",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                opacity: 0.8,
-                transition: "opacity 0.2s ease",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
-              onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.8")}
             >
-              <X size={24} color="white" />
+              <X size={24} />
             </button>
           </div>
 
-          <div
-            style={{
-              padding: "2rem",
-              backgroundColor: "#f8f9fa",
-              textAlign: "center",
-            }}
-          >
+          <div className="mgr-modal-body mgr-modal-body--center">
             <AlertTriangle
               size={48}
-              style={{ color: "#EF4444", marginBottom: "1rem" }}
+              className="mgr-icon-error"
             />
-            <h6
-              style={{
-                fontWeight: 600,
-                color: "#111827",
-                marginBottom: "0.75rem",
-              }}
-            >
+            <h6 className="mgr-modal-subtitle">
               No Department Head Available
             </h6>
-            <p
-              style={{
-                margin: 0,
-                color: "#6B7280",
-                fontSize: "0.875rem",
-                textAlign: "center",
-              }}
-            >
+            <p className="mgr-modal-text">
               Cannot escalate: No department head found for your department.
             </p>
           </div>
 
-          <div
-            style={{
-              padding: "1rem 1.5rem",
-              borderTop: "1px solid #e5e7eb",
-              backgroundColor: "white",
-            }}
-          >
+          <div className="mgr-modal-footer mgr-modal-footer--single">
             <button
+              className="mgr-btn mgr-btn--close-full"
               onClick={onClose}
-              style={{
-                width: "100%",
-                padding: "0.625rem 1.25rem",
-                border: "none",
-                backgroundColor: "#6b7280",
-                color: "white",
-                borderRadius: "8px",
-                cursor: "pointer",
-                fontSize: "0.875rem",
-                fontWeight: 600,
-                transition: "all 0.2s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#4b5563";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#6b7280";
-              }}
             >
               Close
             </button>
@@ -489,123 +275,39 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
 
   return (
     <div
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: "rgba(0, 0, 0, 0.7)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 1050,
-        backdropFilter: "blur(4px)",
-      }}
+      className="mgr-overlay"
       onClick={!loading ? onClose : undefined}
     >
       <div
-        style={{
-          backgroundColor: "white",
-          borderRadius: "12px",
-          width: "90%",
-          maxWidth: "540px",
-          boxShadow: "0 20px 60px rgba(0, 0, 0, 0.4)",
-          overflow: "hidden",
-        }}
+        className="mgr-modal mgr-modal--main"
         onClick={(e) => e.stopPropagation()}
       >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "1.25rem 1.5rem",
-            backgroundColor: "#3c3862",
-            borderBottom: "none",
-          }}
-        >
-          <h5
-            style={{
-              margin: 0,
-              fontWeight: 600,
-              fontSize: "1.1rem",
-              color: "white",
-              textAlign: "left",
-            }}
-          >
+        <div className="mgr-modal-header mgr-modal-header--primary">
+          <h5 className="mgr-modal-title">
             Escalate to Department Head
           </h5>
           <button
+            className={`mgr-close-btn ${loading ? "mgr-close-btn--disabled" : ""}`}
             onClick={onClose}
             disabled={loading}
-            style={{
-              border: "none",
-              backgroundColor: "transparent",
-              cursor: loading ? "not-allowed" : "pointer",
-              padding: "0.5rem",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              opacity: loading ? 0.5 : 0.8,
-              transition: "opacity 0.2s ease",
-            }}
-            onMouseEnter={(e) => {
-              if (!loading) e.currentTarget.style.opacity = "1";
-            }}
-            onMouseLeave={(e) => {
-              if (!loading) e.currentTarget.style.opacity = "0.8";
-            }}
           >
-            <X size={24} color="white" />
+            <X size={24} />
           </button>
         </div>
 
-        <div style={{ padding: "1.75rem", backgroundColor: "#f8f9fa" }}>
+        <div className="mgr-modal-body mgr-modal-body--main">
           {error && (
-            <div
-              style={{
-                display: "flex",
-                gap: "0.75rem",
-                padding: "1rem",
-                backgroundColor: "rgba(224, 25, 80, 0.1)",
-                border: "1px solid rgba(224, 25, 80, 0.3)",
-                borderRadius: "8px",
-                marginBottom: "1.5rem",
-                alignItems: "flex-start",
-              }}
-            >
+            <div className="mgr-error-alert">
               <AlertCircle
                 size={20}
-                style={{ color: "#E01950", flexShrink: 0, marginTop: "2px" }}
+                className="mgr-error-icon"
               />
-              <div style={{ flex: 1 }}>
-                <p
-                  style={{
-                    margin: 0,
-                    color: "#991b1b",
-                    fontSize: "0.875rem",
-                    textAlign: "left",
-                  }}
-                >
-                  {error}
-                </p>
+              <div className="mgr-error-text-wrapper">
+                <p className="mgr-error-text">{error}</p>
               </div>
               <button
+                className="mgr-error-close"
                 onClick={() => setError(null)}
-                style={{
-                  border: "none",
-                  backgroundColor: "transparent",
-                  cursor: "pointer",
-                  padding: "0",
-                  display: "flex",
-                  alignItems: "center",
-                  color: "#E01950",
-                  opacity: 0.7,
-                  transition: "opacity 0.2s ease",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
-                onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.7")}
               >
                 <X size={18} />
               </button>
@@ -613,113 +315,36 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
           )}
 
           <form onSubmit={handleSubmit}>
-            <div
-              style={{
-                backgroundColor: "white",
-                padding: "0.875rem",
-                borderRadius: "8px",
-                border: "1px solid #e5e7eb",
-                marginBottom: "1.5rem",
-              }}
-            >
-              <small
-                style={{
-                  display: "block",
-                  marginBottom: "0.5rem",
-                  fontSize: "0.8125rem",
-                  fontWeight: 500,
-                  color: "#6b7280",
-                  textAlign: "left",
-                }}
-              >
-                SLA Details
-              </small>
-              <strong
-                style={{
-                  display: "block",
-                  marginBottom: "0.25rem",
-                  fontSize: "0.9375rem",
-                  color: "#374151",
-                  textAlign: "left",
-                }}
-              >
+            <div className="mgr-card mgr-card--sla">
+              <small className="mgr-card-label">SLA Details</small>
+              <strong className="mgr-card-title">
                 {review.employeeName} - {review.slatype}
               </strong>
-              <small
-                style={{
-                  display: "block",
-                  fontSize: "0.8125rem",
-                  color: "#6b7280",
-                  textAlign: "left",
-                }}
-              >
+              <small className="mgr-card-subtitle">
                 SLA #{review.slaid}
               </small>
             </div>
 
-            <div
-              style={{
-                backgroundColor: "#E0E7FF",
-                padding: "0.875rem",
-                borderRadius: "8px",
-                border: "1px solid #C7D2FE",
-                marginBottom: "1.5rem",
-              }}
-            >
-              <small
-                style={{
-                  display: "block",
-                  marginBottom: "0.5rem",
-                  fontSize: "0.8125rem",
-                  fontWeight: 500,
-                  color: "#4338CA",
-                  textAlign: "left",
-                }}
-              >
+            <div className="mgr-card mgr-card--target">
+              <small className="mgr-card-label mgr-card-label--accent">
                 Escalating To
               </small>
-              <strong
-                style={{
-                  display: "block",
-                  marginBottom: "0.25rem",
-                  fontSize: "0.9375rem",
-                  color: "#3730A3",
-                  textAlign: "left",
-                }}
-              >
+              <strong className="mgr-card-title mgr-card-title--accent">
                 {deptHead.firstName} {deptHead.lastName}
               </strong>
-              <small
-                style={{
-                  display: "block",
-                  fontSize: "0.8125rem",
-                  color: "#4338CA",
-                  textAlign: "left",
-                }}
-              >
+              <small className="mgr-card-subtitle mgr-card-subtitle--accent">
                 {deptHead.departmentName} - Department Head
               </small>
             </div>
 
-            <div style={{ marginBottom: "1.5rem" }}>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "0.5rem",
-                  fontWeight: 600,
-                  color: "#374151",
-                  fontSize: "0.9rem",
-                  textAlign: "left",
-                }}
-              >
-                Reason <span style={{ color: "#E01950" }}>*</span>
+            <div className="mgr-field">
+              <label className="mgr-label">
+                Reason <span className="mgr-required">*</span>
               </label>
-
               <div
-                style={{
-                  opacity: loading ? 0.6 : 1,
-                  pointerEvents: loading ? "none" : "auto",
-                }}
+                className={`mgr-select-container ${
+                  loading ? "mgr-select-container--disabled" : ""
+                }`}
               >
                 <MgrSelect
                   value={reason}
@@ -730,139 +355,45 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
               </div>
             </div>
 
-            <div style={{ marginBottom: "1rem" }}>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "0.5rem",
-                  fontWeight: 600,
-                  color: "#374151",
-                  fontSize: "0.9rem",
-                  textAlign: "left",
-                }}
-              >
-                Your Comment <span style={{ color: "#E01950" }}>*</span>
+            <div className="mgr-field mgr-field--comment">
+              <label className="mgr-label">
+                Your Comment <span className="mgr-required">*</span>
               </label>
               <textarea
                 rows="4"
+                className="mgr-textarea"
                 placeholder="Explain why you're escalating..."
                 value={comments}
                 onChange={(e) => setComments(e.target.value)}
                 maxLength={250}
                 disabled={loading}
-                style={{
-                  width: "100%",
-                  padding: "0.65rem 0.75rem",
-                  borderRadius: "8px",
-                  border: "1px solid #d1d5db",
-                  fontSize: "0.875rem",
-                  fontFamily: "inherit",
-                  boxSizing: "border-box",
-                  backgroundColor: "white",
-                  lineHeight: "1.6",
-                  textAlign: "left",
-                  resize: "none",
-                  opacity: loading ? 0.6 : 1,
-                  cursor: loading ? "not-allowed" : "text",
-                }}
               />
-              <small
-                style={{
-                  display: "block",
-                  marginTop: "0.375rem",
-                  fontSize: "0.8125rem",
-                  color: "#6b7280",
-                  textAlign: "left",
-                }}
-              >
+              <small className="mgr-char-count">
                 {comments.length}/250 characters
               </small>
             </div>
           </form>
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            gap: "0.75rem",
-            padding: "1rem 1.5rem",
-            borderTop: "1px solid #e5e7eb",
-            backgroundColor: "white",
-            justifyContent: "flex-end",
-          }}
-        >
+        <div className="mgr-modal-footer">
           <button
+            className="mgr-btn mgr-btn--cancel"
             onClick={onClose}
             disabled={loading}
-            style={{
-              padding: "0.625rem 1.25rem",
-              border: "none",
-              backgroundColor: "#6b7280",
-              color: "white",
-              borderRadius: "8px",
-              cursor: loading ? "not-allowed" : "pointer",
-              fontSize: "0.875rem",
-              fontWeight: 600,
-              opacity: loading ? 0.5 : 1,
-              transition: "all 0.2s ease",
-            }}
-            onMouseEnter={(e) => {
-              if (!loading) {
-                e.currentTarget.style.backgroundColor = "#4b5563";
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "#6b7280";
-            }}
           >
             Cancel
           </button>
 
           <button
+            className={`mgr-btn mgr-btn--primary ${
+              loading || !isValid ? "mgr-btn--disabled" : ""
+            }`}
             onClick={handleSubmit}
             disabled={loading || !isValid}
-            style={{
-              padding: "0.625rem 1.5rem",
-              background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              cursor: loading || !isValid ? "not-allowed" : "pointer",
-              fontSize: "0.875rem",
-              fontWeight: 600,
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              opacity: loading || !isValid ? 0.6 : 1,
-              boxShadow: "0 4px 12px rgba(151, 36, 126, 0.3)",
-              transition: "all 0.2s ease",
-            }}
-            onMouseEnter={(e) => {
-              if (!(loading || !isValid)) {
-                e.currentTarget.style.transform = "translateY(-2px)";
-                e.currentTarget.style.boxShadow =
-                  "0 6px 16px rgba(151, 36, 126, 0.4)";
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow =
-                "0 4px 12px rgba(151, 36, 126, 0.3)";
-            }}
           >
             {loading ? (
               <>
-                <span
-                  style={{
-                    display: "inline-block",
-                    width: "14px",
-                    height: "14px",
-                    border: "2px solid rgba(255,255,255,0.3)",
-                    borderTopColor: "white",
-                    borderRadius: "50%",
-                    animation: "spin 0.8s linear infinite",
-                  }}
-                />
+                <span className="mgr-btn-spinner" />
                 Escalating...
               </>
             ) : (
@@ -874,13 +405,6 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
           </button>
         </div>
       </div>
-
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 };

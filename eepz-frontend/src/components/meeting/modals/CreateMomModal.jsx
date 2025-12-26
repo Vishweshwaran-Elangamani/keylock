@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import employeeService from "../../../services/meeting/employeeservice";
 import momService from "../../../services/meeting/momService";
 import toastr from "toastr";
+import "../../../styles/mom/modals/CreateMomModal.css";
 
 const PRIMARY = "#27235C";
 
@@ -42,14 +43,12 @@ const CreateMomModal = ({ meetingData, onClose }) => {
 
   const [errors, setErrors] = useState({});
 
-  // calendar state shared for the open action item
   const [calendarState, setCalendarState] = useState({
     openIndex: null,
     month: null,
     year: null,
   });
 
-  // custom dropdown state for each action item
   const [assignOpenIndex, setAssignOpenIndex] = useState(null);
   const [statusOpenIndex, setStatusOpenIndex] = useState(null);
   const assignRefs = useRef({});
@@ -77,7 +76,6 @@ const CreateMomModal = ({ meetingData, onClose }) => {
     fetchEmployees();
   }, []);
 
-  // close all popups on outside click
   useEffect(() => {
     const handler = (e) => {
       const path = e.composedPath ? e.composedPath() : [];
@@ -212,7 +210,6 @@ const CreateMomModal = ({ meetingData, onClose }) => {
     return employee ? `${employee.firstName} ${employee.lastName}` : "";
   };
 
-  // ===== Calendar helpers =====
   const monthNames = [
     "January",
     "February",
@@ -326,178 +323,110 @@ const CreateMomModal = ({ meetingData, onClose }) => {
   const { cells, month, year } = getCalendarMatrix();
   const today = new Date();
 
-  // shared dropdown styles (like your Department component)
-  const dropdownTriggerStyle = {
-    width: "100%",
-    borderRadius: "9999px",
-    border: "1px solid #E5E7EB",
-    backgroundColor: "#ffffff",
-    padding: "0.35rem 0.75rem",
-    fontSize: "0.8rem",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    cursor: "pointer",
-  };
-
-  const listContainerStyle = {
-    position: "absolute",
-    top: "100%",
-    left: 0,
-    right: 0,
-    marginTop: 2,
-    backgroundColor: "#ffffff",
-    border: "1px solid #E5E7EB",
-    borderRadius: "0 0 10px 10px",
-    boxShadow: "0 18px 40px rgba(15, 23, 42, 0.18)",
-    zIndex: 20,
-    maxHeight: 220,
-    overflowY: "auto",
-  };
-
-  const itemStyle = (active) => ({
-    padding: "8px 16px",
-    textAlign: "center",
-    cursor: "pointer",
-    backgroundColor: active ? PRIMARY : "#ffffff",
-    color: active ? "#ffffff" : "#111827",
-    fontSize: "0.85rem",
-    borderBottom: "1px solid #F3F4F6",
-  });
-
   return (
-    <div className="card border-0 shadow-sm mt-3" style={{ borderRadius: "12px" }}>
-      <div className="card-body p-4">
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <h6 className="card-title fw-bold mb-0 d-flex align-items-center gap-2">
+    <div className="cmm-modal-container">
+      <div className="cmm-card-body">
+        <div className="cmm-header">
+          <h6 className="cmm-title">
             <i className="bi bi-file-text"></i>
             Create Meeting Minutes
           </h6>
-          <button type="button" className="btn-close" onClick={onClose}></button>
+          <button type="button" className="cmm-close-btn" onClick={onClose}></button>
         </div>
 
         <form onSubmit={handleSubmit}>
-        
-          <div className="card bg-light border-0 mb-4">
-            <div className="card-body p-3">
-              <h6 className="fw-semibold mb-3 text-muted small">
-                MEETING INFORMATION
-              </h6>
-              <div className="row g-3">
-                <div className="col-md-6">
-                  <label className="form-label fw-semibold small text-muted">
-                    Meeting Title
-                  </label>
+          <div className="cmm-info-card">
+            <div className="cmm-info-card-body">
+              <h6 className="cmm-section-title">MEETING INFORMATION</h6>
+              <div className="cmm-row">
+                <div className="cmm-col-md-6">
+                  <label className="cmm-label">Meeting Title</label>
                   <input
                     type="text"
-                    className="form-control form-control-sm"
+                    className="cmm-input cmm-input-sm"
                     value={formData.meetingTitle}
                     disabled
-                    style={{ backgroundColor: "#ffffff" }}
                   />
                 </div>
-                <div className="col-md-6">
-                  <label className="form-label fw-semibold small text-muted">
-                    Meeting Type
-                  </label>
+                <div className="cmm-col-md-6">
+                  <label className="cmm-label">Meeting Type</label>
                   <input
                     type="text"
-                    className="form-control form-control-sm"
+                    className="cmm-input cmm-input-sm"
                     value={formData.meetingType}
                     disabled
-                    style={{ backgroundColor: "#ffffff" }}
                   />
                 </div>
-                <div className="col-12">
-                  <label className="form-label fw-semibold small text-muted d-flex align-items-center gap-2">
+                <div className="cmm-col-12">
+                  <label className="cmm-label cmm-flex-gap">
                     <i className="bi bi-people"></i>
                     Attendees
                   </label>
                   <textarea
-                    className="form-control form-control-sm"
-                    rows="2"
+                    className="cmm-textarea cmm-textarea-compact cmm-input-sm"
+                    rows="1"
                     name="attendees"
                     value={formData.attendees}
                     onChange={handleInputChange}
                     placeholder="Enter attendees (comma separated)..."
-                    style={{ backgroundColor: "#ffffff", resize: "vertical" }}
                   />
-                  <small className="text-muted">
-                    List all meeting participants
-                  </small>
+                  <small className="cmm-help-text">List all meeting participants</small>
                 </div>
               </div>
             </div>
           </div>
 
-       
-          <div className="mb-4">
-            <label className="form-label fw-semibold d-flex align-items-center gap-2">
+          <div className="cmm-section">
+            <label className="cmm-label cmm-flex-gap">
               <i className="bi bi-chat-left-text"></i>
               Comments & Observations
             </label>
             <textarea
-              className="form-control"
-              rows="3"
+              className="cmm-textarea cmm-textarea-compact"
+              rows="1"
               name="commentsObservations"
               value={formData.commentsObservations}
               onChange={handleInputChange}
               placeholder="Add any observations or notes about the meeting..."
-              style={{ resize: "vertical" }}
             />
           </div>
 
-         
-          <div className="mb-4">
-            <div className="d-flex justify-content-between align-items-center mb-3">
-              <label className="form-label fw-semibold mb-0 d-flex align-items-center gap-2">
+          <div className="cmm-section">
+            <div className="cmm-section-header">
+              <label className="cmm-section-label cmm-flex-gap">
                 <i className="bi bi-chat-dots"></i>
                 Discussion Points
-                {formData.discussionPoints.length > 0 && (
-                  <span className="badge bg-primary">
-                    {formData.discussionPoints.length}
-                  </span>
-                )}
+               
               </label>
               <button
                 type="button"
-                className="btn btn-sm btn-outline-primary d-flex align-items-center gap-2"
+                className="cmm-btn cmm-btn-sm cmm-btn-outline-primary cmm-flex-gap"
                 onClick={addDiscussionPoint}
               >
-                <i className="bi bi-plus-circle"></i> Add Point
+                <i className="bi bi-plus-circle"></i>
+                Add Point
               </button>
             </div>
 
             {formData.discussionPoints.length === 0 ? (
-              <div className="alert alert-light border d-flex align-items-center gap-3 mb-0">
-                <i className="bi bi-chat-dots" style={{ fontSize: "1.5rem" }}></i>
+              <div className="cmm-empty-state">
+                <i className="cmm-empty-icon bi bi-chat-dots"></i>
                 <div>
-                  <p className="mb-0 fw-semibold">No discussion points added</p>
-                  <small className="text-muted">
+                  <p className="cmm-empty-title">No discussion points added</p>
+                  <small className="cmm-empty-subtitle">
                     Click "Add Point" to document key topics discussed
                   </small>
                 </div>
               </div>
             ) : (
-              <div className="d-flex flex-column gap-2">
+              <div className="cmm-discussion-list">
                 {formData.discussionPoints.map((dp, index) => (
-                  <div key={index} className="card bg-light border-0">
-                    <div className="card-body p-3">
-                      <div className="d-flex align-items-start gap-2">
-                        <span
-                          className="badge bg-primary d-flex align-items-center justify-content-center fw-bold"
-                          style={{
-                            width: "28px",
-                            height: "28px",
-                            flexShrink: 0,
-                            fontSize: "0.8rem",
-                          }}
-                        >
-                          {index + 1}
-                        </span>
+                  <div key={index} className="cmm-discussion-item">
+                    <div className="cmm-discussion-body">
+                      <div className="cmm-discussion-row">
                         <input
                           type="text"
-                          className="form-control flex-grow-1"
+                          className="cmm-input cmm-flex-grow-1"
                           value={dp.pointText}
                           onChange={(e) =>
                             handleDiscussionPointChange(index, e.target.value)
@@ -506,9 +435,8 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                         />
                         <button
                           type="button"
-                          className="btn btn-sm btn-outline-danger d-flex align-items-center"
+                          className="cmm-btn cmm-btn-sm cmm-btn-outline-danger cmm-flex-center"
                           onClick={() => removeDiscussionPoint(index)}
-                          style={{ flexShrink: 0 }}
                         >
                           <i className="bi bi-trash"></i>
                         </button>
@@ -520,58 +448,47 @@ const CreateMomModal = ({ meetingData, onClose }) => {
             )}
           </div>
 
-          <div className="mb-4">
-            <div className="d-flex justify-content-between align-items-center mb-3">
-              <label className="form-label fw-semibold mb-0 d-flex align-items-center gap-2">
+          <div className="cmm-section">
+            <div className="cmm-section-header">
+              <label className="cmm-section-label cmm-flex-gap">
                 <i className="bi bi-check2-square"></i>
                 Action Items
-                {formData.actionItems.length > 0 && (
-                  <span className="badge bg-success">
-                    {formData.actionItems.length}
-                  </span>
-                )}
+               
               </label>
               <button
                 type="button"
-                className="btn btn-sm btn-outline-success d-flex align-items-center gap-2"
+                className="cmm-btn cmm-btn-sm cmm-btn-outline-success cmm-flex-gap"
                 onClick={addActionItem}
               >
-                <i className="bi bi-plus-circle"></i> Add Action
+                <i className="bi bi-plus-circle"></i>
+                Add Action
               </button>
             </div>
 
             {formData.actionItems.length === 0 ? (
-              <div className="alert alert-light border d-flex align-items-center gap-3 mb-0">
-                <i
-                  className="bi bi-check2-square"
-                  style={{ fontSize: "1.5rem" }}
-                ></i>
+              <div className="cmm-empty-state">
+                <i className="cmm-empty-icon bi bi-check2-square"></i>
                 <div>
-                  <p className="mb-0 fw-semibold">No action items added</p>
-                  <small className="text-muted">
-                    Click "Add Action" to create tasks and assign them to team
-                    members
+                  <p className="cmm-empty-title">No action items added</p>
+                  <small className="cmm-empty-subtitle">
+                    Click "Add Action" to create tasks and assign them to team members
                   </small>
                 </div>
               </div>
             ) : (
-              <div className="d-flex flex-column gap-3">
+              <div className="cmm-action-list">
                 {formData.actionItems.map((item, index) => {
                   const isCalendarOpen = calendarState.openIndex === index;
-                  const selectedDate = item.dueDate
-                    ? new Date(item.dueDate)
-                    : null;
+                  const selectedDate = item.dueDate ? new Date(item.dueDate) : null;
 
                   return (
-                    <div key={index} className="card border shadow-sm">
-                      <div className="card-body p-3">
-                        <div className="mb-3">
-                          <label className="form-label small fw-semibold text-muted">
-                            Task Description *
-                          </label>
+                    <div key={index} className="cmm-action-item">
+                      <div className="cmm-action-body">
+                        <div className="cmm-mb-3">
+                          <label className="cmm-label">Task Description *</label>
                           <input
                             type="text"
-                            className="form-control"
+                            className="cmm-input"
                             value={item.taskDescription}
                             onChange={(e) =>
                               handleActionItemChange(
@@ -584,128 +501,88 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                           />
                         </div>
 
-                        <div className="row g-2">
-                         
-                          <div className="col-md-5">
-                            <label className="form-label small fw-semibold text-muted d-flex align-items-center gap-1">
+                        <div className="cmm-row cmm-row-equal">
+                          <div className="cmm-col-md-4">
+                            <label className="cmm-label cmm-flex-gap">
                               <i className="bi bi-person-circle"></i>
                               Assign To *
                             </label>
                             <div
                               ref={(el) => (assignRefs.current[index] = el)}
-                              style={{ position: "relative" }}
+                              className="cmm-relative"
                             >
-                             <button
-  type="button"
-  style={dropdownTriggerStyle}
-  onClick={() =>
-    setAssignOpenIndex(assignOpenIndex === index ? null : index)
-  }
->
-  <span
-    style={{
-      overflow: "hidden",
-      textOverflow: "ellipsis",
-      whiteSpace: "nowrap",
-    }}
-  >
-    {item.assignedToEmployeeId
-      ? getEmployeeName(item.assignedToEmployeeId) || "Select employee..."
-      : loadingEmployees
-      ? "Loading..."
-      : "Select employee..."}
-  </span>
-  <span style={{ display: "inline-flex", marginLeft: "0.25rem" }}>
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      style={{
-        transition: "transform 0.2s ease",
-        transform:
-          assignOpenIndex === index ? "rotate(180deg)" : "rotate(0deg)",
-        display: "block",
-      }}
-    >
-      <polyline
-        points="6 9 12 15 18 9"
-        fill="none"
-        stroke={PRIMARY}
-        strokeWidth="2.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  </span>
-</button>
+                              <button
+                                type="button"
+                                className={`cmm-dropdown-trigger ${
+                                  assignOpenIndex === index ? "cmm-dropdown-open" : ""
+                                }`}
+                                onClick={() =>
+                                  setAssignOpenIndex(
+                                    assignOpenIndex === index ? null : index
+                                  )
+                                }
+                              >
+                                <span className="cmm-dropdown-text">
+                                  {item.assignedToEmployeeId
+                                    ? getEmployeeName(item.assignedToEmployeeId) ||
+                                      "Select employee..."
+                                    : loadingEmployees
+                                    ? "Loading..."
+                                    : "Select employee..."}
+                                </span>
+                                <span className="cmm-dropdown-arrow">
+                                  <svg width="18" height="18" viewBox="0 0 24 24">
+                                    <polyline
+                                      points="6 9 12 15 18 9"
+                                      fill="none"
+                                      stroke={PRIMARY}
+                                      strokeWidth="2.4"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    />
+                                  </svg>
+                                </span>
+                              </button>
                               {assignOpenIndex === index && (
-                                <div style={listContainerStyle}>
-                                  {(loadingEmployees ? [] : employees).map(
-                                    (emp) => {
-                                      const active =
-                                        String(item.assignedToEmployeeId) ===
-                                        String(emp.employeeMasterId);
-                                      return (
-                                        <div
-                                          key={emp.employeeMasterId}
-                                          style={itemStyle(active)}
-                                          onClick={() => {
-                                            handleActionItemChange(
-                                              index,
-                                              "assignedToEmployeeId",
-                                              emp.employeeMasterId
-                                            );
-                                            setAssignOpenIndex(null);
-                                          }}
-                                          onMouseEnter={(e) => {
-                                            e.currentTarget.style.backgroundColor =
-                                              PRIMARY;
-                                            e.currentTarget.style.color =
-                                              "#ffffff";
-                                          }}
-                                          onMouseLeave={(e) => {
-                                            e.currentTarget.style.backgroundColor =
-                                              active ? PRIMARY : "#ffffff";
-                                            e.currentTarget.style.color = active
-                                              ? "#ffffff"
-                                              : "#111827";
-                                          }}
-                                        >
-                                          {emp.firstName} {emp.lastName} -{" "}
-                                          {emp.roleName}
-                                        </div>
-                                      );
-                                    }
-                                  )}
-                                  {!loadingEmployees &&
-                                    employees.length === 0 && (
+                                <div className="cmm-dropdown-list">
+                                  {(loadingEmployees ? [] : employees).map((emp) => {
+                                    const active =
+                                      String(item.assignedToEmployeeId) ===
+                                      String(emp.employeeMasterId);
+                                    return (
                                       <div
-                                        style={{
-                                          padding: "8px 16px",
-                                          fontSize: "0.85rem",
-                                          color: "#6b7280",
-                                          textAlign: "center",
+                                        key={emp.employeeMasterId}
+                                        className={`cmm-dropdown-item ${
+                                          active ? "cmm-active" : ""
+                                        }`}
+                                        onClick={() => {
+                                          handleActionItemChange(
+                                            index,
+                                            "assignedToEmployeeId",
+                                            emp.employeeMasterId
+                                          );
+                                          setAssignOpenIndex(null);
                                         }}
                                       >
-                                        No employees
+                                        {emp.firstName} {emp.lastName} - {emp.roleName}
                                       </div>
-                                    )}
+                                    );
+                                  })}
+                                  {!loadingEmployees && employees.length === 0 && (
+                                    <div className="cmm-no-employees">No employees</div>
+                                  )}
                                 </div>
                               )}
                             </div>
                             {errors[`actionItem_${index}_assignedToEmployeeId`] && (
-                              <div className="invalid-feedback d-block">
+                              <div className="cmm-error">
                                 <i className="bi bi-exclamation-circle me-1"></i>
-                                {
-                                  errors[
-                                    `actionItem_${index}_assignedToEmployeeId`
-                                  ]
-                                }
+                                {errors[`actionItem_${index}_assignedToEmployeeId`]}
                               </div>
                             )}
                             {item.assignedToEmployeeId &&
                               getEmployeeName(item.assignedToEmployeeId) && (
-                                <small className="text-success d-flex align-items-center gap-1 mt-1">
+                                <small className="cmm-success-text">
                                   <i className="bi bi-check-circle"></i>
                                   Assigned to:{" "}
                                   <strong>
@@ -715,45 +592,31 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                               )}
                           </div>
 
-                          <div className="col-md-4">
-                            <label className="form-label small fw-semibold text-muted d-flex align-items-center gap-1">
+                          <div className="cmm-col-md-4">
+                            <label className="cmm-label cmm-flex-gap">
                               <i className="bi bi-calendar-event"></i>
                               Due Date *
                             </label>
                             <div
                               ref={(el) => (calendarRefs.current[index] = el)}
-                              style={{ position: "relative", width: "100%" }}
+                              className="cmm-relative cmm-w-100"
                             >
                               <input
                                 type="text"
                                 readOnly
                                 value={formatDisplayDate(item.dueDate)}
                                 placeholder="Select date"
-                                className={`form-control form-control-sm ${
+                                className={`cmm-input cmm-input-sm ${
                                   errors[`actionItem_${index}_dueDate`]
-                                    ? "is-invalid"
+                                    ? "cmm-is-invalid"
                                     : ""
                                 }`}
-                                style={{
-                                  paddingRight: "2.3rem",
-                                  cursor: "pointer",
-                                  backgroundColor: "#ffffff",
-                                }}
                                 onClick={() => ensureCalendarMonthYear(index)}
                               />
                               <button
                                 type="button"
+                                className="cmm-calendar-trigger"
                                 onClick={() => ensureCalendarMonthYear(index)}
-                                style={{
-                                  position: "absolute",
-                                  top: "50%",
-                                  right: 8,
-                                  transform: "translateY(-50%)",
-                                  border: "none",
-                                  background: "transparent",
-                                  cursor: "pointer",
-                                  padding: 0,
-                                }}
                               >
                                 <svg
                                   width="16"
@@ -800,152 +663,61 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                               </button>
 
                               {isCalendarOpen && (
-                                <div
-                                  style={{
-                                    position: "absolute",
-                                    top: "calc(100% + 4px)",
-                                    right: 0,
-                                    backgroundColor: "white",
-                                    borderRadius: 12,
-                                    boxShadow:
-                                      "0 14px 40px rgba(15, 23, 42, 0.18)",
-                                    border: "1px solid #e5e7eb",
-                                    zIndex: 9999,
-                                    width: 260,
-                                  }}
-                                >
-                                  <div
-                                    style={{
-                                      display: "flex",
-                                      alignItems: "center",
-                                      justifyContent: "space-between",
-                                      padding: "0.5rem 0.75rem",
-                                      borderBottom: "1px solid #e5e7eb",
-                                      backgroundColor: "#f9fafb",
-                                    }}
-                                  >
+                                <div className="cmm-calendar">
+                                  <div className="cmm-calendar-header">
                                     <button
                                       type="button"
+                                      className="cmm-calendar-nav"
                                       onClick={goPrevMonth}
-                                      style={{
-                                        border: "none",
-                                        background: "transparent",
-                                        cursor: "pointer",
-                                        padding: 4,
-                                      }}
                                     >
                                       <i className="bi bi-chevron-left"></i>
                                     </button>
-                                    <span
-                                      style={{
-                                        fontWeight: 600,
-                                        fontSize: "0.9rem",
-                                        color: "#111827",
-                                      }}
-                                    >
+                                    <span className="cmm-calendar-title">
                                       {monthNames[month]} {year}
                                     </span>
                                     <button
                                       type="button"
+                                      className="cmm-calendar-nav"
                                       onClick={goNextMonth}
-                                      style={{
-                                        border: "none",
-                                        background: "transparent",
-                                        cursor: "pointer",
-                                        padding: 4,
-                                      }}
                                     >
                                       <i className="bi bi-chevron-right"></i>
                                     </button>
                                   </div>
 
-                                  <div
-                                    style={{
-                                      display: "grid",
-                                      gridTemplateColumns: "repeat(7, 1fr)",
-                                      padding: "0.25rem 0.75rem",
-                                      gap: 2,
-                                      fontSize: "0.75rem",
-                                      color: "#6b7280",
-                                    }}
-                                  >
+                                  <div className="cmm-calendar-weekdays">
                                     {weekdays.map((w) => (
-                                      <div
-                                        key={w}
-                                        style={{
-                                          textAlign: "center",
-                                          padding: "0.25rem 0",
-                                        }}
-                                      >
+                                      <div key={w} className="cmm-weekday">
                                         {w}
                                       </div>
                                     ))}
                                   </div>
 
-                                  <div
-                                    style={{
-                                      display: "grid",
-                                      gridTemplateColumns: "repeat(7, 1fr)",
-                                      padding: "0.25rem 0.75rem 0.5rem 0.75rem",
-                                      gap: 2,
-                                    }}
-                                  >
+                                  <div className="cmm-calendar-days">
                                     {cells.map((c, idx) => {
-                                      const cellDate = new Date(
-                                        year,
-                                        month,
-                                        c.day
-                                      );
+                                      const cellDate = new Date(year, month, c.day);
                                       const isToday =
                                         c.current &&
-                                        cellDate.getDate() ===
-                                          today.getDate() &&
-                                        cellDate.getMonth() ===
-                                          today.getMonth() &&
+                                        cellDate.getDate() === today.getDate() &&
+                                        cellDate.getMonth() === today.getMonth() &&
                                         cellDate.getFullYear() ===
                                           today.getFullYear();
-
                                       const isSelected =
                                         selectedDate &&
                                         c.current &&
-                                        cellDate.getDate() ===
-                                          selectedDate.getDate() &&
+                                        cellDate.getDate() === selectedDate.getDate() &&
                                         cellDate.getMonth() ===
                                           selectedDate.getMonth() &&
                                         cellDate.getFullYear() ===
                                           selectedDate.getFullYear();
 
-                                      const baseStyle = {
-                                        textAlign: "center",
-                                        padding: "0.35rem 0",
-                                        borderRadius: 6,
-                                        cursor: c.current
-                                          ? "pointer"
-                                          : "default",
-                                        fontSize: "0.8rem",
-                                      };
-
-                                      let bg = "transparent";
-                                      let color = c.current
-                                        ? "#111827"
-                                        : "#d1d5db";
-
-                                      if (isToday) {
-                                        bg = "rgba(39,35,92,0.08)";
-                                      }
-                                      if (isSelected) {
-                                        bg = PRIMARY;
-                                        color = "#ffffff";
-                                      }
-
                                       return (
                                         <div
                                           key={idx}
-                                          style={{
-                                            ...baseStyle,
-                                            backgroundColor: bg,
-                                            color,
-                                          }}
+                                          className={`cmm-calendar-day ${
+                                            c.current ? "cmm-current" : ""
+                                          } ${isToday ? "cmm-today" : ""} ${
+                                            isSelected ? "cmm-selected" : ""
+                                          }`}
                                           onClick={() =>
                                             handleSelectCalendarDay(
                                               index,
@@ -960,24 +732,11 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                                     })}
                                   </div>
 
-                                  <div
-                                    style={{
-                                      padding: "0.4rem 0.75rem 0.6rem",
-                                      borderTop: "1px solid #e5e7eb",
-                                      textAlign: "right",
-                                    }}
-                                  >
+                                  <div className="cmm-calendar-footer">
                                     <button
                                       type="button"
+                                      className="cmm-today-btn"
                                       onClick={() => goToday(index)}
-                                      style={{
-                                        border: "none",
-                                        background: "transparent",
-                                        color: PRIMARY,
-                                        fontSize: "0.8rem",
-                                        fontWeight: 600,
-                                        cursor: "pointer",
-                                      }}
                                     >
                                       Today
                                     </button>
@@ -986,87 +745,75 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                               )}
                             </div>
                             {errors[`actionItem_${index}_dueDate`] && (
-                              <div className="invalid-feedback d-block">
+                              <div className="cmm-error">
                                 <i className="bi bi-exclamation-circle me-1"></i>
                                 {errors[`actionItem_${index}_dueDate`]}
                               </div>
                             )}
                           </div>
 
-                          <div className="col-md-3">
-  <label className="form-label small fw-semibold text-muted">
-    Status
-  </label>
-  <div
-    ref={(el) => (statusRefs.current[index] = el)}
-    style={{ position: "relative" }}
-  >
-    <button
-      type="button"
-      style={dropdownTriggerStyle}
-      onClick={() =>
-        setStatusOpenIndex(statusOpenIndex === index ? null : index)
-      }
-    >
-      <span>{item.status}</span>
-      <span style={{ display: "inline-flex", marginLeft: "0.25rem" }}>
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          style={{
-            transition: "transform 0.2s ease",
-            transform: statusOpenIndex === index ? "rotate(180deg)" : "rotate(0deg)",
-            display: "block",
-          }}
-        >
-          <polyline
-            points="6 9 12 15 18 9"
-            fill="none"
-            stroke={PRIMARY}
-            strokeWidth="2.4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </span>
-    </button>
-    {statusOpenIndex === index && (
-      <div style={listContainerStyle}>
-        {["Pending", "Completed"].map((st) => {
-          const active = st === item.status;
-          return (
-            <div
-              key={st}
-              style={itemStyle(active)}
-              onClick={() => {
-                handleActionItemChange(index, "status", st);
-                setStatusOpenIndex(null);
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = PRIMARY;
-                e.currentTarget.style.color = "#ffffff";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = active ? PRIMARY : "#ffffff";
-                e.currentTarget.style.color = active ? "#ffffff" : "#111827";
-              }}
-            >
-              {st}
-            </div>
-          );
-        })}
-      </div>
-    )}
-  </div>
-</div>
-
+                          <div className="cmm-col-md-4">
+                            <label className="cmm-label">Status</label>
+                            <div
+                              ref={(el) => (statusRefs.current[index] = el)}
+                              className="cmm-relative"
+                            >
+                              <button
+                                type="button"
+                                className={`cmm-dropdown-trigger ${
+                                  statusOpenIndex === index ? "cmm-dropdown-open" : ""
+                                }`}
+                                onClick={() =>
+                                  setStatusOpenIndex(
+                                    statusOpenIndex === index ? null : index
+                                  )
+                                }
+                              >
+                                <span className="cmm-dropdown-text">
+                                  {item.status}
+                                </span>
+                                <span className="cmm-dropdown-arrow">
+                                  <svg width="18" height="18" viewBox="0 0 24 24">
+                                    <polyline
+                                      points="6 9 12 15 18 9"
+                                      fill="none"
+                                      stroke={PRIMARY}
+                                      strokeWidth="2.4"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    />
+                                  </svg>
+                                </span>
+                              </button>
+                              {statusOpenIndex === index && (
+                                <div className="cmm-dropdown-list">
+                                  {["Pending", "Completed"].map((st) => {
+                                    const active = st === item.status;
+                                    return (
+                                      <div
+                                        key={st}
+                                        className={`cmm-dropdown-item ${
+                                          active ? "cmm-active" : ""
+                                        }`}
+                                        onClick={() => {
+                                          handleActionItemChange(index, "status", st);
+                                          setStatusOpenIndex(null);
+                                        }}
+                                      >
+                                        {st}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          </div>
                         </div>
 
-                        <div className="mt-3 pt-3 border-top">
+                        <div className="cmm-action-footer">
                           <button
                             type="button"
-                            className="btn btn-sm btn-outline-danger d-flex align-items-center gap-2"
+                            className="cmm-btn cmm-btn-sm cmm-btn-outline-danger cmm-flex-gap"
                             onClick={() => removeActionItem(index)}
                           >
                             <i className="bi bi-trash"></i>
@@ -1081,35 +828,16 @@ const CreateMomModal = ({ meetingData, onClose }) => {
             )}
           </div>
 
-          <div className="d-flex gap-2 pt-3 border-top">
+          <div className="cmm-actions">
             <button
               type="submit"
               disabled={submitting || loadingEmployees}
-              className="btn gradient-primary-button flex-grow-1 d-flex align-items-center justify-content-center gap-2"
-              style={{
-                background:
-                  "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                color: "#fff",
-                border: "none",
-                fontWeight: "500",
-                transition: "all 0.2s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.opacity = "0.9";
-                e.currentTarget.style.transform = "translateY(-1px)";
-                e.currentTarget.style.boxShadow =
-                  "0 4px 12px rgba(151, 36, 126, 0.3)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.opacity = "1";
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = "none";
-              }}
+              className="cmm-submit-btn cmm-flex-center cmm-flex-grow-1"
             >
               {submitting ? (
                 <>
                   <span
-                    className="spinner-border spinner-border-sm"
+                    className="spinner-border spinner-border-sm cmm-mr-2"
                     role="status"
                     aria-hidden="true"
                   ></span>
@@ -1117,7 +845,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                 </>
               ) : (
                 <>
-                  <i className="bi bi-check-circle"></i>
+                  <i className="bi bi-check-circle cmm-mr-2"></i>
                   Create MOM
                 </>
               )}
@@ -1125,20 +853,19 @@ const CreateMomModal = ({ meetingData, onClose }) => {
             <button
               type="button"
               onClick={onClose}
-              className="btn btn-danger px-4 d-flex align-items-center gap-2"
+              className="cmm-cancel-btn cmm-flex-center"
               disabled={submitting}
-              style={{ fontWeight: "500" }}
             >
-              <i className="bi bi-x-circle"></i>
+              <i className="bi bi-x-circle cmm-mr-2"></i>
               Cancel
             </button>
           </div>
         </form>
 
         {formData.actionItems.length > 0 && (
-          <div className="alert alert-info mt-3 mb-0 d-flex align-items-start gap-2">
-            <i className="bi bi-info-circle mt-1 flex-shrink-0"></i>
-            <div className="small">
+          <div className="cmm-note">
+            <i className="bi bi-info-circle cmm-note-icon"></i>
+            <div>
               <strong>Note:</strong> All assigned employees will be notified via
               email about their action items.
             </div>

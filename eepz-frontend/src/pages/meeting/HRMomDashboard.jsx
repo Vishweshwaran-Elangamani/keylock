@@ -6,21 +6,15 @@ import {
   FileText,
   Calendar,
   Users,
-  Search,
-  Filter,
   Eye,
-  Download,
   ChevronLeft,
   ChevronRight,
-  BarChart3,
-  RefreshCw,
   CheckCircle,
   AlertCircle,
   MessageSquare,
-  User,
 } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./../../styles/mom/HRMomDashboard.css";
+import "../../styles/mom/components/HRMomDashboard.css";
 import Breadcrumb from "../../components/feedback_management/common/FeedbackBreadcrumb";
 
 const HRMomDashboard = () => {
@@ -33,7 +27,7 @@ const HRMomDashboard = () => {
     startDate: "",
     endDate: "",
     pageNumber: 1,
-    pageSize: 5, // use 5 to match the screenshot style
+    pageSize: 5,
   });
   const [loading, setLoading] = useState(false);
   const [totalMoms, setTotalMoms] = useState(0);
@@ -48,12 +42,10 @@ const HRMomDashboard = () => {
     setLoading(true);
     try {
       const response = await momService.getAllMomsForHR(filters);
-
       if (response.success && response.data) {
         const momsData = response.data.moms || [];
         const total = response.data.totalCount || 0;
         const pages = response.data.totalPages || 0;
-
         setMoms(momsData);
         setTotalMoms(total);
         setTotalPages(pages);
@@ -113,7 +105,9 @@ const HRMomDashboard = () => {
       Other: "secondary",
     };
     return (
-      <span className={`badge bg-${badgeMap[type] || "secondary"} mom-badge`}>
+      <span
+        className={`badge hrmom-badge bg-${badgeMap[type] || "secondary"}`}
+      >
         {type}
       </span>
     );
@@ -173,10 +167,9 @@ const HRMomDashboard = () => {
   const toIndex = Math.min(filters.pageNumber * filters.pageSize, totalMoms);
 
   return (
-    <div className="mom-dashboard-container">
-      <div className="mom-dashboard-wrapper">
-        {/* Header Section */}
-        <div className="mom-header">
+    <div className="hrmom-dashboard-container">
+      <div className="hrmom-dashboard-wrapper">
+        <div className="hrmom-header">
           <Breadcrumb
             items={[
               { label: "Meetings and MoM", href: "/hr/dashboard/mom" },
@@ -185,95 +178,77 @@ const HRMomDashboard = () => {
           />
         </div>
 
-        {/* Stats Cards */}
+        {/* top cards */}
         <div className="row g-3 mb-3">
           <div className="col-lg-3 col-md-6 col-sm-6">
-            <div className="card mom-stat-card">
-              <div className="card-body">
-                <div className="mom-stat-content">
-                  <div
-                    className="mom-stat-icon"
-                    style={{ backgroundColor: "#e3f2fd" }}
-                  >
-                    <FileText size={24} className="text-primary" />
-                  </div>
-                  <div className="mom-stat-info">
-                    <div className="mom-stat-value">{totalMoms}</div>
-                    <div className="mom-stat-label">Total MOMs</div>
-                  </div>
+            <div className="hrmom-top-card">
+              <div className="hrmom-top-card-inner">
+                <div className="hrmom-top-icon hrmom-top-icon-total">
+                  <FileText className="hrmom-top-icon-svg" />
+                </div>
+                <div className="hrmom-top-center">
+                  <div className="hrmom-top-count">{totalMoms}</div>
+                  <div className="hrmom-top-label">TOTAL MOMs</div>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="col-lg-3 col-md-6 col-sm-6">
-            <div className="card mom-stat-card">
-              <div className="card-body">
-                <div className="mom-stat-content">
-                  <div
-                    className="mom-stat-icon"
-                    style={{ backgroundColor: "#e8f5e9" }}
-                  >
-                    <Calendar size={24} className="text-success" />
-                  </div>
-                  <div className="mom-stat-info">
-                    <div className="mom-stat-value">{getThisMonthCount()}</div>
-                    <div className="mom-stat-label">This Month</div>
-                  </div>
+            <div className="hrmom-top-card">
+              <div className="hrmom-top-card-inner">
+                <div className="hrmom-top-icon hrmom-top-icon-month">
+                  <Calendar className="hrmom-top-icon-svg hrmom-top-icon-ok" />
+                </div>
+                <div className="hrmom-top-center">
+                  <div className="hrmom-top-count">{getThisMonthCount()}</div>
+                  <div className="hrmom-top-label">THIS MONTH</div>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="col-lg-3 col-md-6 col-sm-6">
-            <div className="card mom-stat-card">
-              <div className="card-body">
-                <div className="mom-stat-content">
-                  <div
-                    className="mom-stat-icon"
-                    style={{ backgroundColor: "#e8f5e9" }}
-                  >
-                    <CheckCircle size={24} className="text-success" />
+            <div className="hrmom-top-card">
+              <div className="hrmom-top-card-inner">
+                <div className="hrmom-top-icon hrmom-top-icon-actions">
+                  <CheckCircle className="hrmom-top-icon-svg hrmom-top-icon-ok" />
+                </div>
+                <div className="hrmom-top-center">
+                  <div className="hrmom-top-count">
+                    {getTotalActionItems()}
                   </div>
-                  <div className="mom-stat-info">
-                    <div className="mom-stat-value">
-                      {getTotalActionItems()}
-                    </div>
-                    <div className="mom-stat-label">Action Items</div>
-                  </div>
+                  <div className="hrmom-top-label">ACTION ITEMS</div>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="col-lg-3 col-md-6 col-sm-6">
-            <div className="card mom-stat-card">
-              <div className="card-body">
-                <div className="mom-stat-content">
-                  <div
-                    className="mom-stat-icon"
-                    style={{ backgroundColor: "#ffebee" }}
-                  >
-                    <AlertCircle size={24} className="text-danger" />
+            <div className="hrmom-top-card">
+              <div className="hrmom-top-card-inner">
+                <div className="hrmom-top-icon hrmom-top-icon-overdue">
+                  <AlertCircle className="hrmom-top-icon-svg hrmom-top-icon-alert" />
+                </div>
+                <div className="hrmom-top-center">
+                  <div className="hrmom-top-count">
+                    {getOverdueActionItems()}
                   </div>
-                  <div className="mom-stat-info">
-                    <div className="mom-stat-value">
-                      {getOverdueActionItems()}
-                    </div>
-                    <div className="mom-stat-label">Overdue</div>
-                  </div>
+                  <div className="hrmom-top-label">OVERDUE</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        
-          <div className="card-body p-0">
-            <div className="mom-table-wrapper">
-              <table className="table mom-table mb-0">
+
+        {/* table */}
+        <div className="card hrmom-table-card">
+          <div className="card-body hrmom-table-card-body">
+            <div className="hrmom-table-wrapper">
+              <table className="table hrmom-table mb-0">
                 <thead>
                   <tr>
-                    <th>Meeting Details</th>
+                    <th>Meeting Title</th>
                     <th>Submitted By</th>
                     <th>Meeting Date</th>
                     <th>Participants</th>
@@ -299,14 +274,10 @@ const HRMomDashboard = () => {
                     </tr>
                   ) : !Array.isArray(moms) || moms.length === 0 ? (
                     <tr>
-                      <td colSpan="7" className="mom-empty-state">
-                        <FileText
-                          size={40}
-                          className="mb-2 text-muted"
-                          style={{ opacity: 0.3 }}
-                        />
-                        <h6 className="text-muted mb-1">No MOMs Found</h6>
-                        <p className="text-muted small mb-0">
+                      <td colSpan="7" className="hrmom-empty-state">
+                        <FileText size={40} className="hrmom-empty-icon" />
+                        <h6 className="hrmom-empty-title">No MOMs Found</h6>
+                        <p className="hrmom-empty-text">
                           {filters.searchTerm ||
                           filters.meetingType ||
                           filters.startDate ||
@@ -319,17 +290,13 @@ const HRMomDashboard = () => {
                   ) : (
                     moms.map((mom) => (
                       <tr key={mom.momId}>
-                        {/* Meeting Details */}
                         <td>
                           <div className="d-flex align-items-center gap-2">
-                            <div className="mom-table-icon">
-                              <FileText
-                                size={20}
-                                style={{ color: "#0284c7" }}
-                              />
+                            <div className="hrmom-table-icon">
+                              <FileText className="hrmom-table-icon-svg" />
                             </div>
                             <div>
-                              <div className="mom-meeting-title">
+                              <div className="hrmom-meeting-title">
                                 {mom.meetingTitle}
                               </div>
                               <div className="mt-1">
@@ -339,34 +306,34 @@ const HRMomDashboard = () => {
                           </div>
                         </td>
 
-                        {/* Submitted By */}
                         <td>
                           <div className="d-flex align-items-center gap-2">
                             <div>
-                              <div className="mom-submitter-name">
+                              <div className="hrmom-submitter-name">
                                 {mom.submittedByEmployeeName || "Unknown"}
                               </div>
-                              <small className="mom-submitter-role">
+                              <small className="hrmom-submitter-role">
                                 {mom.submittedByRole || "Employee"}
                               </small>
                             </div>
                           </div>
                         </td>
 
-                        {/* Meeting Date */}
                         <td>
                           <div className="d-flex align-items-center gap-2">
-                            <Calendar size={14} className="text-muted" />
-                            <span className="mom-meeting-date">
+                            <Calendar
+                              size={14}
+                              className="hrmom-date-icon text-muted"
+                            />
+                            <span className="hrmom-meeting-date">
                               {formatDateTime(mom.meetingDate)}
                             </span>
                           </div>
                         </td>
 
-                        {/* Participants */}
                         <td>
-                          <div className="mom-count-badge">
-                            <Users size={14} style={{ color: "#0284c7" }} />
+                          <div className="hrmom-count-badge">
+                            <Users className="hrmom-count-icon hrmom-count-icon-participants" />
                             <span>
                               {Array.isArray(mom.attendees)
                                 ? mom.attendees.length
@@ -375,13 +342,9 @@ const HRMomDashboard = () => {
                           </div>
                         </td>
 
-                        {/* Topics */}
                         <td>
-                          <div className="mom-count-badge">
-                            <MessageSquare
-                              size={14}
-                              style={{ color: "#06b6d4" }}
-                            />
+                          <div className="hrmom-count-badge">
+                            <MessageSquare className="hrmom-count-icon hrmom-count-icon-topics" />
                             <span>
                               {Array.isArray(mom.discussionPoints)
                                 ? mom.discussionPoints.length
@@ -390,13 +353,9 @@ const HRMomDashboard = () => {
                           </div>
                         </td>
 
-                        {/* Actions */}
                         <td>
-                          <div className="mom-count-badge">
-                            <CheckCircle
-                              size={14}
-                              style={{ color: "#10b981" }}
-                            />
+                          <div className="hrmom-count-badge">
+                            <CheckCircle className="hrmom-count-icon hrmom-count-icon-actions" />
                             <span>
                               {Array.isArray(mom.actionItems)
                                 ? mom.actionItems.length
@@ -405,10 +364,9 @@ const HRMomDashboard = () => {
                           </div>
                         </td>
 
-                        {/* View */}
                         <td>
                           <button
-                            className="btn btn-sm mom-view-btn"
+                            className="btn btn-sm hrmom-view-btn"
                             onClick={() =>
                               navigate(`/hr/dasboard/meetmom/${mom.momId}`)
                             }
@@ -423,20 +381,17 @@ const HRMomDashboard = () => {
               </table>
             </div>
 
-            {/* Pagination footer inside the same card, matching the screenshot */}
             {!loading &&
               Array.isArray(moms) &&
               moms.length > 0 &&
               totalPages > 0 && (
-                <div className="mom-pagination-footer px-3 py-2 border-top d-flex flex-wrap align-items-center justify-content-between gap-2">
-                  {/* Left: page size */}
-                  <div className="d-flex align-items-center gap-1 small text-muted">
+                <div className="hrmom-pagination-footer">
+                  <div className="hrmom-page-size">
                     <span>Show</span>
                     <select
-                      className="form-select form-select-sm mom-page-size-select"
+                      className="form-select form-select-sm hrmom-page-size-select"
                       value={filters.pageSize}
                       onChange={handlePageSizeChange}
-                      style={{ width: "70px" }}
                     >
                       <option value={5}>5</option>
                       <option value={10}>10</option>
@@ -446,21 +401,19 @@ const HRMomDashboard = () => {
                     <span>entries</span>
                   </div>
 
-                  {/* Center: info text */}
-                  <div className="small text-muted text-center flex-grow-1">
+                  <div className="hrmom-page-info">
                     Showing {fromIndex} to {toIndex} of {totalMoms} entries
                   </div>
 
-                  {/* Right: pager */}
-                  <div className="d-flex justify-content-end">
-                    <ul className="pagination pagination-sm mb-0 mom-pagination-list">
+                  <div className="hrmom-page-nav">
+                    <ul className="pagination pagination-sm mb-0 hrmom-pagination-list">
                       <li
                         className={`page-item ${
                           filters.pageNumber <= 1 ? "disabled" : ""
                         }`}
                       >
                         <button
-                          className="page-link mom-page-btn"
+                          className="page-link hrmom-page-btn"
                           onClick={() =>
                             handlePageChange(filters.pageNumber - 1)
                           }
@@ -491,7 +444,7 @@ const HRMomDashboard = () => {
                             }`}
                           >
                             <button
-                              className="page-link mom-page-btn"
+                              className="page-link hrmom-page-btn"
                               onClick={() => handlePageChange(pageNum)}
                             >
                               {pageNum}
@@ -506,7 +459,7 @@ const HRMomDashboard = () => {
                         }`}
                       >
                         <button
-                          className="page-link mom-page-btn"
+                          className="page-link hrmom-page-btn"
                           onClick={() =>
                             handlePageChange(filters.pageNumber + 1)
                           }
@@ -521,7 +474,7 @@ const HRMomDashboard = () => {
                 </div>
               )}
           </div>
-       
+        </div>
       </div>
     </div>
   );

@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Plus, Loader, AlertCircle, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import slaService from "../../../services/sla/slaService";
-
-const PRIMARY = "#27235C";
+import "../../../styles/sla/modals/CreateSLAModal.css";
 
 const CreateSLAModal = ({ onClose, onSuccess }) => {
   const [loading, setLoading] = useState(false);
@@ -17,7 +16,6 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
     reason: "",
   });
 
-  // calendar state
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [calendarMonth, setCalendarMonth] = useState(null);
   const [calendarYear, setCalendarYear] = useState(null);
@@ -25,7 +23,6 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-  // ===== FETCH EMPLOYEE COUNT =====
   useEffect(() => {
     const fetchCount = async () => {
       try {
@@ -56,7 +53,6 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
     fetchCount();
   }, []);
 
-  // ===== CLOSE CALENDAR ON OUTSIDE CLICK =====
   useEffect(() => {
     const handler = (e) => {
       if (calendarOpen && calendarRef.current && !calendarRef.current.contains(e.target)) {
@@ -67,7 +63,6 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
     return () => document.removeEventListener("mousedown", handler);
   }, [calendarOpen]);
 
-  // ===== FORM CHANGE =====
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -77,7 +72,6 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
     setError(null);
   };
 
-  // ===== SUBMIT =====
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
@@ -172,7 +166,6 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
     }
   };
 
-  // ===== CALENDAR HELPERS =====
   const formatDisplayDate = (iso) => {
     if (!iso) return "";
     const d = new Date(iso);
@@ -270,612 +263,199 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
   };
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        backgroundColor: "rgba(0,0,0,0.7)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 1050,
-        backdropFilter: "blur(4px)",
-      }}
-      onClick={onClose}
-    >
-      <div
-        style={{
-          backgroundColor: "white",
-          borderRadius: 12,
-          width: "90%",
-          maxWidth: 500,
-          boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
-          overflow: "hidden",
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* HEADER */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "1.25rem 1.5rem",
-            backgroundColor: "#3c3862",
-          }}
-        >
-          <h5
-            style={{
-              margin: 0,
-              fontWeight: 600,
-              fontSize: "1.1rem",
-              color: "white",
-              textAlign: "left",
-            }}
-          >
-            Create SLA
-          </h5>
-          <button
-            onClick={onClose}
-            disabled={loading}
-            style={{
-              border: "none",
-              backgroundColor: "transparent",
-              cursor: loading ? "not-allowed" : "pointer",
-              padding: "0.5rem",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              opacity: loading ? 0.5 : 0.8,
-              transition: "opacity 0.2s ease",
-            }}
-            onMouseEnter={(e) => !loading && (e.currentTarget.style.opacity = "1")}
-            onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.8")}
-          >
-            <X size={24} color="white" />
-          </button>
-        </div>
-
-        {/* BODY */}
-        <div style={{ padding: "1.75rem", backgroundColor: "#f8f9fa" }}>
-          {fetchLoading ? (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                height: 200,
-              }}
+    <>
+      <div className="csla-overlay" onClick={onClose}>
+        <div className="csla-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="csla-header">
+            <h5 className="csla-title">Create SLA</h5>
+            <button
+              className={`csla-close-btn ${loading ? "csla-close-btn--disabled" : ""}`}
+              onClick={onClose}
+              disabled={loading}
             >
-              <Loader
-                size={32}
-                style={{
-                  color: "#97247E",
-                  marginBottom: "1rem",
-                  animation: "spin 1s linear infinite",
-                }}
-              />
-              <p style={{ color: "#666", fontSize: "0.95rem" }}>
-                Loading employee count...
-              </p>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit}>
-              {/* ERROR ALERT */}
-              {error && (
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "0.75rem",
-                    padding: "1rem",
-                    backgroundColor: "rgba(224, 25, 80, 0.1)",
-                    border: "1px solid rgba(224, 25, 80, 0.3)",
-                    borderRadius: "8px",
-                    marginBottom: "1.5rem",
-                    alignItems: "flex-start",
-                  }}
-                >
-                  <AlertCircle
-                    size={20}
-                    style={{
-                      color: "#E01950",
-                      flexShrink: 0,
-                      marginTop: "2px",
-                    }}
-                  />
-                  <p
-                    style={{
-                      margin: 0,
-                      color: "#991b1b",
-                      fontSize: "0.95rem",
-                    }}
-                  >
-                    {error}
-                  </p>
-                </div>
-              )}
+              <X size={24} />
+            </button>
+          </div>
 
-              {/* REVIEW TYPE */}
-              <div style={{ marginBottom: "1.5rem" }}>
-                <label
-                  style={{
-                    display: "block",
-                    marginBottom: "0.5rem",
-                    fontWeight: 600,
-                    color: "#374151",
-                    fontSize: "0.9rem",
-                    textAlign: "left",
-                  }}
-                >
-                  Review Type <span style={{ color: "#E01950" }}>*</span>
-                </label>
-                <input
-                  type="text"
-                  name="reviewType"
-                  value={formData.reviewType}
-                  onChange={handleChange}
-                  placeholder="E.g., Performance Form, Quarterly Review"
-                  required
-                  disabled={loading}
-                  style={{
-                    width: "100%",
-                    padding: "0.65rem 0.75rem",
-                    borderRadius: "8px",
-                    border: "1px solid #d1d5db",
-                    fontSize: "0.95rem",
-                    fontFamily: "inherit",
-                    boxSizing: "border-box",
-                    backgroundColor: loading ? "#f3f4f6" : "white",
-                    textAlign: "left",
-                    cursor: loading ? "not-allowed" : "text",
-                  }}
-                />
+          <div className="csla-body">
+            {fetchLoading ? (
+              <div className="csla-loading-container">
+                <Loader className="csla-loading-spinner" size={32} />
+                <p className="csla-loading-text">Loading employee count...</p>
               </div>
+            ) : (
+              <form className="csla-form" onSubmit={handleSubmit}>
+                {error && (
+                  <div className="csla-error-alert">
+                    <AlertCircle className="csla-error-icon" size={20} />
+                    <p className="csla-error-text">{error}</p>
+                  </div>
+                )}
 
-              {/* DEADLINE with same calendar icon as EditSLAModal */}
-              <div style={{ marginBottom: "1.5rem" }}>
-                <label
-                  style={{
-                    display: "block",
-                    marginBottom: "0.5rem",
-                    fontWeight: 600,
-                    color: "#374151",
-                    fontSize: "0.9rem",
-                    textAlign: "left",
-                  }}
-                >
-                  Deadline <span style={{ color: "#E01950" }}>*</span>
-                </label>
-
-                <div
-                  ref={calendarRef}
-                  style={{ position: "relative", width: "100%" }}
-                >
+                <div className="csla-field">
+                  <label className="csla-label">
+                    Review Type <span className="csla-required">*</span>
+                  </label>
                   <input
                     type="text"
-                    readOnly
-                    value={formatDisplayDate(formData.deadline)}
-                    onClick={() => {
-                      ensureCalendarMonthYear();
-                      setCalendarOpen((o) => !o);
-                    }}
+                    name="reviewType"
+                    value={formData.reviewType}
+                    onChange={handleChange}
+                    placeholder="E.g., Performance Form, Quarterly Review"
+                    required
                     disabled={loading}
-                    placeholder="Select date"
-                    style={{
-                      width: "100%",
-                      padding: "0.6rem 2.5rem 0.6rem 0.75rem",
-                      borderRadius: 8,
-                      border: "1px solid #d1d5db",
-                      fontSize: "0.95rem",
-                      boxSizing: "border-box",
-                      cursor: loading ? "not-allowed" : "pointer",
-                      backgroundColor: loading ? "#f3f4f6" : "white",
-                    }}
+                    className={`csla-input ${loading ? "csla-input--disabled" : ""}`}
                   />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      ensureCalendarMonthYear();
-                      setCalendarOpen((o) => !o);
-                    }}
-                    disabled={loading}
-                    style={{
-                      position: "absolute",
-                      top: "50%",
-                      right: 10,
-                      transform: "translateY(-50%)",
-                      border: "none",
-                      background: "transparent",
-                      cursor: loading ? "not-allowed" : "pointer",
-                      padding: 0,
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: 16,          // smaller width
-                         height: 16,         // smaller height
-                          borderRadius: 3,
-                            border: `1.6px solid ${PRIMARY}`, // slightly thinner border
-                             position: "relative",
-                      }}
-                    >
-                      {/* top bar */}
-                      <div
-                        style={{
-                          position: "absolute",
-                          top: -2,
-                          left: 0,
-                          right: 0,
-                          height: 4,
-                          backgroundColor: PRIMARY,
-                          borderRadius: "4px 4px 0 0",
-                        }}
-                      />
-                      {/* two pegs */}
-                      <div
-                        style={{
-                          position: "absolute",
-                          top: -4,
-                          left: 4,
-                          width: 2,
-                          height: 4,
-                          backgroundColor: PRIMARY,
-                          borderRadius: 2,
-                        }}
-                      />
-                      <div
-                        style={{
-                          position: "absolute",
-                          top: -4,
-                          right: 4,
-                          width: 2,
-                          height: 4,
-                          backgroundColor: PRIMARY,
-                          borderRadius: 2,
-                        }}
-                      />
-                    </div>
-                  </button>
-
-                  {calendarOpen && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: "100%",
-                        right: 0,
-                        marginTop: 4,
-                        backgroundColor: "white",
-                        borderRadius: 8,
-                        boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
-                        border: "1px solid #e5e7eb",
-                        zIndex: 9999,
-                        width: 260,
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          padding: "0.5rem 0.75rem",
-                          borderBottom: "1px solid #e5e7eb",
-                          backgroundColor: "#f9fafb",
-                        }}
-                      >
-                        <button
-                          type="button"
-                          onClick={goPrevMonth}
-                          style={{
-                            border: "none",
-                            background: "transparent",
-                            cursor: "pointer",
-                            padding: 4,
-                          }}
-                        >
-                          <ChevronLeft size={16} />
-                        </button>
-                        <span
-                          style={{
-                            fontWeight: 600,
-                            fontSize: "0.9rem",
-                            color: "#111827",
-                          }}
-                        >
-                          {monthNames[month]} {year}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={goNextMonth}
-                          style={{
-                            border: "none",
-                            background: "transparent",
-                            cursor: "pointer",
-                            padding: 4,
-                          }}
-                        >
-                          <ChevronRight size={16} />
-                        </button>
-                      </div>
-
-                      <div
-                        style={{
-                          display: "grid",
-                          gridTemplateColumns: "repeat(7, 1fr)",
-                          padding: "0.25rem 0.5rem",
-                          gap: 2,
-                          fontSize: "0.75rem",
-                          color: "#6b7280",
-                        }}
-                      >
-                        {weekdays.map((w) => (
-                          <div
-                            key={w}
-                            style={{
-                              textAlign: "center",
-                              padding: "0.25rem 0",
-                            }}
-                          >
-                            {w}
-                          </div>
-                        ))}
-                      </div>
-
-                      <div
-                        style={{
-                          display: "grid",
-                          gridTemplateColumns: "repeat(7, 1fr)",
-                          padding: "0.25rem 0.5rem 0.5rem",
-                          gap: 2,
-                        }}
-                      >
-                        {cells.map((c, idx) => {
-                          const cellDate = new Date(year, month, c.day);
-                          const isToday =
-                            c.current &&
-                            cellDate.getDate() === today.getDate() &&
-                            cellDate.getMonth() === today.getMonth() &&
-                            cellDate.getFullYear() === today.getFullYear();
-
-                          const isSelected =
-                            selectedDate &&
-                            c.current &&
-                            cellDate.getDate() === selectedDate.getDate() &&
-                            cellDate.getMonth() === selectedDate.getMonth() &&
-                            cellDate.getFullYear() === selectedDate.getFullYear();
-
-                          const baseStyle = {
-                            textAlign: "center",
-                            padding: "0.35rem 0",
-                            borderRadius: 6,
-                            cursor: c.current ? "pointer" : "default",
-                            fontSize: "0.8rem",
-                          };
-
-                          let bg = "transparent";
-                          let color = c.current ? "#111827" : "#d1d5db";
-
-                          if (isToday) {
-                            bg = "rgba(39,35,92,0.08)";
-                          }
-                          if (isSelected) {
-                            bg = PRIMARY;
-                            color = "#ffffff";
-                          }
-
-                          return (
-                            <div
-                              key={idx}
-                              style={{ ...baseStyle, backgroundColor: bg, color }}
-                              onClick={() =>
-                                handleSelectCalendarDay(c.day, c.current)
-                              }
-                            >
-                              {c.day}
-                            </div>
-                          );
-                        })}
-                      </div>
-
-                      <div
-                        style={{
-                          padding: "0.4rem 0.75rem 0.6rem",
-                          borderTop: "1px solid #e5e7eb",
-                          textAlign: "right",
-                        }}
-                      >
-                        <button
-                          type="button"
-                          onClick={goToday}
-                          style={{
-                            border: "none",
-                            background: "transparent",
-                            color: PRIMARY,
-                            fontSize: "0.8rem",
-                            fontWeight: 600,
-                            cursor: "pointer",
-                          }}
-                        >
-                          Today
-                        </button>
-                      </div>
-                    </div>
-                  )}
                 </div>
-              </div>
 
-              {/* REASON */}
-              <div style={{ marginBottom: "1.5rem" }}>
-                <label
-                  style={{
-                    display: "block",
-                    marginBottom: "0.5rem",
-                    fontWeight: 600,
-                    color: "#374151",
-                    fontSize: "0.9rem",
-                    textAlign: "left",
-                  }}
-                >
-                  Reason (Optional)
-                </label>
-                <input
-                  type="text"
-                  name="reason"
-                  value={formData.reason}
-                  onChange={handleChange}
-                  placeholder="Why assign this SLA?"
-                  disabled={loading}
-                  style={{
-                    width: "100%",
-                    padding: "0.65rem 0.75rem",
-                    borderRadius: "8px",
-                    border: "1px solid #d1d5db",
-                    fontSize: "0.95rem",
-                    fontFamily: "inherit",
-                    boxSizing: "border-box",
-                    backgroundColor: loading ? "#f3f4f6" : "white",
-                    textAlign: "left",
-                    cursor: loading ? "not-allowed" : "text",
-                  }}
-                />
-              </div>
+                <div className="csla-field">
+                  <label className="csla-label">
+                    Deadline <span className="csla-required">*</span>
+                  </label>
 
-              {/* EMPLOYEE COUNT */}
-              <div
-                style={{
-                  backgroundColor: "rgba(13, 110, 253, 0.1)",
-                  border: "1px solid rgba(13, 110, 253, 0.3)",
-                  borderRadius: "8px",
-                  padding: "1rem",
-                  textAlign: "center",
-                }}
-              >
-                <p
-                  style={{
-                    margin: 0,
-                    color: "#0F62FE",
-                    fontWeight: 600,
-                    fontSize: "1.25rem",
-                    lineHeight: 1.2,
-                    textAlign: "left",
-                  }}
-                >
-                  {employeeCount} Employees
-                </p>
-                <small style={{ color: "#6b7280", fontSize: "0.85rem" }}>
-                  SLA will be displayed to all employees
-                </small>
-              </div>
-            </form>
-          )}
-        </div>
+                  <div ref={calendarRef} className="csla-calendar-container">
+                    <input
+                      type="text"
+                      readOnly
+                      value={formatDisplayDate(formData.deadline)}
+                      onClick={() => {
+                        ensureCalendarMonthYear();
+                        setCalendarOpen((o) => !o);
+                      }}
+                      disabled={loading}
+                      placeholder="Select date"
+                      className={`csla-input csla-deadline-input ${loading ? "csla-input--disabled" : ""}`}
+                    />
+                    <button
+                      type="button"
+                      className={`csla-calendar-trigger ${loading ? "csla-calendar-trigger--disabled" : ""}`}
+                      onClick={() => {
+                        ensureCalendarMonthYear();
+                        setCalendarOpen((o) => !o);
+                      }}
+                      disabled={loading}
+                    >
+                      <div className="csla-calendar-icon">
+                        <div className="csla-calendar-icon__top" />
+                        <div className="csla-calendar-icon__peg csla-calendar-icon__peg--left" />
+                        <div className="csla-calendar-icon__peg csla-calendar-icon__peg--right" />
+                      </div>
+                    </button>
 
-        {/* FOOTER */}
-        <div
-          style={{
-            display: "flex",
-            gap: "0.75rem",
-            padding: "1rem 1.5rem",
-            borderTop: "1px solid #e5e7eb",
-            backgroundColor: "white",
-            justifyContent: "flex-end",
-          }}
-        >
-          <button
-            onClick={onClose}
-            disabled={loading}
-            style={{
-              padding: "0.6rem 1.25rem",
-              border: "none",
-              backgroundColor: "#6b7280",
-              color: "white",
-              borderRadius: "8px",
-              cursor: loading ? "not-allowed" : "pointer",
-              fontSize: "0.95rem",
-              fontWeight: 600,
-              opacity: loading ? 0.5 : 1,
-              transition: "all 0.2s ease",
-            }}
-            onMouseEnter={(e) => {
-              if (!loading) {
-                e.currentTarget.style.backgroundColor = "#4b5563";
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "#6b7280";
-            }}
-          >
-            Cancel
-          </button>
+                    {calendarOpen && (
+                      <div className="csla-calendar-dropdown">
+                        <div className="csla-calendar-header">
+                          <button type="button" className="csla-calendar-nav-btn" onClick={goPrevMonth}>
+                            <ChevronLeft size={16} />
+                          </button>
+                          <span className="csla-calendar-title">
+                            {monthNames[month]} {year}
+                          </span>
+                          <button type="button" className="csla-calendar-nav-btn" onClick={goNextMonth}>
+                            <ChevronRight size={16} />
+                          </button>
+                        </div>
 
-          <button
-            onClick={handleSubmit}
-            disabled={loading || fetchLoading || employeeCount === 0}
-            style={{
-              padding: "0.6rem 1.5rem",
-              background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              cursor:
-                loading || fetchLoading || employeeCount === 0
-                  ? "not-allowed"
-                  : "pointer",
-              fontSize: "0.95rem",
-              fontWeight: 600,
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              opacity:
-                loading || fetchLoading || employeeCount === 0 ? 0.6 : 1,
-              boxShadow: "0 4px 12px rgba(151, 36, 126, 0.3)",
-              transition: "all 0.2s ease",
-            }}
-            onMouseEnter={(e) => {
-              if (!(loading || fetchLoading || employeeCount === 0)) {
-                e.currentTarget.style.transform = "translateY(-2px)";
-                e.currentTarget.style.boxShadow =
-                  "0 6px 16px rgba(151, 36, 126, 0.4)";
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow =
-                "0 4px 12px rgba(151, 36, 126, 0.3)";
-            }}
-          >
-            {loading ? (
-              <>
-                <span
-                  style={{
-                    display: "inline-block",
-                    width: "14px",
-                    height: "14px",
-                    border: "2px solid rgba(255,255,255,0.3)",
-                    borderTopColor: "white",
-                    borderRadius: "50%",
-                    animation: "spin 0.8s linear infinite",
-                  }}
-                />
-                Creating...
-              </>
-            ) : (
-              <>
-                <Plus size={18} />
-                Create SLA
-              </>
+                        <div className="csla-calendar-weekdays">
+                          {weekdays.map((w) => (
+                            <div key={w} className="csla-weekday">{w}</div>
+                          ))}
+                        </div>
+
+                        <div className="csla-calendar-grid">
+                          {cells.map((c, idx) => {
+                            const cellDate = new Date(year, month, c.day);
+                            const isToday =
+                              c.current &&
+                              cellDate.getDate() === today.getDate() &&
+                              cellDate.getMonth() === today.getMonth() &&
+                              cellDate.getFullYear() === today.getFullYear();
+
+                            const isSelected =
+                              selectedDate &&
+                              c.current &&
+                              cellDate.getDate() === selectedDate.getDate() &&
+                              cellDate.getMonth() === selectedDate.getMonth() &&
+                              cellDate.getFullYear() === selectedDate.getFullYear();
+
+                            return (
+                              <div
+                                key={idx}
+                                className={`csla-calendar-day 
+                                  ${c.current ? "csla-calendar-day--current" : ""} 
+                                  ${isToday ? "csla-calendar-day--today" : ""} 
+                                  ${isSelected ? "csla-calendar-day--selected" : ""}`}
+                                onClick={() => handleSelectCalendarDay(c.day, c.current)}
+                              >
+                                {c.day}
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        <div className="csla-calendar-footer">
+                          <button type="button" className="csla-today-btn" onClick={goToday}>
+                            Today
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="csla-field">
+                  <label className="csla-label">Reason (Optional)</label>
+                  <input
+                    type="text"
+                    name="reason"
+                    value={formData.reason}
+                    onChange={handleChange}
+                    placeholder="Why assign this SLA?"
+                    disabled={loading}
+                    className={`csla-input ${loading ? "csla-input--disabled" : ""}`}
+                  />
+                </div>
+
+                <div className="csla-employee-info">
+                  <p className="csla-employee-count">{employeeCount} Employees</p>
+                  <small className="csla-employee-note">SLA will be displayed to all employees</small>
+                </div>
+              </form>
             )}
-          </button>
+          </div>
+
+          <div className="csla-footer">
+            <button
+              className={`csla-btn csla-btn--cancel ${loading ? "csla-btn--disabled" : ""}`}
+              onClick={onClose}
+              disabled={loading}
+            >
+              Cancel
+            </button>
+
+            <button
+              className={`csla-btn csla-btn--create ${
+                loading || fetchLoading || employeeCount === 0 ? "csla-btn--disabled" : ""
+              }`}
+              onClick={handleSubmit}
+              disabled={loading || fetchLoading || employeeCount === 0}
+            >
+              {loading ? (
+                <>
+                  <span className="csla-btn-spinner" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <Plus size={18} />
+                  Create SLA
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
-
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
-    </div>
+    </>
   );
 };
 

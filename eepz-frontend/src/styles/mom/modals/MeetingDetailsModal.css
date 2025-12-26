@@ -1,0 +1,151 @@
+.mdm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.mdm-dialog {
+  margin: 0;
+  width: 100%;
+  max-width: 960px;
+  max-height: 100vh;
+  display: flex;
+}
+
+
+.mdm-content {
+  border-radius: 24px;
+  overflow: hidden;
+  max-width: 800px;
+  align-self: center;
+  width: 100%;
+  background-color: #ffffff;
+  margin-left: 100px;
+}
+
+
+.mdm-header {
+  background-color: #3c3668;
+  padding: 1.5rem;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mdm-header-text {
+  text-align: left;
+}
+
+.mdm-title {
+  color: #ffffff;
+  font-size: 1.25rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.mdm-type-badge {
+  font-size: 0.85rem;
+}
+
+/* body */
+.mdm-body {
+  padding: 2rem;
+  text-align: left;
+  max-height: calc(90vh - 180px);
+  overflow-y: auto;
+}
+
+/* info cards */
+.mdm-info-card {
+  background-color: #f8f9fa;
+  text-align: left;
+}
+
+/* meeting link */
+.mdm-link-card {
+  background-color: #e3f2fd;
+  border: 1px solid #bbdefb;
+  text-align: left;
+}
+
+.mdm-link {
+  text-align: left;
+}
+
+/* comments */
+.mdm-section-title {
+  text-align: left;
+}
+
+.mdm-comments-card {
+  background-color: #f8f9fa;
+  border-left: 4px solid #17a2b8;
+  text-align: left;
+}
+
+/* discussion points */
+.mdm-discussion-card {
+  background-color: #f8f9fa;
+  text-align: left;
+}
+
+/* action items */
+.mdm-action-card {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  text-align: left;
+}
+
+.mdm-action-meta {
+  text-align: left;
+}
+
+/* create MOM button */
+.mdm-create-mom-btn {
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  text-align: center;
+}
+
+/* footer */
+.mdm-footer {
+  padding: 1rem 2rem;
+  background-color: #f8f9fa;
+}
+
+.mdm-close-btn {
+  border-radius: 8px;
+  padding: 0.5rem 1.5rem;
+}
+
+/* responsiveness */
+@media (max-width: 768px) {
+  .mdm-body {
+    padding: 1.25rem;
+  }
+
+  .mdm-footer {
+    padding-inline: 1.25rem;
+  }
+
+  .mdm-content {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .mdm-overlay {
+    padding: 10px;
+  }
+
+  .mdm-header {
+    padding: 1.25rem;
+  }
+}

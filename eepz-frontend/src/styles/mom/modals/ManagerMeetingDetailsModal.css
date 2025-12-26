@@ -1,0 +1,270 @@
+.mmdm-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.mmdm-modal {
+  background-color: #ffffff;
+  border-radius: 24px;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mmdm-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  position: relative;
+  background-color: #27235c;
+  color: #ffffff;
+}
+
+.mmdm-title {
+  margin: 0 0 0.5rem 0;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: #ffffff;
+}
+
+.mmdm-subtitle {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mmdm-close-icon {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #e5e7eb;
+  padding: 0;
+  line-height: 1;
+}
+
+/* body */
+.mmdm-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.mmdm-stats-card {
+  background-color: #f9fafb;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.mmdm-stats-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.mmdm-stat {
+  flex: 1;
+}
+
+.mmdm-stat-label {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.mmdm-stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.mmdm-stat-accepted {
+  color: #10b981;
+}
+
+.mmdm-stat-total {
+  color: #3b82f6;
+}
+
+.mmdm-progress-bar {
+  height: 8px;
+  background-color: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.mmdm-progress-fill {
+  height: 100%;
+  background-color: #10b981;
+  width: 0;
+  transition: width 0.3s ease;
+}
+
+/* meeting link */
+.mmdm-meeting-link-wrapper {
+  margin-bottom: 1.5rem;
+}
+
+.mmdm-meeting-link-card {
+  background-color: #e3f2fd;
+  border: 1px solid #bbdefb;
+  padding: 1rem;
+  border-radius: 12px;
+}
+
+.mmdm-meeting-link-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.mmdm-meeting-link-icon {
+  color: #3b82f6;
+}
+
+.mmdm-meeting-link-label {
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.mmdm-meeting-link {
+  color: #3b82f6;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+}
+
+.mmdm-meeting-link-external {
+  font-size: 0.875rem;
+}
+
+
+.mmdm-participants-title {
+  font-weight: 600;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mmdm-participants-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mmdm-participants-icon {
+  color: #3b82f6;
+}
+
+.mmdm-participants-count {
+  background-color: #f3f4f6;
+  color: #1f2937;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.mmdm-no-participants {
+  background-color: #dbeafe;
+  color: #1e40af;
+  padding: 0.75rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mmdm-participants-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mmdm-participant-card {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 0.75rem;
+  border-radius: 12px;
+}
+
+.mmdm-participant-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.mmdm-participant-main {
+  flex: 1;
+}
+
+.mmdm-participant-name {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.mmdm-participant-comment {
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.mmdm-footer {
+  background-color: #f9fafb;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.mmdm-close-btn {
+  background-color: #6b7280;
+  color: #ffffff;
+  border: none;
+  padding: 0.6rem 1.7rem;
+  border-radius: 9999px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.mmdm-close-btn:hover {
+  background-color: #4b5563;
+}
+
+@media (max-width: 640px) {
+  .mmdm-modal {
+    max-width: 100%;
+  }
+
+  .mmdm-header,
+  .mmdm-body,
+  .mmdm-footer {
+    padding-inline: 1rem;
+  }
+
+  .mmdm-stats-row {
+    flex-direction: column;
+  }
+}

@@ -9,28 +9,33 @@ const Breadcrumb = ({ items, dynamicLabels = {} }) => {
 
   // Helper function to resolve dynamic labels
   const resolveDynamicLabel = (item) => {
-    // If item has a dynamic key (e.g., ":slaid"), look it up in params
     if (item.param && params[item.param]) {
-      // If dynamicLabels object has a fetched name, use it
       if (dynamicLabels[item.param]) {
         return dynamicLabels[item.param];
       }
-      // Otherwise, show the param value
       return `SLA #${params[item.param]}`;
     }
     return item.label;
   };
 
   return (
-    <nav aria-label="breadcrumb" className="mb-3">
+    <nav
+      aria-label="breadcrumb"
+      className="mb-3"
+      style={{ "--bs-breadcrumb-divider": "''" }}
+    >
       <ol
-        className="breadcrumb mb-0 p-3 rounded"
+        className="breadcrumb mb-0 p-0"
         style={{
-          backgroundColor: "rgba(255, 255, 255, 0.05)",
+          backgroundColor: "transparent",
           fontSize: "0.875rem",
+          display: "flex",
+          alignItems: "center",
+          gap: "0.5rem",
         }}
       >
-        <li className="breadcrumb-item">
+        {/* Home + slash */}
+        <li className="breadcrumb-item d-flex align-items-center gap-1">
           <a
             href="#"
             onClick={(e) => {
@@ -43,12 +48,15 @@ const Breadcrumb = ({ items, dynamicLabels = {} }) => {
               display: "flex",
               alignItems: "center",
               gap: "0.25rem",
+              fontWeight: 600,
             }}
           >
             <Home size={14} />
             Dashboard
           </a>
+          <span style={{ color: "var(--color-accent-1)" }}>/</span>
         </li>
+
         {items.map((item, index) => {
           const resolvedLabel = resolveDynamicLabel(item);
           const isLast = index === items.length - 1;
@@ -56,12 +64,17 @@ const Breadcrumb = ({ items, dynamicLabels = {} }) => {
           return (
             <li
               key={index}
-              className={`breadcrumb-item ${isLast ? "active" : ""}`}
+              className={`breadcrumb-item d-flex align-items-center gap-1 ${
+                isLast ? "active" : ""
+              }`}
               aria-current={isLast ? "page" : undefined}
             >
               {isLast ? (
                 <span
-                  style={{ color: "var(--color-accent-1)", fontWeight: 600 }}
+                  style={{
+                    color: "var(--color-accent-1)",
+                    fontWeight: 600,
+                  }}
                 >
                   {resolvedLabel}
                 </span>
@@ -79,6 +92,11 @@ const Breadcrumb = ({ items, dynamicLabels = {} }) => {
                 >
                   {resolvedLabel}
                 </a>
+              )}
+
+              {/* cross line (slash) after all except last */}
+              {!isLast && (
+                <span style={{ color: "var(--color-accent-1)" }}>/</span>
               )}
             </li>
           );

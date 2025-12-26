@@ -1,0 +1,513 @@
+.esla-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+}
+
+.esla-modal {
+  background-color: #ffffff;
+  border-radius: 18px;
+  width: 90%;
+  max-width: 520px;
+  box-shadow: 0 22px 60px rgba(15, 23, 42, 0.45);
+  overflow: hidden;
+}
+
+.esla-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.35rem 1.75rem;
+  background-color: #27235C;
+  border-radius: 18px 18px 0 0;
+}
+
+.esla-title {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: white;
+}
+
+.esla-close-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 8px;
+  color: white;
+  transition: opacity 0.2s ease;
+}
+
+.esla-close-btn:hover {
+  opacity: 0.8;
+}
+
+.esla-close-btn--disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.esla-body {
+  padding: 1.75rem;
+  background-color: #f5f7fb;
+}
+
+.esla-error-alert {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background-color: rgba(224, 25, 80, 0.1);
+  border: 1px solid rgba(224, 25, 80, 0.3);
+  border-radius: 12px;
+  margin-bottom: 24px;
+  align-items: flex-start;
+}
+
+.esla-error-icon {
+  color: #E01950;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.esla-error-text {
+  margin: 0;
+  color: #991b1b;
+  font-size: 0.95rem;
+  text-align: left;
+}
+
+.esla-form {
+  width: 100%;
+}
+
+.esla-sla-info {
+  background-color: #ffffff;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 24px;
+}
+
+.esla-sla-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #6b7280;
+  text-align: left;
+}
+
+.esla-sla-type {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.94rem;
+  color: #374151;
+  text-align: left;
+}
+
+.esla-sla-employee {
+  display: block;
+  font-size: 0.8rem;
+  color: #6b7280;
+  text-align: left;
+}
+
+.esla-field {
+  margin-bottom: 24px;
+}
+
+.esla-reason-field {
+  margin-bottom: 16px;
+}
+
+.esla-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.esla-required {
+  color: #E01950;
+}
+
+.esla-calendar-container {
+  position: relative;
+  width: 100%;
+}
+
+.esla-input {
+  width: 100%;
+  padding: 0.8rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid #e2e4f0;
+  font-size: 0.95rem;
+  font-family: inherit;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  line-height: 1.6;
+  resize: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.02);
+}
+
+.esla-textarea {
+  width: 100%;
+  padding: 0.8rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid #e2e4f0;
+  font-size: 0.95rem;
+  font-family: inherit;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  line-height: 1.6;
+  resize: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.02);
+}
+
+.esla-input:focus,
+.esla-textarea:focus {
+  outline: none;
+  border-color: #97247E;
+  box-shadow: 0 0 0 1px rgba(151, 36, 126, 0.18);
+}
+
+.esla-input--disabled,
+.esla-textarea--disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.esla-deadline-input {
+  padding-right: 2.7rem;
+  cursor: pointer;
+}
+
+.esla-calendar-trigger {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  color: #27235C;
+}
+
+.esla-calendar-trigger--disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.esla-calendar-svg {
+  display: block;
+}
+
+.esla-calendar-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+  border: 1px solid #e5e7eb;
+  z-index: 9999;
+  width: 260px;
+}
+
+.esla-calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+  border-radius: 12px 12px 0 0;
+}
+
+.esla-calendar-nav-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.esla-calendar-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #111827;
+}
+
+.esla-calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 0.25rem 0.5rem;
+  gap: 2px;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.esla-weekday {
+  text-align: center;
+  padding: 0.25rem 0;
+}
+
+.esla-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 0.25rem 0.5rem 0.5rem;
+  gap: 2px;
+}
+
+.esla-calendar-day {
+  text-align: center;
+  padding: 0.35rem 0;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  cursor: default;
+  color: #d1d5db;
+}
+
+.esla-calendar-day--current {
+  cursor: pointer;
+  color: #111827;
+}
+
+.esla-calendar-day--current:hover {
+  background-color: rgba(39, 35, 92, 0.06);
+}
+
+.esla-calendar-day--today {
+  background-color: rgba(39, 35, 92, 0.08);
+}
+
+.esla-calendar-day--selected {
+  background-color: #27235C;
+  color: #ffffff;
+}
+
+.esla-calendar-footer {
+  padding: 0.4rem 0.75rem 0.6rem;
+  border-top: 1px solid #e5e7eb;
+  text-align: right;
+  border-radius: 0 0 12px 12px;
+}
+
+.esla-today-btn {
+  border: none;
+  background: transparent;
+  color: #27235C;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.esla-status-container {
+  position: relative;
+  width: 100%;
+}
+
+.esla-status-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.8rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid #e2e4f0;
+  background-color: #ffffff;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.02);
+}
+
+.esla-status-trigger:hover:not(.esla-status-trigger--disabled) {
+  border-color: #97247E;
+  box-shadow: 0 0 0 1px rgba(151, 36, 126, 0.18);
+}
+
+.esla-status-trigger--disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.esla-status-value {
+  opacity: 1;
+}
+
+.esla-status-value--placeholder {
+  opacity: 0.6;
+}
+
+.esla-chevron {
+  transition: transform 0.15s ease;
+}
+
+.esla-chevron--open {
+  transform: rotate(180deg);
+}
+
+.esla-status-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 0;
+  background-color: #ffffff;
+  border-radius: 0 0 12px 12px;
+  border: 1px solid #d1d5db;
+  border-top: none;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  z-index: 9999;
+}
+
+.esla-status-option {
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  text-align: left;
+  border: none;
+  background-color: white;
+  color: #374151;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.esla-status-option:hover:not(.esla-status-option--selected) {
+  background-color: #27235C;
+  color: white;
+}
+
+.esla-status-option--selected {
+  background-color: #27235C;
+  color: white;
+}
+
+.esla-char-count {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: #6b7280;
+  text-align: left;
+}
+
+.esla-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 1rem 1.75rem 1.25rem;
+  border-top: 1px solid #e5e7eb;
+  background-color: #ffffff;
+}
+
+.esla-btn {
+  padding: 0.7rem 1.5rem;
+  border-radius: 999px;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.esla-btn--cancel {
+  background-color: #6b7280;
+  color: white;
+}
+
+.esla-btn--cancel:hover:not(.esla-btn--disabled) {
+  background-color: #4b5563;
+}
+
+.esla-btn--update {
+  padding: 0.7rem 1.7rem;
+  background: linear-gradient(90deg, #97247E 0%, #E01950 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(151, 36, 126, 0.35);
+}
+
+.esla-btn--update:hover:not(.esla-btn--disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(151, 36, 126, 0.45);
+}
+
+.esla-btn--disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.esla-btn--disabled:hover {
+  transform: none;
+}
+
+.esla-btn-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: esla-spin 0.8s linear infinite;
+}
+
+@keyframes esla-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 576px) {
+  .esla-modal {
+    width: 95%;
+    max-width: 520px;
+    border-radius: 18px;
+  }
+
+  .esla-header,
+  .esla-footer {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  .esla-body {
+    padding: 1.35rem;
+  }
+
+  .esla-footer {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .esla-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .esla-calendar-dropdown {
+    width: 280px;
+    right: -10px;
+  }
+}
+
+@media (max-width: 400px) {
+  .esla-calendar-dropdown {
+    width: 100%;
+    max-width: 300px;
+    left: 0;
+    right: 0;
+  }
+}

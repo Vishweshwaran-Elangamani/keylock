@@ -841,6 +841,7 @@ const ProjectList = () => {
               <Home size={14} />
               <span>Dashboard</span>
             </button>
+            /
           </li>
           <li className="breadcrumb-item active" aria-current="page">
             <span className="prj-list-breadcrumb-active">

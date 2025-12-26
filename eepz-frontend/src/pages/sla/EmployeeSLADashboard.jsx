@@ -18,8 +18,7 @@ import slaService, {
   dateHelpers,
 } from "../../services/sla/slaService";
 import Breadcrumb from "../../components/sla/common/Breadcrumbs";
-import "../../styles/sla/EmployeeSLADashboard.css";
-import "../../styles/sla/HRSLADashboard.css";
+import "../../styles/sla/components/EmployeeSLADashboard.css";
 
 const EmployeeSLADashboard = () => {
   const navigate = useNavigate();
@@ -30,8 +29,8 @@ const EmployeeSLADashboard = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
 
-  const [activeTab, setActiveTab] = useState("all"); // all | open | inprogress | completed | overdue
-  const [viewMode, setViewMode] = useState("table"); // table | cards
+  const [activeTab, setActiveTab] = useState("all");
+  const [viewMode, setViewMode] = useState("table");
   const [user, setUser] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -227,8 +226,8 @@ const EmployeeSLADashboard = () => {
   if (loading) {
     return (
       <div className="emp-sla-loading">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+        <div className="emp-sla-spinner-border" role="status">
+          <span className="emp-sla-sr-only">Loading...</span>
         </div>
         <p className="emp-sla-loading-text">Loading SLAs...</p>
       </div>
@@ -260,14 +259,10 @@ const EmployeeSLADashboard = () => {
         </div>
       )}
 
-      {/* Metrics */}
       <div className="emp-sla-metric-row">
         <div className="emp-sla-metric-card">
-          <div
-            className="emp-sla-metric-icon"
-            style={{ background: "#E4F0FF" }}
-          >
-            <FileText size={26} color="#2F64FF" />
+          <div className="emp-sla-metric-icon emp-sla-metric-icon-total">
+            <FileText size={26} />
           </div>
           <div className="emp-sla-metric-content">
             <div className="emp-sla-metric-value">{stats.total}</div>
@@ -276,11 +271,8 @@ const EmployeeSLADashboard = () => {
         </div>
 
         <div className="emp-sla-metric-card">
-          <div
-            className="emp-sla-metric-icon"
-            style={{ background: "#E9E6FF" }}
-          >
-            <Clock size={26} color="#4C3FD8" />
+          <div className="emp-sla-metric-icon emp-sla-metric-icon-open">
+            <Clock size={26} />
           </div>
           <div className="emp-sla-metric-content">
             <div className="emp-sla-metric-value">{stats.open}</div>
@@ -289,11 +281,8 @@ const EmployeeSLADashboard = () => {
         </div>
 
         <div className="emp-sla-metric-card">
-          <div
-            className="emp-sla-metric-icon"
-            style={{ background: "#E3F9EF" }}
-          >
-            <CheckCircle size={26} color="#10B981" />
+          <div className="emp-sla-metric-icon emp-sla-metric-icon-closed">
+            <CheckCircle size={26} />
           </div>
           <div className="emp-sla-metric-content">
             <div className="emp-sla-metric-value">{stats.completed}</div>
@@ -302,11 +291,8 @@ const EmployeeSLADashboard = () => {
         </div>
 
         <div className="emp-sla-metric-card">
-          <div
-            className="emp-sla-metric-icon"
-            style={{ background: "#E4FFF1" }}
-          >
-            <TrendingUp size={26} color="#059669" />
+          <div className="emp-sla-metric-icon emp-sla-metric-icon-ontime">
+            <TrendingUp size={26} />
           </div>
           <div className="emp-sla-metric-content">
             <div className="emp-sla-metric-value">{stats.onTime}</div>
@@ -331,7 +317,6 @@ const EmployeeSLADashboard = () => {
         </div>
       )}
 
-      {/* Tabs + view toggle as one strip */}
       <div className="emp-sla-header-row">
         <div className="emp-sla-tabs-strip">
           <div className="emp-sla-tabs-container">
@@ -386,7 +371,6 @@ const EmployeeSLADashboard = () => {
         </button>
       </div>
 
-      {/* Content */}
       <div className="emp-sla-content">
         {filteredSLAs.length === 0 ? (
           <div className="emp-sla-empty">
@@ -399,10 +383,10 @@ const EmployeeSLADashboard = () => {
             </p>
           </div>
         ) : viewMode === "table" ? (
-          <div className="hr-sla-table-container">
-            <div className="table-responsive">
-              <table className="table table-hover mb-0 emp-sla-table">
-                <thead className="hr-sla-table-header">
+          <div className="emp-sla-table-container">
+            <div className="emp-sla-table-responsive">
+              <table className="emp-sla-table">
+                <thead className="emp-sla-table-header">
                   <tr>
                     <th>TYPE</th>
                     <th>STATUS</th>
@@ -420,7 +404,7 @@ const EmployeeSLADashboard = () => {
                     const Icon = statusStyle.icon;
 
                     return (
-                      <tr key={sla.key} className="hr-sla-clickable-row">
+                      <tr key={sla.key} className="emp-sla-clickable-row">
                         <td>
                           <div className="emp-sla-table-type">
                             <div className={statusStyle.className}>
@@ -491,11 +475,11 @@ const EmployeeSLADashboard = () => {
             </div>
 
             {safeTotal > 0 && (
-              <div className="hr-sla-pagination-footer">
-                <div className="hr-sla-pagination-left">
-                  <span className="hr-sla-pagination-text">Show</span>
+              <div className="emp-sla-pagination-footer">
+                <div className="emp-sla-pagination-left">
+                  <span className="emp-sla-pagination-text">Show</span>
                   <select
-                    className="hr-sla-pagination-dropdown"
+                    className="emp-sla-pagination-dropdown"
                     value={itemsPerPage}
                     onChange={(e) => {
                       setItemsPerPage(Number(e.target.value));
@@ -506,24 +490,24 @@ const EmployeeSLADashboard = () => {
                     <option value={10}>10</option>
                     <option value={25}>25</option>
                   </select>
-                  <span className="hr-sla-pagination-text">entries</span>
+                  <span className="emp-sla-pagination-text">entries</span>
                 </div>
 
-                <div className="hr-sla-pagination-center">
-                  <span className="hr-sla-pagination-status">
+                <div className="emp-sla-pagination-center">
+                  <span className="emp-sla-pagination-status">
                     Showing {startIndex} to {endIndex} of {safeTotal} entries
                   </span>
                 </div>
 
-                <div className="hr-sla-pagination-right">
-                  <ul className="hr-sla-pagination-list">
+                <div className="emp-sla-pagination-right">
+                  <ul className="emp-sla-pagination-list">
                     <li
-                      className={`hr-sla-page-item ${
+                      className={`emp-sla-page-item ${
                         currentPage === 1 ? "disabled" : ""
                       }`}
                     >
                       <button
-                        className="hr-sla-page-link"
+                        className="emp-sla-page-link"
                         onClick={() => goToPage(currentPage - 1)}
                         disabled={currentPage === 1}
                       >
@@ -535,19 +519,19 @@ const EmployeeSLADashboard = () => {
                       page === "..." ? (
                         <li
                           key={`ellipsis-${idx}`}
-                          className="hr-sla-page-item disabled"
+                          className="emp-sla-page-item disabled"
                         >
-                          <span className="hr-sla-page-link">…</span>
+                          <span className="emp-sla-page-link">…</span>
                         </li>
                       ) : (
                         <li
                           key={page}
-                          className={`hr-sla-page-item ${
+                          className={`emp-sla-page-item ${
                             currentPage === page ? "active" : ""
                           }`}
                         >
                           <button
-                            className="hr-sla-page-link"
+                            className="emp-sla-page-link"
                             onClick={() => goToPage(page)}
                           >
                             {page}
@@ -557,12 +541,12 @@ const EmployeeSLADashboard = () => {
                     )}
 
                     <li
-                      className={`hr-sla-page-item ${
+                      className={`emp-sla-page-item ${
                         currentPage === totalPages ? "disabled" : ""
                       }`}
                     >
                       <button
-                        className="hr-sla-page-link"
+                        className="emp-sla-page-link"
                         onClick={() => goToPage(currentPage + 1)}
                         disabled={currentPage === totalPages}
                       >
@@ -608,7 +592,6 @@ const EmployeeSLADashboard = () => {
                         {dateHelpers.formatDeadline(sla.deadline)}
                       </span>
                     </div>
-
                     <div className="emp-sla-card-row">
                       <span className="emp-sla-card-label">
                         Days Remaining

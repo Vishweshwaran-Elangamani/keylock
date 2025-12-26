@@ -14,6 +14,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "../../styles/mom/components/RSVPSummary.css";
 
 const RSVPSummary = () => {
   const { meetingId } = useParams();
@@ -98,14 +99,10 @@ const RSVPSummary = () => {
 
   if (loading) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "300px" }}
-      >
+      <div className="rsvp-sum-loading">
         <div
-          className="spinner-border text-primary"
+          className="spinner-border text-primary rsvp-sum-spinner"
           role="status"
-          style={{ width: "3rem", height: "3rem" }}
         >
           <span className="visually-hidden">Loading...</span>
         </div>
@@ -115,7 +112,7 @@ const RSVPSummary = () => {
 
   if (error) {
     return (
-      <div className="container-fluid px-4 py-4">
+      <div className="container-fluid rsvp-sum-page">
         <div className="row justify-content-center">
           <div className="col-lg-8">
             <div className="alert alert-danger d-flex align-items-center gap-2">
@@ -137,7 +134,7 @@ const RSVPSummary = () => {
 
   if (!summary) {
     return (
-      <div className="container-fluid px-4 py-4">
+      <div className="container-fluid rsvp-sum-page">
         <div className="row justify-content-center">
           <div className="col-lg-8">
             <div className="alert alert-warning d-flex align-items-center gap-2">
@@ -174,33 +171,20 @@ const RSVPSummary = () => {
       : 0;
 
   return (
-    <div
-      className="container-fluid px-4 py-4"
-      style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}
-    >
+    <div className="container-fluid rsvp-sum-page">
       <div className="row justify-content-center">
         <div className="col-12 col-xl-11">
-          {/* Header */}
-          <div className="d-flex align-items-center gap-3 mb-4 flex-wrap">
+          <div className="rsvp-sum-header d-flex align-items-center gap-3 flex-wrap">
             <button
-              className="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+              className="btn btn-light rsvp-sum-back-btn d-flex align-items-center justify-content-center"
               onClick={() => navigate(-1)}
-              style={{ width: "40px", height: "40px", flexShrink: 0 }}
             >
               <ArrowLeft size={20} />
             </button>
             <div className="flex-grow-1">
-              <h2
-                className="fw-bold mb-1"
-                style={{ color: "#1e293b", fontSize: "1.75rem" }}
-              >
-                RSVP Summary
-              </h2>
+              <h2 className="fw-bold mb-1 rsvp-sum-title">RSVP Summary</h2>
               {meetingTitle && (
-                <p
-                  className="text-muted mb-0 d-flex align-items-center gap-2"
-                  style={{ fontSize: "0.95rem" }}
-                >
+                <p className="text-muted mb-0 d-flex align-items-center gap-2 rsvp-sum-subtitle">
                   <Calendar size={16} />
                   {meetingTitle}
                 </p>
@@ -208,16 +192,12 @@ const RSVPSummary = () => {
             </div>
           </div>
 
-          {/* Statistics Cards */}
           <div className="row g-3 mb-4">
             <div className="col-xl-2 col-lg-4 col-md-4 col-6">
-              <div className="card border-0 shadow-sm h-100">
+              <div className="card border-0 shadow-sm h-100 rsvp-sum-stat-card">
                 <div className="card-body text-center p-3">
                   <Users size={28} className="text-primary mb-2" />
-                  <div
-                    className="fw-bold fs-4 mb-1"
-                    style={{ color: "#1e293b" }}
-                  >
+                  <div className="fw-bold fs-4 mb-1 rsvp-sum-stat-number">
                     {totalInvitations}
                   </div>
                   <small className="text-muted">Total Invited</small>
@@ -226,13 +206,10 @@ const RSVPSummary = () => {
             </div>
 
             <div className="col-xl-2 col-lg-4 col-md-4 col-6">
-              <div className="card border-0 shadow-sm h-100">
+              <div className="card border-0 shadow-sm h-100 rsvp-sum-stat-card">
                 <div className="card-body text-center p-3">
                   <CheckCircle size={28} className="text-success mb-2" />
-                  <div
-                    className="fw-bold fs-4 mb-1"
-                    style={{ color: "#1e293b" }}
-                  >
+                  <div className="fw-bold fs-4 mb-1 rsvp-sum-stat-number">
                     {acceptedCount}
                   </div>
                   <small className="text-muted">Accepted</small>
@@ -241,13 +218,10 @@ const RSVPSummary = () => {
             </div>
 
             <div className="col-xl-2 col-lg-4 col-md-4 col-6">
-              <div className="card border-0 shadow-sm h-100">
+              <div className="card border-0 shadow-sm h-100 rsvp-sum-stat-card">
                 <div className="card-body text-center p-3">
                   <XCircle size={28} className="text-danger mb-2" />
-                  <div
-                    className="fw-bold fs-4 mb-1"
-                    style={{ color: "#1e293b" }}
-                  >
+                  <div className="fw-bold fs-4 mb-1 rsvp-sum-stat-number">
                     {declinedCount}
                   </div>
                   <small className="text-muted">Declined</small>
@@ -256,13 +230,10 @@ const RSVPSummary = () => {
             </div>
 
             <div className="col-xl-2 col-lg-4 col-md-4 col-6">
-              <div className="card border-0 shadow-sm h-100">
+              <div className="card border-0 shadow-sm h-100 rsvp-sum-stat-card">
                 <div className="card-body text-center p-3">
                   <AlertCircle size={28} className="text-info mb-2" />
-                  <div
-                    className="fw-bold fs-4 mb-1"
-                    style={{ color: "#1e293b" }}
-                  >
+                  <div className="fw-bold fs-4 mb-1 rsvp-sum-stat-number">
                     {tentativeCount}
                   </div>
                   <small className="text-muted">Tentative</small>
@@ -271,13 +242,10 @@ const RSVPSummary = () => {
             </div>
 
             <div className="col-xl-2 col-lg-4 col-md-4 col-6">
-              <div className="card border-0 shadow-sm h-100">
+              <div className="card border-0 shadow-sm h-100 rsvp-sum-stat-card">
                 <div className="card-body text-center p-3">
                   <Clock size={28} className="text-secondary mb-2" />
-                  <div
-                    className="fw-bold fs-4 mb-1"
-                    style={{ color: "#1e293b" }}
-                  >
+                  <div className="fw-bold fs-4 mb-1 rsvp-sum-stat-number">
                     {pendingCount}
                   </div>
                   <small className="text-muted">Pending</small>
@@ -286,13 +254,10 @@ const RSVPSummary = () => {
             </div>
 
             <div className="col-xl-2 col-lg-4 col-md-4 col-6">
-              <div className="card border-0 shadow-sm h-100">
+              <div className="card border-0 shadow-sm h-100 rsvp-sum-stat-card">
                 <div className="card-body text-center p-3">
                   <TrendingUp size={28} className="text-primary mb-2" />
-                  <div
-                    className="fw-bold fs-4 mb-1"
-                    style={{ color: "#1e293b" }}
-                  >
+                  <div className="fw-bold fs-4 mb-1 rsvp-sum-stat-number">
                     {responsePercentage}%
                   </div>
                   <small className="text-muted">Response Rate</small>
@@ -301,12 +266,11 @@ const RSVPSummary = () => {
             </div>
           </div>
 
-          {/* Response Progress Bar */}
           {totalInvitations > 0 && (
-            <div className="card border-0 shadow-sm mb-4">
+            <div className="card border-0 shadow-sm mb-4 rsvp-sum-breakdown-card">
               <div className="card-body">
                 <h6 className="fw-semibold mb-3">Response Breakdown</h6>
-                <div className="progress mb-3" style={{ height: "30px" }}>
+                <div className="progress mb-3 rsvp-sum-progress">
                   {acceptedCount > 0 && (
                     <div
                       className="progress-bar bg-success d-flex align-items-center justify-content-center"
@@ -323,7 +287,9 @@ const RSVPSummary = () => {
                     <div
                       className="progress-bar bg-info d-flex align-items-center justify-content-center"
                       style={{
-                        width: `${(tentativeCount / totalInvitations) * 100}%`,
+                        width: `${
+                          (tentativeCount / totalInvitations) * 100
+                        }%`,
                       }}
                     >
                       {tentativeCount > 0 && (
@@ -376,8 +342,7 @@ const RSVPSummary = () => {
             </div>
           )}
 
-          {/* Participants Table */}
-          <div className="card border-0 shadow-sm">
+          <div className="card border-0 shadow-sm rsvp-sum-participants-card">
             <div className="card-body">
               <h5 className="card-title fw-semibold mb-4 d-flex align-items-center gap-2">
                 <Users size={22} />
@@ -387,7 +352,7 @@ const RSVPSummary = () => {
 
               {participants.length === 0 ? (
                 <div className="text-center py-5 text-muted">
-                  <Users size={48} className="mb-3" style={{ opacity: 0.3 }} />
+                  <Users size={48} className="mb-3 rsvp-sum-participants-icon" />
                   <p className="mb-0">No participants data available</p>
                 </div>
               ) : (
@@ -395,30 +360,14 @@ const RSVPSummary = () => {
                   <table className="table table-hover align-middle mb-0">
                     <thead className="table-light">
                       <tr>
-                        <th
-                          className="fw-semibold"
-                          style={{ color: "#64748b" }}
-                        >
+                        <th className="fw-semibold rsvp-sum-th">
                           Employee Name
                         </th>
-                        <th
-                          className="fw-semibold"
-                          style={{ color: "#64748b" }}
-                        >
-                          Status
-                        </th>
-                        <th
-                          className="fw-semibold"
-                          style={{ color: "#64748b" }}
-                        >
+                        <th className="fw-semibold rsvp-sum-th">Status</th>
+                        <th className="fw-semibold rsvp-sum-th">
                           Response Date
                         </th>
-                        <th
-                          className="fw-semibold"
-                          style={{ color: "#64748b" }}
-                        >
-                          Comments
-                        </th>
+                        <th className="fw-semibold rsvp-sum-th">Comments</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -426,16 +375,11 @@ const RSVPSummary = () => {
                         <tr key={participant.participantId || index}>
                           <td>
                             <div className="d-flex align-items-center gap-2">
-                              <div
-                                className="rounded-circle d-flex align-items-center justify-content-center"
-                                style={{
-                                  width: "36px",
-                                  height: "36px",
-                                  backgroundColor: "#e3f2fd",
-                                  flexShrink: 0,
-                                }}
-                              >
-                                <Users size={18} style={{ color: "#1976d2" }} />
+                              <div className="rsvp-sum-avatar">
+                                <Users
+                                  size={18}
+                                  className="rsvp-sum-avatar-icon"
+                                />
                               </div>
                               <span className="fw-semibold">
                                 {participant.employeeName || "Unknown"}
@@ -453,8 +397,7 @@ const RSVPSummary = () => {
                               <div className="d-flex align-items-start gap-2">
                                 <MessageSquare
                                   size={16}
-                                  className="text-muted mt-1"
-                                  style={{ flexShrink: 0 }}
+                                  className="text-muted rsvp-sum-comment-icon"
                                 />
                                 <small className="text-muted">
                                   {participant.rsvpComments}
