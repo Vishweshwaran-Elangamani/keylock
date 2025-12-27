@@ -104,8 +104,6 @@
 //             : parseInt(formData.hodEmployeeId),
 //       };
 
-//       console.log("✅ Update Payload (All Fields):", payload);
-
 //       const response = await departmentService.updateDepartment(payload);
 
 //       if (response.success) {

@@ -159,12 +159,6 @@ const AppraisalDetailsModal = ({
   
       // Get the blob from response.data
       const blob = response.data;
-      
-      console.log('File downloaded:', {
-        size: blob.size,
-        type: blob.type,
-        attachmentId: attachment.attachmentId
-      });
   
       let filename = attachment.fileName || "attachment";
   
@@ -174,7 +168,6 @@ const AppraisalDetailsModal = ({
         const headerFilename = extractFilenameFromHeader(contentDisposition);
         if (headerFilename) {
           filename = headerFilename;
-          console.log('Filename from header:', filename);
         }
       }
   
@@ -204,10 +197,7 @@ const AppraisalDetailsModal = ({
         }
   
         filename += extension;
-        console.log('Added extension:', extension, '→', filename);
       }
-  
-      console.log('Final filename:', filename);
   
       // Create and trigger download
       const url = window.URL.createObjectURL(blob);
@@ -222,8 +212,6 @@ const AppraisalDetailsModal = ({
         window.URL.revokeObjectURL(url);
         document.body.removeChild(link);
       }, 100);
-  
-      console.log('Download complete');
       
       // Optional: Show success message if you have a toast/notification system
       // toast.success('File downloaded successfully!');
