@@ -33,7 +33,7 @@ import ProjectDetails from "./pages/project_management/ProjectDetails";
 import ProjectList from "./pages/project_management/ProjectList";
 import ResourcePoolMapping from "./pages/project_management/ResourcePoolMapping";
 import HRSLADashboard from "./pages/sla/HRSLADashboard";
-import FeedbackHRDashboard from "./pages/feedback_management/FeedbackHRDashboard";
+import FeedbackHRDashboard from "./pages/feedback_management/dashboard/FeedbackHRDashboard";
 import CreateFeedbackForm from "./pages/feedback_management/hr/CreateFeedbackForm";
 import HRFeedbackList from "./pages/feedback_management/hr/HRFeedbackList";
 import SLADetails from "./pages/sla/SLADetails";
@@ -79,9 +79,8 @@ import YourGoalsPage from "./pages/goals/YourGoalsPage";
 import ViewGoalPage from "./pages/goals/ViewGoalPage";
 import GoalApprovalsPage from "./pages/goals/GoalApprovalsPage";
 //Feedback imports
-import FeedbackEmployeeDashboard from "./pages/feedback_management/FeedbackEmployeeDashboard";
-import FeedbackManagerDashboard from "./pages/feedback_management/FeedbackManagerDashboard";
-import FeedbackDepartmentHeadDashboard from "./pages/feedback_management/FeedbackDepartmentHeadDashboard";
+import FeedbackEmployeeDashboard from "./pages/feedback_management/dashboard/FeedbackEmployeeDashboard";
+import FeedbackManagerDashboard from "./pages/feedback_management/dashboard/FeedbackManagerDashboard";
 import SubmitContextFeedback from "./pages/feedback_management/feedback/SubmitContextFeedback";
 import MySubmissions from "./pages/feedback_management/feedback/MySubmissions";
 import EmployeeAssignedForms from "./pages/feedback_management/feedback/EmployeeAssignedForms";
@@ -97,7 +96,10 @@ import EmployeeAcknowledgment from "./pages/performancemanagement/employee/Emplo
 import ManagerAcknowledgment from "./pages/performancemanagement/manager/ManagerAcknowledgment";
 import MentorFeedbackDashboard from "./pages/feedback_management/feedback/MentorFeedbackDashboard";
 import ViewManagerReview from "./pages/feedback_management/manager/ViewManagerReview";
+
+
 //Meeting and MOM
+
 import EmployeeMomDashboard from "./pages/meeting/EmployeeMomDashboard";
 import ManagerMomDashboard from "./pages/meeting/ManagerMomDashboard";
 import CreateOrEditMom from "./pages/meeting/CreateOrEditMom";

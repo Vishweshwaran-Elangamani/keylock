@@ -3,29 +3,16 @@ import {
   RefreshCw,
   AlertTriangle,
   Eye,
-  Filter,
-  Download,
-  BarChart3,
-  Clock,
-  CheckCircle,
+  Users,
+  Calendar,
   User,
-  ArrowLeft,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import {employeeApi, managerReviewApi} from '../../../services/feedbackmanagement/feedbackApi'
+import { employeeApi, peerQueueApi } from "../../../services/feedbackmanagement/feedbackApi";
+import "../../../styles/feedback/components/AllManagerReviews.css";
 
-
-const Badge = ({ text, color = "#525252" }) => (
-  <span
-    className="badge"
-    style={{
-      backgroundColor: `${color}20`,
-      color,
-      padding: "4px 8px",
-      fontSize: "0.7rem",
-    }}
-  >
+const Badge = ({ text, color = "#27235C" }) => (
+  <span className="amr-badge" style={{ backgroundColor: `${color}20`, color }}>
     {text}
   </span>
 );
@@ -37,316 +24,283 @@ export default function AllManagerReviews() {
     []
   );
 
-  const [reviews, setReviews] = useState([]);
-  const [filteredReviews, setFilteredReviews] = useState([]);
+  const [feedbacks, setFeedbacks] = useState([]);
+  const [filteredFeedbacks, setFilteredFeedbacks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [employeeMap, setEmployeeMap] = useState({});
-  const [filterManager, setFilterManager] = useState("All");
-  const [filterStatus, setFilterStatus] = useState("All");
+  const [managerIds, setManagerIds] = useState([]);
   const [managers, setManagers] = useState([]);
-
-  // ============================================================================
-  // FETCH EMPLOYEE MAP
-  // ============================================================================
+  const [selectedManager, setSelectedManager] = useState("All");
+  const [isManagerOpen, setIsManagerOpen] = useState(false);
 
   const fetchEmployeeMap = async () => {
     try {
       const res = await employeeApi.getAll();
+      let employeeList = [];
+
       if (res.data?.success && Array.isArray(res.data.data)) {
-        const map = {};
-        res.data.data.forEach((emp) => {
-          map[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
-        });
-        setEmployeeMap(map);
+        employeeList = res.data.data;
+      } else if (Array.isArray(res.data)) {
+        employeeList = res.data;
+      } else if (res.data?.$values && Array.isArray(res.data.$values)) {
+        employeeList = res.data.$values;
       }
+
+      const map = {};
+      const managerList = [];
+      const managerIdList = [];
+
+      employeeList.forEach((emp) => {
+        map[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
+
+        if (emp.roleName === "Manager" || emp.role === "Manager") {
+          managerIdList.push(emp.employeeId);
+          managerList.push({
+            id: emp.employeeId,
+            name: `${emp.firstName} ${emp.lastName}`,
+          });
+        }
+      });
+
+      setEmployeeMap(map);
+      setManagerIds(managerIdList);
+      setManagers(managerList);
     } catch (err) {
-      console.error("Error fetching employee map:", err.message);
+      console.error("Error fetching employee map:", err);
     }
   };
 
-  // ============================================================================
-  // FETCH ALL REVIEWS
-  // ============================================================================
-
-  const fetchReviews = async () => {
+  const fetchPeerFeedbacks = async () => {
     setRefreshing(true);
     setLoading(true);
     setError("");
 
     try {
-      const managerId = user?.empId || 1002;
-      const res = await managerReviewApi.getByManager(managerId);
+      const res = await peerQueueApi.list();
 
+      let feedbackList = [];
       if (res.data?.success && Array.isArray(res.data.data)) {
-        const enriched = res.data.data.map((review) => ({
-          ...review,
-          managerName:
-            employeeMap[review.managerEmployeeId] ||
-            `Manager ${review.managerEmployeeId}`,
-          targetEmployeeName:
-            employeeMap[review.targetEmployeeId] ||
-            `Employee ${review.targetEmployeeId}`,
-        }));
-
-        setReviews(enriched);
-        setFilteredReviews(enriched);
-
-        // Extract unique managers
-        const uniqueManagers = [
-          ...new Set(enriched.map((r) => r.managerEmployeeId)),
-        ];
-        setManagers(uniqueManagers);
+        feedbackList = res.data.data;
+      } else if (Array.isArray(res.data)) {
+        feedbackList = res.data;
+      } else if (res.data?.$values && Array.isArray(res.data.$values)) {
+        feedbackList = res.data.$values;
       }
+
+      const managerFeedbacks = feedbackList.filter((feedback) =>
+        managerIds.includes(feedback.submittedByEmployeeId)
+      );
+
+      const enriched = managerFeedbacks.map((feedback) => ({
+        ...feedback,
+        fromName:
+          employeeMap[feedback.submittedByEmployeeId] ||
+          `Manager ${feedback.submittedByEmployeeId}`,
+        toName:
+          employeeMap[feedback.recipientEmployeeId] ||
+          `Employee ${feedback.recipientEmployeeId}`,
+      }));
+
+      setFeedbacks(enriched);
+      setFilteredFeedbacks(enriched);
     } catch (err) {
-      setError("Failed to load reviews");
-      console.error("Error:", err);
+      setError("Failed to load manager peer feedbacks");
+      console.error("Error fetching peer feedbacks:", err);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   };
 
-  // ============================================================================
-  // EFFECTS
-  // ============================================================================
-
   useEffect(() => {
     fetchEmployeeMap();
   }, []);
 
   useEffect(() => {
-    if (Object.keys(employeeMap).length > 0) {
-      fetchReviews();
+    if (Object.keys(employeeMap).length > 0 && managerIds.length > 0) {
+      fetchPeerFeedbacks();
     }
-  }, [employeeMap]);
-
-  // ============================================================================
-  // FILTER LOGIC
-  // ============================================================================
+  }, [employeeMap, managerIds]);
 
   useEffect(() => {
-    let filtered = reviews;
+    let filtered = feedbacks;
 
-    if (filterManager !== "All") {
+    if (selectedManager !== "All" && !isNaN(Number(selectedManager))) {
       filtered = filtered.filter(
-        (r) => r.managerEmployeeId === Number(filterManager)
+        (f) => f.submittedByEmployeeId === Number(selectedManager)
       );
     }
 
-    if (filterStatus !== "All") {
-      filtered = filtered.filter((r) => r.status === filterStatus);
-    }
+    setFilteredFeedbacks(filtered);
+  }, [selectedManager, feedbacks]);
 
-    setFilteredReviews(filtered);
-  }, [filterManager, filterStatus, reviews]);
+  const extractProjectContext = (feedbackContent) => {
+    const match = feedbackContent?.match(/^\[([^\]]+)\]/);
+    return match ? match[1] : null;
+  };
 
-  // ============================================================================
-  // STATS
-  // ============================================================================
+  const extractFeedbackText = (feedbackContent) => {
+    return feedbackContent?.replace(/^\[[^\]]+\]\s*/, "") || feedbackContent;
+  };
 
-  const stats = useMemo(
-    () => ({
-      total: reviews.length,
-      pending: reviews.filter((r) => r.status === "Pending").length,
-      approved: reviews.filter((r) => r.status === "Approved").length,
-      submitted: reviews.filter((r) => r.status === "Submitted").length,
-    }),
-    [reviews]
-  );
+  const selectedManagerLabel =
+    selectedManager === "All"
+      ? "All Managers"
+      : managers.find((m) => m.id === Number(selectedManager))?.name ||
+        "All Managers";
 
   if (loading) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "60vh" }}
-      >
-        <div className="spinner-border text-primary" />
+      <div className="amr-loading-container">
+        <div className="amr-spinner" />
       </div>
     );
   }
 
   return (
-    <div className="container-fluid py-3" style={{ maxWidth: "1400px" }}>
-      {/* HEADER */}
-      <div className="d-flex justify-content-between align-items-start mb-4">
-        <div className="d-flex gap-2 align-items-start">
-          <button
-            className="btn btn-outline-secondary"
-            onClick={() => navigate(-1)}
-          >
-            <ArrowLeft size={16} />
-          </button>
-          <div>
-            <h2
-              className="fw-bold mb-1"
-              style={{ color: "var(--color-primary-1)" }}
-            >
-              All Manager Reviews
-            </h2>
-            <p className="mb-0 small text-muted">
-              View all review comments and feedback given by managers
+    <div className="amr-page">
+      <div className="amr-container">
+        <div className="amr-header">
+          <div className="amr-header-content">
+            <h2 className="amr-title">Manager Feedbacks</h2>
+            <p className="amr-subtitle">
+              View the feedback submitted by managers to their team members
             </p>
           </div>
+          <button
+            onClick={fetchPeerFeedbacks}
+            disabled={refreshing}
+            className="amr-refresh-btn"
+          >
+            <RefreshCw size={18} className={refreshing ? "amr-spin" : ""} />
+            Refresh
+          </button>
         </div>
-        <button
-          className="btn d-flex align-items-center gap-2"
-          onClick={fetchReviews}
-          disabled={refreshing}
-          style={{
-            background: "transparent",
-            border: "1px solid var(--border)",
-            color: "var(--color-primary-3)",
-          }}
-        >
-          <RefreshCw
-            size={18}
-            style={{
-              animation: refreshing ? "spin 1s linear infinite" : "none",
-            }}
-          />
-          Refresh
-        </button>
-      </div>
 
-      {/* ERROR ALERT */}
-      {error && (
-        <div className="alert alert-danger d-flex align-items-start gap-2 mb-3">
-          <AlertTriangle size={18} className="mt-1" />
-          <div>
-            <strong>Error</strong>
-            <p className="mb-0 small mt-1">{error}</p>
+        {error && (
+          <div className="amr-alert amr-alert-error">
+            <AlertTriangle size={18} />
+            <div className="amr-alert-content">
+              <strong>Error</strong>
+              <p>{error}</p>
+            </div>
+            <button onClick={() => setError("")} className="amr-alert-close">
+              ×
+            </button>
           </div>
-          <button className="btn-close ms-auto" onClick={() => setError("")} />
-        </div>
-      )}
+        )}
 
-      {/* STATS */}
+        <div className="amr-filter-card">
+          <div className="amr-filter-content">
+            <div className="amr-filter-wrapper">
+              <div className="amr-dd">
+              <button type="button"className={`amr-dd-trigger ${isManagerOpen ? "amr-dd-open" : ""}`}
+                onClick={() => setIsManagerOpen((o) => !o)}>
+                       <span className="amr-dd-trigger-text">{selectedManagerLabel}</span>
+                       <span className="amr-dd-arrow" />
+                </button>
 
-      {/* FILTERS */}
-      <div
-        className="card border-0 mb-3"
-        style={{ border: "1px solid var(--border)" }}
-      >
-        <div className="card-body">
-          <div className="row g-3">
-            <div className="col-md-4">
-              <label className="form-label fw-bold small">
-                Filter by Manager:
-              </label>
-              <select
-                className="form-select form-select-sm"
-                value={filterManager}
-                onChange={(e) => setFilterManager(e.target.value)}
-              >
-                <option value="All">All Managers</option>
-                {managers.map((managerId) => (
-                  <option key={managerId} value={managerId}>
-                    {employeeMap[managerId] || `Manager ${managerId}`}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="col-md-4">
-              <label className="form-label fw-bold small">
-                Filter by Status:
-              </label>
-              <select
-                className="form-select form-select-sm"
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-              >
-                <option value="All">All Status</option>
-                <option value="Pending">Pending</option>
-                <option value="Approved">Approved</option>
-                <option value="Submitted">Submitted</option>
-                <option value="Draft">Draft</option>
-              </select>
-            </div>
-            <div className="col-md-4 d-flex align-items-end">
-              <button className="btn btn-outline-secondary btn-sm w-100">
-                <Download size={14} className="me-1" />
-                Export to CSV
-              </button>
+
+                {isManagerOpen && (
+                  <div className="amr-dd-menu">
+                    <button
+                      type="button"
+                      className="amr-dd-item amr-dd-header"
+                      onClick={() => {
+                        setSelectedManager("All");
+                        setIsManagerOpen(false);
+                      }}
+                    >
+                      All Managers
+                    </button>
+
+                    {managers.map((m) => (
+                      <button
+                        key={m.id}
+                        type="button"
+                        className="amr-dd-item"
+                        onClick={() => {
+                          setSelectedManager(String(m.id));
+                          setIsManagerOpen(false);
+                        }}
+                      >
+                        {m.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* REVIEWS TABLE */}
-      <div
-        className="card border-0"
-        style={{ border: "1px solid var(--border)" }}
-      >
-        <div className="card-body">
-          {filteredReviews.length === 0 ? (
-            <p className="text-muted mb-0">No reviews found</p>
-          ) : (
-            <div className="table-responsive">
-              <table className="table table-hover mb-0">
-                <thead>
-                  <tr style={{ borderBottom: "2px solid var(--border)" }}>
-                    <th style={{ color: "var(--color-primary-1)" }}>Manager</th>
-                    <th style={{ color: "var(--color-primary-1)" }}>
-                      Target Employee
-                    </th>
-                    <th style={{ color: "var(--color-primary-1)" }}>Rating</th>
-                    <th style={{ color: "var(--color-primary-1)" }}>Status</th>
-                    <th style={{ color: "var(--color-primary-1)" }}>Date</th>
-                    <th style={{ color: "var(--color-primary-1)" }}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredReviews.map((review) => {
-                    const statusColor =
-                      review.status === "Approved"
-                        ? "#24A148"
-                        : review.status === "Pending"
-                        ? "#E2B93B"
-                        : "#0F62FE";
-                    return (
-                      <tr key={review.reviewcommentId}>
-                        <td className="small fw-bold">{review.managerName}</td>
-                        <td className="small fw-bold">
-                          {review.targetEmployeeName}
-                        </td>
-                        <td className="small">
-                          {"⭐".repeat(review.rating || 0)}
-                        </td>
-                        <td>
-                          <Badge
-                            text={review.status || "Draft"}
-                            color={statusColor}
-                          />
-                        </td>
-                        <td className="small text-muted">
-                          {new Date(review.createdAt).toLocaleDateString()}
-                        </td>
-                        <td>
-                          <button
-                            className="btn btn-sm btn-outline-secondary"
-                            onClick={() =>
-                              navigate(
-                                `/reviews/detail/${review.reviewcommentId}`,
-                                { state: { review } }
-                              )
-                            }
-                          >
-                            <Eye size={14} />
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      </div>
+        {filteredFeedbacks.length === 0 ? (
+          <div className="amr-empty-state">
+            <Users size={48} className="amr-empty-icon" />
+            <p className="amr-empty-title">No manager feedbacks found</p>
+            <p className="amr-empty-text">
+              {selectedManager === "All"
+                ? "No peer feedback has been submitted by managers yet"
+                : "This manager hasn't submitted any peer feedback yet"}
+            </p>
+          </div>
+        ) : (
+          <div className="amr-feedback-grid">
+            {filteredFeedbacks.map((feedback) => {
+              const projectContext = extractProjectContext(
+                feedback.feedbackContent
+              );
+              const feedbackText = extractFeedbackText(
+                feedback.feedbackContent
+              );
 
-      <style>{`@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}`}</style>
+              return (
+                <div key={feedback.queueId} className="amr-feedback-card">
+                  <div className="amr-card-field">
+                    <div className="amr-field-header">
+                      <User size={14} />
+                      <span>From</span>
+                    </div>
+                    <p className="amr-field-value">{feedback.fromName}</p>
+                  </div>
+
+                  <div className="amr-card-field">
+                    <div className="amr-field-header">
+                      <User size={14} />
+                      <span>To</span>
+                    </div>
+                    <p className="amr-field-value">{feedback.toName}</p>
+                  </div>
+
+                  <div className="amr-card-field">
+                    <div className="amr-field-header">
+                      <Calendar size={14} />
+                      <span>
+                        {new Date(
+                          feedback.createdAt || feedback.submittedAt
+                        ).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="amr-feedback-content">
+                    {projectContext && (
+                      <Badge text={projectContext} color="#27235C" />
+                    )}
+                    <p className="amr-feedback-text">{feedbackText}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

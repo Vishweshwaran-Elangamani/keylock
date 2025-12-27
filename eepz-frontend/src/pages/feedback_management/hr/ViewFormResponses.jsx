@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ArrowLeft, CheckCircle, AlertTriangle } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import hrFormApi from "../../../services/feedbackmanagement/hrFormApi";
+import "../../../styles/feedback/hr/HRFormResponse.css";
 
 export default function ViewFormResponses() {
   const navigate = useNavigate();
@@ -45,79 +46,79 @@ export default function ViewFormResponses() {
 
   if (loading) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "60vh" }}
-      >
-        <div className="spinner-border text-primary" />
+      <div className="hfrp-page hfrp-page-loading">
+        <div className="hfrp-spinner-main" />
       </div>
     );
   }
 
   return (
-    <div className="container-fluid py-4" style={{ maxWidth: "1200px" }}>
-      <button
-        className="btn btn-outline-secondary mb-4"
-        onClick={() => navigate(-1)}
-      >
-        <ArrowLeft size={16} className="me-1" />
-        Back
-      </button>
+    <div className="hfrp-page">
+      <div className="hfrp-container">
+        <button
+          className="hfrp-btn hfrp-btn-outline hfrp-back-btn"
+          onClick={() => navigate(-1)}
+        >
+          <ArrowLeft size={16} className="hfrp-inline-icon-left" />
+          Back
+        </button>
 
-      {error && (
-        <div className="alert alert-warning mb-4">
-          <AlertTriangle size={16} className="me-1" />
-          {error}
-        </div>
-      )}
+        {error && (
+          <div className="hfrp-alert hfrp-alert-warning">
+            <AlertTriangle size={16} className="hfrp-alert-icon" />
+            <span>{error}</span>
+          </div>
+        )}
 
-      <h2 className="fw-bold mb-4" style={{ color: "var(--color-primary-1)" }}>
-        {form?.formName}
-      </h2>
+        <h2 className="hfrp-title">{form?.formName}</h2>
 
-      <div className="row g-4">
-        {responses.map((resp) => (
-          <div key={resp.responseId} className="col-md-6 col-lg-4">
-            <div
-              className="card border-0"
-              style={{ border: "1px solid var(--border)" }}
-            >
-              <div className="card-body">
-                <div className="d-flex justify-content-between align-items-start mb-3">
-                  <h6 className="fw-bold">{resp.employeeName}</h6>
-                  <span className="badge bg-success">
-                    <CheckCircle
-                      size={12}
-                      className="me-1"
-                      style={{ display: "inline" }}
-                    />
-                    Submitted
-                  </span>
-                </div>
+        <div className="hfrp-responses-grid">
+          {responses.map((resp) => (
+            <div key={resp.responseId} className="hfrp-response-col">
+              <div className="hfrp-card">
+                <div className="hfrp-card-body">
+                  <div className="hfrp-card-header">
+                    <h6 className="hfrp-employee-name">
+                      {resp.employeeName}
+                    </h6>
+                    <span className="hfrp-status-badge">
+                      <CheckCircle
+                        size={12}
+                        className="hfrp-inline-icon-left"
+                      />
+                      Submitted
+                    </span>
+                  </div>
 
-                <small className="text-muted d-block mb-3">
-                  Submitted: {new Date(resp.submittedAt).toLocaleDateString()}
-                </small>
+                  <small className="hfrp-submitted-text">
+                    Submitted:{" "}
+                    {new Date(resp.submittedAt).toLocaleDateString()}
+                  </small>
 
-                <div className="small">
-                  <strong>Answers:</strong>
-                  <div className="mt-2">
-                    {resp.answers ? (
-                      resp.answers.split(",").map((ans, idx) => (
-                        <div key={idx} className="mb-1">
-                          Q{idx + 1}:{" "}
-                          <span className="badge bg-secondary">{ans} ⭐</span>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-muted">No answers recorded</p>
-                    )}
+                  <div className="hfrp-answers-block">
+                    <strong className="hfrp-answers-label">Answers:</strong>
+                    <div className="hfrp-answers-list">
+                      {resp.answers ? (
+                        resp.answers.split(",").map((ans, idx) => (
+                          <div key={idx} className="hfrp-answer-row">
+                            Q{idx + 1}:{" "}
+                            <span className="hfrp-answer-badge">
+                              {ans} ⭐
+                            </span>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="hfrp-no-answers">
+                          No answers recorded
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );

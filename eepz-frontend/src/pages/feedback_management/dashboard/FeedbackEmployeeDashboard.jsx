@@ -21,11 +21,10 @@ import {
   managerReviewApi,
   employeeApi,
   mentorFeedbackApi,
-} from "../../services/feedbackmanagement/feedbackApi";
-import "../../styles/feedback/FeedbackEmployeeDashboard.css";
-import Breadcrumb from "../../components/feedback_management/common/FeedbackBreadcrumb";
+} from "../../../services/feedbackmanagement/feedbackApi";
+import "../../../styles/feedback/components/FeedbackEmployeeDashboard.css";
+import Breadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb";
 
-// Helper function to get role-based feedback dashboard path
 const getFeedbackDashboardPath = (roleName) => {
   const routes = {
     Employee: "/employee/dashboard/feedback",
@@ -41,9 +40,9 @@ const StatCard = ({ label, value, Icon, bgColor, iconColor }) => (
   <div className="fm-empdb-stat-card">
     <div
       className="fm-empdb-stat-card__icon-wrapper"
-      style={{ backgroundColor: bgColor }}
+      data-bg={bgColor.replace('#', '')}
     >
-      <Icon size={24} color={iconColor} strokeWidth={2.5} />
+      <Icon size={24} data-color={iconColor.replace('#', '')} strokeWidth={2.5} />
     </div>
     <div className="fm-empdb-stat-card__content">
       <h2 className="fm-empdb-stat-card__value">{value}</h2>
@@ -75,7 +74,6 @@ export default function FeedbackEmployeeDashboard() {
   const [isMentor, setIsMentor] = useState(false);
   const [mentorFeedbackCount, setMentorFeedbackCount] = useState(0);
 
-  // Check if user is a mentor using service
   const checkIfMentor = async () => {
     try {
       const empId = user?.empId || user?.employeeId || 1004;
@@ -112,7 +110,6 @@ export default function FeedbackEmployeeDashboard() {
     }
   };
 
-  // Fetch dashboard data using services
   const fetchDashboardData = async () => {
     setLoading(true);
     setError("");
@@ -122,7 +119,6 @@ export default function FeedbackEmployeeDashboard() {
 
       await checkIfMentor();
 
-      // Fetch employee map
       let empMap = {};
       try {
         const empRes = await employeeApi.getAll();
@@ -274,13 +270,9 @@ export default function FeedbackEmployeeDashboard() {
 
   if (loading) {
     return (
-      <div className="d-flex justify-content-center align-items-center fm-empdb-loading">
-        <div
-          className="spinner-border text-primary"
-          role="status"
-          style={{ width: "3rem", height: "3rem" }}
-        >
-          <span className="visually-hidden">Loading...</span>
+      <div className="fm-empdb-loading">
+        <div className="fm-empdb-spinner" role="status">
+          <span className="fm-empdb-spinner__text">Loading...</span>
         </div>
       </div>
     );
@@ -300,36 +292,34 @@ export default function FeedbackEmployeeDashboard() {
       />
 
       {error && (
-        <div className="alert fm-empdb-error d-flex align-items-start gap-2 mb-3">
-          <AlertTriangle
-            size={16}
-            className="flex-shrink-0 fm-empdb-error__icon"
-          />
-          <div className="flex-grow-1">
-            <p className="mb-0 fm-empdb-error__text">{error}</p>
+        <div className="fm-empdb-alert" role="alert">
+          <div className="fm-empdb-alert__icon">
+            <AlertTriangle size={16} />
+          </div>
+          <div className="fm-empdb-alert__content">
+            <p className="fm-empdb-alert__text">{error}</p>
           </div>
           <button
             type="button"
-            className="btn-close fm-empdb-error__close"
+            className="fm-empdb-alert__close"
             onClick={() => setError("")}
+            aria-label="Close"
           />
         </div>
       )}
 
-      {/* Stats Cards - Horizontal Layout */}
-      <div className="row g-3 mb-3">
+      <div className="fm-empdb-stats-grid">
         {stats.map((s, idx) => (
-          <div key={idx} className="col-lg-3 col-md-6">
+          <div key={idx} className="fm-empdb-stats-grid__item">
             <StatCard {...s} />
           </div>
         ))}
       </div>
 
-      {/* Centered Rounded Toggle Navigation – only Quick Actions */}
-      <div className="d-flex justify-content-center align-items-center mb-3 fm-empdb-toggle-nav-wrapper">
-        <div className="d-inline-flex fm-empdb-toggle-nav">
+      <div className="fm-empdb-nav-wrapper">
+        <div className="fm-empdb-nav">
           <button
-            className="fm-empdb-toggle-tab fm-empdb-toggle-tab--active"
+            className="fm-empdb-nav__tab fm-empdb-nav__tab--active"
             onClick={() => setActiveTab("overview")}
           >
             <Zap size={16} />
@@ -338,19 +328,15 @@ export default function FeedbackEmployeeDashboard() {
         </div>
       </div>
 
-      {/* Content Area – only overview / quick actions */}
       <div className="fm-empdb-content">
-        <div className="row g-3">
-          <div className="col-md-4 col-6">
+        <div className="fm-empdb-actions-grid">
+          <div className="fm-empdb-actions-grid__item">
             <Link
               to="/employee/dashboard/feedback/submit-mentor"
               className="fm-empdb-action-card"
             >
-              <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--primary mb-2">
-                <Send
-                  size={20}
-                  className="fm-empdb-action-card__icon--primary"
-                />
+              <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--primary">
+                <Send size={20} className="fm-empdb-action-card__icon" />
               </div>
               <span className="fm-empdb-action-card__label">
                 Mentor Feedback
@@ -358,16 +344,13 @@ export default function FeedbackEmployeeDashboard() {
             </Link>
           </div>
 
-          <div className="col-md-4 col-6">
+          <div className="fm-empdb-actions-grid__item">
             <Link
               to="/employee/dashboard/feedback/contextfeedback"
               className="fm-empdb-action-card"
             >
-              <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--primary mb-2">
-                <MessageSquare
-                  size={20}
-                  className="fm-empdb-action-card__icon--primary"
-                />
+              <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--primary">
+                <MessageSquare size={20} className="fm-empdb-action-card__icon" />
               </div>
               <span className="fm-empdb-action-card__label">
                 Context Feedback
@@ -375,16 +358,13 @@ export default function FeedbackEmployeeDashboard() {
             </Link>
           </div>
 
-          <div className="col-md-4 col-6">
+          <div className="fm-empdb-actions-grid__item">
             <Link
               to="/employee/dashboard/feedback/assignedform"
               className="fm-empdb-action-card"
             >
-              <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--primary mb-2">
-                <Eye
-                  size={20}
-                  className="fm-empdb-action-card__icon--primary"
-                />
+              <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--primary">
+                <Eye size={20} className="fm-empdb-action-card__icon" />
               </div>
               <span className="fm-empdb-action-card__label">
                 Assigned Forms
@@ -392,16 +372,13 @@ export default function FeedbackEmployeeDashboard() {
             </Link>
           </div>
 
-          <div className="col-md-4 col-6">
+          <div className="fm-empdb-actions-grid__item">
             <Link
               to="/employee/dashboard/feedback/submit-peer"
               className="fm-empdb-action-card fm-empdb-action-card--peer"
             >
-              <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--peer mb-2">
-                <Users
-                  size={20}
-                  className="fm-empdb-action-card__icon--peer"
-                />
+              <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--peer">
+                <Users size={20} className="fm-empdb-action-card__icon" />
               </div>
               <span className="fm-empdb-action-card__label">
                 Peer Feedback Received
@@ -409,16 +386,13 @@ export default function FeedbackEmployeeDashboard() {
             </Link>
           </div>
 
-          <div className="col-md-4 col-6">
+          <div className="fm-empdb-actions-grid__item">
             <Link
               to="/employee/dashboard/feedback/submissions"
               className="fm-empdb-action-card fm-empdb-action-card--submissions"
             >
-              <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--submissions mb-2">
-                <Search
-                  size={20}
-                  className="fm-empdb-action-card__icon--submissions"
-                />
+              <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--submissions">
+                <Search size={20} className="fm-empdb-action-card__icon" />
               </div>
               <span className="fm-empdb-action-card__label">
                 My Submissions
@@ -427,16 +401,13 @@ export default function FeedbackEmployeeDashboard() {
           </div>
 
           {isMentor && (
-            <div className="col-md-4 col-6">
+            <div className="fm-empdb-actions-grid__item">
               <Link
                 to="/employee/dashboard/feedback/mentor"
                 className="fm-empdb-action-card fm-empdb-action-card--sme"
               >
-                <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--sme mb-2">
-                  <Award
-                    size={20}
-                    className="fm-empdb-action-card__icon--sme"
-                  />
+                <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--sme">
+                  <Award size={20} className="fm-empdb-action-card__icon" />
                 </div>
                 <span className="fm-empdb-action-card__label">
                   SME Dashboard

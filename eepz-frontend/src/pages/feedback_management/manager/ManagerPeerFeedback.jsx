@@ -1,5 +1,3 @@
-// src/pages/feedback_management/feedback/ManagerPeerFeedback.jsx
-
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import {
   RefreshCw,
@@ -16,9 +14,8 @@ import {
   employeeApi,
 } from "../../../services/feedbackmanagement/feedbackApi";
 import FeedbackBreadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb";
-import "../../../styles/feedback/ManagerPeerFeedback.css";
+import "../../../styles/feedback/components/ManagerPeerFeedback.css";
 
-// Helper function to get role-based feedback dashboard path
 const getFeedbackDashboardPath = (roleName) => {
   const routes = {
     Employee: "/employee/dashboard/feedback",

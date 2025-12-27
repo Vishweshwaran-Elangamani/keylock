@@ -13,8 +13,10 @@ import {
   smeApi,
 } from "../../../services/feedbackmanagement/feedbackApi";
 import FeedbackBreadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb";
+import "../../../styles/feedback/components/SubmitMentorFeedback.css";
 
-// Helper function to get role-based feedback dashboard path
+const PRIMARY = "#27235C";
+
 const getFeedbackDashboardPath = (roleName) => {
   const routes = {
     Employee: "/employee/dashboard/feedback",
@@ -26,32 +28,19 @@ const getFeedbackDashboardPath = (roleName) => {
   return routes[roleName] || "/hr/dashboard/feedback";
 };
 
-const PRIMARY = "#27235C";
-
 const DropdownIcon = ({ open }) => (
-  <svg
-    width="18"              
-    height="18"           
-    viewBox="0 0 24 24"
-    style={{
-      transition: "transform 0.2s ease",
-      transform: open ? "rotate(180deg)" : "rotate(0deg)",
-      display: "block",
-    }}
-  >
+  <svg width="18" height="18" viewBox="0 0 24 24" className={`smf-dropdown-icon ${open ? "smf-dropdown-icon--open" : ""}`}>
     <polyline
       points="6 9 12 15 18 9"
       fill="none"
       stroke={PRIMARY}
-      strokeWidth="2.4"     
+      strokeWidth="2.4"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
   </svg>
 );
 
-
-/** Reusable custom select */
 const CustomSelect = ({
   name,
   value,
@@ -86,30 +75,25 @@ const CustomSelect = ({
   };
 
   return (
-    <div className="prj-dropdown-wrapper" ref={dropdownRef}>
+    <div className="smf-dropdown-wrapper" ref={dropdownRef}>
       <div
-        className={`prj-dropdown-select ${isOpen ? "open" : ""}`}
+        className={`smf-dropdown-select ${isOpen ? "smf-dropdown-select--open" : ""} ${disabled ? "smf-dropdown-select--disabled" : ""}`}
         onClick={() => !disabled && setIsOpen((o) => !o)}
-        style={
-          disabled
-            ? { opacity: 0.6, cursor: "not-allowed" }
-            : { cursor: "pointer" }
-        }
       >
-        <span className="prj-dropdown-value">{getDisplayValue()}</span>
-        <span className="prj-dropdown-arrow">
+        <span className="smf-dropdown-value">{getDisplayValue()}</span>
+        <span className="smf-dropdown-arrow">
           <DropdownIcon open={isOpen} />
         </span>
       </div>
       {isOpen && (
-        <ul className="prj-dropdown-list">
+        <ul className="smf-dropdown-list">
           {options.map((opt, idx) => {
             const isSelected = String(opt.value) === String(value);
             return (
               <li
                 key={idx}
-                className={`prj-dropdown-option ${
-                  isSelected ? "selected" : ""
+                className={`smf-dropdown-option ${
+                  isSelected ? "smf-dropdown-option--selected" : ""
                 }`}
                 onClick={() => handleSelect(opt.value)}
               >
@@ -151,7 +135,6 @@ export default function SubmitMentorFeedback() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // Fetch employee map
   const fetchEmployeeMap = useCallback(async (signal) => {
     setLoadingEmployees(true);
     try {
@@ -176,7 +159,6 @@ export default function SubmitMentorFeedback() {
     }
   }, []);
 
-  // Fetch SME list
   const fetchSmeList = useCallback(
     async (signal) => {
       if (Object.keys(employeeMap).length === 0 && !loadingEmployees) return;
@@ -219,14 +201,12 @@ export default function SubmitMentorFeedback() {
     [employeeMap, loadingEmployees]
   );
 
-  // Fetch employees on mount
   useEffect(() => {
     const abortController = new AbortController();
     fetchEmployeeMap(abortController.signal);
     return () => abortController.abort();
   }, [fetchEmployeeMap]);
 
-  // Fetch SMEs after employees
   useEffect(() => {
     if (Object.keys(employeeMap).length === 0) return;
     const abortController = new AbortController();
@@ -234,7 +214,6 @@ export default function SubmitMentorFeedback() {
     return () => abortController.abort();
   }, [employeeMap, fetchSmeList]);
 
-  // Handle SME selection
   const handleSmeChange = useCallback(
     (smeId) => {
       setForm((prev) => ({ ...prev, smeId }));
@@ -256,7 +235,6 @@ export default function SubmitMentorFeedback() {
     [smeList]
   );
 
-  // Submit
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault();
@@ -329,12 +307,9 @@ export default function SubmitMentorFeedback() {
         <button
           key={index}
           type="button"
-          className={`border-0 bg-transparent p-0 me-1 ${
-            rating <= form.rating ? "text-warning" : "text-muted"
-          }`}
+          className={`smf-star-button ${rating <= form.rating ? "smf-star-button--active" : ""}`}
           onClick={() => handleStarClick(rating)}
           aria-label={`Rate ${rating} star${rating > 1 ? "s" : ""}`}
-          style={{ cursor: "pointer", transition: "all 0.2s" }}
         >
           <Star
             size={24}
@@ -357,21 +332,8 @@ export default function SubmitMentorFeedback() {
     : "/hr/dashboard/feedback";
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        backgroundColor: "#f8f9fa",
-        display: "flex",
-        justifyContent: "center",
-        padding: "1.25rem 1rem",
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "1200px",
-        }}
-      >
+    <div className="smf-container">
+      <div className="smf-content">
         <FeedbackBreadcrumb
           items={[
             { label: "Feedback Management", path: feedbackDashboardPath },
@@ -379,97 +341,41 @@ export default function SubmitMentorFeedback() {
           ]}
         />
 
-        <div className="d-flex align-items-center gap-3 mb-4"></div>
+        <div className="smf-header-gap"></div>
 
-        {/* Alerts */}
         {error && (
-          <div
-            className="alert alert-danger d-flex align-items-start gap-2 mb-4"
-            style={{
-              borderRadius: "10px",
-              border: "none",
-              backgroundColor: "#fee2e2",
-              padding: "1rem 1.25rem",
-            }}
-          >
-            <AlertTriangle
-              size={18}
-              className="flex-shrink-0"
-              style={{ marginTop: "2px", color: "#dc2626" }}
-            />
-            <div className="flex-grow-1" style={{ textAlign: "left" }}>
-              <p
-                className="mb-0"
-                style={{
-                  fontSize: "0.938rem",
-                  color: "#991b1b",
-                  textAlign: "left",
-                }}
-              >
-                {error}
-              </p>
+          <div className="smf-alert smf-alert-error">
+            <AlertTriangle size={18} className="smf-alert-icon" />
+            <div className="smf-alert-content">
+              <p className="smf-alert-message">{error}</p>
             </div>
             <button
               type="button"
-              className="btn-close"
-              style={{ fontSize: "0.875rem" }}
+              className="smf-alert-close"
               onClick={() => setError("")}
-            />
+            >
+              ×
+            </button>
           </div>
         )}
 
         {success && (
-          <div
-            className="alert alert-success d-flex align-items-center gap-2 mb-4"
-            style={{
-              borderRadius: "10px",
-              border: "none",
-              backgroundColor: "#dcfce7",
-              padding: "1rem 1.25rem",
-            }}
-          >
-            <CheckCircle
-              size={18}
-              className="flex-shrink-0"
-              style={{ color: "#16a34a" }}
-            />
-            <p
-              className="mb-0 flex-grow-1"
-              style={{
-                fontSize: "0.938rem",
-                color: "#166534",
-                textAlign: "left",
-              }}
-            >
-              {success}
-            </p>
+          <div className="smf-alert smf-alert-success">
+            <CheckCircle size={18} className="smf-alert-icon" />
+            <p className="smf-alert-message">{success}</p>
           </div>
         )}
 
-        {/* Card */}
-        <div className="card border-0 shadow-sm" style={{ borderRadius: "12px" }}>
-          <div className="card-body" style={{ padding: "2rem" }}>
+        <div className="smf-card">
+          <div className="smf-card-body">
             <form onSubmit={handleSubmit} noValidate>
-              {/* SME select */}
-              <div className="mb-4" style={{ textAlign: "left" }}>
-                <label
-                  htmlFor="smeSelect"
-                  className="form-label fw-semibold mb-2 d-flex align-items-center"
-                  style={{
-                    fontSize: "0.938rem",
-                    color: "#0f172a",
-                    textAlign: "left",
-                  }}
-                >
+              <div className="smf-form-group">
+                <label htmlFor="smeSelect" className="smf-label smf-label-with-loader">
                   <span>
-                    Select Your Mentor/SME <span className="text-danger">*</span>
+                    Select Your Mentor/SME <span className="smf-required">*</span>
                   </span>
                   {isLoading && (
-                    <Loader
-                      size={16}
-                      className="ms-2 animate-spin"
-                      style={{ color: "#64748b" }}
-                    />
+                    <Loader size={16} className="smf-loader-inline" />
                   )}
                 </label>
 
@@ -495,109 +401,40 @@ export default function SubmitMentorFeedback() {
                   }
                 />
 
-                <div
-                  className="form-text"
-                  style={{
-                    fontSize: "0.813rem",
-                    marginTop: "0.5rem",
-                    textAlign: "left",
-                  }}
-                >
+                <div className="smf-form-text">
                   Select the SME whose guidance you'd like to rate
                 </div>
               </div>
 
               {smeDetails && (
-                <div style={{ textAlign: "left" }}>
-                  {/* SME details */}
-                  <div
-                    className="mb-4 p-4"
-                    style={{
-                      backgroundColor: "#f8fafc",
-                      borderRadius: "10px",
-                      border: "1.5px solid #e2e8f0",
-                      textAlign: "left",
-                    }}
-                  >
-                    <h6
-                      className="fw-bold mb-3"
-                      style={{
-                        fontSize: "0.938rem",
-                        color: "#0f172a",
-                        textAlign: "left",
-                      }}
-                    >
+                <div className="smf-details-section">
+                  <div className="smf-sme-details">
+                    <h6 className="smf-sme-details-title">
                       Selected SME Details
                     </h6>
-                    <div className="row g-4">
-                      <div className="col-md-6" style={{ textAlign: "left" }}>
-                        <div
-                          style={{
-                            fontSize: "0.813rem",
-                            color: "#64748b",
-                            marginBottom: "0.5rem",
-                            textAlign: "left",
-                            fontWeight: 600,
-                          }}
-                        >
+                    <div className="smf-sme-details-grid">
+                      <div className="smf-sme-detail-item">
+                        <div className="smf-detail-label">
                           Expertise Area
                         </div>
-                        <div
-                          style={{
-                            fontSize: "0.938rem",
-                            fontWeight: 600,
-                            color: "#0f172a",
-                            textAlign: "left",
-                          }}
-                        >
+                        <div className="smf-detail-value">
                           {smeDetails.skillName}
                         </div>
                         {smeDetails.skillCategoryName && (
-                          <small
-                            style={{
-                              fontSize: "0.813rem",
-                              color: "#64748b",
-                              textAlign: "left",
-                              display: "block",
-                              marginTop: "0.25rem",
-                            }}
-                          >
+                          <small className="smf-detail-meta">
                             Category: {smeDetails.skillCategoryName}
                           </small>
                         )}
                       </div>
-                      <div className="col-md-6" style={{ textAlign: "left" }}>
-                        <div
-                          style={{
-                            fontSize: "0.813rem",
-                            color: "#64748b",
-                            marginBottom: "0.5rem",
-                            textAlign: "left",
-                            fontWeight: 600,
-                          }}
-                        >
+                      <div className="smf-sme-detail-item">
+                        <div className="smf-detail-label">
                           SME
                         </div>
-                        <div
-                          style={{
-                            fontSize: "0.938rem",
-                            fontWeight: 600,
-                            color: "#0f172a",
-                            textAlign: "left",
-                          }}
-                        >
+                        <div className="smf-detail-value">
                           {smeDetails.employeeName}
                         </div>
                         {smeDetails.proficiencyLevel && (
-                          <small
-                            style={{
-                              fontSize: "0.813rem",
-                              color: "#64748b",
-                              textAlign: "left",
-                              display: "block",
-                              marginTop: "0.25rem",
-                            }}
-                          >
+                          <small className="smf-detail-meta">
                             Level: {smeDetails.proficiencyLevel}
                           </small>
                         )}
@@ -605,67 +442,28 @@ export default function SubmitMentorFeedback() {
                     </div>
                   </div>
 
-                  {/* Rating */}
-                  <div className="mb-4" style={{ textAlign: "left" }}>
-                    <label
-                      className="form-label fw-semibold mb-2"
-                      style={{
-                        fontSize: "0.938rem",
-                        color: "#0f172a",
-                        textAlign: "left",
-                      }}
-                    >
-                      Rating <span className="text-danger">*</span>
+                  <div className="smf-form-group">
+                    <label className="smf-label">
+                      Rating <span className="smf-required">*</span>
                     </label>
-                    <div
-                      className="d-flex align-items-center gap-3 p-4"
-                      style={{
-                        backgroundColor: "#f8fafc",
-                        borderRadius: "10px",
-                        border: "1.5px solid #e2e8f0",
-                        textAlign: "left",
-                      }}
-                    >
-                      <div className="d-flex">{renderStars()}</div>
-                      <span
-                        style={{
-                          fontSize: "1rem",
-                          fontWeight: 700,
-                          color: PRIMARY,
-                          textAlign: "left",
-                        }}
-                      >
+                    <div className="smf-rating-box">
+                      <div className="smf-stars">{renderStars()}</div>
+                      <span className="smf-rating-value">
                         {form.rating}/5 Stars
                       </span>
                     </div>
-                    <div
-                      className="form-text"
-                      style={{
-                        fontSize: "0.813rem",
-                        marginTop: "0.5rem",
-                        textAlign: "left",
-                      }}
-                    >
+                    <div className="smf-form-text">
                       1 = Needs Improvement | 5 = Outstanding
                     </div>
                   </div>
 
-                  {/* Comments */}
-                  <div className="mb-4" style={{ textAlign: "left" }}>
-                    <label
-                      htmlFor="feedbackComments"
-                      className="form-label fw-semibold mb-2"
-                      style={{
-                        fontSize: "0.938rem",
-                        color: "#0f172a",
-                        textAlign: "left",
-                      }}
-                    >
-                      Detailed Feedback <span className="text-danger">*</span>
+                  <div className="smf-form-group">
+                    <label htmlFor="feedbackComments" className="smf-label">
+                      Detailed Feedback <span className="smf-required">*</span>
                     </label>
                     <textarea
                       id="feedbackComments"
-                      className="form-control form-control-lg"
+                      className="smf-textarea"
                       rows={6}
                       value={form.feedbackComments}
                       onChange={(e) =>
@@ -676,56 +474,28 @@ export default function SubmitMentorFeedback() {
                       }
                       placeholder="Describe your experience with this mentor's teaching style, knowledge sharing, and overall impact..."
                       maxLength={5000}
-                      style={{
-                        borderRadius: "10px",
-                        border: "1.5px solid #e2e8f0",
-                        fontSize: "0.938rem",
-                        resize: "vertical",
-                        minHeight: "150px",
-                        textAlign: "left",
-                      }}
                     />
-                    <div
-                      className="d-flex justify-content-between align-items-center"
-                      style={{ marginTop: "0.5rem" }}
-                    >
-                      <span
-                        className="form-text"
-                        style={{ fontSize: "0.813rem", textAlign: "left" }}
-                      >
+                    <div className="smf-textarea-footer">
+                      <span className="smf-form-text">
                         Be specific and constructive
                       </span>
                       <span
-                        style={{
-                          fontSize: "0.813rem",
-                          color:
-                            form.feedbackComments.length > 4500
-                              ? "#dc2626"
-                              : "#64748b",
-                          textAlign: "right",
-                          fontWeight: 600,
-                        }}
+                        className={`smf-char-count ${
+                          form.feedbackComments.length > 4500
+                            ? "smf-char-count--warning"
+                            : ""
+                        }`}
                       >
                         {form.feedbackComments.length}/5000
                       </span>
                     </div>
                   </div>
 
-                  {/* Anonymous checkbox */}
-                  <div className="mb-4" style={{ textAlign: "left" }}>
-                    <div
-                      className="form-check p-3"
-                      style={{
-                        backgroundColor: "#f8fafc",
-                        borderRadius: "10px",
-                        border: "1.5px solid #e2e8f0",
-                        display: "flex",
-                        alignItems: "flex-start",
-                      }}
-                    >
+                  <div className="smf-form-group">
+                    <div className="smf-checkbox-wrapper">
                       <input
                         type="checkbox"
-                        className="form-check-input"
+                        className="smf-checkbox-input"
                         id="anonCheck"
                         checked={form.isAnonymous}
                         onChange={(e) =>
@@ -735,71 +505,24 @@ export default function SubmitMentorFeedback() {
                           }))
                         }
                         disabled={loading}
-                        style={{
-                          borderRadius: "4px",
-                          width: "18px",
-                          height: "18px",
-                          marginLeft: "-8px",
-                          marginTop: "2px",
-                        }}
                       />
-                      <label
-                        className="form-check-label"
-                        htmlFor="anonCheck"
-                        style={{
-                          fontSize: "0.938rem",
-                          textAlign: "left",
-                          marginLeft: "0.75rem",
-                        }}
-                      >
+                      <label className="smf-checkbox-label" htmlFor="anonCheck">
                         Submit anonymously
-                        <div
-                          className="form-text"
-                          style={{
-                            fontSize: "0.813rem",
-                            marginTop: "0.25rem",
-                            textAlign: "left",
-                          }}
-                        >
+                        <div className="smf-checkbox-hint">
                           Your identity will be hidden from the mentor
                         </div>
                       </label>
                     </div>
                   </div>
 
-                  {/* Submit */}
                   <button
                     type="submit"
-                    className="btn btn-lg w-100 d-flex align-items-center justify-content-center gap-2"
+                    className="smf-submit-button"
                     disabled={loading || !isFormValid}
-                    style={{
-                      background:
-                        "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "10px",
-                      padding: "1rem",
-                      fontSize: "1rem",
-                      fontWeight: 600,
-                      transition: "all 0.3s ease",
-                      boxShadow: "0 4px 12px rgba(151, 36, 126, 0.25)",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!loading && isFormValid) {
-                        e.currentTarget.style.transform = "translateY(-2px)";
-                        e.currentTarget.style.boxShadow =
-                          "0 6px 16px rgba(151, 36, 126, 0.35)";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = "translateY(0)";
-                      e.currentTarget.style.boxShadow =
-                        "0 4px 12px rgba(151, 36, 126, 0.25)";
-                    }}
                   >
                     {loading ? (
                       <>
-                        <Loader size={20} className="animate-spin" />
+                        <Loader size={20} className="smf-loader" />
                         Submitting...
                       </>
                     ) : (
@@ -815,102 +538,6 @@ export default function SubmitMentorFeedback() {
           </div>
         </div>
       </div>
-
-      <style>{`
-        .animate-spin { animation: spin 1s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-        .prj-dropdown-wrapper {
-          position: relative;
-          width: 100%;
-        }
-
-        .prj-dropdown-select {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          width: 100%;
-          padding: 0.75rem 1rem;
-          font-size: 0.9375rem;
-          background: #ffffff;
-          border: 1px solid #e2e8f0;
-          border-radius: 10px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          user-select: none;
-        }
-
-        .prj-dropdown-select.open {
-          border-color: ${PRIMARY};
-          border-bottom-left-radius: 0;
-          border-bottom-right-radius: 0;
-          box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
-        }
-
-        .prj-dropdown-value {
-          flex: 1;
-          text-align: left;
-          color: #111827;
-          font-weight: 400;
-        }
-
-       .prj-dropdown-arrow {
-         margin-left: 0.5rem;
-         display: flex;
-         align-items: center;
-         justifyContent: center;
-}
-
-
-        .prj-dropdown-list {
-          position: absolute;
-          top: 100%;
-          left: 0;
-          right: 0;
-          background: #ffffff;
-          border: 1px solid ${PRIMARY};
-          border-top: none;
-          border-radius: 0 0 10px 10px;
-          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-          max-height: 260px;
-          overflow-y: auto;
-          z-index: 1000;
-          list-style: none;
-          margin: 0;
-          padding: 0;
-        }
-
-        .prj-dropdown-option {
-          padding: 0.75rem 1rem;
-          font-size: 0.9375rem;
-          color: #4b5563;
-          cursor: pointer;
-          transition: all 0.15s ease;
-          border-bottom: 1px solid #e5e7eb;
-          background: #ffffff;
-        }
-
-        .prj-dropdown-option:last-child {
-          border-bottom: none;
-        }
-
-        .prj-dropdown-option:hover {
-          background: ${PRIMARY};
-          color: #ffffff;
-          font-weight: 600;
-        }
-
-        .prj-dropdown-option.selected {
-          background: ${PRIMARY};
-          color: #ffffff;
-          font-weight: 600;
-        }
-
-        .form-control:focus, .form-select:focus {
-          border-color: ${PRIMARY};
-          box-shadow: 0 0 0 4px rgba(39, 35, 92, 0.1);
-        }
-      `}</style>
     </div>
   );
 }

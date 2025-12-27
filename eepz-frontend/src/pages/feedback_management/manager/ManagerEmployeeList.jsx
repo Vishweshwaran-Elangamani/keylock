@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { RefreshCw, AlertTriangle, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
+import "../../../styles/feedback/components/ManagerEmployeeList.css";
 
 const MOCK_EMPLOYEES = [
   {
@@ -54,90 +55,65 @@ export default function ManagerEmployeeList() {
   }, []);
 
   return (
-    <div className="container-fluid py-3" style={{ maxWidth: "1200px" }}>
-      <div className="d-flex justify-content-between align-items-start mb-4">
-        <div>
-          <h2
-            className="fw-bold mb-1"
-            style={{ color: "var(--color-primary-1)" }}
-          >
-            {" "}
-            Team Members:
-          </h2>
-          <p className="mb-0 small text-muted">Employees you manage</p>
-        </div>
-        <Link
-          to="/manager/dashboard/feedback"
-          className="btn btn-outline-secondary"
-        >
-          Back to Dashboard
-        </Link>
-      </div>
-
-      {error && (
-        <div
-          className="alert alert-danger d-flex align-items-start gap-2 mb-3"
-          style={{ borderRadius: "var(--radius-md)" }}
-        >
-          <AlertTriangle size={18} className="mt-1" />
-          <div>
-            <strong>Error</strong>
-            <p className="mb-0 small mt-1">{error}</p>
+    <div className="mrev-page">
+      <div className="mrev-container">
+        <div className="mrev-header">
+          <div className="mrev-header-left">
+            <h2 className="mrev-title">Team Members:</h2>
+            <p className="mrev-subtitle">Employees you manage</p>
           </div>
+          <Link to="/manager/dashboard/feedback" className="mrev-btn mrev-btn-outline">
+            Back to Dashboard
+          </Link>
         </div>
-      )}
 
-      <div
-        className="card border-0"
-        style={{
-          border: "1px solid var(--border)",
-          borderRadius: "var(--radius-lg)",
-          boxShadow: "var(--shadow)",
-        }}
-      >
-        <div className="card-body">
-          {employees.length === 0 ? (
-            <p className="text-muted mb-0">No employees found</p>
-          ) : (
-            <div className="row g-3">
-              {employees.map((emp) => (
-                <div className="col-md-6 col-lg-4" key={emp.empId}>
-                  <div
-                    className="card h-100 border-0"
-                    style={{
-                      border: "1px solid var(--border)",
-                      borderRadius: "var(--radius-lg)",
-                    }}
-                  >
-                    <div className="card-body">
-                      <h6 className="mb-1">
-                        {emp.firstName} {emp.lastName}
-                      </h6>
-                      <p className="small text-muted mb-2">
-                        {emp.employeeCode}
-                      </p>
-                      <div className="small mb-3">
-                        <div>
-                          <strong>Role:</strong> {emp.role}
+        {error && (
+          <div className="mrev-alert mrev-alert-error">
+            <AlertTriangle size={18} className="mrev-alert-icon" />
+            <div>
+              <strong>Error</strong>
+              <p className="mrev-alert-text">{error}</p>
+            </div>
+          </div>
+        )}
+
+        <div className="mrev-card">
+          <div className="mrev-card-body">
+            {employees.length === 0 ? (
+              <p className="mrev-empty-text">No employees found</p>
+            ) : (
+              <div className="mrev-employees-grid">
+                {employees.map((emp) => (
+                  <div className="mrev-employee-col" key={emp.empId}>
+                    <div className="mrev-employee-card">
+                      <div className="mrev-employee-card-body">
+                        <h6 className="mrev-employee-name">
+                          {emp.firstName} {emp.lastName}
+                        </h6>
+                        <p className="mrev-employee-code">{emp.employeeCode}</p>
+                        <div className="mrev-employee-details">
+                          <div className="mrev-detail-row">
+                            <strong>Role:</strong> {emp.role}
+                          </div>
+                          <div className="mrev-detail-row">
+                            <strong>Department:</strong> {emp.department}
+                          </div>
                         </div>
-                        <div>
-                          <strong>Department:</strong> {emp.department}
-                        </div>
+                        <Link
+                          to={`/manager/dashboard/feedback/create-review`}
+                          state={{ employee: emp }}
+                          className="mrev-btn mrev-btn-primary mrev-btn-full"
+                        >
+                          <Plus size={14} className="mrev-btn-icon-left" />
+                          Review
+                        </Link>
                       </div>
-                      <Link
-                        to={`/manager/dashboard/feedback/create-review`}
-                        state={{ employee: emp }}
-                        className="btn btn-sm btn-primary w-100"
-                      >
-                        <Plus size={14} className="me-1" />
-                        Review
-                      </Link>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

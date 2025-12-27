@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { CheckCircle, Send, AlertTriangle } from "lucide-react";
+import "../../../styles/feedback/components/SubmitOrgGoalFeedback.css";
 
 export default function SubmitOrgGoalFeedback() {
   const user = useMemo(
@@ -30,7 +31,6 @@ export default function SubmitOrgGoalFeedback() {
     setError("");
   };
 
-  // Fetch organization-wide objectives
   useEffect(() => {
     const fetchObjectives = async () => {
       try {
@@ -58,7 +58,6 @@ export default function SubmitOrgGoalFeedback() {
     fetchObjectives();
   }, []);
 
-  // Handle objective selection
   const handleObjectiveChange = (e) => {
     const selectedObjectiveId = Number(e.target.value);
     const selectedObjective = objectives.find(
@@ -133,91 +132,68 @@ export default function SubmitOrgGoalFeedback() {
   );
 
   return (
-    <div className="container-fluid py-3" style={{ maxWidth: "900px" }}>
-      {/* Header */}
-      <div className="d-flex justify-content-between align-items-start mb-4">
-        <div>
-          <h2
-            className="fw-bold mb-1"
-            style={{ color: "var(--color-primary-1)" }}
-          >
-            Submit Organization Objective Feedback
-          </h2>
-          <p className="mb-0 small" style={{ color: "var(--muted)" }}>
+    <div className="sogf-container">
+      <div className="sogf-header">
+        <div className="sogf-header-content">
+          <h2 className="sogf-title">Submit Organization Objective Feedback</h2>
+          <p className="sogf-subtitle">
             Provide your feedback on organization-wide objectives
           </p>
         </div>
       </div>
 
-      {/* Error Alert */}
       {error && (
-        <div
-          className="alert alert-danger d-flex align-items-start gap-2 mb-3"
-          style={{ borderRadius: "var(--radius-md)" }}
-        >
-          <AlertTriangle size={18} className="mt-1 flex-shrink-0" />
-          <div className="flex-grow-1">
+        <div className="sogf-alert sogf-alert-error">
+          <AlertTriangle size={18} className="sogf-alert-icon" />
+          <div className="sogf-alert-content">
             <strong>Error</strong>
-            <p className="mb-0 small mt-1">{error}</p>
+            <p className="sogf-alert-message">{error}</p>
           </div>
-          <button className="btn-close ms-auto" onClick={() => setError("")} />
+          <button className="sogf-alert-close" onClick={() => setError("")}>
+            ×
+          </button>
         </div>
       )}
 
-      {/* Success Alert */}
       {successMsg && (
-        <div
-          className="alert alert-success d-flex align-items-center gap-2 mb-3"
-          style={{ borderRadius: "var(--radius-md)" }}
-        >
-          <CheckCircle size={18} className="flex-shrink-0" />
-          <div className="small flex-grow-1">{successMsg}</div>
+        <div className="sogf-alert sogf-alert-success">
+          <CheckCircle size={18} className="sogf-alert-icon" />
+          <div className="sogf-alert-content">{successMsg}</div>
           <button
-            className="btn-close ms-auto"
+            className="sogf-alert-close"
             onClick={() => setSuccessMsg("")}
-          />
+          >
+            ×
+          </button>
         </div>
       )}
 
-      {/* Main Card */}
-      <div
-        className="card border-0"
-        style={{
-          border: "1px solid var(--border)",
-          borderRadius: "var(--radius-lg)",
-          boxShadow: "var(--shadow)",
-        }}
-      >
-        <div className="card-body">
+      <div className="sogf-card">
+        <div className="sogf-card-body">
           {objectivesLoading ? (
-            <div
-              className="d-flex align-items-center justify-content-center gap-2"
-              style={{ minHeight: "300px" }}
-            >
-              <div className="spinner-border spinner-border-sm" role="status">
-                <span className="visually-hidden">Loading...</span>
+            <div className="sogf-loading-state">
+              <div className="sogf-spinner" role="status">
+                <span className="sogf-visually-hidden">Loading...</span>
               </div>
-              <span className="small">Loading organization objectives...</span>
+              <span className="sogf-loading-text">
+                Loading organization objectives...
+              </span>
             </div>
           ) : objectives.length === 0 ? (
-            <div
-              className="alert alert-warning"
-              style={{ borderRadius: "var(--radius-md)" }}
-            >
-              <p className="mb-0 small">
+            <div className="sogf-alert sogf-alert-warning">
+              <p className="sogf-empty-message">
                 No organization objectives available at the moment.
               </p>
             </div>
           ) : (
-            <form onSubmit={submit} className="row g-4">
-              {/* Objective Selection */}
-              <div className="col-12">
-                <label className="form-label small fw-bold">
+            <form onSubmit={submit} className="sogf-form">
+              <div className="sogf-form-group">
+                <label className="sogf-label">
                   Select Organization Objective{" "}
-                  <span className="text-danger">*</span>
+                  <span className="sogf-required">*</span>
                 </label>
                 <select
-                  className="form-select"
+                  className="sogf-select"
                   value={form.objectiveId || ""}
                   onChange={handleObjectiveChange}
                   required
@@ -234,74 +210,65 @@ export default function SubmitOrgGoalFeedback() {
                 </select>
               </div>
 
-              {/* Objective Description Display */}
               {selectedObjective && (
-                <div className="col-12">
-                  <div
-                    className="alert alert-info small"
-                    style={{ borderRadius: "var(--radius-md)" }}
-                  >
+                <div className="sogf-form-group">
+                  <div className="sogf-objective-description">
                     <strong>Objective Description:</strong>
-                    <p className="mb-0 mt-2">{selectedObjective.description}</p>
+                    <p className="sogf-description-text">
+                      {selectedObjective.description}
+                    </p>
                   </div>
                 </div>
               )}
 
-              {/* Rating Slider */}
-              <div className="col-md-6">
-                <label className="form-label small fw-bold">
-                  Rating <span className="text-danger">*</span>
-                </label>
-                <div className="d-flex align-items-center gap-3">
-                  <input
-                    type="range"
-                    min="1"
-                    max="5"
-                    className="form-range"
-                    value={form.rating}
-                    onChange={(e) =>
-                      setForm({ ...form, rating: Number(e.target.value) })
-                    }
-                    style={{ flex: 1 }}
-                  />
-                  <span
-                    className="badge bg-primary px-3 py-2"
-                    style={{ minWidth: "60px", textAlign: "center" }}
-                  >
-                    {form.rating} ⭐
-                  </span>
-                </div>
-              </div>
-
-              {/* Anonymous Checkbox */}
-              <div className="col-md-6">
-                <label className="form-label small fw-bold">&nbsp;</label>
-                <div className="form-check mt-2">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="anonymousCheckbox"
-                    checked={form.isAnonymous}
-                    onChange={(e) =>
-                      setForm({ ...form, isAnonymous: e.target.checked })
-                    }
-                  />
-                  <label
-                    className="form-check-label small"
-                    htmlFor="anonymousCheckbox"
-                  >
-                    Submit anonymously
+              <div className="sogf-form-row">
+                <div className="sogf-form-col">
+                  <label className="sogf-label">
+                    Rating <span className="sogf-required">*</span>
                   </label>
+                  <div className="sogf-rating-wrapper">
+                    <input
+                      type="range"
+                      min="1"
+                      max="5"
+                      className="sogf-range"
+                      value={form.rating}
+                      onChange={(e) =>
+                        setForm({ ...form, rating: Number(e.target.value) })
+                      }
+                    />
+                    <span className="sogf-rating-badge">{form.rating} ⭐</span>
+                  </div>
+                </div>
+
+                <div className="sogf-form-col">
+                  <label className="sogf-label sogf-label-spacer">&nbsp;</label>
+                  <div className="sogf-checkbox-wrapper">
+                    <input
+                      className="sogf-checkbox-input"
+                      type="checkbox"
+                      id="anonymousCheckbox"
+                      checked={form.isAnonymous}
+                      onChange={(e) =>
+                        setForm({ ...form, isAnonymous: e.target.checked })
+                      }
+                    />
+                    <label
+                      className="sogf-checkbox-label"
+                      htmlFor="anonymousCheckbox"
+                    >
+                      Submit anonymously
+                    </label>
+                  </div>
                 </div>
               </div>
 
-              {/* Comments Textarea */}
-              <div className="col-12">
-                <label className="form-label small fw-bold">
-                  Your Feedback <span className="text-danger">*</span>
+              <div className="sogf-form-group">
+                <label className="sogf-label">
+                  Your Feedback <span className="sogf-required">*</span>
                 </label>
                 <textarea
-                  className="form-control"
+                  className="sogf-textarea"
                   rows={5}
                   value={form.feedbackComments}
                   onChange={(e) =>
@@ -312,15 +279,14 @@ export default function SubmitOrgGoalFeedback() {
                   disabled={!form.objectiveId}
                   maxLength={1000}
                 />
-                <small className="text-muted d-block mt-1">
+                <small className="sogf-char-count">
                   {form.feedbackComments.length} / 1000 characters
                 </small>
               </div>
 
-              {/* Submit Button */}
-              <div className="col-12 d-grid">
+              <div className="sogf-form-group">
                 <button
-                  className="btn btn-primary"
+                  className="sogf-submit-button"
                   disabled={
                     loading ||
                     !form.objectiveId ||
@@ -328,18 +294,16 @@ export default function SubmitOrgGoalFeedback() {
                   }
                   type="submit"
                 >
-                  <Send size={16} className="me-2" />
                   {loading ? (
                     <>
-                      <span
-                        className="spinner-border spinner-border-sm me-2"
-                        role="status"
-                        aria-hidden="true"
-                      ></span>
+                      <span className="sogf-button-spinner" role="status" aria-hidden="true"></span>
                       Submitting...
                     </>
                   ) : (
-                    "Submit Feedback"
+                    <>
+                      <Send size={16} className="sogf-button-icon" />
+                      Submit Feedback
+                    </>
                   )}
                 </button>
               </div>

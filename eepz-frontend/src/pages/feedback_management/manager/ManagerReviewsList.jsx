@@ -1,5 +1,3 @@
-// src/pages/feedback_management/manager/ManagerReviewsList.jsx
-
 import React, { useEffect, useState, useMemo } from "react";
 import {
   RefreshCw,
@@ -16,7 +14,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { employeeApi, managerReviewApi } from '../../../services/feedbackmanagement/feedbackApi';
 import FeedbackBreadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb";
-import "../../../styles/feedback/ManagerReviewsList.css";
+import "../../../styles/feedback/components/ManagerReviewsList.css";
 
 const RATING_LABELS = {
   1: "Poor",
@@ -178,7 +176,6 @@ export default function ManagerReviewsList() {
 
   return (
     <>
-      {/* Edit Modal */}
       {showEditModal && (
         <>
           <div
@@ -362,7 +359,7 @@ export default function ManagerReviewsList() {
 
       <div className="fm-mgrrev-page-wrapper">
         <div className="fm-mgrrev-container">
-          {/* Breadcrumb and Actions */}
+        
           <div className="fm-mgrrev-header">
             <FeedbackBreadcrumb
               items={[
@@ -374,7 +371,6 @@ export default function ManagerReviewsList() {
             
           </div>
 
-          {/* Error Alert */}
           {error && (
             <div className="fm-mgrrev-error-alert alert alert-danger alert-dismissible fade show">
               <AlertTriangle size={18} className="flex-shrink-0" />
@@ -390,7 +386,7 @@ export default function ManagerReviewsList() {
             </div>
           )}
 
-          {/* Reviews Table */}
+         
           <div className="fm-mgrrev-table-wrapper">
             {loading ? (
               <div className="fm-mgrrev-loading">

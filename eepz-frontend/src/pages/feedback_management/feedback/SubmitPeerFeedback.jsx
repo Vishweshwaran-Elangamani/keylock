@@ -1,11 +1,10 @@
-// src/pages/feedback_management/feedback/SubmitPeerFeedback.jsx
-
 import React, { useEffect, useMemo, useState } from "react";
 import { CheckCircle, Send, AlertTriangle, Loader } from "lucide-react";
 import {
   peerQueueApi,
   employeeApi,
 } from "../../../services/feedbackmanagement/feedbackApi";
+import "../../../styles/feedback/components/SubmitPeerFeedback.css";
 
 export default function SubmitPeerFeedback() {
   const user = useMemo(
@@ -30,7 +29,6 @@ export default function SubmitPeerFeedback() {
   const [successMsg, setSuccessMsg] = useState("");
   const [error, setError] = useState("");
 
-  // Fetch employees using service
   useEffect(() => {
     fetchEmployees();
   }, []);
@@ -58,7 +56,6 @@ export default function SubmitPeerFeedback() {
     }
   };
 
-  // Submit feedback using service
   const submitFeedback = async (e) => {
     e.preventDefault();
 
@@ -70,7 +67,6 @@ export default function SubmitPeerFeedback() {
     setError("");
 
     try {
-      // Find the selected employee
       const selectedEmp = employees.find(
         (emp) =>
           String(emp.employeeMasterId) === String(form.recipientEmployeeId)
@@ -82,7 +78,6 @@ export default function SubmitPeerFeedback() {
         return;
       }
 
-      // STEP 1: Create the feedback (initially in Pending status)
       const payload = {
         submittedByEmployeeId: Number(user?.empId),
         recipientEmployeeId: Number(selectedEmp.employeeId),
@@ -100,7 +95,6 @@ export default function SubmitPeerFeedback() {
           throw new Error("Queue ID not returned from create endpoint");
         }
 
-        // STEP 2: Auto-approve the feedback
         try {
           const approveResponse = await peerQueueApi.approve(queueId, {
             isProfessional: true,
@@ -114,7 +108,6 @@ export default function SubmitPeerFeedback() {
             );
             resetForm();
           } else {
-            // Feedback created but approval failed - still show partial success
             setSuccessMsg(
               `Feedback submitted to ${selectedEmp.firstName} ${selectedEmp.lastName}, but auto-approval failed. HR will review it.`
             );
@@ -144,7 +137,6 @@ export default function SubmitPeerFeedback() {
     }
   };
 
-  // Form handlers
   const handleRecipientChange = (e) => {
     setForm((prev) => ({ ...prev, recipientEmployeeId: e.target.value }));
   };
@@ -157,7 +149,6 @@ export default function SubmitPeerFeedback() {
     setForm((prev) => ({ ...prev, isAnonymous: e.target.checked }));
   };
 
-  // Form validation
   const validateForm = () => {
     if (!form.recipientEmployeeId) {
       setError("Please select a recipient employee");
@@ -174,7 +165,6 @@ export default function SubmitPeerFeedback() {
     return true;
   };
 
-  // Reset form
   const resetForm = () => {
     setForm({
       recipientEmployeeId: "",
@@ -183,79 +173,64 @@ export default function SubmitPeerFeedback() {
     });
   };
 
-  // Close alert
   const closeAlert = (type) => {
     if (type === "error") setError("");
     if (type === "success") setSuccessMsg("");
   };
 
-  // Get selected employee details
   const selectedEmployee = employees.find(
     (emp) => String(emp.employeeMasterId) === String(form.recipientEmployeeId)
   );
 
-  // Character count tracking
   const charCount = form.feedbackContent.length;
   const charRemaining = 5000 - charCount;
   const isNearLimit = charCount > 4500;
 
   return (
-    <div className="container-fluid py-4" style={{ maxWidth: "1000px" }}>
-      {/* Header */}
-      <div className="mb-4">
-        <h2
-          className="fw-bold mb-2"
-          style={{ color: "var(--color-primary-1)" }}
-        >
-          Submit Peer Feedback
-        </h2>
-        <p className="text-muted mb-0">
+    <div className="spf-container">
+      <div className="spf-header">
+        <h2 className="spf-title">Submit Peer Feedback</h2>
+        <p className="spf-subtitle">
           Share constructive feedback with a colleague to support their growth
         </p>
       </div>
 
-      {/* Error Alert */}
       {error && (
-        <div
-          className="alert alert-danger alert-dismissible fade show d-flex align-items-start gap-2"
-          role="alert"
-        >
-          <AlertTriangle size={20} className="mt-1 flex-shrink-0" />
-          <div className="flex-grow-1">
+        <div className="spf-alert spf-alert-error">
+          <AlertTriangle size={20} className="spf-alert-icon" />
+          <div className="spf-alert-content">
             <strong>Error</strong>
-            <p className="mb-0 mt-1">{error}</p>
+            <p className="spf-alert-message">{error}</p>
           </div>
           <button
             type="button"
-            className="btn-close"
+            className="spf-alert-close"
             onClick={() => closeAlert("error")}
             aria-label="Close"
-          />
+          >
+            ×
+          </button>
         </div>
       )}
 
-      {/* Success Alert */}
       {successMsg && (
-        <div
-          className="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2"
-          role="alert"
-        >
-          <CheckCircle size={20} className="flex-shrink-0" />
-          <div className="flex-grow-1">{successMsg}</div>
+        <div className="spf-alert spf-alert-success">
+          <CheckCircle size={20} className="spf-alert-icon" />
+          <div className="spf-alert-content">{successMsg}</div>
           <button
             type="button"
-            className="btn-close"
+            className="spf-alert-close"
             onClick={() => closeAlert("success")}
             aria-label="Close"
-          />
+          >
+            ×
+          </button>
         </div>
       )}
 
-      {/* Main Card */}
-      <div className="card shadow-sm" style={{ borderRadius: "8px" }}>
-        <div className="card-body p-4">
-          {/* Debug Info */}
-          <div className="alert alert-info small mb-4">
+      <div className="spf-card">
+        <div className="spf-card-body">
+          <div className="spf-debug-info">
             <strong>Logged in as:</strong> {user?.firstName} {user?.lastName}{" "}
             (ID: {user?.empId})
             <br />
@@ -265,27 +240,20 @@ export default function SubmitPeerFeedback() {
             immediately)
           </div>
 
-          {/* Form */}
           <form onSubmit={submitFeedback} noValidate>
-            {/* Recipient Selection Row */}
-            <div className="row g-3 mb-4">
-              {/* Dropdown Column */}
-              <div className="col-lg-6">
-                <label
-                  htmlFor="recipientSelect"
-                  className="form-label fw-bold mb-2"
-                >
-                  Select Recipient Employee <span className="text-danger">*</span>
+            <div className="spf-form-row">
+              <div className="spf-form-col">
+                <label htmlFor="recipientSelect" className="spf-label">
+                  Select Recipient Employee <span className="spf-required">*</span>
                 </label>
-                <div className="position-relative">
+                <div className="spf-select-wrapper">
                   <select
                     id="recipientSelect"
-                    className="form-select"
+                    className="spf-select"
                     value={form.recipientEmployeeId}
                     onChange={handleRecipientChange}
                     disabled={loadingEmployees || employees.length === 0}
                     aria-label="Select recipient employee"
-                    style={{ height: "40px" }}
                   >
                     <option value="">
                       {loadingEmployees
@@ -304,56 +272,37 @@ export default function SubmitPeerFeedback() {
                     ))}
                   </select>
                   {loadingEmployees && (
-                    <Loader
-                      size={16}
-                      className="position-absolute"
-                      style={{
-                        right: "12px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        animation: "spin 1s linear infinite",
-                      }}
-                    />
+                    <Loader size={16} className="spf-select-loader" />
                   )}
                 </div>
-                <small className="d-block mt-2 text-muted">
+                <small className="spf-help-text">
                   {selectedEmployee
                     ? `Selected: ${selectedEmployee.firstName} ${selectedEmployee.lastName}`
                     : "Choose an employee to give feedback to"}
                 </small>
               </div>
 
-              {/* Recipient Details Column */}
               {selectedEmployee && (
-                <div className="col-lg-6">
-                  <label className="form-label fw-bold mb-2">
-                    Recipient Details
-                  </label>
-                  <div
-                    className="p-3 rounded h-100"
-                    style={{
-                      backgroundColor: "#e7f3ff",
-                      border: "1px solid #b3d9ff",
-                      borderRadius: "8px",
-                    }}
-                  >
-                    <div style={{ fontSize: "0.9rem" }}>
-                      <p className="mb-2">
+                <div className="spf-form-col">
+                  <label className="spf-label">Recipient Details</label>
+                  <div className="spf-recipient-details">
+                    <div className="spf-details-content">
+                      <p className="spf-detail-item">
                         <strong>Name:</strong>
                         <br />
                         {selectedEmployee.firstName} {selectedEmployee.lastName}
                       </p>
-                      <p className="mb-2">
+                      <p className="spf-detail-item">
                         <strong>Email:</strong>
                         <br />
                         {selectedEmployee.email}
                       </p>
-                      <p className="mb-2">
+                      <p className="spf-detail-item">
                         <strong>Role:</strong>
                         <br />
                         {selectedEmployee.roleName}
                       </p>
-                      <p className="mb-0">
+                      <p className="spf-detail-item spf-detail-item-last">
                         <strong>Department:</strong>
                         <br />
                         {selectedEmployee.departmentName}
@@ -364,36 +313,29 @@ export default function SubmitPeerFeedback() {
               )}
             </div>
 
-            {/* Feedback Content */}
-            <div className="mb-3">
-              <label
-                htmlFor="feedbackContent"
-                className="form-label fw-bold mb-2"
-              >
-                Feedback Content <span className="text-danger">*</span>
+            <div className="spf-form-group">
+              <label htmlFor="feedbackContent" className="spf-label">
+                Feedback Content <span className="spf-required">*</span>
               </label>
               <textarea
                 id="feedbackContent"
-                className="form-control"
+                className="spf-textarea"
                 rows={5}
                 placeholder="Share specific, constructive feedback. Example: 'Your communication in meetings is clear and inclusive...'"
                 value={form.feedbackContent}
                 onChange={handleFeedbackChange}
                 disabled={loading}
                 maxLength={5000}
-                style={{
-                  resize: "vertical",
-                  minHeight: "140px",
-                  borderRadius: "8px",
-                }}
                 aria-label="Enter feedback content"
               />
-              <div className="d-flex justify-content-between align-items-center mt-2">
-                <small className="text-muted">
+              <div className="spf-textarea-footer">
+                <small className="spf-help-text">
                   Provide specific, actionable, and constructive feedback
                 </small>
                 <small
-                  className={isNearLimit ? "text-danger fw-bold" : "text-muted"}
+                  className={`spf-char-count ${
+                    isNearLimit ? "spf-char-count-warning" : ""
+                  }`}
                 >
                   {charCount} / 5000 characters
                   {isNearLimit && ` (${charRemaining} remaining)`}
@@ -401,65 +343,50 @@ export default function SubmitPeerFeedback() {
               </div>
             </div>
 
-            {/* Anonymous Checkbox */}
-            <div className="mb-4">
-              <div className="form-check">
+            <div className="spf-form-group">
+              <div className="spf-checkbox-wrapper">
                 <input
                   id="isAnonymous"
                   type="checkbox"
-                  className="form-check-input"
+                  className="spf-checkbox-input"
                   checked={form.isAnonymous}
                   onChange={handleAnonymousChange}
                   disabled={loading}
                 />
-                <label htmlFor="isAnonymous" className="form-check-label">
+                <label htmlFor="isAnonymous" className="spf-checkbox-label">
                   <strong>Submit anonymously</strong>
-                  <small className="d-block text-muted mt-1">
+                  <small className="spf-checkbox-hint">
                     Your name won't be shown to the recipient
                   </small>
                 </label>
               </div>
             </div>
 
-            {/* Buttons */}
-            <div className="d-grid gap-2 d-sm-flex justify-content-sm-between">
+            <div className="spf-button-group">
               <button
                 type="submit"
-                className="btn btn-primary btn-lg"
+                className="spf-submit-button"
                 disabled={
                   loading || loadingEmployees || !form.recipientEmployeeId
                 }
-                style={{ minWidth: "200px", borderRadius: "8px" }}
               >
                 {loading ? (
                   <>
-                    <Loader
-                      size={16}
-                      className="me-2"
-                      style={{
-                        display: "inline",
-                        animation: "spin 1s linear infinite",
-                      }}
-                    />
+                    <Loader size={16} className="spf-button-loader" />
                     Submitting & Approving...
                   </>
                 ) : (
                   <>
-                    <Send
-                      size={16}
-                      className="me-2"
-                      style={{ display: "inline" }}
-                    />
+                    <Send size={16} className="spf-button-icon" />
                     Submit Feedback
                   </>
                 )}
               </button>
               <button
                 type="button"
-                className="btn btn-outline-secondary btn-lg"
+                className="spf-clear-button"
                 onClick={resetForm}
                 disabled={loading}
-                style={{ borderRadius: "8px" }}
               >
                 Clear Form
               </button>
@@ -468,23 +395,15 @@ export default function SubmitPeerFeedback() {
         </div>
       </div>
 
-      {/* Footer Info */}
-      <div className="mt-4 p-3 bg-light rounded small text-muted">
+      <div className="spf-tips">
         <strong>Tips for good feedback:</strong>
-        <ul className="mb-0 mt-2 ps-3">
+        <ul className="spf-tips-list">
           <li>Be specific about behaviors and outcomes, not personality</li>
           <li>Provide examples to support your feedback</li>
           <li>Balance constructive criticism with recognition</li>
           <li>Focus on things they can improve</li>
         </ul>
       </div>
-
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 }

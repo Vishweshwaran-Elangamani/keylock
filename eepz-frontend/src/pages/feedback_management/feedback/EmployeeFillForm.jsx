@@ -1,5 +1,3 @@
-// src/pages/feedback_management/forms/EmployeeFillForm.jsx
-
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import {
   CheckCircle,
@@ -13,8 +11,8 @@ import {
 } from "lucide-react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import hrFormApi from "../../../services/feedbackmanagement/hrFormApi";
+import "../../../styles/feedback/components/EmployeeFillForm.css";
 
-// Helper function to get role-based feedback dashboard path
 const getFeedbackDashboardPath = (roleName) => {
   const routes = {
     Employee: "/employee/dashboard/feedback",
@@ -46,12 +44,10 @@ export default function EmployeeFillForm() {
     ? getFeedbackDashboardPath(user.roleName)
     : "/hr/dashboard/feedback";
 
-  // Question templates
   const QUESTION_TEMPLATES = {
     PerformanceReview: {
       label: "Performance Appraisal Process",
-      description:
-        "Evaluate the effectiveness of our performance appraisal and review process",
+      description: "Evaluate the effectiveness of our performance appraisal and review process",
       questions: [
         {
           id: 1,
@@ -117,8 +113,7 @@ export default function EmployeeFillForm() {
     },
     GeneralFeedback: {
       label: "General Feedback",
-      description:
-        "Provide feedback on workplace environment and organizational practices",
+      description: "Provide feedback on workplace environment and organizational practices",
       questions: [
         {
           id: 1,
@@ -154,8 +149,7 @@ export default function EmployeeFillForm() {
     },
     BiasReview: {
       label: "Bias & Inclusion Review",
-      description:
-        "Assess organizational fairness, diversity, and inclusion practices",
+      description: "Assess organizational fairness, diversity, and inclusion practices",
       questions: [
         {
           id: 1,
@@ -203,8 +197,7 @@ export default function EmployeeFillForm() {
     },
     ProfessionalismReview: {
       label: "Professionalism Standards Review",
-      description:
-        "Evaluate organizational policies and professional conduct standards",
+      description: "Evaluate organizational policies and professional conduct standards",
       questions: [
         {
           id: 1,
@@ -363,10 +356,7 @@ export default function EmployeeFillForm() {
       if (typeof dateValue === "string") {
         parsedDate = new Date(dateValue);
       } else if (typeof dateValue === "number") {
-        parsedDate =
-          dateValue > 10000000000
-            ? new Date(dateValue)
-            : new Date(dateValue * 1000);
+        parsedDate = dateValue > 10000000000 ? new Date(dateValue) : new Date(dateValue * 1000);
       } else {
         parsedDate = new Date(dateValue);
       }
@@ -407,16 +397,13 @@ export default function EmployeeFillForm() {
     [parseDate]
   );
 
-  // Fetch form
   useEffect(() => {
     const fetchForm = async () => {
       try {
         const response = await hrFormApi.getFormById(formId);
         if (response?.data) {
           const formData = response.data;
-          const templateData =
-            QUESTION_TEMPLATES[formData.formType] ||
-            QUESTION_TEMPLATES.GeneralFeedback;
+          const templateData = QUESTION_TEMPLATES[formData.formType] || QUESTION_TEMPLATES.GeneralFeedback;
           setForm({ ...formData, ...templateData });
         } else {
           throw new Error("Invalid form data");
@@ -441,9 +428,7 @@ export default function EmployeeFillForm() {
     setSuccess("");
 
     if (!form || Object.keys(responses).length < form.questions?.length) {
-      setError(
-        `Please answer all ${form.questions?.length} questions before submitting`
-      );
+      setError(`Please answer all ${form.questions?.length} questions before submitting`);
       return;
     }
 
@@ -464,9 +449,7 @@ export default function EmployeeFillForm() {
     try {
       const createResponse = await hrFormApi.createResponse(payload);
       if (createResponse?.success || createResponse?.data?.success) {
-        const responseId =
-          createResponse.data?.responseId ||
-          createResponse.data?.data?.responseId;
+        const responseId = createResponse.data?.responseId || createResponse.data?.data?.responseId;
         if (!responseId) {
           throw new Error("Response ID not returned from create endpoint");
         }
@@ -475,9 +458,7 @@ export default function EmployeeFillForm() {
           setSuccess("Form submitted successfully!");
           setTimeout(() => navigate(-1), 2000);
         } else {
-          setError(
-            "Response saved as draft but failed to submit. Please contact support."
-          );
+          setError("Response saved as draft but failed to submit. Please contact support.");
         }
       } else {
         setError(createResponse?.message || "Failed to create form response");
@@ -495,25 +476,16 @@ export default function EmployeeFillForm() {
     }
   };
 
-  const progress = form
-    ? (Object.keys(responses).length / form.questions.length) * 100
-    : 0;
+  const progress = form ? (Object.keys(responses).length / form.questions.length) * 100 : 0;
   const daysLeft = form ? calculateDaysLeft(form.deadline) : null;
   const formattedDeadline = form ? formatDate(form.deadline) : "";
 
   if (loading) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "60vh" }}
-      >
-        <div className="text-center">
-          <Loader
-            size={40}
-            className="text-primary mb-3"
-            style={{ animation: "spin 1s linear infinite" }}
-          />
-          <p className="text-muted">Loading form...</p>
+      <div className="eaf-loading-wrapper">
+        <div className="eaf-loading-content">
+          <Loader size={40} className="eaf-loading-spinner" />
+          <p className="eaf-loading-text">Loading form...</p>
         </div>
       </div>
     );
@@ -521,128 +493,61 @@ export default function EmployeeFillForm() {
 
   if (!form) {
     return (
-      <div className="container-fluid py-4" style={{ maxWidth: "800px" }}>
-        <nav aria-label="breadcrumb" className="mb-3">
-          <ol
-            className="breadcrumb mb-0"
-            style={{ columnGap: "0.5rem", alignItems: "center" }}
-          >
-            <li className="breadcrumb-item">
-              <Link
-                to={feedbackDashboardPath.replace("/feedback", "")}
-                className="d-flex align-items-center"
-                style={{ color: "#97247E", textDecoration: "none" }}
-              >
-                <Home size={16} className="me-1" />
+      <div className="eaf-container">
+        <nav aria-label="breadcrumb" className="eaf-breadcrumb-wrapper">
+          <ol className="eaf-breadcrumb">
+            <li className="eaf-breadcrumb-item">
+              <Link to={feedbackDashboardPath.replace("/feedback", "")} className="eaf-breadcrumb-link">
+                <Home size={16} className="eaf-breadcrumb-icon" />
                 Dashboard
               </Link>
             </li>
-            <li className="breadcrumb-separator" style={{ color: "#97247E" }}>
-              /
-            </li>
-            <li className="breadcrumb-item">
-              <Link
-                to={feedbackDashboardPath}
-                style={{ color: "#97247E", textDecoration: "none" }}
-              >
+            <li className="eaf-breadcrumb-separator">/</li>
+            <li className="eaf-breadcrumb-item">
+              <Link to={feedbackDashboardPath} className="eaf-breadcrumb-link">
                 Feedback Management
               </Link>
             </li>
-            <li className="breadcrumb-separator" style={{ color: "#97247E" }}>
-              /
-            </li>
-            <li className="breadcrumb-item active" aria-current="page">
-              Assigned Forms
-            </li>
+            <li className="eaf-breadcrumb-separator">/</li>
+            <li className="eaf-breadcrumb-item eaf-breadcrumb-active">Assigned Forms</li>
           </ol>
         </nav>
 
-        <div className="alert alert-danger d-flex align-items-center gap-2">
+        <div className="eaf-alert eaf-alert-danger">
           <AlertTriangle size={20} />
           <div>
             <strong>Error</strong>
-            <p className="mb-0 small mt-1">
-              Form not found or failed to load
-            </p>
+            <p className="eaf-alert-message">Form not found or failed to load</p>
           </div>
         </div>
-        <button className="btn btn-primary" onClick={() => navigate(-1)}>
+        <button className="eaf-btn eaf-btn-primary" onClick={() => navigate(-1)}>
           Back to Assigned Forms
         </button>
-
-        <style>{`
-          @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-          }
-        `}</style>
       </div>
     );
   }
 
   return (
-    <div className="container-fluid py-4">
-      {/* Breadcrumb aligned with form header */}
-      <div className="row">
-        <div className="col-lg-9 col-xl-10 offset-lg-3 offset-xl-2">
-          <nav aria-label="breadcrumb" className="mb-3">
-            <ol
-              className="breadcrumb mb-0"
-              style={{ columnGap: "0.5rem", alignItems: "center" }}
-            >
-              <li className="breadcrumb-item">
-                <Link
-                  to={feedbackDashboardPath.replace("/feedback", "")}
-                  className="d-flex align-items-center"
-                  style={{
-                    color: "#97247E",
-                    textDecoration: "none",
-                    fontWeight: 500,
-                  }}
-                >
-                  <Home size={16} className="me-1" />
+    <div className="eaf-container-fluid">
+      <div className="eaf-row">
+        <div className="eaf-col-main">
+          <nav aria-label="breadcrumb" className="eaf-breadcrumb-wrapper">
+            <ol className="eaf-breadcrumb">
+              <li className="eaf-breadcrumb-item">
+                <Link to={feedbackDashboardPath.replace("/feedback", "")} className="eaf-breadcrumb-link">
+                  <Home size={16} className="eaf-breadcrumb-icon" />
                   Dashboard
                 </Link>
               </li>
-              <li
-                className="breadcrumb-separator"
-                style={{ color: "#97247E" }}
-              >
-                /
-              </li>
-              <li className="breadcrumb-item">
-                <Link
-                  to={feedbackDashboardPath}
-                  style={{
-                    color: "#97247E",
-                    textDecoration: "none",
-                    fontWeight: 500,
-                  }}
-                >
+              <li className="eaf-breadcrumb-separator">/</li>
+              <li className="eaf-breadcrumb-item">
+                <Link to={feedbackDashboardPath} className="eaf-breadcrumb-link">
                   Feedback Management
                 </Link>
               </li>
-              <li
-                className="breadcrumb-separator"
-                style={{ color: "#97247E" }}
-              >
-                /
-              </li>
-              {/* Clickable Assigned Forms that goes back */}
-              <li className="breadcrumb-item">
-                <button
-                  type="button"
-                  onClick={() => navigate(-1)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    padding: 0,
-                    margin: 0,
-                    color: "#97247E",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                  }}
-                >
+              <li className="eaf-breadcrumb-separator">/</li>
+              <li className="eaf-breadcrumb-item">
+                <button type="button" onClick={() => navigate(-1)} className="eaf-breadcrumb-button">
                   Assigned Forms
                 </button>
               </li>
@@ -651,146 +556,50 @@ export default function EmployeeFillForm() {
         </div>
       </div>
 
-      <div className="row">
-        {/* LEFT SIDEBAR - CIRCULAR PROGRESS */}
-        <div className="col-lg-3 col-xl-2">
-          <div
-            style={{
-              position: "sticky",
-              top: "20px",
-              paddingTop: "20px",
-            }}
-          >
-            <div className="text-center mb-4">
-              <div
-                style={{
-                  position: "relative",
-                  width: "140px",
-                  height: "140px",
-                  margin: "0 auto",
-                }}
-              >
-                <svg
-                  width="140"
-                  height="140"
-                  style={{ transform: "rotate(-90deg)" }}
-                >
+      <div className="eaf-row">
+        <div className="eaf-col-sidebar">
+          <div className="eaf-sidebar-sticky">
+            <div className="eaf-progress-circle-wrapper">
+              <div className="eaf-progress-circle">
+                <svg width="140" height="140" className="eaf-progress-svg">
+                  <circle cx="70" cy="70" r="60" className="eaf-progress-bg" />
                   <circle
                     cx="70"
                     cy="70"
                     r="60"
-                    fill="none"
-                    stroke="#e0e0e0"
-                    strokeWidth="10"
-                  />
-                  <circle
-                    cx="70"
-                    cy="70"
-                    r="60"
-                    fill="none"
-                    stroke="#27235C"
-                    strokeWidth="10"
-                    strokeDasharray={`${(progress / 100) * 377} 377`}
-                    strokeLinecap="round"
-                    style={{
-                      transition: "stroke-dasharray 0.3s ease",
-                    }}
+                    className="eaf-progress-bar"
+                    style={{ strokeDasharray: `${(progress / 100) * 377} 377` }}
                   />
                 </svg>
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    textAlign: "center",
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: "28px",
-                      fontWeight: "bold",
-                      color: "#27235C",
-                    }}
-                  >
-                    {Math.round(progress)}%
-                  </div>
-                  <div
-                    style={{
-                      fontSize: "12px",
-                      color: "#6c757d",
-                      marginTop: "4px",
-                    }}
-                  >
-                    Complete
-                  </div>
+                <div className="eaf-progress-label">
+                  <div className="eaf-progress-value">{Math.round(progress)}%</div>
+                  <div className="eaf-progress-text">Complete</div>
                 </div>
               </div>
-              <div className="mt-3">
-                <small className="text-muted d-block">
-                  {Object.keys(responses).length} of {form.questions.length}{" "}
-                  answered
-                </small>
+              <div className="eaf-progress-info">
+                {Object.keys(responses).length} of {form.questions.length} answered
               </div>
             </div>
 
-            <div
-              className="card border-0 shadow-sm"
-              style={{ borderRadius: "8px" }}
-            >
-              <div className="card-body p-3">
-                <h6
-                  className="fw-bold mb-3 text-start"
-                  style={{ fontSize: "14px" }}
-                >
-                  Questions
-                </h6>
-                <div className="d-flex flex-column gap-2">
+            <div className="eaf-questions-card">
+              <div className="eaf-questions-card-body">
+                <h6 className="eaf-questions-title">Questions</h6>
+                <div className="eaf-questions-list">
                   {form.questions.map((q, idx) => (
                     <div
                       key={q.id}
-                      className="d-flex align-items-center gap-2"
-                      style={{ cursor: "pointer" }}
+                      className="eaf-question-item"
                       onClick={() => {
-                        document
-                          .getElementById(`question-${q.id}`)
-                          ?.scrollIntoView({
-                            behavior: "smooth",
-                            block: "center",
-                          });
+                        document.getElementById(`question-${q.id}`)?.scrollIntoView({
+                          behavior: "smooth",
+                          block: "center",
+                        });
                       }}
                     >
-                      <div
-                        style={{
-                          width: "28px",
-                          height: "28px",
-                          borderRadius: "50%",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontSize: "12px",
-                          fontWeight: "bold",
-                          backgroundColor: responses[q.id]
-                            ? "#27235C"
-                            : "#e0e0e0",
-                          color: responses[q.id] ? "#fff" : "#6c757d",
-                          transition: "all 0.2s",
-                        }}
-                      >
-                        {responses[q.id] ? (
-                          <CheckCircle size={16} />
-                        ) : (
-                          idx + 1
-                        )}
+                      <div className={`eaf-question-number ${responses[q.id] ? "eaf-question-number-answered" : ""}`}>
+                        {responses[q.id] ? <CheckCircle size={16} /> : idx + 1}
                       </div>
-                      <small
-                        className="text-start"
-                        style={{
-                          fontSize: "11px",
-                          color: responses[q.id] ? "#27235C" : "#6c757d",
-                          fontWeight: responses[q.id] ? "600" : "400",
-                        }}
-                      >
+                      <small className={`eaf-question-category ${responses[q.id] ? "eaf-question-category-answered" : ""}`}>
                         {q.category}
                       </small>
                     </div>
@@ -801,110 +610,44 @@ export default function EmployeeFillForm() {
           </div>
         </div>
 
-        {/* MAIN CONTENT */}
-        <div className="col-lg-9 col-xl-10">
-          {/* HEADER */}
-          <div className="mb-4 text-start">
-            <div className="mb-3">
-              <h2 className="fw-bold mb-1" style={{ color: "#27235C" }}>
-                {form.formName}
-              </h2>
-              <p className="mb-0 text-muted small">{form.formDescription}</p>
+        <div className="eaf-col-main">
+          <div className="eaf-header-section">
+            <div className="eaf-header-content">
+              <h2 className="eaf-header-title">{form.formName}</h2>
+              <p className="eaf-header-description">{form.formDescription}</p>
             </div>
 
-            <div className="d-flex gap-2 flex-wrap">
-              <span
-                className="badge"
-                style={{
-                  backgroundColor: "#27235C",
-                  color: "#fff",
-                }}
-              >
-                {form.label}
-              </span>
-              <span className="badge bg-secondary">
-                {form.questions.length} Questions
-              </span>
+            <div className="eaf-badges">
+              <span className="eaf-badge eaf-badge-primary">{form.label}</span>
+              <span className="eaf-badge eaf-badge-secondary">{form.questions.length} Questions</span>
             </div>
           </div>
 
-          {/* ERROR ALERT */}
           {error && (
-            <div
-              className="alert alert-danger alert-dismissible fade show mb-4 text-start"
-              role="alert"
-            >
-              <AlertTriangle
-                size={16}
-                className="me-2"
-                style={{ display: "inline" }}
-              />
+            <div className="eaf-alert eaf-alert-danger eaf-alert-dismissible">
+              <AlertTriangle size={16} className="eaf-alert-icon" />
               <strong>Error:</strong> {error}
-              <button
-                type="button"
-                className="btn-close"
-                onClick={() => setError("")}
-              />
+              <button type="button" className="eaf-alert-close" onClick={() => setError("")}>
+                ×
+              </button>
             </div>
           )}
 
-          {/* SUCCESS ALERT */}
           {success && (
-            <div
-              className="alert alert-success alert-dismissible fade show mb-4 text-start"
-              role="alert"
-            >
-              <CheckCircle
-                size={16}
-                className="me-2"
-                style={{ display: "inline" }}
-              />
+            <div className="eaf-alert eaf-alert-success eaf-alert-dismissible">
+              <CheckCircle size={16} className="eaf-alert-icon" />
               <strong>Success:</strong> {success}
             </div>
           )}
 
-          {/* DEADLINE INFO */}
           {form.deadline && (
-            <div
-              className={`alert mb-4 d-flex align-items-center gap-2 text-start`}
-              style={{
-                backgroundColor:
-                  daysLeft === null
-                    ? "#f8f9fa"
-                    : daysLeft > 3
-                    ? "#e3f2fd"
-                    : daysLeft > 0
-                    ? "#fff3cd"
-                    : "#f8d7da",
-                border:
-                  daysLeft === null
-                    ? "1px solid #dee2e6"
-                    : daysLeft > 3
-                    ? "1px solid #90caf9"
-                    : daysLeft > 0
-                    ? "1px solid #ffc107"
-                    : "1px solid #f5c6cb",
-                borderRadius: "8px",
-              }}
-            >
-              <Clock
-                size={18}
-                style={{
-                  color:
-                    daysLeft === null
-                      ? "#6c757d"
-                      : daysLeft > 3
-                      ? "#27235C"
-                      : daysLeft > 0
-                      ? "#ff9800"
-                      : "#dc3545",
-                }}
-              />
-              <div style={{ flex: 1 }}>
+            <div className={`eaf-deadline-alert ${daysLeft === null ? "eaf-deadline-none" : daysLeft > 3 ? "eaf-deadline-safe" : daysLeft > 0 ? "eaf-deadline-warning" : "eaf-deadline-danger"}`}>
+              <Clock size={18} className="eaf-deadline-icon" />
+              <div className="eaf-deadline-content">
                 <strong>Deadline: </strong>
                 {formattedDeadline}
                 {daysLeft !== null && (
-                  <span className="ms-2 small">
+                  <span className="eaf-deadline-days">
                     {daysLeft > 0
                       ? `${daysLeft} day${daysLeft !== 1 ? "s" : ""} remaining`
                       : daysLeft === 0
@@ -916,110 +659,40 @@ export default function EmployeeFillForm() {
             </div>
           )}
 
-          {/* FORM */}
-          <div
-            className="card border-0 shadow-sm"
-            style={{ borderRadius: "8px" }}
-          >
-            <div className="card-body p-4">
+          <div className="eaf-form-card">
+            <div className="eaf-form-card-body">
               <form onSubmit={handleSubmit}>
-                {/* FORM TYPE BANNER */}
-                <div
-                  className="p-3 mb-4 text-start"
-                  style={{
-                    borderRadius: "8px",
-                    borderLeft: "4px solid #27235C",
-                    backgroundColor: "#f0f0ff",
-                  }}
-                >
-                  <h6 className="mb-1 fw-bold" style={{ color: "#27235C" }}>
-                    Form Type
-                  </h6>
-                  <p className="mb-0 small text-muted">{form.label}</p>
+                <div className="eaf-form-type-banner">
+                  <h6 className="eaf-form-type-title">Form Type</h6>
+                  <p className="eaf-form-type-label">{form.label}</p>
                 </div>
 
-                {/* QUESTIONS */}
                 {form.questions.map((q, idx) => (
-                  <div
-                    key={q.id}
-                    id={`question-${q.id}`}
-                    className="mb-4 pb-4 text-start"
-                    style={{
-                      borderBottom:
-                        idx < form.questions.length - 1
-                          ? "1px solid #e0e0e0"
-                          : "none",
-                      scrollMarginTop: "20px",
-                    }}
-                  >
-                    <div className="d-flex gap-3">
-                      <div
-                        className="d-flex align-items-center justify-content-center fw-bold"
-                        style={{
-                          minWidth: "40px",
-                          height: "40px",
-                          borderRadius: "50%",
-                          backgroundColor: "#f0f0ff",
-                          color: "#27235C",
-                          flexShrink: 0,
-                        }}
-                      >
-                        {idx + 1}
-                      </div>
+                  <div key={q.id} id={`question-${q.id}`} className="eaf-question-wrapper">
+                    <div className="eaf-question-layout">
+                      <div className="eaf-question-index">{idx + 1}</div>
 
-                      <div className="flex-grow-1">
-                        <div className="mb-2">
-                          <h6 className="fw-bold mb-2">{q.text}</h6>
-                          <span
-                            className="badge text-dark small"
-                            style={{ backgroundColor: "#e8e8f5" }}
-                          >
-                            {q.category}
-                          </span>
+                      <div className="eaf-question-content">
+                        <div className="eaf-question-header">
+                          <h6 className="eaf-question-text">{q.text}</h6>
+                          <span className="eaf-question-badge">{q.category}</span>
                         </div>
 
                         {q.helpText && (
-                          <div
-                            className="d-flex gap-2 mb-3 p-2"
-                            style={{
-                              backgroundColor: "#f9f9f9",
-                              borderRadius: "4px",
-                              borderLeft: "3px solid #27235C",
-                            }}
-                          >
-                            <HelpCircle
-                              size={14}
-                              className="text-muted"
-                              style={{ flexShrink: 0, marginTop: "2px" }}
-                            />
-                            <small className="text-muted">{q.helpText}</small>
+                          <div className="eaf-question-help">
+                            <HelpCircle size={14} className="eaf-question-help-icon" />
+                            <small className="eaf-question-help-text">{q.helpText}</small>
                           </div>
                         )}
 
-                        <div className="d-flex gap-2 flex-wrap mb-2">
+                        <div className="eaf-rating-buttons">
                           {[1, 2, 3, 4, 5].map((rating) => (
                             <button
                               key={rating}
                               type="button"
-                              className={`btn btn-sm fw-bold`}
+                              className={`eaf-rating-btn ${responses[q.id] === rating ? "eaf-rating-btn-active" : ""}`}
                               onClick={() => handleRatingChange(q.id, rating)}
                               disabled={submitting}
-                              style={{
-                                minWidth: "50px",
-                                transition: "all 0.2s",
-                                background:
-                                  responses[q.id] === rating
-                                    ? "#27235C"
-                                    : "transparent",
-                                color:
-                                  responses[q.id] === rating
-                                    ? "#fff"
-                                    : "#6c757d",
-                                border:
-                                  responses[q.id] === rating
-                                    ? "none"
-                                    : "1px solid #6c757d",
-                              }}
                               title={`Rate as ${RATING_LABELS[rating]}`}
                             >
                               {rating}
@@ -1027,20 +700,14 @@ export default function EmployeeFillForm() {
                           ))}
                         </div>
 
-                        <div>
+                        <div className="eaf-question-status">
                           {responses[q.id] ? (
-                            <small className="text-success fw-bold">
-                              <CheckCircle
-                                size={12}
-                                className="me-1"
-                                style={{ display: "inline" }}
-                              />
+                            <small className="eaf-question-status-answered">
+                              <CheckCircle size={12} className="eaf-question-status-icon" />
                               Rated: {RATING_LABELS[responses[q.id]]}
                             </small>
                           ) : (
-                            <small className="text-muted">
-                              Response required
-                            </small>
+                            <small className="eaf-question-status-pending">Response required</small>
                           )}
                         </div>
                       </div>
@@ -1048,98 +715,39 @@ export default function EmployeeFillForm() {
                   </div>
                 ))}
 
-                {/* COMMENTS */}
-                <div
-                  className="mb-4 text-start"
-                  style={{
-                    borderTop: "2px solid #e0e0e0",
-                    paddingTop: "1.5rem",
-                  }}
-                >
-                  <label
-                    htmlFor="comments"
-                    className="form-label fw-bold mb-2"
-                  >
-                    <MessageSquare
-                      size={16}
-                      className="me-2"
-                      style={{ display: "inline" }}
-                    />
+                <div className="eaf-comments-section">
+                  <label htmlFor="comments" className="eaf-comments-label">
+                    <MessageSquare size={16} className="eaf-comments-icon" />
                     Additional Comments
                   </label>
-                  <small className="text-muted d-block mb-2">
-                    Optional - Maximum 1000 characters
-                  </small>
+                  <small className="eaf-comments-hint">Optional - Maximum 1000 characters</small>
                   <textarea
                     id="comments"
-                    className="form-control"
+                    className="eaf-comments-textarea"
                     rows={4}
                     value={comments}
-                    onChange={(e) =>
-                      setComments(e.target.value.slice(0, 1000))
-                    }
+                    onChange={(e) => setComments(e.target.value.slice(0, 1000))}
                     placeholder="Share any additional feedback about the process or system..."
                     disabled={submitting}
                     maxLength={1000}
-                    style={{ resize: "vertical", borderRadius: "8px" }}
                   />
-                  <small className="text-muted d-block mt-2">
-                    {comments.length} / 1000 characters
-                  </small>
+                  <small className="eaf-comments-counter">{comments.length} / 1000 characters</small>
                 </div>
 
-                {/* SUBMIT BUTTON */}
-                <div className="d-grid gap-2">
+                <div className="eaf-submit-wrapper">
                   <button
                     type="submit"
-                    className="btn fw-bold"
-                    style={{
-                      padding: "0.75rem",
-                      borderRadius: "8px",
-                      fontSize: "1rem",
-                      background:
-                        "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                      color: "#fff",
-                      border: "none",
-                      transition: "all 0.3s ease",
-                    }}
-                    disabled={
-                      submitting ||
-                      Object.keys(responses).length < form.questions.length
-                    }
-                    onMouseEnter={(e) => {
-                      if (!e.currentTarget.disabled) {
-                        e.currentTarget.style.opacity = "0.9";
-                        e.currentTarget.style.transform = "translateY(-2px)";
-                        e.currentTarget.style.boxShadow =
-                          "0 4px 12px rgba(151, 36, 126, 0.4)";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.opacity = "1";
-                      e.currentTarget.style.transform = "translateY(0)";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
+                    className="eaf-submit-btn"
+                    disabled={submitting || Object.keys(responses).length < form.questions.length}
                   >
                     {submitting ? (
                       <>
-                        <Loader
-                          size={16}
-                          className="me-2"
-                          style={{
-                            display: "inline",
-                            animation: "spin 1s linear infinite",
-                          }}
-                        />
+                        <Loader size={16} className="eaf-submit-icon eaf-submit-spinner" />
                         Submitting Form...
                       </>
                     ) : (
                       <>
-                        <Send
-                          size={16}
-                          className="me-2"
-                          style={{ display: "inline" }}
-                        />
+                        <Send size={16} className="eaf-submit-icon" />
                         Submit Feedback
                       </>
                     )}
@@ -1150,13 +758,6 @@ export default function EmployeeFillForm() {
           </div>
         </div>
       </div>
-
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 }

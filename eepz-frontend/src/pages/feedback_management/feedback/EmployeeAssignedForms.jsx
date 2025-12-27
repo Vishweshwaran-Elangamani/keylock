@@ -11,9 +11,8 @@ import {
 import { Link } from "react-router-dom";
 import hrFormApi from "../../../services/feedbackmanagement/hrFormApi";
 import Breadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb";
-import "../../../styles/feedback/EmployeeAssignedForms.css";
+import "../../../styles/feedback/components/EmployeeAssignedForms.css";
 
-// Helper function to get role-based feedback dashboard path
 const getFeedbackDashboardPath = (roleName) => {
   const routes = {
     Employee: "/employee/dashboard/feedback",
@@ -81,7 +80,7 @@ export default function EmployeeAssignedForms() {
     [user?.empId]
   );
 
-  // Fetch submitted forms by employee
+  
   const fetchSubmittedForms = useCallback(async () => {
     if (!user?.empId) return;
     try {
@@ -108,7 +107,7 @@ export default function EmployeeAssignedForms() {
     }
   }, [user?.empId, fetchForms, fetchSubmittedForms]);
 
-  // Calculate stats
+ 
   const stats = useMemo(() => {
     const submitted = submittedFormIds.size;
     const total = allForms.length;
@@ -135,7 +134,7 @@ export default function EmployeeAssignedForms() {
     fetchSubmittedForms();
   }, [fetchForms, fetchSubmittedForms]);
 
-   // Get role-based dashboard path
+  
   const feedbackDashboardPath = user?.roleName 
     ? getFeedbackDashboardPath(user.roleName) 
     : "/hr/dashboard/feedback";
@@ -150,7 +149,7 @@ export default function EmployeeAssignedForms() {
           ]}
         />
 
-      {/* Error Alert */}
+     
       {error && (
         <div className="employee-forms-alert-error">
           <AlertTriangle size={18} className="employee-forms-alert-icon" />
@@ -168,7 +167,7 @@ export default function EmployeeAssignedForms() {
         </div>
       )}
 
-      {/* Stats Grid */}
+     
       <div className="employee-forms-stats-grid">
         <div className="employee-forms-stat-card">
           <div
@@ -242,7 +241,6 @@ export default function EmployeeAssignedForms() {
                   className="employee-forms-card"
                   style={isSubmitted ? { opacity: 0.86 } : {}}
                 >
-                  {/* Card Header */}
                   <div className="employee-forms-card-header">
                     <div className="employee-forms-card-icon">
                       <FileText size={20} />
@@ -262,8 +260,8 @@ export default function EmployeeAssignedForms() {
                       </span>
                     </div>
                   </div>
-                  {/* Card Body - Simple Rows */}
                   <div className="employee-forms-card-body">
+
                     <div className="employee-forms-card-row">
                       <span className="employee-forms-card-label">Description</span>
                       <span
@@ -286,7 +284,7 @@ export default function EmployeeAssignedForms() {
                       </span>
                     </div>
                   </div>
-                  {/* Card Footer */}
+                 
                   <div className="employee-forms-card-footer">
                     {isSubmitted ? (
                       <button

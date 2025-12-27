@@ -21,19 +21,21 @@ import {
   peerQueueApi,
   employeeApi,
   managerReviewApi,
-} from "../../services/feedbackmanagement/feedbackApi";
-import { hrFormApi } from "../../services/feedbackmanagement/hrFormApi";
-import FeedbackBreadcrumb from "../../components/feedback_management/common/FeedbackBreadcrumb";
-import "../../styles/feedback/FeedbackHRDashboard.css";
-
+} from "../../../services/feedbackmanagement/feedbackApi";
+import { hrFormApi } from "../../../services/feedbackmanagement/hrFormApi";
+import FeedbackBreadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb";
+import "../../../styles/feedback/components/FeedbackHRDashboard.css";
 
 const StatCard = ({ label, value, Icon, color, bgColor }) => (
   <div className="fb-hr-stat-card">
     <div className="fb-hr-stat-card__row">
-      <div className="fb-hr-stat-card__icon" style={{ background: bgColor }}>
-        <Icon size={28} style={{ color }} />
+      <div 
+        className="fb-hr-stat-card__icon" 
+        data-bg={bgColor.replace('#', '')}
+      >
+        <Icon size={28} className="fb-hr-stat-card__icon-svg" data-color={color.replace('#', '')} />
       </div>
-      <div>
+      <div className="fb-hr-stat-card__info">
         <h2 className="fb-hr-stat-card__value">{value}</h2>
         <p className="fb-hr-stat-card__label">{label}</p>
       </div>
@@ -41,12 +43,14 @@ const StatCard = ({ label, value, Icon, color, bgColor }) => (
   </div>
 );
 
-
 const HeroActionCard = ({ title, description, icon: Icon, to, iconBg, iconColor }) => (
   <Link to={to} className="fb-hr-action-card-link">
     <div className="fb-hr-action-card">
-      <div className="fb-hr-action-card__icon-wrapper" style={{ background: iconBg }}>
-        <Icon size={24} style={{ color: iconColor }} />
+      <div 
+        className="fb-hr-action-card__icon-wrapper" 
+        data-bg={iconBg.replace('#', '')}
+      >
+        <Icon size={24} className="fb-hr-action-card__icon-svg" data-color={iconColor.replace('#', '')} />
       </div>
       <div className="fb-hr-action-card__content">
         <h5 className="fb-hr-action-card__title">{title}</h5>
@@ -55,7 +59,6 @@ const HeroActionCard = ({ title, description, icon: Icon, to, iconBg, iconColor 
     </div>
   </Link>
 );
-
 
 export default function FeedbackHRDashboard() {
   const user = useMemo(
@@ -72,17 +75,14 @@ export default function FeedbackHRDashboard() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // HR-specific data
   const [feedback, setFeedback] = useState([]);
   const [employeeMap, setEmployeeMap] = useState({});
 
-  // Employee-like data (HR as employee)
   const [myPeerFeedback, setMyPeerFeedback] = useState([]);
   const [submittedForms, setSubmittedForms] = useState([]);
   const [activeHrForms, setActiveHrForms] = useState([]);
   const [myReviews, setMyReviews] = useState([]);
 
-  // Fetch employees using service
   const fetchEmployeeMap = async () => {
     try {
       const response = await employeeApi.getAll();
@@ -105,7 +105,6 @@ export default function FeedbackHRDashboard() {
     return {};
   };
 
-  // Fetch dashboard data using services
   const fetchDashboardData = async (empMap = {}) => {
     setLoading(true);
     setError("");
@@ -113,7 +112,6 @@ export default function FeedbackHRDashboard() {
     try {
       const hrId = user?.empId || 1001;
 
-      // Peer feedback queue (HR role)
       try {
         const res = await peerQueueApi.list(1, 100);
         const feedbackData = Array.isArray(res?.data)
@@ -135,7 +133,6 @@ export default function FeedbackHRDashboard() {
         console.warn("Error fetching peer feedback:", err.message);
       }
 
-      // Peer feedback received (HR as employee)
       try {
         const peerRes = await peerQueueApi.list(1, 1000);
         const peerData = Array.isArray(peerRes?.data)
@@ -157,7 +154,6 @@ export default function FeedbackHRDashboard() {
         console.warn("Error fetching my peer feedback:", err.message);
       }
 
-      // Active HR Forms using service
       try {
         const activeRes = await hrFormApi.getActiveForms();
         const forms = activeRes?.data || [];
@@ -166,7 +162,6 @@ export default function FeedbackHRDashboard() {
         console.warn("Error fetching active forms:", err.message);
       }
 
-      // Submitted HR Forms (HR as employee)
       try {
         const submittedRes = await hrFormApi.getResponsesByEmployee(hrId);
         const forms = submittedRes?.data || [];
@@ -175,7 +170,6 @@ export default function FeedbackHRDashboard() {
         console.warn("Error fetching submitted forms:", err.message);
       }
 
-      // Reviews about me using service
       try {
         const reviewRes = await managerReviewApi.getByTargetEmployee(hrId);
         const reviews = Array.isArray(reviewRes?.data)
@@ -193,7 +187,6 @@ export default function FeedbackHRDashboard() {
     }
   };
 
-  // Effects
   useEffect(() => {
     const loadData = async () => {
       const empMap = await fetchEmployeeMap();
@@ -202,7 +195,6 @@ export default function FeedbackHRDashboard() {
     loadData();
   }, [user?.empId]);
 
-  // Handlers
   const refresh = async () => {
     setRefreshing(true);
     const empMap = await fetchEmployeeMap();
@@ -210,7 +202,6 @@ export default function FeedbackHRDashboard() {
     setRefreshing(false);
   };
 
-  // Stats
   const stats = useMemo(() => {
     const submittedFormIds = new Set(submittedForms.map((f) => f.formId));
     const pendingForms = activeHrForms.filter(
@@ -257,7 +248,7 @@ export default function FeedbackHRDashboard() {
     return (
       <div className="fb-hr-loading">
         <div className="fb-hr-spinner" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="fb-hr-visually-hidden">Loading...</span>
         </div>
       </div>
     );
@@ -266,10 +257,8 @@ export default function FeedbackHRDashboard() {
   return (
     <div className="fb-hr-dashboard">
       <div className="fb-hr-dashboard__container">
-        {/* Breadcrumb */}
         <FeedbackBreadcrumb items={[{ label: "Feedback Management" }]} />
 
-        {/* Error Alert */}
         {error && (
           <div className="fb-hr-alert" role="alert">
             <div className="fb-hr-alert__icon">
@@ -290,7 +279,6 @@ export default function FeedbackHRDashboard() {
           </div>
         )}
 
-        {/* Stats Cards */}
         <div className="fb-hr-stat-cards-row">
           {stats.map((s, idx) => (
             <div key={idx} className="fb-hr-stat-cards-row__col">
@@ -299,7 +287,6 @@ export default function FeedbackHRDashboard() {
           ))}
         </div>
 
-        {/* Hero Action Cards */}
         <div className="fb-hr-action-cards-row">
           <HeroActionCard
             title="View All Feedback"
@@ -329,7 +316,6 @@ export default function FeedbackHRDashboard() {
           />
         </div>
 
-        {/* Peer Feedback Section */}
         {myPeerFeedback.length > 0 && (
           <div className="fb-hr-peer">
             <div className="fb-hr-peer__row">

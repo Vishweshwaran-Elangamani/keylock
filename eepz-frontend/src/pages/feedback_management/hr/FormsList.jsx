@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import hrFormApi from "../../../services/feedbackmanagement/hrFormApi";
+import "../../../styles/feedback/forms/FormList.css";
 
 export default function FormsList() {
   const [forms, setForms] = useState([]);
@@ -24,8 +25,9 @@ export default function FormsList() {
     try {
       const res = await hrFormApi.getAllForms(1, 100);
       if (res.data?.success === true || res.status === 200) {
-        setForms(res.data?.data || []);
-        if ((res.data?.data || []).length === 0) {
+        const list = res.data?.data || [];
+        setForms(list);
+        if (list.length === 0) {
           setError("No forms found. Create a new form to get started.");
         }
       } else {
@@ -61,8 +63,7 @@ export default function FormsList() {
   };
 
   const handleDeleteForm = async (formId) => {
-    if (!window.confirm("Delete this form? This action cannot be undone."))
-      return;
+    if (!window.confirm("Delete this form? This action cannot be undone.")) return;
     try {
       const res = await hrFormApi.deleteForm(formId);
       if (res.data?.success === true || res.status === 200) {
@@ -104,139 +105,82 @@ export default function FormsList() {
 
   useEffect(() => {
     fetchForms();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (loading) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "60vh" }}
-      >
-        <div className="text-center">
-          <div className="spinner-border text-primary mb-3" role="status" />
-          <p className="text-muted">Loading forms...</p>
+      <div className="fl-page fl-page-loading">
+        <div className="fl-loading-content">
+          <div className="fl-spinner-main" />
+          <p className="fl-loading-text">Loading forms...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container-fluid py-4" style={{ maxWidth: "1400px" }}>
-      {/* HEADER */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <h3
-            className="fw-bold mb-1"
-            style={{ color: "var(--color-primary-1)" }}
-          >
-            📋 Forms Management
-          </h3>
-          <p className="text-muted mb-0">Create and track feedback forms</p>
+    <div className="fl-page">
+      <div className="fl-header">
+        <div className="fl-header-left">
+          <h3 className="fl-title"> Forms Management</h3>
+          <p className="fl-subtitle">Create and track feedback forms</p>
         </div>
-        <div className="d-flex gap-2">
+        <div className="fl-header-actions">
           <button
             onClick={fetchForms}
-            className="btn btn-outline-secondary"
+            className="fl-btn fl-btn-icon fl-btn-refresh"
             disabled={loading}
             title="Refresh"
           >
             <RefreshCw
               size={16}
-              style={{
-                animation: loading ? "spin 1s linear infinite" : "none",
-              }}
+              className={loading ? "fl-icon-spin" : ""}
             />
           </button>
-          <Link to="/hr/create-form" className="btn btn-primary">
-            <Plus size={16} className="me-2" />
+          <Link to="/hr/create-form" className="fl-btn fl-btn-primary">
+            <Plus size={16} className="fl-btn-icon-left" />
             Create Form
           </Link>
         </div>
       </div>
 
-      {/* ERROR ALERT */}
       {error && (
-        <div
-          className="alert alert-warning alert-dismissible fade show mb-4"
-          role="alert"
-        >
-          <AlertTriangle
-            size={16}
-            className="me-2"
-            style={{ display: "inline" }}
-          />
-          <strong>Info:</strong> {error}
+        <div className="fl-alert fl-alert-warning">
+          <div className="fl-alert-main">
+            <AlertTriangle size={16} className="fl-alert-icon" />
+            <span>
+              <strong>Info:</strong> {error}
+            </span>
+          </div>
           <button
             type="button"
-            className="btn-close"
+            className="fl-alert-close"
             onClick={() => setError("")}
             aria-label="Close"
-          />
+          >
+            ×
+          </button>
         </div>
       )}
 
-      {/* FORMS TABLE */}
       {forms.length === 0 ? (
-        <div
-          className="card border-0 text-center py-5"
-          style={{ border: "1px solid var(--border)" }}
-        >
-          <p className="text-muted mb-3">No forms created yet</p>
-          <Link to="/hr/create-form" className="btn btn-sm btn-primary">
+        <div className="fl-card fl-card-empty">
+          <p className="fl-empty-text">No forms created yet</p>
+          <Link to="/hr/create-form" className="fl-btn fl-btn-primary fl-btn-sm">
             Create First Form
           </Link>
         </div>
       ) : (
-        <div
-          className="card border-0"
-          style={{
-            border: "1px solid var(--border)",
-            boxShadow: "var(--shadow)",
-          }}
-        >
-          <div className="table-responsive">
-            <table className="table table-hover mb-0">
-              <thead
-                style={{
-                  background: "#f9f9fa",
-                  borderBottom: "2px solid var(--border)",
-                }}
-              >
+        <div className="fl-card">
+          <div className="fl-table-wrapper">
+            <table className="fl-table">
+              <thead className="fl-table-head">
                 <tr>
-                  <th
-                    style={{
-                      color: "var(--color-primary-1)",
-                      fontWeight: "600",
-                    }}
-                  >
-                    Form Name
-                  </th>
-                  <th
-                    style={{
-                      color: "var(--color-primary-1)",
-                      fontWeight: "600",
-                    }}
-                  >
-                    Type
-                  </th>
-                  <th
-                    style={{
-                      color: "var(--color-primary-1)",
-                      fontWeight: "600",
-                    }}
-                    className="text-center"
-                  >
-                    Deadline
-                  </th>
-                  <th
-                    style={{
-                      color: "var(--color-primary-1)",
-                      fontWeight: "600",
-                    }}
-                    className="text-center"
-                  >
-                    Actions
-                  </th>
+                  <th className="fl-th fl-th-main">Form Name</th>
+                  <th className="fl-th">Type</th>
+                  <th className="fl-th fl-th-center">Deadline</th>
+                  <th className="fl-th fl-th-center">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -255,28 +199,26 @@ export default function FormsList() {
 
                   return (
                     <React.Fragment key={form.formId}>
-                      <tr
-                        style={{ cursor: "pointer" }}
-                        className="align-middle"
-                      >
-                        <td className="fw-bold">{form.formName}</td>
-                        <td>
-                          <span
-                            className="badge bg-secondary"
-                            style={{ fontSize: "0.75rem" }}
-                          >
+                      <tr className="fl-row-main">
+                        <td className="fl-td fl-td-name">{form.formName}</td>
+                        <td className="fl-td">
+                          <span className="fl-badge-type">
                             {form.formType}
                           </span>
                         </td>
-                        <td className="text-center">
-                          <small className="text-muted">
-                            {formatDate(form.deadline)}
-                          </small>
+                        <td className="fl-td fl-td-center">
+                          <div className="fl-deadline-cell">
+                            <span className="fl-deadline-date">
+                              {formatDate(form.deadline)}
+                            </span>
+                            <span className="fl-deadline-chip">
+                              {getDaysRemaining(form.deadline)}
+                            </span>
+                          </div>
                         </td>
-
-                        <td className="text-center">
+                        <td className="fl-td fl-td-center">
                           <button
-                            className="btn btn-sm btn-outline-primary me-1"
+                            className="fl-btn fl-btn-outline-primary fl-btn-xs fl-btn-icon-only"
                             onClick={() => fetchFormResponses(form.formId)}
                             disabled={loadingResponses[form.formId]}
                             title="View responses"
@@ -284,7 +226,7 @@ export default function FormsList() {
                             <Eye size={14} />
                           </button>
                           <button
-                            className="btn btn-sm btn-outline-danger"
+                            className="fl-btn fl-btn-outline-danger fl-btn-xs fl-btn-icon-only"
                             onClick={() => handleDeleteForm(form.formId)}
                             title="Delete form"
                           >
@@ -293,35 +235,37 @@ export default function FormsList() {
                         </td>
                       </tr>
 
-                      {/* RESPONSES ROW - EXPANDED */}
                       {isExpanded && (
-                        <tr style={{ background: "#f0f4ff" }}>
-                          <td colSpan="7" className="py-3">
-                            <h6 className="fw-bold mb-3">
-                              <CheckCircle
-                                size={16}
-                                className="me-2"
-                                style={{ display: "inline", color: "#24A148" }}
-                              />
-                              Responses ({totalResp})
-                            </h6>
+                        <tr className="fl-row-expanded">
+                          <td colSpan="7" className="fl-expanded-cell">
+                            <div className="fl-responses-header">
+                              <h6 className="fl-responses-title">
+                                <CheckCircle
+                                  size={16}
+                                  className="fl-responses-icon"
+                                />
+                                Responses ({totalResp})
+                              </h6>
+                              {totalDist > 0 && (
+                                <span className="fl-responses-rate">
+                                  {totalResp}/{totalDist} ({rate}%)
+                                </span>
+                              )}
+                            </div>
 
                             {loadingResponses[form.formId] ? (
-                              <div className="text-center py-3">
-                                <div className="spinner-border spinner-border-sm text-primary" />
+                              <div className="fl-responses-loading">
+                                <div className="fl-spinner-small" />
                               </div>
                             ) : responses[form.formId]?.length === 0 ? (
-                              <p className="text-muted mb-0">
+                              <p className="fl-responses-empty">
                                 No responses yet
                               </p>
                             ) : (
-                              <div className="table-responsive">
-                                <table
-                                  className="table table-sm mb-0"
-                                  style={{ fontSize: "0.9rem" }}
-                                >
+                              <div className="fl-table-wrapper-inner">
+                                <table className="fl-table fl-table-inner">
                                   <thead>
-                                    <tr style={{ background: "#e8f0ff" }}>
+                                    <tr>
                                       <th>Employee</th>
                                       <th>Submitted Date</th>
                                       <th>Submitted Time</th>
@@ -330,19 +274,19 @@ export default function FormsList() {
                                   <tbody>
                                     {responses[form.formId]?.map((resp) => (
                                       <tr key={resp.responseId}>
-                                        <td className="fw-600">
+                                        <td className="fl-td-employee">
                                           {resp.employeeName || "Employee"}
                                         </td>
                                         <td>{formatDate(resp.submittedAt)}</td>
                                         <td>
-                                          <small className="text-muted">
+                                          <span className="fl-time-text">
                                             {new Date(
                                               resp.submittedAt
                                             ).toLocaleTimeString([], {
                                               hour: "2-digit",
                                               minute: "2-digit",
                                             })}
-                                          </small>
+                                          </span>
                                         </td>
                                       </tr>
                                     ))}
@@ -361,26 +305,6 @@ export default function FormsList() {
           </div>
         </div>
       )}
-
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0); }
-          to { transform: rotate(360deg); }
-        }
-        .table th, .table td {
-          padding: 12px 15px;
-          vertical-align: middle;
-        }
-        .table tbody tr {
-          border-bottom: 1px solid var(--border);
-        }
-        .table tbody tr:hover {
-          background: #f9f9fa;
-        }
-        .fw-600 {
-          font-weight: 600;
-        }
-      `}</style>
     </div>
   );
 }

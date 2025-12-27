@@ -5,7 +5,7 @@ import { Home } from "lucide-react";
 const FeedbackBreadcrumb = ({ items }) => {
   const navigate = useNavigate();
 
-  // Get user from localStorage for home route
+
   const getHomeRoute = () => {
     try {
       const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -38,7 +38,6 @@ const FeedbackBreadcrumb = ({ items }) => {
           gap: "0.5rem",
         }}
       >
-        {/* Home + slash */}
         <li className="breadcrumb-item d-flex align-items-center gap-1">
           <a
             href="#"
@@ -58,11 +57,8 @@ const FeedbackBreadcrumb = ({ items }) => {
             <Home size={14} />
             Dashboard
           </a>
-          {/* Home always has a slash after it */}
           <span className="fb-breadcrumb-slash">/</span>
         </li>
-
-        {/* Other items – slash only if not last */}
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
 

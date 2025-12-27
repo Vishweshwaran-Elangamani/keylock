@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import "../../../styles/feedback/components/ManagerGoalFeedbackView.css";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
@@ -34,7 +35,7 @@ export default function ManagerGoalFeedbackView() {
     user?.role?.toLowerCase() === "manager" ||
     user?.roleName?.toLowerCase() === "manager";
 
-  const [activeTab, setActiveTab] = useState("myFeedback"); // 'myFeedback' or 'teamFeedback'
+  const [activeTab, setActiveTab] = useState("myFeedback");
   const [myGoalFeedback, setMyGoalFeedback] = useState([]);
   const [teamGoalFeedback, setTeamGoalFeedback] = useState([]);
   const [objectives, setObjectives] = useState({});
@@ -57,7 +58,6 @@ export default function ManagerGoalFeedbackView() {
     }
   };
 
-  // Fetch Employees
   const fetchEmployees = async () => {
     try {
       const response = await axios.get(`${API_BASE}/EmployeeManagement/all`);
@@ -69,16 +69,14 @@ export default function ManagerGoalFeedbackView() {
         setEmployeeMap(map);
       }
     } catch (err) {
-      console.error(" Error fetching employees:", err.message);
+      console.error("Error fetching employees:", err.message);
     }
   };
 
-  // Fetch Objectives
   const fetchObjectives = async () => {
     try {
       const response = await axios.get(`${API_BASE}/Orgwideobjectives`);
       const objectivesData = response.data?.data || response.data || [];
-
       if (Array.isArray(objectivesData)) {
         const objMap = {};
         objectivesData.forEach((obj) => {
@@ -88,11 +86,10 @@ export default function ManagerGoalFeedbackView() {
         setObjectives(objMap);
       }
     } catch (err) {
-      console.error(" Error loading objectives:", err.message);
+      console.error("Error loading objectives:", err.message);
     }
   };
 
-  // Fetch Goal Feedback
   const fetchGoalFeedback = async () => {
     setLoading(true);
     setError("");
@@ -105,7 +102,6 @@ export default function ManagerGoalFeedbackView() {
         return;
       }
 
-      // Fetch all goal feedback with pagination
       const response = await axios.get(`${API_BASE}/OrgGoalFeedback/all`, {
         params: {
           pageNumber: 1,
@@ -116,7 +112,6 @@ export default function ManagerGoalFeedbackView() {
       if (response.data?.success && Array.isArray(response.data.data)) {
         const allFeedback = response.data.data;
 
-        // Filter: My feedback (submitted by me)
         const myFeedback = allFeedback
           .filter((f) => Number(f.submittedByEmployeeId) === Number(empId))
           .map((f) => ({
@@ -135,17 +130,12 @@ export default function ManagerGoalFeedbackView() {
 
         setMyGoalFeedback(myFeedback);
 
-        // Filter: Team feedback (submitted by my team members where I'm the manager)
-        
         if (isManager) {
           const teamFeedback = allFeedback
             .filter((f) => {
-             
               if (f.managerEmployeeId) {
                 return Number(f.managerEmployeeId) === Number(empId);
               }
-
-             
               return Number(f.submittedByEmployeeId) !== Number(empId);
             })
             .map((f) => ({
@@ -165,12 +155,11 @@ export default function ManagerGoalFeedbackView() {
           setTeamGoalFeedback(teamFeedback);
         }
       } else {
-        console.warn(" Invalid goal feedback data structure");
         setMyGoalFeedback([]);
         setTeamGoalFeedback([]);
       }
     } catch (err) {
-      console.error(" Error fetching goal feedback:", err);
+      console.error("Error fetching goal feedback:", err);
       setError("Failed to load goal feedback. Please try refreshing.");
     } finally {
       setLoading(false);
@@ -190,92 +179,70 @@ export default function ManagerGoalFeedbackView() {
   }, [user?.empId]);
 
   const renderFeedbackCard = (feedback, showSubmitter = false) => (
-    <div className="col-12 col-md-6 col-lg-4" key={feedback.orgGoalFeedbackId}>
-      <div
-        className="card border-0 shadow-sm h-100"
-        style={{
-          borderRadius: "8px",
-          borderLeft: "4px solid #0F62FE",
-        }}
-      >
-        <div className="card-body">
-          {/* Header */}
-          <div className="d-flex justify-content-between align-items-start mb-3">
-            <div className="flex-grow-1">
-              <div className="d-flex align-items-center gap-2 mb-2">
-                <Target size={16} style={{ color: "#0F62FE" }} />
-                <h6 className="fw-bold mb-0 small">
+    <div
+      className="mgfv-col"
+      key={feedback.orgGoalFeedbackId}
+    >
+      <div className="mgfv-card">
+        <div className="mgfv-card-body">
+          <div className="mgfv-card-header">
+            <div className="mgfv-card-header-left">
+              <div className="mgfv-title-row">
+                <Target size={16} className="mgfv-title-icon" />
+                <h6 className="mgfv-objective-title">
                   {feedback.objectiveTitle}
                 </h6>
               </div>
               {showSubmitter && (
-                <div className="d-flex align-items-center gap-2 mb-2">
-                  <User size={14} className="text-muted" />
-                  <small className="text-muted">{feedback.submitterName}</small>
+                <div className="mgfv-submitter-row">
+                  <User size={14} className="mgfv-submitter-icon" />
+                  <small className="mgfv-submitter-text">
+                    {feedback.submitterName}
+                  </small>
                 </div>
               )}
-              <div className="d-flex align-items-center gap-2">
-                <Calendar size={14} className="text-muted" />
-                <small className="text-muted">{feedback.formattedDate}</small>
+              <div className="mgfv-date-row">
+                <Calendar size={14} className="mgfv-date-icon" />
+                <small className="mgfv-date-text">
+                  {feedback.formattedDate}
+                </small>
               </div>
             </div>
-            <div className="d-flex flex-column align-items-end gap-2">
-              {/* Rating */}
-              <div className="d-flex align-items-center gap-2">
-                <Star size={16} style={{ color: "#FFB800", fill: "#FFB800" }} />
-                <span className="fw-bold" style={{ color: "#0F62FE" }}>
+            <div className="mgfv-header-right">
+              <div className="mgfv-rating-row">
+                <Star size={16} className="mgfv-star-icon" />
+                <span className="mgfv-rating-value">
                   {feedback.rating}/5
                 </span>
               </div>
-              <span
-                className="badge"
-                style={{
-                  backgroundColor: "#0F62FE20",
-                  color: "#0F62FE",
-                  fontSize: "0.7rem",
-                }}
-              >
+              <span className="mgfv-rating-badge">
                 {RATING_LABELS[feedback.rating] || "N/A"}
               </span>
             </div>
           </div>
 
-          {/* Feedback Source & Status */}
-          <div className="mb-3">
+          <div className="mgfv-meta-row">
             <span
-              className="badge me-2"
-              style={{
-                backgroundColor:
-                  feedback.feedbackFrom === "Manager"
-                    ? "#24A14820"
-                    : "#0F62FE20",
-                color:
-                  feedback.feedbackFrom === "Manager" ? "#24A148" : "#0F62FE",
-              }}
+              className={`mgfv-feedback-type-badge ${
+                feedback.feedbackFrom === "Manager"
+                  ? "mgfv-feedback-type-manager"
+                  : "mgfv-feedback-type-employee"
+              }`}
             >
               {feedback.feedbackFrom || "Employee"} Feedback
             </span>
             {feedback.isAnonymous && (
-              <span
-                className="badge"
-                style={{ backgroundColor: "#E0195020", color: "#E01950" }}
-              >
-                Anonymous
-              </span>
+              <span className="mgfv-anon-badge">Anonymous</span>
             )}
           </div>
 
-          {/* Comments */}
           {feedback.feedbackComments && (
-            <div>
-              <div className="d-flex align-items-center gap-2 mb-2">
-                <MessageCircle size={14} style={{ color: "#0F62FE" }} />
-                <h6 className="small fw-bold text-muted mb-0">Comments</h6>
+            <div className="mgfv-comments-block">
+              <div className="mgfv-comments-header">
+                <MessageCircle size={14} className="mgfv-comments-icon" />
+                <h6 className="mgfv-comments-title">Comments</h6>
               </div>
-              <p
-                className="mb-0 small ps-3"
-                style={{ lineHeight: "1.6", color: "#555" }}
-              >
+              <p className="mgfv-comments-text">
                 {feedback.feedbackComments.length > 100
                   ? feedback.feedbackComments.substring(0, 100) + "..."
                   : feedback.feedbackComments}
@@ -289,59 +256,36 @@ export default function ManagerGoalFeedbackView() {
 
   if (loading) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "60vh" }}
-      >
-        <div className="text-center">
-          <RefreshCw
-            size={40}
-            className="text-primary mb-3"
-            style={{ animation: "spin 1s linear infinite" }}
-          />
-          <p className="text-muted">Loading goal feedback...</p>
+      <div className="mgfv-loading-page">
+        <div className="mgfv-loading-content">
+          <RefreshCw size={40} className="mgfv-loading-icon" />
+          <p className="mgfv-loading-text">Loading goal feedback...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div
-      className="d-flex justify-content-center py-4"
-      style={{ minHeight: "100vh", background: "#f9f9f9" }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "1200px",
-          paddingLeft: "1rem",
-          paddingRight: "1rem",
-        }}
-      >
-        {/* HEADER */}
-        <div className="d-flex align-items-start mb-4">
+    <div className="mgfv-page">
+      <div className="mgfv-container">
+        <div className="mgfv-header">
           <button
-            className="btn btn-outline-secondary me-2"
+            className="mgfv-btn mgfv-btn-outline mgfv-back-btn"
             onClick={() => navigate(-1)}
-            style={{ borderRadius: "8px" }}
           >
             <ArrowLeft size={16} />
           </button>
-          <div className="flex-grow-1">
-            <h2 className="fw-bold mb-1" style={{ color: "#0F62FE" }}>
-              <Target
-                size={24}
-                className="me-2"
-                style={{ display: "inline" }}
-              />
+          <div className="mgfv-header-main">
+            <h2 className="mgfv-title">
+              <Target size={24} className="mgfv-title-leading-icon" />
               Goal Feedback - Manager View
             </h2>
-            <p className="mb-0 small text-muted">
+            <p className="mgfv-subtitle">
               View your submissions and team feedback on organizational goals
             </p>
           </div>
           <button
-            className="btn btn-outline-secondary"
+            className="mgfv-btn mgfv-btn-outline mgfv-refresh-btn"
             onClick={() => {
               fetchEmployees();
               fetchObjectives();
@@ -349,109 +293,69 @@ export default function ManagerGoalFeedbackView() {
             }}
             disabled={loading}
             title="Refresh"
-            style={{ borderRadius: "8px" }}
           >
             <RefreshCw
               size={18}
-              style={{
-                animation: loading ? "spin 1s linear infinite" : "none",
-              }}
+              className={loading ? "mgfv-refresh-icon-spin" : ""}
             />
           </button>
         </div>
 
-        {/* ERROR ALERT */}
         {error && (
-          <div
-            className="alert alert-danger alert-dismissible fade show mb-4"
-            role="alert"
-          >
-            <AlertTriangle
-              size={18}
-              className="me-2"
-              style={{ display: "inline" }}
-            />
-            <strong>Error:</strong> {error}
+          <div className="mgfv-alert mgfv-alert-error">
+            <AlertTriangle size={18} className="mgfv-alert-icon" />
+            <span className="mgfv-alert-text">
+              <strong>Error:</strong> {error}
+            </span>
             <button
               type="button"
-              className="btn-close"
+              className="mgfv-alert-close"
               onClick={() => setError("")}
             />
           </div>
         )}
 
-        {/* TABS */}
-        <div
-          className="card border-0 shadow-sm mb-4"
-          style={{ borderRadius: "8px" }}
-        >
-          <div className="card-body p-0">
-            <div className="btn-group w-100" role="group">
+        <div className="mgfv-tabs-card">
+          <div className="mgfv-tabs-body">
+            <button
+              type="button"
+              className={`mgfv-tab-btn ${
+                activeTab === "myFeedback" ? "mgfv-tab-btn-active" : ""
+              }`}
+              onClick={() => setActiveTab("myFeedback")}
+            >
+              <User size={16} className="mgfv-tab-icon" />
+              My Feedback ({myGoalFeedback.length})
+            </button>
+            {isManager && (
               <button
                 type="button"
-                className={`btn ${
-                  activeTab === "myFeedback"
-                    ? "btn-primary"
-                    : "btn-outline-secondary"
+                className={`mgfv-tab-btn ${
+                  activeTab === "teamFeedback" ? "mgfv-tab-btn-active" : ""
                 }`}
-                onClick={() => setActiveTab("myFeedback")}
-                style={{ borderRadius: "8px 0 0 8px", padding: "1rem" }}
+                onClick={() => setActiveTab("teamFeedback")}
               >
-                <User
-                  size={16}
-                  className="me-2"
-                  style={{ display: "inline" }}
-                />
-                My Feedback ({myGoalFeedback.length})
+                <Briefcase size={16} className="mgfv-tab-icon" />
+                Team Feedback ({teamGoalFeedback.length})
               </button>
-              {isManager && (
-                <button
-                  type="button"
-                  className={`btn ${
-                    activeTab === "teamFeedback"
-                      ? "btn-primary"
-                      : "btn-outline-secondary"
-                  }`}
-                  onClick={() => setActiveTab("teamFeedback")}
-                  style={{ borderRadius: "0 8px 8px 0", padding: "1rem" }}
-                >
-                  <Briefcase
-                    size={16}
-                    className="me-2"
-                    style={{ display: "inline" }}
-                  />
-                  Team Feedback ({teamGoalFeedback.length})
-                </button>
-              )}
-            </div>
+            )}
           </div>
         </div>
 
-        {/* MY FEEDBACK TAB */}
         {activeTab === "myFeedback" && (
           <>
             {myGoalFeedback.length === 0 ? (
-              <div
-                className="card border-0 shadow-sm"
-                style={{ borderRadius: "8px" }}
-              >
-                <div className="card-body text-center py-5">
-                  <Target
-                    size={48}
-                    className="mb-3"
-                    style={{ color: "#ccc" }}
-                  />
-                  <h5 className="text-muted mb-2">
-                    No goal feedback submitted yet
-                  </h5>
-                  <p className="small text-muted mb-0">
-                    Submit feedback on organizational objectives to see them
-                    here
-                  </p>
-                </div>
+              <div className="mgfv-empty-card">
+                <Target size={48} className="mgfv-empty-icon" />
+                <h5 className="mgfv-empty-title">
+                  No goal feedback submitted yet
+                </h5>
+                <p className="mgfv-empty-text">
+                  Submit feedback on organizational objectives to see them here
+                </p>
               </div>
             ) : (
-              <div className="row g-3">
+              <div className="mgfv-grid">
                 {myGoalFeedback.map((feedback) =>
                   renderFeedbackCard(feedback, false)
                 )}
@@ -460,24 +364,18 @@ export default function ManagerGoalFeedbackView() {
           </>
         )}
 
-        {/* TEAM FEEDBACK TAB (Manager Only) */}
         {activeTab === "teamFeedback" && isManager && (
           <>
             {teamGoalFeedback.length === 0 ? (
-              <div
-                className="card border-0 shadow-sm"
-                style={{ borderRadius: "8px" }}
-              >
-                <div className="card-body text-center py-5">
-                  <Users size={48} className="mb-3" style={{ color: "#ccc" }} />
-                  <h5 className="text-muted mb-2">No team feedback yet</h5>
-                  <p className="small text-muted mb-0">
-                    Goal feedback from your team members will appear here
-                  </p>
-                </div>
+              <div className="mgfv-empty-card">
+                <Users size={48} className="mgfv-empty-icon" />
+                <h5 className="mgfv-empty-title">No team feedback yet</h5>
+                <p className="mgfv-empty-text">
+                  Goal feedback from your team members will appear here
+                </p>
               </div>
             ) : (
-              <div className="row g-3">
+              <div className="mgfv-grid">
                 {teamGoalFeedback.map((feedback) =>
                   renderFeedbackCard(feedback, true)
                 )}
@@ -485,13 +383,6 @@ export default function ManagerGoalFeedbackView() {
             )}
           </>
         )}
-
-        <style>{`
-          @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-          }
-        `}</style>
       </div>
     </div>
   );

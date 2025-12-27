@@ -5,17 +5,18 @@ import {
   mentorFeedbackApi,
   peerQueueApi,
 } from "../../../services/feedbackmanagement/feedbackApi";
+import "../../../styles/feedback/components/EditFeedback.css";
 
 export default function EditFeedback() {
   const { id } = useParams();
   const [params] = useSearchParams();
-  const type = params.get("type"); // 'mentor' | 'peer'
+  const type = params.get("type");
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
     rating: 4,
-    feedbackComments: "", // mentor
-    feedbackContent: "", // peer
+    feedbackComments: "",
+    feedbackContent: "",
   });
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
@@ -76,7 +77,6 @@ export default function EditFeedback() {
           feedbackComments: form.feedbackComments,
         });
       } else {
-        // Peer queue doesn't have an update endpoint in your spec; skip or show error
         setError(
           "Peer feedback cannot be edited after submission (no API endpoint)."
         );
@@ -98,97 +98,77 @@ export default function EditFeedback() {
 
   if (loadingData) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "60vh" }}
-      >
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+      <div className="fm-editfb-loading-container">
+        <div className="fm-editfb-spinner" role="status">
+          <span className="fm-editfb-spinner-text">Loading...</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container-fluid py-3" style={{ maxWidth: "900px" }}>
-      <div className="d-flex justify-content-between align-items-start mb-4">
-        <div>
-          <h2
-            className="fw-bold mb-1"
-            style={{ color: "var(--color-primary-1)" }}
-          >
-            Edit Feedback
-          </h2>
-          <p className="mb-0 small" style={{ color: "var(--muted)" }}>
-            Update your submitted feedback
-          </p>
+    <div className="fm-editfb-page-wrapper">
+      <div className="fm-editfb-header">
+        <div className="fm-editfb-header-content">
+          <h2 className="fm-editfb-title">Edit Feedback</h2>
+          <p className="fm-editfb-subtitle">Update your submitted feedback</p>
         </div>
         <button
-          className="btn btn-outline-secondary btn-sm"
+          className="fm-editfb-back-btn"
           onClick={() => navigate(-1)}
         >
-          <ArrowLeft size={16} className="me-1" />
-          Back
+          <ArrowLeft size={16} />
+          <span>Back</span>
         </button>
       </div>
 
       {error && (
-        <div
-          className="alert alert-danger d-flex align-items-start gap-2"
-          style={{ borderRadius: "var(--radius-md)" }}
-        >
-          <AlertTriangle size={18} className="mt-1" />
-          <div>
+        <div className="fm-editfb-alert fm-editfb-alert--error">
+          <AlertTriangle size={18} className="fm-editfb-alert-icon" />
+          <div className="fm-editfb-alert-content">
             <strong>Error</strong>
-            <p className="mb-0 small mt-1">{error}</p>
+            <p>{error}</p>
           </div>
-          <button className="btn-close ms-auto" onClick={() => setError("")} />
-        </div>
-      )}
-      {successMsg && (
-        <div
-          className="alert alert-success d-flex align-items-center gap-2"
-          style={{ borderRadius: "var(--radius-md)" }}
-        >
-          <CheckCircle size={18} />
-          <div className="small">{successMsg}</div>
+          <button className="fm-editfb-alert-close" onClick={() => setError("")}>
+            ×
+          </button>
         </div>
       )}
 
-      <div
-        className="card border-0"
-        style={{
-          border: "1px solid var(--border)",
-          borderRadius: "var(--radius-lg)",
-          boxShadow: "var(--shadow)",
-        }}
-      >
-        <div className="card-body">
-          <form onSubmit={submit} className="row g-3">
+      {successMsg && (
+        <div className="fm-editfb-alert fm-editfb-alert--success">
+          <CheckCircle size={18} className="fm-editfb-alert-icon" />
+          <div className="fm-editfb-alert-message">{successMsg}</div>
+        </div>
+      )}
+
+      <div className="fm-editfb-card">
+        <div className="fm-editfb-card-body">
+          <form onSubmit={submit} className="fm-editfb-form">
             {type === "mentor" && (
               <>
-                <div className="col-md-6">
-                  <label className="form-label small">Rating (1-5) *</label>
+                <div className="fm-editfb-form-group fm-editfb-form-group--half">
+                  <label className="fm-editfb-label">Rating (1-5) *</label>
                   <input
                     type="range"
                     min="1"
                     max="5"
-                    className="form-range"
+                    className="fm-editfb-range"
                     value={form.rating}
                     onChange={(e) =>
                       setForm({ ...form, rating: e.target.value })
                     }
                   />
-                  <div className="small text-muted">
+                  <div className="fm-editfb-rating-display">
                     Selected: {form.rating} ⭐
                   </div>
                 </div>
-                <div className="col-12">
-                  <label className="form-label small">
+                <div className="fm-editfb-form-group fm-editfb-form-group--full">
+                  <label className="fm-editfb-label">
                     Feedback Comments *
                   </label>
                   <textarea
-                    className="form-control"
+                    className="fm-editfb-textarea"
                     rows={4}
                     value={form.feedbackComments}
                     onChange={(e) =>
@@ -200,10 +180,10 @@ export default function EditFeedback() {
               </>
             )}
             {type === "peer" && (
-              <div className="col-12">
-                <label className="form-label small">Feedback Content *</label>
+              <div className="fm-editfb-form-group fm-editfb-form-group--full">
+                <label className="fm-editfb-label">Feedback Content *</label>
                 <textarea
-                  className="form-control"
+                  className="fm-editfb-textarea"
                   rows={4}
                   value={form.feedbackContent}
                   onChange={(e) =>
@@ -212,19 +192,19 @@ export default function EditFeedback() {
                   placeholder="Update your feedback…"
                   disabled
                 />
-                <small className="text-muted d-block mt-1">
+                <small className="fm-editfb-help-text">
                   Peer feedback cannot be edited after submission (API
                   limitation).
                 </small>
               </div>
             )}
-            <div className="col-12 d-grid">
+            <div className="fm-editfb-form-actions">
               <button
-                className="btn btn-primary"
+                className="fm-editfb-submit-btn"
                 disabled={loading || type === "peer"}
               >
-                <Save size={16} className="me-1" />
-                Save Changes
+                <Save size={16} />
+                <span>Save Changes</span>
               </button>
             </div>
           </form>

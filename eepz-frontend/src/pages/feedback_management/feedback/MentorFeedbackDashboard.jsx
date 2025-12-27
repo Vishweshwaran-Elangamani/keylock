@@ -4,20 +4,13 @@ import {
   User,
   MessageSquare,
   Calendar,
-  Filter,
   Eye,
   ThumbsUp,
-  Clock,
-  CheckCircle,
-  Award,
-  RefreshCw,
-  Home,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { employeeApi, mentorFeedbackApi } from "../../../services/feedbackmanagement/feedbackApi";
+import { mentorFeedbackApi } from "../../../services/feedbackmanagement/feedbackApi";
 import axios from "axios";
-
-import "../../../styles/feedback/SMEDashboard.css";
+import "../../../styles/feedback/components/MentorFeedbackDashboard.css";
 
 const formatDate = (dateInput) => {
   if (!dateInput) return "—";
@@ -32,24 +25,6 @@ const formatDate = (dateInput) => {
   } catch {
     return "—";
   }
-};
-
-const RATING_LABELS = {
-  1: "Poor",
-  2: "Fair",
-  3: "Good",
-  4: "Very Good",
-  5: "Excellent",
-};
-
-const getRatingColor = (rating) => {
-  const num = Number(rating);
-  if (num === 5) return "#24A148";
-  if (num === 4) return "#0F62FE";
-  if (num === 3) return "#E2B93B";
-  if (num === 2) return "#E89E14";
-  if (num === 1) return "#E01950";
-  return "#64748b";
 };
 
 export default function MentorFeedbackDashboard() {
@@ -79,8 +54,7 @@ export default function MentorFeedbackDashboard() {
     skill: "all",
   });
 
-  // NEW: which dropdown is open
-  const [openDropdown, setOpenDropdown] = useState(null); // "status" | "rating" | "skill" | null
+  const [openDropdown, setOpenDropdown] = useState(null);
 
   const fetchEmployeeName = async (employeeId) => {
     try {
@@ -215,7 +189,7 @@ export default function MentorFeedbackDashboard() {
 
   const renderStars = (rating) => {
     return (
-      <div className="d-flex gap-1">
+      <div className="mfd-stars-wrapper">
         {[1, 2, 3, 4, 5].map((star) => (
           <Star
             key={star}
@@ -229,7 +203,6 @@ export default function MentorFeedbackDashboard() {
     );
   };
 
-  // options for new dropdowns
   const statusOptions = [
     { label: "Select Status", value: "all" },
     { label: "Submitted", value: "Submitted" },
@@ -262,28 +235,17 @@ export default function MentorFeedbackDashboard() {
     const selectedLabel = getLabel(options, selectedValue);
 
     return (
-      <div className="sme-dropdown">
+      <div className="mfd-dropdown">
         <button
           type="button"
-          className={`sme-dropdown-trigger ${isOpen ? "open" : ""}`}
+          className={`mfd-dropdown-trigger ${isOpen ? "mfd-dropdown-trigger-open" : ""}`}
           onClick={() =>
             setOpenDropdown((prev) => (prev === name ? null : name))
           }
         >
-          <span className="sme-dropdown-placeholder">
-            {selectedLabel}
-          </span>
-          <span className="sme-dropdown-arrow">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              style={{
-                transition: "transform 0.2s ease",
-                transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
-                display: "block",
-              }}
-            >
+          <span className="mfd-dropdown-placeholder">{selectedLabel}</span>
+          <span className={`mfd-dropdown-arrow ${isOpen ? "mfd-dropdown-arrow-open" : ""}`}>
+            <svg width="18" height="18" viewBox="0 0 24 24">
               <polyline
                 points="6 9 12 15 18 9"
                 fill="none"
@@ -297,12 +259,12 @@ export default function MentorFeedbackDashboard() {
         </button>
 
         {isOpen && (
-          <div className="sme-dropdown-menu">
+          <div className="mfd-dropdown-menu">
             {options.map((opt) => (
               <div
                 key={opt.value}
-                className={`sme-dropdown-item ${
-                  opt.value === selectedValue ? "selected" : ""
+                className={`mfd-dropdown-item ${
+                  opt.value === selectedValue ? "mfd-dropdown-item-selected" : ""
                 }`}
                 onClick={() => {
                   setFilters((prev) => ({ ...prev, [name]: opt.value }));
@@ -320,192 +282,103 @@ export default function MentorFeedbackDashboard() {
 
   if (loading) {
     return (
-      <div className="sme-sla-wrapper h-100 d-flex align-items-center justify-content-center">
-        <div className="text-center">
-          <div
-            className="spinner-border text-primary"
-            style={{ width: "3rem", height: "3rem" }}
-          >
+      <div className="mfd-loading-wrapper">
+        <div className="mfd-loading-content">
+          <div className="mfd-loading-spinner">
             <span className="visually-hidden">Loading...</span>
           </div>
-          <p className="text-muted mt-3">Loading feedback data...</p>
+          <p className="mfd-loading-text">Loading feedback data...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="sme-sla-wrapper">
-      <nav aria-label="breadcrumb" className="mb-3">
-        <ol
-          className="breadcrumb mb-0 d-flex align-items-center"
-          style={{
-            backgroundColor: "transparent",
-            padding: 0,
-            margin: 0,
-          }}
-        >
-          <li
-            className="breadcrumb-item"
-            style={{ display: "flex", alignItems: "center" }}
-          >
+    <div className="mfd-wrapper">
+      <nav aria-label="breadcrumb" className="mfd-breadcrumb-nav">
+        <ol className="mfd-breadcrumb">
+          <li className="mfd-breadcrumb-item">
             <button
               onClick={() => navigate("/employee/dashboard")}
-              style={{
-                background: "none",
-                border: "none",
-                color: "#97247E",
-                cursor: "pointer",
-                padding: 0,
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                fontSize: "0.875rem",
-                fontWeight: 500,
-                textDecoration: "none",
-                transition: "color 0.2s ease",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
+              className="mfd-breadcrumb-link"
             >
-              <i className="bi bi-house-door" style={{ fontSize: "1rem" }}></i>
+              <i className="bi bi-house-door mfd-breadcrumb-icon"></i>
               Dashboard
             </button>
           </li>
-          <li
-            style={{
-              display: "flex",
-              alignItems: "center",
-              color: "#97247E",
-              margin: "0 8px",
-              fontSize: "1rem",
-            }}
-          >
-            /
-          </li>
-
-          <li
-            className="breadcrumb-item"
-            style={{ display: "flex", alignItems: "center" }}
-          >
+          <li className="mfd-breadcrumb-separator">/</li>
+          <li className="mfd-breadcrumb-item">
             <button
               onClick={() => navigate("/employee/dashboard/feedback")}
-              style={{
-                background: "none",
-                border: "none",
-                color: "#97247E",
-                cursor: "pointer",
-                padding: 0,
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                fontSize: "0.875rem",
-                fontWeight: 500,
-                textDecoration: "none",
-                transition: "color 0.2s ease",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
+              className="mfd-breadcrumb-link"
             >
               Feedbacks
             </button>
           </li>
-          <li
-            style={{
-              display: "flex",
-              alignItems: "center",
-              color: "#97247E",
-              margin: "0 8px",
-              fontSize: "1rem",
-            }}
-          >
-            /
-          </li>
-          <li
-            className="breadcrumb-item active"
-            aria-current="page"
-            style={{
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <span
-              style={{
-                color: "#1e293b",
-                fontSize: "0.875rem",
-                fontWeight: 600,
-              }}
-            >
-              SME Dashboard
-            </span>
+          <li className="mfd-breadcrumb-separator">/</li>
+          <li className="mfd-breadcrumb-item mfd-breadcrumb-active">
+            <span>SME Dashboard</span>
           </li>
         </ol>
       </nav>
 
-      {/* Header with Refresh */}
-      {/* (you can keep your header here if you add it later) */}
-
-      {/* Error Alert */}
       {error && (
-        <div className="alert alert-danger sme-sla-alert-error mb-3" role="alert">
-          <p className="mb-0">{error}</p>
+        <div className="mfd-alert-error">
+          <p className="mfd-alert-message">{error}</p>
         </div>
       )}
 
-      <div className="row g-3 mb-3">
+      <div className="mfd-stats-grid">
         {[
           {
             label: "Total Feedback",
             value: stats.total,
             icon: MessageSquare,
-            bgColor: "#EEF2FF",
+            bgClass: "mfd-stat-icon-blue",
             iconColor: "#3B82F6",
           },
           {
             label: "Average Rating",
             value: stats.avgRating,
             icon: Star,
-            bgColor: "#FEF3C7",
+            bgClass: "mfd-stat-icon-yellow",
             iconColor: "#E2B93B",
           },
-        ].map(({ label, value, icon: Icon, bgColor, iconColor }) => (
-          <div key={label} className="col-xl-3 col-lg-4 col-md-6 col-sm-6">
-            <div className="sme-sla-stat-card">
-              <div className="sme-sla-stat-icon" style={{ backgroundColor: bgColor }}>
+        ].map(({ label, value, icon: Icon, bgClass, iconColor }) => (
+          <div key={label} className="mfd-stat-col">
+            <div className="mfd-stat-card">
+              <div className={`mfd-stat-icon ${bgClass}`}>
                 <Icon size={28} color={iconColor} strokeWidth={2.5} />
               </div>
-              <div>
-                <h3 className="sme-sla-stat-value">{value}</h3>
-                <p className="sme-sla-stat-label">{label}</p>
+              <div className="mfd-stat-content">
+                <h3 className="mfd-stat-value">{value}</h3>
+                <p className="mfd-stat-label">{label}</p>
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* FILTERS CARD – custom dropdowns */}
-      <div className="sme-sla-filters-card">
-        <div className="row g-3">
-          <div className="col-md-4">
+      <div className="mfd-filters-card">
+        <div className="mfd-filters-grid">
+          <div className="mfd-filter-col">
             {renderDropdown("status", statusOptions)}
           </div>
-
-          <div className="col-md-4">
+          <div className="mfd-filter-col">
             {renderDropdown("rating", ratingOptions)}
           </div>
-
-          <div className="col-md-4">
+          <div className="mfd-filter-col">
             {renderDropdown("skill", skillOptions)}
           </div>
         </div>
       </div>
 
       {filteredFeedbacks.length === 0 ? (
-        <div className="sme-sla-empty-state-wrapper">
-          <div className="sme-sla-empty-state">
-            <MessageSquare size={64} className="sme-sla-empty-icon" />
-            <h6 className="sme-sla-empty-title">No feedback found</h6>
-            <p className="sme-sla-empty-text">
+        <div className="mfd-empty-wrapper">
+          <div className="mfd-empty-state">
+            <MessageSquare size={64} className="mfd-empty-icon" />
+            <h6 className="mfd-empty-title">No feedback found</h6>
+            <p className="mfd-empty-text">
               {feedbacks.length === 0
                 ? "You haven't received any feedback from mentees yet"
                 : "No feedback matches your current filters"}
@@ -513,10 +386,10 @@ export default function MentorFeedbackDashboard() {
           </div>
         </div>
       ) : (
-        <div className="sme-sla-table-wrapper">
-          <div className="table-responsive">
-            <table className="table table-hover mb-0 sme-sla-table">
-              <thead className="sme-sla-table-header">
+        <div className="mfd-table-wrapper">
+          <div className="mfd-table-responsive">
+            <table className="mfd-table">
+              <thead className="mfd-table-header">
                 <tr>
                   <th>EMPLOYEE</th>
                   <th>SKILL</th>
@@ -525,52 +398,46 @@ export default function MentorFeedbackDashboard() {
                   <th>ACTIONS</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="mfd-table-body">
                 {filteredFeedbacks.map((feedback) => (
                   <tr
                     key={feedback.trackingId}
-                    className="sme-sla-clickable-row"
+                    className="mfd-table-row"
                     onClick={() => setSelectedFeedback(feedback)}
                   >
                     <td>
-                      <div className="sme-sla-employee-cell">
-                        <User size={16} className="sme-sla-employee-icon" />
-                        <div className="sme-sla-employee-info">
-                          <div className="sme-sla-employee-name">
+                      <div className="mfd-employee-cell">
+                        <User size={16} className="mfd-employee-icon" />
+                        <div className="mfd-employee-info">
+                          <div className="mfd-employee-name">
                             {feedback.isAnonymous ? "Anonymous" : feedback.menteeName}
                           </div>
                         </div>
                       </div>
                     </td>
                     <td>
-                      <span className="sme-sla-badge sme-sla-badge-skill">
+                      <span className="mfd-badge-skill">
                         {feedback.skillName}
                       </span>
                     </td>
                     <td>
-                      <div className="d-flex align-items-center gap-2 justify-content-center">
-                        <Star
-                          size={16}
-                          fill="#FFB800"
-                          stroke="#FFB800"
-                          strokeWidth={2}
-                        />
-                        <span className="sme-sla-rating-text">
+                      <div className="mfd-rating-cell">
+                        <Star size={16} className="mfd-rating-star" />
+                        <span className="mfd-rating-text">
                           {feedback.rating}/5
                         </span>
                       </div>
                     </td>
                     <td>
-                      <div className="sme-sla-date-cell">
-                        <Calendar size={14} className="sme-sla-date-icon" />
+                      <div className="mfd-date-cell">
+                        <Calendar size={14} className="mfd-date-icon" />
                         {feedback.createdAtFormatted}
                       </div>
                     </td>
-
                     <td>
-                      <div className="sme-sla-actions">
+                      <div className="mfd-actions">
                         <button
-                          className="btn btn-sm sme-sla-action-btn sme-sla-action-view"
+                          className="mfd-action-btn mfd-action-view"
                           onClick={(e) => {
                             e.stopPropagation();
                             setSelectedFeedback(feedback);
@@ -581,7 +448,7 @@ export default function MentorFeedbackDashboard() {
                         </button>
                         {feedback.status === "Submitted" && (
                           <button
-                            className="btn btn-sm sme-sla-action-btn sme-sla-action-acknowledge"
+                            className="mfd-action-btn mfd-action-acknowledge"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleAcknowledge(feedback.trackingId);
@@ -600,83 +467,78 @@ export default function MentorFeedbackDashboard() {
           </div>
         </div>
       )}
+
       {selectedFeedback && (
         <>
           <div
-            className="modal-backdrop fade show"
-            style={{ zIndex: 1040 }}
+            className="mfd-modal-backdrop"
             onClick={() => setSelectedFeedback(null)}
           />
           <div
-            className="modal fade show d-block"
-            tabIndex="-1"
-            style={{ zIndex: 1050 }}
+            className="mfd-modal"
             onClick={(e) => {
-              if (e.target.classList.contains("modal")) {
+              if (e.target.classList.contains("mfd-modal")) {
                 setSelectedFeedback(null);
               }
             }}
           >
-            <div className="modal-dialog modal-dialog-centered" style={{ maxWidth: "700px" }}>
-              <div className="modal-content sme-sla-modal-content">
-                <div className="modal-header sme-sla-modal-header">
-                  <h5 className="modal-title sme-sla-modal-title">
-                    Feedback Details
-                  </h5>
+            <div className="mfd-modal-dialog">
+              <div className="mfd-modal-content">
+                <div className="mfd-modal-header">
+                  <h5 className="mfd-modal-title">Feedback Details</h5>
                   <button
                     type="button"
-                    className="btn-close btn-close-white"
+                    className="mfd-modal-close"
                     onClick={() => setSelectedFeedback(null)}
                     aria-label="Close"
-                  />
+                  >
+                    ×
+                  </button>
                 </div>
-                <div className="modal-body sme-sla-modal-body">
-                  <div className="row g-3 mb-4">
-                    <div className="col-6">
-                      <small className="sme-sla-modal-label">Skill</small>
-
-                      <div className="sme-sla-modal-value" style={{ textAlign: "left" }}>
+                <div className="mfd-modal-body">
+                  <div className="mfd-modal-grid">
+                    <div className="mfd-modal-field">
+                      <small className="mfd-modal-label">Skill</small>
+                      <div className="mfd-modal-value">
                         {selectedFeedback.skillName}
                       </div>
                     </div>
-                    <div className="col-6">
-                      <small className="sme-sla-modal-label">Rating</small>
-                      <div className="d-flex align-items-center gap-2">
+                    <div className="mfd-modal-field">
+                      <small className="mfd-modal-label">Rating</small>
+                      <div className="mfd-modal-rating">
                         {renderStars(selectedFeedback.rating)}
-                        <span className="fw-bold">
+                        <span className="mfd-modal-rating-value">
                           {selectedFeedback.rating}/5
                         </span>
                       </div>
                     </div>
-                    <div className="col-6">
-                      <small className="sme-sla-modal-label" >From</small>
-                      <div className="sme-sla-modal-value"  style={{ textAlign: "left" }}>
+                    <div className="mfd-modal-field">
+                      <small className="mfd-modal-label">From</small>
+                      <div className="mfd-modal-value">
                         {selectedFeedback.isAnonymous
                           ? "Anonymous"
                           : selectedFeedback.menteeName}
                       </div>
                     </div>
-                    <div className="col-6">
-                      <small className="sme-sla-modal-label">Submitted</small>
-                      <div className="sme-sla-modal-value"  style={{ textAlign: "left" }}>
+                    <div className="mfd-modal-field">
+                      <small className="mfd-modal-label">Submitted</small>
+                      <div className="mfd-modal-value">
                         {selectedFeedback.createdAtFormatted}
                       </div>
                     </div>
                   </div>
 
-                  <div>
-                    <small className="sme-sla-modal-label">
-                      Feedback Comments
-                    </small>
-                    <div className="sme-sla-modal-comments">
+                  <div className="mfd-modal-comments-section">
+                    <small className="mfd-modal-label">Feedback Comments</small>
+                    <div className="mfd-modal-comments">
                       {selectedFeedback.feedbackComments}
                     </div>
                   </div>
                 </div>
-                <div className="modal-footer sme-sla-modal-footer">
+                <div className="mfd-modal-footer">
                   {selectedFeedback.status === "Submitted" && (
                     <button
-                      className="btn sme-sla-btn-acknowledge-modal"
+                      className="mfd-modal-btn mfd-modal-btn-acknowledge"
                       onClick={() => {
                         handleAcknowledge(selectedFeedback.trackingId);
                         setSelectedFeedback(null);
@@ -687,7 +549,7 @@ export default function MentorFeedbackDashboard() {
                     </button>
                   )}
                   <button
-                    className="btn sme-sla-btn-close-modal"
+                    className="mfd-modal-btn mfd-modal-btn-close"
                     onClick={() => setSelectedFeedback(null)}
                   >
                     Close

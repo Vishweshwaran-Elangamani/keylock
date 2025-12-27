@@ -6,24 +6,17 @@ import {
   peerQueueApi,
   orgGoalFeedbackApi,
 } from "../../../services/feedbackmanagement/feedbackApi";
+import "../../../styles/feedback/components/SearchFeedback.css";
 
 const Badge = ({ text, color = "#525252" }) => (
-  <span
-    className="badge"
-    style={{
-      backgroundColor: `${color}20`,
-      color,
-      padding: "4px 8px",
-      fontSize: "0.7rem",
-    }}
-  >
+  <span className="sf-badge" style={{ backgroundColor: `${color}20`, color }}>
     {text}
   </span>
 );
 
 export default function SearchFeedback() {
   const [query, setQuery] = useState("");
-  const [type, setType] = useState("All"); // All | Manager | Mentor | Peer | OrgGoal
+  const [type, setType] = useState("All");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -124,133 +117,92 @@ export default function SearchFeedback() {
   const TypeBtn = ({ label, active }) => (
     <button
       type="button"
-      className={`btn btn-sm ${active ? "btn-primary" : "btn-outline-primary"}`}
+      className={`sf-type-btn ${active ? "sf-type-btn--active" : ""}`}
       onClick={() => setType(label)}
-      style={{ borderRadius: "var(--radius-sm)" }}
     >
       {label}
     </button>
   );
 
   return (
-    <div className="container-fluid py-3" style={{ maxWidth: "1000px" }}>
-      <div className="d-flex justify-content-between align-items-start mb-4">
-        <div>
-          <h2
-            className="fw-bold mb-1"
-            style={{ color: "var(--color-primary-1)" }}
-          >
-            {" "}
-            Search Feedback
-          </h2>
-          <p className="mb-0 small" style={{ color: "var(--muted)" }}>
-            Search across all feedback types
-          </p>
+    <div className="sf-container">
+      <div className="sf-header">
+        <div className="sf-header-content">
+          <h2 className="sf-title">Search Feedback</h2>
+          <p className="sf-subtitle">Search across all feedback types</p>
         </div>
         <button
-          className="btn d-flex align-items-center gap-2"
+          className="sf-refresh-btn"
           onClick={fetchAll}
           disabled={loading}
-          style={{
-            background: "transparent",
-            border: "1px solid var(--border)",
-            color: "var(--color-primary-3)",
-            borderRadius: "var(--radius-md)",
-            padding: "0.5rem 0.9rem",
-            fontWeight: "600",
-          }}
         >
-          <RefreshCw
-            size={18}
-            style={{ animation: loading ? "spin 1s linear infinite" : "none" }}
-          />
+          <RefreshCw size={18} className={loading ? "sf-spin" : ""} />
           Refresh
         </button>
       </div>
 
       {error && (
-        <div
-          className="alert alert-danger d-flex align-items-start gap-2"
-          style={{ borderRadius: "var(--radius-md)" }}
-        >
-          <AlertTriangle size={18} className="mt-1" />
-          <div>
+        <div className="sf-alert sf-alert-error">
+          <AlertTriangle size={18} className="sf-alert-icon" />
+          <div className="sf-alert-content">
             <strong>Error</strong>
-            <p className="mb-0 small mt-1">{error}</p>
+            <p className="sf-alert-message">{error}</p>
           </div>
-          <button className="btn-close ms-auto" onClick={() => setError("")} />
+          <button className="sf-alert-close" onClick={() => setError("")}>
+            ×
+          </button>
         </div>
       )}
 
-      <div
-        className="card border-0 mb-3"
-        style={{
-          border: "1px solid var(--border)",
-          borderRadius: "var(--radius-lg)",
-          boxShadow: "var(--shadow)",
-        }}
-      >
-        <div className="card-body">
-          <div className="d-flex gap-2 mb-3 flex-wrap">
+      <div className="sf-search-card">
+        <div className="sf-search-card-body">
+          <div className="sf-type-buttons">
             {["All", "Manager", "Mentor", "Peer", "OrgGoal"].map((t) => (
               <TypeBtn key={t} label={t} active={type === t} />
             ))}
           </div>
-          <div className="input-group">
+          <div className="sf-search-input-wrapper">
             <input
               type="text"
-              className="form-control"
+              className="sf-search-input"
               placeholder="Search feedback by keyword…"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             />
-            <button className="btn btn-primary" onClick={handleSearch}>
+            <button className="sf-search-button" onClick={handleSearch}>
               <Search size={18} />
             </button>
           </div>
         </div>
       </div>
 
-      <div
-        className="card border-0"
-        style={{
-          border: "1px solid var(--border)",
-          borderRadius: "var(--radius-lg)",
-          boxShadow: "var(--shadow)",
-        }}
-      >
-        <div className="card-body">
-          <h5 className="mb-3">Results ({results.length})</h5>
+      <div className="sf-results-card">
+        <div className="sf-results-card-body">
+          <h5 className="sf-results-title">Results ({results.length})</h5>
           {results.length === 0 ? (
-            <p className="text-muted mb-0">
+            <p className="sf-empty-message">
               No results found. Try searching with different keywords.
             </p>
           ) : (
-            <div className="row g-3">
+            <div className="sf-results-grid">
               {results.map((item, idx) => (
-                <div className="col-md-6 col-lg-4" key={idx}>
-                  <div
-                    className="card h-100 border-0"
-                    style={{
-                      border: "1px solid var(--border)",
-                      borderRadius: "var(--radius-lg)",
-                    }}
-                  >
-                    <div className="card-body">
-                      <div className="d-flex justify-content-between align-items-start mb-2">
+                <div className="sf-results-grid-item" key={idx}>
+                  <div className="sf-result-card">
+                    <div className="sf-result-card-body">
+                      <div className="sf-result-card-header">
                         <Badge text={item._type} color="#0F62FE" />
                         {item.status && (
                           <Badge text={item.status} color="#24A148" />
                         )}
                       </div>
-                      <p className="small mb-2">
+                      <p className="sf-result-content">
                         {item.reviewComment ||
                           item.feedbackComments ||
                           item.feedbackContent ||
                           "No content"}
                       </p>
-                      <small className="text-muted d-block">
+                      <small className="sf-result-meta">
                         {item.targetEmployeeName ||
                           item.mentorName ||
                           item.recipientName ||
@@ -265,8 +217,6 @@ export default function SearchFeedback() {
           )}
         </div>
       </div>
-
-      <style>{`@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}`}</style>
     </div>
   );
 }

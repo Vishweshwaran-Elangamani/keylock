@@ -1,5 +1,3 @@
-// src/pages/feedback_management/feedback/ViewMyPeerFeedback.jsx
-
 import React, { useEffect, useState, useMemo } from "react";
 import {
   RefreshCw,
@@ -19,7 +17,7 @@ import {
   employeeApi,
 } from "../../../services/feedbackmanagement/feedbackApi";
 import FeedbackBreadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb";
-import "../../../styles/feedback/ViewMyPeerFeedback.css";
+import "../../../styles/feedback/components/ViewMyPeerFeedback.css";
 
 export default function ViewMyPeerFeedback() {
   const navigate = useNavigate();
@@ -34,7 +32,6 @@ export default function ViewMyPeerFeedback() {
   const [employeeMap, setEmployeeMap] = useState({});
   const [viewMode, setViewMode] = useState("card"); // "card" or "table"
 
-  // Safe date formatting
   const formatDate = (dateInput) => {
     if (!dateInput) return "—";
     try {
@@ -64,7 +61,6 @@ export default function ViewMyPeerFeedback() {
     );
   };
 
-  // Get sender display name
   const getSenderDisplayName = (feedback) => {
     const isAnon = checkIsAnonymous(feedback);
 
@@ -181,7 +177,6 @@ export default function ViewMyPeerFeedback() {
     }
   }, [user?.empId]);
 
-  // Loading state
   if (loading) {
     return (
       <div className="fm-viewpeer-loading">
@@ -194,7 +189,7 @@ export default function ViewMyPeerFeedback() {
   return (
     <div className="fm-viewpeer-page-wrapper">
       <div className="fm-viewpeer-container">
-        {/* Breadcrumb */}
+
         <FeedbackBreadcrumb
           items={[
             { label: "Feedback Management", path: "/employee/dashboard/feedback" },
@@ -202,7 +197,6 @@ export default function ViewMyPeerFeedback() {
           ]}
         />
 
-        {/* View Toggle */}
         <div className="fm-viewpeer-view-toggle">
           <button
             className={`fm-viewpeer-view-toggle__btn ${
@@ -224,7 +218,6 @@ export default function ViewMyPeerFeedback() {
           </button>
         </div>
 
-        {/* Error Alert */}
         {error && (
           <div className="fm-viewpeer-error-alert alert alert-danger alert-dismissible fade show">
             <AlertTriangle size={18} className="flex-shrink-0" />
@@ -239,8 +232,7 @@ export default function ViewMyPeerFeedback() {
             />
           </div>
         )}
-
-        {/* Stats Card */}
+    
         {peerFeedback.length > 0 && (
           <div className="fm-viewpeer-stats">
             <div className="fm-viewpeer-stat-card">
@@ -259,7 +251,7 @@ export default function ViewMyPeerFeedback() {
           </div>
         )}
 
-        {/* Empty State */}
+     
         {peerFeedback.length === 0 ? (
           <div className="fm-viewpeer-empty">
             <Users size={48} className="fm-viewpeer-empty__icon" />
@@ -270,7 +262,7 @@ export default function ViewMyPeerFeedback() {
           </div>
         ) : (
           <>
-            {/* Card View */}
+          
             {viewMode === "card" && (
               <div className="fm-viewpeer-cards-grid">
                 {peerFeedback.map((feedback) => {
@@ -353,9 +345,6 @@ export default function ViewMyPeerFeedback() {
               </div>
             )}
 
-            
-{/* Table View */}
-{/* Table View */}
 {viewMode === "table" && (
   <div className="fm-viewpeer-table-wrapper">
     <div className="fm-viewpeer-table-scroll">
@@ -411,14 +400,14 @@ export default function ViewMyPeerFeedback() {
                   </div>
                 </td>
 
-                {/* TYPE */}
+              
                 <td className="fm-viewpeer-table__td fm-viewpeer-table__td--type">
                   <span className="fm-viewpeer-badge fm-viewpeer-badge--peer">
                     Peer
                   </span>
                 </td>
 
-                {/* FEEDBACK */}
+      
                 <td className="fm-viewpeer-table__td fm-viewpeer-table__td--comment">
                   {feedback.feedbackContent ||
                     feedback.comment ||
@@ -426,7 +415,6 @@ export default function ViewMyPeerFeedback() {
                     "No comment provided"}
                 </td>
 
-                {/* DATE */}
                 <td className="fm-viewpeer-table__td fm-viewpeer-table__td--date">
                   {feedback.formattedDate}
                 </td>

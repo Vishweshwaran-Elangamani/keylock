@@ -1,5 +1,3 @@
-// src/pages/feedback_management/feedback/ViewMyReviews.jsx
-
 import React, { useEffect, useState, useMemo } from "react";
 import {
   RefreshCw,
@@ -15,18 +13,10 @@ import {
   managerReviewApi,
   employeeApi,
 } from "../../../services/feedbackmanagement/feedbackApi";
+import "../../../styles/feedback/components/ViewMyReviews.css";
 
 const Badge = ({ text, color = "#525252" }) => (
-  <span
-    className="badge"
-    style={{
-      backgroundColor: `${color}20`,
-      color,
-      padding: "6px 12px",
-      fontSize: "0.75rem",
-      fontWeight: "600",
-    }}
-  >
+  <span className="vmr-badge" style={{ backgroundColor: `${color}20`, color }}>
     {text}
   </span>
 );
@@ -43,7 +33,6 @@ export default function ViewMyReviews() {
   const [error, setError] = useState("");
   const [employeeMap, setEmployeeMap] = useState({});
 
-  // Fetch reviews using services
   const fetchReviews = async () => {
     setLoading(true);
     setError("");
@@ -55,7 +44,6 @@ export default function ViewMyReviews() {
         return;
       }
 
-      // STEP 1: Fetch employee map
       let empMap = {};
       try {
         const empRes = await employeeApi.getAll();
@@ -74,7 +62,6 @@ export default function ViewMyReviews() {
         console.warn("Error fetching employee map:", err.message);
       }
 
-      // STEP 2: Fetch reviews about me using service
       const reviewRes = await managerReviewApi.getByTargetEmployee(empId);
       
       if (reviewRes?.data) {
@@ -97,278 +84,182 @@ export default function ViewMyReviews() {
     }
   };
 
-  // Fetch on mount
   useEffect(() => {
     fetchReviews();
   }, [user?.empId]);
 
-  // Calculate average rating
   const averageRating = useMemo(() => {
     if (reviews.length === 0) return 0;
     const sum = reviews.reduce((acc, r) => acc + (r.rating || 0), 0);
     return (sum / reviews.length).toFixed(1);
   }, [reviews]);
 
-  // Loading state
   if (loading) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "60vh" }}
-      >
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+      <div className="vmr-loading">
+        <div className="vmr-spinner" role="status">
+          <span className="vmr-visually-hidden">Loading...</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div
-      className="d-flex justify-content-center py-4"
-      style={{ minHeight: "100vh", background: "#f9f9f9" }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "1000px",
-          paddingLeft: "1rem",
-          paddingRight: "1rem",
-        }}
-      >
-        {/* Header */}
-        <div className="d-flex align-items-start mb-4">
+    <div className="vmr-container">
+      <div className="vmr-content">
+        <div className="vmr-header">
           <button
-            className="btn btn-outline-secondary me-2"
+            className="vmr-back-button"
             onClick={() => navigate(-1)}
-            style={{ borderRadius: "var(--radius-md)" }}
           >
             <ArrowLeft size={16} />
           </button>
-          <div className="flex-grow-1">
-            <h2
-              className="fw-bold mb-1"
-              style={{ color: "var(--color-primary-1)" }}
-            >
-              My Reviews
-            </h2>
-            <p className="mb-0 small text-muted">
+          <div className="vmr-header-text">
+            <h2 className="vmr-title">My Reviews</h2>
+            <p className="vmr-subtitle">
               Reviews you have received from your managers
             </p>
           </div>
           <button
-            className="btn btn-outline-secondary"
+            className="vmr-refresh-button"
             onClick={fetchReviews}
             disabled={loading}
             title="Refresh"
-            style={{ borderRadius: "var(--radius-md)" }}
           >
             <RefreshCw
               size={18}
-              style={{
-                animation: loading ? "spin 1s linear infinite" : "none",
-              }}
+              className={loading ? "vmr-refresh-icon-spin" : ""}
             />
           </button>
         </div>
 
-        {/* Error Alert */}
         {error && (
-          <div
-            className="alert alert-danger d-flex align-items-start gap-2 mb-3"
-            style={{ borderRadius: "var(--radius-md)" }}
-          >
-            <AlertTriangle size={18} className="mt-1 flex-shrink-0" />
-            <div className="flex-grow-1">
+          <div className="vmr-alert vmr-alert-error">
+            <AlertTriangle size={18} className="vmr-alert-icon" />
+            <div className="vmr-alert-content">
               <strong>Error</strong>
-              <p className="mb-0 small mt-1">{error}</p>
+              <p className="vmr-alert-message">{error}</p>
             </div>
-            <button className="btn-close" onClick={() => setError("")} />
+            <button className="vmr-alert-close" onClick={() => setError("")}>
+              ×
+            </button>
           </div>
         )}
 
-        {/* Stats */}
         {reviews.length > 0 && (
-          <div className="row g-3 mb-4">
-            <div className="col-md-6">
-              <div
-                className="card border-0"
-                style={{
-                  border: "1px solid var(--border)",
-                  borderRadius: "var(--radius-md)",
-                }}
-              >
-                <div className="card-body text-center">
-                  <div className="d-flex justify-content-center mb-2">
-                    <div
-                      className="rounded p-2"
-                      style={{ background: "#0F62FE15" }}
-                    >
-                      <Eye size={24} style={{ color: "#0F62FE" }} />
-                    </div>
+          <div className="vmr-stats-grid">
+            <div className="vmr-stat-card">
+              <div className="vmr-stat-card-body">
+                <div className="vmr-stat-icon-wrapper">
+                  <div className="vmr-stat-icon vmr-stat-icon-blue">
+                    <Eye size={24} />
                   </div>
-                  <h3 className="fw-bold" style={{ color: "#0F62FE" }}>
-                    {reviews.length}
-                  </h3>
-                  <p className="mb-0 small text-muted">Reviews Received</p>
                 </div>
+                <h3 className="vmr-stat-value vmr-stat-value-blue">
+                  {reviews.length}
+                </h3>
+                <p className="vmr-stat-label">Reviews Received</p>
               </div>
             </div>
-            <div className="col-md-6">
-              <div
-                className="card border-0"
-                style={{
-                  border: "1px solid var(--border)",
-                  borderRadius: "var(--radius-md)",
-                }}
-              >
-                <div className="card-body text-center">
-                  <div className="d-flex justify-content-center mb-2">
-                    <div
-                      className="rounded p-2"
-                      style={{ background: "#24A14815" }}
-                    >
-                      <Star size={24} style={{ color: "#24A148" }} />
-                    </div>
+            <div className="vmr-stat-card">
+              <div className="vmr-stat-card-body">
+                <div className="vmr-stat-icon-wrapper">
+                  <div className="vmr-stat-icon vmr-stat-icon-green">
+                    <Star size={24} />
                   </div>
-                  <h3 className="fw-bold" style={{ color: "#24A148" }}>
-                    <Star
-                      size={20}
-                      style={{
-                        color: "#FFB800",
-                        fill: "#FFB800",
-                        display: "inline",
-                      }}
-                    />{" "}
-                    {averageRating}
-                  </h3>
-                  <p className="mb-0 small text-muted">Average Rating</p>
                 </div>
+                <h3 className="vmr-stat-value vmr-stat-value-green">
+                  <Star size={20} className="vmr-star-inline" />{" "}
+                  {averageRating}
+                </h3>
+                <p className="vmr-stat-label">Average Rating</p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Reviews List */}
         {reviews.length === 0 ? (
-          <div
-            className="card border-0"
-            style={{
-              border: "1px solid var(--border)",
-              borderRadius: "var(--radius-lg)",
-            }}
-          >
-            <div className="card-body text-center py-5">
-              <Star
-                size={48}
-                className="mb-3"
-                style={{ color: "var(--muted)" }}
-              />
-              <h5 className="text-muted mb-2">No reviews yet</h5>
-              <p className="small text-muted mb-0">
+          <div className="vmr-empty-state">
+            <div className="vmr-empty-state-body">
+              <Star size={48} className="vmr-empty-icon" />
+              <h5 className="vmr-empty-title">No reviews yet</h5>
+              <p className="vmr-empty-text">
                 Check back later for reviews from your managers
               </p>
             </div>
           </div>
         ) : (
-          <div className="row g-3">
+          <div className="vmr-reviews-list">
             {reviews.map((review) => (
-              <div className="col-12" key={review.reviewcommentId}>
-                <div
-                  className="card border-0"
-                  style={{
-                    border: "1px solid var(--border)",
-                    borderRadius: "var(--radius-lg)",
-                    boxShadow: "var(--shadow)",
-                  }}
-                >
-                  <div className="card-body">
-                    {/* Manager & Rating */}
-                    <div className="d-flex justify-content-between align-items-start mb-3">
-                      <div>
-                        <div className="d-flex align-items-center gap-2 mb-2">
-                          <User
-                            size={16}
-                            style={{ color: "var(--color-primary-1)" }}
+              <div className="vmr-review-card" key={review.reviewcommentId}>
+                <div className="vmr-review-card-body">
+                  <div className="vmr-review-header">
+                    <div className="vmr-review-manager">
+                      <div className="vmr-manager-info">
+                        <User size={16} className="vmr-manager-icon" />
+                        <h6 className="vmr-manager-name">{review.managerName}</h6>
+                      </div>
+                      <div className="vmr-review-date">
+                        <Calendar size={14} className="vmr-date-icon" />
+                        <small className="vmr-date-text">
+                          {new Date(review.createdAt).toLocaleDateString()}
+                        </small>
+                      </div>
+                    </div>
+                    <div className="vmr-review-rating">
+                      <div className="vmr-stars">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            size={18}
+                            className={`vmr-star ${
+                              i < review.rating ? "vmr-star-filled" : "vmr-star-empty"
+                            }`}
                           />
-                          <h6 className="fw-bold mb-0">{review.managerName}</h6>
-                        </div>
-                        <div className="d-flex align-items-center gap-2">
-                          <Calendar size={14} className="text-muted" />
-                          <small className="text-muted">
-                            {new Date(review.createdAt).toLocaleDateString()}
-                          </small>
-                        </div>
+                        ))}
                       </div>
-                      <div className="text-end">
-                        <div className="mb-2 d-flex gap-1">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              size={18}
-                              style={{
-                                color: i < review.rating ? "#FFB800" : "#e0e0e0",
-                                fill: i < review.rating ? "#FFB800" : "none",
-                              }}
-                            />
-                          ))}
-                        </div>
-                        <Badge text={`${review.rating}/5`} color="#24A148" />
-                      </div>
+                      <Badge text={`${review.rating}/5`} color="#24A148" />
                     </div>
-
-                    {/* Review Comment */}
-                    <div className="mb-3">
-                      <h6 className="small fw-bold text-muted mb-2">Review</h6>
-                      <p
-                        className="mb-0"
-                        style={{ lineHeight: "1.6", color: "#333" }}
-                      >
-                        {review.reviewComment}
-                      </p>
-                    </div>
-
-                    {/* Project & Goal Context */}
-                    {(review.projectContext || review.goalContext) && (
-                      <div className="row g-2">
-                        {review.projectContext && (
-                          <div className="col-md-6">
-                            <div
-                              className="p-2 rounded"
-                              style={{ backgroundColor: "#f9f9f9" }}
-                            >
-                              <h6 className="small fw-bold text-muted mb-1">
-                                Project Context
-                              </h6>
-                              <p className="small mb-0">
-                                {review.projectContext}
-                              </p>
-                            </div>
-                          </div>
-                        )}
-                        {review.goalContext && (
-                          <div className="col-md-6">
-                            <div
-                              className="p-2 rounded"
-                              style={{ backgroundColor: "#f9f9f9" }}
-                            >
-                              <h6 className="small fw-bold text-muted mb-1">
-                                Goal Context
-                              </h6>
-                              <p className="small mb-0">{review.goalContext}</p>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
                   </div>
+
+                  <div className="vmr-review-content">
+                    <h6 className="vmr-review-label">Review</h6>
+                    <p className="vmr-review-text">
+                      {review.reviewComment}
+                    </p>
+                  </div>
+
+                  {(review.projectContext || review.goalContext) && (
+                    <div className="vmr-context-grid">
+                      {review.projectContext && (
+                        <div className="vmr-context-item">
+                          <div className="vmr-context-box">
+                            <h6 className="vmr-context-label">
+                              Project Context
+                            </h6>
+                            <p className="vmr-context-text">
+                              {review.projectContext}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                      {review.goalContext && (
+                        <div className="vmr-context-item">
+                          <div className="vmr-context-box">
+                            <h6 className="vmr-context-label">
+                              Goal Context
+                            </h6>
+                            <p className="vmr-context-text">{review.goalContext}</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
           </div>
         )}
-
-        <style>{`@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}`}</style>
       </div>
     </div>
   );

@@ -4,14 +4,9 @@ import {
   AlertTriangle,
   Eye,
   MessageSquare,
-  FileText,
-  Users,
-  Send,
   Clock,
   User,
-  Target,
   Star,
-  Briefcase,
 } from "lucide-react";
 import {
   mentorFeedbackApi,
@@ -19,10 +14,10 @@ import {
 } from "../../../services/feedbackmanagement/feedbackApi";
 import ResponseViewModal from "../../../components/feedback_management/modals/ResponseViewModal";
 import axios from "axios";
+import "../../../styles/feedback/components/ManagerTeamSubmissions.css";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
-// Robust date formatting helper
 const formatDate = (dateInput) => {
   if (!dateInput) return "—";
 
@@ -44,7 +39,6 @@ const formatDate = (dateInput) => {
     }
 
     if (isNaN(dateObj.getTime())) {
-      console.warn("Invalid date detected:", dateInput);
       return "Invalid Date";
     }
 
@@ -53,13 +47,11 @@ const formatDate = (dateInput) => {
       month: "short",
       day: "numeric",
     });
-  } catch (err) {
-    console.error("Date formatting error:", err, dateInput);
+  } catch {
     return "Invalid Date";
   }
 };
 
-// Calculate days ago safely
 const getDaysAgo = (dateInput) => {
   try {
     const dateObj =
@@ -112,7 +104,6 @@ export default function ManageTeamSubmissions() {
   const [selectedResponse, setSelectedResponse] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
 
-  // Fetch Employee Map & Department Employees
   const fetchEmployeeData = useCallback(async () => {
     try {
       const response = await axios.get(`${API_BASE}/EmployeeManagement/all`);
@@ -139,7 +130,6 @@ export default function ManageTeamSubmissions() {
     }
   }, [user?.empId, user?.departmentId]);
 
-  // Fetch Objectives
   const fetchObjectives = useCallback(async () => {
     try {
       const response = await axios.get(`${API_BASE}/Orgwideobjectives`);
@@ -158,7 +148,6 @@ export default function ManageTeamSubmissions() {
     }
   }, []);
 
-  // Fetch Data
   const fetchData = useCallback(async () => {
     setRefreshing(true);
     setLoading(true);
@@ -173,7 +162,6 @@ export default function ManageTeamSubmissions() {
 
       const deptEmpIds = departmentEmployees.map((emp) => emp.employeeId);
 
-      // HR Forms
       try {
         const hrData = [];
         for (const empId of deptEmpIds) {
@@ -198,7 +186,6 @@ export default function ManageTeamSubmissions() {
         setHrForms([]);
       }
 
-      // Mentor Feedback
       try {
         const mentorData = [];
         for (const empId of deptEmpIds) {
@@ -223,7 +210,6 @@ export default function ManageTeamSubmissions() {
         setMentor([]);
       }
 
-      // Peer Feedback
       try {
         const peerRes = await peerQueueApi.list(1, 200);
         const allPeer = Array.isArray(peerRes.data?.data)
@@ -247,9 +233,7 @@ export default function ManageTeamSubmissions() {
         setPeer([]);
       }
 
-      // Goal Feedback
       try {
-
         const goalRes = await axios.get(`${API_BASE}/OrgGoalFeedback/all`, {
           params: {
             pageNumber: 1,
@@ -308,7 +292,6 @@ export default function ManageTeamSubmissions() {
     }
   }, [employeeMap, departmentEmployees, fetchData]);
 
-  // Modal Handlers
   const handleViewResponse = (data, type) => {
     setSelectedResponse(data);
     setSelectedType(type);
@@ -339,147 +322,57 @@ export default function ManageTeamSubmissions() {
   const activeData = getActiveData();
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#f8f9fa",
-        padding: "2rem 1rem",
-      }}
-    >
-      <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
-        {/* HEADER */}
-        <div
-          className="d-flex justify-content-between align-items-center mb-4"
-          style={{ flexWrap: "wrap", gap: "1rem" }}
-        >
-          <div>
-            <h2
-              className="fw-bold mb-1"
-              style={{ fontSize: "1.75rem", color: "#212529" }}
-            >
-              Department Team Submissions
-            </h2>
-            <p className="mb-0 text-muted" style={{ fontSize: "0.875rem" }}>
-              View all feedback from your department (
-              {departmentEmployees.length} employees)
+    <div className="mts-page">
+      <div className="mts-container">
+        <div className="mts-header">
+          <div className="mts-header-text">
+            <h2 className="mts-title">Department Team Submissions</h2>
+            <p className="mts-subtitle">
+              View all feedback from your department ({departmentEmployees.length} employees)
             </p>
           </div>
-          
         </div>
 
-        {/* ERROR ALERT */}
         {error && (
-          <div
-            className="alert alert-danger alert-dismissible fade show d-flex align-items-start gap-2 mb-4"
-            role="alert"
-            style={{ borderRadius: "8px" }}
-          >
-            <AlertTriangle size={18} className="mt-1 flex-shrink-0" />
-            <div className="flex-grow-1">
+          <div className="mts-alert mts-alert-error" role="alert">
+            <AlertTriangle size={18} className="mts-alert-icon" />
+            <div className="mts-alert-body">
               <strong>Error</strong>
-              <p className="mb-0 small mt-1">{error}</p>
+              <p className="mts-alert-message">{error}</p>
             </div>
             <button
               type="button"
-              className="btn-close"
+              className="mts-alert-close"
               onClick={() => setError("")}
             />
           </div>
         )}
 
-        {/* ENHANCED PILL-STYLE TOGGLE TABS WITH INCREASED SIZE */}
-        <div className="d-flex justify-content-center mb-4">
-          <div
-            className="toggle-container"
-            style={{
-              backgroundColor: "#27235c",
-              borderRadius: "60px",
-              padding: "8px",
-              display: "inline-flex",
-              gap: "4px",
-              boxShadow: "0 6px 16px rgba(39, 35, 92, 0.25)",
-              minHeight: "60px",
-            }}
-          >
+        <div className="mts-toggle-wrapper">
+          <div className="mts-toggle-container">
             <button
               type="button"
               onClick={() => setTab("HRForms")}
-              style={{
-                background: tab === "HRForms" ? "#ffffff" : "transparent",
-                color: tab === "HRForms" ? "#27235c" : "#ffffff",
-                border: "none",
-                borderRadius: "60px",
-                padding: "14px 36px",
-                fontSize: "0.938rem",
-                fontWeight: 600,
-                cursor: "pointer",
-                transition: "all 0.3s ease",
-                whiteSpace: "nowrap",
-                minHeight: "44px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              className={`mts-toggle-btn ${
+                tab === "HRForms" ? "mts-toggle-btn-active" : ""
+              }`}
             >
-              HR Forms
+              <span>HR Forms</span>
               {hrForms.length > 0 && (
-                <span
-                  style={{
-                    marginLeft: "10px",
-                    backgroundColor:
-                      tab === "HRForms" ? "#27235c" : "rgba(255,255,255,0.3)",
-                    color: "#ffffff",
-                    padding: "3px 10px",
-                    borderRadius: "14px",
-                    fontSize: "0.813rem",
-                    fontWeight: 700,
-                    minWidth: "28px",
-                    textAlign: "center",
-                  }}
-                >
-                  {hrForms.length}
-                </span>
+                <span className="mts-toggle-count">{hrForms.length}</span>
               )}
             </button>
 
             <button
               type="button"
               onClick={() => setTab("GoalFeedback")}
-              style={{
-                background: tab === "GoalFeedback" ? "#ffffff" : "transparent",
-                color: tab === "GoalFeedback" ? "#27235c" : "#ffffff",
-                border: "none",
-                borderRadius: "60px",
-                padding: "14px 36px",
-                fontSize: "0.938rem",
-                fontWeight: 600,
-                cursor: "pointer",
-                transition: "all 0.3s ease",
-                whiteSpace: "nowrap",
-                minHeight: "44px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              className={`mts-toggle-btn ${
+                tab === "GoalFeedback" ? "mts-toggle-btn-active" : ""
+              }`}
             >
-              Goal Feedback
+              <span>Goal Feedback</span>
               {goalFeedback.length > 0 && (
-                <span
-                  style={{
-                    marginLeft: "10px",
-                    backgroundColor:
-                      tab === "GoalFeedback"
-                        ? "#27235c"
-                        : "rgba(255,255,255,0.3)",
-                    color: "#ffffff",
-                    padding: "3px 10px",
-                    borderRadius: "14px",
-                    fontSize: "0.813rem",
-                    fontWeight: 700,
-                    minWidth: "28px",
-                    textAlign: "center",
-                  }}
-                >
+                <span className="mts-toggle-count">
                   {goalFeedback.length}
                 </span>
               )}
@@ -488,249 +381,107 @@ export default function ManageTeamSubmissions() {
             <button
               type="button"
               onClick={() => setTab("Mentor")}
-              style={{
-                background: tab === "Mentor" ? "#ffffff" : "transparent",
-                color: tab === "Mentor" ? "#27235c" : "#ffffff",
-                border: "none",
-                borderRadius: "60px",
-                padding: "14px 36px",
-                fontSize: "0.938rem",
-                fontWeight: 600,
-                cursor: "pointer",
-                transition: "all 0.3s ease",
-                whiteSpace: "nowrap",
-                minHeight: "44px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              className={`mts-toggle-btn ${
+                tab === "Mentor" ? "mts-toggle-btn-active" : ""
+              }`}
             >
-              Mentor
+              <span>Mentor</span>
               {mentor.length > 0 && (
-                <span
-                  style={{
-                    marginLeft: "10px",
-                    backgroundColor:
-                      tab === "Mentor" ? "#27235c" : "rgba(255,255,255,0.3)",
-                    color: "#ffffff",
-                    padding: "3px 10px",
-                    borderRadius: "14px",
-                    fontSize: "0.813rem",
-                    fontWeight: 700,
-                    minWidth: "28px",
-                    textAlign: "center",
-                  }}
-                >
-                  {mentor.length}
-                </span>
+                <span className="mts-toggle-count">{mentor.length}</span>
               )}
             </button>
 
             <button
               type="button"
               onClick={() => setTab("Peer")}
-              style={{
-                background: tab === "Peer" ? "#ffffff" : "transparent",
-                color: tab === "Peer" ? "#27235c" : "#ffffff",
-                border: "none",
-                borderRadius: "60px",
-                padding: "14px 36px",
-                fontSize: "0.938rem",
-                fontWeight: 600,
-                cursor: "pointer",
-                transition: "all 0.3s ease",
-                whiteSpace: "nowrap",
-                minHeight: "44px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              className={`mts-toggle-btn ${
+                tab === "Peer" ? "mts-toggle-btn-active" : ""
+              }`}
             >
-              Peer
+              <span>Peer</span>
               {peer.length > 0 && (
-                <span
-                  style={{
-                    marginLeft: "10px",
-                    backgroundColor:
-                      tab === "Peer" ? "#27235c" : "rgba(255,255,255,0.3)",
-                    color: "#ffffff",
-                    padding: "3px 10px",
-                    borderRadius: "14px",
-                    fontSize: "0.813rem",
-                    fontWeight: 700,
-                    minWidth: "28px",
-                    textAlign: "center",
-                  }}
-                >
-                  {peer.length}
-                </span>
+                <span className="mts-toggle-count">{peer.length}</span>
               )}
             </button>
           </div>
         </div>
 
-        {/* CONTENT AREA */}
         {loading ? (
-          <div className="text-center py-5">
-            <div
-              className="spinner-border"
-              style={{
-                width: "3rem",
-                height: "3rem",
-                color: "#97247E",
-                borderWidth: "3px",
-              }}
-              role="status"
-            >
-              <span className="visually-hidden">Loading...</span>
+          <div className="mts-loading">
+            <div className="mts-spinner" role="status">
+              <span className="mts-visually-hidden">Loading...</span>
             </div>
-            <p className="text-muted mt-3 fw-medium">Loading submissions...</p>
+            <p className="mts-loading-text">Loading submissions...</p>
           </div>
         ) : activeData.length === 0 ? (
-          <div
-            style={{
-              background: "white",
-              border: "1px solid #e5e7eb",
-              borderRadius: "12px",
-              padding: "3rem",
-              textAlign: "center",
-            }}
-          >
-            <AlertTriangle
-              size={48}
-              style={{ color: "#cbd5e1", marginBottom: "1rem" }}
-            />
-            <h5 className="fw-bold mb-2" style={{ color: "#6c757d" }}>
-              No Submissions Yet
-            </h5>
-            <p className="text-muted mb-0">
+          <div className="mts-empty-card">
+            <AlertTriangle size={48} className="mts-empty-icon" />
+            <h5 className="mts-empty-title">No Submissions Yet</h5>
+            <p className="mts-empty-text">
               There are no submissions from your department in this category.
             </p>
           </div>
         ) : (
-          <div className="row g-3">
-            {/* HR FORMS */}
+          <div className="mts-grid">
             {tab === "HRForms" &&
               hrForms.map((hr) => {
                 const statusColor =
                   hr.status === "Reviewed"
-                    ? "#198754"
+                    ? "mts-status-reviewed"
                     : hr.status === "Submitted"
-                    ? "#97247E"
-                    : "#ffc107";
+                    ? "mts-status-submitted"
+                    : "mts-status-pending";
                 return (
-                  <div className="col-md-6 col-lg-4" key={hr.responseId}>
-                    <div
-                      style={{
-                        background: "white",
-                        border: "1px solid #e5e7eb",
-                        borderLeft: `4px solid ${statusColor}`,
-                        borderRadius: "10px",
-                        padding: "1.25rem",
-                        height: "100%",
-                        transition: "box-shadow 0.2s",
-                        cursor: "pointer",
-                      }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.boxShadow =
-                          "0 4px 12px rgba(0,0,0,0.15)")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.boxShadow = "none")
-                      }
-                    >
-                      <div className="d-flex justify-content-between align-items-start mb-3">
-                        <div>
-                          <div
-                            style={{
-                              fontSize: "0.75rem",
-                              color: "#6c757d",
-                              marginBottom: "4px",
-                              fontWeight: 600,
-                            }}
-                          >
+                  <div className="mts-card" key={hr.responseId}>
+                    <div className="mts-card-inner mts-card-hr">
+                      <div className="mts-card-header">
+                        <div className="mts-card-header-left">
+                          <div className="mts-card-submitter">
                             {hr.submittedByName}
                           </div>
-                          <h6
-                            className="mb-0 fw-bold"
-                            style={{ fontSize: "1rem", color: "#212529" }}
-                          >
+                          <h6 className="mts-card-title">
                             {hr.formName || "HR Form"}
                           </h6>
                         </div>
-                        <span
-                          style={{
-                            display: "inline-block",
-                            backgroundColor: `${statusColor}15`,
-                            color: statusColor,
-                            padding: "4px 10px",
-                            fontSize: "0.75rem",
-                            fontWeight: 600,
-                            borderRadius: "6px",
-                            border: `1.5px solid ${statusColor}40`,
-                          }}
-                        >
+                        <span className={`mts-status-badge ${statusColor}`}>
                           {hr.status || "Draft"}
                         </span>
                       </div>
 
-                      <div className="mb-3">
-                        <div
-                          className="d-flex align-items-center gap-2 text-muted"
-                          style={{ fontSize: "0.813rem" }}
-                        >
-                          <Clock size={14} />
-                          <span>{hr.submittedAtFormatted}</span>
-                          {hr.daysAgo !== null && (
-                            <span>({hr.daysAgo}d ago)</span>
-                          )}
-                        </div>
+                      <div className="mts-card-date-row">
+                        <Clock size={14} className="mts-card-date-icon" />
+                        <span className="mts-card-date-text">
+                          {hr.submittedAtFormatted}
+                        </span>
+                        {hr.daysAgo !== null && (
+                          <span className="mts-card-date-ago">
+                            ({hr.daysAgo}d ago)
+                          </span>
+                        )}
                       </div>
 
                       {hr.status === "Reviewed" && hr.hrReviewComments && (
-                        <div
-                          className="mb-3"
-                          style={{
-                            background: "#f8f9fa",
-                            padding: "0.75rem",
-                            borderRadius: "6px",
-                            border: "1px solid #e9ecef",
-                          }}
-                        >
-                          <div className="d-flex align-items-center gap-1 mb-1">
+                        <div className="mts-hr-review">
+                          <div className="mts-hr-review-header">
                             <MessageSquare
                               size={12}
-                              style={{ color: "#6c757d" }}
+                              className="mts-hr-review-icon"
                             />
-                            <small
-                              style={{
-                                fontSize: "0.75rem",
-                                fontWeight: 600,
-                                color: "#6c757d",
-                              }}
-                            >
+                            <small className="mts-hr-review-label">
                               HR Review:
                             </small>
                           </div>
-                          <p
-                            className="mb-0"
-                            style={{ fontSize: "0.813rem", color: "#495057" }}
-                          >
+                          <p className="mts-hr-review-text">
                             {hr.hrReviewComments.substring(0, 80)}...
                           </p>
                         </div>
                       )}
 
                       <button
-                        className="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2"
+                        className="mts-btn mts-btn-outline mts-btn-full"
                         onClick={() => handleViewResponse(hr, "HR")}
-                        style={{
-                          borderRadius: "6px",
-                          padding: "8px",
-                          fontWeight: 600,
-                        }}
                       >
-                        <Eye size={16} />
+                        <Eye size={16} className="mts-btn-icon-left" />
                         View Details
                       </button>
                     </div>
@@ -738,214 +489,94 @@ export default function ManageTeamSubmissions() {
                 );
               })}
 
-            {/* GOAL FEEDBACK */}
             {tab === "GoalFeedback" &&
               goalFeedback.map((goal) => (
-                <div className="col-md-6 col-lg-4" key={goal.orgGoalFeedbackId}>
-                  <div
-                    style={{
-                      background: "white",
-                      border: "1px solid #e5e7eb",
-                      borderLeft: "4px solid #97247E",
-                      borderRadius: "10px",
-                      padding: "1.25rem",
-                      height: "100%",
-                      transition: "box-shadow 0.2s",
-                      cursor: "pointer",
-                    }}
-                    onMouseEnter={(e) =>
-                      (e.currentTarget.style.boxShadow =
-                        "0 4px 12px rgba(0,0,0,0.15)")
-                    }
-                    onMouseLeave={(e) =>
-                      (e.currentTarget.style.boxShadow = "none")
-                    }
-                  >
-                    <div className="d-flex justify-content-between align-items-start mb-3">
-                      <div>
-                        <div
-                          style={{
-                            fontSize: "0.75rem",
-                            color: "#6c757d",
-                            marginBottom: "4px",
-                            fontWeight: 600,
-                          }}
-                        >
+                <div className="mts-card" key={goal.orgGoalFeedbackId}>
+                  <div className="mts-card-inner mts-card-goal">
+                    <div className="mts-card-header">
+                      <div className="mts-card-header-left">
+                        <div className="mts-card-submitter">
                           {goal.submittedByName}
                         </div>
-                        <h6
-                          className="mb-0 fw-bold"
-                          style={{ fontSize: "0.938rem", color: "#212529" }}
-                        >
+                        <h6 className="mts-card-title">
                           {goal.objectiveTitle}
                         </h6>
                       </div>
-                      <div className="d-flex align-items-center gap-1">
-                        <Star
-                          size={16}
-                          style={{ color: "#ffc107", fill: "#ffc107" }}
-                        />
-                        <span
-                          style={{
-                            fontSize: "1rem",
-                            fontWeight: 700,
-                            color: "#212529",
-                          }}
-                        >
+                      <div className="mts-goal-rating">
+                        <Star size={16} className="mts-goal-star" />
+                        <span className="mts-goal-rating-value">
                           {goal.rating}/5
                         </span>
                       </div>
                     </div>
 
-                    <div className="mb-3">
-                      <span
-                        style={{
-                          display: "inline-block",
-                          backgroundColor: "#97247E15",
-                          color: "#97247E",
-                          padding: "4px 10px",
-                          fontSize: "0.75rem",
-                          fontWeight: 600,
-                          borderRadius: "6px",
-                          border: "1.5px solid #97247E40",
-                        }}
-                      >
+                    <div className="mts-goal-badge-row">
+                      <span className="mts-goal-rating-badge">
                         {RATING_LABELS[goal.rating] || "N/A"}
                       </span>
                     </div>
 
-                    <div className="mb-3">
-                      <div
-                        className="d-flex align-items-center gap-2 text-muted"
-                        style={{ fontSize: "0.813rem" }}
-                      >
-                        <Clock size={14} />
-                        <span>{goal.submittedAtFormatted}</span>
-                        {goal.daysAgo !== null && (
-                          <span>({goal.daysAgo}d ago)</span>
-                        )}
-                      </div>
+                    <div className="mts-card-date-row">
+                      <Clock size={14} className="mts-card-date-icon" />
+                      <span className="mts-card-date-text">
+                        {goal.submittedAtFormatted}
+                      </span>
+                      {goal.daysAgo !== null && (
+                        <span className="mts-card-date-ago">
+                          ({goal.daysAgo}d ago)
+                        </span>
+                      )}
                     </div>
 
                     {goal.feedbackComments && (
-                      <div
-                        className="mb-3"
-                        style={{
-                          background: "#f8f9fa",
-                          padding: "0.75rem",
-                          borderRadius: "6px",
-                          minHeight: "60px",
-                        }}
-                      >
-                        <p
-                          className="mb-0"
-                          style={{ fontSize: "0.813rem", color: "#495057" }}
-                        >
+                      <div className="mts-comment-box">
+                        <p className="mts-comment-text">
                           {goal.feedbackComments.substring(0, 80)}...
                         </p>
                       </div>
                     )}
 
                     <button
-                      className="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2"
+                      className="mts-btn mts-btn-outline mts-btn-full"
                       onClick={() => handleViewResponse(goal, "Goal")}
-                      style={{
-                        borderRadius: "6px",
-                        padding: "8px",
-                        fontWeight: 600,
-                      }}
                     >
-                      <Eye size={16} />
+                      <Eye size={16} className="mts-btn-icon-left" />
                       View Details
                     </button>
                   </div>
                 </div>
               ))}
 
-            {/* MENTOR */}
             {tab === "Mentor" &&
               mentor.map((m) => (
-                <div className="col-md-6 col-lg-4" key={m.trackingId || m.id}>
-                  <div
-                    style={{
-                      background: "white",
-                      border: "1px solid #e5e7eb",
-                      borderLeft: "4px solid #198754",
-                      borderRadius: "10px",
-                      padding: "1.25rem",
-                      height: "100%",
-                      transition: "box-shadow 0.2s",
-                      cursor: "pointer",
-                    }}
-                    onMouseEnter={(e) =>
-                      (e.currentTarget.style.boxShadow =
-                        "0 4px 12px rgba(0,0,0,0.15)")
-                    }
-                    onMouseLeave={(e) =>
-                      (e.currentTarget.style.boxShadow = "none")
-                    }
-                  >
-                    <div className="d-flex justify-content-between align-items-start mb-3">
-                      <div>
-                        <div
-                          style={{
-                            fontSize: "0.75rem",
-                            color: "#6c757d",
-                            marginBottom: "4px",
-                            fontWeight: 600,
-                          }}
-                        >
+                <div className="mts-card" key={m.trackingId || m.id}>
+                  <div className="mts-card-inner mts-card-mentor">
+                    <div className="mts-card-header">
+                      <div className="mts-card-header-left">
+                        <div className="mts-card-submitter">
                           {m.submittedByName}
                         </div>
-                        <div className="d-flex align-items-center gap-1">
-                          <User size={14} style={{ color: "#198754" }} />
-                          <h6
-                            className="mb-0 fw-bold"
-                            style={{ fontSize: "0.938rem", color: "#212529" }}
-                          >
+                        <div className="mts-mentor-name-row">
+                          <User size={14} className="mts-mentor-icon" />
+                          <h6 className="mts-card-title">
                             {m.mentorNameFull}
                           </h6>
                         </div>
                       </div>
-                      <span
-                        style={{
-                          display: "inline-block",
-                          backgroundColor: "#19875415",
-                          color: "#198754",
-                          padding: "4px 10px",
-                          fontSize: "0.75rem",
-                          fontWeight: 600,
-                          borderRadius: "6px",
-                          border: "1.5px solid #19875440",
-                        }}
-                      >
+                      <span className="mts-mentor-rating-badge">
                         {m.rating || 0}/5
                       </span>
                     </div>
 
-                    <div className="mb-3">
-                      <div
-                        className="d-flex align-items-center gap-2 text-muted"
-                        style={{ fontSize: "0.813rem" }}
-                      >
-                        <Clock size={14} />
-                        <span>{m.createdAtFormatted}</span>
-                      </div>
+                    <div className="mts-card-date-row">
+                      <Clock size={14} className="mts-card-date-icon" />
+                      <span className="mts-card-date-text">
+                        {m.createdAtFormatted}
+                      </span>
                     </div>
 
-                    <div
-                      className="mb-3"
-                      style={{
-                        background: "#f8f9fa",
-                        padding: "0.75rem",
-                        borderRadius: "6px",
-                        minHeight: "60px",
-                      }}
-                    >
-                      <p
-                        className="mb-0"
-                        style={{ fontSize: "0.813rem", color: "#495057" }}
-                      >
+                    <div className="mts-comment-box">
+                      <p className="mts-comment-text">
                         {m.feedbackComments
                           ? m.feedbackComments.substring(0, 80) + "..."
                           : "No comments"}
@@ -953,89 +584,43 @@ export default function ManageTeamSubmissions() {
                     </div>
 
                     <button
-                      className="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2"
+                      className="mts-btn mts-btn-outline mts-btn-full"
                       onClick={() => handleViewResponse(m, "Mentor")}
-                      style={{
-                        borderRadius: "6px",
-                        padding: "8px",
-                        fontWeight: 600,
-                      }}
                     >
-                      <Eye size={16} />
+                      <Eye size={16} className="mts-btn-icon-left" />
                       View Details
                     </button>
                   </div>
                 </div>
               ))}
 
-            {/* PEER */}
             {tab === "Peer" &&
               peer.map((p) => (
-                <div className="col-md-6 col-lg-4" key={p.queueId || p.id}>
-                  <div
-                    style={{
-                      background: "white",
-                      border: "1px solid #e5e7eb",
-                      borderLeft: "4px solid #6610f2",
-                      borderRadius: "10px",
-                      padding: "1.25rem",
-                      height: "100%",
-                      transition: "box-shadow 0.2s",
-                      cursor: "pointer",
-                    }}
-                    onMouseEnter={(e) =>
-                      (e.currentTarget.style.boxShadow =
-                        "0 4px 12px rgba(0,0,0,0.15)")
-                    }
-                    onMouseLeave={(e) =>
-                      (e.currentTarget.style.boxShadow = "none")
-                    }
-                  >
-                    <div className="mb-3">
-                      <div
-                        style={{
-                          fontSize: "0.75rem",
-                          color: "#6c757d",
-                          marginBottom: "4px",
-                          fontWeight: 600,
-                        }}
-                      >
-                        {p.submittedByName}
-                      </div>
-                      <div className="d-flex align-items-center gap-1">
-                        <User size={14} style={{ color: "#6610f2" }} />
-                        <h6
-                          className="mb-0 fw-bold"
-                          style={{ fontSize: "0.938rem", color: "#212529" }}
-                        >
-                          {p.recipientNameFull}
-                        </h6>
+                <div className="mts-card" key={p.queueId || p.id}>
+                  <div className="mts-card-inner mts-card-peer">
+                    <div className="mts-card-header">
+                      <div className="mts-card-header-left">
+                        <div className="mts-card-submitter">
+                          {p.submittedByName}
+                        </div>
+                        <div className="mts-mentor-name-row">
+                          <User size={14} className="mts-peer-icon" />
+                          <h6 className="mts-card-title">
+                            {p.recipientNameFull}
+                          </h6>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="mb-3">
-                      <div
-                        className="d-flex align-items-center gap-2 text-muted"
-                        style={{ fontSize: "0.813rem" }}
-                      >
-                        <Clock size={14} />
-                        <span>{p.createdAtFormatted}</span>
-                      </div>
+                    <div className="mts-card-date-row">
+                      <Clock size={14} className="mts-card-date-icon" />
+                      <span className="mts-card-date-text">
+                        {p.createdAtFormatted}
+                      </span>
                     </div>
 
-                    <div
-                      className="mb-3"
-                      style={{
-                        background: "#f8f9fa",
-                        padding: "0.75rem",
-                        borderRadius: "6px",
-                        minHeight: "60px",
-                      }}
-                    >
-                      <p
-                        className="mb-0"
-                        style={{ fontSize: "0.813rem", color: "#495057" }}
-                      >
+                    <div className="mts-comment-box">
+                      <p className="mts-comment-text">
                         {p.feedbackContent
                           ? p.feedbackContent.substring(0, 80) + "..."
                           : "No content"}
@@ -1043,15 +628,10 @@ export default function ManageTeamSubmissions() {
                     </div>
 
                     <button
-                      className="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2"
+                      className="mts-btn mts-btn-outline mts-btn-full"
                       onClick={() => handleViewResponse(p, "Peer")}
-                      style={{
-                        borderRadius: "6px",
-                        padding: "8px",
-                        fontWeight: 600,
-                      }}
                     >
-                      <Eye size={16} />
+                      <Eye size={16} className="mts-btn-icon-left" />
                       View Details
                     </button>
                   </div>
@@ -1059,26 +639,14 @@ export default function ManageTeamSubmissions() {
               ))}
           </div>
         )}
+
+        <ResponseViewModal
+          show={showModal}
+          response={selectedResponse}
+          onClose={handleCloseModal}
+          type={selectedType}
+        />
       </div>
-
-      <ResponseViewModal
-        show={showModal}
-        response={selectedResponse}
-        onClose={handleCloseModal}
-        type={selectedType}
-      />
-
-      <style>{`
-        @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-        
-        .toggle-container button:hover {
-          opacity: 0.92;
-        }
-        
-        .toggle-container button:active {
-          transform: scale(0.98);
-        }
-      `}</style>
     </div>
   );
 }

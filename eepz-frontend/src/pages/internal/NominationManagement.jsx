@@ -134,7 +134,6 @@ const NominationManagement = () => {
     if (searchInputRef.current) searchInputRef.current.value = "";
   };
 
-  // role-based API selection
   const fetchData = async () => {
     try {
       setLoading(true);

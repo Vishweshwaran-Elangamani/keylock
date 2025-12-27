@@ -1,5 +1,3 @@
-// src/pages/feedback_management/dashboard/FeedbackManagerDashboard.jsx
-
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import {
   RefreshCw,
@@ -21,11 +19,10 @@ import {
   peerQueueApi,
   hrFormApi,
   managerReviewApi,
-} from "../../services/feedbackmanagement/feedbackApi";
-import FeedbackBreadcrumb from "../../components/feedback_management/common/FeedbackBreadcrumb";
-import "../../styles/feedback/FeedbackManagerDashboard.css";
+} from "../../../services/feedbackmanagement/feedbackApi";
+import FeedbackBreadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb";
+import "../../../styles/feedback/components/FeedbackManagerDashboard.css";
 
-// Helper function to get role-based feedback dashboard path
 const getFeedbackDashboardPath = (roleName) => {
   const routes = {
     Employee: "/employee/dashboard/feedback",
@@ -54,13 +51,11 @@ export default function FeedbackManagerDashboard() {
   const [loading, setLoading] = useState(false);
   const [activeTab] = useState("overview");
 
-  // State for each stat
   const [myReviews, setMyReviews] = useState([]);
   const [myPeerFeedback, setMyPeerFeedback] = useState([]);
   const [allForms, setAllForms] = useState([]);
   const [submittedFormIds, setSubmittedFormIds] = useState(new Set());
 
-  // Fetch MY reviews (reviews I created as a manager)
   const fetchMyReviews = useCallback(
     async (retryCount = 0) => {
       if (!user?.empId) return;
@@ -83,7 +78,6 @@ export default function FeedbackManagerDashboard() {
     [user?.empId]
   );
 
-  // Fetch peer feedback RECEIVED by me (approved feedback only)
   const fetchPeerFeedback = useCallback(
     async (retryCount = 0) => {
       if (!user?.empId) return;
@@ -110,7 +104,6 @@ export default function FeedbackManagerDashboard() {
     [user?.empId]
   );
 
-  // Fetch ALL forms (active and inactive)
   const fetchAllForms = useCallback(
     async (retryCount = 0) => {
       if (!user?.empId) return;
@@ -133,7 +126,6 @@ export default function FeedbackManagerDashboard() {
     [user?.empId]
   );
 
-  // Fetch submitted forms by THIS manager
   const fetchSubmittedForms = useCallback(
     async (retryCount = 0) => {
       if (!user?.empId || allForms.length === 0) return;
@@ -173,7 +165,6 @@ export default function FeedbackManagerDashboard() {
     [user?.empId, allForms]
   );
 
-  // Fetch all dashboard data
   const fetchDashboardData = useCallback(async () => {
     if (!user?.empId) {
       setError("User not authenticated. Please log in.");
@@ -182,10 +173,7 @@ export default function FeedbackManagerDashboard() {
     setLoading(true);
     setError("");
     try {
-      // Fetch reviews and peer feedback in parallel
       await Promise.all([fetchMyReviews(), fetchPeerFeedback()]);
-
-      // Fetch forms first
       await fetchAllForms();
     } catch (err) {
       let msg = "Failed to load dashboard data.";
@@ -205,21 +193,18 @@ export default function FeedbackManagerDashboard() {
     }
   }, [user?.empId, fetchMyReviews, fetchPeerFeedback, fetchAllForms]);
 
-  // Fetch submitted forms after allForms is populated
   useEffect(() => {
     if (allForms.length > 0) {
       fetchSubmittedForms();
     }
   }, [allForms, fetchSubmittedForms]);
 
-  // Initial data fetch
   useEffect(() => {
     if (user?.empId) {
       fetchDashboardData();
     }
   }, [user?.empId, fetchDashboardData]);
 
-  // Calculate stats
   const stats = useMemo(() => {
     const pending = allForms.filter((f) => !submittedFormIds.has(f.formId))
       .length;
@@ -250,7 +235,6 @@ export default function FeedbackManagerDashboard() {
         ]}
       />
 
-      {/* Error Alert */}
       {error && (
         <div className="fm-mgrdash-error-alert">
           <AlertTriangle size={18} className="fm-mgrdash-error-alert__icon" />
@@ -268,59 +252,38 @@ export default function FeedbackManagerDashboard() {
         </div>
       )}
 
-      {/* Stats Grid - Updated with Horizontal Layout */}
       <div className="fm-mgrdash-stats">
         <div className="fm-mgrdash-stat-card">
-          <div className="fm-mgrdash-stat-card__body">
-            <div
-              className="fm-mgrdash-stat-card__icon"
-              style={{ backgroundColor: "#E8F1FF" }}
-            >
-              <Star size={24} color="#3B82F6" strokeWidth={2.5} />
-            </div>
-            <div className="fm-mgrdash-stat-card__content">
-              <h2 className="fm-mgrdash-stat-card__value">{stats.myReviews}</h2>
-              <p className="fm-mgrdash-stat-card__label">MY REVIEWS</p>
-            </div>
+          <div className="fm-mgrdash-stat-card__icon fm-mgrdash-stat-card__icon--blue">
+            <Star size={24} strokeWidth={2.5} />
+          </div>
+          <div className="fm-mgrdash-stat-card__content">
+            <h2 className="fm-mgrdash-stat-card__value">{stats.myReviews}</h2>
+            <p className="fm-mgrdash-stat-card__label">MY REVIEWS</p>
           </div>
         </div>
 
         <div className="fm-mgrdash-stat-card">
-          <div className="fm-mgrdash-stat-card__body">
-            <div
-              className="fm-mgrdash-stat-card__icon"
-              style={{ backgroundColor: "#FEE2E2" }}
-            >
-              <FileText size={24} color="#E01950" strokeWidth={2.5} />
-            </div>
-            <div className="fm-mgrdash-stat-card__content">
-              <h2 className="fm-mgrdash-stat-card__value">
-                {stats.pendingForms}
-              </h2>
-              <p className="fm-mgrdash-stat-card__label">PENDING FORMS</p>
-            </div>
+          <div className="fm-mgrdash-stat-card__icon fm-mgrdash-stat-card__icon--red">
+            <FileText size={24} strokeWidth={2.5} />
+          </div>
+          <div className="fm-mgrdash-stat-card__content">
+            <h2 className="fm-mgrdash-stat-card__value">{stats.pendingForms}</h2>
+            <p className="fm-mgrdash-stat-card__label">PENDING FORMS</p>
           </div>
         </div>
 
         <div className="fm-mgrdash-stat-card">
-          <div className="fm-mgrdash-stat-card__body">
-            <div
-              className="fm-mgrdash-stat-card__icon"
-              style={{ backgroundColor: "#DCFCE7" }}
-            >
-              <Users size={24} color="#16A34A" strokeWidth={2.5} />
-            </div>
-            <div className="fm-mgrdash-stat-card__content">
-              <h2 className="fm-mgrdash-stat-card__value">
-                {stats.peerFeedback}
-              </h2>
-              <p className="fm-mgrdash-stat-card__label">PEER FEEDBACK</p>
-            </div>
+          <div className="fm-mgrdash-stat-card__icon fm-mgrdash-stat-card__icon--green">
+            <Users size={24} strokeWidth={2.5} />
+          </div>
+          <div className="fm-mgrdash-stat-card__content">
+            <h2 className="fm-mgrdash-stat-card__value">{stats.peerFeedback}</h2>
+            <p className="fm-mgrdash-stat-card__label">PEER FEEDBACK</p>
           </div>
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="fm-mgrdash-tabs-wrapper">
         <ul className="fm-mgrdash-tabs">
           <li className="fm-mgrdash-tabs__item">
@@ -338,7 +301,6 @@ export default function FeedbackManagerDashboard() {
         </ul>
       </div>
 
-      {/* Content Area */}
       <div className="fm-mgrdash-content">
         {loading ? (
           <div className="fm-mgrdash-loading">
@@ -347,7 +309,6 @@ export default function FeedbackManagerDashboard() {
           </div>
         ) : (
           <div className="fm-mgrdash-actions-grid">
-            {/* Manager Functions */}
             <Link
               to="/manager/dashboard/feedback/create-review"
               className="fm-mgrdash-action-card"
@@ -384,7 +345,6 @@ export default function FeedbackManagerDashboard() {
               </span>
             </Link>
 
-            {/* Employee-like actions */}
             <Link
               to="/manager/dashboard/feedback/submit-mentor"
               className="fm-mgrdash-action-card"

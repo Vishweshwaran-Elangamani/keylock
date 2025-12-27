@@ -1,0 +1,365 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+.rvm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  padding: 1rem;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.rvm-container {
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.rvm-header {
+  background: linear-gradient(135deg, #27235c 0%, #1a1845 100%);
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rvm-header__title {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-align: left;
+}
+
+.rvm-header__close-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #ffffff;
+}
+
+.rvm-header__close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.rvm-body {
+  padding: 2rem;
+  overflow-y: auto;
+  flex: 1;
+  text-align: left;
+}
+
+.rvm-section {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+.rvm-section--last {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.rvm-section__title {
+  font-size: 0.938rem;
+  font-weight: 700;
+  color: #27235c;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.rvm-section__title--with-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rvm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem 1.5rem;
+}
+
+.rvm-grid__col {
+  min-width: 0;
+  text-align: left;
+}
+
+.rvm-field__label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+.rvm-field__value {
+  font-weight: 600;
+  color: #1f2937;
+  text-align: left;
+}
+
+.rvm-field__value--with-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: left;
+}
+
+.rvm-field__icon {
+  color: #27235c;
+  flex-shrink: 0;
+}
+
+.rvm-field__icon--star {
+  color: #ffb800;
+  fill: #ffb800;
+  flex-shrink: 0;
+}
+
+.rvm-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+.rvm-badge--success {
+  background-color: #d1fae5;
+  color: #10b981;
+}
+
+.rvm-badge--info {
+  background-color: #dbeafe;
+  color: #3b82f6;
+}
+
+.rvm-badge--danger {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+.rvm-rating-item {
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  border-left: 4px solid #e5e7eb;
+  text-align: left;
+}
+
+.rvm-rating-item__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+  gap: 1rem;
+}
+
+.rvm-rating-item__question {
+  flex: 1;
+  text-align: left;
+}
+
+.rvm-rating-item__question-number {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 600;
+  text-align: left;
+}
+
+.rvm-rating-item__question-text {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1f2937;
+  text-align: left;
+}
+
+.rvm-rating-item__badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.rvm-rating-item__label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-align: left;
+}
+
+.rvm-rating-display {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  border-left: 4px solid #e5e7eb;
+  text-align: left;
+}
+
+.rvm-rating-display__value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem 0;
+  text-align: left;
+}
+
+.rvm-comment-box {
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  border-left: 4px solid #27235c;
+  text-align: left;
+}
+
+.rvm-comment-box--primary {
+  border-left-color: #27235c;
+}
+
+.rvm-comment-box--hr {
+  background-color: #f0f0f0;
+  border-left-color: #0f62fe;
+}
+
+.rvm-comment-box__text {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #374151;
+  text-align: left;
+}
+
+.rvm-comment-box__text--pre {
+  white-space: pre-wrap;
+}
+
+.rvm-footer {
+  padding: 1rem 2rem;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+  background-color: #f9fafb;
+}
+
+.rvm-footer__btn {
+  padding: 0.625rem 1.5rem;
+  border-radius: 8px;
+  border: 1.5px solid #e5e7eb;
+  background-color: #ffffff;
+  color: #374151;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.rvm-footer__btn:hover {
+  background-color: #f9fafb;
+}
+
+@media (max-width: 768px) {
+  .rvm-overlay {
+    padding: 0.5rem;
+  }
+
+  .rvm-container {
+    max-height: 95vh;
+  }
+
+  .rvm-header {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .rvm-header__title {
+    font-size: 1.125rem;
+  }
+
+  .rvm-body {
+    padding: 1.5rem;
+  }
+
+  .rvm-section {
+    margin-bottom: 1.25rem;
+    padding-bottom: 1.25rem;
+  }
+
+  .rvm-rating-item__header {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .rvm-rating-item__badge {
+    align-self: flex-start;
+  }
+
+  .rvm-footer {
+    padding: 1rem 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .rvm-overlay {
+    padding: 0;
+  }
+
+  .rvm-container {
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .rvm-header {
+    padding: 1rem;
+  }
+
+  .rvm-header__title {
+    font-size: 1rem;
+  }
+
+  .rvm-body {
+    padding: 1rem;
+  }
+
+  .rvm-rating-item {
+    padding: 0.75rem;
+  }
+
+  .rvm-comment-box {
+    padding: 0.75rem;
+  }
+
+  .rvm-footer {
+    padding: 1rem;
+  }
+
+  .rvm-footer__btn {
+    width: 100%;
+  }
+}

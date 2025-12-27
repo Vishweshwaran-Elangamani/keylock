@@ -1,5 +1,3 @@
-// src/pages/feedback_management/forms/CreateFeedbackForm.jsx
-
 import React, { useMemo, useState, useRef, useEffect } from "react";
 import {
   CheckCircle,
@@ -14,6 +12,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import hrFormApi from "../../../services/feedbackmanagement/hrFormApi";
 import FeedbackBreadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb";
+import "../../../styles/feedback/components/CreateFeedbackForm.css";
 
 const PRIMARY = "#27235C";
 
@@ -52,7 +51,7 @@ export default function CreateFeedbackForm() {
 
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (!e.target.closest(".feedback-custom-select")) {
+      if (!e.target.closest(".cff-custom-select")) {
         setOpenDropdown(false);
       }
     };
@@ -60,181 +59,85 @@ export default function CreateFeedbackForm() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const CustomSelect = ({ value, onChange, options, placeholder, disabled }) => {
+    const selectRef = useRef(null);
+    const dropdownRef = useRef(null);
+    const selectedOption = options.find((opt) => opt.value === value);
+    const [dropdownPosition, setDropdownPosition] = useState({
+      top: 0,
+      left: 0,
+      width: 0,
+    });
+    const [isHovered, setIsHovered] = useState(false);
+    const [hoveredOption, setHoveredOption] = useState(null);
 
- // inside CreateFeedbackForm.jsx, keep everything else the same
+    useEffect(() => {
+      if (openDropdown && selectRef.current) {
+        const rect = selectRef.current.getBoundingClientRect();
+        setDropdownPosition({
+          top: rect.bottom + window.scrollY + 4,
+          left: rect.left + window.scrollX,
+          width: rect.width,
+        });
+      }
+    }, [openDropdown]);
 
-const CustomSelect = ({ value, onChange, options, placeholder, disabled }) => {
-  const selectRef = useRef(null);
-  const dropdownRef = useRef(null);
-  const selectedOption = options.find((opt) => opt.value === value);
-  const [dropdownPosition, setDropdownPosition] = useState({
-    top: 0,
-    left: 0,
-    width: 0,
-  });
-  const [isHovered, setIsHovered] = useState(false);
-  const [hoveredOption, setHoveredOption] = useState(null);
+    return (
+      <div className="cff-custom-select" ref={selectRef}>
+        <button
+          type="button"
+          className={`cff-select-trigger ${disabled ? "cff-select-disabled" : ""} ${
+            isHovered && !disabled ? "cff-select-hovered" : ""
+          } ${openDropdown ? "cff-select-open" : ""}`}
+          onClick={() => !disabled && setOpenDropdown(!openDropdown)}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          disabled={disabled}
+        >
+          <span className={`cff-select-value ${!value ? "cff-select-placeholder" : ""}`}>
+            {selectedOption?.label || placeholder}
+          </span>
+          <ChevronDown size={18} className="cff-select-icon" strokeWidth={2} />
+        </button>
 
-  useEffect(() => {
-    if (openDropdown && selectRef.current) {
-      const rect = selectRef.current.getBoundingClientRect();
-      setDropdownPosition({
-        top: rect.bottom + window.scrollY + 4,
-        left: rect.left + window.scrollX,
-        width: rect.width,
-      });
-    }
-  }, [openDropdown]);
-
-  const triggerStyles = {
-    width: "100%",
-    padding: "0.75rem 2.75rem 0.75rem 1rem",
-    background: disabled
-      ? "#F3F4F6"
-      : isHovered && !disabled
-      ? "#F9FAFB"
-      : "white",
-    border: "1.5px solid",
-    borderColor: openDropdown
-      ? PRIMARY
-      : isHovered && !disabled
-      ? "#9CA3AF"
-      : "#E5E7EB",
-    borderRadius: "8px",
-    fontSize: "1rem",
-    color: disabled ? "#9CA3AF" : "#6B7280",
-    cursor: disabled ? "not-allowed" : "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    transition: "all 0.2s ease",
-    textAlign: "left", // keep button content left
-    fontWeight: 400,
-    lineHeight: 1.5,
-    minHeight: "48px",
-    position: "relative",
-    boxShadow: openDropdown ? "0 0 0 3px rgba(39, 35, 92, 0.1)" : "none",
-    fontFamily:
-      "Poppins, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        {openDropdown && !disabled && (
+          <div
+            ref={dropdownRef}
+            className="cff-select-dropdown"
+            style={{
+              top: `${dropdownPosition.top}px`,
+              left: `${dropdownPosition.left}px`,
+              width: `${dropdownPosition.width}px`,
+            }}
+          >
+            {options.map((option, index) => (
+              <div
+                key={option.value}
+                className={`cff-select-option ${
+                  value === option.value ? "cff-select-option-selected" : ""
+                } ${hoveredOption === option.value ? "cff-select-option-hovered" : ""} ${
+                  index === 0 ? "cff-select-option-first" : ""
+                } ${index === options.length - 1 ? "cff-select-option-last" : ""}`}
+                onClick={() => {
+                  onChange(option.value);
+                  setOpenDropdown(false);
+                }}
+                onMouseEnter={() => setHoveredOption(option.value)}
+                onMouseLeave={() => setHoveredOption(null)}
+              >
+                {option.label}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
   };
-
-  const valueStyles = {
-    flex: 1,
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-    color: value ? "#374151" : "#9CA3AF",
-    textAlign: "left",              // NEW: left align selected text
-  };
-
-  const iconStyles = {
-    position: "absolute",
-    right: "1rem",
-    transition: "transform 0.2s ease",
-    color: openDropdown ? PRIMARY : "#6B7280",
-    flexShrink: 0,
-    pointerEvents: "none",
-    transform: openDropdown ? "rotate(180deg)" : "rotate(0deg)",
-  };
-
-  const dropdownStyles = {
-    position: "fixed",
-    top: `${dropdownPosition.top}px`,
-    left: `${dropdownPosition.left}px`,
-    width: `${dropdownPosition.width}px`,
-    background: "white",
-    border: "1.5px solid #E5E7EB",
-    borderRadius: "8px",
-    boxShadow:
-      "0 10px 30px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08)",
-    zIndex: 9999,
-    maxHeight: "280px",
-    overflowY: "auto",
-    animation: "feedbackDropdownFadeIn 0.15s ease",
-    marginTop: "4px",
-    fontFamily:
-      "Poppins, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-  };
-
-  const getOptionStyles = (optionValue) => ({
-    padding: "0.75rem 1rem",
-    cursor: "pointer",
-    fontSize: "0.9rem",
-    color:
-      value === optionValue || hoveredOption === optionValue
-        ? "#FFFFFF"
-        : "#374151",
-    transition: "all 0.12s ease",
-    borderBottom: "1px solid #F3F4F6",
-    background:
-      value === optionValue || hoveredOption === optionValue
-        ? PRIMARY
-        : "white",
-    fontWeight: value === optionValue ? 600 : 400,
-    lineHeight: 1.5,
-    textAlign: "left",              // NEW: left align each option
-  });
-
-  return (
-    <div
-      className="feedback-custom-select"
-      ref={selectRef}
-      style={{ position: "relative", width: "100%" }}
-    >
-      <button
-        type="button"
-        style={triggerStyles}
-        onClick={() => !disabled && setOpenDropdown(!openDropdown)}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        disabled={disabled}
-      >
-        <span style={valueStyles}>
-          {selectedOption?.label || placeholder}
-        </span>
-        <ChevronDown size={18} style={iconStyles} strokeWidth={2} />
-      </button>
-
-      {openDropdown && !disabled && (
-        <div ref={dropdownRef} style={dropdownStyles}>
-          {options.map((option, index) => (
-            <div
-              key={option.value}
-              style={{
-                ...getOptionStyles(option.value),
-                borderTopLeftRadius: index === 0 ? "6px" : "0",
-                borderTopRightRadius: index === 0 ? "6px" : "0",
-                borderBottomLeftRadius:
-                  index === options.length - 1 ? "6px" : "0",
-                borderBottomRightRadius:
-                  index === options.length - 1 ? "6px" : "0",
-                borderBottom:
-                  index === options.length - 1
-                    ? "none"
-                    : "1px solid #F3F4F6",
-              }}
-              onClick={() => {
-                onChange(option.value);
-                setOpenDropdown(false);
-              }}
-              onMouseEnter={() => setHoveredOption(option.value)}
-              onMouseLeave={() => setHoveredOption(null)}
-            >
-              {option.label}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
 
   const [calendarOpen, setCalendarOpen] = useState(false);
   const calendarRef = useRef(null);
   const [calendarMonth, setCalendarMonth] = useState(null);
   const [calendarYear, setCalendarYear] = useState(null);
-
 
   useEffect(() => {
     const handler = (e) => {
@@ -296,7 +199,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled }) => {
   const selectedDate = form.deadline ? new Date(form.deadline) : null;
 
   const monthNames = [
-    "January","February","March","April","May","June", "July", "August", "September","October", "November", "December",
+    "January","February","March","April","May","June","July","August","September","October","November","December",
   ];
   const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
@@ -346,7 +249,6 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled }) => {
     setCalendarOpen(false);
   };
 
-  // ========= Submit =========
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -417,7 +319,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled }) => {
   };
 
   return (
-    <div className="container-fluid py-4 create-feedback-form-page" style={{ maxWidth: "900px" }}>
+    <div className="cff-page">
       <FeedbackBreadcrumb
         items={[
           { label: "Feedback Management", path: "/hr/dashboard/feedback" },
@@ -426,92 +328,62 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled }) => {
       />
 
       {error && (
-        <div
-          className="alert alert-danger alert-dismissible fade show"
-          role="alert"
-        >
-          <AlertTriangle
-            size={18}
-            className="me-2"
-            style={{ display: "inline" }}
-          />
-          <strong>Error:</strong> {error}
+        <div className="cff-alert cff-alert-error">
+          <AlertTriangle size={18} className="cff-alert-icon" />
+          <div className="cff-alert-content">
+            <strong>Error:</strong> {error}
+          </div>
           <button
             type="button"
-            className="btn-close"
+            className="cff-alert-close"
             onClick={() => setError("")}
             aria-label="Close"
-          />
+          >
+            ×
+          </button>
         </div>
       )}
 
       {success && (
-        <div
-          className="alert alert-success alert-dismissible fade show"
-          role="alert"
-        >
-          <CheckCircle
-            size={18}
-            className="me-2"
-            style={{ display: "inline" }}
-          />
-          <strong>Success!</strong>
-          <p className="mb-0 small mt-1" style={{ whiteSpace: "pre-wrap" }}>
-            {success}
-          </p>
+        <div className="cff-alert cff-alert-success">
+          <CheckCircle size={18} className="cff-alert-icon" />
+          <div className="cff-alert-content">
+            <strong>Success!</strong>
+            <p className="cff-alert-message">{success}</p>
+          </div>
         </div>
       )}
 
-      <div
-        className="card border-0"
-        style={{
-          border: "1px solid var(--border)",
-          boxShadow: "var(--shadow)",
-          borderRadius: "var(--radius-lg)",
-        }}
-      >
-        <div className="card-body p-4">
-          <form onSubmit={handleSubmit}>
-            {/* FORM NAME */}
-            <div className="mb-4">
-              <label
-                htmlFor="formName"
-                className="form-label fw-bold"
-                style={{ textAlign: "left", display: "block" }}
-              >
-                Form Name <span className="text-danger">*</span>
+      <div className="cff-card">
+        <div className="cff-card-body">
+          <form onSubmit={handleSubmit} className="cff-form">
+            <div className="cff-form-group">
+              <label htmlFor="formName" className="cff-label">
+                Form Name <span className="cff-required">*</span>
               </label>
-
               <input
                 id="formName"
                 type="text"
-                className="form-control form-control-lg"
+                className="cff-input"
                 value={form.formName}
                 onChange={(e) =>
                   setForm((prev) => ({ ...prev, formName: e.target.value }))
                 }
                 placeholder="e.g., Q4 Performance Review"
                 disabled={loading}
-                style={{ borderRadius: "var(--radius-md)" }}
               />
-              <small className="text-muted">
+              <small className="cff-hint">
                 Give your form a clear, descriptive name
               </small>
             </div>
 
-            {/* FORM DESCRIPTION */}
-            <div className="mb-4">
-              <label
-                htmlFor="formDescription"
-                className="form-label fw-bold"
-                style={{ textAlign: "left", display: "block" }}
-              >
-                Description <span className="text-danger">*</span>
+            <div className="cff-form-group">
+              <label htmlFor="formDescription" className="cff-label">
+                Description <span className="cff-required">*</span>
               </label>
-
               <textarea
                 id="formDescription"
-                className="form-control"
+                className="cff-textarea"
                 rows={4}
                 value={form.formDescription}
                 onChange={(e) =>
@@ -523,24 +395,17 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled }) => {
                 placeholder="Describe the purpose and goals of this form..."
                 disabled={loading}
                 maxLength={500}
-                style={{ borderRadius: "var(--radius-md)", resize: "vertical" }}
               />
-              <small className="text-muted">
+              <small className="cff-hint">
                 Employees will see this description (
                 {form.formDescription.length}/500 characters)
               </small>
             </div>
 
-            {/* FORM TYPE */}
-            <div className="mb-4">
-              <label
-                htmlFor="formType"
-                className="form-label fw-bold"
-                style={{ textAlign: "left", display: "block" }}
-              >
-                Form Type <span className="text-danger">*</span>
+            <div className="cff-form-group">
+              <label htmlFor="formType" className="cff-label">
+                Form Type <span className="cff-required">*</span>
               </label>
-
               <CustomSelect
                 value={form.formType}
                 onChange={(value) =>
@@ -550,25 +415,17 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled }) => {
                 placeholder="-- Select Form Type --"
                 disabled={loading}
               />
-              <small className="text-muted">
+              <small className="cff-hint">
                 Choose what type of feedback this form collects
               </small>
             </div>
 
-            {/* DEADLINE */}
-            <div className="mb-4">
-              <label
-                htmlFor="deadline"
-                className="form-label fw-bold"
-                style={{ textAlign: "left", display: "block" }}
-              >
-                Response Deadline <span className="text-danger">*</span>
+            <div className="cff-form-group">
+              <label htmlFor="deadline" className="cff-label">
+                Response Deadline <span className="cff-required">*</span>
               </label>
 
-              <div
-                ref={calendarRef}
-                style={{ position: "relative", width: "100%" }}
-              >
+              <div ref={calendarRef} className="cff-date-wrapper">
                 <input
                   type="text"
                   readOnly
@@ -581,12 +438,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled }) => {
                     }
                   }}
                   placeholder="Select deadline date"
-                  className="form-control form-control-lg"
-                  style={{
-                    borderRadius: "var(--radius-md)",
-                    padding: "0.6rem 2.5rem 0.6rem 0.75rem",
-                    cursor: "pointer",
-                  }}
+                  className="cff-input cff-date-input"
                 />
                 <button
                   type="button"
@@ -596,115 +448,42 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled }) => {
                       setCalendarOpen(true);
                     }
                   }}
-                  style={{
-                    position: "absolute",
-                    top: "50%",
-                    right: 10,
-                    transform: "translateY(-50%)",
-                    border: "none",
-                    background: "transparent",
-                    cursor: "pointer",
-                    padding: 0,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: PRIMARY,
-                  }}
+                  className="cff-calendar-icon-btn"
                 >
                   <CalendarIcon size={18} />
                 </button>
 
                 {calendarOpen && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      bottom: "100%",
-                      right: 0,
-                      marginBottom: 4,
-                      backgroundColor: "white",
-                      borderRadius: 8,
-                      boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
-                      border: "1px solid #e5e7eb",
-                      zIndex: 9999,
-                      width: 260,
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        padding: "0.5rem 0.75rem",
-                        borderBottom: "1px solid #e5e7eb",
-                        backgroundColor: "#f9fafb",
-                      }}
-                    >
+                  <div className="cff-calendar">
+                    <div className="cff-calendar-header">
                       <button
                         type="button"
                         onClick={goPrevMonth}
-                        style={{
-                          border: "none",
-                          background: "transparent",
-                          cursor: "pointer",
-                          padding: 4,
-                        }}
+                        className="cff-calendar-nav"
                       >
                         <ChevronLeftIcon size={16} />
                       </button>
-                      <span
-                        style={{
-                          fontWeight: 600,
-                          fontSize: "0.9rem",
-                          color: "#111827",
-                        }}
-                      >
+                      <span className="cff-calendar-title">
                         {monthNames[month]} {year}
                       </span>
                       <button
                         type="button"
                         onClick={goNextMonth}
-                        style={{
-                          border: "none",
-                          background: "transparent",
-                          cursor: "pointer",
-                          padding: 4,
-                        }}
+                        className="cff-calendar-nav"
                       >
                         <ChevronRight size={16} />
                       </button>
                     </div>
 
-                    <div
-                      style={{
-                        display: "grid",
-                        gridTemplateColumns: "repeat(7, 1fr)",
-                        padding: "0.25rem 0.5rem",
-                        gap: 2,
-                        fontSize: "0.75rem",
-                        color: "#6b7280",
-                      }}
-                    >
+                    <div className="cff-calendar-weekdays">
                       {weekdays.map((w) => (
-                        <div
-                          key={w}
-                          style={{
-                            textAlign: "center",
-                            padding: "0.25rem 0",
-                          }}
-                        >
+                        <div key={w} className="cff-calendar-weekday">
                           {w}
                         </div>
                       ))}
                     </div>
 
-                    <div
-                      style={{
-                        display: "grid",
-                        gridTemplateColumns: "repeat(7, 1fr)",
-                        padding: "0.25rem 0.5rem 0.5rem",
-                        gap: 2,
-                      }}
-                    >
+                    <div className="cff-calendar-days">
                       {cells.map((c, idx) => {
                         const cellDate = new Date(year, month, c.day);
                         const isToday =
@@ -731,24 +510,11 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled }) => {
                               handleSelectCalendarDay(c.day, c.current)
                             }
                             disabled={isDisabled}
-                            style={{
-                              border: "none",
-                              backgroundColor: isSelected
-                                ? PRIMARY
-                                : isToday
-                                ? "#e5e7eb"
-                                : "transparent",
-                              color: isSelected
-                                ? "#ffffff"
-                                : isDisabled
-                                ? "#d1d5db"
-                                : "#111827",
-                              borderRadius: 6,
-                              padding: "0.35rem 0",
-                              fontSize: "0.8rem",
-                              cursor: isDisabled ? "default" : "pointer",
-                              transition: "all 0.15s ease",
-                            }}
+                            className={`cff-calendar-day ${
+                              isSelected ? "cff-calendar-day-selected" : ""
+                            } ${isToday ? "cff-calendar-day-today" : ""} ${
+                              isDisabled ? "cff-calendar-day-disabled" : ""
+                            }`}
                           >
                             {c.day}
                           </button>
@@ -756,40 +522,18 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled }) => {
                       })}
                     </div>
 
-                    <div
-                      style={{
-                        borderTop: "1px solid #e5e7eb",
-                        padding: "0.4rem 0.6rem",
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        backgroundColor: "#f9fafb",
-                      }}
-                    >
+                    <div className="cff-calendar-footer">
                       <button
                         type="button"
                         onClick={goToday}
-                        style={{
-                          border: "none",
-                          background: "transparent",
-                          color: PRIMARY,
-                          fontSize: "0.75rem",
-                          fontWeight: 600,
-                          cursor: "pointer",
-                        }}
+                        className="cff-calendar-footer-btn cff-calendar-today-btn"
                       >
                         Today
                       </button>
                       <button
                         type="button"
                         onClick={() => setCalendarOpen(false)}
-                        style={{
-                          border: "none",
-                          background: "transparent",
-                          color: "#6b7280",
-                          fontSize: "0.75rem",
-                          cursor: "pointer",
-                        }}
+                        className="cff-calendar-footer-btn cff-calendar-close-btn"
                       >
                         Close
                       </button>
@@ -798,62 +542,25 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled }) => {
                 )}
               </div>
 
-              <small className="text-muted">
+              <small className="cff-hint">
                 When employees need to complete this form by
               </small>
             </div>
 
-            {/* SUBMIT BUTTON */}
-            <div className="d-grid gap-2">
+            <div className="cff-submit-wrapper">
               <button
                 type="submit"
-                className="btn btn-lg fw-bold"
+                className="cff-submit-btn"
                 disabled={loading}
-                style={{
-                  background:
-                    "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "var(--radius-md)",
-                  padding: "0.75rem 1.5rem",
-                  fontSize: "1rem",
-                  transition: "all 0.3s ease",
-                  boxShadow: "0 2px 8px rgba(151, 36, 126, 0.2)",
-                  fontFamily:
-                    "Poppins, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-                }}
-                onMouseEnter={(e) => {
-                  if (!loading) {
-                    e.currentTarget.style.transform = "translateY(-2px)";
-                    e.currentTarget.style.boxShadow =
-                      "0 4px 12px rgba(151, 36, 126, 0.3)";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow =
-                    "0 2px 8px rgba(151, 36, 126, 0.2)";
-                }}
               >
                 {loading ? (
                   <>
-                    <Loader
-                      size={18}
-                      className="me-2"
-                      style={{
-                        display: "inline",
-                        animation: "spin 1s linear infinite",
-                      }}
-                    />
+                    <Loader size={18} className="cff-submit-icon cff-spinner" />
                     Creating Form...
                   </>
                 ) : (
                   <>
-                    <Send
-                      size={18}
-                      className="me-1"
-                      style={{ display: "inline" }}
-                    />
+                    <Send size={18} className="cff-submit-icon" />
                     Create Form
                   </>
                 )}
@@ -862,37 +569,6 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled }) => {
           </form>
         </div>
       </div>
-
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
-        .create-feedback-form-page,
-        .create-feedback-form-page * {
-          font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        }
-
-        .create-feedback-form-page input,
-        .create-feedback-form-page textarea,
-        .create-feedback-form-page select,
-        .create-feedback-form-page button {
-          font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        }
-
-        .create-feedback-form-page input::placeholder,
-        .create-feedback-form-page textarea::placeholder {
-          font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        }
-
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-
-        @keyframes feedbackDropdownFadeIn {
-          from { opacity: 0; transform: translateY(-4px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </div>
   );
 }

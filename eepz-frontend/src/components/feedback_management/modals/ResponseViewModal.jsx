@@ -1,3 +1,5 @@
+// src/components/FeedbackManagement/ResponseViewModal.jsx
+
 import React, { useState, useEffect } from "react";
 import {
   User,
@@ -10,6 +12,7 @@ import {
   X,
 } from "lucide-react";
 import axios from "axios";
+import "../../../styles/feedback/modals/ResponseViewModal.css";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
@@ -104,8 +107,7 @@ const ResponseViewModal = ({ show, response, onClose, type }) => {
           if (res?.data?.success && res?.data?.data) {
             setFormDetails(res.data.data);
           }
-        } catch (err) {
-          console.warn("Could not fetch form details");
+        } catch {
         } finally {
           setLoadingFormDetails(false);
         }
@@ -125,7 +127,6 @@ const ResponseViewModal = ({ show, response, onClose, type }) => {
   const parseHRResponses = () => {
     if (!response?.formResponse || typeof response.formResponse !== "object")
       return [];
-
     const items = [];
     Object.keys(response.formResponse).forEach((key) => {
       if (key.startsWith("question_")) {
@@ -137,7 +138,6 @@ const ResponseViewModal = ({ show, response, onClose, type }) => {
         });
       }
     });
-
     return items.sort((a, b) => Number(a.qId) - Number(b.qId));
   };
 
@@ -164,57 +164,10 @@ const ResponseViewModal = ({ show, response, onClose, type }) => {
   const userComments = response.formResponse?.comments || null;
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: "rgba(0,0,0,0.6)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 1050,
-        padding: "1rem",
-      }}
-      onClick={onClose}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "900px",
-          maxHeight: "90vh",
-          display: "flex",
-          flexDirection: "column",
-          backgroundColor: "white",
-          borderRadius: "12px",
-          boxShadow: "0 10px 40px rgba(0,0,0,0.2)",
-          overflow: "hidden",
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Modal Header */}
-        <div
-          style={{
-            background: "linear-gradient(135deg, #27235C 0%, #1a1845 100%)",
-            padding: "1.5rem 2rem",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            borderBottom: "none",
-          }}
-        >
-          <h5
-            style={{
-              margin: 0,
-              color: "white",
-              fontSize: "1.25rem",
-              fontWeight: 700,
-              letterSpacing: "0.3px",
-              textAlign: "left",
-            }}
-          >
+    <div className="rvm-overlay" onClick={onClose}>
+      <div className="rvm-container" onClick={(e) => e.stopPropagation()}>
+        <div className="rvm-header">
+          <h5 className="rvm-header__title">
             {type === "HR" && "HR Form Response"}
             {type === "Mentor" && "Mentor Feedback"}
             {type === "Peer" && "Peer Feedback"}
@@ -223,125 +176,28 @@ const ResponseViewModal = ({ show, response, onClose, type }) => {
           <button
             type="button"
             onClick={onClose}
-            style={{
-              background: "rgba(255,255,255,0.2)",
-              border: "none",
-              borderRadius: "6px",
-              width: "32px",
-              height: "32px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              transition: "all 0.2s",
-            }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.background = "rgba(255,255,255,0.3)")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.background = "rgba(255,255,255,0.2)")
-            }
+            className="rvm-header__close-btn"
             aria-label="Close"
           >
-            <X size={20} style={{ color: "white" }} />
+            <X size={20} />
           </button>
         </div>
 
-        {/* Modal Body */}
-        <div
-          style={{
-            padding: "2rem",
-            overflowY: "auto",
-            flex: 1,
-            textAlign: "left",
-          }}
-        >
-          {/* HR FORM */}
+        <div className="rvm-body">
           {type === "HR" && (
             <>
-              <div
-                style={{
-                  marginBottom: "1.5rem",
-                  paddingBottom: "1.5rem",
-                  borderBottom: "1px solid #e5e7eb",
-                }}
-              >
-                <h6
-                  style={{
-                    fontSize: "0.938rem",
-                    fontWeight: 700,
-                    color: "#27235C",
-                    marginBottom: "1rem",
-                    textAlign: "left",
-                  }}
-                >
-                  Form Information
-                </h6>
-                <div className="row g-3">
-                  <div className="col-md-6">
-                    <div
-                      style={{
-                        fontSize: "0.75rem",
-                        color: "#6B7280",
-                        marginBottom: "0.25rem",
-                        fontWeight: 600,
-                        textAlign: "left",
-                      }}
-                    >
-                      Form Name
-                    </div>
-                    <div
-                      style={{
-                        fontWeight: 600,
-                        color: "#1F2937",
-                        textAlign: "left",
-                      }}
-                    >
+              <div className="rvm-section">
+                <h6 className="rvm-section__title">Form Information</h6>
+                <div className="rvm-grid">
+                  <div className="rvm-grid__col">
+                    <div className="rvm-field__label">Form Name</div>
+                    <div className="rvm-field__value">
                       {response.formName || "N/A"}
                     </div>
                   </div>
-                 
-                  <div className="col-md-6">
-                    <div
-                      style={{
-                        fontSize: "0.75rem",
-                        color: "#6B7280",
-                        marginBottom: "0.25rem",
-                        fontWeight: 600,
-                        textAlign: "left",
-                      }}
-                    >
-                      Form Type
-                    </div>
-                    <div
-                      style={{
-                        fontWeight: 600,
-                        color: "#1F2937",
-                        textAlign: "left",
-                      }}
-                    >
-                      {formDetails?.formType || "Loading..."}
-                    </div>
-                  </div>
-                  <div className="col-md-6">
-                    <div
-                      style={{
-                        fontSize: "0.75rem",
-                        color: "#6B7280",
-                        marginBottom: "0.25rem",
-                        fontWeight: 600,
-                        textAlign: "left",
-                      }}
-                    >
-                      Submitted
-                    </div>
-                    <div
-                      style={{
-                        fontWeight: 600,
-                        color: "#1F2937",
-                        textAlign: "left",
-                      }}
-                    >
+                  <div className="rvm-grid__col">
+                    <div className="rvm-field__label">Submitted</div>
+                    <div className="rvm-field__value">
                       {formatDate(response.submittedAt)}
                     </div>
                   </div>
@@ -349,90 +205,38 @@ const ResponseViewModal = ({ show, response, onClose, type }) => {
               </div>
 
               {hrResponses.length > 0 && (
-                <div
-                  style={{
-                    marginBottom: "1.5rem",
-                    paddingBottom: "1.5rem",
-                    borderBottom: "1px solid #e5e7eb",
-                  }}
-                >
-                  <h6
-                    style={{
-                      fontSize: "0.938rem",
-                      fontWeight: 700,
-                      color: "#27235C",
-                      marginBottom: "1rem",
-                      textAlign: "left",
-                    }}
-                  >
+                <div className="rvm-section">
+                  <h6 className="rvm-section__title">
                     Your Ratings ({hrResponses.length} questions)
                   </h6>
                   {hrResponses.map((item, idx) => (
                     <div
                       key={idx}
-                      style={{
-                        padding: "1rem",
-                        marginBottom: "0.75rem",
-                        backgroundColor: "#F9FAFB",
-                        borderRadius: "8px",
-                        borderLeft: `4px solid ${getRatingColor(item.rating)}`,
-                        textAlign: "left",
-                      }}
+                      className="rvm-rating-item"
+                      style={{ borderLeftColor: getRatingColor(item.rating) }}
                     >
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "start",
-                          marginBottom: "0.5rem",
-                        }}
-                      >
-                        <div style={{ flex: 1, textAlign: "left" }}>
-                          <small
-                            style={{
-                              fontSize: "0.75rem",
-                              color: "#6B7280",
-                              fontWeight: 600,
-                              textAlign: "left",
-                            }}
-                          >
+                      <div className="rvm-rating-item__header">
+                        <div className="rvm-rating-item__question">
+                          <small className="rvm-rating-item__question-number">
                             Question {item.qId}
                           </small>
-                          <p
-                            style={{
-                              margin: "0.25rem 0 0 0",
-                              fontSize: "0.875rem",
-                              fontWeight: 600,
-                              color: "#1F2937",
-                              textAlign: "left",
-                            }}
-                          >
+                          <p className="rvm-rating-item__question-text">
                             {item.text}
                           </p>
                         </div>
                         <span
+                          className="rvm-rating-item__badge"
                           style={{
-                            display: "inline-block",
-                            padding: "6px 12px",
-                            borderRadius: "6px",
-                            fontSize: "0.875rem",
-                            fontWeight: 700,
-                            backgroundColor: `${getRatingColor(item.rating)}20`,
+                            backgroundColor: `${getRatingColor(
+                              item.rating
+                            )}20`,
                             color: getRatingColor(item.rating),
-                            marginLeft: "1rem",
-                            textAlign: "center",
                           }}
                         >
                           {item.rating}
                         </span>
                       </div>
-                      <small
-                        style={{
-                          fontSize: "0.75rem",
-                          color: "#6B7280",
-                          textAlign: "left",
-                        }}
-                      >
+                      <small className="rvm-rating-item__label">
                         Rating: {RATING_LABELS[item.rating] || "N/A"}
                       </small>
                     </div>
@@ -441,743 +245,67 @@ const ResponseViewModal = ({ show, response, onClose, type }) => {
               )}
 
               {userComments && (
-                <div
-                  style={{
-                    marginBottom: "1.5rem",
-                    paddingBottom: "1.5rem",
-                    borderBottom: "1px solid #e5e7eb",
-                  }}
-                >
-                  <h6
-                    style={{
-                      fontSize: "0.938rem",
-                      fontWeight: 700,
-                      color: "#27235C",
-                      marginBottom: "0.75rem",
-                      textAlign: "left",
-                    }}
-                  >
-                    Your Comments
-                  </h6>
-                  <div
-                    style={{
-                      padding: "1rem",
-                      backgroundColor: "#F9FAFB",
-                      borderRadius: "8px",
-                      borderLeft: "4px solid #27235C",
-                      textAlign: "left",
-                    }}
-                  >
-                    <p
-                      style={{
-                        margin: 0,
-                        fontSize: "0.875rem",
-                        color: "#374151",
-                        textAlign: "left",
-                      }}
-                    >
-                      {userComments}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {response.status === "Reviewed" && response.hrReviewComments && (
-                <div>
-                  <h6
-                    style={{
-                      fontSize: "0.938rem",
-                      fontWeight: 700,
-                      color: "#27235C",
-                      marginBottom: "0.75rem",
-                      textAlign: "left",
-                    }}
-                  >
-                    HR Review
-                  </h6>
-                  <div
-                    style={{
-                      padding: "1rem",
-                      backgroundColor: "#F0F0F0",
-                      borderRadius: "8px",
-                      borderLeft: "4px solid #0F62FE",
-                      textAlign: "left",
-                    }}
-                  >
-                    <p
-                      style={{
-                        margin: 0,
-                        fontSize: "0.875rem",
-                        color: "#374151",
-                        textAlign: "left",
-                      }}
-                    >
-                      {response.hrReviewComments}
-                    </p>
+                <div className="rvm-section rvm-section--last">
+                  <h6 className="rvm-section__title">Your Comments</h6>
+                  <div className="rvm-comment-box rvm-comment-box--primary">
+                    <p className="rvm-comment-box__text">{userComments}</p>
                   </div>
                 </div>
               )}
             </>
           )}
 
-          {/* MENTOR FEEDBACK */}
-          {type === "Mentor" && (
-            <>
-              <div
-                style={{
-                  marginBottom: "1.5rem",
-                  paddingBottom: "1.5rem",
-                  borderBottom: "1px solid #e5e7eb",
-                }}
-              >
-                <h6
-                  style={{
-                    fontSize: "0.938rem",
-                    fontWeight: 700,
-                    color: "#27235C",
-                    marginBottom: "1rem",
-                    textAlign: "left",
-                  }}
-                >
-                  Mentor Information
-                </h6>
-                <div className="row g-3">
-                  <div className="col-md-6">
-                    <div
-                      style={{
-                        fontSize: "0.75rem",
-                        color: "#6B7280",
-                        marginBottom: "0.25rem",
-                        fontWeight: 600,
-                        textAlign: "left",
-                      }}
-                    >
-                      Mentor Name
-                    </div>
-                    <div
-                      style={{
-                        fontWeight: 600,
-                        color: "#1F2937",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.5rem",
-                        textAlign: "left",
-                      }}
-                    >
-                      <User size={14} style={{ color: "#27235C" }} />
-                      {response.mentorNameFull || response.mentorName || "N/A"}
-                    </div>
+          {type !== "HR" && (
+            <div className="rvm-section rvm-section--last">
+              <h6 className="rvm-section__title rvm-section__title--with-icon">
+                <User size={16} className="rvm-field__icon" />
+                Feedback Details
+              </h6>
+              <div className="rvm-grid">
+                <div className="rvm-grid__col">
+                  <div className="rvm-field__label">From</div>
+                  <div className="rvm-field__value">
+                    {response.submittedByName || response.reviewerName || "N/A"}
                   </div>
-                  <div className="col-md-6">
-                    <div
-                      style={{
-                        fontSize: "0.75rem",
-                        color: "#6B7280",
-                        marginBottom: "0.25rem",
-                        fontWeight: 600,
-                        textAlign: "left",
-                      }}
-                    >
-                      Rating
-                    </div>
-                    <div style={{ textAlign: "left" }}>
-                      <span
-                        style={{
-                          display: "inline-block",
-                          padding: "4px 12px",
-                          borderRadius: "6px",
-                          fontSize: "0.75rem",
-                          fontWeight: 600,
-                          backgroundColor: "#D1FAE5",
-                          color: "#10B981",
-                        }}
-                      >
-                        {response.rating || 0} / 5
-                      </span>
-                    </div>
-                  </div>
-                  <div className="col-12">
-                    <div
-                      style={{
-                        fontSize: "0.75rem",
-                        color: "#6B7280",
-                        marginBottom: "0.25rem",
-                        fontWeight: 600,
-                        textAlign: "left",
-                      }}
-                    >
-                      Submitted
-                    </div>
-                    <div
-                      style={{
-                        fontWeight: 600,
-                        color: "#1F2937",
-                        textAlign: "left",
-                      }}
-                    >
-                      {formatDate(response.createdAt)}
-                    </div>
+                </div>
+                <div className="rvm-grid__col">
+                  <div className="rvm-field__label">Submitted</div>
+                  <div className="rvm-field__value">
+                    {formatDate(response.submittedAt)}
                   </div>
                 </div>
               </div>
 
               {response.rating && (
-                <div
-                  style={{
-                    marginBottom: "1.5rem",
-                    paddingBottom: "1.5rem",
-                    borderBottom: "1px solid #e5e7eb",
-                  }}
-                >
-                  <h6
-                    style={{
-                      fontSize: "0.938rem",
-                      fontWeight: 700,
-                      color: "#27235C",
-                      marginBottom: "0.75rem",
-                      textAlign: "left",
-                    }}
+                <div className="rvm-rating-display">
+                  <p
+                    className="rvm-rating-display__value"
+                    style={{ color: getRatingColor(response.rating) }}
                   >
-                    Rating Details
-                  </h6>
-                  <div
-                    style={{
-                      padding: "1rem",
-                      backgroundColor: "#F9FAFB",
-                      borderRadius: "8px",
-                      borderLeft: `4px solid ${getRatingColor(
-                        response.rating
-                      )}`,
-                      textAlign: "left",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "1.5rem",
-                        fontWeight: 700,
-                        color: getRatingColor(response.rating),
-                        margin: 0,
-                        textAlign: "left",
-                      }}
-                    >
-                      {response.rating} / 5 - {RATING_LABELS[response.rating]}
-                    </div>
-                  </div>
+                    {response.rating}
+                  </p>
+                  <p className="rvm-rating-item__label">
+                    {RATING_LABELS[response.rating] || "N/A"}
+                  </p>
                 </div>
               )}
 
-              {response.feedbackComments && (
-                <div>
-                  <h6
-                    style={{
-                      fontSize: "0.938rem",
-                      fontWeight: 700,
-                      color: "#27235C",
-                      marginBottom: "0.75rem",
-                      textAlign: "left",
-                    }}
-                  >
-                    Your Feedback
-                  </h6>
-                  <div
-                    style={{
-                      padding: "1rem",
-                      backgroundColor: "#F9FAFB",
-                      borderRadius: "8px",
-                      borderLeft: "4px solid #27235C",
-                      textAlign: "left",
-                    }}
-                  >
-                    <p
-                      style={{
-                        margin: 0,
-                        fontSize: "0.875rem",
-                        color: "#374151",
-                        textAlign: "left",
-                      }}
-                    >
-                      {response.feedbackComments}
-                    </p>
-                  </div>
+              {response.comments && (
+                <div className="rvm-comment-box rvm-comment-box--primary">
+                  <p className="rvm-comment-box__text rvm-comment-box__text--pre">
+                    {response.comments}
+                  </p>
                 </div>
               )}
-            </>
-          )}
-
-          {/* PEER FEEDBACK */}
-          {type === "Peer" && (
-            <>
-              <div
-                style={{
-                  marginBottom: "1.5rem",
-                  paddingBottom: "1.5rem",
-                  borderBottom: "1px solid #e5e7eb",
-                }}
-              >
-                <h6
-                  style={{
-                    fontSize: "0.938rem",
-                    fontWeight: 700,
-                    color: "#27235C",
-                    marginBottom: "1rem",
-                    textAlign: "left",
-                  }}
-                >
-                  Feedback Details
-                </h6>
-                <div className="row g-3">
-                  <div className="col-md-6">
-                    <div
-                      style={{
-                        fontSize: "0.75rem",
-                        color: "#6B7280",
-                        marginBottom: "0.25rem",
-                        fontWeight: 600,
-                        textAlign: "left",
-                      }}
-                    >
-                      Recipient
-                    </div>
-                    <div
-                      style={{
-                        fontWeight: 600,
-                        color: "#1F2937",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.5rem",
-                        textAlign: "left",
-                      }}
-                    >
-                      <User size={14} style={{ color: "#27235C" }} />
-                      {response.recipientNameFull ||
-                        response.recipientName ||
-                        "N/A"}
-                    </div>
-                  </div>
-                  
-                  <div className="col-12">
-                    <div
-                      style={{
-                        fontSize: "0.75rem",
-                        color: "#6B7280",
-                        marginBottom: "0.25rem",
-                        fontWeight: 600,
-                        textAlign: "left",
-                      }}
-                    >
-                      Submitted
-                    </div>
-                    <div
-                      style={{
-                        fontWeight: 600,
-                        color: "#1F2937",
-                        textAlign: "left",
-                      }}
-                    >
-                      {formatDate(response.createdAt)}
-                    </div>
-                  </div>
-                  {response.isAnonymous && (
-                    <div className="col-12">
-                      <div
-                        style={{
-                          fontSize: "0.75rem",
-                          color: "#6B7280",
-                          marginBottom: "0.25rem",
-                          fontWeight: 600,
-                          textAlign: "left",
-                        }}
-                      >
-                        Type
-                      </div>
-                      <div
-                        style={{
-                          fontWeight: 600,
-                          color: "#1F2937",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "0.5rem",
-                          textAlign: "left",
-                        }}
-                      >
-                        <Lock size={14} style={{ color: "#27235C" }} />
-                        Anonymous
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {response.feedbackContent && (
-                <div>
-                  <h6
-                    style={{
-                      fontSize: "0.938rem",
-                      fontWeight: 700,
-                      color: "#27235C",
-                      marginBottom: "0.75rem",
-                      textAlign: "left",
-                    }}
-                  >
-                    Your Feedback
-                  </h6>
-                  <div
-                    style={{
-                      padding: "1rem",
-                      backgroundColor: "#F9FAFB",
-                      borderRadius: "8px",
-                      borderLeft: "4px solid #27235C",
-                      textAlign: "left",
-                    }}
-                  >
-                    <p
-                      style={{
-                        margin: 0,
-                        fontSize: "0.875rem",
-                        color: "#374151",
-                        textAlign: "left",
-                      }}
-                    >
-                      {response.feedbackContent}
-                    </p>
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-
-          {/* GOAL FEEDBACK */}
-          {type === "Goal" && (
-            <>
-              <div
-                style={{
-                  marginBottom: "1.5rem",
-                  paddingBottom: "1.5rem",
-                  borderBottom: "1px solid #e5e7eb",
-                }}
-              >
-                <h6
-                  style={{
-                    fontSize: "0.938rem",
-                    fontWeight: 700,
-                    color: "#27235C",
-                    marginBottom: "1rem",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                    textAlign: "left",
-                  }}
-                >
-                  <Target size={18} style={{ color: "#27235C" }} />
-                  Goal Information
-                </h6>
-                <div className="row g-3">
-                  <div className="col-12">
-                    <div
-                      style={{
-                        fontSize: "0.75rem",
-                        color: "#6B7280",
-                        marginBottom: "0.25rem",
-                        fontWeight: 600,
-                        textAlign: "left",
-                      }}
-                    >
-                      Objective
-                    </div>
-                    <div
-                      style={{
-                        fontWeight: 600,
-                        color: "#1F2937",
-                        textAlign: "left",
-                      }}
-                    >
-                      {response.objectiveTitle ||
-                        response.organizationGoalName ||
-                        `Objective #${response.organizationObjectiveId}`}
-                    </div>
-                  </div>
-                  <div className="col-md-6">
-                    <div
-                      style={{
-                        fontSize: "0.75rem",
-                        color: "#6B7280",
-                        marginBottom: "0.25rem",
-                        fontWeight: 600,
-                        textAlign: "left",
-                      }}
-                    >
-                      Rating
-                    </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.5rem",
-                        textAlign: "left",
-                      }}
-                    >
-                      <Star
-                        size={16}
-                        style={{ color: "#FFB800", fill: "#FFB800" }}
-                      />
-                      <span
-                        style={{
-                          fontWeight: 600,
-                          color: "#1F2937",
-                          textAlign: "left",
-                        }}
-                      >
-                        {response.rating}/5
-                      </span>
-                      <span
-                        style={{
-                          display: "inline-block",
-                          padding: "4px 12px",
-                          borderRadius: "6px",
-                          fontSize: "0.75rem",
-                          fontWeight: 600,
-                          backgroundColor: `${getRatingColor(
-                            response.rating
-                          )}20`,
-                          color: getRatingColor(response.rating),
-                        }}
-                      >
-                        {RATING_LABELS[response.rating]}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="col-md-6">
-                    <div
-                      style={{
-                        fontSize: "0.75rem",
-                        color: "#6B7280",
-                        marginBottom: "0.25rem",
-                        fontWeight: 600,
-                        textAlign: "left",
-                      }}
-                    >
-                      Feedback From
-                    </div>
-                    <div style={{ textAlign: "left" }}>
-                      <span
-                        style={{
-                          display: "inline-block",
-                          padding: "4px 12px",
-                          borderRadius: "6px",
-                          fontSize: "0.75rem",
-                          fontWeight: 600,
-                          backgroundColor:
-                            response.feedbackFrom === "Manager"
-                              ? "#D1FAE5"
-                              : "#DBEAFE",
-                          color:
-                            response.feedbackFrom === "Manager"
-                              ? "#10B981"
-                              : "#3B82F6",
-                        }}
-                      >
-                        {response.feedbackFrom || "Employee"}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="col-md-6">
-                    <div
-                      style={{
-                        fontSize: "0.75rem",
-                        color: "#6B7280",
-                        marginBottom: "0.25rem",
-                        fontWeight: 600,
-                        textAlign: "left",
-                      }}
-                    >
-                      Status
-                    </div>
-                    <div style={{ textAlign: "left" }}>
-                      <span
-                        style={{
-                          display: "inline-block",
-                          padding: "4px 12px",
-                          borderRadius: "6px",
-                          fontSize: "0.75rem",
-                          fontWeight: 600,
-                          backgroundColor:
-                            response.status === "Approved"
-                              ? "#D1FAE5"
-                              : response.status === "Rejected"
-                              ? "#FEE2E2"
-                              : "#DBEAFE",
-                          color:
-                            response.status === "Approved"
-                              ? "#10B981"
-                              : response.status === "Rejected"
-                              ? "#EF4444"
-                              : "#3B82F6",
-                        }}
-                      >
-                        {response.status || "Submitted"}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="col-md-6">
-                    <div
-                      style={{
-                        fontSize: "0.75rem",
-                        color: "#6B7280",
-                        marginBottom: "0.25rem",
-                        fontWeight: 600,
-                        textAlign: "left",
-                      }}
-                    >
-                      Submitted
-                    </div>
-                    <div
-                      style={{
-                        fontWeight: 600,
-                        color: "#1F2937",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.5rem",
-                        textAlign: "left",
-                      }}
-                    >
-                      <Calendar size={14} style={{ color: "#27235C" }} />
-                      {formatDate(response.createdAt)}
-                    </div>
-                  </div>
-                  {response.submitterName && (
-                    <div className="col-md-6">
-                      <div
-                        style={{
-                          fontSize: "0.75rem",
-                          color: "#6B7280",
-                          marginBottom: "0.25rem",
-                          fontWeight: 600,
-                          textAlign: "left",
-                        }}
-                      >
-                        Submitted By
-                      </div>
-                      <div
-                        style={{
-                          fontWeight: 600,
-                          color: "#1F2937",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "0.5rem",
-                          textAlign: "left",
-                        }}
-                      >
-                        <User size={14} style={{ color: "#27235C" }} />
-                        {response.submitterName}
-                      </div>
-                    </div>
-                  )}
-                  {response.isAnonymous && (
-                    <div className="col-md-6">
-                      <div
-                        style={{
-                          fontSize: "0.75rem",
-                          color: "#6B7280",
-                          marginBottom: "0.25rem",
-                          fontWeight: 600,
-                          textAlign: "left",
-                        }}
-                      >
-                        Type
-                      </div>
-                      <div
-                        style={{
-                          fontWeight: 600,
-                          color: "#1F2937",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "0.5rem",
-                          textAlign: "left",
-                        }}
-                      >
-                        <Lock size={14} style={{ color: "#27235C" }} />
-                        Anonymous
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {response.feedbackComments && (
-                <div>
-                  <h6
-                    style={{
-                      fontSize: "0.938rem",
-                      fontWeight: 700,
-                      color: "#27235C",
-                      marginBottom: "0.75rem",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.5rem",
-                      textAlign: "left",
-                    }}
-                  >
-                    <MessageSquare size={16} style={{ color: "#27235C" }} />
-                    Feedback Comments
-                  </h6>
-                  <div
-                    style={{
-                      padding: "1rem",
-                      backgroundColor: "#F9FAFB",
-                      borderRadius: "8px",
-                      borderLeft: "4px solid #27235C",
-                      textAlign: "left",
-                    }}
-                  >
-                    <p
-                      style={{
-                        margin: 0,
-                        fontSize: "0.875rem",
-                        color: "#374151",
-                        whiteSpace: "pre-wrap",
-                        textAlign: "left",
-                      }}
-                    >
-                      {response.feedbackComments}
-                    </p>
-                  </div>
-                </div>
-              )}
-            </>
+            </div>
           )}
         </div>
 
-        {/* Modal Footer */}
-        <div
-          style={{
-            padding: "1rem 2rem",
-            borderTop: "1px solid #e5e7eb",
-            display: "flex",
-            justifyContent: "flex-end",
-            backgroundColor: "#F9FAFB",
-          }}
-        >
+        <div className="rvm-footer">
           <button
             type="button"
             onClick={onClose}
-            style={{
-              padding: "0.625rem 1.5rem",
-              borderRadius: "8px",
-              border: "1.5px solid #E5E7EB",
-              backgroundColor: "white",
-              color: "#374151",
-              fontWeight: 600,
-              fontSize: "0.875rem",
-              cursor: "pointer",
-              transition: "all 0.2s",
-              textAlign: "center",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "#F9FAFB";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "white";
-            }}
+            className="rvm-footer__btn"
           >
             Close
           </button>

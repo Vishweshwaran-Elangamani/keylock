@@ -1,5 +1,3 @@
-// src/pages/feedback_management/feedback/MySubmissions.jsx
-
 import React, {
   useEffect,
   useMemo,
@@ -34,11 +32,9 @@ import {
 } from "../../../services/feedbackmanagement/feedbackApi";
 import hrFormApi from "../../../services/feedbackmanagement/hrFormApi";
 import ResponseViewModal from "../../../components/feedback_management/modals/ResponseViewModal";
-import FeedbackDeleteConfirmModal from "../../../components/feedback_management/modals/FeedbackDeleteConfirmModal";
 import Breadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb";
-import "../../../styles/feedback/MySubmissions.css";
+import "../../../styles/feedback/components/MySubmissions.css";
 
-// Format date helper
 const formatDate = (dateInput) => {
   if (!dateInput) return "—";
 
@@ -71,7 +67,6 @@ const formatDate = (dateInput) => {
   }
 };
 
-// Calculate days ago helper
 const getDaysAgo = (dateInput) => {
   try {
     const dateObj =
@@ -90,7 +85,6 @@ const getDaysAgo = (dateInput) => {
   }
 };
 
-// Helper function to get role-based feedback dashboard path
 const getFeedbackDashboardPath = (roleName) => {
   const routes = {
     Employee: "/employee/dashboard/feedback",
@@ -123,7 +117,6 @@ export default function MySubmissions() {
     []
   );
 
-  // Get role-based dashboard path
   const feedbackDashboardPath = useMemo(
     () => getFeedbackDashboardPath(user?.roleName || "Employee"),
     [user?.roleName]
@@ -142,21 +135,8 @@ export default function MySubmissions() {
   const [showModal, setShowModal] = useState(false);
   const [selectedResponse, setSelectedResponse] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
-
-  // Error modal (for fetch errors)
   const [errorModalOpen, setErrorModalOpen] = useState(false);
 
-  // Confirmation modal (for delete actions)
-  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
-  const [confirmConfig, setConfirmConfig] = useState({
-    title: "",
-    message: "",
-    itemName: "",
-    onConfirm: null,
-  });
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  // Error modal helpers
   const openErrorModal = (message) => {
     setError(message || "Failed to fetch submissions");
     setErrorModalOpen(true);
@@ -167,21 +147,6 @@ export default function MySubmissions() {
     setErrorModalOpen(false);
   };
 
-  // Confirmation modal helpers
-  const openConfirmModal = (config) => {
-    setConfirmConfig(
-      config || { title: "", message: "", itemName: "", onConfirm: null }
-    );
-    setConfirmModalOpen(true);
-  };
-
-  const closeConfirmModal = () => {
-    setConfirmModalOpen(false);
-    setConfirmConfig({ title: "", message: "", itemName: "", onConfirm: null });
-    setIsDeleting(false);
-  };
-
-  // Fetch employee map using service
   const fetchEmployeeMap = useCallback(async () => {
     try {
       const response = await employeeApi.getAll();
@@ -202,18 +167,15 @@ export default function MySubmissions() {
     }
   }, []);
 
-  // Fetch objectives/goals using service - FIXED
   const fetchObjectives = useCallback(async () => {
     try {
       const response = await goalsApi.getAll(1, 100);
       
-      // Handle nested data structure
       const goalsData = response?.data?.data || response?.data || [];
 
       if (Array.isArray(goalsData)) {
         const map = {};
         goalsData.forEach((goal) => {
-          // Try multiple field name variations
           const goalId = goal.goalId || goal.goalid || goal.GoalId;
           const goalTitle = goal.goalName || goal.organizationGoalName || goal.goaltitle || goal.title;
           if (goalId) {
@@ -227,7 +189,6 @@ export default function MySubmissions() {
     }
   }, []);
 
-  // Fetch all submission data using services - FIXED
   const fetchData = useCallback(async () => {
     setRefreshing(true);
     setLoading(true);
@@ -236,7 +197,6 @@ export default function MySubmissions() {
     try {
       const userEmpId = Number(user?.empId) || 1004;
 
-      // HR Forms
       try {
         const hrRes = await hrFormApi.getResponsesByEmployee(userEmpId);
         const hrData = hrRes?.data || [];
@@ -252,7 +212,6 @@ export default function MySubmissions() {
         setHrForms([]);
       }
 
-      // Mentor feedback
       try {
         const mentorRes = await mentorFeedbackApi.myFeedback(userEmpId);
         const mentorData = Array.isArray(mentorRes?.data)
@@ -273,7 +232,6 @@ export default function MySubmissions() {
         setMentor([]);
       }
 
-      // Peer feedback
       try {
         const peerRes = await peerQueueApi.list(1, 100);
         const allPeer = Array.isArray(peerRes?.data)
@@ -298,11 +256,9 @@ export default function MySubmissions() {
         setPeer([]);
       }
 
-      // Goal feedback - MAJOR FIX HERE
       try {
         const goalRes = await orgGoalFeedbackApi.list(1, 100);
         
-        // Fix: Handle nested data structure properly
         const allGoalData = goalRes?.data?.data || goalRes?.data || [];
 
         if (Array.isArray(allGoalData)) {
@@ -313,7 +269,6 @@ export default function MySubmissions() {
             })
             .map((g) => ({
               ...g,
-              // Fix: Use goalId instead of organizationObjectiveId
               objectiveTitle:
                 objectives[g.goalId] ||
                 g.organizationGoalName ||
@@ -352,7 +307,6 @@ export default function MySubmissions() {
     }
   }, [employeeMap, objectives, fetchData]);
 
-  // View response
   const handleViewResponse = (data, type) => {
     setSelectedResponse(data);
     setSelectedType(type);
@@ -363,107 +317,6 @@ export default function MySubmissions() {
     setShowModal(false);
     setSelectedResponse(null);
     setSelectedType(null);
-  };
-
-  // Delete actions using confirmation modal
-  const deleteHRForm = (responseId, formName) => {
-    if (!responseId) {
-      toast.error("Invalid response ID");
-      return;
-    }
-
-    openConfirmModal({
-      title: "Delete HR Form",
-      message: "Are you sure you want to delete this HR form submission?",
-      itemName: formName || "HR Form Submission",
-      onConfirm: async () => {
-        setIsDeleting(true);
-        try {
-          await hrFormApi.deleteResponse(responseId);
-          toast.success("HR form deleted successfully!");
-          await fetchData();
-          closeConfirmModal();
-        } catch (err) {
-          toast.error(err?.message || "Failed to delete");
-          setIsDeleting(false);
-        }
-      },
-    });
-  };
-
-  const deleteMentor = (trackingId, mentorName) => {
-    if (!trackingId) {
-      toast.error("Invalid mentor feedback ID");
-      return;
-    }
-
-    openConfirmModal({
-      title: "Delete Mentor Feedback",
-      message: "Are you sure you want to delete this mentor feedback?",
-      itemName: `Feedback for ${mentorName}`,
-      onConfirm: async () => {
-        setIsDeleting(true);
-        try {
-          await mentorFeedbackApi.remove(trackingId);
-          toast.success("Mentor feedback deleted successfully!");
-          await fetchData();
-          closeConfirmModal();
-        } catch (err) {
-          toast.error(err?.message || "Failed to delete");
-          setIsDeleting(false);
-        }
-      },
-    });
-  };
-
-  const deletePeer = (queueId, recipientName) => {
-    if (!queueId) {
-      toast.error("Invalid peer feedback ID");
-      return;
-    }
-
-    openConfirmModal({
-      title: "Delete Peer Feedback",
-      message: "Are you sure you want to delete this peer feedback?",
-      itemName: `Feedback for ${recipientName}`,
-      onConfirm: async () => {
-        setIsDeleting(true);
-        try {
-          await peerQueueApi.remove(queueId);
-          toast.success("Peer feedback deleted successfully!");
-          await fetchData();
-          closeConfirmModal();
-        } catch (err) {
-          toast.error(err?.message || "Failed to delete");
-          setIsDeleting(false);
-        }
-      },
-    });
-  };
-
-  const deleteGoalFeedback = (feedbackId, goalTitle) => {
-    if (!feedbackId) {
-      toast.error("Invalid goal feedback ID");
-      return;
-    }
-
-    openConfirmModal({
-      title: "Delete Goal Feedback",
-      message: "Are you sure you want to delete this goal feedback?",
-      itemName: goalTitle,
-      onConfirm: async () => {
-        setIsDeleting(true);
-        try {
-          await orgGoalFeedbackApi.remove(feedbackId);
-          toast.success("Goal feedback deleted successfully!");
-          await fetchData();
-          closeConfirmModal();
-        } catch (err) {
-          toast.error(err?.message || "Failed to delete");
-          setIsDeleting(false);
-        }
-      },
-    });
   };
 
   const getTabData = () => {
@@ -504,7 +357,6 @@ export default function MySubmissions() {
 
   return (
     <>
-      {/* Error Modal */}
       {error && (
         <div
           className={`fm-mysub-error-modal-backdrop ${
@@ -543,19 +395,7 @@ export default function MySubmissions() {
         </div>
       )}
 
-      {/* Delete Confirm Modal */}
-      <FeedbackDeleteConfirmModal
-        isOpen={confirmModalOpen}
-        onClose={closeConfirmModal}
-        onConfirm={confirmConfig.onConfirm || (() => {})}
-        title={confirmConfig.title}
-        message={confirmConfig.message}
-        itemName={confirmConfig.itemName}
-        isDeleting={isDeleting}
-      />
-
       <div className="fm-mysub-page-wrapper">
-        {/* Breadcrumb */}
         <Breadcrumb
           items={[
             { label: "Feedback Management", path: feedbackDashboardPath },
@@ -563,7 +403,6 @@ export default function MySubmissions() {
           ]}
         />
 
-        {/* Tabs */}
         <div className="fm-mysub-tabs-wrapper d-flex justify-content-center mb-3">
           <div className="fm-mysub-tabs">
             <button
@@ -632,7 +471,6 @@ export default function MySubmissions() {
           </div>
         </div>
 
-        {/* Content */}
         <div className="fm-mysub-content">
           {loading ? (
             <div className="d-flex justify-content-center align-items-center fm-mysub-loading">
@@ -658,7 +496,6 @@ export default function MySubmissions() {
             </div>
           ) : (
             <div className="row g-3">
-              {/* HR Forms */}
               {tab === "HR Forms" &&
                 hrForms.map((hr) => (
                   <div className="col-md-6 col-lg-4" key={hr.responseId}>
@@ -721,14 +558,12 @@ export default function MySubmissions() {
                             <Eye size={16} />
                             View
                           </button>
-                          
                         </div>
                       </div>
                     </div>
                   </div>
                 ))}
 
-              {/* Goal Feedback */}
               {tab === "Goal Feedback" &&
                 goalFeedback.map((goal) => (
                   <div
@@ -808,14 +643,12 @@ export default function MySubmissions() {
                             <Eye size={16} />
                             View
                           </button>
-                          
                         </div>
                       </div>
                     </div>
                   </div>
                 ))}
 
-              {/* Mentor Feedback */}
               {tab === "Mentor" &&
                 mentor.map((m) => (
                   <div
@@ -883,14 +716,12 @@ export default function MySubmissions() {
                             <Eye size={16} />
                             View
                           </button>
-                          
                         </div>
                       </div>
                     </div>
                   </div>
                 ))}
 
-              {/* Peer Feedback */}
               {tab === "Peer" &&
                 peer.map((p) => (
                   <div
@@ -965,7 +796,6 @@ export default function MySubmissions() {
           )}
         </div>
 
-        {/* Response View Modal */}
         <ResponseViewModal
           show={showModal}
           response={selectedResponse}

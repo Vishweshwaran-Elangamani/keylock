@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import {
   RefreshCw,
   AlertTriangle,
@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import "../../../styles/feedback/hr/HRReviewQueue.css";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
@@ -25,10 +26,6 @@ export default function ViewMyPeerFeedback() {
   const [error, setError] = useState("");
   const [employeeMap, setEmployeeMap] = useState({});
 
-  // ============================================================================
-  // FETCH PEER FEEDBACK
-  // ============================================================================
-
   const fetchPeerFeedback = async () => {
     setLoading(true);
     setRefreshing(false);
@@ -42,7 +39,6 @@ export default function ViewMyPeerFeedback() {
         return;
       }
 
-      // STEP 1: Fetch employee map
       let empMap = {};
       try {
         const empRes = await axios.get(`${API_BASE}/EmployeeManagement/all`);
@@ -56,11 +52,9 @@ export default function ViewMyPeerFeedback() {
         console.warn("Error fetching employee map:", err.message);
       }
 
-      // STEP 2: Fetch all peer feedback and filter for feedback about me (NO STATUS FILTER)
       try {
         const peerRes = await axios.get(`${API_BASE}/PeerFeedbackQueue/all`);
         if (peerRes.data?.success && Array.isArray(peerRes.data.data)) {
-          // Filter to only feedback where I'm the recipient (REGARDLESS OF STATUS)
           const myFeedback = peerRes.data.data
             .filter((p) => p.recipientEmployeeId === empId)
             .map((p) => ({
@@ -93,6 +87,7 @@ export default function ViewMyPeerFeedback() {
 
   useEffect(() => {
     fetchPeerFeedback();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.empId]);
 
   const handleRefresh = async () => {
@@ -102,166 +97,107 @@ export default function ViewMyPeerFeedback() {
 
   if (loading) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "60vh" }}
-      >
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
+      <div className="hrq-page hrq-page-loading">
+        <div className="hrq-spinner-main" />
       </div>
     );
   }
 
   return (
-    <div
-      className="d-flex justify-content-center py-4"
-      style={{ minHeight: "100vh", background: "#f9f9f9" }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "1000px",
-          paddingLeft: "1rem",
-          paddingRight: "1rem",
-        }}
-      >
-        {/* HEADER */}
-        <div className="d-flex align-items-center justify-content-between mb-4">
-          <div className="d-flex align-items-center gap-2">
+    <div className="hrq-page hrq-page-bg">
+      <div className="hrq-container">
+        <div className="hrq-header">
+          <div className="hrq-header-left">
             <button
-              className="btn btn-outline-secondary"
+              className="hrq-btn hrq-btn-outline hrq-btn-back"
               onClick={() => navigate(-1)}
-              style={{ borderRadius: "var(--radius-md)" }}
             >
               <ArrowLeft size={16} />
             </button>
-            <div>
-              <h2
-                className="fw-bold mb-1"
-                style={{ color: "var(--color-primary-1)" }}
-              >
-                Peer Feedback
-              </h2>
-              <p className="mb-0 small text-muted">
+            <div className="hrq-header-text">
+              <h2 className="hrq-title">Peer Feedback</h2>
+              <p className="hrq-subtitle">
                 Feedback you have received from peers
               </p>
             </div>
           </div>
           <button
-            className="btn btn-outline-secondary"
+            className="hrq-btn hrq-btn-outline hrq-btn-refresh"
             onClick={handleRefresh}
             disabled={refreshing}
             title="Refresh"
-            style={{ borderRadius: "var(--radius-md)" }}
           >
             <RefreshCw
               size={18}
-              style={{
-                animation: refreshing ? "spin 1s linear infinite" : "none",
-              }}
+              className={refreshing ? "hrq-icon-spin" : ""}
             />
           </button>
         </div>
 
-        {/* ERROR ALERT */}
         {error && (
-          <div
-            className="alert alert-danger d-flex align-items-start gap-2 mb-3"
-            style={{ borderRadius: "var(--radius-md)" }}
-          >
-            <AlertTriangle size={18} className="mt-1 flex-shrink-0" />
-            <div className="flex-grow-1">
-              <strong>Error</strong>
-              <p className="mb-0 small mt-1">{error}</p>
+          <div className="hrq-alert hrq-alert-error">
+            <div className="hrq-alert-main">
+              <AlertTriangle size={18} className="hrq-alert-icon" />
+              <div>
+                <strong>Error</strong>
+                <p className="hrq-alert-text">{error}</p>
+              </div>
             </div>
-            <button className="btn-close" onClick={() => setError("")} />
+            <button
+              className="hrq-alert-close"
+              onClick={() => setError("")}
+            >
+              ×
+            </button>
           </div>
         )}
 
-        {/* STATS */}
         {peerFeedback.length > 0 && (
-          <div className="row g-3 mb-4">
-            <div className="col-12">
-              <div
-                className="card border-0"
-                style={{
-                  border: "1px solid var(--border)",
-                  borderRadius: "var(--radius-md)",
-                }}
-              >
-                <div className="card-body">
-                  <div className="d-flex align-items-center gap-2">
-                    <div
-                      className="rounded p-2"
-                      style={{ background: "#0F62FE15" }}
-                    >
-                      <Users size={20} style={{ color: "#0F62FE" }} />
-                    </div>
-                    <div>
-                      <h5 className="fw-bold mb-0" style={{ color: "#0F62FE" }}>
-                        {peerFeedback.length}
-                      </h5>
-                      <small className="text-muted">
-                        Peer Feedback Received
-                      </small>
-                    </div>
-                  </div>
+          <div className="hrq-stats-row">
+            <div className="hrq-stat-card">
+              <div className="hrq-stat-body">
+                <div className="hrq-stat-icon-wrap">
+                  <Users size={20} className="hrq-stat-icon" />
+                </div>
+                <div>
+                  <h5 className="hrq-stat-number">{peerFeedback.length}</h5>
+                  <small className="hrq-stat-label">
+                    Peer Feedback Received
+                  </small>
                 </div>
               </div>
             </div>
           </div>
         )}
 
-        {/* PEER FEEDBACK LIST */}
         {peerFeedback.length === 0 ? (
-          <div
-            className="card border-0"
-            style={{
-              border: "1px solid var(--border)",
-              borderRadius: "var(--radius-lg)",
-            }}
-          >
-            <div className="card-body text-center py-5">
-              <Users
-                size={48}
-                className="mb-3"
-                style={{ color: "var(--muted)" }}
-              />
-              <h5 className="text-muted mb-2">No peer feedback received</h5>
-              <p className="small text-muted mb-0">
-                Check back later for feedback from your peers
-              </p>
-            </div>
+          <div className="hrq-card hrq-card-empty">
+            <Users size={48} className="hrq-empty-icon" />
+            <h5 className="hrq-empty-title">No peer feedback received</h5>
+            <p className="hrq-empty-text">
+              Check back later for feedback from your peers
+            </p>
           </div>
         ) : (
-          <div className="row g-3">
+          <div className="hrq-feedback-grid">
             {peerFeedback.map((feedback) => (
-              <div className="col-12" key={feedback.queueId}>
-                <div
-                  className="card border-0"
-                  style={{
-                    border: "1px solid var(--border)",
-                    borderRadius: "var(--radius-lg)",
-                    boxShadow: "var(--shadow)",
-                  }}
-                >
-                  <div className="card-body">
-                    {/* Header - Peer Info, Date & Status */}
-                    <div className="d-flex justify-content-between align-items-start mb-3">
+              <div className="hrq-feedback-col" key={feedback.queueId}>
+                <div className="hrq-card hrq-feedback-card">
+                  <div className="hrq-feedback-body">
+                    <div className="hrq-feedback-header">
                       <div>
-                        <div className="d-flex align-items-center gap-2 mb-2">
+                        <div className="hrq-feedback-peer-row">
                           <User
                             size={16}
-                            style={{ color: "var(--color-primary-1)" }}
+                            className="hrq-feedback-peer-icon"
                           />
-                          <h6 className="fw-bold mb-0">
+                          <h6 className="hrq-feedback-peer-name">
                             {feedback.submittedByName}
                           </h6>
                         </div>
-                        <div className="d-flex align-items-center gap-2">
-                          <Calendar size={14} className="text-muted" />
-                          <small className="text-muted">
+                        <div className="hrq-feedback-date-row">
+                          <Calendar size={14} className="hrq-inline-icon" />
+                          <small className="hrq-feedback-date">
                             {feedback.submittedDate
                               ? new Date(
                                   feedback.submittedDate
@@ -272,64 +208,42 @@ export default function ViewMyPeerFeedback() {
                           </small>
                         </div>
                       </div>
-                      <div className="d-flex flex-column align-items-end gap-2">
+                      <div className="hrq-feedback-status-wrap">
                         <span
-                          className="badge"
-                          style={{
-                            backgroundColor:
-                              feedback.status === "Approved"
-                                ? "#24A14820"
-                                : "#0F62FE20",
-                            color:
-                              feedback.status === "Approved"
-                                ? "#24A148"
-                                : "#0F62FE",
-                            padding: "6px 12px",
-                          }}
+                          className={`hrq-status-chip ${
+                            feedback.status === "Approved"
+                              ? "hrq-status-chip-approved"
+                              : "hrq-status-chip-default"
+                          }`}
                         >
                           {feedback.status || "Pending"}
                         </span>
                       </div>
                     </div>
 
-                    {/* Feedback Comment */}
-                    <div className="mb-3">
-                      <div className="d-flex align-items-center gap-2 mb-2">
+                    <div className="hrq-feedback-comment-section">
+                      <div className="hrq-feedback-comment-header">
                         <MessageCircle
                           size={16}
-                          style={{ color: "var(--color-primary-1)" }}
+                          className="hrq-feedback-comment-icon"
                         />
-                        <h6 className="small fw-bold text-muted mb-0">
+                        <h6 className="hrq-feedback-comment-title">
                           Feedback
                         </h6>
                       </div>
-                      <p
-                        className="mb-0"
-                        style={{
-                          lineHeight: "1.6",
-                          color: "#333",
-                          marginLeft: "2rem",
-                        }}
-                      >
+                      <p className="hrq-feedback-comment-text">
                         {feedback.comment ||
                           feedback.feedbackComment ||
                           "No comment provided"}
                       </p>
                     </div>
 
-                    {/* Context if available */}
                     {(feedback.context || feedback.feedbackContext) && (
-                      <div
-                        className="p-3 rounded"
-                        style={{
-                          backgroundColor: "#f9f9f9",
-                          borderLeft: "3px solid var(--color-primary-1)",
-                        }}
-                      >
-                        <h6 className="small fw-bold text-muted mb-1">
+                      <div className="hrq-feedback-context-box">
+                        <h6 className="hrq-feedback-context-title">
                           Context
                         </h6>
-                        <p className="small mb-0" style={{ color: "#555" }}>
+                        <p className="hrq-feedback-context-text">
                           {feedback.context || feedback.feedbackContext}
                         </p>
                       </div>
@@ -340,8 +254,6 @@ export default function ViewMyPeerFeedback() {
             ))}
           </div>
         )}
-
-        <style>{`@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}`}</style>
       </div>
     </div>
   );

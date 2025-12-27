@@ -1,0 +1,831 @@
+.fa-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 1rem;
+}
+
+.fa-modal-container {
+  background: white;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 1000px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  margin-left: 80px;
+}
+
+.fa-modal-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #3d3a68;
+  border-radius: 8px 8px 0 0;
+}
+
+.fa-modal-header-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: white;
+}
+
+.fa-modal-title {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1.125rem;
+  color: white;
+}
+
+.fa-modal-close-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  color: white;
+  transition: opacity 0.2s;
+}
+
+.fa-modal-close-btn:hover {
+  opacity: 0.8;
+}
+
+.fa-modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+  background: #fafafa;
+}
+
+.fa-loading-container {
+  text-align: left;
+  padding: 3rem 1rem;
+}
+
+.fa-spinner {
+  width: 3rem;
+  height: 3rem;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #3d3a68;
+  border-radius: 50%;
+  animation: fa-spin 1s linear infinite;
+  margin: 0;
+}
+
+.fa-loading-text {
+  margin-top: 1rem;
+  font-size: 1rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.fa-loading-subtext {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.fa-error-container {
+  background: #fff5f5;
+  border: 1px solid #feb2b2;
+  border-left: 4px solid #dc3545;
+  border-radius: 6px;
+  padding: 1rem;
+  display: flex;
+  align-items: start;
+  gap: 1rem;
+  color: #dc3545;
+  text-align: left;
+}
+
+.fa-error-title {
+  margin: 0;
+  font-weight: 600;
+  color: #721c24;
+}
+
+.fa-error-text {
+  margin: 0.25rem 0 0 0;
+  color: #721c24;
+  font-size: 0.875rem;
+}
+
+.fa-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.fa-section {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  overflow: hidden;
+  text-align: left;
+}
+
+.fa-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+  color: #666;
+}
+
+.fa-section-header h3 {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #666;
+}
+
+.fa-feedback-box {
+  padding: 1rem;
+  background: #f9f9f9;
+  line-height: 1.6;
+  color: #333;
+  text-align: left;
+}
+
+.fa-feedback-box p {
+  margin: 0.5rem 0;
+  text-align: left;
+}
+
+.fa-feedback-box p:first-child {
+  margin-top: 0;
+}
+
+.fa-feedback-box p:last-child {
+  margin-bottom: 0;
+}
+
+.fa-summary-box {
+  padding: 1rem;
+  background: #e7f3ff;
+  line-height: 1.6;
+  color: #333;
+  font-size: 0.938rem;
+  text-align: left;
+}
+
+.fa-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.fa-metric-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: 2px solid;
+  text-align: left;
+}
+
+.fa-metric-card--success {
+  border-color: #198754;
+}
+
+.fa-metric-card--warning {
+  border-color: #ffc107;
+}
+
+.fa-metric-card--danger {
+  border-color: #dc3545;
+}
+
+.fa-metric-card--neutral {
+  border-color: #6c757d;
+}
+
+.fa-metric-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fa-metric-card--success .fa-metric-icon {
+  background: #198754;
+  color: white;
+}
+
+.fa-metric-card--warning .fa-metric-icon {
+  background: #ffc107;
+  color: #333;
+}
+
+.fa-metric-card--danger .fa-metric-icon {
+  background: #dc3545;
+  color: white;
+}
+
+.fa-metric-card--neutral .fa-metric-icon {
+  background: #6c757d;
+  color: white;
+}
+
+.fa-metric-content {
+  flex: 1;
+  text-align: left;
+}
+
+.fa-metric-label {
+  font-size: 0.75rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.fa-metric-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #333;
+  text-align: left;
+}
+
+.fa-sentiment-card {
+  padding: 1rem;
+  border-radius: 0 0 8px 8px;
+  text-align: left;
+}
+
+.fa-sentiment-card--positive {
+  background: #f0f9f4;
+  border-top: 3px solid #198754;
+}
+
+.fa-sentiment-card--negative {
+  background: #fff5f5;
+  border-top: 3px solid #dc3545;
+}
+
+.fa-sentiment-card--neutral {
+  background: #f8f9fa;
+  border-top: 3px solid #6c757d;
+}
+
+.fa-sentiment-card--mixed {
+  background: #fff8e1;
+  border-top: 3px solid #ffc107;
+}
+
+.fa-sentiment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+  text-align: left;
+}
+
+.fa-sentiment-result {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #333;
+  text-align: left;
+}
+
+.fa-sentiment-confidence {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.813rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.fa-sentiment-card--positive .fa-sentiment-confidence {
+  background: #198754;
+  color: white;
+}
+
+.fa-sentiment-card--negative .fa-sentiment-confidence {
+  background: #dc3545;
+  color: white;
+}
+
+.fa-sentiment-card--neutral .fa-sentiment-confidence {
+  background: #6c757d;
+  color: white;
+}
+
+.fa-sentiment-card--mixed .fa-sentiment-confidence {
+  background: #ffc107;
+  color: #333;
+}
+
+.fa-sentiment-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.fa-sentiment-metric-item {
+  text-align: left;
+  background: white;
+  padding: 0.75rem;
+  border-radius: 6px;
+}
+
+.fa-sentiment-metric-label {
+  display: block;
+  font-size: 0.688rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  text-align: left;
+}
+
+.fa-sentiment-metric-value {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #333;
+  text-align: left;
+}
+
+.fa-vader-section {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+
+.fa-vader-label {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #333;
+  font-size: 0.875rem;
+  text-align: left;
+}
+
+.fa-vader-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.fa-vader-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: left;
+}
+
+.fa-vader-bar-label {
+  min-width: 70px;
+  font-size: 0.813rem;
+  color: #666;
+  font-weight: 600;
+  text-align: left;
+}
+
+.fa-vader-bar-track {
+  flex: 1;
+  height: 10px;
+  background: #e0e0e0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.fa-vader-bar-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.fa-vader-bar-fill--positive {
+  background: #198754;
+}
+
+.fa-vader-bar-fill--neutral {
+  background: #6c757d;
+}
+
+.fa-vader-bar-fill--negative {
+  background: #dc3545;
+}
+
+.fa-vader-bar-value {
+  min-width: 50px;
+  text-align: right;
+  font-size: 0.813rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.fa-emotion-card {
+  padding: 1rem;
+  text-align: left;
+}
+
+.fa-emotion-dominant {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: #f5f5f5;
+  border-radius: 6px;
+  text-align: left;
+}
+
+.fa-emotion-dominant-label {
+  font-size: 0.813rem;
+  color: #666;
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
+.fa-emotion-dominant-value {
+  font-size: 0.938rem;
+  color: #3d3a68;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.fa-emotion-bar-label {
+  font-size: 0.813rem;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-align: left;
+}
+
+.fa-emotion-single-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.fa-emotion-bar-track {
+  flex: 1;
+  height: 10px;
+  background: #e0e0e0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.fa-emotion-bar-fill {
+  height: 100%;
+  background: #3d3a68;
+  transition: width 0.3s ease;
+}
+
+.fa-emotion-bar-value {
+  min-width: 50px;
+  text-align: right;
+  font-size: 0.813rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.fa-bias-card {
+  padding: 1rem;
+  border-radius: 0 0 8px 8px;
+  text-align: left;
+}
+
+.fa-bias-card--none {
+  background: #f0f9f4;
+  border-top: 3px solid #198754;
+}
+
+.fa-bias-card--detected {
+  background: #fff5f5;
+  border-top: 3px solid #ffc107;
+}
+
+.fa-bias-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+  text-align: left;
+}
+
+.fa-bias-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: #333;
+  text-align: left;
+}
+
+.fa-bias-card--none .fa-bias-status {
+  color: #198754;
+}
+
+.fa-bias-card--detected .fa-bias-status {
+  color: #ffc107;
+}
+
+.fa-bias-level {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.813rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.fa-bias-card--none .fa-bias-level {
+  background: #198754;
+  color: white;
+}
+
+.fa-bias-card--detected .fa-bias-level {
+  background: #ffc107;
+  color: #333;
+}
+
+.fa-bias-score {
+  font-size: 0.938rem;
+  color: #666;
+  text-align: left;
+}
+
+.fa-toxicity-card {
+  padding: 1rem;
+  border-radius: 0 0 8px 8px;
+  text-align: left;
+}
+
+.fa-toxicity-card--none {
+  background: #f0f9f4;
+  border-top: 3px solid #198754;
+}
+
+.fa-toxicity-card--detected {
+  background: #fff5f5;
+  border-top: 3px solid #dc3545;
+}
+
+.fa-toxicity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  text-align: left;
+}
+
+.fa-toxicity-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  text-align: left;
+}
+
+.fa-toxicity-card--none .fa-toxicity-status {
+  color: #198754;
+}
+
+.fa-toxicity-card--detected .fa-toxicity-status {
+  color: #dc3545;
+}
+
+.fa-toxicity-severity {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.813rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.fa-toxicity-card--none .fa-toxicity-severity {
+  background: #198754;
+  color: white;
+}
+
+.fa-toxicity-card--detected .fa-toxicity-severity {
+  background: #dc3545;
+  color: white;
+}
+
+.fa-constructiveness-card {
+  padding: 1rem;
+  text-align: left;
+}
+
+.fa-constructiveness-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.fa-constructiveness-item {
+  font-size: 0.875rem;
+  color: #666;
+  text-align: left;
+}
+
+.fa-action-items {
+  padding: 0.75rem;
+  background: #f5f5f5;
+  border-radius: 6px;
+  text-align: left;
+  font-size: 0.938rem;
+  color: #333;
+}
+
+.fa-feedback-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.fa-feedback-metric-item {
+  text-align: left;
+  padding: 0.75rem;
+  background: #f9f9f9;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+.fa-feedback-metric-label {
+  font-size: 0.688rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  text-align: left;
+}
+
+.fa-feedback-metric-value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #333;
+  text-align: left;
+}
+
+.fa-insights-list {
+  margin: 0;
+  padding: 1rem 1rem 1rem 2rem;
+  color: #333;
+  line-height: 1.8;
+  list-style-type: disc;
+  text-align: left;
+}
+
+.fa-insights-list li {
+  margin-bottom: 0.5rem;
+  text-align: left;
+}
+
+.fa-insights-list li:last-child {
+  margin-bottom: 0;
+}
+
+.fa-suggestions-container {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  text-align: left;
+}
+
+.fa-suggestions-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-align: left;
+}
+
+.fa-suggestions-heading {
+  font-weight: 600;
+  font-size: 0.938rem;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  text-align: left;
+}
+
+.fa-suggestions-list {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: #666;
+  line-height: 1.8;
+  text-align: left;
+}
+
+.fa-suggestions-list li {
+  margin-bottom: 0.5rem;
+  text-align: left;
+}
+
+.fa-suggestions-list li:last-child {
+  margin-bottom: 0;
+}
+
+.fa-example-rewrite {
+  background: #e7f3ff;
+  border-left: 4px solid #0066cc;
+  border-radius: 6px;
+  padding: 1rem;
+  color: #333;
+  line-height: 1.6;
+  font-size: 0.938rem;
+  font-style: italic;
+  text-align: left;
+}
+
+.fa-focus-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  text-align: left;
+}
+
+.fa-focus-tag {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: #ffc107;
+  color: #333;
+  border-radius: 20px;
+  font-size: 0.813rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+@keyframes fa-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .fa-modal-container {
+    max-width: 95%;
+  }
+
+  .fa-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fa-sentiment-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .fa-feedback-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .fa-modal-body {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .fa-feedback-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fa-vader-bar,
+  .fa-emotion-single-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .fa-vader-bar-track,
+  .fa-emotion-bar-track {
+    width: 100%;
+  }
+}

@@ -16,10 +16,10 @@ import {
   employeeApi,
   goalsApi,
 } from "../../../services/feedbackmanagement/feedbackApi";
+import "../../../styles/feedback/components/SubmitContextFeedback.css";
 
 const PRIMARY = "#27235C";
 
-/** Reusable custom dropdown */
 const CustomSelect = ({
   value,
   onChange,
@@ -42,26 +42,17 @@ const CustomSelect = ({
   };
 
   return (
-    <div className="ctx-dropdown-wrapper">
+    <div className="scf-dropdown-wrapper">
       <button
         type="button"
         id={id}
         onClick={() => !disabled && setIsOpen((o) => !o)}
-        className={`ctx-dropdown-select ${isOpen ? "open" : ""}`}
+        className={`scf-dropdown-select ${isOpen ? "scf-dropdown-select--open" : ""}`}
         disabled={disabled}
       >
-        <span className="ctx-dropdown-value">{displayLabel}</span>
-        <span className="ctx-dropdown-arrow">
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            style={{
-              transition: "transform 0.2s ease",
-              transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
-              display: "block",
-            }}
-          >
+        <span className="scf-dropdown-value">{displayLabel}</span>
+        <span className={`scf-dropdown-arrow ${isOpen ? "scf-dropdown-arrow--open" : ""}`}>
+          <svg width="18" height="18" viewBox="0 0 24 24">
             <polyline
               points="6 9 12 15 18 9"
               fill="none"
@@ -74,14 +65,14 @@ const CustomSelect = ({
         </span>
       </button>
       {isOpen && (
-        <ul className="ctx-dropdown-list">
+        <ul className="scf-dropdown-list">
           {options.map((opt) => {
             const isSelected = String(opt.value) === String(value);
             return (
               <li
                 key={opt.value}
-                className={`ctx-dropdown-option ${
-                  isSelected ? "selected" : ""
+                className={`scf-dropdown-option ${
+                  isSelected ? "scf-dropdown-option--selected" : ""
                 }`}
                 onClick={() => handleSelect(opt.value)}
               >
@@ -95,7 +86,6 @@ const CustomSelect = ({
   );
 };
 
-// Helper to get role-based base dashboard + feedback paths
 const getRolePaths = (roleName) => {
   switch (roleName) {
     case "Manager":
@@ -118,7 +108,6 @@ const getRolePaths = (roleName) => {
         baseLabel: "Department Head Dashboard",
       };
     default:
-      // Employee fallback
       return {
         baseDashboard: "/employee/dashboard",
         feedbackDashboard: "/employee/dashboard/feedback",
@@ -168,7 +157,6 @@ export default function SubmitContextFeedback() {
         setLoadingData(true);
         setError("");
 
-        // Goals
         try {
           const goalsResponse = await goalsApi.getOrganizationLevel();
           let goalsList = [];
@@ -191,7 +179,6 @@ export default function SubmitContextFeedback() {
           setObjectives([]);
         }
 
-        // Employees
         try {
           const empResponse = await employeeApi.getAll();
           const employeesList = Array.isArray(empResponse.data)
@@ -214,7 +201,6 @@ export default function SubmitContextFeedback() {
     fetchData();
   }, []);
 
-  // Handle goal selection
   const handleObjectiveChange = (selectedIdStr) => {
     const selectedId = Number(selectedIdStr);
     const selectedObjective = objectives.find((obj) => {
@@ -278,7 +264,6 @@ export default function SubmitContextFeedback() {
     }
   };
 
-  // Handle employee selection
   const handleEmployeeChange = (selectedIdStr) => {
     const selectedId = Number(selectedIdStr);
     const selectedEmployee = employees.find(
@@ -399,7 +384,7 @@ export default function SubmitContextFeedback() {
           fill={starValue <= rating ? "#ffc107" : "none"}
           stroke={starValue <= rating ? "#ffc107" : "#cbd5e1"}
           strokeWidth={2}
-          style={{ cursor: "pointer" }}
+          className="scf-star"
           onClick={() => setGoalForm({ ...goalForm, rating: starValue })}
         />
       );
@@ -418,275 +403,98 @@ export default function SubmitContextFeedback() {
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        backgroundColor: "#f8f9fa",
-        display: "flex",
-        justifyContent: "center",
-        padding: "1.25rem 1rem",
-        fontFamily:
-          "'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif",
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "900px",
-        }}
-      >
-        {/* Breadcrumb – role-aware */}
-        <nav aria-label="breadcrumb" style={{ marginBottom: "2rem" }}>
-          <ol
-            style={{
-              display: "flex",
-              alignItems: "center",
-              listStyle: "none",
-              padding: 0,
-              margin: 0,
-              fontSize: "1rem",
-            }}
-          >
-            <li>
-              <Link
-                to={baseDashboard}
-                style={{
-                  color: "#97247E",
-                  display: "flex",
-                  alignItems: "center",
-                  textDecoration: "none",
-                  fontWeight: 500,
-                  transition: "color 0.2s ease",
-                  fontFamily: "inherit",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "#E01950")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
-              >
-                <Home size={18} style={{ marginRight: "5px" }} />
+    <div className="scf-container">
+      <div className="scf-content">
+        <nav className="scf-breadcrumb" aria-label="breadcrumb">
+          <ol className="scf-breadcrumb-list">
+            <li className="scf-breadcrumb-item">
+              <Link to={baseDashboard} className="scf-breadcrumb-link">
+                <Home size={18} className="scf-breadcrumb-icon" />
                 {baseLabel}
               </Link>
             </li>
-            <li
-              style={{ margin: "0 0.75rem", color: "#97247E", fontWeight: 400 }}
-            >
-              /
-            </li>
-            <li>
-              <Link
-                to={feedbackDashboard}
-                style={{
-                  color: "#97247E",
-                  textDecoration: "none",
-                  fontWeight: 500,
-                  transition: "color 0.2s ease",
-                  fontFamily: "inherit",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "#E01950")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
-              >
+            <li className="scf-breadcrumb-separator">/</li>
+            <li className="scf-breadcrumb-item">
+              <Link to={feedbackDashboard} className="scf-breadcrumb-link">
                 Feedback Management
               </Link>
             </li>
-            <li
-              style={{ margin: "0 0.75rem", color: "#97247E", fontWeight: 400 }}
-            >
-              /
-            </li>
-            <li>
-              <span
-                style={{
-                  color: "#97247E",
-                  fontWeight: 600,
-                  fontFamily: "inherit",
-                }}
-              >
-                Submit Feedback
-              </span>
+            <li className="scf-breadcrumb-separator">/</li>
+            <li className="scf-breadcrumb-item scf-breadcrumb-active">
+              <span>Submit Feedback</span>
             </li>
           </ol>
         </nav>
 
-        {/* Error */}
         {error && (
-          <div
-            className="alert alert-danger d-flex align-items-start gap-2 mb-3"
-            style={{
-              borderRadius: "8px",
-              border: "none",
-              backgroundColor: "#fee2e2",
-              padding: "0.75rem 1rem",
-              fontFamily: "inherit",
-            }}
-          >
-            <AlertTriangle
-              size={16}
-              className="flex-shrink-0"
-              style={{ marginTop: "2px", color: "#dc2626" }}
-            />
-            <div className="flex-grow-1">
-              <p
-                className="mb-0"
-                style={{
-                  fontSize: "0.875rem",
-                  color: "#991b1b",
-                  fontFamily: "inherit",
-                }}
-              >
-                {error}
-              </p>
+          <div className="scf-alert scf-alert-error">
+            <AlertTriangle size={16} className="scf-alert-icon" />
+            <div className="scf-alert-content">
+              <p className="scf-alert-message">{error}</p>
             </div>
             <button
               type="button"
-              className="btn-close"
-              style={{ fontSize: "0.75rem" }}
+              className="scf-alert-close"
               onClick={() => setError("")}
-            />
+            >
+              ×
+            </button>
           </div>
         )}
 
-        {/* Success */}
         {successMsg && (
-          <div
-            className="alert alert-success d-flex align-items-center gap-2 mb-3"
-            style={{
-              borderRadius: "8px",
-              border: "none",
-              backgroundColor: "#dcfce7",
-              padding: "0.75rem 1rem",
-              fontFamily: "inherit",
-            }}
-          >
-            <CheckCircle
-              size={16}
-              className="flex-shrink-0"
-              style={{ color: "#16a34a" }}
-            />
-            <p
-              className="mb-0 flex-grow-1"
-              style={{
-                fontSize: "0.875rem",
-                color: "#166534",
-                fontFamily: "inherit",
-              }}
-            >
-              {successMsg}
-            </p>
+          <div className="scf-alert scf-alert-success">
+            <CheckCircle size={16} className="scf-alert-icon" />
+            <p className="scf-alert-message">{successMsg}</p>
             <button
               type="button"
-              className="btn-close"
-              style={{ fontSize: "0.75rem" }}
+              className="scf-alert-close"
               onClick={() => setSuccessMsg("")}
-            />
+            >
+              ×
+            </button>
           </div>
         )}
 
-        {/* Tabs */}
-        <div
-          style={{
-            background: PRIMARY,
-            borderRadius: "30px",
-            padding: "4px",
-            display: "inline-flex",
-            gap: "4px",
-            marginBottom: "1.5rem",
-            boxShadow: "0 2px 8px rgba(39, 35, 92, 0.15)",
-            fontFamily: "inherit",
-          }}
-        >
+        <div className="scf-tabs">
           <button
             type="button"
             onClick={() => setActiveTab("goal")}
-            style={{
-              background: activeTab === "goal" ? "#fff" : "transparent",
-              color: activeTab === "goal" ? PRIMARY : "#fff",
-              border: "none",
-              borderRadius: "26px",
-              padding: "10px 24px",
-              fontSize: "0.875rem",
-              fontWeight: 600,
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              whiteSpace: "nowrap",
-              fontFamily: "inherit",
-            }}
+            className={`scf-tab-button ${
+              activeTab === "goal" ? "scf-tab-button--active" : ""
+            }`}
           >
             <Target size={16} />
             Goal Feedback
           </button>
-
           <button
             type="button"
             onClick={() => setActiveTab("context")}
-            style={{
-              background: activeTab === "context" ? "#fff" : "transparent",
-              color: activeTab === "context" ? PRIMARY : "#fff",
-              border: "none",
-              borderRadius: "26px",
-              padding: "10px 24px",
-              fontSize: "0.875rem",
-              fontWeight: 600,
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              whiteSpace: "nowrap",
-              fontFamily: "inherit",
-            }}
+            className={`scf-tab-button ${
+              activeTab === "context" ? "scf-tab-button--active" : ""
+            }`}
           >
             <Users size={16} />
             Context Feedback
           </button>
         </div>
 
-        {/* Loading */}
         {loadingData && (
-          <div className="card border-0 shadow-sm" style={{ borderRadius: "10px" }}>
-            <div
-              className="card-body text-center py-5"
-              style={{ fontFamily: "inherit" }}
-            >
-              <Loader
-                size={40}
-                className="mb-3 animate-spin"
-                style={{ color: PRIMARY }}
-              />
-              <p
-                style={{
-                  fontSize: "0.875rem",
-                  color: "#64748b",
-                  marginBottom: 0,
-                  fontFamily: "inherit",
-                }}
-              >
-                Loading data...
-              </p>
+          <div className="scf-card">
+            <div className="scf-card-body scf-loading-state">
+              <Loader size={40} className="scf-loader" />
+              <p className="scf-loading-text">Loading data...</p>
             </div>
           </div>
         )}
 
-        {/* Goal feedback */}
         {!loadingData && activeTab === "goal" && (
-          <div className="card border-0 shadow-sm" style={{ borderRadius: "10px" }}>
-            <div
-              className="card-body"
-              style={{ padding: "1.5rem", fontFamily: "inherit" }}
-            >
+          <div className="scf-card">
+            <div className="scf-card-body">
               <form onSubmit={submitGoal}>
-                {/* Goal dropdown */}
-                <div className="mb-4">
-                  <label
-                    className="form-label fw-semibold mb-2 left-label"
-                    style={{
-                      fontSize: "0.875rem",
-                      color: "#0f172a",
-                      fontFamily: "inherit",
-                    }}
-                  >
-                    Select Organization Goal <span className="text-danger">*</span>
+                <div className="scf-form-group">
+                  <label className="scf-label">
+                    Select Organization Goal <span className="scf-required">*</span>
                   </label>
                   <CustomSelect
                     id="goalSelect"
@@ -709,33 +517,9 @@ export default function SubmitContextFeedback() {
                 </div>
 
                 {selectedObjective && (
-                  <div
-                    className="mb-4 p-3"
-                    style={{
-                      backgroundColor: "#f8fafc",
-                      borderRadius: "8px",
-                      border: "1px solid #e2e8f0",
-                      fontFamily: "inherit",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "0.75rem",
-                        color: "#64748b",
-                        marginBottom: "0.25rem",
-                        fontFamily: "inherit",
-                      }}
-                    >
-                      Goal Description
-                    </div>
-                    <p
-                      style={{
-                        fontSize: "0.875rem",
-                        color: "#0f172a",
-                        marginBottom: 0,
-                        fontFamily: "inherit",
-                      }}
-                    >
+                  <div className="scf-info-box">
+                    <div className="scf-info-label">Goal Description</div>
+                    <p className="scf-info-text">
                       {selectedObjective.description ||
                         selectedObjective.goalDescription ||
                         selectedObjective.objectiveDescription ||
@@ -744,57 +528,24 @@ export default function SubmitContextFeedback() {
                   </div>
                 )}
 
-                {/* Rating */}
-                <div className="mb-4">
-                  <label
-                    className="form-label fw-semibold mb-2 left-label"
-                    style={{
-                      fontSize: "0.875rem",
-                      color: "#0f172a",
-                      fontFamily: "inherit",
-                    }}
-                  >
-                    Rating <span className="text-danger">*</span>
+                <div className="scf-form-group">
+                  <label className="scf-label">
+                    Rating <span className="scf-required">*</span>
                   </label>
-                  <div
-                    className="d-flex align-items-center gap-3 p-3"
-                    style={{
-                      backgroundColor: "#f8fafc",
-                      borderRadius: "8px",
-                      border: "1px solid #e2e8f0",
-                      fontFamily: "inherit",
-                    }}
-                  >
-                    <div className="d-flex gap-1">
-                      {renderStars(goalForm.rating)}
-                    </div>
-                    <span
-                      style={{
-                        fontSize: "0.875rem",
-                        fontWeight: 600,
-                        color: PRIMARY,
-                        fontFamily: "inherit",
-                      }}
-                    >
+                  <div className="scf-rating-box">
+                    <div className="scf-stars">{renderStars(goalForm.rating)}</div>
+                    <span className="scf-rating-value">
                       {goalForm.rating}/5
                     </span>
                   </div>
                 </div>
 
-                {/* Comments */}
-                <div className="mb-4">
-                  <label
-                    className="form-label fw-semibold mb-2 left-label"
-                    style={{
-                      fontSize: "0.875rem",
-                      color: "#0f172a",
-                      fontFamily: "inherit",
-                    }}
-                  >
-                    Feedback Comments <span className="text-danger">*</span>
+                <div className="scf-form-group">
+                  <label className="scf-label">
+                    Feedback Comments <span className="scf-required">*</span>
                   </label>
                   <textarea
-                    className="form-control"
+                    className="scf-textarea"
                     rows={5}
                     value={goalForm.feedbackComments}
                     onChange={(e) =>
@@ -806,41 +557,25 @@ export default function SubmitContextFeedback() {
                     placeholder="Provide your detailed feedback on this goal..."
                     required
                     maxLength={1000}
-                    style={{
-                      borderRadius: "8px",
-                      border: "1px solid #e2e8f0",
-                      fontSize: "0.875rem",
-                      resize: "vertical",
-                      minHeight: "120px",
-                      fontFamily: "inherit",
-                    }}
                   />
-                  <div
-                    className="d-flex justify-content-between"
-                    style={{ marginTop: "0.5rem", fontFamily: "inherit" }}
-                  >
-                    <span style={{ fontSize: "0.75rem", color: "#64748b" }}>
-                      Be specific and constructive
-                    </span>
+                  <div className="scf-textarea-footer">
+                    <span className="scf-textarea-hint">Be specific and constructive</span>
                     <span
-                      style={{
-                        fontSize: "0.75rem",
-                        color:
-                          goalForm.feedbackComments.length > 900
-                            ? "#dc2626"
-                            : "#64748b",
-                      }}
+                      className={`scf-textarea-count ${
+                        goalForm.feedbackComments.length > 900
+                          ? "scf-textarea-count--warning"
+                          : ""
+                      }`}
                     >
                       {goalForm.feedbackComments.length}/1000
                     </span>
                   </div>
                 </div>
 
-                {/* Anonymous checkbox */}
-                <div className="mb-4">
-                  <div className="form-check" style={{ fontFamily: "inherit" }}>
+                <div className="scf-form-group">
+                  <div className="scf-checkbox">
                     <input
-                      className="form-check-input"
+                      className="scf-checkbox-input"
                       type="checkbox"
                       id="goalAnon"
                       checked={goalForm.isAnonymous}
@@ -851,11 +586,7 @@ export default function SubmitContextFeedback() {
                         }))
                       }
                     />
-                    <label
-                      className="form-check-label left-label"
-                      htmlFor="goalAnon"
-                      style={{ fontSize: "0.875rem", fontFamily: "inherit" }}
-                    >
+                    <label className="scf-checkbox-label" htmlFor="goalAnon">
                       Submit anonymously
                     </label>
                   </div>
@@ -863,37 +594,12 @@ export default function SubmitContextFeedback() {
 
                 <button
                   type="submit"
-                  className="btn w-100 d-flex align-items-center justify-content-center gap-2"
+                  className="scf-submit-button"
                   disabled={loading || !goalForm.organizationObjectiveId}
-                  style={{
-                    background:
-                      "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "8px",
-                    padding: "0.75rem",
-                    fontSize: "0.875rem",
-                    fontWeight: 600,
-                    transition: "all 0.3s ease",
-                    boxShadow: "0 2px 8px rgba(151, 36, 126, 0.2)",
-                    fontFamily: "inherit",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!loading) {
-                      e.currentTarget.style.transform = "translateY(-2px)";
-                      e.currentTarget.style.boxShadow =
-                        "0 4px 12px rgba(151, 36, 126, 0.3)";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "translateY(0)";
-                    e.currentTarget.style.boxShadow =
-                      "0 2px 8px rgba(151, 36, 126, 0.2)";
-                  }}
                 >
                   {loading ? (
                     <>
-                      <Loader size={16} className="animate-spin" />
+                      <Loader size={16} className="scf-loader" />
                       Submitting...
                     </>
                   ) : (
@@ -908,25 +614,13 @@ export default function SubmitContextFeedback() {
           </div>
         )}
 
-        {/* Context feedback */}
         {!loadingData && activeTab === "context" && (
-          <div className="card border-0 shadow-sm" style={{ borderRadius: "10px" }}>
-            <div
-              className="card-body"
-              style={{ padding: "1.5rem", fontFamily: "inherit" }}
-            >
+          <div className="scf-card">
+            <div className="scf-card-body">
               <form onSubmit={submitContext}>
-                {/* Recipient dropdown */}
-                <div className="mb-4">
-                  <label
-                    className="form-label fw-semibold mb-2 left-label"
-                    style={{
-                      fontSize: "0.875rem",
-                      color: "#0f172a",
-                      fontFamily: "inherit",
-                    }}
-                  >
-                    Select Recipient <span className="text-danger">*</span>
+                <div className="scf-form-group">
+                  <label className="scf-label">
+                    Select Recipient <span className="scf-required">*</span>
                   </label>
                   <CustomSelect
                     id="recipientSelect"
@@ -946,62 +640,24 @@ export default function SubmitContextFeedback() {
                 </div>
 
                 {selectedEmployee && (
-                  <div
-                    className="mb-4 p-3"
-                    style={{
-                      backgroundColor: "#f8fafc",
-                      borderRadius: "8px",
-                      border: "1px solid #e2e8f0",
-                      fontFamily: "inherit",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "0.75rem",
-                        color: "#64748b",
-                        marginBottom: "0.25rem",
-                        fontFamily: "inherit",
-                      }}
-                    >
-                      Feedback for
-                    </div>
-                    <div
-                      style={{
-                        fontSize: "0.875rem",
-                        fontWeight: 600,
-                        color: "#0f172a",
-                        fontFamily: "inherit",
-                      }}
-                    >
+                  <div className="scf-info-box">
+                    <div className="scf-info-label">Feedback for</div>
+                    <div className="scf-employee-name">
                       {selectedEmployee.firstName} {selectedEmployee.lastName}
                     </div>
-                    <small
-                      style={{
-                        fontSize: "0.75rem",
-                        color: "#64748b",
-                        fontFamily: "inherit",
-                      }}
-                    >
+                    <small className="scf-employee-email">
                       {selectedEmployee.email}
                     </small>
                   </div>
                 )}
 
-                {/* Project context */}
-                <div className="mb-4">
-                  <label
-                    className="form-label fw-semibold mb-2 left-label"
-                    style={{
-                      fontSize: "0.875rem",
-                      color: "#0f172a",
-                      fontFamily: "inherit",
-                    }}
-                  >
-                    Project Context <span className="text-danger">*</span>
+                <div className="scf-form-group">
+                  <label className="scf-label">
+                    Project Context <span className="scf-required">*</span>
                   </label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="scf-input"
                     value={contextForm.projectContext}
                     onChange={(e) =>
                       setContextForm((prev) => ({
@@ -1011,30 +667,15 @@ export default function SubmitContextFeedback() {
                     }
                     placeholder="e.g., AI Platform Project, Q4 Sprint"
                     required
-                    style={{
-                      borderRadius: "8px",
-                      border: "1px solid #e2e8f0",
-                      fontSize: "0.875rem",
-                      padding: "0.625rem 0.875rem",
-                      fontFamily: "inherit",
-                    }}
                   />
                 </div>
 
-                {/* Feedback content */}
-                <div className="mb-4">
-                  <label
-                    className="form-label fw-semibold mb-2 left-label"
-                    style={{
-                      fontSize: "0.875rem",
-                      color: "#0f172a",
-                      fontFamily: "inherit",
-                    }}
-                  >
-                    Feedback Content <span className="text-danger">*</span>
+                <div className="scf-form-group">
+                  <label className="scf-label">
+                    Feedback Content <span className="scf-required">*</span>
                   </label>
                   <textarea
-                    className="form-control"
+                    className="scf-textarea"
                     rows={5}
                     value={contextForm.feedbackContent}
                     onChange={(e) =>
@@ -1046,41 +687,25 @@ export default function SubmitContextFeedback() {
                     placeholder="Provide constructive feedback on their work, collaboration, or skills..."
                     required
                     maxLength={1000}
-                    style={{
-                      borderRadius: "8px",
-                      border: "1px solid #e2e8f0",
-                      fontSize: "0.875rem",
-                      resize: "vertical",
-                      minHeight: "120px",
-                      fontFamily: "inherit",
-                    }}
                   />
-                  <div
-                    className="d-flex justify-content-between"
-                    style={{ marginTop: "0.5rem", fontFamily: "inherit" }}
-                  >
-                    <span style={{ fontSize: "0.75rem", color: "#64748b" }}>
-                      Be specific and constructive
-                    </span>
+                  <div className="scf-textarea-footer">
+                    <span className="scf-textarea-hint">Be specific and constructive</span>
                     <span
-                      style={{
-                        fontSize: "0.75rem",
-                        color:
-                          contextForm.feedbackContent.length > 900
-                            ? "#dc2626"
-                            : "#64748b",
-                      }}
+                      className={`scf-textarea-count ${
+                        contextForm.feedbackContent.length > 900
+                          ? "scf-textarea-count--warning"
+                          : ""
+                      }`}
                     >
                       {contextForm.feedbackContent.length}/1000
                     </span>
                   </div>
                 </div>
 
-                {/* Anonymous checkbox */}
-                <div className="mb-4">
-                  <div className="form-check" style={{ fontFamily: "inherit" }}>
+                <div className="scf-form-group">
+                  <div className="scf-checkbox">
                     <input
-                      className="form-check-input"
+                      className="scf-checkbox-input"
                       type="checkbox"
                       id="contextAnon"
                       checked={contextForm.isAnonymous}
@@ -1091,11 +716,7 @@ export default function SubmitContextFeedback() {
                         }))
                       }
                     />
-                    <label
-                      className="form-check-label left-label"
-                      htmlFor="contextAnon"
-                      style={{ fontSize: "0.875rem", fontFamily: "inherit" }}
-                    >
+                    <label className="scf-checkbox-label" htmlFor="contextAnon">
                       Submit anonymously
                     </label>
                   </div>
@@ -1103,41 +724,16 @@ export default function SubmitContextFeedback() {
 
                 <button
                   type="submit"
-                  className="btn w-100 d-flex align-items-center justify-content-center gap-2"
+                  className="scf-submit-button"
                   disabled={
                     loading ||
                     !contextForm.recipientEmployeeId ||
                     !contextForm.projectContext
                   }
-                  style={{
-                    background:
-                      "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "8px",
-                    padding: "0.75rem",
-                    fontSize: "0.875rem",
-                    fontWeight: 600,
-                    transition: "all 0.3s ease",
-                    boxShadow: "0 2px 8px rgba(151, 36, 126, 0.2)",
-                    fontFamily: "inherit",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!loading) {
-                      e.currentTarget.style.transform = "translateY(-2px)";
-                      e.currentTarget.style.boxShadow =
-                        "0 4px 12px rgba(151, 36, 126, 0.3)";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "translateY(0)";
-                    e.currentTarget.style.boxShadow =
-                      "0 2px 8px rgba(151, 36, 126, 0.2)";
-                  }}
                 >
                   {loading ? (
                     <>
-                      <Loader size={16} className="animate-spin" />
+                      <Loader size={16} className="scf-loader" />
                       Submitting...
                     </>
                   ) : (
@@ -1152,134 +748,6 @@ export default function SubmitContextFeedback() {
           </div>
         )}
       </div>
-
-      <style>{`
-        /* Import Poppins font */
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
-        .animate-spin { animation: spin 1s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-        .form-control,
-        .btn,
-        .form-label,
-        .form-check-label,
-        .alert,
-        .card,
-        .ctx-dropdown-select,
-        .ctx-dropdown-option {
-          font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-        }
-
-        .form-control::placeholder {
-          font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-        }
-
-        .form-control:focus {
-          border-color: ${PRIMARY};
-          box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
-        }
-
-        /* Force all form labels on this page to be left aligned */
-        .left-label,
-        .card .form-label,
-        .card .form-check-label {
-          text-align: left !important;
-          display: block;
-          width: 100%;
-        }
-
-        /* Custom dropdown styles */
-        .ctx-dropdown-wrapper {
-          position: relative;
-          width: 100%;
-        }
-
-        .ctx-dropdown-select {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          width: 100%;
-          padding: 0.75rem 1rem;
-          font-size: 0.9375rem;
-          background: #ffffff;
-          border: 1.5px solid #e2e8f0;
-          border-radius: 10px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          text-align: left;
-        }
-
-        .ctx-dropdown-select.open {
-          border-color: ${PRIMARY};
-          border-bottom-left-radius: 0;
-          border-bottom-right-radius: 0;
-          box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
-        }
-
-        .ctx-dropdown-select:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-
-        .ctx-dropdown-value {
-          flex: 1;
-          text-align: left;
-          color: #111827;
-          font-weight: 400;
-        }
-
-        .ctx-dropdown-arrow {
-          color: #6b7280;
-          margin-left: 0.5rem;
-          font-size: 0.85rem;
-        }
-
-        .ctx-dropdown-list {
-          position: absolute;
-          top: 100%;
-          left: 0;
-          right: 0;
-          background: #ffffff;
-          border: 1px solid ${PRIMARY};
-          border-top: none;
-          border-radius: 0 0 10px 10px;
-          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-          max-height: 260px;
-          overflow-y: auto;
-          z-index: 1000;
-          list-style: none;
-          margin: 0;
-          padding: 0;
-        }
-
-        .ctx-dropdown-option {
-          padding: 0.75rem 1rem;
-          font-size: 0.9375rem;
-          color: #4b5563;
-          cursor: pointer;
-          transition: all 0.15s ease;
-          border-bottom: 1px solid #e5e7eb;
-          background: #ffffff;
-          text-align: left;
-        }
-
-        .ctx-dropdown-option:last-child {
-          border-bottom: none;
-        }
-
-        .ctx-dropdown-option:hover {
-          background: ${PRIMARY};
-          color: #ffffff;
-          font-weight: 600;
-        }
-
-        .ctx-dropdown-option.selected {
-          background: ${PRIMARY};
-          color: #ffffff;
-          font-weight: 600;
-        }
-      `}</style>
     </div>
   );
 }

@@ -1,5 +1,3 @@
-// src/pages/feedback_management/hr/HRFeedbackReport.jsx
-
 import React, { useEffect, useState } from "react";
 import {
   RefreshCw,
@@ -17,17 +15,10 @@ import {
   employeeApi,
 } from "../../../services/feedbackmanagement/feedbackApi";
 import ResponseViewModal from "../../../components/FeedbackManagement/ResponseViewModal";
+import "../../../styles/feedback/hr/HRFeedbackReport.css";
 
 const Badge = ({ text, color = "#525252" }) => (
-  <span
-    className="badge"
-    style={{
-      backgroundColor: `${color}20`,
-      color,
-      padding: "6px 10px",
-      fontSize: "0.75rem",
-    }}
-  >
+  <span className="hfr-badge" style={{ color, backgroundColor: `${color}20` }}>
     {text}
   </span>
 );
@@ -43,16 +34,13 @@ export default function HRFeedbackReport() {
   const [showModal, setShowModal] = useState(false);
   const [selectedResponse, setSelectedResponse] = useState(null);
 
-  // Fetch employee map using service
   const fetchEmployeeMap = async () => {
     try {
       const response = await employeeApi.getAll();
-
       if (response?.data) {
         const employees = Array.isArray(response.data)
           ? response.data
           : response.data.data || [];
-
         const map = {};
         employees.forEach((emp) => {
           map[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
@@ -66,63 +54,49 @@ export default function HRFeedbackReport() {
     return {};
   };
 
-  // Fetch all data using services
   const fetchData = async () => {
     setRefreshing(true);
     setLoading(true);
     setError("");
 
     try {
-      // Step 1: Get employee map
       const empMap = await fetchEmployeeMap();
 
-      // Step 2: Fetch all active forms
       const formsRes = await hrFormApi.getActiveForms();
-
       let formsData = [];
-      const forms = formsRes?.data || [];
-      
-      if (Array.isArray(forms)) {
-        formsData = forms;
+      const formsArr = formsRes?.data || [];
+      if (Array.isArray(formsArr)) {
+        formsData = formsArr;
         setForms(formsData);
       }
 
-      // Step 3: Fetch responses for all forms
       let allResponses = [];
 
       for (const form of formsData) {
         try {
           const respRes = await hrFormApi.getResponsesByFormId(form.formId);
-
           const responseData = respRes?.data || [];
 
           if (Array.isArray(responseData)) {
-            if (responseData.length > 0) {
-            }
-
-            const mappedResponses = responseData.map((r) => {
-              // Debug each field
-
-              return {
-                responseId: r.responseId,
-                formId: form.formId,
-                formName: form.formName,
-                employeeId: r.employeeId,
-                employeeName:
-                  empMap[r.employeeId] ||
-                  empMap[r.submittedByEmployeeId] ||
-                  `Employee ${r.employeeId}`,
-                status: r.status || "Submitted",
-                submittedDate:
-                  r.submittedDate ||
-                  r.createdAt ||
-                  r.createdDate ||
-                  r.submittedOn ||
-                  new Date().toISOString(),
-                hrReviewComments: r.hrReviewComments,
-                ...r,
-              };
-            });
+            const mappedResponses = responseData.map((r) => ({
+              responseId: r.responseId,
+              formId: form.formId,
+              formName: form.formName,
+              employeeId: r.employeeId,
+              employeeName:
+                empMap[r.employeeId] ||
+                empMap[r.submittedByEmployeeId] ||
+                `Employee ${r.employeeId}`,
+              status: r.status || "Submitted",
+              submittedDate:
+                r.submittedDate ||
+                r.createdAt ||
+                r.createdDate ||
+                r.submittedOn ||
+                new Date().toISOString(),
+              hrReviewComments: r.hrReviewComments,
+              ...r,
+            }));
 
             allResponses = [...allResponses, ...mappedResponses];
           }
@@ -147,12 +121,11 @@ export default function HRFeedbackReport() {
     }
   };
 
-  // Fetch data on mount
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Modal handlers
   const handleViewResponse = (response) => {
     setSelectedResponse(response);
     setShowModal(true);
@@ -163,7 +136,6 @@ export default function HRFeedbackReport() {
     setSelectedResponse(null);
   };
 
-  // Delete response using service
   const deleteResponse = async (responseId) => {
     if (!window.confirm("Delete this response? This action cannot be undone."))
       return;
@@ -178,114 +150,82 @@ export default function HRFeedbackReport() {
     }
   };
 
-  // Tab button component
   const TabBtn = ({ label, icon: Icon, active, count }) => (
     <button
       type="button"
-      className={`btn btn-sm ${active ? "btn-primary" : "btn-outline-primary"}`}
+      className={`hfr-tab-btn ${active ? "hfr-tab-btn-active" : ""}`}
       onClick={() => setTab(label)}
-      style={{ borderRadius: "var(--radius-sm)" }}
     >
-      <Icon size={14} className="me-1" style={{ display: "inline" }} />
+      <Icon size={14} className="hfr-tab-icon" />
       {label}
       {count !== undefined && (
-        <span className="ms-1 badge bg-secondary">{count}</span>
+        <span className="hfr-tab-count">{count}</span>
       )}
     </button>
   );
 
   return (
-    <div className="container-fluid py-3" style={{ maxWidth: "1200px" }}>
-      {/* Header */}
-      <div className="d-flex justify-content-between align-items-start mb-4">
-        <div>
-          <div className="d-flex align-items-center gap-2 mb-1">
-            <FileText size={24} style={{ color: "var(--color-primary-1)" }} />
-            <h2
-              className="fw-bold mb-0"
-              style={{ color: "var(--color-primary-1)" }}
-            >
-              HR Feedback Report
-            </h2>
+    <div className="hfr-page">
+      <div className="hfr-header">
+        <div className="hfr-header-left">
+          <div className="hfr-header-title-row">
+            <FileText size={24} className="hfr-header-icon" />
+            <h2 className="hfr-title">HR Feedback Report</h2>
           </div>
-          <p className="mb-0 small" style={{ color: "var(--muted)" }}>
-            View all forms and submitted responses
-          </p>
+          <p className="hfr-subtitle">View all forms and submitted responses</p>
         </div>
         <button
-          className="btn d-flex align-items-center gap-2"
+          className="hfr-refresh-btn"
           onClick={fetchData}
           disabled={refreshing || loading}
-          style={{
-            background: "transparent",
-            border: "1px solid var(--border)",
-            color: "var(--color-primary-3)",
-            borderRadius: "var(--radius-md)",
-            padding: "0.5rem 0.9rem",
-            fontWeight: "600",
-          }}
         >
           <RefreshCw
             size={18}
-            style={{
-              animation: refreshing ? "spin 1s linear infinite" : "none",
-            }}
+            className={refreshing ? "hfr-icon-spin" : ""}
           />
           Refresh
         </button>
       </div>
 
-      {/* Error Alert */}
       {error && (
-        <div
-          className="alert alert-danger d-flex align-items-start gap-2 mb-3"
-          style={{ borderRadius: "var(--radius-md)" }}
-        >
-          <AlertTriangle size={18} className="mt-1" />
-          <div>
-            <strong>Error</strong>
-            <p className="mb-0 small mt-1">{error}</p>
+        <div className="hfr-alert hfr-alert-error">
+          <div className="hfr-alert-main">
+            <AlertTriangle size={18} className="hfr-alert-icon" />
+            <div>
+              <strong>Error</strong>
+              <p className="hfr-alert-text">{error}</p>
+            </div>
           </div>
-          <button className="btn-close ms-auto" onClick={() => setError("")} />
+          <button
+            className="hfr-alert-close"
+            onClick={() => setError("")}
+          >
+            ×
+          </button>
         </div>
       )}
 
-      {/* Stats */}
-      <div className="row g-3 mb-4">
-        <div className="col-6 col-md-3">
-          <div
-            className="card border-0 text-center"
-            style={{ border: "1px solid var(--border)" }}
-          >
-            <div className="card-body">
-              <h4 className="fw-bold text-primary">{forms.length}</h4>
-              <small className="text-muted">Total Forms</small>
-            </div>
+      <div className="hfr-stats-row">
+        <div className="hfr-stat-card">
+          <div className="hfr-stat-body">
+            <h4 className="hfr-stat-number hfr-stat-number-primary">
+              {forms.length}
+            </h4>
+            <small className="hfr-stat-label">Total Forms</small>
           </div>
         </div>
-        <div className="col-6 col-md-3">
-          <div
-            className="card border-0 text-center"
-            style={{ border: "1px solid var(--border)" }}
-          >
-            <div className="card-body">
-              <h4 className="fw-bold text-success">{responses.length}</h4>
-              <small className="text-muted">Submitted</small>
-            </div>
+        <div className="hfr-stat-card">
+          <div className="hfr-stat-body">
+            <h4 className="hfr-stat-number hfr-stat-number-success">
+              {responses.length}
+            </h4>
+            <small className="hfr-stat-label">Submitted</small>
           </div>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div
-        className="card border-0 mb-3"
-        style={{
-          border: "1px solid var(--border)",
-          borderRadius: "var(--radius-lg)",
-          boxShadow: "var(--shadow)",
-        }}
-      >
-        <div className="card-body d-flex gap-2 flex-wrap">
+      <div className="hfr-tabs-card">
+        <div className="hfr-tabs-body">
           <TabBtn
             label="Forms"
             icon={FileText}
@@ -301,56 +241,41 @@ export default function HRFeedbackReport() {
         </div>
       </div>
 
-      {/* Forms Tab */}
       {tab === "Forms" && (
-        <div
-          className="card border-0"
-          style={{
-            border: "1px solid var(--border)",
-            borderRadius: "var(--radius-lg)",
-            boxShadow: "var(--shadow)",
-          }}
-        >
-          <div className="card-body">
-            <div className="d-flex align-items-center gap-2 mb-3">
-              <FileText size={20} style={{ color: "var(--color-primary-1)" }} />
-              <h5 className="mb-0">Active Forms</h5>
+        <div className="hfr-card">
+          <div className="hfr-card-body">
+            <div className="hfr-section-header">
+              <FileText size={20} className="hfr-section-icon" />
+              <h5 className="hfr-section-title">Active Forms</h5>
             </div>
             {forms.length === 0 ? (
-              <div className="alert alert-info mb-0">No forms available</div>
+              <div className="hfr-empty-alert">No forms available</div>
             ) : (
-              <div className="row g-3">
+              <div className="hfr-forms-grid">
                 {forms.map((form) => {
                   const formResponses = responses.filter(
                     (r) => r.formId === form.formId
                   );
                   return (
-                    <div className="col-md-6 col-lg-4" key={form.formId}>
-                      <div
-                        className="card h-100 border-0"
-                        style={{
-                          border: "1px solid var(--border)",
-                          borderLeft: "4px solid #0F62FE",
-                          borderRadius: "var(--radius-lg)",
-                          boxShadow: "var(--shadow)",
-                        }}
-                      >
-                        <div className="card-body">
-                          <div className="d-flex justify-content-between align-items-start mb-2">
-                            <h6 className="mb-0">{form.formName}</h6>
+                    <div className="hfr-form-col" key={form.formId}>
+                      <div className="hfr-form-card">
+                        <div className="hfr-form-card-body">
+                          <div className="hfr-form-header">
+                            <h6 className="hfr-form-name">
+                              {form.formName}
+                            </h6>
                             <Badge
                               text={`${formResponses.length}`}
                               color="#0F62FE"
                             />
                           </div>
-                          <p className="small text-muted mb-3">
+                          <p className="hfr-form-description">
                             {form.formDescription || "No description"}
                           </p>
-                          <div className="small text-success fw-bold">
+                          <div className="hfr-form-responses">
                             <CheckCircle
                               size={12}
-                              className="me-1"
-                              style={{ display: "inline" }}
+                              className="hfr-form-responses-icon"
                             />
                             {formResponses.length} response
                             {formResponses.length !== 1 ? "s" : ""}
@@ -366,28 +291,17 @@ export default function HRFeedbackReport() {
         </div>
       )}
 
-      {/* Responses Tab */}
       {tab === "Responses" && (
-        <div
-          className="card border-0"
-          style={{
-            border: "1px solid var(--border)",
-            borderRadius: "var(--radius-lg)",
-            boxShadow: "var(--shadow)",
-          }}
-        >
-          <div className="card-body">
-            <div className="d-flex align-items-center gap-2 mb-3">
-              <CheckCircle
-                size={20}
-                style={{ color: "var(--color-primary-1)" }}
-              />
-              <h5 className="mb-0">Submitted Responses</h5>
+        <div className="hfr-card">
+          <div className="hfr-card-body">
+            <div className="hfr-section-header">
+              <CheckCircle size={20} className="hfr-section-icon" />
+              <h5 className="hfr-section-title">Submitted Responses</h5>
             </div>
             {responses.length === 0 ? (
-              <p className="text-muted mb-0">No responses submitted yet</p>
+              <p className="hfr-empty-text">No responses submitted yet</p>
             ) : (
-              <div className="row g-3">
+              <div className="hfr-responses-grid">
                 {responses.map((response) => {
                   const daysAgo = Math.floor(
                     (new Date() - new Date(response.submittedDate)) /
@@ -395,57 +309,40 @@ export default function HRFeedbackReport() {
                   );
                   return (
                     <div
-                      className="col-md-6 col-lg-4"
+                      className="hfr-response-col"
                       key={response.responseId}
                     >
-                      <div
-                        className="card h-100 border-0"
-                        style={{
-                          border: "1px solid var(--border)",
-                          borderLeft: "4px solid #24A148",
-                          borderRadius: "var(--radius-lg)",
-                          boxShadow: "var(--shadow)",
-                        }}
-                      >
-                        <div className="card-body">
-                          <div className="d-flex justify-content-between align-items-start mb-2">
+                      <div className="hfr-response-card">
+                        <div className="hfr-response-card-body">
+                          <div className="hfr-response-header">
                             <div>
-                              <h6 className="mb-1 small text-muted">Form:</h6>
-                              <p
-                                className="mb-0 fw-bold"
-                                style={{
-                                  fontSize: "0.95rem",
-                                  color: "var(--color-primary-1)",
-                                }}
-                              >
+                              <h6 className="hfr-response-form-label">
+                                Form:
+                              </h6>
+                              <p className="hfr-response-form-name">
                                 {response.formName}
                               </p>
                             </div>
                             <Badge text="Submitted" color="#24A148" />
                           </div>
 
-                          <div
-                            className="mb-3 p-2 rounded"
-                            style={{ backgroundColor: "#f9f9f9" }}
-                          >
-                            <h6 className="mb-1 small text-muted">
+                          <div className="hfr-response-employee-box">
+                            <h6 className="hfr-response-employee-label">
                               <User
                                 size={12}
-                                className="me-1"
-                                style={{ display: "inline" }}
+                                className="hfr-inline-icon"
                               />
                               Employee:
                             </h6>
-                            <p className="mb-0 fw-bold small">
+                            <p className="hfr-response-employee-name">
                               {response.employeeName}
                             </p>
                           </div>
 
-                          <small className="text-muted d-block mb-2">
+                          <small className="hfr-response-time">
                             <Clock
                               size={12}
-                              className="me-1"
-                              style={{ display: "inline" }}
+                              className="hfr-inline-icon"
                             />
                             {new Date(
                               response.submittedDate
@@ -454,38 +351,31 @@ export default function HRFeedbackReport() {
                           </small>
 
                           {response.hrReviewComments && (
-                            <div
-                              className="mb-2 p-2 rounded"
-                              style={{ backgroundColor: "#f0f0f0" }}
-                            >
-                              <small className="fw-bold d-block mb-1">
+                            <div className="hfr-response-review-box">
+                              <small className="hfr-response-review-label">
                                 <MessageSquare
                                   size={12}
-                                  className="me-1"
-                                  style={{ display: "inline" }}
+                                  className="hfr-inline-icon"
                                 />
                                 HR Review:
                               </small>
-                              <p className="small mb-0">
-                                {response.hrReviewComments.substring(0, 60)}...
+                              <p className="hfr-response-review-text">
+                                {response.hrReviewComments.substring(0, 60)}
+                                ...
                               </p>
                             </div>
                           )}
 
-                          <div className="d-flex gap-2">
+                          <div className="hfr-response-actions">
                             <button
-                              className="btn btn-sm btn-outline-secondary flex-grow-1"
+                              className="hfr-btn hfr-btn-outline hfr-btn-full"
                               onClick={() => handleViewResponse(response)}
                             >
-                              <Eye
-                                size={14}
-                                className="me-1"
-                                style={{ display: "inline" }}
-                              />
+                              <Eye size={14} className="hfr-inline-icon" />
                               View
                             </button>
                             <button
-                              className="btn btn-sm btn-outline-danger"
+                              className="hfr-btn hfr-btn-outline-danger"
                               onClick={() =>
                                 deleteResponse(response.responseId)
                               }
@@ -504,15 +394,12 @@ export default function HRFeedbackReport() {
         </div>
       )}
 
-      {/* Response View Modal */}
       <ResponseViewModal
         show={showModal}
         response={selectedResponse}
         onClose={handleCloseModal}
         type="HR"
       />
-
-      <style>{`@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}`}</style>
     </div>
   );
 }

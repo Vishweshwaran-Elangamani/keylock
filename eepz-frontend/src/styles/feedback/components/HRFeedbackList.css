@@ -1,0 +1,523 @@
+/* src/pages/feedback_management/hr/HRFeedbackList.css */
+
+.hrfeedback-list-container {
+  min-height: 100vh;
+  background: #f8f9fa;
+  padding: 2rem 1rem;
+}
+
+.hrfeedback-list-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Alert */
+.hrfeedback-alert-error {
+  background: #fff;
+  border: 1px solid #f5c6cb;
+  border-left: 4px solid #dc3545;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: start;
+  gap: 1rem;
+}
+
+.hrfeedback-alert-icon {
+  color: #dc3545;
+  flex-shrink: 0;
+}
+
+.hrfeedback-alert-content {
+  flex: 1;
+}
+
+.hrfeedback-alert-text {
+  margin: 0.25rem 0 0 0;
+  color: #721c24;
+}
+
+.hrfeedback-alert-close {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: #721c24;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+/* Toggle Tabs */
+.hrfeedback-toggle-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.hrfeedback-toggle-container {
+  background-color: #27235c;
+  border-radius: 55px;
+  padding: 7px;
+  display: inline-flex;
+  gap: 2px;
+  box-shadow: 0 5px 15px rgba(39, 35, 92, 0.22);
+  min-height: 54px;
+}
+
+.hrfeedback-toggle-btn {
+  background: transparent;
+  color: #ffffff;
+  border: none;
+  border-radius: 55px;
+  padding: 12px 30px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.hrfeedback-toggle-btn:hover {
+  opacity: 0.92;
+}
+
+.hrfeedback-toggle-btn-active {
+  background: #ffffff;
+  color: #27235c;
+}
+
+.hrfeedback-toggle-badge {
+  background-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  min-width: 24px;
+  text-align: center;
+}
+
+.hrfeedback-toggle-btn-active .hrfeedback-toggle-badge {
+  background-color: #27235c;
+  color: #ffffff;
+}
+
+/* Loading */
+.hrfeedback-loading-container {
+  padding: 3rem 0;
+  text-align: center;
+}
+
+.hrfeedback-spinner {
+  width: 3rem;
+  height: 3rem;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #27235c;
+  border-radius: 50%;
+  animation: hrfeedback-spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+.hrfeedback-loading-text {
+  margin-top: 1rem;
+  color: #6c757d;
+}
+
+/* Empty State */
+.hrfeedback-empty-state {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 3rem;
+  text-align: center;
+}
+
+.hrfeedback-empty-icon {
+  color: #cbd5e1;
+  margin-bottom: 1rem;
+}
+
+.hrfeedback-empty-title {
+  color: #6c757d;
+  font-size: 1.125rem;
+  margin-bottom: 0.5rem;
+}
+
+.hrfeedback-empty-text {
+  font-size: 0.875rem;
+  color: #9ca3af;
+}
+
+/* Badge */
+.fm-hrlist-badge-wrapper {
+  display: inline-block;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 6px;
+}
+
+.fm-hrlist-badge-wrapper--primary {
+  background-color: rgba(39, 35, 92, 0.082);
+  color: #27235c;
+  border: 1.5px solid rgba(39, 35, 92, 0.251);
+}
+
+.fm-hrlist-badge-wrapper--default {
+  background-color: rgba(82, 82, 82, 0.082);
+  color: #525252;
+  border: 1.5px solid rgba(82, 82, 82, 0.251);
+}
+
+/* Card */
+.hrfeedback-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1.25rem;
+  height: 100%;
+  transition: box-shadow 0.2s ease;
+  cursor: pointer;
+  text-align: left;
+}
+
+.hrfeedback-card-mentor {
+  border-left: 4px solid #27235c;
+}
+
+.hrfeedback-card:hover {
+  box-shadow: 0 4px 12px rgba(39, 35, 92, 0.2);
+}
+
+.hrfeedback-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 1rem;
+}
+
+.fm-hrlist-card__header-wrapper {
+  flex: 1;
+}
+
+.hrfeedback-card-label {
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-bottom: 4px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.hrfeedback-card-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  text-align: left;
+}
+
+.hrfeedback-mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.hrfeedback-card-user-icon {
+  color: #27235c;
+  flex-shrink: 0;
+}
+
+.fm-hrlist-card__user-icon--muted {
+  color: #6c757d;
+  flex-shrink: 0;
+}
+
+.hrfeedback-card-name {
+  margin: 0;
+  font-size: 0.938rem;
+  color: #212529;
+  font-weight: 700;
+  text-align: left;
+}
+
+.hrfeedback-card-name-small {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #212529;
+  font-weight: 600;
+  text-align: left;
+}
+
+.hrfeedback-card-date {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #6c757d;
+  font-size: 0.813rem;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.hrfeedback-card-anonymous {
+  font-size: 0.813rem;
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  text-align: left;
+}
+
+.hrfeedback-card-content {
+  background: #f8f9fa;
+  padding: 0.75rem;
+  border-radius: 6px;
+  min-height: 60px;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.hrfeedback-card-text {
+  margin: 0;
+  font-size: 0.813rem;
+  color: #495057;
+  text-align: left;
+  line-height: 1.5;
+}
+
+.hrfeedback-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.hrfeedback-btn-view {
+  background: #27235c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  flex: 1;
+}
+
+.hrfeedback-btn-view:hover {
+  background: #1a1840;
+  color: white;
+}
+
+.hrfeedback-btn-analyze {
+  background: #f8f9fa;
+  color: #27235c;
+  border: 1px solid #27235c;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  width: 100%;
+}
+
+.hrfeedback-btn-analyze:hover {
+  background: #27235c;
+  color: white;
+}
+
+/* Delete Modal */
+.hrfeedback-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
+}
+
+.hrfeedback-delete-modal {
+  background-color: white;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  animation: hrfeedback-slide-up 0.3s ease;
+}
+
+.hrfeedback-delete-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hrfeedback-delete-title {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: #212529;
+}
+
+.hrfeedback-delete-close {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: background 0.2s;
+  color: #6c757d;
+}
+
+.hrfeedback-delete-close:hover {
+  background: #f8f9fa;
+}
+
+.hrfeedback-delete-body {
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+
+.hrfeedback-delete-icon {
+  color: #dc3545;
+  margin-bottom: 1rem;
+}
+
+.hrfeedback-delete-message {
+  color: #495057;
+  margin-bottom: 1rem;
+  font-size: 0.938rem;
+}
+
+.hrfeedback-delete-name {
+  background: #f8f9fa;
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-weight: 600;
+  color: #212529;
+}
+
+.hrfeedback-delete-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.hrfeedback-btn-cancel {
+  background: white;
+  color: #6c757d;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.hrfeedback-btn-cancel:hover {
+  background: #f8f9fa;
+}
+
+.hrfeedback-btn-cancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.hrfeedback-btn-delete-confirm {
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.hrfeedback-btn-delete-confirm:hover:not(:disabled) {
+  background: #bb2d3b;
+}
+
+.hrfeedback-btn-delete-confirm:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Utility */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Animations */
+@keyframes hrfeedback-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes hrfeedback-slide-up {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+  .hrfeedback-list-container {
+    padding: 1rem;
+  }
+
+  .hrfeedback-toggle-container {
+    padding: 5px;
+  }
+
+  .hrfeedback-toggle-btn {
+    padding: 10px 20px;
+    font-size: 0.8rem;
+  }
+
+  .hrfeedback-delete-modal {
+    margin: 0 1rem;
+  }
+}

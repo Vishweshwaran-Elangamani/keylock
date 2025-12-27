@@ -1,0 +1,484 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+.amr-page {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  padding: 2rem 1.5rem;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+}
+
+.amr-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.amr-loading-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f9fa;
+}
+
+.amr-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e2e8f0;
+  border-top: 4px solid #27235C;
+  border-radius: 50%;
+  animation: amr-spin 1s linear infinite;
+}
+
+@keyframes amr-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.amr-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.amr-header-content {
+  flex: 1;
+  min-width: 250px;
+}
+
+.amr-title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #27235C;
+  text-align: left;
+}
+
+.amr-subtitle {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.875rem;
+  color: #64748b;
+  text-align: left;
+}
+
+.amr-refresh-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background-color: #fff;
+  color: #27235C;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.amr-refresh-btn:hover:not(:disabled) {
+  background-color: #27235C;
+  color: #fff;
+}
+
+.amr-refresh-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.amr-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 10px;
+}
+
+.amr-alert-error {
+  background-color: #fee2e2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+}
+
+.amr-alert-content {
+  flex: 1;
+}
+
+.amr-alert-content strong {
+  color: #991b1b;
+  font-size: 0.875rem;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.amr-alert-content p {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 0.875rem;
+}
+
+.amr-alert-close {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: #991b1b;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+/* Filter card */
+
+.amr-filter-card {
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.amr-filter-content {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+/* Manager dropdown width similar to reference */
+.amr-filter-wrapper {
+  flex: 1;
+  min-width: 180px;
+  max-width: 260px;
+}
+
+.amr-filter-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+/* Custom Manager dropdown (matches Status style) */
+
+.amr-dd {
+  position: relative;
+  width: 100%;
+}
+
+.amr-dd-trigger {
+  width: 100%;
+  padding: 0.75rem 2.25rem 0.75rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid #d5d7e5;
+  background-color: white;
+  font-size: 0.9rem;
+  color: #9ea3b8;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  outline: none;
+}
+
+.amr-dd-trigger:hover {
+  border-color: #27235c;
+}
+
+.amr-dd-trigger-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Arrow style like reference */
+
+.amr-dd-arrow {
+  position: relative;
+  width: 16px;
+  height: 16px;
+}
+
+.amr-dd-arrow::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 2px;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid #b2b6c7;
+  border-bottom: 2px solid #b2b6c7;
+  transform: translateY(-60%) rotate(45deg); /* down */
+  transition: transform 0.15s ease;
+}
+
+
+.amr-dd-open .amr-dd-arrow::before {
+  transform: translateY(-40%) rotate(-135deg); /* up */
+}
+
+
+.amr-dd-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+ 
+  border-radius: 14px;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.18);
+  overflow: hidden;
+  z-index: 1000;
+}
+
+.amr-dd-item {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: none;
+  background-color: #ffffff;
+  text-align: left;
+  font-size: 0.9rem;
+  color: #22223b;
+  cursor: pointer;
+}
+
+/* First row – dark purple header like Status dropdown */
+.amr-dd-header {
+  background-color: #27235c;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Hover for non-header rows */
+.amr-dd-item:not(.amr-dd-header):hover {
+  background-color:  #27235C;
+  color: white;
+}
+
+/* Divider between rows */
+.amr-dd-item + .amr-dd-item {
+  border-top: 1px solid #f1f2f7;
+}
+
+/* Results count, empty state etc. */
+
+.amr-results-count {
+  font-size: 0.875rem;
+  color: #64748b;
+  white-space: nowrap;
+  padding-bottom: 0.5rem;
+}
+
+.amr-results-count strong {
+  color: #27235C;
+}
+
+.amr-empty-state {
+  background-color: #fff;
+  padding: 3rem;
+  border-radius: 12px;
+  text-align: center;
+  color: #64748b;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.amr-empty-icon {
+  color: #cbd5e1;
+  margin-bottom: 1rem;
+}
+
+.amr-empty-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.amr-empty-text {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #94a3b8;
+}
+
+/* Feedback cards */
+
+.amr-feedback-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.amr-feedback-card {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.amr-feedback-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.amr-card-field {
+  margin-bottom: 0.75rem;
+}
+
+.amr-field-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+  color: #64748b;
+}
+
+.amr-field-header svg {
+  width: 14px;
+  height: 14px;
+}
+
+.amr-field-header span {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.amr-field-value {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #27235C;
+  text-align: left;
+}
+
+.amr-feedback-content {
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  min-height: 80px;
+  text-align: left;
+}
+
+.amr-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.amr-feedback-text {
+  margin: 0.75rem 0 0 0;
+  font-size: 0.875rem;
+  color: #475569;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.amr-feedback-content .amr-badge + .amr-feedback-text {
+  margin-top: 0.75rem;
+}
+
+.amr-feedback-content:not(:has(.amr-badge)) .amr-feedback-text {
+  margin-top: 0;
+}
+
+.amr-view-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: none;
+  background-color: #27235C;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.amr-view-btn:hover {
+  background-color: #1a1842;
+}
+
+@media (max-width: 768px) {
+  .amr-page {
+    padding: 1rem;
+  }
+
+  .amr-title {
+    font-size: 1.5rem;
+  }
+
+  .amr-subtitle {
+    font-size: 0.8125rem;
+  }
+
+  .amr-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .amr-refresh-btn {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .amr-filter-content {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .amr-filter-wrapper {
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  .amr-results-count {
+    text-align: center;
+    padding-bottom: 0;
+  }
+
+  .amr-feedback-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .amr-empty-state {
+    padding: 2rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .amr-page {
+    padding: 0.75rem;
+  }
+
+  .amr-title {
+    font-size: 1.25rem;
+  }
+
+  .amr-filter-card {
+    padding: 1rem;
+  }
+
+  .amr-feedback-card {
+    padding: 1rem;
+  }
+}
