@@ -170,73 +170,70 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
         selectedFile
       );
 
+      // Dismiss loading toast immediately after getting result
       toast.dismiss(loadingToastId);
 
-      setTimeout(() => {
-        if (result.success) {
-          const data = result.data;
+      if (result.success) {
+        const data = result.data;
 
-          setUploadResult({
-            successCount: data.successCount || 0,
-            failureCount: data.failureCount || 0,
-            totalRecords: data.totalRecords || 0,
-            errors: data.errors || [],
-            categorizedErrors:
-              data.errors && data.errors.length > 0
-                ? categorizeErrors(data.errors)
-                : null,
-          });
+        setUploadResult({
+          successCount: data.successCount || 0,
+          failureCount: data.failureCount || 0,
+          totalRecords: data.totalRecords || 0,
+          errors: data.errors || [],
+          categorizedErrors:
+            data.errors && data.errors.length > 0
+              ? categorizeErrors(data.errors)
+              : null,
+        });
 
-          if (data.failureCount === 0) {
-            toast.success(
-              `${data.successCount} user${
-                data.successCount !== 1 ? "s" : ""
-              } added successfully!`,
-              {
-                duration: 6000,
-                description:
-                  "All records have been imported and are now active in the system.",
-              }
-            );
-          } else if (data.successCount > 0) {
-            toast.success(
-              `${data.successCount} user${
-                data.successCount !== 1 ? "s" : ""
-              } added successfully!`,
-              { duration: 5000 }
-            );
-            toast.warning(
-              `${data.failureCount} record${
-                data.failureCount !== 1 ? "s" : ""
-              } failed. Check details below.`,
-              { duration: 8000 }
-            );
-          } else {
-            toast.error(
-              `All ${data.totalRecords} records failed. Review errors below.`,
-              { duration: 8000 }
-            );
-          }
-
-          if (data.successCount > 0) {
-            onSuccess?.();
-          }
+        // Show toast notifications based on result
+        if (data.failureCount === 0) {
+          toast.success(
+            `🎉 ${data.successCount} user${
+              data.successCount !== 1 ? "s" : ""
+            } added successfully!`,
+            {
+              duration: 6000,
+              description: "All records have been imported and are now active in the system.",
+            }
+          );
+        } else if (data.successCount > 0) {
+          toast.success(
+            `✓ ${data.successCount} user${
+              data.successCount !== 1 ? "s" : ""
+            } added successfully!`,
+            { duration: 5000 }
+          );
+          toast.warning(
+            `⚠ ${data.failureCount} record${
+              data.failureCount !== 1 ? "s" : ""
+            } failed. Check details below.`,
+            { duration: 8000 }
+          );
         } else {
-          toast.error(result.message || "Import failed", { duration: 5000 });
-
-          if (result.data?.errors) {
-            setUploadResult({
-              successCount: 0,
-              failureCount:
-                result.data.failureCount || result.data.errors.length,
-              totalRecords:
-                result.data.totalRecords || result.data.errors.length,
-              errors: result.data.errors,
-              categorizedErrors: categorizeErrors(result.data.errors),
-            });
-          }
+          toast.error(
+            `✗ All ${data.totalRecords} records failed. Review errors below.`,
+            { duration: 8000 }
+          );
         }
-      }, 150);
+
+        if (data.successCount > 0) {
+          onSuccess?.();
+        }
+      } else {
+        toast.error(result.message || "Import failed", { duration: 5000 });
+
+        if (result.data?.errors) {
+          setUploadResult({
+            successCount: 0,
+            failureCount: result.data.failureCount || result.data.errors.length,
+            totalRecords: result.data.totalRecords || result.data.errors.length,
+            errors: result.data.errors,
+            categorizedErrors: categorizeErrors(result.data.errors),
+          });
+        }
+      }
     } catch (error) {
       toast.dismiss(loadingToastId);
 
@@ -244,32 +241,30 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
       const errorMessage =
         responseData?.message || error.message || "Import failed";
 
-      setTimeout(() => {
-        toast.error(errorMessage, { duration: 5000 });
+      toast.error(errorMessage, { duration: 5000 });
 
-        if (
-          responseData?.data?.errors &&
-          Array.isArray(responseData.data.errors)
-        ) {
-          setUploadResult({
-            successCount: responseData.data.successCount || 0,
-            failureCount:
-              responseData.data.failureCount || responseData.data.errors.length,
-            totalRecords:
-              responseData.data.totalRecords || responseData.data.errors.length,
-            errors: responseData.data.errors,
-            categorizedErrors: categorizeErrors(responseData.data.errors),
-          });
-        } else if (responseData?.errors && Array.isArray(responseData.errors)) {
-          setUploadResult({
-            successCount: 0,
-            failureCount: responseData.errors.length,
-            totalRecords: responseData.errors.length,
-            errors: responseData.errors,
-            categorizedErrors: categorizeErrors(responseData.errors),
-          });
-        }
-      }, 150);
+      if (
+        responseData?.data?.errors &&
+        Array.isArray(responseData.data.errors)
+      ) {
+        setUploadResult({
+          successCount: responseData.data.successCount || 0,
+          failureCount:
+            responseData.data.failureCount || responseData.data.errors.length,
+          totalRecords:
+            responseData.data.totalRecords || responseData.data.errors.length,
+          errors: responseData.data.errors,
+          categorizedErrors: categorizeErrors(responseData.data.errors),
+        });
+      } else if (responseData?.errors && Array.isArray(responseData.errors)) {
+        setUploadResult({
+          successCount: 0,
+          failureCount: responseData.errors.length,
+          totalRecords: responseData.errors.length,
+          errors: responseData.errors,
+          categorizedErrors: categorizeErrors(responseData.errors),
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -283,9 +278,17 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
     onClose();
   };
 
+  // Prevent modal close when clicking inside modal content
+  const handleBackdropClick = (e) => {
+    // Only close if clicking directly on backdrop, not on modal content
+    if (e.target.classList.contains("bom-backdrop")) {
+      handleClose();
+    }
+  };
+
   return (
     <>
-      <div className="bom-backdrop" onClick={handleClose} />
+      <div className="bom-backdrop" onClick={handleBackdropClick} />
 
       <div className="bom-modal-wrapper">
         <div className="bom-modal-dialog">

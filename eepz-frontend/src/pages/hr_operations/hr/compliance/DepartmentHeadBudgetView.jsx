@@ -446,7 +446,7 @@ const DepartmentHeadBudgetView = () => {
                     <th>Remaining</th>
                     <th>Utilization</th>
                     <th>Status</th>
-                    <th className="budget-text-center budget-actions-header">Actions</th>
+                    <th className="budget-text-center budget-actions-header">Update</th>
                   </tr>
                 </thead>
                 <tbody>

@@ -1,12 +1,10 @@
-
-
-
 import React, { useState, useEffect } from "react";
 import { formatCurrency } from "../../../utils/auth/currencyFormatter";
 import UpdateUtilizationModal from "./UpdateUtilizationModal";
 import { FaSearch } from "react-icons/fa";
 import { Form } from "react-bootstrap";
 import "../../../styles/hr_operations/hr/AllocationsList.css";
+
 
 const TypeDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
@@ -20,25 +18,25 @@ const TypeDropdown = ({ value, onChange, options }) => {
 
   return (
     <div
-      className="allocations-filter-select custom-allocations-dropdown"
+      className="allocations-filter-select allocations-custom-dropdown"
       tabIndex={0}
       onBlur={() => setTimeout(() => setOpen(false), 200)}
     >
       <div
-        className="custom-allocations-selected"
+        className="allocations-custom-selected"
         onClick={() => setOpen((prev) => !prev)}
       >
         {selected.label}
-        <span className="custom-allocations-arrow" />
+        <span className="allocations-custom-arrow" />
       </div>
       {open && (
-        <div className="custom-allocations-menu">
+        <div className="allocations-custom-menu">
           {allOptions.map((opt) => (
             <div
               key={opt.value}
               className={
-                "custom-allocations-option" +
-                (opt.value === value ? " custom-allocations-option-active" : "")
+                "allocations-custom-option" +
+                (opt.value === value ? " allocations-custom-option-active" : "")
               }
               onClick={() => handleSelect(opt.value)}
             >
@@ -50,6 +48,7 @@ const TypeDropdown = ({ value, onChange, options }) => {
     </div>
   );
 };
+
 
 const AllocationNameDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
@@ -63,25 +62,25 @@ const AllocationNameDropdown = ({ value, onChange, options }) => {
 
   return (
     <div
-      className="allocations-filter-select custom-allocations-dropdown"
+      className="allocations-filter-select allocations-custom-dropdown"
       tabIndex={0}
       onBlur={() => setTimeout(() => setOpen(false), 200)}
     >
       <div
-        className="custom-allocations-selected"
+        className="allocations-custom-selected"
         onClick={() => setOpen((prev) => !prev)}
       >
         {selected.label}
-        <span className="custom-allocations-arrow" />
+        <span className="allocations-custom-arrow" />
       </div>
       {open && (
-        <div className="custom-allocations-menu">
+        <div className="allocations-custom-menu">
           {allOptions.map((opt) => (
             <div
               key={opt.value || "all-allocations"}
               className={
-                "custom-allocations-option" +
-                (opt.value === value ? " custom-allocations-option-active" : "")
+                "allocations-custom-option" +
+                (opt.value === value ? " allocations-custom-option-active" : "")
               }
               onClick={() => handleSelect(opt.value)}
             >
@@ -93,6 +92,7 @@ const AllocationNameDropdown = ({ value, onChange, options }) => {
     </div>
   );
 };
+
 
 const AllocationsList = ({
   budget,
@@ -120,7 +120,6 @@ const AllocationsList = ({
     allocationNames: [],
   });
 
-  //  GET USER ROLE FROM LOCALSTORAGE
   const userRole = localStorage.getItem("userRole");
   const isDeptHead = userRole === "Department Head";
 
@@ -266,8 +265,37 @@ const AllocationsList = ({
         : 0,
   };
 
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxPagesToShow = 5;
+
+    if (totalPages <= maxPagesToShow) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        pages.push(1, 2, 3, "...", totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1, "...", totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(
+          1,
+          "...",
+          currentPage - 1,
+          currentPage,
+          currentPage + 1,
+          "...",
+          totalPages
+        );
+      }
+    }
+    return pages;
+  };
+
   return (
     <div className="allocations-root">
+      {/* BREADCRUMB */}
       <div className="allocations-header-section">
         <div className="allocations-breadcrumb">
           <button className="allocations-back-btn" onClick={onBack}>
@@ -280,52 +308,53 @@ const AllocationsList = ({
         </div>
       </div>
 
+      {/* STATISTICS CARDS */}
       {filteredAllocations.length > 0 && (
-        <div className="allocations-summary-cards">
-          <div className="allocations-summary-card total">
-            <div className="allocations-summary-icon">
+        <div className="allocations-stats-grid">
+          <div className="allocations-stat-card">
+            <div className="allocations-stat-icon allocations-stat-icon-primary">
               <i className="bi bi-cash-stack"></i>
             </div>
-            <div className="allocations-summary-content">
-              <div className="allocations-summary-value">
+            <div className="allocations-stat-content">
+              <h3 className="allocations-stat-value">
                 {formatCurrency(summaryStats.totalAllocated)}
-              </div>
-              <div className="allocations-summary-label">Total Allocated</div>
+              </h3>
+              <p className="allocations-stat-label">Total Allocated</p>
             </div>
           </div>
 
-          <div className="allocations-summary-card utilized">
-            <div className="allocations-summary-icon">
+          <div className="allocations-stat-card">
+            <div className="allocations-stat-icon allocations-stat-icon-success">
               <i className="bi bi-graph-up-arrow"></i>
             </div>
-            <div className="allocations-summary-content">
-              <div className="allocations-summary-value">
+            <div className="allocations-stat-content">
+              <h3 className="allocations-stat-value">
                 {formatCurrency(summaryStats.totalUtilized)}
-              </div>
-              <div className="allocations-summary-label">Total Utilized</div>
+              </h3>
+              <p className="allocations-stat-label">Total Utilized</p>
             </div>
           </div>
 
-          <div className="allocations-summary-card average">
-            <div className="allocations-summary-icon">
+          <div className="allocations-stat-card">
+            <div className="allocations-stat-icon allocations-stat-icon-warning">
               <i className="bi bi-percent"></i>
             </div>
-            <div className="allocations-summary-content">
-              <div className="allocations-summary-value">
+            <div className="allocations-stat-content">
+              <h3 className="allocations-stat-value">
                 {summaryStats.avgUtilization}%
-              </div>
-              <div className="allocations-summary-label">
+              </h3>
+              <p className="allocations-stat-label">
                 Avg Utilization
-              </div>
+              </p>
             </div>
           </div>
         </div>
       )}
 
-      {/* UPDATED FILTER SECTION WITH ALLOCATION NAME DROPDOWN */}
-      <div className="allocations-filter-section">
-        <div className="allocations-filter-row">
-          <div className="allocations-search-input">
+      {/* FILTERS CARD */}
+      <div className="allocations-filters-card">
+        <div className="allocations-filters-content">
+          <div className="allocations-search-box">
             <div className="allocations-search-inner">
               <span className="allocations-search-icon">
                 <FaSearch />
@@ -376,420 +405,195 @@ const AllocationsList = ({
       </div>
 
       {filteredAllocations.length === 0 ? (
-        <div className="allocations-empty">
-          <i className="bi bi-inbox"></i>
-          <p>
-            {activeSearchTerm || filters.type !== "all" || filters.allocationName
-              ? "No allocations found matching your filters"
-              : "No allocations created yet"}
-          </p>
-          <small>
-            {activeSearchTerm || filters.type !== "all" || filters.allocationName
-              ? "Try adjusting your search criteria"
-              : 'Click "Allocate" button to create new allocations'}
-          </small>
-        </div>
-      ) : viewType === "card" ? (
-        <>
-          <div className="allocations-cards-grid">
-            {currentPageData.map((alloc) => {
-              const typeColor = getTypeColor(alloc.allocationType);
-              const utilizedAmount = alloc.utilizedAmount || 0;
-
-              return (
-                <div key={alloc.allocationId} className="allocations-card">
-                  <div className="allocations-card-header">
-                    <div className="allocations-card-avatar">
-                      {alloc.allocationType?.substring(0, 2).toUpperCase()}
-                    </div>
-                    <div className="allocations-card-header-info">
-                      <h5 className="allocations-card-title">
-                        {alloc.notes ||
-                          alloc.allocationType ||
-                          "Unnamed Allocation"}
-                      </h5>
-                      <span
-                        className="allocations-card-type-badge"
-                        style={{
-                          backgroundColor: typeColor.bg,
-                          color: typeColor.color,
-                        }}
-                      >
-                        {alloc.allocationType}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="allocations-card-body">
-                    <div className="allocations-card-row">
-                      <span className="allocations-card-label">Amount</span>
-                      <span className="allocations-card-value">
-                        {formatCurrency(alloc.amount)}
-                      </span>
-                    </div>
-
-                    <div className="allocations-card-row">
-                      <span className="allocations-card-label">Utilized</span>
-                      <span className="allocations-card-value utilized-amount">
-                        {formatCurrency(utilizedAmount)}
-                      </span>
-                    </div>
-
-                    <div className="allocations-card-row">
-                      <span className="allocations-card-label">
-                        Utilization
-                      </span>
-                      <span className="allocations-card-value">
-                        {alloc.utilizationPercentage || 0}%
-                      </span>
-                    </div>
-
-                    <div className="allocations-card-progress">
-                      <div
-                        className="allocations-card-progress-bar"
-                        style={{
-                          width: `${Math.min(
-                            alloc.utilizationPercentage || 0,
-                            100
-                          )}%`,
-                          backgroundColor:
-                            alloc.utilizationPercentage >= 90
-                              ? "#ef4444"
-                              : alloc.utilizationPercentage >= 75
-                              ? "#f59e0b"
-                              : alloc.utilizationPercentage >= 50
-                              ? "#10b981"
-                              : "#3b82f6",
-                        }}
-                      ></div>
-                    </div>
-                  </div>
-
-                  {isDeptHead && (
-                    <div className="allocations-card-actions">
-                      <button
-                        className="allocations-btn-card-action allocations-btn-update"
-                        onClick={() => {
-                          setSelectedAllocation(alloc);
-                          setShowUpdateModal(true);
-                        }}
-                        title="Update Utilization"
-                      >
-                        <i className="bi bi-cash-coin"></i>
-                        Update
-                      </button>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+        <div className="allocations-empty-card">
+          <div className="allocations-empty-state">
+            <i className="bi bi-inbox"></i>
+            <p>
+              {activeSearchTerm || filters.type !== "all" || filters.allocationName
+                ? "No allocations found matching your filters"
+                : "No allocations created yet"}
+            </p>
+            <small>
+              {activeSearchTerm || filters.type !== "all" || filters.allocationName
+                ? "Try adjusting your search criteria"
+                : 'Click "Allocate" button to create new allocations'}
+            </small>
           </div>
-
-          {totalPages > 1 && (
-            <div className="allocations-pagination-container">
-              <div className="allocations-pagination-info">
-                <span className="allocations-pagination-label">Show</span>
-                <select
-                  className="allocations-pagination-select"
-                  value={itemsPerPage}
-                  onChange={handleItemsPerPageChange}
-                >
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="25">25</option>
-                  <option value="50">50</option>
-                </select>
-                <span className="allocations-pagination-label">entries</span>
-              </div>
-
-              <div className="allocations-pagination-status">
-                Showing{" "}
-                {Math.min(startIndex + 1, filteredAllocations.length)}-
-                {Math.min(endIndex, filteredAllocations.length)} of{" "}
-                {filteredAllocations.length} entries
-              </div>
-
-              <nav className="allocations-pagination-nav">
-                <ul className="allocations-pagination">
-                  <li
-                    className={`allocations-page-item ${
-                      currentPage === 1 ? "disabled" : ""
-                    }`}
-                  >
-                    <button
-                      className="allocations-page-link"
-                      onClick={() => goToPage(currentPage - 1)}
-                      disabled={currentPage === 1}
-                    >
-                      <i className="bi bi-chevron-left"></i>
-                    </button>
-                  </li>
-
-                  {Array.from({ length: totalPages }, (_, i) => i + 1)
-                    .filter((page) => {
-                      if (totalPages <= 7) return true;
-                      if (page === 1 || page === totalPages) return true;
-                      if (page >= currentPage - 1 && page <= currentPage + 1)
-                        return true;
-                      return false;
-                    })
-                    .map((page, index, array) => {
-                      if (index > 0 && page - array[index - 1] > 1) {
-                        return (
-                          <React.Fragment key={`ellipsis-${page}`}>
-                            <li className="allocations-page-item disabled">
-                              <button className="allocations-page-link">
-                                ...
-                              </button>
-                            </li>
-                            <li
-                              className={`allocations-page-item ${
-                                currentPage === page ? "active" : ""
-                              }`}
-                            >
-                              <button
-                                className="allocations-page-link"
-                                onClick={() => goToPage(page)}
-                              >
-                                {page}
-                              </button>
-                            </li>
-                          </React.Fragment>
-                        );
-                      }
-                      return (
-                        <li
-                          key={page}
-                          className={`allocations-page-item ${
-                            currentPage === page ? "active" : ""
-                          }`}
-                        >
-                          <button
-                            className="allocations-page-link"
-                            onClick={() => goToPage(page)}
-                          >
-                            {page}
-                          </button>
-                        </li>
-                      );
-                    })}
-
-                  <li
-                    className={`allocations-page-item ${
-                      currentPage === totalPages ? "disabled" : ""
-                    }`}
-                  >
-                    <button
-                      className="allocations-page-link"
-                      onClick={() => goToPage(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                    >
-                      <i className="bi bi-chevron-right"></i>
-                    </button>
-                  </li>
-                </ul>
-              </nav>
-            </div>
-          )}
-        </>
+        </div>
       ) : (
         <>
-          <div className="allocations-table-container">
-            <table className="allocations-table">
-              <thead>
-                <tr>
-                  <th>Allocation Name</th>
-                  <th>Type</th>
-                  <th>Amount</th>
-                  <th>Utilized</th>
-                  <th>Utilization</th>
-                  {isDeptHead && <th className="allocations-text-center">Actions</th>}
-                </tr>
-              </thead>
-              <tbody>
-                {currentPageData.map((alloc) => {
-                  const typeColor = getTypeColor(alloc.allocationType);
-                  const utilizedAmount = alloc.utilizedAmount || 0;
+          <div className="allocations-table-card">
+            <div className="allocations-table-wrapper">
+              <table className="allocations-table">
+                <thead>
+                  <tr>
+                    <th>Allocation Name</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Utilized</th>
+                    <th>Utilization</th>
+                    {isDeptHead && <th className="allocations-text-center">Actions</th>}
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentPageData.map((alloc) => {
+                    const typeColor = getTypeColor(alloc.allocationType);
+                    const utilizedAmount = alloc.utilizedAmount || 0;
 
-                  return (
-                    <tr key={alloc.allocationId}>
-                      <td>
-                        <strong>
-                          {alloc.notes ||
-                            alloc.allocationType ||
-                            "Unnamed Allocation"}
-                        </strong>
-                      </td>
-                      <td>
-                        <span
-                          className="allocations-type-badge"
-                          style={{
-                            backgroundColor: typeColor.bg,
-                            color: typeColor.color,
-                          }}
-                        >
-                          {alloc.allocationType}
-                        </span>
-                      </td>
-                      <td>{formatCurrency(alloc.amount)}</td>
-                      <td>
-                        <span className="allocations-utilized-amount">
-                          {formatCurrency(utilizedAmount)}
-                        </span>
-                      </td>
-                      <td>
-                        <div className="allocations-progress-container">
-                          <div
-                            className="allocations-progress-bar"
-                            style={{
-                              width: `${Math.min(
-                                alloc.utilizationPercentage || 0,
-                                100
-                              )}%`,
-                              backgroundColor:
-                                alloc.utilizationPercentage >= 90
-                                  ? "#ef4444"
-                                  : alloc.utilizationPercentage >= 75
-                                  ? "#f59e0b"
-                                  : alloc.utilizationPercentage >= 50
-                                  ? "#10b981"
-                                  : "#3b82f6",
-                            }}
-                          ></div>
-                          <span className="allocations-progress-text">
-                            {alloc.utilizationPercentage || 0}%
-                          </span>
-                        </div>
-                      </td>
-                      {isDeptHead && (
+                    return (
+                      <tr key={alloc.allocationId}>
                         <td>
-                          <div className="allocations-action-buttons">
-                            <button
-                              className="allocations-action-btn allocations-action-btn-update"
-                              onClick={() => {
-                                setSelectedAllocation(alloc);
-                                setShowUpdateModal(true);
-                              }}
-                              title="Update Utilization"
-                            >
-                              <i className="bi bi-cash-coin"></i>
-                            </button>
+                          <div className="allocations-name-cell">
+                            <strong>
+                              {alloc.notes ||
+                                alloc.allocationType ||
+                                "Unnamed Allocation"}
+                            </strong>
                           </div>
                         </td>
-                      )}
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-
-          {totalPages > 1 && (
-            <div className="allocations-pagination-container">
-              <div className="allocations-pagination-info">
-                <span className="allocations-pagination-label">Show</span>
-                <select
-                  className="allocations-pagination-select"
-                  value={itemsPerPage}
-                  onChange={handleItemsPerPageChange}
-                >
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="25">25</option>
-                  <option value="50">50</option>
-                </select>
-                <span className="allocations-pagination-label">entries</span>
-              </div>
-
-              <div className="allocations-pagination-status">
-                Showing{" "}
-                {Math.min(startIndex + 1, filteredAllocations.length)}-
-                {Math.min(endIndex, filteredAllocations.length)} of{" "}
-                {filteredAllocations.length} entries
-              </div>
-
-              <nav className="allocations-pagination-nav">
-                <ul className="allocations-pagination">
-                  <li
-                    className={`allocations-page-item ${
-                      currentPage === 1 ? "disabled" : ""
-                    }`}
-                  >
-                    <button
-                      className="allocations-page-link"
-                      onClick={() => goToPage(currentPage - 1)}
-                      disabled={currentPage === 1}
-                    >
-                      <i className="bi bi-chevron-left"></i>
-                    </button>
-                  </li>
-
-                  {Array.from({ length: totalPages }, (_, i) => i + 1)
-                    .filter((page) => {
-                      if (totalPages <= 7) return true;
-                      if (page === 1 || page === totalPages) return true;
-                      if (page >= currentPage - 1 && page <= currentPage + 1)
-                        return true;
-                      return false;
-                    })
-                    .map((page, index, array) => {
-                      if (index > 0 && page - array[index - 1] > 1) {
-                        return (
-                          <React.Fragment key={`ellipsis-${page}`}>
-                            <li className="allocations-page-item disabled">
-                              <button className="allocations-page-link">
-                                ...
-                              </button>
-                            </li>
-                            <li
-                              className={`allocations-page-item ${
-                                currentPage === page ? "active" : ""
-                              }`}
-                            >
-                              <button
-                                className="allocations-page-link"
-                                onClick={() => goToPage(page)}
-                              >
-                                {page}
-                              </button>
-                            </li>
-                          </React.Fragment>
-                        );
-                      }
-                      return (
-                        <li
-                          key={page}
-                          className={`allocations-page-item ${
-                            currentPage === page ? "active" : ""
-                          }`}
-                        >
-                          <button
-                            className="allocations-page-link"
-                            onClick={() => goToPage(page)}
+                        <td>
+                          <span
+                            className="allocations-type-badge"
+                            style={{
+                              backgroundColor: typeColor.bg,
+                              color: typeColor.color,
+                            }}
                           >
-                            {page}
-                          </button>
-                        </li>
-                      );
-                    })}
-
-                  <li
-                    className={`allocations-page-item ${
-                      currentPage === totalPages ? "disabled" : ""
-                    }`}
-                  >
-                    <button
-                      className="allocations-page-link"
-                      onClick={() => goToPage(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                    >
-                      <i className="bi bi-chevron-right"></i>
-                    </button>
-                  </li>
-                </ul>
-              </nav>
+                            {alloc.allocationType}
+                          </span>
+                        </td>
+                        <td className="allocations-amount-cell">
+                          {formatCurrency(alloc.amount)}
+                        </td>
+                        <td>
+                          <span className="allocations-utilized-amount">
+                            {formatCurrency(utilizedAmount)}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="allocations-progress-container">
+                            <div
+                              className="allocations-progress-bar"
+                              style={{
+                                width: `${Math.min(
+                                  alloc.utilizationPercentage || 0,
+                                  100
+                                )}%`,
+                                backgroundColor:
+                                  alloc.utilizationPercentage >= 90
+                                    ? "#ef4444"
+                                    : alloc.utilizationPercentage >= 75
+                                    ? "#f59e0b"
+                                    : alloc.utilizationPercentage >= 50
+                                    ? "#10b981"
+                                    : "#3b82f6",
+                              }}
+                            ></div>
+                            <span className="allocations-progress-text">
+                              {alloc.utilizationPercentage || 0}%
+                            </span>
+                          </div>
+                        </td>
+                        {isDeptHead && (
+                          <td>
+                            <div className="allocations-action-buttons">
+                              <button
+                                className="allocations-action-btn allocations-action-btn-update"
+                                onClick={() => {
+                                  setSelectedAllocation(alloc);
+                                  setShowUpdateModal(true);
+                                }}
+                                title="Update Utilization"
+                              >
+                                <i className="bi bi-cash-coin"></i>
+                              </button>
+                            </div>
+                          </td>
+                        )}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
-          )}
+
+            {totalPages > 1 && (
+              <div className="allocations-pagination-container">
+                <div className="allocations-pagination-info">
+                  <span className="allocations-pagination-label">Show</span>
+                  <select
+                    className="allocations-pagination-select"
+                    value={itemsPerPage}
+                    onChange={handleItemsPerPageChange}
+                  >
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                  </select>
+                  <span className="allocations-pagination-label">entries</span>
+                </div>
+
+                <div className="allocations-pagination-status">
+                  Showing{" "}
+                  {Math.min(startIndex + 1, filteredAllocations.length)}-
+                  {Math.min(endIndex, filteredAllocations.length)} of{" "}
+                  {filteredAllocations.length} entries
+                </div>
+
+                <nav className="allocations-pagination-nav">
+                  <ul className="allocations-pagination">
+                    <li
+                      className={`allocations-page-item ${
+                        currentPage === 1 ? "disabled" : ""
+                      }`}
+                    >
+                      <button
+                        className="allocations-page-link"
+                        onClick={() => goToPage(currentPage - 1)}
+                        disabled={currentPage === 1}
+                      >
+                        <i className="bi bi-chevron-left"></i>
+                      </button>
+                    </li>
+
+                    {getPageNumbers().map((page, index) => (
+                      <li
+                        key={index}
+                        className={`allocations-page-item ${
+                          page === currentPage ? "active" : ""
+                        } ${typeof page !== "number" ? "disabled" : ""}`}
+                      >
+                        <button
+                          className="allocations-page-link"
+                          onClick={() =>
+                            typeof page === "number" && goToPage(page)
+                          }
+                          disabled={typeof page !== "number"}
+                        >
+                          {page}
+                        </button>
+                      </li>
+                    ))}
+
+                    <li
+                      className={`allocations-page-item ${
+                        currentPage === totalPages ? "disabled" : ""
+                      }`}
+                    >
+                      <button
+                        className="allocations-page-link"
+                        onClick={() => goToPage(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                      >
+                        <i className="bi bi-chevron-right"></i>
+                      </button>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+            )}
+          </div>
         </>
       )}
 
@@ -807,5 +611,6 @@ const AllocationsList = ({
     </div>
   );
 };
+
 
 export default AllocationsList;

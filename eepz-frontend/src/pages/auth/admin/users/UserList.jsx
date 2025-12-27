@@ -241,7 +241,7 @@ const UserList = () => {
     fetchData();
   };
   const handleBulkOperationsSuccess = () => {
-    setShowBulkOperations(true); //  Close modal first
+    setShowBulkOperations(true); 
     fetchData(); // Then reload data
 
     // Show success toast after a small delay

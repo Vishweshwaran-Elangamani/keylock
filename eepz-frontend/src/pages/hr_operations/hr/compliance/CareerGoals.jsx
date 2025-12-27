@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import careerGoalsService from "../../../../services/hr_operations/hr/careerGoalsService";
 import {
-  Button,
   Spinner,
   OverlayTrigger,
   Tooltip,
@@ -29,7 +28,6 @@ import { toast, Toaster } from "sonner";
 import GoalSuggestionsModal from "../../../../components/hr_operations/modals/GoalSuggestionsModal";
 import ReminderEmailModal from "../../../../components/hr_operations/modals/ReminderEmailModal";
 import BulkReminderModal from "../../../../components/hr_operations/modals/BulkReminderModal";
-import Breadcrumb from "../../../../components/common/Breadcrumb";
 import "../../../../styles/hr_operations/hr/CareerGoals.css";
 
 const COLORS = [
@@ -45,10 +43,13 @@ const COLORS = [
 const DepartmentDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
 
-  const list = [{ label: "All Departments", value: "" }, ...options.map((o) => ({
-    label: o,
-    value: o,
-  }))];
+  const list = [
+    { label: "All Departments", value: "" },
+    ...options.map((o) => ({
+      label: o,
+      value: o,
+    })),
+  ];
 
   const selected = list.find((o) => o.value === value) || list[0];
 
@@ -59,26 +60,27 @@ const DepartmentDropdown = ({ value, onChange, options }) => {
 
   return (
     <div
-      className="cg-filter-select custom-status-dropdown"
+      className="cg-filter-select cg-custom-dropdown"
       tabIndex={0}
-      onBlur={() => setOpen(false)}
-      onClick={() => setOpen((prev) => !prev)}
-      style={{ position: "relative" }}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
     >
-      <div className="custom-status-selected">
+      <div
+        className="cg-custom-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
         {selected.label}
-        <span className="custom-status-arrow" />
+        <span className="cg-custom-arrow" />
       </div>
       {open && (
-        <div className="custom-status-menu">
+        <div className="cg-custom-menu">
           {list.map((opt) => (
             <div
               key={opt.value || "all-departments"}
               className={
-                "custom-status-option" +
-                (opt.value === value ? " custom-status-option-active" : "")
+                "cg-custom-option" +
+                (opt.value === value ? " cg-custom-option-active" : "")
               }
-              onMouseDown={() => handleSelect(opt.value)}
+              onClick={() => handleSelect(opt.value)}
             >
               {opt.label}
             </div>
@@ -109,26 +111,27 @@ const DaysDropdown = ({ value, onChange }) => {
 
   return (
     <div
-      className="cg-filter-select custom-status-dropdown"
+      className="cg-filter-select cg-custom-dropdown"
       tabIndex={0}
-      onBlur={() => setOpen(false)}
-      onClick={() => setOpen((prev) => !prev)}
-      style={{ position: "relative" }}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
     >
-      <div className="custom-status-selected">
+      <div
+        className="cg-custom-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
         {selected.label}
-        <span className="custom-status-arrow" />
+        <span className="cg-custom-arrow" />
       </div>
       {open && (
-        <div className="custom-status-menu">
+        <div className="cg-custom-menu">
           {options.map((opt) => (
             <div
               key={opt.value || "all-days"}
               className={
-                "custom-status-option" +
-                (opt.value === value ? " custom-status-option-active" : "")
+                "cg-custom-option" +
+                (opt.value === value ? " cg-custom-option-active" : "")
               }
-              onMouseDown={() => handleSelect(opt.value)}
+              onClick={() => handleSelect(opt.value)}
             >
               {opt.label}
             </div>
@@ -436,105 +439,48 @@ const CareerGoals = () => {
     <div className="cg-root">
       <Toaster position="top-right" closeButton expand={false} />
 
+      {/* STATISTICS CARDS */}
       {adoptionStats && (
-        <div className="cg-summary-cards">
-          <div className="cg-summary-card total">
-            <div className="cg-summary-card-icon">
+        <div className="cg-stats-grid">
+          <div className="cg-stat-card">
+            <div className="cg-stat-icon cg-stat-icon-primary">
               <i className="bi bi-people-fill"></i>
             </div>
-            <div className="cg-summary-card-content">
-              <div className="cg-summary-card-value">
-                {adoptionStats.totalEmployees}
-              </div>
-              <div className="cg-summary-card-label">Total Employees</div>
+            <div className="cg-stat-content">
+              <h3 className="cg-stat-value">{adoptionStats.totalEmployees}</h3>
+              <p className="cg-stat-label">Total Employees</p>
             </div>
           </div>
 
-          <div className="cg-summary-card with-goals">
-            <div className="cg-summary-card-icon">
+          <div className="cg-stat-card">
+            <div className="cg-stat-icon cg-stat-icon-success">
               <i className="bi bi-check-circle-fill"></i>
             </div>
-            <div className="cg-summary-card-content">
-              <div className="cg-summary-card-value">
+            <div className="cg-stat-content">
+              <h3 className="cg-stat-value">
                 {adoptionStats.employeesWithGoals}
-              </div>
-              <div className="cg-summary-card-label">
+              </h3>
+              <p className="cg-stat-label">
                 With Goals ({adoptionStats.adoptionRate}%)
-              </div>
+              </p>
             </div>
           </div>
 
-          <div className="cg-summary-card without-goals">
-            <div className="cg-summary-card-icon">
+          <div className="cg-stat-card">
+            <div className="cg-stat-icon cg-stat-icon-danger">
               <i className="bi bi-exclamation-triangle-fill"></i>
             </div>
-            <div className="cg-summary-card-content">
-              <div className="cg-summary-card-value">
+            <div className="cg-stat-content">
+              <h3 className="cg-stat-value">
                 {adoptionStats.employeesWithoutGoals}
-              </div>
-              <div className="cg-summary-card-label">Without Goals</div>
+              </h3>
+              <p className="cg-stat-label">Without Goals</p>
             </div>
           </div>
         </div>
       )}
 
-      <div className="cag-filter-section">
-        <div className="cg-filter-row-single">
-          <div className="cg-search-input-wrapper">
-            <div className="cg-search-inner">
-              <span className="cg-search-icon">
-                <FaSearch />
-              </span>
-              <input
-                type="text"
-                placeholder="Search by name, email, or ID..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="cg-search-field"
-              />
-              <button
-                type="button"
-                className="cg-search-btn"
-                onClick={applyFilters}
-              >
-                Search
-              </button>
-            </div>
-          </div>
-
-          <DepartmentDropdown
-            value={departmentFilter}
-            onChange={setDepartmentFilter}
-            options={uniqueDepartments}
-          />
-
-          <DaysDropdown value={daysFilter} onChange={setDaysFilter} />
-
-          <button className="cg-clear-btn" onClick={clearFilters}>
-            Clear Filters
-          </button>
-
-          <div className="cg-results-count-inline">
-            Showing {currentItems.length} of {filteredData.length} employees
-          </div>
-
-          {selectedEmployees.length > 0 && (
-            <button className="cg-bulk-btn" onClick={openBulkReminderModal}>
-              <i className="bi bi-send me-1"></i>
-              Send to Selected ({selectedEmployees.length})
-            </button>
-          )}
-
-          <button
-            className="cg-analytics-btn"
-            onClick={() => setShowVisualization(!showVisualization)}
-          >
-            <FaChartBar className="me-1" />
-            {showVisualization ? "Hide" : "Show"} Analytics
-          </button>
-        </div>
-      </div>
-
+      {/* ANALYTICS COLLAPSE */}
       <Collapse in={showVisualization}>
         <div>
           <Card className="cg-analytics-card">
@@ -593,204 +539,263 @@ const CareerGoals = () => {
         </div>
       </Collapse>
 
-      <div className="cg-table-container">
-        <table className="cg-table">
-          <thead>
-            <tr>
-              <th>
-                <Form.Check
-                  type="checkbox"
-                  checked={selectAll}
-                  onChange={handleSelectAll}
-                  label=""
-                />
-              </th>
-              <th>Employee ID</th>
-              <th>Employee Name</th>
-              <th>Department</th>
-              <th>Email</th>
-              <th>Days Without Goals</th>
-              <th>Recommended Action</th>
-              <th className="cg-text-center cg-actions-header">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loadingWithoutGoals ? (
-              <tr>
-                <td colSpan={8} className="cg-empty-state">
-                  <Spinner animation="border" size="sm" /> Loading...
-                </td>
-              </tr>
-            ) : currentItems.length === 0 ? (
-              <tr>
-                <td colSpan={8} className="cg-empty-state">
-                  <i className="bi bi-inbox"></i>
-                  <p>No employees found matching the criteria!</p>
-                </td>
-              </tr>
-            ) : (
-              currentItems.map((emp) => {
-                const empId = emp.userId ?? emp.UserId;
-                return (
-                  <tr key={empId}>
-                    <td>
-                      <Form.Check
-                        type="checkbox"
-                        checked={selectedEmployees.includes(empId)}
-                        onChange={() => handleSelectEmployee(empId)}
-                        label=""
-                      />
-                    </td>
-                    <td>
-                      <strong>
-                        {emp.employeeCompanyId ?? emp.EmployeeCompanyId}
-                      </strong>
-                    </td>
-                    <td>{emp.employeeName ?? emp.EmployeeName}</td>
-                    <td>{emp.departmentName ?? emp.DepartmentName}</td>
-                    <td className="cg-email-cell">{emp.email ?? emp.Email}</td>
-                    <td className="cg-text-center">
-                      <span
-                        className={`cg-days-badge ${
-                          (emp.daysWithoutGoals ?? emp.DaysWithoutGoals) > 30
-                            ? "badge-danger"
-                            : (emp.daysWithoutGoals ?? emp.DaysWithoutGoals) >
-                              7
-                            ? "badge-warning"
-                            : "badge-info"
-                        }`}
-                      >
-                        {emp.daysWithoutGoals ?? emp.DaysWithoutGoals}
-                      </span>
-                    </td>
-                    <td>{emp.recommendedAction ?? emp.RecommendedAction}</td>
-                    <td>
-                      <div className="action-buttons">
-                        <OverlayTrigger
-                          placement="top"
-                          overlay={
-                            <Tooltip id={`tooltip-send-${empId}`}>
-                              Send Reminder
-                            </Tooltip>
-                          }
-                        >
-                          <button
-                            className="action-btn action-btn-edit"
-                            onClick={() => openSendReminder(emp)}
-                          >
-                            <i className="bi bi-send"></i>
-                          </button>
-                        </OverlayTrigger>
+      {/* FILTERS CARD WITH ACTION BUTTONS */}
+      <div className="cg-filters-card">
+        <div className="cg-filters-content">
+          <div className="cg-search-box">
+            <div className="cg-search-inner">
+              <span className="cg-search-icon">
+                <FaSearch />
+              </span>
+              <input
+                type="text"
+                placeholder="Search by name, email, or ID..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="cg-search-input"
+              />
+              <button
+                type="button"
+                className="cg-search-btn"
+                onClick={applyFilters}
+              >
+                Search
+              </button>
+            </div>
+          </div>
 
-                        <OverlayTrigger
-                          placement="top"
-                          overlay={
-                            <Tooltip id={`tooltip-suggest-${empId}`}>
-                              Suggest Goals
-                            </Tooltip>
-                          }
-                        >
-                          <button
-                            className="action-btn action-btn-warning"
-                            onClick={() => fetchSuggestions(empId)}
-                          >
-                            <i className="bi bi-lightbulb"></i>
-                          </button>
-                        </OverlayTrigger>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
+          <DepartmentDropdown
+            value={departmentFilter}
+            onChange={setDepartmentFilter}
+            options={uniqueDepartments}
+          />
+
+          <DaysDropdown value={daysFilter} onChange={setDaysFilter} />
+
+          <button className="cg-btn-clear" onClick={clearFilters}>
+  Clear Filters
+</button>
+
+{selectedEmployees.length > 0 && (
+  <button className="cg-btn-bulk" onClick={openBulkReminderModal}>
+    <i className="bi bi-send"></i>
+    Send to Selected ({selectedEmployees.length})
+  </button>
+)}
+
+
+
+<button
+  className="cg-btn-analytics"
+  onClick={() => setShowVisualization(!showVisualization)}
+>
+  <FaChartBar />
+  {showVisualization ? "Hide" : "Show"} Analytics
+</button>
+
+        </div>
       </div>
 
-      {filteredData.length > 0 && (
-        <div className="pagination-container">
-          <div className="pagination-info">
-            <span className="pagination-label">Show</span>
-            <select
-              className="pagination-select"
-              value={rowsPerPage}
-              onChange={(e) => {
-                setRowsPerPage(Number(e.target.value));
-                setCurrentPage(1);
-              }}
-            >
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-            </select>
-            <span className="pagination-label">entries</span>
-          </div>
+      {/* TABLE */}
+      <div className="cg-table-card">
+        <div className="cg-table-wrapper">
+          <table className="cg-table">
+            <thead>
+              <tr>
+                <th style={{ width: "50px" }}>
+                  <Form.Check
+                    type="checkbox"
+                    checked={selectAll}
+                    onChange={handleSelectAll}
+                    label=""
+                  />
+                </th>
+                <th>Employee ID</th>
+                <th>Employee Name</th>
+                <th>Department</th>
+                <th>Email</th>
+                <th>Days Without Goals</th>
+                <th className="cg-text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loadingWithoutGoals ? (
+                <tr>
+                  <td colSpan={8} className="cg-empty-state">
+                    <Spinner animation="border" size="sm" /> Loading...
+                  </td>
+                </tr>
+              ) : currentItems.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="cg-empty-state">
+                    <i className="bi bi-inbox"></i>
+                    <p>No employees found matching the criteria!</p>
+                  </td>
+                </tr>
+              ) : (
+                currentItems.map((emp) => {
+                  const empId = emp.userId ?? emp.UserId;
+                  return (
+                    <tr key={empId}>
+                      <td>
+                        <Form.Check
+                          type="checkbox"
+                          checked={selectedEmployees.includes(empId)}
+                          onChange={() => handleSelectEmployee(empId)}
+                          label=""
+                        />
+                      </td>
+                      <td>
+                        <strong>
+                          {emp.employeeCompanyId ?? emp.EmployeeCompanyId}
+                        </strong>
+                      </td>
+                      <td>{emp.employeeName ?? emp.EmployeeName}</td>
+                      <td>{emp.departmentName ?? emp.DepartmentName}</td>
+                      <td className="cg-email-cell">
+                        {emp.email ?? emp.Email}
+                      </td>
+                      <td className="cg-text-center">
+                        <span
+                          className={`cg-days-badge ${
+                            (emp.daysWithoutGoals ?? emp.DaysWithoutGoals) > 30
+                              ? "badge-danger"
+                              : (emp.daysWithoutGoals ?? emp.DaysWithoutGoals) >
+                                7
+                              ? "badge-warning"
+                              : "badge-info"
+                          }`}
+                        >
+                          {emp.daysWithoutGoals ?? emp.DaysWithoutGoals}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="cg-action-buttons">
+                          <OverlayTrigger
+                            placement="top"
+                            overlay={
+                              <Tooltip id={`tooltip-send-${empId}`}>
+                                Send Reminder
+                              </Tooltip>
+                            }
+                          >
+                            <button
+                              className="cg-action-btn cg-action-send"
+                              onClick={() => openSendReminder(emp)}
+                            >
+                              <i className="bi bi-send"></i>
+                            </button>
+                          </OverlayTrigger>
 
-          <div className="pagination-status">
-            Showing {indexOfFirstItem + 1} to{" "}
-            {Math.min(indexOfLastItem, filteredData.length)} of{" "}
-            {filteredData.length} entries
-          </div>
+                          <OverlayTrigger
+                            placement="top"
+                            overlay={
+                              <Tooltip id={`tooltip-suggest-${empId}`}>
+                                Suggest Goals
+                              </Tooltip>
+                            }
+                          >
+                            <button
+                              className="cg-action-btn cg-action-suggest"
+                              onClick={() => fetchSuggestions(empId)}
+                            >
+                              <i className="bi bi-lightbulb"></i>
+                            </button>
+                          </OverlayTrigger>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
 
-          <nav className="pagination-nav">
-            <ul className="pagination">
-              <li
-                className={`page-item ${
-                  currentPage === 1 ? "disabled" : ""
-                }`}
+        {/* PAGINATION */}
+        {filteredData.length > 0 && (
+          <div className="cg-pagination-container">
+            <div className="cg-pagination-info">
+              <span className="cg-pagination-label">Show</span>
+              <select
+                className="cg-pagination-select"
+                value={rowsPerPage}
+                onChange={(e) => {
+                  setRowsPerPage(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
               >
-                <button
-                  className="page-link"
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(prev - 1, 1))
-                  }
-                  disabled={currentPage === 1}
-                >
-                  <i className="bi bi-chevron-left"></i>
-                </button>
-              </li>
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+              </select>
+              <span className="cg-pagination-label">entries</span>
+            </div>
 
-              {getPageNumbers().map((page, index) => (
+            <div className="cg-pagination-status">
+              Showing {indexOfFirstItem + 1} to{" "}
+              {Math.min(indexOfLastItem, filteredData.length)} of{" "}
+              {filteredData.length} entries
+            </div>
+
+            <nav className="cg-pagination-nav">
+              <ul className="cg-pagination">
                 <li
-                  key={index}
-                  className={`page-item ${
-                    page === currentPage ? "active" : ""
-                  } ${typeof page !== "number" ? "disabled" : ""}`}
+                  className={`cg-page-item ${
+                    currentPage === 1 ? "disabled" : ""
+                  }`}
                 >
                   <button
-                    className="page-link"
+                    className="cg-page-link"
                     onClick={() =>
-                      typeof page === "number" && setCurrentPage(page)
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
                     }
-                    disabled={typeof page !== "number"}
+                    disabled={currentPage === 1}
                   >
-                    {page}
+                    <i className="bi bi-chevron-left"></i>
                   </button>
                 </li>
-              ))}
 
-              <li
-                className={`page-item ${
-                  currentPage === totalPages ? "disabled" : ""
-                }`}
-              >
-                <button
-                  className="page-link"
-                  onClick={() =>
-                    setCurrentPage((prev) =>
-                      Math.min(prev + 1, totalPages)
-                    )
-                  }
-                  disabled={currentPage === totalPages}
+                {getPageNumbers().map((page, index) => (
+                  <li
+                    key={index}
+                    className={`cg-page-item ${
+                      page === currentPage ? "active" : ""
+                    } ${typeof page !== "number" ? "disabled" : ""}`}
+                  >
+                    <button
+                      className="cg-page-link"
+                      onClick={() =>
+                        typeof page === "number" && setCurrentPage(page)
+                      }
+                      disabled={typeof page !== "number"}
+                    >
+                      {page}
+                    </button>
+                  </li>
+                ))}
+
+                <li
+                  className={`cg-page-item ${
+                    currentPage === totalPages ? "disabled" : ""
+                  }`}
                 >
-                  <i className="bi bi-chevron-right"></i>
-                </button>
-              </li>
-            </ul>
-          </nav>
-        </div>
-      )}
+                  <button
+                    className="cg-page-link"
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
+                    disabled={currentPage === totalPages}
+                  >
+                    <i className="bi bi-chevron-right"></i>
+                  </button>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        )}
+      </div>
 
       <GoalSuggestionsModal
         show={!!goalSuggestions}
