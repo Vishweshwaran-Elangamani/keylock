@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -61,8 +60,6 @@ export default function HRHome() {
   return (
     <div className="eepz-hrhome-bg">
       <div className="eepz-hrhome-container">
-
-        {/* Page Title */}
         <h1 className="eepz-hrhome-title">Performance &amp; Nomination Management</h1>
         <p className="eepz-hrhome-subtitle">
           Initiate , Review , Track the form and nominations
@@ -143,20 +140,22 @@ export default function HRHome() {
 }
 .eepz-hrhome-card {
   background: #FFFFFF;
-  border: 1px solid #D7DCE5;
+  border: 1px solid black; /* Updated to match the image */
   border-radius: 16px;
   padding: 16px 18px;
   cursor: pointer;
   transition: box-shadow 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
   box-shadow: 0 1px 1px rgba(17, 24, 39, 0.03);
 }
+
 .eepz-hrhome-card:hover,
 .eepz-hrhome-card.hovered,
 .eepz-hrhome-card:focus-visible {
   transform: translateY(-2px);
-  border-color: #B8BFCB;
+  border-color: #94A3B8; /* Slightly darker slate tone for hover */
   box-shadow: 0 6px 16px rgba(17, 24, 39, 0.08);
 }
+
 .hrhome-card-header {
   display: flex;
   align-items: center;
@@ -188,7 +187,7 @@ export default function HRHome() {
   line-height: 1.35;
   white-space: normal;
 }
-           `}</style>
+      `}</style>
     </div>
   );
 }
