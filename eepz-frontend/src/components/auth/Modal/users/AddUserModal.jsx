@@ -1,18 +1,14 @@
+
+
 import { useState, useEffect, useRef } from "react";
 import userService from "../../../../services/auth/userService";
 import { toast } from "sonner";
 import "../../../../styles/auth/user/AddUserModal.css";
 
-// Custom Dropdown Component
-const CustomDropdown = ({
-  value,
-  onChange,
-  options,
-  placeholder,
-  name,
-  error,
-}) => {
+// Custom Dropdown Component with Smart Positioning
+const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [openUpward, setOpenUpward] = useState(false);
   const dropdownRef = useRef(null);
 
   const selectedOption = options.find((opt) => opt.value === value);
@@ -33,6 +29,23 @@ const CustomDropdown = ({
     };
   }, [isOpen]);
 
+  // Smart positioning logic
+  useEffect(() => {
+    if (isOpen && dropdownRef.current) {
+      const rect = dropdownRef.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      const dropdownHeight = 250; // Approximate max height of dropdown
+
+      // Open upward if not enough space below but enough space above
+      if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
+        setOpenUpward(true);
+      } else {
+        setOpenUpward(false);
+      }
+    }
+  }, [isOpen]);
+
   const handleSelect = (optionValue) => {
     onChange({ target: { name, value: optionValue } });
     setIsOpen(false);
@@ -41,7 +54,7 @@ const CustomDropdown = ({
   return (
     <div
       ref={dropdownRef}
-      className={`aum-custom-dropdown ${error ? "error" : ""}`}
+      className={`aum-custom-dropdown ${error ? "error" : ""} ${isOpen ? "active" : ""}`}
     >
       <div
         className="aum-custom-dropdown-selected"
@@ -58,7 +71,7 @@ const CustomDropdown = ({
       </div>
 
       {isOpen && (
-        <div className="aum-custom-dropdown-menu">
+        <div className={`aum-custom-dropdown-menu ${openUpward ? "open-upward" : ""}`}>
           {options.map((option) => (
             <div
               key={option.value}

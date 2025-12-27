@@ -1,8 +1,99 @@
+
+
+
 import { useState } from "react";
 import { toast } from "sonner";
 import periodAllocationService from "../../../services/hr_operations/hr/periodAllocationService";
 import { formatCurrency } from "../../../utils/auth/currencyFormatter";
 import "../../../styles/hr_operations/hr/CreatePeriodAllocationModal.css";
+
+/* Custom Period Dropdown */
+const PeriodDropdown = ({ value, onChange, periods }) => {
+  const [open, setOpen] = useState(false);
+
+  const selected = periods.find((p) => p.value === value) || periods[0];
+
+  const handleSelect = (val) => {
+    onChange({ target: { name: "period", value: val } });
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="cpam-custom-dropdown"
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+    >
+      <div
+        className="cpam-custom-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {selected.label}
+        <i className={`bi bi-chevron-${open ? "up" : "down"} cpam-custom-arrow`}></i>
+      </div>
+
+      {open && (
+        <div className="cpam-custom-menu">
+          {periods.map((period) => (
+            <div
+              key={period.value}
+              className={
+                "cpam-custom-option" +
+                (period.value === value ? " cpam-custom-option-active" : "")
+              }
+              onClick={() => handleSelect(period.value)}
+            >
+              {period.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* Custom Year Dropdown */
+const YearDropdown = ({ value, onChange, years }) => {
+  const [open, setOpen] = useState(false);
+
+  const handleSelect = (val) => {
+    onChange({ target: { name: "periodYear", value: val } });
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="cpam-custom-dropdown"
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+    >
+      <div
+        className="cpam-custom-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {value}
+        <i className={`bi bi-chevron-${open ? "up" : "down"} cpam-custom-arrow`}></i>
+      </div>
+
+      {open && (
+        <div className="cpam-custom-menu">
+          {years.map((year) => (
+            <div
+              key={year}
+              className={
+                "cpam-custom-option" +
+                (year === value ? " cpam-custom-option-active" : "")
+              }
+              onClick={() => handleSelect(year)}
+            >
+              {year}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -25,6 +116,8 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
     { value: "H1", label: "H1 - Half Year 1" },
     { value: "H2", label: "H2 - Half Year 2" },
   ];
+
+  const years = [2024, 2025, 2026, 2027];
 
   const validateForm = () => {
     const newErrors = {};
@@ -158,19 +251,11 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
                   <label className="cpam-form-label">
                     Period <span className="cpam-required-asterisk">*</span>
                   </label>
-                  <select
-                    name="period"
+                  <PeriodDropdown
                     value={formData.period}
                     onChange={handleChange}
-                    required
-                    className="cpam-form-input cpam-form-select"
-                  >
-                    {periods.map((period) => (
-                      <option key={period.value} value={period.value}>
-                        {period.label}
-                      </option>
-                    ))}
-                  </select>
+                    periods={periods}
+                  />
                 </div>
 
                 {/* Year */}
@@ -178,19 +263,11 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
                   <label className="cpam-form-label">
                     Year <span className="cpam-required-asterisk">*</span>
                   </label>
-                  <select
-                    name="periodYear"
+                  <YearDropdown
                     value={formData.periodYear}
                     onChange={handleChange}
-                    required
-                    className="cpam-form-input cpam-form-select"
-                  >
-                    {[2024, 2025, 2026, 2027].map((year) => (
-                      <option key={year} value={year}>
-                        {year}
-                      </option>
-                    ))}
-                  </select>
+                    years={years}
+                  />
                 </div>
               </div>
 

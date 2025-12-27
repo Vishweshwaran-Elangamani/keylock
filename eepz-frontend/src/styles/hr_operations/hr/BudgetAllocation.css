@@ -41,6 +41,7 @@
   border-radius: 8px;
 }
 
+/* ==================== KPI CARDS - ICON LEFT, TEXT CENTERED ==================== */
 .budget-summary-cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -52,7 +53,6 @@
   background: #ffffff;
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(44, 39, 98, 0.08);
-  text-align: left;
   transition: all 0.3s ease;
   cursor: pointer;
   border: 1px solid #27235c;
@@ -87,6 +87,7 @@
   border-color: #0d6efd;
 }
 
+/* ICON - STAYS ON LEFT */
 .summary-card-icon {
   width: 48px;
   height: 48px;
@@ -118,12 +119,14 @@
   color: #be185d;
 }
 
+/* TEXT CONTENT - CENTERED IN REMAINING SPACE */
 .summary-card-content {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  text-align: left;
-  align-items: flex-start;
+  text-align: center;
+  align-items: center;
+  flex: 1;
 }
 
 .summary-card-label {
@@ -133,6 +136,7 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   line-height: 1.2;
+  text-align: center;
 }
 
 .summary-card-value {
@@ -140,8 +144,10 @@
   font-weight: 700;
   color: #1e293b;
   line-height: 1;
+  text-align: center;
 }
 
+/* ==================== FILTER SECTION ==================== */
 .budget-filter-section {
   padding: 1rem 1.5rem;
   background: #ffffff;
@@ -159,7 +165,7 @@
 }
 
 /* ========================================
-   SEARCH BAR WITH BUTTON - NEW
+   SEARCH BAR WITH BUTTON
 ======================================== */
 .budget-search-input {
   position: relative;
@@ -216,7 +222,6 @@
   box-shadow: none;
 }
 
-/* Search Button */
 .budget-search-btn {
   border: none;
   outline: none;
@@ -240,7 +245,7 @@
 }
 
 /* ========================================
-   CLEAR FILTERS BUTTON - WHITE BACKGROUND, BLACK OUTLINE
+   CLEAR FILTERS BUTTON
 ======================================== */
 .budget-clear-btn {
   white-space: nowrap;

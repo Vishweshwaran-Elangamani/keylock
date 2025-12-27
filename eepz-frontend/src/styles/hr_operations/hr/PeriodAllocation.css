@@ -144,385 +144,169 @@
   gap: 1rem;
 }
 
-/* First Row - Budget + Actions */
-.period-filter-row-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.period-filter-actions-right {
-  display: flex;
-  gap: 0.75rem;
-  align-items: center;
-}
-
-/* Second Row - ALL FILTERS IN SINGLE LINE */
-.period-filter-row-bottom {
+/* SINGLE ROW - ALL FILTERS */
+.period-filter-row-single {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: nowrap;
 }
 
-.period-filter-row-bottom .period-search-input-wrapper {
-  flex: 1;
-  min-width: 280px;
-  max-width: 420px;
+/* Results Count Row */
+.period-results-count-row {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 0.5rem;
+  border-top: 1px solid #f3f4f6;
 }
 
-.period-filter-row-bottom .period-filter-select {
-  min-width: 160px;
-  width: 160px;
-  flex-shrink: 0;
-}
-
-.period-filter-row-bottom .custom-year-dropdown,
-.period-filter-row-bottom .custom-period-dropdown {
-  min-width: 160px;
-  width: 160px;
-  flex-shrink: 0;
-}
-
-.period-filter-row-bottom .period-clear-btn {
+.period-results-count-inline {
+  font-size: 0.875rem;
+  color: #6c757d;
   white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.period-filter-row-bottom .period-results-count-inline {
-  white-space: nowrap;
-  flex-shrink: 0;
-  margin-left: auto;
-  font-size: 13px;
-  color: #64748b;
   font-weight: 500;
 }
 
-/* ========================================
-   CUSTOM BUDGET DROPDOWN
-======================================== */
-.period-budget-dropdown-custom {
-  min-width: 400px;
-  max-width: 600px;
+/* Spacer for flex gap */
+.period-filter-spacer {
   flex: 1;
-  padding: 0;
-  border: 2px solid #27235c;
-  border-radius: 8px;
-  font-size: 14px;
-  background: #ffffff;
-  color: #27235c;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-weight: 600;
-  position: relative;
-  user-select: none;
-  height: 38px;
-}
-
-.period-budget-dropdown-custom:focus {
-  outline: none;
-  border-color: #27235c;
-  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
-}
-
-.period-budget-dropdown-empty {
-  min-width: 400px;
-  max-width: 600px;
-  flex: 1;
-  padding: 0.5rem 0.75rem;
-  border: 2px solid #cbd5e1;
-  border-radius: 8px;
-  font-size: 14px;
-  background: #f1f5f9;
-  color: #64748b;
-  font-weight: 600;
-  height: 38px;
-  display: flex;
-  align-items: center;
-}
-
-.custom-budget-selected {
-  padding: 0.5rem 2.5rem 0.5rem 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  position: relative;
-  cursor: pointer;
-  user-select: none;
-  min-height: 34px;
-}
-
-.custom-budget-selected span {
-  flex: 1;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-/* Budget Dropdown Placeholder */
-.custom-budget-placeholder {
-  color: #9ca3af;
-  font-weight: 500;
-}
-
-.custom-budget-selected-text {
-  color: #27235c;
-  font-weight: 600;
-}
-
-.custom-budget-arrow {
-  position: absolute;
-  right: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%) rotate(45deg);
-  width: 8px;
-  height: 8px;
-  border-right: 2px solid #27235c;
-  border-bottom: 2px solid #27235c;
-  pointer-events: none;
-  transition: transform 0.2s ease;
-}
-
-.period-budget-dropdown-custom:focus-within .custom-budget-arrow {
-  transform: translateY(-25%) rotate(225deg);
-}
-
-.custom-budget-menu {
-  position: absolute;
-  top: calc(100% - 2px);
-  left: -2px;
-  right: -2px;
-  background: #ffffff;
-  border: 2px solid #27235c;
-  border-top: none;
-  border-radius: 0 0 7px 7px;
-  box-shadow: 0 8px 16px rgba(39, 35, 92, 0.15);
-  z-index: 1000;
-  max-height: 300px;
-  overflow-y: auto;
-  animation: budgetDropdownFadeIn 0.15s ease-out;
-}
-
-@keyframes budgetDropdownFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.custom-budget-option {
-  padding: 0.625rem 0.75rem;
-  cursor: pointer;
-  display: block;
-  text-align: left;
-  transition: all 0.12s ease;
-  font-size: 14px;
-  color: #27235c;
-  border-bottom: 1px solid #e5e7eb;
-  font-weight: 600;
-}
-
-.custom-budget-option:last-child {
-  border-bottom: none;
-  border-radius: 0 0 5px 5px;
-}
-
-.custom-budget-option:hover {
-  background-color: #27235c;
-  color: #ffffff;
-}
-
-.custom-budget-option-active {
-  background-color: #f3f4f6;
-  font-weight: 700;
-}
-
-.custom-budget-option-active:hover {
-  background-color: #27235c;
-  color: #ffffff;
-}
-
-.custom-budget-menu::-webkit-scrollbar {
-  width: 8px;
-}
-
-.custom-budget-menu::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 0 0 5px 0;
-}
-
-.custom-budget-menu::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-
-.custom-budget-menu::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
 }
 
 /* ============================================================
-   SEARCH
+   SEARCH INPUT - CLEAN & FULL VIEW
 ============================================================ */
-.period-search-input-wrapper {
-  flex: 1;
-  min-width: 300px;
-  max-width: 420px;
-  display: flex;
-}
-
-.period-search-inner {
+.period-search-wrapper {
+  flex: 0 1 auto;
+  min-width: 250px;
+  max-width: 320px;
   display: flex;
   align-items: center;
-  width: 100%;
-  height: 38px;
-  border-radius: 4px;
-  border: 1px solid #ced4da;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
   background: #ffffff;
+  height: 44px;
   overflow: hidden;
   transition: all 0.2s ease;
 }
 
-.period-search-inner:focus-within {
+.period-search-wrapper:focus-within {
   border-color: #27235c;
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
 }
 
-.period-search-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding-left: 0.75rem;
-  padding-right: 0.5rem;
-  font-size: 0.875rem;
-  color: #a0aec0;
-}
-
-.period-search-field {
+.period-search-input {
   flex: 1;
   height: 100%;
+  padding: 0 0.875rem;
+  border: none;
+  outline: none;
   font-size: 14px;
-  padding: 0;
-  padding-right: 0.75rem;
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
+  color: #1f2937;
   background: transparent;
 }
 
-.period-search-field::placeholder {
-  color: #a0aec0;
-}
-
-.period-search-field:focus {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
+.period-search-input::placeholder {
+  color: #9ca3af;
+  font-size: 14px;
 }
 
 .period-search-btn {
-  border: none;
-  outline: none;
   height: 100%;
   padding: 0 1rem;
+  border: none;
+  outline: none;
+  background: #27235c;
+  color: #ffffff;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  background: #27235c;
-  color: #ffffff;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  border-radius: 0 6px 6px 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  white-space: nowrap;
-  transition: all 0.15s ease;
-  border-radius: 0 4px 4px 0;
 }
 
 .period-search-btn:hover {
   background: #1f1c4b;
 }
 
-/* Filter Selects */
-.period-filter-select {
+/* ========================================
+   UNIFORM DROPDOWNS (Department & Year)
+   DARK NAVY BLUE HOVER (#27235c)
+======================================== */
+.period-uniform-dropdown {
+  position: relative;
   min-width: 160px;
   max-width: 180px;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
-  font-size: 14px;
+  height: 44px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
   background: #ffffff;
-  color: #212529;
   cursor: pointer;
   transition: all 0.2s ease;
-  height: 38px;
+  user-select: none;
+  display: flex;
+  align-items: center;
 }
 
-.period-filter-select:focus {
-  outline: none;
+/* Department dropdown specific width */
+.period-dept-dropdown {
+  min-width: 220px;
+  max-width: 260px;
+}
+
+.period-uniform-dropdown.disabled {
+  background: #f3f4f6;
+  cursor: not-allowed;
+  border-color: #e5e7eb;
+}
+
+.period-uniform-dropdown:focus-within {
   border-color: #27235c;
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
 }
 
-/* ========================================
-   CUSTOM YEAR DROPDOWN
-======================================== */
-.custom-year-dropdown {
-  position: relative;
-  padding: 0;
-  border-radius: 4px;
-  user-select: none;
-  z-index: 1;
-}
-
-.custom-year-dropdown.active {
-  z-index: 100;
-}
-
-.custom-year-selected {
-  padding: 0.5rem 2rem 0.5rem 0.75rem;
+.period-uniform-selected {
+  width: 100%;
+  padding: 0 2.5rem 0 0.875rem;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
   position: relative;
   cursor: pointer;
   user-select: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2937;
+  height: 100%;
 }
 
-.custom-year-arrow {
+.period-uniform-dropdown.disabled .period-uniform-selected {
+  color: #9ca3af;
+}
+
+.period-uniform-arrow {
   position: absolute;
-  right: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%) rotate(45deg);
-  width: 8px;
-  height: 8px;
-  border-right: 2px solid #111827;
-  border-bottom: 2px solid #111827;
+  right: 0.875rem;
+  font-size: 12px;
+  color: #6b7280;
   pointer-events: none;
   transition: transform 0.2s ease;
 }
 
-.custom-year-dropdown:focus-within .custom-year-arrow {
-  transform: translateY(-25%) rotate(225deg);
-}
-
-.custom-year-menu {
+.period-uniform-menu {
   position: absolute;
-  top: calc(100% - 1px);
-  left: -1px;
-  right: -1px;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
   background: #ffffff;
-  border: 1px solid #ced4da;
-  border-top: none;
-  border-radius: 0 0 4px 4px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
   z-index: 1000;
-  max-height: 200px;
+  max-height: 280px;
   overflow-y: auto;
   animation: dropdownFadeIn 0.15s ease-out;
 }
@@ -538,156 +322,107 @@
   }
 }
 
-.custom-year-option {
-  padding: 0.5rem 0.75rem;
+.period-uniform-option {
+  padding: 0.75rem 0.875rem;
   cursor: pointer;
   display: block;
   text-align: left;
-  transition: all 0.12s ease;
+  transition: all 0.15s ease;
   font-size: 14px;
-  color: #111827;
+  color: #1f2937;
+  border-bottom: 1px solid #f3f4f6;
 }
 
-.custom-year-option:hover {
+.period-uniform-option:last-child {
+  border-bottom: none;
+}
+
+/* DARK NAVY BLUE HOVER - matching your image */
+.period-uniform-option:hover {
   background-color: #27235c;
   color: #ffffff;
 }
 
-.custom-year-option:first-child:hover {
-  border-radius: 0;
-}
-
-.custom-year-option:last-child {
-  border-radius: 0 0 3px 3px;
-}
-
-.custom-year-option-active {
+.period-uniform-option-active {
   background-color: #f3f4f6;
   font-weight: 600;
 }
 
-.custom-year-option-active:hover {
+.period-uniform-option-active:hover {
   background-color: #27235c;
   color: #ffffff;
 }
 
-/* ========================================
-   CUSTOM PERIOD DROPDOWN
-======================================== */
-.custom-period-dropdown {
-  position: relative;
-  padding: 0;
-  border-radius: 4px;
-  user-select: none;
-  z-index: 1;
-}
-
-.custom-period-dropdown.active {
-  z-index: 100;
-}
-
-.custom-period-selected {
-  padding: 0.5rem 2rem 0.5rem 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  position: relative;
-  cursor: pointer;
-  user-select: none;
-}
-
-.custom-period-arrow {
-  position: absolute;
-  right: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%) rotate(45deg);
-  width: 8px;
-  height: 8px;
-  border-right: 2px solid #111827;
-  border-bottom: 2px solid #111827;
-  pointer-events: none;
-  transition: transform 0.2s ease;
-}
-
-.custom-period-dropdown:focus-within .custom-period-arrow {
-  transform: translateY(-25%) rotate(225deg);
-}
-
-.custom-period-menu {
-  position: absolute;
-  top: calc(100% - 1px);
-  left: -1px;
-  right: -1px;
-  background: #ffffff;
-  border: 1px solid #ced4da;
-  border-top: none;
-  border-radius: 0 0 4px 4px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  z-index: 1000;
-  max-height: 200px;
-  overflow-y: auto;
-  animation: dropdownFadeIn 0.15s ease-out;
-}
-
-.custom-period-option {
-  padding: 0.5rem 0.75rem;
-  cursor: pointer;
-  display: block;
-  text-align: left;
-  transition: all 0.12s ease;
+/* Department dropdown - two-line option */
+.period-uniform-option-main {
   font-size: 14px;
-  color: #111827;
+  font-weight: 600;
+  color: inherit;
+  line-height: 1.3;
 }
 
-.custom-period-option:hover {
+.period-uniform-option-sub {
+  font-size: 12px;
+  color: inherit;
+  opacity: 0.8;
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+/* Placeholder option styling */
+.period-uniform-option-placeholder {
+  font-style: italic;
+  color: #6b7280;
+}
+
+.period-uniform-option-placeholder:hover {
   background-color: #27235c;
   color: #ffffff;
+  font-style: normal;
 }
 
-.custom-period-option:first-child:hover {
-  border-radius: 0;
-}
-
-.custom-period-option:last-child {
-  border-radius: 0 0 3px 3px;
-}
-
-.custom-period-option-active {
+.period-uniform-option-placeholder.period-uniform-option-active {
   background-color: #f3f4f6;
   font-weight: 600;
+  font-style: italic;
 }
 
-.custom-period-option-active:hover {
-  background-color: #27235c;
-  color: #ffffff;
+.period-uniform-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.period-uniform-menu::-webkit-scrollbar-track {
+  background: #f9fafb;
+}
+
+.period-uniform-menu::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.period-uniform-menu::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 /* Clear Filters Button */
 .period-clear-btn {
   white-space: nowrap;
-  padding: 0.5rem 1rem;
+  padding: 0 1rem;
   font-weight: 500;
   background: #ffffff;
-  border: 1px solid #ced4da;
-  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
   font-size: 14px;
-  color: #212529;
+  color: #374151;
   cursor: pointer;
   transition: all 0.2s ease;
-  height: 38px;
+  height: 44px;
+  min-width: 120px;
 }
 
 .period-clear-btn:hover {
-  background: #f8f9fa;
-  border-color: #6c757d;
-}
-
-/* Results Count */
-.period-results-count-inline {
-  font-size: 0.875rem;
-  color: #6c757d;
-  white-space: nowrap;
-  font-weight: 500;
+  background: #f9fafb;
+  border-color: #9ca3af;
 }
 
 /* Export Button */
@@ -695,8 +430,8 @@
   background: #ffffff;
   color: #27235c;
   border: 2px solid #27235c;
-  padding: 0.5rem 1.25rem;
-  border-radius: 8px;
+  padding: 0 1.25rem;
+  border-radius: 6px;
   font-weight: 600;
   font-size: 14px;
   display: flex;
@@ -705,7 +440,9 @@
   transition: all 0.12s ease;
   cursor: pointer;
   white-space: nowrap;
-  height: 38px;
+  height: 44px;
+  min-width: 110px;
+  justify-content: center;
 }
 
 .period-btn-export:hover {
@@ -724,8 +461,8 @@
   background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
   color: #ffffff;
   border: none;
-  padding: 0.5rem 1.25rem;
-  border-radius: 8px;
+  padding: 0 1.25rem;
+  border-radius: 6px;
   font-weight: 600;
   font-size: 14px;
   display: flex;
@@ -735,7 +472,9 @@
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(151, 36, 126, 0.25);
   white-space: nowrap;
-  height: 38px;
+  height: 44px;
+  min-width: 130px;
+  justify-content: center;
 }
 
 .period-btn-create:hover {
@@ -1029,33 +768,31 @@
 /* ========================================
    RESPONSIVE DESIGN
 ======================================== */
-@media (max-width: 1200px) {
-  .period-summary-cards {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .period-filter-row-bottom {
+@media (max-width: 1400px) {
+  .period-filter-row-single {
     flex-wrap: wrap;
   }
 
-  .period-filter-row-bottom .period-search-input-wrapper {
+  .period-search-wrapper {
     flex: 1 1 100%;
     min-width: 100%;
     max-width: 100%;
+    margin-bottom: 0.5rem;
   }
 
-  .period-filter-row-bottom .period-filter-select,
-  .period-filter-row-bottom .custom-year-dropdown,
-  .period-filter-row-bottom .custom-period-dropdown {
-    flex: 1 1 auto;
-    min-width: 150px;
+  .period-filter-spacer {
+    display: none;
   }
 
-  .period-filter-row-bottom .period-results-count-inline {
-    flex: 1 1 100%;
-    margin-left: 0;
-    text-align: center;
-    margin-top: 0.5rem;
+  .period-btn-export,
+  .period-btn-create {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 1200px) {
+  .period-summary-cards {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -1067,6 +804,28 @@
   .period-table {
     min-width: 900px;
   }
+
+  .period-filter-row-single {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .period-search-wrapper,
+  .period-uniform-dropdown,
+  .period-dept-dropdown {
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  .period-clear-btn,
+  .period-btn-export,
+  .period-btn-create {
+    width: 100%;
+  }
+
+  .period-filter-spacer {
+    display: none;
+  }
 }
 
 @media (max-width: 768px) {
@@ -1076,47 +835,6 @@
 
   .period-summary-cards {
     grid-template-columns: 1fr;
-  }
-
-  .period-filter-row-top {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .period-budget-dropdown-custom,
-  .period-budget-dropdown-empty {
-    min-width: 100%;
-    max-width: 100%;
-  }
-
-  .period-filter-actions-right {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .period-filter-row-bottom {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .period-filter-row-bottom .period-search-input-wrapper {
-    min-width: 100%;
-    max-width: 100%;
-  }
-
-  .period-filter-row-bottom .period-filter-select,
-  .period-filter-row-bottom .custom-year-dropdown,
-  .period-filter-row-bottom .custom-period-dropdown {
-    min-width: 100%;
-    max-width: 100%;
-    width: 100%;
-  }
-
-  .period-clear-btn,
-  .period-btn-export,
-  .period-btn-create {
-    width: 100%;
-    justify-content: center;
   }
 
   .pagination-container {

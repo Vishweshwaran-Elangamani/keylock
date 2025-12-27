@@ -104,6 +104,7 @@
   display: flex;
   flex-direction: column;
   gap: 5px;
+  position: relative;
 }
 
 .adm-form-label {
@@ -171,7 +172,6 @@
   position: relative;
   width: 100%;
   user-select: none;
-  z-index: 10;
 }
 
 .adm-custom-dropdown-selected {
@@ -183,7 +183,7 @@
   font-size: 13px;
   border: 1px solid #cbd5e1;
   border-radius: 6px;
-  background-color: #ffffff !important;
+  background-color: #ffffff;
   cursor: pointer;
   transition: all 0.2s ease;
   min-height: 42px;
@@ -200,7 +200,7 @@
 }
 
 .adm-custom-dropdown.error .adm-custom-dropdown-selected {
-  border-color: #dc3545 !important;
+  border-color: #dc3545;
 }
 
 .adm-custom-dropdown-selected:focus,
@@ -247,19 +247,26 @@
   transform: translateY(-25%) rotate(-135deg);
 }
 
+/* ==================== DROPDOWN MENU ==================== */
 .adm-custom-dropdown-menu {
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
   right: 0;
-  background: #ffffff !important;
+  background: #ffffff;
   border: 1px solid #cbd5e1;
   border-radius: 6px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-  z-index: 10000;
-  max-height: 220px;
+  max-height: 250px;
   overflow-y: auto;
   animation: adm-dropdown-fade-in 0.15s ease-out;
+}
+
+/* OPEN UPWARD */
+.adm-custom-dropdown-menu.open-upward {
+  top: auto;
+  bottom: calc(100% + 4px);
+  animation: adm-dropdown-fade-in-upward 0.15s ease-out;
 }
 
 @keyframes adm-dropdown-fade-in {
@@ -273,14 +280,25 @@
   }
 }
 
+@keyframes adm-dropdown-fade-in-upward {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .adm-custom-dropdown-option {
   padding: 10px 12px;
   font-size: 13px;
-  color: #334155 !important;
+  color: #334155;
   cursor: pointer;
   transition: all 0.15s ease;
   text-align: left;
-  background-color: #ffffff !important;
+  background-color: #ffffff;
   border-bottom: 1px solid #f1f5f9;
 }
 
@@ -289,19 +307,19 @@
 }
 
 .adm-custom-dropdown-option:hover {
-  background-color: #27235c !important;
-  color: #ffffff !important;
+  background-color: #27235c;
+  color: #ffffff;
 }
 
 .adm-custom-dropdown-option.selected {
-  background-color: #ffffff !important;
+  background-color: #f3f4f6;
   font-weight: 600;
-  color: #334155 !important;
+  color: #334155;
 }
 
 .adm-custom-dropdown-option.selected:hover {
-  background-color: #27235c !important;
-  color: #ffffff !important;
+  background-color: #27235c;
+  color: #ffffff;
 }
 
 .adm-custom-dropdown-menu::-webkit-scrollbar {
