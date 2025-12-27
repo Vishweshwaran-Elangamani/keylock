@@ -180,7 +180,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddScoped<IAppraisalProcessService, AppraisalProcessService>();
+
 builder.Services.AddScoped<IHRNominationRepository, HRNominationRepository>();
 builder.Services.AddScoped<IHRNominationService, HRNominationService>();
 builder.Services.AddScoped<IManagerNominationRepository, ManagerNominationRepository>();
