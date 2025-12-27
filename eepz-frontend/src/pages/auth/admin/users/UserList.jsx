@@ -184,8 +184,12 @@ const UserList = () => {
     if (activeSearchTerm) {
       filtered = filtered.filter(
         (user) =>
-          user.firstName?.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
-          user.lastName?.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
+          user.firstName
+            ?.toLowerCase()
+            .includes(activeSearchTerm.toLowerCase()) ||
+          user.lastName
+            ?.toLowerCase()
+            .includes(activeSearchTerm.toLowerCase()) ||
           user.email?.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
           user.employeeCompanyId
             ?.toLowerCase()
@@ -237,8 +241,13 @@ const UserList = () => {
     fetchData();
   };
   const handleBulkOperationsSuccess = () => {
-    fetchData();
-    toast.success("Operation completed successfully!");
+    setShowBulkOperations(true); //  Close modal first
+    fetchData(); // Then reload data
+
+    // Show success toast after a small delay
+    setTimeout(() => {
+      toast.success("Users imported successfully!");
+    }, 100);
   };
 
   // Pagination helpers

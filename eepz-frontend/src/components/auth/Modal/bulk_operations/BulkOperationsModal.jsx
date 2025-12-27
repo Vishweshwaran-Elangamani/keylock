@@ -13,13 +13,6 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
   const [exportingUsers, setExportingUsers] = useState(false);
   const [exportingAll, setExportingAll] = useState(false);
   const fileInputRef = useRef(null);
-  const modalRef = useRef(null);
-
-  const handleBackdropClick = (e) => {
-    if (modalRef.current && !modalRef.current.contains(e.target)) {
-      handleClose();
-    }
-  };
 
   useEffect(() => {
     if (uploadResult && uploadResult.errors && uploadResult.errors.length > 0) {
@@ -179,69 +172,71 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
 
       toast.dismiss(loadingToastId);
 
-      if (result.success) {
-        const data = result.data;
+      setTimeout(() => {
+        if (result.success) {
+          const data = result.data;
 
-        setUploadResult({
-          successCount: data.successCount || 0,
-          failureCount: data.failureCount || 0,
-          totalRecords: data.totalRecords || 0,
-          errors: data.errors || [],
-          categorizedErrors:
-            data.errors && data.errors.length > 0
-              ? categorizeErrors(data.errors)
-              : null,
-        });
-
-        if (data.failureCount === 0) {
-          // Enhanced success message for complete success
-          toast.success(
-            ` ${data.successCount} user${
-              data.successCount !== 1 ? "s" : ""
-            } added successfully!`,
-            {
-              duration: 6000,
-              description:
-                "All records have been imported and are now active in the system.",
-            }
-          );
-        } else if (data.successCount > 0) {
-          // Partial success message
-          toast.success(
-            `✓ ${data.successCount} user${
-              data.successCount !== 1 ? "s" : ""
-            } added successfully!`,
-            { duration: 5000 }
-          );
-          toast.warning(
-            `⚠ ${data.failureCount} record${
-              data.failureCount !== 1 ? "s" : ""
-            } failed. Check details below.`,
-            { duration: 8000 }
-          );
-        } else {
-          toast.error(
-            `✗ All ${data.totalRecords} records failed. Review errors below.`,
-            { duration: 8000 }
-          );
-        }
-
-        if (data.successCount > 0) {
-          onSuccess?.();
-        }
-      } else {
-        toast.error(result.message || "Import failed", { duration: 5000 });
-
-        if (result.data?.errors) {
           setUploadResult({
-            successCount: 0,
-            failureCount: result.data.failureCount || result.data.errors.length,
-            totalRecords: result.data.totalRecords || result.data.errors.length,
-            errors: result.data.errors,
-            categorizedErrors: categorizeErrors(result.data.errors),
+            successCount: data.successCount || 0,
+            failureCount: data.failureCount || 0,
+            totalRecords: data.totalRecords || 0,
+            errors: data.errors || [],
+            categorizedErrors:
+              data.errors && data.errors.length > 0
+                ? categorizeErrors(data.errors)
+                : null,
           });
+
+          if (data.failureCount === 0) {
+            toast.success(
+              `${data.successCount} user${
+                data.successCount !== 1 ? "s" : ""
+              } added successfully!`,
+              {
+                duration: 6000,
+                description:
+                  "All records have been imported and are now active in the system.",
+              }
+            );
+          } else if (data.successCount > 0) {
+            toast.success(
+              `${data.successCount} user${
+                data.successCount !== 1 ? "s" : ""
+              } added successfully!`,
+              { duration: 5000 }
+            );
+            toast.warning(
+              `${data.failureCount} record${
+                data.failureCount !== 1 ? "s" : ""
+              } failed. Check details below.`,
+              { duration: 8000 }
+            );
+          } else {
+            toast.error(
+              `All ${data.totalRecords} records failed. Review errors below.`,
+              { duration: 8000 }
+            );
+          }
+
+          if (data.successCount > 0) {
+            onSuccess?.();
+          }
+        } else {
+          toast.error(result.message || "Import failed", { duration: 5000 });
+
+          if (result.data?.errors) {
+            setUploadResult({
+              successCount: 0,
+              failureCount:
+                result.data.failureCount || result.data.errors.length,
+              totalRecords:
+                result.data.totalRecords || result.data.errors.length,
+              errors: result.data.errors,
+              categorizedErrors: categorizeErrors(result.data.errors),
+            });
+          }
         }
-      }
+      }, 150);
     } catch (error) {
       toast.dismiss(loadingToastId);
 
@@ -249,30 +244,32 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
       const errorMessage =
         responseData?.message || error.message || "Import failed";
 
-      toast.error(errorMessage, { duration: 5000 });
+      setTimeout(() => {
+        toast.error(errorMessage, { duration: 5000 });
 
-      if (
-        responseData?.data?.errors &&
-        Array.isArray(responseData.data.errors)
-      ) {
-        setUploadResult({
-          successCount: responseData.data.successCount || 0,
-          failureCount:
-            responseData.data.failureCount || responseData.data.errors.length,
-          totalRecords:
-            responseData.data.totalRecords || responseData.data.errors.length,
-          errors: responseData.data.errors,
-          categorizedErrors: categorizeErrors(responseData.data.errors),
-        });
-      } else if (responseData?.errors && Array.isArray(responseData.errors)) {
-        setUploadResult({
-          successCount: 0,
-          failureCount: responseData.errors.length,
-          totalRecords: responseData.errors.length,
-          errors: responseData.errors,
-          categorizedErrors: categorizeErrors(responseData.errors),
-        });
-      }
+        if (
+          responseData?.data?.errors &&
+          Array.isArray(responseData.data.errors)
+        ) {
+          setUploadResult({
+            successCount: responseData.data.successCount || 0,
+            failureCount:
+              responseData.data.failureCount || responseData.data.errors.length,
+            totalRecords:
+              responseData.data.totalRecords || responseData.data.errors.length,
+            errors: responseData.data.errors,
+            categorizedErrors: categorizeErrors(responseData.data.errors),
+          });
+        } else if (responseData?.errors && Array.isArray(responseData.errors)) {
+          setUploadResult({
+            successCount: 0,
+            failureCount: responseData.errors.length,
+            totalRecords: responseData.errors.length,
+            errors: responseData.errors,
+            categorizedErrors: categorizeErrors(responseData.errors),
+          });
+        }
+      }, 150);
     } finally {
       setLoading(false);
     }
@@ -415,12 +412,21 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                     </strong>
                     <ul className="bom-info-alert-list">
                       <li>
-                        Required columns: EmployeeCompanyId, Email, FirstName,
+                        <strong>Employee IDs are AUTO-GENERATED:</strong> Do NOT
+                        include Employee ID column. IDs will be assigned
+                        automatically starting from the last used ID (e.g.,
+                        1000, 1001, 1002...)
+                      </li>
+                      <li>
+                        <strong>Required columns:</strong> Email, FirstName,
                         LastName, Role, Department
+                      </li>
+                      <li>
+                        <strong>Role & Department:</strong> Use dropdown lists
+                        in the Excel template (values loaded from database)
                       </li>
                       <li>File format: .xlsx or .xls (max 5MB)</li>
                       <li>First row must contain column headers</li>
-                      <li>Follow template format with dropdown validations</li>
                     </ul>
                   </div>
                 </div>
@@ -569,7 +575,7 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                           </div>
                           <div className="bom-success-details-summary">
                             <strong className="bom-success-details-summary-title">
-                              ✓ {uploadResult.successCount} user
+                              {uploadResult.successCount} user
                               {uploadResult.successCount !== 1 ? "s" : ""} added
                               successfully!
                             </strong>

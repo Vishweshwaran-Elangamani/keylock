@@ -1,13 +1,17 @@
-
-
-
 import { useState, useEffect, useRef } from "react";
 import userService from "../../../../services/auth/userService";
 import { toast } from "sonner";
 import "../../../../styles/auth/user/AddUserModal.css";
 
 // Custom Dropdown Component
-const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) => {
+const CustomDropdown = ({
+  value,
+  onChange,
+  options,
+  placeholder,
+  name,
+  error,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -43,7 +47,11 @@ const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) 
         className="aum-custom-dropdown-selected"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span className={`aum-custom-dropdown-text ${!selectedOption ? "placeholder" : ""}`}>
+        <span
+          className={`aum-custom-dropdown-text ${
+            !selectedOption ? "placeholder" : ""
+          }`}
+        >
           {selectedOption ? selectedOption.label : placeholder}
         </span>
         <span className={`aum-custom-dropdown-arrow ${isOpen ? "open" : ""}`} />
@@ -85,6 +93,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
     departmentId: "",
   });
   const [loading, setLoading] = useState(false);
+  const [loadingEmployeeId, setLoadingEmployeeId] = useState(false);
   const [errors, setErrors] = useState({});
 
   // Dropdown options
@@ -121,33 +130,41 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
 
   useEffect(() => {
     const fetchNextEmployeeId = async () => {
+      if (!show) return;
+
       try {
+        setLoadingEmployeeId(true);
         const response = await userService.getNextEmployeeCompanyId();
         if (response.success) {
           setFormData((prev) => ({
             ...prev,
             employeeCompanyId: response.data,
           }));
+        } else {
+          toast.error("Failed to generate Employee ID");
+          setFormData((prev) => ({
+            ...prev,
+            employeeCompanyId: "",
+          }));
         }
       } catch (error) {
+        console.error("Error fetching next employee ID:", error);
+        toast.error("Failed to generate Employee ID");
         setFormData((prev) => ({
           ...prev,
           employeeCompanyId: "",
         }));
+      } finally {
+        setLoadingEmployeeId(false);
       }
     };
-    if (show) fetchNextEmployeeId();
+
+    fetchNextEmployeeId();
   }, [show]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === "employeeCompanyId") {
-      if (value === "" || /^\d+$/.test(value)) {
-        setFormData((prev) => ({ ...prev, [name]: value }));
-      }
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
+    setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
@@ -169,18 +186,6 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
 
     if (!formData.employeeCompanyId.trim())
       newErrors.employeeCompanyId = "Employee Company ID is required";
-    else if (!/^\d+$/.test(formData.employeeCompanyId.trim()))
-      newErrors.employeeCompanyId =
-        "Employee Company ID must contain only numbers";
-    else {
-      const idNumber = parseInt(formData.employeeCompanyId.trim());
-      if (idNumber < 1000)
-        newErrors.employeeCompanyId =
-          "Employee Company ID must be ≥ 1000 and must be unique (i.e., not previously used)";
-      else if (idNumber > 999999)
-        newErrors.employeeCompanyId =
-          "Employee Company ID must be less than 1000000";
-    }
 
     if (!formData.email.trim()) newErrors.email = "Email is required";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim()))
@@ -363,29 +368,59 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                   )}
                 </div>
 
-                {/* Employee Company Id */}
+                {/* Employee Company Id - AUTO-GENERATED READ-ONLY */}
                 <div className="aum-form-group">
                   <label className="aum-form-label">
                     Employee ID <span className="aum-required-asterisk">*</span>
                   </label>
-                  <input
-                    type="text"
-                    name="employeeCompanyId"
-                    placeholder="Enter Employee ID"
-                    value={formData.employeeCompanyId}
-                    onChange={handleChange}
-                    maxLength={6}
-                    className={`aum-form-input ${
-                      errors.employeeCompanyId ? "error" : ""
-                    }`}
-                  />
+                  <div style={{ position: "relative" }}>
+                    <input
+                      type="text"
+                      name="employeeCompanyId"
+                      placeholder={
+                        loadingEmployeeId ? "Generating..." : "Auto-generated"
+                      }
+                      value={
+                        loadingEmployeeId
+                          ? "Generating..."
+                          : formData.employeeCompanyId
+                      }
+                      readOnly
+                      disabled
+                      className={`aum-form-input ${
+                        errors.employeeCompanyId ? "error" : ""
+                      }`}
+                      style={{
+                        backgroundColor: "#f8f9fa",
+                        cursor: "not-allowed",
+                        color: loadingEmployeeId ? "#6c757d" : "#28a745",
+                        fontWeight: loadingEmployeeId ? "normal" : "600",
+                        paddingLeft: "12px",
+                      }}
+                    />
+                    {loadingEmployeeId && (
+                      <span
+                        className="aum-spinner-small"
+                        style={{
+                          position: "absolute",
+                          right: "12px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          width: "16px",
+                          height: "16px",
+                          borderWidth: "2px",
+                        }}
+                      />
+                    )}
+                  </div>
                   {errors.employeeCompanyId && (
                     <div className="aum-form-error">
                       {errors.employeeCompanyId}
                     </div>
                   )}
-                  <small className="aum-form-hint">
-                    Must be numeric and start from 1000 or higher
+                  <small className="aum-form-hint" style={{ color: "#6c757d" }}>
+                    <i className="bi bi-shield-check"></i> Auto-generated ID
+                    (sequential from last ID)
                   </small>
                 </div>
 
@@ -539,7 +574,8 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
               <div className="aum-info-alert">
                 <i className="bi bi-info-circle"></i>
                 <small>
-                  Password is automatically generated and sent to user's email
+                  Employee ID is auto-generated. Password is automatically
+                  generated and sent to user's email.
                 </small>
               </div>
             </div>
@@ -557,7 +593,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
 
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || loadingEmployeeId}
                 className="aum-btn-submit"
               >
                 {loading ? (
