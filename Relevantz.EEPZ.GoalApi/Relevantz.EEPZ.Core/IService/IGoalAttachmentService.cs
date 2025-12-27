@@ -7,6 +7,9 @@ namespace Relevantz.EEPZ.Core.IService
     /// <summary>
     /// Service interface for managing goal attachments with MongoDB GridFS storage
     /// </summary>
+    /// <summary>
+    /// Service interface for managing goal attachments with MongoDB GridFS storage
+    /// </summary>
     public interface IGoalAttachmentService
     {
         /// <summary>
