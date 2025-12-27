@@ -28,15 +28,33 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         Task<int?> GetEmployeeIdByMasterIdAsync(int employeeMasterId);
 
         Task<bool> UpdateEmployeeAsync(Employee employee);
-   
         Task<bool> UpdateProjectEmployeePrimaryFlagsAsync(List<Projectemployee> projectEmployees);
 
         Task<Dictionary<int, (int ProjectId, string ProjectName)?>> GetAllEmployeesWithPrimaryProjectAsync();
+
         /// <summary>
-/// Move employees to resource pool if they have no other project mappings
-/// </summary>
-Task<int> MoveUnmappedEmployeesToResourcePoolAsync(List<int> employeeIds);
+        /// Move employees to resource pool if they have no other project mappings
+        /// </summary>
+        Task<int> MoveUnmappedEmployeesToResourcePoolAsync(List<int> employeeIds);
 
+        /// <summary>
+        /// Get the resource pool project (org.rz.resourcepool)
+        /// </summary>
+        Task<Project?> GetResourcePoolProjectAsync();
 
+        /// <summary>
+        /// Get resource pool mappings for specific employees
+        /// </summary>
+        Task<List<Projectemployee>> GetResourcePoolMappingsAsync(int resourcePoolProjectId, List<int> employeeIds);
+
+        /// <summary>
+        /// Get mappings from other projects (excluding resource pool)
+        /// </summary>
+        Task<List<Projectemployee>> GetOtherProjectMappingsAsync(int resourcePoolProjectId, List<int> employeeIds);
+
+        /// <summary>
+        /// Remove project-employee mappings and save changes
+        /// </summary>
+        Task<bool> RemoveProjectEmployeeMappingsAsync(List<Projectemployee> mappings);
     }
 }

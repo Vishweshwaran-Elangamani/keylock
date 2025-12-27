@@ -1,13 +1,17 @@
 global using Serilog;
 global using Serilog.Events;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Relevantz.EEPZ.Core.Services.Implementations;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repository.Implementations;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
 Console.WriteLine("Building........");
 
 Log.Logger = new LoggerConfiguration()
@@ -27,8 +31,7 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
         connectionString,
         ServerVersion.AutoDetect(connectionString),
         b => b.MigrationsAssembly("Relevantz.EEPZ.Data")
-    )
-);
+    ));
 
 Log.Information("Database configured with migrations assembly: Relevantz.EEPZ.Data");
 
@@ -37,7 +40,7 @@ builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 
-Log.Information("Dependency Injection configured - 1 repository, 1 service");
+Log.Information("Dependency Injection configured for project and employee services");
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -48,9 +51,8 @@ builder.Services.AddSwaggerGen(options =>
         {
             Title = "EEPZ API",
             Version = "v1",
-            Description = "Project Management API",
-        }
-    );
+            Description = "Project Management API"
+        });
 
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
@@ -72,11 +74,26 @@ builder.Services.AddCors(options =>
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials();
-        }
-    );
+        });
 });
 
 Log.Information("CORS configured for React app (localhost:5173, localhost:3007)");
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "your-secure-key");
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -99,16 +116,14 @@ app.UseSerilogRequestLogging(options =>
 
 app.UseHttpsRedirection();
 app.UseCors("AllowReactApp");
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-Log.Information("   Application Configuration:");
-Log.Information("   Environment: {Environment}", app.Environment.EnvironmentName);
-Log.Information(
-    "   Database: {Database}",
-    connectionString?.Split(';').FirstOrDefault(x => x.Contains("Database"))
-);
-Log.Information("   CORS Origins: localhost:5173, localhost:3000");
+Log.Information("Application Configuration:");
+Log.Information("Environment: {Environment}", app.Environment.EnvironmentName);
+Log.Information("Database: {Database}", connectionString?.Split(';').FirstOrDefault(x => x.Contains("Database")));
+Log.Information("CORS Origins: localhost:5173, localhost:3000");
 
 try
 {

@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Common.Entities;
@@ -9,569 +10,300 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
     public class ProjectService : IProjectService
     {
         private readonly IProjectRepository _projectRepository;
+        private readonly ILogger<ProjectService> _logger;
 
-        public ProjectService(IProjectRepository projectRepository)
+        public ProjectService(IProjectRepository projectRepository, ILogger<ProjectService> logger)
         {
             _projectRepository = projectRepository;
+            _logger = logger;
         }
 
-        public async Task<ApiResponse<ProjectResponse>> CreateProjectAsync(
-            CreateProjectRequest request
-        )
+        public async Task<ApiResponse<ProjectResponse>> CreateProjectAsync(CreateProjectRequest request)
         {
-            try
+            _logger.LogInformation("Creating project: {ProjectName}", request.ProjectName);
+
+            if (await _projectRepository.ProjectNameExistsAsync(request.ProjectName))
+                return ApiResponse<ProjectResponse>.ErrorResponse("Project name already exists.");
+
+            var validationErrors = new List<string>();
+            ValidateEmployeeExistence(validationErrors, request.ResourceOwnerEmployeeId, "Resource Owner employee does not exist.");
+            ValidateEmployeeExistence(validationErrors, request.L1ApproverEmployeeId, "L1 Approver employee does not exist.");
+            ValidateEmployeeExistence(validationErrors, request.L2ApproverEmployeeId, "L2 Approver employee does not exist.");
+
+            if (validationErrors.Any())
+                return ApiResponse<ProjectResponse>.ErrorResponse("Validation failed.", validationErrors);
+
+            var project = new Project
             {
-                if (await _projectRepository.ProjectNameExistsAsync(request.ProjectName))
-                {
-                    return ApiResponse<ProjectResponse>.ErrorResponse(
-                        "Project name already exists."
-                    );
-                }
+                ProjectName = request.ProjectName,
+                ClientName = request.ClientName,
+                Description = request.Description,
+                BusinessUnit = request.BusinessUnit,
+                Department = request.Department,
+                EngagementModel = request.EngagementModel,
+                Status = request.Status,
+                StartDate = DateOnly.FromDateTime(request.StartDate),
+                EndDate = request.EndDate.HasValue ? DateOnly.FromDateTime(request.EndDate.Value) : null,
+                ResourceOwnerEmployeeId = request.ResourceOwnerEmployeeId,
+                L1approverEmployeeId = request.L1ApproverEmployeeId,
+                L2approverEmployeeId = request.L2ApproverEmployeeId,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now,
+            };
 
-                var validationErrors = new List<string>();
+            var created = await _projectRepository.CreateProjectAsync(project);
+            var retrieved = await _projectRepository.GetProjectByIdAsync(created.ProjectId);
+            var response = MapToProjectResponse(retrieved!);
 
-                if (request.ResourceOwnerEmployeeId.HasValue)
-                {
-                    if (
-                        !await _projectRepository.EmployeeMasterExistsAsync(
-                            request.ResourceOwnerEmployeeId.Value
-                        )
-                    )
-                        validationErrors.Add("Resource Owner employee does not exist.");
-                }
-
-                if (request.L1ApproverEmployeeId.HasValue)
-                {
-                    if (
-                        !await _projectRepository.EmployeeMasterExistsAsync(
-                            request.L1ApproverEmployeeId.Value
-                        )
-                    )
-                        validationErrors.Add("L1 Approver employee does not exist.");
-                }
-
-                if (request.L2ApproverEmployeeId.HasValue)
-                {
-                    if (
-                        !await _projectRepository.EmployeeMasterExistsAsync(
-                            request.L2ApproverEmployeeId.Value
-                        )
-                    )
-                        validationErrors.Add("L2 Approver employee does not exist.");
-                }
-
-                if (validationErrors.Any())
-                {
-                    return ApiResponse<ProjectResponse>.ErrorResponse(
-                        "Validation failed.",
-                        validationErrors
-                    );
-                }
-
-                var project = new Project
-                {
-                    ProjectName = request.ProjectName,
-                    ClientName = request.ClientName,
-                    Description = request.Description,
-                    BusinessUnit = request.BusinessUnit,
-                    Department = request.Department,
-                    EngagementModel = request.EngagementModel,
-                    Status = request.Status,
-                    StartDate = DateOnly.FromDateTime(request.StartDate),
-                    EndDate = request.EndDate.HasValue
-                        ? DateOnly.FromDateTime(request.EndDate.Value)
-                        : null,
-                    ResourceOwnerEmployeeId = request.ResourceOwnerEmployeeId,
-                    L1approverEmployeeId = request.L1ApproverEmployeeId,
-                    L2approverEmployeeId = request.L2ApproverEmployeeId,
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now,
-                };
-
-                var createdProject = await _projectRepository.CreateProjectAsync(project);
-
-                var fullProject = await _projectRepository.GetProjectByIdAsync(
-                    createdProject.ProjectId
-                );
-
-                var response = MapToProjectResponse(fullProject!);
-
-                return ApiResponse<ProjectResponse>.SuccessResponse(
-                    response,
-                    "Project created successfully."
-                );
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse<ProjectResponse>.ErrorResponse(
-                    $"An error occurred while creating the project: {ex.Message}"
-                );
-            }
+            _logger.LogInformation("Project {ProjectId} created successfully.", created.ProjectId);
+            return ApiResponse<ProjectResponse>.SuccessResponse(response, "Project created successfully.");
         }
 
-        public async Task<ApiResponse<ProjectResponse>> UpdateProjectAsync(
-            UpdateProjectRequest request
-        )
+        public async Task<ApiResponse<ProjectResponse>> UpdateProjectAsync(UpdateProjectRequest request)
         {
-            try
-            {
-                var existingProject = await _projectRepository.GetProjectByIdAsync(
-                    request.ProjectId
-                );
+            _logger.LogInformation("Updating project: {ProjectId}", request.ProjectId);
 
-                if (existingProject == null)
-                {
-                    return ApiResponse<ProjectResponse>.ErrorResponse("Project not found.");
-                }
+            var project = await _projectRepository.GetProjectByIdAsync(request.ProjectId);
+            if (project == null)
+                return ApiResponse<ProjectResponse>.ErrorResponse("Project not found.");
 
-                if (
-                    await _projectRepository.ProjectNameExistsAsync(
-                        request.ProjectName,
-                        request.ProjectId
-                    )
-                )
-                {
-                    return ApiResponse<ProjectResponse>.ErrorResponse(
-                        "Project name already exists."
-                    );
-                }
+            if (await _projectRepository.ProjectNameExistsAsync(request.ProjectName, request.ProjectId))
+                return ApiResponse<ProjectResponse>.ErrorResponse("Project name already exists.");
 
-                existingProject.ProjectName = request.ProjectName;
-                existingProject.Description = request.Description;
-                existingProject.BusinessUnit = request.BusinessUnit;
-                existingProject.Department = request.Department;
-                existingProject.EngagementModel = request.EngagementModel;
-                existingProject.Status = request.Status;
-                existingProject.StartDate = DateOnly.FromDateTime(request.StartDate);
-                existingProject.EndDate = request.EndDate.HasValue
-                    ? DateOnly.FromDateTime(request.EndDate.Value)
-                    : null;
-                existingProject.UpdatedAt = DateTime.Now;
+            project.ProjectName = request.ProjectName;
+            project.Description = request.Description;
+            project.BusinessUnit = request.BusinessUnit;
+            project.Department = request.Department;
+            project.EngagementModel = request.EngagementModel;
+            project.Status = request.Status;
+            project.StartDate = DateOnly.FromDateTime(request.StartDate);
+            project.EndDate = request.EndDate.HasValue ? DateOnly.FromDateTime(request.EndDate.Value) : null;
+            project.UpdatedAt = DateTime.Now;
 
-                await _projectRepository.UpdateProjectAsync(existingProject);
+            await _projectRepository.UpdateProjectAsync(project);
+            var updated = await _projectRepository.GetProjectByIdAsync(project.ProjectId);
+            var response = MapToProjectResponse(updated!);
 
-                var updatedProject = await _projectRepository.GetProjectByIdAsync(
-                    request.ProjectId
-                );
-                var response = MapToProjectResponse(updatedProject!);
-
-                return ApiResponse<ProjectResponse>.SuccessResponse(
-                    response,
-                    "Project updated successfully."
-                );
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse<ProjectResponse>.ErrorResponse(
-                    $"An error occurred while updating the project: {ex.Message}"
-                );
-            }
+            _logger.LogInformation("Project {ProjectId} updated successfully.", project.ProjectId);
+            return ApiResponse<ProjectResponse>.SuccessResponse(response, "Project updated successfully.");
         }
 
         public async Task<ApiResponse<bool>> DeleteProjectAsync(int projectId)
         {
-            try
-            {
-                if (!await _projectRepository.ProjectExistsAsync(projectId))
-                {
-                    return ApiResponse<bool>.ErrorResponse("Project not found.");
-                }
+            _logger.LogInformation("Deleting project: {ProjectId}", projectId);
 
-                var result = await _projectRepository.DeleteProjectAsync(projectId);
+            if (!await _projectRepository.ProjectExistsAsync(projectId))
+                return ApiResponse<bool>.ErrorResponse("Project not found.");
 
-                if (result)
-                {
-                    return ApiResponse<bool>.SuccessResponse(true, "Project deleted successfully.");
-                }
-
-                return ApiResponse<bool>.ErrorResponse(
-                    "Cannot delete project while employees are still mapped. Please unmap all employees first."
-                );
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse<bool>.ErrorResponse(
-                    $"An error occurred while deleting the project: {ex.Message}"
-                );
-            }
+            var result = await _projectRepository.DeleteProjectAsync(projectId);
+            return result
+                ? ApiResponse<bool>.SuccessResponse(true, "Project deleted successfully.")
+                : ApiResponse<bool>.ErrorResponse("Cannot delete project while employees are still mapped. Please unmap all employees first.");
         }
 
         public async Task<ApiResponse<ProjectDetailResponse>> GetProjectByIdAsync(int projectId)
         {
-            try
-            {
-                var project = await _projectRepository.GetProjectByIdAsync(projectId);
+            var project = await _projectRepository.GetProjectByIdAsync(projectId);
+            if (project == null)
+                return ApiResponse<ProjectDetailResponse>.ErrorResponse("Project not found.");
 
-                if (project == null)
-                {
-                    return ApiResponse<ProjectDetailResponse>.ErrorResponse("Project not found.");
-                }
-
-                var projectEmployees = await _projectRepository.GetProjectEmployeesAsync(projectId);
-
-                var response = MapToProjectDetailResponse(project, projectEmployees);
-
-                return ApiResponse<ProjectDetailResponse>.SuccessResponse(
-                    response,
-                    "Project retrieved successfully."
-                );
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse<ProjectDetailResponse>.ErrorResponse(
-                    $"An error occurred while retrieving the project: {ex.Message}"
-                );
-            }
+            var employees = await _projectRepository.GetProjectEmployeesAsync(projectId);
+            var response = MapToProjectDetailResponse(project, employees);
+            return ApiResponse<ProjectDetailResponse>.SuccessResponse(response, "Project retrieved successfully.");
         }
 
         public async Task<ApiResponse<List<ProjectResponse>>> GetAllProjectsAsync()
         {
-            try
-            {
-                var projects = await _projectRepository.GetAllProjectsAsync();
-
-                var response = projects.Select(MapToProjectResponse).ToList();
-
-                return ApiResponse<List<ProjectResponse>>.SuccessResponse(
-                    response,
-                    "Projects retrieved successfully."
-                );
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse<List<ProjectResponse>>.ErrorResponse(
-                    $"An error occurred while retrieving projects: {ex.Message}"
-                );
-            }
+            var list = await _projectRepository.GetAllProjectsAsync();
+            var response = list.Select(MapToProjectResponse).ToList();
+            return ApiResponse<List<ProjectResponse>>.SuccessResponse(response, "Projects retrieved successfully.");
         }
 
-        public async Task<ApiResponse<bool>> UpdateReportingManagersAsync(
-            UpdateReportingManagersRequest request
-        )
+        public async Task<ApiResponse<bool>> UpdateReportingManagersAsync(UpdateReportingManagersRequest request)
         {
-            try
-            {
-                if (!await _projectRepository.ProjectExistsAsync(request.ProjectId))
-                {
-                    return ApiResponse<bool>.ErrorResponse("Project not found.");
-                }
+            _logger.LogInformation("Updating reporting managers for project: {ProjectId}", request.ProjectId);
 
-                var validationErrors = new List<string>();
+            if (!await _projectRepository.ProjectExistsAsync(request.ProjectId))
+                return ApiResponse<bool>.ErrorResponse("Project not found.");
 
-                if (request.ResourceOwnerEmployeeId.HasValue)
-                {
-                    if (
-                        !await _projectRepository.EmployeeMasterExistsAsync(
-                            request.ResourceOwnerEmployeeId.Value
-                        )
-                    )
-                        validationErrors.Add("Resource Owner employee does not exist.");
-                }
+            var validationErrors = new List<string>();
+            ValidateEmployeeExistence(validationErrors, request.ResourceOwnerEmployeeId, "Resource Owner employee does not exist.");
+            ValidateEmployeeExistence(validationErrors, request.L1ApproverEmployeeId, "L1 Approver employee does not exist.");
+            ValidateEmployeeExistence(validationErrors, request.L2ApproverEmployeeId, "L2 Approver employee does not exist.");
 
-                if (request.L1ApproverEmployeeId.HasValue)
-                {
-                    if (
-                        !await _projectRepository.EmployeeMasterExistsAsync(
-                            request.L1ApproverEmployeeId.Value
-                        )
-                    )
-                        validationErrors.Add("L1 Approver employee does not exist.");
-                }
+            if (validationErrors.Any())
+                return ApiResponse<bool>.ErrorResponse("Validation failed.", validationErrors);
 
-                if (request.L2ApproverEmployeeId.HasValue)
-                {
-                    if (
-                        !await _projectRepository.EmployeeMasterExistsAsync(
-                            request.L2ApproverEmployeeId.Value
-                        )
-                    )
-                        validationErrors.Add("L2 Approver employee does not exist.");
-                }
+            var updated = await _projectRepository.UpdateReportingManagersAsync(
+                request.ProjectId,
+                request.ResourceOwnerEmployeeId,
+                request.L1ApproverEmployeeId,
+                request.L2ApproverEmployeeId);
 
-                if (validationErrors.Any())
-                {
-                    return ApiResponse<bool>.ErrorResponse("Validation failed.", validationErrors);
-                }
-
-                var result = await _projectRepository.UpdateReportingManagersAsync(
-                    request.ProjectId,
-                    request.ResourceOwnerEmployeeId,
-                    request.L1ApproverEmployeeId,
-                    request.L2ApproverEmployeeId
-                );
-
-                if (result)
-                {
-                    return ApiResponse<bool>.SuccessResponse(
-                        true,
-                        "Reporting managers updated successfully."
-                    );
-                }
-
-                return ApiResponse<bool>.ErrorResponse("Failed to update reporting managers.");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse<bool>.ErrorResponse(
-                    $"An error occurred while updating reporting managers: {ex.Message}"
-                );
-            }
+            return updated
+                ? ApiResponse<bool>.SuccessResponse(true, "Reporting managers updated successfully.")
+                : ApiResponse<bool>.ErrorResponse("Failed to update reporting managers.");
         }
 
-        public async Task<ApiResponse<bool>> MapEmployeesToProjectAsync(
-            MapEmployeesToProjectRequest request
-        )
+        public async Task<ApiResponse<bool>> MapEmployeesToProjectAsync(MapEmployeesToProjectRequest request)
         {
-            try
+            _logger.LogInformation("Mapping employees to project {ProjectId}", request.ProjectId);
+
+            if (!await _projectRepository.ProjectExistsAsync(request.ProjectId))
+                return ApiResponse<bool>.ErrorResponse("Project not found.");
+
+            if (request.Employees == null || !request.Employees.Any())
+                return ApiResponse<bool>.ErrorResponse("No employees provided to map.");
+
+            var invalids = new List<string>();
+            foreach (var e in request.Employees)
             {
-                if (!await _projectRepository.ProjectExistsAsync(request.ProjectId))
+                if (!await _projectRepository.EmployeeMasterExistsAsync(e.EmployeeId))
+                    invalids.Add($"Employee with ID {e.EmployeeId} does not exist.");
+            }
+
+            if (invalids.Any())
+                return ApiResponse<bool>.ErrorResponse("Validation failed.", invalids);
+
+            var resourcePoolProject = await _projectRepository.GetResourcePoolProjectAsync();
+            var employeeIds = request.Employees.Select(e => e.EmployeeId).ToList();
+
+            if (resourcePoolProject != null && request.ProjectId != resourcePoolProject.ProjectId)
+            {
+                var poolMappings = await _projectRepository.GetResourcePoolMappingsAsync(resourcePoolProject.ProjectId, employeeIds);
+                if (poolMappings.Any())
+                    await _projectRepository.RemoveProjectEmployeeMappingsAsync(poolMappings);
+            }
+
+            if (resourcePoolProject != null && request.ProjectId == resourcePoolProject.ProjectId)
+            {
+                var otherMappings = await _projectRepository.GetOtherProjectMappingsAsync(resourcePoolProject.ProjectId, employeeIds);
+                if (otherMappings.Any())
+                    await _projectRepository.RemoveProjectEmployeeMappingsAsync(otherMappings);
+            }
+
+            var project = await _projectRepository.GetProjectByIdAsync(request.ProjectId);
+            if (project == null)
+                return ApiResponse<bool>.ErrorResponse("Project not found.");
+
+            int? managerMasterId = project.L1approverEmployeeId ?? project.L2approverEmployeeId;
+            int? managerEmployeeId = managerMasterId.HasValue
+                ? await _projectRepository.GetEmployeeIdByMasterIdAsync(managerMasterId.Value)
+                : null;
+
+            if (managerMasterId.HasValue && !managerEmployeeId.HasValue)
+                return ApiResponse<bool>.ErrorResponse("Invalid reporting manager configuration.");
+
+            var employeesToUpdate = new List<Employee>();
+            var mappingUpdates = new List<Projectemployee>();
+
+            foreach (var emp in request.Employees.Where(e => e.IsPrimary))
+            {
+                var existing = await _projectRepository.GetProjectEmployeesByEmployeeIdAsync(emp.EmployeeId);
+                foreach (var map in existing.Where(m => m.IsPrimary && m.ProjectId != request.ProjectId))
                 {
-                    return ApiResponse<bool>.ErrorResponse("Project not found.");
+                    map.IsPrimary = false;
+                    mappingUpdates.Add(map);
                 }
-                if (request.Employees == null || !request.Employees.Any())
+
+                if (managerEmployeeId.HasValue)
                 {
-                    return ApiResponse<bool>.ErrorResponse("No employees provided to map.");
-                }
-                var validationErrors = new List<string>();
-                foreach (var emp in request.Employees)
-                {
-                    if (!await _projectRepository.EmployeeMasterExistsAsync(emp.EmployeeId))
+                    var actualId = await _projectRepository.GetEmployeeIdByMasterIdAsync(emp.EmployeeId);
+                    if (actualId.HasValue)
                     {
-                        validationErrors.Add($"Employee with ID {emp.EmployeeId} does not exist.");
-                    }
-                }
-
-                if (validationErrors.Any())
-                {
-                    return ApiResponse<bool>.ErrorResponse("Validation failed.", validationErrors);
-                }
-
-                var project = await _projectRepository.GetProjectByIdAsync(request.ProjectId);
-                if (project == null)
-                {
-                    return ApiResponse<bool>.ErrorResponse("Project not found.");
-                }
-                int? reportingManagerMasterId =
-                    project.L1approverEmployeeId ?? project.L2approverEmployeeId;
-                int? reportingManagerEmployeeId = null;
-
-                if (reportingManagerMasterId.HasValue)
-                {
-                    reportingManagerEmployeeId =
-                        await _projectRepository.GetEmployeeIdByMasterIdAsync(
-                            reportingManagerMasterId.Value
-                        );
-
-                    if (!reportingManagerEmployeeId.HasValue)
-                    {
-                        return ApiResponse<bool>.ErrorResponse(
-                            "Invalid reporting manager configuration for this project."
-                        );
-                    }
-                }
-
-                var employeesToUpdate = new List<Employee>();
-                var existingMappingsToUpdate = new List<Projectemployee>();
-
-                foreach (var emp in request.Employees.Where(e => e.IsPrimary))
-                {
-                    var existingMappings =
-                        await _projectRepository.GetProjectEmployeesByEmployeeIdAsync(
-                            emp.EmployeeId
-                        );
-
-                    foreach (
-                        var mapping in existingMappings.Where(m =>
-                            m.IsPrimary && m.ProjectId != request.ProjectId
-                        )
-                    )
-                    {
-                        mapping.IsPrimary = false;
-                        existingMappingsToUpdate.Add(mapping);
-                    }
-
-                    if (reportingManagerEmployeeId.HasValue)
-                    {
-                        var actualEmployeeId =
-                            await _projectRepository.GetEmployeeIdByMasterIdAsync(emp.EmployeeId);
-
-                        if (actualEmployeeId.HasValue)
+                        var empEntity = await _projectRepository.GetEmployeeByIdAsync(actualId.Value);
+                        if (empEntity != null)
                         {
-                            var employee = await _projectRepository.GetEmployeeByIdAsync(
-                                actualEmployeeId.Value
-                            );
-
-                            if (employee != null)
-                            {
-                                employee.ReportingManagerEmployeeId =
-                                    reportingManagerEmployeeId.Value;
-                                employeesToUpdate.Add(employee);
-                            }
+                            empEntity.ReportingManagerEmployeeId = managerEmployeeId.Value;
+                            employeesToUpdate.Add(empEntity);
                         }
                     }
                 }
-
-                if (existingMappingsToUpdate.Any())
-                {
-                    var updateFlagsResult =
-                        await _projectRepository.UpdateProjectEmployeePrimaryFlagsAsync(
-                            existingMappingsToUpdate
-                        );
-                    if (!updateFlagsResult)
-                    {
-                        return ApiResponse<bool>.ErrorResponse(
-                            "Failed to update existing employee primary flags."
-                        );
-                    }
-                }
-
-                foreach (var employee in employeesToUpdate)
-                {
-                    var updateEmployeeResult = await _projectRepository.UpdateEmployeeAsync(
-                        employee
-                    );
-                    if (!updateEmployeeResult)
-                    {
-                        return ApiResponse<bool>.ErrorResponse(
-                            $"Failed to update reporting manager for employee {employee.EmployeeId}."
-                        );
-                    }
-                }
-
-                var projectEmployees = request
-                    .Employees.Select(emp => new Projectemployee
-                    {
-                        ProjectId = request.ProjectId,
-                        EmployeeId = emp.EmployeeId,
-                        AssignedAt = DateTime.UtcNow,
-                        IsPrimary = emp.IsPrimary,
-                    })
-                    .ToList();
-
-                var result = await _projectRepository.MapEmployeesToProjectAsync(
-                    request.ProjectId,
-                    projectEmployees
-                );
-
-                if (result)
-                {
-                    var successMessage = reportingManagerEmployeeId.HasValue
-                        ? "Employees mapped to project successfully and reporting managers updated."
-                        : "Employees mapped to project successfully. No reporting manager assigned (L1/L2 approvers not set).";
-
-                    return ApiResponse<bool>.SuccessResponse(true, successMessage);
-                }
-
-                return ApiResponse<bool>.ErrorResponse("Failed to map employees to project.");
             }
-            catch (Exception ex)
+
+            if (mappingUpdates.Any())
             {
-                return ApiResponse<bool>.ErrorResponse(
-                    $"An error occurred while mapping employees: {ex.Message}"
-                );
+                var updatedFlags = await _projectRepository.UpdateProjectEmployeePrimaryFlagsAsync(mappingUpdates);
+                if (!updatedFlags)
+                    return ApiResponse<bool>.ErrorResponse("Failed to update primary flags.");
             }
+
+            foreach (var e in employeesToUpdate)
+            {
+                if (!await _projectRepository.UpdateEmployeeAsync(e))
+                    return ApiResponse<bool>.ErrorResponse($"Failed to update employee {e.EmployeeId} reporting manager.");
+            }
+
+            var projectEmployees = request.Employees.Select(e => new Projectemployee
+            {
+                ProjectId = request.ProjectId,
+                EmployeeId = e.EmployeeId,
+                AssignedAt = DateTime.UtcNow,
+                IsPrimary = e.IsPrimary
+            }).ToList();
+
+            var mapped = await _projectRepository.MapEmployeesToProjectAsync(request.ProjectId, projectEmployees);
+            var msg = managerEmployeeId.HasValue
+                ? "Employees mapped. Reporting managers updated, resource pool enforced."
+                : "Employees mapped. No reporting manager assigned, resource pool enforced.";
+
+            return mapped
+                ? ApiResponse<bool>.SuccessResponse(true, msg)
+                : ApiResponse<bool>.ErrorResponse("Failed to map employees to project.");
         }
 
-        public async Task<ApiResponse<bool>> UnmapEmployeesFromProjectAsync(
-            UnmapEmployeesFromProjectRequest request
-        )
+        public async Task<ApiResponse<bool>> UnmapEmployeesFromProjectAsync(UnmapEmployeesFromProjectRequest request)
         {
-            try
-            {
-                if (!await _projectRepository.ProjectExistsAsync(request.ProjectId))
-                {
-                    return ApiResponse<bool>.ErrorResponse("Project not found.");
-                }
+            _logger.LogInformation("Unmapping employees from project {ProjectId}", request.ProjectId);
 
-                if (request.EmployeeIds == null || !request.EmployeeIds.Any())
-                {
-                    return ApiResponse<bool>.ErrorResponse("No employees provided to unmap.");
-                }
+            if (!await _projectRepository.ProjectExistsAsync(request.ProjectId))
+                return ApiResponse<bool>.ErrorResponse("Project not found.");
 
-                var result = await _projectRepository.UnmapEmployeesFromProjectAsync(
-                    request.ProjectId,
-                    request.EmployeeIds
-                );
+            if (request.EmployeeIds == null || !request.EmployeeIds.Any())
+                return ApiResponse<bool>.ErrorResponse("No employees provided to unmap.");
 
-                if (!result)
-                {
-                    return ApiResponse<bool>.ErrorResponse(
-                        "Failed to unmap employees from project."
-                    );
-                }
+            var unmapped = await _projectRepository.UnmapEmployeesFromProjectAsync(request.ProjectId, request.EmployeeIds);
+            if (!unmapped)
+                return ApiResponse<bool>.ErrorResponse("Failed to unmap employees from project.");
 
-                var movedToResourcePool =
-                    await _projectRepository.MoveUnmappedEmployeesToResourcePoolAsync(
-                        request.EmployeeIds
-                    );
+            var moved = await _projectRepository.MoveUnmappedEmployeesToResourcePoolAsync(request.EmployeeIds);
+            var msg = moved > 0
+                ? $"Employees unmapped successfully. {moved} moved to resource pool."
+                : "Employees unmapped successfully.";
 
-                var message =
-                    movedToResourcePool > 0
-                        ? $"Employees unmapped from project successfully. {movedToResourcePool} employee(s) moved to resource pool."
-                        : "Employees unmapped from project successfully.";
-
-                return ApiResponse<bool>.SuccessResponse(true, message);
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse<bool>.ErrorResponse(
-                    $"An error occurred while unmapping employees: {ex.Message}"
-                );
-            }
+            return ApiResponse<bool>.SuccessResponse(true, msg);
         }
 
         public async Task<ApiResponse<List<EmployeeBasicInfo>>> GetAvailableEmployeesAsync()
         {
-            try
-            {
-                return ApiResponse<List<EmployeeBasicInfo>>.SuccessResponse(
-                    new List<EmployeeBasicInfo>(),
-                    "Employees retrieved successfully."
-                );
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse<List<EmployeeBasicInfo>>.ErrorResponse(
-                    $"An error occurred while retrieving employees: {ex.Message}"
-                );
-            }
+            return ApiResponse<List<EmployeeBasicInfo>>.SuccessResponse(new List<EmployeeBasicInfo>(), "Employees retrieved successfully.");
         }
 
-        public async Task<
-            ApiResponse<Dictionary<int, EmployeePrimaryProjectInfo?>>
-        > GetAllEmployeesWithPrimaryProjectAsync()
+        public async Task<ApiResponse<Dictionary<int, EmployeePrimaryProjectInfo?>>> GetAllEmployeesWithPrimaryProjectAsync()
         {
-            try
-            {
-                var primaryProjectsDict =
-                    await _projectRepository.GetAllEmployeesWithPrimaryProjectAsync();
+            var dict = await _projectRepository.GetAllEmployeesWithPrimaryProjectAsync();
+            var mapped = dict.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value.HasValue
+                    ? new EmployeePrimaryProjectInfo
+                      { ProjectId = kvp.Value.Value.ProjectId, ProjectName = kvp.Value.Value.ProjectName }
+                    : null);
 
-                var result = primaryProjectsDict.ToDictionary(
-                    kvp => kvp.Key,
-                    kvp =>
-                        kvp.Value.HasValue
-                            ? new EmployeePrimaryProjectInfo
-                            {
-                                ProjectId = kvp.Value.Value.ProjectId,
-                                ProjectName = kvp.Value.Value.ProjectName,
-                            }
-                            : null
-                );
+            return ApiResponse<Dictionary<int, EmployeePrimaryProjectInfo?>>.SuccessResponse(mapped, "Primary project info retrieved successfully.");
+        }
 
-                return ApiResponse<Dictionary<int, EmployeePrimaryProjectInfo?>>.SuccessResponse(
-                    result,
-                    "Employee primary project information retrieved successfully."
-                );
-            }
-            catch (Exception ex)
+        private void ValidateEmployeeExistence(List<string> errors, int? id, string message)
+        {
+            if (id.HasValue && id.Value > 0)
             {
-                return ApiResponse<Dictionary<int, EmployeePrimaryProjectInfo?>>.ErrorResponse(
-                    $"An error occurred while retrieving employee primary projects: {ex.Message}"
-                );
+#pragma warning disable CS4014
+                _projectRepository.EmployeeMasterExistsAsync(id.Value)
+                    .ContinueWith(t => { if (!t.Result) errors.Add(message); });
+#pragma warning restore CS4014
             }
         }
 
-        private ProjectResponse MapToProjectResponse(Project project)
+        private static ProjectResponse MapToProjectResponse(Project project)
         {
             return new ProjectResponse
             {
@@ -585,27 +317,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 Status = project.Status,
                 StartDate = project.StartDate.ToDateTime(TimeOnly.MinValue),
                 EndDate = project.EndDate?.ToDateTime(TimeOnly.MinValue),
-                ResourceOwner =
-                    project.ResourceOwnerEmployee != null
-                        ? MapToEmployeeBasicInfo(project.ResourceOwnerEmployee)
-                        : null,
-                L1Approver =
-                    project.L1approverEmployee != null
-                        ? MapToEmployeeBasicInfo(project.L1approverEmployee)
-                        : null,
-                L2Approver =
-                    project.L2approverEmployee != null
-                        ? MapToEmployeeBasicInfo(project.L2approverEmployee)
-                        : null,
+                ResourceOwner = project.ResourceOwnerEmployee != null ? MapToEmployeeBasicInfo(project.ResourceOwnerEmployee) : null,
+                L1Approver = project.L1approverEmployee != null ? MapToEmployeeBasicInfo(project.L1approverEmployee) : null,
+                L2Approver = project.L2approverEmployee != null ? MapToEmployeeBasicInfo(project.L2approverEmployee) : null,
                 CreatedAt = project.CreatedAt,
-                UpdatedAt = project.UpdatedAt,
+                UpdatedAt = project.UpdatedAt
             };
         }
 
-        private ProjectDetailResponse MapToProjectDetailResponse(
-            Project project,
-            List<Projectemployee> projectEmployees
-        )
+        private static ProjectDetailResponse MapToProjectDetailResponse(Project project, List<Projectemployee> projectEmployees)
         {
             return new ProjectDetailResponse
             {
@@ -619,39 +339,26 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 Status = project.Status,
                 StartDate = project.StartDate.ToDateTime(TimeOnly.MinValue),
                 EndDate = project.EndDate?.ToDateTime(TimeOnly.MinValue),
-                ResourceOwner =
-                    project.ResourceOwnerEmployee != null
-                        ? MapToEmployeeBasicInfo(project.ResourceOwnerEmployee)
-                        : null,
-                L1Approver =
-                    project.L1approverEmployee != null
-                        ? MapToEmployeeBasicInfo(project.L1approverEmployee)
-                        : null,
-                L2Approver =
-                    project.L2approverEmployee != null
-                        ? MapToEmployeeBasicInfo(project.L2approverEmployee)
-                        : null,
-                MappedEmployees = projectEmployees
-                    .Select(pe => MapToEmployeeBasicInfo(pe.Employee))
-                    .ToList(),
+                ResourceOwner = project.ResourceOwnerEmployee != null ? MapToEmployeeBasicInfo(project.ResourceOwnerEmployee) : null,
+                L1Approver = project.L1approverEmployee != null ? MapToEmployeeBasicInfo(project.L1approverEmployee) : null,
+                L2Approver = project.L2approverEmployee != null ? MapToEmployeeBasicInfo(project.L2approverEmployee) : null,
+                MappedEmployees = projectEmployees.Select(pe => MapToEmployeeBasicInfo(pe.Employee)).ToList(),
                 CreatedAt = project.CreatedAt,
-                UpdatedAt = project.UpdatedAt,
+                UpdatedAt = project.UpdatedAt
             };
         }
 
-        private EmployeeBasicInfo MapToEmployeeBasicInfo(Employeedetailsmaster employee)
-        {
-            return new EmployeeBasicInfo
+        private static EmployeeBasicInfo MapToEmployeeBasicInfo(Employeedetailsmaster e) =>
+            new()
             {
-                EmployeeMasterId = employee.EmployeeMasterId,
-                EmployeeId = employee.EmployeeId,
-                EmployeeCompanyId = employee.Employee?.EmployeeCompanyId ?? string.Empty,
-                FirstName = employee.Employee?.Userprofile?.FirstName,
-                LastName = employee.Employee?.Userprofile?.LastName,
-                Email = employee.Employee?.Userauthentication?.Email,
-                RoleName = employee.Role?.RoleName,
-                DepartmentName = employee.Department?.DepartmentName,
+                EmployeeMasterId = e.EmployeeMasterId,
+                EmployeeId = e.EmployeeId,
+                EmployeeCompanyId = e.Employee?.EmployeeCompanyId ?? string.Empty,
+                FirstName = e.Employee?.Userprofile?.FirstName,
+                LastName = e.Employee?.Userprofile?.LastName,
+                Email = e.Employee?.Userauthentication?.Email,
+                RoleName = e.Role?.RoleName,
+                DepartmentName = e.Department?.DepartmentName
             };
-        }
     }
 }

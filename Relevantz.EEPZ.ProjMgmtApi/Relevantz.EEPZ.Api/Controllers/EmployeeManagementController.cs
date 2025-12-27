@@ -1,10 +1,9 @@
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.Services.Interfaces;
-using Serilog;
+using Microsoft.AspNetCore.Authorization;
 
 namespace eepzbackend.Controllers
 {
@@ -16,7 +15,9 @@ namespace eepzbackend.Controllers
         private readonly IEmployeeService _employeeService;
         private readonly ILogger<EmployeeManagementController> _logger;
 
-        public EmployeeManagementController(IEmployeeService employeeService, ILogger<EmployeeManagementController> logger)
+        public EmployeeManagementController(
+            IEmployeeService employeeService, 
+            ILogger<EmployeeManagementController> logger)
         {
             _employeeService = employeeService;
             _logger = logger;
@@ -30,18 +31,9 @@ namespace eepzbackend.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllEmployees()
         {
-            try
-            {
-                _logger.LogInformation("HR requested all active employees");
-                var result = await _employeeService.GetAllEmployeesAsync();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Controller failed to retrieve all employees");
-                Log.Error(ex, "EmployeeRetrievalController: Failed to retrieve all employees");
-                return StatusCode(500, new { success = false, message = "Failed to retrieve employees", error = ex.Message });
-            }
+            _logger.LogInformation("HR requested all active employees");
+            var result = await _employeeService.GetAllEmployeesAsync();
+            return Ok(result);
         }
 
         /// <summary>
@@ -52,18 +44,9 @@ namespace eepzbackend.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetManagers()
         {
-            try
-            {
-                _logger.LogInformation("HR requested manager employees for approver dropdowns");
-                var result = await _employeeService.GetManagersAsync();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Controller failed to retrieve managers");
-                Log.Error(ex, "EmployeeRetrievalController: Failed to retrieve managers");
-                return StatusCode(500, new { success = false, message = "Failed to retrieve managers", error = ex.Message });
-            }
+            _logger.LogInformation("HR requested manager employees for approver dropdowns");
+            var result = await _employeeService.GetManagersAsync();
+            return Ok(result);
         }
 
         /// <summary>
@@ -75,22 +58,13 @@ namespace eepzbackend.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetEmployeeById(int employeeMasterId)
         {
-            try
-            {
-                _logger.LogInformation("HR requested employee details for ID: {EmployeeMasterId}", employeeMasterId);
-                var result = await _employeeService.GetEmployeeByIdAsync(employeeMasterId);
-                
-                if (!result.Success && result.Data == null)
-                    return NotFound(result);
+            _logger.LogInformation("HR requested employee details for ID: {EmployeeMasterId}", employeeMasterId);
+            var result = await _employeeService.GetEmployeeByIdAsync(employeeMasterId);
+            
+            if (!result.Success && result.Data == null)
+                return NotFound(result);
 
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Controller failed to retrieve employee {EmployeeMasterId}", employeeMasterId);
-                Log.Error(ex, "EmployeeRetrievalController: Failed to retrieve employee {EmployeeMasterId}", employeeMasterId);
-                return StatusCode(500, new { success = false, message = "Failed to retrieve employee", error = ex.Message });
-            }
+            return Ok(result);
         }
 
         /// <summary>
@@ -102,22 +76,13 @@ namespace eepzbackend.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> SearchEmployees([FromQuery] string query)
         {
-            try
-            {
-                _logger.LogInformation("HR requested employee search with query: {SearchQuery}", query);
-                var result = await _employeeService.SearchEmployeesAsync(query);
-                
-                if (!result.Success && result.Message == "Search query is required")
-                    return BadRequest(result);
+            _logger.LogInformation("HR requested employee search with query: {SearchQuery}", query);
+            var result = await _employeeService.SearchEmployeesAsync(query);
+            
+            if (!result.Success && result.Message == "Search query is required")
+                return BadRequest(result);
 
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Controller failed to search employees with query: {SearchQuery}", query);
-                Log.Error(ex, "EmployeeRetrievalController: Failed to search employees");
-                return StatusCode(500, new { success = false, message = "Failed to search employees", error = ex.Message });
-            }
+            return Ok(result);
         }
 
         /// <summary>
@@ -128,18 +93,9 @@ namespace eepzbackend.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetEmployeesByDepartment(int departmentId)
         {
-            try
-            {
-                _logger.LogInformation("HR requested employees for department ID: {DepartmentId}", departmentId);
-                var result = await _employeeService.GetEmployeesByDepartmentAsync(departmentId);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Controller failed to retrieve employees for department {DepartmentId}", departmentId);
-                Log.Error(ex, "EmployeeRetrievalController: Failed to retrieve department employees");
-                return StatusCode(500, new { success = false, message = "Failed to retrieve employees by department", error = ex.Message });
-            }
+            _logger.LogInformation("HR requested employees for department ID: {DepartmentId}", departmentId);
+            var result = await _employeeService.GetEmployeesByDepartmentAsync(departmentId);
+            return Ok(result);
         }
 
         /// <summary>
@@ -150,18 +106,9 @@ namespace eepzbackend.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetEmployeesByRole(int roleId)
         {
-            try
-            {
-                _logger.LogInformation("HR requested employees for role ID: {RoleId}", roleId);
-                var result = await _employeeService.GetEmployeesByRoleAsync(roleId);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Controller failed to retrieve employees for role {RoleId}", roleId);
-                Log.Error(ex, "EmployeeRetrievalController: Failed to retrieve role employees");
-                return StatusCode(500, new { success = false, message = "Failed to retrieve employees by role", error = ex.Message });
-            }
+            _logger.LogInformation("HR requested employees for role ID: {RoleId}", roleId);
+            var result = await _employeeService.GetEmployeesByRoleAsync(roleId);
+            return Ok(result);
         }
 
         /// <summary>
@@ -172,18 +119,9 @@ namespace eepzbackend.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllDepartments()
         {
-            try
-            {
-                _logger.LogInformation("HR requested all departments");
-                var result = await _employeeService.GetAllDepartmentsAsync();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Controller failed to retrieve departments");
-                Log.Error(ex, "EmployeeRetrievalController: Failed to retrieve departments");
-                return StatusCode(500, new { success = false, message = "Failed to retrieve departments", error = ex.Message });
-            }
+            _logger.LogInformation("HR requested all departments");
+            var result = await _employeeService.GetAllDepartmentsAsync();
+            return Ok(result);
         }
 
         /// <summary>
@@ -194,18 +132,9 @@ namespace eepzbackend.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllBusinessUnits()
         {
-            try
-            {
-                _logger.LogInformation("HR requested all business units");
-                var result = await _employeeService.GetAllBusinessUnitsAsync();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Controller failed to retrieve business units");
-                Log.Error(ex, "EmployeeRetrievalController: Failed to retrieve business units");
-                return StatusCode(500, new { success = false, message = "Failed to retrieve business units", error = ex.Message });
-            }
+            _logger.LogInformation("HR requested all business units");
+            var result = await _employeeService.GetAllBusinessUnitsAsync();
+            return Ok(result);
         }
 
         /// <summary>
@@ -216,18 +145,9 @@ namespace eepzbackend.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetInitialStageEmployees()
         {
-            try
-            {
-                _logger.LogInformation("HR requested initial stage employees");
-                var result = await _employeeService.GetInitialStageEmployeesAsync();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Controller failed to retrieve initial stage employees");
-                Log.Error(ex, "EmployeeRetrievalController: Failed to retrieve initial stage employees");
-                return StatusCode(500, new { success = false, message = "Failed to retrieve initial stage employees", error = ex.Message });
-            }
+            _logger.LogInformation("HR requested initial stage employees");
+            var result = await _employeeService.GetInitialStageEmployeesAsync();
+            return Ok(result);
         }
 
         /// <summary>
@@ -240,18 +160,9 @@ namespace eepzbackend.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> MapToResourcePool([FromBody] MapToResourcePoolRequest request)
         {
-            try
-            {
-                _logger.LogInformation("HR requested mapping {EmployeeCount} employees to resource pool", request.EmployeeMasterIds?.Count ?? 0);
-                var result = await _employeeService.MapEmployeesToResourcePoolAsync(request.EmployeeMasterIds ?? new List<int>());
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Controller failed to map employees to resource pool");
-                Log.Error(ex, "EmployeeRetrievalController: Failed to map employees to resource pool");
-                return StatusCode(500, new { success = false, message = "Failed to map employees to resource pool", error = ex.Message });
-            }
+            _logger.LogInformation("HR requested mapping {EmployeeCount} employees to resource pool", request.EmployeeMasterIds?.Count ?? 0);
+            var result = await _employeeService.MapEmployeesToResourcePoolAsync(request.EmployeeMasterIds ?? new List<int>());
+            return Ok(result);
         }
 
         /// <summary>
@@ -263,22 +174,13 @@ namespace eepzbackend.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetDepartmentById(int departmentId)
         {
-            try
-            {
-                _logger.LogInformation("HR requested department details for ID: {DepartmentId}", departmentId);
-                var result = await _employeeService.GetDepartmentByIdAsync(departmentId);
-                
-                if (!result.Success && result.Data == null)
-                    return NotFound(result);
+            _logger.LogInformation("HR requested department details for ID: {DepartmentId}", departmentId);
+            var result = await _employeeService.GetDepartmentByIdAsync(departmentId);
+            
+            if (!result.Success && result.Data == null)
+                return NotFound(result);
 
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Controller failed to retrieve department {DepartmentId}", departmentId);
-                Log.Error(ex, "EmployeeRetrievalController: Failed to retrieve department {DepartmentId}", departmentId);
-                return StatusCode(500, new { success = false, message = "Failed to retrieve department", error = ex.Message });
-            }
+            return Ok(result);
         }
     }
 }
