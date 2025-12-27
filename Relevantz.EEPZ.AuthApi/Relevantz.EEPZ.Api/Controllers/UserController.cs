@@ -291,5 +291,31 @@ namespace Relevantz.EEPZ.Api.Controllers
 
             return Ok(result);
         }
+
+        [HttpGet("next-employee-id")]
+        [Authorize(Roles = "Admin,HR")]
+        public async Task<IActionResult> GetNextEmployeeCompanyId()
+        {
+            try
+            {
+                var nextId = await _userManagementService.GetNextEmployeeCompanyIdAsync();
+
+                return Ok(new
+                {
+                    success = true,
+                    data = nextId,
+                    message = "Next Employee ID retrieved successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Failed to generate Employee ID",
+                    error = ex.Message
+                });
+            }
+        }
     }
 }

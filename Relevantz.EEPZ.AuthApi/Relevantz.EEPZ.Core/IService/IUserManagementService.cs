@@ -14,6 +14,6 @@ namespace Relevantz.EEPZ.Core.IService
         Task<ApiResponseDto<string>> ActivateUserAsync(int userId);
         Task<ApiResponseDto<string>> AssignRoleAndDepartmentAsync(AssignRoleDepartmentRequestDto request);
         Task<ApiResponseDto<List<UserResponseDto>>> GetEmployeesByManagerAsync(int managerId);
- 
+        Task<string> GetNextEmployeeCompanyIdAsync();
     }
 }

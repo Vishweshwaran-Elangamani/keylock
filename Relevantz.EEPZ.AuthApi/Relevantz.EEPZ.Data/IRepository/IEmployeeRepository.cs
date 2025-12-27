@@ -13,5 +13,6 @@ namespace Relevantz.EEPZ.Data.IRepository
         Task<bool> DeleteAsync(int employeeId);
         Task<bool> EmployeeCompanyIdExistsAsync(string employeeCompanyId);
         Task<List<Employee>> GetByReportingManagerAsync(int reportingManagerEmployeeId);
+        Task<string> GetNextEmployeeCompanyIdAsync();
     }
 }

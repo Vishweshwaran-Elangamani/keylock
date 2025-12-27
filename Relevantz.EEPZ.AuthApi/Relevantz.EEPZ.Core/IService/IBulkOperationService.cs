@@ -9,6 +9,6 @@ namespace Relevantz.EEPZ.Core.IService
         Task<ApiResponseDto<BulkOperationResponseDto>> BulkCreateUsersAsync(List<CreateUserRequestDto> users, int performedByUserId);
         Task<ApiResponseDto<BulkOperationResponseDto>> BulkInactivateUsersAsync(BulkUserInactivateRequestDto request, int performedByUserId);
         Task<ApiResponseDto<BulkOperationResponseDto>> BulkCreateUsersFromExcelAsync(Stream fileStream, int performedByUserId);
-        byte[] GenerateExcelTemplate();
+        Task<byte[]> GenerateExcelTemplateAsync();
     }
 }

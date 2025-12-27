@@ -1,4 +1,3 @@
-
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Data.IRepository;
 using Relevantz.EEPZ.Core.IService;
@@ -21,19 +20,22 @@ namespace Relevantz.EEPZ.Core.Service
         private readonly IBulkOperationLogRepository _bulkOperationLogRepository;
         private readonly IRoleRepository _roleRepository;
         private readonly IDepartmentRepository _departmentRepository;
+        private readonly IEmployeeRepository _employeeRepository;
 
         public BulkOperationService(
             IUserManagementService userManagementService,
             IUserAuthenticationRepository userAuthRepository,
             IBulkOperationLogRepository bulkOperationLogRepository,
             IRoleRepository roleRepository,
-            IDepartmentRepository departmentRepository)
+            IDepartmentRepository departmentRepository,
+            IEmployeeRepository employeeRepository)
         {
             _userManagementService = userManagementService;
             _userAuthRepository = userAuthRepository;
             _bulkOperationLogRepository = bulkOperationLogRepository;
             _roleRepository = roleRepository;
             _departmentRepository = departmentRepository;
+            _employeeRepository = employeeRepository;
         }
 
         private List<string> ValidateUserData(CreateUserRequestDto user, int rowNumber)
@@ -71,19 +73,6 @@ namespace Relevantz.EEPZ.Core.Service
             else if (!Regex.IsMatch(user.LastName.Trim(), @"^[a-zA-Z\s]+$"))
             {
                 errors.Add($"{rowPrefix}: Last name must contain only letters");
-            }
-
-            if (string.IsNullOrWhiteSpace(user.EmployeeCompanyId))
-            {
-                errors.Add($"{rowPrefix}: Employee Company ID is required");
-            }
-            else if (user.EmployeeCompanyId.Trim().Length < 3)
-            {
-                errors.Add($"{rowPrefix}: Employee Company ID must be at least 3 characters");
-            }
-            else if (!Regex.IsMatch(user.EmployeeCompanyId.Trim(), @"^[a-zA-Z0-9_]+$"))
-            {
-                errors.Add($"{rowPrefix}: Employee Company ID must contain only letters, numbers, and underscores");
             }
 
             if (string.IsNullOrWhiteSpace(user.Email))
@@ -137,7 +126,6 @@ namespace Relevantz.EEPZ.Core.Service
             return errors;
         }
 
-
         public async Task<ApiResponseDto<BulkOperationResponseDto>> BulkCreateUsersAsync(List<CreateUserRequestDto> users, int performedByUserId)
         {
             var successCount = 0;
@@ -147,11 +135,19 @@ namespace Relevantz.EEPZ.Core.Service
 
             try
             {
+                var nextIdString = await _employeeRepository.GetNextEmployeeCompanyIdAsync();
+                int nextEmployeeId = int.Parse(nextIdString);
+
+                EEPZBusinessLog.Information($"Starting bulk user creation with Employee ID: {nextEmployeeId}");
+
                 foreach (var user in users)
                 {
                     rowNumber++;
                     try
                     {
+                        user.EmployeeCompanyId = nextEmployeeId.ToString();
+                        nextEmployeeId++;
+
                         var validationErrors = ValidateUserData(user, rowNumber);
 
                         if (validationErrors.Any())
@@ -165,6 +161,7 @@ namespace Relevantz.EEPZ.Core.Service
                         if (result.Success)
                         {
                             successCount++;
+                            EEPZBusinessLog.Information($"User created with Employee ID: {user.EmployeeCompanyId}");
                         }
                         else
                         {
@@ -201,7 +198,7 @@ namespace Relevantz.EEPZ.Core.Service
                     Message = $"Bulk operation completed: {successCount} successful, {failureCount} failed"
                 };
 
-                EEPZBusinessLog.Information($"Bulk user creation completed: {successCount}/{users.Count} successful");
+                EEPZBusinessLog.Information($"Bulk user creation completed: {successCount}/{users.Count} successful. Employee IDs assigned: {nextIdString} to {nextEmployeeId - 1}");
 
                 return ApiResponseDto<BulkOperationResponseDto>.SuccessResponse(response, "Bulk operation completed");
             }
@@ -310,7 +307,7 @@ namespace Relevantz.EEPZ.Core.Service
                         try
                         {
                             var isEmptyRow = true;
-                            for (int col = 1; col <= 12; col++)
+                            for (int col = 1; col <= 11; col++)
                             {
                                 if (worksheet.Cells[row, col].Value != null &&
                                     !string.IsNullOrWhiteSpace(worksheet.Cells[row, col].Value.ToString()))
@@ -322,7 +319,7 @@ namespace Relevantz.EEPZ.Core.Service
 
                             if (isEmptyRow) continue;
 
-                            var mobileNumber = worksheet.Cells[row, 11].Value?.ToString();
+                            var mobileNumber = worksheet.Cells[row, 10].Value?.ToString();
                             if (!string.IsNullOrWhiteSpace(mobileNumber))
                             {
                                 mobileNumber = mobileNumber.Replace("+91-", "").Replace("+91", "").Trim();
@@ -332,26 +329,26 @@ namespace Relevantz.EEPZ.Core.Service
                                 }
                             }
 
-                            var roleName = worksheet.Cells[row, 9].Value?.ToString()?.Trim() ?? string.Empty;
+                            var roleName = worksheet.Cells[row, 8].Value?.ToString()?.Trim() ?? string.Empty;
                             var roleId = await GetRoleIdByNameAsync(roleName);
 
-                            var departmentName = worksheet.Cells[row, 10].Value?.ToString()?.Trim() ?? string.Empty;
+                            var departmentName = worksheet.Cells[row, 9].Value?.ToString()?.Trim() ?? string.Empty;
                             var departmentId = await GetDepartmentIdByNameAsync(departmentName);
 
                             var user = new CreateUserRequestDto
                             {
-                                EmployeeCompanyId = worksheet.Cells[row, 1].Value?.ToString()?.Trim() ?? string.Empty,
-                                Email = worksheet.Cells[row, 2].Value?.ToString()?.Trim() ?? string.Empty,
-                                FirstName = worksheet.Cells[row, 3].Value?.ToString()?.Trim() ?? string.Empty,
-                                LastName = worksheet.Cells[row, 4].Value?.ToString()?.Trim() ?? string.Empty,
-                                EmploymentType = worksheet.Cells[row, 5].Value?.ToString()?.Trim() ?? Constants.EmploymentTypes.Permanent,
-                                EmploymentStatus = worksheet.Cells[row, 6].Value?.ToString()?.Trim() ?? Constants.EmploymentStatuses.Active,
-                                JoiningDate = DateOnly.TryParse(worksheet.Cells[row, 7].Value?.ToString(), out var joinDate) ? joinDate : DateOnly.FromDateTime(DateTime.UtcNow),
-                                EmployeeType = worksheet.Cells[row, 8].Value?.ToString()?.Trim() ?? Constants.EmployeeTypes.FullTime,
+                                EmployeeCompanyId = string.Empty,
+                                Email = worksheet.Cells[row, 1].Value?.ToString()?.Trim() ?? string.Empty,
+                                FirstName = worksheet.Cells[row, 2].Value?.ToString()?.Trim() ?? string.Empty,
+                                LastName = worksheet.Cells[row, 3].Value?.ToString()?.Trim() ?? string.Empty,
+                                EmploymentType = worksheet.Cells[row, 4].Value?.ToString()?.Trim() ?? Constants.EmploymentTypes.Permanent,
+                                EmploymentStatus = worksheet.Cells[row, 5].Value?.ToString()?.Trim() ?? Constants.EmploymentStatuses.Active,
+                                JoiningDate = DateOnly.TryParse(worksheet.Cells[row, 6].Value?.ToString(), out var joinDate) ? joinDate : DateOnly.FromDateTime(DateTime.UtcNow),
+                                EmployeeType = worksheet.Cells[row, 7].Value?.ToString()?.Trim() ?? Constants.EmployeeTypes.FullTime,
                                 RoleId = roleId,
                                 DepartmentId = departmentId,
                                 MobileNumber = mobileNumber,
-                                Gender = worksheet.Cells[row, 12].Value?.ToString()?.Trim()
+                                Gender = worksheet.Cells[row, 11].Value?.ToString()?.Trim()
                             };
 
                             users.Add(user);
@@ -413,18 +410,26 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
 
-        public byte[] GenerateExcelTemplate()
+        public async Task<byte[]> GenerateExcelTemplateAsync()
         {
             try
             {
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+                var roles = await _roleRepository.GetAllAsync();
+                var departments = await _departmentRepository.GetAllAsync();
+
+                var availableRoles = roles?.Where(r => r.RoleName != "Admin").ToList() ?? new List<Role>();
+                var availableDepartments = departments ?? new List<Department>();
+
+                EEPZBusinessLog.Information($"Generating template with {availableRoles.Count} roles and {availableDepartments.Count} departments");
 
                 using var package = new ExcelPackage();
                 var worksheet = package.Workbook.Worksheets.Add("Users");
 
                 var headers = new[]
                 {
-                    "EmployeeCompanyId", "Email", "FirstName", "LastName",
+                    "Email", "FirstName", "LastName",
                     "EmploymentType", "EmploymentStatus", "JoiningDate",
                     "EmployeeType", "Role", "Department", "MobileNumber", "Gender"
                 };
@@ -445,66 +450,75 @@ namespace Relevantz.EEPZ.Core.Service
                     range.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 }
 
-                AddExcelValidations(worksheet);
+                CreateReferenceDataSheet(package, availableRoles, availableDepartments);
+
+                AddExcelValidations(worksheet, availableRoles, availableDepartments);
 
                 var instructionSheet = package.Workbook.Worksheets.Add("Instructions");
                 instructionSheet.Cells[1, 1].Value = "Bulk User Import Instructions";
                 instructionSheet.Cells[1, 1].Style.Font.Bold = true;
                 instructionSheet.Cells[1, 1].Style.Font.Size = 16;
 
-                instructionSheet.Cells[3, 1].Value = "Column Definitions:";
+                instructionSheet.Cells[3, 1].Value = "IMPORTANT: Employee IDs are AUTO-GENERATED";
                 instructionSheet.Cells[3, 1].Style.Font.Bold = true;
+                instructionSheet.Cells[3, 1].Style.Font.Color.SetColor(Color.Red);
+                instructionSheet.Cells[3, 1].Style.Font.Size = 14;
+
+                instructionSheet.Cells[4, 1].Value = "Do NOT include Employee ID column. IDs will be assigned automatically starting from the last used ID (e.g., 1000, 1001, 1002...)";
+                instructionSheet.Cells[4, 1].Style.Font.Color.SetColor(Color.Red);
+
+                instructionSheet.Cells[6, 1].Value = "Column Definitions:";
+                instructionSheet.Cells[6, 1].Style.Font.Bold = true;
 
                 var instructions = new[]
                 {
-                    "EmployeeCompanyId: Unique employee ID - min 3 characters, only letters/numbers/underscores (e.g., 12592)",
                     "Email: Valid email address (required) - must be in proper email format",
                     "FirstName: Employee first name (required) - min 2 characters, only letters",
                     "LastName: Employee last name (required) - min 2 characters, only letters",
-                    "EmploymentType: Permanent, Contract, Temporary, Intern, Probation (select from dropdown)",
-                    "EmploymentStatus: Active, Inactive, OnLeave (select from dropdown)",
+                    "EmploymentType: Select from dropdown (Permanent, Contract, Temporary, Intern, Probation)",
+                    "EmploymentStatus: Select from dropdown (Active, Inactive, OnLeave)",
                     "JoiningDate: Date in format YYYY-MM-DD (e.g., 2025-01-15)",
-                    "EmployeeType: FullTime, PartTime, Intern (select from dropdown)",
-                    "Role: Type role name (e.g., Admin, Manager, Employee, HR)",
-                    "Department: Type department name (e.g., IT, HR, Finance, Operations)",
+                    "EmployeeType: Select from dropdown (FullTime, PartTime, Intern)",
+                    $"Role: Select from dropdown ({availableRoles.Count} roles available - excludes Admin role)",
+                    $"Department: Select from dropdown ({availableDepartments.Count} departments available)",
                     "MobileNumber: 10-digit phone number starting with 6-9 (e.g., 9876543210) - optional",
-                    "Gender: Male, Female, PreferNotToSay (select from dropdown) - optional"
+                    "Gender: Select from dropdown (Male, Female, PreferNotToSay) - optional"
                 };
 
                 for (int i = 0; i < instructions.Length; i++)
                 {
-                    instructionSheet.Cells[i + 4, 1].Value = $"{i + 1}. {instructions[i]}";
+                    instructionSheet.Cells[i + 7, 1].Value = $"{i + 1}. {instructions[i]}";
                 }
 
-                instructionSheet.Cells[18, 1].Value = "Validation Rules:";
-                instructionSheet.Cells[18, 1].Style.Font.Bold = true;
-                instructionSheet.Cells[18, 1].Style.Font.Size = 14;
+                instructionSheet.Cells[20, 1].Value = "Validation Rules:";
+                instructionSheet.Cells[20, 1].Style.Font.Bold = true;
+                instructionSheet.Cells[20, 1].Style.Font.Size = 14;
 
                 var validationRules = new[]
                 {
-                    "✓ Names must contain only letters (no numbers or special characters)",
-                    "✓ Employee Company ID must be at least 3 characters",
-                    "✓ Email must be in valid format (example@domain.com)",
-                    "✓ Phone number must start with 6, 7, 8, or 9 and be exactly 10 digits",
-                    "✓ Role and Department names must match exactly with system data",
-                    "✓ All required fields must be filled",
-                    "✓ Use dropdown lists where available for consistency"
+                    "Employee IDs are AUTOMATICALLY assigned - sequential numbering",
+                    "Names must contain only letters (no numbers or special characters)",
+                    "Email must be in valid format (example@domain.com)",
+                    "Phone number must start with 6, 7, 8, or 9 and be exactly 10 digits",
+                    "Role and Department: Use dropdown lists (values from database)",
+                    "All required fields must be filled",
+                    "Use dropdown lists for all fields that have them"
                 };
 
                 for (int i = 0; i < validationRules.Length; i++)
                 {
-                    instructionSheet.Cells[i + 19, 1].Value = validationRules[i];
+                    instructionSheet.Cells[i + 21, 1].Value = validationRules[i];
                 }
 
-                instructionSheet.Cells[28, 1].Value = " TIP: Start entering data from Row 2 onwards. Header is in Row 1.";
-                instructionSheet.Cells[28, 1].Style.Font.Bold = true;
-                instructionSheet.Cells[28, 1].Style.Font.Color.SetColor(Color.Green);
-                instructionSheet.Cells[28, 1].Style.Font.Size = 12;
+                instructionSheet.Cells[30, 1].Value = "TIP: Start entering data from Row 2 onwards. Header is in Row 1. Use dropdowns for Role and Department.";
+                instructionSheet.Cells[30, 1].Style.Font.Bold = true;
+                instructionSheet.Cells[30, 1].Style.Font.Color.SetColor(Color.Green);
+                instructionSheet.Cells[30, 1].Style.Font.Size = 12;
 
                 worksheet.Cells.AutoFitColumns();
                 instructionSheet.Cells.AutoFitColumns();
 
-                EEPZBusinessLog.Information("Excel template generated successfully");
+                EEPZBusinessLog.Information("Excel template generated successfully with dynamic dropdowns");
 
                 return package.GetAsByteArray();
             }
@@ -515,45 +529,58 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
 
-        private void AddExcelValidations(ExcelWorksheet worksheet)
+        private void CreateReferenceDataSheet(ExcelPackage package, List<Role> roles, List<Department> departments)
+        {
+            var refSheet = package.Workbook.Worksheets.Add("ReferenceData");
+
+            refSheet.Cells[1, 1].Value = "Roles";
+            refSheet.Cells[1, 1].Style.Font.Bold = true;
+
+            for (int i = 0; i < roles.Count; i++)
+            {
+                refSheet.Cells[i + 2, 1].Value = roles[i].RoleName;
+            }
+
+            refSheet.Cells[1, 2].Value = "Departments";
+            refSheet.Cells[1, 2].Style.Font.Bold = true;
+
+            for (int i = 0; i < departments.Count; i++)
+            {
+                refSheet.Cells[i + 2, 2].Value = departments[i].DepartmentName;
+            }
+
+            refSheet.Hidden = eWorkSheetHidden.VeryHidden;
+
+            EEPZBusinessLog.Information($"Reference data sheet created with {roles.Count} roles and {departments.Count} departments");
+        }
+
+        private void AddExcelValidations(ExcelWorksheet worksheet, List<Role> roles, List<Department> departments)
         {
             int dataStartRow = 2;
             int dataEndRow = 1000;
 
-            // 1️ EmployeeCompanyId
-            var companyIdVal = worksheet.DataValidations.AddTextLengthValidation($"A{dataStartRow}:A{dataEndRow}");
-            companyIdVal.Operator = ExcelDataValidationOperator.greaterThanOrEqual;
-            companyIdVal.Formula.Value = 3;
-            companyIdVal.ShowErrorMessage = true;
-            companyIdVal.ErrorTitle = "Invalid Employee ID";
-            companyIdVal.Error = "Must be at least 3 characters";
-
-            // 2 Email
-            var emailVal = worksheet.DataValidations.AddTextLengthValidation($"B{dataStartRow}:B{dataEndRow}");
+            var emailVal = worksheet.DataValidations.AddTextLengthValidation($"A{dataStartRow}:A{dataEndRow}");
             emailVal.Operator = ExcelDataValidationOperator.greaterThan;
             emailVal.Formula.Value = 5;
             emailVal.ShowErrorMessage = true;
             emailVal.ErrorTitle = "Invalid Email";
             emailVal.Error = "Email must be at least 5 characters";
 
-            // 3️ FirstName
-            var firstNameVal = worksheet.DataValidations.AddTextLengthValidation($"C{dataStartRow}:C{dataEndRow}");
+            var firstNameVal = worksheet.DataValidations.AddTextLengthValidation($"B{dataStartRow}:B{dataEndRow}");
             firstNameVal.Operator = ExcelDataValidationOperator.greaterThanOrEqual;
             firstNameVal.Formula.Value = 2;
             firstNameVal.ShowErrorMessage = true;
             firstNameVal.ErrorTitle = "Invalid First Name";
             firstNameVal.Error = "Must be at least 2 characters";
 
-            // 4️ LastName
-            var lastNameVal = worksheet.DataValidations.AddTextLengthValidation($"D{dataStartRow}:D{dataEndRow}");
+            var lastNameVal = worksheet.DataValidations.AddTextLengthValidation($"C{dataStartRow}:C{dataEndRow}");
             lastNameVal.Operator = ExcelDataValidationOperator.greaterThanOrEqual;
             lastNameVal.Formula.Value = 2;
             lastNameVal.ShowErrorMessage = true;
             lastNameVal.ErrorTitle = "Invalid Last Name";
             lastNameVal.Error = "Must be at least 2 characters";
 
-            // 5️ EmploymentType - Dropdown
-            var empTypeVal = worksheet.DataValidations.AddListValidation($"E{dataStartRow}:E{dataEndRow}");
+            var empTypeVal = worksheet.DataValidations.AddListValidation($"D{dataStartRow}:D{dataEndRow}");
             empTypeVal.Formula.Values.Add("Permanent");
             empTypeVal.Formula.Values.Add("Contract");
             empTypeVal.Formula.Values.Add("Temporary");
@@ -563,8 +590,7 @@ namespace Relevantz.EEPZ.Core.Service
             empTypeVal.ErrorTitle = "Invalid Employment Type";
             empTypeVal.Error = "Select from dropdown";
 
-            // 6️ EmploymentStatus - Dropdown
-            var empStatusVal = worksheet.DataValidations.AddListValidation($"F{dataStartRow}:F{dataEndRow}");
+            var empStatusVal = worksheet.DataValidations.AddListValidation($"E{dataStartRow}:E{dataEndRow}");
             empStatusVal.Formula.Values.Add("Active");
             empStatusVal.Formula.Values.Add("Inactive");
             empStatusVal.Formula.Values.Add("OnLeave");
@@ -572,16 +598,14 @@ namespace Relevantz.EEPZ.Core.Service
             empStatusVal.ErrorTitle = "Invalid Employment Status";
             empStatusVal.Error = "Select from dropdown";
 
-            // 7️ JoiningDate - Date
-            var dateVal = worksheet.DataValidations.AddDateTimeValidation($"G{dataStartRow}:G{dataEndRow}");
+            var dateVal = worksheet.DataValidations.AddDateTimeValidation($"F{dataStartRow}:F{dataEndRow}");
             dateVal.Operator = ExcelDataValidationOperator.greaterThanOrEqual;
             dateVal.Formula.Value = new DateTime(1900, 1, 1);
             dateVal.ShowErrorMessage = true;
             dateVal.ErrorTitle = "Invalid Date";
             dateVal.Error = "Enter date as YYYY-MM-DD";
 
-            // 8️ EmployeeType - Dropdown
-            var empTypeDropdown = worksheet.DataValidations.AddListValidation($"H{dataStartRow}:H{dataEndRow}");
+            var empTypeDropdown = worksheet.DataValidations.AddListValidation($"G{dataStartRow}:G{dataEndRow}");
             empTypeDropdown.Formula.Values.Add("FullTime");
             empTypeDropdown.Formula.Values.Add("PartTime");
             empTypeDropdown.Formula.Values.Add("Intern");
@@ -589,24 +613,35 @@ namespace Relevantz.EEPZ.Core.Service
             empTypeDropdown.ErrorTitle = "Invalid Employee Type";
             empTypeDropdown.Error = "Select from dropdown";
 
-            // 9️ Role - Text Input
-            var roleVal = worksheet.DataValidations.AddTextLengthValidation($"I{dataStartRow}:I{dataEndRow}");
-            roleVal.Operator = ExcelDataValidationOperator.greaterThanOrEqual;
-            roleVal.Formula.Value = 2;
-            roleVal.ShowErrorMessage = true;
-            roleVal.ErrorTitle = "Invalid Role";
-            roleVal.Error = "Type role name (min 2 characters)";
+            if (roles != null && roles.Any())
+            {
+                var roleValidation = worksheet.DataValidations.AddListValidation($"H{dataStartRow}:H{dataEndRow}");
+                roleValidation.ShowErrorMessage = true;
+                roleValidation.ErrorTitle = "Invalid Role";
+                roleValidation.Error = "Select a role from the dropdown list";
+                roleValidation.ShowInputMessage = true;
+                roleValidation.PromptTitle = "Select Role";
+                roleValidation.Prompt = $"Choose from {roles.Count} available roles";
+                roleValidation.Formula.ExcelFormula = $"ReferenceData!$A$2:$A${roles.Count + 1}";
 
-            //  Department - Text Input
-            var deptVal = worksheet.DataValidations.AddTextLengthValidation($"J{dataStartRow}:J{dataEndRow}");
-            deptVal.Operator = ExcelDataValidationOperator.greaterThanOrEqual;
-            deptVal.Formula.Value = 2;
-            deptVal.ShowErrorMessage = true;
-            deptVal.ErrorTitle = "Invalid Department";
-            deptVal.Error = "Type department name (min 2 characters)";
+                EEPZBusinessLog.Information($"Role dropdown created with {roles.Count} options");
+            }
 
-            // 1 MobileNumber
-            var mobileVal = worksheet.DataValidations.AddTextLengthValidation($"K{dataStartRow}:K{dataEndRow}");
+            if (departments != null && departments.Any())
+            {
+                var deptValidation = worksheet.DataValidations.AddListValidation($"I{dataStartRow}:I{dataEndRow}");
+                deptValidation.ShowErrorMessage = true;
+                deptValidation.ErrorTitle = "Invalid Department";
+                deptValidation.Error = "Select a department from the dropdown list";
+                deptValidation.ShowInputMessage = true;
+                deptValidation.PromptTitle = "Select Department";
+                deptValidation.Prompt = $"Choose from {departments.Count} available departments";
+                deptValidation.Formula.ExcelFormula = $"ReferenceData!$B$2:$B${departments.Count + 1}";
+
+                EEPZBusinessLog.Information($"Department dropdown created with {departments.Count} options");
+            }
+
+            var mobileVal = worksheet.DataValidations.AddTextLengthValidation($"J{dataStartRow}:J{dataEndRow}");
             mobileVal.Operator = ExcelDataValidationOperator.equal;
             mobileVal.Formula.Value = 10;
             mobileVal.AllowBlank = true;
@@ -614,8 +649,7 @@ namespace Relevantz.EEPZ.Core.Service
             mobileVal.ErrorTitle = "Invalid Phone";
             mobileVal.Error = "Must be exactly 10 digits or blank";
 
-            // 1 Gender - Dropdown
-            var genderVal = worksheet.DataValidations.AddListValidation($"L{dataStartRow}:L{dataEndRow}");
+            var genderVal = worksheet.DataValidations.AddListValidation($"K{dataStartRow}:K{dataEndRow}");
             genderVal.Formula.Values.Add("Male");
             genderVal.Formula.Values.Add("Female");
             genderVal.Formula.Values.Add("PreferNotToSay");
@@ -624,23 +658,19 @@ namespace Relevantz.EEPZ.Core.Service
             genderVal.ErrorTitle = "Invalid Gender";
             genderVal.Error = "Select from dropdown or leave blank";
 
-            // Set column widths
-            worksheet.Column(1).Width = 18;
-            worksheet.Column(2).Width = 28;
+            worksheet.Column(1).Width = 28;
+            worksheet.Column(2).Width = 15;
             worksheet.Column(3).Width = 15;
             worksheet.Column(4).Width = 15;
             worksheet.Column(5).Width = 15;
             worksheet.Column(6).Width = 15;
-            worksheet.Column(7).Width = 15;
-            worksheet.Column(8).Width = 12;
-            worksheet.Column(9).Width = 15;
+            worksheet.Column(7).Width = 12;
+            worksheet.Column(8).Width = 20;
+            worksheet.Column(9).Width = 20;
             worksheet.Column(10).Width = 15;
-            worksheet.Column(11).Width = 15;
-            worksheet.Column(12).Width = 18;
+            worksheet.Column(11).Width = 18;
 
-            // Freeze header row
             worksheet.View.FreezePanes(2, 1);
         }
     }
 }
-

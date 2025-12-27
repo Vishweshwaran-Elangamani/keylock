@@ -5,6 +5,7 @@ using Relevantz.EEPZ.Data.IRepository;
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Common.Utils;
 
+
 namespace Relevantz.EEPZ.Core.Service
 {
     public class UserManagementService : IUserManagementService
@@ -15,6 +16,7 @@ namespace Relevantz.EEPZ.Core.Service
         private readonly IEmployeeDetailsMasterRepository _employeeDetailsRepository;
         private readonly IPasswordService _passwordService;
         private readonly IEmailService _emailService;
+
 
         public UserManagementService(
             IEmployeeRepository employeeRepository,
@@ -32,6 +34,7 @@ namespace Relevantz.EEPZ.Core.Service
             _emailService = emailService;
         }
 
+
         public async Task<ApiResponseDto<UserResponseDto>> CreateUserAsync(CreateUserRequestDto request, int createdByUserId)
         {
             try
@@ -42,11 +45,22 @@ namespace Relevantz.EEPZ.Core.Service
                     return ApiResponseDto<UserResponseDto>.FailureResponse(Constants.Messages.EmailAlreadyExists);
                 }
 
-                // Check if Employee Company ID already exists
-                if (await _employeeRepository.EmployeeCompanyIdExistsAsync(request.EmployeeCompanyId))
+
+                // Auto-generate Employee Company ID if not provided or empty
+                if (string.IsNullOrWhiteSpace(request.EmployeeCompanyId))
                 {
-                    return ApiResponseDto<UserResponseDto>.FailureResponse(Constants.Messages.EmployeeIdAlreadyExists);
+                    request.EmployeeCompanyId = await _employeeRepository.GetNextEmployeeCompanyIdAsync();
+                    EEPZBusinessLog.Information($"Auto-generated Employee Company ID: {request.EmployeeCompanyId}");
                 }
+                else
+                {
+                    // Check if Employee Company ID already exists (if manually provided)
+                    if (await _employeeRepository.EmployeeCompanyIdExistsAsync(request.EmployeeCompanyId))
+                    {
+                        return ApiResponseDto<UserResponseDto>.FailureResponse(Constants.Messages.EmployeeIdAlreadyExists);
+                    }
+                }
+
 
                 // Create Employee
                 var employee = new Employee
@@ -65,13 +79,16 @@ namespace Relevantz.EEPZ.Core.Service
                     CreatedByUserId = createdByUserId
                 };
 
+
                 await _employeeRepository.CreateAsync(employee);
+
 
                 // Generate temporary password
                 var temporaryPassword = _passwordService.GenerateTemporaryPassword();
                 var hashedPassword = _passwordService.HashPassword(temporaryPassword);
                 Console.WriteLine($"Generated Temp Password: {temporaryPassword}");
                 Console.WriteLine($"Hashed Password Length: {hashedPassword.Length}");
+
 
                 // Create User Authentication
                 var userAuth = new Userauthentication
@@ -84,7 +101,9 @@ namespace Relevantz.EEPZ.Core.Service
                     CreatedAt = DateTime.UtcNow
                 };
 
+
                 await _userAuthRepository.CreateAsync(userAuth);
+
 
                 // Create User Profile
                 var userProfile = new Userprofile
@@ -103,7 +122,9 @@ namespace Relevantz.EEPZ.Core.Service
                     PersonalEmail = request.PersonalEmail
                 };
 
+
                 await _userProfileRepository.CreateAsync(userProfile);
+
 
                 // Assign Role and Department
                 var employeeDetails = new Employeedetailsmaster
@@ -113,16 +134,21 @@ namespace Relevantz.EEPZ.Core.Service
                     DepartmentId = request.DepartmentId
                 };
 
+
                 await _employeeDetailsRepository.CreateAsync(employeeDetails);
+
 
                 // Send welcome email
                 await _emailService.SendWelcomeEmailAsync(request.Email, request.FirstName, temporaryPassword);
 
-                EEPZBusinessLog.Information($"User created successfully: {request.Email}");
+
+                EEPZBusinessLog.Information($"User created successfully: {request.Email} with Employee ID: {request.EmployeeCompanyId}");
+
 
                 // Fetch complete user data
                 var createdUser = await _userAuthRepository.GetByIdAsync(userAuth.UserId);
                 var userResponse = MapToUserResponse(createdUser!);
+
 
                 return ApiResponseDto<UserResponseDto>.SuccessResponse(userResponse, Constants.Messages.UserCreatedSuccess);
             }
@@ -132,6 +158,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<UserResponseDto>.FailureResponse("An error occurred while creating user");
             }
         }
+
 
         public async Task<ApiResponseDto<UserResponseDto>> UpdateUserAsync(UpdateUserRequestDto request, int updatedByUserId)
         {
@@ -143,7 +170,9 @@ namespace Relevantz.EEPZ.Core.Service
                     return ApiResponseDto<UserResponseDto>.FailureResponse(Constants.Messages.UserNotFound);
                 }
 
+
                 var employee = user.Employee;
+
 
                 // Update Employee fields if provided
                 if (request.EmploymentType != null) employee.EmploymentType = request.EmploymentType;
@@ -154,8 +183,10 @@ namespace Relevantz.EEPZ.Core.Service
                 if (request.NoticePeriodDays.HasValue) employee.NoticePeriodDays = request.NoticePeriodDays.Value;
                 if (request.IsActive.HasValue) employee.IsActive = request.IsActive.Value;
 
+
                 employee.UpdatedByUserId = updatedByUserId;
                 await _employeeRepository.UpdateAsync(employee);
+
 
                 // Update User Authentication status if provided
                 if (request.Status != null)
@@ -164,10 +195,13 @@ namespace Relevantz.EEPZ.Core.Service
                     await _userAuthRepository.UpdateAsync(user);
                 }
 
+
                 EEPZBusinessLog.Information($"User updated successfully: UserId {request.UserId}");
+
 
                 var updatedUser = await _userAuthRepository.GetByIdAsync(request.UserId);
                 var userResponse = MapToUserResponse(updatedUser!);
+
 
                 return ApiResponseDto<UserResponseDto>.SuccessResponse(userResponse, Constants.Messages.UserUpdatedSuccess);
             }
@@ -177,6 +211,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<UserResponseDto>.FailureResponse("An error occurred while updating user");
             }
         }
+
 
         public async Task<ApiResponseDto<UserResponseDto>> GetUserByIdAsync(int userId)
         {
@@ -188,6 +223,7 @@ namespace Relevantz.EEPZ.Core.Service
                     return ApiResponseDto<UserResponseDto>.FailureResponse(Constants.Messages.UserNotFound);
                 }
 
+
                 var userResponse = MapToUserResponse(user);
                 return ApiResponseDto<UserResponseDto>.SuccessResponse(userResponse, "User retrieved successfully");
             }
@@ -197,6 +233,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<UserResponseDto>.FailureResponse("An error occurred while retrieving user");
             }
         }
+
 
         public async Task<ApiResponseDto<List<UserResponseDto>>> GetAllUsersAsync()
         {
@@ -213,6 +250,7 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
 
+
         public async Task<ApiResponseDto<string>> DeactivateUserAsync(int userId)
         {
             try
@@ -223,9 +261,11 @@ namespace Relevantz.EEPZ.Core.Service
                     return ApiResponseDto<string>.FailureResponse(Constants.Messages.UserNotFound);
                 }
 
+
                 user.Status = Constants.UserStatuses.Inactive;
                 user.Employee.IsActive = false;
                 await _userAuthRepository.UpdateAsync(user);
+
 
                 EEPZBusinessLog.Information($"User deactivated: UserId {userId}");
                 return ApiResponseDto<string>.SuccessResponse("User deactivated successfully", "User deactivated successfully");
@@ -237,6 +277,7 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
 
+
         public async Task<ApiResponseDto<string>> ActivateUserAsync(int userId)
         {
             try
@@ -247,9 +288,11 @@ namespace Relevantz.EEPZ.Core.Service
                     return ApiResponseDto<string>.FailureResponse(Constants.Messages.UserNotFound);
                 }
 
+
                 user.Status = Constants.UserStatuses.Active;
                 user.Employee.IsActive = true;
                 await _userAuthRepository.UpdateAsync(user);
+
 
                 EEPZBusinessLog.Information($"User activated: UserId {userId}");
                 return ApiResponseDto<string>.SuccessResponse("User activated successfully", "User activated successfully");
@@ -261,11 +304,13 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
 
+
         public async Task<ApiResponseDto<string>> AssignRoleAndDepartmentAsync(AssignRoleDepartmentRequestDto request)
         {
             try
             {
                 var existingDetails = await _employeeDetailsRepository.GetByEmployeeIdAsync(request.EmployeeId);
+
 
                 if (existingDetails != null)
                 {
@@ -284,6 +329,7 @@ namespace Relevantz.EEPZ.Core.Service
                     await _employeeDetailsRepository.CreateAsync(newDetails);
                 }
 
+
                 EEPZBusinessLog.Information($"Role and Department assigned to EmployeeId: {request.EmployeeId}");
                 return ApiResponseDto<string>.SuccessResponse("Role and Department assigned successfully", "Role and Department assigned successfully");
             }
@@ -293,6 +339,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<string>.FailureResponse("An error occurred while assigning role and department");
             }
         }
+
 
         public async Task<ApiResponseDto<List<UserResponseDto>>> GetEmployeesByManagerAsync(int managerId)
         {
@@ -305,14 +352,17 @@ namespace Relevantz.EEPZ.Core.Service
                     return ApiResponseDto<List<UserResponseDto>>.FailureResponse("Manager not found");
                 }
 
+
                 // Get all employees where ReportingManagerEmployeeId matches the manager's EmployeeId
                 var allEmployees = await _employeeRepository.GetAllAsync();
                 var reportingEmployees = allEmployees
                     .Where(e => e.ReportingManagerEmployeeId == manager.EmployeeId && e.IsActive == true)
                     .ToList();
 
+
                 // Get user authentication data for these employees
                 var userResponses = new List<UserResponseDto>();
+
 
                 foreach (var employee in reportingEmployees)
                 {
@@ -322,6 +372,7 @@ namespace Relevantz.EEPZ.Core.Service
                         userResponses.Add(MapToUserResponse(userAuth));
                     }
                 }
+
 
                 EEPZBusinessLog.Information($"Retrieved {userResponses.Count} employees for manager: {managerId}");
                 return ApiResponseDto<List<UserResponseDto>>.SuccessResponse(
@@ -338,10 +389,12 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
 
+
         private UserResponseDto MapToUserResponse(Userauthentication user)
         {
             var profile = user.Employee?.Userprofile;
             var employeeDetails = user.Employee?.Employeedetailsmasters?.FirstOrDefault();
+
 
             return new UserResponseDto
             {
@@ -373,5 +426,11 @@ namespace Relevantz.EEPZ.Core.Service
                 DepartmentName = employeeDetails?.Department?.DepartmentName
             };
         }
+        
+        public async Task<string> GetNextEmployeeCompanyIdAsync()
+        {
+            return await _employeeRepository.GetNextEmployeeCompanyIdAsync();
+        }
+
     }
 }

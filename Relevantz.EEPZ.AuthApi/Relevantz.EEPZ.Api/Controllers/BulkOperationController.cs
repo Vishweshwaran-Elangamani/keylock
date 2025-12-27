@@ -5,6 +5,7 @@ using Relevantz.EEPZ.Core.IService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Relevantz.EEPZ.Common.Utils;
 
 
 namespace Relevantz.EEPZ.Api.Controllers
@@ -73,25 +74,26 @@ namespace Relevantz.EEPZ.Api.Controllers
 
 
         [HttpGet("download-template")]
-        public IActionResult DownloadExcelTemplate()
+        [Authorize]
+        public async Task<IActionResult> DownloadExcelTemplate()
         {
             try
             {
-                var fileBytes = _bulkOperationService.GenerateExcelTemplate();
-
-                var fileName = $"BulkUserImportTemplate_{DateTime.UtcNow:yyyyMMddHHmmss}.xlsx";
+                var templateBytes = await _bulkOperationService.GenerateExcelTemplateAsync();
 
                 return File(
-                    fileBytes,
+                    templateBytes,
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    fileName
+                    $"UserImportTemplate_{DateTime.UtcNow:yyyyMMdd}.xlsx"
                 );
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { success = false, message = "Error generating Excel template", error = ex.Message });
+                EEPZServiceLog.Error("Error downloading Excel template", ex);
+                return StatusCode(500, "Failed to generate template");
             }
         }
+
 
 
         /// <summary>
