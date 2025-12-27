@@ -1,14 +1,18 @@
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
-  from { 
+  from {
     opacity: 0;
     transform: translateY(20px);
   }
-  to { 
+  to {
     opacity: 1;
     transform: translateY(0);
   }
@@ -35,7 +39,7 @@
   width: 100%;
   max-width: 500px;
   max-height: 90vh;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
   animation: slideUp 0.3s ease-out;
@@ -132,6 +136,106 @@
   color: #9ca3af;
 }
 
+/* Custom Dropdown Styles */
+.customDropdownContainer {
+  position: relative;
+}
+
+.customDropdownButton {
+  width: 100%;
+  padding: 0.625rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  background: #fff;
+  color: rgb(39, 35, 92);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  text-align: left;
+  height: 40px;
+}
+
+.customDropdownButton:hover:not(:disabled) {
+  border-color: rgb(39, 35, 92);
+  background-color: rgba(39, 35, 92, 0.05);
+}
+
+.customDropdownButton:focus {
+  border-color: rgb(39, 35, 92);
+  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+}
+
+.customDropdownButtonDisabled {
+  background: #f3f4f6;  /* ✅ Slightly darker gray background */
+  cursor: not-allowed;
+  color: rgb(39, 35, 92);  /* ✅ Purple text - visible! */
+  opacity: 1;  /* ✅ Full opacity */
+  font-weight: 600;  /* ✅ Bold for better visibility */
+  border: 1px solid #d1d5db;  /* ✅ Slightly darker border */
+}
+
+.customDropdownButtonDisabled .customDropdownButtonText {
+  color: rgb(39, 35, 92);  /* ✅ Force purple color on text */
+}
+
+.customDropdownButtonText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: inherit;
+}
+
+.customDropdownMenu {
+  position: fixed;
+  transform: translateY(-100%);
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  z-index: 9999;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  max-height: 250px;
+  overflow-y: auto;
+  margin-bottom: 4px;
+}
+
+.customDropdownItem {
+  padding: 0.625rem 0.875rem;
+  cursor: pointer;
+  font-size: 14px;
+  color: #212529;
+  text-align: left;
+  transition: all 0.2s;
+  background: #fff;
+  font-weight: 500;
+}
+
+.customDropdownItem:hover {
+  background: rgb(39, 35, 92);
+  color: white;
+}
+
+.customDropdownItemActive {
+  background: #f3f4f6;
+  font-weight: 600;
+}
+
+.customDropdownItemActive:hover {
+  background: rgb(39, 35, 92);
+  color: white;
+}
+
+.customDropdownItemDisabled {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Old select styles - keep for backwards compatibility */
 .select {
   width: 100%;
   padding: 0.625rem;
@@ -339,7 +443,7 @@
 
 .btnSubmitEnabled {
   composes: btnSubmit;
-  background: linear-gradient(90deg, #97247E 0%, #E01950 100%);
+  background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
   color: #fff;
 }
 
@@ -366,7 +470,7 @@
   .ratingButtons {
     justify-content: center;
   }
-  
+
   .ratingBtn {
     width: 32px;
     height: 32px;

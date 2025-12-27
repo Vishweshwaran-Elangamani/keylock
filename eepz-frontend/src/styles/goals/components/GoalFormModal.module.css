@@ -220,8 +220,8 @@
 }
 
 .customDropdownItem.selected {
-  background-color: rgb(39, 35, 92);
-  color: white;
+  background-color: #f3f4f6;
+  color: rgb(39, 35, 92);
   font-weight: 600;
 }
 

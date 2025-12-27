@@ -93,7 +93,7 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
     } finally {
       setLoading(false);
     }
-  };
+  };           
 
   const fetchApprovalHistory = async () => {
     try {
@@ -146,8 +146,7 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
     return assignments.some(
       (assignment) =>
         assignment.skillId === skillId &&
-        // make sure you use the correct property name from your DTO:
-        assignment.menteeEmployeeId === employee.employeeId &&
+              assignment.menteeEmployeeId === employee.employeeId &&
         ACTIVE_STATUSES.includes(assignment.status)
     );
   };
@@ -401,6 +400,5 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
       )}
     </>
   );
-};
-
+};       
 export default EmployeeSkillsModal;

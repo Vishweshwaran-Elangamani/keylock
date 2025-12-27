@@ -98,7 +98,7 @@ export const getFileIcon = (filename) => {
     ".rar": "bi-file-earmark-zip-fill text-dark",
   };
 
-  return iconMap[extension] || "bi-file-earmark text-secondary";
+  return iconMap[extension] || "bi-file-earmark text-secondary";                                                                    
 };
 
 // ==================== GOAL SERVICE ====================

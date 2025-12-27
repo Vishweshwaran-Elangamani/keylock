@@ -1,10 +1,82 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { X, AlertCircle } from "lucide-react";
 import { lndService } from "../../../services/lnd/lndService";
 import { RATING } from "../../../constants/lnd/lndConstants";
 import ConfirmationModal from "./ConfirmationModal";
 import { toast } from "sonner";
 import styles from "../../../styles/lnd/components/RecordSkillModal.module.css";
+
+// Custom Dropdown Component
+const CustomDropdown = ({ value, onChange, options, disabled, placeholder }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const selectedOption = options.find((opt) => opt.value === value);
+  const displayText = selectedOption ? selectedOption.label : placeholder;
+
+  return (
+    <div ref={dropdownRef} className={styles.customDropdownContainer}>
+      <button
+        type="button"
+        onClick={() => !disabled && setIsOpen(!isOpen)}
+        disabled={disabled}
+        className={`${styles.customDropdownButton} ${
+          disabled ? styles.customDropdownButtonDisabled : ""
+        }`}
+      >
+        <span className={styles.customDropdownButtonText}>
+          {displayText}
+        </span>
+        <i
+          className={`bi bi-chevron-${isOpen ? "up" : "down"}`}
+          style={{ fontSize: "0.7rem", marginLeft: "0.5rem", flexShrink: 0 }}
+        ></i>
+      </button>
+
+      {isOpen && !disabled && (
+        <div
+          className={styles.customDropdownMenu}
+          style={{
+            top: dropdownRef.current?.getBoundingClientRect().top - 4 || 0,
+            left: dropdownRef.current?.getBoundingClientRect().left || 0,
+            width: dropdownRef.current?.getBoundingClientRect().width || "auto",
+          }}
+        >
+          {options.map((option) => (
+            <div
+              key={option.value}
+              onClick={() => {
+                if (option.value !== "") {
+                  onChange({ target: { value: option.value } });
+                  setIsOpen(false);
+                }
+              }}
+              className={`${styles.customDropdownItem} ${
+                value === option.value ? styles.customDropdownItemActive : ""
+              } ${option.value === "" ? styles.customDropdownItemDisabled : ""}`}
+            >
+              {option.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
   const [employees, setEmployees] = useState([]);
@@ -26,7 +98,7 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [pendingSubmit, setPendingSubmit] = useState(null);
 
-  const isEditMode = !!skill?.mapperId;
+  const isEditMode = !!skill?.mapperId; 
 
   // Load employees and all skills on mount
   useEffect(() => {
@@ -123,7 +195,7 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
     setSelectedEmployeeId(e.target.value);
     setSelectedSkillId("");
     setAvailableSkills([]);
-  };
+  };  
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -139,7 +211,7 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
     } else {
       submitSkill();
     }
-  };
+  };  
 
   const submitSkill = async () => {
     try {
@@ -195,6 +267,39 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
     return "#198754";
   };
 
+  // Prepare dropdown options
+  const employeeOptions = [
+    {
+      value: "",
+      label: fetchingEmployees ? "Loading employees..." : "Select Employee",
+    },
+    ...employees.map((emp) => ({
+      value: emp.employeeId,
+      label: `${emp.employeeName}${
+        emp.departmentName ? ` (${emp.departmentName})` : ""
+      }`,
+    })),
+  ];
+
+  const skillOptions = [
+    {
+      value: "",
+      label: !selectedEmployeeId
+        ? "Select employee first"
+        : !allSkillsLoaded
+        ? "Loading skills..."
+        : fetchingSkills
+        ? "Loading available skills..."
+        : availableSkills.length === 0
+        ? "No skills available"
+        : "Select Skill",
+    },
+    ...availableSkills.map((skill) => ({
+      value: skill.skillId,
+      label: skill.skillName,
+    })),
+  ];
+
   return (
     <>
       <div className={styles.backdrop} onClick={onClose}>
@@ -236,28 +341,16 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
                 ) : (
                   <>
                     <div className={styles.formField}>
-                      <label className={styles.formLabel}>
+                      <label className={styles.formLabel}>  
                         Employee <span className={styles.required}> *</span>
                       </label>
-                      <select
+                      <CustomDropdown
                         value={selectedEmployeeId}
-                        className={`EmployeeSelector ${styles.select} ${styles.selectDisabled}`}
                         onChange={handleEmployeeChange}
-                        required
-                        disabled
-                      >
-                        <option value="">
-                          {fetchingEmployees
-                            ? "Loading employees..."
-                            : "Select Employee"}
-                        </option>
-                        {employees.map((emp) => (
-                          <option key={emp.employeeId} value={emp.employeeId}>
-                            {emp.employeeName}{" "}
-                            {emp.departmentName && `(${emp.departmentName})`}
-                          </option>
-                        ))}
-                      </select>
+                        options={employeeOptions}
+                        disabled={true}
+                        placeholder="Select Employee"
+                      />
                     </div>
 
                     <div className={styles.formField}>
@@ -268,40 +361,17 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
                       >
                         Select Skill <span className={styles.required}> *</span>
                       </label>
-                      <select
+                      <CustomDropdown
                         value={selectedSkillId}
                         onChange={(e) => setSelectedSkillId(e.target.value)}
-                        required
+                        options={skillOptions}
                         disabled={
                           !selectedEmployeeId ||
                           fetchingSkills ||
                           !allSkillsLoaded
                         }
-                        className={`${styles.select} ${
-                          !selectedEmployeeId ||
-                          fetchingSkills ||
-                          !allSkillsLoaded
-                            ? styles.selectDisabled
-                            : ""
-                        }`}
-                      >
-                        <option value="">
-                          {!selectedEmployeeId
-                            ? "Select employee first"
-                            : !allSkillsLoaded
-                            ? "Loading skills..."
-                            : fetchingSkills
-                            ? "Loading available skills..."
-                            : availableSkills.length === 0
-                            ? "No skills available"
-                            : "Select Skill"}
-                        </option>
-                        {availableSkills.map((skill) => (
-                          <option key={skill.skillId} value={skill.skillId}>
-                            {skill.skillName}
-                          </option>
-                        ))}
-                      </select>
+                        placeholder="Select Skill"
+                      />
                       {selectedEmployeeId && availableSkills.length > 0 && (
                         <p className={styles.availableCount}>
                           {availableSkills.length} skill(s) available for this
@@ -328,7 +398,7 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
                       {rating}
                     </span>
                     <span className={styles.ratingScaleLabel}>/10</span>
-                  </label>
+                  </label> 
 
                   <div className={styles.ratingButtons}>
                     {[...Array(10)].map((_, index) => {
@@ -382,7 +452,7 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
                     <div className={styles.ratingScaleMax}>
                       <span className={styles.ratingScaleLabel}>Max</span>
                       <span className={styles.ratingScaleValueMax}>10</span>
-                    </div>
+                    </div>                                                                 
                   </div>
                 </div>
               </div>
@@ -452,4 +522,4 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
   );
 };
 
-export default RecordSkillModal;
+export default RecordSkillModal; 

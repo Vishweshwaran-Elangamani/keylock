@@ -24,10 +24,17 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
     return labels[type] || type;
   };
 
-  // Check if file can be previewed (only PDF and images)
+  const getFileExtension = (filename) => {
+    if (!filename) return "";
+    const cleanName = filename.split("?")[0].split("#")[0];
+    const parts = cleanName.split(".");
+    return parts.length > 1 ? parts[parts.length - 1].toLowerCase() : "";
+  };
+
   const fileName = approval.attachmentFileName || approval.attachmentPath || "";
-  const extension = fileName.split(".").pop()?.toLowerCase();
-  const canPreview = [
+  const extension = getFileExtension(fileName);
+
+  const previewableExtensions = [
     "pdf",
     "png",
     "jpg",
@@ -35,18 +42,50 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
     "gif",
     "bmp",
     "svg",
-  ].includes(extension);
+  ];
 
-  // PREVIEW HANDLER
+  const nonPreviewableExtensions = [
+    "doc",
+    "docx",
+    "xls",
+    "xlsx",
+    "ppt",
+    "pptx",
+    "txt",
+    "zip",
+    "rar",
+    "7z",
+  ];
+
+  const hasAttachment = approval.attachmentPath || approval.attachmentFileName;
+
+  let canPreview = false;
+
+  if (hasAttachment) {
+    if (extension) {
+      if (nonPreviewableExtensions.includes(extension)) {
+        canPreview = false;
+      } else if (previewableExtensions.includes(extension)) {
+        canPreview = true;
+      } else {
+        canPreview = false;
+      }
+    } else {
+      canPreview = true;
+    }
+  }
+
   const handlePreview = async () => {
     if (!canPreview) {
-      toast.info(
+      toast.warning(
         "Preview not supported for this file type. Please download to view."
       );
       return;
     }
 
     try {
+      toast.info("Loading preview...");
+
       const response = await lndService.previewApprovalAttachment(
         approval.approvalId
       );
@@ -54,11 +93,44 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
       if (response?.data) {
         const contentType =
           response.headers["content-type"] || "application/pdf";
+
+        const previewableContentTypes = [
+          "application/pdf",
+          "image/png",
+          "image/jpeg",
+          "image/jpg",
+          "image/gif",
+          "image/bmp",
+          "image/svg+xml",
+        ];
+
+        const blockedContentTypes = [
+          "application/msword",
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "application/vnd.ms-excel",
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          "application/vnd.ms-powerpoint",
+          "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        ];
+
+        if (blockedContentTypes.includes(contentType)) {
+          toast.warning(
+            "This file type cannot be previewed in browser. Please use the download button."
+          );
+          return;
+        }
+
+        if (!previewableContentTypes.includes(contentType)) {
+          toast.warning(
+            "This file type cannot be previewed. Please download to view."
+          );
+          return;
+        }
+
         previewFile(response.data, contentType);
         toast.success("Opening preview...");
       }
     } catch (error) {
-      console.error("Failed to preview:", error);
       const errorMessage =
         error.response?.data?.message ||
         error.response?.data?.errors?.[0] ||
@@ -72,13 +144,24 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
       const response = await lndService.downloadApprovalAttachment(
         approval.approvalId
       );
-      const filename =
-        approval.attachmentFileName ||
-        `approval_${approval.approvalId}_attachment`;
+
+      const contentDisposition = response.headers["content-disposition"];
+      let filename = `approval_${approval.approvalId}_attachment`;
+
+      if (contentDisposition) {
+        const fileNameMatch = contentDisposition.match(
+          /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
+        );
+        if (fileNameMatch && fileNameMatch[1]) {
+          filename = fileNameMatch[1].replace(/['"]/g, "");
+        }
+      } else if (approval.attachmentFileName) {
+        filename = approval.attachmentFileName;
+      }
+
       downloadFile(response.data, filename);
       toast.success("File downloaded successfully");
     } catch (error) {
-      console.error("Failed to download:", error);
       const errorMessage =
         error.response?.data?.message ||
         error.response?.data?.errors?.[0] ||
@@ -95,7 +178,6 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
       return;
     }
 
-    // Complete assignment approval flow
     if (
       approval.approvalType === APPROVAL_TYPE.ASSIGNMENT_COMPLETION &&
       decision === "approve"
@@ -128,7 +210,6 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
           toast.error(response.data.message || "Failed to complete assignment");
         }
       } catch (error) {
-        console.error("Failed to complete assignment:", error);
         toast.error(
           error.response?.data?.message || "Failed to complete assignment"
         );
@@ -138,7 +219,6 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
       return;
     }
 
-    // Default: other approval types use processApproval
     const isSmeRequest = approval.approvalType === APPROVAL_TYPE.SME_REQUEST;
     const notesToSend = isSmeRequest ? approval.notes || "" : notes.trim();
 
@@ -169,7 +249,6 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
         toast.error(response.data.message || "Failed to process approval");
       }
     } catch (error) {
-      console.error("Failed to process approval:", error);
       toast.error(
         error.response?.data?.message || "Failed to process approval"
       );
