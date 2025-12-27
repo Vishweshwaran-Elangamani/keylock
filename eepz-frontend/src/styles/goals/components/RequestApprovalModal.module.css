@@ -74,7 +74,7 @@
 .icon {
   font-size: 1.75rem;
   color: white;
-}
+}   
 
 .headerTitle {
   margin: 0;
@@ -246,7 +246,7 @@
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
-  background-color: #f8f9fa;
+  background-color: #f8f9fa; 
   border-radius: 0 0 1.5rem 1.5rem;
 }
 
@@ -269,9 +269,13 @@
 
 .btnSubmit:hover:not(:disabled) {
   filter: brightness(85%);
-}
+  color:#fff;
+
+}       
 
 .btnSubmit:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  color: white;
+  background: rgb(39, 35, 92);  
 }

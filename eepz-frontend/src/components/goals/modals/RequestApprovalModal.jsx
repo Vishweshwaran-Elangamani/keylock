@@ -307,7 +307,7 @@ const RequestApprovalModal = ({
 
                   {!proofFile ? (
                     <div
-                      className={`${styles.dragDropArea} ${
+                      className={`${styles.dragDropArea} ${    
                         isDragActive ? styles.dragDropAreaActive : ""
                       }`}
                       style={{
@@ -373,7 +373,7 @@ const RequestApprovalModal = ({
                         onChange={handleFileChange}
                         disabled={loading}
                         className={styles.fileInput}
-                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif"
+                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif" 
                       />
                     </div>
                   ) : (

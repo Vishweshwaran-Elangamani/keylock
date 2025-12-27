@@ -45,7 +45,7 @@
 .sizeButton:hover:not(.disabled) {
   background: rgb(39, 35, 92);
   color: white;
-  border-color: rgb(39, 35, 92);
+  
 }
 
 .sizeButton.disabled {
@@ -88,6 +88,7 @@
 .sizeOption.active {
   background: #f3f4f6;
   font-weight: 600;
+  color:rgb(39, 35, 92);
 }
 
 .status {
@@ -162,7 +163,7 @@
 .page-item.active .pageLink {
   background-color: rgb(39, 35, 92);
   border-color: rgb(39, 35, 92);
-  color: #fff;
+  color: rgb(39, 35, 92);
   font-weight: 600;
 }
 
