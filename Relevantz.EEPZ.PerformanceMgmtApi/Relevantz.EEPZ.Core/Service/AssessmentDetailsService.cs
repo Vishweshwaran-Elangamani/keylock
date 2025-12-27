@@ -2,6 +2,7 @@ using System.IO;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Core.Services.Interfaces;
+using Relevantz.EEPZ.Core.IService;
 using Microsoft.Extensions.Logging;
 using Relevantz.EEPZ.Common.DTOs.Response;
 
@@ -10,13 +11,16 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
     public class AssessmentDetailsService : IAssessmentDetailsService
     {
         private readonly IAssessmentDetailsRepository _repository;
+        private readonly IFileStorageService _fileStorage;
         private readonly ILogger<AssessmentDetailsService> _logger;
 
         public AssessmentDetailsService(
             IAssessmentDetailsRepository repository,
+            IFileStorageService fileStorage,
             ILogger<AssessmentDetailsService> logger)
         {
             _repository = repository;
+            _fileStorage = fileStorage;
             _logger = logger;
         }
 
@@ -44,7 +48,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var pe = projectEmployees
                     .Where(x => x.EmployeeId == profile.EmployeeId && x.IsPrimary == true)
                     .FirstOrDefault();
-                var project = pe != null ? projects.FirstOrDefault(pj => pj.ProjectId == pe.ProjectId) : null;
+
+                var project = pe != null
+                    ? projects.FirstOrDefault(pj => pj.ProjectId == pe.ProjectId)
+                    : null;
 
                 var selfAssessment = selfAssessments
                     .Where(sa => sa.EmployeeId == assignment.EmployeeId && sa.FormId == assignment.FormId)
@@ -54,6 +61,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var l1Auth = project?.L1approverEmployeeId.HasValue == true
                     ? userAuths.FirstOrDefault(ua => ua.EmployeeId == project.L1approverEmployeeId)
                     : null;
+
                 var l2Auth = project?.L2approverEmployeeId.HasValue == true
                     ? userAuths.FirstOrDefault(ua => ua.EmployeeId == project.L2approverEmployeeId)
                     : null;
@@ -75,24 +83,22 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                             ? reviews.FirstOrDefault(r => r.DetailId == detail.DetailId && r.ReviewerId == l2Auth.UserId)
                             : null;
 
-                        string status =
-                            detail.EmployeeRating == null || string.IsNullOrEmpty(detail.EmployeeComments)
-                                ? "Pending"
-                                : (!hasL1 && !hasL2)
-                                    ? "Pending Review"
-                                    : (hasL1 && l1Review == null && hasL2 && l2Review == null)
-                                        ? "Pending Assessment"
-                                        : "Completed";
+                        string status = (detail.EmployeeRating == null && string.IsNullOrEmpty(detail.EmployeeComments))
+                            ? "Pending"
+                            : (!hasL1 && !hasL2)
+                                ? "Pending Review"
+                                : (hasL1 && l1Review == null) || (hasL2 && l2Review == null)
+                                    ? "Pending"
+                                    : "Assessment Completed";
 
                         string l1ReviewerName = "No L1";
                         if (hasL1 && project?.L1approverEmployeeId.HasValue == true)
                         {
                             var l1Profile = profiles.FirstOrDefault(p => p.EmployeeId == project.L1approverEmployeeId);
                             l1ReviewerName = l1Profile != null
-                                ? (l1Profile.FirstName ?? l1Profile.LastName ?? "").Trim()
+                                ? $"{l1Profile.FirstName ?? ""} {l1Profile.LastName ?? ""}".Trim()
                                 : "L1 Reviewer";
-                            if (string.IsNullOrEmpty(l1ReviewerName))
-                                l1ReviewerName = "L1 Reviewer";
+                            if (string.IsNullOrEmpty(l1ReviewerName)) l1ReviewerName = "L1 Reviewer";
                         }
 
                         string l2ReviewerName = "No L2";
@@ -100,10 +106,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         {
                             var l2Profile = profiles.FirstOrDefault(p => p.EmployeeId == project.L2approverEmployeeId);
                             l2ReviewerName = l2Profile != null
-                                ? (l2Profile.FirstName ?? l2Profile.LastName ?? "").Trim()
+                                ? $"{l2Profile.FirstName ?? ""} {l2Profile.LastName ?? ""}".Trim()
                                 : "L2 Reviewer";
-                            if (string.IsNullOrEmpty(l2ReviewerName))
-                                l2ReviewerName = "L2 Reviewer";
+                            if (string.IsNullOrEmpty(l2ReviewerName)) l2ReviewerName = "L2 Reviewer";
                         }
 
                         competencies.Add(new
@@ -126,7 +131,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 else
                 {
                     var formComps = assignment.Form?.Competencies ?? new List<Competency>();
-
                     foreach (var fc in formComps)
                     {
                         string l1ReviewerName = "No L1";
@@ -134,7 +138,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         {
                             var l1Profile = profiles.FirstOrDefault(p => p.EmployeeId == project.L1approverEmployeeId);
                             l1ReviewerName = l1Profile != null
-                                ? (l1Profile.FirstName ?? l1Profile.LastName ?? "").Trim()
+                                ? $"{l1Profile.FirstName ?? ""} {l1Profile.LastName ?? ""}".Trim()
                                 : "No L1";
                         }
 
@@ -143,7 +147,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         {
                             var l2Profile = profiles.FirstOrDefault(p => p.EmployeeId == project.L2approverEmployeeId);
                             l2ReviewerName = l2Profile != null
-                                ? (l2Profile.FirstName ?? l2Profile.LastName ?? "").Trim()
+                                ? $"{l2Profile.FirstName ?? ""} {l2Profile.LastName ?? ""}".Trim()
                                 : "No L2";
                         }
 
@@ -205,33 +209,43 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             var result = new AssessmentDownloadResult();
 
-            var attachment = await _repository.GetAttachmentByIdAsync(attachmentId);
-            if (attachment == null)
+            try
             {
-                result.Success = false;
-                result.ErrorMessage = "Attachment not found";
+                var attachment = await _repository.GetAttachmentByIdAsync(attachmentId);
+
+                if (attachment == null)
+                {
+                    result.Success = false;
+                    result.ErrorMessage = "Attachment not found";
+                    return result;
+                }
+
+                // Get file from MongoDB GridFS using stored ObjectId
+                var (fileBytes, contentType, fileName) = await _fileStorage.GetFileForPreviewAsync(
+                    attachment.FilePath ?? "");
+
+                result.Success = true;
+                result.FileName = attachment.FileName;
+                result.ContentType = contentType;
+                result.FileBytes = fileBytes;
+
+                _logger.LogInformation("HR attachment {AttachmentId} downloaded successfully", attachmentId);
                 return result;
             }
-
-            var filePath = Path.Combine(
-                Directory.GetCurrentDirectory(),
-                attachment.FilePath.TrimStart('\\'));
-
-            if (!File.Exists(filePath))
+            catch (FileNotFoundException ex)
             {
+                _logger.LogError(ex, "File not found for attachment {AttachmentId}", attachmentId);
                 result.Success = false;
-                result.ErrorMessage = "File not found on server";
+                result.ErrorMessage = "File not found in storage";
                 return result;
             }
-
-            var bytes = await File.ReadAllBytesAsync(filePath);
-
-            result.Success = true;
-            result.FileName = attachment.FileName;
-            result.ContentType = "application/octet-stream";
-            result.FileBytes = bytes;
-
-            return result;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error downloading HR attachment {AttachmentId}", attachmentId);
+                result.Success = false;
+                result.ErrorMessage = $"Error: {ex.Message}";
+                return result;
+            }
         }
     }
 }

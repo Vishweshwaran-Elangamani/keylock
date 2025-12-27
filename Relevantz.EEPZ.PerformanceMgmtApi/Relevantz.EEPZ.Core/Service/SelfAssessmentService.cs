@@ -2,6 +2,7 @@ using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.Services.Interfaces;
+using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -9,32 +10,33 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
     public class SelfAssessmentService : ISelfAssessmentService
     {
         private readonly ISelfAssessmentRepository _repository;
+        private readonly IFileStorageService _fileStorage;
         private readonly IConfiguration _configuration;
-        private readonly string _uploadBasePath;
+        private readonly ILogger<SelfAssessmentService> _logger;
 
-        public SelfAssessmentService(ISelfAssessmentRepository repository, IConfiguration configuration)
+        public SelfAssessmentService(
+            ISelfAssessmentRepository repository,
+            IFileStorageService fileStorage,
+            IConfiguration configuration,
+            ILogger<SelfAssessmentService> logger)
         {
             _repository = repository;
+            _fileStorage = fileStorage;
             _configuration = configuration;
-            
-            var basePath = _configuration["FileStorage:BasePath"] ?? @"D:\Capstone\Backend Push\Backend\eepz\SharedUploads";
-            _uploadBasePath = Path.Combine(basePath, "assessments");
-            
-            if (!Directory.Exists(_uploadBasePath))
-            {
-                Directory.CreateDirectory(_uploadBasePath);
-            }
+            _logger = logger;
         }
 
         public async Task<ApiResponse<SelfAssessmentResponseDto>> SubmitSelfAssessmentAsync(SubmitSelfAssessmentRequestDto request)
         {
             await _repository.BeginTransactionAsync();
+
             try
             {
                 var form = await _repository.GetFormWithCompetenciesAsync(request.FormId);
@@ -46,13 +48,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     return ApiResponse<SelfAssessmentResponseDto>.ErrorResponse("User not found or inactive");
 
                 var existingAssessment = await _repository.GetAssessmentForUpsertAsync(request.FormId, request.UserId);
-                Selfassessment assessment;
 
+                Selfassessment assessment;
                 if (existingAssessment != null)
                 {
                     existingAssessment.Status = request.Status;
                     existingAssessment.SubmittedAt = request.Status == "Submitted" ? DateTime.Now : existingAssessment.SubmittedAt;
                     assessment = existingAssessment;
+
                     await _repository.DeleteAssessmentDetailsAsync(existingAssessment.AssessmentId);
                 }
                 else
@@ -64,8 +67,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         Status = request.Status,
                         SubmittedAt = request.Status == "Submitted" ? DateTime.Now : null
                     };
-                    await _repository.UpsertSelfAssessmentAsync(assessment);
                 }
+
+                await _repository.UpsertSelfAssessmentAsync(assessment);
 
                 var details = request.AssessmentDetails.Select(d => new Assessmentdetail
                 {
@@ -104,6 +108,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             catch (Exception ex)
             {
                 await _repository.RollbackTransactionAsync();
+                _logger.LogError(ex, "Error submitting assessment");
                 return ApiResponse<SelfAssessmentResponseDto>.ErrorResponse($"Error submitting assessment: {ex.Message}");
             }
         }
@@ -113,15 +118,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             try
             {
                 var assessments = await _repository.GetSelfAssessmentsByUserAsync(userId);
+
                 if (assessments == null || !assessments.Any())
-                {
                     return ApiResponse<List<SelfAssessmentResponseDto>>.SuccessResponse(new List<SelfAssessmentResponseDto>());
-                }
 
                 var dtoList = assessments.Select(a => new SelfAssessmentResponseDto
                 {
                     AssessmentId = a.AssessmentId,
-                    FormName = a.Form?.Name ?? $"Form #{a.FormId}",
+                    FormName = a.Form?.Name ?? $"Form {a.FormId}",
                     Status = a.Status ?? string.Empty,
                     SubmittedAt = a.SubmittedAt
                 }).ToList();
@@ -130,6 +134,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error getting assessments for user {UserId}", userId);
                 return ApiResponse<List<SelfAssessmentResponseDto>>.ErrorResponse($"Failed to retrieve assessments: {ex.Message}");
             }
         }
@@ -139,6 +144,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             try
             {
                 var assessment = await _repository.GetSelfAssessmentByIdWithDetailsAsync(assessmentId);
+
                 if (assessment == null)
                     return ApiResponse<SelfAssessmentResponseDto>.ErrorResponse("Assessment not found");
 
@@ -147,6 +153,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error fetching assessment {AssessmentId}", assessmentId);
                 return ApiResponse<SelfAssessmentResponseDto>.ErrorResponse($"Error fetching assessment: {ex.Message}");
             }
         }
@@ -156,6 +163,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             try
             {
                 var assessment = await _repository.GetSelfAssessmentByFormAndUserWithDetailsAsync(formId, userId);
+
                 if (assessment == null)
                     return ApiResponse<SelfAssessmentResponseDto>.ErrorResponse("Assessment not found");
 
@@ -164,6 +172,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error fetching assessment for form {FormId} user {UserId}", formId, userId);
                 return ApiResponse<SelfAssessmentResponseDto>.ErrorResponse($"Error fetching assessment: {ex.Message}");
             }
         }
@@ -199,6 +208,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error fetching submitted forms");
                 return ApiResponse<ViewSubmittedFormsResponseDto>.ErrorResponse($"Error fetching submitted forms: {ex.Message}");
             }
         }
@@ -208,20 +218,21 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             try
             {
                 var assessment = await _repository.GetAssessmentForStatusUpdateAsync(assessmentId);
+
                 if (assessment == null)
                     return ApiResponse<bool>.ErrorResponse("Assessment not found");
 
                 assessment.Status = status;
                 if (status == "Submitted")
-                {
                     assessment.SubmittedAt = DateTime.Now;
-                }
 
                 await _repository.SaveChangesAsync();
+
                 return ApiResponse<bool>.SuccessResponse(true, "Status updated successfully");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error updating status for assessment {AssessmentId}", assessmentId);
                 return ApiResponse<bool>.ErrorResponse($"Error updating status: {ex.Message}");
             }
         }
@@ -249,6 +260,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error fetching attachments for assessment {AssessmentId}", assessmentId);
                 return ApiResponse<List<AttachmentResponseDto>>.ErrorResponse($"Error fetching attachments: {ex.Message}");
             }
         }
@@ -258,29 +270,31 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             try
             {
                 var attachment = await _repository.GetAttachmentByIdAsync(attachmentId);
+
                 if (attachment == null)
                     return ApiResponse<bool>.ErrorResponse("Attachment not found");
 
+                // Delete file from MongoDB GridFS
                 if (!string.IsNullOrEmpty(attachment.FilePath))
                 {
-                    var basePath = _configuration["FileStorage:BasePath"] ?? @"D:\Capstone\Backend Push\Backend\eepz\SharedUploads";
-                    var cleanPath = attachment.FilePath
-                        .Replace("uploads\\", "", StringComparison.OrdinalIgnoreCase)
-                        .Replace("uploads/", "", StringComparison.OrdinalIgnoreCase)
-                        .TrimStart('\\', '/');
-                    
-                    var fullPath = Path.Combine(basePath, cleanPath);
-                    if (File.Exists(fullPath))
+                    var deleted = await _fileStorage.DeleteFileAsync(attachment.FilePath);
+                    if (deleted)
                     {
-                        File.Delete(fullPath);
+                        _logger.LogInformation("File {FileId} deleted from MongoDB GridFS", attachment.FilePath);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("File {FileId} not found in MongoDB GridFS during deletion", attachment.FilePath);
                     }
                 }
 
                 await _repository.DeleteAttachmentAsync(attachmentId);
+
                 return ApiResponse<bool>.SuccessResponse(true, "Attachment deleted successfully");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error deleting attachment {AttachmentId}", attachmentId);
                 return ApiResponse<bool>.ErrorResponse($"Error deleting attachment: {ex.Message}");
             }
         }
@@ -291,11 +305,16 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             foreach (var attachment in attachments)
             {
-                string filePath = attachment.FilePath ?? string.Empty;
+                string fileId = attachment.FilePath ?? string.Empty;
 
+                // Upload Base64 content to MongoDB GridFS
                 if (!string.IsNullOrEmpty(attachment.Base64Content))
                 {
-                    filePath = await SaveFileFromBase64Async(assessmentId, attachment.FileName, attachment.Base64Content);
+                    fileId = await SaveFileFromBase64Async(
+                        assessmentId,
+                        attachment.FileName,
+                        attachment.Base64Content,
+                        attachment.FileType ?? "application/octet-stream");
                 }
 
                 var dbAttachment = new Selfassessmentattachment
@@ -303,7 +322,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     AssessmentId = assessmentId,
                     UploadedBy = userId,
                     FileName = attachment.FileName,
-                    FilePath = filePath,
+                    FilePath = fileId, // Store MongoDB ObjectId
                     FileType = attachment.FileType,
                     FileSize = attachment.FileSize,
                     AttachmentNote = attachment.AttachmentNote,
@@ -321,10 +340,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-        private async Task<string> SaveFileFromBase64Async(int assessmentId, string fileName, string base64Content)
+        private async Task<string> SaveFileFromBase64Async(
+            int assessmentId,
+            string fileName,
+            string base64Content,
+            string contentType)
         {
             try
             {
+                // Extract base64 data (remove data:xxx;base64, prefix if present)
                 var base64Data = base64Content;
                 if (base64Content.Contains(","))
                 {
@@ -333,23 +357,25 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 var bytes = Convert.FromBase64String(base64Data);
 
-                var assessmentDir = Path.Combine(_uploadBasePath, assessmentId.ToString());
-                if (!Directory.Exists(assessmentDir))
-                {
-                    Directory.CreateDirectory(assessmentDir);
-                }
+                // Create temporary IFormFile from bytes
+                using var memoryStream = new MemoryStream(bytes);
+                var formFile = new FormFileWrapper(memoryStream, fileName, contentType, bytes.Length);
 
-                var fileExtension = Path.GetExtension(fileName);
-                var uniqueFileName = $"{Guid.NewGuid()}{fileExtension}";
-                var fullPath = Path.Combine(assessmentDir, uniqueFileName);
+                // Upload to MongoDB GridFS
+                var fileId = await _fileStorage.SaveFileAsync(formFile, $"assessments/{assessmentId}");
 
-                await File.WriteAllBytesAsync(fullPath, bytes);
+                _logger.LogInformation(
+                    "File {FileName} uploaded to MongoDB GridFS with ID {FileId} for assessment {AssessmentId}",
+                    fileName,
+                    fileId,
+                    assessmentId);
 
-                return Path.Combine("assessments", assessmentId.ToString(), uniqueFileName);
+                return fileId;
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error saving file {fileName}: {ex.Message}");
+                _logger.LogError(ex, "Error saving file {FileName}", fileName);
+                throw new Exception($"Error saving file '{fileName}': {ex.Message}");
             }
         }
 
@@ -389,5 +415,34 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }).OrderBy(a => a.DisplayOrder).ToList() ?? new List<AttachmentResponseDto>()
             };
         }
+    }
+
+    // Helper class to wrap byte array as IFormFile
+    public class FormFileWrapper : Microsoft.AspNetCore.Http.IFormFile
+    {
+        private readonly Stream _stream;
+        private readonly string _fileName;
+        private readonly string _contentType;
+        private readonly long _length;
+
+        public FormFileWrapper(Stream stream, string fileName, string contentType, long length)
+        {
+            _stream = stream;
+            _fileName = fileName;
+            _contentType = contentType;
+            _length = length;
+        }
+
+        public string ContentType => _contentType;
+        public string ContentDisposition => $"form-data; name=\"file\"; filename=\"{_fileName}\"";
+        public Microsoft.AspNetCore.Http.IHeaderDictionary Headers => new Microsoft.AspNetCore.Http.HeaderDictionary();
+        public long Length => _length;
+        public string Name => "file";
+        public string FileName => _fileName;
+
+        public void CopyTo(Stream target) => _stream.CopyTo(target);
+        public Task CopyToAsync(Stream target, CancellationToken cancellationToken = default) 
+            => _stream.CopyToAsync(target, cancellationToken);
+        public Stream OpenReadStream() => _stream;
     }
 }

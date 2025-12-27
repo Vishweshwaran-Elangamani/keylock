@@ -8,8 +8,7 @@ using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
- 
- 
+
 namespace Relevantz.EEPZ.Core.Services.Interfaces
 {
     public interface IApproverService
@@ -24,8 +23,8 @@ namespace Relevantz.EEPZ.Core.Services.Interfaces
         Task<ReviewerDecisionDto?> GetLatestReviewerDecisionAsync(int assessmentId);
         Task<List<AttachmentInfoDto>> GetAssessmentAttachmentsAsync(int assessmentId);
         Task<Selfassessmentattachment?> GetAttachmentByIdAsync(int attachmentId);
- 
+        
+        // New GridFS method
+        Task<(bool success, byte[] fileBytes, string contentType, string fileName, List<string> errors)> DownloadAttachmentFromGridFSAsync(int attachmentId);
     }
 }
- 
- 

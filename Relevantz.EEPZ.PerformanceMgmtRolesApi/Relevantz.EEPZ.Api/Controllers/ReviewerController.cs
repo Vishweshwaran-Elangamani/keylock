@@ -91,42 +91,18 @@ public async Task<IActionResult> DownloadAttachment(int approverUserId, int atta
 {
     try
     {
-        var attachment = await _service.GetAttachmentByIdAsync(attachmentId);
-       
-        if (attachment == null)
-            return NotFound(new { success = false, message = "Attachment not found." });
- 
-        if (string.IsNullOrWhiteSpace(attachment.FilePath))
-            return NotFound(new { success = false, message = "File path missing." });
- 
-        var basePath = _configuration["FileStorage:BasePath"] ?? "D:\\Capstone\\Backend\\eepz\\SharedUploads";
-       
-        var cleanPath = attachment.FilePath
-            .Replace("uploads\\", "", StringComparison.OrdinalIgnoreCase)
-            .Replace("uploads/", "", StringComparison.OrdinalIgnoreCase)
-            .TrimStart('\\', '/');
-       
-        var filePath = Path.Combine(basePath, cleanPath);
- 
-        Console.WriteLine($"=== DEBUG INFO ===");
-        Console.WriteLine($"Base Path: {basePath}");
-        Console.WriteLine($"Database Path: {attachment.FilePath}");
-        Console.WriteLine($"Cleaned Path: {cleanPath}");
-        Console.WriteLine($"Full Path: {filePath}");
-        Console.WriteLine($"File Exists: {System.IO.File.Exists(filePath)}");
- 
-        if (!System.IO.File.Exists(filePath))
-            return NotFound(new {
-                success = false,
-                message = "File not found on server.",
-                attemptedPath = filePath,
-                databasePath = attachment.FilePath
-            });
- 
-        var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
-        var contentType = attachment.FileType ?? "application/octet-stream";
- 
-        return File(fileBytes, contentType, attachment.FileName);
+        var (success, fileBytes, contentType, fileName, errors) = await _service.DownloadAttachmentFromGridFSAsync(attachmentId);
+
+        if (!success)
+        {
+            if (errors.Contains("ATTACHMENT_NOT_FOUND") || errors.Contains("FILE_NOT_FOUND"))
+            {
+                return NotFound(new { success = false, message = string.Join(", ", errors) });
+            }
+            return StatusCode(500, new { success = false, message = string.Join(", ", errors) });
+        }
+
+        return File(fileBytes, contentType, fileName);
     }
     catch (Exception ex)
     {
@@ -138,6 +114,7 @@ public async Task<IActionResult> DownloadAttachment(int approverUserId, int atta
         });
     }
 }
+
  
     }
 }

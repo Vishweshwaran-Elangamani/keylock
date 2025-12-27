@@ -9,6 +9,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using MongoDB.Driver;
+using MongoDB.Driver.GridFS;
+using MongoDB.Bson;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -17,6 +20,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private readonly IDeptHeadApprovalsRepository _repository;
         private readonly IConfiguration _configuration;
         private readonly ILogger<DeptHeadApprovalsService> _logger;
+        private readonly IGridFSBucket _gridFSBucket;
 
         public DeptHeadApprovalsService(
             IDeptHeadApprovalsRepository repository,
@@ -26,6 +30,32 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _repository = repository;
             _configuration = configuration;
             _logger = logger;
+
+            // Initialize MongoDB GridFS
+            try
+            {
+                var connectionString = _configuration["MongoDbSettings:ConnectionString"];
+                var databaseName = _configuration["MongoDbSettings:DatabaseName"];
+                var bucketName = _configuration["MongoDbSettings:GridFSBucketName"];
+                var chunkSize = _configuration["MongoDbSettings:ChunkSizeBytes"];
+
+                _logger.LogInformation($"Initializing GridFS with Database: {databaseName}, Bucket: {bucketName}");
+
+                var client = new MongoClient(connectionString);
+                var database = client.GetDatabase(databaseName);
+                _gridFSBucket = new GridFSBucket(database, new GridFSBucketOptions
+                {
+                    BucketName = bucketName,
+                    ChunkSizeBytes = int.Parse(chunkSize ?? "1048576")
+                });
+
+                _logger.LogInformation("GridFS initialized successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error initializing GridFS: {ex.Message}");
+                throw;
+            }
         }
 
         public async Task<ApiResponse<int>> ApproveDeptHeadEmployeeAsync(ApprovalRequestDto request, int deptHeadUserId)
@@ -534,38 +564,58 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var attachment = await _repository.GetAttachmentByIdAsync(attachmentId);
 
                 if (attachment == null)
+                {
+                    _logger.LogWarning($"Attachment not found for attachmentId: {attachmentId}");
                     return (false, null, null, null, new List<string> { "ATTACHMENT_NOT_FOUND - Attachment not found." });
+                }
 
                 if (string.IsNullOrWhiteSpace(attachment.FilePath))
+                {
+                    _logger.LogWarning($"File path missing for attachmentId: {attachmentId}");
                     return (false, null, null, null, new List<string> { "FILE_NOT_FOUND - File path missing." });
+                }
 
-                var basePath = _configuration["FileStorage:BasePath"] ?? "D:\\Capstone\\Backend\\eepz\\SharedUploads";
+                _logger.LogInformation($"=== DEPT HEAD DOWNLOAD DEBUG (GridFS) ===");
+                _logger.LogInformation($"Attachment ID: {attachmentId}");
+                _logger.LogInformation($"File Name: {attachment.FileName}");
+                _logger.LogInformation($"Database Path (GridFS ObjectId): {attachment.FilePath}");
+                _logger.LogInformation($"File Type: {attachment.FileType}");
 
-                var cleanPath = attachment.FilePath
-                    .Replace("uploads\\", "", StringComparison.OrdinalIgnoreCase)
-                    .Replace("uploads/", "", StringComparison.OrdinalIgnoreCase)
-                    .TrimStart('\\', '/');
+                // Parse GridFS ObjectId from FilePath
+                ObjectId fileId;
+                try
+                {
+                    fileId = ObjectId.Parse(attachment.FilePath);
+                    _logger.LogInformation($"Parsed ObjectId: {fileId}");
+                }
+                catch (FormatException)
+                {
+                    _logger.LogError($"Invalid ObjectId format: {attachment.FilePath}");
+                    return (false, null, null, null, new List<string> { "FILE_NOT_FOUND - Invalid file reference format." });
+                }
 
-                var filePath = Path.Combine(basePath, cleanPath);
+                // Download file from GridFS
+                byte[] fileBytes;
+                try
+                {
+                    fileBytes = await _gridFSBucket.DownloadAsBytesAsync(fileId);
+                    _logger.LogInformation($"File successfully downloaded from GridFS. Size: {fileBytes.Length} bytes");
+                }
+                catch (GridFSFileNotFoundException)
+                {
+                    _logger.LogError($"File not found in GridFS for ObjectId: {fileId}");
+                    return (false, null, null, null, new List<string> { "FILE_NOT_FOUND - File not found in GridFS storage." });
+                }
 
-                _logger.LogInformation($"=== DEPT HEAD DOWNLOAD DEBUG ===");
-                _logger.LogInformation($"Base Path: {basePath}");
-                _logger.LogInformation($"Database Path: {attachment.FilePath}");
-                _logger.LogInformation($"Cleaned Path: {cleanPath}");
-                _logger.LogInformation($"Full Path: {filePath}");
-                _logger.LogInformation($"File Exists: {System.IO.File.Exists(filePath)}");
-
-                if (!System.IO.File.Exists(filePath))
-                    return (false, null, null, null, new List<string> { $"FILE_NOT_FOUND - File not found on server. Attempted path: {filePath}" });
-
-                var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
                 var contentType = attachment.FileType ?? "application/octet-stream";
 
+                _logger.LogInformation($"File download completed successfully");
                 return (true, fileBytes, contentType, attachment.FileName, new List<string>());
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error in DownloadDeptHeadAttachmentAsync: {ex.Message}");
+                _logger.LogError($"Stack Trace: {ex.StackTrace}");
                 return (false, null, null, null, new List<string> { $"Error: {ex.Message}" });
             }
         }

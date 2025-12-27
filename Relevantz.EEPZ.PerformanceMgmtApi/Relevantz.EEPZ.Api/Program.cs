@@ -6,12 +6,12 @@ using Relevantz.EEPZ.Core.Services.Implementations;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using System.Security.Claims;
 using System.Text;
-
-
+using Relevantz.EEPZ.Core.IService;
+using Relevantz.EEPZ.Core.Service;
 using Relevantz.EEPZ.Data.DBContexts;
 using System.IdentityModel.Tokens.Jwt;
 using Serilog;
-
+using Relevantz.EEPZ.Common.Configuration;
 var builder = WebApplication.CreateBuilder(args);
 
 var sharedUploadsPath = Path.GetFullPath(Path.Combine(
@@ -211,7 +211,11 @@ builder.Services.AddScoped<Relevantz.EEPZ.Data.Repository.Interfaces.ISelfAssess
 
 builder.Services.AddScoped<Relevantz.EEPZ.Core.Services.Interfaces.ISelfAssessmentService,
                            Relevantz.EEPZ.Core.Services.Implementations.SelfAssessmentService>();
+builder.Services.Configure<MongoDbSettings>(
+    builder.Configuration.GetSection("MongoDbSettings"));
 
+// Register File Storage Service (Singleton - MongoDB connection is thread-safe)
+builder.Services.AddSingleton<IFileStorageService, FileStorageService>();
 
 builder.Services.AddCors(options =>
 {
