@@ -148,72 +148,168 @@ const AppraisalDetailsModal = ({
     try {
       setDownloadingId(attachment.attachmentId);
       setError(null);
-
-      const downloadUrl = `${api.defaults.baseURL}/AppraisalProcess/hr/attachments/${attachment.attachmentId}/download`;
-
-      const response = await fetch(downloadUrl);
-
-      const contentType = response.headers.get("content-type");
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`[ERROR] HTTP ${response.status}:`, errorText);
-        throw new Error(
-          `Download failed with status ${response.status}: ${errorText}`
-        );
-      }
-
-      if (contentType && contentType.includes("text/html")) {
-        const errorText = await response.text();
-        console.error("[ERROR] Backend returned HTML error page:", errorText);
-        throw new Error("Backend returned error page. Check console for details.");
-      }
-
-      const blob = await response.blob();
-
+  
+      // FIX: Use api.get() with responseType: 'blob' instead of fetch
+      const response = await api.get(
+        `/SelfAssessment/attachments/${attachment.attachmentId}/download`,
+        {
+          responseType: 'blob'  //  CRITICAL: Must be 'blob' for binary files
+        }
+      );
+  
+      // Get the blob from response.data
+      const blob = response.data;
+      
+      console.log('File downloaded:', {
+        size: blob.size,
+        type: blob.type,
+        attachmentId: attachment.attachmentId
+      });
+  
       let filename = attachment.fileName || "attachment";
-
+  
+      // Try to get filename from Content-Disposition header
+      const contentDisposition = response.headers['content-disposition'];
+      if (contentDisposition) {
+        const headerFilename = extractFilenameFromHeader(contentDisposition);
+        if (headerFilename) {
+          filename = headerFilename;
+          console.log('Filename from header:', filename);
+        }
+      }
+  
+      // Add extension if missing
       if (!hasExtension(filename)) {
         let extension = "";
-
+  
+        // Try to get extension from response content-type
+        const contentType = response.headers['content-type'];
         if (contentType) {
           extension = getExtensionFromMime(contentType);
         }
-
+  
+        // Fallback to attachment fileType
         if (!extension && attachment.fileType) {
           extension = getExtensionFromMime(attachment.fileType);
         }
-
+  
+        // Fallback to blob type
         if (!extension && blob.type) {
           extension = getExtensionFromMime(blob.type);
         }
-
+  
+        // Final fallback
         if (!extension) {
           extension = ".bin";
         }
-
+  
         filename += extension;
-      } else {
+        console.log('Added extension:', extension, '→', filename);
       }
-
+  
+      console.log('Final filename:', filename);
+  
+      // Create and trigger download
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
       link.download = filename;
       document.body.appendChild(link);
       link.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(link);
+  
+      // Cleanup
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(link);
+      }, 100);
+  
+      console.log('Download complete');
+      
+      // Optional: Show success message if you have a toast/notification system
+      // toast.success('File downloaded successfully!');
+  
     } catch (err) {
-      console.error("✗ Download error:", err);
-      console.error("Error stack:", err.stack);
+      console.error("Download error:", err);
+      console.error("Error details:", {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status,
+        url: err.config?.url
+      });
+      
       setError(
-        `Failed to download ${attachment.fileName}: ${err.message}`
+        `Failed to download ${attachment.fileName}: ${err.response?.data?.message || err.message}`
       );
     } finally {
       setDownloadingId(null);
     }
   };
+  
+  // Helper function to extract filename from Content-Disposition header
+  function extractFilenameFromHeader(contentDisposition) {
+    if (!contentDisposition) return null;
+    
+    // Try UTF-8 encoded filename first
+    const matchUtf8 = contentDisposition.match(/filename\*=(?:UTF-8'')?([^;]+)(?:;|$)/i);
+    if (matchUtf8 && matchUtf8[1]) {
+      try {
+        return decodeURIComponent(matchUtf8[1].replace(/"/g, '').trim());
+      } catch (e) {
+        return matchUtf8[1].replace(/"/g, '').trim();
+      }
+    }
+    
+    // Fallback to normal filename
+    const matchNormal = contentDisposition.match(/filename=([^;]+)(?:;|$)/i);
+    if (matchNormal && matchNormal[1]) {
+      return matchNormal[1].replace(/"/g, '').trim();
+    }
+    
+    return null;
+  }
+  
+  // Helper function to check if filename has extension
+  function hasExtension(filename) {
+    return /\.[a-zA-Z0-9]{2,5}$/.test(filename);
+  }
+  
+  // Helper function to get file extension from MIME type
+  function getExtensionFromMime(mimeType) {
+    if (!mimeType) return '';
+    
+    const type = mimeType.toLowerCase().trim();
+    const mimeMap = {
+      'application/pdf': '.pdf',
+      'text/csv': '.csv',
+      'text/plain': '.txt',
+      'application/msword': '.doc',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
+      'application/vnd.ms-excel': '.xls',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '.xlsx',
+      'application/vnd.ms-powerpoint': '.ppt',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation': '.pptx',
+      'image/jpeg': '.jpg',
+      'image/jpg': '.jpg',
+      'image/png': '.png',
+      'image/gif': '.gif',
+      'image/bmp': '.bmp',
+      'image/svg+xml': '.svg',
+      'application/zip': '.zip',
+      'application/x-zip-compressed': '.zip',
+      'application/x-rar-compressed': '.rar',
+      'application/x-7z-compressed': '.7z',
+      'audio/mpeg': '.mp3',
+      'audio/wav': '.wav',
+      'video/mp4': '.mp4',
+      'video/mpeg': '.mpeg',
+      'application/json': '.json',
+      'application/xml': '.xml',
+      'text/xml': '.xml',
+    };
+    
+    return mimeMap[type] || '';
+  }
+  
 
   if (!show) return null;
 

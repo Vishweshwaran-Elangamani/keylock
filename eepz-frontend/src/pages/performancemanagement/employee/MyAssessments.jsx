@@ -125,27 +125,33 @@ function MyAssessments() {
   const handleDownloadViewAttachment = async (attachment) => {
     try {
       setDownloadingAttachmentId(attachment.attachmentId);
-      const downloadUrl = `/api/SelfAssessment/attachments/${attachment.attachmentId}/download`;
-      const response = await fetch(downloadUrl);
-
-      if (!response.ok) {
-        throw new Error(`Download failed with status ${response.status}`);
-      }
-
-      const blob = await response.blob();
+      
+      // ✅ Use api service with responseType: 'blob'
+      const response = await api.get(
+        `/SelfAssessment/attachments/${attachment.attachmentId}/download`,
+        {
+          responseType: 'blob'  // ⚠️ CRITICAL: Must be 'blob' for binary files
+        }
+      );
+  
+      // Get the blob from response.data
+      const blob = response.data;
+      
       let filename = attachment.fileName || "attachment";
-      const contentDisposition = response.headers.get('content-disposition');
-
+      
+      // Try to get filename from Content-Disposition header
+      const contentDisposition = response.headers['content-disposition'];
       if (contentDisposition) {
         const headerFilename = extractFilenameFromHeader(contentDisposition);
         if (headerFilename) {
           filename = headerFilename;
         }
       }
-
+  
+      // Add extension if missing
       if (!hasExtension(filename)) {
         let extension = '';
-        const contentType = response.headers.get('content-type');
+        const contentType = response.headers['content-type'];
         if (contentType) {
           extension = getExtensionFromMime(contentType);
         }
@@ -157,15 +163,22 @@ function MyAssessments() {
         }
         filename += extension;
       }
-
+  
+      // Create and trigger download
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
       link.download = filename;
       document.body.appendChild(link);
       link.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(link);
+      
+      // Cleanup
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(link);
+      }, 100);
+      
+      toast.success('File downloaded successfully!');
     } catch (err) {
       console.error("Download error:", err);
       toast.error(`Failed to download attachment: ${err.message}`);
@@ -173,6 +186,7 @@ function MyAssessments() {
       setDownloadingAttachmentId(null);
     }
   };
+  
 
   const fetchAssignments = async () => {
     setLoading(true);
