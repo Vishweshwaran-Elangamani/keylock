@@ -26,7 +26,7 @@
 
 .managermom-stat-card {
   border-radius: 12px;
-  border: 2px solid #1b2344;
+  border: 1px solid #1b2344;
   background-color: #ffffff;
   height: 100px;
   display: flex;
@@ -233,7 +233,7 @@
 /* table shell */
 
 .managermom-table-shell {
-  border: 2px solid #27235c;
+  border: 1px solid #27235c;
   border-radius: 12px;
   overflow: hidden;
 }

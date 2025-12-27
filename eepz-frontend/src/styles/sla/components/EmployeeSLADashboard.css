@@ -134,7 +134,7 @@
   align-items: center;
   padding: 1.1rem 1.25rem;
   border-radius: 14px;
-  border: 2px solid #27235c;
+  border: 1px solid #27235c;
   background-color: #ffffff;
   box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04);
   transition: all 0.2s ease;
@@ -355,7 +355,7 @@
 
 .emp-sla-table-container {
   background: #ffffff;
-  border: 2px solid #27235c;
+  border: 1px solid #27235c;
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -458,7 +458,7 @@
 
 .emp-sla-card {
   background: #ffffff;
-  border: 2px solid #27235c;
+  border: 1px solid #27235c;
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;

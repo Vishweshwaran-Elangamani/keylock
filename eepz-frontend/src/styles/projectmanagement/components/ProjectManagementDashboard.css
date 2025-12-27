@@ -17,7 +17,7 @@
 
 .pm-dashboard__stat-card {
   background: #ffffff;
-  border: 2px solid #27235c;
+  border: 1px solid #27235c;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
@@ -101,7 +101,7 @@
 
 .pm-dashboard__main-card {
   background: #ffffff;
-  border: 2px solid #27235c;
+  border: 1px solid #27235c;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   flex: 1;
@@ -185,7 +185,7 @@
 .pm-dashboard__btn--secondary {
   background-color: transparent;
   color: #27235c;
-  border: 2px solid #27235c;
+  border: 1px solid #27235c;
 }
 
 .pm-dashboard__btn--secondary:hover {

@@ -182,7 +182,7 @@
   border-radius: 12px;
   padding: 1.25rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  border: 2px solid #27235c;
+  border: 1px solid #27235c;
   margin-bottom: 1.5rem;
 }
 
@@ -486,7 +486,7 @@
 
 .mgr-escalation-card {
   background: #ffffff;
-  border: 2px solid #27235c;
+  border: 1px solid #27235c;
   border-radius: 12px;
   overflow: hidden;
   transition: all 0.3s ease;

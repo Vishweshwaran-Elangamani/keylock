@@ -174,7 +174,7 @@
   background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  border: 2px solid #27235c;
+  border: 1px solid #27235c;
   overflow: hidden;
 }
 
@@ -595,7 +595,7 @@
 
 .dh-sla-info-box {
   background: #ffffff;
-  border: 2px solid #27235c;
+  border: 1px solid #27235c;
   border-radius: 10px;
   padding: 1rem;
   margin-bottom: 1.5rem;
