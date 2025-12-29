@@ -275,6 +275,7 @@
 
 .prj-dropdown-wrapper {
   position: relative;
+  
 }
 
 .prj-dropdown-select {
@@ -302,6 +303,8 @@
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+  
+  
 }
 
 .prj-dropdown-select.error {
@@ -406,8 +409,8 @@
 }
 
 .prj-dropdown-option.selected {
-  background: #27235c;
-  color: #ffffff;
+  background: #efefef;
+  color: #000000;
   font-weight: 600;
 }
 

@@ -463,8 +463,8 @@
 }
 
 .hr-sla-custom-select-option.selected {
-  background-color: #27235c;
-  color: #ffffff;
+  background-color: #efefef;
+  color: #000000;
   font-weight: 600;
 }
 

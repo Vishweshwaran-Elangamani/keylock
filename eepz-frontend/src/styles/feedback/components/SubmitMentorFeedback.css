@@ -222,11 +222,18 @@
   border-bottom: none;
 }
 
-.smf-dropdown-option:hover,
-.smf-dropdown-option--selected {
+.smf-dropdown-option:hover {
   background: #27235c;
   color: #ffffff;
   font-weight: 600;
+}
+
+.smf-dropdown-option--selected{
+
+  background: #efefef;
+  color: #000000;
+  font-weight: 600;
+
 }
 
 .smf-form-text {

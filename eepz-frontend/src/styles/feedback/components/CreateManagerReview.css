@@ -408,8 +408,9 @@
 }
 
 .cmr-dropdown-item-selected {
-  background-color: #27235c;
-  color: #ffffff;
+  background: #efefef;
+  color:#000;
+  font-weight: 600;
 }
 
 .cmr-dropdown-menu::-webkit-scrollbar {

@@ -302,10 +302,15 @@
   border-bottom: none;
 }
 
-.scf-dropdown-option:hover,
-.scf-dropdown-option--selected {
+.scf-dropdown-option:hover{
   background: #27235c;
   color: #ffffff;
+  font-weight: 600;
+}
+
+.scf-dropdown-option--selected {
+  background: #efefef;
+  color: #000000;
   font-weight: 600;
 }
 

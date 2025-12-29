@@ -261,8 +261,8 @@
 }
 
 .prj-list-custom-option.prj-list-option-selected {
-  background-color: #3c3862 !important;
-  color: #FFFFFF !important;
+  background-color: #efefef !important;
+  color: #000000 !important;
   font-weight: 600 !important;
 }
 

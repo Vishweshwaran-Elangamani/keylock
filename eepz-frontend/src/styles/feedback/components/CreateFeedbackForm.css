@@ -267,10 +267,16 @@
 
 .cff-select-option-selected,
 .cff-select-option-hovered {
-  background: #27235c;
-  color: #ffffff;
+  background: #efefef;
+  color: #000000;
 }
 
+.cff-select-option-hovered{
+
+  background: #27235c;
+  color: #ffffff;
+
+}
 .cff-select-option-selected {
   font-weight: 600;
 }

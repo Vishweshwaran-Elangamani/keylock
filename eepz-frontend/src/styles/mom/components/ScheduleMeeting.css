@@ -149,8 +149,8 @@
 }
 
 .sched-dropdown-item-active {
-  background-color: #27235c;
-  color: #ffffff;
+  background-color: #efefef;
+  color: #000 ;
   font-weight: 600;
 }
 
