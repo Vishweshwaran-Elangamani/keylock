@@ -1,5 +1,5 @@
 import React from "react";
-import api from "../../../../services/performancemanagement/api/api";
+import { downloadAttachment } from "../../../../services/performancemanagement/api/api";
 
 function statusRender(status) {
   if (typeof status !== "string") return "-";
@@ -99,13 +99,11 @@ function getExtensionFromMime(mimeType) {
     "text/csv": ".csv",
     "text/plain": ".txt",
     "application/msword": ".doc",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-      ".docx",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": ".docx",
     "application/vnd.ms-excel": ".xls",
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": ".xlsx",
     "application/vnd.ms-powerpoint": ".ppt",
-    "application/vnd.openxmlformats-officedocument.presentationml.presentation":
-      ".pptx",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation": ".pptx",
     "image/jpeg": ".jpg",
     "image/png": ".png",
     "image/gif": ".gif",
@@ -132,6 +130,26 @@ function hasExtension(filename) {
   return /\.[a-zA-Z0-9]{2,5}$/.test(filename);
 }
 
+function extractFilenameFromHeader(contentDisposition) {
+  if (!contentDisposition) return null;
+
+  const matchUtf8 = contentDisposition.match(/filename\*=(?:UTF-8'')?([^;]+)(?:;|$)/i);
+  if (matchUtf8 && matchUtf8[1]) {
+    try {
+      return decodeURIComponent(matchUtf8[1].replace(/"/g, '').trim());
+    } catch (e) {
+      return matchUtf8[1].replace(/"/g, '').trim();
+    }
+  }
+
+  const matchNormal = contentDisposition.match(/filename=([^;]+)(?:;|$)/i);
+  if (matchNormal && matchNormal[1]) {
+    return matchNormal[1].replace(/"/g, '').trim();
+  }
+
+  return null;
+}
+
 const AppraisalDetailsModal = ({
   show,
   onClose,
@@ -148,20 +166,13 @@ const AppraisalDetailsModal = ({
     try {
       setDownloadingId(attachment.attachmentId);
       setError(null);
-  
-      // FIX: Use api.get() with responseType: 'blob' instead of fetch
-      const response = await api.get(
-        `/SelfAssessment/attachments/${attachment.attachmentId}/download`,
-        {
-          responseType: 'blob'  //  CRITICAL: Must be 'blob' for binary files
-        }
-      );
-  
-      // Get the blob from response.data
+
+      // ✅ Use the API function instead of direct api.get()
+      const response = await downloadAttachment(attachment.attachmentId);
+
       const blob = response.data;
-  
       let filename = attachment.fileName || "attachment";
-  
+
       // Try to get filename from Content-Disposition header
       const contentDisposition = response.headers['content-disposition'];
       if (contentDisposition) {
@@ -170,35 +181,31 @@ const AppraisalDetailsModal = ({
           filename = headerFilename;
         }
       }
-  
+
       // Add extension if missing
       if (!hasExtension(filename)) {
         let extension = "";
-  
-        // Try to get extension from response content-type
+
         const contentType = response.headers['content-type'];
         if (contentType) {
           extension = getExtensionFromMime(contentType);
         }
-  
-        // Fallback to attachment fileType
+
         if (!extension && attachment.fileType) {
           extension = getExtensionFromMime(attachment.fileType);
         }
-  
-        // Fallback to blob type
+
         if (!extension && blob.type) {
           extension = getExtensionFromMime(blob.type);
         }
-  
-        // Final fallback
+
         if (!extension) {
           extension = ".bin";
         }
-  
+
         filename += extension;
       }
-  
+
       // Create and trigger download
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -206,16 +213,13 @@ const AppraisalDetailsModal = ({
       link.download = filename;
       document.body.appendChild(link);
       link.click();
-  
+
       // Cleanup
       setTimeout(() => {
         window.URL.revokeObjectURL(url);
         document.body.removeChild(link);
       }, 100);
-      
-      // Optional: Show success message if you have a toast/notification system
-      // toast.success('File downloaded successfully!');
-  
+
     } catch (err) {
       console.error("Download error:", err);
       console.error("Error details:", {
@@ -224,7 +228,7 @@ const AppraisalDetailsModal = ({
         status: err.response?.status,
         url: err.config?.url
       });
-      
+
       setError(
         `Failed to download ${attachment.fileName}: ${err.response?.data?.message || err.message}`
       );
@@ -232,72 +236,6 @@ const AppraisalDetailsModal = ({
       setDownloadingId(null);
     }
   };
-  
-  // Helper function to extract filename from Content-Disposition header
-  function extractFilenameFromHeader(contentDisposition) {
-    if (!contentDisposition) return null;
-    
-    // Try UTF-8 encoded filename first
-    const matchUtf8 = contentDisposition.match(/filename\*=(?:UTF-8'')?([^;]+)(?:;|$)/i);
-    if (matchUtf8 && matchUtf8[1]) {
-      try {
-        return decodeURIComponent(matchUtf8[1].replace(/"/g, '').trim());
-      } catch (e) {
-        return matchUtf8[1].replace(/"/g, '').trim();
-      }
-    }
-    
-    // Fallback to normal filename
-    const matchNormal = contentDisposition.match(/filename=([^;]+)(?:;|$)/i);
-    if (matchNormal && matchNormal[1]) {
-      return matchNormal[1].replace(/"/g, '').trim();
-    }
-    
-    return null;
-  }
-  
-  // Helper function to check if filename has extension
-  function hasExtension(filename) {
-    return /\.[a-zA-Z0-9]{2,5}$/.test(filename);
-  }
-  
-  // Helper function to get file extension from MIME type
-  function getExtensionFromMime(mimeType) {
-    if (!mimeType) return '';
-    
-    const type = mimeType.toLowerCase().trim();
-    const mimeMap = {
-      'application/pdf': '.pdf',
-      'text/csv': '.csv',
-      'text/plain': '.txt',
-      'application/msword': '.doc',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
-      'application/vnd.ms-excel': '.xls',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '.xlsx',
-      'application/vnd.ms-powerpoint': '.ppt',
-      'application/vnd.openxmlformats-officedocument.presentationml.presentation': '.pptx',
-      'image/jpeg': '.jpg',
-      'image/jpg': '.jpg',
-      'image/png': '.png',
-      'image/gif': '.gif',
-      'image/bmp': '.bmp',
-      'image/svg+xml': '.svg',
-      'application/zip': '.zip',
-      'application/x-zip-compressed': '.zip',
-      'application/x-rar-compressed': '.rar',
-      'application/x-7z-compressed': '.7z',
-      'audio/mpeg': '.mp3',
-      'audio/wav': '.wav',
-      'video/mp4': '.mp4',
-      'video/mpeg': '.mpeg',
-      'application/json': '.json',
-      'application/xml': '.xml',
-      'text/xml': '.xml',
-    };
-    
-    return mimeMap[type] || '';
-  }
-  
 
   if (!show) return null;
 

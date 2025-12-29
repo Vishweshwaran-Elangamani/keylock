@@ -10,6 +10,7 @@ import ActionModal from "../../../components/performance_management/modals/Hrnom
 import "../../../styles/performancemanagement/hr/Hrnomination.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 
+
 function HRNominations() {
   const [nominations, setNominations] = useState([]);
   const [loading, setLoading] = useState(true);

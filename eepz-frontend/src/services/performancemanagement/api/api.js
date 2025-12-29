@@ -123,6 +123,13 @@ export const submitNomination = (payload) => {
   return api.post("/EmployeeNomination/submit", payload);
 };
 
+export const downloadAttachment = async (attachmentId) => {
+  return api.get(`/SelfAssessment/attachments/${attachmentId}/download`, {
+    responseType: 'blob', // Critical for binary file downloads
+  });
+};
+
 
 
 export default api;
+
