@@ -77,9 +77,11 @@ const ChangeRequestModal = ({
     }
   };
 
-  const validateGmailDomain = (email) => {
+  const validateEmailDomain = (email) => {
     const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
-    return gmailRegex.test(email);
+    const eepzRegex = /^[a-zA-Z0-9._%+-]+@eepz\.com$/i;
+    const relevantzRegex = /^[a-zA-Z0-9._%+-]+@relevantz\.com$/i;
+    return gmailRegex.test(email) || eepzRegex.test(email) || relevantzRegex.test(email);
   };
 
   const handleSubmit = (e) => {
@@ -90,8 +92,8 @@ const ChangeRequestModal = ({
       return;
     }
 
-    if (!validateGmailDomain(formData.newEmail.trim())) {
-      toast.error("Only Gmail addresses (@gmail.com) are allowed");
+    if (!validateEmailDomain(formData.newEmail.trim())) {
+      toast.error("Only Gmail (@gmail.com), Eepz (@eepz.com), or Relevantz (@relevantz.com) addresses are allowed");
       return;
     }
 
@@ -156,7 +158,6 @@ const ChangeRequestModal = ({
 
   if (!show) return null;
 
-  // PENDING REQUEST VIEW
   if (hasPendingRequest) {
     return (
       <>
@@ -245,8 +246,6 @@ const ChangeRequestModal = ({
       </>
     );
   }
-
-  // FORM VIEW
   return (
     <>
       <div className="crm-backdrop" onClick={handleClose} />
@@ -274,7 +273,7 @@ const ChangeRequestModal = ({
                 <i className="bi bi-info-circle-fill crm-alert-icon"></i>
                 <div>
                   <strong>Note:</strong> You can only request to change your
-                  email to a <strong>Gmail address (@gmail.com)</strong>. Your
+                  email to a <strong>Gmail (@gmail.com)</strong>, <strong>Eepz (@eepz.com)</strong>, or <strong>Relevantz (@relevantz.com)</strong> address. Your
                   current password is required for security verification. Your
                   request will be sent to admin for approval. You can only have
                   one pending request at a time.
@@ -291,16 +290,15 @@ const ChangeRequestModal = ({
                   className="crm-form-input"
                 />
               </div>
-
               <div className="crm-form-group">
                 <label className="crm-form-label">
-                  New Gmail Address{" "}
+                  New Email Address{" "}
                   <span className="crm-required-asterisk">*</span>
                 </label>
                 <input
                   type="email"
                   required
-                  placeholder="Enter new Gmail address (e.g., youremail@gmail.com)"
+                  placeholder="Enter new email address (Gmail, Eepz, or Relevantz)"
                   value={formData.newEmail}
                   onChange={(e) =>
                     setFormData({ ...formData, newEmail: e.target.value })
@@ -309,7 +307,7 @@ const ChangeRequestModal = ({
                 />
                 <small className="crm-form-help">
                   <i className="bi bi-envelope" style={{ marginRight: 4 }}></i>
-                  Only Gmail addresses (@gmail.com) are allowed
+                  Only Gmail (@gmail.com), Eepz (@eepz.com), or Relevantz (@relevantz.com) addresses are allowed
                 </small>
               </div>
 

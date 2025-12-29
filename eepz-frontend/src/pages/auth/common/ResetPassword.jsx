@@ -13,10 +13,7 @@ const ResetPassword = () => {
 
   const navigate = useNavigate();
 
-  // ✅ PROTECTED EMPLOYEE - EmployeeCompanyID 1000
-  const PROTECTED_EMPLOYEE_ID = "1000";
-
-  // Validate Gmail OR eepz.com
+  // Validate Gmail OR eepz.com OR relevantz.com
   const validateEmail = (email) => {
     const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
     const eepzRegex = /^[a-zA-Z0-9._%+-]+@eepz\.com$/i;
@@ -41,7 +38,7 @@ const ResetPassword = () => {
     e.preventDefault();
 
     if (!validateEmail(email)) {
-      const errorMsg = "Only Gmail (@gmail.com) or Eepz (@eepz.com) addresses are allowed for password reset";
+      const errorMsg = "Only Gmail (@gmail.com), Eepz (@eepz.com), or Relevantz (@relevantz.com) addresses are allowed for password reset";
       setError(errorMsg);
       setEmailTouched(true);
       toast.error(errorMsg);
@@ -53,22 +50,21 @@ const ResetPassword = () => {
     setMessage("");
 
     try {
-      toast.loading("Sending reset code...");
+      toast.loading("Verifying email address...");
 
       const response = await authService.forgotPassword(email);
 
+      toast.dismiss();
+
       if (response.success) {
         setMessage("OTP sent to your email successfully!");
-        toast.dismiss();
         toast.success("OTP sent to your email successfully!");
 
         setTimeout(() => {
           navigate("/verify-reset-otp", { state: { email } });
         }, 2000);
       } else {
-        toast.dismiss();
-        const errorMsg =
-          response.message || "Failed to send reset instructions";
+        const errorMsg = response.message || "Failed to send reset instructions";
         setError(errorMsg);
         toast.error(errorMsg);
       }
@@ -112,23 +108,12 @@ const ResetPassword = () => {
           </div>
           <h2 className="reset-title">Reset Password</h2>
           <p className="reset-subtitle">
-            Enter your Gmail or Eepz email address and we'll send you a verification code to
+            Enter your email address and we'll send you a verification code to
             reset your password
           </p>
         </div>
 
         <div className="reset-password-body">
-          {message && (
-            <div className="alert-success-reset">
-              <i className="bi bi-check-circle-fill"></i>
-              <div className="alert-content">
-                <strong>Success!</strong>
-                <p>{message}</p>
-                <small>Redirecting you to verification page...</small>
-              </div>
-            </div>
-          )}
-
           <form onSubmit={handleSubmit}>
             <div className="form-group-reset">
               <label htmlFor="email" className="form-label-reset">
@@ -162,7 +147,7 @@ const ResetPassword = () => {
               {showEmailError && (
                 <small className="feedback-error-reset">
                   <i className="bi bi-info-circle"></i>
-                  Only Gmail (@gmail.com) or Eepz (@eepz.com) addresses are allowed
+                  Only Gmail, Eepz, or Relevantz email addresses are allowed
                 </small>
               )}
               {emailTouched && isEmailValid && (
@@ -181,7 +166,7 @@ const ResetPassword = () => {
               {loading ? (
                 <>
                   <span className="spinner-reset"></span>
-                  Sending Code...
+                  Verifying...
                 </>
               ) : (
                 <>
@@ -207,7 +192,7 @@ const ResetPassword = () => {
           <div className="security-note">
             <small>
               <i className="bi bi-shield-check"></i>
-              Password reset is only available for Gmail or Eepz accounts. Your account
+              Password reset is only available for registered accounts. Your account
               information is protected.
             </small>
           </div>

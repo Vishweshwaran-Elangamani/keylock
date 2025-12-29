@@ -1209,7 +1209,7 @@ const EmployeeProfile = () => {
                   disabled={checkingPending}
                 >
                   <i className="bi bi-arrow-repeat"></i>
-                  {checkingPending ? "Checking..." : "Request Change"}
+                  {checkingPending ? "Checking..." : " Request Change"}
                 </button>
                 <button
                   className="btn-primary-pf"

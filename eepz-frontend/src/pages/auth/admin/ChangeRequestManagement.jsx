@@ -8,7 +8,6 @@ import ApproveEmailChangeModal from "../../../components/auth/Modal/changereques
 import RejectEmailChangeModal from "../../../components/auth/Modal/changerequest/RejectEmailChangeModal";
 import "../../../styles/auth/admin/ChangeRequestManagement.css";
 
-/* Custom Status Dropdown Component */
 const StatusDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
 
