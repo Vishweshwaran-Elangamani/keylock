@@ -448,12 +448,13 @@ namespace Relevantz.EEPZ.Api.Controllers
                 EscalationId = escalation.EscalationId,
                 SlaId = escalation.Slaid,
                 SlaType = escalation.Sla?.Slatype,
-                EmployeeUserId = escalation.Sla?.EmployeeId ?? 0,
+                EmployeeCompanyId = escalation.Sla?.Employee?.EmployeeCompanyId,
                 EmployeeName = GetEmployeeName(escalation.Sla?.Employee?.Userprofile),
-                EmployeeEmail = escalation.Sla?.Employee?.Userprofile?.PersonalEmail,
+                EmployeeEmail = escalation.Sla?.Employee?.Userauthentication?.Email,
                 EscalatedToEmployeeId = escalation.EscalatedToEmployeeId,
+                EscalatedToEmployeeCompanyId = escalation.EscalatedToEmployee?.EmployeeCompanyId,
                 EscalatedToName = GetEmployeeName(escalation.EscalatedToEmployee?.Userprofile),
-                EscalatedToEmail = escalation.EscalatedToEmployee?.Userprofile?.PersonalEmail,
+                EscalatedToEmail = escalation.EscalatedToEmployee?.Userauthentication?.Email,
                 EscalationLevel = escalation.EscalationLevel,
                 Reason = escalation.Reason,
                 Description = escalation.Description,
@@ -470,6 +471,8 @@ namespace Relevantz.EEPZ.Api.Controllers
                 Severity = GetSeverityLevel(CalculateDaysOverdue(escalation.Sla?.Deadline))
             };
         }
+
+
 
         private string GetEmployeeName(Common.Entities.Userprofile? userprofile)
         {

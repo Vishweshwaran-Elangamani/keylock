@@ -1,3 +1,5 @@
+using System;
+
 namespace Relevantz.EEPZ.Common.DTOs.Response
 {
     public class SlaEscalationResponseDto
@@ -5,16 +7,17 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public int EscalationId { get; set; }
         public int SlaId { get; set; }
         public string? SlaType { get; set; }
-        public int EmployeeUserId { get; set; }
+        public string? EmployeeCompanyId { get; set; }
         public string? EmployeeName { get; set; }
         public string? EmployeeEmail { get; set; }
-        public int EscalatedToEmployeeId { get; set; }
+        public int? EscalatedToEmployeeId { get; set; }
+        public string? EscalatedToEmployeeCompanyId { get; set; }
         public string? EscalatedToName { get; set; }
         public string? EscalatedToEmail { get; set; }
-        public string EscalationLevel { get; set; } = null!;
-        public string Reason { get; set; } = null!;
+        public string? EscalationLevel { get; set; }
+        public string? Reason { get; set; }
         public string? Description { get; set; }
-        public string EscalationStatus { get; set; } = null!;
+        public string? EscalationStatus { get; set; }
         public string? SubmittedByName { get; set; }
         public DateTime? SubmittedAt { get; set; }
         public DateTime? EscalationDeadline { get; set; }
