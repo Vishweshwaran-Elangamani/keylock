@@ -626,18 +626,18 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         /// <summary>Gets paginated assignments where the employee is the assigned SME.</summary>
         public async Task<ApiResponse<PaginatedResponse<AssignmentDto>>> GetSmeAssignments(
-            int smeEmployeeId,
-            string? statusFilter,
-            string? searchTerm,
-            string? sortField,
-            string? sortOrder,
-            int pageNumber,
-            int pageSize
-        )
+      int smeEmployeeId,
+      string? statusFilter,
+      string? searchTerm,
+      string? sortField,
+      string? sortOrder,
+      int pageNumber,
+      int pageSize
+  )
         {
             Log.Information(
-                "GetSmeAssignments started. SmeEmployeeId={SmeEmployeeId}, StatusFilter={StatusFilter}, Page={PageNumber}",
-                smeEmployeeId, statusFilter ?? "all", pageNumber
+                "GetSmeAssignments started. SmeEmployeeId={SmeEmployeeId}, StatusFilter={StatusFilter}, SearchTerm={SearchTerm}, SortField={SortField}, SortOrder={SortOrder}, Page={PageNumber}, PageSize={PageSize}",
+                smeEmployeeId, statusFilter ?? "all", searchTerm ?? "none", sortField ?? "default", sortOrder ?? "default", pageNumber, pageSize
             );
 
             try
@@ -652,32 +652,66 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     pageSize
                 );
 
+                Log.Debug(
+                    "GetSmeAssignments: Retrieved {ItemCount} items from repository. TotalCount={TotalCount}",
+                    items.Count, totalCount
+                );
+
+                var today = DateTime.Now.Date;
+                Log.Debug("GetSmeAssignments: Current date for overdue calculation: {Today}", today);
+
                 var assignmentDtos = items
-                    .Select(a => new AssignmentDto
+                    .Select(a =>
                     {
-                        AssignmentId = a.AssignmentId,
-                        MenteeEmployeeId = a.MenteeEmployeeId,
-                        MenteeName =
-                            $"{a.MenteeEmployee.Userprofile.FirstName} {a.MenteeEmployee.Userprofile.LastName}",
-                        SmeId = a.SmeId,
-                        SmeEmployeeId = a.Sme.EmployeeId,
-                        SmeName =
-                            $"{a.Sme.Employee.Userprofile.FirstName} {a.Sme.Employee.Userprofile.LastName}",
-                        SkillId = a.SkillId,
-                        SkillName = a.Skill.SkillName,
-                        Deadline = a.Deadline,
-                        Status = a.Status,
-                        ProofFilePath = a.ProofFilePath,
-                        CompletionNotes = a.CompletionNotes,
-                        CompletionRating = a.CompletionRating,
-                        CreatedOn = a.CreatedOn,
-                        UpdatedOn = a.UpdatedOn,
+                        var deadlineDate = a.Deadline?.Date;
+                        var isCompleted = a.Status == LnDConstants.ASSIGNMENT_STATUS.COMPLETED;
+
+                        var isOverdue = deadlineDate.HasValue
+                            && deadlineDate.Value < today
+                            && !isCompleted;
+
+                        var daysOverdue = isOverdue && deadlineDate.HasValue
+                            ? (int)(today - deadlineDate.Value).TotalDays
+                            : (int?)null;
+
+
+                        if (isOverdue)
+                        {
+                            Log.Debug(
+                                "GetSmeAssignments: Overdue assignment detected. AssignmentId={AssignmentId}, Deadline={Deadline}, DaysOverdue={DaysOverdue}, Status={Status}",
+                                a.AssignmentId, deadlineDate, daysOverdue, a.Status
+                            );
+                        }
+
+                        return new AssignmentDto
+                        {
+                            AssignmentId = a.AssignmentId,
+                            MenteeEmployeeId = a.MenteeEmployeeId,
+                            MenteeName = $"{a.MenteeEmployee.Userprofile.FirstName} {a.MenteeEmployee.Userprofile.LastName}",
+                            SmeId = a.SmeId,
+                            SmeEmployeeId = a.Sme.EmployeeId,
+                            SmeName = $"{a.Sme.Employee.Userprofile.FirstName} {a.Sme.Employee.Userprofile.LastName}",
+                            SkillId = a.SkillId,
+                            SkillName = a.Skill.SkillName,
+                            Deadline = a.Deadline,
+                            Status = a.Status,
+                            ProofFilePath = a.ProofFilePath,
+                            CompletionNotes = a.CompletionNotes,
+                            CompletionRating = a.CompletionRating,
+                            CreatedOn = a.CreatedOn,
+                            UpdatedOn = a.UpdatedOn,
+                            IsOverdue = isOverdue,
+                            DaysOverdue = daysOverdue,
+                        };
                     })
                     .ToList();
 
                 Log.Information(
-                    "GetSmeAssignments succeeded. SmeEmployeeId={SmeEmployeeId}, ReturnedCount={Count}, TotalCount={TotalCount}",
-                    smeEmployeeId, assignmentDtos.Count, totalCount
+                    "GetSmeAssignments succeeded. SmeEmployeeId={SmeEmployeeId}, ReturnedCount={Count}, TotalCount={TotalCount}, OverdueCount={OverdueCount}",
+                    smeEmployeeId,
+                    assignmentDtos.Count,
+                    totalCount,
+                    assignmentDtos.Count(a => a.IsOverdue)
                 );
 
                 return new ApiResponse<PaginatedResponse<AssignmentDto>>
@@ -696,18 +730,19 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 Log.Error(
                     ex,
-                    "GetSmeAssignments failed. SmeEmployeeId={SmeEmployeeId}, Error={ErrorMessage}",
-                    smeEmployeeId, ex.Message
+                    "GetSmeAssignments failed. SmeEmployeeId={SmeEmployeeId}, StatusFilter={StatusFilter}, Error={ErrorMessage}",
+                    smeEmployeeId, statusFilter, ex.Message
                 );
 
                 return new ApiResponse<PaginatedResponse<AssignmentDto>>
                 {
                     Success = false,
-                    Message = "An error occurred",
+                    Message = "An error occurred while retrieving SME assignments",
                     Errors = new List<string> { ex.Message },
                 };
             }
         }
+
 
         #endregion
 

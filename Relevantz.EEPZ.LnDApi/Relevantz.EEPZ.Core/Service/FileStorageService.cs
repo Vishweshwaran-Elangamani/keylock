@@ -12,7 +12,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
     public class FileStorageService : IFileStorageService
     {
         private readonly GridFSBucket _gridFSBucket;
-        private readonly MongoDbSettings _mongoSettings;
+        private readonly MongoDbSettings _mongoSettings;     
 
         public FileStorageService(IOptions<MongoDbSettings> mongoSettings)
         {

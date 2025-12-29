@@ -160,7 +160,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                         && a.CompletionNotes.ToLower().Contains(lowerSearchTerm)
                     )
                 );
-            }
+            }  
 
             var totalCount = await query.CountAsync();
 
@@ -393,7 +393,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 smeEmployeeId, items.Count, totalCount
             );
 
-            return (items, totalCount);
+            return (items, totalCount); 
         }
 
         /// <summary>Gets all team assignments for Excel export without pagination.</summary>

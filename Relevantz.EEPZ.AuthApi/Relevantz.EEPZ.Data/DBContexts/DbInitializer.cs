@@ -126,7 +126,7 @@ namespace Relevantz.EEPZ.Data.DBContexts
 
             await context.SaveChangesAsync();
             Console.WriteLine(" Roles seeding completed!");
-        }
+        } 
 
         /// <summary>
         /// Seeds default departments
@@ -184,7 +184,7 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 },
             };
 
-            foreach (var department in departments)
+            foreach (var department in departments) 
             {
                 var existingDepartment = await context.Departments.FirstOrDefaultAsync(d =>
                     d.DepartmentName == department.DepartmentName
@@ -192,7 +192,7 @@ namespace Relevantz.EEPZ.Data.DBContexts
 
                 if (existingDepartment == null)
                 {
-                    context.Departments.Add(department);
+                    context.Departments.Add(department); 
                     Console.WriteLine($"   Added department: {department.DepartmentName}");
                 }
                 else
@@ -204,7 +204,7 @@ namespace Relevantz.EEPZ.Data.DBContexts
             }
 
             await context.SaveChangesAsync();
-            Console.WriteLine(" Departments seeding completed!");
+            Console.WriteLine(" Departments seeding completed!"); 
         }
 
         /// <summary>
@@ -215,7 +215,7 @@ namespace Relevantz.EEPZ.Data.DBContexts
             IConfiguration configuration
         )
         {
-            Console.WriteLine(" Seeding admin user...");
+            Console.WriteLine(" Seeding admin user..."); 
 
             try
             {

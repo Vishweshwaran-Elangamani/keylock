@@ -4,7 +4,7 @@ using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repositories.Interface;
-using Serilog;
+using Serilog;     
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -13,10 +13,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private readonly ILnDApprovalRepository _approvalRepository;
         private readonly ILnDSmeRepository _smeRepository;
         private readonly ILnDAssignmentRepository _assignmentRepository;
-        private readonly IFileStorageService _fileStorage;
+        private readonly IFileStorageService _fileStorage; 
         private readonly ILnDBaseRepository _baseRepository;
 
-        #region Constructor
+        #region Constructor   
 
         public LnDApprovalService(
             ILnDApprovalRepository approvalRepository,
@@ -24,14 +24,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             ILnDAssignmentRepository assignmentRepository,
             IFileStorageService fileStorage,
             ILnDBaseRepository baseRepository
-        )
+        ) 
         {
             _approvalRepository = approvalRepository;
             _smeRepository = smeRepository;
             _assignmentRepository = assignmentRepository;
             _fileStorage = fileStorage;
             _baseRepository = baseRepository;
-        }
+        }  
 
         #endregion
 
@@ -369,14 +369,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     "ProcessApproval failed. ApprovalId={ApprovalId}, ApproverId={ApproverId}",
                     request.ApprovalId,
                     approverId
-                );
+                );   
 
                 return new ApiResponse<bool>
                 {
                     Success = false,
                     Message = "An error occurred",
                     Errors = new List<string> { ex.Message },
-                };
+                };   
             }
         }
 
@@ -727,7 +727,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         && assignment.Sme.EmployeeId != employeeId
                         && assignment.MenteeEmployee.ReportingManagerEmployeeId != employeeId
                     )
-                )
+                )            
                 {
                     Log.Warning(
                         "GetAssignmentProof: Assignment not found or access denied. AssignmentId={AssignmentId}, EmployeeId={EmployeeId}",

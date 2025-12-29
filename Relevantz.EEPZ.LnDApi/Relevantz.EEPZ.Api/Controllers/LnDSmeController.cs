@@ -20,12 +20,12 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
         public LnDSmeController(ILnDSmeService smeService)
         {
-            _smeService = smeService;
+            _smeService = smeService; 
         }
 
-        #endregion
+        #endregion 
 
-        #region SME Status
+        #region SME Status 
 
         /// <summary>Checks if the logged-in employee has active SME status for any skill.</summary>
         [HttpGet("check")]
@@ -60,7 +60,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         #region SME Application
 
         /// <summary>Submits an SME application with supporting documents for approval.</summary>
-        [HttpPost("apply")]
+        [HttpPost("apply")]   
         public async Task<IActionResult> ApplyToBecomeSme([FromForm] BecomeSmeRequest request)
         {
             var employeeId = GetCurrentEmployeeId();

@@ -289,10 +289,10 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Previews approval attachment in browser without download.
         /// Supports range processing for video and large file streaming.
         /// </summary>
-        [HttpGet("{approvalId}/attachment/preview")]
+        [HttpGet("{approvalId}/attachment/preview")]  
         public async Task<IActionResult> PreviewApprovalAttachment(int approvalId)
         {
-            var employeeId = GetCurrentEmployeeId();
+            var employeeId = GetCurrentEmployeeId(); 
 
             Log.Debug(
                 "PreviewApprovalAttachment API called. ApprovalId={ApprovalId}, EmployeeId={EmployeeId}",
@@ -307,7 +307,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                     "PreviewApprovalAttachment API failed. ApprovalId={ApprovalId}, Message={Message}",
                     approvalId, result.Message
                 );
-                return BadRequest(result);
+                return BadRequest(result); 
             }
 
             Log.Debug(

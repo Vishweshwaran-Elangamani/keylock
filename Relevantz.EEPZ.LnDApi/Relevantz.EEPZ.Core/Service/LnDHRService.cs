@@ -9,7 +9,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 {
     public class LnDHRService : ILnDHRService
     {
-        #region Dependencies
+        #region Dependencies           
 
         private readonly ILnDHRRepository _hrRepository;
         private readonly ILnDBaseRepository _baseRepository;
@@ -22,7 +22,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         #endregion
 
-        #region Employee Management
+        #region Employee Management                                                                            
 
         /// <summary>Gets paginated list of all organization employees with department information.</summary>
         public async Task<
@@ -184,15 +184,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         /// <summary>Gets paginated organization-wide assignments with filtering and search.</summary>
         public async Task<
-            ApiResponse<PaginatedResponse<AssignmentDto>>
-        > GetAllOrganizationAssignments(
-            string? statusFilter,
-            string? searchTerm,
-            string? sortField,
-            string? sortOrder,
-            int pageNumber,
-            int pageSize
-        )
+     ApiResponse<PaginatedResponse<AssignmentDto>>
+ > GetAllOrganizationAssignments(
+     string? statusFilter,
+     string? searchTerm,
+     string? sortField,
+     string? sortOrder,
+     int pageNumber,
+     int pageSize
+ )
         {
             Log.Information(
                 "GetAllOrganizationAssignments started. StatusFilter={StatusFilter}, SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
@@ -215,21 +215,41 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     items.Count, totalCount
                 );
 
+
+                var today = DateTime.Now.Date;
+
                 var assignmentDtos = items
-                    .Select(a => new AssignmentDto
+                    .Select(a =>
                     {
-                        AssignmentId = a.AssignmentId,
-                        SkillName = a.Skill?.SkillName,
-                        MenteeName =
-                            $"{a.MenteeEmployee?.Userprofile?.FirstName} {a.MenteeEmployee?.Userprofile?.LastName}",
-                        SmeName =
-                            $"{a.Sme?.Employee?.Userprofile?.FirstName} {a.Sme?.Employee?.Userprofile?.LastName}",
-                        Status = a.Status,
-                        CreatedOn = a.CreatedOn,
-                        Deadline = a.Deadline,
-                        CompletionRating = a.CompletionRating,
-                        CompletionNotes = a.CompletionNotes,
-                        ProofFilePath = a.ProofFilePath,
+
+                        var deadlineDate = a.Deadline?.Date;
+                        var isCompleted = a.Status == LnDConstants.ASSIGNMENT_STATUS.COMPLETED;
+
+                        var isOverdue = deadlineDate.HasValue
+                            && deadlineDate.Value < today
+                            && !isCompleted;
+
+                        var daysOverdue = isOverdue && deadlineDate.HasValue
+                            ? (int)(today - deadlineDate.Value).TotalDays
+                            : (int?)null;
+
+                        return new AssignmentDto
+                        {
+                            AssignmentId = a.AssignmentId,
+                            SkillName = a.Skill?.SkillName,
+                            MenteeName =
+                                $"{a.MenteeEmployee?.Userprofile?.FirstName} {a.MenteeEmployee?.Userprofile?.LastName}",
+                            SmeName =
+                                $"{a.Sme?.Employee?.Userprofile?.FirstName} {a.Sme?.Employee?.Userprofile?.LastName}",
+                            Status = a.Status,
+                            CreatedOn = a.CreatedOn,
+                            Deadline = a.Deadline,
+                            CompletionRating = a.CompletionRating,
+                            CompletionNotes = a.CompletionNotes,
+                            ProofFilePath = a.ProofFilePath,
+                            IsOverdue = isOverdue,
+                            DaysOverdue = daysOverdue,
+                        };
                     })
                     .ToList();
 

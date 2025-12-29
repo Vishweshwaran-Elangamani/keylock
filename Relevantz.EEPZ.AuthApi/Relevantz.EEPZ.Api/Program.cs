@@ -151,7 +151,7 @@ builder.Services.AddScoped<IBulkOperationLogRepository, BulkOperationLogReposito
 
 // Register MongoDB Repository
 builder.Services.AddScoped<IProfileImageRepository, ProfileImageRepository>();
-Log.Information("MongoDB ProfileImageRepository registered successfully");
+Log.Information("MongoDB ProfileImageRepository registered successfully");   
 
 // Register Services
 builder.Services.AddScoped<IPasswordService, PasswordService>();
