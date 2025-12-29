@@ -7,6 +7,247 @@ import ProfilePhotoUploadModal from "../../../components/auth/Modal/common/Profi
 import { toast } from "sonner";
 import "../../../styles/auth/common/EmployeeProfile.css";
 
+/* ============================================
+   CUSTOM DROPDOWN COMPONENTS
+   ============================================ */
+
+/* Custom Gender Dropdown */
+const GenderDropdown = ({ value, onChange, disabled, showError }) => {
+  const [open, setOpen] = useState(false);
+
+  const options = [
+    { label: "Select Gender", value: "" },
+    { label: "Male", value: "Male" },
+    { label: "Female", value: "Female" },
+    { label: "Other", value: "Other" },
+    { label: "Prefer not to say", value: "Prefer not to say" },
+  ];
+
+  const selected = options.find((o) => o.value === value) || options[0];
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  if (disabled) {
+    return (
+      <div className={`form-control-modern ${showError ? "error" : ""}`}>
+        {selected.label}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`ep-custom-dropdown ${showError ? "error" : ""}`}
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+    >
+      <div
+        className="ep-custom-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {selected.label}
+        <span className="ep-custom-arrow" />
+      </div>
+
+      {open && (
+        <div className="ep-custom-menu">
+          {options.map((opt) => (
+            <div
+              key={opt.value || "empty"}
+              className={
+                "ep-custom-option" +
+                (opt.value === value ? " ep-custom-option-active" : "")
+              }
+              onClick={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* Custom Nationality Dropdown */
+const NationalityDropdown = ({ value, onChange, disabled, showError, options }) => {
+  const [open, setOpen] = useState(false);
+
+  const allOptions = [
+    { label: "Select Nationality", value: "" },
+    ...options.map((nat) => ({ label: nat, value: nat })),
+  ];
+
+  const selected = allOptions.find((o) => o.value === value) || allOptions[0];
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  if (disabled) {
+    return (
+      <div className={`form-control-modern ${showError ? "error" : ""}`}>
+        {selected.label}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`ep-custom-dropdown ${showError ? "error" : ""}`}
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+    >
+      <div
+        className="ep-custom-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {selected.label}
+        <span className="ep-custom-arrow" />
+      </div>
+
+      {open && (
+        <div className="ep-custom-menu">
+          {allOptions.map((opt) => (
+            <div
+              key={opt.value || "empty"}
+              className={
+                "ep-custom-option" +
+                (opt.value === value ? " ep-custom-option-active" : "")
+              }
+              onClick={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* Custom Marital Status Dropdown */
+const MaritalStatusDropdown = ({ value, onChange, disabled, showError }) => {
+  const [open, setOpen] = useState(false);
+
+  const options = [
+    { label: "Select Status", value: "" },
+    { label: "Single", value: "Single" },
+    { label: "Married", value: "Married" },
+    { label: "Prefer not to say", value: "Prefer not to say" },
+  ];
+
+  const selected = options.find((o) => o.value === value) || options[0];
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  if (disabled) {
+    return (
+      <div className={`form-control-modern ${showError ? "error" : ""}`}>
+        {selected.label}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`ep-custom-dropdown ${showError ? "error" : ""}`}
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+    >
+      <div
+        className="ep-custom-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {selected.label}
+        <span className="ep-custom-arrow" />
+      </div>
+
+      {open && (
+        <div className="ep-custom-menu">
+          {options.map((opt) => (
+            <div
+              key={opt.value || "empty"}
+              className={
+                "ep-custom-option" +
+                (opt.value === value ? " ep-custom-option-active" : "")
+              }
+              onClick={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* Custom State Dropdown */
+const StateDropdown = ({ value, onChange, disabled, showError, options }) => {
+  const [open, setOpen] = useState(false);
+
+  const allOptions = [
+    { label: "Select State", value: "" },
+    ...options.map((state) => ({ label: state, value: state })),
+  ];
+
+  const selected = allOptions.find((o) => o.value === value) || allOptions[0];
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  if (disabled) {
+    return (
+      <div className={`form-control-modern ${showError ? "error" : ""}`}>
+        {selected.label}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`ep-custom-dropdown ${showError ? "error" : ""}`}
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+    >
+      <div
+        className="ep-custom-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {selected.label}
+        <span className="ep-custom-arrow" />
+      </div>
+
+      {open && (
+        <div className="ep-custom-menu">
+          {allOptions.map((opt) => (
+            <div
+              key={opt.value || "empty"}
+              className={
+                "ep-custom-option" +
+                (opt.value === value ? " ep-custom-option-active" : "")
+              }
+              onClick={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 /**
  * EmployeeProfile Component
  * Displays and manages employee profile information with modern UI
@@ -30,7 +271,7 @@ const EmployeeProfile = () => {
   const [pendingRequestId, setPendingRequestId] = useState(null);
   const [checkingPending, setCheckingPending] = useState(false);
 
-  // NEW: Profile photo states
+  // Profile photo states
   const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [profilePhoto, setProfilePhoto] = useState(null);
 
@@ -95,7 +336,7 @@ const EmployeeProfile = () => {
   }, []);
 
   /**
-   * NEW: Update profile photo when profile data loads
+   * Update profile photo when profile data loads
    */
   useEffect(() => {
     if (profileData?.profilePhotoBase64) {
@@ -119,7 +360,6 @@ const EmployeeProfile = () => {
         setProfileData(response.data);
         initializeFormData(response.data);
         toast.dismiss();
-        // toast.success("Profile loaded successfully");
       } else {
         toast.dismiss();
         toast.error(response.message || "Failed to load profile");
@@ -157,26 +397,22 @@ const EmployeeProfile = () => {
   };
 
   /**
-   * NEW: Handles camera icon click to open photo upload modal
+   * Handles camera icon click to open photo upload modal
    */
   const handleCameraClick = () => {
     setShowPhotoModal(true);
   };
 
   /**
-   * NEW: Handles photo update callback from modal
-   * Updates the profile photo state with new image
+   * Handles photo update callback from modal
    */
   const handlePhotoUpdate = async (newPhotoUrl) => {
     setProfilePhoto(newPhotoUrl);
-    // Refresh profile data to get updated photo
     await fetchProfileData();
   };
 
   /**
    * Initializes form data with profile data
-   * Sets up address objects with proper structure
-   * @param {Object} data - Profile data from API
    */
   const initializeFormData = (data) => {
     setFormData({
@@ -249,18 +485,15 @@ const EmployeeProfile = () => {
       setSameAsCurrentAddress(false);
     }
 
-    // Reset errors and touched state
     setErrors({});
     setTouched({});
   };
 
   /**
    * Handles change request submission
-   * @param {Object} requestPayload - Change request data
    */
   const handleChangeRequest = async (requestPayload) => {
     try {
-
       toast.loading("Submitting change request...");
 
       const response = await ChangeRequestService.submitChangeRequest(
@@ -273,7 +506,6 @@ const EmployeeProfile = () => {
           response.message || "Change request submitted successfully"
         );
 
-        // Update state immediately
         if (response.data && response.data.requestId) {
           setHasPendingRequest(true);
           setPendingRequestId(response.data.requestId);
@@ -281,7 +513,6 @@ const EmployeeProfile = () => {
 
         setShowChangeRequestModal(false);
 
-        // Refresh pending request check
         setTimeout(async () => {
           await checkPendingRequest();
         }, 500);
@@ -304,16 +535,13 @@ const EmployeeProfile = () => {
 
   /**
    * Handles modal close event
-   * @param {string} action - Action taken before closing
    */
   const handleModalClose = (action) => {
-
     if (action === "requestCancelled") {
       setHasPendingRequest(false);
       setPendingRequestId(null);
       toast.success("Request cancelled. You can submit a new one now.");
 
-      // Refresh pending request check
       setTimeout(async () => {
         await checkPendingRequest();
       }, 300);
@@ -323,57 +551,37 @@ const EmployeeProfile = () => {
   };
 
   /**
-   * Validates individual field with comprehensive 360° validation
-   * @param {string} name - Field name
-   * @param {string} value - Field value
-   * @returns {string} - Error message or empty string
+   * Validates individual field
    */
   const validateField = (name, value) => {
     let error = "";
-
-    // Convert value to string if it's not already, handle null/undefined
     const stringValue = value != null ? String(value) : "";
 
     switch (name) {
       case "firstName":
-        // Required field validation
         if (!stringValue || !stringValue.trim()) {
           error = "First name is required";
-        }
-        // Length validation
-        else if (stringValue.trim().length < 2) {
+        } else if (stringValue.trim().length < 2) {
           error = "First name must be at least 2 characters";
         } else if (stringValue.trim().length > 50) {
           error = "First name cannot exceed 50 characters";
-        }
-        // Character validation - only letters
-        else if (!/^[a-zA-Z]+$/.test(stringValue.trim())) {
+        } else if (!/^[a-zA-Z]+$/.test(stringValue.trim())) {
           error = "First name can only contain letters";
-        }
-        // Check for consecutive spaces
-        else if (/\s{2,}/.test(stringValue)) {
+        } else if (/\s{2,}/.test(stringValue)) {
           error = "First name cannot contain consecutive spaces";
         }
         break;
 
       case "middleName":
-        // Optional field - only validate if value exists
         if (stringValue && stringValue.trim()) {
-          // Length validation
           if (stringValue.trim().length > 50) {
             error = "Middle name cannot exceed 50 characters";
-          }
-          // Character validation
-          else if (!/^[a-zA-Z\s'-]*$/.test(stringValue.trim())) {
+          } else if (!/^[a-zA-Z\s'-]*$/.test(stringValue.trim())) {
             error =
               "Middle name can only contain letters, spaces, hyphens, and apostrophes";
-          }
-          // Check for consecutive spaces
-          else if (/\s{2,}/.test(stringValue)) {
+          } else if (/\s{2,}/.test(stringValue)) {
             error = "Middle name cannot contain consecutive spaces";
-          }
-          // Check for consecutive special chars
-          else if (/[-']{2,}/.test(stringValue)) {
+          } else if (/[-']{2,}/.test(stringValue)) {
             error =
               "Middle name cannot contain consecutive hyphens or apostrophes";
           }
@@ -381,44 +589,29 @@ const EmployeeProfile = () => {
         break;
 
       case "lastName":
-        // Required field validation
         if (!stringValue || !stringValue.trim()) {
           error = "Last name is required";
-        }
-        // Length validation
-        else if (stringValue.trim().length < 2) {
+        } else if (stringValue.trim().length < 2) {
           error = "Last name must be at least 2 characters";
         } else if (stringValue.trim().length > 50) {
           error = "Last name cannot exceed 50 characters";
-        }
-        // Character validation - only letters
-        else if (!/^[a-zA-Z]+$/.test(stringValue.trim())) {
+        } else if (!/^[a-zA-Z]+$/.test(stringValue.trim())) {
           error = "Last name can only contain letters";
-        }
-        // Check for consecutive spaces
-        else if (/\s{2,}/.test(stringValue)) {
+        } else if (/\s{2,}/.test(stringValue)) {
           error = "Last name cannot contain consecutive spaces";
         }
         break;
 
       case "callingName":
-        // Optional field - only validate if value exists
         if (stringValue && stringValue.trim()) {
-          // Length validation
           if (stringValue.trim().length > 50) {
             error = "Calling name cannot exceed 50 characters";
-          }
-          // Character validation
-          else if (!/^[a-zA-Z\s'-]*$/.test(stringValue.trim())) {
+          } else if (!/^[a-zA-Z\s'-]*$/.test(stringValue.trim())) {
             error =
               "Calling name can only contain letters, spaces, hyphens, and apostrophes";
-          }
-          // Check for consecutive spaces
-          else if (/\s{2,}/.test(stringValue)) {
+          } else if (/\s{2,}/.test(stringValue)) {
             error = "Calling name cannot contain consecutive spaces";
-          }
-          // Check for consecutive special chars
-          else if (/[-']{2,}/.test(stringValue)) {
+          } else if (/[-']{2,}/.test(stringValue)) {
             error =
               "Calling name cannot contain consecutive hyphens or apostrophes";
           }
@@ -426,31 +619,19 @@ const EmployeeProfile = () => {
         break;
 
       case "mobileNumber":
-        // Required field validation
         if (!stringValue || !stringValue.trim()) {
           error = "Mobile number is required";
-        }
-        // Remove spaces for validation
-        else {
+        } else {
           const cleanNumber = stringValue.replace(/\s+/g, "");
-          // Check if only digits
           if (!/^\d+$/.test(cleanNumber)) {
             error = "Mobile number can only contain digits";
-          }
-          // Check exact length
-          else if (cleanNumber.length !== 10) {
+          } else if (cleanNumber.length !== 10) {
             error = "Mobile number must be exactly 10 digits";
-          }
-          // Check if starts with valid digit (6-9 for Indian numbers)
-          else if (!/^[6-9]/.test(cleanNumber)) {
+          } else if (!/^[6-9]/.test(cleanNumber)) {
             error = "Mobile number must start with 6, 7, 8, or 9";
-          }
-          // Check for all same digits
-          else if (/^(\d)\1{9}$/.test(cleanNumber)) {
+          } else if (/^(\d)\1{9}$/.test(cleanNumber)) {
             error = "Mobile number cannot have all same digits";
-          }
-          // Check for sequential digits
-          else if (
+          } else if (
             cleanNumber === "0123456789" ||
             cleanNumber === "9876543210"
           ) {
@@ -460,62 +641,38 @@ const EmployeeProfile = () => {
         break;
 
       case "alternateNumber":
-        // Optional field - only validate if value exists
         if (stringValue && stringValue.trim()) {
           const cleanNumber = stringValue.replace(/\s+/g, "");
-          // Check if only digits
           if (!/^\d+$/.test(cleanNumber)) {
             error = "Alternate number can only contain digits";
-          }
-          // Check exact length
-          else if (cleanNumber.length !== 10) {
+          } else if (cleanNumber.length !== 10) {
             error = "Alternate number must be exactly 10 digits";
-          }
-          // Check if starts with valid digit
-          else if (!/^[6-9]/.test(cleanNumber)) {
+          } else if (!/^[6-9]/.test(cleanNumber)) {
             error = "Alternate number must start with 6, 7, 8, or 9";
-          }
-          // Check if same as mobile number
-          else if (cleanNumber === formData.mobileNumber?.replace(/\s+/g, "")) {
+          } else if (cleanNumber === formData.mobileNumber?.replace(/\s+/g, "")) {
             error = "Alternate number must be different from mobile number";
-          }
-          // Check for all same digits
-          else if (/^(\d)\1{9}$/.test(cleanNumber)) {
+          } else if (/^(\d)\1{9}$/.test(cleanNumber)) {
             error = "Alternate number cannot have all same digits";
           }
         }
         break;
 
       case "personalEmail":
-        // Optional field - only validate if value exists
         if (stringValue && stringValue.trim()) {
           const email = stringValue.trim().toLowerCase();
-          // Length validation
           if (email.length > 100) {
             error = "Email address cannot exceed 100 characters";
-          }
-          // Check if ends with @gmail.com
-          else if (!email.endsWith("@gmail.com")) {
+          } else if (!email.endsWith("@gmail.com")) {
             error = "Personal email must be a Gmail account";
-          }
-          // Basic email format validation
-          else if (!/^[a-zA-Z0-9._-]+@gmail\.com$/.test(email)) {
+          } else if (!/^[a-zA-Z0-9._-]+@gmail\.com$/.test(email)) {
             error = "Please enter a valid Gmail address";
-          }
-          // Check for consecutive dots
-          else if (/\.{2,}/.test(email)) {
+          } else if (/\.{2,}/.test(email)) {
             error = "Email cannot contain consecutive dots";
-          }
-          // Check if starts with special character
-          else if (/^[._-]/.test(email)) {
+          } else if (/^[._-]/.test(email)) {
             error = "Email cannot start with a special character";
-          }
-          // Check if contains invalid characters before @
-          else if (!/^[a-zA-Z0-9._-]+@/.test(email)) {
+          } else if (!/^[a-zA-Z0-9._-]+@/.test(email)) {
             error = "Email contains invalid characters";
-          }
-          // Check minimum length before @
-          else {
+          } else {
             const localPart = email.split("@")[0];
             if (localPart.length < 3) {
               error = "Email username must be at least 3 characters";
@@ -525,23 +682,19 @@ const EmployeeProfile = () => {
         break;
 
       case "gender":
-        // Required field validation
         if (!stringValue || stringValue === "") {
           error = "Gender is required";
         }
         break;
 
       case "dateOfBirthOfficial":
-        // Optional field - only validate if value exists
         if (stringValue) {
           const birthDate = new Date(stringValue);
           const today = new Date();
 
-          // Validate date is not in future
           if (birthDate > today) {
             error = "Date of birth cannot be in the future";
           } else {
-            // Calculate exact age
             const age = today.getFullYear() - birthDate.getFullYear();
             const monthDiff = today.getMonth() - birthDate.getMonth();
             const actualAge =
@@ -550,7 +703,6 @@ const EmployeeProfile = () => {
                 ? age - 1
                 : age;
 
-            // Age validation
             if (actualAge < 18) {
               error = "You must be at least 18 years old";
             } else if (actualAge > 100) {
@@ -559,7 +711,6 @@ const EmployeeProfile = () => {
               error = "Age cannot exceed 65 years for employment";
             }
 
-            // Check if date is too old (before 1900)
             if (birthDate.getFullYear() < 1900) {
               error = "Please enter a valid date of birth";
             }
@@ -568,14 +719,12 @@ const EmployeeProfile = () => {
         break;
 
       case "nationality":
-        // Required field validation
         if (!stringValue || stringValue === "") {
           error = "Nationality is required";
         }
         break;
 
       case "maritalStatus":
-        // Required field validation
         if (!stringValue || stringValue === "") {
           error = "Marital status is required";
         }
@@ -589,114 +738,79 @@ const EmployeeProfile = () => {
   };
 
   /**
-   * Validates address fields with comprehensive validation
-   * @param {string} addressType - Type of address (current/permanent)
-   * @param {string} field - Field name
-   * @param {string} value - Field value
-   * @returns {string} - Error message or empty string
+   * Validates address fields
    */
   const validateAddressField = (addressType, field, value) => {
     let error = "";
-
-    // Convert value to string if it's not already, handle null/undefined
     const stringValue = value != null ? String(value) : "";
 
-    // All address fields are optional
     if (!stringValue || !stringValue.trim()) {
       return "";
     }
 
     switch (field) {
       case "doorNumber":
-        // Length validation
         if (stringValue.trim().length > 20) {
           error = "Door number cannot exceed 20 characters";
-        }
-        // Check for only special characters
-        else if (/^[^a-zA-Z0-9]+$/.test(stringValue.trim())) {
+        } else if (/^[^a-zA-Z0-9]+$/.test(stringValue.trim())) {
           error = "Door number must contain alphanumeric characters";
-        }
-        // Check for consecutive spaces
-        else if (/\s{2,}/.test(stringValue)) {
+        } else if (/\s{2,}/.test(stringValue)) {
           error = "Door number cannot contain consecutive spaces";
         }
         break;
 
       case "street":
-        // Length validation
         if (stringValue.trim().length < 2) {
           error = "Street must be at least 2 characters";
         } else if (stringValue.trim().length > 100) {
           error = "Street cannot exceed 100 characters";
-        }
-        // Character validation - alphanumeric with spaces and common chars
-        else if (!/^[a-zA-Z0-9\s,.-]+$/.test(stringValue.trim())) {
+        } else if (!/^[a-zA-Z0-9\s,.-]+$/.test(stringValue.trim())) {
           error =
             "Street can only contain letters, numbers, spaces, commas, dots, and hyphens";
-        }
-        // Check for consecutive spaces
-        else if (/\s{2,}/.test(stringValue)) {
+        } else if (/\s{2,}/.test(stringValue)) {
           error = "Street cannot contain consecutive spaces";
         }
         break;
 
       case "landmark":
-        // Length validation
         if (stringValue.trim().length > 100) {
           error = "Landmark cannot exceed 100 characters";
-        }
-        // Character validation
-        else if (!/^[a-zA-Z0-9\s,.-]+$/.test(stringValue.trim())) {
+        } else if (!/^[a-zA-Z0-9\s,.-]+$/.test(stringValue.trim())) {
           error =
             "Landmark can only contain letters, numbers, spaces, commas, dots, and hyphens";
-        }
-        // Check for consecutive spaces
-        else if (/\s{2,}/.test(stringValue)) {
+        } else if (/\s{2,}/.test(stringValue)) {
           error = "Landmark cannot contain consecutive spaces";
         }
         break;
 
       case "area":
-        // Length validation
         if (stringValue.trim().length < 2) {
           error = "Area must be at least 2 characters";
         } else if (stringValue.trim().length > 100) {
           error = "Area cannot exceed 100 characters";
-        }
-        // Character validation
-        else if (!/^[a-zA-Z0-9\s,.-]+$/.test(stringValue.trim())) {
+        } else if (!/^[a-zA-Z0-9\s,.-]+$/.test(stringValue.trim())) {
           error =
             "Area can only contain letters, numbers, spaces, commas, dots, and hyphens";
-        }
-        // Check for consecutive spaces
-        else if (/\s{2,}/.test(stringValue)) {
+        } else if (/\s{2,}/.test(stringValue)) {
           error = "Area cannot contain consecutive spaces";
         }
         break;
 
       case "city":
-        // Length validation
         if (stringValue.trim().length < 2) {
           error = "City must be at least 2 characters";
         } else if (stringValue.trim().length > 50) {
           error = "City cannot exceed 50 characters";
-        }
-        // Character validation - only letters and spaces
-        else if (!/^[a-zA-Z\s]+$/.test(stringValue.trim())) {
+        } else if (!/^[a-zA-Z\s]+$/.test(stringValue.trim())) {
           error = "City can only contain letters and spaces";
-        }
-        // Check for consecutive spaces
-        else if (/\s{2,}/.test(stringValue)) {
+        } else if (/\s{2,}/.test(stringValue)) {
           error = "City cannot contain consecutive spaces";
-        }
-        // Check if city name is too short
-        else if (stringValue.trim().replace(/\s/g, "").length < 2) {
+        } else if (stringValue.trim().replace(/\s/g, "").length < 2) {
           error = "City name is too short";
         }
         break;
 
       case "state":
-        // State is required if city is filled
         if (
           formData[addressType]?.city &&
           (!stringValue || stringValue === "")
@@ -707,26 +821,18 @@ const EmployeeProfile = () => {
 
       case "pinCode":
         const pinCode = stringValue.replace(/\s+/g, "");
-        // Check if only digits
         if (!/^\d+$/.test(pinCode)) {
           error = "PIN code can only contain digits";
-        }
-        // Check exact length
-        else if (pinCode.length !== 6) {
+        } else if (pinCode.length !== 6) {
           error = "PIN code must be exactly 6 digits";
-        }
-        // Check if starts with 0
-        else if (pinCode.startsWith("0")) {
+        } else if (pinCode.startsWith("0")) {
           error = "PIN code cannot start with 0";
-        }
-        // Check for all same digits
-        else if (/^(\d)\1{5}$/.test(pinCode)) {
+        } else if (/^(\d)\1{5}$/.test(pinCode)) {
           error = "PIN code cannot have all same digits";
         }
         break;
 
       case "country":
-        // Length validation
         if (stringValue && stringValue.trim().length > 50) {
           error = "Country cannot exceed 50 characters";
         }
@@ -741,7 +847,6 @@ const EmployeeProfile = () => {
 
   /**
    * Handles input field changes
-   * @param {Event} e - Change event
    */
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -751,13 +856,11 @@ const EmployeeProfile = () => {
       [name]: value,
     }));
 
-    // Mark field as touched
     setTouched((prev) => ({
       ...prev,
       [name]: true,
     }));
 
-    // Validate field in real-time
     const error = validateField(name, value);
     setErrors((prev) => ({
       ...prev,
@@ -767,9 +870,6 @@ const EmployeeProfile = () => {
 
   /**
    * Handles address field changes
-   * @param {string} addressType - current or permanent address
-   * @param {string} field - Field name
-   * @param {string} value - Field value
    */
   const handleAddressChange = (addressType, field, value) => {
     setFormData((prev) => ({
@@ -785,7 +885,6 @@ const EmployeeProfile = () => {
       [`${addressType}.${field}`]: true,
     }));
 
-    // Validate address field in real-time
     const error = validateAddressField(addressType, field, value);
     setErrors((prev) => ({
       ...prev,
@@ -795,7 +894,6 @@ const EmployeeProfile = () => {
 
   /**
    * Handles "same as current address" checkbox
-   * @param {Event} e - Change event
    */
   const handleSameAddressChange = (e) => {
     const isChecked = e.target.checked;
@@ -837,43 +935,23 @@ const EmployeeProfile = () => {
   };
 
   /**
-   * Upload/Update profile photo only
-   * Uses dedicated endpoint: PUT /Profile/upload-photo
+   * Auto-sync permanent address when current address changes
    */
-  updateProfilePhoto: async (formData) => {
-    try {
-
-      const response = await api.put("/Profile/upload-photo", formData);
-
-      return response.data;
-    } catch (error) {
-      console.error("Error updating profile photo:", error);
-      console.error("Error response:", error.response?.data);
-      throw (
-        error.response?.data || { message: "Failed to update profile photo" }
-      );
+  useEffect(() => {
+    if (sameAsCurrentAddress && isEditing) {
+      setFormData((prev) => ({
+        ...prev,
+        permanentAddress: { ...prev.currentAddress },
+      }));
     }
-  },
-    /**
-     * Auto-sync permanent address when current address changes
-     */
-    useEffect(() => {
-      if (sameAsCurrentAddress && isEditing) {
-        setFormData((prev) => ({
-          ...prev,
-          permanentAddress: { ...prev.currentAddress },
-        }));
-      }
-    }, [formData.currentAddress, sameAsCurrentAddress, isEditing]);
+  }, [formData.currentAddress, sameAsCurrentAddress, isEditing]);
 
   /**
-   * Validates entire form before submission with 360° coverage
-   * @returns {boolean} - True if form is valid
+   * Validates entire form before submission
    */
   const validateForm = () => {
     const newErrors = {};
 
-    // Define required fields
     const requiredFields = [
       "firstName",
       "lastName",
@@ -883,7 +961,6 @@ const EmployeeProfile = () => {
       "nationality",
     ];
 
-    // Validate required fields
     requiredFields.forEach((field) => {
       const fieldValue = formData[field];
       if (
@@ -896,7 +973,6 @@ const EmployeeProfile = () => {
       }
     });
 
-    // Validate all string fields with specific validations
     Object.keys(formData).forEach((field) => {
       if (typeof formData[field] === "string" || formData[field] != null) {
         const error = validateField(field, formData[field]);
@@ -906,7 +982,6 @@ const EmployeeProfile = () => {
       }
     });
 
-    // Validate address fields
     ["currentAddress", "permanentAddress"].forEach((addressType) => {
       if (formData[addressType]) {
         Object.keys(formData[addressType]).forEach((field) => {
@@ -922,8 +997,6 @@ const EmployeeProfile = () => {
       }
     });
 
-    // Cross-field validation
-    // Check if alternate number is same as mobile number
     if (
       formData.alternateNumber &&
       formData.mobileNumber &&
@@ -936,7 +1009,6 @@ const EmployeeProfile = () => {
 
     setErrors(newErrors);
 
-    // Show toast with error count if validation fails
     const errorCount = Object.keys(newErrors).length;
     if (errorCount > 0) {
       toast.error(
@@ -951,12 +1023,10 @@ const EmployeeProfile = () => {
 
   /**
    * Handles form submission
-   * @param {Event} e - Submit event
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Mark all fields as touched for validation display
     const allTouched = {};
     Object.keys(formData).forEach((key) => {
       if (typeof formData[key] === "object" && !Array.isArray(formData[key])) {
@@ -969,11 +1039,9 @@ const EmployeeProfile = () => {
     });
     setTouched(allTouched);
 
-    // Validate form
     if (!validateForm()) {
-      // Scroll to first error
       const firstErrorField = document.querySelector(
-        ".form-control-modern.error"
+        ".form-control-modern.error, .ep-custom-dropdown.error"
       );
       if (firstErrorField) {
         firstErrorField.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -992,16 +1060,10 @@ const EmployeeProfile = () => {
         toast.dismiss();
         toast.success("Profile updated successfully!");
 
-        // Update profileData with fresh data from response
         setProfileData(response.data);
-
-        // Reinitialize form with updated data
         initializeFormData(response.data);
-
-        // Exit edit mode
         setIsEditing(false);
 
-        // Reset the sameAsCurrentAddress flag based on new data
         if (
           response.data.currentAddress &&
           response.data.permanentAddress &&
@@ -1030,7 +1092,7 @@ const EmployeeProfile = () => {
   };
 
   /**
-   * Handles cancel button - resets form to original data
+   * Handles cancel button
    */
   const handleCancel = () => {
     setIsEditing(false);
@@ -1041,9 +1103,6 @@ const EmployeeProfile = () => {
 
   /**
    * Gets initials from first and last name
-   * @param {string} firstName - First name
-   * @param {string} lastName - Last name
-   * @returns {string} - Initials
    */
   const getInitials = (firstName, lastName) => {
     if (!firstName && !lastName) return "NA";
@@ -1054,8 +1113,6 @@ const EmployeeProfile = () => {
 
   /**
    * Formats date to readable format
-   * @param {string} dateString - ISO date string
-   * @returns {string} - Formatted date
    */
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -1068,8 +1125,6 @@ const EmployeeProfile = () => {
 
   /**
    * Formats address object to readable string
-   * @param {Object} address - Address object
-   * @returns {string} - Formatted address
    */
   const formatAddress = (address) => {
     if (!address) return "N/A";
@@ -1088,8 +1143,6 @@ const EmployeeProfile = () => {
 
   /**
    * Returns appropriate badge class for employment status
-   * @param {string} status - Employment status
-   * @returns {string} - CSS class name
    */
   const getStatusBadgeClass = (status) => {
     switch (status?.toLowerCase()) {
@@ -1108,8 +1161,6 @@ const EmployeeProfile = () => {
 
   /**
    * Checks if field should show error
-   * @param {string} fieldName - Field name
-   * @returns {boolean} - True if error should be shown
    */
   const showError = (fieldName) => {
     return touched[fieldName] && errors[fieldName];
@@ -1146,11 +1197,10 @@ const EmployeeProfile = () => {
 
   return (
     <div className="employee-profile-container">
-      {/* Modern Profile Header with Gradient Background */}
+      {/* Modern Profile Header */}
       <div className="profile-header-modern">
         <div className="profile-header-background"></div>
         <div className="profile-header-content">
-          {/* Avatar and Basic Info Section */}
           <div className="profile-avatar-section">
             <div className="profile-avatar-wrapper-modern">
               <div className="profile-avatar-modern">
@@ -1166,7 +1216,6 @@ const EmployeeProfile = () => {
                   </span>
                 )}
               </div>
-              {/* Camera Icon Button */}
               <button
                 className="camera-icon-btn-modern"
                 onClick={handleCameraClick}
@@ -1199,7 +1248,6 @@ const EmployeeProfile = () => {
             </div>
           </div>
 
-          {/* Action Buttons */}
           <div className="profile-actions">
             {!isEditing ? (
               <>
@@ -1258,7 +1306,7 @@ const EmployeeProfile = () => {
       {/* Main Content Grid */}
       <div className="profile-content-modern">
         <div className="content-grid">
-          {/* Left Sidebar - Static Information */}
+          {/* Left Sidebar */}
           <div className="sidebar-section">
             {/* Personal Details Card */}
             <div className="info-card">
@@ -1268,36 +1316,30 @@ const EmployeeProfile = () => {
               </div>
               <div className="card-content">
                 <div className="info-grid">
-                  {/* Employee ID - Read Only */}
                   <div className="info-item-modern">
                     <label>Employee ID</label>
                     <span>{profileData.employeeCompanyId || "N/A"}</span>
                     <small>Cannot be changed</small>
                   </div>
 
-                  {/* Gender - REQUIRED */}
+                  {/* Gender - Custom Dropdown */}
                   <div className="info-item-modern">
                     <label>
                       Gender <span className="required">*</span>
                     </label>
                     {isEditing ? (
                       <div className="form-field">
-                        <select
-                          className={`form-control-modern ${
-                            showError("gender") ? "error" : ""
-                          }`}
-                          name="gender"
+                        <GenderDropdown
                           value={formData.gender}
-                          onChange={handleChange}
-                        >
-                          <option value="">Select Gender</option>
-                          <option value="Male">Male</option>
-                          <option value="Female">Female</option>
-                          <option value="Other">Other</option>
-                          <option value="Prefer not to say">
-                            Prefer not to say
-                          </option>
-                        </select>
+                          onChange={(val) => {
+                            setFormData((prev) => ({ ...prev, gender: val }));
+                            setTouched((prev) => ({ ...prev, gender: true }));
+                            const error = validateField("gender", val);
+                            setErrors((prev) => ({ ...prev, gender: error }));
+                          }}
+                          disabled={false}
+                          showError={showError("gender")}
+                        />
                         {showError("gender") && (
                           <span className="error-message">{errors.gender}</span>
                         )}
@@ -1307,7 +1349,7 @@ const EmployeeProfile = () => {
                     )}
                   </div>
 
-                  {/* Date of Birth - OPTIONAL */}
+                  {/* Date of Birth */}
                   <div className="info-item-modern">
                     <label>Date of Birth</label>
                     {isEditing ? (
@@ -1333,28 +1375,34 @@ const EmployeeProfile = () => {
                     )}
                   </div>
 
-                  {/* Nationality - REQUIRED */}
+                  {/* Nationality - Custom Dropdown */}
                   <div className="info-item-modern">
                     <label>
                       Nationality <span className="required">*</span>
                     </label>
                     {isEditing ? (
                       <div className="form-field">
-                        <select
-                          className={`form-control-modern ${
-                            showError("nationality") ? "error" : ""
-                          }`}
-                          name="nationality"
+                        <NationalityDropdown
                           value={formData.nationality}
-                          onChange={handleChange}
-                        >
-                          <option value="">Select Nationality</option>
-                          {nationalityOptions.map((nat) => (
-                            <option key={nat} value={nat}>
-                              {nat}
-                            </option>
-                          ))}
-                        </select>
+                          onChange={(val) => {
+                            setFormData((prev) => ({
+                              ...prev,
+                              nationality: val,
+                            }));
+                            setTouched((prev) => ({
+                              ...prev,
+                              nationality: true,
+                            }));
+                            const error = validateField("nationality", val);
+                            setErrors((prev) => ({
+                              ...prev,
+                              nationality: error,
+                            }));
+                          }}
+                          disabled={false}
+                          showError={showError("nationality")}
+                          options={nationalityOptions}
+                        />
                         {showError("nationality") && (
                           <span className="error-message">
                             {errors.nationality}
@@ -1366,28 +1414,33 @@ const EmployeeProfile = () => {
                     )}
                   </div>
 
-                  {/* Marital Status - REQUIRED */}
+                  {/* Marital Status - Custom Dropdown */}
                   <div className="info-item-modern">
                     <label>
                       Marital Status <span className="required">*</span>
                     </label>
                     {isEditing ? (
                       <div className="form-field">
-                        <select
-                          className={`form-control-modern ${
-                            showError("maritalStatus") ? "error" : ""
-                          }`}
-                          name="maritalStatus"
+                        <MaritalStatusDropdown
                           value={formData.maritalStatus}
-                          onChange={handleChange}
-                        >
-                          <option value="">Select Status</option>
-                          <option value="Single">Single</option>
-                          <option value="Married">Married</option>
-                          <option value="Prefer not to say">
-                            Prefer not to say
-                          </option>
-                        </select>
+                          onChange={(val) => {
+                            setFormData((prev) => ({
+                              ...prev,
+                              maritalStatus: val,
+                            }));
+                            setTouched((prev) => ({
+                              ...prev,
+                              maritalStatus: true,
+                            }));
+                            const error = validateField("maritalStatus", val);
+                            setErrors((prev) => ({
+                              ...prev,
+                              maritalStatus: error,
+                            }));
+                          }}
+                          disabled={false}
+                          showError={showError("maritalStatus")}
+                        />
                         {showError("maritalStatus") && (
                           <span className="error-message">
                             {errors.maritalStatus}
@@ -1435,7 +1488,7 @@ const EmployeeProfile = () => {
             </div>
           </div>
 
-          {/* Right Main Content - Editable Forms */}
+          {/* Right Main Content */}
           <div className="main-section">
             {/* Contact Information Card */}
             <div className="form-card">
@@ -1445,7 +1498,6 @@ const EmployeeProfile = () => {
               </div>
               <div className="card-content">
                 <div className="form-grid">
-                  {/* First Name - REQUIRED */}
                   <div className="form-field">
                     <label>
                       First Name <span className="required">*</span>
@@ -1466,7 +1518,6 @@ const EmployeeProfile = () => {
                     )}
                   </div>
 
-                  {/* Middle Name - OPTIONAL */}
                   <div className="form-field">
                     <label>
                       Middle Name<span className="required">*</span>
@@ -1487,7 +1538,6 @@ const EmployeeProfile = () => {
                     )}
                   </div>
 
-                  {/* Last Name - REQUIRED */}
                   <div className="form-field">
                     <label>
                       Last Name <span className="required">*</span>
@@ -1508,7 +1558,6 @@ const EmployeeProfile = () => {
                     )}
                   </div>
 
-                  {/* Calling Name - OPTIONAL */}
                   <div className="form-field">
                     <label>
                       Calling Name
@@ -1532,7 +1581,6 @@ const EmployeeProfile = () => {
                     )}
                   </div>
 
-                  {/* Company Email - Read Only */}
                   <div className="form-field">
                     <label>Company Email</label>
                     <input
@@ -1546,7 +1594,6 @@ const EmployeeProfile = () => {
                     <small>Cannot be changed</small>
                   </div>
 
-                  {/* Personal Email - OPTIONAL */}
                   <div className="form-field">
                     <label>
                       Personal Email
@@ -1571,7 +1618,6 @@ const EmployeeProfile = () => {
                     <small>Gmail only</small>
                   </div>
 
-                  {/* Mobile Number - REQUIRED */}
                   <div className="form-field">
                     <label>
                       Mobile Number <span className="required">*</span>
@@ -1595,7 +1641,6 @@ const EmployeeProfile = () => {
                     )}
                   </div>
 
-                  {/* Alternate Number - OPTIONAL */}
                   <div className="form-field">
                     <label>
                       Alternate Number
@@ -1630,7 +1675,7 @@ const EmployeeProfile = () => {
                 <h3>Address Information</h3>
               </div>
               <div className="card-content">
-                {/* Current Address Section - ALL OPTIONAL */}
+                {/* Current Address Section */}
                 <div className="address-section-modern">
                   <h4 className="section-title">Current Address</h4>
                   {!isEditing ? (
@@ -1639,7 +1684,6 @@ const EmployeeProfile = () => {
                     </div>
                   ) : (
                     <div className="form-grid address-grid">
-                      {/* All address fields are OPTIONAL */}
                       <div className="form-field">
                         <label>
                           Door/Flat Number<span className="required">*</span>
@@ -1772,30 +1816,20 @@ const EmployeeProfile = () => {
                         )}
                       </div>
 
+                      {/* State - Custom Dropdown */}
                       <div className="form-field">
                         <label>
                           State<span className="required">*</span>
                         </label>
-                        <select
-                          className={`form-control-modern ${
-                            showError("currentAddress.state") ? "error" : ""
-                          }`}
+                        <StateDropdown
                           value={formData.currentAddress.state}
-                          onChange={(e) =>
-                            handleAddressChange(
-                              "currentAddress",
-                              "state",
-                              e.target.value
-                            )
+                          onChange={(val) =>
+                            handleAddressChange("currentAddress", "state", val)
                           }
-                        >
-                          <option value="">Select State</option>
-                          {stateOptions.map((state) => (
-                            <option key={state} value={state}>
-                              {state}
-                            </option>
-                          ))}
-                        </select>
+                          disabled={false}
+                          showError={showError("currentAddress.state")}
+                          options={stateOptions}
+                        />
                         {showError("currentAddress.state") && (
                           <span className="error-message">
                             {errors["currentAddress.state"]}
@@ -1848,7 +1882,7 @@ const EmployeeProfile = () => {
                   </div>
                 )}
 
-                {/* Permanent Address Section - ALL OPTIONAL */}
+                {/* Permanent Address Section */}
                 <div className="address-section-modern">
                   <h4 className="section-title">Permanent Address</h4>
                   {!isEditing ? (
@@ -1996,31 +2030,20 @@ const EmployeeProfile = () => {
                         )}
                       </div>
 
+                      {/* State - Custom Dropdown */}
                       <div className="form-field">
                         <label>
                           State<span className="required">*</span>
                         </label>
-                        <select
-                          className={`form-control-modern ${
-                            showError("permanentAddress.state") ? "error" : ""
-                          }`}
+                        <StateDropdown
                           value={formData.permanentAddress.state}
-                          onChange={(e) =>
-                            handleAddressChange(
-                              "permanentAddress",
-                              "state",
-                              e.target.value
-                            )
+                          onChange={(val) =>
+                            handleAddressChange("permanentAddress", "state", val)
                           }
                           disabled={sameAsCurrentAddress}
-                        >
-                          <option value="">Select State</option>
-                          {stateOptions.map((state) => (
-                            <option key={state} value={state}>
-                              {state}
-                            </option>
-                          ))}
-                        </select>
+                          showError={showError("permanentAddress.state")}
+                          options={stateOptions}
+                        />
                         {showError("permanentAddress.state") && (
                           <span className="error-message">
                             {errors["permanentAddress.state"]}
@@ -2058,7 +2081,6 @@ const EmployeeProfile = () => {
                     </div>
                   )}
 
-                  {/* Auto-filled Notice */}
                   {isEditing && sameAsCurrentAddress && (
                     <div className="address-auto-filled">
                       <i className="bi bi-info-circle"></i>
@@ -2071,6 +2093,7 @@ const EmployeeProfile = () => {
           </div>
         </div>
       </div>
+
       {/* Change Request Modal */}
       <ChangeRequestModal
         show={showChangeRequestModal}
@@ -2081,7 +2104,7 @@ const EmployeeProfile = () => {
         pendingRequestId={pendingRequestId}
       />
 
-      {/* NEW: Profile Photo Upload Modal */}
+      {/* Profile Photo Upload Modal */}
       {showPhotoModal && (
         <ProfilePhotoUploadModal
           onClose={() => setShowPhotoModal(false)}

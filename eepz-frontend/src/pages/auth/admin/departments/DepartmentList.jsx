@@ -70,9 +70,9 @@ const DepartmentList = () => {
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
 
-  const [viewMode, setViewMode] = useState("grid");
+  const [viewMode, setViewMode] = useState("table");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(9);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   useEffect(() => {
     fetchDepartments();
@@ -322,17 +322,6 @@ const DepartmentList = () => {
 
         <div className="dlm-view-switcher">
           <button
-            className={`dlm-view-btn ${viewMode === "grid" ? "active" : ""}`}
-            onClick={() => {
-              setViewMode("grid");
-              setItemsPerPage(9);
-              setCurrentPage(1);
-            }}
-            title="Grid View"
-          >
-            <i className="bi bi-grid-3x3-gap-fill"></i>
-          </button>
-          <button
             className={`dlm-view-btn ${viewMode === "table" ? "active" : ""}`}
             onClick={() => {
               setViewMode("table");
@@ -342,6 +331,17 @@ const DepartmentList = () => {
             title="Table View"
           >
             <i className="bi bi-table"></i>
+          </button>
+          <button
+            className={`dlm-view-btn ${viewMode === "grid" ? "active" : ""}`}
+            onClick={() => {
+              setViewMode("grid");
+              setItemsPerPage(9);
+              setCurrentPage(1);
+            }}
+            title="Grid View"
+          >
+            <i className="bi bi-grid-3x3-gap-fill"></i>
           </button>
         </div>
 
