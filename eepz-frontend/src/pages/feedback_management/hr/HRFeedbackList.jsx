@@ -24,7 +24,13 @@ import FeedbackBreadcrumb from "../../../components/feedback_management/common/F
 import "../../../styles/feedback/components/HRFeedbackList.css";
 
 const Badge = ({ text, color = "#525252" }) => (
-  <span className={`fm-hrlist-badge-wrapper ${color === "#27235C" ? "fm-hrlist-badge-wrapper--primary" : "fm-hrlist-badge-wrapper--default"}`}>
+  <span
+    className={`fm-hrlist-badge-wrapper ${
+      color === "#27235C"
+        ? "fm-hrlist-badge-wrapper--primary"
+        : "fm-hrlist-badge-wrapper--default"
+    }`}
+  >
     {text}
   </span>
 );
@@ -33,119 +39,156 @@ export default function HRFeedbackList() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [tab, setTab] = useState("Mentor");
-  const [hrForms, setHrForms] = useState([]);
   const [mentor, setMentor] = useState([]);
   const [peer, setPeer] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
-  const [employeeMap, setEmployeeMap] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [selectedResponse, setSelectedResponse] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
-
-  // Analysis Modal States
   const [showAnalysisModal, setShowAnalysisModal] = useState(false);
   const [analysisData, setAnalysisData] = useState(null);
   const [analysisLoading, setAnalysisLoading] = useState(false);
   const [analysisError, setAnalysisError] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
-
-  // Delete Modal States
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteFeedbackData, setDeleteFeedbackData] = useState(null);
   const [deleteFeedbackType, setDeleteFeedbackType] = useState("");
 
-  // Fetch employee map using service
-  const fetchEmployeeMap = async () => {
-    try {
-      const response = await employeeApi.getAll();
-
-      if (response?.data) {
-        const employees = Array.isArray(response.data)
-          ? response.data
-          : response.data.data || [];
-
-        const map = {};
-        employees.forEach((emp) => {
-          map[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
-        });
-        setEmployeeMap(map);
-      }
-    } catch (err) {
-      console.error("Error fetching employee map:", err.message);
-    }
-  };
-
-  // Fetch all feedback data using services
-  const fetchData = async () => {
-    setRefreshing(true);
+  const fetchAllData = async () => {
     setLoading(true);
+    setRefreshing(true);
     setError("");
 
     try {
-      // Fetch Mentor Feedback
-      try {
-        const mentorRes = await mentorFeedbackApi.list(1, 100);
-        const mentorData = Array.isArray(mentorRes?.data)
-          ? mentorRes.data
-          : mentorRes?.data?.data || [];
+      const employeeResponse = await employeeApi.getAll();
+      const employees = Array.isArray(employeeResponse?.data)
+        ? employeeResponse.data
+        : employeeResponse?.data?.data || [];
 
-        const enrichedMentorData = mentorData.map((m) => ({
+      const employeeMap = {};
+      employees.forEach((emp) => {
+        const empId = emp.employeeId || emp.id || emp.EmployeeID;
+        if (empId) {
+          const fullName = `${emp.firstName || ""} ${emp.lastName || ""}`.trim();
+          employeeMap[empId] = fullName;
+          employeeMap[String(empId)] = fullName;
+          employeeMap[Number(empId)] = fullName;
+        }
+      });
+
+      const [mentorResponse, peerResponse] = await Promise.all([
+        mentorFeedbackApi.list(1, 100).catch(() => ({ data: [] })),
+        peerQueueApi.list(1, 100).catch(() => ({ data: [] })),
+      ]);
+
+      const mentorData = Array.isArray(mentorResponse?.data)
+        ? mentorResponse.data
+        : mentorResponse?.data?.data || [];
+
+      const enrichedMentorData = mentorData.map((m) => {
+        const mentorName = employeeMap[m.mentorEmployeeId] || 
+                          employeeMap[String(m.mentorEmployeeId)] || 
+                          employeeMap[Number(m.mentorEmployeeId)] || 
+                          null;
+
+        const submitterId = m.menteeEmployeeId || 
+                           m.employeeId || 
+                           m.submittedByEmployeeId || 
+                           m.submitterEmployeeId ||
+                           m.createdByEmployeeId;
+
+        let submitterName = null;
+        if (m.menteeName && isNaN(m.menteeName)) {
+          submitterName = m.menteeName;
+        } else if (submitterId) {
+          submitterName = employeeMap[submitterId] || 
+                         employeeMap[String(submitterId)] || 
+                         employeeMap[Number(submitterId)] || 
+                         null;
+        }
+
+        return {
           ...m,
-          mentorNameFull:
-            employeeMap[m.mentorEmployeeId] || `Employee ${m.mentorEmployeeId}`,
-        }));
+          mentorNameFull: mentorName || `Employee ${m.mentorEmployeeId || "Unknown"}`,
+          submitterNameFull: submitterName || "Anonymous Feedback",
+        };
+      });
 
-        setMentor(enrichedMentorData);
-      } catch (mentorErr) {
-        console.warn("Mentor feedback API error:", mentorErr.message);
-        setMentor([]);
-      }
+      setMentor(enrichedMentorData);
 
-      // Fetch Peer Feedback
-      try {
-        const peerRes = await peerQueueApi.list(1, 100);
-        const allPeer = Array.isArray(peerRes?.data)
-          ? peerRes.data
-          : peerRes?.data?.data || [];
+      const peerData = Array.isArray(peerResponse?.data)
+        ? peerResponse.data
+        : peerResponse?.data?.data || [];
 
-        const enrichedPeerData = allPeer.map((p) => ({
+      const enrichedPeerData = peerData.map((p) => {
+        let recipientName = null;
+        if (p.recipientName && isNaN(p.recipientName)) {
+          recipientName = p.recipientName;
+        } else if (p.recipientEmployeeId) {
+          recipientName = employeeMap[p.recipientEmployeeId] || 
+                         employeeMap[String(p.recipientEmployeeId)] || 
+                         employeeMap[Number(p.recipientEmployeeId)] || 
+                         null;
+        }
+
+        let submitterName = null;
+        if (p.submitterName && isNaN(p.submitterName)) {
+          submitterName = p.submitterName;
+        } else if (p.submittedByEmployeeId) {
+          submitterName = employeeMap[p.submittedByEmployeeId] || 
+                         employeeMap[String(p.submittedByEmployeeId)] || 
+                         employeeMap[Number(p.submittedByEmployeeId)] || 
+                         null;
+        }
+
+        return {
           ...p,
-          recipientNameFull:
-            employeeMap[p.recipientEmployeeId] ||
-            `Employee ${p.recipientEmployeeId}`,
-          submitterNameFull:
-            employeeMap[p.submittedByEmployeeId] ||
-            `Employee ${p.submittedByEmployeeId}`,
-        }));
+          recipientNameFull: recipientName || `Employee ${p.recipientEmployeeId || "Unknown"}`,
+          submitterNameFull: submitterName || "Anonymous Feedback",
+        };
+      });
 
-        setPeer(enrichedPeerData);
-      } catch (peerErr) {
-        console.warn("Peer feedback API error:", peerErr.message);
-        setPeer([]);
-      }
+      setPeer(enrichedPeerData);
     } catch (err) {
-      console.error("Fetch error:", err);
-      setError(err?.message || "Failed to fetch feedback");
+      setError(err?.message || "Failed to fetch feedback data");
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   };
 
-  // Fetch employee map on mount
   useEffect(() => {
-    fetchEmployeeMap();
+    fetchAllData();
   }, []);
 
-  // Fetch data after employee map is loaded
-  useEffect(() => {
-    if (Object.keys(employeeMap).length > 0) {
-      fetchData();
-    }
-  }, [employeeMap]);
-
-  // Modal handlers
   const handleViewResponse = (data, type) => {
+    if (type === "Mentor") {
+      const normalized = {
+        ...data,
+        submittedByName: data.submitterNameFull || "Anonymous",
+        submittedAt: data.createdAt || data.submittedAt,
+        comments: data.feedbackComments || data.comments || "",
+        rating: data.rating,
+      };
+      setSelectedResponse(normalized);
+      setSelectedType(type);
+      setShowModal(true);
+      return;
+    }
+
+    if (type === "Peer") {
+      const normalized = {
+        ...data,
+        submittedByName: data.submitterNameFull || "Anonymous",
+        submittedAt: data.createdAt || data.submittedAt,
+        comments: data.feedbackContent || data.comments || "",
+      };
+      setSelectedResponse(normalized);
+      setSelectedType(type);
+      setShowModal(true);
+      return;
+    }
+
     setSelectedResponse(data);
     setSelectedType(type);
     setShowModal(true);
@@ -157,7 +200,6 @@ export default function HRFeedbackList() {
     setSelectedType(null);
   };
 
-  // Analysis Modal handlers
   const handleAnalyzeFeedback = async (feedbackData, type) => {
     setShowAnalysisModal(true);
     setAnalysisLoading(true);
@@ -165,27 +207,20 @@ export default function HRFeedbackList() {
     setAnalysisData(null);
 
     try {
-      // Extract feedback text based on type
       let feedbackText = "";
       if (type === "Mentor") {
-        feedbackText =
-          feedbackData.feedbackComments || feedbackData.comments || "";
+        feedbackText = feedbackData.feedbackComments || feedbackData.comments || "";
       } else if (type === "Peer") {
-        feedbackText =
-          feedbackData.feedbackContent || feedbackData.content || "";
+        feedbackText = feedbackData.feedbackContent || feedbackData.content || "";
       }
 
       if (!feedbackText || feedbackText.trim() === "") {
         throw new Error("No feedback text available for analysis");
       }
 
-      // Call the analysis API
       const result = await feedbackAnalysisApi.analyze(feedbackText);
-
-      // Set the complete analysis data from API response
       setAnalysisData(result);
     } catch (err) {
-      console.error("Analysis error:", err);
       setAnalysisError(err.message || "Failed to analyze feedback");
     } finally {
       setAnalysisLoading(false);
@@ -196,19 +231,6 @@ export default function HRFeedbackList() {
     setShowAnalysisModal(false);
     setAnalysisData(null);
     setAnalysisError("");
-  };
-
-  const handleDeleteSuccess = async () => {
-    // Force refresh by calling fetchData directly
-    setRefreshing(true);
-    setLoading(true);
-
-    try {
-      await fetchData();
-    } finally {
-      setRefreshing(false);
-      setLoading(false);
-    }
   };
 
   const handleDeleteClick = (item, type) => {
@@ -227,20 +249,10 @@ export default function HRFeedbackList() {
     if (!deleteFeedbackData) return "";
 
     if (deleteFeedbackType === "Mentor") {
-      return (
-        deleteFeedbackData.mentorNameFull ||
-        deleteFeedbackData.mentorName ||
-        `Employee ${deleteFeedbackData.mentorEmployeeId}`
-      );
+      return deleteFeedbackData.mentorNameFull || `Employee ${deleteFeedbackData.mentorEmployeeId}`;
     } else if (deleteFeedbackType === "Peer") {
-      const submitter =
-        deleteFeedbackData.submitterNameFull ||
-        deleteFeedbackData.submitterName ||
-        `Employee ${deleteFeedbackData.submittedByEmployeeId}`;
-      const recipient =
-        deleteFeedbackData.recipientNameFull ||
-        deleteFeedbackData.recipientName ||
-        `Employee ${deleteFeedbackData.recipientEmployeeId}`;
+      const submitter = deleteFeedbackData.submitterNameFull || `Employee ${deleteFeedbackData.submittedByEmployeeId}`;
+      const recipient = deleteFeedbackData.recipientNameFull || `Employee ${deleteFeedbackData.recipientEmployeeId}`;
       return `From ${submitter} to ${recipient}`;
     } else if (deleteFeedbackType === "HR") {
       return deleteFeedbackData.formName || "HR Form";
@@ -260,7 +272,7 @@ export default function HRFeedbackList() {
       }
 
       handleCloseDeleteModal();
-      await fetchData();
+      await fetchAllData();
     } catch (err) {
       setError(err?.message || "Failed to delete feedback");
     } finally {
@@ -285,31 +297,9 @@ export default function HRFeedbackList() {
     return "Are you sure you want to delete this submission?";
   };
 
-  // Helper functions
-  const getMentorName = (m) => {
-    return m.mentorNameFull || m.mentorName || `Employee ${m.mentorEmployeeId}`;
-  };
-
-  const getRecipientName = (p) => {
-    return (
-      p.recipientNameFull ||
-      p.recipientName ||
-      `Employee ${p.recipientEmployeeId}`
-    );
-  };
-
-  const getSubmitterName = (p) => {
-    return (
-      p.submitterNameFull ||
-      p.submitterName ||
-      `Employee ${p.submittedByEmployeeId}`
-    );
-  };
-
   return (
     <div className="hrfeedback-list-container">
       <div className="hrfeedback-list-wrapper">
-        {/* ========== BREADCRUMB ========== */}
         <FeedbackBreadcrumb
           items={[
             { label: "Feedback Management", path: "/hr/dashboard/feedback" },
@@ -317,7 +307,6 @@ export default function HRFeedbackList() {
           ]}
         />
 
-        {/* Error Alert */}
         {error && (
           <div className="hrfeedback-alert-error">
             <AlertTriangle size={18} className="hrfeedback-alert-icon" />
@@ -335,7 +324,6 @@ export default function HRFeedbackList() {
           </div>
         )}
 
-        {/* PILL-STYLE TOGGLE NAVIGATION - CENTERED */}
         <div className="hrfeedback-toggle-wrapper">
           <div className="hrfeedback-toggle-container">
             <button
@@ -348,9 +336,7 @@ export default function HRFeedbackList() {
               <Send size={15} />
               Mentor
               {mentor.length > 0 && (
-                <span className="hrfeedback-toggle-badge">
-                  {mentor.length}
-                </span>
+                <span className="hrfeedback-toggle-badge">{mentor.length}</span>
               )}
             </button>
 
@@ -370,7 +356,6 @@ export default function HRFeedbackList() {
           </div>
         </div>
 
-        {/* Content Area */}
         {loading ? (
           <div className="hrfeedback-loading-container">
             <div className="hrfeedback-spinner" role="status">
@@ -380,14 +365,11 @@ export default function HRFeedbackList() {
           </div>
         ) : (
           <>
-            {/* Mentor Tab */}
             {tab === "Mentor" &&
               (mentor.length === 0 ? (
                 <div className="hrfeedback-empty-state">
                   <AlertTriangle size={48} className="hrfeedback-empty-icon" />
-                  <h5 className="hrfeedback-empty-title">
-                    No Mentor Feedback Yet
-                  </h5>
+                  <h5 className="hrfeedback-empty-title">No Mentor Feedback Yet</h5>
                   <p className="hrfeedback-empty-text">
                     There are no mentor feedback submissions.
                   </p>
@@ -395,21 +377,15 @@ export default function HRFeedbackList() {
               ) : (
                 <div className="row g-3">
                   {mentor.map((m) => (
-                    <div
-                      className="col-md-6 col-lg-4"
-                      key={m.trackingId || m.id}
-                    >
-                      <div className="hrfeedback-card hrfeedback-card-mentor">
+                    <div className="col-md-6 col-lg-4" key={m.trackingId || m.id}>
+                      <div className="hrfeedback-card">
                         <div className="hrfeedback-card-header">
-                          <div>
+                          <div className="fm-hrlist-card__header-wrapper">
                             <div className="hrfeedback-card-label">Mentor</div>
                             <div className="hrfeedback-card-name-row">
-                              <User
-                                size={14}
-                                className="hrfeedback-card-user-icon"
-                              />
+                              <User size={14} className="hrfeedback-card-user-icon" />
                               <h6 className="hrfeedback-card-name">
-                                {getMentorName(m)}
+                                {m.mentorNameFull}
                               </h6>
                             </div>
                           </div>
@@ -443,7 +419,6 @@ export default function HRFeedbackList() {
                           </button>
                         </div>
 
-                        {/* Analyze Feedback Button */}
                         <button
                           className="hrfeedback-btn-analyze"
                           onClick={() => handleAnalyzeFeedback(m, "Mentor")}
@@ -457,105 +432,89 @@ export default function HRFeedbackList() {
                 </div>
               ))}
 
-            {/* Peer Tab */}
             {tab === "Peer" &&
               (peer.length === 0 ? (
                 <div className="hrfeedback-empty-state">
                   <AlertTriangle size={48} className="hrfeedback-empty-icon" />
-                  <h5 className="hrfeedback-empty-title">
-                    No Peer Feedback Yet
-                  </h5>
+                  <h5 className="hrfeedback-empty-title">No Peer Feedback Yet</h5>
                   <p className="hrfeedback-empty-text">
                     There are no peer feedback submissions.
                   </p>
                 </div>
               ) : (
                 <div className="row g-3">
-                  {peer.map((p) => {
-                    return (
-                      <div
-                        className="col-md-6 col-lg-4"
-                        key={p.queueId || p.id}
-                      >
-                        <div className="hrfeedback-card">
-                          <div className="hrfeedback-card-header">
-                            <div className="fm-hrlist-card__header-wrapper">
-                              <div className="hrfeedback-card-label">From</div>
-                              <div className="hrfeedback-card-name-row hrfeedback-mb-2">
-                                <User
-                                  size={14}
-                                  className="fm-hrlist-card__user-icon--muted"
-                                />
-                                <h6 className="hrfeedback-card-name-small">
-                                  {getSubmitterName(p)}
-                                </h6>
-                              </div>
-                              <div className="hrfeedback-card-label">To</div>
-                              <div className="hrfeedback-card-name-row">
-                                <User
-                                  size={14}
-                                  className="hrfeedback-card-user-icon"
-                                />
-                                <h6 className="hrfeedback-card-name">
-                                  {getRecipientName(p)}
-                                </h6>
-                              </div>
+                  {peer.map((p) => (
+                    <div className="col-md-6 col-lg-4" key={p.queueId || p.id}>
+                      <div className="hrfeedback-card">
+                        <div className="hrfeedback-card-header">
+                          <div className="fm-hrlist-card__header-wrapper">
+                            <div className="hrfeedback-card-label">From</div>
+                            <div className="hrfeedback-card-name-row hrfeedback-mb-2">
+                              <User size={14} className="fm-hrlist-card__user-icon--muted" />
+                              <h6 className="hrfeedback-card-name-small">
+                                {p.submitterNameFull}
+                              </h6>
+                            </div>
+                            <div className="hrfeedback-card-label">To</div>
+                            <div className="hrfeedback-card-name-row">
+                              <User size={14} className="hrfeedback-card-user-icon" />
+                              <h6 className="hrfeedback-card-name">
+                                {p.recipientNameFull}
+                              </h6>
                             </div>
                           </div>
+                        </div>
 
-                          <div className="hrfeedback-card-date">
-                            <Clock size={14} />
-                            <span>
-                              {p.createdAt
-                                ? new Date(p.createdAt).toLocaleDateString()
-                                : "—"}
-                            </span>
+                        <div className="hrfeedback-card-date">
+                          <Clock size={14} />
+                          <span>
+                            {p.createdAt
+                              ? new Date(p.createdAt).toLocaleDateString()
+                              : "—"}
+                          </span>
+                        </div>
+
+                        {p.isAnonymous && (
+                          <div className="hrfeedback-card-anonymous">
+                            <Lock size={12} />
+                            <span>Anonymous submission</span>
                           </div>
+                        )}
 
-                          {p.isAnonymous && (
-                            <div className="hrfeedback-card-anonymous">
-                              <Lock size={12} />
-                              <span>Anonymous submission</span>
-                            </div>
-                          )}
+                        <div className="hrfeedback-card-content">
+                          <p className="hrfeedback-card-text">
+                            {p.feedbackContent
+                              ? p.feedbackContent.substring(0, 80) + "..."
+                              : "No content"}
+                          </p>
+                        </div>
 
-                          <div className="hrfeedback-card-content">
-                            <p className="hrfeedback-card-text">
-                              {p.feedbackContent
-                                ? p.feedbackContent.substring(0, 80) + "..."
-                                : "No content"}
-                            </p>
-                          </div>
-
-                          <div className="hrfeedback-card-actions">
-                            <button
-                              className="hrfeedback-btn-view"
-                              onClick={() => handleViewResponse(p, "Peer")}
-                            >
-                              <Eye size={16} />
-                              View
-                            </button>
-                          </div>
-
-                          {/* Analyze Feedback Button */}
+                        <div className="hrfeedback-card-actions">
                           <button
-                            className="hrfeedback-btn-analyze"
-                            onClick={() => handleAnalyzeFeedback(p, "Peer")}
+                            className="hrfeedback-btn-view"
+                            onClick={() => handleViewResponse(p, "Peer")}
                           >
-                            <ChartLine size={16} />
-                            Analyze Feedback
+                            <Eye size={16} />
+                            View
                           </button>
                         </div>
+
+                        <button
+                          className="hrfeedback-btn-analyze"
+                          onClick={() => handleAnalyzeFeedback(p, "Peer")}
+                        >
+                          <ChartLine size={16} />
+                          Analyze Feedback
+                        </button>
                       </div>
-                    );
-                  })}
+                    </div>
+                  ))}
                 </div>
               ))}
           </>
         )}
       </div>
 
-      {/* Response View Modal */}
       <ResponseViewModal
         show={showModal}
         response={selectedResponse}
@@ -563,7 +522,6 @@ export default function HRFeedbackList() {
         type={selectedType}
       />
 
-      {/* Feedback Analysis Modal */}
       <FeedbackAnalysisModal
         show={showAnalysisModal}
         onClose={handleCloseAnalysisModal}
@@ -572,13 +530,18 @@ export default function HRFeedbackList() {
         error={analysisError}
       />
 
-      {/* Delete Confirmation Modal */}
       {showDeleteModal && (
         <div className="hrfeedback-modal-overlay" onClick={handleCloseDeleteModal}>
-          <div className="hrfeedback-delete-modal" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="hrfeedback-delete-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="hrfeedback-delete-header">
               <h5 className="hrfeedback-delete-title">{getDeleteTitle()}</h5>
-              <button className="hrfeedback-delete-close" onClick={handleCloseDeleteModal}>
+              <button
+                className="hrfeedback-delete-close"
+                onClick={handleCloseDeleteModal}
+              >
                 <X size={24} />
               </button>
             </div>

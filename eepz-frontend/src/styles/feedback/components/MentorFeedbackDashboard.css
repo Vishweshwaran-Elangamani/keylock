@@ -1,7 +1,6 @@
 .mfd-wrapper {
   padding: 1.5rem;
   width: 100%;
-  background-color: #f5f5f5;
 }
 
 
@@ -37,7 +36,8 @@
 
 
 .mfd-breadcrumb-nav {
-  margin-bottom: 1.5rem;
+margin-top: -25px;  
+margin-bottom: 25px;
 }
 
 

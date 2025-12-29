@@ -1,9 +1,8 @@
-
-
 .mgrpeer-container {
   padding: 1.5rem 2rem;
   min-height: 100vh;
   background: #f8f9fa;
+  margin-top: -30px;
 }
 
 .mgrpeer-loading {

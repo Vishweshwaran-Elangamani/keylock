@@ -33,7 +33,8 @@
   align-items: center;
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin-left: -180px;
+  margin-top: -40px;
 }
 
 .cmr-breadcrumb-item {

@@ -80,6 +80,7 @@
   display: flex;
   align-items: center;
   gap: 0.25rem;
+  margin-top: -40px;
 }
 
 .prj-detail-breadcrumb-item + .prj-detail-breadcrumb-item::before {

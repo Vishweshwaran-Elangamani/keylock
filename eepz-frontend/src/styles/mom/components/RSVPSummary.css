@@ -4,7 +4,6 @@
   padding: 1.5rem 1.25rem;
 }
 
-/* Loading */
 
 .rsvp-sum-loading {
   min-height: 300px;
@@ -18,7 +17,6 @@
   height: 3rem;
 }
 
-/* Header */
 
 .rsvp-sum-header {
   margin-bottom: 1.5rem;
@@ -94,7 +92,6 @@
   flex-shrink: 0;
 }
 
-/* Responsive */
 
 @media (max-width: 768px) {
   .rsvp-sum-page {

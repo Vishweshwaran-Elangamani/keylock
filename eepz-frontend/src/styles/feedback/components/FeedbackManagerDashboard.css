@@ -3,6 +3,7 @@
   max-width: 100%;
   min-height: 100vh;
   background-color: #f8f9fa;
+  margin-top: -35px;
 }
 
 .fm-mgrdash-loading {
@@ -76,7 +77,8 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  margin-top: 40px;
 }
 
 .fm-mgrdash-stat-card {

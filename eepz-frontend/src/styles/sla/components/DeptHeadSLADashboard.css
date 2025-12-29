@@ -2,6 +2,7 @@
   padding: 1.5rem 1.75rem;
   background-color: #f9fafb;
   min-height: 100vh;
+  margin-top: -25px;
 }
 
 .dh-sla-loading-wrapper {
@@ -82,6 +83,7 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
   margin-bottom: 1.5rem;
+  margin-top: 30px;
 }
 
 .dh-sla-stat-card {

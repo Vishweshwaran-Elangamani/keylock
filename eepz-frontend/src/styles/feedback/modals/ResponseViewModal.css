@@ -25,6 +25,7 @@
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   overflow: hidden;
+  margin-left: 100px;
 }
 
 .rvm-header {
@@ -86,7 +87,7 @@
   font-size: 0.938rem;
   font-weight: 700;
   color: #27235c;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
   text-align: left;
 }
 
@@ -100,6 +101,10 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem 1.5rem;
+}
+
+.rvm-grid--spaced {
+  margin-bottom: 1.75rem;
 }
 
 .rvm-grid__col {
@@ -217,7 +222,8 @@
 }
 
 .rvm-rating-display {
-  margin-top: 1rem;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
   padding: 1rem;
   background-color: #f9fafb;
   border-radius: 8px;

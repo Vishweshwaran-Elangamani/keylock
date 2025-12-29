@@ -5,8 +5,9 @@
 }
 
 .fm-viewpeer-container {
-  max-width: 1400px;
+  max-width: 1100px;
   margin: 0 auto;
+  margin-top: -30px;
 }
 
 .fm-viewpeer-loading {
@@ -38,47 +39,6 @@
   margin: 0;
 }
 
-.fm-viewpeer-view-toggle {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  background: #27235c;
-  border-radius: 50px;
-  padding: 0.5rem;
-  width: fit-content;
-  margin-left: auto;
-  box-shadow: 0 4px 12px rgba(39, 35, 92, 0.25);
-  margin-top: 40px;
-
-}
-
-.fm-viewpeer-view-toggle__btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.8);
-  border: none;
-  border-radius: 50px;
-  font-weight: 600;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-}
-
-.fm-viewpeer-view-toggle__btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-}
-
-.fm-viewpeer-view-toggle__btn--active {
-  background: #fff;
-  color: #27235c;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
 .fm-viewpeer-error-alert {
   display: flex;
   align-items: flex-start;
@@ -93,7 +53,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 1.5rem;
-  margin-top: -50px;
+  margin-top: 20px;
   margin-bottom: 30px;
 }
 
@@ -209,8 +169,6 @@
 .fm-viewpeer-card__indicator--anonymous {
   background: linear-gradient(180deg, #e01950 0%, #97247e 100%);
 }
-
-
 
 .fm-viewpeer-card__header {
   padding: 1.25rem 1.25rem 1rem 1.5rem;
@@ -352,131 +310,9 @@
   color: #2563eb;
 }
 
-.fm-viewpeer-table-wrapper {
-  background: white;
-  border: 2px solid #27235c;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.fm-viewpeer-table-scroll {
-  overflow-x: auto;
-}
-
-.fm-viewpeer-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: auto;
-}
-
-.fm-viewpeer-table__head {
-  background-color: #27235c;
-  color: #ffffff;
-}
-
-.fm-viewpeer-table__th {
-  padding: 0.75rem 1.25rem;
-  font-weight: 700;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  white-space: nowrap;
-}
-
-.fm-viewpeer-table__th--from,
-.fm-viewpeer-table__th--type,
-.fm-viewpeer-table__th--feedback {
-  text-align: left;
-}
-
-.fm-viewpeer-table__th--date {
-  text-align: right;
-}
-
-.fm-viewpeer-table__body {
-  background: #ffffff;
-}
-
-.fm-viewpeer-table__row {
-  border-bottom: 1px solid #e5e7eb;
-  transition: background-color 0.15s ease;
-}
-
-.fm-viewpeer-table__row:hover {
-  background-color: #f9fafb;
-}
-
-.fm-viewpeer-table__row:last-child {
-  border-bottom: none;
-}
-
-.fm-viewpeer-table__td {
-  padding: 0.75rem 1.25rem;
-  font-size: 0.875rem;
-  color: #1e293b;
-  vertical-align: middle;
-}
-
-.fm-viewpeer-table__td--from,
-.fm-viewpeer-table__td--type,
-.fm-viewpeer-table__td--comment {
-  text-align: left;
-}
-
-.fm-viewpeer-table__td--date {
-  text-align: right;
-  white-space: nowrap;
-  color: #64748b;
-  font-weight: 500;
-}
-
-.fm-viewpeer-table__td--from .fm-viewpeer-table__sender {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  justify-content: flex-start;
-}
-
-.fm-viewpeer-table__icon {
-  color: #64748b;
-}
-
-.fm-viewpeer-table__icon--anonymous {
-  color: #e01950;
-}
-
-.fm-viewpeer-table__name {
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.fm-viewpeer-table__td--type {
-  white-space: nowrap;
-}
-
-.fm-viewpeer-table__td--type .fm-viewpeer-badge {
-  display: inline-flex;
-  margin-left: 0;
-}
-
-.fm-viewpeer-table__td--comment {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: #64748b;
-  font-weight: 400;
-}
-
 @media (max-width: 1200px) {
   .fm-viewpeer-cards-grid {
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  }
-
-  .fm-viewpeer-table {
-    table-layout: auto;
   }
 }
 
@@ -492,26 +328,12 @@
 
   .fm-viewpeer-stat-card {
     max-width: 100%;
-  }
-
-  .fm-viewpeer-view-toggle {
-    width: 100%;
-    
-  }
-
-  .fm-viewpeer-stat-card {
     flex-direction: row;
     justify-content: flex-start;
   }
 
   .fm-viewpeer-cards-grid {
     grid-template-columns: 1fr;
-  }
-
-  .fm-viewpeer-table__th,
-  .fm-viewpeer-table__td {
-    padding: 0.8rem 0.75rem;
-    font-size: 0.813rem;
   }
 }
 
@@ -523,11 +345,6 @@
 
   .fm-viewpeer-card__badges {
     width: 100%;
-  }
-
-  .fm-viewpeer-view-toggle__btn {
-    padding: 0.625rem 1rem;
-    font-size: 0.813rem;
   }
 
   .fm-viewpeer-badge {

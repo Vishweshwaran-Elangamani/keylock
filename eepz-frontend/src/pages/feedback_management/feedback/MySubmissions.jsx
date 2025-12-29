@@ -170,14 +170,18 @@ export default function MySubmissions() {
   const fetchObjectives = useCallback(async () => {
     try {
       const response = await goalsApi.getAll(1, 100);
-      
+
       const goalsData = response?.data?.data || response?.data || [];
 
       if (Array.isArray(goalsData)) {
         const map = {};
         goalsData.forEach((goal) => {
           const goalId = goal.goalId || goal.goalid || goal.GoalId;
-          const goalTitle = goal.goalName || goal.organizationGoalName || goal.goaltitle || goal.title;
+          const goalTitle =
+            goal.goalName ||
+            goal.organizationGoalName ||
+            goal.goaltitle ||
+            goal.title;
           if (goalId) {
             map[goalId] = goalTitle || `Goal ${goalId}`;
           }
@@ -258,7 +262,7 @@ export default function MySubmissions() {
 
       try {
         const goalRes = await orgGoalFeedbackApi.list(1, 100);
-        
+
         const allGoalData = goalRes?.data?.data || goalRes?.data || [];
 
         if (Array.isArray(allGoalData)) {
@@ -307,8 +311,51 @@ export default function MySubmissions() {
     }
   }, [employeeMap, objectives, fetchData]);
 
-  const handleViewResponse = (data, type) => {
-    setSelectedResponse(data);
+  const handleViewResponse = (raw, type) => {
+    const fullName = `${user.firstName} ${user.lastName}`;
+
+    if (type === "Goal") {
+      const normalized = {
+        ...raw,
+        submittedByName: fullName,
+        submittedAt: raw.createdAt || raw.submittedAt || raw.submittedAtFormatted,
+        rating: raw.rating,
+        comments: raw.feedbackComments,
+      };
+      setSelectedResponse(normalized);
+      setSelectedType(type);
+      setShowModal(true);
+      return;
+    }
+
+    if (type === "Mentor") {
+      const normalized = {
+        ...raw,
+        submittedByName: fullName,
+        submittedAt: raw.createdAt || raw.createdAtFormatted,
+        comments: raw.feedbackContent || raw.comments,
+        rating: raw.rating,
+      };
+      setSelectedResponse(normalized);
+      setSelectedType(type);
+      setShowModal(true);
+      return;
+    }
+
+    if (type === "Peer") {
+      const normalized = {
+        ...raw,
+        submittedByName: fullName,
+        submittedAt: raw.createdAt || raw.createdAtFormatted,
+        comments: raw.feedbackContent,
+      };
+      setSelectedResponse(normalized);
+      setSelectedType(type);
+      setShowModal(true);
+      return;
+    }
+
+    setSelectedResponse(raw);
     setSelectedType(type);
     setShowModal(true);
   };

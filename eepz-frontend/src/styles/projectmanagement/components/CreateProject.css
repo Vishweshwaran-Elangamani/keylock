@@ -16,11 +16,13 @@
   padding: 0;
   margin: 0;
   font-size: 0.875rem;
+  margin-top: -25px;
 }
 
 .prj-breadcrumb-item {
   display: flex;
   align-items: center;
+  
 }
 
 .prj-breadcrumb-item:not(:last-child)::after {

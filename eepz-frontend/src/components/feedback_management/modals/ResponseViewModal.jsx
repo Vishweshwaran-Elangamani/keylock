@@ -255,17 +255,70 @@ const ResponseViewModal = ({ show, response, onClose, type }) => {
             </>
           )}
 
-          {type !== "HR" && (
+          {(type === "Mentor" || type === "Peer") && (
             <div className="rvm-section rvm-section--last">
               <h6 className="rvm-section__title rvm-section__title--with-icon">
                 <User size={16} className="rvm-field__icon" />
                 Feedback Details
               </h6>
-              <div className="rvm-grid">
+              <div className="rvm-grid rvm-grid--spaced">
                 <div className="rvm-grid__col">
                   <div className="rvm-field__label">From</div>
                   <div className="rvm-field__value">
-                    {response.submittedByName || response.reviewerName || "N/A"}
+                    {response.submittedByName ||
+                      response.reviewerName ||
+                      response.submitterNameFull ||
+                      response.submitterName ||
+                      "N/A"}
+                  </div>
+                </div>
+                <div className="rvm-grid__col">
+                  <div className="rvm-field__label">Submitted</div>
+                  <div className="rvm-field__value">
+                    {formatDate(response.submittedAt)}
+                  </div>
+                </div>
+              </div>
+
+              {response.rating && (
+                <div className="rvm-rating-display">
+                  <p
+                    className="rvm-rating-display__value"
+                    style={{ color: getRatingColor(response.rating) }}
+                  >
+                    {response.rating}
+                  </p>
+                  <p className="rvm-rating-item__label">
+                    {RATING_LABELS[response.rating] || "N/A"}
+                  </p>
+                </div>
+              )}
+
+              {response.comments && (
+                <div className="rvm-comment-box rvm-comment-box--primary">
+                  <p className="rvm-comment-box__text rvm-comment-box__text--pre">
+                    {response.comments}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {type !== "HR" && type !== "Mentor" && type !== "Peer" && (
+            <div className="rvm-section rvm-section--last">
+              <h6 className="rvm-section__title rvm-section__title--with-icon">
+                <User size={16} className="rvm-field__icon" />
+                Feedback Details
+              </h6>
+              <div className="rvm-grid rvm-grid--spaced">
+                <div className="rvm-grid__col">
+                  <div className="rvm-field__label">From</div>
+                  <div className="rvm-field__value">
+                    {response.submittedByName ||
+                      response.reviewerName ||
+                      response.submitterNameFull ||
+                      response.submitterName ||
+                      "N/A"}
                   </div>
                 </div>
                 <div className="rvm-grid__col">

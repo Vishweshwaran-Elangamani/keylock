@@ -49,6 +49,7 @@
 
 .eaf-breadcrumb-wrapper {
   margin-bottom: 1rem;
+
 }
 
 .eaf-breadcrumb {
@@ -58,6 +59,7 @@
   margin: 0;
   padding: 0;
   list-style: none;
+
 }
 
 .eaf-breadcrumb-item {

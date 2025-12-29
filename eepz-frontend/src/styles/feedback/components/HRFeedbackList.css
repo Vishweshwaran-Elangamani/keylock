@@ -1,9 +1,8 @@
-/* src/pages/feedback_management/hr/HRFeedbackList.css */
-
 .hrfeedback-list-container {
   min-height: 100vh;
   background: #f8f9fa;
   padding: 2rem 1rem;
+  margin-top: -35px;
 }
 
 .hrfeedback-list-wrapper {
@@ -11,7 +10,6 @@
   margin: 0 auto;
 }
 
-/* Alert */
 .hrfeedback-alert-error {
   background: #fff;
   border: 1px solid #f5c6cb;
@@ -48,7 +46,6 @@
   line-height: 1;
 }
 
-/* Toggle Tabs */
 .hrfeedback-toggle-wrapper {
   display: flex;
   justify-content: center;
@@ -108,7 +105,6 @@
   color: #ffffff;
 }
 
-/* Loading */
 .hrfeedback-loading-container {
   padding: 3rem 0;
   text-align: center;
@@ -129,7 +125,6 @@
   color: #6c757d;
 }
 
-/* Empty State */
 .hrfeedback-empty-state {
   background: white;
   border: 1px solid #e5e7eb;
@@ -154,7 +149,6 @@
   color: #9ca3af;
 }
 
-/* Badge */
 .fm-hrlist-badge-wrapper {
   display: inline-block;
   padding: 6px 12px;
@@ -175,7 +169,6 @@
   border: 1.5px solid rgba(82, 82, 82, 0.251);
 }
 
-/* Card */
 .hrfeedback-card {
   background: white;
   border: 1px solid #e5e7eb;
@@ -185,10 +178,6 @@
   transition: box-shadow 0.2s ease;
   cursor: pointer;
   text-align: left;
-}
-
-.hrfeedback-card-mentor {
-  border-left: 4px solid #27235c;
 }
 
 .hrfeedback-card:hover {
@@ -338,7 +327,6 @@
   color: white;
 }
 
-/* Delete Modal */
 .hrfeedback-modal-overlay {
   position: fixed;
   top: 0;
@@ -468,7 +456,6 @@
   cursor: not-allowed;
 }
 
-/* Utility */
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -481,7 +468,6 @@
   border-width: 0;
 }
 
-/* Animations */
 @keyframes hrfeedback-spin {
   from {
     transform: rotate(0deg);
@@ -502,7 +488,6 @@
   }
 }
 
-/* Responsive */
 @media (max-width: 576px) {
   .hrfeedback-list-container {
     padding: 1rem;

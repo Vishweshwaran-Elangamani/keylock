@@ -8,8 +8,6 @@ import {
   MessageCircle,
   Lock,
   Loader,
-  Grid,
-  List,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -30,7 +28,6 @@ export default function ViewMyPeerFeedback() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [employeeMap, setEmployeeMap] = useState({});
-  const [viewMode, setViewMode] = useState("card"); // "card" or "table"
 
   const formatDate = (dateInput) => {
     if (!dateInput) return "—";
@@ -189,34 +186,12 @@ export default function ViewMyPeerFeedback() {
   return (
     <div className="fm-viewpeer-page-wrapper">
       <div className="fm-viewpeer-container">
-
         <FeedbackBreadcrumb
           items={[
             { label: "Feedback Management", path: "/employee/dashboard/feedback" },
             { label: "Peer Feedback Received" },
           ]}
         />
-
-        <div className="fm-viewpeer-view-toggle">
-          <button
-            className={`fm-viewpeer-view-toggle__btn ${
-              viewMode === "card" ? "fm-viewpeer-view-toggle__btn--active" : ""
-            }`}
-            onClick={() => setViewMode("card")}
-          >
-            <Grid size={18} />
-            <span>Card View</span>
-          </button>
-          <button
-            className={`fm-viewpeer-view-toggle__btn ${
-              viewMode === "table" ? "fm-viewpeer-view-toggle__btn--active" : ""
-            }`}
-            onClick={() => setViewMode("table")}
-          >
-            <List size={18} />
-            <span>Table View</span>
-          </button>
-        </div>
 
         {error && (
           <div className="fm-viewpeer-error-alert alert alert-danger alert-dismissible fade show">
@@ -251,7 +226,6 @@ export default function ViewMyPeerFeedback() {
           </div>
         )}
 
-     
         {peerFeedback.length === 0 ? (
           <div className="fm-viewpeer-empty">
             <Users size={48} className="fm-viewpeer-empty__icon" />
@@ -261,172 +235,85 @@ export default function ViewMyPeerFeedback() {
             </p>
           </div>
         ) : (
-          <>
-          
-            {viewMode === "card" && (
-              <div className="fm-viewpeer-cards-grid">
-                {peerFeedback.map((feedback) => {
-                  const isAnon = checkIsAnonymous(feedback);
+          <div className="fm-viewpeer-cards-grid">
+            {peerFeedback.map((feedback) => {
+              const isAnon = checkIsAnonymous(feedback);
 
-                  return (
-                    <div
-                      className="fm-viewpeer-card"
-                      key={
-                        feedback.queueId ||
-                        feedback.QueueId ||
-                        feedback.peerQueueId
-                      }
-                    >
-                      <div
-                        className={`fm-viewpeer-card__indicator ${
-                          isAnon
-                            ? "fm-viewpeer-card__indicator--anonymous"
-                            : "fm-viewpeer-card__indicator--peer"
-                        }`}
-                      />
+              return (
+                <div
+                  className="fm-viewpeer-card"
+                  key={
+                    feedback.queueId ||
+                    feedback.QueueId ||
+                    feedback.peerQueueId
+                  }
+                >
+                  <div
+                    className={`fm-viewpeer-card__indicator ${
+                      isAnon
+                        ? "fm-viewpeer-card__indicator--anonymous"
+                        : "fm-viewpeer-card__indicator--peer"
+                    }`}
+                  />
 
-                      <div className="fm-viewpeer-card__header">
-                        <div className="fm-viewpeer-card__sender">
-                          {isAnon ? (
-                            <Lock size={18} className="fm-viewpeer-card__icon fm-viewpeer-card__icon--anonymous" />
-                          ) : (
-                            <User size={18} className="fm-viewpeer-card__icon fm-viewpeer-card__icon--peer" />
-                          )}
-                          <h6 className={`fm-viewpeer-card__name ${
-                            isAnon ? "fm-viewpeer-card__name--anonymous" : ""
-                          }`}>
-                            {getSenderDisplayName(feedback)}
-                          </h6>
-                        </div>
-                        <div className="fm-viewpeer-card__badges">
-                          {isAnon && (
-                            <span className="fm-viewpeer-badge fm-viewpeer-badge--anonymous">
-                              <Lock size={12} />
-                              Anonymous
-                            </span>
-                          )}
-                          <span className="fm-viewpeer-badge fm-viewpeer-badge--peer">
-                            Peer
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="fm-viewpeer-card__body">
-                        <div className="fm-viewpeer-card__date">
-                          <Calendar size={14} />
-                          <span>{feedback.formattedDate}</span>
-                        </div>
-
-                        <div className="fm-viewpeer-card__feedback">
-                          <div className="fm-viewpeer-card__feedback-header">
-                            <MessageCircle size={16} />
-                            <h6>Feedback</h6>
-                          </div>
-                          <p className="fm-viewpeer-card__feedback-text">
-                            {feedback.feedbackContent ||
-                              feedback.comment ||
-                              feedback.feedbackComment ||
-                              "No comment provided"}
-                          </p>
-                        </div>
-
-                        {(feedback.context || feedback.feedbackContext) && (
-                          <div className="fm-viewpeer-card__context">
-                            <h6>Context</h6>
-                            <p>
-                              {feedback.context || feedback.feedbackContext}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-{viewMode === "table" && (
-  <div className="fm-viewpeer-table-wrapper">
-    <div className="fm-viewpeer-table-scroll">
-      <table className="fm-viewpeer-table">
-        <thead className="fm-viewpeer-table__head">
-          <tr>
-            <th className="fm-viewpeer-table__th fm-viewpeer-table__th--from">
-              Employee
-            </th>
-            <th className="fm-viewpeer-table__th fm-viewpeer-table__th--type">
-              Type
-            </th>
-            <th className="fm-viewpeer-table__th fm-viewpeer-table__th--feedback">
-              Feedback
-            </th>
-            <th className="fm-viewpeer-table__th fm-viewpeer-table__th--date">
-              Date
-            </th>
-          </tr>
-        </thead>
-        <tbody className="fm-viewpeer-table__body">
-          {peerFeedback.map((feedback) => {
-            const isAnon = checkIsAnonymous(feedback);
-
-            return (
-              <tr
-                key={
-                  feedback.queueId ||
-                  feedback.QueueId ||
-                  feedback.peerQueueId
-                }
-                className="fm-viewpeer-table__row"
-              >
-                {/* EMPLOYEE */}
-                <td className="fm-viewpeer-table__td fm-viewpeer-table__td--from">
-                  <div className="fm-viewpeer-table__sender">
-                    {isAnon ? (
-                      <Lock
-                        size={18}
-                        className="fm-viewpeer-table__icon fm-viewpeer-table__icon--anonymous"
-                      />
-                    ) : (
-                      <User
-                        size={18}
-                        className="fm-viewpeer-table__icon"
-                      />
-                    )}
-                    <div className="fm-viewpeer-table__sender-text">
-                      <span className="fm-viewpeer-table__name">
+                  <div className="fm-viewpeer-card__header">
+                    <div className="fm-viewpeer-card__sender">
+                      {isAnon ? (
+                        <Lock size={18} className="fm-viewpeer-card__icon fm-viewpeer-card__icon--anonymous" />
+                      ) : (
+                        <User size={18} className="fm-viewpeer-card__icon fm-viewpeer-card__icon--peer" />
+                      )}
+                      <h6 className={`fm-viewpeer-card__name ${
+                        isAnon ? "fm-viewpeer-card__name--anonymous" : ""
+                      }`}>
                         {getSenderDisplayName(feedback)}
+                      </h6>
+                    </div>
+                    <div className="fm-viewpeer-card__badges">
+                      {isAnon && (
+                        <span className="fm-viewpeer-badge fm-viewpeer-badge--anonymous">
+                          <Lock size={12} />
+                          Anonymous
+                        </span>
+                      )}
+                      <span className="fm-viewpeer-badge fm-viewpeer-badge--peer">
+                        Peer
                       </span>
                     </div>
                   </div>
-                </td>
 
-              
-                <td className="fm-viewpeer-table__td fm-viewpeer-table__td--type">
-                  <span className="fm-viewpeer-badge fm-viewpeer-badge--peer">
-                    Peer
-                  </span>
-                </td>
+                  <div className="fm-viewpeer-card__body">
+                    <div className="fm-viewpeer-card__date">
+                      <Calendar size={14} />
+                      <span>{feedback.formattedDate}</span>
+                    </div>
 
-      
-                <td className="fm-viewpeer-table__td fm-viewpeer-table__td--comment">
-                  {feedback.feedbackContent ||
-                    feedback.comment ||
-                    feedback.feedbackComment ||
-                    "No comment provided"}
-                </td>
+                    <div className="fm-viewpeer-card__feedback">
+                      <div className="fm-viewpeer-card__feedback-header">
+                        <MessageCircle size={16} />
+                        <h6>Feedback</h6>
+                      </div>
+                      <p className="fm-viewpeer-card__feedback-text">
+                        {feedback.feedbackContent ||
+                          feedback.comment ||
+                          feedback.feedbackComment ||
+                          "No comment provided"}
+                      </p>
+                    </div>
 
-                <td className="fm-viewpeer-table__td fm-viewpeer-table__td--date">
-                  {feedback.formattedDate}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  </div>
-)}
-          </>
+                    {(feedback.context || feedback.feedbackContext) && (
+                      <div className="fm-viewpeer-card__context">
+                        <h6>Context</h6>
+                        <p>
+                          {feedback.context || feedback.feedbackContext}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         )}
       </div>
     </div>

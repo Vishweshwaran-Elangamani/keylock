@@ -9,6 +9,7 @@ import {
   Loader,
   X,
   Plus,
+  Calendar,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -359,7 +360,6 @@ export default function ManagerReviewsList() {
 
       <div className="fm-mgrrev-page-wrapper">
         <div className="fm-mgrrev-container">
-        
           <div className="fm-mgrrev-header">
             <FeedbackBreadcrumb
               items={[
@@ -367,8 +367,6 @@ export default function ManagerReviewsList() {
                 { label: "My Reviews" },
               ]}
             />
-
-            
           </div>
 
           {error && (
@@ -386,107 +384,96 @@ export default function ManagerReviewsList() {
             </div>
           )}
 
-         
-          <div className="fm-mgrrev-table-wrapper">
-            {loading ? (
-              <div className="fm-mgrrev-loading">
-                <div className="spinner-border fm-mgrrev-loading__spinner" role="status">
-                  <span className="visually-hidden">Loading...</span>
-                </div>
-                <p className="fm-mgrrev-loading__text">Loading reviews...</p>
+          {loading ? (
+            <div className="fm-mgrrev-loading">
+              <div className="spinner-border fm-mgrrev-loading__spinner" role="status">
+                <span className="visually-hidden">Loading...</span>
               </div>
-            ) : reviews.length === 0 ? (
-              <div className="fm-mgrrev-empty">
-                <User size={48} className="fm-mgrrev-empty__icon" />
-                <p className="fm-mgrrev-empty__text">No reviews created yet</p>
-              </div>
-            ) : (
-              <div className="fm-mgrrev-table-scroll">
-                <table className="fm-mgrrev-table">
-                  <thead className="fm-mgrrev-table__head">
-                    <tr>
-                      <th className="fm-mgrrev-table__th">Employee</th>
-                      <th className="fm-mgrrev-table__th">Rating</th>
-                      <th className="fm-mgrrev-table__th">Status</th>
-                      <th className="fm-mgrrev-table__th">Comment</th>
-                      <th className="fm-mgrrev-table__th">Created</th>
-                      <th className="fm-mgrrev-table__th fm-mgrrev-table__th--center">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="fm-mgrrev-table__body">
-                    {reviews.map((review) => {
-                      const isSubmitted =
-                        review.status === "Submitted" ||
-                        review.submitted === true ||
-                        review.isSubmitted === true;
-                      const isFinalized = review.status === "Finalized";
+              <p className="fm-mgrrev-loading__text">Loading reviews...</p>
+            </div>
+          ) : reviews.length === 0 ? (
+            <div className="fm-mgrrev-empty">
+              <User size={48} className="fm-mgrrev-empty__icon" />
+              <p className="fm-mgrrev-empty__text">No reviews created yet</p>
+            </div>
+          ) : (
+            <div className="fm-mgrrev-cards-grid">
+              {reviews.map((review) => {
+                const isSubmitted =
+                  review.status === "Submitted" ||
+                  review.submitted === true ||
+                  review.isSubmitted === true;
+                const isFinalized = review.status === "Finalized";
 
-                      let statusClass = "fm-mgrrev-badge--success";
-                      let statusText = "Submitted";
+                let statusClass = "fm-mgrrev-status--success";
+                let statusText = "Submitted";
 
-                      if (isFinalized) {
-                        statusClass = "fm-mgrrev-badge--info";
-                        statusText = "Finalized";
-                      }
+                if (isFinalized) {
+                  statusClass = "fm-mgrrev-status--info";
+                  statusText = "Finalized";
+                }
 
-                      return (
-                        <tr
-                          key={review.reviewcommentId}
-                          className="fm-mgrrev-table__row"
-                        >
-                          <td className="fm-mgrrev-table__td">
-                            <div className="fm-mgrrev-table__employee">
-                              <User size={18} className="fm-mgrrev-table__icon" />
-                              <span className="fm-mgrrev-table__name">
-                                {review.targetEmployeeName}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="fm-mgrrev-table__td">
-                            <div className="fm-mgrrev-table__rating">
-                              <Star size={18} className="fm-mgrrev-table__star" />
-                              <span className="fm-mgrrev-table__rating-value">
-                                {review.rating || 0}/5
-                              </span>
-                            </div>
-                          </td>
-                          <td className="fm-mgrrev-table__td">
-                            <span className={`fm-mgrrev-badge ${statusClass}`}>
-                              {statusText}
-                            </span>
-                          </td>
-                          <td
-                            className="fm-mgrrev-table__td fm-mgrrev-table__td--comment"
-                            title={review.reviewComment}
-                          >
-                            {review.reviewComment || "No comment"}
-                          </td>
-                          <td className="fm-mgrrev-table__td fm-mgrrev-table__td--date">
-                            {review.createdAt
-                              ? new Date(review.createdAt).toLocaleDateString("en-GB")
-                              : "—"}
-                          </td>
-                          <td className="fm-mgrrev-table__td">
-                            <div className="fm-mgrrev-table__actions">
-                              <button
-                                onClick={() => handleView(review.reviewcommentId)}
-                                className="fm-mgrrev-action-btn"
-                                title="View"
-                              >
-                                <Eye size={18} />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
+                return (
+                  <div key={review.reviewcommentId} className="fm-mgrrev-card">
+                    <div className="fm-mgrrev-card__header">
+                      <div className="fm-mgrrev-card__label">Employee</div>
+                      <div className="fm-mgrrev-card__rating-badge">
+                        {review.rating || 0}/5
+                      </div>
+                    </div>
+
+                    <div className="fm-mgrrev-card__body">
+                      <div className="fm-mgrrev-card__employee">
+                        <User size={16} className="fm-mgrrev-card__user-icon" />
+                        <span className="fm-mgrrev-card__employee-name">
+                          {review.targetEmployeeName}
+                        </span>
+                      </div>
+
+                      <div className="fm-mgrrev-card__date">
+                        <Calendar size={14} className="fm-mgrrev-card__calendar-icon" />
+                        <span className="fm-mgrrev-card__date-text">
+                          {review.createdAt
+                            ? new Date(review.createdAt).toLocaleDateString("en-GB")
+                            : "—"}
+                        </span>
+                      </div>
+
+                    
+                      <div className="fm-mgrrev-card__comment">
+                        <p className="fm-mgrrev-card__comment-text">
+                          {review.reviewComment || "No comment"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="fm-mgrrev-card__footer">
+                      <div className="fm-mgrrev-card__stars">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            size={16}
+                            className={`fm-mgrrev-star ${
+                              i < (review.rating || 0)
+                                ? "fm-mgrrev-star--filled"
+                                : "fm-mgrrev-star--empty"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <button
+                        onClick={() => handleView(review.reviewcommentId)}
+                        className="fm-mgrrev-card__view-btn"
+                        title="View"
+                      >
+                        <Eye size={16} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </>

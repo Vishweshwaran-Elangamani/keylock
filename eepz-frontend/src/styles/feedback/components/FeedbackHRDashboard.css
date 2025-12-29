@@ -7,12 +7,16 @@
   color: #23223d;
   overflow-x: hidden;
 }
+.mb-3{
+  margin-top: 10px;
+}
 
 .fb-hr-dashboard__container {
   max-width: 1320px;
   margin: 0 auto;
   padding: 0 1rem;
   overflow-x: hidden;
+  margin-top: -35px;
 }
 
 .fb-hr-visually-hidden {

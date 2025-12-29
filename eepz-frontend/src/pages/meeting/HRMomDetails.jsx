@@ -414,9 +414,7 @@ const HRMomDetails = () => {
                       key={dp.pointId || index}
                       className="hrmom-discussion-item"
                     >
-                      <span className="hrmom-discussion-number">
-                        {index + 1}
-                      </span>
+                     
                       <div className="hrmom-discussion-content">
                         <p className="hrmom-discussion-text">
                           {dp.pointText || dp.point || "No details"}
@@ -458,9 +456,7 @@ const HRMomDetails = () => {
                       className="hrmom-action-item"
                     >
                       <div className="hrmom-action-item-header">
-                        <div className="hrmom-action-item-number">
-                          {index + 1}
-                        </div>
+                      
                         <div className="hrmom-action-item-content">
                           <div className="hrmom-action-item-title">
                             {ai.taskDescription ||

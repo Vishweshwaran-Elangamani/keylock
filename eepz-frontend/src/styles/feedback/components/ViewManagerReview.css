@@ -123,11 +123,13 @@
   font-size: 1.05rem;
   font-weight: 600;
   margin: 0;
+  color: white;
 }
 
 .vmr-header-subtitle {
   font-size: 0.85rem;
   opacity: 0.9;
+  text-align: left;
 }
 
 .vmr-icon-btn {
