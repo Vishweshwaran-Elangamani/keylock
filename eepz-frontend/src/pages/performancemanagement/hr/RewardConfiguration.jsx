@@ -7,7 +7,7 @@ import StatusConfirmModal from "../../../components/performance_management/modal
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import Breadcrumb from "../../../components/common/Breadcrumb";
-
+import "../../../styles/performancemanagement/hr/RewardConfiguration.css";
 
 function RewardConfiguration() {
   const [rewardTypes, setRewardTypes] = useState([]);
@@ -25,7 +25,6 @@ function RewardConfiguration() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingRewardTypeId, setEditingRewardTypeId] = useState(null);
   const [parameterCounts, setParameterCounts] = useState({});
-
 
   const [rewardTypeForm, setRewardTypeForm] = useState({
     rewardCategory: "Recognition",
@@ -45,21 +44,17 @@ function RewardConfiguration() {
   const [activeTab, setActiveTab] = useState("Active");
   const [descExpanded, setDescExpanded] = useState(false);
 
-
   const navigate = useNavigate();
-
 
   useEffect(() => {
     fetchRewardTypes();
   }, []);
-
 
   useEffect(() => {
     if (rewardTypes.length > 0) {
       fetchAllParameterCounts();
     }
   }, [rewardTypes]);
-
 
   const fetchRewardTypes = async () => {
     setLoading(true);
@@ -75,7 +70,6 @@ function RewardConfiguration() {
       setLoading(false);
     }
   };
-
 
   const fetchAllParameterCounts = async () => {
     const counts = {};
@@ -94,7 +88,6 @@ function RewardConfiguration() {
     }
   };
 
-
   const fetchParameters = async (rewardTypeId) => {
     try {
       const response = await getParametersByRewardType(rewardTypeId);
@@ -110,7 +103,6 @@ function RewardConfiguration() {
     }
   };
 
-
   const openAddRewardTypeModal = () => {
     setIsEditMode(false);
     setEditingRewardTypeId(null);
@@ -122,7 +114,6 @@ function RewardConfiguration() {
     });
     setShowRewardTypeModal(true);
   };
-
 
   const openEditRewardTypeModal = (rt) => {
     setIsEditMode(true);
@@ -136,9 +127,7 @@ function RewardConfiguration() {
     setShowRewardTypeModal(true);
   };
 
-
   const closeRewardTypeModal = () => setShowRewardTypeModal(false);
-
 
   const openParameterModal = () => {
     if (!selectedRewardType) {
@@ -157,9 +146,7 @@ function RewardConfiguration() {
     setShowParameterModal(true);
   };
 
-
   const closeParameterModal = () => setShowParameterModal(false);
-
 
   const handleCreateOrUpdateRewardType = async (e) => {
     e.preventDefault();
@@ -187,10 +174,8 @@ function RewardConfiguration() {
     }
   };
 
-
   const handleToggleActive = async (rewardType) => {
     try {
-      // ✅ FIX: Only send the fields that UpdateRewardTypeDto expects
       const response = await updateRewardType(rewardType.rewardTypeId, {
         rewardName: rewardType.rewardName,
         description: rewardType.description || "",
@@ -211,8 +196,6 @@ function RewardConfiguration() {
       toast.error("Error updating reward type");
     }
   };
-  
-
 
   const handleBulkToggleActiveRewards = async () => {
     const activeRewards = rewardTypes.filter((rt) => rt.isActive === true);
@@ -228,9 +211,9 @@ function RewardConfiguration() {
     try {
       const updatePromises = activeRewards.map((rt) =>
         updateRewardType(rt.rewardTypeId, {
-          rewardName: rt.rewardName,           
-          description: rt.description || "",    
-          isActive: rt.isActive,                
+          rewardName: rt.rewardName,
+          description: rt.description || "",
+          isActive: rt.isActive,
           isVisibleForManagerNomination: newVisibility,
         })
       );
@@ -246,8 +229,6 @@ function RewardConfiguration() {
       toast.error("Error updating bulk visibility");
     }
   };
-  
-
 
   const handleCreateParameter = async (e) => {
     e.preventDefault();
@@ -272,13 +253,11 @@ function RewardConfiguration() {
     }
   };
 
-
   const confirmDelete = (id, type) => {
     setToDeleteId(id);
     setDeleteType(type);
     setShowDeleteModal(true);
   };
-
 
   const handleConfirmDelete = async () => {
     try {
@@ -298,40 +277,28 @@ function RewardConfiguration() {
     }
   };
 
-
   const confirmStatusChange = (rt) => {
     setRewardTypeForStatus(rt);
     setStatusActionType(rt.isActive ? "deactivate" : "activate");
     setShowStatusModal(true);
   };
 
-
   const handleConfirmStatusChange = async () => {
     await handleToggleActive(rewardTypeForStatus);
     setShowStatusModal(false);
   };
 
-
   const activeRewardTypes = rewardTypes.filter((rt) => rt.isActive === true);
   const inactiveRewardTypes = rewardTypes.filter((rt) => rt.isActive === false);
   const displayedRewards = activeTab === "Active" ? activeRewardTypes : inactiveRewardTypes;
 
-
   const allActiveVisible = activeRewardTypes.length > 0 && activeRewardTypes.every((rt) => rt.isVisibleForManagerNomination === true);
-
 
   const getParameterCount = (rewardTypeId) => {
     return parameterCounts[rewardTypeId] ?? 0;
   };
 
-
-  const RL_PURPLE = "#97247e";
-  const RL_DARK = "#27235c";
-  const RL_BG = "#f8f9fc";
-  const RL_BORDER = "#27235c";
-  const BTN_RADIUS = "7px";
   const PREVIEW_CHAR_LIMIT = 280;
-
 
   function renderRewardDetails() {
     if (!selectedRewardType) return null;
@@ -340,90 +307,25 @@ function RewardConfiguration() {
     const visibleDesc = descExpanded ? desc : desc.slice(0, PREVIEW_CHAR_LIMIT);
     const showReadMore = needsCollapse;
 
-
     return (
       <>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div
-            style={{
-              fontWeight: 800,
-              fontSize: "18px",
-              color: RL_DARK,
-              fontFamily: "Montserrat, Nunito, sans-serif",
-              textAlign: "left",
-              minWidth: 0,
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {selectedRewardType.rewardName}
+        <div className="rc-reward-details-header">
+          <div className="rc-reward-title-container">
+            <div className="rc-reward-name">{selectedRewardType.rewardName}</div>
+            <span className="rc-reward-category-badge">Recognition</span>
           </div>
-          <span
-            style={{
-              background: "#F3EBFA",
-              color: RL_PURPLE,
-              fontWeight: 700,
-              fontSize: "11px",
-              padding: "2px 8px",
-              borderRadius: 8,
-              marginLeft: 4,
-              display: "inline-block",
-            }}
-          >
-            Recognition
-          </span>
-          <button
-            onClick={openParameterModal}
-            style={{
-              marginLeft: "auto",
-              padding: "6px 14px",
-              background: "linear-gradient(90deg, #97247e 0%, #e01950 100%)",
-              color: "#fff",
-              borderRadius: BTN_RADIUS,
-              fontWeight: 700,
-              cursor: "pointer",
-              border: "none",
-              fontSize: 12,
-              height: 28,
-              boxShadow: "0 1px 4px rgba(39,35,92,0.08)",
-              whiteSpace: "nowrap",
-            }}
-          >
+          <button onClick={openParameterModal} className="rc-add-parameter-btn">
             + Add Parameter
           </button>
         </div>
-        <div
-          style={{
-            fontSize: "13px",
-            color: "#8886b3",
-            marginTop: 6,
-            maxWidth: "100%",
-            textAlign: "justify",
-            lineHeight: 1.6,
-            wordBreak: "break-word",
-            whiteSpace: "pre-wrap",
-            minHeight: needsCollapse ? 75 : "auto",
-          }}
-        >
+        <div className="rc-reward-description">
           <span>
             {visibleDesc}
-            {showReadMore && !descExpanded && <span style={{ color: RL_PURPLE }}>...</span>}
+            {showReadMore && !descExpanded && <span className="rc-ellipsis">...</span>}
             {showReadMore && (
               <button
                 onClick={() => setDescExpanded((e) => !e)}
-                style={{
-                  background: "transparent",
-                  border: "none",
-                  color: RL_PURPLE,
-                  fontWeight: 600,
-                  fontSize: 12,
-                  cursor: "pointer",
-                  outline: "none",
-                  padding: 0,
-                  whiteSpace: "nowrap",
-                  marginLeft: 2,
-                }}
+                className="rc-read-more-btn"
               >
                 {descExpanded ? "Read Less" : "Read More"}
               </button>
@@ -434,209 +336,58 @@ function RewardConfiguration() {
     );
   }
 
-
   function ChooseButton({ onClick }) {
     return (
-      <button
-        onClick={onClick}
-        className="choose-btn"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          border: `1.3px solid ${RL_PURPLE}`,
-          background: "#fff",
-          color: RL_PURPLE,
-          fontWeight: 700,
-          borderRadius: "50%",
-          width: 32,
-          height: 32,
-          fontSize: 15,
-          cursor: "pointer",
-          transition: "box-shadow 0.15s",
-          marginLeft: 5,
-        }}
-        title="Select Reward Type"
-      >
+      <button onClick={onClick} className="rc-choose-btn" title="Select Reward Type">
         <i className="bi bi-plus-circle"></i>
       </button>
     );
   }
 
-
   return (
-    <div style={{ background: RL_BG, minHeight: "100vh", minWidth: 0 }}>
-      <div
-        style={{
-          padding: "16px 28px 0 28px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          background: RL_BG,
-          gap: 10,
-          marginBottom: "1.2rem",
-        }}
-      >
-       <Breadcrumb
-  items={[
-    { label: "Dashboard", path: "/hr/dashboard" },
-    { label: "Performance", path: "/hr/dashboard/performance" },
-    { label: "Rewards", path: null }
-  ]}
-/>
- 
+    <div className="rc-container">
+      <div className="rc-header">
+        <Breadcrumb
+          items={[
+            { label: "Dashboard", path: "/hr/dashboard" },
+            { label: "Performance", path: "/hr/dashboard/performance" },
+            { label: "Rewards", path: null }
+          ]}
+        />
 
-
-        <button
-          onClick={openAddRewardTypeModal}
-          style={{
-            padding: "8px 16px",
-            background: "linear-gradient(90deg, #97247e 0%, #e01950 100%)",
-            color: "#fff",
-            borderRadius: BTN_RADIUS,
-            fontWeight: "700",
-            fontSize: "13px",
-            border: "none",
-            boxShadow: "0 1.5px 6px rgba(151,36,126,0.12)",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            height: 32,
-          }}
-          title="Create a new Reward Type"
-        >
-          <i className="bi bi-plus-circle" style={{ fontSize: "15px" }}></i>
+        <button onClick={openAddRewardTypeModal} className="rc-create-reward-btn" title="Create a new Reward Type">
+          <i className="bi bi-plus-circle"></i>
           Create Reward Type
         </button>
       </div>
 
-
-      <div
-        style={{
-          margin: "0 auto",
-          maxWidth: 1500,
-          background: RL_BG,
-          minHeight: "100vh",
-          display: "flex",
-          gap: "24px",
-          padding: "0 32px 32px 32px",
-          alignItems: "flex-start",
-        }}
-      >
-        <div
-          style={{
-            flex: 1.3,
-            background: "#fff",
-            borderRadius: 12,
-            marginTop: 0,
-            border: `1px solid ${RL_BORDER}`,
-            boxShadow: "0 1px 4px rgba(0,0,0,0.02)",
-            display: "flex",
-            flexDirection: "column",
-            minHeight: 480,
-            maxHeight: "75vh",
-          }}
-        >
-          <div
-            style={{
-              background: "#fff",
-              padding: "14px 18px 8px 18px",
-              borderRadius: "12px 12px 0 0",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <div
-              style={{
-                background: RL_DARK,
-                padding: "5px",
-                borderRadius: "40px",
-                display: "inline-flex",
-                gap: "5px",
-              }}
-            >
+      <div className="rc-main-content">
+        <div className="rc-left-panel">
+          <div className="rc-tab-header">
+            <div className="rc-tab-buttons">
               <button
                 onClick={() => setActiveTab("Active")}
-                style={{
-                  padding: "8px 26px",
-                  background: activeTab === "Active" ? "#fff" : "transparent",
-                  color: activeTab === "Active" ? RL_DARK : "#fff",
-                  borderRadius: "40px",
-                  fontWeight: "700",
-                  fontSize: "13px",
-                  cursor: "pointer",
-                  border: "none",
-                  transition: "all 0.18s ease",
-                  whiteSpace: "nowrap",
-                }}
+                className={`rc-tab-btn ${activeTab === "Active" ? "rc-tab-btn-active" : ""}`}
               >
                 Active ({activeRewardTypes.length})
               </button>
               <button
                 onClick={() => setActiveTab("Inactive")}
-                style={{
-                  padding: "8px 26px",
-                  background: activeTab === "Inactive" ? "#fff" : "transparent",
-                  color: activeTab === "Inactive" ? RL_DARK : "#fff",
-                  borderRadius: "40px",
-                  fontWeight: "700",
-                  fontSize: "13px",
-                  cursor: "pointer",
-                  border: "none",
-                  transition: "all 0.18s ease",
-                  whiteSpace: "nowrap",
-                }}
+                className={`rc-tab-btn ${activeTab === "Inactive" ? "rc-tab-btn-active" : ""}`}
               >
                 Inactive ({inactiveRewardTypes.length})
               </button>
             </div>
 
-
             {activeTab === "Active" && activeRewardTypes.length > 0 && (
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ 
-                  fontSize: "11px", 
-                  fontWeight: "600", 
-                  color: "#666",
-                  whiteSpace: "nowrap" 
-                }}>
-                  Manager Visibility:
-                </span>
+              <div className="rc-visibility-toggle">
+                <span className="rc-visibility-label">Manager Visibility:</span>
                 <button
                   onClick={handleBulkToggleActiveRewards}
-                  style={{
-                    width: "44px",
-                    height: "22px",
-                    borderRadius: "11px",
-                    border: "none",
-                    background: allActiveVisible ? "#10b981" : "#ef4444",
-                    position: "relative",
-                    cursor: "pointer",
-                    transition: "all 0.3s ease",
-                    boxShadow: "0 2px 4px rgba(0,0,0,0.15)",
-                    flexShrink: 0
-                  }}
+                  className={`rc-toggle-switch ${allActiveVisible ? "rc-toggle-on" : "rc-toggle-off"}`}
                   title={allActiveVisible ? "Hide all active rewards from managers" : "Show all active rewards to managers"}
                 >
-                  <div style={{
-                    width: "16px",
-                    height: "16px",
-                    borderRadius: "50%",
-                    background: "#fff",
-                    position: "absolute",
-                    top: "3px",
-                    left: allActiveVisible ? "25px" : "3px",
-                    transition: "all 0.3s ease",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "9px",
-                    color: allActiveVisible ? "#10b981" : "#ef4444",
-                    fontWeight: "700",
-                    boxShadow: "0 1px 2px rgba(0,0,0,0.2)"
-                  }}>
+                  <div className="rc-toggle-knob">
                     <i className={allActiveVisible ? "bi bi-eye-fill" : "bi bi-eye-slash-fill"} />
                   </div>
                 </button>
@@ -644,141 +395,46 @@ function RewardConfiguration() {
             )}
           </div>
 
-
-          <div
-            style={{
-              flex: 1,
-              overflowY: "auto",
-              padding: "6px 16px 14px 18px",
-              minHeight: 0,
-              maxHeight: "calc(75vh - 70px)",
-            }}
-          >
+          <div className="rc-rewards-list">
             {loading ? (
-              <div style={{ textAlign: "center", color: "#aaa", padding: "36px 3px 14px 4px" }}>
-                <div className="spinner-border" style={{ width: 18, height: 18 }}></div>
-                <div style={{ fontSize: 12, marginTop: 5 }}>Loading...</div>
+              <div className="rc-loading-state">
+                <div className="spinner-border"></div>
+                <div className="rc-loading-text">Loading...</div>
               </div>
             ) : displayedRewards.length === 0 ? (
-              <div
-                style={{
-                  color: "#a1a9b9",
-                  background: "#f7f5fa",
-                  borderRadius: 8,
-                  border: `1px dashed ${RL_BORDER}`,
-                  padding: "30px 8px",
-                  textAlign: "center",
-                  fontSize: "13px",
-                }}
-              >
+              <div className="rc-empty-state">
                 No {activeTab.toLowerCase()} rewards
               </div>
             ) : (
               displayedRewards.map((rt) => (
                 <div
                   key={rt.rewardTypeId}
-                  style={{
-                    padding: "11px 11px 12px 12px",
-                    marginBottom: "12px",
-                    borderRadius: 8,
-                    background: "#fcfcfc",
-                    border:
-                      selectedRewardType?.rewardTypeId === rt.rewardTypeId
-                        ? `1.5px solid ${RL_PURPLE}`
-                        : `1px solid ${RL_BORDER}`,
-                    boxShadow:
-                      selectedRewardType?.rewardTypeId === rt.rewardTypeId
-                        ? "0 1.5px 8px rgba(149,51,161,0.08)"
-                        : "none",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    transition: ".14s",
-                  }}
+                  className={`rc-reward-card ${selectedRewardType?.rewardTypeId === rt.rewardTypeId ? "rc-reward-card-selected" : ""}`}
                 >
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ 
-                      fontWeight: 700, 
-                      fontSize: "14px", 
-                      color: RL_DARK, 
-                      marginBottom: 3,
-                      textAlign: "left"
-                    }}>
-                      {rt.rewardName}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: "11.5px",
-                        color: "#85779c",
-                        marginBottom: 6,
-                        textOverflow: "ellipsis",
-                        overflow: "hidden",
-                        whiteSpace: "nowrap",
-                        maxWidth: 190,
-                        textAlign: "left"
-                      }}
-                    >
-                      {rt.description || "—"}
-                    </div>
-                    <div style={{ display: "flex", gap: 6, alignItems: "center", fontSize: 11 }}>
-                      <span
-                        style={{
-                          padding: "1.5px 7px",
-                          background: "#f3f4fa",
-                          borderRadius: 3,
-                          fontWeight: "500",
-                        }}
-                      >
+                  <div className="rc-reward-card-content">
+                    <div className="rc-reward-card-title">{rt.rewardName}</div>
+                    <div className="rc-reward-card-description">{rt.description || "—"}</div>
+                    <div className="rc-reward-card-badges">
+                      <span className="rc-param-count-badge">
                         {getParameterCount(rt.rewardTypeId)} parameters
                       </span>
-                      <span
-                        style={{
-                          padding: "2px 9px",
-                          borderRadius: 4,
-                          fontWeight: "600",
-                          background: rt.isActive ? "#e7e0fa" : "#fbe2f3",
-                          color: rt.isActive ? RL_PURPLE : "#bc387a",
-                        }}
-                      >
+                      <span className={`rc-status-badge ${rt.isActive ? "rc-status-active" : "rc-status-inactive"}`}>
                         {rt.isActive ? "Active" : "Inactive"}
                       </span>
                     </div>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+                  <div className="rc-reward-card-actions">
                     <button
                       onClick={() => openEditRewardTypeModal(rt)}
                       title="Edit Reward Type"
-                      style={{
-                        padding: "6px 8px",
-                        marginRight: 3,
-                        background: "#fff",
-                        color: RL_PURPLE,
-                        border: `1.3px solid ${RL_PURPLE}`,
-                        borderRadius: BTN_RADIUS,
-                        fontSize: "15px",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
+                      className="rc-action-btn rc-edit-btn"
                     >
                       <i className="bi bi-pencil-square" />
                     </button>
                     <button
                       onClick={() => confirmStatusChange(rt)}
                       title={rt.isActive ? "Deactivate Reward Type" : "Activate Reward Type"}
-                      style={{
-                        padding: "6px 8px",
-                        background: "#fff",
-                        color: rt.isActive ? "#E01950" : RL_PURPLE,
-                        border: `1.3px solid ${rt.isActive ? "#E01950" : RL_PURPLE}`,
-                        borderRadius: BTN_RADIUS,
-                        fontSize: "15px",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
+                      className={`rc-action-btn ${rt.isActive ? "rc-deactivate-btn" : "rc-activate-btn"}`}
                     >
                       <i className={rt.isActive ? "bi bi-x-circle" : "bi bi-check2-circle"} />
                     </button>
@@ -796,198 +452,47 @@ function RewardConfiguration() {
           </div>
         </div>
 
-
-        <div
-          style={{
-            flex: 2,
-            background: "#fff",
-            borderRadius: 12,
-            marginTop: 0,
-            border: `1px solid ${RL_BORDER}`,
-            boxShadow: "0 1px 4px rgba(0,0,0,0.02)",
-            minHeight: 480,
-            maxHeight: "75vh",
-            display: "flex",
-            flexDirection: "column",
-            overflow: "hidden",
-          }}
-        >
-          <div
-            style={{
-              padding: "20px 26px 0px 26px",
-              background: "#fff",
-              zIndex: 2,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-start",
-            }}
-          ></div>
-          <div
-            style={{
-              flex: 1,
-              overflowY: "auto",
-              minHeight: 0,
-              padding: "3px 26px 18px 26px",
-              width: "100%",
-              boxSizing: "border-box",
-            }}
-          >
+        <div className="rc-right-panel">
+          <div className="rc-parameters-section">
             {selectedRewardType ? (
               <>
-                <div style={{ marginTop: 0 }}>{renderRewardDetails()}</div>
-                <div style={{ height: 14 }} />
+                <div className="rc-parameters-header">{renderRewardDetails()}</div>
+                <div className="rc-parameters-spacer" />
                 {parameters.length === 0 ? (
-                  <div
-                    style={{
-                      color: "#85799a",
-                      padding: "40px 10px",
-                      background: "#fcfbff",
-                      borderRadius: "8px",
-                      border: `1px dashed ${RL_BORDER}`,
-                      textAlign: "center",
-                    }}
-                  >
-                    <div style={{ fontSize: "14px", marginBottom: 6 }}>No parameters configured</div>
-                    <div style={{ fontSize: "12px", color: "#b9bace" }}>
+                  <div className="rc-no-parameters">
+                    <div className="rc-no-parameters-title">No parameters configured</div>
+                    <div className="rc-no-parameters-subtitle">
                       Add parameters to customize nomination forms
                     </div>
                   </div>
                 ) : (
-                  <table
-                    style={{
-                      width: "100%",
-                      borderCollapse: "collapse",
-                      fontSize: "13px",
-                      border: "2px solid #27235C",
-                    }}
-                  >
+                  <table className="rc-parameters-table">
                     <thead>
-                      <tr
-                        style={{
-                          background: "#27235C",
-                          borderBottom: "1.5px solid #27235C",
-                        }}
-                      >
-                        <th
-                          style={{
-                            textAlign: "left",
-                            padding: "11px",
-                            fontWeight: 800,
-                            color: "white",
-                          }}
-                        >
-                          Parameter Name
-                        </th>
-                        <th
-                          style={{
-                            textAlign: "left",
-                            padding: "11px",
-                            fontWeight: 700,
-                            color: "white",
-                          }}
-                        >
-                          Type
-                        </th>
-                        <th
-                          style={{
-                            textAlign: "left",
-                            padding: "11px",
-                            fontWeight: 700,
-                            color: "white",
-                          }}
-                        >
-                          Required
-                        </th>
-                        <th
-                          style={{
-                            textAlign: "left",
-                            padding: "11px",
-                            fontWeight: 700,
-                            color: "white",
-                          }}
-                        >
-                          Order
-                        </th>
-                        <th
-                          style={{
-                            textAlign: "left",
-                            padding: "11px",
-                            fontWeight: 800,
-                            color: "white",
-                          }}
-                        >
-                          Actions
-                        </th>
+                      <tr>
+                        <th>Parameter Name</th>
+                        <th>Type</th>
+                        <th>Required</th>
+                        <th>Order</th>
+                        <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {parameters.map((param) => (
-                        <tr
-                          key={param.parameterId}
-                          style={{
-                            borderBottom: "1px solid darkblue",
-                          }}
-                        >
-                          <td
-                            style={{
-                              padding: "13px 11px",
-                              fontWeight: "600",
-                              color: "#000",
-                              textAlign: "left",
-                            }}
-                          >
-                            {param.parameterName}
-                          </td>
-                          <td
-                            style={{
-                              padding: "13px 11px",
-                              color: "#000",
-                              fontWeight: 500,
-                              textAlign: "left",
-                            }}
-                          >
-                            {param.parameterType}
-                          </td>
-                          <td
-                            style={{
-                              padding: "13px 11px",
-                              textAlign: "left",
-                              fontWeight: "700",
-                            }}
-                          >
+                        <tr key={param.parameterId}>
+                          <td><strong>{param.parameterName}</strong></td>
+                          <td>{param.parameterType}</td>
+                          <td>
                             {param.isRequired ? (
-                              <span style={{ color: "green" }}>Yes</span>
+                              <span className="rc-required-yes">Yes</span>
                             ) : (
-                              <span style={{ color: "red" }}>No</span>
+                              <span className="rc-required-no">No</span>
                             )}
                           </td>
-                          <td
-                            style={{
-                              padding: "13px 11px",
-                              textAlign: "left",
-                              color: "#000",
-                            }}
-                          >
-                            {param.sortOrder}
-                          </td>
-                          <td
-                            style={{
-                              padding: "13px 11px",
-                              textAlign: "left",
-                            }}
-                          >
+                          <td>{param.sortOrder}</td>
+                          <td>
                             <button
                               onClick={() => confirmDelete(param.parameterId, "parameter")}
-                              style={{
-                                padding: "6px 18px",
-                                background: "#eee",
-                                color: "#27235C",
-                                borderRadius: 5,
-                                fontWeight: "700",
-                                border: "1px solid #27235C",
-                                cursor: "pointer",
-                                fontSize: 13,
-                              }}
+                              className="rc-delete-param-btn"
                               title="Delete Parameter"
                             >
                               <i className="bi bi-trash" />
@@ -1000,23 +505,16 @@ function RewardConfiguration() {
                 )}
               </>
             ) : (
-              <div
-                style={{
-                  textAlign: "center",
-                  color: "#bbb",
-                  padding: "70px 10px",
-                }}
-              >
-                <div style={{ fontSize: "14px", fontWeight: 600, marginBottom: 7 }}>
+              <div className="rc-no-selection">
+                <div className="rc-no-selection-title">
                   Select a recognition reward to view parameters
                 </div>
-                <div style={{ fontSize: 12 }}>Choose from Active or Inactive rewards</div>
+                <div className="rc-no-selection-subtitle">Choose from Active or Inactive rewards</div>
               </div>
             )}
           </div>
         </div>
       </div>
-
 
       {showRewardTypeModal && (
         <RewardTypeModal
@@ -1059,6 +557,5 @@ function RewardConfiguration() {
     </div>
   );
 }
-
 
 export default RewardConfiguration;

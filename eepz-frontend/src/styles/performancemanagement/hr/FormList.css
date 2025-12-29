@@ -36,6 +36,41 @@
   padding: 1.5rem;
 }
 
+.formlistperf .stat-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.formlistperf .stat-icon i {
+  font-size: 26px;
+  color: #27235c;
+}
+
+.formlistperf .fl-icon-bg-blue {
+  background: #e2ebfd;
+}
+
+.formlistperf .fl-icon-bg-green {
+  background: #d2fbe7;
+}
+
+.formlistperf .fl-icon-bg-orange {
+  background: #fbe7d2;
+}
+
+.formlistperf .fl-icon-bg-purple {
+  background: #f9eaff;
+}
+
+.formlistperf .fl-icon-bg-indigo {
+  background: #e2e7fa;
+}
+
 .formlistperf .flp-main-area {
   display: grid;
   grid-template-columns: 1fr 380px;
@@ -47,7 +82,7 @@
   background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-  border: 1px solid #e5e7eb;
+  border: 1px solid #27235c;
   overflow: hidden;
 }
 
@@ -95,8 +130,55 @@
 .formlistperf .flp-header-right {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 10px;
   flex-wrap: wrap;
+}
+
+.formlistperf .fl-search-container {
+  display: flex;
+  align-items: center;
+  border: 1px solid #27235c;
+  border-radius: 6px;
+  overflow: hidden;
+  flex: 1;
+  min-width: 180px;
+  height: 38px;
+}
+
+.formlistperf .fl-search-input {
+  border: none;
+  padding: 8px 12px;
+  outline: none;
+  flex: 1;
+  font-size: 14px;
+  background: #ffffff;
+  color: #2c3e50;
+  min-width: 0;
+}
+
+.formlistperf .fl-search-input::placeholder {
+  color: #9ca3af;
+}
+
+.formlistperf .fl-search-btn {
+  background-color: #27235c;
+  color: #fff;
+  border: none;
+  padding: 0 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+  font-weight: 600;
+  font-size: 13px;
+  white-space: nowrap;
+  height: 100%;
+  min-width: 70px;
+}
+
+.formlistperf .fl-search-btn:hover {
+  background-color: #1a1740;
 }
 
 .formlistperf .flp-search-box {
@@ -137,19 +219,21 @@
 
 .formlistperf .flp-filter-select {
   min-width: 140px;
-  padding: 0.55rem 0.75rem;
-  border: 1px solid #ced4da;
-  border-radius: 8px;
-  font-size: 0.9rem;
+  padding: 8px 12px;
+  border: 1px solid #27235c;
+  border-radius: 6px;
+  font-size: 14px;
   background: #ffffff;
   color: #2c3e50;
   cursor: pointer;
   transition: all 0.2s ease;
+  outline: none;
+  height: 38px;
 }
 
 .formlistperf .flp-filter-select:focus {
   outline: none;
-  border-color: #27235c;
+  border-color:1px  #27235c;
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
 }
 
@@ -317,7 +401,7 @@
   background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-  border: 1px solid #e5e7eb;
+  border: 1px solid #27235c;
   display: flex;
   flex-direction: column;
   height: 680px;
@@ -332,10 +416,9 @@
   border-bottom: 1px solid #e5e7eb;
   background: #ffffff;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   gap: 1rem;
-  justify-content: space-between;
 }
 
 .formlistperf .flp-panel-header h3 {
@@ -355,9 +438,15 @@
 
 .formlistperf .flp-users-filters {
   display: flex;
-  gap: 0.5rem;
+  gap: 10px;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+.formlistperf .flp-users-filters .fl-search-container {
+  flex: 1;
+  min-width: 150px;
 }
 
 .formlistperf .flp-user-search-input {
@@ -380,34 +469,58 @@
   color: #9ca3af;
 }
 
+
 .formlistperf .flp-btn-select-all {
-  padding: 0.55rem 1rem;
+  background: #27235c;
+  color: #fff;
   border: none;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #ffffff;
+  padding: 0 12px;
+  height: 38px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s ease;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 5px;
+  font-weight: 700;
+  font-size: 11px;
+  transition: all 0.2s ease;
   white-space: nowrap;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
+  min-width: auto;
+  width: auto;
 }
 
 .formlistperf .flp-btn-select-all:hover {
-  opacity: 0.9;
   transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(39, 35, 92, 0.3);
+}
+
+.formlistperf .flp-btn-select-all:active {
+  transform: scale(0.97);
+}
+
+.formlistperf .flp-deselect-all {
+  background: #27235c;
+}
+
+.formlistperf .flp-deselect-all:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(39, 35, 92, 0.3);
 }
 
 .formlistperf .flp-btn-select-all i {
-  font-size: 1.05rem;
+  font-size: 13px;
 }
 
 .formlistperf .flp-panel-body {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
+  max-height: 580px;
+  min-height: 350px;
   padding: 0.5rem 1rem;
   background: #fff;
 }
@@ -580,6 +693,327 @@
   transform: none;
 }
 
+/* ========================================
+   CUSTOM DROPDOWN STYLES - #27235c Theme
+======================================== */
+
+.custom-dropdown-wrapper {
+  position: relative;
+  padding: 0;
+  border-radius: 4px;
+  user-select: none;
+  min-width: 160px;
+  max-width: 180px;
+  border: 1px solid #ced4da;
+  background: #ffffff;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.custom-dropdown-wrapper:hover {
+  border-color: #27235c;
+}
+
+.custom-dropdown-wrapper:focus {
+  outline: none;
+  border-color: #27235c;
+  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+}
+
+.custom-dropdown-selected {
+  padding: 0.5rem 2rem 0.5rem 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  border: 1px solid  #27235c;
+  cursor: pointer;
+  user-select: none;
+  width: 100%;
+  font-size: 14px;
+  color: #212529;
+  font-weight: 500;
+  
+}
+
+.custom-dropdown-arrow {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #111827;
+  border-bottom: 2px solid #111827;
+  pointer-events: none;
+  transition: transform 0.2s ease;
+}
+
+.custom-dropdown-wrapper:focus-within .custom-dropdown-arrow {
+  transform: translateY(-25%) rotate(225deg);
+}
+
+.custom-dropdown-menu {
+  position: absolute;
+  top: calc(100% - 1px);
+  left: -1px;
+  right: -1px;
+  background: #ffffff;
+  border: 1px solid #ced4da;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+  animation: dropdownFadeIn 0.15s ease-out;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.custom-dropdown-option {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  display: block;
+  text-align: left;
+  transition: all 0.12s ease;
+  font-size: 14px;
+  color: #212529;
+}
+
+.custom-dropdown-option:hover {
+  background-color: #27235c;
+  color: #ffffff;
+}
+
+.custom-dropdown-option:first-child:hover {
+  border-radius: 0;
+}
+
+.custom-dropdown-option:last-child {
+  border-radius: 0 0 3px 3px;
+}
+
+.custom-dropdown-option-active {
+  background-color: #f3f4f6;
+  font-weight: 600;
+  color: #27235c;
+}
+
+.custom-dropdown-option-active:hover {
+  background-color: #27235c;
+  color: #ffffff;
+}
+
+/* ========================================
+   UNIFIED SEARCH BAR - ZERO GAP
+======================================== */
+
+.hrvasspm-filter-group {
+  display: inline-flex;
+  align-items: stretch;
+  position: relative;
+  border: 1px solid  #27235c;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  height: 38px;
+}
+
+.hrvasspm-filter-group:focus-within {
+  border-color: #27235c;
+  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+}
+
+.hrvasspm-filter-group input[type="search"] {
+  padding: 0 0.75rem;
+  font-size: 14px;
+  border: none !important;
+  outline: none !important;
+  min-width: 300px;
+  height: 100%;
+  background: transparent;
+  margin: 0 !important;
+  flex: 1;
+  box-shadow: none !important;
+}
+
+.hrvasspm-filter-group input[type="search"]::placeholder {
+  color: #9ca3af;
+}
+
+/* Remove browser default styling */
+.hrvasspm-filter-group input[type="search"]::-webkit-search-cancel-button {
+  display: none;
+}
+
+.hrvasspm-search-btn {
+  padding: 0 1.5rem;
+  font-size: 14px;
+  font-weight: 600;
+  background: #27235c;
+  color: #ffffff;
+  border: none !important;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  white-space: nowrap;
+  height: 100%;
+  margin: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: none !important;
+}
+
+.hrvasspm-search-btn:hover {
+  background: #1e1a47;
+}
+
+.hrvasspm-search-btn:active {
+  background: #15112f;
+}
+
+/* Clear Filters Button */
+.hrvasspm-clear-filters-btn {
+  padding: 0.5rem 1rem;
+  font-size: 14px;
+  font-weight: 600;
+  background: #ffffff;
+  color: #6c757d;
+  border: 1px solid  #27235c;
+
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hrvasspm-clear-filters-btn:hover {
+  background: #f8f9fa;
+  border-color: #6c757d;
+  color: #495057;
+}
+
+/* Export Button */
+.hrvasspm-btn-export {
+  padding: 0.5rem 1rem;
+  font-size: 14px;
+  font-weight: 600;
+  background: #a82a5e;
+  color: #ffffff;
+  border: 1px solid #a82a5e;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hrvasspm-btn-export:hover {
+  background: #8e2450;
+  border-color: #8e2450;
+}
+
+.hrvasspm-btn-export i {
+  font-size: 16px;
+}
+
+/* Filters Container */
+.hrvasspm-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  
+}
+
+/* Clear Filters Button */
+.flp-clear-filters-btn {
+  padding: 0.5rem 1rem;
+  font-size: 14px;
+  font-weight: 600;
+  background: #ffffff;
+  color: #6c757d;
+  border: 1px solid  #27235c;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flp-clear-filters-btn:hover {
+  background: #f8f9fa;
+  border-color: #6c757d;
+  color: #495057;
+}
+
+.flp-clear-filters-btn:active {
+  background: #e9ecef;
+  transform: translateY(1px);
+}
+
+
+/* Pagination Select Dropdown - Smaller size */
+.flp-pagination-select-wrapper {
+  min-width: 60px;
+  max-width: 80px;
+  height: 32px;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.flp-pagination-select-wrapper:hover {
+  border-color: #27235c;
+}
+
+.flp-pagination-select-wrapper:focus {
+  outline: none;
+  border-color: #27235c;
+  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+}
+
+.flp-pagination-select-wrapper .custom-dropdown-selected {
+  padding: 0.375rem 2rem 0.375rem 0.5rem;
+  font-size: 13px;
+  height: 32px;
+}
+
+.flp-pagination-select-wrapper .custom-dropdown-arrow {
+  width: 6px;
+  height: 6px;
+}
+
 .formlistperf .flp-pagination-container {
   padding: 1.25rem;
   display: flex;
@@ -713,6 +1147,11 @@
     gap: 0.5rem;
   }
 
+  .formlistperf .fl-search-container {
+    width: 100%;
+    max-width: 100%;
+  }
+
   .formlistperf .flp-search-box {
     min-width: 100%;
     flex: none;
@@ -721,6 +1160,7 @@
   .formlistperf .flp-filter-select {
     min-width: 140px;
     flex: none;
+    width: 100%;
   }
 
   .formlistperf .flp-table-wrapper {
@@ -731,13 +1171,15 @@
     min-width: 700px;
   }
 
-  .formlistperf .flp-users-filters {
-    flex-wrap: wrap;
-    justify-content: center;
+  .formlistperf .flp-users-filters .fl-search-container {
+    flex: 1;
+    min-width: 0;
   }
 
-  .formlistperf .flp-user-search-input {
-    min-width: 140px;
+  .formlistperf .flp-btn-select-all {
+    padding: 0 10px;
+    font-size: 10px;
+    min-width: auto;
   }
 }
 
@@ -754,8 +1196,6 @@
 
   .formlistperf .flp-panel-header h3 {
     font-size: 1rem;
-    flex-direction: column;
-    align-items: flex-start;
   }
 
   .formlistperf .flp-pagination-container {

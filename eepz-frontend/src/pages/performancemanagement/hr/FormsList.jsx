@@ -10,6 +10,212 @@ import "../../../styles/performancemanagement/hr/FormList.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 
+/* Custom Form Type Filter Dropdown */
+const FormTypeDropdown = ({ value, onChange, formTypes }) => {
+  const [open, setOpen] = useState(false);
+
+  const allOptions = formTypes.map((type) => ({ label: type, value: type }));
+  const selected = allOptions.find((o) => o.value === value) || allOptions[0];
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="flp-filter-select custom-dropdown-wrapper"
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+      style={{ position: "relative" }}
+    >
+      <div
+        className="custom-dropdown-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {selected.label}
+        <span className="custom-dropdown-arrow" />
+      </div>
+
+      {open && (
+        <div className="custom-dropdown-menu">
+          {allOptions.map((opt) => (
+            <div
+              key={opt.value}
+              className={
+                "custom-dropdown-option" +
+                (opt.value === value ? " custom-dropdown-option-active" : "")
+              }
+              onClick={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* Custom Delivery/Enablement Filter Dropdown */
+const DeliveryDropdown = ({ value, onChange }) => {
+  const [open, setOpen] = useState(false);
+
+  const options = [
+    { label: "All", value: "All" },
+    { label: "Delivery", value: "Delivery" },
+    { label: "Enablement", value: "Enablement" },
+  ];
+
+  const selected = options.find((o) => o.value === value) || options[0];
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="flp-filter-select custom-dropdown-wrapper"
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+      style={{ position: "relative" }}
+    >
+      <div
+        className="custom-dropdown-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {selected.label}
+        <span className="custom-dropdown-arrow" />
+      </div>
+
+      {open && (
+        <div className="custom-dropdown-menu">
+          {options.map((opt) => (
+            <div
+              key={opt.value}
+              className={
+                "custom-dropdown-option" +
+                (opt.value === value ? " custom-dropdown-option-active" : "")
+              }
+              onClick={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* Custom Role Filter Dropdown */
+const RoleFilterDropdown = ({ value, onChange }) => {
+  const [open, setOpen] = useState(false);
+
+  const options = [
+    { label: "All", value: "All" },
+    { label: "Manager", value: "MANAGER" },
+    { label: "Executive", value: "EXECUTIVE" },
+    { label: "Employee", value: "EMPLOYEE" },
+  ];
+
+  const selected = options.find((o) => o.value === value) || options[0];
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="flp-filter-select custom-dropdown-wrapper"
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+      style={{ position: "relative" }}
+    >
+      <div
+        className="custom-dropdown-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {selected.label}
+        <span className="custom-dropdown-arrow" />
+      </div>
+
+      {open && (
+        <div className="custom-dropdown-menu">
+          {options.map((opt) => (
+            <div
+              key={opt.value}
+              className={
+                "custom-dropdown-option" +
+                (opt.value === value ? " custom-dropdown-option-active" : "")
+              }
+              onClick={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* Custom Rows Per Page Dropdown */
+const RowsPerPageDropdown = ({ value, onChange }) => {
+  const [open, setOpen] = useState(false);
+
+  const options = [
+    { label: "5", value: 5 },
+    { label: "8", value: 8 },
+    { label: "10", value: 10 },
+    { label: "15", value: 15 },
+    { label: "20", value: 20 },
+  ];
+
+  const selected = options.find((o) => o.value === value) || options[0];
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="flp-pagination-select-wrapper custom-dropdown-wrapper"
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+      style={{ position: "relative" }}
+    >
+      <div
+        className="custom-dropdown-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {selected.label}
+        <span className="custom-dropdown-arrow" />
+      </div>
+
+      {open && (
+        <div className="custom-dropdown-menu">
+          {options.map((opt) => (
+            <div
+              key={opt.value}
+              className={
+                "custom-dropdown-option" +
+                (opt.value === value ? " custom-dropdown-option-active" : "")
+              }
+              onClick={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 function FormsList() {
   const navigate = useNavigate();
 
@@ -54,35 +260,18 @@ function FormsList() {
   };
 
   const analyticsIconBg = {
-    "Total Forms": "#e2ebfd",
-    "Manager Forms": "#d2fbe7",
-    "Delivery Forms": "#fbe7d2",
-    "Enablement Forms": "#f9eaff",
-    "Assigned Users": "#e2e7fa",
+    "Total Forms": "fl-icon-bg-blue",
+    "Manager Forms": "fl-icon-bg-green",
+    "Delivery Forms": "fl-icon-bg-orange",
+    "Enablement Forms": "fl-icon-bg-purple",
+    "Assigned Users": "fl-icon-bg-indigo",
   };
-
 
   function AnalyticsStatCard({ title, value }) {
     return (
       <div className="ad-stat-card">
-        <div
-          className="stat-icon"
-          style={{
-            background: analyticsIconBg[title] || "#f0f0f0",
-            width: 50,
-            height: 50,
-            borderRadius: 16,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: "8px"
-
-          }}
-        >
-          <i
-            className={`bi ${analyticsIcons[title]}`}
-            style={{ fontSize: "26px", color: "#27235C" }}
-          />
+        <div className={`stat-icon ${analyticsIconBg[title]}`}>
+          <i className={`bi ${analyticsIcons[title]}`} />
         </div>
         <div className="stat-content">
           <h3 className="stat-value">{value}</h3>
@@ -91,7 +280,6 @@ function FormsList() {
       </div>
     );
   }
-
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -421,7 +609,6 @@ function FormsList() {
   const handleView = (form) => {
     setViewFormDetails(form);
   };
-  
 
   const analytics = useMemo(() => {
     const totalForms = rows.length;
@@ -445,14 +632,13 @@ function FormsList() {
   return (
     <div className="formlistperf">
       <div className="flp-root">
-        
-<Breadcrumb
-        items={[
-          { label: 'Dashbaord', path: '/hr/dashboard' },
-          { label: 'Performance', path: '/hr/dashboard/performance' },
-          { label: 'Initiate Form', path: null }
-        ]}
-      />
+        <Breadcrumb
+          items={[
+            { label: 'Dashboard', path: '/hr/dashboard' },
+            { label: 'Performance', path: '/hr/dashboard/performance' },
+            { label: 'Initiate Form', path: null }
+          ]}
+        />
 
         <div className="row row-cols-2 row-cols-lg-3 row-cols-xl-5 g-4 mb-3">
           <div className="col">
@@ -499,126 +685,70 @@ function FormsList() {
         />
 
         <div className="flp-main-area">
-          <div
-            className="flp-forms-section"
-            style={{
-              border: "1px solid #27235C",
-              borderRadius: "8px",
-              overflow: "hidden",
-            }}
-          >
-            <div className="flp-section-header">
-              <div className="flp-header-left">
-                <h3>
-                  Available Forms
-                </h3>
-                <span className="flp-count-badge">{filteredForms.length}</span>
-              </div>
-              <div className="flp-header-right" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    border: "1px solid #ccc",
-                    borderRadius: "6px",
-                    overflow: "hidden",
+          <div className="flp-forms-section">
+          <div className="flp-section-header">
+  <div className="flp-header-left">
+    <h3>Available Forms</h3>
+    <span className="flp-count-badge">{filteredForms.length}</span>
+  </div>
+  <div className="flp-header-right">
+    <div className="fl-search-container">
+      <input
+        type="text"
+        placeholder="Search forms..."
+        value={formSearchInput}
+        onChange={(e) => setFormSearchInput(e.target.value)}
+        onKeyPress={(e) => {
+          if (e.key === 'Enter') {
+            setFormSearchQuery(formSearchInput);
+            setFormsPage(1);
+          }
+        }}
+        className="fl-search-input"
+      />
+      <button
+        onClick={() => {
+          setFormSearchQuery(formSearchInput);
+          setFormsPage(1);
+        }}
+        className="fl-search-btn"
+      >
+        Search
+      </button>
+    </div>
 
+    <FormTypeDropdown
+      value={formTypeFilter}
+      onChange={(val) => {
+        setFormTypeFilter(val);
+        setFormsPage(1);
+      }}
+      formTypes={formTypes}
+    />
 
-                  }}
-                >
-                  <input
-                    type="text"
-                    placeholder="Search forms..."
-                    value={formSearchInput}
-                    onChange={(e) => setFormSearchInput(e.target.value)}
-                    style={{
-                      border: "none",
-                      padding: "8px 12px",
-                      outline: "none",
-                      flex: 1,
+    <DeliveryDropdown
+      value={formDeliveryFilter}
+      onChange={(val) => {
+        setFormDeliveryFilter(val);
+        setFormsPage(1);
+      }}
+    />
 
-                    }}
-                  />
+    <button
+      onClick={() => {
+        setFormSearchQuery("");
+        setFormSearchInput("");
+        setFormTypeFilter("All");
+        setFormDeliveryFilter("All");
+        setFormsPage(1);
+      }}
+      className="flp-clear-filters-btn"
+    >
+      Clear Filters
+    </button>
+  </div>
+</div>
 
-                  {formSearchQuery ? (
-
-                    <button
-                      onClick={() => {
-                        setFormSearchQuery("");
-                        setFormSearchInput("");
-                        setFormsPage(1);
-                      }}
-                      style={{
-                        backgroundColor: "#27235c",
-                        color: "#fff",
-                        border: "none",
-                        padding: "8px 12px",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center"
-                      }}
-                    >
-                      Clear
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => {
-                        setFormSearchQuery(formSearchInput);
-                        setFormsPage(1);
-                      }}
-                      style={{
-                        backgroundColor: "#27235c",
-                        color: "#fff",
-                        border: "none",
-                        padding: "8px 12px",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center"
-                      }}
-                    >
-                      Search
-                    </button>
-                  )}
-                </div>
-
-
-
-                <select
-                  className="flp-filter-select"
-                  value={formTypeFilter}
-                  onChange={(e) => {
-                    setFormTypeFilter(e.target.value);
-                    setFormsPage(1);
-                  }}
-                  style={{ padding: "6px", borderRadius: "6px" }}
-                >
-                  {formTypes.map((type) => (
-                    <option key={type} value={type}>
-                      {type}
-                    </option>
-                  ))}
-                </select>
-
-                <select
-                  className="flp-filter-select"
-                  value={formDeliveryFilter}
-                  onChange={(e) => {
-                    setFormDeliveryFilter(e.target.value);
-                    setFormsPage(1);
-                  }}
-                  style={{ padding: "6px", borderRadius: "6px" }}
-                >
-                  {formDeliveryOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-            </div>
 
             <div className="flp-table-card">
               <div className="flp-table-wrapper">
@@ -707,20 +837,13 @@ function FormsList() {
               <div className="flp-pagination-container">
                 <div className="flp-pagination-info">
                   <span className="flp-pagination-label">Rows per page:</span>
-                  <select
-                    className="flp-pagination-select"
+                  <RowsPerPageDropdown
                     value={formsPerPage}
-                    onChange={(e) => {
-                      setFormsPerPage(Number(e.target.value));
+                    onChange={(val) => {
+                      setFormsPerPage(val);
                       setFormsPage(1);
                     }}
-                  >
-                    <option value={5}>5</option>
-                    <option value={8}>8</option>
-                    <option value={10}>10</option>
-                    <option value={15}>15</option>
-                    <option value={20}>20</option>
-                  </select>
+                  />
                 </div>
 
                 <nav className="flp-pagination-nav">
@@ -775,122 +898,60 @@ function FormsList() {
                 </div>
               </div>
             </div>
-
-
           </div>
 
-          <div
-            className="flp-users-panel"
-            style={{
-              border: "1px solid #27235C",
-              borderRadius: "8px",
-              overflow: "hidden",
-            }}
-          >
-            <div className="flp-panel-header">
-              <h3>
-                <i className="bi bi-people-fill"></i> Select Users
-              </h3>
-              {selectedFormId && (
-                <div className="flp-users-filters" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      border: "1px solid #27235c",
-                      borderRadius: "6px",
-                      overflow: "hidden",
-                      flex: 1
-                    }}
-                  >
-                    <input
-                      type="text"
-                      placeholder="Search users..."
-                      value={userSearchInput}
-                      onChange={(e) => setUserSearchInput(e.target.value)}
-                      style={{
-                        border: "none",
-                        padding: "8px 12px",
-                        outline: "none",
-                        flex: 1
-                      }}
-                    />
-
-                    {userSearchQuery ? (
-
-                      <button
-                        onClick={() => {
-                          setUserSearchQuery("");
-                          setUserSearchInput("");
-                          setUsersPage(1);
-                        }}
-                        style={{
-                          backgroundColor: "#27235c",
-                          color: "#fff",
-                          border: "none",
-                          padding: "8px 12px",
-                          cursor: "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center"
-                        }}
-                      >
-                        Clear
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => {
-                          setUserSearchQuery(userSearchInput);
-                          setUsersPage(1);
-                        }}
-                        style={{
-                          backgroundColor: "#27235c",
-                          color: "#fff",
-                          border: "none",
-                          padding: "8px 12px",
-                          cursor: "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center"
-                        }}
-                      >
-                        Search
-                      </button>
-                    )}
-                  </div>
-
-                  <button
-                    onClick={handleSelectAll}
-                    className="flp-btn-select-all"
-                    style={{
-                      background: allEligibleSelected ? "#AC5098" : "#27235C",
-                      color: "#fff",
-                      border: "none",
-                      padding: "8px 12px",
-                      borderRadius: "6px",
-                      cursor: "pointer"
-                    }}
-                    title={allEligibleSelected ? "Deselect All" : "Select All"}
-                  >
-                    <i
-                      className={
-                        allEligibleSelected ? "bi bi-x-circle" : "bi bi-check2-all"
-                      }
-                    ></i>
-                    {allEligibleSelected ? "Deselect All" : "Select All"}
-                  </button>
-                </div>
-              )}
-            </div>
-
-            <div
-              className="flp-panel-body"
-              style={{
-                overflowY: "auto",
-                maxHeight: "580px",
-                minHeight: "350px",
+          <div className="flp-users-panel">
+  <div className="flp-panel-header">
+    <h3>
+      <i className="bi bi-people-fill"></i> Select Users
+    </h3>
+    {selectedFormId && (
+      <div className="flp-users-filters">
+        <div className="fl-search-container">
+          <input
+            type="text"
+            placeholder="Search users..."
+            value={userSearchInput}
+            onChange={(e) => setUserSearchInput(e.target.value)}
+            className="fl-search-input"
+          />
+          {userSearchQuery ? (
+            <button
+              onClick={() => {
+                setUserSearchQuery("");
+                setUserSearchInput("");
+                setUsersPage(1);
               }}
+              className="fl-search-btn"
             >
+              Clear
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                setUserSearchQuery(userSearchInput);
+                setUsersPage(1);
+              }}
+              className="fl-search-btn"
+            >
+              Search
+            </button>
+          )}
+        </div>
+
+        <button
+          onClick={handleSelectAll}
+          className={`flp-btn-select-all ${allEligibleSelected ? "flp-deselect-all" : ""}`}
+          title={allEligibleSelected ? "Deselect All" : "Select All"}
+        >
+          {allEligibleSelected ? "Deselect All" : "Select All"}
+        </button>
+      </div>
+    )}
+  </div>
+
+
+            <div className="flp-panel-body">
               {!selectedFormId ? (
                 <div className="flp-empty-box">
                   <i className="bi bi-hand-index"></i>
@@ -946,19 +1007,13 @@ function FormsList() {
               <div className="flp-pagination-container">
                 <div className="flp-pagination-info">
                   <span className="flp-pagination-label">Rows per page:</span>
-                  <select
-                    className="flp-pagination-select"
+                  <RowsPerPageDropdown
                     value={usersPerPage}
-                    onChange={(e) => {
-                      setUsersPerPage(Number(e.target.value));
+                    onChange={(val) => {
+                      setUsersPerPage(val);
                       setUsersPage(1);
                     }}
-                  >
-                    <option value={5}>5</option>
-                    <option value={10}>10</option>
-                    <option value={15}>15</option>
-                    <option value={20}>20</option>
-                  </select>
+                  />
                 </div>
 
                 <nav className="flp-pagination-nav">
@@ -1016,7 +1071,6 @@ function FormsList() {
               </button>
             </div>
           </div>
-
         </div>
       </div>
     </div>

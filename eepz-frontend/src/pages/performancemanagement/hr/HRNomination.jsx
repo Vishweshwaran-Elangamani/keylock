@@ -10,7 +10,6 @@ import ActionModal from "../../../components/performance_management/modals/Hrnom
 import "../../../styles/performancemanagement/hr/Hrnomination.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 
-
 function HRNominations() {
   const [nominations, setNominations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -25,7 +24,6 @@ function HRNominations() {
   const [actionNominationId, setActionNominationId] = useState(null);
   const [actionRemarks, setActionRemarks] = useState("");
   
-  // New state for viewing employees under a reward type
   const [showEmployeeList, setShowEmployeeList] = useState(false);
   const [selectedRewardEmployees, setSelectedRewardEmployees] = useState([]);
   const [selectedRewardName, setSelectedRewardName] = useState("");
@@ -145,7 +143,6 @@ function HRNominations() {
     }
   };
 
-  // Group nominations by reward type
   const groupByRewardType = (nominations) => {
     const grouped = {};
     
@@ -203,6 +200,7 @@ function HRNominations() {
     setActionRemarks("");
     setShowActionModal(true);
   };
+
   const submitAction = async () => {
     if (!actionRemarks.trim()) {
       toast.warning("Please enter remarks");
@@ -286,7 +284,6 @@ function HRNominations() {
     setSelectedRewardEmployees([]);
   };
 
-  // Handle breadcrumb click for Nominations
   const handleNominationsClick = (e) => {
     if (e) e.preventDefault();
     goBackToNominations();
@@ -332,16 +329,13 @@ function HRNominations() {
     );
   }
 
-  // Employee List View - COMPACT 2 COLUMNS
   if (showEmployeeList) {
     return (
       <div style={{ background: THEME.background, minHeight: "100vh", paddingTop: "16px", paddingBottom: "32px" }}>
         <ToastContainer position="top-right" autoClose={3000} />
         
         <div className="container-fluid">
-          {/* Breadcrumb with custom handler */}
           <div onClick={(e) => {
-            // Check if Nominations breadcrumb was clicked
             const target = e.target;
             if (target.textContent === "Nominations" || target.closest('[data-breadcrumb="nominations"]')) {
               handleNominationsClick(e);
@@ -357,7 +351,6 @@ function HRNominations() {
             />
           </div>
 
-          {/* Header */}
           <div style={{
             background: "#fff",
             border: "2px solid #27235c",
@@ -388,7 +381,6 @@ function HRNominations() {
             </div>
           </div>
 
-          {/* Employee Cards - 2 COLUMNS COMPACT */}
           <div className="row g-3">
             {selectedRewardEmployees.map((employee) => (
               <div key={employee.nominationId} className="col-md-6">
@@ -410,7 +402,6 @@ function HRNominations() {
                     e.currentTarget.style.boxShadow = "none";
                   }}
                 >
-                  {/* Employee Header - LEFT ALIGNED */}
                   <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
                     <div style={{
                       width: "40px",
@@ -437,7 +428,6 @@ function HRNominations() {
                     </div>
                   </div>
                   
-                  {/* Info Grid */}
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "12px" }}>
                     <div style={{ background: "#f8f9fc", padding: "8px 10px", borderRadius: "6px" }}>
                       <span style={{ fontSize: "10px", color: THEME.textLight, fontWeight: "600", textTransform: "uppercase", display: "block" }}>
@@ -457,7 +447,6 @@ function HRNominations() {
                     </div>
                   </div>
 
-                  {/* Justification */}
                   {employee.justification && (
                     <div style={{
                       background: "#f8f9fc",
@@ -481,7 +470,6 @@ function HRNominations() {
                     </div>
                   )}
 
-                  {/* Action Buttons - ICON ONLY */}
                   <div style={{ display: "flex", gap: "6px", justifyContent: "center" }}>
                     <button
                       onClick={() => viewDetails(employee.nominationId)}
@@ -572,35 +560,6 @@ function HRNominations() {
   return (
     <div style={{ background: THEME.background, minHeight: "100vh", paddingTop: "16px", paddingBottom: "32px" }}>
       <ToastContainer position="top-right" autoClose={3000} />
-      <style>{`
-        .status-tabs {
-          background: #27235c;
-          border-radius: 999px;
-          display: flex;
-          padding: 5px;
-          border: 2px solid #27235c;
-          width: fit-content;
-        }
-        .status-tab {
-          background: transparent;
-          color: #fff;
-          font-weight: 700;
-          border: none;
-          outline: none;
-          font-size: 0.95rem;
-          border-radius: 999px;
-          padding: 10px 28px;
-          cursor: pointer;
-          margin: 0;
-          transition: background 0.15s, color 0.15s;
-        }
-        .status-tab.active {
-          background: #fff;
-          color: #27235c;
-          font-weight: 700;
-          box-shadow: 0 2px 6px rgba(39,35,92,0.08);
-        }
-      `}</style>
 
       <div className="container-fluid">
         <Breadcrumb
@@ -821,7 +780,6 @@ function HRNominations() {
                             <div style={{ fontWeight: "700", color: THEME.text, fontSize: "15px" }}>
                               {reward.rewardName}
                             </div>
-                           
                           </div>
                         </div>
                       </td>
@@ -887,7 +845,6 @@ function HRNominations() {
                       className="page-link"
                       onClick={() => setCurrentPage(1)}
                       disabled={currentPage === 1}
-                      style={{ color: "#27235c", fontWeight: "600", fontSize: "13px", padding: "6px 12px" }}
                     >
                       First
                     </button>
@@ -899,14 +856,6 @@ function HRNominations() {
                         <button
                           className="page-link"
                           onClick={() => setCurrentPage(pageNum)}
-                          style={{
-                            background: currentPage === pageNum ? "#27235c" : "transparent",
-                            color: currentPage === pageNum ? "#fff" : "#27235c",
-                            border: "1px solid #27235c",
-                            fontWeight: "600",
-                            fontSize: "13px",
-                            padding: "6px 12px",
-                          }}
                         >
                           {pageNum}
                         </button>
@@ -918,7 +867,6 @@ function HRNominations() {
                       className="page-link"
                       onClick={() => setCurrentPage(totalPages)}
                       disabled={currentPage === totalPages}
-                      style={{ color: "#27235c", fontWeight: "600", fontSize: "13px", padding: "6px 12px" }}
                     >
                       Last
                     </button>
@@ -1041,7 +989,6 @@ function HRNominations() {
                       className="page-link"
                       onClick={() => setCurrentPage(1)}
                       disabled={currentPage === 1}
-                      style={{ color: "#27235c", fontWeight: "600", fontSize: "13px", padding: "6px 12px" }}
                     >
                       First
                     </button>
@@ -1053,14 +1000,6 @@ function HRNominations() {
                         <button
                           className="page-link"
                           onClick={() => setCurrentPage(pageNum)}
-                          style={{
-                            background: currentPage === pageNum ? "#27235c" : "transparent",
-                            color: currentPage === pageNum ? "#fff" : "#27235c",
-                            border: "1px solid #27235c",
-                            fontWeight: "600",
-                            fontSize: "13px",
-                            padding: "6px 12px",
-                          }}
                         >
                           {pageNum}
                         </button>
@@ -1072,7 +1011,6 @@ function HRNominations() {
                       className="page-link"
                       onClick={() => setCurrentPage(totalPages)}
                       disabled={currentPage === totalPages}
-                      style={{ color: "#27235c", fontWeight: "600", fontSize: "13px", padding: "6px 12px" }}
                     >
                       Last
                     </button>

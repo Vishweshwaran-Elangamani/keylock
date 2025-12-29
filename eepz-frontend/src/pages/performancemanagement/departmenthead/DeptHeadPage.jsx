@@ -7,7 +7,7 @@ import {
 } from "../../../services/performancemanagement/api/rolesapi";
 import { getEmployeeIdForFilter } from "../../../utils/PerformanceManagement/jwtDecoder";
 import { toast } from "sonner";
-import "../../../styles/performancemanagement/hr/DeptHeadPage.css";
+import "../../../styles/performancemanagement/depthead/DeptHeadPage.css"
 import Breadcrumb from "../../../components/common/Breadcrumb";
 import { apiPort5113 } from "../../../services/performancemanagement/api/rolesapi";
 
@@ -409,7 +409,6 @@ export default function DeptHeadPage() {
         <div className="dp-modal-backdrop"></div>
         <div className="dp-modal-wrapper">
           <div className="dp-modal-dialog dp-modal-bordered">
-            {/* Header - Fixed color issue */}
             <div className="dp-modal-header dp-modal-header-primary">
               <div className="dp-modal-title">
                 <i className="bi bi-check-circle-fill"></i>
@@ -426,7 +425,6 @@ export default function DeptHeadPage() {
               </button>
             </div>
   
-            {/* Body - WITHOUT footer inside */}
             <div className="dp-modal-body">
               <div className="dp-details-box">
                 <h6 className="dp-details-title">
@@ -488,7 +486,6 @@ export default function DeptHeadPage() {
               </div>
             </div>
   
-            {/* Footer - OUTSIDE body, fixed negative margins */}
             <div className="dp-modal-footer dp-modal-footer-approve">
               <button
                 type="button"
@@ -819,7 +816,6 @@ return (
           </button>
         </div>
 
-        {/* Show Clear Filters button only when filters are active */}
         {hasActiveFilters && (
           <button
             onClick={handleClearFilters}

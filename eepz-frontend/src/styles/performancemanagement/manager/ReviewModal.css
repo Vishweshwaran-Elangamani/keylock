@@ -25,7 +25,6 @@
   font-weight: 600;
 }
 
-/* Header – aligned with page style */
 .tl-modal {
   max-width: 960px;
   background: #fff;
@@ -96,7 +95,6 @@
   color: #26225A;
 }
 
-/* Overlay */
 .tl-modal-overlay {
   position: fixed;
   inset: 0;
@@ -107,7 +105,6 @@
   z-index: 9999;
 }
 
-/* Info strip */
 .tl-modal-info {
   padding: 12px 24px;
   background: #f8f9fa;
@@ -133,7 +130,6 @@
   color: #26225A;
 }
 
-/* Rejection */
 .tl-rejection {
   padding: 16px 24px;
   background: #fef2f2;
@@ -157,7 +153,6 @@
   margin: 0;
 }
 
-/* Attachments */
 .tl-attachments-section {
   margin: 20px 0 10px 0;
   padding: 14px 16px;
@@ -339,7 +334,6 @@
   border-color: #9ca3af;
 }
 
-/* L1 submit gradient, no hover change */
 .tl-btn-l1-submit {
   background: linear-gradient(135deg, #97247E 0%, #E01950 100%);
   color: #ffffff;
@@ -406,7 +400,6 @@
   margin-top: 16px;
 }
 
-/* Inputs */
 .tl-input-text {
   width: 100%;
   padding: 8px 12px;

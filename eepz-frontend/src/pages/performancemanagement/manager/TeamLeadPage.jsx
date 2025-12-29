@@ -7,7 +7,7 @@ import "../../../styles/performancemanagement/manager/TeamLeadPage.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import ReviewModal from "../../../components/performance_management/modals/TeamLeadPage/ReviewModal";
 import Breadcrumb from "../../../components/common/Breadcrumb";
- 
+
 const calculateAverageRating = (items) => {
   if (!items || items.length === 0) return 0;
   const validRatings = items
@@ -18,10 +18,10 @@ const calculateAverageRating = (items) => {
     validRatings.reduce((a, b) => a + b, 0) / validRatings.length
   ).toFixed(2);
 };
- 
+
 const getExtensionFromContentType = (contentType) => {
   if (!contentType) return null;
- 
+
   const mimeToExt = {
     "application/pdf": ".pdf",
     "application/msword": ".doc",
@@ -41,10 +41,10 @@ const getExtensionFromContentType = (contentType) => {
     "application/zip": ".zip",
     "application/x-zip-compressed": ".zip",
   };
- 
+
   return mimeToExt[contentType.toLowerCase()] || null;
 };
- 
+
 const isL1Complete = (assess) => {
   return (assess.items || []).every(
     (item) =>
@@ -54,7 +54,7 @@ const isL1Complete = (assess) => {
       item.approverRating <= 5
   );
 };
- 
+
 const getL1Categories = (allSubs) => {
   if (!Array.isArray(allSubs))
     return { pending: [], submitted: [], rejected: [] };
@@ -74,7 +74,7 @@ const getL1Categories = (allSubs) => {
   });
   return { pending, submitted, rejected };
 };
- 
+
 function TeamLeadPage() {
   const user = JSON.parse(localStorage.getItem("user"));
   const empId = user ? user.empId : null;
@@ -95,14 +95,13 @@ function TeamLeadPage() {
   const [rejectionReason, setRejectionReason] = useState("");
   const [l2ActionLoading, setL2ActionLoading] = useState(false);
   const [isReadOnly, setIsReadOnly] = useState(false);
- 
- 
+
   useEffect(() => {
     if (userId) {
       fetchData();
     }
   }, [userId, active]);
- 
+
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -120,7 +119,7 @@ function TeamLeadPage() {
             params: { page: 1, pageSize: 25 },
           }).catch(() => ({ data: [] })),
         ]);
- 
+
         const extractAssessments = (resp) => {
           const respData = resp?.data;
           return Array.isArray(respData)
@@ -133,7 +132,7 @@ function TeamLeadPage() {
             ? respData.assessments
             : [];
         };
- 
+
         const pendingAssessments = extractAssessments(pendingResp);
         const reworkAssessmentsList = extractAssessments(reworkResp);
         const submittedAssessmentsBasic = extractAssessments(submittedResp);
@@ -142,7 +141,7 @@ function TeamLeadPage() {
           ...pendingAssessments.map((a) => a.assessmentId),
           ...reworkAssessmentsList.map((a) => a.assessmentId),
         ];
- 
+
         const allWithDetails = await Promise.all(
           allAssessmentIds.map(async (assessmentId) => {
             try {
@@ -162,7 +161,7 @@ function TeamLeadPage() {
             }
           })
         );
- 
+
         const withNotes = await Promise.all(
           allWithDetails.map(async (a) => {
             try {
@@ -179,7 +178,7 @@ function TeamLeadPage() {
             }
           })
         );
- 
+
         const submittedWithDetails = await Promise.all(
           submittedAssessmentsBasic.map(async (basic) => {
             try {
@@ -192,7 +191,7 @@ function TeamLeadPage() {
             }
           })
         );
- 
+
         setAllL1(withNotes);
         setSubmittedL1(submittedWithDetails);
       } else {
@@ -245,7 +244,7 @@ function TeamLeadPage() {
       setLoading(false);
     }
   };
- 
+
   const openModal = async (assess, readOnly = false) => {
     setIsReadOnly(readOnly);
     setModalData(assess);
@@ -266,17 +265,17 @@ function TeamLeadPage() {
     setModalRatings(ratings);
     setShowRejectReason(false);
     setRejectionReason("");
- 
+
     try {
       const endpoint =
         active === "l1"
           ? `/approver/${userId}/assessment/${assess.assessmentId}/attachments`
           : `/reviewer/${userId}/assessment/${assess.assessmentId}/attachments`;
- 
+
       const attachmentsResp = await apiPort5113.get(endpoint);
       const attachments =
         attachmentsResp.data?.data || attachmentsResp.data || [];
- 
+
       setModalData((prev) => ({
         ...assess,
         attachments: attachments,
@@ -288,10 +287,10 @@ function TeamLeadPage() {
         attachments: [],
       }));
     }
- 
+
     setShowModal(true);
   };
- 
+
   const closeModal = () => {
     setShowModal(false);
     setModalData(null);
@@ -300,7 +299,7 @@ function TeamLeadPage() {
     setRejectionReason("");
     setIsReadOnly(false);
   };
- 
+
   const handleL1Submit = async () => {
     setSubmitting(true);
     try {
@@ -309,7 +308,7 @@ function TeamLeadPage() {
         rating: Number(modalRatings[item.detailId]?.rating),
         comments: modalRatings[item.detailId]?.comment,
       }));
- 
+
       if (
         !items.every(
           (it) =>
@@ -325,7 +324,7 @@ function TeamLeadPage() {
         setSubmitting(false);
         return;
       }
- 
+
       await apiPort5113.post(`/approver/${userId}/reviews`, {
         assessmentId: modalData.assessmentId,
         items,
@@ -339,7 +338,7 @@ function TeamLeadPage() {
       setSubmitting(false);
     }
   };
- 
+
   const handleL2Approve = async () => {
     setL2ActionLoading(true);
     try {
@@ -372,13 +371,13 @@ function TeamLeadPage() {
           return null;
         })
         .filter((item) => item !== null);
- 
+
       if (items.length !== (modalData.items || []).length) {
         toast.error("Please complete all items.");
         setL2ActionLoading(false);
         return;
       }
- 
+
       await apiPort5113.post(`/reviewer/${userId}/reviews`, {
         assessmentId: modalData.assessmentId,
         items,
@@ -397,7 +396,7 @@ function TeamLeadPage() {
       setL2ActionLoading(false);
     }
   };
- 
+
   const handleL2Reject = async () => {
     if (!rejectionReason.trim()) {
       toast.error("Please provide a rejection reason.");
@@ -419,22 +418,22 @@ function TeamLeadPage() {
       setL2ActionLoading(false);
     }
   };
- 
+
   const handleDownloadAttachment = async (attachmentId) => {
     try {
       const endpoint =
         active === "l1"
           ? `/approver/${userId}/attachments/${attachmentId}/download`
           : `/reviewer/${userId}/attachments/${attachmentId}/download`;
- 
+
       const response = await apiPort5113.get(endpoint, {
         responseType: "blob",
       });
- 
+
       let filename = "attachment";
- 
+
       const contentDisposition = response.headers["content-disposition"];
- 
+
       if (contentDisposition) {
         const matches = contentDisposition.match(
           /filename\s*=\s*(?:"([^"]*)"|([^;,\n]*))/
@@ -444,16 +443,16 @@ function TeamLeadPage() {
           filename = filename.trim();
         }
       }
- 
+
       const contentType = response.headers["content-type"];
- 
+
       if (!filename.includes(".") && contentType) {
         const extension = getExtensionFromContentType(contentType);
         if (extension) {
           filename = `${filename}${extension}`;
         }
       }
- 
+
       const blob = new Blob([response.data], {
         type: contentType || "application/octet-stream",
       });
@@ -461,22 +460,22 @@ function TeamLeadPage() {
       const link = document.createElement("a");
       link.href = url;
       link.setAttribute("download", filename);
- 
+
       document.body.appendChild(link);
       link.click();
- 
+
       setTimeout(() => {
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
       }, 100);
- 
+
       toast.success(`Downloaded: ${filename}`);
     } catch (error) {
       console.error("Error downloading attachment:", error);
       toast.error("Failed to download attachment.");
     }
   };
- 
+
   function renderL1Table() {
     const categories = getL1Categories(allL1);
     const tabs = [
@@ -485,58 +484,18 @@ function TeamLeadPage() {
       { key: "Submitted", label: "Submitted L1 Ratings", subs: submittedL1 },
     ];
     const currentSubs = tabs.find((t) => t.key === activeL1Tab)?.subs || [];
- 
+
     return (
       <>
-        <div
-          className="tl-tabs-bar"
-          style={{
-            backgroundColor: "#27235c",
-            border: "2px solid #27235c",
-            borderRadius: "12px",
-            padding: "8px 10px",
-            marginBottom: "14px",
-          }}
-        >
+        <div className="tl-tabs-bar">
           {tabs.map((tab) => (
             <button
               key={tab.key}
               className={`tl-tab ${activeL1Tab === tab.key ? "active" : ""}`}
               onClick={() => setActiveL1Tab(tab.key)}
-              style={{
-                padding: "5px 12px",
-                fontWeight: "700",
-                background:
-                  activeL1Tab === tab.key ? "#ffffff" : "transparent",
-                border: "none",
-                color:
-                  activeL1Tab === tab.key ? "#27235c" : "#ffffff",
-                cursor: "pointer",
-                borderRadius: "999px",
-                fontSize: "12px",
-              }}
             >
               {tab.label}
-              <span
-                className="tl-count"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  minWidth: "18px",
-                  height: "18px",
-                  background:
-                    activeL1Tab === tab.key
-                      ? "rgba(39,35,92,0.15)"
-                      : "rgba(255,255,255,0.2)",
-                  color:
-                    activeL1Tab === tab.key ? "#27235c" : "#ffffff",
-                  borderRadius: "50%",
-                  fontSize: "10px",
-                  fontWeight: "700",
-                  marginLeft: "6px",
-                }}
-              >
+              <span className="tl-count">
                 {tab.subs.length}
               </span>
             </button>
@@ -549,17 +508,7 @@ function TeamLeadPage() {
           </div>
         ) : (
           <>
-            <table
-              className="cg-employee-table"
-              style={{
-                border: "2px solid #27235c",
-                borderRadius: "12px",
-                overflow: "hidden",
-                borderCollapse: "separate",
-                borderSpacing: 0,
-                background: "#ffffff",
-              }}
-            >
+            <table className="cg-employee-table">
               <thead>
                 <tr>
                   <th>Employee</th>
@@ -609,9 +558,7 @@ function TeamLeadPage() {
                         </span>
                       </td>
                       <td>
-                        {new Date(
-                          assess.submittedAt
-                        ).toLocaleDateString()}
+                        {new Date(assess.submittedAt).toLocaleDateString()}
                       </td>
                       <td>
                         {showReviewBtn && (
@@ -619,20 +566,15 @@ function TeamLeadPage() {
                             className="cg-bulk-btn"
                             onClick={() => openModal(assess, false)}
                           >
-                            <i className="bi bi-pencil-square"></i>{" "}
-                            Review &amp; Submit
+                            <i className="bi bi-pencil-square"></i> Review &amp; Submit
                           </button>
                         )}
                         {isSubmittedTab && (
                           <button
-                            className="cg-bulk-btn"
+                            className="cg-bulk-btn cg-bulk-btn-view"
                             onClick={() => openModal(assess, true)}
-                            style={{
-                              background: "linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)",
-                              boxShadow: "0 4px 12px rgba(59,130,246,0.18)",
-                            }}
                           >
-                            <i className="bi bi-eye"></i> 
+                            <i className="bi bi-eye"></i>
                           </button>
                         )}
                       </td>
@@ -641,23 +583,10 @@ function TeamLeadPage() {
                 })}
               </tbody>
             </table>
-            <div
-              className="pagination-container"
-              style={{ marginTop: "6px", padding: "4px 0" }}
-            >
-              <div
-                className="pagination-info"
-                style={{ fontSize: "11px", gap: "4px" }}
-              >
+            <div className="pagination-container">
+              <div className="pagination-info">
                 <span className="pagination-label">Show</span>
-                <select
-                  className="pagination-select"
-                  style={{
-                    height: "24px",
-                    padding: "1px 6px",
-                    fontSize: "11px",
-                  }}
-                >
+                <select className="pagination-select">
                   <option value="5">5</option>
                   <option value="10">10</option>
                   <option value="25">25</option>
@@ -665,51 +594,21 @@ function TeamLeadPage() {
                 </select>
                 <span className="pagination-label">entries</span>
               </div>
-              <div
-                className="pagination-status"
-                style={{ fontSize: "11px" }}
-              >
-                Showing 1 to {currentSubs.length} of{" "}
-                {currentSubs.length} entries
+              <div className="pagination-status">
+                Showing 1 to {currentSubs.length} of {currentSubs.length} entries
               </div>
               <nav className="pagination-nav">
-                <ul
-                  className="pagination"
-                  style={{ margin: 0, gap: "3px" }}
-                >
+                <ul className="pagination">
                   <li className="page-item disabled">
-                    <button
-                      className="page-link"
-                      style={{
-                        padding: "3px 6px",
-                        fontSize: "11px",
-                        minHeight: "0",
-                      }}
-                    >
+                    <button className="page-link">
                       <i className="bi bi-chevron-left"></i>
                     </button>
                   </li>
                   <li className="page-item active">
-                    <button
-                      className="page-link"
-                      style={{
-                        padding: "3px 8px",
-                        fontSize: "11px",
-                        minHeight: "0",
-                      }}
-                    >
-                      1
-                    </button>
+                    <button className="page-link">1</button>
                   </li>
                   <li className="page-item disabled">
-                    <button
-                      className="page-link"
-                      style={{
-                        padding: "3px 6px",
-                        fontSize: "11px",
-                        minHeight: "0",
-                      }}
-                    >
+                    <button className="page-link">
                       <i className="bi bi-chevron-right"></i>
                     </button>
                   </li>
@@ -721,7 +620,7 @@ function TeamLeadPage() {
       </>
     );
   }
- 
+
   function renderL2Table() {
     const tabs = [
       { key: "Pending", label: "Pending L2 Review", subs: l2Subs },
@@ -732,55 +631,15 @@ function TeamLeadPage() {
     
     return (
       <>
-        <div
-          className="tl-tabs-bar"
-          style={{
-            backgroundColor: "#27235c",
-            border: "2px solid #27235c",
-            borderRadius: "12px",
-            padding: "8px 10px",
-            marginBottom: "14px",
-          }}
-        >
+        <div className="tl-tabs-bar">
           {tabs.map((tab) => (
             <button
               key={tab.key}
               className={`tl-tab ${activeL2Tab === tab.key ? "active" : ""}`}
               onClick={() => setActiveL2Tab(tab.key)}
-              style={{
-                padding: "5px 12px",
-                fontWeight: "700",
-                background:
-                  activeL2Tab === tab.key ? "#ffffff" : "transparent",
-                border: "none",
-                color:
-                  activeL2Tab === tab.key ? "#27235c" : "#ffffff",
-                cursor: "pointer",
-                borderRadius: "999px",
-                fontSize: "12px",
-              }}
             >
               {tab.label}
-              <span
-                className="tl-count"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  minWidth: "18px",
-                  height: "18px",
-                  background:
-                    activeL2Tab === tab.key
-                      ? "rgba(39,35,92,0.15)"
-                      : "rgba(255,255,255,0.2)",
-                  color:
-                    activeL2Tab === tab.key ? "#27235c" : "#ffffff",
-                  borderRadius: "50%",
-                  fontSize: "10px",
-                  fontWeight: "700",
-                  marginLeft: "6px",
-                }}
-              >
+              <span className="tl-count">
                 {tab.subs.length}
               </span>
             </button>
@@ -794,17 +653,7 @@ function TeamLeadPage() {
           </div>
         ) : (
           <>
-            <table
-              className="cg-employee-table"
-              style={{
-                border: "2px solid #27235c",
-                borderRadius: "12px",
-                overflow: "hidden",
-                borderCollapse: "separate",
-                borderSpacing: 0,
-                background: "#ffffff",
-              }}
-            >
+            <table className="cg-employee-table">
               <thead>
                 <tr>
                   <th>Employee</th>
@@ -825,10 +674,8 @@ function TeamLeadPage() {
                   const l1Avg =
                     l1Ratings.length > 0
                       ? (
-                          l1Ratings.reduce(
-                            (sum, i) => sum + i.approverRating,
-                            0
-                          ) / l1Ratings.length
+                          l1Ratings.reduce((sum, i) => sum + i.approverRating, 0) /
+                          l1Ratings.length
                         ).toFixed(2)
                       : 0;
                   return (
@@ -851,9 +698,7 @@ function TeamLeadPage() {
                         </span>
                       </td>
                       <td>
-                        {new Date(
-                          assess.submittedAt
-                        ).toLocaleDateString()}
+                        {new Date(assess.submittedAt).toLocaleDateString()}
                       </td>
                       <td>
                         {!isSubmittedTab && (
@@ -866,12 +711,8 @@ function TeamLeadPage() {
                         )}
                         {isSubmittedTab && (
                           <button
-                            className="cg-bulk-btn"
+                            className="cg-bulk-btn cg-bulk-btn-view"
                             onClick={() => openModal(assess, true)}
-                            style={{
-                              background: "linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)",
-                              boxShadow: "0 4px 12px rgba(59,130,246,0.18)",
-                            }}
                           >
                             <i className="bi bi-eye"></i> View
                           </button>
@@ -882,73 +723,31 @@ function TeamLeadPage() {
                 })}
               </tbody>
             </table>
-            <div
-              className="pagination-container"
-              style={{ marginTop: "6px", padding: "4px 0" }}
-            >
-              <div
-                className="pagination-info"
-                style={{ fontSize: "11px", gap: "4px" }}
-              >
+            <div className="pagination-container">
+              <div className="pagination-info">
                 <span className="pagination-label">Show</span>
-                <select
-                  className="pagination-select"
-                  style={{
-                    height: "24px",
-                    padding: "1px 6px",
-                    fontSize: "11px",
-                  }}
-                >
+                <select className="pagination-select">
                   <option value="10">10</option>
                   <option value="25">25</option>
                   <option value="50">50</option>
                 </select>
                 <span className="pagination-label">entries</span>
               </div>
-              <div
-                className="pagination-status"
-                style={{ fontSize: "11px" }}
-              >
+              <div className="pagination-status">
                 Showing 1 to {currentSubs.length} of {currentSubs.length} entries
               </div>
               <nav className="pagination-nav">
-                <ul
-                  className="pagination"
-                  style={{ margin: 0, gap: "3px" }}
-                >
+                <ul className="pagination">
                   <li className="page-item disabled">
-                    <button
-                      className="page-link"
-                      style={{
-                        padding: "3px 6px",
-                        fontSize: "11px",
-                        minHeight: "0",
-                      }}
-                    >
+                    <button className="page-link">
                       <i className="bi bi-chevron-left"></i>
                     </button>
                   </li>
                   <li className="page-item active">
-                    <button
-                      className="page-link"
-                      style={{
-                        padding: "3px 8px",
-                        fontSize: "11px",
-                        minHeight: "0",
-                      }}
-                    >
-                      1
-                    </button>
+                    <button className="page-link">1</button>
                   </li>
                   <li className="page-item disabled">
-                    <button
-                      className="page-link"
-                      style={{
-                        padding: "3px 6px",
-                        fontSize: "11px",
-                        minHeight: "0",
-                      }}
-                    >
+                    <button className="page-link">
                       <i className="bi bi-chevron-right"></i>
                     </button>
                   </li>
@@ -960,21 +759,20 @@ function TeamLeadPage() {
       </>
     );
   }
- 
+
   return (
     <div className="tl-page">
-      <Toaster position="top-right"  />
- 
+      <Toaster position="top-right" />
+
       <div className="hrfcper-top-bar compact">
-           <Breadcrumb
-  items={[
-    { label: "Dashboard", path: "/manager/dashboard" },
-    { label: "Performance", path: "/manager/dashboard/performance" },
-    { label: "Performance Review", path: null }
-  ]}
-/>
-       
- 
+        <Breadcrumb
+          items={[
+            { label: "Dashboard", path: "/manager/dashboard" },
+            { label: "Performance", path: "/manager/dashboard/performance" },
+            { label: "Performance Review", path: null }
+          ]}
+        />
+
         <div className="tl-toggle compact">
           <button
             className={`tl-toggle-btn ${active === "l1" ? "active" : ""}`}
@@ -998,7 +796,7 @@ function TeamLeadPage() {
           </button>
         </div>
       </div>
- 
+
       <div className="tl-content">
         {loading ? (
           <div className="tl-loading">
@@ -1012,7 +810,7 @@ function TeamLeadPage() {
           </>
         )}
       </div>
- 
+
       {showModal && modalData && (
         <ReviewModal
           showModal={showModal}
@@ -1037,5 +835,5 @@ function TeamLeadPage() {
     </div>
   );
 }
- 
+
 export default TeamLeadPage;

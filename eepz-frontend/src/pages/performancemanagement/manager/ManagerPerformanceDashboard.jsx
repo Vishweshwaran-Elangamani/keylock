@@ -184,7 +184,7 @@ export default function ManagerDashboard() {
 
   const renderTable = (data, isCompleted) => (
     <div className="manevap-table-container">
-      <table className="manevap-table" style={{ border: "2px solid #26225A", borderRadius: "8px", borderCollapse: "collapse" }}>
+      <table className="manevap-table">
         <thead>
           <tr>
             <th><i className="bi bi-file-earmark-text"></i> Form Name</th>
@@ -227,31 +227,6 @@ export default function ManagerDashboard() {
                       setAssessmentData(initialData);
                       setShowModal(true);
                     }}
-                    style={{
-                      background: "linear-gradient(135deg, #97247E 0%, #E01950 100%)",
-                      border: "none",
-                      boxShadow: "0 4px 12px rgba(151, 36, 126, 0.3)",
-                      color: "white",
-                      padding: "8px 16px",
-                      borderRadius: "6px",
-                      cursor: "pointer",
-                      fontWeight: 600,
-                      fontSize: "14px",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "6px",
-                      transition: "all 0.2s"
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = "linear-gradient(135deg, #7d1a6a 0%, #c01640 100%)";
-                      e.currentTarget.style.boxShadow = "0 6px 16px rgba(151, 36, 126, 0.4)";
-                      e.currentTarget.style.transform = "translateY(-1px)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = "linear-gradient(135deg, #97247E 0%, #E01950 100%)";
-                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(151, 36, 126, 0.3)";
-                      e.currentTarget.style.transform = "translateY(0)";
-                    }}
                   >
                     Submit
                   </button>
@@ -259,31 +234,6 @@ export default function ManagerDashboard() {
                   <button
                     className="manevap-btn manevap-btn-view"
                     onClick={() => handleViewCompleted(assignment)}
-                    style={{
-                      background: "linear-gradient(135deg, #97247E 0%, #E01950 100%)",
-                      border: "none",
-                      boxShadow: "0 4px 12px rgba(151, 36, 126, 0.3)",
-                      color: "white",
-                      padding: "8px 16px",
-                      borderRadius: "6px",
-                      cursor: "pointer",
-                      fontWeight: 600,
-                      fontSize: "14px",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "6px",
-                      transition: "all 0.2s"
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = "linear-gradient(135deg, #7d1a6a 0%, #c01640 100%)";
-                      e.currentTarget.style.boxShadow = "0 6px 16px rgba(151, 36, 126, 0.4)";
-                      e.currentTarget.style.transform = "translateY(-1px)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = "linear-gradient(135deg, #97247E 0%, #E01950 100%)";
-                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(151, 36, 126, 0.3)";
-                      e.currentTarget.style.transform = "translateY(0)";
-                    }}
                   >
                     <i className="bi bi-eye-fill"></i> View
                   </button>
@@ -300,7 +250,7 @@ export default function ManagerDashboard() {
     return (
       <div className="manevap-container">
         <Toaster position="top-right" />
-        <div style={{ position: 'relative', zIndex: 12000 }}>
+        <div className="toaster-wrapper">
           <Toaster position="top-right" />
         </div>
         <div className="manevap-loading-state">
@@ -313,11 +263,11 @@ export default function ManagerDashboard() {
 
   return (
     <div className="manevap-container">
-      <div style={{ position: 'relative', zIndex: 12000 }}>
+      <div className="toaster-wrapper">
         <Toaster position="top-right" />
       </div>
       <div className="hrfcper-top-bar">
-        <div style={{ width: '100%' }}>
+        <div className="breadcrumb-wrapper">
           <Breadcrumb
             items={[
               { label: 'Performance Management', path: '/manager/dashboard/performance' },
@@ -353,15 +303,14 @@ export default function ManagerDashboard() {
       {activeTab === "pending" && (
         <div className="manevap-card">
           <div className="manevap-filter-section">
-            <div className="manevap-filter-group" style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-              <div className="unified-search-wrapper" style={{ flex: 1 }}>
+            <div className="manevap-filter-group">
+              <div className="unified-search-wrapper">
                 <input
                   type="text"
                   placeholder="Search by form name..."
                   value={pendingFormNameInput}
                   onChange={(e) => setPendingFormNameInput(e.target.value)}
                   className="manevap-filter-input"
-                  style={{ flex: 1 }}
                 />
                 <button
                   className="manevap-btn-primary"
@@ -407,15 +356,14 @@ export default function ManagerDashboard() {
       {activeTab === "completed" && (
         <div className="manevap-card">
           <div className="manevap-filter-section">
-            <div className="manevap-filter-group" style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-              <div className="unified-search-wrapper" style={{ flex: 1 }}>
+            <div className="manevap-filter-group">
+              <div className="unified-search-wrapper">
                 <input
                   type="text"
                   placeholder="Search by form name..."
                   value={completedFormNameInput}
                   onChange={(e) => setCompletedFormNameInput(e.target.value)}
                   className="manevap-filter-input"
-                  style={{ flex: 1 }}
                 />
                 <button
                   className="manevap-btn-primary"
@@ -460,80 +408,32 @@ export default function ManagerDashboard() {
 
       {showModal && currentAssignment && (
         <div className="manevap-modal-overlay" onClick={() => setShowModal(false)}>
-          <div 
-            className="manevap-modal-content" 
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              maxHeight: "90vh"
-            }}
-          >
-            <div
-              className="manevap-form-header-strict"
-              style={{
-                padding: "12px 20px",
-                minHeight: "auto",
-                borderBottom: "2px solid #2E2B5F",
-                flexShrink: 0
-              }}
-            >
-              <div style={{ 
-                display: "flex", 
-                alignItems: "center", 
-                justifyContent: "space-between",
-                gap: "12px"
-              }}>
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <div className="manevap-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="manevap-form-header-strict">
+              <div className="manevap-header-inner">
+                <div className="manevap-logo-section">
                   <img
                     src={logoImage}
                     alt="EEPZ Logo"
                     className="manevap-modal-logo"
-                    style={{ height: "32px", width: "auto" }}
                   />
-                  <div style={{
-                    fontSize: "9px",
-                    marginTop: "2px",
-                    fontWeight: 600,
-                    color: "#26225A"
-                  }}>
+                  <div className="manevap-logo-subtitle">
                     MANAGER FORM
                   </div>
                 </div>
 
-                <div style={{ 
-                  flex: 1, 
-                  textAlign: "center"
-                }}>
-                  <div style={{
-                    fontSize: "16px",
-                    fontWeight: 700,
-                    marginBottom: "2px",
-                    color: "#26225A"
-                  }}>
+                <div className="manevap-title-section">
+                  <div className="manevap-title-main">
                     Appraisal Form
                   </div>
-                  <div style={{ fontSize: "13px", color: "#6b7280" }}>
+                  <div className="manevap-title-sub">
                     {currentAssignment?.formName || ""}
                   </div>
                 </div>
 
                 <button
                   onClick={() => setShowModal(false)}
-                  style={{
-                    background: "transparent",
-                    border: "none",
-                    fontSize: "32px",
-                    color: "#6b7280",
-                    cursor: "pointer",
-                    padding: "0",
-                    lineHeight: 1,
-                    transition: "color 0.2s",
-                    fontWeight: 300,
-                    flexShrink: 0
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = "#26225A"}
-                  onMouseLeave={(e) => e.currentTarget.style.color = "#6b7280"}
+                  className="manevap-close-btn"
                   aria-label="Close modal"
                 >
                   ×
@@ -552,22 +452,22 @@ export default function ManagerDashboard() {
                   <table className="manevap-strict-table">
                     <thead>
                       <tr>
-                        <th style={{ textAlign: "left" }}>COMPETENCY NAME</th>
-                        <th style={{ textAlign: "left" }}>DESCRIPTION</th>
-                        <th style={{ textAlign: "left" }}>RATING</th>
-                        <th style={{ textAlign: "left" }}>COMMENTS</th>
+                        <th>COMPETENCY NAME</th>
+                        <th>DESCRIPTION</th>
+                        <th>RATING</th>
+                        <th>COMMENTS</th>
                       </tr>
                     </thead>
                     <tbody>
                       {assessmentData.map((item, idx) => (
                         <tr key={item.competencyId || idx}>
-                          <td className="manevap-cell-bold" style={{ textAlign: "left" }}>
+                          <td className="manevap-cell-bold">
                             {item.competencyName}
                           </td>
-                          <td style={{ textAlign: "left" }}>
+                          <td>
                             {item.competencyDescription || ""}
                           </td>
-                          <td style={{ textAlign: "left" }}>
+                          <td>
                             {modalMode === "view" ? (
                               <div className="manevap-modal-cell-view">
                                 {item.rating ? `${item.rating} / 5` : '-'}
@@ -589,7 +489,7 @@ export default function ManagerDashboard() {
                               </select>
                             )}
                           </td>
-                          <td style={{ textAlign: "left" }}>
+                          <td>
                             {modalMode === "view" ? (
                               <div className="manevap-modal-cell-view">{item.comments || "-"}</div>
                             ) : (
@@ -610,33 +510,10 @@ export default function ManagerDashboard() {
                   </table>
                 </div>
 
-                <div
-                  className="manevap-modal-actions"
-                  style={{
-                    padding: "10px 20px",
-                    display: "flex",
-                    gap: "10px",
-                    justifyContent: "flex-end",
-                    borderTop: "1px solid #e5e7eb",
-                    flexShrink: 0
-                  }}
-                >
+                <div className="manevap-modal-actions">
                   <button
                     onClick={() => setShowModal(false)}
                     className="manevap-btn-close"
-                    style={{
-                      background: "#6b7280",
-                      color: "white",
-                      border: "none",
-                      padding: "8px 16px",
-                      borderRadius: "6px",
-                      cursor: "pointer",
-                      fontWeight: 600,
-                      fontSize: "14px",
-                      transition: "background 0.2s"
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = "#4b5563"}
-                    onMouseLeave={(e) => e.currentTarget.style.background = "#6b7280"}
                   >
                     Cancel
                   </button>
@@ -644,36 +521,7 @@ export default function ManagerDashboard() {
                     <button
                       onClick={handleSubmitAssessment}
                       disabled={submitting}
-                      className="manevap-btn-submit-form"
-                      style={{
-                        background: submitting
-                          ? "#9ca3af"
-                          : "linear-gradient(135deg, #97247E 0%, #E01950 100%)",
-                        color: "white",
-                        border: "none",
-                        padding: "8px 20px",
-                        borderRadius: "6px",
-                        cursor: submitting ? "not-allowed" : "pointer",
-                        fontWeight: 700,
-                        fontSize: "14px",
-                        boxShadow: submitting ? "none" : "0 4px 12px rgba(151, 36, 126, 0.3)",
-                        transition: "all 0.2s",
-                        opacity: submitting ? 0.7 : 1
-                      }}
-                      onMouseEnter={(e) => {
-                        if (!submitting) {
-                          e.currentTarget.style.background = "linear-gradient(135deg, #7d1a6a 0%, #c01640 100%)";
-                          e.currentTarget.style.boxShadow = "0 6px 16px rgba(151, 36, 126, 0.4)";
-                          e.currentTarget.style.transform = "translateY(-1px)";
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!submitting) {
-                          e.currentTarget.style.background = "linear-gradient(135deg, #97247E 0%, #E01950 100%)";
-                          e.currentTarget.style.boxShadow = "0 4px 12px rgba(151, 36, 126, 0.3)";
-                          e.currentTarget.style.transform = "translateY(0)";
-                        }
-                      }}
+                      className={`manevap-btn-submit-form ${submitting ? 'disabled' : ''}`}
                     >
                       {submitting ? "Submitting..." : "Submit Assessment"}
                     </button>

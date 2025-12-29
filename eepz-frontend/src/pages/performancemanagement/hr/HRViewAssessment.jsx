@@ -6,7 +6,160 @@ import AppraisalDetailsModal from "../../../components/performance_management/mo
 import "../../../styles/performancemanagement/hr/HRViewAssessment.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 
+/* Custom Status Filter Dropdown */
+const StatusDropdown = ({ value, onChange }) => {
+  const [open, setOpen] = useState(false);
 
+  const options = [
+    { label: "All Status", value: "all" },
+    { label: "Pending", value: "pending" },
+    { label: "Completed", value: "completed" },
+  ];
+
+  const selected = options.find((o) => o.value === value) || options[0];
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="hrvasspm-filter-select custom-dropdown-wrapper"
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+      style={{ position: "relative" }}
+    >
+      <div
+        className="custom-dropdown-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {selected.label}
+        <span className="custom-dropdown-arrow" />
+      </div>
+
+      {open && (
+        <div className="custom-dropdown-menu">
+          {options.map((opt) => (
+            <div
+              key={opt.value}
+              className={
+                "custom-dropdown-option" +
+                (opt.value === value ? " custom-dropdown-option-active" : "")
+              }
+              onClick={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* Custom Project Filter Dropdown */
+const ProjectDropdown = ({ value, onChange, projects }) => {
+  const [open, setOpen] = useState(false);
+
+  const allOptions = projects.map((proj) => ({
+    label: proj === "all" ? "All Projects" : proj,
+    value: proj,
+  }));
+  const selected = allOptions.find((o) => o.value === value) || allOptions[0];
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="hrvasspm-filter-select custom-dropdown-wrapper"
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+      style={{ position: "relative" }}
+    >
+      <div
+        className="custom-dropdown-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {selected.label}
+        <span className="custom-dropdown-arrow" />
+      </div>
+
+      {open && (
+        <div className="custom-dropdown-menu">
+          {allOptions.map((opt) => (
+            <div
+              key={opt.value}
+              className={
+                "custom-dropdown-option" +
+                (opt.value === value ? " custom-dropdown-option-active" : "")
+              }
+              onClick={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* Custom Rows Per Page Dropdown */
+const RowsPerPageDropdown = ({ value, onChange }) => {
+  const [open, setOpen] = useState(false);
+
+  const options = [
+    { label: "5", value: 5 },
+    { label: "10", value: 10 },
+    { label: "25", value: 25 },
+    { label: "50", value: 50 },
+  ];
+
+  const selected = options.find((o) => o.value === value) || options[1];
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="hrvasspm-pagination-select-wrapper custom-dropdown-wrapper"
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+      style={{ position: "relative" }}
+    >
+      <div
+        className="custom-dropdown-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {selected.label}
+        <span className="custom-dropdown-arrow" />
+      </div>
+
+      {open && (
+        <div className="custom-dropdown-menu">
+          {options.map((opt) => (
+            <div
+              key={opt.value}
+              className={
+                "custom-dropdown-option" +
+                (opt.value === value ? " custom-dropdown-option-active" : "")
+              }
+              onClick={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 function exportToCsv(filename, rows) {
   if (!rows || !rows.length) return;
@@ -37,13 +190,11 @@ function exportToCsv(filename, rows) {
   document.body.removeChild(link);
 }
 
-
 function average(values) {
   const arr = values.filter((v) => typeof v === "number");
   if (!arr.length) return "N/A";
   return (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(2);
 }
-
 
 function statusBadge(status) {
   if (typeof status !== "string") return "";
@@ -70,22 +221,20 @@ function statusBadge(status) {
   );
 }
 
-
 function HRViewAppraisals() {
   const [loading, setLoading] = useState(true);
   const [appraisals, setAppraisals] = useState([]);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchInput, setSearchInput] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterProject, setFilterProject] = useState("all");
   const [modalRow, setModalRow] = useState(null);
   const [modalAttachments, setModalAttachments] = useState([]);
   const navigate = useNavigate();
 
-
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-
 
   useEffect(() => {
     async function fetchAppraisals() {
@@ -115,7 +264,6 @@ function HRViewAppraisals() {
     }
     fetchAppraisals();
   }, []);
-
 
   const allSummaryRows = useMemo(() => {
     return appraisals.map((a, idx) => {
@@ -149,7 +297,6 @@ function HRViewAppraisals() {
     });
   }, [appraisals]);
 
-
   const uniqueProjects = useMemo(() => {
     const projects = new Set();
     projects.add("all");
@@ -159,10 +306,8 @@ function HRViewAppraisals() {
     return Array.from(projects);
   }, [allSummaryRows]);
 
-
   const summaryRows = useMemo(() => {
     let filtered = [...allSummaryRows];
-
 
     if (filterStatus !== "all") {
       filtered = filtered.filter((row) => {
@@ -173,11 +318,9 @@ function HRViewAppraisals() {
       });
     }
 
-
     if (filterProject !== "all") {
       filtered = filtered.filter((row) => row.projectName === filterProject);
     }
-
 
     if (searchTerm.trim() !== "") {
       const search = searchTerm.trim().toLowerCase();
@@ -186,16 +329,13 @@ function HRViewAppraisals() {
       );
     }
 
-
     return filtered;
   }, [allSummaryRows, filterStatus, filterProject, searchTerm]);
-
 
   const totalPages = Math.ceil(summaryRows.length / rowsPerPage);
   const indexOfLastItem = currentPage * rowsPerPage;
   const indexOfFirstItem = indexOfLastItem - rowsPerPage;
   const currentItems = summaryRows.slice(indexOfFirstItem, indexOfLastItem);
-
 
   function getPageNumbers() {
     const pages = [];
@@ -216,7 +356,6 @@ function HRViewAppraisals() {
     return pages;
   }
 
-
   const csvData = useMemo(() => {
     return summaryRows.map((r) => ({
       "Employee Name": r.employeeName,
@@ -230,12 +369,18 @@ function HRViewAppraisals() {
     }));
   }, [summaryRows]);
 
-
   const handleViewDetails = (row) => {
     setModalRow(row);
     setModalAttachments(row.attachments || []);
   };
 
+  const handleClearFilters = () => {
+    setSearchTerm("");
+    setSearchInput("");
+    setFilterStatus("all");
+    setFilterProject("all");
+    setCurrentPage(1);
+  };
 
   if (loading)
     return (
@@ -262,82 +407,84 @@ function HRViewAppraisals() {
       </div>
     );
 
-
   return (
     <div className="hrvasspm-page">
-    
-  <Breadcrumb
-    items={[
-      { label: "Dashboard", path: "/hr/dashboard" },
-      { label: "Performance", path: "/hr/dashboard/performance" },
-      { label: "Form Progress", path: null }
-    ]}
+      <Breadcrumb
+        items={[
+          { label: "Dashboard", path: "/hr/dashboard" },
+          { label: "Performance", path: "/hr/dashboard/performance" },
+          { label: "Form Progress", path: null }
+        ]}
+      />
+
+<div
+  className="hrvasspm-filters"
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    flexWrap: "wrap"
+  }}
+>
+  {/* Unified Search Component */}
+  <div className="hrvasspm-filter-group" style={{ gap: 0 }}>
+    <input
+      type="search"
+      placeholder="Type to search..."
+      value={searchInput}
+      onChange={(e) => setSearchInput(e.target.value)}
+      onKeyPress={(e) => {
+        if (e.key === 'Enter') {
+          setSearchTerm(searchInput);
+          setCurrentPage(1);
+        }
+      }}
+    />
+    <button
+      onClick={() => {
+        setSearchTerm(searchInput);
+        setCurrentPage(1);
+      }}
+      className="hrvasspm-search-btn"
+    >
+      Search
+    </button>
+  </div>
+
+  <StatusDropdown
+    value={filterStatus}
+    onChange={(val) => {
+      setFilterStatus(val);
+      setCurrentPage(1);
+    }}
   />
 
- 
+  <ProjectDropdown
+    value={filterProject}
+    onChange={(val) => {
+      setFilterProject(val);
+      setCurrentPage(1);
+    }}
+    projects={uniqueProjects}
+  />
 
-      <div className="hrvasspm-container">
-        <div
-          className="hrvasspm-filters"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap"
-          }}
-        >
-          <div className="hrvasspm-filter-group">
-            <input
-              type="search"
-              placeholder="Type to search..."
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setCurrentPage(1);
-              }}
-            />
-          </div>
+  <button
+    className="hrvasspm-clear-filters-btn"
+    onClick={handleClearFilters}
+  >
+    Clear Filters
+  </button>
 
-          <div className="hrvasspm-filter-group">
-            <select
-              value={filterStatus}
-              onChange={(e) => {
-                setFilterStatus(e.target.value);
-                setCurrentPage(1);
-              }}
-            >
-              <option value="all">All Statuses</option>
-              <option value="pending">Pending</option>
-              <option value="completed">Completed</option>
-            </select>
-          </div>
+  <div style={{ marginLeft: "auto" }}>
+    <button
+      className="hrvasspm-btn-export"
+      onClick={() => exportToCsv("appraisals.csv", csvData)}
+    >
+      <i className="bi bi-download"></i> Export CSV
+    </button>
+  </div>
 
-          <div className="hrvasspm-filter-group">
-            <select
-              value={filterProject}
-              onChange={(e) => {
-                setFilterProject(e.target.value);
-                setCurrentPage(1);
-              }}
-            >
-              {uniqueProjects.map((p) => (
-                <option key={p} value={p}>
-                  {p === "all" ? "All Projects" : p}
-                </option>
-              ))}
-            </select>
-          </div>
 
-          <div className="hrvasspm-filter-group" style={{ display: "flex", alignItems: "center" }}>
-            <button
-              className="hrvasspm-btn-export"
-              onClick={() => exportToCsv("appraisals.csv", csvData)}
-            >
-              <i className="bi bi-download"></i> Export CSV
-            </button>
-          </div>
-
-        </div>
         <div className="hrvasspm-table-card">
           <div className="hrvasspm-table-wrapper">
             <table className="hrvasspm-table">
@@ -391,23 +538,16 @@ function HRViewAppraisals() {
             </table>
           </div>
 
-
           <div className="hrvasspm-pagination-container">
             <div className="hrvasspm-pagination-info">
               <span className="hrvasspm-pagination-label">Show</span>
-              <select
-                className="hrvasspm-pagination-select"
+              <RowsPerPageDropdown
                 value={rowsPerPage}
-                onChange={(e) => {
-                  setRowsPerPage(Number(e.target.value));
+                onChange={(val) => {
+                  setRowsPerPage(val);
                   setCurrentPage(1);
                 }}
-              >
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-              </select>
+              />
               <span className="hrvasspm-pagination-label">entries</span>
             </div>
             <div className="hrvasspm-pagination-status">
@@ -463,6 +603,5 @@ function HRViewAppraisals() {
     </div>
   );
 }
-
 
 export default HRViewAppraisals;
