@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import authService from "../../../services/auth/authService";
@@ -13,6 +12,9 @@ const ResetPassword = () => {
   const [emailTouched, setEmailTouched] = useState(false);
 
   const navigate = useNavigate();
+
+  // ✅ PROTECTED EMPLOYEE - EmployeeCompanyID 1000
+  const PROTECTED_EMPLOYEE_ID = "1000";
 
   // Validate Gmail OR eepz.com
   const validateEmail = (email) => {
@@ -51,7 +53,6 @@ const ResetPassword = () => {
     setMessage("");
 
     try {
-
       toast.loading("Sending reset code...");
 
       const response = await authService.forgotPassword(email);
@@ -124,16 +125,6 @@ const ResetPassword = () => {
                 <strong>Success!</strong>
                 <p>{message}</p>
                 <small>Redirecting you to verification page...</small>
-              </div>
-            </div>
-          )}
-
-          {error && (
-            <div className="alert-danger-reset">
-              <i className="bi bi-exclamation-triangle-fill"></i>
-              <div className="alert-content">
-                <strong>Error</strong>
-                <p>{error}</p>
               </div>
             </div>
           )}

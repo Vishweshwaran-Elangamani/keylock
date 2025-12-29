@@ -40,6 +40,10 @@ const ChangePassword = () => {
   const isFirstLogin = location.state?.isFirstLogin || false;
   const fromSettings = location.state?.fromSettings || false;
 
+  // ✅ CHECK IF USER IS PROTECTED EMPLOYEE (EmployeeCompanyID = 1000)
+  const PROTECTED_EMPLOYEE_ID = "1000";
+  const isProtectedEmployee = user?.employeeCompanyId === PROTECTED_EMPLOYEE_ID;
+
   const PASSWORD_REQUIREMENTS = {
     requireUppercase: true,
     requireLowercase: true,
@@ -66,8 +70,15 @@ const ChangePassword = () => {
     if (!isFirstLogin && !user) {
       toast.error("Please login first");
       navigate("/login");
+      return;
     }
-  }, [user, isFirstLogin, navigate]);
+
+    // ✅ REDIRECT PROTECTED EMPLOYEE TO DASHBOARD (except first login)
+    if (user && isProtectedEmployee && !isFirstLogin) {
+      toast.error("Password changes are not allowed for this account. Please contact system administrator.");
+      navigate("/dashboard", { replace: true });
+    }
+  }, [user, isFirstLogin, isProtectedEmployee, navigate]);
 
   const evaluatePasswordStrength = (password) => {
     let score = 0;
@@ -147,6 +158,14 @@ const ChangePassword = () => {
     e.preventDefault();
     setError("");
 
+    // ✅ DOUBLE CHECK - PREVENT PROTECTED EMPLOYEE PASSWORD CHANGE
+    if (isProtectedEmployee && !isFirstLogin) {
+      const errorMsg = "Password changes are not allowed for this account. Please contact system administrator.";
+      setError(errorMsg);
+      toast.error(errorMsg);
+      return;
+    }
+
     if (!isFirstLogin && !formData.currentPassword) {
       setError("Current password is required");
       return;
@@ -177,7 +196,6 @@ const ChangePassword = () => {
     setLoading(true);
 
     try {
-
       toast.loading("Changing password...");
 
       const response = await api.post("/Authentication/change-password", {
@@ -195,7 +213,6 @@ const ChangePassword = () => {
       }
 
       if (isFirstLogin) {
-
         localStorage.removeItem("tempUser");
         localStorage.removeItem("firstLoginOtpLockout");
 
@@ -315,61 +332,216 @@ const ChangePassword = () => {
         </div>
 
         <div className="change-password-body">
-          {error && (
-            <div className="error-alert-cp">
-              <i className="bi bi-exclamation-triangle-fill"></i>
-              <div>{error}</div>
+          {/* ✅ SHOW WARNING FOR PROTECTED EMPLOYEE (except first login) */}
+          {isProtectedEmployee && !isFirstLogin && (
+            <div className="error-alert-cp" style={{ marginBottom: "20px", background: "#fff3cd", borderColor: "#ffc107", color: "#856404" }}>
+              <i className="bi bi-shield-exclamation"></i>
+              <div>
+                <strong>Protected Account</strong>
+                <p style={{ marginTop: "8px", fontSize: "14px", marginBottom: 0 }}>
+                  Password changes are not allowed for this account. 
+                  Please contact system administrator if you need to update your credentials.
+                </p>
+              </div>
             </div>
           )}
 
           <form onSubmit={handleSubmit}>
-            {!isFirstLogin ? (
-              <div className="form-grid-cp">
-                <div className="form-column-cp">
-                  <div className="form-group-cp">
-                    <label htmlFor="currentPassword" className="form-label-cp">
-                      <i className="bi bi-shield-lock"></i>
-                      Current Password
-                    </label>
-                    <div className="password-input-cp">
-                      <input
-                        type={showPasswords.current ? "text" : "password"}
-                        className="form-input-cp"
-                        id="currentPassword"
-                        name="currentPassword"
-                        placeholder="Enter current password"
-                        value={formData.currentPassword}
-                        onChange={handleChange}
-                        required
-                      />
-                      <button
-                        className="toggle-password-cp"
-                        type="button"
-                        onClick={() =>
-                          setShowPasswords((prev) => ({
-                            ...prev,
-                            current: !prev.current,
-                          }))
-                        }
-                        title={
-                          showPasswords.current
-                            ? "Hide password"
-                            : "Show password"
-                        }
-                      >
-                        <i
-                          className={`bi ${
+            {/* ✅ DISABLE FORM FOR PROTECTED EMPLOYEE (except first login) */}
+            <fieldset disabled={isProtectedEmployee && !isFirstLogin} style={{ border: "none", padding: 0, margin: 0 }}>
+              {!isFirstLogin ? (
+                <div className="form-grid-cp">
+                  <div className="form-column-cp">
+                    <div className="form-group-cp">
+                      <label htmlFor="currentPassword" className="form-label-cp">
+                        <i className="bi bi-shield-lock"></i>
+                        Current Password
+                      </label>
+                      <div className="password-input-cp">
+                        <input
+                          type={showPasswords.current ? "text" : "password"}
+                          className="form-input-cp"
+                          id="currentPassword"
+                          name="currentPassword"
+                          placeholder="Enter current password"
+                          value={formData.currentPassword}
+                          onChange={handleChange}
+                          required
+                        />
+                        <button
+                          className="toggle-password-cp"
+                          type="button"
+                          onClick={() =>
+                            setShowPasswords((prev) => ({
+                              ...prev,
+                              current: !prev.current,
+                            }))
+                          }
+                          title={
                             showPasswords.current
-                              ? "bi-eye-slash-fill"
-                              : "bi-eye-fill"
-                          }`}
-                        ></i>
-                      </button>
+                              ? "Hide password"
+                              : "Show password"
+                          }
+                        >
+                          <i
+                            className={`bi ${
+                              showPasswords.current
+                                ? "bi-eye-slash-fill"
+                                : "bi-eye-fill"
+                            }`}
+                          ></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="form-column-cp">
+                    <div className="form-group-cp">
+                      <label htmlFor="newPassword" className="form-label-cp">
+                        <i className="bi bi-lock"></i>
+                        New Password
+                        <div className="info-icon-wrapper-cp">
+                          <div
+                            className="info-icon-cp"
+                            title="Password requirements"
+                          >
+                            <i className="bi bi-info-circle"></i>
+                          </div>
+                          <div className="password-requirements-tooltip-cp">
+                            <strong>Requirements:</strong>
+                            <ul>
+                              <li>At least 8 characters long</li>
+                              <li>One uppercase & lowercase letter</li>
+                              <li>One number & special character</li>
+                            </ul>
+                          </div>
+                        </div>
+                      </label>
+                      <div className="password-input-cp">
+                        <input
+                          type={showPasswords.new ? "text" : "password"}
+                          className="form-input-cp"
+                          id="newPassword"
+                          name="newPassword"
+                          placeholder="Enter new password"
+                          value={formData.newPassword}
+                          onChange={handleChange}
+                          required
+                        />
+                        <button
+                          className="toggle-password-cp"
+                          type="button"
+                          onClick={() =>
+                            setShowPasswords((prev) => ({
+                              ...prev,
+                              new: !prev.new,
+                            }))
+                          }
+                          title={
+                            showPasswords.new ? "Hide password" : "Show password"
+                          }
+                        >
+                          <i
+                            className={`bi ${
+                              showPasswords.new
+                                ? "bi-eye-slash-fill"
+                                : "bi-eye-fill"
+                            }`}
+                          ></i>
+                        </button>
+                      </div>
+
+                      {formData.newPassword && (
+                        <div className="strength-indicator">
+                          <div className="strength-bar-wrapper">
+                            <div
+                              className="strength-bar-fill"
+                              style={{
+                                width: getStrengthWidth(),
+                                backgroundColor: getStrengthColor(),
+                              }}
+                            ></div>
+                          </div>
+                          <small className="strength-text">
+                            Strength:{" "}
+                            <span
+                              style={{
+                                color: getStrengthColor(),
+                                fontWeight: "600",
+                              }}
+                            >
+                              {passwordStrength.toUpperCase()}
+                            </span>
+                          </small>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="form-group-cp">
+                      <label htmlFor="confirmPassword" className="form-label-cp">
+                        <i className="bi bi-lock-fill"></i>
+                        Confirm New Password
+                      </label>
+                      <div className="password-input-cp">
+                        <input
+                          type={showPasswords.confirm ? "text" : "password"}
+                          className="form-input-cp"
+                          id="confirmPassword"
+                          name="confirmPassword"
+                          placeholder="Re-enter new password"
+                          value={formData.confirmPassword}
+                          onChange={handleChange}
+                          required
+                        />
+                        <button
+                          className="toggle-password-cp"
+                          type="button"
+                          onClick={() =>
+                            setShowPasswords((prev) => ({
+                              ...prev,
+                              confirm: !prev.confirm,
+                            }))
+                          }
+                          title={
+                            showPasswords.confirm
+                              ? "Hide password"
+                              : "Show password"
+                          }
+                        >
+                          <i
+                            className={`bi ${
+                              showPasswords.confirm
+                                ? "bi-eye-slash-fill"
+                                : "bi-eye-fill"
+                            }`}
+                          ></i>
+                        </button>
+                      </div>
+                      {formData.confirmPassword && (
+                        <small
+                          className={
+                            formData.newPassword === formData.confirmPassword
+                              ? "match-success"
+                              : "match-error"
+                          }
+                        >
+                          <i
+                            className={`bi ${
+                              formData.newPassword === formData.confirmPassword
+                                ? "bi-check-circle-fill"
+                                : "bi-x-circle-fill"
+                            }`}
+                          ></i>
+                          {formData.newPassword === formData.confirmPassword
+                            ? "Passwords match"
+                            : "Passwords do not match"}
+                        </small>
+                      )}
                     </div>
                   </div>
                 </div>
-
-                <div className="form-column-cp">
+              ) : (
+                <>
                   <div className="form-group-cp">
                     <label htmlFor="newPassword" className="form-label-cp">
                       <i className="bi bi-lock"></i>
@@ -512,199 +684,54 @@ const ChangePassword = () => {
                       </small>
                     )}
                   </div>
-                </div>
-              </div>
-            ) : (
-              <>
-                <div className="form-group-cp">
-                  <label htmlFor="newPassword" className="form-label-cp">
-                    <i className="bi bi-lock"></i>
-                    New Password
-                    <div className="info-icon-wrapper-cp">
-                      <div
-                        className="info-icon-cp"
-                        title="Password requirements"
-                      >
-                        <i className="bi bi-info-circle"></i>
-                      </div>
-                      <div className="password-requirements-tooltip-cp">
-                        <strong>Requirements:</strong>
-                        <ul>
-                          <li>At least 8 characters long</li>
-                          <li>One uppercase & lowercase letter</li>
-                          <li>One number & special character</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </label>
-                  <div className="password-input-cp">
-                    <input
-                      type={showPasswords.new ? "text" : "password"}
-                      className="form-input-cp"
-                      id="newPassword"
-                      name="newPassword"
-                      placeholder="Enter new password"
-                      value={formData.newPassword}
-                      onChange={handleChange}
-                      required
-                    />
-                    <button
-                      className="toggle-password-cp"
-                      type="button"
-                      onClick={() =>
-                        setShowPasswords((prev) => ({
-                          ...prev,
-                          new: !prev.new,
-                        }))
-                      }
-                      title={
-                        showPasswords.new ? "Hide password" : "Show password"
-                      }
-                    >
-                      <i
-                        className={`bi ${
-                          showPasswords.new
-                            ? "bi-eye-slash-fill"
-                            : "bi-eye-fill"
-                        }`}
-                      ></i>
-                    </button>
-                  </div>
-
-                  {formData.newPassword && (
-                    <div className="strength-indicator">
-                      <div className="strength-bar-wrapper">
-                        <div
-                          className="strength-bar-fill"
-                          style={{
-                            width: getStrengthWidth(),
-                            backgroundColor: getStrengthColor(),
-                          }}
-                        ></div>
-                      </div>
-                      <small className="strength-text">
-                        Strength:{" "}
-                        <span
-                          style={{
-                            color: getStrengthColor(),
-                            fontWeight: "600",
-                          }}
-                        >
-                          {passwordStrength.toUpperCase()}
-                        </span>
-                      </small>
-                    </div>
-                  )}
-                </div>
-
-                <div className="form-group-cp">
-                  <label htmlFor="confirmPassword" className="form-label-cp">
-                    <i className="bi bi-lock-fill"></i>
-                    Confirm New Password
-                  </label>
-                  <div className="password-input-cp">
-                    <input
-                      type={showPasswords.confirm ? "text" : "password"}
-                      className="form-input-cp"
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      placeholder="Re-enter new password"
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      required
-                    />
-                    <button
-                      className="toggle-password-cp"
-                      type="button"
-                      onClick={() =>
-                        setShowPasswords((prev) => ({
-                          ...prev,
-                          confirm: !prev.confirm,
-                        }))
-                      }
-                      title={
-                        showPasswords.confirm
-                          ? "Hide password"
-                          : "Show password"
-                      }
-                    >
-                      <i
-                        className={`bi ${
-                          showPasswords.confirm
-                            ? "bi-eye-slash-fill"
-                            : "bi-eye-fill"
-                        }`}
-                      ></i>
-                    </button>
-                  </div>
-                  {formData.confirmPassword && (
-                    <small
-                      className={
-                        formData.newPassword === formData.confirmPassword
-                          ? "match-success"
-                          : "match-error"
-                      }
-                    >
-                      <i
-                        className={`bi ${
-                          formData.newPassword === formData.confirmPassword
-                            ? "bi-check-circle-fill"
-                            : "bi-x-circle-fill"
-                        }`}
-                      ></i>
-                      {formData.newPassword === formData.confirmPassword
-                        ? "Passwords match"
-                        : "Passwords do not match"}
-                    </small>
-                  )}
-                </div>
-              </>
-            )}
-
-            <div className="form-group-cp">
-              <label htmlFor="confirmationText" className="form-label-cp">
-                <i className="bi bi-shield-check"></i>
-                Confirmation Phrase
-                <span style={{ color: "#dc3545", marginLeft: "4px" }}>*</span>
-              </label>
-              <input
-                type="text"
-                className="form-input-cp"
-                id="confirmationText"
-                placeholder={`Type "${CONFIRMATION_PHRASE}" to confirm`}
-                value={confirmationText}
-                onChange={handleConfirmationTextChange}
-                required
-                style={{
-                  borderColor: confirmationText && !isConfirmationValid ? "#dc3545" : confirmationText && isConfirmationValid ? "#198754" : "#ced4da"
-                }}
-              />
-              {confirmationText && (
-                <small
-                  className={isConfirmationValid ? "match-success" : "match-error"}
-                >
-                  <i
-                    className={`bi ${
-                      isConfirmationValid
-                        ? "bi-check-circle-fill"
-                        : "bi-x-circle-fill"
-                    }`}
-                  ></i>
-                  {isConfirmationValid
-                    ? "Confirmation phrase correct"
-                    : `Please type "${CONFIRMATION_PHRASE}" exactly`}
-                </small>
+                </>
               )}
-              <small style={{ display: "block", marginTop: "6px", color: "#6c757d", fontSize: "12px" }}>
-                <i className="bi bi-info-circle" style={{ marginRight: "4px" }}></i>
-                This is a security measure to prevent accidental password changes
-              </small>
-            </div>
+
+              <div className="form-group-cp">
+                <label htmlFor="confirmationText" className="form-label-cp">
+                  <i className="bi bi-shield-check"></i>
+                  Confirmation Phrase
+                  <span style={{ color: "#dc3545", marginLeft: "4px" }}>*</span>
+                </label>
+                <input
+                  type="text"
+                  className="form-input-cp"
+                  id="confirmationText"
+                  placeholder={`Type "${CONFIRMATION_PHRASE}" to confirm`}
+                  value={confirmationText}
+                  onChange={handleConfirmationTextChange}
+                  required
+                  style={{
+                    borderColor: confirmationText && !isConfirmationValid ? "#dc3545" : confirmationText && isConfirmationValid ? "#198754" : "#ced4da"
+                  }}
+                />
+                {confirmationText && (
+                  <small
+                    className={isConfirmationValid ? "match-success" : "match-error"}
+                  >
+                    <i
+                      className={`bi ${
+                        isConfirmationValid
+                          ? "bi-check-circle-fill"
+                          : "bi-x-circle-fill"
+                      }`}
+                    ></i>
+                    {isConfirmationValid
+                      ? "Confirmation phrase correct"
+                      : `Please type "${CONFIRMATION_PHRASE}" exactly`}
+                  </small>
+                )}
+                <small style={{ display: "block", marginTop: "6px", color: "#6c757d", fontSize: "12px" }}>
+                  <i className="bi bi-info-circle" style={{ marginRight: "4px" }}></i>
+                  This is a security measure to prevent accidental password changes
+                </small>
+              </div>
+            </fieldset>
 
             <button
               type="submit"
               className="btn-submit-cp"
-              disabled={loading || !allValidationsPassed || !isConfirmationValid}
+              disabled={loading || !allValidationsPassed || !isConfirmationValid || (isProtectedEmployee && !isFirstLogin)}
             >
               {loading ? (
                 <>

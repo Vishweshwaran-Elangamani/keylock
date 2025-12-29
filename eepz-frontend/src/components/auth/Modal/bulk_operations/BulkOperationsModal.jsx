@@ -170,7 +170,6 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
         selectedFile
       );
 
-      // Dismiss loading toast immediately after getting result
       toast.dismiss(loadingToastId);
 
       if (result.success) {
@@ -181,45 +180,42 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
           failureCount: data.failureCount || 0,
           totalRecords: data.totalRecords || 0,
           errors: data.errors || [],
+          successfulUsers: data.successfulUsers || [],
           categorizedErrors:
             data.errors && data.errors.length > 0
               ? categorizeErrors(data.errors)
               : null,
         });
 
-        // Show toast notifications based on result
         if (data.failureCount === 0) {
           toast.success(
-            `🎉 ${data.successCount} user${
+            ` ${data.successCount} user${
               data.successCount !== 1 ? "s" : ""
             } added successfully!`,
             {
               duration: 6000,
-              description: "All records have been imported and are now active in the system.",
+              description:
+                "All records have been imported and are now active in the system.",
             }
           );
         } else if (data.successCount > 0) {
           toast.success(
-            `✓ ${data.successCount} user${
+            ` ${data.successCount} user${
               data.successCount !== 1 ? "s" : ""
             } added successfully!`,
             { duration: 5000 }
           );
           toast.warning(
-            `⚠ ${data.failureCount} record${
+            ` ${data.failureCount} record${
               data.failureCount !== 1 ? "s" : ""
             } failed. Check details below.`,
             { duration: 8000 }
           );
         } else {
           toast.error(
-            `✗ All ${data.totalRecords} records failed. Review errors below.`,
+            ` All ${data.totalRecords} records failed. Review errors below.`,
             { duration: 8000 }
           );
-        }
-
-        if (data.successCount > 0) {
-          onSuccess?.();
         }
       } else {
         toast.error(result.message || "Import failed", { duration: 5000 });
@@ -230,6 +226,7 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
             failureCount: result.data.failureCount || result.data.errors.length,
             totalRecords: result.data.totalRecords || result.data.errors.length,
             errors: result.data.errors,
+            successfulUsers: [],
             categorizedErrors: categorizeErrors(result.data.errors),
           });
         }
@@ -254,6 +251,7 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
           totalRecords:
             responseData.data.totalRecords || responseData.data.errors.length,
           errors: responseData.data.errors,
+          successfulUsers: responseData.data.successfulUsers || [],
           categorizedErrors: categorizeErrors(responseData.data.errors),
         });
       } else if (responseData?.errors && Array.isArray(responseData.errors)) {
@@ -262,6 +260,7 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
           failureCount: responseData.errors.length,
           totalRecords: responseData.errors.length,
           errors: responseData.errors,
+          successfulUsers: [],
           categorizedErrors: categorizeErrors(responseData.errors),
         });
       }
@@ -270,17 +269,22 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
     }
   };
 
+  // Call onSuccess when closing
   const handleClose = () => {
     toast.dismiss();
+
+    // If there were successful imports, refresh parent data
+    if (uploadResult && uploadResult.successCount > 0) {
+      onSuccess?.(); // Call here instead
+    }
+
     setSelectedFile(null);
     setUploadResult(null);
     setActiveTab("import");
     onClose();
   };
 
-  // Prevent modal close when clicking inside modal content
   const handleBackdropClick = (e) => {
-    // Only close if clicking directly on backdrop, not on modal content
     if (e.target.classList.contains("bom-backdrop")) {
       handleClose();
     }
@@ -543,54 +547,95 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                       </div>
                     </div>
 
-                    {uploadResult.successCount > 0 &&
-                      uploadResult.failureCount === 0 && (
-                        <div className="bom-success-details-container">
-                          <div className="bom-success-details-header">
-                            <i className="bi bi-check-circle-fill bom-success-details-icon"></i>
-                            <span className="bom-success-details-title">
-                              Users Added Successfully
-                            </span>
+                    {/* SHOW SUCCESS DETAILS ALWAYS WHEN successCount > 0 */}
+                    {uploadResult.successCount > 0 && (
+                      <div className="bom-success-details-container">
+                        <details
+                          open
+                          className="bom-error-category"
+                          style={{
+                            borderColor: "#10b981",
+                            background: "#f0fdf4",
+                          }}
+                        >
+                          <summary
+                            className="bom-error-category-summary"
+                            style={{ background: "#dcfce7", color: "#065f46" }}
+                          >
+                            <div className="bom-error-category-summary-content">
+                              <i
+                                className="bi bi-check-circle-fill"
+                                style={{ color: "#10b981" }}
+                              ></i>
+                              <span>Successfully Imported Users</span>
+                              <span
+                                className="bom-error-category-badge"
+                                style={{ background: "#10b981" }}
+                              >
+                                {uploadResult.successCount}
+                              </span>
+                            </div>
+                            <i className="bi bi-chevron-down"></i>
+                          </summary>
+                          <div className="bom-error-category-content">
+                            {uploadResult.successfulUsers &&
+                            uploadResult.successfulUsers.length > 0 ? (
+                              <ul className="bom-error-list">
+                                {uploadResult.successfulUsers.map(
+                                  (user, index) => (
+                                    <li
+                                      key={`success-${index}`}
+                                      className="bom-error-list-item"
+                                      style={{
+                                        borderLeft: "3px solid #10b981",
+                                      }}
+                                    >
+                                      <i
+                                        className="bi bi-check-circle-fill"
+                                        style={{ color: "#10b981" }}
+                                      ></i>
+                                      <span>
+                                        <strong>{user.email}</strong> -{" "}
+                                        {user.firstName} {user.lastName} (
+                                        {user.role} - {user.department})
+                                      </span>
+                                    </li>
+                                  )
+                                )}
+                              </ul>
+                            ) : (
+                              <div
+                                style={{
+                                  padding: "1rem",
+                                  textAlign: "center",
+                                  color: "#065f46",
+                                }}
+                              >
+                                <i
+                                  className="bi bi-check-circle-fill"
+                                  style={{ fontSize: "2rem", color: "#10b981" }}
+                                ></i>
+                                <p
+                                  style={{
+                                    marginTop: "0.5rem",
+                                    fontWeight: 600,
+                                  }}
+                                >
+                                  {uploadResult.successCount} user
+                                  {uploadResult.successCount !== 1 ? "s" : ""}{" "}
+                                  imported successfully!
+                                </p>
+                                <small style={{ color: "#047857" }}>
+                                  All users are now active in the system.
+                                </small>
+                              </div>
+                            )}
                           </div>
-                          <div className="bom-success-details-summary">
-                            <strong className="bom-success-details-summary-title">
-                              {uploadResult.successCount} user
-                              {uploadResult.successCount !== 1 ? "s" : ""} have
-                              been successfully added to the system!
-                            </strong>
-                            <p className="bom-success-details-summary-text">
-                              All records have been processed and the users are
-                              now active. They can log in and access their
-                              accounts immediately.
-                            </p>
-                          </div>
-                        </div>
-                      )}
+                        </details>
+                      </div>
+                    )}
 
-                    {uploadResult.successCount > 0 &&
-                      uploadResult.failureCount > 0 && (
-                        <div className="bom-success-details-container bom-partial-success">
-                          <div className="bom-success-details-header">
-                            <i className="bi bi-check-circle-fill bom-success-details-icon"></i>
-                            <span className="bom-success-details-title">
-                              Partial Success
-                            </span>
-                          </div>
-                          <div className="bom-success-details-summary">
-                            <strong className="bom-success-details-summary-title">
-                              {uploadResult.successCount} user
-                              {uploadResult.successCount !== 1 ? "s" : ""} added
-                              successfully!
-                            </strong>
-                            <p className="bom-success-details-summary-text">
-                              These users have been added and are now active in
-                              the system. Review the errors below for failed
-                              records.
-                            </p>
-                          </div>
-                        </div>
-                      )}
-
+                    {/* EXISTING ERROR SECTION */}
                     {uploadResult.errors && uploadResult.errors.length > 0 && (
                       <div className="error-details-bulk">
                         <div className="bom-error-details-container">

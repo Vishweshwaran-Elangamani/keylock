@@ -240,14 +240,9 @@ const UserList = () => {
     setShowDeactivateModal(false);
     fetchData();
   };
-  const handleBulkOperationsSuccess = () => {
-    setShowBulkOperations(true); 
-    fetchData(); // Then reload data
 
-    // Show success toast after a small delay
-    setTimeout(() => {
-      toast.success("Users imported successfully!");
-    }, 100);
+  const handleBulkOperationsSuccess = () => {
+    fetchData(); // Silently reload data in background
   };
 
   // Pagination helpers
