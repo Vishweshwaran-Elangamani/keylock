@@ -25,15 +25,47 @@
   min-height: 35.7px;
 }
 
-/* Export Button */
+/* Export Button - Updated with purple gradient */
 .exportButton {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.625rem 1.25rem;
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
   white-space: nowrap;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 6px rgba(151, 36, 126, 0.25);
+}
+
+.exportButton:hover:not(:disabled) {
+  filter: brightness(105%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(151, 36, 126, 0.35);
+}
+
+.exportButton:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(151, 36, 126, 0.2);
+  filter: brightness(95%);
+}
+
+.exportButton:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(151, 36, 126, 0.3);
+}
+
+.exportButton:disabled {
+  background: #e5e7eb;
+  color: #6c757d;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
 /* Table Container */

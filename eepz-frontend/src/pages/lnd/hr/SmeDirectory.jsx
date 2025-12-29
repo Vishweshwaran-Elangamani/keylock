@@ -160,7 +160,7 @@ const SmeDirectory = () => {
         <button
           onClick={handleExportToExcel}
           disabled={exporting || smes.length === 0}
-          className={`btn btn-success ${styles.exportButton}`}
+          className={`${styles.exportButton}`}
         >
           {exporting ? (
             <>

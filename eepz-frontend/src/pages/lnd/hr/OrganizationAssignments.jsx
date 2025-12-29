@@ -16,23 +16,28 @@ import { ASSIGNMENT_STATUS } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
 import styles from "../../../styles/lnd/pages/hr/OrganizationAssignments.module.css";
 
+
 const OrganizationAssignments = () => {
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
 
+
   // Search
   const [searchTerm, setSearchTerm] = useState("");
   const [searchInput, setSearchInput] = useState("");
+
 
   // Filter
   const [statusFilter, setStatusFilter] = useState("");
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const statusDropdownRef = useRef(null);
 
+
   // Sorting
   const [sortField, setSortField] = useState("");
   const [sortOrderAsc, setSortOrderAsc] = useState(true);
+
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -40,7 +45,8 @@ const OrganizationAssignments = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
-  // Close dropdown when clicking outside
+
+ 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -51,11 +57,13 @@ const OrganizationAssignments = () => {
       }
     };
 
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
 
   useEffect(() => {
     fetchAssignments();
@@ -68,20 +76,35 @@ const OrganizationAssignments = () => {
     sortOrderAsc,
   ]);
 
+
   const fetchAssignments = async () => {
     try {
       setLoading(true);
+      
+  
+      const backendStatusFilter = statusFilter === ASSIGNMENT_STATUS.OVERDUE 
+        ? "" 
+        : statusFilter;
+      
       const response = await lndService.getAllOrganizationAssignments(
         currentPage,
-        statusFilter,
+        backendStatusFilter,  
         searchTerm,
         sortField,
         sortOrderAsc ? "asc" : "desc",
         itemsPerPage
       );
 
+
       if (response.data.success) {
-        setAssignments(response.data.data.items);
+        let items = response.data.data.items;
+
+       
+        if (statusFilter === ASSIGNMENT_STATUS.OVERDUE) {
+          items = items.filter((a) => a.isOverdue === true);
+        }
+
+        setAssignments(items);
         setTotalItems(response.data.data.totalCount);
         setTotalPages(response.data.data.totalPages);
       }
@@ -93,17 +116,20 @@ const OrganizationAssignments = () => {
     }
   };
 
+
   const handleExportToExcel = async () => {
     try {
       setExporting(true);
       toast.loading("Preparing Excel export...");
 
+
       const response = await lndService.exportOrganizationAssignments(
-        statusFilter,
+        statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter,  
         searchTerm,
         sortField,
         sortOrderAsc ? "asc" : "desc"
       );
+
 
       const timestamp = new Date()
         .toISOString()
@@ -111,7 +137,9 @@ const OrganizationAssignments = () => {
         .slice(0, -5);
       const filename = `OrganizationalAssignments_${timestamp}.xlsx`;
 
+
       downloadFile(response.data, filename);
+
 
       toast.dismiss();
       toast.success("Excel file downloaded successfully!");
@@ -124,9 +152,11 @@ const OrganizationAssignments = () => {
     }
   };
 
+
   const handleSearchInputChange = (e) => {
     setSearchInput(e.target.value);
   };
+
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -134,11 +164,13 @@ const OrganizationAssignments = () => {
     setCurrentPage(1);
   };
 
+
   const handleCancelSearch = () => {
     setSearchInput("");
     setSearchTerm("");
     setCurrentPage(1);
   };
+
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
@@ -146,16 +178,19 @@ const OrganizationAssignments = () => {
     }
   };
 
+
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
 
   const handleItemsPerPageChange = (newSize) => {
     setItemsPerPage(newSize);
     setCurrentPage(1);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
 
   const getStatusLabel = (value) => {
     const statusMap = {
@@ -168,6 +203,7 @@ const OrganizationAssignments = () => {
     };
     return statusMap[value] || "All Statuses";
   };
+
 
   const statusOptions = [
     { value: "", label: "All Statuses" },
@@ -184,6 +220,7 @@ const OrganizationAssignments = () => {
     { value: ASSIGNMENT_STATUS.OVERDUE, label: "Overdue" },
   ];
 
+
   const onSortClick = (field) => {
     if (sortField === field) {
       setSortOrderAsc(!sortOrderAsc);
@@ -194,9 +231,11 @@ const OrganizationAssignments = () => {
     setCurrentPage(1);
   };
 
+
   const renderSortIcon = (field) => {
     const isActive = sortField === field;
     const iconClass = isActive ? styles.sortIconActive : styles.sortIconInactive;
+
 
     if (!isActive) {
       return (
@@ -210,6 +249,7 @@ const OrganizationAssignments = () => {
     );
   };
 
+
   const getHeaderCellClass = (field, align) => {
     const baseClass = styles.tableHeaderCell;
     const alignClass = align === "center" ? styles.tableHeaderCellCenter : styles.tableHeaderCellLeft;
@@ -218,11 +258,13 @@ const OrganizationAssignments = () => {
     return `${baseClass} ${alignClass} ${sortableClass} ${activeClass}`.trim();
   };
 
+
   const getDropdownItemClass = (currentValue, optionValue) => {
     return `${styles.dropdownItem} ${
       currentValue === optionValue ? styles.dropdownItemActive : ""
     }`.trim();
   };
+
 
   if (loading && assignments.length === 0) {
     return (
@@ -234,6 +276,7 @@ const OrganizationAssignments = () => {
     );
   }
 
+
   return (
     <div>
       <Breadcrumb
@@ -243,6 +286,7 @@ const OrganizationAssignments = () => {
           { label: "Organizational Assignments" },
         ]}
       />
+
 
       <div className={styles.actionBar}>
         <div className={styles.filterGroup}>
@@ -274,6 +318,7 @@ const OrganizationAssignments = () => {
             </div>
           </form>
 
+
           {/* STATUS FILTER DROPDOWN */}
           <div ref={statusDropdownRef} className={styles.dropdownWrapper}>
             <button
@@ -288,6 +333,7 @@ const OrganizationAssignments = () => {
                 } ${styles.dropdownIcon}`}
               ></i>
             </button>
+
 
             {showStatusDropdown && (
               <div className={styles.dropdownMenu}>
@@ -309,10 +355,11 @@ const OrganizationAssignments = () => {
           </div>
         </div>
 
+
         <button
           onClick={handleExportToExcel}
           disabled={exporting || assignments.length === 0}
-          className={`btn btn-success ${styles.exportButton}`}
+          className={` ${styles.exportButton}`}
         >
           {exporting ? (
             <>
@@ -331,6 +378,7 @@ const OrganizationAssignments = () => {
           )}
         </button>
       </div>
+
 
       {assignments.length === 0 && !loading ? (
         <EmptyState
@@ -383,6 +431,7 @@ const OrganizationAssignments = () => {
                 ))}
               </div>
 
+
               {assignments.map((assignment, idx) => (
                 <div key={assignment.assignmentId}>
                   <div
@@ -395,20 +444,24 @@ const OrganizationAssignments = () => {
                       {assignment.menteeName}
                     </div>
 
+
                     {/* Skill Name */}
                     <div className={styles.cellText} title={assignment.skillName}>
                       {assignment.skillName}
                     </div>
+
 
                     {/* SME Assigned */}
                     <div className={`${styles.cellText} ${styles.cellSme}`} title={assignment.smeName}>
                       {assignment.smeName}
                     </div>
 
+
                     {/* Assignment Status */}
                     <div className={styles.cellStatus}>
                       <StatusBadge status={assignment.status} />
                     </div>
+
 
                     {/* Start Date */}
                     <div className={styles.cellDate}>
@@ -418,6 +471,7 @@ const OrganizationAssignments = () => {
                         <span className={styles.cellNone}>None</span>
                       )}
                     </div>
+
 
                     {/* Due Date */}
                     <div className={assignment.isOverdue ? styles.cellDateOverdue : styles.cellDate}>
@@ -433,6 +487,7 @@ const OrganizationAssignments = () => {
                       )}
                     </div>
 
+
                     {/* Score */}
                     <div className={styles.cellScore}>
                       {assignment.completionRating ? (
@@ -446,6 +501,7 @@ const OrganizationAssignments = () => {
               ))}
             </div>
           </div>
+
 
           <Pagination
             currentPage={currentPage}
@@ -462,5 +518,6 @@ const OrganizationAssignments = () => {
     </div>
   );
 };
+
 
 export default OrganizationAssignments;

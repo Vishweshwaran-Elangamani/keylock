@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Download,
   Search,
@@ -29,6 +29,8 @@ const SmeAssignments = () => {
 
   // Filter
   const [statusFilter, setStatusFilter] = useState("");
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+  const dropdownRef = useRef(null);
 
   // Sorting
   const [sortField, setSortField] = useState("");
@@ -59,6 +61,20 @@ const SmeAssignments = () => {
     return prefixMap[role] || "/employee";
   };
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowStatusDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   useEffect(() => {
     fetchSmeAssignments();
   }, [
@@ -73,9 +89,15 @@ const SmeAssignments = () => {
   const fetchSmeAssignments = async () => {
     try {
       setLoading(true);
+      
+      // Pass empty string to backend when overdue is selected
+      const backendStatusFilter = statusFilter === ASSIGNMENT_STATUS.OVERDUE 
+        ? "" 
+        : statusFilter;
+      
       const response = await lndService.getSmeAssignments(
         currentPage,
-        statusFilter,
+        backendStatusFilter,
         searchTerm,
         sortField,
         sortOrderAsc ? "asc" : "desc",
@@ -83,7 +105,14 @@ const SmeAssignments = () => {
       );
 
       if (response.data.success) {
-        setAssignments(response.data.data.items);
+        let items = response.data.data.items;
+
+        // Client-side filtering for overdue
+        if (statusFilter === ASSIGNMENT_STATUS.OVERDUE) {
+          items = items.filter((a) => a.isOverdue === true);
+        }
+
+        setAssignments(items);
         setTotalItems(response.data.data.totalCount);
         setTotalPages(response.data.data.totalPages);
       }
@@ -170,6 +199,28 @@ const SmeAssignments = () => {
     );
   };
 
+  const getStatusLabel = (value) => {
+    const statusMap = {
+      "": "All Statuses",
+      [ASSIGNMENT_STATUS.IN_PROGRESS]: "In Progress",
+      [ASSIGNMENT_STATUS.PENDING_SME_ACKNOWLEDGEMENT]: "SME Review",
+      [ASSIGNMENT_STATUS.COMPLETED]: "Completed",
+      [ASSIGNMENT_STATUS.OVERDUE]: "Overdue",
+    };
+    return statusMap[value] || "All Statuses";
+  };
+
+  const statusOptions = [
+    { value: "", label: "All Statuses" },
+    { value: ASSIGNMENT_STATUS.IN_PROGRESS, label: "In Progress" },
+    {
+      value: ASSIGNMENT_STATUS.PENDING_SME_ACKNOWLEDGEMENT,
+      label: "SME Review",
+    },
+    { value: ASSIGNMENT_STATUS.COMPLETED, label: "Completed" },
+    { value: ASSIGNMENT_STATUS.OVERDUE, label: "Overdue" },
+  ];
+
   const getHeaderCellClass = (field, align) => {
     const baseClass = styles.tableHeaderCell;
     const alignClass =
@@ -179,6 +230,12 @@ const SmeAssignments = () => {
     const sortableClass = field ? styles.tableHeaderCellSortable : "";
     const activeClass = sortField === field ? styles.tableHeaderCellActive : "";
     return `${baseClass} ${alignClass} ${sortableClass} ${activeClass}`.trim();
+  };
+
+  const getDropdownItemClass = (currentValue, optionValue) => {
+    return `${styles.dropdownItem} ${
+      currentValue === optionValue ? styles.dropdownItemActive : ""
+    }`.trim();
   };
 
   if (loading && assignments.length === 0) {
@@ -229,23 +286,38 @@ const SmeAssignments = () => {
             )}
           </div>
         </form>
-        <select
-          value={statusFilter}
-          onChange={(e) => {
-            setStatusFilter(e.target.value);
-            setCurrentPage(1);
-          }}
-          className={styles.statusSelect}
-        >
-          <option value="">All Statuses</option>
-          <option value={ASSIGNMENT_STATUS.IN_PROGRESS}>In Progress</option>
-          <option value={ASSIGNMENT_STATUS.PENDING_SME_ACKNOWLEDGEMENT}>
-            Pending My Review
-          </option>
-          <option value={ASSIGNMENT_STATUS.ACKNOWLEDGED}>Acknowledged</option>
-          <option value={ASSIGNMENT_STATUS.COMPLETED}>Completed</option>
-          <option value={ASSIGNMENT_STATUS.OVERDUE}>Overdue</option>
-        </select>
+
+        {/* CUSTOM DROPDOWN */}
+        <div ref={dropdownRef} className={styles.dropdownWrapper}>
+          <button
+            type="button"
+            onClick={() => setShowStatusDropdown(!showStatusDropdown)}
+            className={styles.dropdownButton}
+          >
+            <span>{getStatusLabel(statusFilter)}</span>
+            <i
+              className={`bi bi-chevron-${showStatusDropdown ? "up" : "down"} ${styles.dropdownIcon}`}
+            ></i>
+          </button>
+
+          {showStatusDropdown && (
+            <div className={styles.dropdownMenu}>
+              {statusOptions.map((option) => (
+                <div
+                  key={option.value}
+                  onClick={() => {
+                    setStatusFilter(option.value);
+                    setCurrentPage(1);
+                    setShowStatusDropdown(false);
+                  }}
+                  className={getDropdownItemClass(statusFilter, option.value)}
+                >
+                  {option.label}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {assignments.length === 0 && !loading ? (
@@ -333,7 +405,7 @@ const SmeAssignments = () => {
                       )}
                     </div>
 
-                    {/* Due Date */}
+                    {/* Due Date - Overdue logic applied */}
                     <div
                       className={
                         assignment.isOverdue

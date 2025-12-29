@@ -34,13 +34,12 @@ const OrganizationSkills = () => {
       const response = await lndService.getAllOrganizationEmployees(
         currentPage,
         searchTerm,
-        itemsPerPage // Pass itemsPerPage to API
+        itemsPerPage 
       );
 
       if (response.data.success) {
         let employeesData = response.data.data.items;
 
-        // Only filter out Admins if there is no search term
         if (!searchTerm) {
           employeesData = employeesData.filter(
             (emp) => emp.departmentName !== "Administration"
@@ -112,7 +111,7 @@ const OrganizationSkills = () => {
       .toUpperCase();
   };
 
-  // Show initial loading spinner only when no data
+
   if (loading && employees.length === 0) {
     return (
       <div className={styles.loadingContainer}>
