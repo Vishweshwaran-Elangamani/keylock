@@ -35,7 +35,7 @@ const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) 
       const rect = dropdownRef.current.getBoundingClientRect();
       const spaceBelow = window.innerHeight - rect.bottom;
       const spaceAbove = rect.top;
-      const dropdownHeight = 250; // Approximate max height of dropdown
+      const dropdownHeight = 250; 
 
       // Open upward if not enough space below but enough space above
       if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {

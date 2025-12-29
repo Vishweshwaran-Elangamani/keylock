@@ -121,7 +121,7 @@ const ComplianceIssues = () => {
   const [selectedLevel, setSelectedLevel] = useState("");
 
   // View Mode State
-  const [viewMode, setViewMode] = useState("card");
+  const [viewMode, setViewMode] = useState("table");
 
   // Pagination States
   const [currentPage, setCurrentPage] = useState(1);
