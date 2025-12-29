@@ -131,12 +131,17 @@ namespace Relevantz.EEPZ.Core.Service
             var successCount = 0;
             var failureCount = 0;
             var errors = new List<string>();
+            var successfulUsers = new List<SuccessfulUserDto>();  
             var rowNumber = 1;
 
             try
             {
                 var nextIdString = await _employeeRepository.GetNextEmployeeCompanyIdAsync();
                 int nextEmployeeId = int.Parse(nextIdString);
+
+                //  LOAD ROLES AND DEPARTMENTS FOR MAPPING
+                var roles = await _roleRepository.GetAllAsync();
+                var departments = await _departmentRepository.GetAllAsync();
 
                 EEPZBusinessLog.Information($"Starting bulk user creation with Employee ID: {nextEmployeeId}");
 
@@ -161,6 +166,20 @@ namespace Relevantz.EEPZ.Core.Service
                         if (result.Success)
                         {
                             successCount++;
+
+                            var role = roles?.FirstOrDefault(r => r.RoleId == user.RoleId);
+                            var department = departments?.FirstOrDefault(d => d.DepartmentId == user.DepartmentId);
+
+                            successfulUsers.Add(new SuccessfulUserDto
+                            {
+                                Email = user.Email,
+                                FirstName = user.FirstName,
+                                LastName = user.LastName,
+                                EmployeeCompanyId = user.EmployeeCompanyId,
+                                Role = role?.RoleName ?? "Unknown",
+                                Department = department?.DepartmentName ?? "Unknown"
+                            });
+
                             EEPZBusinessLog.Information($"User created with Employee ID: {user.EmployeeCompanyId}");
                         }
                         else
@@ -195,6 +214,7 @@ namespace Relevantz.EEPZ.Core.Service
                     SuccessCount = successCount,
                     FailureCount = failureCount,
                     Errors = errors,
+                    SuccessfulUsers = successfulUsers,
                     Message = $"Bulk operation completed: {successCount} successful, {failureCount} failed"
                 };
 
@@ -208,6 +228,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<BulkOperationResponseDto>.FailureResponse("An error occurred during bulk operation");
             }
         }
+
 
         public async Task<ApiResponseDto<BulkOperationResponseDto>> BulkInactivateUsersAsync(BulkUserInactivateRequestDto request, int performedByUserId)
         {

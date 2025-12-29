@@ -152,7 +152,6 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<LoginResponseDto>.FailureResponse("An error occurred during login");
             }
         }
-
         public async Task<ApiResponseDto<LoginResponseDto>> VerifyOtpAndLoginAsync(VerifyOtpRequestDto request)
         {
             try
@@ -177,6 +176,7 @@ namespace Relevantz.EEPZ.Core.Service
                 await _userAuthRepository.UpdateLastLoginAsync(user.UserId);
 
                 var userResponse = MapToUserResponse(user);
+                var employeeMasterId = user.Employee?.Employeedetailsmasters?.FirstOrDefault()?.EmployeeMasterId;
 
                 EEPZBusinessLog.Information($"Admin logged in successfully with 2FA: {user.Email}");
 
@@ -189,6 +189,7 @@ namespace Relevantz.EEPZ.Core.Service
                         RefreshToken = refreshToken,
                         TokenExpiration = DateTime.UtcNow.AddMinutes(_configuration.GetValue<int>("Jwt:AccessTokenExpirationMinutes", 60)),
                         User = userResponse,
+                        EmployeeMasterId = employeeMasterId,
                         Message = "Login successful"
                     },
                     "Login successful");
@@ -199,6 +200,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<LoginResponseDto>.FailureResponse("An error occurred during OTP verification");
             }
         }
+
 
         public async Task<ApiResponseDto<OtpResponseDto>> ForgotPasswordAsync(ForgotPasswordRequestDto request)
         {
@@ -216,7 +218,19 @@ namespace Relevantz.EEPZ.Core.Service
                         Constants.Messages.OtpSent);
                 }
 
+                //  CHECK IF USER IS PROTECTED EMPLOYEE (EmployeeCompanyID = 1000)
+                var employeeCompanyId = user.Employee?.EmployeeCompanyId;
+                if (!string.IsNullOrEmpty(employeeCompanyId) && employeeCompanyId == "1000")
+                {
+                    EEPZBusinessLog.Warning($"Password reset attempt blocked for protected employee: {user.Email} (EmployeeCompanyID: {employeeCompanyId})");
+                    return ApiResponseDto<OtpResponseDto>.FailureResponse(
+                        "Password reset is not allowed for this account. Please contact system administrator for assistance."
+                    );
+                }
+
                 await _otpService.GenerateOtpAsync(request.Email, Constants.OtpTypes.ForgotPassword);
+
+                EEPZBusinessLog.Information($"Password reset OTP sent to: {user.Email}");
 
                 return ApiResponseDto<OtpResponseDto>.SuccessResponse(
                     new OtpResponseDto
@@ -233,6 +247,7 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
 
+
         public async Task<ApiResponseDto<string>> ResetPasswordAsync(ResetPasswordRequestDto request)
         {
             try
@@ -241,6 +256,16 @@ namespace Relevantz.EEPZ.Core.Service
                 if (user == null)
                 {
                     return ApiResponseDto<string>.FailureResponse(Constants.Messages.UserNotFound);
+                }
+
+                //  CHECK IF USER IS PROTECTED EMPLOYEE (EmployeeCompanyID = 1000) - DOUBLE SECURITY
+                var employeeCompanyId = user.Employee?.EmployeeCompanyId;
+                if (!string.IsNullOrEmpty(employeeCompanyId) && employeeCompanyId == "1000")
+                {
+                    EEPZBusinessLog.Warning($"Password reset attempt blocked at reset stage for protected employee: {user.Email} (EmployeeCompanyID: {employeeCompanyId})");
+                    return ApiResponseDto<string>.FailureResponse(
+                        "Password reset is not allowed for this account. Please contact system administrator."
+                    );
                 }
 
                 var isOtpValid = await _otpService.VerifyOtpAsync(request.Email, request.OtpCode, Constants.OtpTypes.ForgotPassword);
@@ -277,6 +302,7 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
 
+
         public async Task<ApiResponseDto<string>> ChangePasswordAsync(int userId, ChangePasswordRequestDto request)
         {
             try
@@ -285,6 +311,16 @@ namespace Relevantz.EEPZ.Core.Service
                 if (user == null)
                 {
                     return ApiResponseDto<string>.FailureResponse(Constants.Messages.UserNotFound);
+                }
+
+                //  CHECK IF USER IS PROTECTED EMPLOYEE (EmployeeCompanyID = 1000)
+                var employeeCompanyId = user.Employee?.EmployeeCompanyId;
+                if (!string.IsNullOrEmpty(employeeCompanyId) && employeeCompanyId == "1000")
+                {
+                    EEPZBusinessLog.Warning($"Password change attempt blocked for protected employee: UserId {userId} (EmployeeCompanyID: {employeeCompanyId})");
+                    return ApiResponseDto<string>.FailureResponse(
+                        "Password changes are not allowed for this account. Please contact system administrator."
+                    );
                 }
 
                 if (user.IsFirstLogin == false)
@@ -319,6 +355,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<string>.FailureResponse("An error occurred while changing password");
             }
         }
+
 
         public async Task<ApiResponseDto<string>> LogoutAsync(int userId)
         {
