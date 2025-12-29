@@ -207,18 +207,15 @@ namespace Relevantz.EEPZ.Core.Service
             try
             {
                 var user = await _userAuthRepository.GetByEmailAsync(request.Email);
+
                 if (user == null)
                 {
-                    return ApiResponseDto<OtpResponseDto>.SuccessResponse(
-                        new OtpResponseDto
-                        {
-                            Success = true,
-                            Message = Constants.Messages.OtpSent
-                        },
-                        Constants.Messages.OtpSent);
+                    // ❌ Email doesn't exist - return FAILURE with clear message
+                    EEPZBusinessLog.Warning($"Password reset attempt for non-existent email: {request.Email}");
+                    return ApiResponseDto<OtpResponseDto>.FailureResponse(
+                        "This email address is not registered in our system. Please check your email or contact support."
+                    );
                 }
-
-                //  CHECK IF USER IS PROTECTED EMPLOYEE (EmployeeCompanyID = 1000)
                 var employeeCompanyId = user.Employee?.EmployeeCompanyId;
                 if (!string.IsNullOrEmpty(employeeCompanyId) && employeeCompanyId == "1000")
                 {
@@ -243,10 +240,9 @@ namespace Relevantz.EEPZ.Core.Service
             catch (Exception ex)
             {
                 EEPZBusinessLog.Error($"Error in forgot password for {request.Email}", ex);
-                return ApiResponseDto<OtpResponseDto>.FailureResponse("An error occurred");
+                return ApiResponseDto<OtpResponseDto>.FailureResponse("An error occurred while processing your request");
             }
         }
-
 
         public async Task<ApiResponseDto<string>> ResetPasswordAsync(ResetPasswordRequestDto request)
         {

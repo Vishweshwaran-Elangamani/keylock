@@ -40,6 +40,16 @@ namespace Relevantz.EEPZ.Core.Service
                     return ApiResponseDto<ChangeRequestResponseDto>.FailureResponse(Constants.Messages.UserNotFound);
                 }
 
+                // ✅ CHECK IF USER IS PROTECTED EMPLOYEE (EmployeeCompanyID = 1000)
+                var employeeCompanyId = user.Employee?.EmployeeCompanyId;
+                if (!string.IsNullOrEmpty(employeeCompanyId) && employeeCompanyId == "1000")
+                {
+                    EEPZBusinessLog.Warning($"Change request blocked for protected employee: UserId {userId} (EmployeeCompanyID: {employeeCompanyId})");
+                    return ApiResponseDto<ChangeRequestResponseDto>.FailureResponse(
+                        "Change requests are not allowed for this account. Please contact system administrator for assistance."
+                    );
+                }
+
                 // Validate password
                 if (string.IsNullOrWhiteSpace(request.CurrentPassword))
                 {
@@ -171,6 +181,16 @@ namespace Relevantz.EEPZ.Core.Service
                     return ApiResponseDto<ChangeRequestResponseDto>.FailureResponse("Change request already processed");
                 }
 
+                // ✅ DOUBLE CHECK: Prevent processing for protected employees (EmployeeCompanyID = 1000)
+                var employee = await _employeeRepository.GetByIdAsync(changeRequest.EmployeeId);
+                if (employee != null && !string.IsNullOrEmpty(employee.EmployeeCompanyId) && employee.EmployeeCompanyId == "1000")
+                {
+                    EEPZBusinessLog.Warning($"Attempt to process change request for protected employee: EmployeeId {changeRequest.EmployeeId} (EmployeeCompanyID: {employee.EmployeeCompanyId})");
+                    return ApiResponseDto<ChangeRequestResponseDto>.FailureResponse(
+                        "Cannot process change request for this protected account. Please contact system administrator."
+                    );
+                }
+
                 changeRequest.Status = request.Status;
                 changeRequest.ApprovedByUserId = adminUserId;
                 changeRequest.AdminRemarks = request.AdminRemarks;
@@ -190,11 +210,11 @@ namespace Relevantz.EEPZ.Core.Service
                     }
                     else if (changeRequest.ChangeType == Constants.ChangeTypes.EmployeeCompanyId && !string.IsNullOrEmpty(changeRequest.NewEmployeeCompanyId))
                     {
-                        var employee = await _employeeRepository.GetByIdAsync(changeRequest.EmployeeId);
-                        if (employee != null)
+                        var employeeToUpdate = await _employeeRepository.GetByIdAsync(changeRequest.EmployeeId);
+                        if (employeeToUpdate != null)
                         {
-                            employee.EmployeeCompanyId = changeRequest.NewEmployeeCompanyId;
-                            await _employeeRepository.UpdateAsync(employee);
+                            employeeToUpdate.EmployeeCompanyId = changeRequest.NewEmployeeCompanyId;
+                            await _employeeRepository.UpdateAsync(employeeToUpdate);
                             EEPZBusinessLog.Information($"EmployeeCompanyId updated for EmployeeId: {changeRequest.EmployeeId}, New ID: {changeRequest.NewEmployeeCompanyId}");
                         }
                     }
