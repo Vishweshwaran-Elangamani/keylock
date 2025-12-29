@@ -352,10 +352,6 @@ const ComplianceIssues = () => {
               <i className="bi bi-table"></i>
             </button>
           </div>
-
-          <div className="ci-results-count-inline">
-            Showing {currentItems.length} of {filteredEscalations.length} escalations
-          </div>
         </div>
       </div>
 
@@ -393,7 +389,7 @@ const ComplianceIssues = () => {
                         {escalation.employeeName || "Unknown Employee"}
                       </h3>
                       <span className="ci-card-user-id">
-                        User ID: {escalation.employeeUserId}
+                        User ID: {escalation.employeeCompanyId}
                       </span>
                       <p className="ci-card-email">
                         {escalation.employeeEmail || "N/A"}

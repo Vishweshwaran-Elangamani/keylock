@@ -48,7 +48,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #27235c;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
@@ -397,23 +397,28 @@
 
 /* Clear Button */
 .cg-btn-clear {
-  background: white;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
+  white-space: nowrap;
   padding: 0.5rem 1rem;
+  font-weight: 500;
+  background: #ffffff !important;
+  border: 1px solid #000000 !important;
   border-radius: 8px;
-  font-weight: 600;
   font-size: 14px;
+  color: #000000 !important;
   cursor: pointer;
   transition: all 0.2s ease;
-  white-space: nowrap;
   height: 38px;
 }
 
 .cg-btn-clear:hover {
-  background: #f8fafc;
-  border-color: #cbd5e1;
-  color: #475569;
+  background: #6b7280 !important;
+  border-color: #6b7280 !important;
+  color: #ffffff !important;
+}
+
+.cg-btn-clear:active {
+  background: #4b5563 !important;
+  border-color: #4b5563 !important;
 }
 
 /* ============================================

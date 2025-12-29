@@ -359,7 +359,6 @@
   font-weight: 550;
   color: #27235c;
   margin-bottom: 0.625rem;
-  font-family: "Courier New", monospace;
 }
 
 .rlm-card-desc {
@@ -513,7 +512,6 @@
   border-radius: 4px;
   font-size: 0.75rem;
   color: #27235c;
-  font-family: "Courier New", monospace;
 }
 
 .rlm-desc-cell {

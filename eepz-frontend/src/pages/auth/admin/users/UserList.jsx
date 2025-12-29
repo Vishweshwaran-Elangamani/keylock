@@ -30,7 +30,7 @@ const RoleDropdown = ({ value, onChange, roles }) => {
 
   return (
     <div
-      className="filter-select custom-ul-dropdown"
+      className="ul-filter-select custom-ul-dropdown"
       tabIndex={0}
       onBlur={() => setOpen(false)}
       onClick={() => setOpen((prev) => !prev)}
@@ -77,7 +77,7 @@ const StatusDropdown = ({ value, onChange }) => {
 
   return (
     <div
-      className="filter-select custom-ul-dropdown"
+      className="ul-filter-select custom-ul-dropdown"
       tabIndex={0}
       onBlur={() => setOpen(false)}
       onClick={() => setOpen((prev) => !prev)}
@@ -107,11 +107,6 @@ const StatusDropdown = ({ value, onChange }) => {
   );
 };
 
-/**
- * UserList Component
- * Main admin user management listing, filtering, and modal launching.
- * All notifications use Sonner.
- */
 const UserList = () => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
@@ -119,17 +114,14 @@ const UserList = () => {
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Filters
-  const [searchTerm, setSearchTerm] = useState(""); // What user types
-  const [activeSearchTerm, setActiveSearchTerm] = useState(""); // What's actually used for filtering
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeSearchTerm, setActiveSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
 
-  // Pagination
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Modal states
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
@@ -144,7 +136,6 @@ const UserList = () => {
     filterUsers();
   }, [users, activeSearchTerm, selectedRole, selectedStatus]);
 
-  // Data load
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -164,23 +155,18 @@ const UserList = () => {
     } catch (error) {
       toast.dismiss();
       toast.error("Failed to load data.");
-      console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Filter out Admin users from display
   const getNonAdminUsers = () => {
     return users.filter((user) => user.roleName !== "Admin");
   };
 
-  // Filters
   const filterUsers = () => {
-    // Start with non-admin users only
     let filtered = getNonAdminUsers();
 
-    // Use activeSearchTerm instead of searchTerm
     if (activeSearchTerm) {
       filtered = filtered.filter(
         (user) =>
@@ -218,7 +204,6 @@ const UserList = () => {
     setSelectedStatus("");
   };
 
-  // Modal triggers
   const handleAddUser = () => setShowAddModal(true);
   const handleEditUser = (user) => {
     setSelectedUser(user);
@@ -242,16 +227,17 @@ const UserList = () => {
   };
 
   const handleBulkOperationsSuccess = () => {
-    fetchData(); // Silently reload data in background
+    fetchData();
   };
 
-  // Pagination helpers
   const getPaginatedUsers = () => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
     return filteredUsers.slice(startIndex, endIndex);
   };
-  const totalPages = Math.ceil(filteredUsers.length / rowsPerPage);
+
+  const totalPages = Math.ceil(filteredUsers.length / rowsPerPage) || 1;
+
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
@@ -279,17 +265,15 @@ const UserList = () => {
     return pages;
   };
 
-  // User initials for avatar
   const getInitials = (firstName, lastName) => {
     const first = firstName?.charAt(0)?.toUpperCase() || "";
     const last = lastName?.charAt(0)?.toUpperCase() || "";
     return `${first}${last}`;
   };
 
-  // Loading indicator
   if (loading) {
     return (
-      <div className="loading-container">
+      <div className="ul-loading-container">
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
@@ -298,8 +282,7 @@ const UserList = () => {
   }
 
   return (
-    <div className="user-list-page">
-      {/* BREADCRUMB COMPONENT */}
+    <div className="ul-page">
       <Breadcrumb
         items={[
           {
@@ -308,45 +291,47 @@ const UserList = () => {
         ]}
       />
 
-      {/* STATISTICS CARDS - EXCLUDE ADMIN USERS */}
-      <div className="ad-stats-grid">
-        <div className="ad-stat-card">
-          <div className="stat-icon stat-icon-primary">
+      <div className="stats-cards-ul">
+        <div className="stat-card-ul stat-total-ul">
+          <div className="stat-icon-ul">
             <i className="bi bi-people-fill"></i>
           </div>
-          <div className="stat-content">
-            <h3 className="stat-value-ul">{getNonAdminUsers().length}</h3>
-            <p className="stat-label">Total Users</p>
+          <div className="stat-content-ul">
+            <div className="stat-value-ul">{getNonAdminUsers().length}</div>
+            <div className="stat-label-ul">Total Users</div>
           </div>
         </div>
-        <div className="ad-stat-card">
-          <div className="stat-icon stat-icon-success">
+
+        <div className="stat-card-ul stat-active-ul">
+          <div className="stat-icon-ul">
             <i className="bi bi-person-check-fill"></i>
           </div>
-          <div className="stat-content">
-            <h3 className="stat-value-ul">
+          <div className="stat-content-ul">
+            <div className="stat-value-ul">
               {getNonAdminUsers().filter((u) => u.isActive).length}
-            </h3>
-            <p className="stat-label">Active Users</p>
+            </div>
+            <div className="stat-label-ul">Active Users</div>
           </div>
         </div>
-        <div className="ad-stat-card">
-          <div className="stat-icon stat-icon-danger">
+
+        <div className="stat-card-ul stat-inactive-ul">
+          <div className="stat-icon-ul">
             <i className="bi bi-person-x-fill"></i>
           </div>
-          <div className="stat-content">
-            <h3 className="stat-value-ul id=one">
+          <div className="stat-content-ul">
+            <div className="stat-value-ul">
               {getNonAdminUsers().filter((u) => !u.isActive).length}
-            </h3>
-            <p className="stat-label">Inactive Users</p>
+            </div>
+            <div className="stat-label-ul">Inactive Users</div>
           </div>
         </div>
-        <div className="ad-stat-card">
-          <div className="stat-icon stat-icon-warning">
+
+        <div className="stat-card-ul stat-new-ul">
+          <div className="stat-icon-ul">
             <i className="bi bi-person-plus-fill"></i>
           </div>
-          <div className="stat-content">
-            <h3 className="stat-value-ul">
+          <div className="stat-content-ul">
+            <div className="stat-value-ul">
               {
                 getNonAdminUsers().filter((u) => {
                   const joinDate = new Date(u.joiningDate);
@@ -355,82 +340,75 @@ const UserList = () => {
                   return joinDate > thirtyDaysAgo;
                 }).length
               }
-            </h3>
-            <p className="stat-label">New (Last 30 Days)</p>
-          </div>
-        </div>
-      </div>
-
-      {/* FILTERS AND ACTIONS */}
-      <div className="filters-card">
-        <div className="filters-content">
-          <div className="filters-left">
-            {/* Search with Button */}
-            <div className="ul-search-input">
-              <div className="ul-search-inner">
-                <span className="ul-search-icon">
-                  <FaSearch />
-                </span>
-                <Form.Control
-                  type="text"
-                  placeholder="Search users..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  onKeyPress={(e) => {
-                    if (e.key === "Enter") {
-                      handleSearch();
-                    }
-                  }}
-                  className="ul-search-field"
-                />
-                <button
-                  type="button"
-                  className="ul-search-btn"
-                  onClick={handleSearch}
-                >
-                  Search
-                </button>
-              </div>
             </div>
-
-            {/* Role Filter - EXCLUDE ADMIN ROLE */}
-            <RoleDropdown
-              value={selectedRole}
-              onChange={(e) => setSelectedRole(e.target.value)}
-              roles={roles}
-            />
-
-            {/* Status Filter */}
-            <StatusDropdown
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-            />
-
-            {/* Clear Filters Button */}
-            <button className="btn-clear-filters" onClick={clearFilters}>
-              Clear Filters
-            </button>
-          </div>
-          <div className="filters-actions">
-            <button
-              className="btn-bulk"
-              onClick={() => setShowBulkOperations(true)}
-            >
-              <i className="bi bi-database"></i>
-              Bulk Operations
-            </button>
-            <button className="btn-add" onClick={handleAddUser}>
-              <i className="bi bi-plus-circle"></i>
-              Create User
-            </button>
+            <div className="stat-label-ul">New (Last 30 Days)</div>
           </div>
         </div>
       </div>
 
-      {/* TABLE CARD */}
-      <div className="us-table-card">
-        <div className="table-wrapper">
-          <table className="user-table">
+      <div className="ul-filters-card">
+        <div className="ul-filters-content">
+          <div className="ul-search-input">
+            <div className="ul-search-inner">
+              <span className="ul-search-icon">
+                <FaSearch />
+              </span>
+              <Form.Control
+                type="text"
+                placeholder="Search users..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearch();
+                  }
+                }}
+                className="ul-search-field"
+              />
+              <button
+                type="button"
+                className="ul-search-btn"
+                onClick={handleSearch}
+              >
+                Search
+              </button>
+            </div>
+          </div>
+
+          <RoleDropdown
+            value={selectedRole}
+            onChange={(e) => setSelectedRole(e.target.value)}
+            roles={roles}
+          />
+
+          <StatusDropdown
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+          />
+
+          <button className="ul-btn-clear" onClick={clearFilters}>
+            Clear Filters
+          </button>
+
+          <div className="ul-results-count">
+            Showing {getPaginatedUsers().length} of {filteredUsers.length} users
+          </div>
+
+          <button className="ul-btn-bulk" onClick={() => setShowBulkOperations(true)}>
+            <i className="bi bi-database"></i>
+            Bulk Operations
+          </button>
+
+          <button className="ul-btn-create" onClick={handleAddUser}>
+            <i className="bi bi-plus-circle"></i>
+            Create User
+          </button>
+        </div>
+      </div>
+
+      <div className="ul-table-card">
+        <div className="ul-table-wrapper">
+          <table className="ul-table">
             <thead>
               <tr>
                 <th>Full Name</th>
@@ -445,7 +423,7 @@ const UserList = () => {
             <tbody>
               {getPaginatedUsers().length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="empty-state">
+                  <td colSpan="7" className="ul-empty-state">
                     <i className="bi bi-inbox"></i>
                     <p>No users found</p>
                   </td>
@@ -454,19 +432,21 @@ const UserList = () => {
                 getPaginatedUsers().map((user) => (
                   <tr key={user.userId}>
                     <td>
-                      <div className="user-info">
-                        <div className="user-avatar">
+                      <div className="ul-user-info">
+                        <div className="ul-user-avatar">
                           {getInitials(user.firstName, user.lastName)}
                         </div>
-                        <span className="user-name">{`${user.firstName} ${user.lastName}`}</span>
+                        <span className="ul-user-name">{`${user.firstName} ${user.lastName}`}</span>
                       </div>
                     </td>
                     <td>{user.email}</td>
                     <td className="text-muted">{user.employeeCompanyId}</td>
                     <td>
                       <span
-                        className={`status-badge ${
-                          user.isActive ? "status-active" : "status-inactive"
+                        className={`ul-status-badge ${
+                          user.isActive
+                            ? "ul-status-active"
+                            : "ul-status-inactive"
                         }`}
                       >
                         {user.isActive ? "Active" : "Inactive"}
@@ -485,9 +465,9 @@ const UserList = () => {
                       })}
                     </td>
                     <td>
-                      <div className="action-buttons">
+                      <div className="ul-action-buttons">
                         <button
-                          className="action-btn action-btn-edit"
+                          className="ul-action-btn ul-action-edit"
                           onClick={() => handleEditUser(user)}
                           title="Edit User"
                         >
@@ -495,7 +475,7 @@ const UserList = () => {
                         </button>
                         {user.isActive ? (
                           <button
-                            className="action-btn action-btn-delete"
+                            className="ul-action-btn ul-action-delete"
                             onClick={() => handleDeactivate(user)}
                             title="Deactivate User"
                           >
@@ -503,7 +483,7 @@ const UserList = () => {
                           </button>
                         ) : (
                           <button
-                            className="action-btn action-btn-disabled"
+                            className="ul-action-btn ul-action-disabled"
                             disabled
                             title="Permanently Deactivated"
                           >
@@ -519,38 +499,39 @@ const UserList = () => {
           </table>
         </div>
 
-        {/* PAGINATION */}
-        {filteredUsers.length > 0 && (
-          <div className="pagination-container">
-            <div className="pagination-info">
-              <span className="pagination-label">Show</span>
+        {filteredUsers.length > 0 && totalPages > 1 && (
+          <div className="ul-pagination">
+            <div className="ul-pagination-info">
+              <span>Show</span>
               <select
-                className="pagination-select"
                 value={rowsPerPage}
                 onChange={(e) => {
                   setRowsPerPage(Number(e.target.value));
                   setCurrentPage(1);
                 }}
               >
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
               </select>
-              <span className="pagination-label">entries</span>
+              <span>entries</span>
             </div>
-            <div className="pagination-status">
+
+            <div className="ul-pagination-status">
               Showing {(currentPage - 1) * rowsPerPage + 1} to{" "}
               {Math.min(currentPage * rowsPerPage, filteredUsers.length)} of{" "}
               {filteredUsers.length} entries
             </div>
-            <nav className="pagination-nav">
-              <ul className="pagination">
+
+            <nav className="ul-pagination-nav">
+              <ul className="ul-pagination-list">
                 <li
-                  className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                  className={`ul-page-item ${
+                    currentPage === 1 ? "disabled" : ""
+                  }`}
                 >
                   <button
-                    className="page-link"
                     onClick={() =>
                       setCurrentPage((prev) => Math.max(prev - 1, 1))
                     }
@@ -559,15 +540,15 @@ const UserList = () => {
                     <i className="bi bi-chevron-left"></i>
                   </button>
                 </li>
+
                 {getPageNumbers().map((page, index) => (
                   <li
                     key={index}
-                    className={`page-item ${
+                    className={`ul-page-item ${
                       page === currentPage ? "active" : ""
                     } ${typeof page !== "number" ? "disabled" : ""}`}
                   >
                     <button
-                      className="page-link"
                       onClick={() =>
                         typeof page === "number" && setCurrentPage(page)
                       }
@@ -577,15 +558,17 @@ const UserList = () => {
                     </button>
                   </li>
                 ))}
+
                 <li
-                  className={`page-item ${
+                  className={`ul-page-item ${
                     currentPage === totalPages ? "disabled" : ""
                   }`}
                 >
                   <button
-                    className="page-link"
                     onClick={() =>
-                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                      setCurrentPage((prev) =>
+                        Math.min(prev + 1, totalPages)
+                      )
                     }
                     disabled={currentPage === totalPages}
                   >
@@ -598,7 +581,6 @@ const UserList = () => {
         )}
       </div>
 
-      {/* MODALS */}
       {showAddModal && (
         <AddUserModal
           show={showAddModal}

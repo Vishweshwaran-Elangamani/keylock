@@ -43,7 +43,7 @@ const NominationStatusDropdown = ({ value, onChange }) => {
         <span className="custom-status-arrow" />
       </div>
 
-      {open && (
+      {open && (  
         <div className="custom-status-menu">
           {options.map((opt) => (
             <div
@@ -416,20 +416,18 @@ const NominationManagement = () => {
               </div>
             </div>
 
-            {/* Clear Filters */}
-            <button
-              className="pm-clear-btn"
-              onClick={clearFilters}
-              style={{ marginLeft: "1rem" }}
-            >
-              Clear Filters
-            </button>
-
             {/* Status Filter (custom dropdown) */}
             <NominationStatusDropdown
               value={selectedStatus}
               onChange={(val) => setSelectedStatus(val)}
             />
+            <button
+              className="nm-clear-btn"
+              onClick={clearFilters}
+              style={{ marginLeft: "1rem" }}
+            >
+              Clear Filters
+            </button>
           </div>
 
           <div className="filters-actions">

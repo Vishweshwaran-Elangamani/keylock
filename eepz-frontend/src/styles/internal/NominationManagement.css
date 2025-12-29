@@ -98,3 +98,28 @@
 .custom-status-option-active {
   background-color: #f3f4f6;
 }
+
+.nm-clear-btn {
+  white-space: nowrap;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  background: #ffffff !important;
+  border: 1px solid #000000 !important;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #000000 !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  height: 38px;
+}
+
+.nm-clear-btn:hover {
+  background: #6b7280 !important;
+  border-color: #6b7280 !important;
+  color: #ffffff !important;
+}
+
+.nm-clear-btn:active {
+  background: #4b5563 !important;
+  border-color: #4b5563 !important;
+}

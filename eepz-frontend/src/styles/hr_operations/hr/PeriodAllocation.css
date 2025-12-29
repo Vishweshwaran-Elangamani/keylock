@@ -93,7 +93,6 @@
 
 
 /* Compact Buttons */
-.pa-btn-export-compact,
 .pa-btn-add-compact {
   padding: 0.5rem 1rem;
   border-radius: 8px;
@@ -109,19 +108,34 @@
   border: none;
 }
 
-
 .pa-btn-export-compact {
-  background: white;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
+  white-space: nowrap;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  background: #ffffff !important;
+  border: 1px solid #000000 !important;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #000000 !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
-
 
 .pa-btn-export-compact:hover {
-  background: #f8fafc;
-  border-color: #cbd5e1;
-  color: #475569;
+  background: #6b7280 !important;
+  border-color: #6b7280 !important;
+  color: #ffffff !important;
 }
+
+.pa-btn-export-compact:active {
+  background: #4b5563 !important;
+  border-color: #4b5563 !important;
+}
+
 
 
 .pa-btn-add-compact {
@@ -555,26 +569,34 @@
 
 
 /* Clear Button */
+
 .pa-btn-clear {
-  background: white;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
+  white-space: nowrap;
   padding: 0.5rem 1rem;
+  font-weight: 500;
+  background: #ffffff !important;
+  border: 1px solid #000000 !important;
   border-radius: 8px;
-  font-weight: 600;
   font-size: 14px;
+  color: #000000 !important;
   cursor: pointer;
   transition: all 0.2s ease;
-  white-space: nowrap;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
-
 
 .pa-btn-clear:hover {
-  background: #f8fafc;
-  border-color: #cbd5e1;
-  color: #475569;
+  background: #6b7280 !important;
+  border-color: #6b7280 !important;
+  color: #ffffff !important;
 }
 
+.pa-btn-clear:active {
+  background: #4b5563 !important;
+  border-color: #4b5563 !important;
+}
 
 /* Results Count */
 .pa-results-count {

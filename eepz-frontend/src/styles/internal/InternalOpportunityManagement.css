@@ -196,27 +196,31 @@
 
 
 /* Clear Button */
+
 .btn-clear {
   white-space: nowrap;
   padding: 0.5rem 1rem;
   font-weight: 500;
-  background: #ffffff;
-  border: 1px solid #ced4da;
+  background: #ffffff !important;
+  border: 1px solid #000000 !important;
   border-radius: 8px;
   font-size: 14px;
-  color: #212529;
+  color: #000000 !important;
   cursor: pointer;
   transition: all 0.2s ease;
   height: 38px;
 }
 
-
 .btn-clear:hover {
-  background: #f8f9fa;
-  border-color: #6c757d;
-  color: #212529;
+  background: #6b7280 !important;
+  border-color: #6b7280 !important;
+  color: #ffffff !important;
 }
 
+.btn-clear:active {
+  background: #4b5563 !important;
+  border-color: #4b5563 !important;
+}
 
 /* Add Button */
 .btn-add {

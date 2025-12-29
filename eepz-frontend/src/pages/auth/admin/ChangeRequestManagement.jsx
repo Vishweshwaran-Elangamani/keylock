@@ -4,6 +4,7 @@ import ChangeRequestService from "../../../services/auth/changeRequestService";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 import { toast } from "sonner";
 import { FaSearch } from "react-icons/fa";
+import { Form } from "react-bootstrap";
 import ApproveEmailChangeModal from "../../../components/auth/Modal/changerequest/ApproveEmailChangeModal";
 import RejectEmailChangeModal from "../../../components/auth/Modal/changerequest/RejectEmailChangeModal";
 import "../../../styles/auth/admin/ChangeRequestManagement.css";
@@ -21,29 +22,26 @@ const StatusDropdown = ({ value, onChange, options }) => {
 
   return (
     <div
-      className="crm-filter-select custom-status-dropdown"
+      className="crm-status-select custom-crm-dropdown"
       tabIndex={0}
-      onBlur={() => setTimeout(() => setOpen(false), 200)}
+      onBlur={() => setOpen(false)}
+      onClick={() => setOpen((prev) => !prev)}
       style={{ position: "relative" }}
     >
-      <div
-        className="custom-status-selected"
-        onClick={() => setOpen((prev) => !prev)}
-      >
+      <div className="custom-crm-selected">
         {selected.label}
-        <span className="custom-status-arrow" />
+        <span className="custom-crm-arrow" />
       </div>
-
       {open && (
-        <div className="custom-status-menu">
+        <div className="custom-crm-menu">
           {allOptions.map((opt) => (
             <div
               key={opt.value || "all-status"}
               className={
-                "custom-status-option" +
-                (opt.value === value ? " custom-status-option-active" : "")
+                "custom-crm-option" +
+                (opt.value === value ? " custom-crm-option-active" : "")
               }
-              onClick={() => handleSelect(opt.value)}
+              onMouseDown={() => handleSelect(opt.value)}
             >
               {opt.label}
             </div>
@@ -54,7 +52,6 @@ const StatusDropdown = ({ value, onChange, options }) => {
   );
 };
 
-// Separate component for Pending Requests
 const PendingRequests = ({
   requests,
   searchTerm,
@@ -105,7 +102,7 @@ const PendingRequests = ({
     setCurrentPage(1);
   };
 
-  const totalPages = Math.ceil(filteredRequests.length / rowsPerPage);
+  const totalPages = Math.ceil(filteredRequests.length / rowsPerPage) || 1;
 
   const getPaginatedRequests = () => {
     const startIndex = (currentPage - 1) * rowsPerPage;
@@ -143,19 +140,16 @@ const PendingRequests = ({
 
   return (
     <>
-      {/* FILTERS CARD */}
       <div className="crm-filters-card">
         <div className="crm-filters-content">
-          {/* Search with Button */}
-          <div className="crm-search-box">
+          <div className="crm-search-input">
             <div className="crm-search-inner">
               <span className="crm-search-icon">
                 <FaSearch />
               </span>
-              <input
+              <Form.Control
                 type="text"
-                className="crm-search-input"
-                placeholder="Search by name, ID, or email..."
+                placeholder="Search requests..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={(e) => {
@@ -163,6 +157,7 @@ const PendingRequests = ({
                     handleSearch();
                   }
                 }}
+                className="crm-search-field"
               />
               <button
                 type="button"
@@ -181,18 +176,17 @@ const PendingRequests = ({
             onChange={(e) => setFilterDate(e.target.value)}
           />
 
-          <button className="btn-clear-crm" onClick={clearFilters}>
+          <button className="crm-btn-clear" onClick={clearFilters}>
             Clear Filters
           </button>
 
-          <div className="results-count-inline-crm">
+          <div className="crm-results-count">
             Showing {getPaginatedRequests().length} of {filteredRequests.length}{" "}
             requests
           </div>
         </div>
       </div>
 
-      {/* TABLE CARD */}
       <div className="crm-table-card">
         <div className="crm-table-wrapper">
           <table className="crm-request-table">
@@ -259,7 +253,7 @@ const PendingRequests = ({
                     <td>
                       <div className="crm-action-buttons">
                         <button
-                          className="action-btn action-btn-approve"
+                          className="crm-action-btn crm-action-approve"
                           onClick={() =>
                             handleProcessClick(request, "Approved")
                           }
@@ -268,7 +262,7 @@ const PendingRequests = ({
                           <i className="bi bi-check-circle"></i>
                         </button>
                         <button
-                          className="action-btn action-btn-reject"
+                          className="crm-action-btn crm-action-reject"
                           onClick={() =>
                             handleProcessClick(request, "Rejected")
                           }
@@ -285,40 +279,39 @@ const PendingRequests = ({
           </table>
         </div>
 
-        {/* PAGINATION */}
-        {filteredRequests.length > 0 && (
-          <div className="pagination-container">
-            <div className="pagination-info">
-              <span className="pagination-label">Show</span>
+        {filteredRequests.length > 0 && totalPages > 1 && (
+          <div className="crm-pagination">
+            <div className="crm-pagination-info">
+              <span>Show</span>
               <select
-                className="pagination-select"
                 value={rowsPerPage}
                 onChange={(e) => {
                   setRowsPerPage(Number(e.target.value));
                   setCurrentPage(1);
                 }}
               >
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
               </select>
-              <span className="pagination-label">entries</span>
+              <span>entries</span>
             </div>
 
-            <div className="pagination-status">
+            <div className="crm-pagination-status">
               Showing {(currentPage - 1) * rowsPerPage + 1} to{" "}
               {Math.min(currentPage * rowsPerPage, filteredRequests.length)} of{" "}
               {filteredRequests.length} entries
             </div>
 
-            <nav className="pagination-nav">
-              <ul className="pagination">
+            <nav className="crm-pagination-nav">
+              <ul className="crm-pagination-list">
                 <li
-                  className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                  className={`crm-page-item ${
+                    currentPage === 1 ? "disabled" : ""
+                  }`}
                 >
                   <button
-                    className="page-link"
                     onClick={() =>
                       setCurrentPage((prev) => Math.max(prev - 1, 1))
                     }
@@ -331,12 +324,11 @@ const PendingRequests = ({
                 {getPageNumbers().map((page, index) => (
                   <li
                     key={index}
-                    className={`page-item ${
+                    className={`crm-page-item ${
                       page === currentPage ? "active" : ""
                     } ${typeof page !== "number" ? "disabled" : ""}`}
                   >
                     <button
-                      className="page-link"
                       onClick={() =>
                         typeof page === "number" && setCurrentPage(page)
                       }
@@ -348,14 +340,15 @@ const PendingRequests = ({
                 ))}
 
                 <li
-                  className={`page-item ${
+                  className={`crm-page-item ${
                     currentPage === totalPages ? "disabled" : ""
                   }`}
                 >
                   <button
-                    className="page-link"
                     onClick={() =>
-                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                      setCurrentPage((prev) =>
+                        Math.min(prev + 1, totalPages)
+                      )
                     }
                     disabled={currentPage === totalPages}
                   >
@@ -371,7 +364,6 @@ const PendingRequests = ({
   );
 };
 
-// Separate component for All Requests
 const AllRequests = ({
   requests,
   searchTerm,
@@ -428,7 +420,7 @@ const AllRequests = ({
     setCurrentPage(1);
   };
 
-  const totalPages = Math.ceil(filteredRequests.length / rowsPerPage);
+  const totalPages = Math.ceil(filteredRequests.length / rowsPerPage) || 1;
 
   const getPaginatedRequests = () => {
     const startIndex = (currentPage - 1) * rowsPerPage;
@@ -464,7 +456,6 @@ const AllRequests = ({
     return pages;
   };
 
-  // Status options for dropdown
   const statusOptions = [
     { label: "Pending", value: "Pending" },
     { label: "Approved", value: "Approved" },
@@ -474,19 +465,16 @@ const AllRequests = ({
 
   return (
     <>
-      {/* FILTERS CARD */}
       <div className="crm-filters-card">
         <div className="crm-filters-content">
-          {/* Search with Button */}
-          <div className="crm-search-box">
+          <div className="crm-search-input">
             <div className="crm-search-inner">
               <span className="crm-search-icon">
                 <FaSearch />
               </span>
-              <input
+              <Form.Control
                 type="text"
-                className="crm-search-input"
-                placeholder="Search by name, ID, or email..."
+                placeholder="Search requests..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={(e) => {
@@ -494,6 +482,7 @@ const AllRequests = ({
                     handleSearch();
                   }
                 }}
+                className="crm-search-field"
               />
               <button
                 type="button"
@@ -505,7 +494,6 @@ const AllRequests = ({
             </div>
           </div>
 
-          {/* Custom Status Dropdown */}
           <StatusDropdown
             value={filterStatus}
             onChange={(val) => setFilterStatus(val)}
@@ -519,18 +507,17 @@ const AllRequests = ({
             onChange={(e) => setFilterDate(e.target.value)}
           />
 
-          <button className="btn-clear-crm" onClick={clearFilters}>
+          <button className="crm-btn-clear" onClick={clearFilters}>
             Clear Filters
           </button>
 
-          <div className="results-count-inline-crm">
+          <div className="crm-results-count">
             Showing {getPaginatedRequests().length} of {filteredRequests.length}{" "}
             requests
           </div>
         </div>
       </div>
 
-      {/* TABLE CARD */}
       <div className="crm-table-card">
         <div className="crm-table-wrapper">
           <table className="crm-request-table">
@@ -599,7 +586,7 @@ const AllRequests = ({
                         {request.status === "Pending" ? (
                           <>
                             <button
-                              className="action-btn action-btn-approve"
+                              className="crm-action-btn crm-action-approve"
                               onClick={() =>
                                 handleProcessClick(request, "Approved")
                               }
@@ -608,7 +595,7 @@ const AllRequests = ({
                               <i className="bi bi-check-circle"></i>
                             </button>
                             <button
-                              className="action-btn action-btn-reject"
+                              className="crm-action-btn crm-action-reject"
                               onClick={() =>
                                 handleProcessClick(request, "Rejected")
                               }
@@ -641,40 +628,39 @@ const AllRequests = ({
           </table>
         </div>
 
-        {/* PAGINATION */}
-        {filteredRequests.length > 0 && (
-          <div className="pagination-container">
-            <div className="pagination-info">
-              <span className="pagination-label">Show</span>
+        {filteredRequests.length > 0 && totalPages > 1 && (
+          <div className="crm-pagination">
+            <div className="crm-pagination-info">
+              <span>Show</span>
               <select
-                className="pagination-select"
                 value={rowsPerPage}
                 onChange={(e) => {
                   setRowsPerPage(Number(e.target.value));
                   setCurrentPage(1);
                 }}
               >
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
               </select>
-              <span className="pagination-label">entries</span>
+              <span>entries</span>
             </div>
 
-            <div className="pagination-status">
+            <div className="crm-pagination-status">
               Showing {(currentPage - 1) * rowsPerPage + 1} to{" "}
               {Math.min(currentPage * rowsPerPage, filteredRequests.length)} of{" "}
               {filteredRequests.length} entries
             </div>
 
-            <nav className="pagination-nav">
-              <ul className="pagination">
+            <nav className="crm-pagination-nav">
+              <ul className="crm-pagination-list">
                 <li
-                  className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                  className={`crm-page-item ${
+                    currentPage === 1 ? "disabled" : ""
+                  }`}
                 >
                   <button
-                    className="page-link"
                     onClick={() =>
                       setCurrentPage((prev) => Math.max(prev - 1, 1))
                     }
@@ -687,12 +673,11 @@ const AllRequests = ({
                 {getPageNumbers().map((page, index) => (
                   <li
                     key={index}
-                    className={`page-item ${
+                    className={`crm-page-item ${
                       page === currentPage ? "active" : ""
                     } ${typeof page !== "number" ? "disabled" : ""}`}
                   >
                     <button
-                      className="page-link"
                       onClick={() =>
                         typeof page === "number" && setCurrentPage(page)
                       }
@@ -704,14 +689,15 @@ const AllRequests = ({
                 ))}
 
                 <li
-                  className={`page-item ${
+                  className={`crm-page-item ${
                     currentPage === totalPages ? "disabled" : ""
                   }`}
                 >
                   <button
-                    className="page-link"
                     onClick={() =>
-                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                      setCurrentPage((prev) =>
+                        Math.min(prev + 1, totalPages)
+                      )
                     }
                     disabled={currentPage === totalPages}
                   >
@@ -727,7 +713,6 @@ const AllRequests = ({
   );
 };
 
-// Main Component
 const ChangeRequestManagement = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -972,8 +957,7 @@ const ChangeRequestManagement = () => {
   }
 
   return (
-    <div className="crm-change-request-page">
-      {/* BREADCRUMB */}
+    <div className="crm-page">
       <Breadcrumb
         items={[
           {
@@ -986,56 +970,54 @@ const ChangeRequestManagement = () => {
         ]}
       />
 
-      {/* STATISTICS CARDS */}
-      <div className="crm-stats-grid">
-        <div className="crm-stat-card">
-          <div className="crm-stat-icon crm-stat-icon-primary">
+      <div className="stats-cards-crm">
+        <div className="stat-card-crm stat-total-crm">
+          <div className="stat-icon-crm">
             <i className="bi bi-inbox-fill"></i>
           </div>
-          <div className="crm-stat-content">
-            <h3 className="crm-stat-value">{requests.length}</h3>
-            <p className="crm-stat-label">Total Requests</p>
+          <div className="stat-content-crm">
+            <div className="stat-value-crm">{requests.length}</div>
+            <div className="stat-label-crm">Total Requests</div>
           </div>
         </div>
 
-        <div className="crm-stat-card">
-          <div className="crm-stat-icon crm-stat-icon-warning">
+        <div className="stat-card-crm stat-pending-crm">
+          <div className="stat-icon-crm">
             <i className="bi bi-hourglass-split"></i>
           </div>
-          <div className="crm-stat-content">
-            <h3 className="crm-stat-value">
+          <div className="stat-content-crm">
+            <div className="stat-value-crm">
               {requests.filter((r) => r.status === "Pending").length}
-            </h3>
-            <p className="crm-stat-label">Pending</p>
+            </div>
+            <div className="stat-label-crm">Pending</div>
           </div>
         </div>
 
-        <div className="crm-stat-card">
-          <div className="crm-stat-icon crm-stat-icon-success">
+        <div className="stat-card-crm stat-approved-crm">
+          <div className="stat-icon-crm">
             <i className="bi bi-check-circle-fill"></i>
           </div>
-          <div className="crm-stat-content">
-            <h3 className="crm-stat-value">
+          <div className="stat-content-crm">
+            <div className="stat-value-crm">
               {requests.filter((r) => r.status === "Approved").length}
-            </h3>
-            <p className="crm-stat-label">Approved</p>
+            </div>
+            <div className="stat-label-crm">Approved</div>
           </div>
         </div>
 
-        <div className="crm-stat-card">
-          <div className="crm-stat-icon crm-stat-icon-danger">
+        <div className="stat-card-crm stat-rejected-crm">
+          <div className="stat-icon-crm">
             <i className="bi bi-x-circle-fill"></i>
           </div>
-          <div className="crm-stat-content">
-            <h3 className="crm-stat-value">
+          <div className="stat-content-crm">
+            <div className="stat-value-crm">
               {requests.filter((r) => r.status === "Rejected").length}
-            </h3>
-            <p className="crm-stat-label">Rejected</p>
+            </div>
+            <div className="stat-label-crm">Rejected</div>
           </div>
         </div>
       </div>
 
-      {/* TAB NAVIGATION BAR */}
       <div className="crm-request-tabs">
         {tabs.map((tab) => (
           <button
@@ -1055,8 +1037,7 @@ const ChangeRequestManagement = () => {
         ))}
       </div>
 
-      {/* TAB CONTENT WITH ROUTES */}
-      <div className="tab-content-hr">
+      <div className="tab-content-crm">
         <Routes>
           <Route
             path="pending"
@@ -1134,7 +1115,6 @@ const ChangeRequestManagement = () => {
         </Routes>
       </div>
 
-      {/* MODALS */}
       <ApproveEmailChangeModal
         show={showApproveModal}
         request={selectedRequest}

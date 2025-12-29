@@ -55,7 +55,7 @@ const EscalationDetailModal = ({
               <div className="edm-detail-item">
                 <label className="edm-detail-label">Employee ID:</label>
                 <span className="edm-detail-value">
-                  {escalation.employeeUserId}
+                  {escalation.employeeCompanyId}
                 </span>
               </div>
 

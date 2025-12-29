@@ -160,28 +160,25 @@
   white-space: nowrap;
   padding: 0.5rem 1rem;
   font-weight: 500;
-  background: #ffffff;
-  border: 1px solid #ced4da;
+  background: #ffffff !important;
+  border: 1px solid #000000 !important;
   border-radius: 8px;
   font-size: 14px;
-  color: #212529;
+  color: #000000 !important;
   cursor: pointer;
   transition: all 0.2s ease;
   height: 38px;
 }
+
 .pm-clear-btn:hover {
-  background: #f8f9fa;
-  border-color: #6c757d;
-  color: #212529;
+  background: #6b7280 !important;
+  border-color: #6b7280 !important;
+  color: #ffffff !important;
 }
 
-/* Results Count */
-.pm-results-count-inline {
-  font-size: 0.875rem;
-  color: #6c757d;
-  white-space: nowrap;
-  font-weight: 500;
-  flex: 1;
+.pm-clear-btn:active {
+  background: #4b5563 !important;
+  border-color: #4b5563 !important;
 }
 
 /* Add Button */

@@ -55,7 +55,9 @@ const DepartmentDropdown = ({ budgets, selectedBudget, onChange }) => {
       {open && (
         <div className="pa-custom-menu">
           <div
-            className={`pa-custom-option ${!selectedBudget ? "pa-custom-option-active" : ""}`}
+            className={`pa-custom-option ${
+              !selectedBudget ? "pa-custom-option-active" : ""
+            }`}
             onClick={handleSelectPlaceholder}
           >
             Select Department
@@ -93,7 +95,10 @@ const YearDropdown = ({ value, onChange, years }) => {
 
   const allOptions = [
     { label: "All Years", value: "all" },
-    ...years.map((year) => ({ label: year.toString(), value: year.toString() })),
+    ...years.map((year) => ({
+      label: year.toString(),
+      value: year.toString(),
+    })),
   ];
 
   const selected = allOptions.find((o) => o.value === value) || allOptions[0];
@@ -503,36 +508,35 @@ const PeriodAllocationManagement = () => {
       )}
 
       {/* ULTRA COMPACT HEADER - EVERYTHING IN ONE LINE */}
-<div className="pa-compact-header">
-  <div className="pa-compact-left">
-    <i className="bi bi-calendar3"></i>
-    <span className="pa-compact-title">Period Allocations</span>
-  </div>
-  
-  <div className="pa-compact-center">
-    <DepartmentDropdown
-      budgets={budgets}
-      selectedBudget={selectedBudget}
-      onChange={setSelectedBudget}
-    />
-  </div>
-  
-  <div className="pa-compact-right">
-    <button className="pa-btn-export-compact" onClick={exportToCSV}>
-      <i className="bi bi-download"></i>
-      Export CSV
-    </button>
-    <button
-      className="pa-btn-add-compact"
-      onClick={handleCreatePeriod}
-      disabled={!selectedBudget}
-    >
-      <i className="bi bi-plus-circle"></i>
-      Add Period
-    </button>
-  </div>
-</div>
+      <div className="pa-compact-header">
+        <div className="pa-compact-left">
+          <i className="bi bi-calendar3"></i>
+          <span className="pa-compact-title">Budget Allocations</span>
+        </div>
 
+        <div className="pa-compact-center">
+          <DepartmentDropdown
+            budgets={budgets}
+            selectedBudget={selectedBudget}
+            onChange={setSelectedBudget}
+          />
+        </div>
+
+        <div className="pa-compact-right">
+          <button className="pa-btn-export-compact" onClick={exportToCSV}>
+            <i className="bi bi-download"></i>
+            Export CSV
+          </button>
+          <button
+            className="pa-btn-add-compact"
+            onClick={handleCreatePeriod}
+            disabled={!selectedBudget}
+          >
+            <i className="bi bi-plus-circle"></i>
+            Add Period
+          </button>
+        </div>
+      </div>
 
       {selectedBudget ? (
         <>
@@ -608,7 +612,9 @@ const PeriodAllocationManagement = () => {
 
               <YearDropdown
                 value={filters.year}
-                onChange={(val) => setFilters((prev) => ({ ...prev, year: val }))}
+                onChange={(val) =>
+                  setFilters((prev) => ({ ...prev, year: val }))
+                }
                 years={filterOptions.years}
               />
 
