@@ -693,7 +693,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                             SmeName = $"{a.Sme.Employee.Userprofile.FirstName} {a.Sme.Employee.Userprofile.LastName}",
                             SkillId = a.SkillId,
                             SkillName = a.Skill.SkillName,
-                            Deadline = a.Deadline,
+                            Deadline = a.Deadline,  
                             Status = a.Status,
                             ProofFilePath = a.ProofFilePath,
                             CompletionNotes = a.CompletionNotes,

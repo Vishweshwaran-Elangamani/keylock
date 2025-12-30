@@ -13,9 +13,9 @@ public partial class Assessmentdetail
 
     public int? EmployeeRating { get; set; }
 
-    public string? EmployeeComments { get; set; }
+    public string? EmployeeComments { get; set; } 
 
-    public virtual Selfassessment Assessment { get; set; } = null!;
+    public virtual Selfassessment Assessment { get; set; } = null!; 
 
     public virtual ICollection<Assessmentreview> Assessmentreviews { get; set; } = new List<Assessmentreview>();
 

@@ -39,7 +39,7 @@ public partial class Lndassignment
 
     public virtual MasterSkill Skill { get; set; } = null!;
 
-    public virtual Lndsme Sme { get; set; } = null!;
+    public virtual Lndsme Sme { get; set; } = null!;     
 
     public virtual Employee? UpdatedByEmployee { get; set; }
 }

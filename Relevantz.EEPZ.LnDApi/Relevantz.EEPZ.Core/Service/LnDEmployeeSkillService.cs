@@ -5,6 +5,8 @@ using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repositories.Interface;
 using Serilog;
 
+
+using Microsoft.EntityFrameworkCore;
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
     public class LnDEmployeeSkillService : ILnDEmployeeSkillService
@@ -14,16 +16,19 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private readonly ILnDEmployeeSkillRepository _repository;
         private readonly ILnDSmeRepository _smeRepository;
         private readonly ILnDBaseRepository _baseRepository;
+       
 
         public LnDEmployeeSkillService(
             ILnDEmployeeSkillRepository repository,
             ILnDSmeRepository smeRepository,
             ILnDBaseRepository baseRepository
+
         )
         {
             _repository = repository;
             _smeRepository = smeRepository;
             _baseRepository = baseRepository;
+
         }
 
         #endregion
@@ -676,6 +681,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             try
             {
+                // Validation
                 var mapper = await _repository.GetEmployeeSkillMappingByIdAsync(mapperId);
 
                 if (mapper == null || mapper.Employee.ReportingManagerEmployeeId != managerId)
@@ -691,6 +697,52 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         Message = "Skill mapping not found or employee not your subordinate",
                     };
                 }
+
+
+                var pendingSkillApprovals = await _repository.GetPendingSkillApprovalsAsync(
+                    mapper.EmployeeId,
+                    mapper.SkillId
+                );
+
+                if (pendingSkillApprovals.Any())
+                {
+                    Log.Information(
+                        "DeleteEmployeeSkill: Deleting {Count} pending skill approvals. EmployeeId={EmployeeId}, SkillId={SkillId}",
+                        pendingSkillApprovals.Count, mapper.EmployeeId, mapper.SkillId
+                    );
+                    await _repository.DeleteApprovalsAsync(pendingSkillApprovals);
+                }
+
+                // Step 2: Get related active assignments
+                var relatedAssignments = await _repository.GetActiveAssignmentsForSkillAsync(
+                    mapper.EmployeeId,
+                    mapper.SkillId
+                );
+
+                // Step 3: Delete pending assignment approvals (child records first)
+                if (relatedAssignments.Any())
+                {
+                    var assignmentIds = relatedAssignments.Select(a => a.AssignmentId).ToList();
+
+                    var assignmentApprovals = await _repository.GetPendingAssignmentApprovalsAsync(assignmentIds);
+
+                    if (assignmentApprovals.Any())
+                    {
+                        Log.Information(
+                            "DeleteEmployeeSkill: Deleting {Count} pending assignment approvals",
+                            assignmentApprovals.Count
+                        );
+                        await _repository.DeleteApprovalsAsync(assignmentApprovals);
+                    }
+
+
+                    Log.Information(
+                        "DeleteEmployeeSkill: Deleting {Count} related assignments. EmployeeId={EmployeeId}, SkillId={SkillId}",
+                        relatedAssignments.Count, mapper.EmployeeId, mapper.SkillId
+                    );
+                    await _repository.DeleteAssignmentsAsync(relatedAssignments);
+                }
+
 
                 var smeRecord = await _smeRepository.GetActiveSmeAsync(
                     mapper.EmployeeId,
@@ -708,18 +760,21 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     await _smeRepository.UpdateSmeAsync(smeRecord);
                 }
 
+
                 await _repository.DeleteEmployeeSkillAsync(mapper);
+
+
                 await _baseRepository.SaveChangesAsync();
 
                 Log.Information(
-                    "DeleteEmployeeSkill succeeded. MapperId={MapperId}, EmployeeId={EmployeeId}, SkillId={SkillId}",
-                    mapperId, mapper.EmployeeId, mapper.SkillId
+                    "DeleteEmployeeSkill succeeded. MapperId={MapperId}, EmployeeId={EmployeeId}, SkillId={SkillId}, DeletedAssignments={AssignmentCount}",
+                    mapperId, mapper.EmployeeId, mapper.SkillId, relatedAssignments.Count
                 );
 
                 return new ApiResponse<bool>
                 {
                     Success = true,
-                    Message = "Skill deleted successfully. SME status deactivated if applicable.",
+                    Message = $"Skill deleted successfully. {relatedAssignments.Count} active assignment(s) removed. SME status deactivated if applicable.",
                     Data = true,
                 };
             }

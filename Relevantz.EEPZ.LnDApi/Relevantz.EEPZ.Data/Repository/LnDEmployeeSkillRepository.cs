@@ -378,6 +378,119 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             Log.Debug("DeleteEmployeeSkillAsync: Mapper removed from context. Pending SaveChanges");
         }
 
+
+        public async Task<List<Lndapproval>> GetPendingSkillApprovalsAsync(int employeeId, int skillId)
+        {
+            Log.Debug(
+                "GetPendingSkillApprovalsAsync called. EmployeeId={EmployeeId}, SkillId={SkillId}",
+                employeeId, skillId
+            );
+
+            var approvals = await _context.Lndapprovals
+                .Where(a => a.SkillId == skillId
+                         && a.RequesterEmployeeId == employeeId
+                         && a.Status == LnDConstants.APPROVAL_STATUS.PENDING
+                         && a.ApprovalType == LnDConstants.APPROVAL_TYPE.SME_REQUEST)
+                .ToListAsync();
+
+            Log.Debug(
+                "GetPendingSkillApprovalsAsync completed. Count={Count}",
+                approvals.Count
+            );
+
+            return approvals;
+        }
+
+        /// <summary>Gets active assignments for a specific employee and skill.</summary>
+        public async Task<List<Lndassignment>> GetActiveAssignmentsForSkillAsync(int employeeId, int skillId)
+        {
+            Log.Debug(
+                "GetActiveAssignmentsForSkillAsync called. EmployeeId={EmployeeId}, SkillId={SkillId}",
+                employeeId, skillId
+            );
+
+            var assignments = await _context.Lndassignments
+                .Where(a => a.MenteeEmployeeId == employeeId
+                         && a.SkillId == skillId
+                         && (a.Status == LnDConstants.ASSIGNMENT_STATUS.IN_PROGRESS
+                             || a.Status == LnDConstants.ASSIGNMENT_STATUS.OVERDUE
+                             || a.Status == LnDConstants.ASSIGNMENT_STATUS.PENDING_SME_ACKNOWLEDGEMENT
+                             || a.Status == LnDConstants.ASSIGNMENT_STATUS.PENDING_MANAGER_ACKNOWLEDGEMENT))
+                .ToListAsync();
+
+            Log.Debug(
+                "GetActiveAssignmentsForSkillAsync completed. Count={Count}",
+                assignments.Count
+            );
+
+            return assignments;
+        }
+
+        /// <summary>Gets pending approvals for specific assignments.</summary>
+        public async Task<List<Lndapproval>> GetPendingAssignmentApprovalsAsync(List<int> assignmentIds)
+        {
+            Log.Debug(
+                "GetPendingAssignmentApprovalsAsync called. AssignmentCount={Count}",
+                assignmentIds.Count
+            );
+
+            if (!assignmentIds.Any())
+            {
+                return new List<Lndapproval>();
+            }
+
+            var approvals = await _context.Lndapprovals
+                .Where(a => assignmentIds.Contains(a.AssignmentId.Value)
+                         && a.Status == LnDConstants.APPROVAL_STATUS.PENDING)
+                .ToListAsync();
+
+            Log.Debug(
+                "GetPendingAssignmentApprovalsAsync completed. Count={Count}",
+                approvals.Count
+            );
+
+            return approvals;
+        }
+
+        /// <summary>Deletes multiple approvals from the database.</summary>
+        public async Task DeleteApprovalsAsync(List<Lndapproval> approvals)
+        {
+            Log.Debug(
+                "DeleteApprovalsAsync called. Count={Count}",
+                approvals.Count
+            );
+
+            if (approvals.Any())
+            {
+                _context.Lndapprovals.RemoveRange(approvals);
+                Log.Debug("DeleteApprovalsAsync: Approvals marked for deletion");
+            }
+
+            await Task.CompletedTask;
+        }
+
+        /// <summary>Deletes multiple assignments from the database.</summary>
+        public async Task DeleteAssignmentsAsync(List<Lndassignment> assignments)
+        {
+            Log.Debug(
+                "DeleteAssignmentsAsync called. Count={Count}",
+                assignments.Count
+            );
+
+            if (assignments.Any())
+            {
+                _context.Lndassignments.RemoveRange(assignments);
+                Log.Debug("DeleteAssignmentsAsync: Assignments marked for deletion");
+            }
+
+            await Task.CompletedTask;
+        }
+
+
+
+
         #endregion
     }
 }
+
+

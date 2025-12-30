@@ -36,6 +36,13 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
             int pageSize
         );
         Task<List<int>> GetExistingSkillMappingsAsync(int employeeId, List<int> skillIds);
+
+
+         Task<List<Lndapproval>> GetPendingSkillApprovalsAsync(int employeeId, int skillId);
+    Task<List<Lndassignment>> GetActiveAssignmentsForSkillAsync(int employeeId, int skillId);
+    Task<List<Lndapproval>> GetPendingAssignmentApprovalsAsync(List<int> assignmentIds); 
+    Task DeleteApprovalsAsync(List<Lndapproval> approvals);
+    Task DeleteAssignmentsAsync(List<Lndassignment> assignments);  
           
     }
 }
