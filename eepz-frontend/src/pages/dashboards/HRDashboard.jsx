@@ -1076,7 +1076,7 @@ const HRDashboard = () => {
                     </div>
 
                     {chartData.length > 0 ? (
-                      <ResponsiveContainer width="100%" height={120}>
+                      <ResponsiveContainer width="100%" height={160}>
                         <PieChart>
                           <Pie
                             data={chartData}
@@ -1086,7 +1086,7 @@ const HRDashboard = () => {
                             outerRadius={50}
                             paddingAngle={2}
                             dataKey="value"
-                            label={({ value }) => value}
+                            label={false}
                           >
                             {chartData.map((entry, index) => (
                               <Cell
@@ -1096,6 +1096,17 @@ const HRDashboard = () => {
                             ))}
                           </Pie>
                           <Tooltip />
+                          <Legend
+  layout="horizontal"
+  align="center"
+  verticalAlign="bottom"
+  wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
+  formatter={(value, entry) => {
+    const item = chartData.find(d => d.name === entry.value);
+    return `${item?.name || value}: ${item?.value || 0}`;
+  }}
+/>
+
                         </PieChart>
                       </ResponsiveContainer>
                     ) : (
