@@ -7,6 +7,7 @@ import ProfilePhotoUploadModal from "../../../components/auth/Modal/common/Profi
 import { toast } from "sonner";
 import "../../../styles/auth/common/EmployeeProfile.css";
 
+/* Custom Gender Dropdown Component */
 const GenderDropdown = ({ value, onChange, disabled, showError }) => {
   const [open, setOpen] = useState(false);
 
@@ -27,7 +28,7 @@ const GenderDropdown = ({ value, onChange, disabled, showError }) => {
 
   if (disabled) {
     return (
-      <div className={`form-control-modern ${showError ? "error" : ""}`}>
+      <div className={`epda-form-control ${showError ? "epda-error" : ""}`}>
         {selected.label}
       </div>
     );
@@ -35,26 +36,26 @@ const GenderDropdown = ({ value, onChange, disabled, showError }) => {
 
   return (
     <div
-  className={`ep-custom-dropdown ${showError ? "error" : ""} ${open ? "dropdown-open" : ""}`}
-  tabIndex={0}
-  onBlur={() => setTimeout(() => setOpen(false), 200)}
->
+      className={`epda-custom-dropdown ${showError ? "epda-error" : ""}`}
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+    >
       <div
-        className="ep-custom-selected"
+        className="epda-custom-selected"
         onClick={() => setOpen((prev) => !prev)}
       >
         {selected.label}
-        <span className="ep-custom-arrow" />
+        <span className="epda-custom-arrow" />
       </div>
 
       {open && (
-        <div className="ep-custom-menu">
+        <div className="epda-custom-menu">
           {options.map((opt) => (
             <div
               key={opt.value || "empty"}
               className={
-                "ep-custom-option" +
-                (opt.value === value ? " ep-custom-option-active" : "")
+                "epda-custom-option" +
+                (opt.value === value ? " epda-custom-option-active" : "")
               }
               onClick={() => handleSelect(opt.value)}
             >
@@ -85,7 +86,7 @@ const NationalityDropdown = ({ value, onChange, disabled, showError, options }) 
 
   if (disabled) {
     return (
-      <div className={`form-control-modern ${showError ? "error" : ""}`}>
+      <div className={`epda-form-control ${showError ? "epda-error" : ""}`}>
         {selected.label}
       </div>
     );
@@ -93,26 +94,26 @@ const NationalityDropdown = ({ value, onChange, disabled, showError, options }) 
 
   return (
     <div
-  className={`ep-custom-dropdown ${showError ? "error" : ""} ${open ? "dropdown-open" : ""}`}
-  tabIndex={0}
-  onBlur={() => setTimeout(() => setOpen(false), 200)}
->
+      className={`epda-custom-dropdown ${showError ? "epda-error" : ""}`}
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+    >
       <div
-        className="ep-custom-selected"
+        className="epda-custom-selected"
         onClick={() => setOpen((prev) => !prev)}
       >
         {selected.label}
-        <span className="ep-custom-arrow" />
+        <span className="epda-custom-arrow" />
       </div>
 
       {open && (
-        <div className="ep-custom-menu">
+        <div className="epda-custom-menu">
           {allOptions.map((opt) => (
             <div
               key={opt.value || "empty"}
               className={
-                "ep-custom-option" +
-                (opt.value === value ? " ep-custom-option-active" : "")
+                "epda-custom-option" +
+                (opt.value === value ? " epda-custom-option-active" : "")
               }
               onClick={() => handleSelect(opt.value)}
             >
@@ -145,7 +146,7 @@ const MaritalStatusDropdown = ({ value, onChange, disabled, showError }) => {
 
   if (disabled) {
     return (
-      <div className={`form-control-modern ${showError ? "error" : ""}`}>
+      <div className={`epda-form-control ${showError ? "epda-error" : ""}`}>
         {selected.label}
       </div>
     );
@@ -153,26 +154,26 @@ const MaritalStatusDropdown = ({ value, onChange, disabled, showError }) => {
 
   return (
     <div
-  className={`ep-custom-dropdown ${showError ? "error" : ""} ${open ? "dropdown-open" : ""}`}
-  tabIndex={0}
-  onBlur={() => setTimeout(() => setOpen(false), 200)}
->
+      className={`epda-custom-dropdown ${showError ? "epda-error" : ""}`}
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+    >
       <div
-        className="ep-custom-selected"
+        className="epda-custom-selected"
         onClick={() => setOpen((prev) => !prev)}
       >
         {selected.label}
-        <span className="ep-custom-arrow" />
+        <span className="epda-custom-arrow" />
       </div>
 
       {open && (
-        <div className="ep-custom-menu">
+        <div className="epda-custom-menu">
           {options.map((opt) => (
             <div
               key={opt.value || "empty"}
               className={
-                "ep-custom-option" +
-                (opt.value === value ? " ep-custom-option-active" : "")
+                "epda-custom-option" +
+                (opt.value === value ? " epda-custom-option-active" : "")
               }
               onClick={() => handleSelect(opt.value)}
             >
@@ -203,7 +204,7 @@ const StateDropdown = ({ value, onChange, disabled, showError, options }) => {
 
   if (disabled) {
     return (
-      <div className={`form-control-modern ${showError ? "error" : ""}`}>
+      <div className={`epda-form-control ${showError ? "epda-error" : ""}`}>
         {selected.label}
       </div>
     );
@@ -211,26 +212,26 @@ const StateDropdown = ({ value, onChange, disabled, showError, options }) => {
 
   return (
     <div
-  className={`ep-custom-dropdown ${showError ? "error" : ""} ${open ? "dropdown-open" : ""}`}
-  tabIndex={0}
-  onBlur={() => setTimeout(() => setOpen(false), 200)}
->
+      className={`epda-custom-dropdown ${showError ? "epda-error" : ""}`}
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+    >
       <div
-        className="ep-custom-selected"
+        className="epda-custom-selected"
         onClick={() => setOpen((prev) => !prev)}
       >
         {selected.label}
-        <span className="ep-custom-arrow" />
+        <span className="epda-custom-arrow" />
       </div>
 
       {open && (
-        <div className="ep-custom-menu">
+        <div className="epda-custom-menu">
           {allOptions.map((opt) => (
             <div
               key={opt.value || "empty"}
               className={
-                "ep-custom-option" +
-                (opt.value === value ? " ep-custom-option-active" : "")
+                "epda-custom-option" +
+                (opt.value === value ? " epda-custom-option-active" : "")
               }
               onClick={() => handleSelect(opt.value)}
             >
@@ -1036,7 +1037,7 @@ const EmployeeProfile = () => {
 
     if (!validateForm()) {
       const firstErrorField = document.querySelector(
-        ".form-control-modern.error, .ep-custom-dropdown.error"
+        ".epda-form-control.epda-error, .epda-custom-dropdown.epda-error"
       );
       if (firstErrorField) {
         firstErrorField.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -1110,7 +1111,7 @@ const EmployeeProfile = () => {
    * Formats date to readable format
    */
   const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
+    if (!dateString) return null;
     return new Date(dateString).toLocaleDateString("en-IN", {
       day: "2-digit",
       month: "short",
@@ -1122,7 +1123,7 @@ const EmployeeProfile = () => {
    * Formats address object to readable string
    */
   const formatAddress = (address) => {
-    if (!address) return "N/A";
+    if (!address) return null;
     const parts = [
       address.doorNumber,
       address.street,
@@ -1133,7 +1134,7 @@ const EmployeeProfile = () => {
       address.country,
       address.pinCode,
     ].filter(Boolean);
-    return parts.length > 0 ? parts.join(", ") : "N/A";
+    return parts.length > 0 ? parts.join(", ") : null;
   };
 
   /**
@@ -1142,15 +1143,15 @@ const EmployeeProfile = () => {
   const getStatusBadgeClass = (status) => {
     switch (status?.toLowerCase()) {
       case "active":
-        return "badge-success";
+        return "epda-badge-success";
       case "inactive":
-        return "badge-secondary";
+        return "epda-badge-secondary";
       case "on leave":
-        return "badge-warning";
+        return "epda-badge-warning";
       case "terminated":
-        return "badge-danger";
+        return "epda-badge-danger";
       default:
-        return "badge-secondary";
+        return "epda-badge-secondary";
     }
   };
 
@@ -1164,9 +1165,9 @@ const EmployeeProfile = () => {
   // Loading state
   if (loading) {
     return (
-      <div className="loading-wrapper">
-        <div className="loading-content">
-          <div className="spinner"></div>
+      <div className="epda-loading-wrapper">
+        <div className="epda-loading-content">
+          <div className="epda-spinner"></div>
           <p>Loading profile...</p>
         </div>
       </div>
@@ -1176,12 +1177,12 @@ const EmployeeProfile = () => {
   // No data state
   if (!profileData) {
     return (
-      <div className="error-wrapper">
-        <div className="error-content">
+      <div className="epda-error-wrapper">
+        <div className="epda-error-content">
           <i className="bi bi-exclamation-triangle"></i>
           <h3>Profile Not Available</h3>
           <p>Unable to load profile data</p>
-          <button className="btn-retry" onClick={fetchProfileData}>
+          <button className="epda-btn-retry" onClick={fetchProfileData}>
             <i className="bi bi-arrow-clockwise me-2"></i>
             Retry
           </button>
@@ -1191,48 +1192,48 @@ const EmployeeProfile = () => {
   }
 
   return (
-    <div className="employee-profile-container">
+    <div className="epda-profile-container">
       {/* Modern Profile Header */}
-      <div className="profile-header-modern">
-        <div className="profile-header-background"></div>
-        <div className="profile-header-content">
-          <div className="profile-avatar-section">
-            <div className="profile-avatar-wrapper-modern">
-              <div className="profile-avatar-modern">
+      <div className="epda-profile-header">
+        <div className="epda-header-background"></div>
+        <div className="epda-header-content">
+          <div className="epda-avatar-section">
+            <div className="epda-avatar-wrapper">
+              <div className="epda-avatar">
                 {profilePhoto ? (
                   <img
                     src={profilePhoto}
                     alt="Profile"
-                    className="avatar-photo-modern"
+                    className="epda-avatar-photo"
                   />
                 ) : (
-                  <span className="avatar-initials">
+                  <span className="epda-avatar-initials">
                     {getInitials(profileData.firstName, profileData.lastName)}
                   </span>
                 )}
               </div>
               <button
-                className="camera-icon-btn-modern"
+                className="epda-camera-btn"
                 onClick={handleCameraClick}
                 title="Upload profile photo"
               >
                 <i className="bi bi-camera-fill"></i>
               </button>
             </div>
-            <div className="profile-basic-info">
-              <h1 className="profile-name-modern">
+            <div className="epda-basic-info">
+              <h1 className="epda-profile-name">
                 {profileData.firstName} {profileData.lastName}
               </h1>
-              <p className="profile-role-modern">
+              <p className="epda-profile-role">
                 {profileData.roleName || "Employee"}
               </p>
-              <div className="profile-meta">
-                <span className="profile-id">
+              <div className="epda-profile-meta">
+                <span className="epda-profile-id">
                   <i className="bi bi-person-badge"></i>
                   {profileData.employeeCompanyId}
                 </span>
                 <span
-                  className={`profile-status ${getStatusBadgeClass(
+                  className={`epda-profile-status ${getStatusBadgeClass(
                     profileData.employmentStatus
                   )}`}
                 >
@@ -1243,11 +1244,11 @@ const EmployeeProfile = () => {
             </div>
           </div>
 
-          <div className="profile-actions">
+          <div className="epda-profile-actions">
             {!isEditing ? (
               <>
                 <button
-                  className="btn btn-outline-light btn-modern"
+                  className="epda-btn epda-btn-outline-light"
                   onClick={() => setShowChangeRequestModal(true)}
                   disabled={checkingPending}
                 >
@@ -1255,7 +1256,7 @@ const EmployeeProfile = () => {
                   {checkingPending ? "Checking..." : " Request Change"}
                 </button>
                 <button
-                  className="btn-primary-pf"
+                  className="epda-btn epda-btn-primary"
                   onClick={() => {
                     setIsEditing(true);
                     toast.info("Edit mode enabled");
@@ -1268,7 +1269,7 @@ const EmployeeProfile = () => {
             ) : (
               <>
                 <button
-                  className="btn btn-danger btn-modern"
+                  className="epda-btn epda-btn-outline-danger"
                   onClick={handleCancel}
                   disabled={saving}
                 >
@@ -1276,13 +1277,13 @@ const EmployeeProfile = () => {
                   Cancel
                 </button>
                 <button
-                  className="btn btn-success btn-modern"
+                  className="epda-btn epda-btn-success"
                   onClick={handleSubmit}
                   disabled={saving}
                 >
                   {saving ? (
                     <>
-                      <span className="spinner-sm"></span>
+                      <span className="epda-spinner-sm"></span>
                       Saving...
                     </>
                   ) : (
@@ -1299,398 +1300,425 @@ const EmployeeProfile = () => {
       </div>
 
       {/* Main Content Grid */}
-      <div className="profile-content-modern">
-        <div className="content-grid">
+      <div className="epda-profile-content">
+        <div className="epda-content-grid">
           {/* Left Sidebar */}
-          <div className="sidebar-section">
+          <div className="epda-sidebar">
             {/* Personal Details Card */}
-            <div className="info-card">
-              <div className="card-header-modern">
+            <div className="epda-info-card">
+              <div className="epda-card-header">
                 <i className="bi bi-person-circle"></i>
                 <h3>Personal Details</h3>
               </div>
-              <div className="card-content">
-                <div className="info-grid">
-                  <div className="info-item-modern">
+              <div className="epda-card-content">
+                <div className="epda-info-grid">
+                  <div className="epda-info-item">
                     <label>Employee ID</label>
                     <span>{profileData.employeeCompanyId || "N/A"}</span>
-                    <small>Cannot be changed</small>
                   </div>
-
-                  {/* Gender - Custom Dropdown */}
-                  <div className="info-item-modern">
-                    <label>
-                      Gender <span className="required">*</span>
-                    </label>
-                    {isEditing ? (
-                      <div className="form-field">
-                        <GenderDropdown
-                          value={formData.gender}
-                          onChange={(val) => {
-                            setFormData((prev) => ({ ...prev, gender: val }));
-                            setTouched((prev) => ({ ...prev, gender: true }));
-                            const error = validateField("gender", val);
-                            setErrors((prev) => ({ ...prev, gender: error }));
-                          }}
-                          disabled={false}
-                          showError={showError("gender")}
-                        />
-                        {showError("gender") && (
-                          <span className="error-message">{errors.gender}</span>
-                        )}
-                      </div>
-                    ) : (
-                      <span>{profileData.gender || "N/A"}</span>
-                    )}
-                  </div>
-
-                  {/* Date of Birth */}
-                  <div className="info-item-modern">
-                    <label>Date of Birth</label>
-                    {isEditing ? (
-                      <div className="form-field">
-                        <input
-                          type="date"
-                          className={`form-control-modern ${
-                            showError("dateOfBirthOfficial") ? "error" : ""
-                          }`}
-                          name="dateOfBirthOfficial"
-                          value={formData.dateOfBirthOfficial}
-                          onChange={handleChange}
-                          max={new Date().toISOString().split("T")[0]}
-                        />
-                        {showError("dateOfBirthOfficial") && (
-                          <span className="error-message">
-                            {errors.dateOfBirthOfficial}
-                          </span>
-                        )}
-                      </div>
-                    ) : (
+                  {profileData.email && (
+                    <div className="epda-info-item">
+                      <label>Official Email</label>
+                      <span>{profileData.email}</span>
+                    </div>
+                  )}
+                  {profileData.dateOfBirthOfficial && (
+                    <div className="epda-info-item">
+                      <label>Date of Birth</label>
                       <span>{formatDate(profileData.dateOfBirthOfficial)}</span>
-                    )}
-                  </div>
-
-                  {/* Nationality - Custom Dropdown */}
-                  <div className="info-item-modern">
-                    <label>
-                      Nationality <span className="required">*</span>
-                    </label>
-                    {isEditing ? (
-                      <div className="form-field">
-                        <NationalityDropdown
-                          value={formData.nationality}
-                          onChange={(val) => {
-                            setFormData((prev) => ({
-                              ...prev,
-                              nationality: val,
-                            }));
-                            setTouched((prev) => ({
-                              ...prev,
-                              nationality: true,
-                            }));
-                            const error = validateField("nationality", val);
-                            setErrors((prev) => ({
-                              ...prev,
-                              nationality: error,
-                            }));
-                          }}
-                          disabled={false}
-                          showError={showError("nationality")}
-                          options={nationalityOptions}
-                        />
-                        {showError("nationality") && (
-                          <span className="error-message">
-                            {errors.nationality}
-                          </span>
-                        )}
-                      </div>
-                    ) : (
-                      <span>{profileData.nationality || "N/A"}</span>
-                    )}
-                  </div>
-
-                  {/* Marital Status - Custom Dropdown */}
-                  <div className="info-item-modern">
-                    <label>
-                      Marital Status <span className="required">*</span>
-                    </label>
-                    {isEditing ? (
-                      <div className="form-field">
-                        <MaritalStatusDropdown
-                          value={formData.maritalStatus}
-                          onChange={(val) => {
-                            setFormData((prev) => ({
-                              ...prev,
-                              maritalStatus: val,
-                            }));
-                            setTouched((prev) => ({
-                              ...prev,
-                              maritalStatus: true,
-                            }));
-                            const error = validateField("maritalStatus", val);
-                            setErrors((prev) => ({
-                              ...prev,
-                              maritalStatus: error,
-                            }));
-                          }}
-                          disabled={false}
-                          showError={showError("maritalStatus")}
-                        />
-                        {showError("maritalStatus") && (
-                          <span className="error-message">
-                            {errors.maritalStatus}
-                          </span>
-                        )}
-                      </div>
-                    ) : (
-                      <span>{profileData.maritalStatus || "N/A"}</span>
-                    )}
-                  </div>
+                    </div>
+                  )}
+                  {profileData.dateOfBirthOfficial && (
+                    <div className="epda-info-item">
+                      <label>Age</label>
+                      <span>
+                        {Math.floor(
+                          (new Date() -
+                            new Date(profileData.dateOfBirthOfficial)) /
+                            (365.25 * 24 * 60 * 60 * 1000)
+                        )}{" "}
+                        years
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* Employment Card */}
-            <div className="info-card">
-              <div className="card-header-modern">
-                <i className="bi bi-building"></i>
-                <h3>Employment</h3>
+            {/* Employment Details Card */}
+            <div className="epda-info-card">
+              <div className="epda-card-header">
+                <i className="bi bi-briefcase"></i>
+                <h3>Employment Details</h3>
               </div>
-              <div className="card-content">
-                <div className="info-grid">
-                  <div className="info-item-modern">
-                    <label>Department</label>
-                    <span>{profileData.departmentName || "N/A"}</span>
-                  </div>
-                  <div className="info-item-modern">
-                    <label>Role</label>
-                    <span>{profileData.roleName || "N/A"}</span>
-                  </div>
-                  <div className="info-item-modern">
-                    <label>Employment Type</label>
-                    <span>{profileData.employmentType || "N/A"}</span>
-                  </div>
-                  <div className="info-item-modern">
-                    <label>Joining Date</label>
-                    <span>{formatDate(profileData.joiningDate)}</span>
-                  </div>
-                  <div className="info-item-modern">
-                    <label>Work Location</label>
-                    <span>{profileData.workLocation || "N/A"}</span>
-                  </div>
+              <div className="epda-card-content">
+                <div className="epda-info-grid">
+                  {profileData.roleName && (
+                    <div className="epda-info-item">
+                      <label>Role</label>
+                      <span>{profileData.roleName}</span>
+                    </div>
+                  )}
+                  {profileData.departmentName && (
+                    <div className="epda-info-item">
+                      <label>Department</label>
+                      <span>{profileData.departmentName}</span>
+                    </div>
+                  )}
+                  {profileData.employmentStatus && (
+                    <div className="epda-info-item">
+                      <label>Employment Status</label>
+                      <span>{profileData.employmentStatus}</span>
+                    </div>
+                  )}
+                  {profileData.joiningDate && (
+                    <div className="epda-info-item">
+                      <label>Date of Joining</label>
+                      <span>{formatDate(profileData.joiningDate)}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
+
+            {/* Address Card - View Mode */}
+            {!isEditing && (profileData.currentAddress || profileData.permanentAddress) && (
+              <div className="epda-info-card">
+                <div className="epda-card-header">
+                  <i className="bi bi-geo-alt"></i>
+                  <h3>Address</h3>
+                </div>
+                <div className="epda-card-content">
+                  <div className="epda-info-grid">
+                    {profileData.currentAddress && formatAddress(profileData.currentAddress) && (
+                      <div className="epda-info-item">
+                        <label>Current Address</label>
+                        <span>{formatAddress(profileData.currentAddress)}</span>
+                      </div>
+                    )}
+                    {profileData.permanentAddress && formatAddress(profileData.permanentAddress) && (
+                      <div className="epda-info-item">
+                        <label>Permanent Address</label>
+                        <span>{formatAddress(profileData.permanentAddress)}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Right Main Content */}
-          <div className="main-section">
-            {/* Contact Information Card */}
-            <div className="form-card">
-              <div className="card-header-modern">
+          {/* Main Section */}
+          <div className="epda-main-section">
+            {/* Editable Personal Information */}
+            <div className="epda-form-card">
+              <div className="epda-card-header">
+                <i className="bi bi-person-lines-fill"></i>
+                <h3>Personal Information</h3>
+              </div>
+              <div className="epda-card-content">
+                <form>
+                  <div className="epda-form-grid">
+                    {/* First Name */}
+                    <div className="epda-form-field">
+                      <label>
+                        First Name <span className="epda-required">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="firstName"
+                        value={formData.firstName || ""}
+                        onChange={handleChange}
+                        disabled={!isEditing}
+                        className={`epda-form-control ${
+                          showError("firstName") ? "epda-error" : ""
+                        }`}
+                        placeholder="Enter first name"
+                      />
+                      {showError("firstName") && (
+                        <span className="epda-error-message">
+                          {errors.firstName}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Middle Name */}
+                    <div className="epda-form-field">
+                      <label>Middle Name</label>
+                      <input
+                        type="text"
+                        name="middleName"
+                        value={formData.middleName || ""}
+                        onChange={handleChange}
+                        disabled={!isEditing}
+                        className={`epda-form-control ${
+                          showError("middleName") ? "epda-error" : ""
+                        }`}
+                        placeholder="Enter middle name"
+                      />
+                      {showError("middleName") && (
+                        <span className="epda-error-message">
+                          {errors.middleName}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Last Name */}
+                    <div className="epda-form-field">
+                      <label>
+                        Last Name <span className="epda-required">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="lastName"
+                        value={formData.lastName || ""}
+                        onChange={handleChange}
+                        disabled={!isEditing}
+                        className={`epda-form-control ${
+                          showError("lastName") ? "epda-error" : ""
+                        }`}
+                        placeholder="Enter last name"
+                      />
+                      {showError("lastName") && (
+                        <span className="epda-error-message">
+                          {errors.lastName}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Calling Name */}
+                    <div className="epda-form-field">
+                      <label>Calling Name</label>
+                      <input
+                        type="text"
+                        name="callingName"
+                        value={formData.callingName || ""}
+                        onChange={handleChange}
+                        disabled={!isEditing}
+                        className={`epda-form-control ${
+                          showError("callingName") ? "epda-error" : ""
+                        }`}
+                        placeholder="Enter calling name"
+                      />
+                      {showError("callingName") && (
+                        <span className="epda-error-message">
+                          {errors.callingName}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Gender */}
+                    <div className="epda-form-field">
+                      <label>
+                        Gender <span className="epda-required">*</span>
+                      </label>
+                      <GenderDropdown
+                        value={formData.gender || ""}
+                        onChange={(val) => {
+                          setFormData((prev) => ({ ...prev, gender: val }));
+                          setTouched((prev) => ({ ...prev, gender: true }));
+                          const error = validateField("gender", val);
+                          setErrors((prev) => ({ ...prev, gender: error }));
+                        }}
+                        disabled={!isEditing}
+                        showError={showError("gender")}
+                      />
+                      {showError("gender") && (
+                        <span className="epda-error-message">{errors.gender}</span>
+                      )}
+                    </div>
+
+                    {/* Date of Birth */}
+                    <div className="epda-form-field">
+                      <label>Date of Birth</label>
+                      <input
+                        type="date"
+                        name="dateOfBirthOfficial"
+                        value={formData.dateOfBirthOfficial || ""}
+                        onChange={handleChange}
+                        disabled={!isEditing}
+                        className={`epda-form-control ${
+                          showError("dateOfBirthOfficial") ? "epda-error" : ""
+                        }`}
+                        max={new Date().toISOString().split("T")[0]}
+                      />
+                      {showError("dateOfBirthOfficial") && (
+                        <span className="epda-error-message">
+                          {errors.dateOfBirthOfficial}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Marital Status */}
+                    <div className="epda-form-field">
+                      <label>
+                        Marital Status <span className="epda-required">*</span>
+                      </label>
+                      <MaritalStatusDropdown
+                        value={formData.maritalStatus || ""}
+                        onChange={(val) => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            maritalStatus: val,
+                          }));
+                          setTouched((prev) => ({
+                            ...prev,
+                            maritalStatus: true,
+                          }));
+                          const error = validateField("maritalStatus", val);
+                          setErrors((prev) => ({
+                            ...prev,
+                            maritalStatus: error,
+                          }));
+                        }}
+                        disabled={!isEditing}
+                        showError={showError("maritalStatus")}
+                      />
+                      {showError("maritalStatus") && (
+                        <span className="epda-error-message">
+                          {errors.maritalStatus}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Nationality */}
+                    <div className="epda-form-field">
+                      <label>
+                        Nationality <span className="epda-required">*</span>
+                      </label>
+                      <NationalityDropdown
+                        value={formData.nationality || ""}
+                        onChange={(val) => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            nationality: val,
+                          }));
+                          setTouched((prev) => ({
+                            ...prev,
+                            nationality: true,
+                          }));
+                          const error = validateField("nationality", val);
+                          setErrors((prev) => ({
+                            ...prev,
+                            nationality: error,
+                          }));
+                        }}
+                        disabled={!isEditing}
+                        showError={showError("nationality")}
+                        options={nationalityOptions}
+                      />
+                      {showError("nationality") && (
+                        <span className="epda-error-message">
+                          {errors.nationality}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            {/* Contact Information */}
+            <div className="epda-form-card">
+              <div className="epda-card-header">
                 <i className="bi bi-telephone"></i>
                 <h3>Contact Information</h3>
               </div>
-              <div className="card-content">
-                <div className="form-grid">
-                  <div className="form-field">
-                    <label>
-                      First Name <span className="required">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className={`form-control-modern ${
-                        showError("firstName") ? "error" : ""
-                      }`}
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleChange}
-                      disabled
-                      placeholder="Enter first name"
-                    />
-                    {showError("firstName") && (
-                      <span className="error-message">{errors.firstName}</span>
-                    )}
-                  </div>
+              <div className="epda-card-content">
+                <form>
+                  <div className="epda-form-grid">
+                    {/* Mobile Number */}
+                    <div className="epda-form-field">
+                      <label>
+                        Mobile Number <span className="epda-required">*</span>
+                      </label>
+                      <input
+                        type="tel"
+                        name="mobileNumber"
+                        value={formData.mobileNumber || ""}
+                        onChange={handleChange}
+                        disabled={!isEditing}
+                        className={`epda-form-control ${
+                          showError("mobileNumber") ? "epda-error" : ""
+                        }`}
+                        placeholder="Enter mobile number"
+                        maxLength={10}
+                      />
+                      {showError("mobileNumber") && (
+                        <span className="epda-error-message">
+                          {errors.mobileNumber}
+                        </span>
+                      )}
+                    </div>
 
-                  <div className="form-field">
-                    <label>
-                      Middle Name<span className="required">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className={`form-control-modern ${
-                        showError("middleName") ? "error" : ""
-                      }`}
-                      name="middleName"
-                      value={formData.middleName}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      placeholder="Enter middle name"
-                    />
-                    {showError("middleName") && (
-                      <span className="error-message">{errors.middleName}</span>
-                    )}
-                  </div>
+                    {/* Alternate Number */}
+                    <div className="epda-form-field">
+                      <label>Alternate Number</label>
+                      <input
+                        type="tel"
+                        name="alternateNumber"
+                        value={formData.alternateNumber || ""}
+                        onChange={handleChange}
+                        disabled={!isEditing}
+                        className={`epda-form-control ${
+                          showError("alternateNumber") ? "epda-error" : ""
+                        }`}
+                        placeholder="Enter alternate number"
+                        maxLength={10}
+                      />
+                      {showError("alternateNumber") && (
+                        <span className="epda-error-message">
+                          {errors.alternateNumber}
+                        </span>
+                      )}
+                    </div>
 
-                  <div className="form-field">
-                    <label>
-                      Last Name <span className="required">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className={`form-control-modern ${
-                        showError("lastName") ? "error" : ""
-                      }`}
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleChange}
-                      disabled
-                      placeholder="Enter last name"
-                    />
-                    {showError("lastName") && (
-                      <span className="error-message">{errors.lastName}</span>
-                    )}
+                    {/* Personal Email */}
+                    <div className="epda-form-field">
+                      <label>Personal Email</label>
+                      <input
+                        type="email"
+                        name="personalEmail"
+                        value={formData.personalEmail || ""}
+                        onChange={handleChange}
+                        disabled={!isEditing}
+                        className={`epda-form-control ${
+                          showError("personalEmail") ? "epda-error" : ""
+                        }`}
+                        placeholder="yourname@gmail.com"
+                      />
+                      {showError("personalEmail") && (
+                        <span className="epda-error-message">
+                          {errors.personalEmail}
+                        </span>
+                      )}
+                      <small>Must be a Gmail account</small>
+                    </div>
                   </div>
-
-                  <div className="form-field">
-                    <label>
-                      Calling Name
-                      <span className="required">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className={`form-control-modern ${
-                        showError("callingName") ? "error" : ""
-                      }`}
-                      name="callingName"
-                      value={formData.callingName}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      placeholder="Enter preferred name"
-                    />
-                    {showError("callingName") && (
-                      <span className="error-message">
-                        {errors.callingName}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="form-field">
-                    <label>Company Email</label>
-                    <input
-                      type="email"
-                      className="form-control-modern"
-                      value={
-                        profileData.email || profileData.companyEmail || "N/A"
-                      }
-                      disabled
-                    />
-                    <small>Cannot be changed</small>
-                  </div>
-
-                  <div className="form-field">
-                    <label>
-                      Personal Email
-                      <span className="required">*</span>
-                    </label>
-                    <input
-                      type="email"
-                      className={`form-control-modern ${
-                        showError("personalEmail") ? "error" : ""
-                      }`}
-                      name="personalEmail"
-                      value={formData.personalEmail}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      placeholder="Enter Gmail address"
-                    />
-                    {showError("personalEmail") && (
-                      <span className="error-message">
-                        {errors.personalEmail}
-                      </span>
-                    )}
-                    <small>Gmail only</small>
-                  </div>
-
-                  <div className="form-field">
-                    <label>
-                      Mobile Number <span className="required">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className={`form-control-modern ${
-                        showError("mobileNumber") ? "error" : ""
-                      }`}
-                      name="mobileNumber"
-                      value={formData.mobileNumber}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      placeholder="Enter 10-digit mobile number"
-                      maxLength="10"
-                    />
-                    {showError("mobileNumber") && (
-                      <span className="error-message">
-                        {errors.mobileNumber}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="form-field">
-                    <label>
-                      Alternate Number
-                      <span className="required">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className={`form-control-modern ${
-                        showError("alternateNumber") ? "error" : ""
-                      }`}
-                      name="alternateNumber"
-                      value={formData.alternateNumber}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      placeholder="Enter 10-digit alternate number"
-                      maxLength="10"
-                    />
-                    {showError("alternateNumber") && (
-                      <span className="error-message">
-                        {errors.alternateNumber}
-                      </span>
-                    )}
-                  </div>
-                </div>
+                </form>
               </div>
             </div>
 
-            {/* Address Information Card */}
-            <div className="form-card">
-              <div className="card-header-modern">
-                <i className="bi bi-geo-alt"></i>
-                <h3>Address Information</h3>
-              </div>
-              <div className="card-content">
-                {/* Current Address Section */}
-                <div className="address-section-modern">
-                  <h4 className="section-title">Current Address</h4>
-                  {!isEditing ? (
-                    <div className="address-display-modern">
-                      {formatAddress(profileData.currentAddress)}
-                    </div>
-                  ) : (
-                    <div className="form-grid address-grid">
-                      <div className="form-field">
-                        <label>
-                          Door/Flat Number<span className="required">*</span>
-                        </label>
+            {/* Address Information - Edit Mode */}
+            {isEditing && (
+              <div className="epda-form-card">
+                <div className="epda-card-header">
+                  <i className="bi bi-geo-alt-fill"></i>
+                  <h3>Address Information</h3>
+                </div>
+                <div className="epda-card-content">
+                  {/* Current Address */}
+                  <div className="epda-address-section">
+                    <h4 className="epda-section-title">
+                      <i className="bi bi-house-door"></i>
+                      Current Address
+                    </h4>
+                    <div className="epda-form-grid epda-address-grid">
+                      <div className="epda-form-field">
+                        <label>Door Number</label>
                         <input
                           type="text"
-                          className={`form-control-modern ${
-                            showError("currentAddress.doorNumber")
-                              ? "error"
-                              : ""
-                          }`}
-                          value={formData.currentAddress.doorNumber}
+                          value={formData.currentAddress?.doorNumber || ""}
                           onChange={(e) =>
                             handleAddressChange(
                               "currentAddress",
@@ -1698,25 +1726,25 @@ const EmployeeProfile = () => {
                               e.target.value
                             )
                           }
-                          placeholder="Enter door or flat number"
+                          className={`epda-form-control ${
+                            showError("currentAddress.doorNumber")
+                              ? "epda-error"
+                              : ""
+                          }`}
+                          placeholder="Enter door number"
                         />
                         {showError("currentAddress.doorNumber") && (
-                          <span className="error-message">
+                          <span className="epda-error-message">
                             {errors["currentAddress.doorNumber"]}
                           </span>
                         )}
                       </div>
 
-                      <div className="form-field">
-                        <label>
-                          Street<span className="required">*</span>
-                        </label>
+                      <div className="epda-form-field">
+                        <label>Street</label>
                         <input
                           type="text"
-                          className={`form-control-modern ${
-                            showError("currentAddress.street") ? "error" : ""
-                          }`}
-                          value={formData.currentAddress.street}
+                          value={formData.currentAddress?.street || ""}
                           onChange={(e) =>
                             handleAddressChange(
                               "currentAddress",
@@ -1724,25 +1752,23 @@ const EmployeeProfile = () => {
                               e.target.value
                             )
                           }
-                          placeholder="Enter street name"
+                          className={`epda-form-control ${
+                            showError("currentAddress.street") ? "epda-error" : ""
+                          }`}
+                          placeholder="Enter street"
                         />
                         {showError("currentAddress.street") && (
-                          <span className="error-message">
+                          <span className="epda-error-message">
                             {errors["currentAddress.street"]}
                           </span>
                         )}
                       </div>
 
-                      <div className="form-field">
-                        <label>
-                          Landmark<span className="required">*</span>
-                        </label>
+                      <div className="epda-form-field">
+                        <label>Landmark</label>
                         <input
                           type="text"
-                          className={`form-control-modern ${
-                            showError("currentAddress.landmark") ? "error" : ""
-                          }`}
-                          value={formData.currentAddress.landmark}
+                          value={formData.currentAddress?.landmark || ""}
                           onChange={(e) =>
                             handleAddressChange(
                               "currentAddress",
@@ -1750,25 +1776,23 @@ const EmployeeProfile = () => {
                               e.target.value
                             )
                           }
-                          placeholder="Enter nearby landmark"
+                          className={`epda-form-control ${
+                            showError("currentAddress.landmark") ? "epda-error" : ""
+                          }`}
+                          placeholder="Enter landmark"
                         />
                         {showError("currentAddress.landmark") && (
-                          <span className="error-message">
+                          <span className="epda-error-message">
                             {errors["currentAddress.landmark"]}
                           </span>
                         )}
                       </div>
 
-                      <div className="form-field">
-                        <label>
-                          Area<span className="required">*</span>
-                        </label>
+                      <div className="epda-form-field">
+                        <label>Area</label>
                         <input
                           type="text"
-                          className={`form-control-modern ${
-                            showError("currentAddress.area") ? "error" : ""
-                          }`}
-                          value={formData.currentAddress.area}
+                          value={formData.currentAddress?.area || ""}
                           onChange={(e) =>
                             handleAddressChange(
                               "currentAddress",
@@ -1776,25 +1800,23 @@ const EmployeeProfile = () => {
                               e.target.value
                             )
                           }
-                          placeholder="Enter area or locality"
+                          className={`epda-form-control ${
+                            showError("currentAddress.area") ? "epda-error" : ""
+                          }`}
+                          placeholder="Enter area"
                         />
                         {showError("currentAddress.area") && (
-                          <span className="error-message">
+                          <span className="epda-error-message">
                             {errors["currentAddress.area"]}
                           </span>
                         )}
                       </div>
 
-                      <div className="form-field">
-                        <label>
-                          City<span className="required">*</span>
-                        </label>
+                      <div className="epda-form-field">
+                        <label>City</label>
                         <input
                           type="text"
-                          className={`form-control-modern ${
-                            showError("currentAddress.city") ? "error" : ""
-                          }`}
-                          value={formData.currentAddress.city}
+                          value={formData.currentAddress?.city || ""}
                           onChange={(e) =>
                             handleAddressChange(
                               "currentAddress",
@@ -1802,22 +1824,22 @@ const EmployeeProfile = () => {
                               e.target.value
                             )
                           }
-                          placeholder="Enter city name"
+                          className={`epda-form-control ${
+                            showError("currentAddress.city") ? "epda-error" : ""
+                          }`}
+                          placeholder="Enter city"
                         />
                         {showError("currentAddress.city") && (
-                          <span className="error-message">
+                          <span className="epda-error-message">
                             {errors["currentAddress.city"]}
                           </span>
                         )}
                       </div>
 
-                      {/* State - Custom Dropdown */}
-                      <div className="form-field">
-                        <label>
-                          State<span className="required">*</span>
-                        </label>
+                      <div className="epda-form-field">
+                        <label>State</label>
                         <StateDropdown
-                          value={formData.currentAddress.state}
+                          value={formData.currentAddress?.state || ""}
                           onChange={(val) =>
                             handleAddressChange("currentAddress", "state", val)
                           }
@@ -1826,22 +1848,41 @@ const EmployeeProfile = () => {
                           options={stateOptions}
                         />
                         {showError("currentAddress.state") && (
-                          <span className="error-message">
+                          <span className="epda-error-message">
                             {errors["currentAddress.state"]}
                           </span>
                         )}
                       </div>
 
-                      <div className="form-field">
-                        <label>
-                          PIN Code<span className="required">*</span>
-                        </label>
+                      <div className="epda-form-field">
+                        <label>Country</label>
                         <input
                           type="text"
-                          className={`form-control-modern ${
-                            showError("currentAddress.pinCode") ? "error" : ""
+                          value={formData.currentAddress?.country || "India"}
+                          onChange={(e) =>
+                            handleAddressChange(
+                              "currentAddress",
+                              "country",
+                              e.target.value
+                            )
+                          }
+                          className={`epda-form-control ${
+                            showError("currentAddress.country") ? "epda-error" : ""
                           }`}
-                          value={formData.currentAddress.pinCode}
+                          placeholder="Enter country"
+                        />
+                        {showError("currentAddress.country") && (
+                          <span className="epda-error-message">
+                            {errors["currentAddress.country"]}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="epda-form-field">
+                        <label>PIN Code</label>
+                        <input
+                          type="text"
+                          value={formData.currentAddress?.pinCode || ""}
                           onChange={(e) =>
                             handleAddressChange(
                               "currentAddress",
@@ -1849,55 +1890,57 @@ const EmployeeProfile = () => {
                               e.target.value
                             )
                           }
-                          placeholder="Enter 6-digit PIN code"
-                          maxLength="6"
+                          className={`epda-form-control ${
+                            showError("currentAddress.pinCode") ? "epda-error" : ""
+                          }`}
+                          placeholder="Enter PIN code"
+                          maxLength={6}
                         />
                         {showError("currentAddress.pinCode") && (
-                          <span className="error-message">
+                          <span className="epda-error-message">
                             {errors["currentAddress.pinCode"]}
                           </span>
                         )}
                       </div>
                     </div>
-                  )}
-                </div>
+                  </div>
 
-                {/* Same Address Checkbox */}
-                {isEditing && (
-                  <div className="address-checkbox-modern">
-                    <label className="checkbox-label">
+                  {/* Same as Current Address Checkbox */}
+                  <div className="epda-address-checkbox">
+                    <label className="epda-checkbox-label">
                       <input
                         type="checkbox"
                         checked={sameAsCurrentAddress}
                         onChange={handleSameAddressChange}
                       />
-                      <span className="checkmark"></span>
+                      <span className="epda-checkmark"></span>
                       Permanent address is same as current address
                     </label>
                   </div>
-                )}
 
-                {/* Permanent Address Section */}
-                <div className="address-section-modern">
-                  <h4 className="section-title">Permanent Address</h4>
-                  {!isEditing ? (
-                    <div className="address-display-modern">
-                      {formatAddress(profileData.permanentAddress)}
-                    </div>
-                  ) : (
-                    <div className="form-grid address-grid">
-                      <div className="form-field">
-                        <label>
-                          Door/Flat Number<span className="required">*</span>
-                        </label>
+                  {/* Permanent Address */}
+                  <div className="epda-address-section">
+                    <h4 className="epda-section-title">
+                      <i className="bi bi-house"></i>
+                      Permanent Address
+                    </h4>
+
+                    {sameAsCurrentAddress && (
+                      <div className="epda-address-auto-filled">
+                        <i className="bi bi-info-circle-fill"></i>
+                        <span>
+                          Permanent address will automatically sync with current
+                          address
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="epda-form-grid epda-address-grid">
+                      <div className="epda-form-field">
+                        <label>Door Number</label>
                         <input
                           type="text"
-                          className={`form-control-modern ${
-                            showError("permanentAddress.doorNumber")
-                              ? "error"
-                              : ""
-                          }`}
-                          value={formData.permanentAddress.doorNumber}
+                          value={formData.permanentAddress?.doorNumber || ""}
                           onChange={(e) =>
                             handleAddressChange(
                               "permanentAddress",
@@ -1906,25 +1949,25 @@ const EmployeeProfile = () => {
                             )
                           }
                           disabled={sameAsCurrentAddress}
-                          placeholder="Enter door or flat number"
+                          className={`epda-form-control ${
+                            showError("permanentAddress.doorNumber")
+                              ? "epda-error"
+                              : ""
+                          }`}
+                          placeholder="Enter door number"
                         />
                         {showError("permanentAddress.doorNumber") && (
-                          <span className="error-message">
+                          <span className="epda-error-message">
                             {errors["permanentAddress.doorNumber"]}
                           </span>
                         )}
                       </div>
 
-                      <div className="form-field">
-                        <label>
-                          Street<span className="required">*</span>
-                        </label>
+                      <div className="epda-form-field">
+                        <label>Street</label>
                         <input
                           type="text"
-                          className={`form-control-modern ${
-                            showError("permanentAddress.street") ? "error" : ""
-                          }`}
-                          value={formData.permanentAddress.street}
+                          value={formData.permanentAddress?.street || ""}
                           onChange={(e) =>
                             handleAddressChange(
                               "permanentAddress",
@@ -1933,27 +1976,23 @@ const EmployeeProfile = () => {
                             )
                           }
                           disabled={sameAsCurrentAddress}
-                          placeholder="Enter street name"
+                          className={`epda-form-control ${
+                            showError("permanentAddress.street") ? "epda-error" : ""
+                          }`}
+                          placeholder="Enter street"
                         />
                         {showError("permanentAddress.street") && (
-                          <span className="error-message">
+                          <span className="epda-error-message">
                             {errors["permanentAddress.street"]}
                           </span>
                         )}
                       </div>
 
-                      <div className="form-field">
-                        <label>
-                          Landmark<span className="required">*</span>
-                        </label>
+                      <div className="epda-form-field">
+                        <label>Landmark</label>
                         <input
                           type="text"
-                          className={`form-control-modern ${
-                            showError("permanentAddress.landmark")
-                              ? "error"
-                              : ""
-                          }`}
-                          value={formData.permanentAddress.landmark}
+                          value={formData.permanentAddress?.landmark || ""}
                           onChange={(e) =>
                             handleAddressChange(
                               "permanentAddress",
@@ -1962,25 +2001,25 @@ const EmployeeProfile = () => {
                             )
                           }
                           disabled={sameAsCurrentAddress}
-                          placeholder="Enter nearby landmark"
+                          className={`epda-form-control ${
+                            showError("permanentAddress.landmark")
+                              ? "epda-error"
+                              : ""
+                          }`}
+                          placeholder="Enter landmark"
                         />
                         {showError("permanentAddress.landmark") && (
-                          <span className="error-message">
+                          <span className="epda-error-message">
                             {errors["permanentAddress.landmark"]}
                           </span>
                         )}
                       </div>
 
-                      <div className="form-field">
-                        <label>
-                          Area<span className="required">*</span>
-                        </label>
+                      <div className="epda-form-field">
+                        <label>Area</label>
                         <input
                           type="text"
-                          className={`form-control-modern ${
-                            showError("permanentAddress.area") ? "error" : ""
-                          }`}
-                          value={formData.permanentAddress.area}
+                          value={formData.permanentAddress?.area || ""}
                           onChange={(e) =>
                             handleAddressChange(
                               "permanentAddress",
@@ -1989,25 +2028,23 @@ const EmployeeProfile = () => {
                             )
                           }
                           disabled={sameAsCurrentAddress}
-                          placeholder="Enter area or locality"
+                          className={`epda-form-control ${
+                            showError("permanentAddress.area") ? "epda-error" : ""
+                          }`}
+                          placeholder="Enter area"
                         />
                         {showError("permanentAddress.area") && (
-                          <span className="error-message">
+                          <span className="epda-error-message">
                             {errors["permanentAddress.area"]}
                           </span>
                         )}
                       </div>
 
-                      <div className="form-field">
-                        <label>
-                          City<span className="required">*</span>
-                        </label>
+                      <div className="epda-form-field">
+                        <label>City</label>
                         <input
                           type="text"
-                          className={`form-control-modern ${
-                            showError("permanentAddress.city") ? "error" : ""
-                          }`}
-                          value={formData.permanentAddress.city}
+                          value={formData.permanentAddress?.city || ""}
                           onChange={(e) =>
                             handleAddressChange(
                               "permanentAddress",
@@ -2016,46 +2053,74 @@ const EmployeeProfile = () => {
                             )
                           }
                           disabled={sameAsCurrentAddress}
-                          placeholder="Enter city name"
+                          className={`epda-form-control ${
+                            showError("permanentAddress.city") ? "epda-error" : ""
+                          }`}
+                          placeholder="Enter city"
                         />
                         {showError("permanentAddress.city") && (
-                          <span className="error-message">
+                          <span className="epda-error-message">
                             {errors["permanentAddress.city"]}
                           </span>
                         )}
                       </div>
 
-                      {/* State - Custom Dropdown */}
-                      <div className="form-field">
-                        <label>
-                          State<span className="required">*</span>
-                        </label>
+                      <div className="epda-form-field">
+                        <label>State</label>
                         <StateDropdown
-                          value={formData.permanentAddress.state}
+                          value={formData.permanentAddress?.state || ""}
                           onChange={(val) =>
-                            handleAddressChange("permanentAddress", "state", val)
+                            handleAddressChange(
+                              "permanentAddress",
+                              "state",
+                              val
+                            )
                           }
                           disabled={sameAsCurrentAddress}
                           showError={showError("permanentAddress.state")}
                           options={stateOptions}
                         />
                         {showError("permanentAddress.state") && (
-                          <span className="error-message">
+                          <span className="epda-error-message">
                             {errors["permanentAddress.state"]}
                           </span>
                         )}
                       </div>
 
-                      <div className="form-field">
-                        <label>
-                          PIN Code<span className="required">*</span>
-                        </label>
+                      <div className="epda-form-field">
+                        <label>Country</label>
                         <input
                           type="text"
-                          className={`form-control-modern ${
-                            showError("permanentAddress.pinCode") ? "error" : ""
+                          value={
+                            formData.permanentAddress?.country || "India"
+                          }
+                          onChange={(e) =>
+                            handleAddressChange(
+                              "permanentAddress",
+                              "country",
+                              e.target.value
+                            )
+                          }
+                          disabled={sameAsCurrentAddress}
+                          className={`epda-form-control ${
+                            showError("permanentAddress.country")
+                              ? "epda-error"
+                              : ""
                           }`}
-                          value={formData.permanentAddress.pinCode}
+                          placeholder="Enter country"
+                        />
+                        {showError("permanentAddress.country") && (
+                          <span className="epda-error-message">
+                            {errors["permanentAddress.country"]}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="epda-form-field">
+                        <label>PIN Code</label>
+                        <input
+                          type="text"
+                          value={formData.permanentAddress?.pinCode || ""}
                           onChange={(e) =>
                             handleAddressChange(
                               "permanentAddress",
@@ -2064,46 +2129,47 @@ const EmployeeProfile = () => {
                             )
                           }
                           disabled={sameAsCurrentAddress}
-                          placeholder="Enter 6-digit PIN code"
-                          maxLength="6"
+                          className={`epda-form-control ${
+                            showError("permanentAddress.pinCode")
+                              ? "epda-error"
+                              : ""
+                          }`}
+                          placeholder="Enter PIN code"
+                          maxLength={6}
                         />
                         {showError("permanentAddress.pinCode") && (
-                          <span className="error-message">
+                          <span className="epda-error-message">
                             {errors["permanentAddress.pinCode"]}
                           </span>
                         )}
                       </div>
                     </div>
-                  )}
-
-                  {isEditing && sameAsCurrentAddress && (
-                    <div className="address-auto-filled">
-                      <i className="bi bi-info-circle"></i>
-                      Address automatically filled from current address
-                    </div>
-                  )}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
 
       {/* Change Request Modal */}
-      <ChangeRequestModal
-        show={showChangeRequestModal}
-        onClose={handleModalClose}
-        onSubmit={handleChangeRequest}
-        profileData={profileData}
-        hasPendingRequest={hasPendingRequest}
-        pendingRequestId={pendingRequestId}
-      />
+      {showChangeRequestModal && (
+        <ChangeRequestModal
+          show={showChangeRequestModal}
+          onClose={handleModalClose}
+          onSubmit={handleChangeRequest}
+          hasPendingRequest={hasPendingRequest}
+          pendingRequestId={pendingRequestId}
+        />
+      )}
 
       {/* Profile Photo Upload Modal */}
       {showPhotoModal && (
         <ProfilePhotoUploadModal
+          show={showPhotoModal}
           onClose={() => setShowPhotoModal(false)}
           onPhotoUpdate={handlePhotoUpdate}
+          currentPhoto={profilePhoto}
         />
       )}
     </div>

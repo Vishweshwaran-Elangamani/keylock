@@ -1,16 +1,14 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Form, Button } from "react-bootstrap";
+import { Form, Alert } from "react-bootstrap";
 import { FaSearch } from "react-icons/fa";
 import policyService from "../../../../services/hr_operations/hr/policyService";
 import AddPolicyModal from "../../../../components/hr_operations/modals/AddPolicyModal";
 import EditPolicyModal from "../../../../components/hr_operations/modals/EditPolicyModal";
 import PublishPolicyModal from "../../../../components/hr_operations/modals/PublishPolicyModal";
 import UnpublishPolicyModal from "../../../../components/hr_operations/modals/UnpublishPolicyModal";
-import { Alert, Spinner } from "react-bootstrap";
 import "../../../../styles/hr_operations/hr/PolicyManagement.css";
 
-/* Custom status dropdown for policies */
 const PolicyStatusDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
 
@@ -29,7 +27,7 @@ const PolicyStatusDropdown = ({ value, onChange }) => {
 
   return (
     <div
-      className="pm-filter-select custom-status-dropdown"
+      className="pma-status-select custom-status-dropdown"
       tabIndex={0}
       onBlur={() => setTimeout(() => setOpen(false), 200)}
       style={{ position: "relative" }}
@@ -62,7 +60,6 @@ const PolicyStatusDropdown = ({ value, onChange }) => {
   );
 };
 
-/* Custom category dropdown for policies */
 const PolicyCategoryDropdown = ({ value, onChange, categories }) => {
   const [open, setOpen] = useState(false);
 
@@ -80,27 +77,27 @@ const PolicyCategoryDropdown = ({ value, onChange, categories }) => {
 
   return (
     <div
-      className="pm-filter-select custom-category-dropdown"
+      className="pma-category-select custom-status-dropdown"
       tabIndex={0}
       onBlur={() => setTimeout(() => setOpen(false), 200)}
       style={{ position: "relative" }}
     >
       <div
-        className="custom-category-selected"
+        className="custom-status-selected"
         onClick={() => setOpen((prev) => !prev)}
       >
         {selected.label}
-        <span className="custom-category-arrow" />
+        <span className="custom-status-arrow" />
       </div>
 
       {open && (
-        <div className="custom-category-menu">
+        <div className="custom-status-menu">
           {allOptions.map((opt) => (
             <div
               key={opt.value || "all-cat"}
               className={
-                "custom-category-option" +
-                (opt.value === value ? " custom-category-option-active" : "")
+                "custom-status-option" +
+                (opt.value === value ? " custom-status-option-active" : "")
               }
               onClick={() => handleSelect(opt.value)}
             >
@@ -128,16 +125,14 @@ const PolicyManagement = () => {
 
   const [alert, setAlert] = useState(null);
 
-  // Filter states
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeSearchTerm, setActiveSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
 
-  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  // Sonner toast function
   const enqueueToast = (variant, message) => {
     switch (variant) {
       case "success":
@@ -164,7 +159,7 @@ const PolicyManagement = () => {
 
   useEffect(() => {
     applyFilters();
-  }, [policies, categoryFilter, statusFilter]);
+  }, [policies, categoryFilter, statusFilter, activeSearchTerm]);
 
   const showAlert = (type, message) => {
     setAlert({ type, message });
@@ -177,7 +172,6 @@ const PolicyManagement = () => {
       const response = await policyService.getAllPolicies();
       setPolicies(response || []);
     } catch (error) {
-      console.error("Error fetching policies:", error);
       showAlert("danger", "Failed to load policies");
       setPolicies([]);
     } finally {
@@ -185,33 +179,31 @@ const PolicyManagement = () => {
     }
   };
 
+  const handleSearch = () => {
+    setActiveSearchTerm(searchTerm);
+    setCurrentPage(1);
+  };
+
   const applyFilters = () => {
     let filtered = [...policies];
 
-    if (searchTerm) {
+    if (activeSearchTerm) {
       filtered = filtered.filter(
         (policy) =>
-          policy.policyName
-            ?.toLowerCase()
-            .includes(searchTerm.toLowerCase()) ||
-          policy.description
-            ?.toLowerCase()
-            .includes(searchTerm.toLowerCase())
+          policy.policyName?.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
+          policy.description?.toLowerCase().includes(activeSearchTerm.toLowerCase())
       );
     }
 
     if (categoryFilter) {
       filtered = filtered.filter(
-        (policy) =>
-          policy.category?.toLowerCase() === categoryFilter.toLowerCase()
+        (policy) => policy.category?.toLowerCase() === categoryFilter.toLowerCase()
       );
     }
 
     if (statusFilter) {
       const isPublished = statusFilter === "Published";
-      filtered = filtered.filter(
-        (policy) => policy.isPublished === isPublished
-      );
+      filtered = filtered.filter((policy) => policy.isPublished === isPublished);
     }
 
     setFilteredPolicies(filtered);
@@ -220,9 +212,9 @@ const PolicyManagement = () => {
 
   const clearFilters = () => {
     setSearchTerm("");
+    setActiveSearchTerm("");
     setCategoryFilter("");
     setStatusFilter("");
-    setFilteredPolicies(policies);
     setCurrentPage(1);
   };
 
@@ -230,14 +222,10 @@ const PolicyManagement = () => {
     ...new Set(policies.map((policy) => policy.category).filter(Boolean)),
   ];
 
-  // Pagination helpers
-  const indexOfLastItem = currentPage * rowsPerPage;
-  const indexOfFirstItem = indexOfLastItem - rowsPerPage;
-  const currentItems = filteredPolicies.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
-  const totalPages = Math.ceil(filteredPolicies.length / rowsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredPolicies.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredPolicies.length / itemsPerPage) || 1;
 
   const getPageNumbers = () => {
     const pages = [];
@@ -251,23 +239,9 @@ const PolicyManagement = () => {
       if (currentPage <= 3) {
         pages.push(1, 2, 3, "...", totalPages);
       } else if (currentPage >= totalPages - 2) {
-        pages.push(
-          1,
-          "...",
-          totalPages - 2,
-          totalPages - 1,
-          totalPages
-        );
+        pages.push(1, "...", totalPages - 2, totalPages - 1, totalPages);
       } else {
-        pages.push(
-          1,
-          "...",
-          currentPage - 1,
-          currentPage,
-          currentPage + 1,
-          "...",
-          totalPages
-        );
+        pages.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages);
       }
     }
 
@@ -316,7 +290,6 @@ const PolicyManagement = () => {
       setSelectedPolicy(null);
       fetchPolicies();
     } catch (error) {
-      console.error("Error publishing policy:", error);
       enqueueToast("danger", "Failed to publish policy");
     } finally {
       setPublishing(false);
@@ -334,122 +307,222 @@ const PolicyManagement = () => {
     try {
       setUnpublishing(true);
       await policyService.unpublishPolicy(selectedPolicy.policyId);
-      enqueueToast(
-        "warning",
-        "Policy unpublished - Now hidden from employees"
-      );
+      enqueueToast("warning", "Policy unpublished - Now hidden from employees");
       setShowUnpublishModal(false);
       setSelectedPolicy(null);
       fetchPolicies();
     } catch (error) {
-      console.error("Error unpublishing policy:", error);
       enqueueToast("danger", "Failed to unpublish policy");
     } finally {
       setUnpublishing(false);
     }
   };
 
+  const getPolicyStats = () => {
+    const total = filteredPolicies.length;
+    const published = filteredPolicies.filter((p) => p.isPublished).length;
+    const draft = filteredPolicies.filter((p) => !p.isPublished).length;
+    const categories = [...new Set(filteredPolicies.map((p) => p.category).filter(Boolean))].length;
+
+    return {
+      totalPolicies: total,
+      publishedPolicies: published,
+      draftPolicies: draft,
+      totalCategories: categories,
+    };
+  };
+
+  const stats = getPolicyStats();
+
   if (loading) {
     return (
-      <div className="pm-loading-container">
-        <Spinner animation="border" variant="primary" />
-        <p>Loading policies...</p>
+      <div className="pma-loading-container">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="pm-root">
+    <div className="pma-page">
       {alert && (
         <Alert
           variant={alert.type}
           dismissible
           onClose={() => setAlert(null)}
-          className="pm-alert"
+          className="pma-alert"
         >
           {alert.message}
         </Alert>
       )}
 
-      {/* Filter Section with Add Button */}
-      <div className="pm-filter-section">
-        <div className="pm-filter-row-single">
-          {/* Combined search (icon + input + button in one component) */}
-          <div className="pm-search-input">
-            <div className="pm-search-inner">
-              <span className="pm-search-icon">
-                <FaSearch />
-              </span>
-              <Form.Control
-                type="text"
-                placeholder="Search by policy name or description..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pm-search-field"
-              />
-              <button
-                type="button"
-                className="pm-search-btn"
-                onClick={applyFilters}
-              >
-                Search
-              </button>
-            </div>
+      <div className="stats-cards-pma">
+        <div className="stat-card-pma stat-total-pma">
+          <div className="stat-icon-pma">
+            <i className="bi bi-file-earmark-text"></i>
           </div>
-
-          {/* Category Filter as custom dropdown */}
-          <PolicyCategoryDropdown
-            value={categoryFilter}
-            onChange={(val) => setCategoryFilter(val)}
-            categories={uniqueCategories}
-          />
-
-          {/* Status Filter as custom dropdown */}
-          <PolicyStatusDropdown
-            value={statusFilter}
-            onChange={(val) => setStatusFilter(val)}
-          />
-
-          <Button
-            variant="outline-secondary"
-            onClick={clearFilters}
-            className="pm-clear-btn"
-          >
-            Clear Filters
-          </Button>
-
-          <div className="pm-results-count-inline">
-            Showing {currentItems.length} of {filteredPolicies.length} policies
+          <div className="stat-content-pma">
+            <div className="stat-value-pma">{stats.totalPolicies}</div>
+            <div className="stat-label-pma">Total Policies</div>
           </div>
+        </div>
 
-          <button
-            className="pm-btn-add"
-            onClick={() => setShowAddModal(true)}
-          >
-            <i className="bi bi-plus-circle"></i> Add Policy
-          </button>
+        <div className="stat-card-pma stat-published-pma">
+          <div className="stat-icon-pma">
+            <i className="bi bi-check2-circle"></i>
+          </div>
+          <div className="stat-content-pma">
+            <div className="stat-value-pma">{stats.publishedPolicies}</div>
+            <div className="stat-label-pma">Published</div>
+          </div>
+        </div>
+
+        <div className="stat-card-pma stat-draft-pma">
+          <div className="stat-icon-pma">
+            <i className="bi bi-pencil-square"></i>
+          </div>
+          <div className="stat-content-pma">
+            <div className="stat-value-pma">{stats.draftPolicies}</div>
+            <div className="stat-label-pma">Draft</div>
+          </div>
+        </div>
+
+        <div className="stat-card-pma stat-categories-pma">
+          <div className="stat-icon-pma">
+            <i className="bi bi-grid-3x3-gap"></i>
+          </div>
+          <div className="stat-content-pma">
+            <div className="stat-value-pma">{stats.totalCategories}</div>
+            <div className="stat-label-pma">Categories</div>
+          </div>
         </div>
       </div>
 
-      {/* Policies Table */}
-      <div className="pm-table-card">
-        <div className="table-wrapper">
-          <table className="pm-table">
+      <div className="pma-controls">
+        <div className="pma-search-input">
+          <div className="pma-search-inner">
+            <span className="pma-search-icon">
+              <FaSearch />
+            </span>
+            <Form.Control
+              type="text"
+              placeholder="Search policies..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  handleSearch();
+                }
+              }}
+              className="pma-search-field"
+            />
+            <button
+              type="button"
+              className="pma-search-btn"
+              onClick={handleSearch}
+            >
+              Search
+            </button>
+          </div>
+        </div>
+
+        <div className="pma-category-filter">
+          <PolicyCategoryDropdown
+            value={categoryFilter}
+            onChange={(val) => {
+              setCategoryFilter(val);
+              setCurrentPage(1);
+            }}
+            categories={uniqueCategories}
+          />
+        </div>
+
+        <div className="pma-status-filter">
+          <PolicyStatusDropdown
+            value={statusFilter}
+            onChange={(val) => {
+              setStatusFilter(val);
+              setCurrentPage(1);
+            }}
+          />
+        </div>
+
+        <button className="pma-btn-clear" onClick={clearFilters}>
+          Clear Filters
+        </button>
+
+        <div className="pma-results-count">
+          Showing {currentItems.length} of {filteredPolicies.length} policies
+        </div>
+
+        <button className="pma-btn-create" onClick={() => setShowAddModal(true)}>
+          <i className="bi bi-plus-circle"></i>
+          Add Policy
+        </button>
+      </div>
+
+      {totalPages > 1 && (
+        <div className="pma-pagination-wrapper">
+          <nav className="pma-pagination">
+            <ul className="pma-pagination-list">
+              <li className={`pma-page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                >
+                  <i className="bi bi-chevron-left"></i>
+                </button>
+              </li>
+              {getPageNumbers().map((page, index) => (
+                <li
+                  key={index}
+                  className={`pma-page-item ${
+                    page === currentPage ? "active" : ""
+                  } ${typeof page !== "number" ? "disabled" : ""}`}
+                >
+                  <button
+                    onClick={() => typeof page === "number" && setCurrentPage(page)}
+                    disabled={typeof page !== "number"}
+                  >
+                    {page}
+                  </button>
+                </li>
+              ))}
+              <li className={`pma-page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                >
+                  <i className="bi bi-chevron-right"></i>
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      )}
+
+      <div className={`pma-table-card ${totalPages > 1 ? "pma-table-with-pagination" : ""}`}>
+        <div className="pma-table-wrapper">
+          <table className="pma-table">
             <thead>
               <tr>
-                <th>POLICY NAME</th>
-                <th>CATEGORY</th>
-                <th>DESCRIPTION</th>
-                <th>STATUS</th>
-                <th className="text-center">ACTIONS</th>
+                <th>Policy Name</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {currentItems.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="empty-state">
-                    <i className="bi bi-inbox"></i>
-                    <p>No policies found matching your filters</p>
+                  <td colSpan="5" className="pma-empty-state">
+                    <div className="pma-empty-content">
+                      <i className="bi bi-inbox"></i>
+                      <h4>No policies found</h4>
+                      <p>Try adjusting your search or filter criteria</p>
+                    </div>
                   </td>
                 </tr>
               ) : (
@@ -459,32 +532,28 @@ const PolicyManagement = () => {
                       <strong>{policy.policyName}</strong>
                     </td>
                     <td>
-                      <span className="pm-category-badge">
+                      <span className="pma-category-badge">
                         {policy.category || "General"}
                       </span>
                     </td>
                     <td>
-                      <div className="pm-description">
+                      <div className="pma-description">
                         {policy.description?.substring(0, 60)}
                         {policy.description?.length > 60 && "..."}
                       </div>
                     </td>
                     <td>
                       {policy.isPublished ? (
-                        <span className="pm-status-badge pm-status-active">
-                          Published
-                        </span>
+                        <span className="pma-badge-table-active">Published</span>
                       ) : (
-                        <span className="pm-status-badge pm-status-draft">
-                          Draft
-                        </span>
+                        <span className="pma-badge-table-draft">Draft</span>
                       )}
                     </td>
                     <td>
-                      <div className="action-buttons">
+                      <div className="pma-table-actions">
                         {!policy.isPublished && (
                           <button
-                            className="action-btn action-btn-publish"
+                            className="pma-action-publish"
                             onClick={() => handlePublishClick(policy)}
                             title="Publish Policy"
                           >
@@ -493,7 +562,7 @@ const PolicyManagement = () => {
                         )}
                         {policy.isPublished && (
                           <button
-                            className="action-btn action-btn-unpublish"
+                            className="pma-action-unpublish"
                             onClick={() => handleUnpublishClick(policy)}
                             title="Unpublish Policy"
                           >
@@ -501,11 +570,11 @@ const PolicyManagement = () => {
                           </button>
                         )}
                         <button
-                          className="action-btn action-btn-edit"
+                          className="pma-action-edit"
                           onClick={() => handleView(policy)}
                           title="View/Edit Policy"
                         >
-                          <i className="bi bi-pencil"></i>
+                          <i className="bi bi-pencil-square"></i>
                         </button>
                       </div>
                     </td>
@@ -515,103 +584,8 @@ const PolicyManagement = () => {
             </tbody>
           </table>
         </div>
-
-        {/* Pagination */}
-        {filteredPolicies.length > 0 && (
-          <div className="pagination-container">
-            <div className="pagination-info">
-              <span className="pagination-label">Show</span>
-              <select
-                className="pagination-select"
-                value={rowsPerPage}
-                onChange={(e) => {
-                  setRowsPerPage(Number(e.target.value));
-                  setCurrentPage(1);
-                }}
-              >
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-              </select>
-              <span className="pagination-label">entries</span>
-            </div>
-            <div className="pagination-status">
-              Showing {indexOfFirstItem + 1} to{" "}
-              {Math.min(indexOfLastItem, filteredPolicies.length)} of{" "}
-              {filteredPolicies.length} entries
-            </div>
-
-            <nav className="pagination-nav">
-              <ul className="pagination">
-                <li
-                  className={`page-item ${
-                    currentPage === 1 ? "disabled" : ""
-                  }`}
-                >
-                  <button
-                    className="page-link"
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(prev - 1, 1))
-                    }
-                    disabled={currentPage === 1}
-                  >
-                    <i className="bi bi-chevron-left"></i>
-                  </button>
-                </li>
-
-                {getPageNumbers().map((page, index) => (
-                  <li
-                    key={index}
-                    className={`page-item ${
-                      page === currentPage ? "active" : ""
-                    } ${
-                      typeof page !== "number" ? "disabled" : ""
-                    }`}
-                  >
-                    <button
-                      className="page-link"
-                      onClick={() =>
-                        typeof page === "number" && setCurrentPage(page)
-                      }
-                      disabled={typeof page !== "number"}
-                    >
-                      {page}
-                    </button>
-                  </li>
-                ))}
-
-                <li
-                  className={`page-item ${
-                    currentPage === totalPages ? "disabled" : ""
-                  }`}
-                >
-                  <button
-                    className="page-link"
-                    onClick={() =>
-                      setCurrentPage((prev) =>
-                        Math.min(prev + 1, totalPages)
-                      )
-                    }
-                    disabled={currentPage === totalPages}
-                  >
-                    <i className="bi bi-chevron-right"></i>
-                  </button>
-                </li>
-              </ul>
-            </nav>
-          </div>
-        )}
       </div>
 
-      {/* Blur overlay when modal is open */}
-      {(showAddModal ||
-        showEditModal ||
-        showPublishModal ||
-        showUnpublishModal) && (
-        <div className="pm-blur-backdrop"></div>
-      )}
-
-      {/* Add Policy Modal */}
       {showAddModal && (
         <AddPolicyModal
           show={showAddModal}
@@ -621,7 +595,6 @@ const PolicyManagement = () => {
         />
       )}
 
-      {/* Edit Policy Modal */}
       {showEditModal && selectedPolicy && (
         <EditPolicyModal
           show={showEditModal}
@@ -636,7 +609,6 @@ const PolicyManagement = () => {
         />
       )}
 
-      {/* Publish Policy Modal */}
       {showPublishModal && selectedPolicy && (
         <PublishPolicyModal
           show={showPublishModal}
@@ -650,7 +622,6 @@ const PolicyManagement = () => {
         />
       )}
 
-      {/* Unpublish Policy Modal */}
       {showUnpublishModal && selectedPolicy && (
         <UnpublishPolicyModal
           show={showUnpublishModal}

@@ -1,4 +1,5 @@
-/* Department Management - Scoped Styles (Prefix: dlm-) */
+/* Department Management - Scoped Styles (Prefix: dlm-) - FULL UPDATED */
+
 
 .dlm-page {
   padding: 16px 20px 48px 20px;
@@ -7,6 +8,7 @@
   background: #f8f9fc;
   min-height: 100vh;
 }
+
 
 /* KPI CARDS */
 .stats-cards-dl {
@@ -88,6 +90,7 @@
   text-align: center;
 }
 
+
 /* CONTROLS BAR */
 .dlm-controls {
   display: flex;
@@ -101,6 +104,7 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
   flex-wrap: nowrap;
 }
+
 
 /* SEARCH BAR WITH BUTTON */
 .dlm-search-input {
@@ -181,32 +185,36 @@
   background: #1f1c4b;
 }
 
-/* STATUS FILTER DROPDOWN */
+
+/* ========================================
+   STATUS FILTER DROPDOWN - UPDATED FROM POLICY MANAGEMENT
+======================================== */
 .dlm-status-filter {
   position: relative;
-  min-width: 140px;
+  min-width: 160px;
+  max-width: 180px;
 }
 
-.dlm-status-select {
+.custom-status-dropdown {
   position: relative;
-  height: 38px;
-}
-
-.custom-dlm-dropdown {
-  position: relative;
-  width: 100%;
-  cursor: pointer;
+  padding: 0;
+  border-radius: 4px;
   user-select: none;
+  height: 38px;
+  width: 100%;
 }
 
-.custom-dlm-selected {
+.custom-status-selected {
+  padding: 0.5rem 2rem 0.5rem 0.75rem;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 1rem;
+  justify-content: flex-start;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
   background: #ffffff;
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border-radius: 4px;
   font-size: 14px;
   font-weight: 500;
   color: #212529;
@@ -214,36 +222,46 @@
   transition: all 0.2s ease;
 }
 
-.custom-dlm-dropdown:focus .custom-dlm-selected,
-.custom-dlm-dropdown:focus-within .custom-dlm-selected {
+.custom-status-dropdown:focus-within .custom-status-selected,
+.custom-status-selected:focus {
   border-color: #27235c;
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
 }
 
-.custom-dlm-arrow {
-  width: 0;
-  height: 0;
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-top: 5px solid #6c757d;
-  margin-left: 0.5rem;
+.custom-status-arrow {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #6c757d;
+  border-bottom: 2px solid #6c757d;
+  pointer-events: none;
+  transition: transform 0.2s ease;
 }
 
-.custom-dlm-menu {
+.custom-status-dropdown:focus-within .custom-status-arrow {
+  transform: translateY(-50%) rotate(225deg);
+}
+
+.custom-status-menu {
   position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  right: 0;
+  top: calc(100% - 1px);
+  left: -1px;
+  right: -1px;
   background: #ffffff;
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   z-index: 1000;
-  overflow: hidden;
-  animation: dlmDropdownSlide 0.2s ease;
+  max-height: 200px;
+  overflow-y: auto;
+  animation: dropdownFadeIn 0.15s ease-out;
 }
 
-@keyframes dlmDropdownSlide {
+@keyframes dropdownFadeIn {
   from {
     opacity: 0;
     transform: translateY(-8px);
@@ -254,27 +272,39 @@
   }
 }
 
-.custom-dlm-option {
-  padding: 0.625rem 1rem;
-  font-size: 14px;
-  color: #212529;
+.custom-status-option {
+  padding: 0.5rem 0.75rem;
   cursor: pointer;
-  transition: all 0.15s ease;
+  display: block;
+  text-align: left;
+  transition: all 0.12s ease;
+  font-size: 14px;
+  color: #111827;
 }
 
-.custom-dlm-option:hover {
-  background: rgba(39, 35, 92, 0.05);
-}
-
-.custom-dlm-option-active {
-  background: #27235c;
+.custom-status-option:hover {
+  background-color: #27235c;
   color: #ffffff;
+}
+
+.custom-status-option:first-child:hover {
+  border-radius: 0;
+}
+
+.custom-status-option:last-child {
+  border-radius: 0 0 3px 3px;
+}
+
+.custom-status-option-active {
+  background-color: #f3f4f6;
   font-weight: 600;
 }
 
-.custom-dlm-option-active:hover {
-  background: #1f1c4b;
+.custom-status-option-active:hover {
+  background-color: #27235c;
+  color: #ffffff;
 }
+
 
 /* CLEAR FILTERS BUTTON */
 .dlm-btn-clear {
@@ -301,6 +331,7 @@
   background: #4b5563 !important;
   border-color: #4b5563 !important;
 }
+
 
 /* VIEW SWITCHER */
 .dlm-view-switcher {
@@ -373,6 +404,7 @@
   font-weight: 500;
 }
 
+
 /* MODERN GRID LAYOUT */
 .dlm-grid {
   display: grid;
@@ -384,6 +416,7 @@
 .dlm-card-modern {
   /* Inline styles used in JSX */
 }
+
 
 /* TABLE VIEW */
 .dlm-table-card {
@@ -537,50 +570,22 @@
   cursor: not-allowed;
 }
 
+
 /* PAGINATION */
+.dlm-pagination-wrapper {
+  background: #ffffff;
+  border-radius: 0 0 12px 12px;
+  border-top: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
 .dlm-pagination {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.25rem;
-  border-top: 1px solid #e5e7eb;
   flex-wrap: wrap;
   gap: 1rem;
-  background: #ffffff;
-  border-radius: 0 0 12px 12px;
-}
-
-.dlm-pagination-info {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  color: #6c757d;
-}
-
-.dlm-pagination-info select {
-  padding: 0.3rem 0.625rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  cursor: pointer;
-  background: #ffffff;
-  color: #212529;
-  height: 30px;
-}
-
-.dlm-pagination-info select:focus {
-  outline: none;
-  border-color: #27235c;
-}
-
-.dlm-pagination-status {
-  color: #6c757d;
-  font-size: 0.875rem;
-}
-
-.dlm-pagination-nav {
-  margin: 0;
 }
 
 .dlm-pagination-list {
@@ -631,6 +636,7 @@
   pointer-events: none;
 }
 
+
 /* LOADING & EMPTY */
 .dlm-loading-container {
   display: flex;
@@ -666,6 +672,7 @@
   margin: 0 0 1rem 0;
   font-size: 0.875rem;
 }
+
 
 /* RESPONSIVE DESIGN */
 @media (max-width: 1400px) {

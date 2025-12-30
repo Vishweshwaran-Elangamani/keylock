@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation, Routes, Route } from "react-router-dom";
 import ChangeRequestService from "../../../services/auth/changeRequestService";
 import Breadcrumb from "../../../components/common/Breadcrumb";
@@ -8,6 +8,7 @@ import { Form } from "react-bootstrap";
 import ApproveEmailChangeModal from "../../../components/auth/Modal/changerequest/ApproveEmailChangeModal";
 import RejectEmailChangeModal from "../../../components/auth/Modal/changerequest/RejectEmailChangeModal";
 import "../../../styles/auth/admin/ChangeRequestManagement.css";
+
 
 const StatusDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
@@ -24,11 +25,12 @@ const StatusDropdown = ({ value, onChange, options }) => {
     <div
       className="crm-status-select custom-crm-dropdown"
       tabIndex={0}
-      onBlur={() => setOpen(false)}
-      onClick={() => setOpen((prev) => !prev)}
-      style={{ position: "relative" }}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
     >
-      <div className="custom-crm-selected">
+      <div
+        className="custom-crm-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
         {selected.label}
         <span className="custom-crm-arrow" />
       </div>
@@ -41,7 +43,7 @@ const StatusDropdown = ({ value, onChange, options }) => {
                 "custom-crm-option" +
                 (opt.value === value ? " custom-crm-option-active" : "")
               }
-              onMouseDown={() => handleSelect(opt.value)}
+              onClick={() => handleSelect(opt.value)}
             >
               {opt.label}
             </div>
@@ -51,6 +53,7 @@ const StatusDropdown = ({ value, onChange, options }) => {
     </div>
   );
 };
+
 
 const PendingRequests = ({
   requests,
@@ -71,6 +74,7 @@ const PendingRequests = ({
   setCurrentPage,
 }) => {
   const [filteredRequests, setFilteredRequests] = useState([]);
+  const searchInputRef = useRef(null);
 
   useEffect(() => {
     applyFilters();
@@ -138,6 +142,13 @@ const PendingRequests = ({
     return pages;
   };
 
+  const handleSearchKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+      if (searchInputRef.current) searchInputRef.current.blur();
+    }
+  };
+
   return (
     <>
       <div className="crm-filters-card">
@@ -148,15 +159,12 @@ const PendingRequests = ({
                 <FaSearch />
               </span>
               <Form.Control
+                ref={searchInputRef}
                 type="text"
                 placeholder="Search requests..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === "Enter") {
-                    handleSearch();
-                  }
-                }}
+                onKeyPress={handleSearchKeyDown}
                 className="crm-search-field"
               />
               <button
@@ -364,6 +372,7 @@ const PendingRequests = ({
   );
 };
 
+
 const AllRequests = ({
   requests,
   searchTerm,
@@ -385,6 +394,7 @@ const AllRequests = ({
   setCurrentPage,
 }) => {
   const [filteredRequests, setFilteredRequests] = useState([]);
+  const searchInputRef = useRef(null);
 
   useEffect(() => {
     applyFilters();
@@ -456,6 +466,13 @@ const AllRequests = ({
     return pages;
   };
 
+  const handleSearchKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+      if (searchInputRef.current) searchInputRef.current.blur();
+    }
+  };
+
   const statusOptions = [
     { label: "Pending", value: "Pending" },
     { label: "Approved", value: "Approved" },
@@ -473,15 +490,12 @@ const AllRequests = ({
                 <FaSearch />
               </span>
               <Form.Control
+                ref={searchInputRef}
                 type="text"
                 placeholder="Search requests..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === "Enter") {
-                    handleSearch();
-                  }
-                }}
+                onKeyPress={handleSearchKeyDown}
                 className="crm-search-field"
               />
               <button
@@ -712,6 +726,7 @@ const AllRequests = ({
     </>
   );
 };
+
 
 const ChangeRequestManagement = () => {
   const navigate = useNavigate();

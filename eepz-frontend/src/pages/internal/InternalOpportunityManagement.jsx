@@ -1,6 +1,6 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../../contexts/auth/AuthContext";
+import { useNavigate } from "react-router-dom";
 import internalOpportunityService from "../../services/internal/internalOpportunityService";
 import departmentService from "../../services/auth/departmentService";
 import CreateOpportunityModal from "../../components/internal/OpportunityModals/CreateOpportunityModal";
@@ -15,7 +15,7 @@ import { FaSearch } from "react-icons/fa";
 import { Form } from "react-bootstrap";
 import "../../styles/internal/InternalOpportunityManagement.css";
 
-/* Simple custom status dropdown with #27235c hover */
+/* Custom status dropdown for opportunities */
 const StatusDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
 
@@ -35,15 +35,17 @@ const StatusDropdown = ({ value, onChange }) => {
 
   return (
     <div
-      className="filter-select custom-status-dropdown"
+      className="ioma-status-select custom-status-dropdown"
       tabIndex={0}
-      onBlur={() => setOpen(false)}
-      onClick={() => setOpen((prev) => !prev)}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
       style={{ position: "relative" }}
     >
-      <div className="custom-status-selected">
+      <div
+        className="custom-status-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
         {selected.label}
-        <span className="custom-status-arrow">▾</span>
+        <span className="custom-status-arrow" />
       </div>
 
       {open && (
@@ -55,7 +57,7 @@ const StatusDropdown = ({ value, onChange }) => {
                 "custom-status-option" +
                 (opt.value === value ? " custom-status-option-active" : "")
               }
-              onMouseDown={() => handleSelect(opt.value)}
+              onClick={() => handleSelect(opt.value)}
             >
               {opt.label}
             </div>
@@ -68,6 +70,7 @@ const StatusDropdown = ({ value, onChange }) => {
 
 const InternalOpportunityManagement = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [opportunities, setOpportunities] = useState([]);
   const [filteredOpportunities, setFilteredOpportunities] = useState([]);
   const [departments, setDepartments] = useState([]);
@@ -75,12 +78,13 @@ const InternalOpportunityManagement = () => {
 
   // Filter states
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeSearchTerm, setActiveSearchTerm] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
 
   // Pagination
-  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Modal states
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -88,8 +92,7 @@ const InternalOpportunityManagement = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showSelfNominateModal, setShowSelfNominateModal] = useState(false);
-  const [showManagerNominateModal, setShowManagerNominateModal] =
-    useState(false);
+  const [showManagerNominateModal, setShowManagerNominateModal] = useState(false);
   const [selectedOpportunity, setSelectedOpportunity] = useState(null);
 
   toast.options = {
@@ -111,10 +114,10 @@ const InternalOpportunityManagement = () => {
     fetchData();
   }, []);
 
-  // Auto-filter only on department/status changes (NOT searchTerm)
+  // Auto-filter when dependencies change
   useEffect(() => {
     filterOpportunities();
-  }, [opportunities, selectedDepartment, selectedStatus]);
+  }, [opportunities, selectedDepartment, selectedStatus, activeSearchTerm]);
 
   const fetchData = async () => {
     try {
@@ -129,8 +132,10 @@ const InternalOpportunityManagement = () => {
           ? opportunitiesResponse.data
           : [];
         setOpportunities(oppArray);
+        toast.dismiss();
       } else {
         setOpportunities([]);
+        toast.dismiss();
         toast.error("Failed to load opportunities");
       }
 
@@ -140,6 +145,7 @@ const InternalOpportunityManagement = () => {
     } catch (error) {
       console.error("Error fetching data:", error);
       setOpportunities([]);
+      toast.dismiss();
       toast.error("Failed to load data. Please try again.");
     } finally {
       setLoading(false);
@@ -149,8 +155,8 @@ const InternalOpportunityManagement = () => {
   const filterOpportunities = useCallback(() => {
     let filtered = Array.isArray(opportunities) ? [...opportunities] : [];
 
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
+    if (activeSearchTerm) {
+      const term = activeSearchTerm.toLowerCase();
       filtered = filtered.filter(
         (opp) =>
           opp.opportunityName?.toLowerCase().includes(term) ||
@@ -171,15 +177,18 @@ const InternalOpportunityManagement = () => {
 
     setFilteredOpportunities(filtered);
     setCurrentPage(1);
-  }, [opportunities, searchTerm, selectedDepartment, selectedStatus]);
+  }, [opportunities, activeSearchTerm, selectedDepartment, selectedStatus]);
+
+  const handleSearch = () => {
+    setActiveSearchTerm(searchTerm);
+    setCurrentPage(1);
+  };
 
   const clearFilters = () => {
-    // Reset all filters first
     setSearchTerm("");
+    setActiveSearchTerm("");
     setSelectedDepartment("");
     setSelectedStatus("");
-    // Force update filteredOpportunities to show ALL opportunities
-    setFilteredOpportunities(opportunities);
     setCurrentPage(1);
   };
 
@@ -234,13 +243,13 @@ const InternalOpportunityManagement = () => {
     fetchData();
   };
 
-  const getPaginatedOpportunities = () => {
-    const startIndex = (currentPage - 1) * rowsPerPage;
-    const endIndex = startIndex + rowsPerPage;
-    return filteredOpportunities.slice(startIndex, endIndex);
-  };
-
-  const totalPages = Math.ceil(filteredOpportunities.length / rowsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredOpportunities.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+  const totalPages = Math.ceil(filteredOpportunities.length / itemsPerPage) || 1;
 
   const getPageNumbers = () => {
     const pages = [];
@@ -271,26 +280,26 @@ const InternalOpportunityManagement = () => {
     return pages;
   };
 
-  const getStatusBadgeClass = (status) => {
-    switch (status?.toLowerCase()) {
-      case "active":
-        return "status-active";
-      case "closed":
-        return "status-inactive";
-      case "pending":
-        return "status-pending";
-      default:
-        return "status-inactive";
-    }
-  };
-
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-US", {
-      month: "short",
       day: "numeric",
+      month: "short",
       year: "numeric",
     });
+  };
+
+  const getStatusBadgeClass = (status) => {
+    switch (status?.toLowerCase()) {
+      case "active":
+        return "ioma-badge-active";
+      case "closed":
+        return "ioma-badge-closed";
+      case "pending":
+        return "ioma-badge-pending";
+      default:
+        return "ioma-badge-inactive";
+    }
   };
 
   // ROLE-BASED UI RENDERING
@@ -298,9 +307,25 @@ const InternalOpportunityManagement = () => {
   const isEmployee = user?.role === "Employee";
   const isManager = user?.role === "Manager";
 
+  const getOppStats = () => {
+    const total = opportunities.length;
+    const active = opportunities.filter((o) => o.status === "Active").length;
+    const closed = opportunities.filter((o) => o.status === "Closed").length;
+    const pending = opportunities.filter((o) => o.status === "Pending").length;
+
+    return {
+      totalOpportunities: total,
+      activeOpportunities: active,
+      closedOpportunities: closed,
+      pendingOpportunities: pending,
+    };
+  };
+
+  const stats = getOppStats();
+
   if (loading) {
     return (
-      <div className="loading-container">
+      <div className="ioma-loading-container">
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
@@ -309,7 +334,7 @@ const InternalOpportunityManagement = () => {
   }
 
   return (
-    <div className="user-list-page">
+    <div className="ioma-page">
       <Breadcrumb
         items={[
           {
@@ -320,110 +345,110 @@ const InternalOpportunityManagement = () => {
         ]}
       />
 
-      {/* Statistics Cards - Compact */}
-      <div className="int-stats-grid">
-        <div className="in-stat-card">
-          <div className="stat-icon stat-icon-primary">
+      {/* KPI CARDS */}
+      <div className="stats-cards-ioma">
+        <div className="stat-card-ioma stat-total-ioma">
+          <div className="stat-icon-ioma">
             <i className="bi bi-briefcase-fill"></i>
           </div>
-          <div className="stat-content">
-            <h3 className="stat-value">{opportunities.length}</h3>
-            <p className="stat-label">{isHR ? "Total Created" : "Available"}</p>
+          <div className="stat-content-ioma">
+            <div className="stat-value-ioma">{stats.totalOpportunities}</div>
+            <div className="stat-label-ioma">Total Opportunities</div>
           </div>
         </div>
 
-        <div className="in-stat-card">
-          <div className="stat-icon stat-icon-success">
-            <i className="bi bi-check-circle-fill"></i>
+        <div className="stat-card-ioma stat-active-ioma">
+          <div className="stat-icon-ioma">
+            <i className="bi bi-check2-circle"></i>
           </div>
-          <div className="stat-content">
-            <h3 className="stat-value">
-              {opportunities.filter((o) => o.status === "Active").length}
-            </h3>
-            <p className="stat-label">Active</p>
+          <div className="stat-content-ioma">
+            <div className="stat-value-ioma">{stats.activeOpportunities}</div>
+            <div className="stat-label-ioma">Active</div>
           </div>
         </div>
 
-        <div className="in-stat-card">
-          <div className="stat-icon stat-icon-danger">
-            <i className="bi bi-x-circle-fill"></i>
+        <div className="stat-card-ioma stat-closed-ioma">
+          <div className="stat-icon-ioma">
+            <i className="bi bi-x-circle"></i>
           </div>
-          <div className="stat-content">
-            <h3 className="stat-value">
-              {opportunities.filter((o) => o.status === "Closed").length}
-            </h3>
-            <p className="stat-label">Closed</p>
+          <div className="stat-content-ioma">
+            <div className="stat-value-ioma">{stats.closedOpportunities}</div>
+            <div className="stat-label-ioma">Closed</div>
           </div>
         </div>
 
-        <div className="in-stat-card">
-          <div className="stat-icon stat-icon-warning">
-            <i className="bi bi-clock-fill"></i>
+        <div className="stat-card-ioma stat-pending-ioma">
+          <div className="stat-icon-ioma">
+            <i className="bi bi-clock"></i>
           </div>
-          <div className="stat-content">
-            <h3 className="stat-value">
-              {opportunities.filter((o) => o.status === "Pending").length}
-            </h3>
-            <p className="stat-label">Pending</p>
+          <div className="stat-content-ioma">
+            <div className="stat-value-ioma">{stats.pendingOpportunities}</div>
+            <div className="stat-label-ioma">Pending</div>
           </div>
         </div>
       </div>
 
-      {/* Filter Section with Search Button */}
-      <div className="filters-card">
-        <div className="filters-content">
-          {/* Search with Button */}
-          <div className="io-search-input">
-            <div className="io-search-inner">
-              <span className="io-search-icon">
-                <FaSearch />
-              </span>
-              <Form.Control
-                type="text"
-                placeholder="Search opportunities..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="io-search-field"
-              />
-              <button
-                type="button"
-                className="io-search-btn"
-                onClick={filterOpportunities}
-              >
-                Search
-              </button>
-            </div>
-          </div>
-
-          {(isHR || isEmployee || isManager) && (
-            <StatusDropdown
-              value={selectedStatus}
-              onChange={(val) => setSelectedStatus(val)}
+      {/* CONTROLS BAR */}
+      <div className="ioma-controls">
+        <div className="ioma-search-input">
+          <div className="ioma-search-inner">
+            <span className="ioma-search-icon">
+              <FaSearch />
+            </span>
+            <Form.Control
+              type="text"
+              placeholder="Search opportunities..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  handleSearch();
+                }
+              }}
+              className="ioma-search-field"
             />
-          )}
-
-          <button className="btn-clear" onClick={clearFilters}>
-            Clear Filters
-          </button>
-          <div className="results-count-inline">
-            Showing {getPaginatedOpportunities().length} of{" "}
-            {filteredOpportunities.length} opportunities
-          </div>
-
-          {/* ONLY HR CAN CREATE */}
-          {isHR && (
-            <button className="btn-add" onClick={handleCreateOpportunity}>
-              <i className="bi bi-plus-circle"></i>
-              Create Opportunity
+            <button
+              type="button"
+              className="ioma-search-btn"
+              onClick={handleSearch}
+            >
+              Search
             </button>
-          )}
+          </div>
         </div>
+
+        <div className="ioma-status-filter">
+          <StatusDropdown
+            value={selectedStatus}
+            onChange={(val) => {
+              setSelectedStatus(val);
+              setCurrentPage(1);
+            }}
+          />
+        </div>
+
+        <button className="ioma-btn-clear" onClick={clearFilters}>
+          Clear Filters
+        </button>
+
+        <div className="ioma-results-count">
+          Showing {filteredOpportunities.length}{" "}
+          {filteredOpportunities.length === 1 ? "opportunity" : "opportunities"}
+        </div>
+
+        {/* ONLY HR CAN CREATE */}
+        {isHR && (
+          <button className="ioma-btn-create" onClick={handleCreateOpportunity}>
+            <i className="bi bi-plus-circle"></i>
+            Create Opportunity
+          </button>
+        )}
       </div>
 
-      {/* Table Card */}
-      <div className="in-table-card">
-        <div className="table-wrapper">
-          <table className="user-table">
+      {/* TABLE */}
+      <div className="ioma-table-card">
+        <div className="ioma-table-wrapper">
+          <table className="ioma-table">
             <thead>
               <tr>
                 <th>Opportunity Name</th>
@@ -432,70 +457,63 @@ const InternalOpportunityManagement = () => {
                 <th>Requirements</th>
                 <th>Deadline</th>
                 <th>Status</th>
-                <th className="text-center">Actions</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {getPaginatedOpportunities().length === 0 ? (
+              {currentItems.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="empty-state">
-                    <i className="bi bi-inbox"></i>
-                    <p>No opportunities found</p>
+                  <td colSpan="7" className="ioma-empty-state">
+                    <div className="ioma-empty-content">
+                      <i className="bi bi-inbox"></i>
+                      <h4>No opportunities found</h4>
+                      <p>Try adjusting your search or filter criteria</p>
+                    </div>
                   </td>
                 </tr>
               ) : (
-                getPaginatedOpportunities().map((opportunity) => (
+                currentItems.map((opportunity) => (
                   <tr key={opportunity.opportunityId}>
                     <td>
-                      <div className="opportunity-info">
-                        <span className="opportunity-name">
-                          {opportunity.opportunityName}
-                        </span>
-                      </div>
+                      <strong>{opportunity.opportunityName}</strong>
                     </td>
-                    <td className="text-muted">
-                      {opportunity.departmentName || "N/A"}
+                    <td>
+                      <span className="ioma-department-badge">
+                        {opportunity.departmentName || "N/A"}
+                      </span>
                     </td>
-                    <td className="text-muted opportunity-desc">
+                    <td className="ioma-opp-desc">
                       {opportunity.description?.substring(0, 80)}
                       {opportunity.description?.length > 80 && "..."}
                     </td>
-                    <td className="text-muted opportunity-req">
+                    <td className="ioma-opp-req">
                       {opportunity.requirements?.substring(0, 60)}
                       {opportunity.requirements?.length > 60 && "..."}
                     </td>
                     <td>{formatDate(opportunity.deadline)}</td>
                     <td>
-                      <span
-                        className={`status-badge ${getStatusBadgeClass(
-                          opportunity.status
-                        )}`}
-                      >
+                      <span className={getStatusBadgeClass(opportunity.status)}>
                         {opportunity.status || "Pending"}
                       </span>
                     </td>
                     <td>
-                      <div className="action-buttons">
+                      <div className="ioma-table-actions">
                         {/* HR: Edit & Delete */}
                         {isHR && (
                           <>
                             <button
-                              className="action-btn action-btn-edit"
-                              onClick={() =>
-                                handleEditOpportunity(opportunity)
-                              }
+                              className="ioma-action-edit"
+                              onClick={() => handleEditOpportunity(opportunity)}
                               title="Edit Opportunity"
                             >
-                              <i className="bi bi-pencil"></i>
+                              <i className="bi bi-pencil-square"></i>
                             </button>
                             <button
-                              className="action-btn action-btn-delete"
-                              onClick={() =>
-                                handleDeleteOpportunity(opportunity)
-                              }
+                              className="ioma-action-delete"
+                              onClick={() => handleDeleteOpportunity(opportunity)}
                               title="Delete Opportunity"
                             >
-                              <i className="bi bi-trash"></i>
+                              <i className="bi bi-trash3"></i>
                             </button>
                           </>
                         )}
@@ -503,7 +521,7 @@ const InternalOpportunityManagement = () => {
                         {/* EMPLOYEE: Self Nominate */}
                         {isEmployee && (
                           <button
-                            className="action-btn action-btn-nominate"
+                            className="ioma-action-nominate"
                             onClick={() => handleSelfNominate(opportunity)}
                             title="Self Nominate"
                           >
@@ -515,17 +533,15 @@ const InternalOpportunityManagement = () => {
                         {isManager && (
                           <>
                             <button
-                              className="action-btn action-btn-nominate"
+                              className="ioma-action-nominate"
                               onClick={() => handleSelfNominate(opportunity)}
                               title="Self Nominate"
                             >
                               <i className="bi bi-hand-thumbs-up"></i>
                             </button>
                             <button
-                              className="action-btn action-btn-nominate-team"
-                              onClick={() =>
-                                handleManagerNominate(opportunity)
-                              }
+                              className="ioma-action-nominate-team"
+                              onClick={() => handleManagerNominate(opportunity)}
                               title="Nominate Team Member"
                             >
                               <i className="bi bi-person-plus"></i>
@@ -535,7 +551,7 @@ const InternalOpportunityManagement = () => {
 
                         {/* View Details for all */}
                         <button
-                          className="action-btn action-btn-view"
+                          className="ioma-action-view"
                           onClick={() => handleViewOpportunity(opportunity)}
                           title="View Details"
                         >
@@ -552,43 +568,39 @@ const InternalOpportunityManagement = () => {
 
         {/* Pagination */}
         {filteredOpportunities.length > 0 && (
-          <div className="pagination-container">
-            <div className="pagination-info">
-              <span className="pagination-label">Show</span>
+          <div className="ioma-pagination-container">
+            <div className="ioma-pagination-info">
+              <span className="ioma-pagination-label">Show</span>
               <select
-                className="pagination-select"
-                value={rowsPerPage}
+                className="ioma-pagination-select"
+                value={itemsPerPage}
                 onChange={(e) => {
-                  setRowsPerPage(Number(e.target.value));
+                  setItemsPerPage(Number(e.target.value));
                   setCurrentPage(1);
                 }}
               >
-                <option value="5">5</option>
                 <option value="10">10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>
               </select>
-              <span className="pagination-label">entries</span>
+              <span className="ioma-pagination-label">entries</span>
             </div>
 
-            <div className="pagination-status">
-              Showing {(currentPage - 1) * rowsPerPage + 1} to{" "}
-              {Math.min(
-                currentPage * rowsPerPage,
-                filteredOpportunities.length
-              )}{" "}
-              of {filteredOpportunities.length} entries
+            <div className="ioma-pagination-status">
+              Showing {indexOfFirstItem + 1} to{" "}
+              {Math.min(indexOfLastItem, filteredOpportunities.length)} of{" "}
+              {filteredOpportunities.length} entries
             </div>
 
-            <nav className="pagination-nav">
-              <ul className="pagination">
+            <nav className="ioma-pagination-nav">
+              <ul className="ioma-pagination">
                 <li
-                  className={`page-item ${
+                  className={`ioma-page-item ${
                     currentPage === 1 ? "disabled" : ""
                   }`}
                 >
                   <button
-                    className="page-link"
+                    className="ioma-page-link"
                     onClick={() =>
                       setCurrentPage((prev) => Math.max(prev - 1, 1))
                     }
@@ -601,12 +613,12 @@ const InternalOpportunityManagement = () => {
                 {getPageNumbers().map((page, index) => (
                   <li
                     key={index}
-                    className={`page-item ${
+                    className={`ioma-page-item ${
                       page === currentPage ? "active" : ""
                     } ${typeof page !== "number" ? "disabled" : ""}`}
                   >
                     <button
-                      className="page-link"
+                      className="ioma-page-link"
                       onClick={() =>
                         typeof page === "number" && setCurrentPage(page)
                       }
@@ -618,12 +630,12 @@ const InternalOpportunityManagement = () => {
                 ))}
 
                 <li
-                  className={`page-item ${
+                  className={`ioma-page-item ${
                     currentPage === totalPages ? "disabled" : ""
                   }`}
                 >
                   <button
-                    className="page-link"
+                    className="ioma-page-link"
                     onClick={() =>
                       setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                     }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { Form } from "react-bootstrap";
 import budgetAllocationService from "../../../../services/hr_operations/hr/budgetAllocationService";
 import periodAllocationService from "../../../../services/hr_operations/hr/periodAllocationService";
 import CreatePeriodAllocationModal from "../../../../components/hr_operations/modals/CreatePeriodAllocationModal";
@@ -10,6 +11,7 @@ import DeleteConfirmationModal from "../../../../components/hr_operations/modals
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
 import { FaSearch } from "react-icons/fa";
 import "../../../../styles/hr_operations/hr/PeriodAllocation.css";
+
 
 /* Custom Department Dropdown */
 const DepartmentDropdown = ({ budgets, selectedBudget, onChange }) => {
@@ -27,10 +29,10 @@ const DepartmentDropdown = ({ budgets, selectedBudget, onChange }) => {
 
   if (budgets.length === 0) {
     return (
-      <div className="pa-filter-select pa-select-disabled">
-        <div className="pa-custom-selected">
+      <div className="pa-filter-select custom-status-dropdown">
+        <div className="custom-status-selected">
           No departments available
-          <span className="pa-custom-arrow" />
+          <span className="custom-status-arrow" />
         </div>
       </div>
     );
@@ -38,26 +40,25 @@ const DepartmentDropdown = ({ budgets, selectedBudget, onChange }) => {
 
   return (
     <div
-      className="pa-filter-select pa-custom-dropdown"
+      className="pa-filter-select custom-status-dropdown"
       tabIndex={0}
       onBlur={() => setTimeout(() => setOpen(false), 200)}
+      style={{ position: "relative" }}
     >
       <div
-        className="pa-custom-selected"
+        className="custom-status-selected"
         onClick={() => setOpen((prev) => !prev)}
       >
         {selectedBudget
           ? `${selectedBudget.departmentName} - FY ${selectedBudget.fiscalYear}`
           : "Select Department"}
-        <span className="pa-custom-arrow" />
+        <span className="custom-status-arrow" />
       </div>
 
       {open && (
-        <div className="pa-custom-menu">
+        <div className="custom-status-menu">
           <div
-            className={`pa-custom-option ${
-              !selectedBudget ? "pa-custom-option-active" : ""
-            }`}
+            className={`custom-status-option ${!selectedBudget ? "custom-status-option-active" : ""}`}
             onClick={handleSelectPlaceholder}
           >
             Select Department
@@ -66,9 +67,9 @@ const DepartmentDropdown = ({ budgets, selectedBudget, onChange }) => {
           {budgets.map((budget) => (
             <div
               key={budget.budgetId}
-              className={`pa-custom-option ${
+              className={`custom-status-option ${
                 selectedBudget?.budgetId === budget.budgetId
-                  ? "pa-custom-option-active"
+                  ? "custom-status-option-active"
                   : ""
               }`}
               onClick={() => handleSelect(budget)}
@@ -89,16 +90,14 @@ const DepartmentDropdown = ({ budgets, selectedBudget, onChange }) => {
   );
 };
 
+
 /* Custom Year Dropdown */
 const YearDropdown = ({ value, onChange, years }) => {
   const [open, setOpen] = useState(false);
 
   const allOptions = [
     { label: "All Years", value: "all" },
-    ...years.map((year) => ({
-      label: year.toString(),
-      value: year.toString(),
-    })),
+    ...years.map((year) => ({ label: year.toString(), value: year.toString() })),
   ];
 
   const selected = allOptions.find((o) => o.value === value) || allOptions[0];
@@ -110,25 +109,26 @@ const YearDropdown = ({ value, onChange, years }) => {
 
   return (
     <div
-      className="pa-filter-select pa-custom-dropdown pa-select-compact"
+      className="pa-year-select custom-status-dropdown"
       tabIndex={0}
       onBlur={() => setTimeout(() => setOpen(false), 200)}
+      style={{ position: "relative" }}
     >
       <div
-        className="pa-custom-selected"
+        className="custom-status-selected"
         onClick={() => setOpen((prev) => !prev)}
       >
         {selected.label}
-        <span className="pa-custom-arrow" />
+        <span className="custom-status-arrow" />
       </div>
 
       {open && (
-        <div className="pa-custom-menu">
+        <div className="custom-status-menu">
           {allOptions.map((opt) => (
             <div
               key={opt.value}
-              className={`pa-custom-option ${
-                opt.value === value ? "pa-custom-option-active" : ""
+              className={`custom-status-option ${
+                opt.value === value ? "custom-status-option-active" : ""
               }`}
               onClick={() => handleSelect(opt.value)}
             >
@@ -140,6 +140,7 @@ const YearDropdown = ({ value, onChange, years }) => {
     </div>
   );
 };
+
 
 const PeriodAllocationManagement = () => {
   const [budgets, setBudgets] = useState([]);
@@ -376,7 +377,7 @@ const PeriodAllocationManagement = () => {
     toast.success("Period allocations exported successfully");
   };
 
-  const totalPages = Math.ceil(filteredPeriods.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredPeriods.length / itemsPerPage) || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentPageData = filteredPeriods.slice(startIndex, endIndex);
@@ -493,28 +494,91 @@ const PeriodAllocationManagement = () => {
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
-        <p className="pa-loading-text">Loading period allocations...</p>
       </div>
     );
   }
 
   return (
-    <div className="pa-page-container">
-      {error && (
-        <div className="alert alert-danger pa-alert-banner">
-          <i className="bi bi-exclamation-triangle-fill"></i>
-          <span>{error}</span>
+    <div className="pa-page">
+      {selectedBudget && filteredPeriods.length > 0 && (
+        <div className="stats-cards-pa">
+          <div className="stat-card-pa stat-total-pa">
+            <div className="stat-icon-pa">
+              <i className="bi bi-wallet2"></i>
+            </div>
+            <div className="stat-content-pa">
+              <div className="stat-value-pa">
+                {formatCurrency(summaryStats.totalAllocated)}
+              </div>
+              <div className="stat-label-pa">Total Allocated</div>
+            </div>
+          </div>
+
+          <div className="stat-card-pa stat-periods-pa">
+            <div className="stat-icon-pa">
+              <i className="bi bi-calendar-check"></i>
+            </div>
+            <div className="stat-content-pa">
+              <div className="stat-value-pa">{summaryStats.totalPeriods}</div>
+              <div className="stat-label-pa">Active Periods</div>
+            </div>
+          </div>
+
+          <div className="stat-card-pa stat-sub-pa">
+            <div className="stat-icon-pa">
+              <i className="bi bi-diagram-3"></i>
+            </div>
+            <div className="stat-content-pa">
+              <div className="stat-value-pa">
+                {summaryStats.totalSubAllocations}
+              </div>
+              <div className="stat-label-pa">Sub-Allocations</div>
+            </div>
+          </div>
+
+          <div className="stat-card-pa stat-budget-pa">
+            <div className="stat-icon-pa">
+              <i className="bi bi-building"></i>
+            </div>
+            <div className="stat-content-pa">
+              <div className="stat-value-pa" style={{ fontSize: "1.25rem" }}>
+                {selectedBudget.departmentName}
+              </div>
+              <div className="stat-label-pa">Department</div>
+            </div>
+          </div>
         </div>
       )}
 
-      {/* ULTRA COMPACT HEADER - EVERYTHING IN ONE LINE */}
-      <div className="pa-compact-header">
-        <div className="pa-compact-left">
-          <i className="bi bi-calendar3"></i>
-          <span className="pa-compact-title">Budget Allocations</span>
+      <div className="pa-controls">
+        <div className="pa-search-input">
+          <div className="pa-search-inner">
+            <span className="pa-search-icon">
+              <FaSearch />
+            </span>
+            <Form.Control
+              type="text"
+              placeholder="Search periods..."
+              value={searchInput}
+              onChange={handleSearchInputChange}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  handleSearchClick();
+                }
+              }}
+              className="pa-search-field"
+            />
+            <button
+              type="button"
+              className="pa-search-btn"
+              onClick={handleSearchClick}
+            >
+              Search
+            </button>
+          </div>
         </div>
 
-        <div className="pa-compact-center">
+        <div className="pa-department-filter">
           <DepartmentDropdown
             budgets={budgets}
             selectedBudget={selectedBudget}
@@ -522,335 +586,195 @@ const PeriodAllocationManagement = () => {
           />
         </div>
 
-        <div className="pa-compact-right">
-          <button className="pa-btn-export-compact" onClick={exportToCSV}>
-            <i className="bi bi-download"></i>
-            Export CSV
-          </button>
-          <button
-            className="pa-btn-add-compact"
-            onClick={handleCreatePeriod}
-            disabled={!selectedBudget}
-          >
-            <i className="bi bi-plus-circle"></i>
-            Add Period
-          </button>
+        <div className="pa-year-filter">
+          <YearDropdown
+            value={filters.year}
+            onChange={(val) => setFilters((prev) => ({ ...prev, year: val }))}
+            years={filterOptions.years}
+          />
         </div>
+
+        <button className="pa-btn-clear" onClick={clearFilters}>
+          Clear Filters
+        </button>
+
+        <button className="pa-btn-export" onClick={exportToCSV}>
+          <i className="bi bi-download"></i>
+          Export
+        </button>
+
+        <div className="pa-results-count">
+          Showing {filteredPeriods.length} {filteredPeriods.length === 1 ? "period" : "periods"}
+        </div>
+
+        <button
+          className="pa-btn-create"
+          onClick={handleCreatePeriod}
+          disabled={!selectedBudget}
+        >
+          <i className="bi bi-plus-circle"></i>
+          Add Period
+        </button>
       </div>
 
-      {selectedBudget ? (
-        <>
-          {/* STATISTICS CARDS */}
-          {filteredPeriods.length > 0 && (
-            <div className="pa-stats-grid">
-              <div className="pa-stat-card">
-                <div className="pa-stat-icon pa-stat-icon-primary">
-                  <i className="bi bi-wallet2"></i>
-                </div>
-                <div className="pa-stat-content">
-                  <h3 className="pa-stat-value">
-                    {formatCurrency(summaryStats.totalAllocated)}
-                  </h3>
-                  <p className="pa-stat-label">Total Allocated</p>
-                </div>
-              </div>
-
-              <div className="pa-stat-card">
-                <div className="pa-stat-icon pa-stat-icon-success">
-                  <i className="bi bi-calendar-check"></i>
-                </div>
-                <div className="pa-stat-content">
-                  <h3 className="pa-stat-value">{summaryStats.totalPeriods}</h3>
-                  <p className="pa-stat-label">Active Periods</p>
-                </div>
-              </div>
-
-              <div className="pa-stat-card">
-                <div className="pa-stat-icon pa-stat-icon-info">
-                  <i className="bi bi-diagram-3"></i>
-                </div>
-                <div className="pa-stat-content">
-                  <h3 className="pa-stat-value">
-                    {summaryStats.totalSubAllocations}
-                  </h3>
-                  <p className="pa-stat-label">Sub-Allocations</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* FILTERS CARD */}
-          <div className="pa-filters-card">
-            <div className="pa-filters-content">
-              {/* Search with Button */}
-              <div className="pa-search-box">
-                <div className="pa-search-inner">
-                  <span className="pa-search-icon">
-                    <FaSearch />
-                  </span>
-                  <input
-                    type="text"
-                    placeholder="Search periods..."
-                    value={searchInput}
-                    onChange={handleSearchInputChange}
-                    onKeyPress={(e) => {
-                      if (e.key === "Enter") {
-                        handleSearchClick();
-                      }
-                    }}
-                    className="pa-search-input"
-                  />
-                  <button
-                    type="button"
-                    className="pa-search-btn"
-                    onClick={handleSearchClick}
-                  >
-                    Search
-                  </button>
-                </div>
-              </div>
-
-              <YearDropdown
-                value={filters.year}
-                onChange={(val) =>
-                  setFilters((prev) => ({ ...prev, year: val }))
-                }
-                years={filterOptions.years}
-              />
-
-              {(searchTerm || filters.year !== "all") && (
-                <button className="pa-btn-clear" onClick={clearFilters}>
-                  Clear Filters
+      {totalPages > 1 && filteredPeriods.length > 0 && (
+        <div className="pa-pagination-wrapper">
+          <nav className="pa-pagination">
+            <ul className="pa-pagination-list">
+              <li className={`pa-page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                <button
+                  onClick={() => goToPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  <i className="bi bi-chevron-left"></i>
                 </button>
-              )}
-
-              <div className="pa-results-count">
-                Showing {filteredPeriods.length}{" "}
-                {filteredPeriods.length === 1 ? "period" : "periods"}
-              </div>
-            </div>
-          </div>
-
-          {/* TABLE OR EMPTY STATE */}
-          {filteredPeriods.length === 0 ? (
-            <div className="pa-table-card">
-              <div className="pa-empty-state">
-                <i className="bi bi-calendar-x"></i>
-                <p>
-                  {searchTerm || filters.year !== "all"
-                    ? "No matching periods found"
-                    : "No period allocations yet"}
-                </p>
-                {!searchTerm && filters.year === "all" && (
+              </li>
+              {getPageNumbers().map((page, index) => (
+                <li
+                  key={index}
+                  className={`pa-page-item ${
+                    page === currentPage ? "active" : ""
+                  } ${typeof page !== "number" ? "disabled" : ""}`}
+                >
                   <button
-                    className="pa-btn pa-btn-primary"
-                    onClick={handleCreatePeriod}
+                    onClick={() => typeof page === "number" && goToPage(page)}
+                    disabled={typeof page !== "number"}
                   >
-                    <i className="bi bi-plus-circle"></i>
-                    Create Period
+                    {page}
                   </button>
-                )}
-              </div>
-            </div>
-          ) : (
-            <>
-              <div className="pa-table-card">
-                <div className="pa-table-wrapper">
-                  <table className="pa-table">
-                    <thead>
-                      <tr>
-                        <th
-                          onClick={() => handleSort("period")}
-                          className="pa-th-sortable"
-                        >
-                          <div className="pa-th-content">
-                            <span>Period</span>
-                            {getSortIcon("period")}
-                          </div>
-                        </th>
-                        <th
-                          onClick={() => handleSort("periodYear")}
-                          className="pa-th-sortable"
-                        >
-                          <div className="pa-th-content">
-                            <span>Year</span>
-                            {getSortIcon("periodYear")}
-                          </div>
-                        </th>
-                        <th
-                          onClick={() => handleSort("allocatedAmount")}
-                          className="pa-th-sortable"
-                        >
-                          <div className="pa-th-content">
-                            <span>Allocated Amount</span>
-                            {getSortIcon("allocatedAmount")}
-                          </div>
-                        </th>
-                        <th
-                          onClick={() => handleSort("subAllocationCount")}
-                          className="pa-th-sortable"
-                        >
-                          <div className="pa-th-content">
-                            <span>Sub-Allocations</span>
-                            {getSortIcon("subAllocationCount")}
-                          </div>
-                        </th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {currentPageData.map((period) => (
-                        <tr key={period.periodAllocationId}>
-                          <td>
-                            <div className="pa-period-info">
-                              <span className="pa-period-name">
-                                {period.period || "Unknown"}
-                              </span>
-                            </div>
-                          </td>
-                          <td>
-                            <span className="pa-year-badge">
-                              {period.periodYear}
-                            </span>
-                          </td>
-                          <td>
-                            <span className="pa-amount">
-                              {formatCurrency(period.allocatedAmount)}
-                            </span>
-                          </td>
-                          <td>
-                            <span className="pa-sub-badge">
-                              {period.subAllocationCount || 0}
-                            </span>
-                          </td>
-                          <td>
-                            <div className="pa-action-buttons">
-                              <button
-                                className="pa-action-btn pa-action-view"
-                                onClick={() => handleViewDetails(period)}
-                                title="View Details"
-                              >
-                                <i className="bi bi-eye"></i>
-                              </button>
-                              <button
-                                className="pa-action-btn pa-action-edit"
-                                onClick={() => handleUpdatePeriod(period)}
-                                title="Edit Period"
-                              >
-                                <i className="bi bi-pencil"></i>
-                              </button>
-                              <button
-                                className="pa-action-btn pa-action-allocate"
-                                onClick={() => handleAllocateFromPeriod(period)}
-                                title="Create Sub-Allocation"
-                              >
-                                <i className="bi bi-diagram-3"></i>
-                              </button>
-                              <button
-                                className="pa-action-btn pa-action-delete"
-                                onClick={() => handleDeletePeriod(period)}
-                                title="Delete Period"
-                              >
-                                <i className="bi bi-trash"></i>
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* PAGINATION */}
-                {totalPages > 1 && (
-                  <div className="pa-pagination-container">
-                    <div className="pa-pagination-info">
-                      <span className="pa-pagination-label">Show</span>
-                      <select
-                        className="pa-pagination-select"
-                        value={itemsPerPage}
-                        onChange={handleItemsPerPageChange}
-                      >
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                      </select>
-                      <span className="pa-pagination-label">entries</span>
-                    </div>
-
-                    <div className="pa-pagination-status">
-                      Showing {startIndex + 1} to{" "}
-                      {Math.min(endIndex, filteredPeriods.length)} of{" "}
-                      {filteredPeriods.length} entries
-                    </div>
-
-                    <nav className="pa-pagination-nav">
-                      <ul className="pa-pagination">
-                        <li
-                          className={`pa-page-item ${
-                            currentPage === 1 ? "disabled" : ""
-                          }`}
-                        >
-                          <button
-                            className="pa-page-link"
-                            onClick={() => goToPage(currentPage - 1)}
-                            disabled={currentPage === 1}
-                          >
-                            <i className="bi bi-chevron-left"></i>
-                          </button>
-                        </li>
-
-                        {getPageNumbers().map((page, index) => (
-                          <li
-                            key={index}
-                            className={`pa-page-item ${
-                              page === currentPage ? "active" : ""
-                            } ${typeof page !== "number" ? "disabled" : ""}`}
-                          >
-                            <button
-                              className="pa-page-link"
-                              onClick={() =>
-                                typeof page === "number" && goToPage(page)
-                              }
-                              disabled={typeof page !== "number"}
-                            >
-                              {page}
-                            </button>
-                          </li>
-                        ))}
-
-                        <li
-                          className={`pa-page-item ${
-                            currentPage === totalPages ? "disabled" : ""
-                          }`}
-                        >
-                          <button
-                            className="pa-page-link"
-                            onClick={() => goToPage(currentPage + 1)}
-                            disabled={currentPage === totalPages}
-                          >
-                            <i className="bi bi-chevron-right"></i>
-                          </button>
-                        </li>
-                      </ul>
-                    </nav>
-                  </div>
-                )}
-              </div>
-            </>
-          )}
-        </>
-      ) : (
-        <div className="pa-table-card">
-          <div className="pa-empty-state">
-            <i className="bi bi-building"></i>
-            <p>Select a Department to View</p>
-          </div>
+                </li>
+              ))}
+              <li className={`pa-page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                <button
+                  onClick={() => goToPage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  <i className="bi bi-chevron-right"></i>
+                </button>
+              </li>
+            </ul>
+          </nav>
         </div>
       )}
 
-      {/* MODALS */}
+      <div className={`pa-table-card ${totalPages > 1 ? "pa-table-with-pagination" : ""}`}>
+        {!selectedBudget ? (
+          <div className="pa-empty-state">
+            <div className="pa-empty-content">
+              <i className="bi bi-building"></i>
+              <h4>Select a Department</h4>
+              <p>Choose a department from the dropdown to view period allocations</p>
+            </div>
+          </div>
+        ) : filteredPeriods.length === 0 ? (
+          <div className="pa-empty-state">
+            <div className="pa-empty-content">
+              <i className="bi bi-calendar-x"></i>
+              <h4>No periods found</h4>
+              <p>
+                {searchTerm || filters.year !== "all"
+                  ? "Try adjusting your search or filter criteria"
+                  : "Get started by creating your first period allocation"}
+              </p>
+              {!searchTerm && filters.year === "all" && (
+                <button className="pa-btn-primary" onClick={handleCreatePeriod}>
+                  <i className="bi bi-plus-circle"></i>
+                  Create Period
+                </button>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="pa-table-wrapper">
+            <table className="pa-table">
+              <thead>
+                <tr>
+                  <th onClick={() => handleSort("period")} className="pa-th-sortable">
+                    <div className="pa-th-content">
+                      <span>Period</span>
+                      {getSortIcon("period")}
+                    </div>
+                  </th>
+                  <th onClick={() => handleSort("periodYear")} className="pa-th-sortable">
+                    <div className="pa-th-content">
+                      <span>Year</span>
+                      {getSortIcon("periodYear")}
+                    </div>
+                  </th>
+                  <th onClick={() => handleSort("allocatedAmount")} className="pa-th-sortable">
+                    <div className="pa-th-content">
+                      <span>Allocated Amount</span>
+                      {getSortIcon("allocatedAmount")}
+                    </div>
+                  </th>
+                  <th onClick={() => handleSort("subAllocationCount")} className="pa-th-sortable">
+                    <div className="pa-th-content">
+                      <span>Sub-Allocations</span>
+                      {getSortIcon("subAllocationCount")}
+                    </div>
+                  </th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentPageData.map((period) => (
+                  <tr key={period.periodAllocationId}>
+                    <td>
+                      <strong>{period.period || "Unknown"}</strong>
+                    </td>
+                    <td>
+                      <span className="pa-year-badge">{period.periodYear}</span>
+                    </td>
+                    <td>
+                      <span className="pa-amount-value">
+                        {formatCurrency(period.allocatedAmount)}
+                      </span>
+                    </td>
+                    <td>
+                      <span className="pa-sub-badge">
+                        {period.subAllocationCount || 0}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="pa-table-actions">
+                        <button
+                          className="pa-action-view"
+                          onClick={() => handleViewDetails(period)}
+                          title="View Details"
+                        >
+                          <i className="bi bi-eye"></i>
+                        </button>
+                        <button
+                          className="pa-action-edit"
+                          onClick={() => handleUpdatePeriod(period)}
+                          title="Edit Period"
+                        >
+                          <i className="bi bi-pencil"></i>
+                        </button>
+                        <button
+                          className="pa-action-allocate"
+                          onClick={() => handleAllocateFromPeriod(period)}
+                          title="Create Sub-Allocation"
+                        >
+                          <i className="bi bi-diagram-3"></i>
+                        </button>
+                        <button
+                          className="pa-action-delete"
+                          onClick={() => handleDeletePeriod(period)}
+                          title="Delete Period"
+                        >
+                          <i className="bi bi-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
       {showCreatePeriodModal && (
         <CreatePeriodAllocationModal
           budget={selectedBudget}

@@ -10,6 +10,7 @@ import {
 import ProfilePhotoUploadModal from "../components/auth/Modal/common/ProfilePhotoUploadModal";
 import EmployeeProfileService from "../services/auth/EmployeeProfileService";
 import { getEmployeeNominations } from "../services/performancemanagement/api/nominationapi";
+import "../styles/layout_styles/Navbar.css";
 
 const Navbar = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -112,70 +113,25 @@ const Navbar = () => {
 
   return (
     <>
-      <header
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 1000,
-          background: "#FFFFFF",
-          borderBottom: "1px solid #e5e7eb",
-          boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
-          height:"74px"
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "15px",
-            height: "70px", 
-          }}
-        >
+      <header className="nbd-navbar">
+        <div className="nbd-navbar-container">
           {/* Left Section */}
-          <div
-            style={{ 
-              display: "flex", 
-              alignItems: "center", 
-              gap: "0.5rem",
-              flexShrink: 0
-            }}
-          >
-            <div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                }}
-              >
-                <i
-                  className="bi bi-person-circle"
-                  style={{ fontSize: "16px", color: "#97247E" }}
-                />
-                <h6 style={{ 
-                  margin: 0, 
-                  fontSize: "16px",
-                  fontWeight: "bold", 
-                  color: "#97247E" 
-                }}>
-                  Welcome, {displayName}
-                </h6>
+          <div className="nbd-navbar-left">
+            <div className="nbd-welcome-section">
+              <div className="nbd-welcome-header">
+                <i className="bi bi-person-circle nbd-welcome-icon" />
+                <h6 className="nbd-welcome-text">Welcome, {displayName}</h6>
               </div>
-              <small style={{ 
-                color: "#6c757d", 
-                fontSize: "10px"
-              }}>
-                {formattedDate}
-              </small>
+              <small className="nbd-welcome-date">{formattedDate}</small>
             </div>
           </div>
 
           {/* Right Section */}
-          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-            {/* Congratulations Card - Compact version */}
+          <div className="nbd-navbar-right">
+            {/* Congratulations Card */}
             {hasNominations && (
               <div
+                className="nbd-congrats-card"
                 onClick={handleNavigateToNominations}
                 role="button"
                 tabIndex={0}
@@ -183,81 +139,14 @@ const Navbar = () => {
                   (e.key === "Enter" || e.key === " ") && handleNavigateToNominations()
                 }
                 aria-label="View Nominations"
-                style={{
-                  position: "relative",
-                  backgroundColor: "#f5f5f7",
-                  borderRadius: 12,
-                  padding: "0 12px",
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  border: "1px solid rgb(139, 17, 125)",
-                  overflow: "hidden",
-                  marginRight:"30px",
-                  marginTop:"11px",
-                  boxShadow : "0 4px 1px rgb(139, 17, 125)"
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow = "0 7px 1px rgb(139, 17, 125)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "0 4px 1px rgb(139, 17, 125)";
-                }}
               >
-                <div
-                  style={{
-                    width: "24px",
-                    height: "24px",
-                    borderRadius: "50%",
-                    background: "linear-gradient(135deg, #f9ca24 0%, #f39c12 100%)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: "12px",
-                      color: "#fff",
-                      filter: "drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2))",
-                    }}
-                  >
-                    ★
-                  </div>
+                <div className="nbd-congrats-icon">
+                  <div className="nbd-star-icon">★</div>
                 </div>
 
-                <div style={{ flex: 1, textAlign: "left", overflow: "hidden" }}>
-                  <div
-                    style={{
-                      fontSize: "13px",
-                      fontWeight: 700,
-                      color: "#1a1a1a",
-                      lineHeight: 1.2,
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      marginLeft:"25px"
-                    }}
-                  >
-                    Congratulations!
-                  </div>
-                  <div
-                    style={{
-                      fontSize: "12px",
-                      color: "#6b7280",
-                      fontWeight: 500,
-                      lineHeight: 1.6,
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      marginLeft:"20px"
-
-                    }}
-                  >
+                <div className="nbd-congrats-content">
+                  <div className="nbd-congrats-title">Congratulations!</div>
+                  <div className="nbd-congrats-subtitle">
                     {awardName || "Recognition earned"}
                   </div>
                 </div>
@@ -265,156 +154,51 @@ const Navbar = () => {
             )}
 
             {/* User Profile Dropdown */}
-            <div style={{ position: "relative" }}>
+            <div className="nbd-profile-wrapper">
               <button
+                className="nbd-profile-avatar"
                 onClick={() => setShowProfileMenu(!showProfileMenu)}
-                style={{
-                  width: "36px",
-                  height: "36px",
-                  borderRadius: "50%",
-                  color: "#FFFFFF",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                  background: profilePhoto
-                    ? "transparent"
-                    : "linear-gradient(135deg, #AC5098 0%, #97247E 100%)",
-                  border: profilePhoto ? "2px solid #97247E" : "none",
-                  boxShadow: "0 2px 8px rgba(151, 36, 126, 0.3)",
-                  fontSize: "0.75rem",
-                  padding: 0,
-                  overflow: "hidden",
-                }}
+                aria-label="User profile menu"
               >
                 {profilePhoto ? (
                   <img
                     src={profilePhoto}
                     alt="Profile"
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      borderRadius: "50%",
-                    }}
+                    className="nbd-profile-photo"
                   />
                 ) : (
-                  initials
+                  <span className="nbd-profile-initials">{initials}</span>
                 )}
               </button>
 
               {/* Profile Dropdown Menu */}
               {showProfileMenu && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "46px",
-                    right: 0,
-                    minWidth: "280px",
-                    borderRadius: "12px",
-                    border: "1px solid #e5e7eb",
-                    boxShadow: "0 10px 40px rgba(0, 0, 0, 0.15)",
-                    padding: 0,
-                    background: "#FFFFFF",
-                    zIndex: 1001,
-                  }}
-                >
+                <div className="nbd-dropdown-menu">
                   {/* Profile Header */}
-                  <div
-                    style={{
-                      padding: "1.25rem",
-                      textAlign: "center",
-                      borderBottom: "1px solid #e5e7eb",
-                      
-                    }}
-                  >
-                    <div
-                      style={{
-                        position: "relative",
-                        width: "64px",
-                        height: "64px",
-                        margin: "0 auto 0.75rem",
-                        display: "inline-block",
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: "64px",
-                          height: "64px",
-                          borderRadius: "50%",
-                          color: "#FFFFFF",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontWeight: "bold",
-                          background: profilePhoto
-                            ? "transparent"
-                            : "linear-gradient(135deg, #AC5098 0%, #97247E 100%)",
-                          border: "3px solid #e5e7eb",
-                          fontSize: "1.25rem",
-                          boxShadow: "0 4px 12px rgba(151, 36, 126, 0.3)",
-                          overflow: "hidden",
-                        }}
-                      >
+                  <div className="nbd-dropdown-header">
+                    <div className="nbd-dropdown-avatar-wrapper">
+                      <div className="nbd-dropdown-avatar">
                         {profilePhoto ? (
                           <img
                             src={profilePhoto}
                             alt="Profile"
-                            style={{
-                              width: "100%",
-                              height: "100%",
-                              objectFit: "cover",
-                              borderRadius: "50%",
-                            }}
+                            className="nbd-dropdown-photo"
                           />
                         ) : (
-                          initials
+                          <span className="nbd-dropdown-initials">{initials}</span>
                         )}
                       </div>
                     </div>
 
-                    <h5
-                      style={{
-                        fontWeight: "bold",
-                        marginBottom: "0.25rem",
-                        fontSize: "16px",
-                        color: "#97247E",
-                      }}
-                    >
-                      {displayName}
-                    </h5>
-                    <p
-                      style={{
-                        color: "#6c757d",
-                        marginBottom: "0",
-                        fontSize: "13px",
-                      }}
-                    >
-                      {displayEmail}
-                    </p>
+                    <h5 className="nbd-dropdown-name">{displayName}</h5>
+                    <p className="nbd-dropdown-email">{displayEmail}</p>
                   </div>
 
                   {/* Profile Actions */}
-                  <div style={{ padding: "0.75rem" }}>
+                  <div className="nbd-dropdown-actions">
                     <button
                       onClick={handleProfile}
-                      style={{
-                        width: "100%",
-                        marginBottom: "0.5rem",
-                        padding: "0.5rem",
-                        fontWeight: "600",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "0.5rem",
-                        backgroundColor: "#3f4d8f",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "8px",
-                        fontSize: "14px",
-                        cursor: "pointer",
-                      }}
+                      className="nbd-action-btn nbd-action-btn-primary"
                     >
                       <i className="bi bi-person"></i>
                       Profile
@@ -422,22 +206,7 @@ const Navbar = () => {
 
                     <button
                       onClick={handleChangePassword}
-                      style={{
-                        width: "100%",
-                        marginBottom: "0.5rem",
-                        padding: "0.5rem",
-                        fontWeight: "600",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "0.5rem",
-                        backgroundColor: "#3f4d8f",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "8px",
-                        fontSize: "14px",
-                        cursor: "pointer",
-                      }}
+                      className="nbd-action-btn nbd-action-btn-primary"
                     >
                       <i className="bi bi-key"></i>
                       Change Password
@@ -445,21 +214,7 @@ const Navbar = () => {
 
                     <button
                       onClick={handleLogout}
-                      style={{
-                        width: "100%",
-                        padding: "0.5rem",
-                        fontWeight: "600",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "0.5rem",
-                        backgroundColor: "transparent",
-                        color: "#dc3545",
-                        border: "1px solid #dc3545",
-                        borderRadius: "8px",
-                        fontSize: "14px",
-                        cursor: "pointer",
-                      }}
+                      className="nbd-action-btn nbd-action-btn-danger"
                     >
                       <i className="bi bi-box-arrow-right"></i>
                       Logout
@@ -475,14 +230,7 @@ const Navbar = () => {
       {/* Backdrop */}
       {showProfileMenu && (
         <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 999,
-          }}
+          className="nbd-backdrop"
           onClick={() => setShowProfileMenu(false)}
         />
       )}

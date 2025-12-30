@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import budgetAllocationService from "../../../../services/hr_operations/hr/budgetAllocationService";
@@ -6,8 +5,7 @@ import AllocationsList from "../../../../components/hr_operations/modals/Allocat
 import Breadcrumb from "../../../../components/common/Breadcrumb";
 import { FaSearch } from "react-icons/fa";
 import { Form } from "react-bootstrap";
-import "../../../../styles/hr_operations/hr/BudgetAllocation.css";
-import "../../../../styles/hr_operations/hr/AllocationsList.css";
+import "../../../../styles/hr_operations/hr/DeptHeadReviewModal.css";
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
 
 const YearDropdown = ({ value, onChange, options }) => {
@@ -22,26 +20,26 @@ const YearDropdown = ({ value, onChange, options }) => {
 
   return (
     <div
-      className="budget-filter-select custom-year-dropdown"
+      className="budget-filter-select custom-status-dropdown"
       tabIndex={0}
       onBlur={() => setTimeout(() => setOpen(false), 200)}
       style={{ position: "relative" }}
     >
       <div
-        className="custom-year-selected"
+        className="custom-status-selected"
         onClick={() => setOpen((prev) => !prev)}
       >
         {selected.label}
-        <span className="custom-year-arrow" />
+        <span className="custom-status-arrow" />
       </div>
       {open && (
-        <div className="custom-year-menu">
+        <div className="custom-status-menu">
           {allOptions.map((opt) => (
             <div
               key={opt.value}
               className={
-                "custom-year-option" +
-                (opt.value === value ? " custom-year-option-active" : "")
+                "custom-status-option" +
+                (opt.value === value ? " custom-status-option-active" : "")
               }
               onClick={() => handleSelect(opt.value)}
             >
@@ -69,26 +67,26 @@ const DepartmentDropdown = ({ value, onChange, options }) => {
 
   return (
     <div
-      className="budget-filter-select custom-department-dropdown"
+      className="budget-filter-select custom-status-dropdown"
       tabIndex={0}
       onBlur={() => setTimeout(() => setOpen(false), 200)}
       style={{ position: "relative" }}
     >
       <div
-        className="custom-department-selected"
+        className="custom-status-selected"
         onClick={() => setOpen((prev) => !prev)}
       >
         {selected.label}
-        <span className="custom-department-arrow" />
+        <span className="custom-status-arrow" />
       </div>
       {open && (
-        <div className="custom-department-menu">
+        <div className="custom-status-menu">
           {allOptions.map((opt) => (
             <div
               key={opt.value || "all-dept"}
               className={
-                "custom-department-option" +
-                (opt.value === value ? " custom-department-option-active" : "")
+                "custom-status-option" +
+                (opt.value === value ? " custom-status-option-active" : "")
               }
               onClick={() => handleSelect(opt.value)}
             >
@@ -302,13 +300,12 @@ const DepartmentHeadBudgetView = () => {
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
-        <p>Loading budget data...</p>
       </div>
     );
   }
 
   return (
-    <div className="budget-root">
+    <div className="budget-page">
       {!selectedBudgetForAllocations ? (
         <>
           <Breadcrumb
@@ -319,77 +316,70 @@ const DepartmentHeadBudgetView = () => {
             ]}
           />
 
-          {error && (
-            <div className="alert alert-warning budget-alert" role="alert">
-              <i className="bi bi-exclamation-triangle-fill me-2"></i>
-              {error}
-            </div>
-          )}
-
           {filteredBudgets.length > 0 && (
-            <div className="budget-summary-cards">
-              <div className="budget-summary-card total">
-                <div className="summary-card-icon">
+            <div className="stats-cards-budget">
+              <div className="stat-card-budget stat-total-budget">
+                <div className="stat-icon-budget">
                   <i className="bi bi-wallet2"></i>
                 </div>
-                <div className="summary-card-content">
-                  <div className="summary-card-value">{formatCurrency(summaryStats.totalBudget)}</div>
-                  <div className="summary-card-label">Total Budget</div>
+                <div className="stat-content-budget">
+                  <div className="stat-value-budget">{formatCurrency(summaryStats.totalBudget)}</div>
+                  <div className="stat-label-budget">Total Budget</div>
                 </div>
               </div>
 
-              <div className="budget-summary-card allocated">
-                <div className="summary-card-icon">
+              <div className="stat-card-budget stat-allocated-budget">
+                <div className="stat-icon-budget">
                   <i className="bi bi-cash-stack"></i>
                 </div>
-                <div className="summary-card-content">
-                  <div className="summary-card-value">{formatCurrency(summaryStats.totalAllocated)}</div>
-                  <div className="summary-card-label">Total Allocated</div>
+                <div className="stat-content-budget">
+                  <div className="stat-value-budget">{formatCurrency(summaryStats.totalAllocated)}</div>
+                  <div className="stat-label-budget">Total Allocated</div>
                 </div>
               </div>
 
-              <div className="budget-summary-card utilized">
-                <div className="summary-card-icon">
+              <div className="stat-card-budget stat-utilized-budget">
+                <div className="stat-icon-budget">
                   <i className="bi bi-graph-up-arrow"></i>
                 </div>
-                <div className="summary-card-content">
-                  <div className="summary-card-value">{formatCurrency(summaryStats.totalUtilized)}</div>
-                  <div className="summary-card-label">Total Utilized</div>
+                <div className="stat-content-budget">
+                  <div className="stat-value-budget">{formatCurrency(summaryStats.totalUtilized)}</div>
+                  <div className="stat-label-budget">Total Utilized</div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* FILTER SECTION - SAME AS LEADERSHIP PAGE */}
-          <div className="budget-filter-section">
-            <div className="budget-filter-row-single">
-              <div className="budget-search-input">
-                <div className="budget-search-inner">
-                  <span className="budget-search-icon">
-                    <FaSearch />
-                  </span>
-                  <Form.Control
-                    type="text"
-                    placeholder="Search by department..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    onKeyPress={(e) => {
-                      if (e.key === "Enter") {
-                        handleSearch();
-                      }
-                    }}
-                    className="budget-search-field"
-                  />
-                  <button
-                    type="button"
-                    className="budget-search-btn"
-                    onClick={handleSearch}
-                  >
-                    Search
-                  </button>
-                </div>
+          {/* CONTROLS */}
+          <div className="budget-controls">
+            <div className="budget-search-input">
+              <div className="budget-search-inner">
+                <span className="budget-search-icon">
+                  <FaSearch />
+                </span>
+                <Form.Control
+                  type="text"
+                  placeholder="Search by department..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      handleSearch();
+                    }
+                  }}
+                  className="budget-search-field"
+                />
+                <button
+                  type="button"
+                  className="budget-search-btn"
+                  onClick={handleSearch}
+                >
+                  Search
+                </button>
               </div>
+            </div>
 
+            <div className="budget-year-filter">
               <YearDropdown
                 value={filters.year}
                 onChange={handleFilterChange}
@@ -398,129 +388,130 @@ const DepartmentHeadBudgetView = () => {
                   value: year.toString(),
                 }))}
               />
+            </div>
 
+            <div className="budget-department-filter">
               <DepartmentDropdown
                 value={filters.department}
                 onChange={handleFilterChange}
                 options={filterOptions.departments}
               />
+            </div>
 
-              <button className="budget-clear-btn" onClick={clearFilters}>
-                Clear Filters
-              </button>
+            <button className="budget-btn-clear" onClick={clearFilters}>
+              Clear Filters
+            </button>
 
-              <div className="budget-results-count-inline">
-                Showing {filteredBudgets.length} of {budgets.length} budgets
-              </div>
+            <div className="budget-results-count">
+              Showing {filteredBudgets.length}{" "}
+              {filteredBudgets.length === 1 ? "budget" : "budgets"}
             </div>
           </div>
 
           {filteredBudgets.length === 0 ? (
-            <div className="budget-alert-empty">
-              <i className="bi bi-inbox"></i>
-              <h4 style={{ marginTop: "16px", color: "#64748b" }}>
-                No Budget Found
-              </h4>
-              <p style={{ color: "#94a3b8" }}>
-                {budgets.length === 0 
-                  ? `No budget has been allocated for ${userDepartmentName} department yet.`
-                  : "No budgets match your search criteria."
-                }
-              </p>
-              {budgets.length === 0 && (
-                <small style={{ color: "#cbd5e1" }}>
-                  Contact HR or Leadership to allocate budget for your department.
-                </small>
-              )}
+            <div className="budget-table-card">
+              <div className="budget-empty-state">
+                <div className="budget-empty-content">
+                  <i className="bi bi-inbox"></i>
+                  <h4>No Budget Found</h4>
+                  <p>
+                    {budgets.length === 0
+                      ? `No budget has been allocated for ${userDepartmentName} department yet.`
+                      : "No budgets match your search criteria."}
+                  </p>
+                  {budgets.length === 0 && (
+                    <small>
+                      Contact HR or Leadership to allocate budget for your department.
+                    </small>
+                  )}
+                </div>
+              </div>
             </div>
           ) : (
-            <div className="budget-table-container">
-              <table className="budget-table">
-                <thead>
-                  <tr>
-                    <th>Department</th>
-                    <th>Fiscal Year</th>
-                    <th>Total Budget</th>
-                    <th>Allocated</th>
-                    <th>Utilized</th>
-                    <th>Remaining</th>
-                    <th>Utilization</th>
-                    <th>Status</th>
-                    <th className="budget-text-center budget-actions-header">Update</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredBudgets.map((budget) => {
-                    const remaining =
-                      (budget.allocatedAmount || 0) -
-                      (budget.utilizedAmount || 0);
-                    const status = getUtilizationStatus(
-                      budget.utilizationPercentage
-                    );
+            <div className="budget-table-card">
+              <div className="budget-table-wrapper">
+                <table className="budget-table">
+                  <thead>
+                    <tr>
+                      <th>Department</th>
+                      <th>Fiscal Year</th>
+                      <th>Total Budget</th>
+                      <th>Allocated</th>
+                      <th>Utilized</th>
+                      <th>Remaining</th>
+                      <th>Utilization</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredBudgets.map((budget) => {
+                      const remaining =
+                        (budget.allocatedAmount || 0) -
+                        (budget.utilizedAmount || 0);
+                      const status = getUtilizationStatus(
+                        budget.utilizationPercentage
+                      );
 
-                    return (
-                      <tr key={budget.budgetId}>
-                        <td>
-                          <strong>{budget.departmentName}</strong>
-                        </td>
-                        <td>{budget.fiscalYear}</td>
-                        <td>{formatCurrency(budget.totalBudget)}</td>
-                        <td style={{ color: "#3b82f6", fontWeight: "600" }}>
-                          {formatCurrency(budget.allocatedAmount || 0)}
-                        </td>
-                        <td style={{ color: "#ef4444", fontWeight: "600" }}>
-                          {formatCurrency(budget.utilizedAmount || 0)}
-                        </td>
-                        <td style={{ color: "#10b981", fontWeight: "600" }}>
-                          {formatCurrency(remaining)}
-                        </td>
-                        <td>
-                          <div className="budget-progress-container">
-                            <div
-                              className="budget-progress-bar"
+                      return (
+                        <tr key={budget.budgetId}>
+                          <td>
+                            <strong>{budget.departmentName}</strong>
+                          </td>
+                          <td>{budget.fiscalYear}</td>
+                          <td>{formatCurrency(budget.totalBudget)}</td>
+                          <td className="budget-allocated-cell">
+                            {formatCurrency(budget.allocatedAmount || 0)}
+                          </td>
+                          <td className="budget-utilized-cell">
+                            {formatCurrency(budget.utilizedAmount || 0)}
+                          </td>
+                          <td className="budget-remaining-cell">
+                            {formatCurrency(remaining)}
+                          </td>
+                          <td>
+                            <div className="budget-progress-container">
+                              <div
+                                className="budget-progress-bar"
+                                style={{
+                                  width: `${Math.min(budget.utilizationPercentage || 0, 100)}%`,
+                                  backgroundColor: getUtilizationColor(
+                                    budget.utilizationPercentage
+                                  ),
+                                }}
+                              ></div>
+                              <span className="budget-progress-text">
+                                {Math.round(budget.utilizationPercentage || 0)}%
+                              </span>
+                            </div>
+                          </td>
+                          <td>
+                            <span
+                              className="budget-status-badge"
                               style={{
-                                width: `${Math.min(budget.utilizationPercentage || 0, 100)}%`,
-                                backgroundColor: getUtilizationColor(
-                                  budget.utilizationPercentage
-                                ),
+                                backgroundColor: status.color,
                               }}
-                            ></div>
-                            <span className="budget-progress-text">
-                              {Math.round(budget.utilizationPercentage || 0)}%
-                            </span>
-                          </div>
-                        </td>
-                        <td>
-                          <span
-                            className="badge"
-                            style={{
-                              backgroundColor: status.color,
-                              color: "white",
-                              padding: "4px 10px",
-                              borderRadius: "12px",
-                              fontSize: "11px",
-                              fontWeight: "600",
-                            }}
-                          >
-                            {status.text}
-                          </span>
-                        </td>
-                        <td>
-                          <div className="action-buttons">
-                            <button
-                              className="action-btn action-btn-edit"
-                              onClick={() => handleShowAllocations(budget)}
-                              title="View & Update Allocations"
                             >
-                              <i className="bi bi-eye"></i>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                              {status.text}
+                            </span>
+                          </td>
+                          <td>
+                            <div className="budget-table-actions">
+                              <button
+                                className="budget-action-view"
+                                onClick={() => handleShowAllocations(budget)}
+                                title="View & Update Allocations"
+                              >
+                                <i className="bi bi-eye"></i>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </>
