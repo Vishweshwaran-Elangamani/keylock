@@ -1,45 +1,27 @@
 import React, { useEffect, useState } from "react";
-
 import { useNavigate } from "react-router-dom";
-
-import api from "../../../services/performancemanagement/api/api";
+import { getAllSubmittedAssessments } from "../../../services/performancemanagement/api/api";
 
 function HRSubmittedAssessments() {
-
   const [submissions, setSubmissions] = useState([]);
-
   const [loading, setLoading] = useState(true);
-
   const navigate = useNavigate();
 
   useEffect(() => {
-
     const fetchData = async () => {
-
       try {
-
-        const res = await api.get("/all-details");
-
+        const res = await getAllSubmittedAssessments();
         if (res.data.success) {
-
           setSubmissions(res.data.data);
-
         }
-
       } catch (err) {
-
         console.error(err);
-
       } finally {
-
         setLoading(false);
-
       }
-
     };
 
     fetchData();
-
   }, []);
 
   if (loading) return <div>Loading...</div>;
@@ -57,7 +39,6 @@ function HRSubmittedAssessments() {
           </tr>
         </thead>
         <tbody>
-
           {submissions.map((sub) => (
             <tr key={`${sub.EmployeeId}-${sub.ProjectName}`} style={{ borderBottom: "1px solid #ccc" }}>
               <td>{sub.EmployeeName}</td>
@@ -65,29 +46,20 @@ function HRSubmittedAssessments() {
               <td>{sub.SelfAssessmentSubmittedAt ? new Date(sub.SelfAssessmentSubmittedAt).toLocaleDateString() : "Pending"}</td>
               <td>
                 <button
-
                   onClick={() =>
-
                     navigate(`/view/submissions/${sub.EmployeeId}/${sub.ProjectName}`)
-
                   }
-
                   style={{ padding: "5px 10px", cursor: "pointer" }}
                 >
-
                   View Details
                 </button>
               </td>
             </tr>
-
           ))}
         </tbody>
       </table>
     </div>
-
   );
-
 }
-
 
 export default HRSubmittedAssessments;

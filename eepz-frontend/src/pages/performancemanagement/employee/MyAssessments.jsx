@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Toaster, toast } from "sonner";
-import api from "../../../services/performancemanagement/api/api";
+import { 
+  getEmployeeAssignments, 
+  submitSelfAssessment, 
+  viewSelfAssessment,
+  downloadAttachment 
+} from "../../../services/performancemanagement/api/api";
 import logoImage from "../../../assets/logodark.png";
 import "../../../styles/performancemanagement/employee/MyAssessments.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
@@ -126,7 +131,6 @@ function MyAssessments() {
     try {
       setDownloadingAttachmentId(attachment.attachmentId);
       
-      // ✅ Use centralized API function
       const response = await downloadAttachment(attachment.attachmentId);
   
       // Get the blob from response.data
@@ -183,7 +187,7 @@ function MyAssessments() {
   };
   
 
-   const fetchAssignments = async () => {
+  const fetchAssignments = async () => {
     setLoading(true);
     try {
       const { data } = await getEmployeeAssignments(userId);
@@ -220,7 +224,7 @@ function MyAssessments() {
     setModalMode("view");
     setSubmitting(true);
     try {
-      const { data } = await viewSelfAssessment(assignment.formId, userId);
+     const { data } = await viewSelfAssessment(assignment.formId, userId);
       if (data.success) {
         const viewData = (data.data.details || []).map((detail) => ({
           competencyId: detail.competencyId,
@@ -243,7 +247,7 @@ function MyAssessments() {
       setSubmitting(false);
     }
   };
-  
+
   const updateAssessmentData = (competencyId, field, value) => {
     setAssessmentData((prev) =>
       prev.map((item) => (item.competencyId === competencyId ? { ...item, [field]: value } : item))
@@ -293,7 +297,7 @@ function MyAssessments() {
     setAttachments((prev) => prev.filter((_, i) => i !== index));
   };
 
-const handleSubmitAssessment = async () => {
+  const handleSubmitAssessment = async () => {
     const incompleteRatings = assessmentData.filter((item) => !item.rating);
     if (incompleteRatings.length > 0) {
       toast.error("Please provide ratings for all competencies.");
@@ -327,7 +331,7 @@ const handleSubmitAssessment = async () => {
     };
 
     try {
-      const { data } = await submitSelfAssessment(payload);
+     const { data } = await submitSelfAssessment(payload);
       if (data.success) {
         toast.success("Assessment submitted successfully!");
         setShowModal(false);
@@ -352,7 +356,6 @@ const handleSubmitAssessment = async () => {
       setSubmitting(false);
     }
   };
-
 
   const pendingAssignments = assignments.filter((a) => !a.isCompleted);
   const completedAssignments = assignments.filter((a) => a.isCompleted);

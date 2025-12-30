@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../../../services/performancemanagement/api/api";
+import { getAllAppraisalDetails } from "../../../services/performancemanagement/api/api";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import AppraisalDetailsModal from "../../../components/performance_management/modals/HRViewAssessment/AppraisalDetailsModal";
 import "../../../styles/performancemanagement/hr/HRViewAssessment.css";
@@ -239,7 +239,7 @@ function HRViewAppraisals() {
   useEffect(() => {
     async function fetchAppraisals() {
       try {
-        const response = await api.get("/AssessmentDetails/all-details");
+        const response = await getAllAppraisalDetails();
         if (response.data?.success) {
           const initiatedAppraisals = response.data.data.filter((appraisal) => {
             const hasInitiatedCompetency = appraisal.competencies.some((comp) => {
@@ -417,175 +417,175 @@ function HRViewAppraisals() {
         ]}
       />
 
-<div
-  className="hrvasspm-filters"
-  style={{
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    flexWrap: "wrap"
-  }}
->
-  {/* Unified Search Component */}
-  <div className="hrvasspm-filter-group" style={{ gap: 0 }}>
-    <input
-      type="search"
-      placeholder="Type to search..."
-      value={searchInput}
-      onChange={(e) => setSearchInput(e.target.value)}
-      onKeyPress={(e) => {
-        if (e.key === 'Enter') {
-          setSearchTerm(searchInput);
-          setCurrentPage(1);
-        }
-      }}
-    />
-    <button
-      onClick={() => {
-        setSearchTerm(searchInput);
-        setCurrentPage(1);
-      }}
-      className="hrvasspm-search-btn"
-    >
-      Search
-    </button>
-  </div>
+      <div
+        className="hrvasspm-filters"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          flexWrap: "wrap"
+        }}
+      >
+        {/* Unified Search Component */}
+        <div className="hrvasspm-filter-group" style={{ gap: 0 }}>
+          <input
+            type="search"
+            placeholder="Type to search..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                setSearchTerm(searchInput);
+                setCurrentPage(1);
+              }
+            }}
+          />
+          <button
+            onClick={() => {
+              setSearchTerm(searchInput);
+              setCurrentPage(1);
+            }}
+            className="hrvasspm-search-btn"
+          >
+            Search
+          </button>
+        </div>
 
-  <StatusDropdown
-    value={filterStatus}
-    onChange={(val) => {
-      setFilterStatus(val);
-      setCurrentPage(1);
-    }}
-  />
+        <StatusDropdown
+          value={filterStatus}
+          onChange={(val) => {
+            setFilterStatus(val);
+            setCurrentPage(1);
+          }}
+        />
 
-  <ProjectDropdown
-    value={filterProject}
-    onChange={(val) => {
-      setFilterProject(val);
-      setCurrentPage(1);
-    }}
-    projects={uniqueProjects}
-  />
+        <ProjectDropdown
+          value={filterProject}
+          onChange={(val) => {
+            setFilterProject(val);
+            setCurrentPage(1);
+          }}
+          projects={uniqueProjects}
+        />
 
-  <button
-    className="hrvasspm-clear-filters-btn"
-    onClick={handleClearFilters}
-  >
-    Clear Filters
-  </button>
+        <button
+          className="hrvasspm-clear-filters-btn"
+          onClick={handleClearFilters}
+        >
+          Clear Filters
+        </button>
 
-  <div style={{ marginLeft: "auto" }}>
-    <button
-      className="hrvasspm-btn-export"
-      onClick={() => exportToCsv("appraisals.csv", csvData)}
-    >
-      <i className="bi bi-download"></i> Export CSV
-    </button>
-  </div>
-
-
-        <div className="hrvasspm-table-card">
-          <div className="hrvasspm-table-wrapper">
-            <table className="hrvasspm-table">
-              <thead>
-                <tr>
-                  <th>Employee Name</th>
-                  <th>Project Name</th>
-                  <th>Emp Avg</th>
-                  <th>L1 Reviewer</th>
-                  <th>L1 Avg</th>
-                  <th>L2 Reviewer</th>
-                  <th>L2 Avg</th>
-                  <th>Status</th>
-                  <th className="text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentItems.length === 0 ? (
-                  <tr>
-                    <td colSpan={9} className="hrvasspm-empty-state">
-                      <i className="bi bi-inbox"></i>
-                      <p>No appraisals match your filters</p>
-                    </td>
-                  </tr>
-                ) : (
-                  currentItems.map((row) => (
-                    <tr key={row.key}>
-                      <td>{row.employeeName}</td>
-                      <td>{row.projectName}</td>
-                      <td style={{ textAlign: "center" }}>{row.empAvg}</td>
-                      <td>{row.l1ReviewerName}</td>
-                      <td style={{ textAlign: "center" }}>{row.l1Avg}</td>
-                      <td>{row.l2ReviewerName}</td>
-                      <td style={{ textAlign: "center" }}>{row.l2Avg}</td>
-                      <td>{statusBadge(row.status)}</td>
-                      <td>
-                        <div className="hrvasspm-action-buttons">
-                          <button
-                            className="hrvasspm-action-btn hrvasspm-btn-view"
-                            title="View Details"
-                            onClick={() => handleViewDetails(row)}
-                          >
-                            <i className="bi bi-eye"></i>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="hrvasspm-pagination-container">
-            <div className="hrvasspm-pagination-info">
-              <span className="hrvasspm-pagination-label">Show</span>
-              <RowsPerPageDropdown
-                value={rowsPerPage}
-                onChange={(val) => {
-                  setRowsPerPage(val);
-                  setCurrentPage(1);
-                }}
-              />
-              <span className="hrvasspm-pagination-label">entries</span>
-            </div>
-            <div className="hrvasspm-pagination-status">
-              Showing {summaryRows.length === 0 ? 0 : indexOfFirstItem + 1} to {Math.min(indexOfLastItem, summaryRows.length)} of{" "}
-              {summaryRows.length} entries
-            </div>
-            <nav className="hrvasspm-pagination-nav">
-              <ul className="hrvasspm-pagination">
-                <li className={`hrvasspm-page-item${currentPage === 1 ? " hrvasspm-disabled" : ""}`}>
-                  <button className="hrvasspm-page-link" onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
-                    <i className="bi bi-chevron-left"></i>
-                  </button>
-                </li>
-                {getPageNumbers().map((page, idx) => (
-                  <li
-                    key={idx}
-                    className={`hrvasspm-page-item${page === currentPage ? " hrvasspm-active" : ""} ${typeof page !== "number" ? " hrvasspm-disabled" : ""
-                      }`}
-                  >
-                    <button className="hrvasspm-page-link" onClick={() => typeof page === "number" && setCurrentPage(page)} disabled={typeof page !== "number"}>
-                      {page}
-                    </button>
-                  </li>
-                ))}
-                <li className={`hrvasspm-page-item${currentPage === totalPages ? " hrvasspm-disabled" : ""}`}>
-                  <button
-                    className="hrvasspm-page-link"
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                  >
-                    <i className="bi bi-chevron-right"></i>
-                  </button>
-                </li>
-              </ul>
-            </nav>
-          </div>
+        <div style={{ marginLeft: "auto" }}>
+          <button
+            className="hrvasspm-btn-export"
+            onClick={() => exportToCsv("appraisals.csv", csvData)}
+          >
+            <i className="bi bi-download"></i> Export CSV
+          </button>
         </div>
       </div>
+
+      <div className="hrvasspm-table-card">
+        <div className="hrvasspm-table-wrapper">
+          <table className="hrvasspm-table">
+            <thead>
+              <tr>
+                <th>Employee Name</th>
+                <th>Project Name</th>
+                <th>Emp Avg</th>
+                <th>L1 Reviewer</th>
+                <th>L1 Avg</th>
+                <th>L2 Reviewer</th>
+                <th>L2 Avg</th>
+                <th>Status</th>
+                <th className="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentItems.length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="hrvasspm-empty-state">
+                    <i className="bi bi-inbox"></i>
+                    <p>No appraisals match your filters</p>
+                  </td>
+                </tr>
+              ) : (
+                currentItems.map((row) => (
+                  <tr key={row.key}>
+                    <td>{row.employeeName}</td>
+                    <td>{row.projectName}</td>
+                    <td style={{ textAlign: "center" }}>{row.empAvg}</td>
+                    <td>{row.l1ReviewerName}</td>
+                    <td style={{ textAlign: "center" }}>{row.l1Avg}</td>
+                    <td>{row.l2ReviewerName}</td>
+                    <td style={{ textAlign: "center" }}>{row.l2Avg}</td>
+                    <td>{statusBadge(row.status)}</td>
+                    <td>
+                      <div className="hrvasspm-action-buttons">
+                        <button
+                          className="hrvasspm-action-btn hrvasspm-btn-view"
+                          title="View Details"
+                          onClick={() => handleViewDetails(row)}
+                        >
+                          <i className="bi bi-eye"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="hrvasspm-pagination-container">
+          <div className="hrvasspm-pagination-info">
+            <span className="hrvasspm-pagination-label">Show</span>
+            <RowsPerPageDropdown
+              value={rowsPerPage}
+              onChange={(val) => {
+                setRowsPerPage(val);
+                setCurrentPage(1);
+              }}
+            />
+            <span className="hrvasspm-pagination-label">entries</span>
+          </div>
+          <div className="hrvasspm-pagination-status">
+            Showing {summaryRows.length === 0 ? 0 : indexOfFirstItem + 1} to {Math.min(indexOfLastItem, summaryRows.length)} of{" "}
+            {summaryRows.length} entries
+          </div>
+          <nav className="hrvasspm-pagination-nav">
+            <ul className="hrvasspm-pagination">
+              <li className={`hrvasspm-page-item${currentPage === 1 ? " hrvasspm-disabled" : ""}`}>
+                <button className="hrvasspm-page-link" onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
+                  <i className="bi bi-chevron-left"></i>
+                </button>
+              </li>
+              {getPageNumbers().map((page, idx) => (
+                <li
+                  key={idx}
+                  className={`hrvasspm-page-item${page === currentPage ? " hrvasspm-active" : ""} ${typeof page !== "number" ? " hrvasspm-disabled" : ""
+                    }`}
+                >
+                  <button className="hrvasspm-page-link" onClick={() => typeof page === "number" && setCurrentPage(page)} disabled={typeof page !== "number"}>
+                    {page}
+                  </button>
+                </li>
+              ))}
+              <li className={`hrvasspm-page-item${currentPage === totalPages ? " hrvasspm-disabled" : ""}`}>
+                <button
+                  className="hrvasspm-page-link"
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                >
+                  <i className="bi bi-chevron-right"></i>
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+
       {modalRow && (
         <AppraisalDetailsModal
           show={!!modalRow}

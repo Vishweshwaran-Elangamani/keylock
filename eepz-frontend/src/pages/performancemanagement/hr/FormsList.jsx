@@ -2,7 +2,13 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import api from "../../../services/performancemanagement/api/api";
+import {
+  getCurrentUser,
+  getAllForms,
+  getFormAssignments,
+  getUpcomingEligibleUsers,
+  initiateAssignments,
+} from "../../../services/performancemanagement/api/api";
 import { apiPort5113 } from "../../../services/performancemanagement/api/rolesapi";
 import ViewFormDetailsModal from "../../../components/performance_management/modals/FormsList/ViewFormDetailsModal";
 import DeadlineModal from "../../../components/performance_management/modals/FormsList/DeadlineModal";
@@ -249,7 +255,6 @@ function FormsList() {
     "All",
     ...new Set(rows.map((f) => f.type).filter(Boolean)),
   ], [rows]);
-  const formDeliveryOptions = ["All", "Delivery", "Enablement"];
 
   const analyticsIcons = {
     "Total Forms": "bi-journal-text",
@@ -281,6 +286,7 @@ function FormsList() {
     );
   }
 
+  // UPDATED: Fetch current user
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
@@ -289,7 +295,7 @@ function FormsList() {
           setCurrentUserId(parseInt(storedUserId));
           return;
         }
-        const res = await api.get("/Auth/current-user");
+        const res = await getCurrentUser();
         const userId = res.data?.data?.userId || res.data?.userId;
         if (userId) {
           setCurrentUserId(userId);
@@ -304,10 +310,10 @@ function FormsList() {
     fetchCurrentUser();
   }, []);
 
+  // UPDATED: Fetch all forms
   useEffect(() => {
     let mounted = true;
-    api
-      .get("/FormManagement/all")
+    getAllForms()
       .then(({ data }) => {
         if (!mounted) return;
         const payload = data?.data ?? [];
@@ -318,9 +324,10 @@ function FormsList() {
     return () => (mounted = false);
   }, []);
 
+  // UPDATED: Fetch assigned users
   const fetchAssignedUsers = useCallback(async (formId) => {
     try {
-      const response = await api.get(`/Assignments/form/${formId}`);
+      const response = await getFormAssignments(formId);
       const apiData = response.data?.data || response.data || [];
       const ids = apiData
         .filter((a) => (a.action || a.Action) === "Send")
@@ -332,6 +339,7 @@ function FormsList() {
     }
   }, []);
 
+  // UPDATED: Fetch users based on form type
   useEffect(() => {
     if (!selectedFormId) {
       setUsers([]);
@@ -354,7 +362,7 @@ function FormsList() {
             ? managersRes.data.data
             : [];
         } else {
-          const usersRes = await api.get("/Assignments/upcoming-eligible");
+          const usersRes = await getUpcomingEligibleUsers();
           filteredUsersData = Array.isArray(usersRes.data?.data)
             ? usersRes.data.data
             : [];
@@ -521,6 +529,7 @@ function FormsList() {
     await shareFormToUsers(pendingAction);
   };
 
+  // UPDATED: Share form to users
   const shareFormToUsers = async (actionType = "Send") => {
     if (!currentUserId) {
       toast.error(
@@ -541,7 +550,7 @@ function FormsList() {
         deadlineInDays: deadlineInDays || 7,
       };
 
-      const { data } = await api.post("/Assignments/initiate", payload);
+      const { data } = await initiateAssignments(payload);
 
       if (data?.success) {
         const appraisals = data.data || [];
@@ -600,7 +609,7 @@ function FormsList() {
         e?.response?.data?.title ||
         (actionType === "Send" ? "Failed to share form." : "Failed to save draft.");
       toast.error(errorMsg, { id: loadingToast });
-      console.error(" Error details:", e.response?.data);
+      console.error("❌ Error details:", e.response?.data);
     } finally {
       setSharing(false);
     }
@@ -686,69 +695,68 @@ function FormsList() {
 
         <div className="flp-main-area">
           <div className="flp-forms-section">
-          <div className="flp-section-header">
-  <div className="flp-header-left">
-    <h3>Available Forms</h3>
-    <span className="flp-count-badge">{filteredForms.length}</span>
-  </div>
-  <div className="flp-header-right">
-    <div className="fl-search-container">
-      <input
-        type="text"
-        placeholder="Search forms..."
-        value={formSearchInput}
-        onChange={(e) => setFormSearchInput(e.target.value)}
-        onKeyPress={(e) => {
-          if (e.key === 'Enter') {
-            setFormSearchQuery(formSearchInput);
-            setFormsPage(1);
-          }
-        }}
-        className="fl-search-input"
-      />
-      <button
-        onClick={() => {
-          setFormSearchQuery(formSearchInput);
-          setFormsPage(1);
-        }}
-        className="fl-search-btn"
-      >
-        Search
-      </button>
-    </div>
+            <div className="flp-section-header">
+              <div className="flp-header-left">
+                <h3>Available Forms</h3>
+                <span className="flp-count-badge">{filteredForms.length}</span>
+              </div>
+              <div className="flp-header-right">
+                <div className="fl-search-container">
+                  <input
+                    type="text"
+                    placeholder="Search forms..."
+                    value={formSearchInput}
+                    onChange={(e) => setFormSearchInput(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        setFormSearchQuery(formSearchInput);
+                        setFormsPage(1);
+                      }
+                    }}
+                    className="fl-search-input"
+                  />
+                  <button
+                    onClick={() => {
+                      setFormSearchQuery(formSearchInput);
+                      setFormsPage(1);
+                    }}
+                    className="fl-search-btn"
+                  >
+                    Search
+                  </button>
+                </div>
 
-    <FormTypeDropdown
-      value={formTypeFilter}
-      onChange={(val) => {
-        setFormTypeFilter(val);
-        setFormsPage(1);
-      }}
-      formTypes={formTypes}
-    />
+                <FormTypeDropdown
+                  value={formTypeFilter}
+                  onChange={(val) => {
+                    setFormTypeFilter(val);
+                    setFormsPage(1);
+                  }}
+                  formTypes={formTypes}
+                />
 
-    <DeliveryDropdown
-      value={formDeliveryFilter}
-      onChange={(val) => {
-        setFormDeliveryFilter(val);
-        setFormsPage(1);
-      }}
-    />
+                <DeliveryDropdown
+                  value={formDeliveryFilter}
+                  onChange={(val) => {
+                    setFormDeliveryFilter(val);
+                    setFormsPage(1);
+                  }}
+                />
 
-    <button
-      onClick={() => {
-        setFormSearchQuery("");
-        setFormSearchInput("");
-        setFormTypeFilter("All");
-        setFormDeliveryFilter("All");
-        setFormsPage(1);
-      }}
-      className="flp-clear-filters-btn"
-    >
-      Clear Filters
-    </button>
-  </div>
-</div>
-
+                <button
+                  onClick={() => {
+                    setFormSearchQuery("");
+                    setFormSearchInput("");
+                    setFormTypeFilter("All");
+                    setFormDeliveryFilter("All");
+                    setFormsPage(1);
+                  }}
+                  className="flp-clear-filters-btn"
+                >
+                  Clear Filters
+                </button>
+              </div>
+            </div>
 
             <div className="flp-table-card">
               <div className="flp-table-wrapper">
@@ -901,55 +909,54 @@ function FormsList() {
           </div>
 
           <div className="flp-users-panel">
-  <div className="flp-panel-header">
-    <h3>
-      <i className="bi bi-people-fill"></i> Select Users
-    </h3>
-    {selectedFormId && (
-      <div className="flp-users-filters">
-        <div className="fl-search-container">
-          <input
-            type="text"
-            placeholder="Search users..."
-            value={userSearchInput}
-            onChange={(e) => setUserSearchInput(e.target.value)}
-            className="fl-search-input"
-          />
-          {userSearchQuery ? (
-            <button
-              onClick={() => {
-                setUserSearchQuery("");
-                setUserSearchInput("");
-                setUsersPage(1);
-              }}
-              className="fl-search-btn"
-            >
-              Clear
-            </button>
-          ) : (
-            <button
-              onClick={() => {
-                setUserSearchQuery(userSearchInput);
-                setUsersPage(1);
-              }}
-              className="fl-search-btn"
-            >
-              Search
-            </button>
-          )}
-        </div>
+            <div className="flp-panel-header">
+              <h3>
+                <i className="bi bi-people-fill"></i> Select Users
+              </h3>
+              {selectedFormId && (
+                <div className="flp-users-filters">
+                  <div className="fl-search-container">
+                    <input
+                      type="text"
+                      placeholder="Search users..."
+                      value={userSearchInput}
+                      onChange={(e) => setUserSearchInput(e.target.value)}
+                      className="fl-search-input"
+                    />
+                    {userSearchQuery ? (
+                      <button
+                        onClick={() => {
+                          setUserSearchQuery("");
+                          setUserSearchInput("");
+                          setUsersPage(1);
+                        }}
+                        className="fl-search-btn"
+                      >
+                        Clear
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setUserSearchQuery(userSearchInput);
+                          setUsersPage(1);
+                        }}
+                        className="fl-search-btn"
+                      >
+                        Search
+                      </button>
+                    )}
+                  </div>
 
-        <button
-          onClick={handleSelectAll}
-          className={`flp-btn-select-all ${allEligibleSelected ? "flp-deselect-all" : ""}`}
-          title={allEligibleSelected ? "Deselect All" : "Select All"}
-        >
-          {allEligibleSelected ? "Deselect All" : "Select All"}
-        </button>
-      </div>
-    )}
-  </div>
-
+                  <button
+                    onClick={handleSelectAll}
+                    className={`flp-btn-select-all ${allEligibleSelected ? "flp-deselect-all" : ""}`}
+                    title={allEligibleSelected ? "Deselect All" : "Select All"}
+                  >
+                    {allEligibleSelected ? "Deselect All" : "Select All"}
+                  </button>
+                </div>
+              )}
+            </div>
 
             <div className="flp-panel-body">
               {!selectedFormId ? (

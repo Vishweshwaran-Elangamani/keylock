@@ -219,7 +219,7 @@ function HRNominations() {
         const { data } = await api.approveNominations(payload);
   
         if (data.success || data.Success) {
-          toast.success(`✓ Nomination approved successfully!`);
+          toast.success(` Nomination approved successfully!`);
           setShowActionModal(false);
           setActionRemarks("");
           
@@ -238,7 +238,7 @@ function HRNominations() {
         });
   
         if (data.success || data.Success) {
-          toast.success(`✓ Nomination rejected successfully!`);
+          toast.success(` Nomination rejected successfully!`);
           setShowActionModal(false);
           setActionRemarks("");
           

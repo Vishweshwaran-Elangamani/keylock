@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../../../services/performancemanagement/api/api";
-import { apiPort5113 } from "../../../services/performancemanagement/api/rolesapi";
-import { apiPort5114 } from "../../../services/performancemanagement/api/nominationapi";
+import { 
+  getEmployeeAssignments, 
+  submitSelfAssessment, 
+  viewSelfAssessment 
+} from "../../../services/performancemanagement/api/api";
+import { getUserRole } from "../../../services/performancemanagement/api/rolesapi";
 import { toast, Toaster } from "sonner";
 import logoImage from "../../../assets/logodark.png";
 import Breadcrumb from "../../../components/common/Breadcrumb";
@@ -70,7 +73,7 @@ export default function ManagerDashboard() {
     setLoading(true);
     setAssignments([]);
     try {
-      const roleResponse = await apiPort5113.get(`/Employees/user/${userId}/role`);
+      const roleResponse = await getUserRole(userId);
       if (!roleResponse.data.success) {
         safeToast("error", "User not found.", "user-not-found");
         return;
@@ -80,7 +83,7 @@ export default function ManagerDashboard() {
         safeToast("error", "This user is not a Manager.", "not-manager");
         return;
       }
-      const assignmentRes = await api.get(`/Assignments/employee/${userId}`);
+      const assignmentRes = await getEmployeeAssignments(userId);
       if (assignmentRes.data.success) {
         setAssignments(assignmentRes.data.data);
         const pending = assignmentRes.data.data.filter((a) => !a.isCompleted).length;
@@ -129,7 +132,7 @@ export default function ManagerDashboard() {
     };
 
     try {
-      const response = await api.post("/SelfAssessment/submit", payload);
+      const response = await submitSelfAssessment(payload);
       if (response.data?.success) {
         toast.success("Form submitted successfully!");
         setShowModal(false);
@@ -149,9 +152,7 @@ export default function ManagerDashboard() {
     setModalMode("view");
     setSubmitting(true);
     try {
-      const { data } = await api.get(
-        `/SelfAssessment/view/${assignment.formId}/user/${userId}`
-      );
+      const { data } = await viewSelfAssessment(assignment.formId, userId);
       if (data.success) {
         const viewData = data.data.details.map((detail) => ({
           competencyId: detail.competencyId,

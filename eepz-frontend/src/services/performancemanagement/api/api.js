@@ -104,6 +104,11 @@ const createApiInstance = (baseURL) => {
 
 const api = createApiInstance(BASE_URL);
 
+// Auth APIs
+export const getCurrentUser = () => {
+  return api.get("/Auth/current-user");
+};
+
 // Manager APIs
 export const getTeamMembers = (managerId) => {
   return api.get(`/AppraisalProcess/manager/${managerId}/project-team`);
@@ -128,6 +133,33 @@ export const submitSelfAssessment = (payload) => {
 
 export const viewSelfAssessment = (formId, userId) => {
   return api.get(`/SelfAssessment/view/${formId}/user/${userId}`);
+};
+
+// Form Management APIs
+export const getAllForms = () => {
+  return api.get("/FormManagement/all");
+};
+
+// Assignment APIs
+export const getFormAssignments = (formId) => {
+  return api.get(`/Assignments/form/${formId}`);
+};
+
+export const getUpcomingEligibleUsers = () => {
+  return api.get("/Assignments/upcoming-eligible");
+};
+
+export const initiateAssignments = (payload) => {
+  return api.post("/Assignments/initiate", payload);
+};
+
+// HR Assessment APIs
+export const getAllSubmittedAssessments = () => {
+  return api.get("/all-details");
+};
+
+export const getAllAppraisalDetails = () => {
+  return api.get("/AssessmentDetails/all-details");
 };
 
 // Attachment APIs
