@@ -25,10 +25,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (await _projectRepository.ProjectNameExistsAsync(request.ProjectName))
                 return ApiResponse<ProjectResponse>.ErrorResponse("Project name already exists.");
 
+            // ✅ Fixed: Properly await all validations
             var validationErrors = new List<string>();
-            ValidateEmployeeExistence(validationErrors, request.ResourceOwnerEmployeeId, "Resource Owner employee does not exist.");
-            ValidateEmployeeExistence(validationErrors, request.L1ApproverEmployeeId, "L1 Approver employee does not exist.");
-            ValidateEmployeeExistence(validationErrors, request.L2ApproverEmployeeId, "L2 Approver employee does not exist.");
+            await ValidateEmployeeExistenceAsync(validationErrors, request.ResourceOwnerEmployeeId, "Resource Owner employee does not exist.");
+            await ValidateEmployeeExistenceAsync(validationErrors, request.L1ApproverEmployeeId, "L1 Approver employee does not exist.");
+            await ValidateEmployeeExistenceAsync(validationErrors, request.L2ApproverEmployeeId, "L2 Approver employee does not exist.");
 
             if (validationErrors.Any())
                 return ApiResponse<ProjectResponse>.ErrorResponse("Validation failed.", validationErrors);
@@ -126,21 +127,22 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (!await _projectRepository.ProjectExistsAsync(request.ProjectId))
                 return ApiResponse<bool>.ErrorResponse("Project not found.");
 
+            // ✅ Fixed: Properly await all validations
             var validationErrors = new List<string>();
-            ValidateEmployeeExistence(validationErrors, request.ResourceOwnerEmployeeId, "Resource Owner employee does not exist.");
-            ValidateEmployeeExistence(validationErrors, request.L1ApproverEmployeeId, "L1 Approver employee does not exist.");
-            ValidateEmployeeExistence(validationErrors, request.L2ApproverEmployeeId, "L2 Approver employee does not exist.");
+            await ValidateEmployeeExistenceAsync(validationErrors, request.ResourceOwnerEmployeeId, "Resource Owner employee does not exist.");
+            await ValidateEmployeeExistenceAsync(validationErrors, request.L1ApproverEmployeeId, "L1 Approver employee does not exist.");
+            await ValidateEmployeeExistenceAsync(validationErrors, request.L2ApproverEmployeeId, "L2 Approver employee does not exist.");
 
             if (validationErrors.Any())
                 return ApiResponse<bool>.ErrorResponse("Validation failed.", validationErrors);
 
-            var updated = await _projectRepository.UpdateReportingManagersAsync(
+            var result = await _projectRepository.UpdateReportingManagersAsync(
                 request.ProjectId,
                 request.ResourceOwnerEmployeeId,
                 request.L1ApproverEmployeeId,
                 request.L2ApproverEmployeeId);
 
-            return updated
+            return result
                 ? ApiResponse<bool>.SuccessResponse(true, "Reporting managers updated successfully.")
                 : ApiResponse<bool>.ErrorResponse("Failed to update reporting managers.");
         }
@@ -292,14 +294,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return ApiResponse<Dictionary<int, EmployeePrimaryProjectInfo?>>.SuccessResponse(mapped, "Primary project info retrieved successfully.");
         }
 
-        private void ValidateEmployeeExistence(List<string> errors, int? id, string message)
+        private async Task ValidateEmployeeExistenceAsync(List<string> errors, int? id, string message)
         {
             if (id.HasValue && id.Value > 0)
             {
-#pragma warning disable CS4014
-                _projectRepository.EmployeeMasterExistsAsync(id.Value)
-                    .ContinueWith(t => { if (!t.Result) errors.Add(message); });
-#pragma warning restore CS4014
+                var exists = await _projectRepository.EmployeeMasterExistsAsync(id.Value);
+                if (!exists)
+                {
+                    errors.Add(message);
+                }
             }
         }
 
