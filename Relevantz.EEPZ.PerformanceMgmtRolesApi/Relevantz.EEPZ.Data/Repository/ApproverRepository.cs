@@ -836,23 +836,23 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
 
         public async Task<ReviewerDecisionDto?> GetLatestReviewerDecisionAsync(int assessmentId)
-        {
-            var decision = await _ctx.Assessmentreviews
-                .Where(ar => ar.ReviewerRole == "Reviewer"
-                          && ar.ReviewStatus == "Rejected"
-                          && _ctx.Assessmentdetails.Any(ad => ad.DetailId == ar.DetailId && ad.AssessmentId == assessmentId))
-                .OrderByDescending(ar => ar.ReviewedAt)
-                .FirstOrDefaultAsync();
+{
+    var decision = await _ctx.Assessmentreviews
+        .Where(ar => ar.ReviewerRole == "Reviewer"
+                  && _ctx.Assessmentdetails.Any(ad => ad.DetailId == ar.DetailId && ad.AssessmentId == assessmentId))
+        .OrderByDescending(ar => ar.ReviewedAt)
+        .FirstOrDefaultAsync();
 
-            if (decision == null)
-                return null;
+    if (decision == null)
+        return null;
 
-            return new ReviewerDecisionDto(
-                assessmentId,
-                decision.ReviewStatus,
-                decision.Comments ?? "",
-                decision.ReviewedAt ?? DateTime.Now
-            );
-        }
+    return new ReviewerDecisionDto(
+        assessmentId,
+        decision.ReviewStatus ?? "",  // Returns "Approved", "Rejected", or empty
+        decision.Comments ?? "",
+        decision.ReviewedAt ?? DateTime.Now
+    );
+}
+
     }
 }
