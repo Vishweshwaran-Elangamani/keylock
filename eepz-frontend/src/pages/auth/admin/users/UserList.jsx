@@ -30,24 +30,24 @@ const RoleDropdown = ({ value, onChange, roles }) => {
 
   return (
     <div
-      className="ul-filter-select custom-ul-dropdown"
+      className="ul-filter-select ep-custom-dropdown"
       tabIndex={0}
-      onBlur={() => setOpen(false)}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
       onClick={() => setOpen((prev) => !prev)}
       style={{ position: "relative" }}
     >
-      <div className="custom-ul-selected">
+      <div className="ep-custom-selected">
         {selected.label}
-        <span className="custom-ul-arrow" />
+        <span className="ep-custom-arrow" />
       </div>
       {open && (
-        <div className="custom-ul-menu">
+        <div className="ep-custom-menu">
           {allOptions.map((opt) => (
             <div
               key={opt.value || "all-roles"}
               className={
-                "custom-ul-option" +
-                (opt.value === value ? " custom-ul-option-active" : "")
+                "ep-custom-option" +
+                (opt.value === value ? " ep-custom-option-active" : "")
               }
               onMouseDown={() => handleSelect(opt.value)}
             >
@@ -77,24 +77,24 @@ const StatusDropdown = ({ value, onChange }) => {
 
   return (
     <div
-      className="ul-filter-select custom-ul-dropdown"
+      className="ul-filter-select ep-custom-dropdown"
       tabIndex={0}
-      onBlur={() => setOpen(false)}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
       onClick={() => setOpen((prev) => !prev)}
       style={{ position: "relative" }}
     >
-      <div className="custom-ul-selected">
+      <div className="ep-custom-selected">
         {selected.label}
-        <span className="custom-ul-arrow" />
+        <span className="ep-custom-arrow" />
       </div>
       {open && (
-        <div className="custom-ul-menu">
+        <div className="ep-custom-menu">
           {allOptions.map((opt) => (
             <div
               key={opt.value || "all-status"}
               className={
-                "custom-ul-option" +
-                (opt.value === value ? " custom-ul-option-active" : "")
+                "ep-custom-option" +
+                (opt.value === value ? " ep-custom-option-active" : "")
               }
               onMouseDown={() => handleSelect(opt.value)}
             >
@@ -107,6 +107,7 @@ const StatusDropdown = ({ value, onChange }) => {
   );
 };
 
+// Rest of UserList component remains exactly the same...
 const UserList = () => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
@@ -390,10 +391,6 @@ const UserList = () => {
             Clear Filters
           </button>
 
-          <div className="ul-results-count">
-            Showing {getPaginatedUsers().length} of {filteredUsers.length} users
-          </div>
-
           <button className="ul-btn-bulk" onClick={() => setShowBulkOperations(true)}>
             <i className="bi bi-database"></i>
             Bulk Operations
@@ -443,11 +440,10 @@ const UserList = () => {
                     <td className="text-muted">{user.employeeCompanyId}</td>
                     <td>
                       <span
-                        className={`ul-status-badge ${
-                          user.isActive
+                        className={`ul-status-badge ${user.isActive
                             ? "ul-status-active"
                             : "ul-status-inactive"
-                        }`}
+                          }`}
                       >
                         {user.isActive ? "Active" : "Inactive"}
                       </span>
@@ -527,9 +523,8 @@ const UserList = () => {
             <nav className="ul-pagination-nav">
               <ul className="ul-pagination-list">
                 <li
-                  className={`ul-page-item ${
-                    currentPage === 1 ? "disabled" : ""
-                  }`}
+                  className={`ul-page-item ${currentPage === 1 ? "disabled" : ""
+                    }`}
                 >
                   <button
                     onClick={() =>
@@ -544,9 +539,8 @@ const UserList = () => {
                 {getPageNumbers().map((page, index) => (
                   <li
                     key={index}
-                    className={`ul-page-item ${
-                      page === currentPage ? "active" : ""
-                    } ${typeof page !== "number" ? "disabled" : ""}`}
+                    className={`ul-page-item ${page === currentPage ? "active" : ""
+                      } ${typeof page !== "number" ? "disabled" : ""}`}
                   >
                     <button
                       onClick={() =>
@@ -560,9 +554,8 @@ const UserList = () => {
                 ))}
 
                 <li
-                  className={`ul-page-item ${
-                    currentPage === totalPages ? "disabled" : ""
-                  }`}
+                  className={`ul-page-item ${currentPage === totalPages ? "disabled" : ""
+                    }`}
                 >
                   <button
                     onClick={() =>

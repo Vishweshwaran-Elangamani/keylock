@@ -7,11 +7,6 @@ import ProfilePhotoUploadModal from "../../../components/auth/Modal/common/Profi
 import { toast } from "sonner";
 import "../../../styles/auth/common/EmployeeProfile.css";
 
-/* ============================================
-   CUSTOM DROPDOWN COMPONENTS
-   ============================================ */
-
-/* Custom Gender Dropdown */
 const GenderDropdown = ({ value, onChange, disabled, showError }) => {
   const [open, setOpen] = useState(false);
 
@@ -40,10 +35,10 @@ const GenderDropdown = ({ value, onChange, disabled, showError }) => {
 
   return (
     <div
-      className={`ep-custom-dropdown ${showError ? "error" : ""}`}
-      tabIndex={0}
-      onBlur={() => setTimeout(() => setOpen(false), 200)}
-    >
+  className={`ep-custom-dropdown ${showError ? "error" : ""} ${open ? "dropdown-open" : ""}`}
+  tabIndex={0}
+  onBlur={() => setTimeout(() => setOpen(false), 200)}
+>
       <div
         className="ep-custom-selected"
         onClick={() => setOpen((prev) => !prev)}
@@ -98,10 +93,10 @@ const NationalityDropdown = ({ value, onChange, disabled, showError, options }) 
 
   return (
     <div
-      className={`ep-custom-dropdown ${showError ? "error" : ""}`}
-      tabIndex={0}
-      onBlur={() => setTimeout(() => setOpen(false), 200)}
-    >
+  className={`ep-custom-dropdown ${showError ? "error" : ""} ${open ? "dropdown-open" : ""}`}
+  tabIndex={0}
+  onBlur={() => setTimeout(() => setOpen(false), 200)}
+>
       <div
         className="ep-custom-selected"
         onClick={() => setOpen((prev) => !prev)}
@@ -158,10 +153,10 @@ const MaritalStatusDropdown = ({ value, onChange, disabled, showError }) => {
 
   return (
     <div
-      className={`ep-custom-dropdown ${showError ? "error" : ""}`}
-      tabIndex={0}
-      onBlur={() => setTimeout(() => setOpen(false), 200)}
-    >
+  className={`ep-custom-dropdown ${showError ? "error" : ""} ${open ? "dropdown-open" : ""}`}
+  tabIndex={0}
+  onBlur={() => setTimeout(() => setOpen(false), 200)}
+>
       <div
         className="ep-custom-selected"
         onClick={() => setOpen((prev) => !prev)}
@@ -216,10 +211,10 @@ const StateDropdown = ({ value, onChange, disabled, showError, options }) => {
 
   return (
     <div
-      className={`ep-custom-dropdown ${showError ? "error" : ""}`}
-      tabIndex={0}
-      onBlur={() => setTimeout(() => setOpen(false), 200)}
-    >
+  className={`ep-custom-dropdown ${showError ? "error" : ""} ${open ? "dropdown-open" : ""}`}
+  tabIndex={0}
+  onBlur={() => setTimeout(() => setOpen(false), 200)}
+>
       <div
         className="ep-custom-selected"
         onClick={() => setOpen((prev) => !prev)}

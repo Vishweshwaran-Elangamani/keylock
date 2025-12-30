@@ -2,11 +2,13 @@
    EMPLOYEE PROFILE - PURPLE THEME
    ============================================ */
 
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+
 
 /* Container */
 .employee-profile-container {
@@ -14,6 +16,7 @@
   background: #f8f9fc;
   overflow-x: hidden;
 }
+
 
 /* ============================================
    LOADING STATE
@@ -26,6 +29,7 @@
   background: #f8f9fc;
 }
 
+
 .loading-content {
   text-align: center;
   display: flex;
@@ -33,6 +37,7 @@
   align-items: center;
   gap: 1rem;
 }
+
 
 .spinner {
   width: 3.5rem;
@@ -43,6 +48,7 @@
   animation: spin 1s linear infinite;
 }
 
+
 @keyframes spin {
   0% {
     transform: rotate(0deg);
@@ -52,11 +58,13 @@
   }
 }
 
+
 .loading-content p {
   color: #27235c;
   font-weight: 500;
   font-size: 1rem;
 }
+
 
 /* ============================================
    ERROR STATE
@@ -69,6 +77,7 @@
   padding: 2rem;
 }
 
+
 .error-content {
   background: white;
   border-radius: 16px;
@@ -79,11 +88,13 @@
   width: 100%;
 }
 
+
 .error-content i {
   font-size: 3rem;
   color: #dc3545;
   margin-bottom: 1rem;
 }
+
 
 .error-content h3 {
   color: #27235c;
@@ -91,10 +102,12 @@
   font-size: 1.5rem;
 }
 
+
 .error-content p {
   color: #6c757d;
   font-size: 0.9375rem;
 }
+
 
 /* ============================================
    PROFILE HEADER - PURPLE GRADIENT
@@ -107,6 +120,7 @@
   overflow: hidden;
 }
 
+
 .profile-header-background {
   position: absolute;
   top: 0;
@@ -118,6 +132,7 @@
   animation: float 6s ease-in-out infinite;
 }
 
+
 @keyframes float {
   0%,
   100% {
@@ -127,6 +142,7 @@
     transform: translateY(-20px);
   }
 }
+
 
 .profile-header-content {
   position: relative;
@@ -140,6 +156,7 @@
   flex-wrap: wrap;
 }
 
+
 .profile-avatar-section {
   display: flex;
   align-items: center;
@@ -147,6 +164,7 @@
   flex: 1;
   min-width: 300px;
 }
+
 
 .profile-avatar-modern {
   position: relative;
@@ -161,12 +179,14 @@
   flex-shrink: 0;
 }
 
+
 .avatar-initials {
   font-size: 2.5rem;
   font-weight: 800;
   color: white;
   letter-spacing: 1px;
 }
+
 
 .avatar-status-ring {
   position: absolute;
@@ -180,6 +200,7 @@
   animation: pulse 2s ease-in-out infinite;
 }
 
+
 @keyframes pulse {
   0%,
   100% {
@@ -190,9 +211,11 @@
   }
 }
 
+
 .profile-basic-info {
   flex: 1;
 }
+
 
 .profile-name-modern {
   font-size: 1.75rem;
@@ -203,6 +226,7 @@
   text-align: left;
 }
 
+
 .profile-role-modern {
   font-size: 1rem;
   color: rgba(255, 255, 255, 0.9);
@@ -211,11 +235,13 @@
   text-align: left;
 }
 
+
 .profile-meta {
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
 }
+
 
 .profile-id {
   display: flex;
@@ -229,9 +255,11 @@
   font-weight: 600;
 }
 
+
 .profile-id i {
   font-size: 1rem;
 }
+
 
 .profile-status {
   display: flex;
@@ -244,26 +272,32 @@
   color: white;
 }
 
+
 .profile-status.badge-success {
   background: rgba(40, 167, 69, 0.9);
 }
+
 
 .profile-status.badge-secondary {
   background: rgba(108, 117, 125, 0.9);
 }
 
+
 .profile-status.badge-warning {
   background: rgba(255, 140, 0, 0.9);
 }
+
 
 .profile-status.badge-danger {
   background: rgba(220, 53, 69, 0.9);
 }
 
+
 .profile-status i {
   font-size: 0.5rem;
   animation: blink 1.5s ease-in-out infinite;
 }
+
 
 @keyframes blink {
   0%,
@@ -275,11 +309,13 @@
   }
 }
 
+
 .profile-actions {
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
 }
+
 
 /* PURPLE THEME BUTTONS */
 .btn-modern {
@@ -295,6 +331,7 @@
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
+
 
 .btn-primary-pf {
   background: linear-gradient(135deg, #97247e 0%, #e01950 100%);
@@ -312,11 +349,13 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+
 .btn-outline-light {
   background: rgba(255, 255, 255, 0.2);
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.4);
 }
+
 
 .btn-outline-light:hover {
   background: rgba(255, 255, 255, 0.3);
@@ -324,10 +363,12 @@
   transform: translateY(-2px);
 }
 
+
 .btn-light {
   background: white;
   color: #27235c;
 }
+
 
 .btn-light:hover {
   background: #f8f9fa;
@@ -335,25 +376,30 @@
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
+
 .btn-light.btn-success {
   color: #28a745;
   background: white;
 }
+
 
 .btn-light.btn-success:hover {
   color: white;
   background: #28a745;
 }
 
+
 .btn-success {
   background: linear-gradient(90deg, #10b981 0%, #059669 100%);
   color: white;
 }
 
+
 .btn-success:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
 }
+
 
 .btn-outline-danger {
   background: red;
@@ -361,17 +407,20 @@
   border: 1px solid rgba(239, 68, 68, 0.5);
 }
 
+
 .btn-outline-danger:hover {
   background: rgba(239, 68, 68, 0.2);
   border-color: #ef4444;
   transform: translateY(-2px);
 }
 
+
 .btn-light:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
 }
+
 
 /* ============================================
    PROFILE CONTENT - MODERN LAYOUT
@@ -383,12 +432,14 @@
   overflow: visible !important;
 }
 
+
 .content-grid {
   display: grid;
   grid-template-columns: 350px 1fr;
   gap: 2rem;
   overflow: visible !important;
 }
+
 
 .sidebar-section {
   display: flex;
@@ -397,12 +448,14 @@
   overflow: visible !important;
 }
 
+
 .main-section {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   overflow: visible !important;
 }
+
 
 /* ============================================
    INFO CARDS (SIDEBAR) - TABLE HEADER STYLE
@@ -415,9 +468,11 @@
   transition: all 0.3s ease;
 }
 
+
 .info-card:hover {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
+
 
 /* TABLE HEADER STYLE - DARK PURPLE WITH WHITE TEXT */
 .card-header-modern {
@@ -428,6 +483,7 @@
   gap: 0.75rem;
   border-bottom: 3px solid #1a1842;
 }
+
 
 .card-header-modern i {
   font-size: 1.25rem;
@@ -441,6 +497,7 @@
   border-radius: 8px;
 }
 
+
 .card-header-modern h3 {
   margin: 0;
   font-size: 0.875rem;
@@ -451,10 +508,12 @@
   text-align: left;
 }
 
+
 .card-content {
   padding: 1.25rem;
   overflow: visible !important;
 }
+
 
 .info-grid {
   display: flex;
@@ -462,6 +521,7 @@
   gap: 1rem;
   overflow: visible !important;
 }
+
 
 /* LEFT ALIGNED INFO ITEMS */
 .info-item-modern {
@@ -474,6 +534,7 @@
   z-index: 1;
 }
 
+
 .info-item-modern label {
   font-size: 0.75rem;
   font-weight: 700;
@@ -483,6 +544,7 @@
   text-align: left;
 }
 
+
 .info-item-modern span {
   font-size: 0.95rem;
   font-weight: 600;
@@ -490,6 +552,7 @@
   line-height: 1.4;
   text-align: left;
 }
+
 
 .info-item-modern small {
   font-size: 0.75rem;
@@ -499,9 +562,11 @@
   text-align: left;
 }
 
+
 .info-item-modern:focus-within {
   z-index: 9998;
 }
+
 
 /* ============================================
    FORM CARDS (MAIN CONTENT) - TABLE HEADER STYLE
@@ -514,9 +579,11 @@
   transition: all 0.3s ease;
 }
 
+
 .form-card:hover {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
+
 
 .form-card .card-header-modern {
   background: #27235c;
@@ -524,10 +591,12 @@
   border-bottom: 3px solid #1a1842;
 }
 
+
 .form-card .card-content {
   padding: 1.5rem;
   overflow: visible !important;
 }
+
 
 .form-grid {
   display: grid;
@@ -536,9 +605,11 @@
   overflow: visible !important;
 }
 
+
 .address-grid {
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
+
 
 /* LEFT ALIGNED FORM FIELDS */
 .form-field {
@@ -551,9 +622,11 @@
   z-index: 1;
 }
 
+
 .form-field:focus-within {
   z-index: 9998;
 }
+
 
 .form-field label {
   font-size: 0.875rem;
@@ -565,10 +638,12 @@
   text-align: left;
 }
 
+
 .required {
   color: #dc3545;
   font-weight: 700;
 }
+
 
 .form-control-modern {
   padding: 0.75rem 1rem;
@@ -583,12 +658,14 @@
   text-align: left;
 }
 
+
 .form-control-modern:focus {
   outline: none;
   border-color: #27235c;
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
   background: white;
 }
+
 
 .form-control-modern:disabled {
   background: #f8f9fa;
@@ -597,19 +674,23 @@
   opacity: 0.7;
 }
 
+
 .form-control-modern.error {
   border-color: #dc3545;
   background: rgba(220, 53, 69, 0.02);
 }
 
+
 .form-control-modern.error:focus {
   box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
 }
+
 
 .form-control-modern::placeholder {
   color: #adb5bd;
   opacity: 0.8;
 }
+
 
 .error-message {
   display: flex;
@@ -622,19 +703,21 @@
   text-align: left;
 }
 
+
 .error-message::before {
   content: "⚠";
   font-size: 0.875rem;
   flex-shrink: 0;
 }
 
+
 /* ============================================
-   CUSTOM DROPDOWN COMPONENTS FOR EMPLOYEE PROFILE
+   CUSTOM DROPDOWN - TIGHT SPACING LIKE "ALL ROLES"
    ============================================ */
 
 .ep-custom-dropdown {
   position: relative;
-  padding: 0.75rem 2rem 0.75rem 1rem;
+  padding: 0.75rem 0.5rem 0.75rem 1rem;  /* Reduced right padding */
   border: 1px solid #e5e7eb;
   border-radius: 10px;
   font-size: 0.9375rem;
@@ -676,11 +759,13 @@
   position: relative;
   cursor: pointer;
   user-select: none;
+  padding-right: 0;  /* No extra padding */
 }
 
+/* FIXED: Arrow positioned very close to edge like "All Roles" */
 .ep-custom-arrow {
   position: absolute;
-  right: -1.25rem;
+  right: 0.5rem;  /* Only 8px from edge (0.5rem = 8px) */
   top: 50%;
   transform: translateY(-50%) rotate(45deg);
   width: 8px;
@@ -688,14 +773,15 @@
   border-right: 2px solid #111827;
   border-bottom: 2px solid #111827;
   pointer-events: none;
-  transition: transform 0.2s ease;
+  transition: transform 0.3s ease;
 }
 
-.ep-custom-dropdown:focus-within .ep-custom-arrow {
+/* Arrow rotation when open */
+.ep-custom-dropdown.dropdown-open .ep-custom-arrow {
   transform: translateY(-25%) rotate(225deg);
 }
 
-/* Dropdown menu - breaks out of parent container */
+/* Dropdown menu */
 .ep-custom-menu {
   position: absolute;
   top: calc(100% + 4px);
@@ -756,7 +842,7 @@
   color: #ffffff;
 }
 
-/* Scrollbar styling - Matching UserList.css */
+/* Scrollbar styling */
 .ep-custom-menu::-webkit-scrollbar {
   width: 6px;
 }
@@ -775,11 +861,13 @@
   background: #1f1c4b;
 }
 
-/* Firefox scrollbar styling */
+/* Firefox scrollbar */
 .ep-custom-menu {
   scrollbar-width: thin;
   scrollbar-color: #27235c #f1f1f1;
 }
+
+
 
 /* ============================================
    ADDRESS SECTIONS - LEFT ALIGNED
@@ -788,9 +876,11 @@
   margin-bottom: 2rem;
 }
 
+
 .address-section-modern:last-child {
   margin-bottom: 0;
 }
+
 
 .section-title {
   font-size: 1rem;
@@ -805,6 +895,7 @@
   text-align: left;
 }
 
+
 .address-display-modern {
   background: #f8f9fa;
   padding: 1rem;
@@ -817,6 +908,7 @@
   word-break: break-word;
   text-align: left;
 }
+
 
 .address-auto-filled {
   display: flex;
@@ -832,10 +924,12 @@
   text-align: left;
 }
 
+
 .address-auto-filled i {
   font-size: 1rem;
   flex-shrink: 0;
 }
+
 
 /* ============================================
    ADDRESS CHECKBOX
@@ -847,6 +941,7 @@
   padding: 1rem;
   margin: 1.5rem 0;
 }
+
 
 .checkbox-label {
   display: flex;
@@ -860,9 +955,11 @@
   text-align: left;
 }
 
+
 .checkbox-label input {
   display: none;
 }
+
 
 .checkmark {
   width: 22px;
@@ -877,10 +974,12 @@
   background: white;
 }
 
+
 .checkbox-label input:checked + .checkmark {
   background: #27235c;
   border-color: #27235c;
 }
+
 
 .checkbox-label input:checked + .checkmark::after {
   content: "✓";
@@ -889,9 +988,11 @@
   font-weight: 700;
 }
 
+
 .checkbox-label input:focus + .checkmark {
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.2);
 }
+
 
 /* ============================================
    PROFILE PHOTO DISPLAY
@@ -903,10 +1004,12 @@
   border-radius: 50%;
 }
 
+
 .profile-avatar-wrapper-modern {
   position: relative;
   display: inline-block;
 }
+
 
 .camera-icon-btn-modern {
   position: absolute;
@@ -926,10 +1029,12 @@
   z-index: 10;
 }
 
+
 .camera-icon-btn-modern:hover {
   background: linear-gradient(135deg, #7f1e6a 0%, #c01543 100%);
   transform: scale(1.1);
 }
+
 
 .camera-icon-btn-modern i {
   font-size: 16px;
@@ -937,9 +1042,11 @@
   transition: color 0.2s ease;
 }
 
+
 .camera-icon-btn-modern:active {
   transform: scale(0.95);
 }
+
 
 /* ============================================
    SPINNER
@@ -954,6 +1061,7 @@
   animation: spin 0.8s linear infinite;
   margin-right: 0.5rem;
 }
+
 
 /* ============================================
    RETRY BUTTON
@@ -975,10 +1083,12 @@
   box-shadow: 0 4px 12px rgba(151, 36, 126, 0.3);
 }
 
+
 .btn-retry:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(151, 36, 126, 0.4);
 }
+
 
 /* ============================================
    ACCESSIBILITY UTILITIES
@@ -989,6 +1099,7 @@
   outline-offset: 2px;
 }
 
+
 small {
   display: block;
   font-size: 0.75rem;
@@ -997,6 +1108,7 @@ small {
   font-style: italic;
   text-align: left;
 }
+
 
 /* ============================================
    RESPONSIVE DESIGN
@@ -1007,25 +1119,30 @@ small {
     gap: 1.5rem;
   }
 
+
   .profile-content-modern {
     padding: 0 1.5rem 1.5rem 1.5rem;
   }
+
 
   .form-grid {
     gap: 1rem;
   }
 }
 
+
 @media (max-width: 768px) {
   .profile-header-modern {
     padding: 1.5rem 1rem;
   }
+
 
   .profile-header-content {
     gap: 1rem;
     flex-direction: column;
     align-items: stretch;
   }
+
 
   .profile-avatar-section {
     flex-direction: column;
@@ -1034,62 +1151,76 @@ small {
     margin-top: 1rem;
   }
 
+
   .profile-avatar-modern {
     width: 90px;
     height: 90px;
   }
 
+
   .avatar-initials {
     font-size: 2rem;
   }
+
 
   .profile-name-modern {
     font-size: 1.5rem;
     text-align: center;
   }
 
+
   .profile-role-modern {
     text-align: center;
   }
+
 
   .profile-actions {
     width: 100%;
     justify-content: stretch;
   }
 
+
   .btn-modern {
     flex: 1;
     justify-content: center;
   }
 
+
   .content-grid {
     grid-template-columns: 1fr;
   }
+
 
   .sidebar-section {
     order: 2;
   }
 
+
   .main-section {
     order: 1;
   }
+
 
   .profile-content-modern {
     padding: 0 1rem 1rem 1rem;
   }
 
+
   .form-grid {
     grid-template-columns: 1fr;
   }
+
 
   .form-card .card-content {
     padding: 1rem;
   }
 
+
   .address-grid {
     grid-template-columns: 1fr;
   }
 }
+
 
 @media (max-width: 480px) {
   .profile-header-modern {
@@ -1097,32 +1228,39 @@ small {
     margin-bottom: 1rem;
   }
 
+
   .profile-header-background {
     width: 300px;
     height: 300px;
     right: -50px;
   }
 
+
   .profile-avatar-modern {
     width: 80px;
     height: 80px;
   }
 
+
   .avatar-initials {
     font-size: 1.75rem;
   }
+
 
   .profile-name-modern {
     font-size: 1.25rem;
   }
 
+
   .profile-role-modern {
     font-size: 0.875rem;
   }
 
+
   .profile-meta {
     gap: 0.5rem;
   }
+
 
   .profile-id,
   .profile-status {
@@ -1130,26 +1268,32 @@ small {
     padding: 0.375rem 0.75rem;
   }
 
+
   .profile-actions {
     gap: 0.5rem;
   }
+
 
   .btn-modern {
     padding: 0.625rem 1rem;
     font-size: 0.875rem;
   }
 
+
   .content-grid {
     gap: 1rem;
   }
+
 
   .profile-content-modern {
     padding: 0 0.75rem 0.75rem 0.75rem;
   }
 
+
   .form-field label {
     font-size: 0.8125rem;
   }
+
 
   .form-control-modern {
     padding: 0.625rem 0.875rem;
@@ -1157,27 +1301,33 @@ small {
     min-height: 40px;
   }
 
+
   .card-content {
     padding: 1rem;
   }
+
 
   .section-title {
     font-size: 0.9375rem;
     margin-bottom: 0.75rem;
   }
 
+
   .address-display-modern {
     font-size: 0.875rem;
     padding: 0.75rem;
   }
 
+
   .info-grid {
     gap: 0.75rem;
   }
 
+
   .form-grid {
     gap: 0.875rem;
   }
+
 
   .ep-custom-dropdown {
     font-size: 0.8125rem;
@@ -1185,15 +1335,18 @@ small {
     min-height: 40px;
   }
 
+
   .ep-custom-option {
     font-size: 0.8125rem;
     padding: 0.625rem 0.875rem;
   }
 
+
   .ep-custom-menu {
     max-height: 160px;
   }
 }
+
 
 /* ============================================
    PRINT STYLES
@@ -1204,20 +1357,24 @@ small {
     color: #27235c;
   }
 
+
   .profile-actions,
   .btn-modern {
     display: none !important;
   }
 
+
   .content-grid {
     grid-template-columns: 1fr;
   }
+
 
   .form-card {
     page-break-inside: avoid;
     box-shadow: none;
     border: 1px solid #dee2e6;
   }
+
 
   .address-display-modern {
     background: white;
