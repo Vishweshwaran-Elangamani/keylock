@@ -3,7 +3,6 @@ import authService from "../../auth/authService";
 
 const BASE_URL = import.meta.env.VITE_PERFORMANCE_API_URL + "/api";
 
-
 const createApiInstance = (baseURL) => {
   const instance = axios.create({
     baseURL: baseURL,
@@ -11,7 +10,6 @@ const createApiInstance = (baseURL) => {
     timeout: 30000,
   });
 
-  
   instance.interceptors.request.use(
     (config) => {
       const token = authService.getToken();
@@ -19,18 +17,17 @@ const createApiInstance = (baseURL) => {
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       } else {
-        console.warn(` No JWT Token Found | ${config.method.toUpperCase()} ${config.url}`);
+        console.warn(`⚠️ No JWT Token Found | ${config.method.toUpperCase()} ${config.url}`);
       }
 
       return config;
     },
     (error) => {
-      console.error(" Request Configuration Error:", error);
+      console.error("❌ Request Configuration Error:", error);
       return Promise.reject(error);
     }
   );
 
-  
   instance.interceptors.response.use(
     (response) => {
       return response;
@@ -62,11 +59,9 @@ const createApiInstance = (baseURL) => {
           const refreshResponse = await authService.refreshAccessToken();
 
           if (refreshResponse.success) {
-
             const newToken = authService.getToken();
             originalRequest.headers.Authorization = `Bearer ${newToken}`;
 
-            
             return instance(originalRequest);
           } else {
             console.error("❌ Token refresh failed:", refreshResponse.message);
@@ -107,10 +102,9 @@ const createApiInstance = (baseURL) => {
   return instance;
 };
 
-
 const api = createApiInstance(BASE_URL);
 
-
+// Manager APIs
 export const getTeamMembers = (managerId) => {
   return api.get(`/AppraisalProcess/manager/${managerId}/project-team`);
 };
@@ -123,13 +117,24 @@ export const submitNomination = (payload) => {
   return api.post("/EmployeeNomination/submit", payload);
 };
 
-export const downloadAttachment = async (attachmentId) => {
+// Employee Assessment APIs
+export const getEmployeeAssignments = (userId) => {
+  return api.get(`/Assignments/employee/${userId}`);
+};
+
+export const submitSelfAssessment = (payload) => {
+  return api.post("/SelfAssessment/submit", payload);
+};
+
+export const viewSelfAssessment = (formId, userId) => {
+  return api.get(`/SelfAssessment/view/${formId}/user/${userId}`);
+};
+
+// Attachment APIs
+export const downloadAttachment = (attachmentId) => {
   return api.get(`/SelfAssessment/attachments/${attachmentId}/download`, {
     responseType: 'blob', // Critical for binary file downloads
   });
 };
 
-
-
 export default api;
-

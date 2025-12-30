@@ -126,13 +126,8 @@ function MyAssessments() {
     try {
       setDownloadingAttachmentId(attachment.attachmentId);
       
-      // ✅ Use api service with responseType: 'blob'
-      const response = await api.get(
-        `/SelfAssessment/attachments/${attachment.attachmentId}/download`,
-        {
-          responseType: 'blob'  // ⚠️ CRITICAL: Must be 'blob' for binary files
-        }
-      );
+      // ✅ Use centralized API function
+      const response = await downloadAttachment(attachment.attachmentId);
   
       // Get the blob from response.data
       const blob = response.data;
@@ -188,10 +183,10 @@ function MyAssessments() {
   };
   
 
-  const fetchAssignments = async () => {
+   const fetchAssignments = async () => {
     setLoading(true);
     try {
-      const { data } = await api.get(`/Assignments/employee/${userId}`);
+      const { data } = await getEmployeeAssignments(userId);
       if (data.success) {
         setAssignments(data.data || []);
       } else {
@@ -225,7 +220,7 @@ function MyAssessments() {
     setModalMode("view");
     setSubmitting(true);
     try {
-      const { data } = await api.get(`/SelfAssessment/view/${assignment.formId}/user/${userId}`);
+      const { data } = await viewSelfAssessment(assignment.formId, userId);
       if (data.success) {
         const viewData = (data.data.details || []).map((detail) => ({
           competencyId: detail.competencyId,
@@ -248,7 +243,7 @@ function MyAssessments() {
       setSubmitting(false);
     }
   };
-
+  
   const updateAssessmentData = (competencyId, field, value) => {
     setAssessmentData((prev) =>
       prev.map((item) => (item.competencyId === competencyId ? { ...item, [field]: value } : item))
@@ -298,7 +293,7 @@ function MyAssessments() {
     setAttachments((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmitAssessment = async () => {
+const handleSubmitAssessment = async () => {
     const incompleteRatings = assessmentData.filter((item) => !item.rating);
     if (incompleteRatings.length > 0) {
       toast.error("Please provide ratings for all competencies.");
@@ -332,7 +327,7 @@ function MyAssessments() {
     };
 
     try {
-      const { data } = await api.post("/SelfAssessment/submit", payload);
+      const { data } = await submitSelfAssessment(payload);
       if (data.success) {
         toast.success("Assessment submitted successfully!");
         setShowModal(false);
@@ -357,6 +352,7 @@ function MyAssessments() {
       setSubmitting(false);
     }
   };
+
 
   const pendingAssignments = assignments.filter((a) => !a.isCompleted);
   const completedAssignments = assignments.filter((a) => a.isCompleted);
