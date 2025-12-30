@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import ReactDOM from "react-dom";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../../services/performancemanagement/api/api";
 import { toast } from "sonner";
@@ -90,6 +91,8 @@ function FormCreate() {
   };
 
   const addCompetency = () => {
+    const newIndex = model.competencies.length;
+    
     setModel((m) => ({
       ...m,
       competencies: [
@@ -102,6 +105,29 @@ function FormCreate() {
       ],
     }));
     toast.success("Competency added");
+    
+    // Scroll to the new competency and focus on first input
+    setTimeout(() => {
+      const sectionBody = document.querySelector('.pmhr-fc-competencies-section .pmhr-fc-section-body');
+      if (sectionBody) {
+        sectionBody.scrollTo({
+          top: sectionBody.scrollHeight,
+          behavior: 'smooth'
+        });
+      }
+      
+      // Focus on the first input of the new competency
+      setTimeout(() => {
+        const competencyCards = document.querySelectorAll('.pmhr-fc-comp-card');
+        const newCard = competencyCards[newIndex];
+        if (newCard) {
+          const firstInput = newCard.querySelector('.pmhr-fc-input');
+          if (firstInput) {
+            firstInput.focus();
+          }
+        }
+      }, 400);
+    }, 100);
   };
 
   const updateComp = (index, key, value) => {
@@ -429,24 +455,24 @@ function FormCreate() {
                         FORM TYPE <span className="pmhr-fc-required">*</span>
                       </label>
                       <div className="pmhr-fc-error-wrapper">
-                        <select
-                          className={`pmhr-fc-select ${
-                            validationErrors.type ? "pmhr-fc-input-error" : ""
-                          }`}
+                        <CustomDropdown
+                          options={[
+                            { value: "", label: "Select form type" },
+                            { value: "Self", label: "Self" },
+                            { value: "Manager", label: "Manager" },
+                          ]}
                           value={model.type}
-                          onChange={(e) => {
-                            setModel({ ...model, type: e.target.value });
+                          onChange={(value) => {
+                            setModel({ ...model, type: value });
                             setValidationErrors({
                               ...validationErrors,
                               type: null,
                             });
                           }}
+                          placeholder="Select form type"
                           disabled={busy}
-                        >
-                          <option value="">Select form type</option>
-                          <option value="Self">Self</option>
-                          <option value="Manager">Manager</option>
-                        </select>
+                          error={validationErrors.type}
+                        />
                         {validationErrors.type && (
                           <span className="pmhr-fc-error-text">
                             <i className="bi bi-exclamation-circle"></i>
@@ -461,29 +487,27 @@ function FormCreate() {
                         CATEGORY <span className="pmhr-fc-required">*</span>
                       </label>
                       <div className="pmhr-fc-error-wrapper">
-                        <select
-                          className={`pmhr-fc-select ${
-                            validationErrors.deliveryEnablement
-                              ? "pmhr-fc-input-error"
-                              : ""
-                          }`}
+                        <CustomDropdown
+                          options={[
+                            { value: "", label: "Select category" },
+                            { value: "Delivery", label: "Delivery" },
+                            { value: "Enablement", label: "Enablement" },
+                          ]}
                           value={model.deliveryEnablement}
-                          onChange={(e) => {
+                          onChange={(value) => {
                             setModel({
                               ...model,
-                              deliveryEnablement: e.target.value,
+                              deliveryEnablement: value,
                             });
                             setValidationErrors({
                               ...validationErrors,
                               deliveryEnablement: null,
                             });
                           }}
+                          placeholder="Select category"
                           disabled={busy}
-                        >
-                          <option value="">Select category</option>
-                          <option value="Delivery">Delivery</option>
-                          <option value="Enablement">Enablement</option>
-                        </select>
+                          error={validationErrors.deliveryEnablement}
+                        />
                         {validationErrors.deliveryEnablement && (
                           <span className="pmhr-fc-error-text">
                             <i className="bi bi-exclamation-circle"></i>
@@ -703,6 +727,118 @@ function FormCreate() {
         </form>
       </div>
     </div>
+  );
+}
+
+// Custom Dropdown Component with Portal
+function CustomDropdown({ options, value, onChange, placeholder, disabled, error }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+  const dropdownRef = useRef(null);
+  const selectedRef = useRef(null);
+
+  // Calculate dropdown position
+  useEffect(() => {
+    if (isOpen && selectedRef.current) {
+      const rect = selectedRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY + 4,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+      });
+    }
+  }, [isOpen]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target) &&
+        selectedRef.current &&
+        !selectedRef.current.contains(event.target)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen]);
+
+  // Close dropdown on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (isOpen) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      window.addEventListener("scroll", handleScroll, true);
+    }
+    return () => window.removeEventListener("scroll", handleScroll, true);
+  }, [isOpen]);
+
+  const handleSelect = (optionValue) => {
+    onChange(optionValue);
+    setIsOpen(false);
+  };
+
+  const selectedOption = options.find((opt) => opt.value === value);
+  const displayText = selectedOption ? selectedOption.label : placeholder;
+
+  return (
+    <>
+      <div
+        className={`custom-dropdown-wrapper ${disabled ? "disabled" : ""}`}
+        ref={selectedRef}
+      >
+        <div
+          className={`custom-dropdown-selected ${error ? "pmhr-fc-input-error" : ""}`}
+          onClick={() => !disabled && setIsOpen(!isOpen)}
+          tabIndex={disabled ? -1 : 0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              !disabled && setIsOpen(!isOpen);
+            }
+          }}
+        >
+          <span>{displayText}</span>
+          <span className="custom-dropdown-arrow"></span>
+        </div>
+      </div>
+
+      {isOpen && !disabled &&
+        ReactDOM.createPortal(
+          <div
+            ref={dropdownRef}
+            className="pmhr-fc-custom-dropdown-portal"
+            style={{
+              position: "absolute",
+              top: `${dropdownPosition.top}px`,
+              left: `${dropdownPosition.left}px`,
+              width: `${dropdownPosition.width}px`,
+            }}
+          >
+            {options.map((option, index) => (
+              <div
+                key={index}
+                className={`custom-dropdown-option ${
+                  option.value === value ? "custom-dropdown-option-active" : ""
+                }`}
+                onClick={() => handleSelect(option.value)}
+              >
+                {option.label}
+              </div>
+            ))}
+          </div>,
+          document.body
+        )}
+    </>
   );
 }
 
