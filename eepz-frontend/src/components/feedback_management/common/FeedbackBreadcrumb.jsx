@@ -1,7 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Home } from "lucide-react";
-import "../../../styles/feedback/components/FeedbackHRDashboard.css"
 
 const FeedbackBreadcrumb = ({ items }) => {
   const navigate = useNavigate();
@@ -60,6 +59,8 @@ const FeedbackBreadcrumb = ({ items }) => {
           </a>
           <span className="fb-breadcrumb-slash">/</span>
         </li>
+
+        {/* Other items – slash only if not last */}
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
 

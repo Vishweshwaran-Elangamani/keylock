@@ -5,11 +5,13 @@
   background-color: #f8f9fa;
   padding: 2rem 1.5rem;
   font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  margin-top: -25px;
 }
 
 .amr-container {
   max-width: 1400px;
   margin: 0 auto;
+  margin-top: 50px;
 }
 
 .amr-loading-container {
@@ -51,11 +53,12 @@
 .amr-header-content {
   flex: 1;
   min-width: 250px;
+  
 }
 
 .amr-title {
   margin: 0;
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: #27235C;
   text-align: left;
@@ -136,7 +139,6 @@
   line-height: 1;
 }
 
-/* Filter card */
 
 .amr-filter-card {
   background-color: #fff;

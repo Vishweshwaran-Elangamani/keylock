@@ -844,7 +844,7 @@ const handleManagerSearchKeyPress = (e) => {
           </li>
           <li className="prj-breadcrumb-item-active">
             <span className="prj-breadcrumb-current">
-              Create Project
+            Create Project
             </span>
           </li>
         </ol>

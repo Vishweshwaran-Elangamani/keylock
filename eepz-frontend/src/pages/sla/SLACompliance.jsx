@@ -13,7 +13,9 @@ import {
   CheckCircle,
   Clock,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import ComplianceCard from "../../components/sla/cards/ComplianceCard";
+import Breadcrumb from "../../components/sla/common/Breadcrumbs";
 import slaService from "../../services/sla/slaService";
 import {
   getComplianceSummary,
@@ -195,6 +197,13 @@ const SLACompliance = () => {
 
   return (
     <div className="sla-compliance-wrapper">
+      {/* ✅ Breadcrumb at TOP - Dashboard / SLA Compliance */}
+      <Breadcrumb
+        items={[
+          { label: "SLA Compliance" }
+        ]}
+      />
+      
       <div className="sla-compliance-header">
         <div className="sla-compliance-header-text">
           <p className="sla-compliance-subtitle">

@@ -55,7 +55,6 @@
   font-size: 0.95rem;
 }
 
-/* BREADCRUMB UPDATED */
 
 .hrmom-breadcrumb-nav {
   margin-bottom: 1.25rem;
@@ -72,7 +71,6 @@
   gap: 0.5rem;
 }
 
-/* remove default Bootstrap divider */
 .hrmom-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
   display: none;
 }
@@ -80,6 +78,7 @@
 .hrmom-breadcrumb-item {
   display: flex;
   align-items: center;
+  margin-top: 15px;
 }
 
 .hrmom-breadcrumb-link {
@@ -109,7 +108,6 @@
   font-weight: 600;
 }
 
-/* buttons / error */
 
 .hrmom-btn {
   display: inline-flex;
@@ -156,8 +154,6 @@
   color: #1e293b;
   margin-bottom: 1.25rem;
 }
-
-/* stats */
 
 .hrmom-stats-grid {
   display: grid;
@@ -219,8 +215,6 @@
   font-weight: 600;
   color: #64748b;
 }
-
-/* meeting card */
 
 .hrmom-card {
   background: #ffffff;
@@ -407,8 +401,6 @@
   text-decoration: underline;
 }
 
-/* comments */
-
 .hrmom-comments-box {
   background: #f8f9fa;
   border-radius: 8px;
@@ -420,8 +412,6 @@
   text-align: left;
 }
 
-/* two column layout */
-
 .hrmom-two-column-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -432,8 +422,6 @@
 .hrmom-two-column-grid .hrmom-card {
   margin-bottom: 0;
 }
-
-/* discussion list */
 
 .hrmom-discussion-list {
   display: flex;
@@ -483,8 +471,6 @@
   color: #64748b;
   margin-top: 0.35rem;
 }
-
-/* action items */
 
 .hrmom-action-items-list {
   display: flex;
@@ -564,7 +550,6 @@
   font-weight: 600;
 }
 
-/* empty state */
 
 .hrmom-empty-state {
   padding: 1.2rem;
@@ -576,7 +561,6 @@
   font-weight: 500;
 }
 
-/* list table styles (unchanged) */
 
 .hrmom-list-shell {
   background-color: #ffffff;
@@ -710,8 +694,6 @@
   box-shadow: 0 4px 10px rgba(39, 35, 92, 0.4);
 }
 
-/* responsiveness */
-
 @media (max-width: 992px) {
   .hrmom-wrapper {
     padding: 1rem;
@@ -800,8 +782,6 @@
   }
 }
 
-/* wrapper scroll behavior */
-
 html,
 body {
   margin: 0;
@@ -824,9 +804,9 @@ body {
   margin: 0 auto;
   max-height: calc(100vh - 2.5rem);
   overflow-y: auto;
+  margin-top: -32px;
 }
 
-/* hide scrollbar track for inner container on webkit browsers */
 .hrmom-container::-webkit-scrollbar {
   width: 0;
   height: 0;

@@ -37,7 +37,8 @@
 }
 
 .fm-mysub-breadcrumb {
-  margin-bottom: 0.75rem;
+  margin-bottom: 1.75rem;
+  
 }
 
 .fm-mysub-breadcrumb__list {
@@ -95,6 +96,7 @@
   border-radius: 999px;
   color: #ffffff;
   font-size: 0.813rem;
+  
 }
 
 .fm-mysub-tabs-wrapper {
@@ -109,6 +111,8 @@
   gap: 4px;
   box-shadow: 0 5px 15px rgba(39, 35, 92, 0.22);
   min-height: 54px;
+  margin-top: 25px;
+
 }
 
 .fm-mysub-tab-btn {

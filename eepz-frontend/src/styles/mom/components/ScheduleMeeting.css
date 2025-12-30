@@ -5,15 +5,14 @@
 }
 
 .sched-breadcrumb-nav {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .sched-breadcrumb {
   background-color: transparent;
   padding: 0;
   margin-left: -150px;
-  margin-top: -20px;
-
+  margin-top: -10px;
 }
 
 .sched-breadcrumb-link {
@@ -24,11 +23,13 @@
   padding: 0;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 1px; 
   font-size: 0.875rem;
   font-weight: 500;
   text-decoration: none;
   transition: color 0.2s ease;
+  margin-top: -1px;
+  margin-Left: 5px;
 }
 
 .sched-breadcrumb-link:hover {
@@ -39,8 +40,9 @@
   display: flex;
   align-items: center;
   color: #97247e;
-  margin: 0 8px;
+  margin: 0 2px; 
   font-size: 1rem;
+  font-weight: 500;
 }
 
 .sched-breadcrumb-current {
@@ -52,7 +54,6 @@
 .breadcrumb-item + .breadcrumb-item::before {
   display: none;
 }
-
 
 .sched-header-card {
   background: linear-gradient(135deg, #27235c 0%, #4338ca 100%);

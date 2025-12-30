@@ -10,7 +10,7 @@
 .fm-mgrrev-container {
   max-width: 1200px;
   margin: 0 auto;
-  margin-top: -35px;
+  margin-top: -25px;
 }
 
 .fm-mgrrev-header {
@@ -67,9 +67,9 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 1.5rem;
+  margin-bottom: 40px;
 }
 
-/* Review Card - Matching Reference Image */
 .fm-mgrrev-card {
   background: white;
   border: 1px solid #e5e7eb;

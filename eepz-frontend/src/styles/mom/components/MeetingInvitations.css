@@ -16,7 +16,7 @@
 .mi-breadcrumb-nav {
   margin-bottom: 1.5rem;
   text-align: left; 
-  margin-left: -150px; 
+  margin-left: -160px; 
 }
 
 .mi-breadcrumb {
@@ -29,6 +29,7 @@
 .mi-breadcrumb-item {
   display: flex;
   align-items: center;
+  margin-top: -25px;
 
 }
 
@@ -61,6 +62,7 @@
   color: #97247e;
   margin: 0 8px;
   font-size: 1rem;
+  margin-top: -25px;
 }
 
 .mi-breadcrumb-current {
@@ -103,11 +105,14 @@
   border: 0;
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
   border-radius: 0.75rem;
+  margin-left: -100px;
+
   
 }
 
 .mi-card-body {
   padding: 1.25rem 1.5rem;
+
 }
 
 .mi-empty-body {

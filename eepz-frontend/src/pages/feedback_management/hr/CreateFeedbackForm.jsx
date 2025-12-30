@@ -320,6 +320,7 @@ export default function CreateFeedbackForm() {
 
   return (
     <div className="cff-page">
+      <div className="cff-breadcrumb">
       <FeedbackBreadcrumb
         items={[
           { label: "Feedback Management", path: "/hr/dashboard/feedback" },
@@ -343,6 +344,7 @@ export default function CreateFeedbackForm() {
           </button>
         </div>
       )}
+    </div>      
 
       {success && (
         <div className="cff-alert cff-alert-success">

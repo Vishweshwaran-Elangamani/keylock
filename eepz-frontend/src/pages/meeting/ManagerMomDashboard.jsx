@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Home } from 'lucide-react';
 import momService from "../../services/meeting/momService";
 import meetingService from "../../services/meeting/meetingService";
 import rsvpService from "../../services/meeting/rsvpService";
@@ -62,7 +63,7 @@ const ManagerMomDashboard = () => {
       if (employeesRes.success && employeesRes.data) {
         const nameMap = {};
         employeesRes.data.forEach((emp) => {
-          nameMap[emp.employeeMasterId] = `${emp.firstName} ${emp.lastName}`;
+         nameMap[emp.employeeMasterId] = `${emp.firstName} ${emp.lastName}`;
         });
         setEmployeeMap(nameMap);
       }
@@ -183,7 +184,27 @@ const ManagerMomDashboard = () => {
 
   return (
     <div className="managermom-page">
+    
+      <div className="row justify-content-center">
+        <div className="col-lg-10 col-xl-9">
+          <nav aria-label="breadcrumb" className="sched-breadcrumb-nav">
+            <ol className="breadcrumb mb-0 d-flex align-items-center sched-breadcrumb">
+              <li className="breadcrumb-item d-flex align-items-center">
+                <button 
+                  onClick={() => navigate('/manager/dashboard')} 
+                  className="sched-breadcrumb-link"
+                >
+                  <Home size={16} />
+                  <span className="ms-1"> Dashboard</span>
+                </button>
+              </li>        
+            </ol>
+          </nav>
+        </div>
+      </div>
+
       <div className="managermom-container">
+        
         <div className="row g-3 mb-4">
           <StatCard
             icon="bi-clock"
