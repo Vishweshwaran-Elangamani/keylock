@@ -268,20 +268,7 @@ const ScheduleMeeting = () => {
     ? new Date(formData.meetingDate)
     : null;
 
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December",];
   const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
   const handleSelectCalendarDay = (day, current) => {
