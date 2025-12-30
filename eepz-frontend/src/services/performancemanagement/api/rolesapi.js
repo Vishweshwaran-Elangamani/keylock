@@ -59,7 +59,6 @@ const createApiInstance = (baseURL) => {
           const refreshResponse = await authService.refreshAccessToken();
 
           if (refreshResponse.success) {
-
             const newToken = authService.getToken();
             originalRequest.headers.Authorization = `Bearer ${newToken}`;
 
@@ -129,6 +128,19 @@ export const acknowledgeRating = (payload) => {
 
 export const getManagerEmployeeAcknowledgments = () => {
   return apiPort5113.get("/DeptHeadApprovals/manager/employee-acknowledged-comments");
+};
+
+// NEW: Fetch attachments for a specific assessment
+export const getAssessmentAttachments = (departmentHeadId, assessmentId) => {
+  return apiPort5113.get(`/DeptHeadApprovals/${departmentHeadId}/assessment/${assessmentId}/attachments`);
+};
+
+// NEW: Download a specific attachment
+export const downloadAttachment = (departmentHeadId, attachmentId) => {
+  return apiPort5113.get(
+    `/DeptHeadApprovals/${departmentHeadId}/attachments/${attachmentId}/download`,
+    { responseType: 'blob' }
+  );
 };
 
 export { apiPort5113 };

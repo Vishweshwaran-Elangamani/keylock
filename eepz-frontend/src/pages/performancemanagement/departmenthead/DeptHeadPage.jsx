@@ -113,79 +113,75 @@ export default function DeptHeadPage() {
   };
 
   const fetchAttachments = async (assessmentId) => {
-    setLoadingAttachments(true);
-    try {
-      const departmentHeadId = getEmployeeIdForFilter();
-      const response = await apiPort5113.get(`/DeptHeadApprovals/${departmentHeadId}/assessment/${assessmentId}/attachments`);
+  setLoadingAttachments(true);
+  try {
+    const departmentHeadId = getEmployeeIdForFilter();
+    const response = await getAssessmentAttachments(departmentHeadId, assessmentId);
 
-      if (response.data.success) {
-        setAttachments(response.data.data || []);
-      } else {
-        setAttachments([]);
-      }
-    } catch (error) {
-      console.error("Error fetching attachments:", error);
+    if (response.data.success) {
+      setAttachments(response.data.data || []);
+    } else {
       setAttachments([]);
-    } finally {
-      setLoadingAttachments(false);
     }
-  };
+  } catch (error) {
+    console.error("Error fetching attachments:", error);
+    setAttachments([]);
+  } finally {
+    setLoadingAttachments(false);
+  }
+};
+ 
 
-  const handleDownloadAttachment = async (attachmentId) => {
-    try {
+ const handleDownloadAttachment = async (attachmentId) => {
+  try {
+    const departmentHeadId = getEmployeeIdForFilter();
+    const response = await downloadAttachment(departmentHeadId, attachmentId);
 
-      const departmentHeadId = getEmployeeIdForFilter();
-      const response = await apiPort5113.get(
-        `/DeptHeadApprovals/${departmentHeadId}/attachments/${attachmentId}/download`,
-        { responseType: 'blob' }
-      );
+    let filename = 'attachment';
 
-      let filename = 'attachment';
+    const contentDisposition = response.headers['content-disposition'];
 
-      const contentDisposition = response.headers['content-disposition'];
-
-      if (contentDisposition) {
-        const matches = contentDisposition.match(/filename\s*=\s*"([^"]+)"/);
-        if (matches && matches[1]) {
-          filename = matches[1].trim();
-        } else {
-          const matches2 = contentDisposition.match(/filename\s*=\s*([^;,\n]+)/);
-          if (matches2 && matches2[1]) {
-            filename = matches2[1].trim();
-          }
+    if (contentDisposition) {
+      const matches = contentDisposition.match(/filename\s*=\s*"([^"]+)"/);
+      if (matches && matches[1]) {
+        filename = matches[1].trim();
+      } else {
+        const matches2 = contentDisposition.match(/filename\s*=\s*([^;,\n]+)/);
+        if (matches2 && matches2[1]) {
+          filename = matches2[1].trim();
         }
       }
-
-      const contentType = response.headers['content-type'];
-
-      if (!filename.includes('.') && contentType) {
-        const extension = getExtensionFromContentType(contentType);
-        if (extension) {
-          filename = `${filename}${extension}`;
-        }
-      }
-
-      const blob = new Blob([response.data], { type: contentType || 'application/octet-stream' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', filename);
-
-      document.body.appendChild(link);
-      link.click();
-
-      setTimeout(() => {
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-      }, 100);
-
-      toast.success(`Downloaded: ${filename}`);
-    } catch (error) {
-      console.error("Error downloading attachment:", error);
-      toast.error("Failed to download attachment.");
     }
-  };
 
+    const contentType = response.headers['content-type'];
+
+    if (!filename.includes('.') && contentType) {
+      const extension = getExtensionFromContentType(contentType);
+      if (extension) {
+        filename = `${filename}${extension}`;
+      }
+    }
+
+    const blob = new Blob([response.data], { type: contentType || 'application/octet-stream' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', filename);
+
+    document.body.appendChild(link);
+    link.click();
+
+    setTimeout(() => {
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    }, 100);
+
+    toast.success(`Downloaded: ${filename}`);
+  } catch (error) {
+    console.error("Error downloading attachment:", error);
+    toast.error("Failed to download attachment.");
+  }
+};
   const applyFilters = () => {
     let filtered = activeTab === "pending" ? [...pendingRequests] : [...approvedRequests];
 
