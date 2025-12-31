@@ -1,6 +1,6 @@
 import React from "react";
 import logoImage from "../../../../assets/logodark.png";
-import "../../../../styles/performancemanagement/manager/ReviewModal.css"; 
+import "../../../../styles/performancemanagement/components/ReviewModal.css"; 
 const ReviewModal = ({
   showModal,
   closeModal,

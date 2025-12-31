@@ -1,165 +1,10 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAllAppraisalDetails } from "../../../services/performancemanagement/api/api";
+import api from "../../../services/performancemanagement/api/api";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import AppraisalDetailsModal from "../../../components/performance_management/modals/HRViewAssessment/AppraisalDetailsModal";
-import "../../../styles/performancemanagement/hr/HRViewAssessment.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
-
-/* Custom Status Filter Dropdown */
-const StatusDropdown = ({ value, onChange }) => {
-  const [open, setOpen] = useState(false);
-
-  const options = [
-    { label: "All Status", value: "all" },
-    { label: "Pending", value: "pending" },
-    { label: "Completed", value: "completed" },
-  ];
-
-  const selected = options.find((o) => o.value === value) || options[0];
-
-  const handleSelect = (val) => {
-    onChange(val);
-    setOpen(false);
-  };
-
-  return (
-    <div
-      className="hrvasspm-filter-select custom-dropdown-wrapper"
-      tabIndex={0}
-      onBlur={() => setTimeout(() => setOpen(false), 200)}
-      style={{ position: "relative" }}
-    >
-      <div
-        className="custom-dropdown-selected"
-        onClick={() => setOpen((prev) => !prev)}
-      >
-        {selected.label}
-        <span className="custom-dropdown-arrow" />
-      </div>
-
-      {open && (
-        <div className="custom-dropdown-menu">
-          {options.map((opt) => (
-            <div
-              key={opt.value}
-              className={
-                "custom-dropdown-option" +
-                (opt.value === value ? " custom-dropdown-option-active" : "")
-              }
-              onClick={() => handleSelect(opt.value)}
-            >
-              {opt.label}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
-/* Custom Project Filter Dropdown */
-const ProjectDropdown = ({ value, onChange, projects }) => {
-  const [open, setOpen] = useState(false);
-
-  const allOptions = projects.map((proj) => ({
-    label: proj === "all" ? "All Projects" : proj,
-    value: proj,
-  }));
-  const selected = allOptions.find((o) => o.value === value) || allOptions[0];
-
-  const handleSelect = (val) => {
-    onChange(val);
-    setOpen(false);
-  };
-
-  return (
-    <div
-      className="hrvasspm-filter-select custom-dropdown-wrapper"
-      tabIndex={0}
-      onBlur={() => setTimeout(() => setOpen(false), 200)}
-      style={{ position: "relative" }}
-    >
-      <div
-        className="custom-dropdown-selected"
-        onClick={() => setOpen((prev) => !prev)}
-      >
-        {selected.label}
-        <span className="custom-dropdown-arrow" />
-      </div>
-
-      {open && (
-        <div className="custom-dropdown-menu">
-          {allOptions.map((opt) => (
-            <div
-              key={opt.value}
-              className={
-                "custom-dropdown-option" +
-                (opt.value === value ? " custom-dropdown-option-active" : "")
-              }
-              onClick={() => handleSelect(opt.value)}
-            >
-              {opt.label}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
-/* Custom Rows Per Page Dropdown */
-const RowsPerPageDropdown = ({ value, onChange }) => {
-  const [open, setOpen] = useState(false);
-
-  const options = [
-    { label: "5", value: 5 },
-    { label: "10", value: 10 },
-    { label: "25", value: 25 },
-    { label: "50", value: 50 },
-  ];
-
-  const selected = options.find((o) => o.value === value) || options[1];
-
-  const handleSelect = (val) => {
-    onChange(val);
-    setOpen(false);
-  };
-
-  return (
-    <div
-      className="hrvasspm-pagination-select-wrapper custom-dropdown-wrapper"
-      tabIndex={0}
-      onBlur={() => setTimeout(() => setOpen(false), 200)}
-      style={{ position: "relative" }}
-    >
-      <div
-        className="custom-dropdown-selected"
-        onClick={() => setOpen((prev) => !prev)}
-      >
-        {selected.label}
-        <span className="custom-dropdown-arrow" />
-      </div>
-
-      {open && (
-        <div className="custom-dropdown-menu">
-          {options.map((opt) => (
-            <div
-              key={opt.value}
-              className={
-                "custom-dropdown-option" +
-                (opt.value === value ? " custom-dropdown-option-active" : "")
-              }
-              onClick={() => handleSelect(opt.value)}
-            >
-              {opt.label}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
+import styles from "../../../styles/performancemanagement/hr/HRViewAssessment.module.css";
 
 function exportToCsv(filename, rows) {
   if (!rows || !rows.length) return;
@@ -201,20 +46,20 @@ function statusBadge(status) {
   const s = status.toLowerCase();
   if (s === "completed")
     return (
-      <span className="hrvasspm-badge hrvasspm-badge-completed">
+      <span className={`${styles.hrViewAssessmentBadge} ${styles.hrViewAssessmentBadgeCompleted}`}>
         <i className="bi bi-check-circle-fill" style={{ marginRight: 6 }}></i>
         Completed
       </span>
     );
   if (s.startsWith("pending"))
     return (
-      <span className="hrvasspm-badge hrvasspm-badge-pending">
+      <span className={`${styles.hrViewAssessmentBadge} ${styles.hrViewAssessmentBadgePending}`}>
         <i className="bi bi-hourglass-split" style={{ marginRight: 6 }}></i>
         Pending
       </span>
     );
   return (
-    <span className="hrvasspm-badge hrvasspm-badge-default">
+    <span className={`${styles.hrViewAssessmentBadge} ${styles.hrViewAssessmentBadgeDefault}`}>
       <i className="bi bi-dot" style={{ marginRight: 6 }}></i>
       {status}
     </span>
@@ -226,7 +71,6 @@ function HRViewAppraisals() {
   const [appraisals, setAppraisals] = useState([]);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchInput, setSearchInput] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterProject, setFilterProject] = useState("all");
   const [modalRow, setModalRow] = useState(null);
@@ -239,7 +83,7 @@ function HRViewAppraisals() {
   useEffect(() => {
     async function fetchAppraisals() {
       try {
-        const response = await getAllAppraisalDetails();
+        const response = await api.get("/AssessmentDetails/all-details");
         if (response.data?.success) {
           const initiatedAppraisals = response.data.data.filter((appraisal) => {
             const hasInitiatedCompetency = appraisal.competencies.some((comp) => {
@@ -374,33 +218,27 @@ function HRViewAppraisals() {
     setModalAttachments(row.attachments || []);
   };
 
-  const handleClearFilters = () => {
-    setSearchTerm("");
-    setSearchInput("");
-    setFilterStatus("all");
-    setFilterProject("all");
-    setCurrentPage(1);
-  };
-
   if (loading)
     return (
-      <div className="hrvasspm-loading">
-        <div className="hrvasspm-spinner"></div>
+      <div className={styles.hrViewAssessmentLoading}>
+        <div className={styles.hrViewAssessmentSpinner}></div>
         <p>Loading appraisals...</p>
       </div>
     );
+
   if (error)
     return (
-      <div className="hrvasspm-error">
+      <div className={styles.hrViewAssessmentError}>
         <i className="bi bi-exclamation-circle"></i>
         <p>{error}</p>
       </div>
     );
+
   if (!appraisals.length)
     return (
-      <div className="hrvasspm-container">
-        <h2 className="hrvasspm-page-title">Appraisal Details</h2>
-        <div className="hrvasspm-alert">
+      <div className={styles.hrViewAssessmentContainer}>
+        <h2 className={styles.hrViewAssessmentPageTitle}>Appraisal Details</h2>
+        <div className={styles.hrViewAssessmentAlert}>
           <i className="bi bi-info-circle"></i>
           No initiated appraisal forms found. Please initiate forms from the "Initiate Form" page.
         </div>
@@ -408,7 +246,7 @@ function HRViewAppraisals() {
     );
 
   return (
-    <div className="hrvasspm-page">
+    <div className={styles.hrViewAssessmentPage}>
       <Breadcrumb
         items={[
           { label: "Dashboard", path: "/hr/dashboard" },
@@ -417,172 +255,173 @@ function HRViewAppraisals() {
         ]}
       />
 
-      <div
-        className="hrvasspm-filters"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "12px",
-          flexWrap: "wrap"
-        }}
-      >
-        {/* Unified Search Component */}
-        <div className="hrvasspm-filter-group" style={{ gap: 0 }}>
-          <input
-            type="search"
-            placeholder="Type to search..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.key === 'Enter') {
-                setSearchTerm(searchInput);
-                setCurrentPage(1);
-              }
-            }}
-          />
-          <button
-            onClick={() => {
-              setSearchTerm(searchInput);
-              setCurrentPage(1);
-            }}
-            className="hrvasspm-search-btn"
-          >
-            Search
-          </button>
-        </div>
-
-        <StatusDropdown
-          value={filterStatus}
-          onChange={(val) => {
-            setFilterStatus(val);
-            setCurrentPage(1);
-          }}
-        />
-
-        <ProjectDropdown
-          value={filterProject}
-          onChange={(val) => {
-            setFilterProject(val);
-            setCurrentPage(1);
-          }}
-          projects={uniqueProjects}
-        />
-
-        <button
-          className="hrvasspm-clear-filters-btn"
-          onClick={handleClearFilters}
-        >
-          Clear Filters
-        </button>
-
-        <div style={{ marginLeft: "auto" }}>
-          <button
-            className="hrvasspm-btn-export"
-            onClick={() => exportToCsv("appraisals.csv", csvData)}
-          >
-            <i className="bi bi-download"></i> Export CSV
-          </button>
-        </div>
-      </div>
-
-      <div className="hrvasspm-table-card">
-        <div className="hrvasspm-table-wrapper">
-          <table className="hrvasspm-table">
-            <thead>
-              <tr>
-                <th>Employee Name</th>
-                <th>Project Name</th>
-                <th>Emp Avg</th>
-                <th>L1 Reviewer</th>
-                <th>L1 Avg</th>
-                <th>L2 Reviewer</th>
-                <th>L2 Avg</th>
-                <th>Status</th>
-                <th className="text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentItems.length === 0 ? (
-                <tr>
-                  <td colSpan={9} className="hrvasspm-empty-state">
-                    <i className="bi bi-inbox"></i>
-                    <p>No appraisals match your filters</p>
-                  </td>
-                </tr>
-              ) : (
-                currentItems.map((row) => (
-                  <tr key={row.key}>
-                    <td>{row.employeeName}</td>
-                    <td>{row.projectName}</td>
-                    <td style={{ textAlign: "center" }}>{row.empAvg}</td>
-                    <td>{row.l1ReviewerName}</td>
-                    <td style={{ textAlign: "center" }}>{row.l1Avg}</td>
-                    <td>{row.l2ReviewerName}</td>
-                    <td style={{ textAlign: "center" }}>{row.l2Avg}</td>
-                    <td>{statusBadge(row.status)}</td>
-                    <td>
-                      <div className="hrvasspm-action-buttons">
-                        <button
-                          className="hrvasspm-action-btn hrvasspm-btn-view"
-                          title="View Details"
-                          onClick={() => handleViewDetails(row)}
-                        >
-                          <i className="bi bi-eye"></i>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="hrvasspm-pagination-container">
-          <div className="hrvasspm-pagination-info">
-            <span className="hrvasspm-pagination-label">Show</span>
-            <RowsPerPageDropdown
-              value={rowsPerPage}
-              onChange={(val) => {
-                setRowsPerPage(val);
+      <div className={styles.hrViewAssessmentContainer}>
+        <div className={styles.hrViewAssessmentFilters}>
+          <div className={styles.hrViewAssessmentFilterGroup}>
+            <input
+              type="search"
+              placeholder="Type to search..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
             />
-            <span className="hrvasspm-pagination-label">entries</span>
           </div>
-          <div className="hrvasspm-pagination-status">
-            Showing {summaryRows.length === 0 ? 0 : indexOfFirstItem + 1} to {Math.min(indexOfLastItem, summaryRows.length)} of{" "}
-            {summaryRows.length} entries
+
+          <div className={styles.hrViewAssessmentFilterGroup}>
+            <select
+              value={filterStatus}
+              onChange={(e) => {
+                setFilterStatus(e.target.value);
+                setCurrentPage(1);
+              }}
+            >
+              <option value="all">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="completed">Completed</option>
+            </select>
           </div>
-          <nav className="hrvasspm-pagination-nav">
-            <ul className="hrvasspm-pagination">
-              <li className={`hrvasspm-page-item${currentPage === 1 ? " hrvasspm-disabled" : ""}`}>
-                <button className="hrvasspm-page-link" onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
-                  <i className="bi bi-chevron-left"></i>
-                </button>
-              </li>
-              {getPageNumbers().map((page, idx) => (
-                <li
-                  key={idx}
-                  className={`hrvasspm-page-item${page === currentPage ? " hrvasspm-active" : ""} ${typeof page !== "number" ? " hrvasspm-disabled" : ""
-                    }`}
-                >
-                  <button className="hrvasspm-page-link" onClick={() => typeof page === "number" && setCurrentPage(page)} disabled={typeof page !== "number"}>
-                    {page}
+
+          <div className={styles.hrViewAssessmentFilterGroup}>
+            <select
+              value={filterProject}
+              onChange={(e) => {
+                setFilterProject(e.target.value);
+                setCurrentPage(1);
+              }}
+            >
+              {uniqueProjects.map((p) => (
+                <option key={p} value={p}>
+                  {p === "all" ? "All Projects" : p}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className={styles.hrViewAssessmentFilterGroup}>
+            <button
+              className={styles.hrViewAssessmentBtnExport}
+              onClick={() => exportToCsv("appraisals.csv", csvData)}
+            >
+              <i className="bi bi-download"></i> Export CSV
+            </button>
+          </div>
+        </div>
+
+        <div className={styles.hrViewAssessmentTableCard}>
+          <div className={styles.hrViewAssessmentTableWrapper}>
+            <table className={styles.hrViewAssessmentTable}>
+              <thead>
+                <tr>
+                  <th>Employee Name</th>
+                  <th>Project Name</th>
+                  <th style={{ textAlign: "center" }}>Emp Avg</th>
+                  <th>L1 Reviewer</th>
+                  <th style={{ textAlign: "center" }}>L1 Avg</th>
+                  <th>L2 Reviewer</th>
+                  <th style={{ textAlign: "center" }}>L2 Avg</th>
+                  <th>Status</th>
+                  <th className={styles.textCenter}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentItems.length === 0 ? (
+                  <tr>
+                    <td colSpan={9} className={styles.hrViewAssessmentEmptyState}>
+                      <i className="bi bi-inbox"></i>
+                      <p>No appraisals match your filters</p>
+                    </td>
+                  </tr>
+                ) : (
+                  currentItems.map((row) => (
+                    <tr key={row.key}>
+                      <td>{row.employeeName}</td>
+                      <td>{row.projectName}</td>
+                      <td style={{ textAlign: "center" }}>{row.empAvg}</td>
+                      <td>{row.l1ReviewerName}</td>
+                      <td style={{ textAlign: "center" }}>{row.l1Avg}</td>
+                      <td>{row.l2ReviewerName}</td>
+                      <td style={{ textAlign: "center" }}>{row.l2Avg}</td>
+                      <td>{statusBadge(row.status)}</td>
+                      <td>
+                        <div className={styles.hrViewAssessmentActionButtons}>
+                          <button
+                            className={`${styles.hrViewAssessmentActionBtn} ${styles.hrViewAssessmentBtnView}`}
+                            title="View Details"
+                            onClick={() => handleViewDetails(row)}
+                          >
+                            <i className="bi bi-eye"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <div className={styles.hrViewAssessmentPaginationContainer}>
+            <div className={styles.hrViewAssessmentPaginationInfo}>
+              <span className={styles.hrViewAssessmentPaginationLabel}>Show</span>
+              <select
+                className={styles.hrViewAssessmentPaginationSelect}
+                value={rowsPerPage}
+                onChange={(e) => {
+                  setRowsPerPage(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+              >
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+              </select>
+              <span className={styles.hrViewAssessmentPaginationLabel}>entries</span>
+            </div>
+            <div className={styles.hrViewAssessmentPaginationStatus}>
+              Showing {summaryRows.length === 0 ? 0 : indexOfFirstItem + 1} to {Math.min(indexOfLastItem, summaryRows.length)} of{" "}
+              {summaryRows.length} entries
+            </div>
+            <nav className={styles.hrViewAssessmentPaginationNav}>
+              <ul className={styles.hrViewAssessmentPagination}>
+                <li className={`${styles.hrViewAssessmentPageItem}${currentPage === 1 ? ` ${styles.hrViewAssessmentDisabled}` : ""}`}>
+                  <button
+                    className={styles.hrViewAssessmentPageLink}
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                  >
+                    <i className="bi bi-chevron-left"></i>
                   </button>
                 </li>
-              ))}
-              <li className={`hrvasspm-page-item${currentPage === totalPages ? " hrvasspm-disabled" : ""}`}>
-                <button
-                  className="hrvasspm-page-link"
-                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
-                >
-                  <i className="bi bi-chevron-right"></i>
-                </button>
-              </li>
-            </ul>
-          </nav>
+                {getPageNumbers().map((page, idx) => (
+                  <li
+                    key={idx}
+                    className={`${styles.hrViewAssessmentPageItem}${page === currentPage ? ` ${styles.hrViewAssessmentActive}` : ""} ${typeof page !== "number" ? ` ${styles.hrViewAssessmentDisabled}` : ""
+                      }`}
+                  >
+                    <button
+                      className={styles.hrViewAssessmentPageLink}
+                      onClick={() => typeof page === "number" && setCurrentPage(page)}
+                      disabled={typeof page !== "number"}
+                    >
+                      {page}
+                    </button>
+                  </li>
+                ))}
+                <li className={`${styles.hrViewAssessmentPageItem}${currentPage === totalPages ? ` ${styles.hrViewAssessmentDisabled}` : ""}`}>
+                  <button
+                    className={styles.hrViewAssessmentPageLink}
+                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                  >
+                    <i className="bi bi-chevron-right"></i>
+                  </button>
+                </li>
+              </ul>
+            </nav>
+          </div>
         </div>
       </div>
 

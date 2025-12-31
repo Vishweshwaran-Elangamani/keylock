@@ -7,7 +7,7 @@ import StatusConfirmModal from "../../../components/performance_management/modal
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import Breadcrumb from "../../../components/common/Breadcrumb";
-import "../../../styles/performancemanagement/hr/RewardConfiguration.css";
+import styles from "../../../styles/performancemanagement/hr/RewardConfiguration.module.css";
 
 function RewardConfiguration() {
   const [rewardTypes, setRewardTypes] = useState([]);
@@ -32,6 +32,7 @@ function RewardConfiguration() {
     description: "",
     isVisibleForManagerNomination: false,
   });
+
   const [parameterForm, setParameterForm] = useState({
     parameterName: "",
     parameterType: "Text",
@@ -41,6 +42,7 @@ function RewardConfiguration() {
     maximumValue: "",
     sortOrder: 1,
   });
+
   const [activeTab, setActiveTab] = useState("Active");
   const [descExpanded, setDescExpanded] = useState(false);
 
@@ -182,7 +184,7 @@ function RewardConfiguration() {
         isActive: !rewardType.isActive,
         isVisibleForManagerNomination: rewardType.isVisibleForManagerNomination || false
       });
-      
+
       if (response.data.success) {
         toast.success(`Reward type ${rewardType.isActive ? "deactivated" : "activated"} successfully!`);
         fetchRewardTypes();
@@ -199,15 +201,15 @@ function RewardConfiguration() {
 
   const handleBulkToggleActiveRewards = async () => {
     const activeRewards = rewardTypes.filter((rt) => rt.isActive === true);
-    
+
     if (activeRewards.length === 0) {
       toast.warning("No active rewards to toggle");
       return;
     }
-  
+
     const allVisible = activeRewards.every((rt) => rt.isVisibleForManagerNomination === true);
     const newVisibility = !allVisible;
-  
+
     try {
       const updatePromises = activeRewards.map((rt) =>
         updateRewardType(rt.rewardTypeId, {
@@ -217,9 +219,9 @@ function RewardConfiguration() {
           isVisibleForManagerNomination: newVisibility,
         })
       );
-  
+
       await Promise.all(updatePromises);
-      
+
       toast.success(
         `All active rewards ${newVisibility ? "now visible to" : "hidden from"} managers!`
       );
@@ -309,24 +311,24 @@ function RewardConfiguration() {
 
     return (
       <>
-        <div className="rc-reward-details-header">
-          <div className="rc-reward-title-container">
-            <div className="rc-reward-name">{selectedRewardType.rewardName}</div>
-            <span className="rc-reward-category-badge">Recognition</span>
+        <div className={styles.rewardDetailsTitleRow}>
+          <div className={styles.rewardDetailsTitle}>
+            {selectedRewardType.rewardName}
           </div>
-          <button onClick={openParameterModal} className="rc-add-parameter-btn">
+          <span className={styles.rewardCategoryBadge}>Recognition</span>
+          <button onClick={openParameterModal} className={styles.addParameterBtn}>
             + Add Parameter
           </button>
         </div>
-        <div className="rc-reward-description">
+        <div 
+          className={styles.rewardDescription} 
+          style={{ minHeight: needsCollapse ? 75 : "auto" }}
+        >
           <span>
             {visibleDesc}
-            {showReadMore && !descExpanded && <span className="rc-ellipsis">...</span>}
+            {showReadMore && !descExpanded && <span className={styles.ellipsis}>...</span>}
             {showReadMore && (
-              <button
-                onClick={() => setDescExpanded((e) => !e)}
-                className="rc-read-more-btn"
-              >
+              <button onClick={() => setDescExpanded((e) => !e)} className={styles.readMoreBtn}>
                 {descExpanded ? "Read Less" : "Read More"}
               </button>
             )}
@@ -338,15 +340,19 @@ function RewardConfiguration() {
 
   function ChooseButton({ onClick }) {
     return (
-      <button onClick={onClick} className="rc-choose-btn" title="Select Reward Type">
+      <button
+        onClick={onClick}
+        className={styles.chooseBtn}
+        title="Select Reward Type"
+      >
         <i className="bi bi-plus-circle"></i>
       </button>
     );
   }
 
   return (
-    <div className="rc-container">
-      <div className="rc-header">
+    <div className={styles.rewardConfigContainer}>
+      <div className={styles.rewardConfigHeader}>
         <Breadcrumb
           items={[
             { label: "Dashboard", path: "/hr/dashboard" },
@@ -355,39 +361,44 @@ function RewardConfiguration() {
           ]}
         />
 
-        <button onClick={openAddRewardTypeModal} className="rc-create-reward-btn" title="Create a new Reward Type">
+        <button 
+          onClick={openAddRewardTypeModal} 
+          className={styles.createRewardBtn} 
+          title="Create a new Reward Type"
+        >
           <i className="bi bi-plus-circle"></i>
           Create Reward Type
         </button>
       </div>
 
-      <div className="rc-main-content">
-        <div className="rc-left-panel">
-          <div className="rc-tab-header">
-            <div className="rc-tab-buttons">
+      <div className={styles.rewardConfigContent}>
+        {/* Left Panel - Reward List */}
+        <div className={styles.rewardListPanel}>
+          <div className={styles.rewardListHeader}>
+            <div className={styles.tabToggleContainer}>
               <button
                 onClick={() => setActiveTab("Active")}
-                className={`rc-tab-btn ${activeTab === "Active" ? "rc-tab-btn-active" : ""}`}
+                className={`${styles.tabToggleBtn} ${activeTab === "Active" ? styles.active : styles.inactive}`}
               >
                 Active ({activeRewardTypes.length})
               </button>
               <button
                 onClick={() => setActiveTab("Inactive")}
-                className={`rc-tab-btn ${activeTab === "Inactive" ? "rc-tab-btn-active" : ""}`}
+                className={`${styles.tabToggleBtn} ${activeTab === "Inactive" ? styles.active : styles.inactive}`}
               >
                 Inactive ({inactiveRewardTypes.length})
               </button>
             </div>
 
             {activeTab === "Active" && activeRewardTypes.length > 0 && (
-              <div className="rc-visibility-toggle">
-                <span className="rc-visibility-label">Manager Visibility:</span>
+              <div className={styles.visibilityWrapper}>
+                <span className={styles.visibilityLabel}>Manager Visibility:</span>
                 <button
                   onClick={handleBulkToggleActiveRewards}
-                  className={`rc-toggle-switch ${allActiveVisible ? "rc-toggle-on" : "rc-toggle-off"}`}
+                  className={`${styles.visibilityToggle} ${allActiveVisible ? styles.visible : styles.hidden}`}
                   title={allActiveVisible ? "Hide all active rewards from managers" : "Show all active rewards to managers"}
                 >
-                  <div className="rc-toggle-knob">
+                  <div className={`${styles.visibilityIndicator} ${allActiveVisible ? styles.visible : styles.hidden}`}>
                     <i className={allActiveVisible ? "bi bi-eye-fill" : "bi bi-eye-slash-fill"} />
                   </div>
                 </button>
@@ -395,46 +406,48 @@ function RewardConfiguration() {
             )}
           </div>
 
-          <div className="rc-rewards-list">
+          <div className={styles.rewardListContent}>
             {loading ? (
-              <div className="rc-loading-state">
-                <div className="spinner-border"></div>
-                <div className="rc-loading-text">Loading...</div>
+              <div className={styles.loadingContainer}>
+                <div className={`spinner-border ${styles.loadingSpinner}`}></div>
+                <div className={styles.loadingText}>Loading...</div>
               </div>
             ) : displayedRewards.length === 0 ? (
-              <div className="rc-empty-state">
+              <div className={styles.emptyState}>
                 No {activeTab.toLowerCase()} rewards
               </div>
             ) : (
               displayedRewards.map((rt) => (
                 <div
                   key={rt.rewardTypeId}
-                  className={`rc-reward-card ${selectedRewardType?.rewardTypeId === rt.rewardTypeId ? "rc-reward-card-selected" : ""}`}
+                  className={`${styles.rewardCard} ${selectedRewardType?.rewardTypeId === rt.rewardTypeId ? styles.selected : ""}`}
                 >
-                  <div className="rc-reward-card-content">
-                    <div className="rc-reward-card-title">{rt.rewardName}</div>
-                    <div className="rc-reward-card-description">{rt.description || "—"}</div>
-                    <div className="rc-reward-card-badges">
-                      <span className="rc-param-count-badge">
+                  <div className={styles.rewardCardContent}>
+                    <div className={styles.rewardCardTitle}>{rt.rewardName}</div>
+                    <div className={styles.rewardCardDesc}>
+                      {rt.description || "—"}
+                    </div>
+                    <div className={styles.rewardCardTags}>
+                      <span className={styles.paramCount}>
                         {getParameterCount(rt.rewardTypeId)} parameters
                       </span>
-                      <span className={`rc-status-badge ${rt.isActive ? "rc-status-active" : "rc-status-inactive"}`}>
+                      <span className={`${styles.statusBadge} ${rt.isActive ? styles.active : styles.inactive}`}>
                         {rt.isActive ? "Active" : "Inactive"}
                       </span>
                     </div>
                   </div>
-                  <div className="rc-reward-card-actions">
+                  <div className={styles.rewardCardActions}>
                     <button
                       onClick={() => openEditRewardTypeModal(rt)}
                       title="Edit Reward Type"
-                      className="rc-action-btn rc-edit-btn"
+                      className={`${styles.actionBtn} ${styles.edit}`}
                     >
                       <i className="bi bi-pencil-square" />
                     </button>
                     <button
                       onClick={() => confirmStatusChange(rt)}
                       title={rt.isActive ? "Deactivate Reward Type" : "Activate Reward Type"}
-                      className={`rc-action-btn ${rt.isActive ? "rc-deactivate-btn" : "rc-activate-btn"}`}
+                      className={`${styles.actionBtn} ${styles.toggle} ${rt.isActive ? styles.deactivate : ""}`}
                     >
                       <i className={rt.isActive ? "bi bi-x-circle" : "bi bi-check2-circle"} />
                     </button>
@@ -452,21 +465,23 @@ function RewardConfiguration() {
           </div>
         </div>
 
-        <div className="rc-right-panel">
-          <div className="rc-parameters-section">
+        {/* Right Panel - Details */}
+        <div className={styles.rewardDetailsPanel}>
+          <div className={styles.rewardDetailsHeader}></div>
+          <div className={styles.rewardDetailsContent}>
             {selectedRewardType ? (
               <>
-                <div className="rc-parameters-header">{renderRewardDetails()}</div>
-                <div className="rc-parameters-spacer" />
+                <div style={{ marginTop: 0 }}>{renderRewardDetails()}</div>
+                <div className={styles.spacer14} />
                 {parameters.length === 0 ? (
-                  <div className="rc-no-parameters">
-                    <div className="rc-no-parameters-title">No parameters configured</div>
-                    <div className="rc-no-parameters-subtitle">
+                  <div className={styles.noParamsEmpty}>
+                    <div className={styles.noParamsTitle}>No parameters configured</div>
+                    <div className={styles.noParamsSubtitle}>
                       Add parameters to customize nomination forms
                     </div>
                   </div>
                 ) : (
-                  <table className="rc-parameters-table">
+                  <table className={styles.paramsTable}>
                     <thead>
                       <tr>
                         <th>Parameter Name</th>
@@ -479,20 +494,20 @@ function RewardConfiguration() {
                     <tbody>
                       {parameters.map((param) => (
                         <tr key={param.parameterId}>
-                          <td><strong>{param.parameterName}</strong></td>
-                          <td>{param.parameterType}</td>
-                          <td>
+                          <td className={styles.paramName}>{param.parameterName}</td>
+                          <td className={styles.paramType}>{param.parameterType}</td>
+                          <td className={styles.paramRequired}>
                             {param.isRequired ? (
-                              <span className="rc-required-yes">Yes</span>
+                              <span className={styles.requiredYes}>Yes</span>
                             ) : (
-                              <span className="rc-required-no">No</span>
+                              <span className={styles.requiredNo}>No</span>
                             )}
                           </td>
-                          <td>{param.sortOrder}</td>
+                          <td className={styles.paramOrder}>{param.sortOrder}</td>
                           <td>
                             <button
                               onClick={() => confirmDelete(param.parameterId, "parameter")}
-                              className="rc-delete-param-btn"
+                              className={styles.deleteBtn}
                               title="Delete Parameter"
                             >
                               <i className="bi bi-trash" />
@@ -505,17 +520,18 @@ function RewardConfiguration() {
                 )}
               </>
             ) : (
-              <div className="rc-no-selection">
-                <div className="rc-no-selection-title">
+              <div className={styles.selectEmpty}>
+                <div className={styles.selectTitle}>
                   Select a recognition reward to view parameters
                 </div>
-                <div className="rc-no-selection-subtitle">Choose from Active or Inactive rewards</div>
+                <div className={styles.selectSubtitle}>Choose from Active or Inactive rewards</div>
               </div>
             )}
           </div>
         </div>
       </div>
 
+      {/* Modals */}
       {showRewardTypeModal && (
         <RewardTypeModal
           show={showRewardTypeModal}

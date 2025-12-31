@@ -1,0 +1,152 @@
+/* RewardTypeModal.css - Unique page-specific styles */
+
+.reward-type-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(39, 35, 92, 0.13);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1500;
+  }
+  
+  .reward-type-modal {
+    background-color: #fff;
+    border-radius: 20px;
+    max-width: 410px;
+    width: 94vw;
+    min-width: 320px;
+    box-shadow: 0 5px 32px rgba(39, 35, 92, 0.13);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .reward-type-header {
+    background: #27235C;
+    color: #fff;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    padding: 19px 24px 12px 24px;
+    margin-bottom: 0;
+    text-align: left;
+  }
+  
+  .reward-type-header-title {
+    font-weight: 800;
+    font-size: 1.24rem;
+    letter-spacing: 0.01em;
+    color: #fff;
+  }
+  
+  .reward-type-body {
+    padding: 12px 20px 20px 20px;
+    background: #fff;
+  }
+  
+  .reward-type-label {
+    display: block;
+    font-weight: 700;
+    font-size: 15px;
+    margin: 18px 0 4px 0;
+    color: #27235C;
+    text-align: left;
+  }
+  
+  .reward-type-required {
+    color: #E01950;
+    font-weight: 700;
+    font-size: 15px;
+    margin-left: 2px;
+  }
+  
+  .reward-type-input {
+    width: 100%;
+    padding: 10px 10px;
+    margin-bottom: 0;
+    font-size: 15px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    color: #27235C;
+    outline: none;
+    box-sizing: border-box;
+  }
+  
+  .reward-type-input:focus {
+    border-color: #27235C;
+    box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+  }
+  
+  .reward-type-textarea {
+    width: 100%;
+    padding: 10px 10px;
+    min-height: 64px;
+    resize: vertical;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    margin-bottom: 0;
+    color: #27235C;
+    background: #fff;
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+    box-sizing: border-box;
+  }
+  
+  .reward-type-textarea:focus {
+    border-color: #27235C;
+    box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+  }
+  
+  .reward-type-action-row {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    margin-top: 22px;
+    padding-right: 0;
+  }
+  
+  .reward-type-cancel-button {
+    padding: 9px 28px;
+    border-radius: 8px;
+    border: none;
+    background: #6C757D;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    transition: background 0.15s;
+  }
+  
+  .reward-type-cancel-button:hover {
+    background: #5a6268;
+  }
+  
+  .reward-type-create-button {
+    padding: 9px 28px;
+    border-radius: 8px;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    background: linear-gradient(90deg, #97247E 0%, #E01950 100%);
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(151, 36, 126, 0.07);
+    letter-spacing: 0.01em;
+    transition: background 0.16s;
+  }
+  
+  .reward-type-create-button:hover {
+    filter: brightness(1.1);
+  }
+  
+  /* Hide scrollbar for elements with overflow */
+  .reward-type-modal div[style*="overflow-y: auto"]::-webkit-scrollbar {
+    display: none;
+  }
+  

@@ -1,4 +1,5 @@
 import React from "react";
+import "../../../../styles/performancemanagement/components/ActionModal.css";
 
 const ActionModal = ({
   show,
@@ -13,113 +14,49 @@ const ActionModal = ({
 
   return (
     <>
-      <div
-        style={{
-          position: "fixed",
-          top: 0, left: 0, right: 0, bottom: 0,
-          background: "rgba(39, 35, 92, 0.32)",
-          backdropFilter: "blur(7px)",
-          WebkitBackdropFilter: "blur(7px)",
-          zIndex: 1040,
-        }}
-        onClick={onClose}
-      ></div>
+      {/* Backdrop */}
+      <div className="action-modal-backdrop" onClick={onClose}></div>
 
-      <div
-        style={{
-          position: "fixed",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          zIndex: 1050,
-          width: "95%",
-          maxWidth: 430,
-        }}
-      >
+      {/* Modal Wrapper */}
+      <div className="action-modal-wrapper">
         <div
-          style={{
-            background: THEME.card,
-            borderRadius: 18,
-            boxShadow: "0 8px 24px rgba(32, 30, 60, 0.13)",
-            overflow: "hidden",
-            border: "2px solid #27235c",
-          }}
+          className="action-modal-container"
+          style={{ background: THEME.card }}
         >
-          {/* HEADER WITH X BUTTON */}
+          {/* Header with X Button */}
           <div
-            style={{
-              background: THEME.primary,
-              color: "#fff",
-              padding: "18px 24px",
-              borderTopLeftRadius: 16,
-              borderTopRightRadius: 16,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
+            className="action-modal-header"
+            style={{ background: THEME.primary }}
           >
-            <h6
-              style={{
-                fontWeight: 700,
-                fontSize: 17,
-                color: "white",
-                margin: 0,
-                letterSpacing: "0.04em",
-                textAlign: "left",
-              }}
-            >
+            <h6 className="action-modal-title">
               {actionType === "approve" ? "Approval Remarks" : "Rejection Reason"}
             </h6>
-            
-            {/* X CLOSE BUTTON */}
+
+            {/* X Close Button - NO HOVER EVENTS */}
             <button
               onClick={onClose}
-              style={{
-                background: "transparent",
-                border: "none",
-                color: "#fff",
-                fontSize: 20,
-                fontWeight: 600,
-                cursor: "pointer",
-                padding: "0",
-                width: 32,
-                height: 32,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: 6,
-                transition: "background 0.2s",
-              }}
-              onMouseEnter={(e) => e.target.style.background = "rgba(255, 255, 255, 0.15)"}
-              onMouseLeave={(e) => e.target.style.background = "transparent"}
+              className="action-modal-close-btn"
               aria-label="Close"
             >
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
 
-          {/* BODY */}
+          {/* Body */}
           <div
-            className="card-body"
-            style={{ padding: "24px 24px 20px 24px", background: THEME.card }}
+            className="action-modal-body"
+            style={{ background: THEME.card }}
           >
             <label
-              style={{
-                fontSize: "14px",
-                fontWeight: 700,
-                color: THEME.textLight,
-                marginBottom: "10px",
-                letterSpacing: "0.2px",
-                display: "block",
-                textAlign: "left",
-              }}
+              className="action-modal-label"
+              style={{ color: THEME.textLight }}
             >
               {actionType === "approve"
                 ? "Enter your approval justification"
                 : "Enter your rejection reason"}
             </label>
             <textarea
-              className="form-control"
+              className="form-control action-modal-textarea"
               rows={4}
               value={actionRemarks}
               onChange={(e) => setActionRemarks(e.target.value)}
@@ -128,70 +65,32 @@ const ActionModal = ({
                   ? "Why are you approving this nomination?"
                   : "Why are you rejecting this nomination?"
               }
-              style={{
-                fontSize: 15,
-                borderColor: THEME.border,
-                borderRadius: 7,
-                background: "#fff",
-                minHeight: 92,
-                padding: "13px",
-                boxShadow: "none",
-                outline: "none",
-                resize: "vertical",
-                textAlign: "left",
-              }}
+              style={{ borderColor: THEME.border }}
             />
           </div>
 
-          {/* FOOTER - EXTRA COMPACT */}
+          {/* Footer */}
           <div
-            className="card-footer"
+            className="action-modal-footer"
             style={{
               background: THEME.background,
-              borderTop: `1px solid ${THEME.border}`,
-              padding: "10px 24px",
-              borderBottomLeftRadius: 16,
-              borderBottomRightRadius: 16,
+              borderTopColor: THEME.border,
             }}
           >
-            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+            <div className="action-modal-footer-buttons">
               <button
-                className="btn"
+                className="btn action-modal-btn-cancel"
                 onClick={onClose}
-                style={{
-                  background: "grey",
-                  color: "white",
-                  border: `1.8px solid #d1d5db`,
-                  fontWeight: 600,
-                  fontSize: 13.5,
-                  padding: "6px 18px",
-                  borderRadius: 6,
-                  minWidth: 75,
-                  transition: "border 0.18s, box-shadow 0.14s",
-                  boxShadow: "0 1.5px 12px rgba(60,70,80,0.03)",
-                  cursor: "pointer",
-                }}
               >
                 Cancel
               </button>
               <button
-                className="btn"
+                className={`btn action-modal-btn-submit ${
+                  actionType === "approve"
+                    ? "action-modal-btn-approve"
+                    : "action-modal-btn-reject"
+                }`}
                 onClick={onSubmit}
-                style={{
-                  background: actionType === "approve"
-                    ? "#27235C"
-                    : "linear-gradient(90deg, #ee4947 0%, #f16f6f 95%)",
-                  color: "#fff",
-                  border: "none",
-                  fontWeight: 700,
-                  fontSize: 13.5,
-                  padding: "6px 20px",
-                  borderRadius: 6,
-                  minWidth: 85,
-                  letterSpacing: "0.05em",
-                  boxShadow: "0 2px 8px rgba(29,100,216,0.09)",
-                  cursor: "pointer",
-                }}
               >
                 {actionType === "approve" ? "Approve" : "Reject"}
               </button>

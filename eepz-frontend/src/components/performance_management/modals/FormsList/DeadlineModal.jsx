@@ -1,6 +1,6 @@
 import React from "react";
 import "bootstrap-icons/font/bootstrap-icons.css";
-
+ 
 function DeadlineModal({
   isOpen,
   onClose,
@@ -10,10 +10,10 @@ function DeadlineModal({
   pendingAction,
 }) {
   if (!isOpen) return null;
-
+ 
   return (
     <>
-
+ 
       <div
         style={{
           position: 'fixed',
@@ -29,7 +29,7 @@ function DeadlineModal({
         }}
         onClick={onClose}
       />
-
+ 
       {/* Modal Container */}
       <div
         style={{
@@ -194,5 +194,7 @@ function DeadlineModal({
     </>
   );
 }
-
+ 
 export default DeadlineModal;
+ 
+ 

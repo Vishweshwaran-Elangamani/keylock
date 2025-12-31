@@ -7,8 +7,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import ViewDetailsModal from "../../../components/performance_management/modals/Hrnomination/ViewDetailsModal";
 import ActionModal from "../../../components/performance_management/modals/Hrnomination/ActionModal";
-import "../../../styles/performancemanagement/hr/Hrnomination.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
+import styles from "../../../styles/performancemanagement/hr/HRNomination.module.css";
 
 function HRNominations() {
   const [nominations, setNominations] = useState([]);
@@ -219,7 +219,7 @@ function HRNominations() {
         const { data } = await api.approveNominations(payload);
   
         if (data.success || data.Success) {
-          toast.success(` Nomination approved successfully!`);
+          toast.success(`✓ Nomination approved successfully!`);
           setShowActionModal(false);
           setActionRemarks("");
           
@@ -238,7 +238,7 @@ function HRNominations() {
         });
   
         if (data.success || data.Success) {
-          toast.success(` Nomination rejected successfully!`);
+          toast.success(`✓ Nomination rejected successfully!`);
           setShowActionModal(false);
           setActionRemarks("");
           
@@ -297,32 +297,29 @@ function HRNominations() {
   };
 
   const statColors = {
-    "Total Nominations": "stat-icon-primary",
-    "Pending": "stat-icon-warning",
-    "Approved": "stat-icon-success",
-    "Rejected": "stat-icon-danger",
+    "Total Nominations": styles.hrNominationStatIconPrimary,
+    "Pending": styles.hrNominationStatIconWarning,
+    "Approved": styles.hrNominationStatIconSuccess,
+    "Rejected": styles.hrNominationStatIconDanger,
   };
 
   const StatCard = ({ title, value }) => (
-    <div className="ad-stat-card">
-      <div className={`stat-icon ${statColors[title]}`}>
+    <div className={styles.hrNominationStatCard}>
+      <div className={`${styles.hrNominationStatIcon} ${statColors[title]}`}>
         <i className={`bi ${statIcons[title]}`}></i>
       </div>
-      <div className="stat-content">
-        <h3 className="stat-value">{value}</h3>
-        <p className="stat-label">{title}</p>
+      <div className={styles.hrNominationStatContent}>
+        <h3>{value}</h3>
+        <p>{title}</p>
       </div>
     </div>
   );
 
   if (loading) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "100vh", background: THEME.background }}
-      >
-        <div className="text-center">
-          <div className="spinner-border mb-3" role="status" style={{ color: THEME.primary }}></div>
+      <div className={styles.hrNominationLoadingWrapper}>
+        <div className={styles.hrNominationLoadingContent}>
+          <div className={`spinner-border mb-3 ${styles.hrNominationSpinner}`} role="status"></div>
           <p className="text-muted">Loading nominations...</p>
         </div>
       </div>
@@ -331,7 +328,7 @@ function HRNominations() {
 
   if (showEmployeeList) {
     return (
-      <div style={{ background: THEME.background, minHeight: "100vh", paddingTop: "16px", paddingBottom: "32px" }}>
+      <div className={styles.hrNominationContainer}>
         <ToastContainer position="top-right" autoClose={3000} />
         
         <div className="container-fluid">
@@ -351,32 +348,16 @@ function HRNominations() {
             />
           </div>
 
-          <div style={{
-            background: "#fff",
-            border: "2px solid #27235c",
-            borderRadius: "12px",
-            padding: "16px 20px",
-            marginBottom: "20px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center"
-          }}>
+          <div className={styles.hrNominationEmployeeHeader}>
             <div>
-              <h4 style={{ margin: 0, color: THEME.primary, fontSize: "18px", fontWeight: "700" }}>
+              <h4 className={styles.hrNominationEmployeeHeaderTitle}>
                 {selectedRewardName}
               </h4>
-              <p style={{ margin: 0, color: THEME.textLight, fontSize: "13px" }}>
+              <p className={styles.hrNominationEmployeeHeaderSubtitle}>
                 {selectedRewardEmployees.length} employee(s) nominated
               </p>
             </div>
-            <div style={{
-              background: THEME.primary,
-              color: "#fff",
-              padding: "6px 16px",
-              borderRadius: "20px",
-              fontSize: "16px",
-              fontWeight: "700"
-            }}>
+            <div className={styles.hrNominationEmployeeHeaderBadge}>
               {selectedRewardEmployees.length}
             </div>
           </div>
@@ -384,108 +365,53 @@ function HRNominations() {
           <div className="row g-3">
             {selectedRewardEmployees.map((employee) => (
               <div key={employee.nominationId} className="col-md-6">
-                <div
-                  style={{
-                    background: "#fff",
-                    border: "2px solid #e5e7eb",
-                    borderRadius: "10px",
-                    padding: "14px 16px",
-                    transition: "all 0.2s",
-                    height: "100%"
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = THEME.primary;
-                    e.currentTarget.style.boxShadow = "0 4px 12px rgba(39,35,92,0.1)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = "#e5e7eb";
-                    e.currentTarget.style.boxShadow = "none";
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
-                    <div style={{
-                      width: "40px",
-                      height: "40px",
-                      flexShrink: 0,
-                      borderRadius: "50%",
-                      background: `linear-gradient(135deg, ${THEME.primary} 0%, ${THEME.secondary} 100%)`,
-                      color: "#fff",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "16px",
-                      fontWeight: "700"
-                    }}>
+                <div className={styles.hrNominationEmployeeCard}>
+                  <div className={styles.hrNominationEmployeeCardHeader}>
+                    <div className={styles.hrNominationEmployeeAvatar}>
                       {employee.nomineeName.charAt(0).toUpperCase()}
                     </div>
-                    <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
-                      <h6 style={{ margin: 0, fontSize: "15px", fontWeight: "700", color: THEME.text }}>
+                    <div className={styles.hrNominationEmployeeInfo}>
+                      <h6 className={styles.hrNominationEmployeeName}>
                         {employee.nomineeName}
                       </h6>
-                      <p style={{ margin: 0, fontSize: "12px", color: THEME.textLight }}>
+                      <p className={styles.hrNominationEmployeeEmail}>
                         {employee.nomineeEmail}
                       </p>
                     </div>
                   </div>
                   
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "12px" }}>
-                    <div style={{ background: "#f8f9fc", padding: "8px 10px", borderRadius: "6px" }}>
-                      <span style={{ fontSize: "10px", color: THEME.textLight, fontWeight: "600", textTransform: "uppercase", display: "block" }}>
+                  <div className={styles.hrNominationEmployeeInfoGrid}>
+                    <div className={styles.hrNominationEmployeeInfoBox}>
+                      <span className={styles.hrNominationEmployeeInfoLabel}>
                         Department
                       </span>
-                      <p style={{ margin: 0, fontSize: "13px", fontWeight: "600", color: THEME.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      <p className={styles.hrNominationEmployeeInfoValue}>
                         {employee.nomineeDepartmentName}
                       </p>
                     </div>
-                    <div style={{ background: "#f8f9fc", padding: "8px 10px", borderRadius: "6px" }}>
-                      <span style={{ fontSize: "10px", color: THEME.textLight, fontWeight: "600", textTransform: "uppercase", display: "block" }}>
+                    <div className={styles.hrNominationEmployeeInfoBox}>
+                      <span className={styles.hrNominationEmployeeInfoLabel}>
                         Submitted
                       </span>
-                      <p style={{ margin: 0, fontSize: "13px", fontWeight: "600", color: THEME.text }}>
+                      <p className={styles.hrNominationEmployeeInfoValue}>
                         {new Date(employee.submittedAt).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
 
                   {employee.justification && (
-                    <div style={{
-                      background: "#f8f9fc",
-                      padding: "10px",
-                      borderRadius: "6px",
-                      borderLeft: `3px solid ${THEME.primary}`,
-                      marginBottom: "12px"
-                    }}>
-                      <p style={{ 
-                        margin: 0, 
-                        fontSize: "12px", 
-                        color: THEME.text, 
-                        lineHeight: "1.5",
-                        display: "-webkit-box",
-                        WebkitLineClamp: "2",
-                        WebkitBoxOrient: "vertical",
-                        overflow: "hidden"
-                      }}>
+                    <div className={styles.hrNominationEmployeeJustification}>
+                      <p className={styles.hrNominationEmployeeJustificationText}>
                         {employee.justification}
                       </p>
                     </div>
                   )}
 
-                  <div style={{ display: "flex", gap: "6px", justifyContent: "center" }}>
+                  <div className={styles.hrNominationEmployeeActions}>
                     <button
                       onClick={() => viewDetails(employee.nominationId)}
                       title="View Details"
-                      style={{
-                        padding: "6px 8px",
-                        background: "#fff",
-                        color: THEME.primary,
-                        border: `1.3px solid ${THEME.primary}`,
-                        borderRadius: "6px",
-                        fontSize: "15px",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
+                      className={`${styles.hrNominationEmployeeActionBtn} ${styles.hrNominationEmployeeActionBtnView}`}
                     >
                       <i className="bi bi-eye" />
                     </button>
@@ -494,36 +420,14 @@ function HRNominations() {
                         <button
                           onClick={() => openApproveModal(employee.nominationId)}
                           title="Approve"
-                          style={{
-                            padding: "6px 8px",
-                            background: "#fff",
-                            color: THEME.success,
-                            border: `1.3px solid ${THEME.success}`,
-                            borderRadius: "6px",
-                            fontSize: "15px",
-                            cursor: "pointer",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
+                          className={`${styles.hrNominationEmployeeActionBtn} ${styles.hrNominationEmployeeActionBtnApprove}`}
                         >
                           <i className="bi bi-check-circle" />
                         </button>
                         <button
                           onClick={() => openRejectModal(employee.nominationId)}
                           title="Reject"
-                          style={{
-                            padding: "6px 8px",
-                            background: "#fff",
-                            color: THEME.danger,
-                            border: `1.3px solid ${THEME.danger}`,
-                            borderRadius: "6px",
-                            fontSize: "15px",
-                            cursor: "pointer",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
+                          className={`${styles.hrNominationEmployeeActionBtn} ${styles.hrNominationEmployeeActionBtnReject}`}
                         >
                           <i className="bi bi-x-circle" />
                         </button>
@@ -558,7 +462,7 @@ function HRNominations() {
   }
 
   return (
-    <div style={{ background: THEME.background, minHeight: "100vh", paddingTop: "16px", paddingBottom: "32px" }}>
+    <div className={styles.hrNominationContainer}>
       <ToastContainer position="top-right" autoClose={3000} />
 
       <div className="container-fluid">
@@ -591,66 +495,34 @@ function HRNominations() {
           </div>
         )}
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "1.2rem 0 1rem 0",
-            flexWrap: "wrap",
-            gap: "1rem",
-          }}
-        >
-          <div className="status-tabs">
+        <div className={styles.hrNominationHeader}>
+          <div className={styles.hrNominationStatusTabs}>
             <button
-              className={`status-tab${activeTab === "Pending" ? " active" : ""}`}
+              className={`${styles.hrNominationStatusTab} ${activeTab === "Pending" ? styles.hrNominationStatusTabActive : ""}`}
               onClick={() => setActiveTab("Pending")}
             >
               Pending
             </button>
             <button
-              className={`status-tab${activeTab === "Approved" ? " active" : ""}`}
+              className={`${styles.hrNominationStatusTab} ${activeTab === "Approved" ? styles.hrNominationStatusTabActive : ""}`}
               onClick={() => setActiveTab("Approved")}
             >
               Approved
             </button>
             <button
-              className={`status-tab${activeTab === "Rejected" ? " active" : ""}`}
+              className={`${styles.hrNominationStatusTab} ${activeTab === "Rejected" ? styles.hrNominationStatusTabActive : ""}`}
               onClick={() => setActiveTab("Rejected")}
             >
               Rejected
             </button>
           </div>
 
-          <div
-            style={{
-              display: "flex",
-              border: "2px solid #27235c",
-              borderRadius: "8px",
-              overflow: "hidden",
-              background: "#fff",
-              height: "36px",
-            }}
-          >
+          <div className={styles.hrNominationViewToggle}>
             <button
               onClick={() => setViewMode("grid")}
               title="Grid View"
               aria-label="Grid View"
-              style={{
-                background: viewMode === "grid" ? "#27235c" : "#fff",
-                color: viewMode === "grid" ? "#fff" : "#27235c",
-                border: "none",
-                fontWeight: 700,
-                fontSize: "13px",
-                padding: "6px 20px",
-                minWidth: 80,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                transition: "all 0.12s",
-                outline: "none",
-                cursor: "pointer",
-              }}
+              className={`${styles.hrNominationViewButton} ${viewMode === "grid" ? styles.hrNominationViewButtonActive : ""}`}
             >
               <i className="bi bi-grid-3x3-gap-fill" style={{ fontSize: 18 }} />
             </button>
@@ -659,21 +531,7 @@ function HRNominations() {
               onClick={() => setViewMode("table")}
               title="Table View"
               aria-label="Table View"
-              style={{
-                background: viewMode === "table" ? "#27235c" : "#fff",
-                color: viewMode === "table" ? "#fff" : "#27235c",
-                border: "none",
-                fontWeight: 700,
-                fontSize: "13px",
-                padding: "6px 20px",
-                minWidth: 80,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                transition: "all 0.12s",
-                outline: "none",
-                cursor: "pointer",
-              }}
+              className={`${styles.hrNominationViewButton} ${viewMode === "table" ? styles.hrNominationViewButtonActive : ""}`}
             >
               <i className="bi bi-table" style={{ fontSize: 18 }} />
             </button>
@@ -681,73 +539,27 @@ function HRNominations() {
         </div>
 
         {groupedRewards.length === 0 ? (
-          <div
-            style={{
-              background: "#fff",
-              border: "2px solid #27235c",
-              borderRadius: "10px",
-              padding: "48px 20px",
-              textAlign: "center",
-            }}
-          >
-            <h5 style={{ fontSize: "16px", fontWeight: "600", marginBottom: "6px", color: "#1A202C" }}>
+          <div className={styles.hrNominationEmptyState}>
+            <h5 className={styles.hrNominationEmptyTitle}>
               No {activeTab.toLowerCase()} nominations
             </h5>
-            <p style={{ fontSize: "13px", marginBottom: 0, color: "#718096" }}>
+            <p className={styles.hrNominationEmptyText}>
               Check back later or switch to another tab
             </p>
           </div>
         ) : viewMode === "table" ? (
           <>
-            <div
-              style={{
-                background: "#fff",
-                border: "2px solid #27235c",
-                borderRadius: "10px",
-                overflow: "hidden",
-                marginBottom: "1.5rem",
-              }}
-            >
-              <table style={{ width: "100%", borderCollapse: "collapse", margin: 0 }}>
-                <thead style={{ background: "#27235c" }}>
+            <div className={styles.hrNominationTableWrapper}>
+              <table className={styles.hrNominationTable}>
+                <thead className={styles.hrNominationTableHead}>
                   <tr>
-                    <th
-                      style={{
-                        fontWeight: "700",
-                        color: "#fff",
-                        padding: "12px 20px",
-                        fontSize: "13px",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.4px",
-                        textAlign: "left",
-                      }}
-                    >
+                    <th className={`${styles.hrNominationTableTh} ${styles.hrNominationTableThLeft}`}>
                       Reward Type
                     </th>
-                    <th
-                      style={{
-                        fontWeight: "700",
-                        color: "#fff",
-                        padding: "12px 20px",
-                        fontSize: "13px",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.4px",
-                        textAlign: "center",
-                      }}
-                    >
+                    <th className={`${styles.hrNominationTableTh} ${styles.hrNominationTableThCenter}`}>
                       Nominated Employees
                     </th>
-                    <th
-                      style={{
-                        fontWeight: "700",
-                        color: "#fff",
-                        padding: "12px 20px",
-                        fontSize: "13px",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.4px",
-                        textAlign: "center",
-                      }}
-                    >
+                    <th className={`${styles.hrNominationTableTh} ${styles.hrNominationTableThCenter}`}>
                       Actions
                     </th>
                   </tr>
@@ -756,76 +568,32 @@ function HRNominations() {
                   {paginatedRewards.map((reward, index) => (
                     <tr
                       key={reward.rewardName}
-                      style={{
-                        borderBottom: index < paginatedRewards.length - 1 ? "1px solid #e5e7eb" : "none",
-                      }}
+                      className={styles.hrNominationTableRow}
                     >
-                      <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                          <div style={{
-                            width: "40px",
-                            height: "40px",
-                            borderRadius: "8px",
-                            background: `linear-gradient(135deg, ${THEME.primary} 0%, ${THEME.secondary} 100%)`,
-                            color: "#fff",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontSize: "18px",
-                            fontWeight: "700"
-                          }}>
+                      <td className={styles.hrNominationTableTd}>
+                        <div className={styles.hrNominationRewardInfo}>
+                          <div className={styles.hrNominationRewardIcon}>
                             <i className="bi bi-award-fill" />
                           </div>
                           <div>
-                            <div style={{ fontWeight: "700", color: THEME.text, fontSize: "15px" }}>
+                            <div className={styles.hrNominationRewardName}>
                               {reward.rewardName}
                             </div>
                           </div>
                         </div>
                       </td>
-                      <td style={{ padding: "16px 20px", verticalAlign: "middle", textAlign: "center" }}>
-                        <div style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "8px",
-                          background: THEME.primary,
-                          color: "#fff",
-                          padding: "6px 16px",
-                          borderRadius: "20px",
-                          fontSize: "14px",
-                          fontWeight: "700"
-                        }}>
+                      <td className={`${styles.hrNominationTableTd} ${styles.hrNominationTableTdCenter}`}>
+                        <div className={styles.hrNominationEmployeeCountBadge}>
                           <i className="bi bi-people-fill" />
                           {reward.totalCount}
                         </div>
                       </td>
-                      <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
+                      <td className={styles.hrNominationTableTd}>
                         <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
                           <button
                             onClick={() => viewEmployeeList(reward)}
                             title="View Employees"
-                            style={{
-                              padding: "8px 16px",
-                              background: THEME.primary,
-                              color: "#fff",
-                              border: "none",
-                              borderRadius: "8px",
-                              fontSize: "13px",
-                              fontWeight: "700",
-                              cursor: "pointer",
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "6px",
-                              transition: "all 0.2s"
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.transform = "translateY(-2px)";
-                              e.currentTarget.style.boxShadow = "0 4px 12px rgba(39,35,92,0.3)";
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.transform = "translateY(0)";
-                              e.currentTarget.style.boxShadow = "none";
-                            }}
+                            className={styles.hrNominationTableViewButton}
                           >
                             View Nominations
                           </button>
@@ -838,11 +606,11 @@ function HRNominations() {
             </div>
 
             {totalPages > 1 && (
-              <nav aria-label="Page navigation">
+              <nav aria-label="Page navigation" className={styles.hrNominationPagination}>
                 <ul className="pagination justify-content-center">
                   <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
                     <button
-                      className="page-link"
+                      className={`page-link ${styles.hrNominationPaginationButton}`}
                       onClick={() => setCurrentPage(1)}
                       disabled={currentPage === 1}
                     >
@@ -854,7 +622,7 @@ function HRNominations() {
                     return pageNum <= totalPages ? (
                       <li key={pageNum} className={`page-item ${currentPage === pageNum ? "active" : ""}`}>
                         <button
-                          className="page-link"
+                          className={`page-link ${styles.hrNominationPaginationButton} ${currentPage === pageNum ? styles.hrNominationPaginationButtonActive : ""}`}
                           onClick={() => setCurrentPage(pageNum)}
                         >
                           {pageNum}
@@ -864,7 +632,7 @@ function HRNominations() {
                   })}
                   <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
                     <button
-                      className="page-link"
+                      className={`page-link ${styles.hrNominationPaginationButton}`}
                       onClick={() => setCurrentPage(totalPages)}
                       disabled={currentPage === totalPages}
                     >
@@ -880,76 +648,28 @@ function HRNominations() {
             <div className="row g-3 mb-3">
               {paginatedRewards.map((reward) => (
                 <div key={reward.rewardName} className="col-md-6 col-lg-4">
-                  <div
-                    style={{
-                      background: "#fff",
-                      border: "2px solid #27235c",
-                      borderRadius: "12px",
-                      padding: "20px",
-                      transition: "transform 0.2s, box-shadow 0.2s",
-                      cursor: "pointer",
-                      height: "100%",
-                      display: "flex",
-                      flexDirection: "column"
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = "translateY(-4px)";
-                      e.currentTarget.style.boxShadow = "0 8px 20px rgba(39,35,92,0.15)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = "translateY(0)";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
-                  >
-                    <div style={{
-                      width: "56px",
-                      height: "56px",
-                      borderRadius: "12px",
-                      background: `linear-gradient(135deg, ${THEME.primary} 0%, ${THEME.secondary} 100%)`,
-                      color: "#fff",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "24px",
-                      marginBottom: "16px"
-                    }}>
+                  <div className={styles.hrNominationGridCard}>
+                    <div className={styles.hrNominationGridCardIcon}>
                       <i className="bi bi-award-fill" />
                     </div>
                     
-                    <h5 style={{
-                      color: THEME.primary,
-                      fontSize: "17px",
-                      fontWeight: "700",
-                      marginBottom: "8px"
-                    }}>
+                    <h5 className={styles.hrNominationGridCardTitle}>
                       {reward.rewardName}
                     </h5>
                     
                     {reward.rewardCategory && (
-                      <p style={{
-                        color: THEME.textLight,
-                        fontSize: "12px",
-                        marginBottom: "12px"
-                      }}>
+                      <p className={styles.hrNominationGridCardCategory}>
                         {reward.rewardCategory}
                       </p>
                     )}
 
-                    <div style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                      padding: "12px",
-                      background: "#f8f9fc",
-                      borderRadius: "8px",
-                      marginBottom: "16px"
-                    }}>
-                      <i className="bi bi-people-fill" style={{ fontSize: "20px", color: THEME.primary }} />
+                    <div className={styles.hrNominationGridCardCount}>
+                      <i className={`bi bi-people-fill ${styles.hrNominationGridCardCountIcon}`} />
                       <div>
-                        <div style={{ fontSize: "24px", fontWeight: "700", color: THEME.primary }}>
+                        <div className={styles.hrNominationGridCardCountValue}>
                           {reward.totalCount}
                         </div>
-                        <div style={{ fontSize: "11px", color: THEME.textLight, fontWeight: "600" }}>
+                        <div className={styles.hrNominationGridCardCountLabel}>
                           Nominated Employees
                         </div>
                       </div>
@@ -957,22 +677,7 @@ function HRNominations() {
 
                     <button
                       onClick={() => viewEmployeeList(reward)}
-                      style={{
-                        width: "100%",
-                        padding: "12px",
-                        background: THEME.primary,
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: "8px",
-                        fontSize: "14px",
-                        fontWeight: "700",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "8px",
-                        marginTop: "auto"
-                      }}
+                      className={styles.hrNominationGridCardButton}
                     >
                       <i className="bi bi-eye" /> View Details
                     </button>
@@ -982,11 +687,11 @@ function HRNominations() {
             </div>
 
             {totalPages > 1 && (
-              <nav aria-label="Page navigation">
+              <nav aria-label="Page navigation" className={styles.hrNominationPagination}>
                 <ul className="pagination justify-content-center">
                   <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
                     <button
-                      className="page-link"
+                      className={`page-link ${styles.hrNominationPaginationButton}`}
                       onClick={() => setCurrentPage(1)}
                       disabled={currentPage === 1}
                     >
@@ -998,7 +703,7 @@ function HRNominations() {
                     return pageNum <= totalPages ? (
                       <li key={pageNum} className={`page-item ${currentPage === pageNum ? "active" : ""}`}>
                         <button
-                          className="page-link"
+                          className={`page-link ${styles.hrNominationPaginationButton} ${currentPage === pageNum ? styles.hrNominationPaginationButtonActive : ""}`}
                           onClick={() => setCurrentPage(pageNum)}
                         >
                           {pageNum}
@@ -1008,7 +713,7 @@ function HRNominations() {
                   })}
                   <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
                     <button
-                      className="page-link"
+                      className={`page-link ${styles.hrNominationPaginationButton}`}
                       onClick={() => setCurrentPage(totalPages)}
                       disabled={currentPage === totalPages}
                     >

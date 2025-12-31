@@ -1,0 +1,639 @@
+/* HRViewAssessment.module.css */
+/* CSS Module for Reward Configuration Component */
+/* Created: 2025-12-26 */
+
+/* ============================================================================ */
+/* COLOR VARIABLES */
+/* ============================================================================ */
+:root {
+  --rl-purple: #97247e;
+  --rl-dark: #27235c;
+  --rl-bg: #f8f9fc;
+  --rl-border: #27235c;
+  --btn-radius: 7px;
+} 
+
+/* ============================================================================ */
+/* MAIN CONTAINER */
+/* ============================================================================ */
+.rewardConfigContainer {
+  background: var(--rl-bg);
+  min-height: 100vh;
+  min-width: 0;
+}
+
+/* ============================================================================ */
+/* HEADER SECTION */
+/* ============================================================================ */
+.rewardConfigHeader {
+  padding: 16px 28px 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--rl-bg);
+  gap: 10px;
+  margin-bottom: 1.2rem;
+}
+
+.createRewardBtn {
+  padding: 8px 16px;
+  background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
+  color: #fff;
+  border-radius: var(--btn-radius);
+  font-weight: 700;
+  font-size: 13px;
+  border: none;
+  box-shadow: 0 1.5px 6px rgba(151, 36, 126, 0.12);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+}
+
+.createRewardBtn i {
+  font-size: 15px;
+}
+
+/* ============================================================================ */
+/* MAIN CONTENT LAYOUT */
+/* ============================================================================ */
+.rewardConfigContent {
+  margin: 0 auto;
+  max-width: 1500px;
+  background: var(--rl-bg);
+  min-height: 100vh;
+  display: flex;
+  gap: 24px;
+  padding: 0 32px 32px 32px;
+  align-items: flex-start;
+}
+
+/* ============================================================================ */
+/* LEFT PANEL - REWARD LIST */
+/* ============================================================================ */
+.rewardListPanel {
+  flex: 1.3;
+  background: #fff;
+  border-radius: 12px;
+  margin-top: 0;
+  border: 1px solid var(--rl-border);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  min-height: 480px;
+  max-height: 75vh;
+}
+
+.rewardListHeader {
+  background: #fff;
+  padding: 14px 18px 8px 18px;
+  border-radius: 12px 12px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ============================================================================ */
+/* TAB TOGGLE */
+/* ============================================================================ */
+.tabToggleContainer {
+  background: var(--rl-dark);
+  padding: 5px;
+  border-radius: 40px;
+  display: inline-flex;
+  gap: 5px;
+}
+
+.tabToggleBtn {
+  padding: 8px 26px;
+  border-radius: 40px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+
+.tabToggleBtn.active {
+  background: #fff;
+  color: var(--rl-dark);
+}
+
+.tabToggleBtn.inactive {
+  background: transparent;
+  color: #fff;
+}
+
+/* ============================================================================ */
+/* MANAGER VISIBILITY TOGGLE */
+/* ============================================================================ */
+.visibilityWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.visibilityLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: #666;
+  white-space: nowrap;
+}
+
+.visibilityToggle {
+  width: 44px;
+  height: 22px;
+  border-radius: 11px;
+  border: none;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+
+.visibilityToggle.visible {
+  background: #10b981;
+}
+
+.visibilityToggle.hidden {
+  background: #ef4444;
+}
+
+.visibilityIndicator {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  position: absolute;
+  top: 3px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.visibilityIndicator.visible {
+  left: 25px;
+  color: #10b981;
+}
+
+.visibilityIndicator.hidden {
+  left: 3px;
+  color: #ef4444;
+}
+
+/* ============================================================================ */
+/* REWARD LIST CONTENT */
+/* ============================================================================ */
+.rewardListContent {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 16px 14px 18px;
+  min-height: 0;
+  max-height: calc(75vh - 70px);
+}
+
+.loadingContainer {
+  text-align: center;
+  color: #aaa;
+  padding: 36px 3px 14px 4px;
+}
+
+.loadingSpinner {
+  width: 18px;
+  height: 18px;
+}
+
+.loadingText {
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.emptyState {
+  color: #a1a9b9;
+  background: #f7f5fa;
+  border-radius: 8px;
+  border: 1px dashed var(--rl-border);
+  padding: 30px 8px;
+  text-align: center;
+  font-size: 13px;
+}
+
+/* ============================================================================ */
+/* REWARD CARD */
+/* ============================================================================ */
+.rewardCard {
+  padding: 11px 11px 12px 12px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  background: #fcfcfc;
+  border: 1px solid var(--rl-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: 0.14s;
+}
+
+.rewardCard.selected {
+  border: 1.5px solid var(--rl-purple);
+  box-shadow: 0 1.5px 8px rgba(149, 51, 161, 0.08);
+}
+
+.rewardCardContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.rewardCardTitle {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--rl-dark);
+  margin-bottom: 3px;
+  text-align: left;
+}
+
+.rewardCardDesc {
+  font-size: 11.5px;
+  color: #85779c;
+  margin-bottom: 6px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 190px;
+  text-align: left;
+}
+
+.rewardCardTags {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 11px;
+}
+
+.paramCount {
+  padding: 1.5px 7px;
+  background: #f3f4fa;
+  border-radius: 3px;
+  font-weight: 500;
+}
+
+.statusBadge {
+  padding: 2px 9px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.statusBadge.active {
+  background: #e7e0fa;
+  color: var(--rl-purple);
+}
+
+.statusBadge.inactive {
+  background: #fbe2f3;
+  color: #bc387a;
+}
+
+.rewardCardActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* ============================================================================ */
+/* ACTION BUTTONS */
+/* ============================================================================ */
+.actionBtn {
+  padding: 6px 8px;
+  background: #fff;
+  border-radius: var(--btn-radius);
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.actionBtn.edit {
+  margin-right: 3px;
+  color: var(--rl-purple);
+  border: 1.3px solid var(--rl-purple);
+}
+
+.actionBtn.toggle {
+  border: 1.3px solid var(--rl-purple);
+  color: var(--rl-purple);
+}
+
+.actionBtn.toggle.deactivate {
+  border-color: #e01950;
+  color: #e01950;
+}
+
+.chooseBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.3px solid var(--rl-purple);
+  background: #fff;
+  color: var(--rl-purple);
+  font-weight: 700;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: box-shadow 0.15s;
+  margin-left: 5px;
+}
+
+.chooseBtn:hover {
+  box-shadow: 0 2px 8px rgba(151, 36, 126, 0.2);
+}
+
+/* ============================================================================ */
+/* RIGHT PANEL - DETAILS */
+/* ============================================================================ */
+.rewardDetailsPanel {
+  flex: 2;
+  background: #fff;
+  border-radius: 12px;
+  margin-top: 0;
+  border: 1px solid var(--rl-border);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+  min-height: 480px;
+  max-height: 75vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.rewardDetailsHeader {
+  padding: 20px 26px 0px 26px;
+  background: #fff;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.rewardDetailsContent {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 3px 26px 18px 26px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ============================================================================ */
+/* REWARD DETAILS SECTION */
+/* ============================================================================ */
+.rewardDetailsTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rewardDetailsTitle {
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--rl-dark);
+  font-family: Montserrat, Nunito, sans-serif;
+  text-align: left;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rewardCategoryBadge {
+  background: #f3ebfa;
+  color: var(--rl-purple);
+  font-weight: 700;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  margin-left: 4px;
+  display: inline-block;
+}
+
+.addParameterBtn {
+  margin-left: auto;
+  padding: 6px 14px;
+  background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
+  color: #fff;
+  border-radius: var(--btn-radius);
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  font-size: 12px;
+  height: 28px;
+  box-shadow: 0 1px 4px rgba(39, 35, 92, 0.08);
+  white-space: nowrap;
+}
+
+.addParameterBtn:hover {
+  box-shadow: 0 2px 8px rgba(151, 36, 126, 0.2);
+}
+
+.rewardDescription {
+  font-size: 13px;
+  color: #8886b3;
+  margin-top: 6px;
+  max-width: 100%;
+  text-align: justify;
+  line-height: 1.6;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.readMoreBtn {
+  background: transparent;
+  border: none;
+  color: var(--rl-purple);
+  font-weight: 600;
+  font-size: 12px;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  white-space: nowrap;
+  margin-left: 2px;
+}
+
+.readMoreBtn:hover {
+  text-decoration: underline;
+}
+
+.ellipsis {
+  color: var(--rl-purple);
+}
+
+/* ============================================================================ */
+/* EMPTY STATES */
+/* ============================================================================ */
+.selectEmpty {
+  text-align: center;
+  color: #bbb;
+  padding: 70px 10px;
+}
+
+.selectTitle {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 7px;
+}
+
+.selectSubtitle {
+  font-size: 12px;
+}
+
+.noParamsEmpty {
+  color: #85799a;
+  padding: 40px 10px;
+  background: #fcfbff;
+  border-radius: 8px;
+  border: 1px dashed var(--rl-border);
+  text-align: center;
+}
+
+.noParamsTitle {
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.noParamsSubtitle {
+  font-size: 12px;
+  color: #b9bace;
+}
+
+/* ============================================================================ */
+/* PARAMETERS TABLE */
+/* ============================================================================ */
+.paramsTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  border: 2px solid #27235c;
+}
+
+.paramsTable thead tr {
+  background: #27235c;
+  border-bottom: 1.5px solid #27235c;
+}
+
+.paramsTable th {
+  text-align: left;
+  padding: 11px;
+  font-weight: 700;
+  color: white;
+}
+
+.paramsTable th:first-child,
+.paramsTable th:last-child {
+  font-weight: 800;
+}
+
+.paramsTable tbody tr {
+  border-bottom: 1px solid darkblue;
+}
+
+.paramsTable tbody tr:hover {
+  background: #f8f9fc;
+}
+
+.paramsTable td {
+  padding: 13px 11px;
+  text-align: left;
+}
+
+.paramName {
+  font-weight: 600;
+  color: #000;
+}
+
+.paramType {
+  color: #000;
+  font-weight: 500;
+}
+
+.paramRequired {
+  font-weight: 700;
+}
+
+.requiredYes {
+  color: green;
+}
+
+.requiredNo {
+  color: red;
+}
+
+.paramOrder {
+  color: #000;
+}
+
+.deleteBtn {
+  padding: 6px 18px;
+  background: #eee;
+  color: #27235c;
+  border-radius: 5px;
+  font-weight: 700;
+  border: 1px solid #27235c;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.deleteBtn:hover {
+  background: #27235c;
+  color: #fff;
+}
+
+/* ============================================================================ */
+/* SPACING UTILITIES */
+/* ============================================================================ */
+.spacer14 {
+  height: 14px;
+}
+
+/* ============================================================================ */
+/* RESPONSIVE DESIGN */
+/* ============================================================================ */
+@media (max-width: 1200px) {
+  .rewardConfigContent {
+    flex-direction: column;
+  }
+
+  .rewardListPanel,
+  .rewardDetailsPanel {
+    flex: 1;
+    max-height: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .rewardConfigHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .createRewardBtn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .tabToggleContainer {
+    width: 100%;
+  }
+
+  .tabToggleBtn {
+    flex: 1;
+  }
+}

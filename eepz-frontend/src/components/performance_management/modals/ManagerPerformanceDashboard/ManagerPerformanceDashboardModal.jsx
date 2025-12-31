@@ -1,6 +1,6 @@
 import React from "react";
 import logoImage from "../../../../assets/logodark.png"
-import "../../../../styles/performancemanagement/manager/ManagerPerformanceDashboard.css"
+import "../../../../styles/performancemanagement/components/ManagerPerformanceDashboard.css"
 
 const ManagerPerformanceDashboardModal = ({
   showModal,

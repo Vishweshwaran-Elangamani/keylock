@@ -203,6 +203,7 @@
   background: #ffffff;
 }
 
+
 .pmhr-fc-form-content {
   display: flex;
   flex-direction: column;
@@ -215,7 +216,7 @@
   background: #ffffff;
   border-radius: 10px;
   border: 1px solid #e5e7eb;
-  overflow: visible;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
@@ -225,7 +226,6 @@
 .pmhr-fc-competencies-section {
   display: flex;
   flex-direction: column;
-  overflow: visible;
 }
 
 .pmhr-fc-section-header {
@@ -239,7 +239,6 @@
   position: sticky;
   top: 0;
   z-index: 10;
-  border-radius: 6px;
 }
 
 .pmhr-fc-section-header i {
@@ -273,11 +272,6 @@
 .pmhr-fc-section-body {
   padding: 1.1rem 1.25rem 1.25rem 1.25rem;
   flex: 1;
-  overflow: visible;
-}
-
-.pmhr-fc-section-body-compact {
-  overflow: visible;
 }
 
 .pmhr-fc-section-body-compact .pmhr-fc-form-group {
@@ -313,7 +307,6 @@
   flex-direction: column;
   gap: 0.4rem;
   margin-bottom: 1rem;
-  position: relative;
 }
 
 .pmhr-fc-form-group:last-child {
@@ -358,7 +351,6 @@
 .pmhr-fc-textarea {
   width: 100%;
   padding: 0.55rem 0.8rem;
-  border: 1px solid #27235c;
   border-radius: 6px;
   font-size: 0.95rem;
   color: #27235c;
@@ -371,7 +363,7 @@
 .pmhr-fc-select:focus,
 .pmhr-fc-textarea:focus {
   outline: none;
-  /* border-color: #97247e; */
+  border-color: #97247e;
   box-shadow: 0 0 0 2px rgba(151, 36, 126, 0.12);
 }
 
@@ -410,130 +402,6 @@
   font-weight: 500;
 }
 
-/* ========================================
-   CUSTOM DROPDOWN STYLES (SCOPED TO FORM CREATE)
-======================================== */
-.pmhr-fc-layout .custom-dropdown-wrapper {
-  position: relative;
-  user-select: none;
-  width: 100%;
-  height: 38px;
-  cursor: pointer;
-  z-index: 10;
-  min-width: auto;
-  max-width: none;
-}
-
-.pmhr-fc-layout .custom-dropdown-wrapper.disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.pmhr-fc-layout .custom-dropdown-selected {
-  padding: 0 2.5rem 0 0.875rem;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  position: relative;
-  border: 1px solid #27235c;
-  border-radius: 6px;
-  cursor: pointer;
-  user-select: none;
-  width: 100%;
-  height: 38px;
-  font-size: 0.95rem;
-  color: #27235c;
-  font-weight: 500;
-  background: #ffffff;
-  transition: all 0.2s ease;
-}
-
-.pmhr-fc-layout .custom-dropdown-selected:hover {
-  border-color:  #27235c;
-  background: #f9fafb;
-}
-
-.pmhr-fc-layout .custom-dropdown-selected.pmhr-fc-input-error {
-  border-color: #ef4444;
-  background: #fef2f2;
-}
-
-.pmhr-fc-layout .custom-dropdown-arrow {
-  position: absolute;
-  right: 0.875rem;
-  top: 50%;
-  transform: translateY(-50%) rotate(45deg);
-  width: 7px;
-  height: 7px;
-  border-right: 2px solid #27235c;
-  border-bottom: 2px solid #27235c;
-  pointer-events: none;
-  transition: transform 0.2s ease;
-}
-
-.pmhr-fc-layout .custom-dropdown-wrapper:focus-within .custom-dropdown-arrow,
-.pmhr-fc-layout .custom-dropdown-selected:focus .custom-dropdown-arrow {
-  transform: translateY(-25%) rotate(225deg);
-}
-
-/* Portal dropdown menu - unique class to avoid conflicts */
-.pmhr-fc-custom-dropdown-portal {
-  position: absolute;
-  background: #ffffff;
-  border: 1px solid #27235c;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 999999;
-  max-height: 280px;
-  overflow-y: auto;
-  animation: pmhrFcDropdownFadeIn 0.15s ease-out;
-}
-
-@keyframes pmhrFcDropdownFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.pmhr-fc-custom-dropdown-portal .custom-dropdown-option {
-  padding: 0.625rem 0.875rem;
-  cursor: pointer;
-  display: block;
-  text-align: left;
-  transition: all 0.12s ease;
-  font-size: 0.95rem;
-  color: #27235c;
-}
-
-.pmhr-fc-custom-dropdown-portal .custom-dropdown-option:hover {
-  background-color:  #27235c;
-  color: #ffffff;
-}
-
-.pmhr-fc-custom-dropdown-portal .custom-dropdown-option-active {
-  background-color: rgba(151, 36, 126, 0.08);
-  font-weight: 600;
-  color: #27235c;
-}
-
-.pmhr-fc-custom-dropdown-portal .custom-dropdown-option-active:hover {
-  background-color:  #27235c;
-  color: #ffffff;
-}
-
-.pmhr-fc-layout .custom-dropdown-wrapper.disabled .custom-dropdown-selected {
-  cursor: not-allowed;
-  background: #f3f4f6;
-}
-
-/* ========================================
-   COMPETENCIES
-======================================== */
 .pmhr-fc-btn-add-comp {
   display: flex;
   align-items: center;
@@ -640,12 +508,12 @@
 }
 
 .pmhr-fc-btn-delete {
-  background:  #27235c;
-  color:  #ffffff;
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
 }
 
 .pmhr-fc-btn-delete:hover:not(:disabled) {
-  background: #27235c;
+  background: #ef4444;
   color: #ffffff;
 }
 
@@ -683,9 +551,6 @@
   flex-shrink: 0;
 }
 
-/* ========================================
-   FORM ACTIONS
-======================================== */
 .pmhr-fc-form-actions {
   display: flex;
   flex-direction: column;
@@ -751,9 +616,6 @@
   transform: none;
 }
 
-/* ========================================
-   LOADING & ERROR STATES
-======================================== */
 .pmhr-fc-loading-container {
   display: flex;
   flex-direction: column;
@@ -824,9 +686,6 @@
   margin: 0;
 }
 
-/* ========================================
-   FOCUS STYLES
-======================================== */
 .pmhr-fc-btn-add-comp:focus-visible,
 .pmhr-fc-btn-icon:focus-visible,
 .pmhr-fc-btn-cancel:focus-visible,
@@ -835,13 +694,10 @@
 .pmhr-fc-select:focus-visible,
 .pmhr-fc-textarea:focus-visible,
 .pmhr-fc-step-number:focus-visible {
-  /* outline: 2px solid #97247e; */
+  outline: 2px solid #97247e;
   outline-offset: 2px;
 }
 
-/* ========================================
-   RESPONSIVE STYLES
-======================================== */
 @media (max-width: 1024px) {
   .pmhr-fc-header {
     flex-direction: column;

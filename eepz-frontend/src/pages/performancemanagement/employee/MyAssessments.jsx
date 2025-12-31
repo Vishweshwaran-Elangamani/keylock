@@ -21,7 +21,6 @@ function getTimeLeft(deadline) {
   return { days, hours, expired: ms === 0 };
 }
 
-
 function MyAssessments() {
   const navigate = useNavigate();
   const [assignments, setAssignments] = useState([]);
@@ -37,9 +36,7 @@ function MyAssessments() {
   const [dateFilter, setDateFilter] = useState("");
   const [timers, setTimers] = useState({});
   const [visibleTimers, setVisibleTimers] = useState([]);
-
   const [downloadingAttachmentId, setDownloadingAttachmentId] = useState(null);
-
   const [attachments, setAttachments] = useState([]);
   const [viewAttachments, setViewAttachments] = useState([]);
 
@@ -133,12 +130,10 @@ function MyAssessments() {
       
       const response = await downloadAttachment(attachment.attachmentId);
   
-      // Get the blob from response.data
       const blob = response.data;
       
       let filename = attachment.fileName || "attachment";
       
-      // Try to get filename from Content-Disposition header
       const contentDisposition = response.headers['content-disposition'];
       if (contentDisposition) {
         const headerFilename = extractFilenameFromHeader(contentDisposition);
@@ -147,7 +142,6 @@ function MyAssessments() {
         }
       }
   
-      // Add extension if missing
       if (!hasExtension(filename)) {
         let extension = '';
         const contentType = response.headers['content-type'];
@@ -163,7 +157,6 @@ function MyAssessments() {
         filename += extension;
       }
   
-      // Create and trigger download
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
@@ -171,7 +164,6 @@ function MyAssessments() {
       document.body.appendChild(link);
       link.click();
       
-      // Cleanup
       setTimeout(() => {
         window.URL.revokeObjectURL(url);
         document.body.removeChild(link);
@@ -185,7 +177,6 @@ function MyAssessments() {
       setDownloadingAttachmentId(null);
     }
   };
-  
 
   const fetchAssignments = async () => {
     setLoading(true);
@@ -389,14 +380,14 @@ function MyAssessments() {
 
   const renderTable = (data, activeTab) => (
     <div className="empassper-table-container">
-      <table className="empassper-table" style={{ borderCollapse: "separate", borderSpacing: 0, width: "100%", border: "1px solid black", borderRadius: "12px" }}>
+      <table className="empassper-table">
         <thead>
           <tr>
-            <th style={{ borderTopLeftRadius: "8px" }}>FORM NAME</th>
+            <th>FORM NAME</th>
             <th>TYPE</th>
             <th>DEADLINE</th>
             <th>STATUS</th>
-            <th style={{ borderTopRightRadius: "8px" }}>
+            <th>
               {activeTab === "pending" ? "SUBMISSION" : "VIEW"}
             </th>
           </tr>
@@ -449,7 +440,6 @@ function MyAssessments() {
     </div>
   );
 
-
   if (loading) {
     return (
       <div className="empassper-container">
@@ -464,19 +454,17 @@ function MyAssessments() {
 
   return (
     <div className="empassper-container">
-         <Breadcrumb
-  items={[
-    { label: "Dashboard", path: "employee/dashboard" },
-    { label: "My Assessments", path: null }
-  ]}
-/>
+      <Breadcrumb
+        items={[
+          { label: "Dashboard", path: "employee/dashboard" },
+          { label: "My Assessments", path: null }
+        ]}
+      />
       <Toaster position="top-right" />
 
       <div className="empassper-header-section">
         <div className="empassper-header-content">
-          <div className="empassper-header-text" style={{ flex: 1 }}>
-           
-          </div>
+          <div className="empassper-header-text"></div>
         </div>
 
         {showModal && currentAssignment && timers[currentAssignment.assignmentId] && (
@@ -512,145 +500,102 @@ function MyAssessments() {
         </div>
       )}
 
-<div className="empassper-search-filter-container">
-  <div style={{ 
-    display: 'flex', 
-    alignItems: 'stretch', 
-    gap: '0px', 
-    flex: 1,
-    border: '1px solid #27235C',
-    borderRadius: '6px',
-    overflow: 'hidden'
-  }}>
-    <input
-      type="text"
-      placeholder="Search by form name or type..."
-      value={searchInput}
-      onChange={(e) => setSearchInput(e.target.value)}
-      onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
-      aria-label="Search assessments"
-      style={{
-        flex: 1,
-        padding: '10px 14px',
-        border: 'none',
-        fontSize: '14px',
-        outline: 'none'
-      }}
-    />
-    <button 
-      onClick={handleSearch} 
-      aria-label="Search"
-      style={{
-        padding: '10px 20px',
-        backgroundColor: '#27235C',
-        color: 'white',
-        border: 'none',
-        fontSize: '14px',
-        fontWeight: '600',
-        cursor: 'pointer',
-        transition: 'opacity 0.2s',
-        whiteSpace: 'nowrap'
-      }}
-      onMouseEnter={(e) => e.target.style.opacity = '0.9'}
-      onMouseLeave={(e) => e.target.style.opacity = '1'}
-    >
-      Search
-    </button>
-  </div>
-  <button 
-    onClick={handleClearFilters} 
-    aria-label="Clear Filters"
-    style={{
-      padding: '10px 20px',
-      backgroundColor: '#6c757d',
-      color: 'white',
-      border: 'none',
-      borderRadius: '6px',
-      fontSize: '14px',
-      fontWeight: '600',
-      cursor: 'pointer',
-      transition: 'opacity 0.2s',
-      whiteSpace: 'nowrap'
-    }}
-    onMouseEnter={(e) => e.target.style.opacity = '0.9'}
-    onMouseLeave={(e) => e.target.style.opacity = '1'}
-  >
-    Clear Filters
-  </button>
-  <input
-    type="date"
-    className="empassper-filter-select"
-    value={dateFilter}
-    onChange={(e) => setDateFilter(e.target.value)}
-    placeholder="Filter by deadline"
-  />
-</div>
-
-
-      
+      <div className="empassper-search-filter-container">
+        <div className="empassper-search-wrapper">
+          <input
+            type="text"
+            className="empassper-search-input"
+            placeholder="Search by form name or type..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
+            aria-label="Search assessments"
+          />
+          <button 
+            onClick={handleSearch}
+            className="empassper-search-btn"
+            aria-label="Search"
+          >
+            Search
+          </button>
+        </div>
+        <button 
+          onClick={handleClearFilters}
+          className="empassper-clear-btn"
+          aria-label="Clear Filters"
+        >
+          Clear Filters
+        </button>
+        <input
+          type="date"
+          className="empassper-filter-select"
+          value={dateFilter}
+          onChange={(e) => setDateFilter(e.target.value)}
+          placeholder="Filter by deadline"
+        />
+      </div>
 
       <div className="empassper-pill-tabs-wrapper" role="tablist" aria-label="Assessment tabs">
-  <div className="empassper-pill-tabs">
-    <button
-      role="tab"
-      aria-pressed={activeTab === "pending"}
-      className={`empassper-pill ${activeTab === "pending" ? "empassper-pill--active" : ""}`}
-      onClick={() => setActiveTab("pending")}
-    >
-      <span className="empassper-pill-text">Pending Assessments</span>
-      <span className="empassper-pill-count">({filteredPending.length})</span>
-    </button>
+        <div className="empassper-pill-tabs">
+          <button
+            role="tab"
+            aria-pressed={activeTab === "pending"}
+            className={`empassper-pill ${activeTab === "pending" ? "empassper-pill--active" : ""}`}
+            onClick={() => setActiveTab("pending")}
+          >
+            <span className="empassper-pill-text">Pending Assessments</span>
+            <span className="empassper-pill-count">({filteredPending.length})</span>
+          </button>
 
-    <button
-      role="tab"
-      aria-pressed={activeTab === "completed"}
-      className={`empassper-pill ${activeTab === "completed" ? "empassper-pill--active" : ""}`}
-      onClick={() => setActiveTab("completed")}
-    >
-      <span className="empassper-pill-text">Completed Assessments</span>
-      <span className="empassper-pill-count">({filteredCompleted.length})</span>
-    </button>
-  </div>
-</div>
-
-{activeTab === "pending" && (
-  <>
-    {filteredPending.length > 0 ? (
-      renderTable(filteredPending, activeTab)
-    ) : (
-      <div className="empassper-empty-state">
-        <div className="empassper-empty-icon">
-          <i className="bi bi-inbox"></i>
+          <button
+            role="tab"
+            aria-pressed={activeTab === "completed"}
+            className={`empassper-pill ${activeTab === "completed" ? "empassper-pill--active" : ""}`}
+            onClick={() => setActiveTab("completed")}
+          >
+            <span className="empassper-pill-text">Completed Assessments</span>
+            <span className="empassper-pill-count">({filteredCompleted.length})</span>
+          </button>
         </div>
-        <h3 className="empassper-empty-title">No Pending Assessments</h3>
-        <p className="empassper-empty-text">
-          {assignments.length === 0
-            ? "You don't have any assessments assigned yet."
-            : "All assessments have been completed or filtered out!"}
-        </p>
       </div>
-    )}
-  </>
-)}
 
-{activeTab === "completed" && (
-  <>
-    {filteredCompleted.length > 0 ? (
-      renderTable(filteredCompleted, activeTab)
-    ) : (
-      <div className="empassper-empty-state">
-        <div className="empassper-empty-icon">
-          <i className="bi bi-clipboard-check"></i>
-        </div>
-        <h3 className="empassper-empty-title">No Completed Assessments</h3>
-        <p className="empassper-empty-text">
-          Complete your pending assessments to see them here.
-        </p>
-      </div>
-    )}
-  </>
-)}
+      {activeTab === "pending" && (
+        <>
+          {filteredPending.length > 0 ? (
+            renderTable(filteredPending, activeTab)
+          ) : (
+            <div className="empassper-empty-state">
+              <div className="empassper-empty-icon">
+                <i className="bi bi-inbox"></i>
+              </div>
+              <h3 className="empassper-empty-title">No Pending Assessments</h3>
+              <p className="empassper-empty-text">
+                {assignments.length === 0
+                  ? "You don't have any assessments assigned yet."
+                  : "All assessments have been completed or filtered out!"}
+              </p>
+            </div>
+          )}
+        </>
+      )}
 
+      {activeTab === "completed" && (
+        <>
+          {filteredCompleted.length > 0 ? (
+            renderTable(filteredCompleted, activeTab)
+          ) : (
+            <div className="empassper-empty-state">
+              <div className="empassper-empty-icon">
+                <i className="bi bi-clipboard-check"></i>
+              </div>
+              <h3 className="empassper-empty-title">No Completed Assessments</h3>
+              <p className="empassper-empty-text">
+                Complete your pending assessments to see them here.
+              </p>
+            </div>
+          )}
+        </>
+      )}
 
       {showModal && currentAssignment && (
         <div
@@ -660,14 +605,13 @@ function MyAssessments() {
           <div
             className="empassper-modal-content"
             onClick={(e) => e.stopPropagation()}
-            style={{ paddingTop: "0px", marginTop: "0px" }}
           >
-            <div className="empass-form-header" style={{ marginBottom: "0px", paddingBottom: "0px", position: "relative" }}>
+            <div className="empass-form-header">
               <div className="empass-logo-section">
                 <img src={logoImage} alt="Logo" className="empass-logo-small" />
-                <div className="empass-appraisal-label" style={{ paddingBottom: "10px" }}>Appraisal Form</div>
+                <div className="empass-appraisal-label">Appraisal Form</div>
               </div>
-              <div className="empass-form-title-container" style={{ marginRight: "100px" }}>
+              <div className="empass-form-title-container">
                 <h2 className="empass-form-title">{currentAssignment?.formName}</h2>
                 <p className="empass-form-subtitle">
                   {currentAssignment?.formType} Assessment Form
@@ -676,28 +620,8 @@ function MyAssessments() {
 
               {((modalMode === "submit" && attachments.length > 0) ||
                 (modalMode === "view" && viewAttachments && viewAttachments.length > 0)) && (
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                      background: "#97247E",
-                      padding: "6px 12px",
-                      borderRadius: "8px",
-                      position: "absolute",
-                      right: "24px",
-                      top: "50%",
-                      transform: "translateY(-50%)"
-                    }}
-                  >
-                    <span
-                      style={{
-                        color: "white",
-                        fontSize: "13px",
-                        fontWeight: 700,
-                        letterSpacing: "0.02em",
-                      }}
-                    >
+                  <div className="empass-attachment-badge">
+                    <span className="empass-attachment-badge-text">
                       {modalMode === "submit"
                         ? `${attachments.length} ${attachments.length === 1 ? "File" : "Files"}`
                         : `${viewAttachments.length} ${viewAttachments.length === 1 ? "File" : "Files"}`
@@ -707,71 +631,27 @@ function MyAssessments() {
                 )}
             </div>
 
-            <div
-              className="empass-form-divider"
-              style={{
-                marginTop: "0px",
-                marginBottom: "0px",
-                padding: "0",
-                height: "0px",
-                lineHeight: "0",
-              }}
-            ></div>
+            <div className="empass-form-divider"></div>
 
             {submitting && modalMode === "view" ? (
-              <div
-                className="empass-form-body"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  paddingTop: "0px",
-                  marginTop: "0px",
-                  padding: "0px"
-                }}
-              >
+              <div className="empass-form-body empass-loading-body">
                 <div>
                   <div className="spinner-border"></div>
-                  <p
-                    style={{
-                      marginTop: "16px",
-                      color: "var(--text-light)",
-                      textAlign: "center",
-                    }}
-                  >
+                  <p className="empass-loading-text">
                     Loading assessment...
                   </p>
                 </div>
               </div>
             ) : (
               <>
-                <div
-                  className="empass-form-body"
-                  style={{
-                    paddingTop: "24px",
-                    marginTop: "0px",
-                  }}
-                >
-                  <table
-                    className="empass-form-table"
-                    style={{
-                      width: "100%",
-                      marginTop: "0px",
-                      borderCollapse: "separate",
-                      borderLeft: "none",
-                      borderRadius: "12px",
-                      borderRight: "none",
-                      borderBottom: "none",
-                      border: "1px solid black",
-                      borderSpacing: 0,
-                    }}
-                  >
+                <div className="empass-form-body">
+                  <table className="empass-form-table">
                     <thead>
                       <tr>
-                        <th style={{ padding: "10px 6px", height: "44px", borderTopLeftRadius: "8px" }}>Competency Name</th>
-                        <th style={{ padding: "10px 6px", height: "40px" }}>Description</th>
-                        <th style={{ padding: "10px 6px", height: "40px" }}>Rating</th>
-                        <th style={{ padding: "10px 6px", height: "40px", borderTopRightRadius: "8px" }}>Comments</th>
+                        <th>Competency Name</th>
+                        <th>Description</th>
+                        <th>Rating</th>
+                        <th>Comments</th>
                       </tr>
                     </thead>
 
@@ -784,7 +664,7 @@ function MyAssessments() {
                           <td>{item.competencyDescription || "N/A"}</td>
                           <td>
                             {modalMode === "view" ? (
-                              <span className="rating-badge">
+                              <span className="empass-rating-badge">
                                 {item.rating} / 5
                               </span>
                             ) : (
@@ -797,7 +677,7 @@ function MyAssessments() {
                                     e.target.value
                                   )
                                 }
-                                className="form-select"
+                                className="empass-form-select"
                                 disabled={submitting}
                               >
                                 <option value="">-</option>
@@ -809,7 +689,6 @@ function MyAssessments() {
                               </select>
                             )}
                           </td>
-
                           <td>
                             {modalMode === "view" ? (
                               <span>{item.comments || "-"}</span>
@@ -824,7 +703,7 @@ function MyAssessments() {
                                   )
                                 }
                                 placeholder="Justify through comments"
-                                className="form-textarea"
+                                className="empass-form-textarea"
                                 disabled={submitting}
                               />
                             )}
@@ -834,40 +713,18 @@ function MyAssessments() {
                     </tbody>
                   </table>
 
-                  <div style={{ marginTop: "24px", padding: "0 16px" }}>
-                    <h3 style={{
-                      fontSize: "16px",
-                      fontWeight: "600",
-                      marginBottom: "12px",
-                      color: "var(--text-primary)",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px"
-                    }}>
+                  <div className="empass-attachments-section">
+                    <h3 className="empass-attachments-title">
                       <i className="bi bi-paperclip"></i>
                       Attachments
                     </h3>
 
                     {modalMode === "submit" && (
                       <div>
-                        <div style={{ marginBottom: "16px" }}>
+                        <div className="empass-upload-section">
                           <label
                             htmlFor="file-upload"
-                            style={{
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: "6px",
-                              padding: "10px 20px",
-                              backgroundColor: "#27235c",
-                              color: "white",
-                              borderRadius: "6px",
-                              cursor: "pointer",
-                              fontSize: "14px",
-                              fontWeight: "500",
-                              transition: "background-color 0.2s",
-                            }}
-                            onMouseOver={(e) => e.target.style.backgroundColor = "#27235c"}
-                            onMouseOut={(e) => e.target.style.backgroundColor = "#27235c"}
+                            className="empass-upload-btn"
                           >
                             <i className="bi bi-cloud-upload"></i> Add Attachment
                           </label>
@@ -876,98 +733,44 @@ function MyAssessments() {
                             type="file"
                             multiple
                             onChange={handleFileSelect}
-                            style={{ display: "none" }}
+                            className="empass-file-input"
                             disabled={submitting}
                           />
-                          <span style={{
-                            marginLeft: "12px",
-                            fontSize: "13px",
-                            color: "#666"
-                          }}>
+                          <span className="empass-file-count">
                             {attachments.length > 0 && `${attachments.length} file(s) selected`}
                           </span>
                         </div>
 
                         {attachments.length > 0 && (
-                          <div style={{ marginTop: "16px" }}>
+                          <div className="empass-attachments-list">
                             {attachments.map((att, index) => (
                               <div
                                 key={index}
-                                style={{
-                                  padding: "16px",
-                                  border: "1px solid #d1d5db",
-                                  borderRadius: "8px",
-                                  marginBottom: "16px",
-                                  backgroundColor: "#f9fafb",
-                                  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                                }}
+                                className="empass-attachment-item"
                               >
-                                <div style={{
-                                  display: "flex",
-                                  justifyContent: "space-between",
-                                  alignItems: "center",
-                                  marginBottom: "12px"
-                                }}>
-                                  <div style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: "8px"
-                                  }}>
-                                    <i
-                                      className="bi bi-file-earmark-text"
-                                      style={{
-                                        fontSize: "24px",
-                                        color: "#3b82f6"
-                                      }}
-                                    ></i>
+                                <div className="empass-attachment-header">
+                                  <div className="empass-attachment-info">
+                                    <i className="bi bi-file-earmark-text empass-file-icon"></i>
                                     <div>
-                                      <div style={{
-                                        fontSize: "12px",
-                                        color: "#6b7280",
-                                        marginBottom: "2px"
-                                      }}>
+                                      <div className="empass-attachment-original">
                                         Original: {att.fileName}
                                       </div>
-                                      <div style={{
-                                        fontSize: "12px",
-                                        color: "#9ca3af"
-                                      }}>
+                                      <div className="empass-attachment-meta">
                                         {(att.fileSize / 1024).toFixed(2)} KB • {att.fileType || 'Unknown type'}
                                       </div>
                                     </div>
                                   </div>
                                   <button
                                     onClick={() => removeAttachment(index)}
-                                    style={{
-                                      padding: "6px 12px",
-                                      backgroundColor: "#ef4444",
-                                      color: "white",
-                                      border: "none",
-                                      borderRadius: "6px",
-                                      cursor: "pointer",
-                                      fontSize: "13px",
-                                      fontWeight: "500",
-                                      display: "flex",
-                                      alignItems: "center",
-                                      gap: "4px",
-                                      transition: "background-color 0.2s",
-                                    }}
-                                    onMouseOver={(e) => e.target.style.backgroundColor = "#dc2626"}
-                                    onMouseOut={(e) => e.target.style.backgroundColor = "#ef4444"}
+                                    className="empass-remove-btn"
                                     disabled={submitting}
                                   >
                                     <i className="bi bi-trash"></i> Remove
                                   </button>
                                 </div>
 
-                                <div style={{ marginBottom: "12px" }}>
-                                  <label style={{
-                                    display: "block",
-                                    fontSize: "13px",
-                                    fontWeight: "600",
-                                    color: "#374151",
-                                    marginBottom: "6px"
-                                  }}>
+                                <div className="empass-attachment-name-section">
+                                  <label className="empass-input-label">
                                     <i className="bi bi-tag"></i> Attachment Name *
                                   </label>
                                   <input
@@ -975,51 +778,20 @@ function MyAssessments() {
                                     value={att.customName}
                                     onChange={(e) => updateAttachmentName(index, e.target.value)}
                                     placeholder="Enter a name for this attachment"
-                                    style={{
-                                      width: "100%",
-                                      padding: "8px 12px",
-                                      border: "1px solid #d1d5db",
-                                      borderRadius: "6px",
-                                      fontSize: "14px",
-                                      backgroundColor: "white",
-                                      outline: "none",
-                                      transition: "border-color 0.2s",
-                                    }}
-                                    onFocus={(e) => e.target.style.borderColor = "#3b82f6"}
-                                    onBlur={(e) => e.target.style.borderColor = "#d1d5db"}
+                                    className="empass-input"
                                     disabled={submitting}
                                   />
                                 </div>
 
                                 <div>
-                                  <label style={{
-                                    display: "block",
-                                    fontSize: "13px",
-                                    fontWeight: "600",
-                                    color: "#374151",
-                                    marginBottom: "6px"
-                                  }}>
+                                  <label className="empass-input-label">
                                     <i className="bi bi-chat-left-text"></i> Description (Optional)
                                   </label>
                                   <textarea
                                     value={att.attachmentNote}
                                     onChange={(e) => updateAttachmentNote(index, e.target.value)}
                                     placeholder="Add a description or notes for this attachment..."
-                                    style={{
-                                      width: "100%",
-                                      padding: "8px 12px",
-                                      border: "1px solid #d1d5db",
-                                      borderRadius: "6px",
-                                      fontSize: "13px",
-                                      minHeight: "70px",
-                                      resize: "vertical",
-                                      backgroundColor: "white",
-                                      outline: "none",
-                                      transition: "border-color 0.2s",
-                                      fontFamily: "inherit"
-                                    }}
-                                    onFocus={(e) => e.target.style.borderColor = "#3b82f6"}
-                                    onBlur={(e) => e.target.style.borderColor = "#d1d5db"}
+                                    className="empass-textarea"
                                     disabled={submitting}
                                   />
                                 </div>
@@ -1029,17 +801,8 @@ function MyAssessments() {
                         )}
 
                         {attachments.length === 0 && (
-                          <div style={{
-                            padding: "24px",
-                            textAlign: "center",
-                            color: "#9ca3af",
-                            fontSize: "14px",
-                            fontStyle: "italic",
-                            border: "2px dashed #e5e7eb",
-                            borderRadius: "8px",
-                            backgroundColor: "#f9fafb"
-                          }}>
-                            <i className="bi bi-inbox" style={{ fontSize: "32px", display: "block", marginBottom: "8px" }}></i>
+                          <div className="empass-no-attachments">
+                            <i className="bi bi-inbox empass-no-attachments-icon"></i>
                             No attachments added yet. Click "Add Attachment" to upload files.
                           </div>
                         )}
@@ -1049,61 +812,25 @@ function MyAssessments() {
                     {modalMode === "view" && (
                       <div>
                         {viewAttachments && viewAttachments.length > 0 ? (
-                          <div style={{ marginTop: "12px" }}>
+                          <div className="empass-view-attachments-list">
                             {viewAttachments.map((att) => (
                               <div
                                 key={att.attachmentId}
-                                style={{
-                                  padding: "16px",
-                                  border: "1px solid #e5e7eb",
-                                  borderRadius: "8px",
-                                  marginBottom: "12px",
-                                  backgroundColor: "#f9fafb",
-                                }}
+                                className="empass-view-attachment-item"
                               >
-                                <div style={{
-                                  display: "flex",
-                                  justifyContent: "space-between",
-                                  alignItems: "flex-start"
-                                }}>
-                                  <div style={{ flex: 1 }}>
-                                    <div style={{
-                                      display: "flex",
-                                      alignItems: "center",
-                                      gap: "8px",
-                                      marginBottom: "8px"
-                                    }}>
-                                      <div style={{
-                                        fontWeight: "600",
-                                        fontSize: "14px",
-                                        color: "#1f2937"
-                                      }}>
-                                        {att.fileName}
-                                      </div>
+                                <div className="empass-view-attachment-content">
+                                  <div className="empass-view-attachment-details">
+                                    <div className="empass-view-attachment-name">
+                                      {att.fileName}
                                     </div>
 
                                     {att.attachmentNote && (
-                                      <div style={{
-                                        fontSize: "13px",
-                                        color: "#4b5563",
-                                        marginTop: "8px",
-                                        padding: "8px 12px",
-                                        backgroundColor: "#ffffff",
-                                        borderRadius: "6px",
-                                        borderLeft: "3px solid #3b82f6"
-                                      }}>
+                                      <div className="empass-view-attachment-note">
                                         <strong>Description:</strong> {att.attachmentNote}
                                       </div>
                                     )}
 
-                                    <div style={{
-                                      fontSize: "12px",
-                                      color: "#9ca3af",
-                                      marginTop: "8px",
-                                      display: "flex",
-                                      gap: "12px",
-                                      flexWrap: "wrap"
-                                    }}>
+                                    <div className="empass-view-attachment-meta">
                                       {att.fileSize && (
                                         <span>
                                           <i className="bi bi-hdd"></i> {(att.fileSize / 1024).toFixed(2)} KB
@@ -1124,19 +851,7 @@ function MyAssessments() {
                                   <button
                                     onClick={() => handleDownloadViewAttachment(att)}
                                     disabled={downloadingAttachmentId === att.attachmentId}
-                                    style={{
-                                      padding: "8px 16px",
-                                      backgroundColor: "#97247E",
-                                      color: "white",
-                                      border: "none",
-                                      borderRadius: "6px",
-                                      cursor: downloadingAttachmentId === att.attachmentId ? "not-allowed" : "pointer",
-                                      fontSize: "13px",
-                                      fontWeight: "600",
-                                      display: "flex",
-                                      alignItems: "center",
-                                      gap: "6px",
-                                    }}
+                                    className="empass-download-btn"
                                   >
                                     {downloadingAttachmentId === att.attachmentId ? (
                                       <>
@@ -1155,17 +870,8 @@ function MyAssessments() {
                             ))}
                           </div>
                         ) : (
-                          <div style={{
-                            padding: "24px",
-                            textAlign: "center",
-                            color: "#9ca3af",
-                            fontSize: "14px",
-                            fontStyle: "italic",
-                            border: "2px dashed #e5e7eb",
-                            borderRadius: "8px",
-                            backgroundColor: "#f9fafb"
-                          }}>
-                            <i className="bi bi-inbox" style={{ fontSize: "32px", display: "block", marginBottom: "8px" }}></i>
+                          <div className="empass-no-attachments">
+                            <i className="bi bi-inbox empass-no-attachments-icon"></i>
                             No attachments submitted with this assessment
                           </div>
                         )}
@@ -1174,7 +880,7 @@ function MyAssessments() {
                   </div>
                 </div>
 
-                <div className="form-footer">
+                <div className="empass-form-footer">
                   <button
                     className="empass-btn-cancel"
                     onClick={() => setShowModal(false)}
@@ -1185,7 +891,7 @@ function MyAssessments() {
 
                   {modalMode === "submit" && (
                     <button
-                      className="btn-submit-form"
+                      className="empass-btn-submit-form"
                       onClick={handleSubmitAssessment}
                       disabled={submitting}
                     >

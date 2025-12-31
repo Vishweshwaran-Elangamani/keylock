@@ -1,0 +1,223 @@
+/* Container */
+.hrSubmittedContainer {
+    padding: 30px;
+    background: #F8FAFC;
+    min-height: 100vh;
+  }
+  
+  /* Header */
+  .hrSubmittedHeader {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #27235c;
+  }
+  
+  .hrSubmittedTitle {
+    font-size: 28px;
+    font-weight: 700;
+    color: #27235c;
+    margin: 0;
+  }
+  
+  .hrSubmittedSubtitle {
+    color: #718096;
+    font-size: 14px;
+    margin: 8px 0 0 0;
+  }
+  
+  /* Loading State */
+  .hrSubmittedLoadingWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+  }
+  
+  .hrSubmittedLoadingContent {
+    text-align: center;
+  }
+  
+  .hrSubmittedSpinner {
+    width: 3rem;
+    height: 3rem;
+    color: #27235c;
+    margin-bottom: 16px;
+  }
+  
+  .hrSubmittedLoadingText {
+    color: #718096;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  /* Table Wrapper */
+  .hrSubmittedTableWrapper {
+    background: #fff;
+    border: 2px solid #27235c;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+  
+  /* Table */
+  .hrSubmittedTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+  }
+  
+  .hrSubmittedTableHead {
+    background: #27235c;
+  }
+  
+  .hrSubmittedTableTh {
+    padding: 16px 20px;
+    text-align: left;
+    font-weight: 700;
+    color: #fff;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .hrSubmittedTableBody {
+    background: #fff;
+  }
+  
+  .hrSubmittedTableRow {
+    border-bottom: 1px solid #e5e7eb;
+    transition: background-color 0.2s;
+  }
+  
+  .hrSubmittedTableRow:last-child {
+    border-bottom: none;
+  }
+  
+  .hrSubmittedTableRow:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .hrSubmittedTableTd {
+    padding: 16px 20px;
+    color: #1a202c;
+    font-size: 14px;
+    vertical-align: middle;
+  }
+  
+  .hrSubmittedEmployeeName {
+    font-weight: 600;
+    color: #27235c;
+  }
+  
+  .hrSubmittedProjectName {
+    color: #2d5b8c;
+    font-weight: 500;
+  }
+  
+  .hrSubmittedDate {
+    color: #718096;
+    font-size: 13px;
+  }
+  
+  .hrSubmittedDatePending {
+    color: #f59e0b;
+    font-weight: 600;
+    font-style: italic;
+  }
+  
+  /* Action Button */
+  .hrSubmittedActionBtn {
+    padding: 8px 16px;
+    background: #27235c;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+  
+  .hrSubmittedActionBtn:hover {
+    background: #1e1b45;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(39, 35, 92, 0.3);
+  }
+  
+  .hrSubmittedActionBtn:active {
+    transform: translateY(0);
+  }
+  
+  /* Empty State */
+  .hrSubmittedEmptyState {
+    text-align: center;
+    padding: 60px 20px;
+    background: #fff;
+    border: 2px solid #27235c;
+    border-radius: 12px;
+  }
+  
+  .hrSubmittedEmptyIcon {
+    font-size: 64px;
+    color: #cbd5e0;
+    margin-bottom: 16px;
+  }
+  
+  .hrSubmittedEmptyTitle {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a202c;
+    margin: 0 0 8px 0;
+  }
+  
+  .hrSubmittedEmptyText {
+    font-size: 14px;
+    color: #718096;
+    margin: 0;
+  }
+  
+  /* Stats Badge */
+  .hrSubmittedStatsBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #27235c;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-left: 12px;
+  }
+  
+  .hrSubmittedStatsIcon {
+    font-size: 16px;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .hrSubmittedContainer {
+      padding: 16px;
+    }
+  
+    .hrSubmittedTitle {
+      font-size: 22px;
+    }
+  
+    .hrSubmittedTableWrapper {
+      overflow-x: auto;
+    }
+  
+    .hrSubmittedTable {
+      min-width: 600px;
+    }
+  
+    .hrSubmittedTableTh,
+    .hrSubmittedTableTd {
+      padding: 12px 16px;
+    }
+  }
+  
