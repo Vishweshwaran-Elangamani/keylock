@@ -3,12 +3,15 @@ import { Link } from "react-router-dom";
 import {
   getDeptHeadSubmittedRatings,
   approveDeptHeadEmployee,
-  getApprovedEmployees,
+  getApprovedEmployees, getAssessmentAttachments,
+  downloadAttachment,
+ 
 } from "../../../services/performancemanagement/api/rolesapi";
 import { getEmployeeIdForFilter } from "../../../utils/PerformanceManagement/jwtDecoder";
 import { toast } from "sonner";
 import "../../../styles/performancemanagement/depthead/DeptHeadPage.css"
 import Breadcrumb from "../../../components/common/Breadcrumb";
+
 
 const getExtensionFromContentType = (contentType) => {
   if (!contentType) return null;
@@ -31,6 +34,57 @@ const getExtensionFromContentType = (contentType) => {
   };
 
   return mimeToExt[contentType.toLowerCase()] || null;
+};
+
+/* Custom Project Dropdown Component */
+const ProjectFilterDropdown = ({ value, onChange, projects }) => {
+  const [open, setOpen] = useState(false);
+
+  const options = [
+    { label: "All Projects", value: "" },
+    ...projects.map(project => ({ label: project, value: project }))
+  ];
+
+  const selected = options.find((o) => o.value === value) || options[0];
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="dp-project-filter-dropdown custom-dp-dropdown"
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+      style={{ position: "relative" }}
+    >
+      <div
+        className="custom-dp-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {selected.label}
+        <span className="custom-dp-arrow" />
+      </div>
+
+      {open && (
+        <div className="custom-dp-menu">
+          {options.map((opt) => (
+            <div
+              key={opt.value || "all"}
+              className={
+                "custom-dp-option" +
+                (opt.value === value ? " custom-dp-option-active" : "")
+              }
+              onClick={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default function DeptHeadPage() {
@@ -406,7 +460,6 @@ export default function DeptHeadPage() {
           <div className="dp-modal-dialog dp-modal-bordered">
             <div className="dp-modal-header dp-modal-header-primary">
               <div className="dp-modal-title">
-                <i className="bi bi-check-circle-fill"></i>
                 <span>Approve Employee Assessment</span>
               </div>
               <button
@@ -488,7 +541,7 @@ export default function DeptHeadPage() {
                 onClick={handleModalClose}
                 disabled={approvingEmployeeId}
               >
-                <i className="bi bi-x-circle"></i> Cancel
+                 Cancel
               </button>
               <button
                 type="button"
@@ -502,7 +555,7 @@ export default function DeptHeadPage() {
                   </>
                 ) : (
                   <>
-                    <i className="bi bi-check-circle"></i> Approve Assessment
+                     Approve Assessment
                   </>
                 )}
               </button>
@@ -735,7 +788,7 @@ export default function DeptHeadPage() {
                 className="dp-btn-cancel"
                 onClick={handleModalClose}
               >
-                <i className="bi bi-x-circle"></i> Close
+                 Close
               </button>
             </div>
           </div>
@@ -756,84 +809,76 @@ export default function DeptHeadPage() {
 
   const hasActiveFilters = appliedSearch || filterProject;
 
-return (
-  <div className="dp-page">
-    <div className="dp-breadcrumb-wrapper">
-      <nav className="hrfcper-breadcrumb-nav" aria-label="breadcrumb">
-        <Breadcrumb
-          items={[{ label: 'Department Head Dashboard' }]}
-        />
-      </nav>
-    </div>
-
-    <div className="dp-tab-toggle-wrapper">
-      <div className="dp-tab-toggle">
-        <button
-          className={`dp-tab-toggle-btn ${activeTab === "pending" ? "active" : ""}`}
-          onClick={() => setActiveTab("pending")}
-        >
-          Pending
-        </button>
-
-        <button
-          className={`dp-tab-toggle-btn ${activeTab === "approved" ? "active" : ""}`}
-          onClick={() => setActiveTab("approved")}
-        >
-          Approved
-        </button>
+  return (
+    <div className="dp-page">
+      <div className="dp-breadcrumb-wrapper">
+        <nav className="hrfcper-breadcrumb-nav" aria-label="breadcrumb">
+          <Breadcrumb
+            items={[{ label: 'Department Head Dashboard' }]}
+          />
+        </nav>
       </div>
-    </div>
-
-    <div className="dp-filters-card">
-      <div className="dp-filter-controls">
-        <div className="dp-search-wrapper">
-          <div className="dp-search-input-container">
-            <i className="bi bi-search dp-search-icon-input"></i>
-            <input
-              type="text"
-              placeholder="Search employee or project..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleSearchClick();
-                }
-              }}
-              className="dp-search-input-field"
-            />
-          </div>
-
+  
+      <div className="dp-tab-toggle-wrapper">
+        <div className="dp-tab-toggle">
           <button
-            onClick={handleSearchClick}
-            className="dp-search-submit-btn"
+            className={`dp-tab-toggle-btn ${activeTab === "pending" ? "active" : ""}`}
+            onClick={() => setActiveTab("pending")}
           >
-            Search
+            Pending
+          </button>
+  
+          <button
+            className={`dp-tab-toggle-btn ${activeTab === "approved" ? "active" : ""}`}
+            onClick={() => setActiveTab("approved")}
+          >
+            Approved
           </button>
         </div>
-
-        {hasActiveFilters && (
+      </div>
+  
+      <div className="dp-filters-card">
+        <div className="dp-filter-controls">
+          <div className="dp-search-wrapper">
+            <div className="dp-search-input-container">
+              <i className="bi bi-search dp-search-icon-input"></i>
+              <input
+                type="text"
+                placeholder="Search employee or project..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearchClick();
+                  }
+                }}
+                className="dp-search-input-field"
+              />
+            </div>
+  
+            <button
+              onClick={handleSearchClick}
+              className="dp-search-submit-btn"
+            >
+              Search
+            </button>
+          </div>
+  
           <button
             onClick={handleClearFilters}
             className="dp-clear-filters-btn"
           >
             Clear Filters
           </button>
-        )}
-
-        <select
-          value={filterProject}
-          onChange={(e) => setFilterProject(e.target.value)}
-          className="dp-project-filter-select"
-        >
-          <option value="">All Projects</option>
-          {getUniqueProjects().map((project, idx) => (
-            <option key={idx} value={project}>
-              {project}
-            </option>
-          ))}
-        </select>
+  
+          <ProjectFilterDropdown
+            value={filterProject}
+            onChange={(val) => setFilterProject(val)}
+            projects={getUniqueProjects()}
+          />
+        </div>
       </div>
-    </div>
+  
       <div className="dp-table-card dp-table-card-bordered">
         <div className="dp-table-wrapper">
           {activeTab === "pending" ? (
@@ -961,7 +1006,7 @@ return (
             </table>
           )}
         </div>
-
+  
         {filteredData.length > 0 && (
           <div className="dp-pagination-container dp-pagination-bordered">
             <div className="dp-pagination-info">
@@ -1025,7 +1070,7 @@ return (
           </div>
         )}
       </div>
-
+  
       {renderApproveModal()}
       {renderDetailsModal()}
     </div>

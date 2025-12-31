@@ -16,7 +16,6 @@ export default function TopPerformers() {
 
   
   const breadcrumbItems = [
-    { label: "Dashboard", path: "/depthead/dashboard" },
     { label: "Top Performers" }
   ];
 
@@ -152,7 +151,6 @@ export default function TopPerformers() {
 
         {nominations.length === 0 ? (
           <div className="dtp-empty-state">
-            <div className="dtp-empty-icon">📭</div>
             <h3 className="dtp-empty-title">No Approved Nominations</h3>
             <p className="dtp-empty-description">
               There are no approved nominations in your department yet.
