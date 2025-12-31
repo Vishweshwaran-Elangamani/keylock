@@ -1,3 +1,5 @@
+/* Career Goals - Scoped Styles (Prefix: cg-) */
+
 .cg-page {
   padding: 16px 20px 48px 20px;
   max-width: 1600px;
@@ -5,6 +7,10 @@
   background: #f8f9fc;
   min-height: 100vh;
 }
+
+/* ========================================
+   KPI CARDS
+======================================== */
 
 .stats-cards-cg {
   display: grid;
@@ -84,6 +90,10 @@
   line-height: 1.2;
   text-align: center;
 }
+
+/* ========================================
+   CONTROLS
+======================================== */
 
 .cg-controls {
   display: flex;
@@ -176,6 +186,10 @@
   background: #1f1c4b;
 }
 
+/* ========================================
+   CUSTOM DROPDOWNS
+======================================== */
+
 .cg-department-filter,
 .cg-days-filter {
   position: relative;
@@ -183,7 +197,8 @@
   max-width: 180px;
 }
 
-.cg-filter-select {
+.cg-filter-select,
+.cg-days-select {
   position: relative;
   min-width: 160px;
 }
@@ -298,6 +313,10 @@
   color: #ffffff;
 }
 
+/* ========================================
+   BUTTONS
+======================================== */
+
 .cg-btn-clear {
   white-space: nowrap;
   padding: 0.5rem 1rem;
@@ -318,34 +337,40 @@
   color: #ffffff !important;
 }
 
-.cg-btn-analytics {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0.5rem 1rem;
-  background: #ffffff;
-  border: 1px solid #27235c;
-  color: #27235c;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  height: 38px;
-}
-
-.cg-btn-analytics:hover {
-  background: #27235c;
-  color: #ffffff;
-}
-
 .cg-results-count {
   font-size: 0.875rem;
   color: #6c757d;
   white-space: nowrap;
   font-weight: 500;
   margin-left: auto;
+}
+
+.cg-btn-analytics {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.5rem 1.25rem;
+  background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  box-shadow: 0 2px 8px rgba(151, 36, 126, 0.25);
+  white-space: nowrap;
+  height: 38px;
+}
+
+.cg-btn-analytics:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(151, 36, 126, 0.35);
+}
+
+.cg-btn-analytics i,
+.cg-btn-analytics svg {
+  font-size: 16px;
 }
 
 .cg-btn-bulk {
@@ -374,6 +399,10 @@
 .cg-btn-bulk i {
   font-size: 16px;
 }
+
+/* ========================================
+   ANALYTICS SECTION
+======================================== */
 
 .cg-analytics-section {
   margin-bottom: 0.875rem;
@@ -447,64 +476,9 @@
   color: #4b5563;
 }
 
-
-
-.cg-pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 1rem 1.25rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.cg-pagination-list {
-  display: flex;
-  list-style: none;
-  gap: 0.3rem;
-  margin: 0;
-  padding: 0;
-}
-
-.cg-page-item {
-  list-style: none;
-}
-
-.cg-page-item button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 32px;
-  height: 32px;
-  padding: 0.3rem 0.625rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  background: #ffffff;
-  color: #212529;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.cg-page-item button:hover:not(:disabled) {
-  background: rgba(39, 35, 92, 0.05);
-  border-color: #27235c;
-  color: #27235c;
-}
-
-.cg-page-item.active button {
-  background: #27235c;
-  border-color: transparent;
-  color: #ffffff;
-  box-shadow: 0 2px 6px rgba(39, 35, 92, 0.3);
-}
-
-.cg-page-item.disabled button {
-  opacity: 0.5;
-  cursor: not-allowed;
-  pointer-events: none;
-}
+/* ========================================
+   TABLE
+======================================== */
 
 .cg-table-card {
   background: #ffffff;
@@ -614,6 +588,10 @@
   border-color: rgba(239, 68, 68, 0.3);
 }
 
+/* ========================================
+   ACTION BUTTONS
+======================================== */
+
 .cg-table-actions {
   display: flex;
   justify-content: center;
@@ -662,6 +640,107 @@
   box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
 }
 
+/* ========================================
+   PAGINATION
+======================================== */
+
+.cg-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid #e5e7eb;
+  flex-wrap: wrap;
+  gap: 1rem;
+  background: #ffffff;
+  border-radius: 0 0 12px 12px;
+}
+
+.cg-pagination-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.cg-pagination-info select {
+  padding: 0.3rem 0.625rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  background: #ffffff;
+  color: #212529;
+  height: 30px;
+}
+
+.cg-pagination-info select:focus {
+  outline: none;
+  border-color: #27235c;
+}
+
+.cg-pagination-status {
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+.cg-pagination-nav {
+  margin: 0;
+}
+
+.cg-pagination-list {
+  display: flex;
+  list-style: none;
+  gap: 0.3rem;
+  margin: 0;
+  padding: 0;
+}
+
+.cg-page-item {
+  list-style: none;
+}
+
+.cg-page-item button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0.3rem 0.625rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #212529;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cg-page-item button:hover:not(:disabled) {
+  background: rgba(39, 35, 92, 0.05);
+  border-color: #27235c;
+  color: #27235c;
+}
+
+.cg-page-item.active button {
+  background: #27235c;
+  border-color: transparent;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(39, 35, 92, 0.3);
+}
+
+.cg-page-item.disabled button {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ========================================
+   EMPTY STATE
+======================================== */
+
 .cg-empty-state {
   text-align: center;
   padding: 3rem 1rem;
@@ -693,6 +772,10 @@
   font-size: 0.875rem;
 }
 
+/* ========================================
+   LOADING
+======================================== */
+
 .cg-loading-container {
   display: flex;
   justify-content: center;
@@ -701,6 +784,10 @@
   flex-direction: column;
   gap: 1rem;
 }
+
+/* ========================================
+   RESPONSIVE
+======================================== */
 
 @media (max-width: 1200px) {
   .cg-controls {
@@ -758,6 +845,22 @@
     flex-direction: column;
     gap: 0.75rem;
   }
+
+  .cg-pagination-info,
+  .cg-pagination-status {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .cg-pagination-nav {
+    width: 100%;
+  }
+
+  .cg-pagination-nav .cg-pagination-list {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
 }
 
 @media (max-width: 576px) {
@@ -774,18 +877,8 @@
     font-size: 0.8rem;
     padding: 0.625rem 0.75rem;
   }
-}
 
-.cg-pagination-wrapper-bottom {
-  background: #ffffff;
-  border-radius: 0 0 12px 12px;
-  border: 1px solid #e5e7eb;
-  border-top: none;
-  overflow: hidden;
-  margin-top: 0;
+  .cg-table {
+    min-width: 900px;
+  }
 }
-
-.cg-table-card {
-  border-radius: 12px 12px 0 0;
-}
-

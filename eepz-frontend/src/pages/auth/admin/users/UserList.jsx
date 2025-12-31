@@ -12,6 +12,7 @@ import { FaSearch } from "react-icons/fa";
 import { Form } from "react-bootstrap";
 import "../../../../styles/auth/user/UserList.css";
 
+
 const RoleDropdown = ({ value, onChange, roles }) => {
   const [open, setOpen] = useState(false);
 
@@ -30,26 +31,27 @@ const RoleDropdown = ({ value, onChange, roles }) => {
 
   return (
     <div
-      className="ul-filter-select ep-custom-dropdown"
+      className="ul-filter-select custom-status-dropdown"
       tabIndex={0}
       onBlur={() => setTimeout(() => setOpen(false), 200)}
-      onClick={() => setOpen((prev) => !prev)}
-      style={{ position: "relative" }}
     >
-      <div className="ep-custom-selected">
+      <div
+        className="custom-status-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
         {selected.label}
-        <span className="ep-custom-arrow" />
+        <span className="custom-status-arrow" />
       </div>
       {open && (
-        <div className="ep-custom-menu">
+        <div className="custom-status-menu">
           {allOptions.map((opt) => (
             <div
               key={opt.value || "all-roles"}
               className={
-                "ep-custom-option" +
-                (opt.value === value ? " ep-custom-option-active" : "")
+                "custom-status-option" +
+                (opt.value === value ? " custom-status-option-active" : "")
               }
-              onMouseDown={() => handleSelect(opt.value)}
+              onClick={() => handleSelect(opt.value)}
             >
               {opt.label}
             </div>
@@ -59,6 +61,7 @@ const RoleDropdown = ({ value, onChange, roles }) => {
     </div>
   );
 };
+
 
 const StatusDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
@@ -77,26 +80,27 @@ const StatusDropdown = ({ value, onChange }) => {
 
   return (
     <div
-      className="ul-filter-select ep-custom-dropdown"
+      className="ul-filter-select custom-status-dropdown"
       tabIndex={0}
       onBlur={() => setTimeout(() => setOpen(false), 200)}
-      onClick={() => setOpen((prev) => !prev)}
-      style={{ position: "relative" }}
     >
-      <div className="ep-custom-selected">
+      <div
+        className="custom-status-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
         {selected.label}
-        <span className="ep-custom-arrow" />
+        <span className="custom-status-arrow" />
       </div>
       {open && (
-        <div className="ep-custom-menu">
+        <div className="custom-status-menu">
           {allOptions.map((opt) => (
             <div
               key={opt.value || "all-status"}
               className={
-                "ep-custom-option" +
-                (opt.value === value ? " ep-custom-option-active" : "")
+                "custom-status-option" +
+                (opt.value === value ? " custom-status-option-active" : "")
               }
-              onMouseDown={() => handleSelect(opt.value)}
+              onClick={() => handleSelect(opt.value)}
             >
               {opt.label}
             </div>
@@ -107,7 +111,7 @@ const StatusDropdown = ({ value, onChange }) => {
   );
 };
 
-// Rest of UserList component remains exactly the same...
+
 const UserList = () => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
@@ -120,7 +124,7 @@ const UserList = () => {
   const [selectedRole, setSelectedRole] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
 
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
 
   const [showAddModal, setShowAddModal] = useState(false);
@@ -129,13 +133,16 @@ const UserList = () => {
   const [showBulkOperations, setShowBulkOperations] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
+
   useEffect(() => {
     fetchData();
   }, []);
 
+
   useEffect(() => {
     filterUsers();
   }, [users, activeSearchTerm, selectedRole, selectedStatus]);
+
 
   const fetchData = async () => {
     try {
@@ -161,9 +168,11 @@ const UserList = () => {
     }
   };
 
+
   const getNonAdminUsers = () => {
     return users.filter((user) => user.roleName !== "Admin");
   };
+
 
   const filterUsers = () => {
     let filtered = getNonAdminUsers();
@@ -194,9 +203,11 @@ const UserList = () => {
     setCurrentPage(1);
   };
 
+
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
   };
+
 
   const clearFilters = () => {
     setSearchTerm("");
@@ -204,6 +215,7 @@ const UserList = () => {
     setSelectedRole("");
     setSelectedStatus("");
   };
+
 
   const handleAddUser = () => setShowAddModal(true);
   const handleEditUser = (user) => {
@@ -227,9 +239,11 @@ const UserList = () => {
     fetchData();
   };
 
+
   const handleBulkOperationsSuccess = () => {
     fetchData();
   };
+
 
   const getPaginatedUsers = () => {
     const startIndex = (currentPage - 1) * rowsPerPage;
@@ -237,7 +251,9 @@ const UserList = () => {
     return filteredUsers.slice(startIndex, endIndex);
   };
 
+
   const totalPages = Math.ceil(filteredUsers.length / rowsPerPage) || 1;
+
 
   const getPageNumbers = () => {
     const pages = [];
@@ -266,11 +282,13 @@ const UserList = () => {
     return pages;
   };
 
+
   const getInitials = (firstName, lastName) => {
     const first = firstName?.charAt(0)?.toUpperCase() || "";
     const last = lastName?.charAt(0)?.toUpperCase() || "";
     return `${first}${last}`;
   };
+
 
   if (loading) {
     return (
@@ -281,6 +299,7 @@ const UserList = () => {
       </div>
     );
   }
+
 
   return (
     <div className="ul-page">
@@ -376,22 +395,33 @@ const UserList = () => {
             </div>
           </div>
 
-          <RoleDropdown
-            value={selectedRole}
-            onChange={(e) => setSelectedRole(e.target.value)}
-            roles={roles}
-          />
+          <div className="ul-role-filter">
+            <RoleDropdown
+              value={selectedRole}
+              onChange={(e) => setSelectedRole(e.target.value)}
+              roles={roles}
+            />
+          </div>
 
-          <StatusDropdown
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-          />
+          <div className="ul-status-filter">
+            <StatusDropdown
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+            />
+          </div>
 
           <button className="ul-btn-clear" onClick={clearFilters}>
             Clear Filters
           </button>
 
-          <button className="ul-btn-bulk" onClick={() => setShowBulkOperations(true)}>
+          <div className="ul-results-count">
+            Showing {getPaginatedUsers().length} of {filteredUsers.length} users
+          </div>
+
+          <button
+            className="ul-btn-bulk"
+            onClick={() => setShowBulkOperations(true)}
+          >
             <i className="bi bi-database"></i>
             Bulk Operations
           </button>
@@ -403,7 +433,13 @@ const UserList = () => {
         </div>
       </div>
 
-      <div className="ul-table-card">
+      
+
+      <div
+        className={`ul-table-card ${
+          totalPages > 1 ? "ul-table-with-pagination" : ""
+        }`}
+      >
         <div className="ul-table-wrapper">
           <table className="ul-table">
             <thead>
@@ -421,8 +457,11 @@ const UserList = () => {
               {getPaginatedUsers().length === 0 ? (
                 <tr>
                   <td colSpan="7" className="ul-empty-state">
-                    <i className="bi bi-inbox"></i>
-                    <p>No users found</p>
+                    <div className="ul-empty-content">
+                      <i className="bi bi-inbox"></i>
+                      <h4>No users found</h4>
+                      <p>Try adjusting your search or filter criteria</p>
+                    </div>
                   </td>
                 </tr>
               ) : (
@@ -439,14 +478,17 @@ const UserList = () => {
                     <td>{user.email}</td>
                     <td className="text-muted">{user.employeeCompanyId}</td>
                     <td>
-                      <span
-                        className={`ul-status-badge ${user.isActive
-                            ? "ul-status-active"
-                            : "ul-status-inactive"
-                          }`}
-                      >
-                        {user.isActive ? "Active" : "Inactive"}
-                      </span>
+                      {user.isActive ? (
+                        <span className="ul-badge-table-active">
+                          <i className="bi bi-check-circle-fill"></i>
+                          Active
+                        </span>
+                      ) : (
+                        <span className="ul-badge-table-inactive">
+                          <i className="bi bi-x-circle-fill"></i>
+                          Inactive
+                        </span>
+                      )}
                     </td>
                     <td>
                       {user.roleName || (
@@ -461,25 +503,25 @@ const UserList = () => {
                       })}
                     </td>
                     <td>
-                      <div className="ul-action-buttons">
+                      <div className="ul-table-actions">
                         <button
-                          className="ul-action-btn ul-action-edit"
+                          className="ul-action-edit"
                           onClick={() => handleEditUser(user)}
                           title="Edit User"
                         >
-                          <i className="bi bi-pencil"></i>
+                          <i className="bi bi-pencil-square"></i>
                         </button>
                         {user.isActive ? (
                           <button
-                            className="ul-action-btn ul-action-delete"
+                            className="ul-action-delete"
                             onClick={() => handleDeactivate(user)}
                             title="Deactivate User"
                           >
-                            <i className="bi bi-trash"></i>
+                            <i className="bi bi-trash3"></i>
                           </button>
                         ) : (
                           <button
-                            className="ul-action-btn ul-action-disabled"
+                            className="ul-action-disabled"
                             disabled
                             title="Permanently Deactivated"
                           >
@@ -494,84 +536,86 @@ const UserList = () => {
             </tbody>
           </table>
         </div>
-
         {filteredUsers.length > 0 && totalPages > 1 && (
-          <div className="ul-pagination">
-            <div className="ul-pagination-info">
-              <span>Show</span>
-              <select
-                value={rowsPerPage}
-                onChange={(e) => {
-                  setRowsPerPage(Number(e.target.value));
-                  setCurrentPage(1);
-                }}
+    <div className="ul-pagination">
+      <div className="ul-pagination-info">
+        <span>Show</span>
+        <select
+          value={rowsPerPage}
+          onChange={(e) => {
+            setRowsPerPage(Number(e.target.value));
+            setCurrentPage(1);
+          }}
+        >
+          <option value={5}>5</option>
+          <option value={10}>10</option>
+          <option value={25}>25</option>
+          <option value={50}>50</option>
+        </select>
+        <span>entries</span>
+      </div>
+
+      <div className="ul-pagination-status">
+        Showing {(currentPage - 1) * rowsPerPage + 1} to{" "}
+        {Math.min(currentPage * rowsPerPage, filteredUsers.length)} of{" "}
+        {filteredUsers.length} entries
+      </div>
+
+      <nav className="ul-pagination-nav">
+        <ul className="ul-pagination-list">
+          <li
+            className={`ul-page-item ${
+              currentPage === 1 ? "disabled" : ""
+            }`}
+          >
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.max(prev - 1, 1))
+              }
+              disabled={currentPage === 1}
+            >
+              <i className="bi bi-chevron-left"></i>
+            </button>
+          </li>
+
+          {getPageNumbers().map((page, index) => (
+            <li
+              key={index}
+              className={`ul-page-item ${
+                page === currentPage ? "active" : ""
+              } ${typeof page !== "number" ? "disabled" : ""}`}
+            >
+              <button
+                onClick={() =>
+                  typeof page === "number" && setCurrentPage(page)
+                }
+                disabled={typeof page !== "number"}
               >
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-              </select>
-              <span>entries</span>
-            </div>
+                {page}
+              </button>
+            </li>
+          ))}
 
-            <div className="ul-pagination-status">
-              Showing {(currentPage - 1) * rowsPerPage + 1} to{" "}
-              {Math.min(currentPage * rowsPerPage, filteredUsers.length)} of{" "}
-              {filteredUsers.length} entries
-            </div>
-
-            <nav className="ul-pagination-nav">
-              <ul className="ul-pagination-list">
-                <li
-                  className={`ul-page-item ${currentPage === 1 ? "disabled" : ""
-                    }`}
-                >
-                  <button
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(prev - 1, 1))
-                    }
-                    disabled={currentPage === 1}
-                  >
-                    <i className="bi bi-chevron-left"></i>
-                  </button>
-                </li>
-
-                {getPageNumbers().map((page, index) => (
-                  <li
-                    key={index}
-                    className={`ul-page-item ${page === currentPage ? "active" : ""
-                      } ${typeof page !== "number" ? "disabled" : ""}`}
-                  >
-                    <button
-                      onClick={() =>
-                        typeof page === "number" && setCurrentPage(page)
-                      }
-                      disabled={typeof page !== "number"}
-                    >
-                      {page}
-                    </button>
-                  </li>
-                ))}
-
-                <li
-                  className={`ul-page-item ${currentPage === totalPages ? "disabled" : ""
-                    }`}
-                >
-                  <button
-                    onClick={() =>
-                      setCurrentPage((prev) =>
-                        Math.min(prev + 1, totalPages)
-                      )
-                    }
-                    disabled={currentPage === totalPages}
-                  >
-                    <i className="bi bi-chevron-right"></i>
-                  </button>
-                </li>
-              </ul>
-            </nav>
-          </div>
-        )}
+          <li
+            className={`ul-page-item ${
+              currentPage === totalPages ? "disabled" : ""
+            }`}
+          >
+            <button
+              onClick={() =>
+                setCurrentPage((prev) =>
+                  Math.min(prev + 1, totalPages)
+                )
+              }
+              disabled={currentPage === totalPages}
+            >
+              <i className="bi bi-chevron-right"></i>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  )}
       </div>
 
       {showAddModal && (
@@ -611,5 +655,6 @@ const UserList = () => {
     </div>
   );
 };
+
 
 export default UserList;

@@ -1,9 +1,8 @@
-
-
 import { useState, useEffect, useRef } from "react";
 import userService from "../../../../services/auth/userService";
 import { toast } from "sonner";
 import "../../../../styles/auth/user/AddUserModal.css";
+
 
 // Custom Dropdown Component with Smart Positioning
 const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) => {
@@ -11,7 +10,9 @@ const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) 
   const [openUpward, setOpenUpward] = useState(false);
   const dropdownRef = useRef(null);
 
+
   const selectedOption = options.find((opt) => opt.value === value);
+
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -20,14 +21,17 @@ const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) 
       }
     };
 
+
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
+
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen]);
+
 
   // Smart positioning logic
   useEffect(() => {
@@ -36,6 +40,7 @@ const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) 
       const spaceBelow = window.innerHeight - rect.bottom;
       const spaceAbove = rect.top;
       const dropdownHeight = 250; 
+
 
       // Open upward if not enough space below but enough space above
       if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
@@ -46,10 +51,12 @@ const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) 
     }
   }, [isOpen]);
 
+
   const handleSelect = (optionValue) => {
     onChange({ target: { name, value: optionValue } });
     setIsOpen(false);
   };
+
 
   return (
     <div
@@ -70,6 +77,7 @@ const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) 
         <span className={`aum-custom-dropdown-arrow ${isOpen ? "open" : ""}`} />
       </div>
 
+
       {isOpen && (
         <div className={`aum-custom-dropdown-menu ${openUpward ? "open-upward" : ""}`}>
           {options.map((option) => (
@@ -88,6 +96,7 @@ const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) 
     </div>
   );
 };
+
 
 const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
   const [formData, setFormData] = useState({
@@ -109,6 +118,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
   const [loadingEmployeeId, setLoadingEmployeeId] = useState(false);
   const [errors, setErrors] = useState({});
 
+
   // Dropdown options
   const genderOptions = [
     { label: "Select Gender", value: "" },
@@ -116,6 +126,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
     { label: "Female", value: "Female" },
     { label: "Prefer not to say", value: "PreferNotToSay" },
   ];
+
 
   const employmentTypeOptions = [
     { label: "Select Employment Type", value: "" },
@@ -126,12 +137,14 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
     { label: "Probation", value: "Probation" },
   ];
 
+
   const roleOptions = [
     { label: "Select Role", value: "" },
     ...roles
       .filter((role) => role.roleName !== "Admin")
       .map((role) => ({ label: role.roleName, value: role.roleId.toString() })),
   ];
+
 
   const departmentOptions = [
     { label: "Select Department", value: "" },
@@ -141,9 +154,11 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
     })),
   ];
 
+
   useEffect(() => {
     const fetchNextEmployeeId = async () => {
       if (!show) return;
+
 
       try {
         setLoadingEmployeeId(true);
@@ -172,8 +187,10 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
       }
     };
 
+
     fetchNextEmployeeId();
   }, [show]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -181,8 +198,10 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
+
   const validateForm = () => {
     const newErrors = {};
+
 
     if (!formData.firstName.trim())
       newErrors.firstName = "First name is required";
@@ -191,18 +210,22 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
     else if (!/^[a-zA-Z\s]+$/.test(formData.firstName.trim()))
       newErrors.firstName = "First name must contain only letters";
 
+
     if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
     else if (formData.lastName.trim().length < 2)
       newErrors.lastName = "Last name must be at least 2 characters";
     else if (!/^[a-zA-Z\s]+$/.test(formData.lastName.trim()))
       newErrors.lastName = "Last name must contain only letters";
 
+
     if (!formData.employeeCompanyId.trim())
       newErrors.employeeCompanyId = "Employee Company ID is required";
+
 
     if (!formData.email.trim()) newErrors.email = "Email is required";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim()))
       newErrors.email = "Please enter a valid email address";
+
 
     if (!formData.mobileNumber.trim()) {
       newErrors.mobileNumber = "Mobile number is required";
@@ -210,6 +233,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
       newErrors.mobileNumber =
         "Phone number must start with 6-9 and be exactly 10 digits";
     }
+
 
     if (!formData.dateOfBirthOfficial) {
       newErrors.dateOfBirthOfficial = "Date of birth is required";
@@ -225,19 +249,25 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
         newErrors.dateOfBirthOfficial = "Please enter a valid date of birth";
     }
 
+
     if (!formData.gender) newErrors.gender = "Gender is required";
+
 
     if (!formData.employmentType)
       newErrors.employmentType = "Employment type is required";
 
+
     if (!formData.roleId) newErrors.roleId = "Role is required";
+
 
     if (!formData.departmentId)
       newErrors.departmentId = "Department is required";
 
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -252,9 +282,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
         email: formData.email.trim(),
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
-        mobileNumber: formData.mobileNumber.trim()
-          ? `+91-${formData.mobileNumber.trim()}`
-          : null,
+        mobileNumber: formData.mobileNumber.trim() || null,  // ✅ FIXED: Send only 10 digits
         gender: formData.gender || null,
         dateOfBirthOfficial: formData.dateOfBirthOfficial || null,
         employmentType: formData.employmentType,
@@ -310,11 +338,14 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
     }
   };
 
+
   if (!show) return null;
+
 
   return (
     <>
       <div className="aum-backdrop" onClick={onHide} />
+
 
       <div className="aum-modal-container">
         <div className="aum-modal-dialog">
@@ -334,6 +365,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
+
 
           {/* BODY/FORM */}
           <form onSubmit={handleSubmit} className="aum-form">
@@ -360,6 +392,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                   )}
                 </div>
 
+
                 {/* Last Name */}
                 <div className="aum-form-group">
                   <label className="aum-form-label">
@@ -380,6 +413,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                     <div className="aum-form-error">{errors.lastName}</div>
                   )}
                 </div>
+
 
                 {/* Employee Company Id - AUTO-GENERATED READ-ONLY */}
                 <div className="aum-form-group">
@@ -437,6 +471,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                   </small>
                 </div>
 
+
                 {/* Email */}
                 <div className="aum-form-group">
                   <label className="aum-form-label">
@@ -455,6 +490,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                     <div className="aum-form-error">{errors.email}</div>
                   )}
                 </div>
+
 
                 {/* Mobile Number */}
                 <div className="aum-form-group">
@@ -483,6 +519,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                   </small>
                 </div>
 
+
                 {/* Date of Birth */}
                 <div className="aum-form-group">
                   <label className="aum-form-label">
@@ -507,6 +544,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                   <small className="aum-form-hint">Must be 18+ years old</small>
                 </div>
 
+
                 {/* Gender - Custom Dropdown */}
                 <div className="aum-form-group">
                   <label className="aum-form-label">
@@ -524,6 +562,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                     <div className="aum-form-error">{errors.gender}</div>
                   )}
                 </div>
+
 
                 {/* Employment Type - Custom Dropdown */}
                 <div className="aum-form-group">
@@ -546,6 +585,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                   )}
                 </div>
 
+
                 {/* Role - Custom Dropdown */}
                 <div className="aum-form-group">
                   <label className="aum-form-label">
@@ -563,6 +603,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                     <div className="aum-form-error">{errors.roleId}</div>
                   )}
                 </div>
+
 
                 {/* Department - Custom Dropdown */}
                 <div className="aum-form-group">
@@ -583,6 +624,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                 </div>
               </div>
 
+
               {/* Info Alert */}
               <div className="aum-info-alert">
                 <i className="bi bi-info-circle"></i>
@@ -592,6 +634,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                 </small>
               </div>
             </div>
+
 
             {/* FOOTER */}
             <div className="aum-modal-footer">
@@ -603,6 +646,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
               >
                 <i className="bi bi-x-circle"></i> Cancel
               </button>
+
 
               <button
                 type="submit"
@@ -627,5 +671,6 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
     </>
   );
 };
+
 
 export default AddUserModal;

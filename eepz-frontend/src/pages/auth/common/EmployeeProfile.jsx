@@ -599,18 +599,18 @@ const EmployeeProfile = () => {
         break;
 
       case "callingName":
-        if (stringValue && stringValue.trim()) {
-          if (stringValue.trim().length > 50) {
-            error = "Calling name cannot exceed 50 characters";
-          } else if (!/^[a-zA-Z\s'-]*$/.test(stringValue.trim())) {
-            error =
-              "Calling name can only contain letters, spaces, hyphens, and apostrophes";
-          } else if (/\s{2,}/.test(stringValue)) {
-            error = "Calling name cannot contain consecutive spaces";
-          } else if (/[-']{2,}/.test(stringValue)) {
-            error =
-              "Calling name cannot contain consecutive hyphens or apostrophes";
-          }
+        if (!stringValue || !stringValue.trim()) {
+          error = "Calling name is required";
+        } else if (stringValue.trim().length > 50) {
+          error = "Calling name cannot exceed 50 characters";
+        } else if (!/^[a-zA-Z\s'-]*$/.test(stringValue.trim())) {
+          error =
+            "Calling name can only contain letters, spaces, hyphens, and apostrophes";
+        } else if (/\s{2,}/.test(stringValue)) {
+          error = "Calling name cannot contain consecutive spaces";
+        } else if (/[-']{2,}/.test(stringValue)) {
+          error =
+            "Calling name cannot contain consecutive hyphens or apostrophes";
         }
         break;
 
@@ -637,7 +637,9 @@ const EmployeeProfile = () => {
         break;
 
       case "alternateNumber":
-        if (stringValue && stringValue.trim()) {
+        if (!stringValue || !stringValue.trim()) {
+          error = "Alternate number is required";
+        } else {
           const cleanNumber = stringValue.replace(/\s+/g, "");
           if (!/^\d+$/.test(cleanNumber)) {
             error = "Alternate number can only contain digits";
@@ -654,7 +656,9 @@ const EmployeeProfile = () => {
         break;
 
       case "personalEmail":
-        if (stringValue && stringValue.trim()) {
+        if (!stringValue || !stringValue.trim()) {
+          error = "Personal email is required";
+        } else {
           const email = stringValue.trim().toLowerCase();
           if (email.length > 100) {
             error = "Email address cannot exceed 100 characters";
@@ -679,12 +683,14 @@ const EmployeeProfile = () => {
 
       case "gender":
         if (!stringValue || stringValue === "") {
-          error = "Gender is required";
+          error = "Please select your gender";
         }
         break;
 
       case "dateOfBirthOfficial":
-        if (stringValue) {
+        if (!stringValue || !stringValue.trim()) {
+          error = "Date of birth is required";
+        } else {
           const birthDate = new Date(stringValue);
           const today = new Date();
 
@@ -716,13 +722,13 @@ const EmployeeProfile = () => {
 
       case "nationality":
         if (!stringValue || stringValue === "") {
-          error = "Nationality is required";
+          error = "Please select your nationality";
         }
         break;
 
       case "maritalStatus":
         if (!stringValue || stringValue === "") {
-          error = "Marital status is required";
+          error = "Please select your marital status";
         }
         break;
 
@@ -740,13 +746,11 @@ const EmployeeProfile = () => {
     let error = "";
     const stringValue = value != null ? String(value) : "";
 
-    if (!stringValue || !stringValue.trim()) {
-      return "";
-    }
-
     switch (field) {
       case "doorNumber":
-        if (stringValue.trim().length > 20) {
+        if (!stringValue || !stringValue.trim()) {
+          error = "Door number is required";
+        } else if (stringValue.trim().length > 20) {
           error = "Door number cannot exceed 20 characters";
         } else if (/^[^a-zA-Z0-9]+$/.test(stringValue.trim())) {
           error = "Door number must contain alphanumeric characters";
@@ -756,7 +760,9 @@ const EmployeeProfile = () => {
         break;
 
       case "street":
-        if (stringValue.trim().length < 2) {
+        if (!stringValue || !stringValue.trim()) {
+          error = "Street is required";
+        } else if (stringValue.trim().length < 2) {
           error = "Street must be at least 2 characters";
         } else if (stringValue.trim().length > 100) {
           error = "Street cannot exceed 100 characters";
@@ -769,7 +775,9 @@ const EmployeeProfile = () => {
         break;
 
       case "landmark":
-        if (stringValue.trim().length > 100) {
+        if (!stringValue || !stringValue.trim()) {
+          error = "Landmark is required";
+        } else if (stringValue.trim().length > 100) {
           error = "Landmark cannot exceed 100 characters";
         } else if (!/^[a-zA-Z0-9\s,.-]+$/.test(stringValue.trim())) {
           error =
@@ -780,7 +788,9 @@ const EmployeeProfile = () => {
         break;
 
       case "area":
-        if (stringValue.trim().length < 2) {
+        if (!stringValue || !stringValue.trim()) {
+          error = "Area is required";
+        } else if (stringValue.trim().length < 2) {
           error = "Area must be at least 2 characters";
         } else if (stringValue.trim().length > 100) {
           error = "Area cannot exceed 100 characters";
@@ -793,7 +803,9 @@ const EmployeeProfile = () => {
         break;
 
       case "city":
-        if (stringValue.trim().length < 2) {
+        if (!stringValue || !stringValue.trim()) {
+          error = "City is required";
+        } else if (stringValue.trim().length < 2) {
           error = "City must be at least 2 characters";
         } else if (stringValue.trim().length > 50) {
           error = "City cannot exceed 50 characters";
@@ -807,29 +819,32 @@ const EmployeeProfile = () => {
         break;
 
       case "state":
-        if (
-          formData[addressType]?.city &&
-          (!stringValue || stringValue === "")
-        ) {
-          error = "State is required when city is provided";
+        if (!stringValue || stringValue === "") {
+          error = "Please select your state";
         }
         break;
 
       case "pinCode":
-        const pinCode = stringValue.replace(/\s+/g, "");
-        if (!/^\d+$/.test(pinCode)) {
-          error = "PIN code can only contain digits";
-        } else if (pinCode.length !== 6) {
-          error = "PIN code must be exactly 6 digits";
-        } else if (pinCode.startsWith("0")) {
-          error = "PIN code cannot start with 0";
-        } else if (/^(\d)\1{5}$/.test(pinCode)) {
-          error = "PIN code cannot have all same digits";
+        if (!stringValue || !stringValue.trim()) {
+          error = "PIN code is required";
+        } else {
+          const pinCode = stringValue.replace(/\s+/g, "");
+          if (!/^\d+$/.test(pinCode)) {
+            error = "PIN code can only contain digits";
+          } else if (pinCode.length !== 6) {
+            error = "PIN code must be exactly 6 digits";
+          } else if (pinCode.startsWith("0")) {
+            error = "PIN code cannot start with 0";
+          } else if (/^(\d)\1{5}$/.test(pinCode)) {
+            error = "PIN code cannot have all same digits";
+          }
         }
         break;
 
       case "country":
-        if (stringValue && stringValue.trim().length > 50) {
+        if (!stringValue || !stringValue.trim()) {
+          error = "Country is required";
+        } else if (stringValue.trim().length > 50) {
           error = "Country cannot exceed 50 characters";
         }
         break;
@@ -951,8 +966,12 @@ const EmployeeProfile = () => {
     const requiredFields = [
       "firstName",
       "lastName",
+      "callingName",
       "gender",
+      "dateOfBirthOfficial",
       "mobileNumber",
+      "alternateNumber",
+      "personalEmail",
       "maritalStatus",
       "nationality",
     ];
@@ -981,13 +1000,15 @@ const EmployeeProfile = () => {
     ["currentAddress", "permanentAddress"].forEach((addressType) => {
       if (formData[addressType]) {
         Object.keys(formData[addressType]).forEach((field) => {
-          const error = validateAddressField(
-            addressType,
-            field,
-            formData[addressType][field]
-          );
-          if (error) {
-            newErrors[`${addressType}.${field}`] = error;
+          if (field !== "addressId") {
+            const error = validateAddressField(
+              addressType,
+              field,
+              formData[addressType][field]
+            );
+            if (error) {
+              newErrors[`${addressType}.${field}`] = error;
+            }
           }
         });
       }
@@ -1381,31 +1402,43 @@ const EmployeeProfile = () => {
               </div>
             </div>
 
-            {/* Address Card - View Mode */}
-            {!isEditing && (profileData.currentAddress || profileData.permanentAddress) && (
-              <div className="epda-info-card">
-                <div className="epda-card-header">
-                  <i className="bi bi-geo-alt"></i>
-                  <h3>Address</h3>
-                </div>
-                <div className="epda-card-content">
-                  <div className="epda-info-grid">
-                    {profileData.currentAddress && formatAddress(profileData.currentAddress) && (
-                      <div className="epda-info-item">
-                        <label>Current Address</label>
-                        <span>{formatAddress(profileData.currentAddress)}</span>
-                      </div>
-                    )}
-                    {profileData.permanentAddress && formatAddress(profileData.permanentAddress) && (
-                      <div className="epda-info-item">
-                        <label>Permanent Address</label>
-                        <span>{formatAddress(profileData.permanentAddress)}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* Address Card - Hide in Edit Mode */}
+{!isEditing && (
+  <div className="epda-info-card">
+    <div className="epda-card-header">
+      <i className="bi bi-geo-alt"></i>
+      <h3>Address</h3>
+    </div>
+    <div className="epda-card-content">
+      <div className="epda-info-grid">
+        {profileData.currentAddress && (
+          <div className="epda-info-item">
+            <label>Current Address</label>
+            <span>
+              {formatAddress(profileData.currentAddress) || "Not provided"}
+            </span>
+          </div>
+        )}
+        {profileData.permanentAddress && (
+          <div className="epda-info-item">
+            <label>Permanent Address</label>
+            <span>
+              {formatAddress(profileData.permanentAddress) || "Not provided"}
+            </span>
+          </div>
+        )}
+        {!profileData.currentAddress && !profileData.permanentAddress && (
+          <div className="epda-info-item">
+            <span style={{ color: '#6c757d', fontStyle: 'italic' }}>
+              No address information available
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+)}
+
           </div>
 
           {/* Main Section */}
@@ -1488,7 +1521,9 @@ const EmployeeProfile = () => {
 
                     {/* Calling Name */}
                     <div className="epda-form-field">
-                      <label>Calling Name</label>
+                      <label>
+                        Calling Name <span className="epda-required">*</span>
+                      </label>
                       <input
                         type="text"
                         name="callingName"
@@ -1530,7 +1565,9 @@ const EmployeeProfile = () => {
 
                     {/* Date of Birth */}
                     <div className="epda-form-field">
-                      <label>Date of Birth</label>
+                      <label>
+                        Date of Birth <span className="epda-required">*</span>
+                      </label>
                       <input
                         type="date"
                         name="dateOfBirthOfficial"
@@ -1653,7 +1690,9 @@ const EmployeeProfile = () => {
 
                     {/* Alternate Number */}
                     <div className="epda-form-field">
-                      <label>Alternate Number</label>
+                      <label>
+                        Alternate Number <span className="epda-required">*</span>
+                      </label>
                       <input
                         type="tel"
                         name="alternateNumber"
@@ -1675,7 +1714,9 @@ const EmployeeProfile = () => {
 
                     {/* Personal Email */}
                     <div className="epda-form-field">
-                      <label>Personal Email</label>
+                      <label>
+                        Personal Email <span className="epda-required">*</span>
+                      </label>
                       <input
                         type="email"
                         name="personalEmail"
@@ -1715,7 +1756,9 @@ const EmployeeProfile = () => {
                     </h4>
                     <div className="epda-form-grid epda-address-grid">
                       <div className="epda-form-field">
-                        <label>Door Number</label>
+                        <label>
+                          Door Number <span className="epda-required">*</span>
+                        </label>
                         <input
                           type="text"
                           value={formData.currentAddress?.doorNumber || ""}
@@ -1741,7 +1784,9 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="epda-form-field">
-                        <label>Street</label>
+                        <label>
+                          Street <span className="epda-required">*</span>
+                        </label>
                         <input
                           type="text"
                           value={formData.currentAddress?.street || ""}
@@ -1765,7 +1810,9 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="epda-form-field">
-                        <label>Landmark</label>
+                        <label>
+                          Landmark <span className="epda-required">*</span>
+                        </label>
                         <input
                           type="text"
                           value={formData.currentAddress?.landmark || ""}
@@ -1789,7 +1836,9 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="epda-form-field">
-                        <label>Area</label>
+                        <label>
+                          Area <span className="epda-required">*</span>
+                        </label>
                         <input
                           type="text"
                           value={formData.currentAddress?.area || ""}
@@ -1813,7 +1862,9 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="epda-form-field">
-                        <label>City</label>
+                        <label>
+                          City <span className="epda-required">*</span>
+                        </label>
                         <input
                           type="text"
                           value={formData.currentAddress?.city || ""}
@@ -1837,7 +1888,9 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="epda-form-field">
-                        <label>State</label>
+                        <label>
+                          State <span className="epda-required">*</span>
+                        </label>
                         <StateDropdown
                           value={formData.currentAddress?.state || ""}
                           onChange={(val) =>
@@ -1855,7 +1908,9 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="epda-form-field">
-                        <label>Country</label>
+                        <label>
+                          Country <span className="epda-required">*</span>
+                        </label>
                         <input
                           type="text"
                           value={formData.currentAddress?.country || "India"}
@@ -1879,7 +1934,9 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="epda-form-field">
-                        <label>PIN Code</label>
+                        <label>
+                          PIN Code <span className="epda-required">*</span>
+                        </label>
                         <input
                           type="text"
                           value={formData.currentAddress?.pinCode || ""}
@@ -1937,7 +1994,9 @@ const EmployeeProfile = () => {
 
                     <div className="epda-form-grid epda-address-grid">
                       <div className="epda-form-field">
-                        <label>Door Number</label>
+                        <label>
+                          Door Number <span className="epda-required">*</span>
+                        </label>
                         <input
                           type="text"
                           value={formData.permanentAddress?.doorNumber || ""}
@@ -1964,7 +2023,9 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="epda-form-field">
-                        <label>Street</label>
+                        <label>
+                          Street <span className="epda-required">*</span>
+                        </label>
                         <input
                           type="text"
                           value={formData.permanentAddress?.street || ""}
@@ -1989,7 +2050,9 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="epda-form-field">
-                        <label>Landmark</label>
+                        <label>
+                          Landmark <span className="epda-required">*</span>
+                        </label>
                         <input
                           type="text"
                           value={formData.permanentAddress?.landmark || ""}
@@ -2016,7 +2079,9 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="epda-form-field">
-                        <label>Area</label>
+                        <label>
+                          Area <span className="epda-required">*</span>
+                        </label>
                         <input
                           type="text"
                           value={formData.permanentAddress?.area || ""}
@@ -2041,7 +2106,9 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="epda-form-field">
-                        <label>City</label>
+                        <label>
+                          City <span className="epda-required">*</span>
+                        </label>
                         <input
                           type="text"
                           value={formData.permanentAddress?.city || ""}
@@ -2066,7 +2133,9 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="epda-form-field">
-                        <label>State</label>
+                        <label>
+                          State <span className="epda-required">*</span>
+                        </label>
                         <StateDropdown
                           value={formData.permanentAddress?.state || ""}
                           onChange={(val) =>
@@ -2088,7 +2157,9 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="epda-form-field">
-                        <label>Country</label>
+                        <label>
+                          Country <span className="epda-required">*</span>
+                        </label>
                         <input
                           type="text"
                           value={
@@ -2117,7 +2188,9 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="epda-form-field">
-                        <label>PIN Code</label>
+                        <label>
+                          PIN Code <span className="epda-required">*</span>
+                        </label>
                         <input
                           type="text"
                           value={formData.permanentAddress?.pinCode || ""}

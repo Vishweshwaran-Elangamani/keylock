@@ -27,17 +27,17 @@ import ReminderEmailModal from "../../../../components/hr_operations/modals/Remi
 import BulkReminderModal from "../../../../components/hr_operations/modals/BulkReminderModal";
 import "../../../../styles/hr_operations/hr/CareerGoals.css";
 
-// Purple colors for charts
+
 const COLORS = [
-  "#97247E", // Purple/Magenta
-  "#8B5CF6", // Purple
-  "#EC4899", // Pink
-  "#A855F7", // Purple
-  "#C026D3", // Fuchsia
-  "#9333EA", // Violet
+  "#97247E",
+  "#8B5CF6",
+  "#EC4899",
+  "#A855F7",
+  "#C026D3",
+  "#9333EA",
 ];
 
-/* Custom dropdown for departments */
+
 const DepartmentDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
 
@@ -61,7 +61,6 @@ const DepartmentDropdown = ({ value, onChange, options }) => {
       className="cg-filter-select custom-status-dropdown"
       tabIndex={0}
       onBlur={() => setTimeout(() => setOpen(false), 200)}
-      style={{ position: "relative" }}
     >
       <div
         className="custom-status-selected"
@@ -90,7 +89,7 @@ const DepartmentDropdown = ({ value, onChange, options }) => {
   );
 };
 
-/* Custom dropdown for days filter */
+
 const DaysDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
 
@@ -113,7 +112,6 @@ const DaysDropdown = ({ value, onChange }) => {
       className="cg-days-select custom-status-dropdown"
       tabIndex={0}
       onBlur={() => setTimeout(() => setOpen(false), 200)}
-      style={{ position: "relative" }}
     >
       <div
         className="custom-status-selected"
@@ -141,6 +139,7 @@ const DaysDropdown = ({ value, onChange }) => {
     </div>
   );
 };
+
 
 const CareerGoals = () => {
   const [withoutGoals, setWithoutGoals] = useState([]);
@@ -172,20 +171,24 @@ const CareerGoals = () => {
 
   const [showVisualization, setShowVisualization] = useState(false);
 
+
   useEffect(() => {
     fetchWithoutGoals();
     fetchAdoptionStats();
     fetchGoalStats();
   }, []);
 
+
   useEffect(() => {
     applyFilters();
   }, [withoutGoals, departmentFilter, daysFilter, activeSearchTerm]);
+
 
   useEffect(() => {
     setSelectedEmployees([]);
     setSelectAll(false);
   }, [filteredData]);
+
 
   const fetchWithoutGoals = () => {
     setLoadingWithoutGoals(true);
@@ -199,6 +202,7 @@ const CareerGoals = () => {
       .finally(() => setLoadingWithoutGoals(false));
   };
 
+
   const fetchAdoptionStats = () => {
     setLoadingAdoption(true);
     careerGoalsService
@@ -211,6 +215,7 @@ const CareerGoals = () => {
       .finally(() => setLoadingAdoption(false));
   };
 
+
   const fetchGoalStats = () => {
     setLoadingGoalStats(true);
     careerGoalsService
@@ -219,6 +224,7 @@ const CareerGoals = () => {
       .catch(() => setGoalStats(null))
       .finally(() => setLoadingGoalStats(false));
   };
+
 
   const fetchSuggestions = (userId) => {
     setLoadingSuggestions(true);
@@ -229,10 +235,12 @@ const CareerGoals = () => {
       .finally(() => setLoadingSuggestions(false));
   };
 
+
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
     setCurrentPage(1);
   };
+
 
   const applyFilters = () => {
     let filtered = [...withoutGoals];
@@ -273,6 +281,7 @@ const CareerGoals = () => {
     setCurrentPage(1);
   };
 
+
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
@@ -281,14 +290,17 @@ const CareerGoals = () => {
     setCurrentPage(1);
   };
 
+
   const uniqueDepartments = [
     ...new Set(withoutGoals.map((emp) => emp.departmentName).filter(Boolean)),
   ];
+
 
   const indexOfLastItem = currentPage * rowsPerPage;
   const indexOfFirstItem = indexOfLastItem - rowsPerPage;
   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredData.length / rowsPerPage) || 1;
+
 
   const getPageNumbers = () => {
     const pages = [];
@@ -317,6 +329,7 @@ const CareerGoals = () => {
     return pages;
   };
 
+
   const handleSelectAll = (e) => {
     if (e.target.checked) {
       const allIds = currentItems.map((emp) => emp.userId ?? emp.UserId);
@@ -328,6 +341,7 @@ const CareerGoals = () => {
     }
   };
 
+
   const handleSelectEmployee = (userId) => {
     if (selectedEmployees.includes(userId)) {
       setSelectedEmployees(selectedEmployees.filter((id) => id !== userId));
@@ -337,6 +351,7 @@ const CareerGoals = () => {
     }
   };
 
+
   const openBulkReminderModal = () => {
     if (selectedEmployees.length === 0) {
       toast("Please select at least one employee!");
@@ -344,6 +359,7 @@ const CareerGoals = () => {
     }
     setBulkReminderModal(true);
   };
+
 
   const sendBulkReminders = () => {
     setSendingBulkReminder(true);
@@ -367,11 +383,13 @@ const CareerGoals = () => {
       .finally(() => setSendingBulkReminder(false));
   };
 
+
   const openSendReminder = (user) => {
     setReminderTargetUser(user);
     setReminderResult(null);
     setReminderEmailModal(true);
   };
+
 
   const sendReminder = () => {
     setSendingReminder(true);
@@ -395,10 +413,12 @@ const CareerGoals = () => {
       .finally(() => setSendingReminder(false));
   };
 
+
   const handleCloseReminderModal = () => {
     setReminderEmailModal(false);
     setReminderResult(null);
   };
+
 
   const getDaysDistributionData = () => {
     const distribution = {
@@ -422,6 +442,7 @@ const CareerGoals = () => {
     }));
   };
 
+
   const getDepartmentData = () => {
     const deptCounts = {};
     filteredData.forEach((emp) => {
@@ -434,6 +455,7 @@ const CareerGoals = () => {
       .sort((a, b) => b.value - a.value);
   };
 
+
   if (loadingAdoption) {
     return (
       <div className="cg-loading-container">
@@ -444,11 +466,11 @@ const CareerGoals = () => {
     );
   }
 
+
   return (
     <div className="cg-page">
       <Toaster position="top-right" closeButton expand={false} />
 
-      {/* STATISTICS CARDS */}
       {adoptionStats && (
         <div className="stats-cards-cg">
           <div className="stat-card-cg stat-total-cg">
@@ -491,7 +513,6 @@ const CareerGoals = () => {
         </div>
       )}
 
-      {/* CONTROLS */}
       <div className="cg-controls">
         <div className="cg-search-input">
           <div className="cg-search-inner">
@@ -536,6 +557,11 @@ const CareerGoals = () => {
           Clear Filters
         </button>
 
+        <div className="cg-results-count">
+          Showing {filteredData.length}{" "}
+          {filteredData.length === 1 ? "employee" : "employees"}
+        </div>
+
         <button
           className="cg-btn-analytics"
           onClick={() => setShowVisualization(!showVisualization)}
@@ -543,11 +569,6 @@ const CareerGoals = () => {
           <FaChartBar />
           {showVisualization ? "Hide" : "Show"} Analytics
         </button>
-
-        <div className="cg-results-count">
-          Showing {filteredData.length}{" "}
-          {filteredData.length === 1 ? "employee" : "employees"}
-        </div>
 
         {selectedEmployees.length > 0 && (
           <button className="cg-btn-bulk" onClick={openBulkReminderModal}>
@@ -557,7 +578,6 @@ const CareerGoals = () => {
         )}
       </div>
 
-      {/* ANALYTICS COLLAPSE */}
       <Collapse in={showVisualization}>
         <div className="cg-analytics-section">
           <div className="cg-charts-grid">
@@ -650,17 +670,12 @@ const CareerGoals = () => {
         </div>
       </Collapse>
 
-      {/* TABLE */}
-      <div
-        className={`cg-table-card ${
-          totalPages > 1 ? "cg-table-with-pagination" : ""
-        }`}
-      >
+      <div className="cg-table-card">
         <div className="cg-table-wrapper">
           <table className="cg-table">
             <thead>
               <tr>
-                <th style={{ width: "50px" }}>
+                <th>
                   <Form.Check
                     type="checkbox"
                     checked={selectAll}
@@ -778,62 +793,84 @@ const CareerGoals = () => {
             </tbody>
           </table>
         </div>
-      </div>
 
-      {/* PAGINATION - NOW BELOW THE TABLE */}
-      {totalPages > 1 && filteredData.length > 0 && (
-        <div className="cg-pagination-wrapper-bottom">
-          <nav className="cg-pagination">
-            <ul className="cg-pagination-list">
-              <li
-                className={`cg-page-item ${
-                  currentPage === 1 ? "disabled" : ""
-                }`}
+        {totalPages > 1 && filteredData.length > 0 && (
+          <div className="cg-pagination">
+            <div className="cg-pagination-info">
+              <span>Show</span>
+              <select
+                value={rowsPerPage}
+                onChange={(e) => {
+                  setRowsPerPage(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
               >
-                <button
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(prev - 1, 1))
-                  }
-                  disabled={currentPage === 1}
-                >
-                  <i className="bi bi-chevron-left"></i>
-                </button>
-              </li>
-              {getPageNumbers().map((page, index) => (
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+              </select>
+              <span>entries</span>
+            </div>
+
+            <div className="cg-pagination-status">
+              Showing {(currentPage - 1) * rowsPerPage + 1} to{" "}
+              {Math.min(currentPage * rowsPerPage, filteredData.length)} of{" "}
+              {filteredData.length} entries
+            </div>
+
+            <nav className="cg-pagination-nav">
+              <ul className="cg-pagination-list">
                 <li
-                  key={index}
                   className={`cg-page-item ${
-                    page === currentPage ? "active" : ""
-                  } ${typeof page !== "number" ? "disabled" : ""}`}
+                    currentPage === 1 ? "disabled" : ""
+                  }`}
                 >
                   <button
                     onClick={() =>
-                      typeof page === "number" && setCurrentPage(page)
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
                     }
-                    disabled={typeof page !== "number"}
+                    disabled={currentPage === 1}
                   >
-                    {page}
+                    <i className="bi bi-chevron-left"></i>
                   </button>
                 </li>
-              ))}
-              <li
-                className={`cg-page-item ${
-                  currentPage === totalPages ? "disabled" : ""
-                }`}
-              >
-                <button
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                  }
-                  disabled={currentPage === totalPages}
+                {getPageNumbers().map((page, index) => (
+                  <li
+                    key={index}
+                    className={`cg-page-item ${
+                      page === currentPage ? "active" : ""
+                    } ${typeof page !== "number" ? "disabled" : ""}`}
+                  >
+                    <button
+                      onClick={() =>
+                        typeof page === "number" && setCurrentPage(page)
+                      }
+                      disabled={typeof page !== "number"}
+                    >
+                      {page}
+                    </button>
+                  </li>
+                ))}
+                <li
+                  className={`cg-page-item ${
+                    currentPage === totalPages ? "disabled" : ""
+                  }`}
                 >
-                  <i className="bi bi-chevron-right"></i>
-                </button>
-              </li>
-            </ul>
-          </nav>
-        </div>
-      )}
+                  <button
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
+                    disabled={currentPage === totalPages}
+                  >
+                    <i className="bi bi-chevron-right"></i>
+                  </button>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        )}
+      </div>
 
       <GoalSuggestionsModal
         show={!!goalSuggestions}
@@ -861,5 +898,6 @@ const CareerGoals = () => {
     </div>
   );
 };
+
 
 export default CareerGoals;
