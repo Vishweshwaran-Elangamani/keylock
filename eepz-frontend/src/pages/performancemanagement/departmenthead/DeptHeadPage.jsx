@@ -114,6 +114,10 @@ export default function DeptHeadPage() {
   const [attachments, setAttachments] = useState([]);
   const [loadingAttachments, setLoadingAttachments] = useState(false);
 
+  const [approvedDetails, setApprovedDetails] = useState(null);
+  const [approvedLoading, setApprovedLoading] = useState(false);
+
+
   useEffect(() => {
     fetchData();
 
@@ -166,75 +170,75 @@ export default function DeptHeadPage() {
   };
 
   const fetchAttachments = async (assessmentId) => {
-  setLoadingAttachments(true);
-  try {
-    const departmentHeadId = getEmployeeIdForFilter();
-    const response = await getAssessmentAttachments(departmentHeadId, assessmentId);
+    setLoadingAttachments(true);
+    try {
+      const departmentHeadId = getEmployeeIdForFilter();
+      const response = await getAssessmentAttachments(departmentHeadId, assessmentId);
 
-    if (response.data.success) {
-      setAttachments(response.data.data || []);
-    } else {
-      setAttachments([]);
-    }
-  } catch (error) {
-    console.error("Error fetching attachments:", error);
-    setAttachments([]);
-  } finally {
-    setLoadingAttachments(false);
-  }
-};
- 
-
- const handleDownloadAttachment = async (attachmentId) => {
-  try {
-    const departmentHeadId = getEmployeeIdForFilter();
-    const response = await downloadAttachment(departmentHeadId, attachmentId);
-
-    let filename = 'attachment';
-
-    const contentDisposition = response.headers['content-disposition'];
-
-    if (contentDisposition) {
-      const matches = contentDisposition.match(/filename\s*=\s*"([^"]+)"/);
-      if (matches && matches[1]) {
-        filename = matches[1].trim();
+      if (response.data.success) {
+        setAttachments(response.data.data || []);
       } else {
-        const matches2 = contentDisposition.match(/filename\s*=\s*([^;,\n]+)/);
-        if (matches2 && matches2[1]) {
-          filename = matches2[1].trim();
+        setAttachments([]);
+      }
+    } catch (error) {
+      console.error("Error fetching attachments:", error);
+      setAttachments([]);
+    } finally {
+      setLoadingAttachments(false);
+    }
+  };
+
+  const handleDownloadAttachment = async (attachmentId) => {
+    try {
+      const departmentHeadId = getEmployeeIdForFilter();
+      const response = await downloadAttachment(departmentHeadId, attachmentId);
+
+      let filename = 'attachment';
+
+      const contentDisposition = response.headers['content-disposition'];
+
+      if (contentDisposition) {
+        const matches = contentDisposition.match(/filename\s*=\s*"([^"]+)"/);
+        if (matches && matches[1]) {
+          filename = matches[1].trim();
+        } else {
+          const matches2 = contentDisposition.match(/filename\s*=\s*([^;,\n]+)/);
+          if (matches2 && matches2[1]) {
+            filename = matches2[1].trim();
+          }
         }
       }
-    }
 
-    const contentType = response.headers['content-type'];
+      const contentType = response.headers['content-type'];
 
-    if (!filename.includes('.') && contentType) {
-      const extension = getExtensionFromContentType(contentType);
-      if (extension) {
-        filename = `${filename}${extension}`;
+      if (!filename.includes('.') && contentType) {
+        const extension = getExtensionFromContentType(contentType);
+        if (extension) {
+          filename = `${filename}${extension}`;
+        }
       }
+
+      const blob = new Blob([response.data], { type: contentType || 'application/octet-stream' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', filename);
+
+      document.body.appendChild(link);
+      link.click();
+
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      }, 100);
+
+      toast.success(`Downloaded: ${filename}`);
+    } catch (error) {
+      console.error("Error downloading attachment:", error);
+      toast.error("Failed to download attachment.");
     }
+  };
 
-    const blob = new Blob([response.data], { type: contentType || 'application/octet-stream' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', filename);
-
-    document.body.appendChild(link);
-    link.click();
-
-    setTimeout(() => {
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    }, 100);
-
-    toast.success(`Downloaded: ${filename}`);
-  } catch (error) {
-    console.error("Error downloading attachment:", error);
-    toast.error("Failed to download attachment.");
-  }
-};
   const applyFilters = () => {
     let filtered = activeTab === "pending" ? [...pendingRequests] : [...approvedRequests];
 
@@ -267,13 +271,58 @@ export default function DeptHeadPage() {
   };
 
   const handleViewDetails = async (employee) => {
-    setSelectedEmployee(employee);
-    setShowDetailsModal(true);
+  setSelectedEmployee(employee);
+  setShowDetailsModal(true);
 
-    if (employee.assessmentId) {
-      await fetchAttachments(employee.assessmentId);
+  // 🔍 Try both possible field names (case-insensitive)
+  const assessmentId = employee.assessmentId || employee.AssessmentId;
+  console.log("🔍 Pending assessmentId:", assessmentId, employee); // DEBUG
+  
+  if (assessmentId) {
+    await fetchAttachments(assessmentId);
+  }
+};
+
+
+  // ← NEW: Handle approved details with attachments
+const handleViewApprovedDetails = async (approvalId) => {
+  setApprovedLoading(true);
+  try {
+    const response = await getApprovedEmployeeDetails(approvalId);
+    if (response.data.success) {
+      const data = response.data.data;
+      setApprovedDetails(data);
+      setShowDetailsModal(true);
+      
+      // 🔥 FULL DATA DEBUG - PASTE CONSOLE OUTPUT HERE!
+      console.log("🔥 FULL APPROVED DATA:", JSON.stringify(data, null, 2));
+      console.log("🔥 ALL KEYS:", Object.keys(data));
+      
+      // Try ALL possible assessment ID field names
+      const assessmentId = data.assessmentId || 
+                          data.AssessmentId || 
+                          data.id || 
+                          data.Id ||
+                          data.assessment_id ||
+                          data.Assessment_id;
+      
+      console.log("🔍 Found assessmentId:", assessmentId);
+      
+      if (assessmentId) {
+        await fetchAttachments(assessmentId);
+      } else {
+        console.error("❌ NO assessmentId found in ANY field!");
+      }
     }
-  };
+  } catch (error) {
+    console.error("Error fetching approved details:", error);
+    toast.error("Failed to load approved assessment details");
+  } finally {
+    setApprovedLoading(false);
+  }
+};
+
+
 
   const handleApproveClick = (employee) => {
     setSelectedEmployee(employee);
@@ -316,6 +365,7 @@ export default function DeptHeadPage() {
     setShowApproveModal(false);
     setShowDetailsModal(false);
     setSelectedEmployee(null);
+    setApprovedDetails(null);
     setAttachments([]);
   };
 
@@ -452,7 +502,7 @@ export default function DeptHeadPage() {
 
   const renderApproveModal = () => {
     if (!showApproveModal || !selectedEmployee) return null;
-  
+
     return (
       <>
         <div className="dp-modal-backdrop"></div>
@@ -472,7 +522,7 @@ export default function DeptHeadPage() {
                 <i className="bi bi-x-lg"></i>
               </button>
             </div>
-  
+
             <div className="dp-modal-body">
               <div className="dp-details-box">
                 <h6 className="dp-details-title">
@@ -533,7 +583,7 @@ export default function DeptHeadPage() {
                 </div>
               </div>
             </div>
-  
+
             <div className="dp-modal-footer dp-modal-footer-approve">
               <button
                 type="button"
@@ -565,9 +615,11 @@ export default function DeptHeadPage() {
       </>
     );
   };
-  
+
   const renderDetailsModal = () => {
-    if (!showDetailsModal || !selectedEmployee) return null;
+    // ← UPDATED: Show approved details if available, otherwise pending details
+    const displayData = approvedDetails || selectedEmployee;
+    if (!showDetailsModal || !displayData) return null;
 
     return (
       <>
@@ -577,7 +629,7 @@ export default function DeptHeadPage() {
             <div className="dp-modal-header dp-modal-header-primary">
               <div className="dp-modal-title">
                 <i className="bi bi-file-text-fill"></i>
-                Employee Assessment Details
+                {approvedDetails ? "Approved Assessment Details" : "Assessment Details"}
               </div>
               <button
                 type="button"
@@ -598,15 +650,17 @@ export default function DeptHeadPage() {
                   </h5>
                   <div className="dp-details-card-content">
                     <div className="dp-details-employee-name">
-                      {selectedEmployee.employeeName}
+                      {displayData.employeeName}
                     </div>
                     <div className="dp-details-project-name">
-                      {selectedEmployee.projectName}
+                      {displayData.projectName}
                     </div>
-                    <div className="dp-details-goals-count">
-                      <i className="bi bi-bullseye"></i>&nbsp;Goals:&nbsp;
-                      <b>{selectedEmployee.goals?.length || 0}</b>
-                    </div>
+                    {displayData.goals && (
+                      <div className="dp-details-goals-count">
+                        <i className="bi bi-bullseye"></i>&nbsp;Goals:&nbsp;
+                        <b>{displayData.goals?.length || 0}</b>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -621,7 +675,7 @@ export default function DeptHeadPage() {
                         <i className="bi bi-person"></i>&nbsp;Employee
                       </span>
                       <span className="dp-details-rating-value dp-rating-emp">
-                        {getAvgRating(selectedEmployee.competencies, "employeeRating")}
+                        {getAvgRating(displayData.competencies, "employeeRating")}
                       </span>
                     </div>
                     <div className="dp-details-rating-item">
@@ -629,7 +683,7 @@ export default function DeptHeadPage() {
                         <i className="bi bi-1-circle"></i>&nbsp;L1
                       </span>
                       <span className="dp-details-rating-value dp-rating-l1">
-                        {getAvgRating(selectedEmployee.competencies, "l1Rating")}
+                        {getAvgRating(displayData.competencies, "l1Rating")}
                       </span>
                     </div>
                     <div className="dp-details-rating-item">
@@ -637,7 +691,7 @@ export default function DeptHeadPage() {
                         <i className="bi bi-2-circle"></i>&nbsp;L2
                       </span>
                       <span className="dp-details-rating-value dp-rating-l2">
-                        {getAvgRating(selectedEmployee.competencies, "l2Rating")}
+                        {getAvgRating(displayData.competencies, "l2Rating")}
                       </span>
                     </div>
                   </div>
@@ -666,8 +720,8 @@ export default function DeptHeadPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {selectedEmployee.competencies && selectedEmployee.competencies.length > 0 ? (
-                        selectedEmployee.competencies.map((c, idx) => (
+                      {displayData.competencies && displayData.competencies.length > 0 ? (
+                        displayData.competencies.map((c, idx) => (
                           <tr key={idx}>
                             <td>{c.competencyName}</td>
                             <td><strong className="emp-rating">{c.employeeRating || "-"}</strong></td>
@@ -736,50 +790,52 @@ export default function DeptHeadPage() {
                 )}
               </div>
 
-              <div className="dp-details-section-card">
-                <div className="dp-details-section-title">
-                  <i className="bi bi-bullseye"></i>
-                  Goals
+              {selectedEmployee && selectedEmployee.goals && (
+                <div className="dp-details-section-card">
+                  <div className="dp-details-section-title">
+                    <i className="bi bi-bullseye"></i>
+                    Goals
+                  </div>
+                  {selectedEmployee.goals && selectedEmployee.goals.length === 0 ? (
+                    <p className="dp-no-data">No goals assigned.</p>
+                  ) : (
+                    selectedEmployee.goals?.map((goal) => {
+                      const latestProgressLog = goal.goalProgressLogs?.length
+                        ? goal.goalProgressLogs.sort((a, b) => new Date(b.updatedOn) - new Date(a.updatedOn))[0]
+                        : null;
+
+                      const latestProgress = latestProgressLog ? latestProgressLog.progressPercent : 0;
+                      const checklistProgress = getAvgChecklistProgress(goal.goalChecklists);
+                      const overallProgress = latestProgress || checklistProgress;
+
+                      return (
+                        <div key={goal.goalId} className="dp-goal-card">
+                          <div className="dp-goal-header">
+                            <div>
+                              <h5 className="dp-goal-title">
+                                {goal.goalTitle}
+                              </h5>
+                              <p className="dp-goal-description">{goal.goalDescription}</p>
+                            </div>
+                            <span className={`dp-goal-status-badge status-${goal.goalstatus?.toLowerCase()}`}>
+                              {goal.goalstatus}
+                            </span>
+                          </div>
+                          <div className="dp-progress-container">
+                            <div className="dp-progress-label">
+                              <span>Progress</span>
+                              <span className="dp-progress-value">{overallProgress}%</span>
+                            </div>
+                            <div className="dp-progress-bar-bg">
+                              <div className="dp-progress-bar-fill" style={{ width: `${overallProgress}%` }} />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
-                {selectedEmployee.goals && selectedEmployee.goals.length === 0 ? (
-                  <p className="dp-no-data">No goals assigned.</p>
-                ) : (
-                  selectedEmployee.goals?.map((goal) => {
-                    const latestProgressLog = goal.goalProgressLogs?.length
-                      ? goal.goalProgressLogs.sort((a, b) => new Date(b.updatedOn) - new Date(a.updatedOn))[0]
-                      : null;
-
-                    const latestProgress = latestProgressLog ? latestProgressLog.progressPercent : 0;
-                    const checklistProgress = getAvgChecklistProgress(goal.goalChecklists);
-                    const overallProgress = latestProgress || checklistProgress;
-
-                    return (
-                      <div key={goal.goalId} className="dp-goal-card">
-                        <div className="dp-goal-header">
-                          <div>
-                            <h5 className="dp-goal-title">
-                              {goal.goalTitle}
-                            </h5>
-                            <p className="dp-goal-description">{goal.goalDescription}</p>
-                          </div>
-                          <span className={`dp-goal-status-badge status-${goal.goalstatus?.toLowerCase()}`}>
-                            {goal.goalstatus}
-                          </span>
-                        </div>
-                        <div className="dp-progress-container">
-                          <div className="dp-progress-label">
-                            <span>Progress</span>
-                            <span className="dp-progress-value">{overallProgress}%</span>
-                          </div>
-                          <div className="dp-progress-bar-bg">
-                            <div className="dp-progress-bar-fill" style={{ width: `${overallProgress}%` }} />
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
+              )}
             </div>
 
             <div className="dp-modal-footer dp-modal-footer-bottom">
@@ -968,13 +1024,17 @@ export default function DeptHeadPage() {
                 <tr>
                   <th>Employee</th>
                   <th>Project</th>
+                  <th>Avg Employee Rating</th>
+                  <th>Avg L1 Rating</th>
+                  <th>Avg L2 Rating</th>
                   <th>Approved At</th>
+                  <th className="text-center">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {getPaginatedData("approved").length === 0 ? (
                   <tr>
-                    <td colSpan={3} className="dp-empty-state">
+                    <td colSpan={7} className="dp-empty-state">
                       <div className="dp-empty-content">
                         <i className="bi bi-inbox"></i>
                         <p>No approved employees found</p>
@@ -983,7 +1043,7 @@ export default function DeptHeadPage() {
                   </tr>
                 ) : (
                   getPaginatedData("approved").map((emp) => (
-                    <React.Fragment key={emp.assessmentId || emp.employeeId}>
+                    <React.Fragment key={emp.approvalId || emp.employeeId}>
                       <tr>
                         <td>
                           <div className="dp-user-info">
@@ -997,7 +1057,34 @@ export default function DeptHeadPage() {
                           </div>
                         </td>
                         <td>{emp.projectName}</td>
+                        <td>
+                          <span className="dp-rating-badge emp-rating">
+                            {emp.employeeAvgRating || "-"}
+                          </span>
+                        </td>
+                        <td>
+                          <span className="dp-rating-badge l1-rating">
+                            {emp.l1AvgRating || "-"}
+                          </span>
+                        </td>
+                        <td>
+                          <span className="dp-rating-badge l2-rating">
+                            {emp.l2AvgRating || "-"}
+                          </span>
+                        </td>
                         <td className="text-muted">{formatDate(emp.approvedAt)}</td>
+                        <td>
+                          <div className="dp-action-buttons">
+                            <button
+                              className="dp-action-btn dp-action-btn-view"
+                              onClick={() => handleViewApprovedDetails(emp.approvalId)}
+                              title="View Details"
+                              disabled={approvedLoading}
+                            >
+                              <i className="bi bi-eye"></i>
+                            </button>
+                          </div>
+                        </td>
                       </tr>
                     </React.Fragment>
                   ))

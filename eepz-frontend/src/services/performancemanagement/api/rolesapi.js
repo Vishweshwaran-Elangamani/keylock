@@ -110,7 +110,10 @@ const createApiInstance = (baseURL) => {
 
 const apiPort5113 = createApiInstance(BASE_URL_5113);
 
+// ============================================
 // Department Head Approval APIs
+// ============================================
+
 export const getDeptHeadSubmittedRatings = () => {
   return apiPort5113.get('/DeptHeadApprovals/submitted-ratings');
 };
@@ -125,6 +128,11 @@ export const getApprovedEmployees = (page = 1, pageSize = 5) => {
   });
 };
 
+// ← NEW EXPORT ADDED - Get Full Details for Approved Assessment
+export const getApprovedEmployeeDetails = (approvalId) => {
+  return apiPort5113.get(`/DeptHeadApprovals/approved-employees/${approvalId}/details`);
+};
+
 export const getPendingAcknowledgments = () => {
   return apiPort5113.get('/DeptHeadApprovals/employee/pending-acknowledgments');
 };
@@ -137,7 +145,10 @@ export const getManagerEmployeeAcknowledgments = () => {
   return apiPort5113.get("/DeptHeadApprovals/manager/employee-acknowledged-comments");
 };
 
+// ============================================
 // Attachment APIs (Department Head)
+// ============================================
+
 export const getAssessmentAttachments = (departmentHeadId, assessmentId) => {
   return apiPort5113.get(`/DeptHeadApprovals/${departmentHeadId}/assessment/${assessmentId}/attachments`);
 };
@@ -149,7 +160,10 @@ export const downloadAttachment = (departmentHeadId, attachmentId) => {
   );
 };
 
+// ============================================
 // Employee Role APIs
+// ============================================
+
 export const getUserRole = (userId) => {
   return apiPort5113.get(`/Employees/user/${userId}/role`);
 };
@@ -158,7 +172,10 @@ export const getAllManagers = () => {
   return apiPort5113.get("/Employees/all-managers");
 };
 
+// ============================================
 // L1 Approver APIs
+// ============================================
+
 export const getApproverAssessments = (userId, page = 1, pageSize = 25) => {
   return apiPort5113.get(`/approver/${userId}/assessments`, {
     params: { page, pageSize }
@@ -230,7 +247,10 @@ export const downloadApproverAttachment = (userId, attachmentId) => {
   });
 };
 
+// ============================================
 // L2 Reviewer APIs
+// ============================================
+
 export const getReviewerAssessments = (userId, page = 1, pageSize = 25) => {
   return apiPort5113.get(`/reviewer/${userId}/assessments`, {
     params: { page, pageSize }
