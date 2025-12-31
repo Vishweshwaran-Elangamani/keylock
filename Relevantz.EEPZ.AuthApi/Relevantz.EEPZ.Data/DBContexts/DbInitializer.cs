@@ -8,6 +8,7 @@ using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Utils;
 using Relevantz.EEPZ.Data.DBContexts;
 
+
 namespace Relevantz.EEPZ.Data.DBContexts
 {
     public class DbInitializer
@@ -22,7 +23,9 @@ namespace Relevantz.EEPZ.Data.DBContexts
         {
             try
             {
-                Console.WriteLine("Starting database initialization...");
+                Console.WriteLine("\n" + new string('=', 70));
+                Console.WriteLine("   STARTING DATABASE INITIALIZATION");
+                Console.WriteLine(new string('=', 70) + "\n");
 
                 // Seed roles first
                 await SeedRolesAsync(context);
@@ -39,17 +42,19 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 // Seed Master Skills
                 await SeedMasterSkillsAsync(context);
 
-                Console.WriteLine("Database initialization completed successfully!");
+                Console.WriteLine("\n" + new string('=', 70));
+                Console.WriteLine("   DATABASE INITIALIZATION COMPLETED SUCCESSFULLY!");
+                Console.WriteLine(new string('=', 70) + "\n");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error during database initialization: {ex.Message}");
+                Console.WriteLine($"\nERROR during database initialization: {ex.Message}\n");
                 throw;
             }
         }
 
         /// <summary>
-        /// Seeds all system roles
+        /// Seeds all system roles with enhanced console output
         /// </summary>
         private static async Task SeedRolesAsync(EEPZDbContext context)
         {
@@ -107,6 +112,9 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 },
             };
 
+            int addedCount = 0;
+            int skippedCount = 0;
+
             foreach (var role in roles)
             {
                 var existingRole = await context.Roles.FirstOrDefaultAsync(r =>
@@ -116,24 +124,28 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 if (existingRole == null)
                 {
                     context.Roles.Add(role);
-                    Console.WriteLine($"   Added role: {role.RoleName} ({role.RoleCode})");
+                    addedCount++;
                 }
                 else
                 {
-                    Console.WriteLine($"  ⏭  Role already exists: {role.RoleName}");
+                    skippedCount++;
                 }
             }
 
             await context.SaveChangesAsync();
-            Console.WriteLine(" Roles seeding completed!");
-        } 
+
+            // Beautiful console output
+            Console.WriteLine("Roles seeding completed!");
+            Console.WriteLine($"Added: {addedCount} | Skipped: {skippedCount} | Total: {roles.Count}");
+            Console.WriteLine(new string('-', 70) + "\n");
+        }
 
         /// <summary>
-        /// Seeds default departments
+        /// Seeds default departments with enhanced console output
         /// </summary>
         private static async Task SeedDepartmentsAsync(EEPZDbContext context)
         {
-            Console.WriteLine(" Seeding departments...");
+            Console.WriteLine("Seeding departments...");
 
             var departments = new List<Department>
             {
@@ -141,81 +153,145 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 {
                     DepartmentName = "Administration",
                     DepartmentCode = "ADMIN100",
-                    BudgetAllocated = 0,
-                    CostCenter = "ADMIN001",
+                    Description = "Manages overall administrative functions and office operations",
                     Status = "Active",
+                    ParentDepartmentId = null,
+                    HodEmployeeId = null,
+                    BudgetAllocated = 0.00m,
+                    CostCenter = "ADMIN001",
                     CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
                 },
                 new Department
                 {
                     DepartmentName = "Human Resources",
                     DepartmentCode = "HR100",
-                    BudgetAllocated = 0,
-                    CostCenter = "HR001",
+                    Description = "Oversees recruitment, employee relations, and talent development",
                     Status = "Active",
+                    ParentDepartmentId = null,
+                    HodEmployeeId = null,
+                    BudgetAllocated = 0.00m,
+                    CostCenter = "HR001",
                     CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
                 },
                 new Department
                 {
                     DepartmentName = "Information Technology",
                     DepartmentCode = "IT100",
-                    BudgetAllocated = 0,
-                    CostCenter = "IT001",
+                    Description = "Manages IT infrastructure, software development, and technology solutions",
                     Status = "Active",
+                    ParentDepartmentId = null,
+                    HodEmployeeId = null,
+                    BudgetAllocated = 0.00m,
+                    CostCenter = "IT001",
                     CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
                 },
                 new Department
                 {
                     DepartmentName = "Finance",
                     DepartmentCode = "FIN100",
-                    BudgetAllocated = 0,
-                    CostCenter = "FIN001",
+                    Description = "Handles financial planning, accounting, and budget management",
                     Status = "Active",
+                    ParentDepartmentId = null,
+                    HodEmployeeId = null,
+                    BudgetAllocated = 0.00m,
+                    CostCenter = "FIN001",
                     CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
                 },
                 new Department
                 {
                     DepartmentName = "Operations",
                     DepartmentCode = "OPS100",
-                    BudgetAllocated = 0,
-                    CostCenter = "OPS001",
+                    Description = "Manages day-to-day business operations and process optimization",
                     Status = "Active",
+                    ParentDepartmentId = null,
+                    HodEmployeeId = null,
+                    BudgetAllocated = 0.00m,
+                    CostCenter = "OPS001",
                     CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                },
+                new Department
+                {
+                    DepartmentName = "Sales",
+                    DepartmentCode = "SALES100",
+                    Description = "Drives revenue through client acquisition and account management",
+                    Status = "Active",
+                    ParentDepartmentId = null,
+                    HodEmployeeId = null,
+                    BudgetAllocated = 0.00m,
+                    CostCenter = "SALES001",
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                },
+                new Department
+                {
+                    DepartmentName = "Marketing",
+                    DepartmentCode = "MKT100",
+                    Description = "Develops brand strategy, digital marketing, and customer engagement",
+                    Status = "Active",
+                    ParentDepartmentId = null,
+                    HodEmployeeId = null,
+                    BudgetAllocated = 0.00m,
+                    CostCenter = "MKT001",
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                },
+                new Department
+                {
+                    DepartmentName = "Quality Assurance",
+                    DepartmentCode = "QA100",
+                    Description = "Ensures product quality standards and testing protocols",
+                    Status = "Active",
+                    ParentDepartmentId = null,
+                    HodEmployeeId = null,
+                    BudgetAllocated = 0.00m,
+                    CostCenter = "QA001",
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
                 },
             };
 
-            foreach (var department in departments) 
+            int addedCount = 0;
+            int skippedCount = 0;
+
+            foreach (var department in departments)
             {
                 var existingDepartment = await context.Departments.FirstOrDefaultAsync(d =>
-                    d.DepartmentName == department.DepartmentName
+                    d.DepartmentCode == department.DepartmentCode
                 );
 
                 if (existingDepartment == null)
                 {
-                    context.Departments.Add(department); 
-                    Console.WriteLine($"   Added department: {department.DepartmentName}");
+                    context.Departments.Add(department);
+                    addedCount++;
                 }
                 else
                 {
-                    Console.WriteLine(
-                        $"    Department already exists: {department.DepartmentName}"
-                    );
+                    skippedCount++;
                 }
             }
 
             await context.SaveChangesAsync();
-            Console.WriteLine(" Departments seeding completed!"); 
+
+            // Beautiful console output
+            Console.WriteLine("Departments seeding completed!");
+            Console.WriteLine($"Added: {addedCount} | Skipped: {skippedCount} | Total: {departments.Count}");
+            Console.WriteLine(new string('-', 70) + "\n");
         }
 
         /// <summary>
-        /// Seeds admin user with all required data
+        /// Seeds admin user with enhanced console output
         /// </summary>
         private static async Task SeedAdminUserAsync(
             EEPZDbContext context,
             IConfiguration configuration
         )
         {
-            Console.WriteLine(" Seeding admin user..."); 
+            Console.WriteLine("Seeding admin user...");
 
             try
             {
@@ -228,7 +304,8 @@ namespace Relevantz.EEPZ.Data.DBContexts
 
                 if (existingAdmin != null)
                 {
-                    Console.WriteLine("    Admin user already exists. Skipping seed.");
+                    Console.WriteLine("Admin user already exists. Skipping seed.");
+                    Console.WriteLine(new string('-', 70) + "\n");
                     return;
                 }
 
@@ -255,7 +332,7 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 // Create Admin Employee
                 var adminEmployee = new Employee
                 {
-                    EmployeeCompanyId = configuration["AdminSeedData:EmployeeCompanyId"] ?? "12501",
+                    EmployeeCompanyId = configuration["AdminSeedData:EmployeeCompanyId"] ?? "1000",
                     EmploymentType = Constants.EmploymentTypes.Permanent,
                     EmploymentStatus = Constants.EmploymentStatuses.Active,
                     JoiningDate = DateOnly.FromDateTime(DateTime.UtcNow),
@@ -268,10 +345,9 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 };
                 context.Employees.Add(adminEmployee);
                 await context.SaveChangesAsync();
-                Console.WriteLine($"   Created admin employee: {adminEmployee.EmployeeCompanyId}");
 
                 // Create Admin Authentication
-                var adminPassword = configuration["AdminSeedData:Password"] ?? "Admin@123456";
+                var adminPassword = configuration["AdminSeedData:Password"] ?? "rZ@26012025#Rix";
                 var adminAuth = new Userauthentication
                 {
                     EmployeeId = adminEmployee.EmployeeId,
@@ -283,7 +359,6 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 };
                 context.Userauthentications.Add(adminAuth);
                 await context.SaveChangesAsync();
-                Console.WriteLine($"   Created admin authentication: {adminEmail}");
 
                 // Create Admin Profile
                 var adminProfile = new Userprofile
@@ -293,13 +368,10 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     LastName = configuration["AdminSeedData:LastName"] ?? "Administrator",
                     CallingName = "Admin",
                     Gender = Constants.Genders.PreferNotToSay,
-                    MobileNumber = configuration["AdminSeedData:MobileNumber"] ?? "+91-0000000000",
+                    MobileNumber = configuration["AdminSeedData:MobileNumber"] ?? "9894076107",
                 };
                 context.Userprofiles.Add(adminProfile);
                 await context.SaveChangesAsync();
-                Console.WriteLine(
-                    $" Created admin profile: {adminProfile.FirstName} {adminProfile.LastName}"
-                );
 
                 // Assign Role and Department to Admin
                 var adminEmployeeDetails = new Employeedetailsmaster
@@ -310,21 +382,21 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 };
                 context.Employeedetailsmasters.Add(adminEmployeeDetails);
                 await context.SaveChangesAsync();
-                Console.WriteLine("   Assigned role and department to admin");
 
-                Console.WriteLine("\n" + new string('=', 60));
-                Console.WriteLine(" ADMIN USER SEEDED SUCCESSFULLY!");
-                Console.WriteLine(new string('=', 60));
-                Console.WriteLine($" Email: {adminEmail}");
-                Console.WriteLine($" Password: {adminPassword}");
-                Console.WriteLine($" Name: {adminProfile.FirstName} {adminProfile.LastName}");
-                Console.WriteLine(" Role: Admin");
-                Console.WriteLine(" Department: Administration");
-                Console.WriteLine(new string('=', 60) + "\n");
+                // Beautiful console output
+                Console.WriteLine(new string('=', 70));
+                Console.WriteLine("   ADMIN USER SEEDED SUCCESSFULLY!");
+                Console.WriteLine(new string('=', 70));
+                Console.WriteLine($"   Email: {adminEmail}");
+                Console.WriteLine($"   Password: {adminPassword}");
+                Console.WriteLine($"   Name: {adminProfile.FirstName} {adminProfile.LastName}");
+                Console.WriteLine($"   Role: {adminRole.RoleName}");
+                Console.WriteLine($"   Department: {adminDepartment.DepartmentName}");
+                Console.WriteLine(new string('=', 70) + "\n");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($" Error seeding admin user: {ex.Message}");
+                Console.WriteLine($"Error seeding admin user: {ex.Message}\n");
                 throw;
             }
         }
@@ -334,6 +406,8 @@ namespace Relevantz.EEPZ.Data.DBContexts
         /// </summary>
         public static async Task SeedResourcePoolProjectAsync(EEPZDbContext context)
         {
+            Console.WriteLine("Seeding resource pool project...");
+
             await context.Database.EnsureCreatedAsync();
 
             var existingProject = await context.Projects.FirstOrDefaultAsync(p =>
@@ -366,11 +440,19 @@ namespace Relevantz.EEPZ.Data.DBContexts
 
                 context.Projects.Add(resourcePoolProject);
                 await context.SaveChangesAsync();
+
+                Console.WriteLine("Resource pool project seeded successfully!");
             }
+            else
+            {
+                Console.WriteLine("Resource pool project already exists.");
+            }
+
+            Console.WriteLine(new string('-', 70) + "\n");
         }
 
         /// <summary>
-        /// Seeds master skills for the organization
+        /// Seeds master skills with enhanced console output
         /// </summary>
         private static async Task SeedMasterSkillsAsync(EEPZDbContext context)
         {
@@ -561,17 +643,15 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 else
                 {
                     skippedCount++;
-                    Console.WriteLine($"Skill already exists: {skill.SkillName}");
                 }
             }
 
             await context.SaveChangesAsync();
 
+            // Beautiful console output
             Console.WriteLine("Master skills seeding completed!");
-            Console.WriteLine(
-                $"Added: {addedCount} | Skipped: {skippedCount} | Total: {skills.Count}"
-            );
-            Console.WriteLine(new string('-', 50));
+            Console.WriteLine($"Added: {addedCount} | Skipped: {skippedCount} | Total: {skills.Count}");
+            Console.WriteLine(new string('-', 70));
         }
     }
 }

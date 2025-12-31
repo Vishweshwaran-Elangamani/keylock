@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 
+
 namespace Relevantz.EEPZ.Core.Service
 {
     public class BulkOperationService : IBulkOperationService
@@ -21,6 +22,7 @@ namespace Relevantz.EEPZ.Core.Service
         private readonly IRoleRepository _roleRepository;
         private readonly IDepartmentRepository _departmentRepository;
         private readonly IEmployeeRepository _employeeRepository;
+
 
         public BulkOperationService(
             IUserManagementService userManagementService,
@@ -38,6 +40,7 @@ namespace Relevantz.EEPZ.Core.Service
             _employeeRepository = employeeRepository;
         }
 
+
         private List<string> ValidateUserData(CreateUserRequestDto user, int rowNumber)
         {
             var errors = new List<string>();
@@ -47,7 +50,9 @@ namespace Relevantz.EEPZ.Core.Service
                     ? user.EmployeeCompanyId
                     : "Unknown User";
 
+
             var rowPrefix = $"Row {rowNumber} ({userIdentifier})";
+
 
             if (string.IsNullOrWhiteSpace(user.FirstName))
             {
@@ -62,6 +67,7 @@ namespace Relevantz.EEPZ.Core.Service
                 errors.Add($"{rowPrefix}: First name must contain only letters");
             }
 
+
             if (string.IsNullOrWhiteSpace(user.LastName))
             {
                 errors.Add($"{rowPrefix}: Last name is required");
@@ -75,6 +81,7 @@ namespace Relevantz.EEPZ.Core.Service
                 errors.Add($"{rowPrefix}: Last name must contain only letters");
             }
 
+
             if (string.IsNullOrWhiteSpace(user.Email))
             {
                 errors.Add($"{rowPrefix}: Email is required");
@@ -83,6 +90,7 @@ namespace Relevantz.EEPZ.Core.Service
             {
                 errors.Add($"{rowPrefix}: Invalid email format");
             }
+
 
             if (!string.IsNullOrWhiteSpace(user.MobileNumber))
             {
@@ -93,21 +101,25 @@ namespace Relevantz.EEPZ.Core.Service
                 }
             }
 
+
             if (user.RoleId <= 0)
             {
                 errors.Add($"{rowPrefix}: Valid Role is required");
             }
+
 
             if (user.DepartmentId <= 0)
             {
                 errors.Add($"{rowPrefix}: Valid Department is required");
             }
 
+
             if (user.DateOfBirthOfficial.HasValue)
             {
                 var dob = user.DateOfBirthOfficial.Value.ToDateTime(TimeOnly.MinValue);
                 var today = DateTime.Today;
                 var age = today.Year - dob.Year;
+
 
                 if (dob > today)
                 {
@@ -123,8 +135,10 @@ namespace Relevantz.EEPZ.Core.Service
                 }
             }
 
+
             return errors;
         }
+
 
         public async Task<ApiResponseDto<BulkOperationResponseDto>> BulkCreateUsersAsync(List<CreateUserRequestDto> users, int performedByUserId)
         {
@@ -134,16 +148,20 @@ namespace Relevantz.EEPZ.Core.Service
             var successfulUsers = new List<SuccessfulUserDto>();  
             var rowNumber = 1;
 
+
             try
             {
                 var nextIdString = await _employeeRepository.GetNextEmployeeCompanyIdAsync();
                 int nextEmployeeId = int.Parse(nextIdString);
 
+
                 //  LOAD ROLES AND DEPARTMENTS FOR MAPPING
                 var roles = await _roleRepository.GetAllAsync();
                 var departments = await _departmentRepository.GetAllAsync();
 
+
                 EEPZBusinessLog.Information($"Starting bulk user creation with Employee ID: {nextEmployeeId}");
+
 
                 foreach (var user in users)
                 {
@@ -153,7 +171,9 @@ namespace Relevantz.EEPZ.Core.Service
                         user.EmployeeCompanyId = nextEmployeeId.ToString();
                         nextEmployeeId++;
 
+
                         var validationErrors = ValidateUserData(user, rowNumber);
+
 
                         if (validationErrors.Any())
                         {
@@ -162,13 +182,16 @@ namespace Relevantz.EEPZ.Core.Service
                             continue;
                         }
 
+
                         var result = await _userManagementService.CreateUserAsync(user, performedByUserId);
                         if (result.Success)
                         {
                             successCount++;
 
+
                             var role = roles?.FirstOrDefault(r => r.RoleId == user.RoleId);
                             var department = departments?.FirstOrDefault(d => d.DepartmentId == user.DepartmentId);
+
 
                             successfulUsers.Add(new SuccessfulUserDto
                             {
@@ -179,6 +202,7 @@ namespace Relevantz.EEPZ.Core.Service
                                 Role = role?.RoleName ?? "Unknown",
                                 Department = department?.DepartmentName ?? "Unknown"
                             });
+
 
                             EEPZBusinessLog.Information($"User created with Employee ID: {user.EmployeeCompanyId}");
                         }
@@ -195,6 +219,7 @@ namespace Relevantz.EEPZ.Core.Service
                     }
                 }
 
+
                 var bulkLog = new Bulkoperationlog
                 {
                     PerformedByUserId = performedByUserId,
@@ -206,7 +231,9 @@ namespace Relevantz.EEPZ.Core.Service
                     PerformedAt = DateTime.UtcNow
                 };
 
+
                 await _bulkOperationLogRepository.CreateAsync(bulkLog);
+
 
                 var response = new BulkOperationResponseDto
                 {
@@ -218,7 +245,9 @@ namespace Relevantz.EEPZ.Core.Service
                     Message = $"Bulk operation completed: {successCount} successful, {failureCount} failed"
                 };
 
+
                 EEPZBusinessLog.Information($"Bulk user creation completed: {successCount}/{users.Count} successful. Employee IDs assigned: {nextIdString} to {nextEmployeeId - 1}");
+
 
                 return ApiResponseDto<BulkOperationResponseDto>.SuccessResponse(response, "Bulk operation completed");
             }
@@ -230,11 +259,13 @@ namespace Relevantz.EEPZ.Core.Service
         }
 
 
+
         public async Task<ApiResponseDto<BulkOperationResponseDto>> BulkInactivateUsersAsync(BulkUserInactivateRequestDto request, int performedByUserId)
         {
             var successCount = 0;
             var failureCount = 0;
             var errors = new List<string>();
+
 
             try
             {
@@ -260,6 +291,7 @@ namespace Relevantz.EEPZ.Core.Service
                     }
                 }
 
+
                 var bulkLog = new Bulkoperationlog
                 {
                     PerformedByUserId = performedByUserId,
@@ -271,7 +303,9 @@ namespace Relevantz.EEPZ.Core.Service
                     PerformedAt = DateTime.UtcNow
                 };
 
+
                 await _bulkOperationLogRepository.CreateAsync(bulkLog);
+
 
                 var response = new BulkOperationResponseDto
                 {
@@ -282,7 +316,9 @@ namespace Relevantz.EEPZ.Core.Service
                     Message = $"Bulk inactivation completed: {successCount} successful, {failureCount} failed"
                 };
 
+
                 EEPZBusinessLog.Information($"Bulk user inactivation completed: {successCount}/{request.UserIds.Count} successful");
+
 
                 return ApiResponseDto<BulkOperationResponseDto>.SuccessResponse(response, "Bulk operation completed");
             }
@@ -293,14 +329,17 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
 
+
         public async Task<ApiResponseDto<BulkOperationResponseDto>> BulkCreateUsersFromExcelAsync(Stream fileStream, int performedByUserId)
         {
             var users = new List<CreateUserRequestDto>();
             var parseErrors = new List<string>();
 
+
             try
             {
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
 
                 using (var package = new ExcelPackage(fileStream))
                 {
@@ -309,19 +348,24 @@ namespace Relevantz.EEPZ.Core.Service
                         return ApiResponseDto<BulkOperationResponseDto>.FailureResponse("Excel file contains no worksheets");
                     }
 
+
                     var worksheet = package.Workbook.Worksheets[0];
+
 
                     if (worksheet.Dimension == null)
                     {
                         return ApiResponseDto<BulkOperationResponseDto>.FailureResponse("Excel worksheet is empty");
                     }
 
+
                     var rowCount = worksheet.Dimension.Rows;
+
 
                     if (rowCount < 2)
                     {
                         return ApiResponseDto<BulkOperationResponseDto>.FailureResponse("Excel file must contain at least one data row besides the header");
                     }
+
 
                     for (int row = 2; row <= rowCount; row++)
                     {
@@ -338,23 +382,25 @@ namespace Relevantz.EEPZ.Core.Service
                                 }
                             }
 
+
                             if (isEmptyRow) continue;
 
+
+                            // FIXED: Remove +91- prefix, store only 10-digit number
                             var mobileNumber = worksheet.Cells[row, 10].Value?.ToString();
                             if (!string.IsNullOrWhiteSpace(mobileNumber))
                             {
-                                mobileNumber = mobileNumber.Replace("+91-", "").Replace("+91", "").Trim();
-                                if (mobileNumber.Length == 10)
-                                {
-                                    mobileNumber = $"+91-{mobileNumber}";
-                                }
+                                mobileNumber = mobileNumber.Replace("+91-", "").Replace("+91", "").Replace("-", "").Replace(" ", "").Trim();
                             }
+
 
                             var roleName = worksheet.Cells[row, 8].Value?.ToString()?.Trim() ?? string.Empty;
                             var roleId = await GetRoleIdByNameAsync(roleName);
 
+
                             var departmentName = worksheet.Cells[row, 9].Value?.ToString()?.Trim() ?? string.Empty;
                             var departmentId = await GetDepartmentIdByNameAsync(departmentName);
+
 
                             var user = new CreateUserRequestDto
                             {
@@ -372,6 +418,7 @@ namespace Relevantz.EEPZ.Core.Service
                                 Gender = worksheet.Cells[row, 11].Value?.ToString()?.Trim()
                             };
 
+
                             users.Add(user);
                         }
                         catch (Exception ex)
@@ -381,14 +428,17 @@ namespace Relevantz.EEPZ.Core.Service
                     }
                 }
 
+
                 if (users.Count == 0)
                 {
                     var errorMessage = parseErrors.Any()
                         ? $"No valid users found. Parse errors: {string.Join("; ", parseErrors.Take(3))}"
                         : "No valid users found in Excel file";
 
+
                     return ApiResponseDto<BulkOperationResponseDto>.FailureResponse(errorMessage);
                 }
+
 
                 return await BulkCreateUsersAsync(users, performedByUserId);
             }
@@ -399,9 +449,11 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
 
+
         private async Task<int> GetRoleIdByNameAsync(string roleName)
         {
             if (string.IsNullOrWhiteSpace(roleName)) return 0;
+
 
             try
             {
@@ -415,9 +467,11 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
 
+
         private async Task<int> GetDepartmentIdByNameAsync(string departmentName)
         {
             if (string.IsNullOrWhiteSpace(departmentName)) return 0;
+
 
             try
             {
@@ -431,22 +485,28 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
 
+
         public async Task<byte[]> GenerateExcelTemplateAsync()
         {
             try
             {
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
+
                 var roles = await _roleRepository.GetAllAsync();
                 var departments = await _departmentRepository.GetAllAsync();
+
 
                 var availableRoles = roles?.Where(r => r.RoleName != "Admin").ToList() ?? new List<Role>();
                 var availableDepartments = departments ?? new List<Department>();
 
+
                 EEPZBusinessLog.Information($"Generating template with {availableRoles.Count} roles and {availableDepartments.Count} departments");
+
 
                 using var package = new ExcelPackage();
                 var worksheet = package.Workbook.Worksheets.Add("Users");
+
 
                 var headers = new[]
                 {
@@ -455,10 +515,12 @@ namespace Relevantz.EEPZ.Core.Service
                     "EmployeeType", "Role", "Department", "MobileNumber", "Gender"
                 };
 
+
                 for (int i = 0; i < headers.Length; i++)
                 {
                     worksheet.Cells[1, i + 1].Value = headers[i];
                 }
+
 
                 using (var range = worksheet.Cells[1, 1, 1, headers.Length])
                 {
@@ -471,25 +533,32 @@ namespace Relevantz.EEPZ.Core.Service
                     range.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 }
 
+
                 CreateReferenceDataSheet(package, availableRoles, availableDepartments);
 
+
                 AddExcelValidations(worksheet, availableRoles, availableDepartments);
+
 
                 var instructionSheet = package.Workbook.Worksheets.Add("Instructions");
                 instructionSheet.Cells[1, 1].Value = "Bulk User Import Instructions";
                 instructionSheet.Cells[1, 1].Style.Font.Bold = true;
                 instructionSheet.Cells[1, 1].Style.Font.Size = 16;
 
+
                 instructionSheet.Cells[3, 1].Value = "IMPORTANT: Employee IDs are AUTO-GENERATED";
                 instructionSheet.Cells[3, 1].Style.Font.Bold = true;
                 instructionSheet.Cells[3, 1].Style.Font.Color.SetColor(Color.Red);
                 instructionSheet.Cells[3, 1].Style.Font.Size = 14;
 
+
                 instructionSheet.Cells[4, 1].Value = "Do NOT include Employee ID column. IDs will be assigned automatically starting from the last used ID (e.g., 1000, 1001, 1002...)";
                 instructionSheet.Cells[4, 1].Style.Font.Color.SetColor(Color.Red);
 
+
                 instructionSheet.Cells[6, 1].Value = "Column Definitions:";
                 instructionSheet.Cells[6, 1].Style.Font.Bold = true;
+
 
                 var instructions = new[]
                 {
@@ -502,44 +571,52 @@ namespace Relevantz.EEPZ.Core.Service
                     "EmployeeType: Select from dropdown (FullTime, PartTime, Intern)",
                     $"Role: Select from dropdown ({availableRoles.Count} roles available - excludes Admin role)",
                     $"Department: Select from dropdown ({availableDepartments.Count} departments available)",
-                    "MobileNumber: 10-digit phone number starting with 6-9 (e.g., 9876543210) - optional",
+                    "MobileNumber: 10-digit phone number starting with 6-9 (e.g., 9876543210) - optional, WITHOUT +91 prefix",
                     "Gender: Select from dropdown (Male, Female, PreferNotToSay) - optional"
                 };
+
 
                 for (int i = 0; i < instructions.Length; i++)
                 {
                     instructionSheet.Cells[i + 7, 1].Value = $"{i + 1}. {instructions[i]}";
                 }
 
+
                 instructionSheet.Cells[20, 1].Value = "Validation Rules:";
                 instructionSheet.Cells[20, 1].Style.Font.Bold = true;
                 instructionSheet.Cells[20, 1].Style.Font.Size = 14;
+
 
                 var validationRules = new[]
                 {
                     "Employee IDs are AUTOMATICALLY assigned - sequential numbering",
                     "Names must contain only letters (no numbers or special characters)",
                     "Email must be in valid format (example@domain.com)",
-                    "Phone number must start with 6, 7, 8, or 9 and be exactly 10 digits",
+                    "Phone number must start with 6, 7, 8, or 9 and be exactly 10 digits (NO +91 prefix)",
                     "Role and Department: Use dropdown lists (values from database)",
                     "All required fields must be filled",
                     "Use dropdown lists for all fields that have them"
                 };
+
 
                 for (int i = 0; i < validationRules.Length; i++)
                 {
                     instructionSheet.Cells[i + 21, 1].Value = validationRules[i];
                 }
 
+
                 instructionSheet.Cells[30, 1].Value = "TIP: Start entering data from Row 2 onwards. Header is in Row 1. Use dropdowns for Role and Department.";
                 instructionSheet.Cells[30, 1].Style.Font.Bold = true;
                 instructionSheet.Cells[30, 1].Style.Font.Color.SetColor(Color.Green);
                 instructionSheet.Cells[30, 1].Style.Font.Size = 12;
 
+
                 worksheet.Cells.AutoFitColumns();
                 instructionSheet.Cells.AutoFitColumns();
 
+
                 EEPZBusinessLog.Information("Excel template generated successfully with dynamic dropdowns");
+
 
                 return package.GetAsByteArray();
             }
@@ -550,35 +627,44 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
 
+
         private void CreateReferenceDataSheet(ExcelPackage package, List<Role> roles, List<Department> departments)
         {
             var refSheet = package.Workbook.Worksheets.Add("ReferenceData");
 
+
             refSheet.Cells[1, 1].Value = "Roles";
             refSheet.Cells[1, 1].Style.Font.Bold = true;
+
 
             for (int i = 0; i < roles.Count; i++)
             {
                 refSheet.Cells[i + 2, 1].Value = roles[i].RoleName;
             }
 
+
             refSheet.Cells[1, 2].Value = "Departments";
             refSheet.Cells[1, 2].Style.Font.Bold = true;
+
 
             for (int i = 0; i < departments.Count; i++)
             {
                 refSheet.Cells[i + 2, 2].Value = departments[i].DepartmentName;
             }
 
+
             refSheet.Hidden = eWorkSheetHidden.VeryHidden;
+
 
             EEPZBusinessLog.Information($"Reference data sheet created with {roles.Count} roles and {departments.Count} departments");
         }
+
 
         private void AddExcelValidations(ExcelWorksheet worksheet, List<Role> roles, List<Department> departments)
         {
             int dataStartRow = 2;
             int dataEndRow = 1000;
+
 
             var emailVal = worksheet.DataValidations.AddTextLengthValidation($"A{dataStartRow}:A{dataEndRow}");
             emailVal.Operator = ExcelDataValidationOperator.greaterThan;
@@ -587,6 +673,7 @@ namespace Relevantz.EEPZ.Core.Service
             emailVal.ErrorTitle = "Invalid Email";
             emailVal.Error = "Email must be at least 5 characters";
 
+
             var firstNameVal = worksheet.DataValidations.AddTextLengthValidation($"B{dataStartRow}:B{dataEndRow}");
             firstNameVal.Operator = ExcelDataValidationOperator.greaterThanOrEqual;
             firstNameVal.Formula.Value = 2;
@@ -594,12 +681,14 @@ namespace Relevantz.EEPZ.Core.Service
             firstNameVal.ErrorTitle = "Invalid First Name";
             firstNameVal.Error = "Must be at least 2 characters";
 
+
             var lastNameVal = worksheet.DataValidations.AddTextLengthValidation($"C{dataStartRow}:C{dataEndRow}");
             lastNameVal.Operator = ExcelDataValidationOperator.greaterThanOrEqual;
             lastNameVal.Formula.Value = 2;
             lastNameVal.ShowErrorMessage = true;
             lastNameVal.ErrorTitle = "Invalid Last Name";
             lastNameVal.Error = "Must be at least 2 characters";
+
 
             var empTypeVal = worksheet.DataValidations.AddListValidation($"D{dataStartRow}:D{dataEndRow}");
             empTypeVal.Formula.Values.Add("Permanent");
@@ -611,6 +700,7 @@ namespace Relevantz.EEPZ.Core.Service
             empTypeVal.ErrorTitle = "Invalid Employment Type";
             empTypeVal.Error = "Select from dropdown";
 
+
             var empStatusVal = worksheet.DataValidations.AddListValidation($"E{dataStartRow}:E{dataEndRow}");
             empStatusVal.Formula.Values.Add("Active");
             empStatusVal.Formula.Values.Add("Inactive");
@@ -619,12 +709,14 @@ namespace Relevantz.EEPZ.Core.Service
             empStatusVal.ErrorTitle = "Invalid Employment Status";
             empStatusVal.Error = "Select from dropdown";
 
+
             var dateVal = worksheet.DataValidations.AddDateTimeValidation($"F{dataStartRow}:F{dataEndRow}");
             dateVal.Operator = ExcelDataValidationOperator.greaterThanOrEqual;
             dateVal.Formula.Value = new DateTime(1900, 1, 1);
             dateVal.ShowErrorMessage = true;
             dateVal.ErrorTitle = "Invalid Date";
             dateVal.Error = "Enter date as YYYY-MM-DD";
+
 
             var empTypeDropdown = worksheet.DataValidations.AddListValidation($"G{dataStartRow}:G{dataEndRow}");
             empTypeDropdown.Formula.Values.Add("FullTime");
@@ -633,6 +725,7 @@ namespace Relevantz.EEPZ.Core.Service
             empTypeDropdown.ShowErrorMessage = true;
             empTypeDropdown.ErrorTitle = "Invalid Employee Type";
             empTypeDropdown.Error = "Select from dropdown";
+
 
             if (roles != null && roles.Any())
             {
@@ -645,8 +738,10 @@ namespace Relevantz.EEPZ.Core.Service
                 roleValidation.Prompt = $"Choose from {roles.Count} available roles";
                 roleValidation.Formula.ExcelFormula = $"ReferenceData!$A$2:$A${roles.Count + 1}";
 
+
                 EEPZBusinessLog.Information($"Role dropdown created with {roles.Count} options");
             }
+
 
             if (departments != null && departments.Any())
             {
@@ -659,8 +754,10 @@ namespace Relevantz.EEPZ.Core.Service
                 deptValidation.Prompt = $"Choose from {departments.Count} available departments";
                 deptValidation.Formula.ExcelFormula = $"ReferenceData!$B$2:$B${departments.Count + 1}";
 
+
                 EEPZBusinessLog.Information($"Department dropdown created with {departments.Count} options");
             }
+
 
             var mobileVal = worksheet.DataValidations.AddTextLengthValidation($"J{dataStartRow}:J{dataEndRow}");
             mobileVal.Operator = ExcelDataValidationOperator.equal;
@@ -670,6 +767,7 @@ namespace Relevantz.EEPZ.Core.Service
             mobileVal.ErrorTitle = "Invalid Phone";
             mobileVal.Error = "Must be exactly 10 digits or blank";
 
+
             var genderVal = worksheet.DataValidations.AddListValidation($"K{dataStartRow}:K{dataEndRow}");
             genderVal.Formula.Values.Add("Male");
             genderVal.Formula.Values.Add("Female");
@@ -678,6 +776,7 @@ namespace Relevantz.EEPZ.Core.Service
             genderVal.ShowErrorMessage = true;
             genderVal.ErrorTitle = "Invalid Gender";
             genderVal.Error = "Select from dropdown or leave blank";
+
 
             worksheet.Column(1).Width = 28;
             worksheet.Column(2).Width = 15;
@@ -690,6 +789,7 @@ namespace Relevantz.EEPZ.Core.Service
             worksheet.Column(9).Width = 20;
             worksheet.Column(10).Width = 15;
             worksheet.Column(11).Width = 18;
+
 
             worksheet.View.FreezePanes(2, 1);
         }
