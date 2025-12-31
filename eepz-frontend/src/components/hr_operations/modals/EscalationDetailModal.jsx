@@ -23,7 +23,7 @@ const EscalationDetailModal = ({
 
       <div className="edm-modal-container">
         <div className="edm-modal-dialog">
-          {/* HEADER - Fixed */}
+          {/* HEADER  */}
           <div className="edm-modal-header">
             <div className="edm-header-title">
               <i className="bi bi-exclamation-triangle"></i>
@@ -39,7 +39,7 @@ const EscalationDetailModal = ({
             </button>
           </div>
 
-          {/* BODY - Scrollable */}
+          {/* BODY  */}
           <div className="edm-modal-body">
             {/* Detail Grid */}
             <div className="edm-detail-grid">

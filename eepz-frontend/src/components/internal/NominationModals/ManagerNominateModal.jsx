@@ -1,13 +1,11 @@
 
-
-
 import { useState, useEffect, useRef, useMemo } from "react";
 import nominationService from "../../../services/internal/nominationService";
 import userService from "../../../services/auth/userService";
 import { toast } from "sonner";
 import "../../../styles/internal/ManagerNominateModal.css";
 
-// Custom Dropdown Component
+
 const CustomDropdown = ({ value, onChange, options, placeholder, name, error, disabled }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);

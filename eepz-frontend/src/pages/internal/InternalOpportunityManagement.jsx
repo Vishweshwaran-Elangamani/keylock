@@ -15,7 +15,7 @@ import { FaSearch } from "react-icons/fa";
 import { Form } from "react-bootstrap";
 import "../../styles/internal/InternalOpportunityManagement.css";
 
-/* Custom status dropdown for opportunities */
+
 const StatusDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
 

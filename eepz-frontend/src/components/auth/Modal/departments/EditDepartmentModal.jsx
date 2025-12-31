@@ -278,12 +278,12 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
       setLoading(true);
       toast.loading("Updating department...");
 
-      // Build payload - ALWAYS send all editable fields
+     
       const payload = {
         departmentId: formData.departmentId,
         description: formData.description.trim() || null,
         status: formData.status,
-        // IMPORTANT: Always send these fields (even if unchanged)
+        
         parentDepartmentId:
           formData.parentDepartmentId === "" ||
           formData.parentDepartmentId === null

@@ -3,7 +3,7 @@ import internalApi from "./internalApi";
 const API_BASE = "Nomination";
 
 const nominationService = {
-  // ✅ ALL nominations (mainly HR/Admin, analytics, etc.)
+  // ALL nominations (mainly HR/Admin, analytics, etc.)
   getAllNominations: async (status = null) => {
     try {
       let url = `/${API_BASE}/all-nominations`;
@@ -35,7 +35,7 @@ const nominationService = {
     }
   },
 
-  // ✅ self nomination (employee_self)
+  //  self nomination (employee_self)
   selfNominate: async (nominationData) => {
     try {
       const response = await internalApi.post(
@@ -52,7 +52,7 @@ const nominationService = {
     }
   },
 
-  // ✅ manager nomination (manager_nomination)
+  // manager nomination (manager_nomination)
   managerNominate: async (nominationData) => {
     try {
       const response = await internalApi.post(
@@ -69,7 +69,7 @@ const nominationService = {
     }
   },
 
-  // ✅ Manager dashboard – items waiting for manager review
+  // Manager dashboard – items waiting for manager review
   getPendingManagerReview: async () => {
     try {
       const response = await internalApi.get(
@@ -94,7 +94,7 @@ const nominationService = {
     }
   },
 
-  // ✅ DeptHead dashboard – items waiting for dept head review
+  //  DeptHead dashboard – items waiting for dept head review
   getPendingDeptHeadReview: async () => {
     try {
       const response = await internalApi.get(
@@ -119,7 +119,7 @@ const nominationService = {
     }
   },
 
-  // ✅ Manager / DeptHead review action
+  //  Manager / DeptHead review action
   reviewNomination: async (nominationId, reviewData, userRole) => {
     try {
       const endpoint =
@@ -137,7 +137,7 @@ const nominationService = {
     }
   },
 
-  // ✅ Single nomination details
+  //  Single nomination details
   getNominationById: async (id) => {
     try {
       const response = await internalApi.get(`/${API_BASE}/${id}`);
@@ -151,7 +151,7 @@ const nominationService = {
     }
   },
 
-  // ✅ MAIN: Logged-in employee “My Nominations”
+  // MAIN: Logged-in employee “My Nominations”
   getMyNominations: async () => {
     try {
       const response = await internalApi.get(`/${API_BASE}/my-nominations`);
@@ -173,7 +173,7 @@ const nominationService = {
     }
   },
 
-  // ✅ eligibility check before self nomination
+  // eligibility check before self nomination
   checkEligibility: async (opportunityId) => {
     try {
       const response = await internalApi.post(
@@ -190,7 +190,7 @@ const nominationService = {
     }
   },
 
-  // ✅ history (self + team nominated by user) – backend already filtered
+  // history (self + team nominated by user) – 
   getMyNominationHistory: async (status = null) => {
     try {
       let url = `/${API_BASE}/my-history`;
@@ -215,7 +215,7 @@ const nominationService = {
     }
   },
 
-  // ✅ analytics – uses getAllNominations then computes counts
+  //  analytics – uses getAllNominations then computes counts
   getMyNominationAnalytics: async () => {
     try {
       const response = await nominationService.getAllNominations();

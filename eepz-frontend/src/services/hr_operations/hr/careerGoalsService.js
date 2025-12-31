@@ -2,7 +2,7 @@ import hrApi from "../hr/hrApi";
 
 
 const careerGoalsService = {
-  // Get career goals overview/statistics for dashboard
+  
   getOverview: async () => {
     try {
       const response = await hrApi.get("/EmployeeData/goal-tracking/overview");
@@ -30,7 +30,6 @@ const careerGoalsService = {
   },
 
 
-  // Get adoption rate of career goals (trend info + breakdown)
   getGoalAdoptionRate: async () => {
     try {
       const response = await hrApi.get("/EmployeeData/goal-tracking/goal-adoption-rate");

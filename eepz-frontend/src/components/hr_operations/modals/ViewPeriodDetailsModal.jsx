@@ -56,7 +56,7 @@ const ViewPeriodDetailsModal = ({ period, onClose }) => {
 
       <div className="vpdm-modal-container">
         <div className="vpdm-modal-dialog">
-          {/* HEADER - Fixed */}
+          {/* HEADER  */}
           <div className="vpdm-modal-header">
             <div className="vpdm-header-title">
               <i className="bi bi-eye"></i>
@@ -72,7 +72,7 @@ const ViewPeriodDetailsModal = ({ period, onClose }) => {
             </button>
           </div>
 
-          {/* BODY - Scrollable */}
+          {/* BODY  */}
           <div className="vpdm-modal-body">
             {/* Period Summary */}
             <div className="vpdm-period-summary">

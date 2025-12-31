@@ -1,4 +1,4 @@
-/* HR OPERATIONS MAIN CONTAINER */
+/* HR OPERATIONS  */
 .hr-operations-container {
   padding: 0;
   background: #f8f9fa;
@@ -17,7 +17,7 @@
 }
 
 
-/* NON-ACTIVE TOGGLE BUTTON - DARK BLUE BACKGROUND */
+/* NON-ACTIVE TOGGLE BUTTON  */
 .toggle-btn-main {
   flex: 1;
   padding: 0.85rem 3rem;
@@ -37,7 +37,7 @@
   min-width: 220px;
 }
 
-/* ACTIVE TOGGLE BUTTON - WHITE BACKGROUND + DARK BLUE TEXT */
+/* ACTIVE TOGGLE BUTTON  */
 .toggle-btn-main.active {
   background: #ffffff !important;
   color: #2c2762 !important;
@@ -121,7 +121,7 @@
   white-space: nowrap;
 }
 
-/* ACTIVE TAB BUTTON - WHITE BACKGROUND */
+/* ACTIVE TAB BUTTON */
 .tab-button-hr.active {
   background: #ffffff !important;
   color: #2c2762 !important;

@@ -5,7 +5,7 @@ import Navbar from "./Navbar";
 const DashboardLayout = ({ children, role, allowedRoles = [] }) => {
   const { user } = useAuth();
 
-  // Determine current role from user object or use the role prop
+  
   const currentRole = user?.role || role;
 
   return (

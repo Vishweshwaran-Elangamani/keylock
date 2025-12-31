@@ -5,7 +5,7 @@ import internalOpportunityService from "../../../services/internal/internalOppor
 import { toast } from "sonner";
 import "../../../styles/internal/CreateOpportunityModal.css";
 
-// Custom Dropdown Component
+
 const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -257,7 +257,7 @@ const CreateOpportunityModal = ({
           <form onSubmit={handleSubmit} className="com-form">
             {/* Modal Body */}
             <div className="com-modal-body">
-              {/* Opportunity Name - Full Width */}
+              {/* Opportunity Name  */}
               <div className="com-form-group">
                 <label className="com-form-label">
                   Opportunity Name{" "}

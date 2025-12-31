@@ -331,13 +331,13 @@
   color: #ffffff;
 }
 
-/* Selected option styling (light gray, NOT blue) */
+/* Selected option styling  */
 .cpam-custom-option-active {
   background-color: #f3f4f6;
   font-weight: 600;
 }
 
-/* When hovering over selected option - still blue */
+/* When hovering over selected option  */
 .cpam-custom-option-active:hover {
   background-color: #27235c;
   color: #ffffff;

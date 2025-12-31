@@ -11,7 +11,7 @@ const HROperations = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // DEFAULT TO HR OPERATIONS
+  
   const [activeSection, setActiveSection] = useState("hr-operations");
 
   const getActiveTab = () => {
@@ -57,7 +57,6 @@ const HROperations = () => {
     setActiveSection(section);
   };
 
-  // Get current tab label for breadcrumb
   const getCurrentTabLabel = () => {
     const currentTab = tabs.find((tab) => tab.key === activeTab);
     return currentTab ? currentTab.label : "Policies";

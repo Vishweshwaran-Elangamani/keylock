@@ -39,7 +39,7 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
           : value,
     }));
 
-    // Clear error for this field
+   
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }

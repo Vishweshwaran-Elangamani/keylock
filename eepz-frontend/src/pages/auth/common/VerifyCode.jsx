@@ -376,7 +376,7 @@ const VerifyCode = () => {
         role: userRole,
       };
 
-      // Clear lockout data on successful verification
+     
       localStorage.removeItem("tempUser");
       localStorage.removeItem("otpLockout");
 
@@ -414,7 +414,7 @@ const VerifyCode = () => {
 
       toast.dismiss();
 
-      // Handle failed attempt on exception
+     
       const newFailedAttempts = failedAttempts + 1;
       setFailedAttempts(newFailedAttempts);
 

@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import "../../../../styles/auth/user/AddUserModal.css";
 
 
-// Custom Dropdown Component with Smart Positioning
+
 const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [openUpward, setOpenUpward] = useState(false);
@@ -33,7 +33,6 @@ const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) 
   }, [isOpen]);
 
 
-  // Smart positioning logic
   useEffect(() => {
     if (isOpen && dropdownRef.current) {
       const rect = dropdownRef.current.getBoundingClientRect();
@@ -42,7 +41,7 @@ const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) 
       const dropdownHeight = 250; 
 
 
-      // Open upward if not enough space below but enough space above
+      
       if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
         setOpenUpward(true);
       } else {
@@ -282,7 +281,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
         email: formData.email.trim(),
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
-        mobileNumber: formData.mobileNumber.trim() || null,  // ✅ FIXED: Send only 10 digits
+        mobileNumber: formData.mobileNumber.trim() || null,  
         gender: formData.gender || null,
         dateOfBirthOfficial: formData.dateOfBirthOfficial || null,
         employmentType: formData.employmentType,

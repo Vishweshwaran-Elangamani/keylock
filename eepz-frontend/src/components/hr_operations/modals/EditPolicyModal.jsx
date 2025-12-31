@@ -1,9 +1,7 @@
 
-
 import { useState, useEffect, useRef } from "react";
 import policyService from "../../../services/hr_operations/hr/policyService";
 import "../../../styles/hr_operations/hr/EditPolicyModal.css";
-
 
 const EditPolicyModal = ({
   show,

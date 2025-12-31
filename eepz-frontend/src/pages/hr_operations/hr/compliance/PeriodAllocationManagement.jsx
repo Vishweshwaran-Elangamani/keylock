@@ -13,7 +13,7 @@ import { FaSearch } from "react-icons/fa";
 import "../../../../styles/hr_operations/hr/PeriodAllocation.css";
 
 
-/* Custom Department Dropdown */
+
 const DepartmentDropdown = ({ budgets, selectedBudget, onChange }) => {
   const [open, setOpen] = useState(false);
 
@@ -91,7 +91,7 @@ const DepartmentDropdown = ({ budgets, selectedBudget, onChange }) => {
 };
 
 
-/* Custom Year Dropdown */
+
 const YearDropdown = ({ value, onChange, years }) => {
   const [open, setOpen] = useState(false);
 

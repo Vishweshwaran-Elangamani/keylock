@@ -14,7 +14,7 @@ import { FaSearch } from "react-icons/fa";
 import { toast } from "sonner";
 import "../../styles/internal/NominationManagement.css";
 
-/* Custom status dropdown for nominations */
+
 const NominationStatusDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
 

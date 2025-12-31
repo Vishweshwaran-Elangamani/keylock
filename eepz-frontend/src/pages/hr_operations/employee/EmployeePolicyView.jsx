@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import "../../../styles/hr_operations/employee/EmployeePolicy.css";
 
 
-/* Custom Category Dropdown Component */
+
 const CategoryDropdown = ({ value, onChange, categories }) => {
   const [open, setOpen] = useState(false);
 

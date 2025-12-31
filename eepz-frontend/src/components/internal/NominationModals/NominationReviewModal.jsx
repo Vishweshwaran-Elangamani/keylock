@@ -1,12 +1,9 @@
-
-
-
 import { useState, useEffect, useRef } from "react";
 import nominationService from "../../../services/internal/nominationService";
 import { toast } from "sonner";
 import "../../../styles/internal/NominationReviewModal.css";
 
-// Custom Dropdown Component
+
 const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -91,14 +88,14 @@ const NominationReviewModal = ({
 
   const isDepartmentHead = userRole === "Department Head";
 
-  // Decision options
+  
   const decisionOptions = [
     { label: "-- Select Action --", value: "" },
     { label: "Approve", value: "Approved" },
     { label: "Reject", value: "Rejected" },
   ];
 
-  // Conflict of Interest options
+  
   const conflictOptions = [
     { label: "-- Select --", value: "" },
     { label: "No", value: "false" },

@@ -214,7 +214,7 @@
   text-align: left;
 }
 
-/* ARROW ICON WITH BOOTSTRAP ICON */
+/* ARROW WITH BOOTSTRAP ICON */
 .eom-custom-dropdown-arrow {
   font-size: 12px;
   color: #64748b;
@@ -256,7 +256,7 @@
   }
 }
 
-/* Dropdown Option - WHITE BACKGROUND, NO LIGHT COLOR */
+/* Dropdown Option */
 .eom-custom-dropdown-option {
   padding: 8px 12px;
   font-size: 13px;
@@ -272,7 +272,7 @@
   color: #ffffff;
 }
 
-/* Selected option - WHITE BACKGROUND (no light gray) */
+/* Selected option  */
 .eom-custom-dropdown-option.selected {
   background-color: #ffffff;
   font-weight: 600;

@@ -6,7 +6,7 @@ import "../../../styles/hr_operations/hr/LeadershipApproval.css";
 const LeadershipApproval = () => {
   const [promotions, setPromotions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [viewType, setViewType] = useState("card"); // "card" or "table"
+  const [viewType, setViewType] = useState("card"); 
 
   useEffect(() => {
     fetchSubmittedPromotions();

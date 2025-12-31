@@ -45,7 +45,7 @@ const NominationGraphModal = ({ show, onHide }) => {
     if (show) {
       fetchAnalytics();
 
-      // Auto-refresh every 5 seconds
+      
       const intervalId = setInterval(() => {
         fetchAnalytics();
       }, 5000);
@@ -84,7 +84,7 @@ const NominationGraphModal = ({ show, onHide }) => {
       analytics.rejected,
     ];
 
-    // For Line: single dataset (connect all points), color each point, line blue
+    
     if (chartType === "line") {
       return {
         labels: ["Total Nominations", "Approved", "Pending", "Rejected"],
@@ -106,7 +106,7 @@ const NominationGraphModal = ({ show, onHide }) => {
       };
     }
 
-    // Bar & Pie (default)
+    
     return {
       labels: ["Total Nominations", "Approved", "Pending", "Rejected"],
       datasets: [

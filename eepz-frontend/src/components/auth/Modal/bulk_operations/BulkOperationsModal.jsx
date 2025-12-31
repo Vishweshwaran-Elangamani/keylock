@@ -269,13 +269,13 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
     }
   };
 
-  // Call onSuccess when closing
+  
   const handleClose = () => {
     toast.dismiss();
 
-    // If there were successful imports, refresh parent data
+    
     if (uploadResult && uploadResult.successCount > 0) {
-      onSuccess?.(); // Call here instead
+      onSuccess?.(); 
     }
 
     setSelectedFile(null);
@@ -547,7 +547,7 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                       </div>
                     </div>
 
-                    {/* SHOW SUCCESS DETAILS ALWAYS WHEN successCount > 0 */}
+                    
                     {uploadResult.successCount > 0 && (
                       <div className="bom-success-details-container">
                         <details
@@ -635,7 +635,6 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                       </div>
                     )}
 
-                    {/* EXISTING ERROR SECTION */}
                     {uploadResult.errors && uploadResult.errors.length > 0 && (
                       <div className="error-details-bulk">
                         <div className="bom-error-details-container">

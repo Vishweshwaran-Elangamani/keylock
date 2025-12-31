@@ -40,7 +40,7 @@ const ChangePassword = () => {
   const isFirstLogin = location.state?.isFirstLogin || false;
   const fromSettings = location.state?.fromSettings || false;
 
-  // ✅ CHECK IF USER IS PROTECTED EMPLOYEE (EmployeeCompanyID = 1000)
+  
   const PROTECTED_EMPLOYEE_ID = "1000";
   const isProtectedEmployee = user?.employeeCompanyId === PROTECTED_EMPLOYEE_ID;
 
@@ -73,7 +73,7 @@ const ChangePassword = () => {
       return;
     }
 
-    // ✅ REDIRECT PROTECTED EMPLOYEE TO DASHBOARD (except first login)
+   
     if (user && isProtectedEmployee && !isFirstLogin) {
       toast.error("Password changes are not allowed for this account. Please contact system administrator.");
       navigate("/dashboard", { replace: true });
@@ -158,7 +158,7 @@ const ChangePassword = () => {
     e.preventDefault();
     setError("");
 
-    // ✅ DOUBLE CHECK - PREVENT PROTECTED EMPLOYEE PASSWORD CHANGE
+    
     if (isProtectedEmployee && !isFirstLogin) {
       const errorMsg = "Password changes are not allowed for this account. Please contact system administrator.";
       setError(errorMsg);
@@ -332,7 +332,7 @@ const ChangePassword = () => {
         </div>
 
         <div className="change-password-body">
-          {/* ✅ SHOW WARNING FOR PROTECTED EMPLOYEE (except first login) */}
+          {/* SHOW WARNING FOR PROTECTED EMPLOYEE (except first login) */}
           {isProtectedEmployee && !isFirstLogin && (
             <div className="error-alert-cp" style={{ marginBottom: "20px", background: "#fff3cd", borderColor: "#ffc107", color: "#856404" }}>
               <i className="bi bi-shield-exclamation"></i>
@@ -347,7 +347,7 @@ const ChangePassword = () => {
           )}
 
           <form onSubmit={handleSubmit}>
-            {/* ✅ DISABLE FORM FOR PROTECTED EMPLOYEE (except first login) */}
+            {/*  DISABLE FORM FOR PROTECTED EMPLOYEE (except first login) */}
             <fieldset disabled={isProtectedEmployee && !isFirstLogin} style={{ border: "none", padding: 0, margin: 0 }}>
               {!isFirstLogin ? (
                 <div className="form-grid-cp">

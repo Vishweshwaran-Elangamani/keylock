@@ -7,7 +7,7 @@ import ProfilePhotoUploadModal from "../../../components/auth/Modal/common/Profi
 import { toast } from "sonner";
 import "../../../styles/auth/common/EmployeeProfile.css";
 
-/* Custom Gender Dropdown Component */
+
 const GenderDropdown = ({ value, onChange, disabled, showError }) => {
   const [open, setOpen] = useState(false);
 
@@ -68,7 +68,7 @@ const GenderDropdown = ({ value, onChange, disabled, showError }) => {
   );
 };
 
-/* Custom Nationality Dropdown */
+
 const NationalityDropdown = ({ value, onChange, disabled, showError, options }) => {
   const [open, setOpen] = useState(false);
 
@@ -126,7 +126,6 @@ const NationalityDropdown = ({ value, onChange, disabled, showError, options }) 
   );
 };
 
-/* Custom Marital Status Dropdown */
 const MaritalStatusDropdown = ({ value, onChange, disabled, showError }) => {
   const [open, setOpen] = useState(false);
 
@@ -186,7 +185,7 @@ const MaritalStatusDropdown = ({ value, onChange, disabled, showError }) => {
   );
 };
 
-/* Custom State Dropdown */
+
 const StateDropdown = ({ value, onChange, disabled, showError, options }) => {
   const [open, setOpen] = useState(false);
 

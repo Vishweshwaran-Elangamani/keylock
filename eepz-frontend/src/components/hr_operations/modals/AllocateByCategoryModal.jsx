@@ -20,8 +20,8 @@ const AllocateByCategoryModal = ({
     notes: "",
   });
 
-  const [loading, setLoading] = useState(false); // Loading spinner state
-  const [error, setError] = useState(null); // Error message state
+  const [loading, setLoading] = useState(false); 
+  const [error, setError] = useState(null); 
 
   // Current logged-in user ID from localStorage
   const currentUserId = parseInt(localStorage.getItem("userId"));
@@ -96,7 +96,7 @@ const AllocateByCategoryModal = ({
         allocationType: formData.allocationType,
         allocationName: allocationName,
         amount: allocationAmount,
-        goalStatus: "Approved", // As per your backend expectation
+        goalStatus: "Approved", 
         notes: formData.notes,
         allocatedByUserId: currentUserId, // Logged-in user ID
       };

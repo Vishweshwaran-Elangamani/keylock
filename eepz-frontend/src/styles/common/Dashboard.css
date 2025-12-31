@@ -47,7 +47,7 @@
   flex-shrink: 0;
 }
 
-/* MONOCHROMATIC BLUE STAT ICONS - CLEAR DIFFERENTIATION */
+/* MONOCHROMATIC BLUE STAT ICONS  */
 .ada-stat-icon-primary {
   background: #1E40AF;
   color: #FFFFFF;
@@ -192,7 +192,7 @@
   min-height: 400px;
 }
 
-/* CARD HEADER - Keep Purple/Navy for Branding */
+/* CARD HEADER  */
 .card-header-dark {
   display: flex;
   justify-content: space-between;

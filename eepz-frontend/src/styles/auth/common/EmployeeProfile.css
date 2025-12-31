@@ -463,7 +463,7 @@
 }
 
 /* ============================================
-   FORM CARDS (MAIN CONTENT) - TABLE HEADER STYLE
+   FORM CARDS (MAIN CONTENT) 
    ============================================ */
 .epda-form-card {
   background: white;
@@ -589,7 +589,7 @@
 }
 
 /* ============================================
-   CUSTOM DROPDOWN - MATCHING REFERENCE PATTERN
+   CUSTOM DROPDOWN 
    ============================================ */
 
 .epda-custom-dropdown {
@@ -639,7 +639,7 @@
   padding-right: 1.5rem;
 }
 
-/* Arrow positioned close to edge - matching reference */
+/* Arrow positioned close to edge  */
 .epda-custom-arrow {
   position: absolute;
   right: 0.75rem;

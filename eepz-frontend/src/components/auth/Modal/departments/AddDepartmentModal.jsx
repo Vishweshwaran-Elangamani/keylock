@@ -64,7 +64,7 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
   };
 
   // ========================
-  // MEMOIZED OPTIONS - Prevents mixing
+  // MEMOIZED OPTIONS 
   // ========================
   
   const statusOptions = useMemo(() => [

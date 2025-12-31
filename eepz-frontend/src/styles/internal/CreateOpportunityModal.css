@@ -257,7 +257,7 @@
   }
 }
 
-/* Dropdown Option - WHITE BACKGROUND, NO LIGHT COLOR */
+/* Dropdown Option  */
 .com-custom-dropdown-option {
   padding: 8px 12px;
   font-size: 13px;
@@ -273,7 +273,7 @@
   color: #ffffff;
 }
 
-/* Selected option - WHITE BACKGROUND (no light gray) */
+/* Selected option  */
 .com-custom-dropdown-option.selected {
   background-color: #ffffff;
   font-weight: 600;

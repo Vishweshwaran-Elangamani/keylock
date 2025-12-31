@@ -1,5 +1,5 @@
 .graph-modal .modal-dialog-custom {
-    max-width: 750px; /* Reduced from 900px */
+    max-width: 750px; 
     max-height: 85vh;
     margin: 2rem auto;
   }
@@ -69,7 +69,7 @@
   }
    
   .chart-container {
-    height: 280px; /* Reduced from 350px */
+    height: 280px; 
     margin: 0;
     padding: 1rem;
     background: white;

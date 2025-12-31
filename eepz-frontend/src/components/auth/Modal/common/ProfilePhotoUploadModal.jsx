@@ -146,7 +146,7 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
         ctx.closePath();
         ctx.clip();
 
-        // Calculate scale to fill circle
+        
         const scale = Math.max(
           containerSize / img.width,
           containerSize / img.height

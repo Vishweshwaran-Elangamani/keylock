@@ -66,7 +66,7 @@ const UpdateUtilizedAmountModal = ({
       const utilizedAmount = parseFloat(formData.utilizedAmount);
       const allocatedAmount = budget.allocatedAmount || 0;
 
-      // Validate: cannot exceed allocated amount
+      
       if (utilizedAmount > allocatedAmount) {
         setError(
           `Utilized amount (₹${utilizedAmount.toLocaleString(

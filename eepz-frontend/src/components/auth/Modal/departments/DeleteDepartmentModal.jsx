@@ -94,14 +94,14 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
 
                 {department?.hodEmployeeName && (
                   <div className="ddm-info-row ddm-info-warning">
-                    <strong>⚠️ HOD Assigned:</strong>{" "}
+                    <strong> HOD Assigned:</strong>{" "}
                     {department.hodEmployeeName}
                   </div>
                 )}
 
                 {department?.hasChildren && (
                   <div className="ddm-info-row ddm-info-warning">
-                    <strong>⚠️ Child Departments:</strong>{" "}
+                    <strong> Child Departments:</strong>{" "}
                     {department.childDepartmentCount}
                   </div>
                 )}

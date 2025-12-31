@@ -5,7 +5,7 @@ import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
 import "../../styles/internal/NominationHistory.css";
 
-// Custom Dropdown Component
+
 const CustomDropdown = ({ value, onChange, options, placeholder, name }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);

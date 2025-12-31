@@ -50,7 +50,7 @@ const BulkOperationService = {
     }
   },
 
-  //  CRITICAL: Download Excel Template
+  //  Download Excel Template
   downloadExcelTemplate: async () => {
     try {
       const response = await api.get("/BulkOperation/download-template", {

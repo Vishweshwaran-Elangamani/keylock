@@ -1,6 +1,3 @@
-/* Reuse your existing AddUserModal.css styles */
-/* This file can import or extend your existing modal styles */
-
 .form-grid .full-width {
   grid-column: 1 / -1;
 }
