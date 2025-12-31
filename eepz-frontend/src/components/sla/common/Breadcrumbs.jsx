@@ -7,7 +7,6 @@ const Breadcrumb = ({ items, dynamicLabels = {} }) => {
   const params = useParams();
   const location = useLocation();
 
-  // Helper function to resolve dynamic labels
   const resolveDynamicLabel = (item) => {
     if (item.param && params[item.param]) {
       if (dynamicLabels[item.param]) {
@@ -34,7 +33,6 @@ const Breadcrumb = ({ items, dynamicLabels = {} }) => {
           gap: "0.5rem",
         }}
       >
-        {/* Home + slash */}
         <li className="breadcrumb-item d-flex align-items-center gap-1">
           <a
             href="#"
@@ -94,7 +92,6 @@ const Breadcrumb = ({ items, dynamicLabels = {} }) => {
                 </a>
               )}
 
-              {/* cross line (slash) after all except last */}
               {!isLast && (
                 <span style={{ color: "var(--color-accent-1)" }}>/</span>
               )}

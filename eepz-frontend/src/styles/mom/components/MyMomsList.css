@@ -16,7 +16,6 @@
   height: 3rem;
 }
 
-/* Header */
 
 .mml-header {
   border: 0;
@@ -77,8 +76,6 @@
   font-weight: 600;
 }
 
-/* Empty state */
-
 .mml-empty-card {
   margin-top: 0.5rem;
 }
@@ -97,8 +94,6 @@
 .mml-empty-icon-svg {
   color: #1976d2;
 }
-
-/* MOM cards */
 
 .mml-mom-card-body {
   padding: 1.5rem 1.5rem;
@@ -134,8 +129,6 @@
   font-size: 1.05rem;
 }
 
-/* Info rows */
-
 .mml-info-row {
   display: flex;
   align-items: flex-start;
@@ -163,7 +156,6 @@
   color: #1e293b;
 }
 
-/* Actions */
 
 .mml-actions-row {
   display: flex;
@@ -171,7 +163,6 @@
   gap: 0.5rem;
 }
 
-/* Modals shared */
 
 .mml-modal-backdrop {
   background-color: rgba(0, 0, 0, 0.5);
@@ -204,7 +195,6 @@
   text-align: left;
 }
 
-/* Share modal specifics */
 
 .mml-search-group {
   overflow: hidden;
@@ -246,7 +236,6 @@
   flex: 1;
 }
 
-/* Details modal */
 
 .mml-detail-row {
   display: flex;
@@ -267,7 +256,6 @@
   justify-content: center;
 }
 
-/* Responsive */
 
 @media (min-width: 768px) {
   .mml-header-inner {

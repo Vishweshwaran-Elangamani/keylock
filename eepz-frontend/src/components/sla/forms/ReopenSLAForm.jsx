@@ -84,7 +84,6 @@ const ReopenSLAForm = ({ sla, onClose, onSuccess }) => {
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <div
           style={{
             display: "flex",
@@ -135,9 +134,7 @@ const ReopenSLAForm = ({ sla, onClose, onSuccess }) => {
           </button>
         </div>
 
-        {/* Body */}
         <div style={{ padding: "1.75rem", backgroundColor: "#f8f9fa" }}>
-          {/* Error Alert */}
           {error && (
             <div
               style={{
@@ -182,7 +179,6 @@ const ReopenSLAForm = ({ sla, onClose, onSuccess }) => {
           )}
 
           <form onSubmit={handleSubmit}>
-            {/* Deadline Comparison */}
             <div
               style={{
                 backgroundColor: "white",
@@ -248,7 +244,6 @@ const ReopenSLAForm = ({ sla, onClose, onSuccess }) => {
               </div>
             </div>
 
-            {/* Info Box */}
             <div
               style={{
                 display: "flex",
@@ -270,7 +265,6 @@ const ReopenSLAForm = ({ sla, onClose, onSuccess }) => {
               </p>
             </div>
 
-            {/* Reason Textarea */}
             <div style={{ marginBottom: "1rem" }}>
               <label
                 style={{
@@ -340,7 +334,6 @@ const ReopenSLAForm = ({ sla, onClose, onSuccess }) => {
           </form>
         </div>
 
-        {/* Footer */}
         <div
           style={{
             display: "flex",

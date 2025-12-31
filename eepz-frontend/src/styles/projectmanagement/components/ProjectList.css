@@ -6,6 +6,7 @@
 .prj-list-breadcrumb {
   font-size: 0.875rem !important;
   background-color: #f8f9fa !important;
+  margin-top:-25px;
 }
 
 .prj-list-breadcrumb-link {
@@ -339,11 +340,11 @@
 }
 
 .prj-list-table-header {
-  background-color: #3c3862 !important;
+  background: #252267  !important;
 }
 
 .prj-list-table-header th {
-  background-color: #3c3862 !important;
+  background: #252267  !important;
   color: #ffffff !important;
   border: none !important;
   font-weight: 700 !important;

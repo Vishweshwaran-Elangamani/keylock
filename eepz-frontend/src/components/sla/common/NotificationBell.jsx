@@ -10,7 +10,6 @@ const NotificationBell = () => {
 
   useEffect(() => {
     fetchNotifications();
-    // Poll for new notifications every 30 seconds
     const interval = setInterval(fetchNotifications, 30000);
     return () => clearInterval(interval);
   }, []);
@@ -73,7 +72,6 @@ const NotificationBell = () => {
 
   return (
     <div className="position-relative">
-      {/* Bell Icon */}
       <button
         className="btn btn-light position-relative rounded-circle p-2"
         onClick={() => setShowDropdown(!showDropdown)}
@@ -90,7 +88,6 @@ const NotificationBell = () => {
         )}
       </button>
 
-      {/* Dropdown */}
       {showDropdown && (
         <>
           <div
@@ -107,7 +104,6 @@ const NotificationBell = () => {
               borderRadius: "12px",
             }}
           >
-            {/* Header */}
             <div className="d-flex justify-content-between align-items-center p-3 border-bottom">
               <h6 className="mb-0 fw-semibold">Notifications</h6>
               <div className="d-flex gap-2">
@@ -129,7 +125,6 @@ const NotificationBell = () => {
               </div>
             </div>
 
-            {/* Notification List */}
             <div style={{ maxHeight: "400px", overflowY: "auto" }}>
               {notifications.length === 0 ? (
                 <div className="text-center py-5">
@@ -188,7 +183,6 @@ const NotificationBell = () => {
               )}
             </div>
 
-            {/* Footer */}
             {notifications.length > 0 && (
               <div className="p-3 border-top text-center">
                 <button className="btn btn-sm btn-link text-decoration-none">

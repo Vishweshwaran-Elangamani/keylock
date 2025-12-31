@@ -39,7 +39,7 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
   return (
     <div className="fa-modal-overlay" onClick={onClose}>
       <div className="fa-modal-container" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
+     
         <div className="fa-modal-header">
           <div className="fa-modal-header-content">
             <BarChart2 size={20} />
@@ -50,7 +50,7 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
           </button>
         </div>
 
-        {/* Body */}
+       
         <div className="fa-modal-body">
           {loading && (
             <div className="fa-loading-container">
@@ -72,7 +72,7 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
 
           {!loading && !error && analysisData && (
             <div className="fa-content">
-              {/* Original Feedback */}
+             
               <div className="fa-section">
                 <div className="fa-section-header">
                   <FileText size={16} />
@@ -84,7 +84,7 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                 </div>
               </div>
 
-              {/* Summary */}
+             
               {analysisData.summary && (
                 <div className="fa-section">
                   <div className="fa-section-header">
@@ -97,9 +97,9 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                 </div>
               )}
 
-              {/* Key Metrics Cards */}
+             
               <div className="fa-metrics-grid">
-                {/* Overall Quality */}
+             
                 <div className={`fa-metric-card fa-metric-card--${getQualityColorClass(analysisData.overall_quality)}`}>
                   <div className="fa-metric-icon">
                     <Target size={20} />
@@ -110,7 +110,7 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                   </div>
                 </div>
 
-                {/* Fairness Score */}
+              
                 <div className={`fa-metric-card fa-metric-card--${analysisData.fairness_score >= 0.7 ? 'warning' : analysisData.fairness_score >= 0.5 ? 'neutral' : 'danger'}`}>
                   <div className="fa-metric-icon">
                     <Shield size={20} />
@@ -121,7 +121,7 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                   </div>
                 </div>
 
-                {/* Professionalism */}
+              
                 <div className={`fa-metric-card fa-metric-card--${analysisData.feedback_metrics?.professionalism_score >= 0.7 ? 'success' : 'neutral'}`}>
                   <div className="fa-metric-icon">
                     <BarChart2 size={20} />
@@ -134,7 +134,7 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                   </div>
                 </div>
 
-                {/* Constructiveness */}
+             
                 <div className={`fa-metric-card fa-metric-card--${analysisData.constructiveness_analysis?.constructiveness_score >= 0.5 ? 'warning' : 'danger'}`}>
                   <div className="fa-metric-icon">
                     <Lightbulb size={20} />
@@ -148,7 +148,7 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                 </div>
               </div>
 
-              {/* Sentiment Analysis */}
+            
               {analysisData.sentiment_analysis && (
                 <div className="fa-section">
                   <div className="fa-section-header">
@@ -165,7 +165,7 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                       </div>
                     </div>
 
-                    {/* Sentiment Metrics */}
+                
                     <div className="fa-sentiment-metrics">
                       <div className="fa-sentiment-metric-item">
                         <div className="fa-sentiment-metric-label">Polarity</div>
@@ -181,7 +181,6 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                       </div>
                     </div>
 
-                    {/* VADER Scores */}
                     <div className="fa-vader-section">
                       <div className="fa-vader-label">VADER Scores</div>
                       <div className="fa-vader-bars">
@@ -223,7 +222,6 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                 </div>
               )}
 
-              {/* Emotion Analysis */}
               {analysisData.emotion_scores && (
                 <div className="fa-section">
                   <div className="fa-section-header">
@@ -250,7 +248,6 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                 </div>
               )}
 
-              {/* Bias Detection */}
               {analysisData.bias_analysis && (
                 <div className="fa-section">
                   <div className="fa-section-header">
@@ -279,7 +276,6 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                 </div>
               )}
 
-              {/* Toxicity Analysis */}
               {analysisData.toxicity_analysis && (
                 <div className="fa-section">
                   <div className="fa-section-header">
@@ -307,7 +303,6 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                 </div>
               )}
 
-              {/* Constructiveness Analysis */}
               {analysisData.constructiveness_analysis && (
                 <div className="fa-section">
                   <div className="fa-section-header">
@@ -336,7 +331,6 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                 </div>
               )}
 
-              {/* Feedback Metrics */}
               {analysisData.feedback_metrics && (
                 <div className="fa-section">
                   <div className="fa-section-header">
@@ -376,7 +370,6 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                 </div>
               )}
 
-              {/* Key Insights */}
               {analysisData.key_insights && analysisData.key_insights.length > 0 && (
                 <div className="fa-section">
                   <div className="fa-section-header">
@@ -391,7 +384,6 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                 </div>
               )}
 
-              {/* Improvement Suggestions */}
               {analysisData.suggestions && (
                 <div className="fa-section">
                   <div className="fa-section-header">
@@ -399,7 +391,6 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                     <h3>IMPROVEMENT SUGGESTIONS</h3>
                   </div>
                   <div className="fa-suggestions-container">
-                    {/* Actionable Recommendations */}
                     {analysisData.suggestions.suggestions && analysisData.suggestions.suggestions.length > 0 && (
                       <div className="fa-suggestions-section">
                         <div className="fa-suggestions-heading">Actionable Recommendations:</div>
@@ -411,7 +402,6 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                       </div>
                     )}
 
-                    {/* Example Rewrite */}
                     {analysisData.suggestions.rewritten_example && (
                       <div className="fa-suggestions-section">
                         <div className="fa-suggestions-heading">
@@ -424,7 +414,6 @@ const FeedbackAnalysisModal = ({ show, onClose, analysisData, loading, error }) 
                       </div>
                     )}
 
-                    {/* Focus Areas */}
                     {analysisData.suggestions.improvement_areas && analysisData.suggestions.improvement_areas.length > 0 && (
                       <div className="fa-suggestions-section">
                         <div className="fa-suggestions-heading">Focus Areas for Improvement:</div>

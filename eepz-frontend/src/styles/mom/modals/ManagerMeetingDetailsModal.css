@@ -60,7 +60,6 @@
   line-height: 1;
 }
 
-/* body */
 .mmdm-body {
   padding: 1.5rem;
   overflow-y: auto;
@@ -116,7 +115,6 @@
   transition: width 0.3s ease;
 }
 
-/* meeting link */
 .mmdm-meeting-link-wrapper {
   margin-bottom: 1.5rem;
 }

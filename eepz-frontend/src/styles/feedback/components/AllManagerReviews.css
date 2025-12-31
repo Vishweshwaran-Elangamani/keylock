@@ -155,7 +155,6 @@
   flex-wrap: wrap;
 }
 
-/* Manager dropdown width similar to reference */
 .amr-filter-wrapper {
   flex: 1;
   min-width: 180px;
@@ -170,7 +169,6 @@
   color: #374151;
 }
 
-/* Custom Manager dropdown (matches Status style) */
 
 .amr-dd {
   position: relative;
@@ -202,7 +200,6 @@
   text-overflow: ellipsis;
 }
 
-/* Arrow style like reference */
 
 .amr-dd-arrow {
   position: relative;
@@ -219,13 +216,13 @@
   height: 7px;
   border-right: 2px solid #b2b6c7;
   border-bottom: 2px solid #b2b6c7;
-  transform: translateY(-60%) rotate(45deg); /* down */
+  transform: translateY(-60%) rotate(45deg);
   transition: transform 0.15s ease;
 }
 
 
 .amr-dd-open .amr-dd-arrow::before {
-  transform: translateY(-40%) rotate(-135deg); /* up */
+  transform: translateY(-40%) rotate(-135deg); 
 }
 
 
@@ -252,25 +249,21 @@
   cursor: pointer;
 }
 
-/* First row – dark purple header like Status dropdown */
 .amr-dd-header {
   background-color: #27235c;
   color: #ffffff;
   font-weight: 600;
 }
 
-/* Hover for non-header rows */
 .amr-dd-item:not(.amr-dd-header):hover {
   background-color:  #27235C;
   color: white;
 }
 
-/* Divider between rows */
 .amr-dd-item + .amr-dd-item {
   border-top: 1px solid #f1f2f7;
 }
 
-/* Results count, empty state etc. */
 
 .amr-results-count {
   font-size: 0.875rem;
@@ -310,7 +303,6 @@
   color: #94a3b8;
 }
 
-/* Feedback cards */
 
 .amr-feedback-grid {
   display: grid;
@@ -386,7 +378,6 @@
   color: #475569;
   line-height: 1.5;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

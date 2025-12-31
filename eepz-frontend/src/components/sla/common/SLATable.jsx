@@ -12,7 +12,6 @@ const SLATable = ({ slas, onViewDetails, onEscalate, showActions = true }) => {
     direction: "asc",
   });
 
-  // Filter SLAs
   const filteredSLAs = slas.filter((sla) => {
     const matchesSearch =
       sla.slatype.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -21,7 +20,6 @@ const SLATable = ({ slas, onViewDetails, onEscalate, showActions = true }) => {
     return matchesSearch && matchesFilter;
   });
 
-  // Sort SLAs
   const sortedSLAs = [...filteredSLAs].sort((a, b) => {
     const aValue = a[sortConfig.key];
     const bValue = b[sortConfig.key];
@@ -44,7 +42,7 @@ const SLATable = ({ slas, onViewDetails, onEscalate, showActions = true }) => {
 
   return (
     <div>
-      {/* Filters */}
+     
       <div
         className="card border-0 shadow-sm mb-3"
         style={{ borderRadius: "12px" }}
@@ -94,7 +92,6 @@ const SLATable = ({ slas, onViewDetails, onEscalate, showActions = true }) => {
         </div>
       </div>
 
-      {/* Table */}
       <div className="card border-0 shadow-sm" style={{ borderRadius: "12px" }}>
         <div className="table-responsive">
           <table className="table table-hover mb-0">

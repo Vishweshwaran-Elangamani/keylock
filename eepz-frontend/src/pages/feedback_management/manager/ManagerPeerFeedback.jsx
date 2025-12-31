@@ -39,7 +39,6 @@ export default function ManagerPeerFeedback() {
   const [employeeMap, setEmployeeMap] = useState({});
   const [refreshing, setRefreshing] = useState(false);
 
-  // Safe date formatting
   const formatDate = useCallback((dateInput) => {
     if (!dateInput) return "—";
     try {
@@ -55,7 +54,6 @@ export default function ManagerPeerFeedback() {
     }
   }, []);
 
-  // Check if feedback is anonymous
   const checkIsAnonymous = useCallback((feedback) => {
     return Boolean(
       feedback.isAnonymous === true ||
@@ -69,7 +67,6 @@ export default function ManagerPeerFeedback() {
     );
   }, []);
 
-  // Get sender display name
   const getSenderDisplayName = useCallback(
     (feedback) => {
       const isAnon = checkIsAnonymous(feedback);
@@ -84,7 +81,6 @@ export default function ManagerPeerFeedback() {
     [employeeMap, checkIsAnonymous]
   );
 
-  // Fetch peer feedback
   const fetchPeerFeedback = useCallback(
     async (retryCount = 0) => {
       if (!user?.empId) {
@@ -98,7 +94,6 @@ export default function ManagerPeerFeedback() {
       try {
         const empId = user.empId;
 
-        // Fetch employee map
         let empMap = {};
         try {
           const empRes = await employeeApi.getAll();
@@ -115,7 +110,6 @@ export default function ManagerPeerFeedback() {
           console.warn("Error fetching employee map:", err.message);
         }
 
-        // Fetch approved peer feedback
         try {
           const peerRes = await peerQueueApi.approved();
           const feedbackData = Array.isArray(peerRes?.data)
@@ -234,10 +228,7 @@ export default function ManagerPeerFeedback() {
         </div>
       )}
 
-      
-
-      {/* Content */}
-      <div className="mgrpeer-content">
+            <div className="mgrpeer-content">
         {peerFeedback.length === 0 ? (
           <div className="mgrpeer-empty">
             <Users size={64} className="mgrpeer-empty-icon" />

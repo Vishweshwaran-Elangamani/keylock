@@ -14,7 +14,6 @@
   max-width: 1400px;
 }
 
-/* Header */
 
 .mts-header {
   display: flex;
@@ -42,8 +41,6 @@
   font-size: 0.875rem;
   color: #6c757d;
 }
-
-/* Alert */
 
 .mts-alert {
   display: flex;
@@ -103,8 +100,6 @@
 .mts-alert-close::after {
   transform: translate(-50%, -50%) rotate(-45deg);
 }
-
-/* Toggle */
 
 .mts-toggle-wrapper {
   display: flex;
@@ -168,8 +163,6 @@
   background-color: rgba(255, 255, 255, 0.3);
 }
 
-/* Loading */
-
 .mts-loading {
   text-align: center;
   padding: 3rem 1rem;
@@ -212,8 +205,6 @@
   }
 }
 
-/* Empty */
-
 .mts-empty-card {
   background: #ffffff;
   border: 1px solid #e5e7eb;
@@ -239,8 +230,6 @@
   font-size: 0.875rem;
   color: #9ca3af;
 }
-
-/* Grid and cards */
 
 .mts-grid {
   display: grid;
@@ -283,7 +272,6 @@
   border-left: 4px solid #6610f2;
 }
 
-/* Card header */
 
 .mts-card-header {
   display: flex;
@@ -312,7 +300,6 @@
   color: #212529;
 }
 
-/* Status badges */
 
 .mts-status-badge {
   display: inline-block;
@@ -342,8 +329,6 @@
   border-color: #ffc10740;
 }
 
-/* Date row */
-
 .mts-card-date-row {
   display: flex;
   align-items: center;
@@ -364,8 +349,6 @@
 .mts-card-date-ago {
   white-space: nowrap;
 }
-
-/* HR review */
 
 .mts-hr-review {
   background: #f8f9fa;
@@ -398,8 +381,6 @@
   color: #495057;
 }
 
-/* Generic comment box */
-
 .mts-comment-box {
   background: #f8f9fa;
   padding: 0.75rem;
@@ -414,7 +395,6 @@
   color: #495057;
 }
 
-/* Goal rating */
 
 .mts-goal-rating {
   display: flex;
@@ -448,7 +428,6 @@
   border: 1.5px solid #97247e40;
 }
 
-/* Mentor & peer */
 
 .mts-mentor-name-row {
   display: flex;
@@ -475,7 +454,6 @@
   border: 1.5px solid #19875440;
 }
 
-/* Buttons */
 
 .mts-btn {
   display: inline-flex;
@@ -506,7 +484,6 @@
   margin-right: 0.35rem;
 }
 
-/* Responsive */
 
 @media (max-width: 992px) {
   .mts-page {

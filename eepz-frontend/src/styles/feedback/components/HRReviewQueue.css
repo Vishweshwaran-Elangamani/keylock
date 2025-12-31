@@ -42,8 +42,6 @@
   }
 }
 
-/* Header */
-
 .hrq-header {
   display: flex;
   align-items: center;
@@ -77,7 +75,6 @@
   color: #6b7280;
 }
 
-/* Buttons */
 
 .hrq-btn {
   display: inline-flex;
@@ -121,7 +118,6 @@
   animation: hrq-spin 1s linear infinite;
 }
 
-/* Alert */
 
 .hrq-alert {
   display: flex;
@@ -166,7 +162,6 @@
   color: inherit;
 }
 
-/* Stats */
 
 .hrq-stats-row {
   margin-bottom: 1.5rem;
@@ -211,7 +206,6 @@
   color: #6b7280;
 }
 
-/* Empty state */
 
 .hrq-card {
   background: #ffffff;
@@ -242,7 +236,6 @@
   color: #9ca3af;
 }
 
-/* Feedback list */
 
 .hrq-feedback-grid {
   display: grid;
@@ -256,13 +249,12 @@
 
 .hrq-feedback-card {
   width: 100%;
-}
+ }
 
 .hrq-feedback-body {
   padding: 1rem 1.1rem;
 }
 
-/* Feedback header */
 
 .hrq-feedback-header {
   display: flex;
@@ -311,7 +303,6 @@
   gap: 0.25rem;
 }
 
-/* Status chip */
 
 .hrq-status-chip {
   display: inline-block;
@@ -331,7 +322,6 @@
   color: #0f62fe;
 }
 
-/* Comment section */
 
 .hrq-feedback-comment-section {
   margin-bottom: 0.85rem;
@@ -365,8 +355,6 @@
   margin-left: 2rem;
 }
 
-/* Context box */
-
 .hrq-feedback-context-box {
   padding: 0.75rem 0.8rem;
   border-radius: 8px;
@@ -386,8 +374,6 @@
   font-size: 0.85rem;
   color: #555555;
 }
-
-/* Responsive */
 
 @media (max-width: 768px) {
   .hrq-page-bg {

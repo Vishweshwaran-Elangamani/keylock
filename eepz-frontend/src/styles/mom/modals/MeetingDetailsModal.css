@@ -54,7 +54,6 @@
   font-size: 0.85rem;
 }
 
-/* body */
 .mdm-body {
   padding: 2rem;
   text-align: left;
@@ -62,13 +61,11 @@
   overflow-y: auto;
 }
 
-/* info cards */
 .mdm-info-card {
   background-color: #f8f9fa;
   text-align: left;
 }
 
-/* meeting link */
 .mdm-link-card {
   background-color: #e3f2fd;
   border: 1px solid #bbdefb;
@@ -79,7 +76,6 @@
   text-align: left;
 }
 
-/* comments */
 .mdm-section-title {
   text-align: left;
 }
@@ -90,13 +86,11 @@
   text-align: left;
 }
 
-/* discussion points */
 .mdm-discussion-card {
   background-color: #f8f9fa;
   text-align: left;
 }
 
-/* action items */
 .mdm-action-card {
   background-color: #f8f9fa;
   border: 1px solid #e9ecef;
@@ -107,14 +101,12 @@
   text-align: left;
 }
 
-/* create MOM button */
 .mdm-create-mom-btn {
   transition: all 0.2s ease;
   border-radius: 8px;
   text-align: center;
 }
 
-/* footer */
 .mdm-footer {
   padding: 1rem 2rem;
   background-color: #f8f9fa;
@@ -125,7 +117,6 @@
   padding: 0.5rem 1.5rem;
 }
 
-/* responsiveness */
 @media (max-width: 768px) {
   .mdm-body {
     padding: 1.25rem;

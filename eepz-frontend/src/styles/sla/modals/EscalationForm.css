@@ -76,7 +76,6 @@
   padding: 1.5rem;
 }
 
-/* loading state */
 .esc-loading {
   text-align: center;
   padding: 1.5rem 0;
@@ -94,7 +93,6 @@
   margin-bottom: 0;
 }
 
-/* manager error state */
 .esc-manager-error {
   border-radius: 8px;
 }
@@ -107,7 +105,6 @@
   border-radius: 8px;
 }
 
-/* goal section */
 .esc-goal {
   background: #f3f4f6;
   padding: 0.75rem 1rem;
@@ -130,7 +127,6 @@
   font-weight: 500;
 }
 
-/* deadline */
 .esc-deadline {
   margin-bottom: 0.75rem;
 }
@@ -141,7 +137,6 @@
   font-weight: 500;
 }
 
-/* manager info */
 .esc-manager-info {
   border-radius: 8px;
   background: #eff6ff;
@@ -160,7 +155,6 @@
   font-size: 0.813rem;
 }
 
-/* fields */
 .esc-field {
   margin-bottom: 0.75rem;
 }
@@ -181,7 +175,6 @@
   color: #dc2626;
 }
 
-/* select */
 .esc-select-wrapper {
   position: relative;
 }
@@ -202,7 +195,6 @@
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-/* textarea */
 .esc-textarea {
   border-radius: 8px;
   border: 1px solid #d1d5db;
@@ -233,7 +225,6 @@
   font-size: 0.75rem;
 }
 
-/* level info */
 .esc-level-info {
   background: #dbeafe;
   padding: 0.75rem;
@@ -257,7 +248,6 @@
   line-height: 1.4;
 }
 
-/* footer buttons */
 .esc-footer {
   margin-top: 1.25rem;
   display: flex;
@@ -300,7 +290,6 @@
   cursor: not-allowed;
 }
 
-/* responsive */
 @media (max-width: 576px) {
   .esc-dialog {
     max-width: 95%;

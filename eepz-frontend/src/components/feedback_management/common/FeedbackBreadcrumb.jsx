@@ -60,7 +60,6 @@ const FeedbackBreadcrumb = ({ items }) => {
           <span className="fb-breadcrumb-slash">/</span>
         </li>
 
-        {/* Other items – slash only if not last */}
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
 

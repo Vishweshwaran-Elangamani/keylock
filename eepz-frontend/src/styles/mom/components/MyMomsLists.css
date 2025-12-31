@@ -283,7 +283,6 @@
   text-align: left;
 }
 
-/* modal bodies */
 
 .mm2-modal-body {
   text-align: left;
@@ -358,8 +357,6 @@
   flex: 1;
 }
 
-/* Share modal footer button */
-
 .mm2-share-btn {
   background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
   color: #ffffff;
@@ -378,9 +375,6 @@
   transform: translateY(0);
   box-shadow: none;
 }
-
-/* DETAIL HEADER – shares base styles above */
-
 .mm2-detail-title {
   margin: 0 0 0.15rem 0;
   font-weight: 700;
@@ -420,13 +414,10 @@
   justify-content: center;
 }
 
-/* Modals footer */
 
 .mm2-modal-footer {
   padding: 0.75rem 1rem 1rem;
 }
-
-/* responsive */
 
 @media (min-width: 768px) {
   .mm2-header-inner {

@@ -164,7 +164,6 @@ export default function AllManagerReviews() {
 
   return (
     <div className="amr-page">
-      {/* ✅ Breadcrumb at TOP OF PAGE - Exactly like your screenshot */}
       <FeedbackBreadcrumb
         items={[
           { label: "Manager Reviews" }

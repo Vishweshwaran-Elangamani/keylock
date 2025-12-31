@@ -94,8 +94,6 @@
   font-weight: 600;
 }
 
-/* Stat cards */
-
 .emd-stats-row {
   margin-bottom: 18px;
 }
@@ -155,8 +153,6 @@
   font-weight: 600;
   color: #4b5563;
 }
-
-/* Quick action pills */
 
 .emd-actions-row {
   margin-bottom: 24px;
@@ -243,8 +239,6 @@
   color: #fff7e6;
 }
 
-/* Cards */
-
 .emd-card {
   background-color: #ffffff;
   border-radius: 16px;
@@ -288,8 +282,6 @@
   color: #4b5563;
 }
 
-/* Empty state */
-
 .emd-empty-state {
   text-align: center;
   padding: 38px 12px;
@@ -314,7 +306,6 @@
   color: #6b7280;
 }
 
-/* Recent activity */
 
 .emd-activity-list {
   display: flex;
@@ -404,7 +395,6 @@
   align-self: center;
 }
 
-/* Meetings */
 
 .emd-meetings-list {
   display: flex;
@@ -423,7 +413,7 @@
 }
 
 .emd-meeting-item:hover {
-  background-color: #f1f5f9;                 /* same as activity */
+  background-color: #f1f5f9;               
   box-shadow: 0 6px 14px rgba(17, 24, 39, 0.12);
   transform: translateX(4px);
 }
@@ -468,8 +458,6 @@
   margin-top: 4px;
 }
 
-/* View all */
-
 .emd-view-all {
   border-top: 1px solid #e5e7eb;
   margin-top: 12px;
@@ -493,8 +481,6 @@
 .emd-view-all-btn i {
   font-size: 0.95rem;
 }
-
-/* Responsive */
 
 @media (max-width: 992px) {
   .emd-container {

@@ -41,10 +41,6 @@ export default function EditManagerReview() {
   const [success, setSuccess] = useState("");
   const [review, setReview] = useState(null);
 
-  // ============================================================================
-  // FETCH REVIEW DATA
-  // ============================================================================
-
   const fetchReview = async () => {
     setLoadingData(true);
     setError("");
@@ -78,9 +74,6 @@ export default function EditManagerReview() {
     }
   }, [id]);
 
-  // ============================================================================
-  // HANDLE SUBMIT
-  // ============================================================================
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -148,7 +141,6 @@ export default function EditManagerReview() {
           paddingRight: "1rem",
         }}
       >
-        {/* HEADER */}
         <div className="d-flex align-items-start mb-4">
           <button
             className="btn btn-outline-secondary me-2"
@@ -185,7 +177,6 @@ export default function EditManagerReview() {
           </button>
         </div>
 
-        {/* ERROR ALERT */}
         {error && (
           <div
             className="alert alert-danger d-flex align-items-start gap-2 mb-3"
@@ -200,7 +191,6 @@ export default function EditManagerReview() {
           </div>
         )}
 
-        {/* SUCCESS ALERT */}
         {success && (
           <div
             className="alert alert-success d-flex align-items-center gap-2 mb-3"
@@ -212,7 +202,6 @@ export default function EditManagerReview() {
           </div>
         )}
 
-        {/* MAIN FORM */}
         <div
           className="card border-0"
           style={{
@@ -223,7 +212,6 @@ export default function EditManagerReview() {
         >
           <div className="card-body p-4">
             <form onSubmit={handleSubmit} className="row g-4">
-              {/* RATING BUTTONS */}
               <div className="col-12">
                 <label className="form-label small fw-bold mb-2">
                   Rating <span className="text-danger">*</span>
@@ -253,7 +241,6 @@ export default function EditManagerReview() {
                 </div>
               </div>
 
-              {/* REVIEW COMMENT */}
               <div className="col-12">
                 <label className="form-label small fw-bold">
                   Review Comment <span className="text-danger">*</span>
@@ -274,7 +261,6 @@ export default function EditManagerReview() {
                 </small>
               </div>
 
-              {/* PROJECT CONTEXT */}
               <div className="col-12">
                 <label className="form-label small fw-bold">
                   Project Context <span className="text-muted">(Optional)</span>
@@ -291,7 +277,6 @@ export default function EditManagerReview() {
                 />
               </div>
 
-              {/* GOAL CONTEXT */}
               <div className="col-12">
                 <label className="form-label small fw-bold">
                   Goal Context <span className="text-muted">(Optional)</span>
@@ -308,7 +293,6 @@ export default function EditManagerReview() {
                 />
               </div>
 
-              {/* ACTION BUTTONS */}
               <div className="col-12 d-flex gap-2">
                 <button
                   type="submit"
@@ -337,7 +321,6 @@ export default function EditManagerReview() {
           </div>
         </div>
 
-        {/* HELPFUL INFO */}
         <div
           className="card border-0 mt-4"
           style={{

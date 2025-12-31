@@ -23,7 +23,6 @@
   box-sizing: border-box;
 }
 
-/* Loading */
 
 .prj-detail-loading {
   text-align: center;
@@ -56,8 +55,6 @@
   color: #6c757d;
   font-size: 0.9375rem;
 }
-
-/* Breadcrumb */
 
 .prj-detail-breadcrumb-nav {
   margin-bottom: 0.75rem;
@@ -112,8 +109,6 @@
   font-weight: 600;
 }
 
-/* Alert */
-
 .prj-detail-alert {
   display: inline-flex;
   align-items: center;
@@ -129,8 +124,6 @@
   color: #842029;
   border: 1px solid #f5c2c7;
 }
-
-/* Layout */
 
 .prj-detail-layout {
   display: flex;
@@ -152,8 +145,6 @@
   padding-left: 1rem;
   box-sizing: border-box;
 }
-
-/* Cards */
 
 .prj-detail-card {
   background: #ffffff;
@@ -197,7 +188,6 @@
   padding: 1.5rem;
 }
 
-/* Grid helpers */
 
 .prj-detail-grid {
   display: grid;
@@ -216,7 +206,6 @@
   grid-column: 1 / -1;
 }
 
-/* Info blocks */
 
 .prj-detail-info-item {
   display: flex;
@@ -287,8 +276,6 @@
   text-align: left;
 }
 
-/* Status badge */
-
 .prj-detail-status-badge {
   display: inline-flex;
   align-items: center;
@@ -328,8 +315,6 @@
   color: #41464b;
   border: 1px solid #d3d6d8;
 }
-
-/* Employee cards */
 
 .prj-detail-employee-card {
   border: 1px solid #4f5152;
@@ -434,7 +419,6 @@
   text-align: left;
 }
 
-/* Managers */
 
 .prj-detail-manager-section {
   margin-bottom: 1.5rem;
@@ -529,7 +513,6 @@
   font-style: italic;
 }
 
-/* Empty state */
 
 .prj-detail-empty-state {
   text-align: center;
@@ -548,7 +531,6 @@
   font-size: 0.9375rem;
 }
 
-/* Scrollbar */
 
 .prj-detail-wrapper::-webkit-scrollbar {
   width: 10px;
@@ -570,8 +552,6 @@
   background: #1b193f;
 }
 
-/* Global text alignment inside wrapper */
-
 .prj-detail-wrapper p,
 .prj-detail-wrapper h1,
 .prj-detail-wrapper h2,
@@ -585,7 +565,6 @@
   text-align: left;
 }
 
-/* Responsive */
 
 @media (max-width: 992px) {
   .prj-detail-layout {

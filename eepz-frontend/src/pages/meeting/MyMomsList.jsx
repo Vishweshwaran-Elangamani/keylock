@@ -390,7 +390,6 @@ const MyMomsList = () => {
             </div>
           )}
 
-          {/* SHARE MODAL */}
           {showShareModal && shareModalMom && (
             <div
               className="modal fade show d-block mm2-modal-backdrop"
@@ -537,7 +536,6 @@ const MyMomsList = () => {
             </div>
           )}
 
-          {/* DETAIL MODAL */}
           {selectedMom && (
             <div
               className="modal fade show d-block mm2-modal-backdrop"

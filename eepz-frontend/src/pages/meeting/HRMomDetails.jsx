@@ -190,7 +190,6 @@ const HRMomDetails = () => {
   return (
     <div className="hrmom-wrapper">
       <div className="hrmom-container">
-        {/* BREADCRUMB UPDATED */}
         <nav
           aria-label="breadcrumb"
           className="hrmom-breadcrumb-nav"
@@ -235,7 +234,6 @@ const HRMomDetails = () => {
           </ol>
         </nav>
 
-        {/* STATS */}
         <div className="hrmom-stats-grid">
           <div className="hrmom-stat-card">
             <div className="hrmom-stat-content">
@@ -285,7 +283,6 @@ const HRMomDetails = () => {
           </div>
         </div>
 
-        {/* MEETING CARD */}
         <div className="hrmom-card">
           <div className="hrmom-card-body">
             <div className="hrmom-meeting-header">
@@ -373,7 +370,6 @@ const HRMomDetails = () => {
           </div>
         </div>
 
-        {/* COMMENTS */}
         {mom.commentsObservations && (
           <div className="hrmom-card">
             <div className="hrmom-card-header">
@@ -390,9 +386,7 @@ const HRMomDetails = () => {
           </div>
         )}
 
-        {/* DISCUSSION + ACTION ITEMS */}
         <div className="hrmom-two-column-grid">
-          {/* Discussion points */}
           <div className="hrmom-card">
             <div className="hrmom-card-header">
               <h5 className="hrmom-card-title">
@@ -437,7 +431,6 @@ const HRMomDetails = () => {
             </div>
           </div>
 
-          {/* Action items */}
           <div className="hrmom-card">
             <div className="hrmom-card-header">
               <h5 className="hrmom-card-title">

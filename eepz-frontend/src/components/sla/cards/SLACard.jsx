@@ -34,7 +34,6 @@ const SLACard = ({ sla, onViewDetails, onEscalate }) => {
 
   return (
     <Card className="sla-card h-100 shadow-sm">
-      {/* Card Header */}
       <Card.Header className="bg-light d-flex justify-content-between align-items-start">
         <div>
           <h6 className="mb-0 fw-bold">{sla.slatype}</h6>
@@ -43,9 +42,7 @@ const SLACard = ({ sla, onViewDetails, onEscalate }) => {
         <Badge bg={statusBadge.bg}>{sla.status}</Badge>
       </Card.Header>
 
-      {/* Card Body */}
       <Card.Body>
-        {/* Employee Info */}
         <div className="mb-3">
           <small className="text-muted d-block">Assigned to</small>
           <strong>{sla.assignedToName || "Unassigned"}</strong>
@@ -56,13 +53,11 @@ const SLACard = ({ sla, onViewDetails, onEscalate }) => {
           )}
         </div>
 
-        {/* Department */}
         <div className="mb-3">
           <small className="text-muted d-block">Department</small>
           <strong>{sla.departmentName}</strong>
         </div>
 
-        {/* Deadline */}
         <div className="mb-3">
           <small className="text-muted d-block">Deadline</small>
           <strong>{new Date(sla.deadline).toLocaleDateString("en-IN")}</strong>
@@ -77,14 +72,12 @@ const SLACard = ({ sla, onViewDetails, onEscalate }) => {
           </small>
         </div>
 
-        {/* Urgency */}
         <div className="mb-3">
           <Badge bg={urgencyBadge.bg} className="me-2">
             {urgencyBadge.icon} {urgency}
           </Badge>
         </div>
 
-        {/* Status Info */}
         {sla.status === "Closed" && (
           <div className="mb-3">
             <small className="text-muted d-block">Compliance Status</small>
@@ -103,7 +96,6 @@ const SLACard = ({ sla, onViewDetails, onEscalate }) => {
         )}
       </Card.Body>
 
-      {/* Card Footer */}
       <Card.Footer className="bg-light d-flex gap-2">
         <Button
           variant="outline-primary"

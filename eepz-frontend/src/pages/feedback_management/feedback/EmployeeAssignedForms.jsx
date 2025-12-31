@@ -201,7 +201,6 @@ export default function EmployeeAssignedForms() {
         </div>
       </div>
 
-      {/* Content Area */}
       <div className="employee-forms-content">
         {loading ? (
           <div className="employee-forms-loading">

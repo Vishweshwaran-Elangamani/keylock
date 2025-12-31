@@ -178,7 +178,6 @@ const HRMomDashboard = () => {
           />
         </div>
 
-        {/* top cards */}
         <div className="row g-3 mb-3">
           <div className="col-lg-3 col-md-6 col-sm-6">
             <div className="hrmom-top-card">
@@ -241,7 +240,6 @@ const HRMomDashboard = () => {
           </div>
         </div>
 
-        {/* table */}
         <div className="card hrmom-table-card">
           <div className="card-body hrmom-table-card-body">
             <div className="hrmom-table-wrapper">

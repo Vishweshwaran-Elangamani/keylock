@@ -438,9 +438,9 @@ const ResourcePoolMapping = () => {
               }
             >
               <Home size={14} />
-              <span>Dashboard</span>
+              <span>Dashboard /</span>
             </button>
-            /
+            
           </li>
           <li className="breadcrumb-item">
             <button
@@ -452,16 +452,9 @@ const ResourcePoolMapping = () => {
             >
               <span>Projects</span>
             </button>
-            /
+            
           </li>
-          <li
-            className="breadcrumb-item active"
-            aria-current="page"
-          >
-            <span className="rp-breadcrumb-active">
-              Resource Pool Mapping
-            </span>
-          </li>
+          
         </ol>
       </nav>
 

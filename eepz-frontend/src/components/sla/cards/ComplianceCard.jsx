@@ -19,13 +19,11 @@ const ComplianceCard = ({
   onClick,
   showActions = false,
 }) => {
-  //  Calculate compliance from real SLA data if provided
   const calculatedCompliance = useMemo(() => {
     if (!slaData || slaData.length === 0) return compliance;
 
     const summary = getComplianceSummary(slaData);
 
-    // Merge with original compliance data
     return {
       ...compliance,
       totalSlas: summary.totalSLAs,
@@ -41,7 +39,6 @@ const ComplianceCard = ({
     };
   }, [slaData, compliance]);
 
-  //  Handle null/undefined compliance
   if (!calculatedCompliance) {
     return (
       <div
@@ -72,7 +69,6 @@ const ComplianceCard = ({
     });
   };
 
-  //  Use calculated values
   const openSlas = calculatedCompliance.openSlas || 0;
   const closedSlas = calculatedCompliance.closedSlas || 0;
   const onTimeSlas = calculatedCompliance.onTimeSlas || 0;
@@ -106,7 +102,6 @@ const ComplianceCard = ({
         }
       }}
     >
-      {/* Colored Top Border */}
       <div
         style={{
           height: "4px",
@@ -115,7 +110,6 @@ const ComplianceCard = ({
       />
 
       <div className="card-body p-4">
-        {/* Header Section */}
         <div className="d-flex justify-content-between align-items-start mb-4">
           <div className="flex-grow-1">
             <h5
@@ -152,7 +146,6 @@ const ComplianceCard = ({
           </div>
         </div>
 
-        {/* Compliance Rate Section */}
         <div className="mb-4">
           <div className="d-flex justify-content-between align-items-end mb-2">
             <span className="text-muted small">Compliance Rate</span>
@@ -194,9 +187,7 @@ const ComplianceCard = ({
           </div>
         </div>
 
-        {/* Stats Grid - 2x2 Layout with Horizontal Alignment */}
         <div className="row g-3 mb-3">
-          {/* On Time */}
           <div className="col-6">
             <div
               className="d-flex align-items-center gap-3 p-3 rounded-3"
@@ -224,7 +215,6 @@ const ComplianceCard = ({
             </div>
           </div>
 
-          {/* Breached */}
           <div className="col-6">
             <div
               className="d-flex align-items-center gap-3 p-3 rounded-3"
@@ -252,7 +242,6 @@ const ComplianceCard = ({
             </div>
           </div>
 
-          {/* Extended */}
           <div className="col-6">
             <div
               className="d-flex align-items-center gap-3 p-3 rounded-3"
@@ -280,7 +269,6 @@ const ComplianceCard = ({
             </div>
           </div>
 
-          {/* Total */}
           <div className="col-6">
             <div
               className="d-flex align-items-center gap-3 p-3 rounded-3"
@@ -309,7 +297,6 @@ const ComplianceCard = ({
           </div>
         </div>
 
-        {/* Open SLAs Info */}
         {openSlas > 0 && (
           <div
             className="alert mb-3 d-flex align-items-center gap-2"
@@ -330,7 +317,6 @@ const ComplianceCard = ({
           </div>
         )}
 
-        {/* Last Updated */}
         <div className="text-muted small mb-0 text-center" style={{ fontSize: "0.75rem" }}>
           <Clock size={12} className="me-1" />
           Last Updated:{" "}
@@ -340,7 +326,6 @@ const ComplianceCard = ({
         </div>
       </div>
 
-      {/* Action Button Footer */}
       {showActions && onClick && (
         <div
           className="card-footer bg-white border-top pt-3 pb-3 px-4"
@@ -360,7 +345,6 @@ const ComplianceCard = ({
         </div>
       )}
 
-      {/* Hover Footer (when no actions) */}
       {!showActions && onClick && (
         <div
           className="card-footer bg-transparent border-top-0 text-center py-2"

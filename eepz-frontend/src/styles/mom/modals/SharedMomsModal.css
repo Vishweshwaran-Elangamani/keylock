@@ -28,7 +28,6 @@
   flex-direction: column;
 }
 
-/* header */
 
 .smm-header {
   background-color: #27235c;
@@ -89,7 +88,6 @@
   opacity: 0.3;
 }
 
-/* table */
 
 .smm-table {
   text-align: left;
@@ -149,7 +147,6 @@
   color: #ffffff;
 }
 
-/* footer */
 
 .smm-footer {
   padding: 1rem 2rem;
@@ -166,7 +163,6 @@
   padding: 0.5rem 1.5rem;
 }
 
-/* responsive */
 
 @media (max-width: 992px) {
   .smm-content {
