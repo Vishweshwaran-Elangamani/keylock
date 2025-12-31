@@ -198,7 +198,7 @@
 }
 
 .managermom-schedule-btn:hover {
-  opacity: 0.9;
+  color: #fff;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(151, 36, 126, 0.3);
 }

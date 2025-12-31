@@ -303,7 +303,6 @@
   left: 0;
   right: 0;
   background: #ffffff;
-  border: 1px solid #27235c;
   border-top: none;
   border-radius: 0 0 8px 8px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
@@ -330,8 +329,8 @@
 }
 
 .msm-dd-item--selected {
-  background: #27235c;
-  color: #ffffff;
+  background: #efefef;
+  color: #000;
   font-weight: 600;
 }
 

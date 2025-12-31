@@ -346,7 +346,6 @@
   left: 0;
   right: 0;
   background: #ffffff;
-  border: 1px solid #27235c;
   border-top: none;
   border-radius: 0 0 6px 6px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
@@ -864,7 +863,7 @@
 }
 
 .prj-custom-filter-select.open {
-  border-color: #27235c;
+
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
@@ -897,7 +896,7 @@
   left: 0;
   right: 0;
   background: #ffffff;
-  border: 1px solid #27235c;
+
   border-top: none;
   border-radius: 0 0 6px 6px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
@@ -948,8 +947,8 @@
 }
 
 .prj-custom-filter-option.selected {
-  background: #27235c;
-  color: #ffffff;
+  background: #efefef;
+  color: #000;
   font-weight: 600;
 }
 

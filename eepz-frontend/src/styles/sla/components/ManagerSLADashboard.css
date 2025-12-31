@@ -468,9 +468,9 @@
 }
 
 .mgr-select-option.selected {
-  background-color: #27235c;
-  color: #ffffff;
-  font-weight: 700;
+  background-color: #efefef;
+  color: #000;
+  font-weight:600;
 }
 
 .mgr-select-option:not(.selected):hover {

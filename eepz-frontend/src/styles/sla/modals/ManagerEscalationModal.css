@@ -367,12 +367,15 @@
 }
 
 .mgr-select-option:hover {
-  background-color: #f3f4ff;
+  background-color: #25235c !important;
+  color: #fff !important;
 }
 
 .mgr-select-option--selected {
-  font-weight: 500;
-  background-color: #eef2ff;
+   background-color: #efefef !important;
+  color: #000 !important;
+  font-weight: 500 !important;
+ 
 }
 
 /* textarea */

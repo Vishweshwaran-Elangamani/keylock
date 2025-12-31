@@ -219,7 +219,7 @@
 
 .esc-dropdown-control:focus,
 .esc-dropdown-control.open {
-  border: none;
+  border: 1px solid #27235c;
   outline: none;
   box-shadow: none;
 }
@@ -270,10 +270,16 @@
   border-bottom: none;
 }
 
-.esc-dropdown-option:hover,
-.esc-dropdown-option.selected {
+.esc-dropdown-option:hover{
   background-color: #27235c;
   color: #ffffff;
+}
+
+.esc-dropdown-option.selected{
+  background-color: #efefef;
+  color: #000;
+  font-weight: 600;
+
 }
 
 
