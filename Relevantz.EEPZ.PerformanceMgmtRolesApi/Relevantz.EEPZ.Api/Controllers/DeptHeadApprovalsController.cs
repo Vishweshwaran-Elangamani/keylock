@@ -283,6 +283,26 @@ namespace PerformanceManagement.Controllers
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
+
+        [HttpGet("approved-employees/{approvalId}/details")]
+        public async Task<IActionResult> GetApprovedEmployeeDetails(int approvalId)
+        {
+            try
+            {
+                var result = await _deptHeadService.GetApprovedEmployeeDetailsAsync(approvalId);
+
+                if (result.Success)
+                    return Ok(new { success = true, data = result.Data });
+
+                return NotFound(new { success = false, message = string.Join(", ", result.Errors) });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error in GetApprovedEmployeeDetails: {ex.Message}");
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
+
     }
 }
 

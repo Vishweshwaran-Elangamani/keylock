@@ -200,7 +200,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             try
             {
                 var today = DateTime.UtcNow.Date;
-                var reminderDays = 1;
+                var reminderDays = 0;
                 var reminderDate = today.AddDays(reminderDays);
                 var targetMonth = reminderDate.Month;
                 var currentYear = today.Year;
@@ -629,7 +629,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private async Task<HashSet<int>> GetEligibleUserIdsForSelfFormAsync()
         {
             var today = DateTime.UtcNow.Date;
-            var reminderDays = 1;
+            var reminderDays = 0;
             var reminderDate = today.AddDays(reminderDays);
             var targetMonth = reminderDate.Month;
 

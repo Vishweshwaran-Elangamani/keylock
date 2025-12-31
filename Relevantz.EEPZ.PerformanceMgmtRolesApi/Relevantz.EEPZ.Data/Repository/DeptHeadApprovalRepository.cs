@@ -308,5 +308,12 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         {
             return await _context.Userauthentications.FirstOrDefaultAsync(u => u.UserId == userId);
         }
+        public async Task<Departmentheadapproval> GetApprovalByIdAsync(int approvalId)
+{
+    return await _context.Departmentheadapprovals
+        .AsNoTracking()
+        .FirstOrDefaultAsync(a => a.ApprovalId == approvalId);
+}
+
     }
 }

@@ -38,5 +38,7 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         Task<List<object>> GetAssessmentAttachmentsAsync(int assessmentId);
         Task<Selfassessmentattachment> GetAttachmentByIdAsync(int attachmentId);
         Task<Userauthentication> GetUserAuthByUserIdAsync(int userId);
+        Task<Departmentheadapproval> GetApprovalByIdAsync(int approvalId);
+
     }
 }

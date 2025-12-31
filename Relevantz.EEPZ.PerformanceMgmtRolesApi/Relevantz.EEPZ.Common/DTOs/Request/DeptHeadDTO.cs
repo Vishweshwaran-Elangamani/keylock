@@ -9,6 +9,7 @@ public class DeptHeadPerformanceDTO
     public string EmployeeName { get; set; }
 
     public string ProjectName { get; set; }
+    public int AssessmentId { get; set; } 
 
     public List<CompetencyRatingDTO> Competencies { get; set; }
 

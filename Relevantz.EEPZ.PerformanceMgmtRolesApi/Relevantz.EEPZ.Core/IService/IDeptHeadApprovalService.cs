@@ -17,5 +17,7 @@ namespace Relevantz.EEPZ.Core.Services.Interfaces
         Task<ApiResponse<List<object>>> GetDeptHeadAssessmentAttachmentsAsync(int assessmentId);
         Task<(bool success, byte[] fileBytes, string contentType, string fileName, List<string> errors)> DownloadDeptHeadAttachmentAsync(int attachmentId);
         Task<int?> GetEmployeeIdFromUserIdAsync(int userId);
+        Task<ApiResponse<DeptHeadPerformanceDTO>> GetApprovedEmployeeDetailsAsync(int approvalId);
+
     }
 }
