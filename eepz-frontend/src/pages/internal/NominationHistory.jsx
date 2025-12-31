@@ -239,7 +239,7 @@ const NominationHistory = () => {
         items={[
           {
             label: "Nominations",
-            path: "/employee/nominations",
+            path: "/internal/nominations",
           },
           {
             label: "History",

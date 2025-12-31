@@ -1,0 +1,150 @@
+/* Breadcrumb - OneDrive Style */
+
+.breadcrumb-nav {
+  margin-bottom: 1rem;
+}
+
+.breadcrumb-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0;
+  flex-wrap: wrap;
+}
+
+/* Home Button - OneDrive Style */
+.breadcrumb-home-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: #97247e;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.breadcrumb-home-btn:hover {
+  background: rgba(151, 36, 126, 0.08);
+}
+
+.breadcrumb-home-btn:active {
+  transform: scale(0.95);
+}
+
+/* Separator - Forward Slash */
+.breadcrumb-separator {
+  color: #6c757d;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+/* Segment Container */
+.breadcrumb-segment {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Clickable Links - Purple OneDrive Style */
+.breadcrumb-link-btn {
+  padding: 0.25rem 0.5rem;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #97247e;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.breadcrumb-link-btn:hover {
+  background: rgba(151, 36, 126, 0.08);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.breadcrumb-link-btn:active {
+  transform: scale(0.97);
+}
+
+/* Current Item - Black/Dark */
+.breadcrumb-current {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #212529;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .breadcrumb-content {
+    gap: 0.4rem;
+  }
+
+  .breadcrumb-segment {
+    gap: 0.4rem;
+  }
+
+  .breadcrumb-link-btn,
+  .breadcrumb-current {
+    font-size: 0.875rem;
+    padding: 0.2rem 0.4rem;
+  }
+
+  .breadcrumb-separator {
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .breadcrumb-nav {
+    margin-bottom: 0.75rem;
+  }
+
+  .breadcrumb-content {
+    gap: 0.35rem;
+  }
+
+  .breadcrumb-segment {
+    gap: 0.35rem;
+  }
+
+  .breadcrumb-home-btn {
+    padding: 0.2rem;
+  }
+
+  .breadcrumb-link-btn,
+  .breadcrumb-current {
+    font-size: 0.8125rem;
+    padding: 0.15rem 0.35rem;
+  }
+
+  .breadcrumb-separator {
+    font-size: 0.8125rem;
+  }
+
+  .breadcrumb-home-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.breadcrumb-text {
+  padding: 0.2rem 0.35rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #6c757d;
+  white-space: nowrap;
+  line-height: 1.4;
+}
