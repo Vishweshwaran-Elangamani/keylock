@@ -1,8 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import "../../../../styles/performancemanagement/hr/ViewFormDetailsModal.css";
- 
+import "../../../../styles/performancemanagement/components/ViewFormDetailsModal.css";
  
 function ViewFormDetailsModal({ formDetails, onClose }) {
   const navigate = useNavigate();
@@ -11,113 +10,113 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
  
   return (
     <>
-      <div className="vfdm-backdrop" onClick={onClose} />
+      <div className="view-form-backdrop" onClick={onClose} />
      
-      <div className="vfdm-container" onClick={e => e.stopPropagation()}>
-        {/* Header */}
-        <div className="vfdm-header">
-          <div className="vfdm-title">
+      <div className="view-form-container" onClick={e => e.stopPropagation()}>
+        {/* HEADER */}
+        <div className="view-form-header">
+          <div className="header-title">
             <i className="bi bi-file-earmark-text-fill"></i>
             Form Details
           </div>
           <button
-            className="vfdm-close-btn"
+            className="header-close"
             onClick={onClose}
-            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'}
-            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+            onMouseEnter={e => e.currentTarget.classList.add('hover')}
+            onMouseLeave={e => e.currentTarget.classList.remove('hover')}
           >
             ×
           </button>
         </div>
  
-        <div className="vfdm-body">
+        <div className="view-form-body">
           {/* Basic Info */}
-          <div className="vfdm-basic-section">
-            <h4 className="vfdm-section-title">
+          <div className="basic-section">
+            <h4 className="section-title">
               <i className="bi bi-info-circle-fill"></i>
               Basic Information
             </h4>
-            <div className="vfdm-grid">
-              <div className="vfdm-info-card">
-                <div className="vfdm-icon-box">
+            <div className="info-grid">
+              <div className="info-item">
+                <div className="item-icon">
                   <i className="bi bi-file-text"></i>
                 </div>
-                <div className="vfdm-content">
-                  <span className="vfdm-label">Form Name</span>
-                  <span className="vfdm-value">{formDetails.name}</span>
+                <div className="item-content">
+                  <span className="item-label">Form Name</span>
+                  <span className="item-value">{formDetails.name}</span>
                 </div>
               </div>
  
-              <div className="vfdm-info-card">
-                <div className="vfdm-icon-box">
+              <div className="info-item">
+                <div className="item-icon">
                   <i className="bi bi-tag-fill"></i>
                 </div>
-                <div className="vfdm-content">
-                  <span className="vfdm-label">Type</span>
-                  <span className="vfdm-type-badge">{formDetails.type}</span>
+                <div className="item-content">
+                  <span className="item-label">Type</span>
+                  <span className="type-tag">{formDetails.type}</span>
                 </div>
               </div>
  
-              <div className="vfdm-info-card">
-                <div className="vfdm-icon-box">
+              <div className="info-item">
+                <div className="item-icon">
                   <i className="bi bi-briefcase-fill"></i>
                 </div>
-                <div className="vfdm-content">
-                  <span className="vfdm-label">Category</span>
-                  <span className="vfdm-value">{formDetails.deliveryEnablement || "N/A"}</span>
+                <div className="item-content">
+                  <span className="item-label">Category</span>
+                  <span className="item-value">{formDetails.deliveryEnablement || "N/A"}</span>
                 </div>
               </div>
  
-              <div className="vfdm-info-card">
-                <div className="vfdm-icon-box">
+              <div className="info-item total-item">
+                <div className="item-icon">
                   <i className="bi bi-list-check"></i>
                 </div>
-                <div className="vfdm-content">
-                  <span className="vfdm-label">Total Competencies</span>
-                  <span className="vfdm-total-count">{formDetails.competencies?.length || 0}</span>
+                <div className="item-content">
+                  <span className="item-label">Total Competencies</span>
+                  <span className="total-number">{formDetails.competencies?.length || 0}</span>
                 </div>
               </div>
             </div>
           </div>
  
-          {/* Competencies Table */}
-          {formDetails.competencies && formDetails.competencies.length > 0 && (
-            <div className="vfdm-table-section">
-              <h4 className="vfdm-section-title">
+          {/* Table Section */}
+          {formDetails.competencies?.length > 0 && (
+            <div className="table-section">
+              <h4 className="section-title">
                 <i className="bi bi-grid-3x3-gap-fill"></i>
                 Competencies Breakdown
               </h4>
-              <div className="vfdm-table-container">
-                <table className="vfdm-table">
+              <div className="table-wrapper">
+                <table className="competencies-table">
                   <thead>
-                    <tr className="vfdm-table-head">
-                      <th className="vfdm-table-th-sno">S.NO</th>
-                      <th className="vfdm-table-th-name">Competency Name</th>
-                      <th className="vfdm-table-th-desc">Description</th>
+                    <tr>
+                      <th className="col-sno">S.NO</th>
+                      <th className="col-name">Competency Name</th>
+                      <th className="col-desc">Description</th>
                     </tr>
                   </thead>
                   <tbody>
                     {formDetails.competencies.map((comp, index) => (
                       <tr
-                        key={index}
-                        className="vfdm-table-row"
-                        onMouseEnter={(e) => e.currentTarget.style.background = '#f9fafb'}
-                        onMouseLeave={(e) => e.currentTarget.style.background = '#ffffff'}
+                        className="table-row"
+                        key={comp.id || index}
+                        onMouseEnter={e => e.currentTarget.classList.add('hover')}
+                        onMouseLeave={e => e.currentTarget.classList.remove('hover')}
                       >
-                        <td className="vfdm-table-td vfdm-td-sno">
-                          <span className="vfdm-serial-number">
-                            {comp.displayOrder || index + 1}
+                        <td className="sno-td">
+                          <span className="sno-circle">
+                            {comp.displayOrder || (index + 1)}
                           </span>
                         </td>
-                        <td className="vfdm-table-td vfdm-td-name">
-                          <div className="vfdm-comp-container">
-                            <i className="bi bi-award-fill vfdm-comp-icon"></i>
-                            <strong className="vfdm-comp-name">{comp.name}</strong>
+                        <td className="name-td">
+                          <div className="name-wrapper">
+                            <i className="bi bi-award-fill"></i>
+                            <strong>{comp.name}</strong>
                           </div>
                         </td>
-                        <td className="vfdm-table-td vfdm-td-desc">
+                        <td className="desc-td">
                           {comp.description || (
-                            <span className="vfdm-no-desc">
+                            <span className="no-desc">
                               <i className="bi bi-dash-circle"></i>
                               No description provided
                             </span>
@@ -132,31 +131,31 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
           )}
  
           {(!formDetails.competencies || formDetails.competencies.length === 0) && (
-            <div className="vfdm-empty-state">
-              <i className="bi bi-inbox vfdm-empty-icon"></i>
-              <p className="vfdm-empty-text">No competencies defined for this form</p>
+            <div className="no-data">
+              <i className="bi bi-inbox"></i>
+              <p>No competencies defined for this form</p>
             </div>
           )}
         </div>
  
         {/* Footer */}
-        <div className="vfdm-footer">
+        <div className="form-footer">
           <button
-            className="vfdm-btn vfdm-close-btn"
+            className="footer-button close-button"
             onClick={onClose}
-            onMouseEnter={(e) => e.currentTarget.style.background = '#5a6268'}
-            onMouseLeave={(e) => e.currentTarget.style.background = '#6c757d'}
+            onMouseEnter={e => e.currentTarget.classList.add('hover')}
+            onMouseLeave={e => e.currentTarget.classList.remove('hover')}
           >
             Close
           </button>
           <button
-            className="vfdm-btn vfdm-edit-btn"
+            className="footer-button edit-button"
             onClick={() => {
               onClose();
               navigate(`/hr/dashboard/performance/create/${formDetails.formId}`);
             }}
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+            onMouseEnter={e => e.currentTarget.classList.add('hover')}
+            onMouseLeave={e => e.currentTarget.classList.remove('hover')}
           >
             <i className="bi bi-pencil-square"></i>
             Edit Form
@@ -168,6 +167,5 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
 }
  
 export default ViewFormDetailsModal;
- 
  
  
