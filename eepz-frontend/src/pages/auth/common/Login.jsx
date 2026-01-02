@@ -3,9 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts/auth/AuthContext";
 import authService from "../../../services/auth/authService";
 import { toast } from "sonner";
-import logodarkfullsanta from "../../../assets/logodarkfullsanta.png";
+import logodarkfullnewyear from "../../../assets/logodarkfullnewyear.png";
 import logodarkfull from "../../../assets/logodarkfull.png";
-import Snowfall from "react-snowfall";
 import "../../../styles/auth/Auth.css";
 
 const Login = () => {
@@ -324,16 +323,13 @@ const Login = () => {
 
   return (
     <div className="eepz-login-page">
-      <Snowfall
-        color="rgba(69, 94, 110, 1)"
-      />
       <div className="container-fluid h-100 g-0">
         <div className="row g-0 h-100">
           <div className="col-lg-6 d-flex align-items-center justify-content-center bg-white p-4">
             <div className="eepz-login-form-container">
               <div className="text-center mb-4">
                 <img
-                  src={logodarkfullsanta}
+                  src={logodarkfullnewyear}
                   alt="EEPZ Logo"
                   className="eepz-logo-img"
                   style={{
