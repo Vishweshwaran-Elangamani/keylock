@@ -43,7 +43,7 @@ const Pagination = ({
     if (totalPages <= maxVisiblePages) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
-      }
+      } 
     } else {
       if (currentPage <= 3) {
         for (let i = 1; i <= 4; i++) pages.push(i);
@@ -104,7 +104,7 @@ const Pagination = ({
                 </div>
               ))}
             </div>
-          )}
+          )} 
         </div>
         <span className={`pagination-label ${styles.label}`}>entries</span>
       </div>

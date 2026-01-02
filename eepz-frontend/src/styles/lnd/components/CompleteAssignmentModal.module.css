@@ -39,7 +39,16 @@
   animation: slideUp 0.3s ease-out;
   display: flex;
   flex-direction: column;
+  overflow: hidden; /* Add this to prevent unwanted scrolling on modal itself */
 }
+
+.body {
+  padding: 1.5rem;
+  overflow-y: auto; /* Enable vertical scrolling */
+  flex: 1; /* Allow body to grow and shrink */
+  min-height: 0; /* Important for flexbox scrolling to work */
+}
+
  
 .modal::-webkit-scrollbar {
   display: none;
@@ -80,11 +89,7 @@
 .btnClose:hover {
   color: red;
 }
- 
-.body {
-  padding: 1.5rem;
-}
- 
+
 .assignmentInfo {
   padding: 1rem;
   background: #f8f9fa;

@@ -17,7 +17,7 @@ const GoalApprovalsPage = () => {
     "Department Head": "/department-head",
     Leadership: "/leadership",
     Employee: "/employee",
-  }[role] || "/employee");
+  }[role] || "/employee");   
 
   const rolePrefix = getRolePrefix(user.role);
   const [loading, setLoading] = useState(true);

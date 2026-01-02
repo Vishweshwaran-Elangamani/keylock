@@ -259,7 +259,7 @@ const PendingApprovals = () => {
           { label: "LnD Dashboard", path: `${rolePrefix}/lnd/dashboard` },
           { label: "Pending Approval" },
         ]}
-      />
+      /> 
 
       {/* Search and Filter */}
       <div className={styles.filterContainer}>
