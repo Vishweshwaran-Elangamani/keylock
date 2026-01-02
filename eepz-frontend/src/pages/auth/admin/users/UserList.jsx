@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import userService from "../../../../services/auth/userService";
 import roleService from "../../../../services/auth/roleService";
 import departmentService from "../../../../services/auth/departmentService";
@@ -11,7 +11,6 @@ import { toast } from "sonner";
 import { FaSearch } from "react-icons/fa";
 import { Form } from "react-bootstrap";
 import "../../../../styles/auth/user/UserList.css";
-
 
 const RoleDropdown = ({ value, onChange, roles }) => {
   const [open, setOpen] = useState(false);
@@ -62,7 +61,6 @@ const RoleDropdown = ({ value, onChange, roles }) => {
   );
 };
 
-
 const StatusDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
 
@@ -111,7 +109,6 @@ const StatusDropdown = ({ value, onChange }) => {
   );
 };
 
-
 const UserList = () => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
@@ -126,6 +123,8 @@ const UserList = () => {
 
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showRowsDropdown, setShowRowsDropdown] = useState(false);
+  const rowsDropdownRef = useRef(null);
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -133,16 +132,30 @@ const UserList = () => {
   const [showBulkOperations, setShowBulkOperations] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
-
   useEffect(() => {
     fetchData();
   }, []);
-
 
   useEffect(() => {
     filterUsers();
   }, [users, activeSearchTerm, selectedRole, selectedStatus]);
 
+  // Click outside handler for rows dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        rowsDropdownRef.current &&
+        !rowsDropdownRef.current.contains(event.target)
+      ) {
+        setShowRowsDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -168,11 +181,9 @@ const UserList = () => {
     }
   };
 
-
   const getNonAdminUsers = () => {
     return users.filter((user) => user.roleName !== "Admin");
   };
-
 
   const filterUsers = () => {
     let filtered = getNonAdminUsers();
@@ -203,11 +214,9 @@ const UserList = () => {
     setCurrentPage(1);
   };
 
-
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
   };
-
 
   const clearFilters = () => {
     setSearchTerm("");
@@ -215,7 +224,6 @@ const UserList = () => {
     setSelectedRole("");
     setSelectedStatus("");
   };
-
 
   const handleAddUser = () => setShowAddModal(true);
   const handleEditUser = (user) => {
@@ -239,11 +247,9 @@ const UserList = () => {
     fetchData();
   };
 
-
   const handleBulkOperationsSuccess = () => {
     fetchData();
   };
-
 
   const getPaginatedUsers = () => {
     const startIndex = (currentPage - 1) * rowsPerPage;
@@ -251,9 +257,7 @@ const UserList = () => {
     return filteredUsers.slice(startIndex, endIndex);
   };
 
-
   const totalPages = Math.ceil(filteredUsers.length / rowsPerPage) || 1;
-
 
   const getPageNumbers = () => {
     const pages = [];
@@ -282,13 +286,11 @@ const UserList = () => {
     return pages;
   };
 
-
   const getInitials = (firstName, lastName) => {
     const first = firstName?.charAt(0)?.toUpperCase() || "";
     const last = lastName?.charAt(0)?.toUpperCase() || "";
     return `${first}${last}`;
   };
-
 
   if (loading) {
     return (
@@ -299,7 +301,6 @@ const UserList = () => {
       </div>
     );
   }
-
 
   return (
     <div className="ul-page">
@@ -433,13 +434,7 @@ const UserList = () => {
         </div>
       </div>
 
-      
-
-      <div
-        className={`ul-table-card ${
-          totalPages > 1 ? "ul-table-with-pagination" : ""
-        }`}
-      >
+      <div className="ul-table-card">
         <div className="ul-table-wrapper">
           <table className="ul-table">
             <thead>
@@ -536,86 +531,107 @@ const UserList = () => {
             </tbody>
           </table>
         </div>
+
         {filteredUsers.length > 0 && totalPages > 1 && (
-    <div className="ul-pagination">
-      <div className="ul-pagination-info">
-        <span>Show</span>
-        <select
-          value={rowsPerPage}
-          onChange={(e) => {
-            setRowsPerPage(Number(e.target.value));
-            setCurrentPage(1);
-          }}
-        >
-          <option value={5}>5</option>
-          <option value={10}>10</option>
-          <option value={25}>25</option>
-          <option value={50}>50</option>
-        </select>
-        <span>entries</span>
-      </div>
+          <div className="ul-pagination">
+            <div className="ul-pagination-info">
+              <span>Show</span>
+              <div ref={rowsDropdownRef} className="ul-rows-dropdown-wrapper">
+                <button
+                  type="button"
+                  onClick={() => setShowRowsDropdown(!showRowsDropdown)}
+                  className="ul-rows-button"
+                >
+                  <span>{rowsPerPage}</span>
+                  <i
+                    className={`bi bi-chevron-${showRowsDropdown ? "up" : "down"} ul-rows-chevron`}
+                  ></i>
+                </button>
 
-      <div className="ul-pagination-status">
-        Showing {(currentPage - 1) * rowsPerPage + 1} to{" "}
-        {Math.min(currentPage * rowsPerPage, filteredUsers.length)} of{" "}
-        {filteredUsers.length} entries
-      </div>
+                {showRowsDropdown && (
+                  <div className="ul-rows-dropdown">
+                    {[5, 10, 25, 50].map((size) => (
+                      <div
+                        key={size}
+                        onClick={() => {
+                          setRowsPerPage(size);
+                          setCurrentPage(1);
+                          setShowRowsDropdown(false);
+                        }}
+                        className={`ul-rows-option ${
+                          rowsPerPage === size ? "ul-rows-active" : ""
+                        }`}
+                      >
+                        {size}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <span>entries</span>
+            </div>
 
-      <nav className="ul-pagination-nav">
-        <ul className="ul-pagination-list">
-          <li
-            className={`ul-page-item ${
-              currentPage === 1 ? "disabled" : ""
-            }`}
-          >
-            <button
-              onClick={() =>
-                setCurrentPage((prev) => Math.max(prev - 1, 1))
-              }
-              disabled={currentPage === 1}
-            >
-              <i className="bi bi-chevron-left"></i>
-            </button>
-          </li>
+            <div className="ul-pagination-status">
+              Showing {(currentPage - 1) * rowsPerPage + 1} to{" "}
+              {Math.min(currentPage * rowsPerPage, filteredUsers.length)} of{" "}
+              {filteredUsers.length} entries
+            </div>
 
-          {getPageNumbers().map((page, index) => (
-            <li
-              key={index}
-              className={`ul-page-item ${
-                page === currentPage ? "active" : ""
-              } ${typeof page !== "number" ? "disabled" : ""}`}
-            >
-              <button
-                onClick={() =>
-                  typeof page === "number" && setCurrentPage(page)
-                }
-                disabled={typeof page !== "number"}
-              >
-                {page}
-              </button>
-            </li>
-          ))}
+            <nav className="ul-pagination-nav">
+              <ul className="ul-pagination-list">
+                <li
+                  className={`ul-page-item ${
+                    currentPage === 1 ? "disabled" : ""
+                  }`}
+                >
+                  <button
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
+                    disabled={currentPage === 1}
+                  >
+                    <i className="bi bi-chevron-left"></i>
+                  </button>
+                </li>
 
-          <li
-            className={`ul-page-item ${
-              currentPage === totalPages ? "disabled" : ""
-            }`}
-          >
-            <button
-              onClick={() =>
-                setCurrentPage((prev) =>
-                  Math.min(prev + 1, totalPages)
-                )
-              }
-              disabled={currentPage === totalPages}
-            >
-              <i className="bi bi-chevron-right"></i>
-            </button>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  )}
+                {getPageNumbers().map((page, index) => (
+                  <li
+                    key={index}
+                    className={`ul-page-item ${
+                      page === currentPage ? "active" : ""
+                    } ${typeof page !== "number" ? "disabled" : ""}`}
+                  >
+                    <button
+                      onClick={() =>
+                        typeof page === "number" && setCurrentPage(page)
+                      }
+                      disabled={typeof page !== "number"}
+                    >
+                      {page}
+                    </button>
+                  </li>
+                ))}
+
+                <li
+                  className={`ul-page-item ${
+                    currentPage === totalPages ? "disabled" : ""
+                  }`}
+                >
+                  <button
+                    onClick={() =>
+                      setCurrentPage((prev) =>
+                        Math.min(prev + 1, totalPages)
+                      )
+                    }
+                    disabled={currentPage === totalPages}
+                  >
+                    <i className="bi bi-chevron-right"></i>
+                  </button>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        )}
       </div>
 
       {showAddModal && (
@@ -655,6 +671,5 @@ const UserList = () => {
     </div>
   );
 };
-
 
 export default UserList;

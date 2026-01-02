@@ -5,8 +5,6 @@ import Breadcrumb from "../../../components/common/Breadcrumb";
 import { toast } from "sonner";
 import "../../../styles/hr_operations/employee/EmployeePolicy.css";
 
-
-
 const CategoryDropdown = ({ value, onChange, categories }) => {
   const [open, setOpen] = useState(false);
 
@@ -50,7 +48,6 @@ const CategoryDropdown = ({ value, onChange, categories }) => {
     </div>
   );
 };
-
 
 /* Custom Date Filter Dropdown Component */
 const DateFilterDropdown = ({ value, onChange, dateFilters }) => {
@@ -98,7 +95,6 @@ const DateFilterDropdown = ({ value, onChange, dateFilters }) => {
   );
 };
 
-
 const EmployeePolicyView = () => {
   const [policies, setPolicies] = useState([]);
   const [filteredPolicies, setFilteredPolicies] = useState([]);
@@ -110,7 +106,9 @@ const EmployeePolicyView = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showRowsDropdown, setShowRowsDropdown] = useState(false);
   const searchInputRef = useRef(null);
+  const rowsDropdownRef = useRef(null);
 
   const categories = [
     "All",
@@ -145,6 +143,23 @@ const EmployeePolicyView = () => {
     applyFilters();
     // eslint-disable-next-line
   }, [policies, selectedCategory, selectedDateFilter]);
+
+  // Click outside handler for rows dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        rowsDropdownRef.current &&
+        !rowsDropdownRef.current.contains(event.target)
+      ) {
+        setShowRowsDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const fetchPublishedPolicies = async () => {
     try {
@@ -491,19 +506,38 @@ const EmployeePolicyView = () => {
             <div className="pagination-container-epd">
               <div className="pagination-info-epd">
                 <span className="pagination-label-epd">Show</span>
-                <select
-                  className="pagination-select-epd"
-                  value={itemsPerPage}
-                  onChange={(e) => {
-                    setItemsPerPage(Number(e.target.value));
-                    setCurrentPage(1);
-                  }}
-                >
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="25">25</option>
-                  <option value="50">50</option>
-                </select>
+                <div ref={rowsDropdownRef} className="rows-dropdown-wrapper-epd">
+                  <button
+                    type="button"
+                    onClick={() => setShowRowsDropdown(!showRowsDropdown)}
+                    className="rows-button-epd"
+                  >
+                    <span>{itemsPerPage}</span>
+                    <i
+                      className={`bi bi-chevron-${showRowsDropdown ? "up" : "down"} rows-chevron-epd`}
+                    ></i>
+                  </button>
+
+                  {showRowsDropdown && (
+                    <div className="rows-dropdown-epd">
+                      {[5, 10, 25, 50].map((size) => (
+                        <div
+                          key={size}
+                          onClick={() => {
+                            setItemsPerPage(size);
+                            setCurrentPage(1);
+                            setShowRowsDropdown(false);
+                          }}
+                          className={`rows-option-epd ${
+                            itemsPerPage === size ? "rows-active-epd" : ""
+                          }`}
+                        >
+                          {size}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <span className="pagination-label-epd">entries</span>
               </div>
 

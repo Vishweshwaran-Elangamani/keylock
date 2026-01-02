@@ -14,7 +14,6 @@ import { FaSearch } from "react-icons/fa";
 import { toast } from "sonner";
 import "../../styles/internal/NominationManagement.css";
 
-
 const NominationStatusDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
 
@@ -80,6 +79,8 @@ const NominationManagement = () => {
   const [selectedStatus, setSelectedStatus] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showRowsDropdown, setShowRowsDropdown] = useState(false);
+  const rowsDropdownRef = useRef(null);
   const [showSelfNominateModal, setShowSelfNominateModal] = useState(false);
   const [showManagerNominateModal, setShowManagerNominateModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -100,6 +101,23 @@ const NominationManagement = () => {
   useEffect(() => {
     applyFilters();
   }, [nominations, selectedStatus, activeSearchTerm]);
+
+  // Click outside handler for rows dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        rowsDropdownRef.current &&
+        !rowsDropdownRef.current.contains(event.target)
+      ) {
+        setShowRowsDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
@@ -524,18 +542,38 @@ const NominationManagement = () => {
           <div className="nm-pagination-container">
             <div className="nm-pagination-info">
               <span className="nm-pagination-label">Show</span>
-              <select
-                className="nm-pagination-select"
-                value={rowsPerPage}
-                onChange={(e) => {
-                  setRowsPerPage(Number(e.target.value));
-                  setCurrentPage(1);
-                }}
-              >
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-              </select>
+              <div ref={rowsDropdownRef} className="nm-rows-dropdown-wrapper">
+                <button
+                  type="button"
+                  onClick={() => setShowRowsDropdown(!showRowsDropdown)}
+                  className="nm-rows-button"
+                >
+                  <span>{rowsPerPage}</span>
+                  <i
+                    className={`bi bi-chevron-${showRowsDropdown ? "up" : "down"} nm-rows-chevron`}
+                  ></i>
+                </button>
+
+                {showRowsDropdown && (
+                  <div className="nm-rows-dropdown">
+                    {[10, 25, 50].map((size) => (
+                      <div
+                        key={size}
+                        onClick={() => {
+                          setRowsPerPage(size);
+                          setCurrentPage(1);
+                          setShowRowsDropdown(false);
+                        }}
+                        className={`nm-rows-option ${
+                          rowsPerPage === size ? "nm-rows-active" : ""
+                        }`}
+                      >
+                        {size}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
               <span className="nm-pagination-label">entries</span>
             </div>
 

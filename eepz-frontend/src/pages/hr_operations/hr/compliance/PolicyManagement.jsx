@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { Form, Alert } from "react-bootstrap";
 import { FaSearch } from "react-icons/fa";
@@ -132,6 +132,8 @@ const PolicyManagement = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [showRowsDropdown, setShowRowsDropdown] = useState(false);
+  const rowsDropdownRef = useRef(null);
 
   const enqueueToast = (variant, message) => {
     switch (variant) {
@@ -160,6 +162,23 @@ const PolicyManagement = () => {
   useEffect(() => {
     applyFilters();
   }, [policies, categoryFilter, statusFilter, activeSearchTerm]);
+
+  // Click outside handler for rows dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        rowsDropdownRef.current &&
+        !rowsDropdownRef.current.contains(event.target)
+      ) {
+        setShowRowsDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const showAlert = (type, message) => {
     setAlert({ type, message });
@@ -462,47 +481,7 @@ const PolicyManagement = () => {
         </button>
       </div>
 
-      {totalPages > 1 && (
-        <div className="pma-pagination-wrapper">
-          <nav className="pma-pagination">
-            <ul className="pma-pagination-list">
-              <li className={`pma-page-item ${currentPage === 1 ? "disabled" : ""}`}>
-                <button
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-                >
-                  <i className="bi bi-chevron-left"></i>
-                </button>
-              </li>
-              {getPageNumbers().map((page, index) => (
-                <li
-                  key={index}
-                  className={`pma-page-item ${
-                    page === currentPage ? "active" : ""
-                  } ${typeof page !== "number" ? "disabled" : ""}`}
-                >
-                  <button
-                    onClick={() => typeof page === "number" && setCurrentPage(page)}
-                    disabled={typeof page !== "number"}
-                  >
-                    {page}
-                  </button>
-                </li>
-              ))}
-              <li className={`pma-page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                <button
-                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
-                >
-                  <i className="bi bi-chevron-right"></i>
-                </button>
-              </li>
-            </ul>
-          </nav>
-        </div>
-      )}
-
-      <div className={`pma-table-card ${totalPages > 1 ? "pma-table-with-pagination" : ""}`}>
+      <div className="pma-table-card">
         <div className="pma-table-wrapper">
           <table className="pma-table">
             <thead>
@@ -584,6 +563,87 @@ const PolicyManagement = () => {
             </tbody>
           </table>
         </div>
+
+        {totalPages > 1 && filteredPolicies.length > 0 && (
+          <div className="pma-pagination">
+            <div className="pma-pagination-info">
+              <span>Show</span>
+              <div ref={rowsDropdownRef} className="pma-rows-dropdown-wrapper">
+                <button
+                  type="button"
+                  onClick={() => setShowRowsDropdown(!showRowsDropdown)}
+                  className="pma-rows-button"
+                >
+                  <span>{itemsPerPage}</span>
+                  <i
+                    className={`bi bi-chevron-${showRowsDropdown ? "up" : "down"} pma-rows-chevron`}
+                  ></i>
+                </button>
+
+                {showRowsDropdown && (
+                  <div className="pma-rows-dropdown">
+                    {[5, 10, 25, 50].map((size) => (
+                      <div
+                        key={size}
+                        onClick={() => {
+                          setItemsPerPage(size);
+                          setCurrentPage(1);
+                          setShowRowsDropdown(false);
+                        }}
+                        className={`pma-rows-option ${
+                          itemsPerPage === size ? "pma-rows-active" : ""
+                        }`}
+                      >
+                        {size}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <span>entries</span>
+            </div>
+
+            <div className="pma-pagination-status">
+              Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredPolicies.length)} of {filteredPolicies.length} entries
+            </div>
+
+            <nav className="pma-pagination-nav">
+              <ul className="pma-pagination-list">
+                <li className={`pma-page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                  >
+                    <i className="bi bi-chevron-left"></i>
+                  </button>
+                </li>
+                {getPageNumbers().map((page, index) => (
+                  <li
+                    key={index}
+                    className={`pma-page-item ${
+                      page === currentPage ? "active" : ""
+                    } ${typeof page !== "number" ? "disabled" : ""}`}
+                  >
+                    <button
+                      onClick={() => typeof page === "number" && setCurrentPage(page)}
+                      disabled={typeof page !== "number"}
+                    >
+                      {page}
+                    </button>
+                  </li>
+                ))}
+                <li className={`pma-page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                  >
+                    <i className="bi bi-chevron-right"></i>
+                  </button>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        )}
       </div>
 
       {showAddModal && (

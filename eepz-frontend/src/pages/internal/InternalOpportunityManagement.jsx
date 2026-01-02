@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useAuth } from "../../contexts/auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import internalOpportunityService from "../../services/internal/internalOpportunityService";
@@ -14,7 +14,6 @@ import { toast } from "sonner";
 import { FaSearch } from "react-icons/fa";
 import { Form } from "react-bootstrap";
 import "../../styles/internal/InternalOpportunityManagement.css";
-
 
 const StatusDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
@@ -85,6 +84,8 @@ const InternalOpportunityManagement = () => {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [showItemsDropdown, setShowItemsDropdown] = useState(false);
+  const itemsDropdownRef = useRef(null);
 
   // Modal states
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -118,6 +119,23 @@ const InternalOpportunityManagement = () => {
   useEffect(() => {
     filterOpportunities();
   }, [opportunities, selectedDepartment, selectedStatus, activeSearchTerm]);
+
+  // Click outside handler for items dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        itemsDropdownRef.current &&
+        !itemsDropdownRef.current.contains(event.target)
+      ) {
+        setShowItemsDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -571,18 +589,38 @@ const InternalOpportunityManagement = () => {
           <div className="ioma-pagination-container">
             <div className="ioma-pagination-info">
               <span className="ioma-pagination-label">Show</span>
-              <select
-                className="ioma-pagination-select"
-                value={itemsPerPage}
-                onChange={(e) => {
-                  setItemsPerPage(Number(e.target.value));
-                  setCurrentPage(1);
-                }}
-              >
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-              </select>
+              <div ref={itemsDropdownRef} className="ioma-items-dropdown-wrapper">
+                <button
+                  type="button"
+                  onClick={() => setShowItemsDropdown(!showItemsDropdown)}
+                  className="ioma-items-button"
+                >
+                  <span>{itemsPerPage}</span>
+                  <i
+                    className={`bi bi-chevron-${showItemsDropdown ? "up" : "down"} ioma-items-chevron`}
+                  ></i>
+                </button>
+
+                {showItemsDropdown && (
+                  <div className="ioma-items-dropdown">
+                    {[10, 25, 50].map((size) => (
+                      <div
+                        key={size}
+                        onClick={() => {
+                          setItemsPerPage(size);
+                          setCurrentPage(1);
+                          setShowItemsDropdown(false);
+                        }}
+                        className={`ioma-items-option ${
+                          itemsPerPage === size ? "ioma-items-active" : ""
+                        }`}
+                      >
+                        {size}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
               <span className="ioma-pagination-label">entries</span>
             </div>
 

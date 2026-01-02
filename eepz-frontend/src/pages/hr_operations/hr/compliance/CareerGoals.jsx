@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import careerGoalsService from "../../../../services/hr_operations/hr/careerGoalsService";
 import {
   Spinner,
@@ -27,7 +27,6 @@ import ReminderEmailModal from "../../../../components/hr_operations/modals/Remi
 import BulkReminderModal from "../../../../components/hr_operations/modals/BulkReminderModal";
 import "../../../../styles/hr_operations/hr/CareerGoals.css";
 
-
 const COLORS = [
   "#97247E",
   "#8B5CF6",
@@ -36,7 +35,6 @@ const COLORS = [
   "#C026D3",
   "#9333EA",
 ];
-
 
 const DepartmentDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
@@ -89,7 +87,6 @@ const DepartmentDropdown = ({ value, onChange, options }) => {
   );
 };
 
-
 const DaysDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
 
@@ -140,7 +137,6 @@ const DaysDropdown = ({ value, onChange }) => {
   );
 };
 
-
 const CareerGoals = () => {
   const [withoutGoals, setWithoutGoals] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -168,9 +164,10 @@ const CareerGoals = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [showRowsDropdown, setShowRowsDropdown] = useState(false);
+  const rowsDropdownRef = useRef(null);
 
   const [showVisualization, setShowVisualization] = useState(false);
-
 
   useEffect(() => {
     fetchWithoutGoals();
@@ -178,17 +175,31 @@ const CareerGoals = () => {
     fetchGoalStats();
   }, []);
 
-
   useEffect(() => {
     applyFilters();
   }, [withoutGoals, departmentFilter, daysFilter, activeSearchTerm]);
-
 
   useEffect(() => {
     setSelectedEmployees([]);
     setSelectAll(false);
   }, [filteredData]);
 
+  // Click outside handler for rows dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        rowsDropdownRef.current &&
+        !rowsDropdownRef.current.contains(event.target)
+      ) {
+        setShowRowsDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const fetchWithoutGoals = () => {
     setLoadingWithoutGoals(true);
@@ -202,7 +213,6 @@ const CareerGoals = () => {
       .finally(() => setLoadingWithoutGoals(false));
   };
 
-
   const fetchAdoptionStats = () => {
     setLoadingAdoption(true);
     careerGoalsService
@@ -215,7 +225,6 @@ const CareerGoals = () => {
       .finally(() => setLoadingAdoption(false));
   };
 
-
   const fetchGoalStats = () => {
     setLoadingGoalStats(true);
     careerGoalsService
@@ -224,7 +233,6 @@ const CareerGoals = () => {
       .catch(() => setGoalStats(null))
       .finally(() => setLoadingGoalStats(false));
   };
-
 
   const fetchSuggestions = (userId) => {
     setLoadingSuggestions(true);
@@ -235,12 +243,10 @@ const CareerGoals = () => {
       .finally(() => setLoadingSuggestions(false));
   };
 
-
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
     setCurrentPage(1);
   };
-
 
   const applyFilters = () => {
     let filtered = [...withoutGoals];
@@ -281,7 +287,6 @@ const CareerGoals = () => {
     setCurrentPage(1);
   };
 
-
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
@@ -290,17 +295,14 @@ const CareerGoals = () => {
     setCurrentPage(1);
   };
 
-
   const uniqueDepartments = [
     ...new Set(withoutGoals.map((emp) => emp.departmentName).filter(Boolean)),
   ];
-
 
   const indexOfLastItem = currentPage * rowsPerPage;
   const indexOfFirstItem = indexOfLastItem - rowsPerPage;
   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredData.length / rowsPerPage) || 1;
-
 
   const getPageNumbers = () => {
     const pages = [];
@@ -329,7 +331,6 @@ const CareerGoals = () => {
     return pages;
   };
 
-
   const handleSelectAll = (e) => {
     if (e.target.checked) {
       const allIds = currentItems.map((emp) => emp.userId ?? emp.UserId);
@@ -341,7 +342,6 @@ const CareerGoals = () => {
     }
   };
 
-
   const handleSelectEmployee = (userId) => {
     if (selectedEmployees.includes(userId)) {
       setSelectedEmployees(selectedEmployees.filter((id) => id !== userId));
@@ -351,7 +351,6 @@ const CareerGoals = () => {
     }
   };
 
-
   const openBulkReminderModal = () => {
     if (selectedEmployees.length === 0) {
       toast("Please select at least one employee!");
@@ -359,7 +358,6 @@ const CareerGoals = () => {
     }
     setBulkReminderModal(true);
   };
-
 
   const sendBulkReminders = () => {
     setSendingBulkReminder(true);
@@ -383,13 +381,11 @@ const CareerGoals = () => {
       .finally(() => setSendingBulkReminder(false));
   };
 
-
   const openSendReminder = (user) => {
     setReminderTargetUser(user);
     setReminderResult(null);
     setReminderEmailModal(true);
   };
-
 
   const sendReminder = () => {
     setSendingReminder(true);
@@ -413,12 +409,10 @@ const CareerGoals = () => {
       .finally(() => setSendingReminder(false));
   };
 
-
   const handleCloseReminderModal = () => {
     setReminderEmailModal(false);
     setReminderResult(null);
   };
-
 
   const getDaysDistributionData = () => {
     const distribution = {
@@ -442,7 +436,6 @@ const CareerGoals = () => {
     }));
   };
 
-
   const getDepartmentData = () => {
     const deptCounts = {};
     filteredData.forEach((emp) => {
@@ -455,7 +448,6 @@ const CareerGoals = () => {
       .sort((a, b) => b.value - a.value);
   };
 
-
   if (loadingAdoption) {
     return (
       <div className="cg-loading-container">
@@ -465,7 +457,6 @@ const CareerGoals = () => {
       </div>
     );
   }
-
 
   return (
     <div className="cg-page">
@@ -798,18 +789,38 @@ const CareerGoals = () => {
           <div className="cg-pagination">
             <div className="cg-pagination-info">
               <span>Show</span>
-              <select
-                value={rowsPerPage}
-                onChange={(e) => {
-                  setRowsPerPage(Number(e.target.value));
-                  setCurrentPage(1);
-                }}
-              >
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-              </select>
+              <div ref={rowsDropdownRef} className="cg-rows-dropdown-wrapper">
+                <button
+                  type="button"
+                  onClick={() => setShowRowsDropdown(!showRowsDropdown)}
+                  className="cg-rows-button"
+                >
+                  <span>{rowsPerPage}</span>
+                  <i
+                    className={`bi bi-chevron-${showRowsDropdown ? "up" : "down"} cg-rows-chevron`}
+                  ></i>
+                </button>
+
+                {showRowsDropdown && (
+                  <div className="cg-rows-dropdown">
+                    {[5, 10, 25, 50].map((size) => (
+                      <div
+                        key={size}
+                        onClick={() => {
+                          setRowsPerPage(size);
+                          setCurrentPage(1);
+                          setShowRowsDropdown(false);
+                        }}
+                        className={`cg-rows-option ${
+                          rowsPerPage === size ? "cg-rows-active" : ""
+                        }`}
+                      >
+                        {size}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
               <span>entries</span>
             </div>
 
@@ -898,6 +909,5 @@ const CareerGoals = () => {
     </div>
   );
 };
-
 
 export default CareerGoals;

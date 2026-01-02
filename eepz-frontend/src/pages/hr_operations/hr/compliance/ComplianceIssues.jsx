@@ -1,11 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { Form } from "react-bootstrap";
 import { FaSearch } from "react-icons/fa";
 import violationService from "../../../../services/hr_operations/hr/violationService";
 import EscalationDetailModal from "../../../../components/hr_operations/modals/EscalationDetailModal";
 import "../../../../styles/hr_operations/hr/ComplianceIssues.css";
-
 
 const StatusDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
@@ -59,7 +58,6 @@ const StatusDropdown = ({ value, onChange }) => {
   );
 };
 
-
 const LevelDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
 
@@ -111,7 +109,6 @@ const LevelDropdown = ({ value, onChange }) => {
   );
 };
 
-
 const ComplianceIssues = () => {
   const [slaEscalations, setSlaEscalations] = useState([]);
   const [filteredEscalations, setFilteredEscalations] = useState([]);
@@ -127,6 +124,8 @@ const ComplianceIssues = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [showRowsDropdown, setShowRowsDropdown] = useState(false);
+  const rowsDropdownRef = useRef(null);
 
   useEffect(() => {
     fetchSlaEscalations();
@@ -135,6 +134,23 @@ const ComplianceIssues = () => {
   useEffect(() => {
     applyFilters();
   }, [slaEscalations, selectedStatus, selectedLevel, activeSearchTerm]);
+
+  // Click outside handler for rows dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        rowsDropdownRef.current &&
+        !rowsDropdownRef.current.contains(event.target)
+      ) {
+        setShowRowsDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const fetchSlaEscalations = async () => {
     try {
@@ -366,47 +382,7 @@ const ComplianceIssues = () => {
         </div>
       </div>
 
-      {totalPages > 1 && (
-        <div className="ci-pagination-wrapper">
-          <nav className="ci-pagination">
-            <ul className="ci-pagination-list">
-              <li className={`ci-page-item ${currentPage === 1 ? "disabled" : ""}`}>
-                <button
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-                >
-                  <i className="bi bi-chevron-left"></i>
-                </button>
-              </li>
-              {getPageNumbers().map((page, index) => (
-                <li
-                  key={index}
-                  className={`ci-page-item ${
-                    page === currentPage ? "active" : ""
-                  } ${typeof page !== "number" ? "disabled" : ""}`}
-                >
-                  <button
-                    onClick={() => typeof page === "number" && setCurrentPage(page)}
-                    disabled={typeof page !== "number"}
-                  >
-                    {page}
-                  </button>
-                </li>
-              ))}
-              <li className={`ci-page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                <button
-                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
-                >
-                  <i className="bi bi-chevron-right"></i>
-                </button>
-              </li>
-            </ul>
-          </nav>
-        </div>
-      )}
-
-      <div className={`ci-table-card ${totalPages > 1 ? "ci-table-with-pagination" : ""}`}>
+      <div className="ci-table-card">
         <div className="ci-table-wrapper">
           <table className="ci-table">
             <thead>
@@ -499,6 +475,87 @@ const ComplianceIssues = () => {
             </tbody>
           </table>
         </div>
+
+        {totalPages > 1 && filteredEscalations.length > 0 && (
+          <div className="ci-pagination">
+            <div className="ci-pagination-info">
+              <span>Show</span>
+              <div ref={rowsDropdownRef} className="ci-rows-dropdown-wrapper">
+                <button
+                  type="button"
+                  onClick={() => setShowRowsDropdown(!showRowsDropdown)}
+                  className="ci-rows-button"
+                >
+                  <span>{itemsPerPage}</span>
+                  <i
+                    className={`bi bi-chevron-${showRowsDropdown ? "up" : "down"} ci-rows-chevron`}
+                  ></i>
+                </button>
+
+                {showRowsDropdown && (
+                  <div className="ci-rows-dropdown">
+                    {[5, 10, 25, 50].map((size) => (
+                      <div
+                        key={size}
+                        onClick={() => {
+                          setItemsPerPage(size);
+                          setCurrentPage(1);
+                          setShowRowsDropdown(false);
+                        }}
+                        className={`ci-rows-option ${
+                          itemsPerPage === size ? "ci-rows-active" : ""
+                        }`}
+                      >
+                        {size}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <span>entries</span>
+            </div>
+
+            <div className="ci-pagination-status">
+              Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredEscalations.length)} of {filteredEscalations.length} entries
+            </div>
+
+            <nav className="ci-pagination-nav">
+              <ul className="ci-pagination-list">
+                <li className={`ci-page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                  >
+                    <i className="bi bi-chevron-left"></i>
+                  </button>
+                </li>
+                {getPageNumbers().map((page, index) => (
+                  <li
+                    key={index}
+                    className={`ci-page-item ${
+                      page === currentPage ? "active" : ""
+                    } ${typeof page !== "number" ? "disabled" : ""}`}
+                  >
+                    <button
+                      onClick={() => typeof page === "number" && setCurrentPage(page)}
+                      disabled={typeof page !== "number"}
+                    >
+                      {page}
+                    </button>
+                  </li>
+                ))}
+                <li className={`ci-page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                  >
+                    <i className="bi bi-chevron-right"></i>
+                  </button>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        )}
       </div>
 
       {showEscalationDetailModal && selectedEscalation && (

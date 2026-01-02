@@ -360,7 +360,7 @@
   background: #ffffff;
   border-radius: 12px;
   border: 1px solid #e5e7eb;
-  overflow: hidden;
+  overflow: visible;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 
@@ -606,6 +606,7 @@
   font-size: 0.875rem;
 }
 
+/* ===== PAGINATION STYLES ===== */
 .ioma-pagination-container {
   display: flex;
   justify-content: space-between;
@@ -615,6 +616,8 @@
   border-top: 1px solid #e5e7eb;
   flex-wrap: wrap;
   gap: 1rem;
+  position: relative;
+  overflow: visible;
 }
 
 .ioma-pagination-info {
@@ -626,20 +629,97 @@
 .ioma-pagination-label {
   font-size: 0.875rem;
   color: #6c757d;
+  font-weight: 500;
 }
 
-.ioma-pagination-select {
-  padding: 0.25rem 0.5rem;
+/* Custom Items Per Page Dropdown */
+.ioma-items-dropdown-wrapper {
+  position: relative;
+  z-index: 100;
+}
+
+.ioma-items-button {
+  padding: 0.4rem 0.75rem;
   border: 1px solid #e5e7eb;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 0.875rem;
   cursor: pointer;
-  background: #ffffff;
+  background: #fff;
+  color: rgb(39, 35, 92);
+  min-width: 70px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  transition: all 0.2s;
+  height: 32px;
+}
+
+.ioma-items-button:hover {
+  background: rgb(39, 35, 92);
+  color: white;
+  border-color: rgb(39, 35, 92);
+}
+
+.ioma-items-chevron {
+  font-size: 0.7rem;
+  margin-left: 0.5rem;
+}
+
+.ioma-items-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 70px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  z-index: 10000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  animation: dropdownSlideDown 0.2s ease-out;
+}
+
+@keyframes dropdownSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ioma-items-option {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #212529;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.ioma-items-option:hover {
+  background: rgb(39, 35, 92);
+  color: white;
+}
+
+.ioma-items-active {
+  background: #f3f4f6;
+  font-weight: 600;
+  color: rgb(39, 35, 92);
+}
+
+.ioma-items-active:hover {
+  background: rgb(39, 35, 92);
+  color: white;
 }
 
 .ioma-pagination-status {
   font-size: 0.875rem;
   color: #6c757d;
+  font-weight: 400;
 }
 
 .ioma-pagination-nav {
@@ -704,6 +784,7 @@
   gap: 1rem;
 }
 
+/* ===== RESPONSIVE STYLES ===== */
 @media (max-width: 1200px) {
   .ioma-controls {
     flex-wrap: wrap;

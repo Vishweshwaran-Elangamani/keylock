@@ -1,3 +1,5 @@
+/* Compliance Issues - Scoped Styles (Prefix: ci-) */
+
 .ci-page {
   padding: 16px 20px 48px 20px;
   max-width: 1600px;
@@ -5,6 +7,10 @@
   background: #f8f9fc;
   min-height: 100vh;
 }
+
+/* ========================================
+   KPI CARDS
+======================================== */
 
 .stats-cards-ci {
   display: grid;
@@ -88,6 +94,10 @@
   line-height: 1.2;
   text-align: center;
 }
+
+/* ========================================
+   CONTROLS
+======================================== */
 
 .ci-controls {
   display: flex;
@@ -179,6 +189,10 @@
 .ci-search-btn:hover {
   background: #1f1c4b;
 }
+
+/* ========================================
+   CUSTOM DROPDOWNS
+======================================== */
 
 .ci-status-filter,
 .ci-level-filter {
@@ -297,6 +311,10 @@
   color: #ffffff;
 }
 
+/* ========================================
+   BUTTONS
+======================================== */
+
 .ci-btn-clear {
   white-space: nowrap;
   padding: 0.5rem 1rem;
@@ -330,98 +348,41 @@
   margin-left: auto;
 }
 
-.ci-pagination-wrapper {
-  background: #ffffff;
-  border-radius: 12px 12px 0 0;
-  border: 1px solid #e5e7eb;
-  border-bottom: none;
-  overflow: hidden;
-  margin-bottom: 0;
-}
-
-.ci-pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 1rem 1.25rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.ci-pagination-list {
-  display: flex;
-  list-style: none;
-  gap: 0.3rem;
-  margin: 0;
-  padding: 0;
-}
-
-.ci-page-item {
-  list-style: none;
-}
-
-.ci-page-item button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 32px;
-  height: 32px;
-  padding: 0.3rem 0.625rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  background: #ffffff;
-  color: #212529;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.ci-page-item button:hover:not(:disabled) {
-  background: rgba(39, 35, 92, 0.05);
-  border-color: #27235c;
-  color: #27235c;
-}
-
-.ci-page-item.active button {
-  background: #27235c;
-  border-color: transparent;
-  color: #ffffff;
-  box-shadow: 0 2px 6px rgba(39, 35, 92, 0.3);
-}
-
-.ci-page-item.disabled button {
-  opacity: 0.5;
-  cursor: not-allowed;
-  pointer-events: none;
-}
+/* ========================================
+   TABLE
+======================================== */
 
 .ci-table-card {
   background: #ffffff;
   border-radius: 12px;
   border: 1px solid #e5e7eb;
-  overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-}
-
-.ci-table-card.ci-table-with-pagination {
-  border-radius: 0 0 12px 12px;
-  border-top: none;
+  overflow: visible;
+  position: relative;
 }
 
 .ci-table-wrapper {
   overflow-x: auto;
+  position: relative;
 }
 
 .ci-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 0.875rem;
 }
 
 .ci-table thead {
   background: #27235c;
-  border-bottom: 3px solid #1a1842;
+}
+
+.ci-table thead tr th:first-child {
+  border-top-left-radius: 11px;
+}
+
+.ci-table thead tr th:last-child {
+  border-top-right-radius: 11px;
 }
 
 .ci-table th {
@@ -433,6 +394,7 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   white-space: nowrap;
+  background: #27235c;
 }
 
 .ci-table th:last-child {
@@ -458,6 +420,7 @@
   vertical-align: middle;
   text-align: left;
   font-size: 1rem;
+  background: #ffffff;
 }
 
 .ci-table td:last-child {
@@ -588,6 +551,10 @@
   border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
+/* ========================================
+   ACTION BUTTONS
+======================================== */
+
 .ci-table-actions {
   display: flex;
   justify-content: center;
@@ -618,6 +585,177 @@
   transform: scale(1.08);
   box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
 }
+
+/* ========================================
+   PAGINATION
+======================================== */
+
+.ci-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid #e5e7eb;
+  flex-wrap: wrap;
+  gap: 1rem;
+  background: #ffffff;
+  border-radius: 0 0 12px 12px;
+  position: relative;
+  overflow: visible;
+}
+
+.ci-pagination-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+/* Custom Rows Per Page Dropdown */
+.ci-rows-dropdown-wrapper {
+  position: relative;
+  z-index: 100;
+}
+
+.ci-rows-button {
+  padding: 0.3rem 0.625rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  background: #ffffff;
+  color: rgb(39, 35, 92);
+  min-width: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  transition: all 0.2s;
+  height: 30px;
+}
+
+.ci-rows-button:hover {
+  background: rgb(39, 35, 92);
+  color: white;
+  border-color: rgb(39, 35, 92);
+}
+
+.ci-rows-chevron {
+  font-size: 0.7rem;
+  margin-left: 0.5rem;
+}
+
+.ci-rows-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 60px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  z-index: 10000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  animation: dropdownSlideDown 0.2s ease-out;
+}
+
+@keyframes dropdownSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ci-rows-option {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #212529;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.ci-rows-option:hover {
+  background: rgb(39, 35, 92);
+  color: white;
+}
+
+.ci-rows-active {
+  background: #f3f4f6;
+  font-weight: 600;
+  color: rgb(39, 35, 92);
+}
+
+.ci-rows-active:hover {
+  background: rgb(39, 35, 92);
+  color: white;
+}
+
+.ci-pagination-status {
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+.ci-pagination-nav {
+  margin: 0;
+}
+
+.ci-pagination-list {
+  display: flex;
+  list-style: none;
+  gap: 0.3rem;
+  margin: 0;
+  padding: 0;
+}
+
+.ci-page-item {
+  list-style: none;
+}
+
+.ci-page-item button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0.3rem 0.625rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #212529;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ci-page-item button:hover:not(:disabled) {
+  background: rgba(39, 35, 92, 0.05);
+  border-color: #27235c;
+  color: #27235c;
+}
+
+.ci-page-item.active button {
+  background: #27235c;
+  border-color: transparent;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(39, 35, 92, 0.3);
+}
+
+.ci-page-item.disabled button {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ========================================
+   EMPTY STATE
+======================================== */
 
 .ci-empty-state {
   text-align: center;
@@ -650,6 +788,10 @@
   font-size: 0.875rem;
 }
 
+/* ========================================
+   LOADING
+======================================== */
+
 .ci-loading-container {
   display: flex;
   justify-content: center;
@@ -658,6 +800,10 @@
   flex-direction: column;
   gap: 1rem;
 }
+
+/* ========================================
+   RESPONSIVE
+======================================== */
 
 @media (max-width: 1200px) {
   .ci-controls {
@@ -709,6 +855,22 @@
     flex-direction: column;
     gap: 0.75rem;
   }
+
+  .ci-pagination-info,
+  .ci-pagination-status {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .ci-pagination-nav {
+    width: 100%;
+  }
+
+  .ci-pagination-nav .ci-pagination-list {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
 }
 
 @media (max-width: 576px) {
@@ -724,5 +886,9 @@
   .ci-table td {
     font-size: 0.8rem;
     padding: 0.625rem 0.75rem;
+  }
+
+  .ci-table {
+    min-width: 900px;
   }
 }

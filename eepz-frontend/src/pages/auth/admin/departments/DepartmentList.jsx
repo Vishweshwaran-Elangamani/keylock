@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import departmentService from "../../../../services/auth/departmentService";
 import AddDepartmentModal from "../../../../components/auth/Modal/departments/AddDepartmentModal";
@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import { FaSearch } from "react-icons/fa";
 import { Form } from "react-bootstrap";
 import "../../../../styles/auth/department/DepartmentList.css";
-
 
 const StatusDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
@@ -61,7 +60,6 @@ const StatusDropdown = ({ value, onChange }) => {
   );
 };
 
-
 const DepartmentList = () => {
   const navigate = useNavigate();
   const [departments, setDepartments] = useState([]);
@@ -78,12 +76,29 @@ const DepartmentList = () => {
   const [viewMode, setViewMode] = useState("table");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-
+  const [showRowsDropdown, setShowRowsDropdown] = useState(false);
+  const rowsDropdownRef = useRef(null);
 
   useEffect(() => {
     fetchDepartments();
   }, []);
 
+  // Click outside handler for rows dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        rowsDropdownRef.current &&
+        !rowsDropdownRef.current.contains(event.target)
+      ) {
+        setShowRowsDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const fetchDepartments = async () => {
     try {
@@ -106,12 +121,10 @@ const DepartmentList = () => {
     }
   };
 
-
   const handleDelete = (dept) => {
     setSelectedDepartment(dept);
     setShowDeleteModal(true);
   };
-
 
   const handleDeleteConfirm = async () => {
     try {
@@ -138,18 +151,15 @@ const DepartmentList = () => {
     }
   };
 
-
   const handleEdit = (department) => {
     setSelectedDepartment(department);
     setShowEditModal(true);
   };
 
-
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
     setCurrentPage(1);
   };
-
 
   const clearFilters = () => {
     setSearchTerm("");
@@ -157,7 +167,6 @@ const DepartmentList = () => {
     setStatusFilter("All");
     setCurrentPage(1);
   };
-
 
   const applyFilters = () => {
     let filtered = [...departments];
@@ -181,7 +190,6 @@ const DepartmentList = () => {
 
   const filteredDepartments = applyFilters();
 
-
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredDepartments.slice(
@@ -189,7 +197,6 @@ const DepartmentList = () => {
     indexOfLastItem
   );
   const totalPages = Math.ceil(filteredDepartments.length / itemsPerPage) || 1;
-
 
   const getPageNumbers = () => {
     const pages = [];
@@ -220,7 +227,6 @@ const DepartmentList = () => {
     return pages;
   };
 
-
   const formatDate = (date) => {
     return date
       ? new Date(date).toLocaleDateString("en-US", {
@@ -230,7 +236,6 @@ const DepartmentList = () => {
         })
       : "N/A";
   };
-
 
   const getDeptStats = () => {
     const total = filteredDepartments.length;
@@ -248,9 +253,7 @@ const DepartmentList = () => {
     };
   };
 
-
   const stats = getDeptStats();
-
 
   if (loading) {
     return (
@@ -261,7 +264,6 @@ const DepartmentList = () => {
       </div>
     );
   }
-
 
   return (
     <div className="dlm-page">
@@ -571,26 +573,128 @@ const DepartmentList = () => {
 
           {/* TABLE VIEW */}
           {viewMode === "table" && (
-            <>
-              {totalPages > 1 && (
-                <div className="dlm-pagination-wrapper">
-                  <nav className="dlm-pagination">
-                    <ul className="dlm-pagination-list">
-                      <li
-                        className={`dlm-page-item ${
-                          currentPage === 1 ? "disabled" : ""
-                        }`}
+            <div className="dlm-table-card">
+              <div className="dlm-table-wrapper">
+                <table className="dlm-table">
+                  <thead>
+                    <tr>
+                      <th>Department</th>
+                      <th>Code</th>
+                      <th>Status</th>
+                      <th>Parent Department</th>
+                      <th>HOD</th>
+                      <th>Children</th>
+                      <th>Created At</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentItems.map((dept) => (
+                      <tr key={dept.departmentId}>
+                        <td>
+                          <div className="dlm-table-dept-name">
+                            <strong>{dept.departmentName}</strong>
+                          </div>
+                        </td>
+                        <td>
+                          <code>{dept.departmentCode}</code>
+                        </td>
+                        <td>
+                          {dept.status === "Active" ? (
+                            <span className="dlm-badge-table-active">
+                              <i className="bi bi-check-circle-fill"></i>
+                              Active
+                            </span>
+                          ) : (
+                            <span className="dlm-badge-table-inactive">
+                              <i className="bi bi-x-circle-fill"></i>
+                              Inactive
+                            </span>
+                          )}
+                        </td>
+                        <td>{dept.parentDepartmentName || "Root Department"}</td>
+                        <td>{dept.hodEmployeeName || "Not assigned"}</td>
+                        <td>
+                          {dept.hasChildren ? dept.childDepartmentCount : "−"}
+                        </td>
+                        <td>{formatDate(dept.createdAt)}</td>
+                        <td>
+                          <div className="dlm-table-actions">
+                            <button
+                              className="dlm-action-edit"
+                              onClick={() => handleEdit(dept)}
+                              title="Edit Department"
+                            >
+                              <i className="bi bi-pencil-square"></i>
+                            </button>
+                            <button
+                              className="dlm-action-delete"
+                              onClick={() => handleDelete(dept)}
+                              title="Delete Department"
+                            >
+                              <i className="bi bi-trash3"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {totalPages > 1 && filteredDepartments.length > 0 && (
+                <div className="dlm-pagination">
+                  <div className="dlm-pagination-info">
+                    <span>Show</span>
+                    <div ref={rowsDropdownRef} className="dlm-rows-dropdown-wrapper">
+                      <button
+                        type="button"
+                        onClick={() => setShowRowsDropdown(!showRowsDropdown)}
+                        className="dlm-rows-button"
                       >
+                        <span>{itemsPerPage}</span>
+                        <i
+                          className={`bi bi-chevron-${showRowsDropdown ? "up" : "down"} dlm-rows-chevron`}
+                        ></i>
+                      </button>
+
+                      {showRowsDropdown && (
+                        <div className="dlm-rows-dropdown">
+                          {[5, 10, 25, 50].map((size) => (
+                            <div
+                              key={size}
+                              onClick={() => {
+                                setItemsPerPage(size);
+                                setCurrentPage(1);
+                                setShowRowsDropdown(false);
+                              }}
+                              className={`dlm-rows-option ${
+                                itemsPerPage === size ? "dlm-rows-active" : ""
+                              }`}
+                            >
+                              {size}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <span>entries</span>
+                  </div>
+
+                  <div className="dlm-pagination-status">
+                    Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredDepartments.length)} of {filteredDepartments.length} entries
+                  </div>
+
+                  <nav className="dlm-pagination-nav">
+                    <ul className="dlm-pagination-list">
+                      <li className={`dlm-page-item ${currentPage === 1 ? "disabled" : ""}`}>
                         <button
-                          onClick={() =>
-                            setCurrentPage((prev) => Math.max(prev - 1, 1))
-                          }
+                          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                           disabled={currentPage === 1}
                         >
                           <i className="bi bi-chevron-left"></i>
                         </button>
                       </li>
-
                       {getPageNumbers().map((page, index) => (
                         <li
                           key={index}
@@ -599,27 +703,16 @@ const DepartmentList = () => {
                           } ${typeof page !== "number" ? "disabled" : ""}`}
                         >
                           <button
-                            onClick={() =>
-                              typeof page === "number" && setCurrentPage(page)
-                            }
+                            onClick={() => typeof page === "number" && setCurrentPage(page)}
                             disabled={typeof page !== "number"}
                           >
                             {page}
                           </button>
                         </li>
                       ))}
-
-                      <li
-                        className={`dlm-page-item ${
-                          currentPage === totalPages ? "disabled" : ""
-                        }`}
-                      >
+                      <li className={`dlm-page-item ${currentPage === totalPages ? "disabled" : ""}`}>
                         <button
-                          onClick={() =>
-                            setCurrentPage((prev) =>
-                              Math.min(prev + 1, totalPages)
-                            )
-                          }
+                          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                           disabled={currentPage === totalPages}
                         >
                           <i className="bi bi-chevron-right"></i>
@@ -629,81 +722,7 @@ const DepartmentList = () => {
                   </nav>
                 </div>
               )}
-
-              <div
-                className={`dlm-table-card ${
-                  totalPages > 1 ? "dlm-table-with-pagination" : ""
-                }`}
-              >
-                <div className="dlm-table-wrapper">
-                  <table className="dlm-table">
-                    <thead>
-                      <tr>
-                        <th>Department</th>
-                        <th>Code</th>
-                        <th>Status</th>
-                        <th>Parent Department</th>
-                        <th>HOD</th>
-                        <th>Children</th>
-                        <th>Created At</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {currentItems.map((dept) => (
-                        <tr key={dept.departmentId}>
-                          <td>
-                            <div className="dlm-table-dept-name">
-                              <strong>{dept.departmentName}</strong>
-                            </div>
-                          </td>
-                          <td>
-                            <code>{dept.departmentCode}</code>
-                          </td>
-                          <td>
-                            {dept.status === "Active" ? (
-                              <span className="dlm-badge-table-active">
-                                <i className="bi bi-check-circle-fill"></i>
-                                Active
-                              </span>
-                            ) : (
-                              <span className="dlm-badge-table-inactive">
-                                <i className="bi bi-x-circle-fill"></i>
-                                Inactive
-                              </span>
-                            )}
-                          </td>
-                          <td>{dept.parentDepartmentName || "Root Department"}</td>
-                          <td>{dept.hodEmployeeName || "Not assigned"}</td>
-                          <td>
-                            {dept.hasChildren ? dept.childDepartmentCount : "−"}
-                          </td>
-                          <td>{formatDate(dept.createdAt)}</td>
-                          <td>
-                            <div className="dlm-table-actions">
-                              <button
-                                className="dlm-action-edit"
-                                onClick={() => handleEdit(dept)}
-                                title="Edit Department"
-                              >
-                                <i className="bi bi-pencil-square"></i>
-                              </button>
-                              <button
-                                className="dlm-action-delete"
-                                onClick={() => handleDelete(dept)}
-                                title="Delete Department"
-                              >
-                                <i className="bi bi-trash3"></i>
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </>
+            </div>
           )}
         </>
       )}
@@ -750,6 +769,5 @@ const DepartmentList = () => {
     </div>
   );
 };
-
 
 export default DepartmentList;

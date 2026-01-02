@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import roleService from "../../../../services/auth/roleService";
 import AddRoleModal from "../../../../components/auth/Modal/roles/AddRoleModal";
@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import { FaSearch } from "react-icons/fa";
 import { Form } from "react-bootstrap";
 import "../../../../styles/auth/roles/RoleList.css";
-
 
 const RoleTypeDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
@@ -62,7 +61,6 @@ const RoleTypeDropdown = ({ value, onChange }) => {
   );
 };
 
-
 const RoleList = () => {
   const navigate = useNavigate();
   const [roles, setRoles] = useState([]);
@@ -79,12 +77,29 @@ const RoleList = () => {
   const [viewMode, setViewMode] = useState("table");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-
+  const [showRowsDropdown, setShowRowsDropdown] = useState(false);
+  const rowsDropdownRef = useRef(null);
 
   useEffect(() => {
     fetchRoles();
   }, []);
 
+  // Click outside handler for rows dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        rowsDropdownRef.current &&
+        !rowsDropdownRef.current.contains(event.target)
+      ) {
+        setShowRowsDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const fetchRoles = async () => {
     try {
@@ -107,7 +122,6 @@ const RoleList = () => {
     }
   };
 
-
   const handleDelete = (role) => {
     if (role.isSystemRole) {
       toast.warning("System roles cannot be deleted");
@@ -117,7 +131,6 @@ const RoleList = () => {
     setSelectedRole(role);
     setShowDeleteModal(true);
   };
-
 
   const handleDeleteConfirm = async () => {
     try {
@@ -142,12 +155,10 @@ const RoleList = () => {
     }
   };
 
-
   const handleEdit = (role) => {
     setSelectedRole(role);
     setShowEditModal(true);
   };
-
 
   const applyFilters = () => {
     let filtered = [...roles];
@@ -172,12 +183,10 @@ const RoleList = () => {
 
   const filteredRoles = applyFilters();
 
-
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
     setCurrentPage(1);
   };
-
 
   const clearFilters = () => {
     setSearchTerm("");
@@ -186,12 +195,10 @@ const RoleList = () => {
     setCurrentPage(1);
   };
 
-
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredRoles.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredRoles.length / itemsPerPage) || 1;
-
 
   const getPageNumbers = () => {
     const pages = [];
@@ -222,7 +229,6 @@ const RoleList = () => {
     return pages;
   };
 
-
   const formatDate = (date) => {
     return date
       ? new Date(date).toLocaleDateString("en-US", {
@@ -233,7 +239,6 @@ const RoleList = () => {
       : "N/A";
   };
 
-
   const getRoleStats = () => {
     const totalRoles = filteredRoles.length;
     const systemRoles = filteredRoles.filter((r) => r.isSystemRole).length;
@@ -242,9 +247,7 @@ const RoleList = () => {
     return { totalRoles, systemRoles, customRoles };
   };
 
-
   const stats = getRoleStats();
-
 
   if (loading) {
     return (
@@ -255,7 +258,6 @@ const RoleList = () => {
       </div>
     );
   }
-
 
   return (
     <div className="rlm-page">
@@ -394,192 +396,54 @@ const RoleList = () => {
             <>
               <div className="rlm-grid">
                 {currentItems.map((role) => (
-                  <div
-                    key={role.roleId}
-                    className="rlm-card-modern"
-                    style={{
-                      cursor: "pointer",
-                      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                      border: "1px solid rgba(39, 35, 92, 0.75)",
-                      borderRadius: "12px",
-                      overflow: "hidden",
-                      position: "relative",
-                      background: "linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)",
-                      height: "100%",
-                      display: "flex",
-                      flexDirection: "column",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.boxShadow = "0 8px 24px rgba(0, 0, 0, 0.52)";
-                      e.currentTarget.style.transform = "translateY(-4px)";
-                      e.currentTarget.style.borderColor = "rgb(39, 35, 92)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.08)";
-                      e.currentTarget.style.transform = "translateY(0)";
-                      e.currentTarget.style.borderColor = "rgba(39, 35, 92, 0.4)";
-                    }}
-                  >
+                  <div key={role.roleId} className="rlm-card-modern">
                     {/* Card Header */}
-                    <div
-                      style={{
-                        backgroundColor: "rgba(248, 249, 250, 0.8)",
-                        backdropFilter: "blur(10px)",
-                        borderBottom: "1px solid #e9ecef",
-                        padding: "0.875rem 1.25rem",
-                      }}
-                    >
-                      <div className="d-flex justify-content-between align-items-start">
-                        <div className="d-flex gap-2 flex-wrap align-items-center">
+                    <div className="rlm-card-header">
+                      <div className="rlm-card-header-content">
+                        <div className="rlm-card-badges">
                           {role.isSystemRole ? (
-                            <span
-                              className="badge"
-                              style={{
-                                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                                fontSize: "10px",
-                                fontWeight: 600,
-                                padding: "0.35rem 0.6rem",
-                                borderRadius: "6px",
-                                boxShadow: "0 2px 8px rgba(102, 126, 234, 0.3)",
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "0.25rem",
-                              }}
-                            >
+                            <span className="rlm-badge-status-system">
                               <i className="bi bi-shield-check"></i>
                               System
                             </span>
                           ) : (
-                            <span
-                              className="badge"
-                              style={{
-                                background: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
-                                fontSize: "10px",
-                                fontWeight: 600,
-                                padding: "0.35rem 0.6rem",
-                                borderRadius: "6px",
-                                boxShadow: "0 2px 8px rgba(79, 172, 254, 0.3)",
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "0.25rem",
-                              }}
-                            >
+                            <span className="rlm-badge-status-custom">
                               <i className="bi bi-gear-fill"></i>
                               Custom
                             </span>
                           )}
                         </div>
 
-                        <code
-                          style={{
-                            fontSize: "10px",
-                            fontWeight: 600,
-                            padding: "0.35rem 0.6rem",
-                            borderRadius: "6px",
-                            backgroundColor: "rgba(39, 35, 92, 0.1)",
-                            color: "#27235c",
-                            border: "1px solid rgba(39, 35, 92, 0.2)",
-                          }}
-                        >
+                        <code className="rlm-card-code">
                           {role.roleCode}
                         </code>
                       </div>
                     </div>
 
                     {/* Card Body */}
-                    <div
-                      style={{
-                        padding: "1.25rem",
-                        flex: 1,
-                        display: "flex",
-                        flexDirection: "column",
-                      }}
-                    >
-                      {/* Role Name */}
-                      <h6
-                        style={{
-                          fontWeight: 700,
-                          fontSize: "18px",
-                          color: "#212529",
-                          lineHeight: "1.4",
-                          marginBottom: "0.75rem",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          display: "-webkit-box",
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: "vertical",
-                          minHeight: "2.8rem",
-                          textAlign: "left",
-                        }}
-                      >
-                        {role.roleName}
-                      </h6>
+                    <div className="rlm-card-body">
+                      <h6 className="rlm-card-title">{role.roleName}</h6>
 
-                      {/* Description */}
-                      <p
-                        style={{
-                          fontSize: "14px",
-                          color: "#6c757d",
-                          lineHeight: "1.5",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          display: "-webkit-box",
-                          WebkitLineClamp: 3,
-                          WebkitBoxOrient: "vertical",
-                          minHeight: "4rem",
-                          textAlign: "left",
-                          marginBottom: "1rem",
-                          flex: 1,
-                        }}
-                      >
+                      <p className="rlm-card-description">
                         {role.description || "No description available"}
                       </p>
 
                       {/* Meta Info */}
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "0.5rem",
-                          padding: "0.75rem",
-                          backgroundColor: "#f8f9fa",
-                          borderRadius: "8px",
-                          fontSize: "0.8rem",
-                          marginTop: "auto",
-                        }}
-                      >
-                        <i
-                          className="bi bi-calendar-check-fill"
-                          style={{ fontSize: "1.1rem", color: "#0d6efd" }}
-                        ></i>
-                        <div style={{ flex: 1 }}>
-                          <div
-                            style={{
-                              fontSize: "0.7rem",
-                              color: "#6c757d",
-                              marginBottom: "2px",
-                            }}
-                          >
-                            Created On
-                          </div>
-                          <div style={{ fontWeight: 600, color: "#212529" }}>
-                            {formatDate(role.createdAt)}
+                      <div className="rlm-card-meta">
+                        <div className="rlm-meta-item-date">
+                          <i className="bi bi-calendar-check-fill"></i>
+                          <div className="rlm-date-content">
+                            <div className="rlm-date-label">Created On</div>
+                            <div className="rlm-date-value">
+                              {formatDate(role.createdAt)}
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
 
                     {/* Card Footer - Actions */}
-                    <div
-                      style={{
-                        borderTop: "1px solid #e9ecef",
-                        padding: "0.75rem 1.25rem",
-                        backgroundColor: "rgba(248, 249, 250, 0.5)",
-                        display: "flex",
-                        justifyContent: "center",
-                        gap: "0.5rem",
-                      }}
-                    >
+                    <div className="rlm-card-footer">
                       <button
                         onClick={() => handleEdit(role)}
                         title="Edit Role"
@@ -668,26 +532,125 @@ const RoleList = () => {
 
           {/* TABLE VIEW */}
           {viewMode === "table" && (
-            <>
-              {totalPages > 1 && (
-                <div className="rlm-pagination-wrapper">
-                  <nav className="rlm-pagination">
-                    <ul className="rlm-pagination-list">
-                      <li
-                        className={`rlm-page-item ${
-                          currentPage === 1 ? "disabled" : ""
-                        }`}
+            <div className="rlm-table-card">
+              <div className="rlm-table-wrapper">
+                <table className="rlm-table">
+                  <thead>
+                    <tr>
+                      <th>Role Name</th>
+                      <th>Role Code</th>
+                      <th>Description</th>
+                      <th>Type</th>
+                      <th>Created At</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentItems.map((role) => (
+                      <tr key={role.roleId}>
+                        <td>
+                          <div className="rlm-table-role-name">
+                            <span>{role.roleName}</span>
+                          </div>
+                        </td>
+                        <td>
+                          <code>{role.roleCode}</code>
+                        </td>
+                        <td className="rlm-desc-cell">
+                          {role.description || "N/A"}
+                        </td>
+                        <td>
+                          {role.isSystemRole ? (
+                            <span className="rlm-badge-table-system">
+                              System
+                            </span>
+                          ) : (
+                            <span className="rlm-badge-table-custom">
+                              Custom
+                            </span>
+                          )}
+                        </td>
+                        <td>{formatDate(role.createdAt)}</td>
+                        <td>
+                          <div className="rlm-table-actions">
+                            <button
+                              className="rlm-action-edit"
+                              onClick={() => handleEdit(role)}
+                              title="Edit"
+                            >
+                              <i className="bi bi-pencil-square"></i>
+                            </button>
+                            <button
+                              className="rlm-action-delete"
+                              onClick={() => handleDelete(role)}
+                              disabled={role.isSystemRole}
+                              title={
+                                role.isSystemRole ? "Cannot delete" : "Delete"
+                              }
+                            >
+                              <i className="bi bi-trash3"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {totalPages > 1 && filteredRoles.length > 0 && (
+                <div className="rlm-pagination">
+                  <div className="rlm-pagination-info">
+                    <span>Show</span>
+                    <div ref={rowsDropdownRef} className="rlm-rows-dropdown-wrapper">
+                      <button
+                        type="button"
+                        onClick={() => setShowRowsDropdown(!showRowsDropdown)}
+                        className="rlm-rows-button"
                       >
+                        <span>{itemsPerPage}</span>
+                        <i
+                          className={`bi bi-chevron-${showRowsDropdown ? "up" : "down"} rlm-rows-chevron`}
+                        ></i>
+                      </button>
+
+                      {showRowsDropdown && (
+                        <div className="rlm-rows-dropdown">
+                          {[5, 10, 25, 50].map((size) => (
+                            <div
+                              key={size}
+                              onClick={() => {
+                                setItemsPerPage(size);
+                                setCurrentPage(1);
+                                setShowRowsDropdown(false);
+                              }}
+                              className={`rlm-rows-option ${
+                                itemsPerPage === size ? "rlm-rows-active" : ""
+                              }`}
+                            >
+                              {size}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <span>entries</span>
+                  </div>
+
+                  <div className="rlm-pagination-status">
+                    Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredRoles.length)} of {filteredRoles.length} entries
+                  </div>
+
+                  <nav className="rlm-pagination-nav">
+                    <ul className="rlm-pagination-list">
+                      <li className={`rlm-page-item ${currentPage === 1 ? "disabled" : ""}`}>
                         <button
-                          onClick={() =>
-                            setCurrentPage((prev) => Math.max(prev - 1, 1))
-                          }
+                          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                           disabled={currentPage === 1}
                         >
                           <i className="bi bi-chevron-left"></i>
                         </button>
                       </li>
-
                       {getPageNumbers().map((page, index) => (
                         <li
                           key={index}
@@ -696,27 +659,16 @@ const RoleList = () => {
                           } ${typeof page !== "number" ? "disabled" : ""}`}
                         >
                           <button
-                            onClick={() =>
-                              typeof page === "number" && setCurrentPage(page)
-                            }
+                            onClick={() => typeof page === "number" && setCurrentPage(page)}
                             disabled={typeof page !== "number"}
                           >
                             {page}
                           </button>
                         </li>
                       ))}
-
-                      <li
-                        className={`rlm-page-item ${
-                          currentPage === totalPages ? "disabled" : ""
-                        }`}
-                      >
+                      <li className={`rlm-page-item ${currentPage === totalPages ? "disabled" : ""}`}>
                         <button
-                          onClick={() =>
-                            setCurrentPage((prev) =>
-                              Math.min(prev + 1, totalPages)
-                            )
-                          }
+                          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                           disabled={currentPage === totalPages}
                         >
                           <i className="bi bi-chevron-right"></i>
@@ -726,74 +678,7 @@ const RoleList = () => {
                   </nav>
                 </div>
               )}
-
-              <div className={`rlm-table-card ${totalPages > 1 ? "rlm-table-with-pagination" : ""}`}>
-                <div className="rlm-table-wrapper">
-                  <table className="rlm-table">
-                    <thead>
-                      <tr>
-                        <th>Role Name</th>
-                        <th>Role Code</th>
-                        <th>Description</th>
-                        <th>Type</th>
-                        <th>Created At</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {currentItems.map((role) => (
-                        <tr key={role.roleId}>
-                          <td>
-                            <div className="rlm-table-role-name">
-                              <span>{role.roleName}</span>
-                            </div>
-                          </td>
-                          <td>
-                            <code>{role.roleCode}</code>
-                          </td>
-                          <td className="rlm-desc-cell">
-                            {role.description || "N/A"}
-                          </td>
-                          <td>
-                            {role.isSystemRole ? (
-                              <span className="rlm-badge-table-system">
-                                System
-                              </span>
-                            ) : (
-                              <span className="rlm-badge-table-custom">
-                                Custom
-                              </span>
-                            )}
-                          </td>
-                          <td>{formatDate(role.createdAt)}</td>
-                          <td>
-                            <div className="rlm-table-actions">
-                              <button
-                                className="rlm-action-edit"
-                                onClick={() => handleEdit(role)}
-                                title="Edit"
-                              >
-                                <i className="bi bi-pencil-square"></i>
-                              </button>
-                              <button
-                                className="rlm-action-delete"
-                                onClick={() => handleDelete(role)}
-                                disabled={role.isSystemRole}
-                                title={
-                                  role.isSystemRole ? "Cannot delete" : "Delete"
-                                }
-                              >
-                                <i className="bi bi-trash3"></i>
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </>
+            </div>
           )}
         </>
       )}
@@ -840,6 +725,5 @@ const RoleList = () => {
     </div>
   );
 };
-
 
 export default RoleList;

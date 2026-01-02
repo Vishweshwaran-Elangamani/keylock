@@ -11,7 +11,6 @@ import { Form } from "react-bootstrap";
 import "../../../../styles/hr_operations/hr/BudgetAllocation.css";
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
 
-
 const YearDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
   const allOptions = [{ label: "All Years", value: "all" }, ...options];
@@ -54,7 +53,6 @@ const YearDropdown = ({ value, onChange, options }) => {
     </div>
   );
 };
-
 
 const DepartmentDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
@@ -102,7 +100,6 @@ const DepartmentDropdown = ({ value, onChange, options }) => {
   );
 };
 
-
 const BudgetAllocation = () => {
   const [budgets, setBudgets] = useState([]);
   const [filteredBudgets, setFilteredBudgets] = useState([]);
@@ -118,10 +115,12 @@ const BudgetAllocation = () => {
   const [viewType, setViewType] = useState("table");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [showRowsDropdown, setShowRowsDropdown] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
   const searchInputRef = useRef(null);
+  const rowsDropdownRef = useRef(null);
 
   const [filters, setFilters] = useState({
     year: "all",
@@ -147,6 +146,23 @@ const BudgetAllocation = () => {
     applyFilters();
     setCurrentPage(1);
   }, [budgets, activeSearchTerm, filters]);
+
+  // Click outside handler for rows dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        rowsDropdownRef.current &&
+        !rowsDropdownRef.current.contains(event.target)
+      ) {
+        setShowRowsDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const fetchBudgets = async () => {
     setLoading(true);
@@ -231,9 +247,10 @@ const BudgetAllocation = () => {
     });
   };
 
-  const handleItemsPerPageChange = (e) => {
-    setItemsPerPage(parseInt(e.target.value));
+  const handleItemsPerPageChange = (newSize) => {
+    setItemsPerPage(newSize);
     setCurrentPage(1);
+    setShowRowsDropdown(false);
   };
 
   const goToPage = (page) => {
@@ -575,16 +592,34 @@ const BudgetAllocation = () => {
             <div className="ba-pagination-container">
               <div className="ba-pagination-info">
                 <span className="ba-pagination-label">Show</span>
-                <select
-                  className="ba-pagination-select"
-                  value={itemsPerPage}
-                  onChange={handleItemsPerPageChange}
-                >
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="25">25</option>
-                  <option value="50">50</option>
-                </select>
+                <div ref={rowsDropdownRef} className="ba-rows-dropdown-wrapper">
+                  <button
+                    type="button"
+                    onClick={() => setShowRowsDropdown(!showRowsDropdown)}
+                    className="ba-rows-button"
+                  >
+                    <span>{itemsPerPage}</span>
+                    <i
+                      className={`bi bi-chevron-${showRowsDropdown ? "up" : "down"} ba-rows-chevron`}
+                    ></i>
+                  </button>
+
+                  {showRowsDropdown && (
+                    <div className="ba-rows-dropdown">
+                      {[5, 10, 25, 50].map((size) => (
+                        <div
+                          key={size}
+                          onClick={() => handleItemsPerPageChange(size)}
+                          className={`ba-rows-option ${
+                            itemsPerPage === size ? "ba-rows-active" : ""
+                          }`}
+                        >
+                          {size}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <span className="ba-pagination-label">entries</span>
               </div>
 
@@ -715,16 +750,34 @@ const BudgetAllocation = () => {
               <div className="ba-pagination-container">
                 <div className="ba-pagination-info">
                   <span className="ba-pagination-label">Show</span>
-                  <select
-                    className="ba-pagination-select"
-                    value={itemsPerPage}
-                    onChange={handleItemsPerPageChange}
-                  >
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                  </select>
+                  <div ref={rowsDropdownRef} className="ba-rows-dropdown-wrapper">
+                    <button
+                      type="button"
+                      onClick={() => setShowRowsDropdown(!showRowsDropdown)}
+                      className="ba-rows-button"
+                    >
+                      <span>{itemsPerPage}</span>
+                      <i
+                        className={`bi bi-chevron-${showRowsDropdown ? "up" : "down"} ba-rows-chevron`}
+                      ></i>
+                    </button>
+
+                    {showRowsDropdown && (
+                      <div className="ba-rows-dropdown">
+                        {[5, 10, 25, 50].map((size) => (
+                          <div
+                            key={size}
+                            onClick={() => handleItemsPerPageChange(size)}
+                            className={`ba-rows-option ${
+                              itemsPerPage === size ? "ba-rows-active" : ""
+                            }`}
+                          >
+                            {size}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                   <span className="ba-pagination-label">entries</span>
                 </div>
 

@@ -10,7 +10,6 @@
   min-height: 100vh;
 }
 
-
 /* ========================
    STATISTICS CARDS
    ======================== */
@@ -93,7 +92,6 @@
   text-align: center;
 }
 
-
 /* ========================
    CONTROLS BAR
    ======================== */
@@ -109,7 +107,6 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
   flex-wrap: wrap;
 }
-
 
 /* ========================
    SEARCH SECTION
@@ -191,7 +188,6 @@
 .ba-search-btn:hover {
   background: #1f1c4b;
 }
-
 
 /* ========================
    FILTER DROPDOWNS
@@ -398,7 +394,6 @@
   color: #ffffff;
 }
 
-
 /* ========================
    BUTTONS
    ======================== */
@@ -460,7 +455,6 @@
   margin-left: auto;
 }
 
-
 /* ========================
    EMPTY STATE
    ======================== */
@@ -492,7 +486,6 @@
   margin: 0;
   font-size: 0.875rem;
 }
-
 
 /* ========================
    BUDGET CARDS GRID
@@ -599,7 +592,6 @@
   border-top: 1px solid #e5e7eb;
 }
 
-
 /* ========================
    TABLE VIEW
    ======================== */
@@ -607,23 +599,33 @@
   background: #ffffff;
   border-radius: 12px;
   border: 1px solid #e5e7eb;
-  overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  overflow: visible;
+  position: relative;
 }
 
 .ba-table-wrapper {
   overflow-x: auto;
+  position: relative;
 }
 
 .ba-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 0.875rem;
 }
 
 .ba-table thead {
   background: #27235c;
-  border-bottom: 3px solid #1a1842;
+}
+
+.ba-table thead tr th:first-child {
+  border-top-left-radius: 11px;
+}
+
+.ba-table thead tr th:last-child {
+  border-top-right-radius: 11px;
 }
 
 .ba-table th {
@@ -635,6 +637,7 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   white-space: nowrap;
+  background: #27235c;
 }
 
 .ba-table th:last-child {
@@ -660,12 +663,12 @@
   vertical-align: middle;
   text-align: left;
   font-size: 1rem;
+  background: #ffffff;
 }
 
 .ba-text-center {
   text-align: center !important;
 }
-
 
 /* ========================
    ACTION BUTTONS
@@ -730,7 +733,6 @@
   box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
 }
 
-
 /* ========================
    PAGINATION
    ======================== */
@@ -739,16 +741,21 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.25rem;
-  background: #f8f9fa;
   border-top: 1px solid #e5e7eb;
   flex-wrap: wrap;
   gap: 1rem;
+  background: #ffffff;
+  border-radius: 0 0 12px 12px;
+  position: relative;
+  overflow: visible;
 }
 
 .ba-pagination-info {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #6c757d;
 }
 
 .ba-pagination-label {
@@ -756,18 +763,88 @@
   color: #6c757d;
 }
 
-.ba-pagination-select {
-  padding: 0.25rem 0.5rem;
+/* Custom Rows Per Page Dropdown */
+.ba-rows-dropdown-wrapper {
+  position: relative;
+  z-index: 100;
+}
+
+.ba-rows-button {
+  padding: 0.3rem 0.625rem;
   border: 1px solid #e5e7eb;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 0.875rem;
   cursor: pointer;
   background: #ffffff;
+  color: rgb(39, 35, 92);
+  min-width: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  transition: all 0.2s;
+  height: 30px;
 }
 
-.ba-pagination-select:focus {
-  outline: none;
-  border-color: #27235c;
+.ba-rows-button:hover {
+  background: rgb(39, 35, 92);
+  color: white;
+  border-color: rgb(39, 35, 92);
+}
+
+.ba-rows-chevron {
+  font-size: 0.7rem;
+  margin-left: 0.5rem;
+}
+
+.ba-rows-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 60px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  z-index: 10000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  animation: baDropdownSlideDown 0.2s ease-out;
+}
+
+@keyframes baDropdownSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ba-rows-option {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #212529;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.ba-rows-option:hover {
+  background: rgb(39, 35, 92);
+  color: white;
+}
+
+.ba-rows-active {
+  background: #f3f4f6;
+  font-weight: 600;
+  color: rgb(39, 35, 92);
+}
+
+.ba-rows-active:hover {
+  background: rgb(39, 35, 92);
+  color: white;
 }
 
 .ba-pagination-status {
@@ -778,6 +855,7 @@
 .ba-pagination-nav {
   display: flex;
   justify-content: center;
+  margin: 0;
 }
 
 .ba-pagination {
@@ -828,7 +906,6 @@
   pointer-events: none;
 }
 
-
 /* ========================
    LOADING STATE
    ======================== */
@@ -846,7 +923,6 @@
   font-size: 0.875rem;
 }
 
-
 /* ========================
    ALERT
    ======================== */
@@ -854,7 +930,6 @@
   margin-bottom: 1rem;
   border-radius: 8px;
 }
-
 
 /* ========================
    BACKDROP
@@ -870,7 +945,6 @@
   z-index: 1040;
   display: none;
 }
-
 
 /* ========================
    RESPONSIVE DESIGN
@@ -938,6 +1012,22 @@
   .ba-pagination-container {
     flex-direction: column;
     gap: 0.75rem;
+  }
+
+  .ba-pagination-info,
+  .ba-pagination-status {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .ba-pagination-nav {
+    width: 100%;
+  }
+
+  .ba-pagination-nav .ba-pagination {
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
   .ba-table-wrapper {

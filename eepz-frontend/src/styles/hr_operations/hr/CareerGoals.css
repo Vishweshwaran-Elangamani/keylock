@@ -428,7 +428,6 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  border-bottom: 3px solid #1a1842;
 }
 
 .cg-chart-header i {
@@ -484,23 +483,33 @@
   background: #ffffff;
   border-radius: 12px;
   border: 1px solid #e5e7eb;
-  overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  overflow: visible;
+  position: relative;
 }
 
 .cg-table-wrapper {
   overflow-x: auto;
+  position: relative;
 }
 
 .cg-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 0.875rem;
 }
 
 .cg-table thead {
   background: #27235c;
-  border-bottom: 3px solid #1a1842;
+}
+
+.cg-table thead tr th:first-child {
+  border-top-left-radius: 11px;
+}
+
+.cg-table thead tr th:last-child {
+  border-top-right-radius: 11px;
 }
 
 .cg-table th {
@@ -512,6 +521,7 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   white-space: nowrap;
+  background: #27235c;
 }
 
 .cg-table th:last-child {
@@ -531,16 +541,64 @@
   border-bottom: none;
 }
 
+.cg-table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 11px;
+}
+
+.cg-table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 11px;
+}
+
 .cg-table td {
   padding: 0.875rem 1rem;
   color: #212529;
   vertical-align: middle;
   text-align: left;
   font-size: 1rem;
+  background: #ffffff;
 }
 
 .cg-table td:last-child {
   text-align: center;
+}
+
+/* Checkbox Styling */
+.cg-table th .form-check,
+.cg-table td .form-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+}
+
+.cg-table th .form-check-input,
+.cg-table td .form-check-input {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #27235c;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 0;
+  background-color: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.cg-table th .form-check-input:checked,
+.cg-table td .form-check-input:checked {
+  background-color: #27235c;
+  border-color: #27235c;
+}
+
+.cg-table th .form-check-input:focus,
+.cg-table td .form-check-input:focus {
+  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.2);
+  border-color: #27235c;
+}
+
+.cg-table th .form-check-input:hover,
+.cg-table td .form-check-input:hover {
+  border-color: #1f1c4b;
 }
 
 .cg-department-badge {
@@ -654,6 +712,8 @@
   gap: 1rem;
   background: #ffffff;
   border-radius: 0 0 12px 12px;
+  position: relative;
+  overflow: visible;
 }
 
 .cg-pagination-info {
@@ -664,20 +724,88 @@
   color: #6c757d;
 }
 
-.cg-pagination-info select {
+/* Custom Rows Per Page Dropdown */
+.cg-rows-dropdown-wrapper {
+  position: relative;
+  z-index: 100;
+}
+
+.cg-rows-button {
   padding: 0.3rem 0.625rem;
   border: 1px solid #e5e7eb;
   border-radius: 6px;
   font-size: 0.875rem;
   cursor: pointer;
   background: #ffffff;
-  color: #212529;
+  color: rgb(39, 35, 92);
+  min-width: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  transition: all 0.2s;
   height: 30px;
 }
 
-.cg-pagination-info select:focus {
-  outline: none;
-  border-color: #27235c;
+.cg-rows-button:hover {
+  background: rgb(39, 35, 92);
+  color: white;
+  border-color: rgb(39, 35, 92);
+}
+
+.cg-rows-chevron {
+  font-size: 0.7rem;
+  margin-left: 0.5rem;
+}
+
+.cg-rows-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 60px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  z-index: 10000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  animation: dropdownSlideDown 0.2s ease-out;
+}
+
+@keyframes dropdownSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cg-rows-option {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #212529;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.cg-rows-option:hover {
+  background: rgb(39, 35, 92);
+  color: white;
+}
+
+.cg-rows-active {
+  background: #f3f4f6;
+  font-weight: 600;
+  color: rgb(39, 35, 92);
+}
+
+.cg-rows-active:hover {
+  background: rgb(39, 35, 92);
+  color: white;
 }
 
 .cg-pagination-status {

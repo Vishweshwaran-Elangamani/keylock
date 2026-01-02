@@ -632,11 +632,117 @@
 
 .dlm-pagination {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   padding: 1rem 1.25rem;
+  border-top: 1px solid #e5e7eb;
   flex-wrap: wrap;
   gap: 1rem;
+  background: #ffffff;
+  border-radius: 0 0 12px 12px;
+  position: relative;
+  overflow: visible;
+}
+
+.dlm-pagination-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+/* Custom Rows Per Page Dropdown */
+.dlm-rows-dropdown-wrapper {
+  position: relative;
+  z-index: 100;
+}
+
+.dlm-rows-button {
+  padding: 0.3rem 0.625rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  background: #ffffff;
+  color: rgb(39, 35, 92);
+  min-width: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  transition: all 0.2s;
+  height: 30px;
+}
+
+.dlm-rows-button:hover {
+  background: rgb(39, 35, 92);
+  color: white;
+  border-color: rgb(39, 35, 92);
+}
+
+.dlm-rows-chevron {
+  font-size: 0.7rem;
+  margin-left: 0.5rem;
+}
+
+.dlm-rows-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 60px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  z-index: 10000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  animation: dropdownSlideDown 0.2s ease-out;
+}
+
+@keyframes dropdownSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dlm-rows-option {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #212529;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.dlm-rows-option:hover {
+  background: rgb(39, 35, 92);
+  color: white;
+}
+
+.dlm-rows-active {
+  background: #f3f4f6;
+  font-weight: 600;
+  color: rgb(39, 35, 92);
+}
+
+.dlm-rows-active:hover {
+  background: rgb(39, 35, 92);
+  color: white;
+}
+
+.dlm-pagination-status {
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+.dlm-pagination-nav {
+  margin: 0;
 }
 
 .dlm-pagination-list {
@@ -695,28 +801,33 @@
   background: #ffffff;
   border-radius: 12px;
   border: 1px solid #e5e7eb;
-  overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-}
-
-.dlm-table-card.dlm-table-with-pagination {
-  border-radius: 0 0 12px 12px;
-  border-top: none;
+  overflow: visible;
+  position: relative;
 }
 
 .dlm-table-wrapper {
   overflow-x: auto;
+  position: relative;
 }
 
 .dlm-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 0.875rem;
 }
 
 .dlm-table thead {
   background: #27235c;
-  border-bottom: 3px solid #1a1842;
+}
+
+.dlm-table thead tr th:first-child {
+  border-top-left-radius: 11px;
+}
+
+.dlm-table thead tr th:last-child {
+  border-top-right-radius: 11px;
 }
 
 .dlm-table th {
@@ -728,6 +839,7 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   white-space: nowrap;
+  background: #27235c;
 }
 
 .dlm-table th:last-child {
@@ -753,6 +865,7 @@
   vertical-align: middle;
   text-align: left;
   font-size: 1rem;
+  background: #ffffff;
 }
 
 .dlm-table td:last-child {
@@ -972,6 +1085,22 @@
     gap: 0.75rem;
   }
 
+  .dlm-pagination-info,
+  .dlm-pagination-status {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .dlm-pagination-nav {
+    width: 100%;
+  }
+
+  .dlm-pagination-nav .dlm-pagination-list {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
   .stats-cards-dl {
     grid-template-columns: 1fr;
   }
@@ -990,5 +1119,9 @@
   .dlm-table td {
     font-size: 0.8rem;
     padding: 0.625rem 0.75rem;
+  }
+
+  .dlm-table {
+    min-width: 900px;
   }
 }
