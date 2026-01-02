@@ -11,6 +11,52 @@ import "../../../styles/performancemanagement/hr/FormList.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 
+/* Custom Dropdown Component */
+const CustomDropdown = ({ value, onChange, options, placeholder, disabled }) => {
+  const [open, setOpen] = useState(false);
+
+  const selected = options.find((o) => o === value) || placeholder || "All";
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="custom-fc-dropdown"
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+      style={{ position: "relative" }}
+    >
+      <div
+        className={`custom-fc-selected ${disabled ? 'custom-fc-disabled' : ''}`}
+        onClick={() => !disabled && setOpen((prev) => !prev)}
+      >
+        {selected}
+        <span className="custom-fc-arrow" />
+      </div>
+
+      {open && !disabled && (
+        <div className="custom-fc-menu">
+          {options.map((opt) => (
+            <div
+              key={opt}
+              className={
+                "custom-fc-option" +
+                (opt === value ? " custom-fc-option-active" : "")
+              }
+              onClick={() => handleSelect(opt)}
+            >
+              {opt}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 function FormsList() {
   const navigate = useNavigate();
 
@@ -62,7 +108,6 @@ function FormsList() {
     "Assigned Users": "#e2e7fa",
   };
 
-
   function AnalyticsStatCard({ title, value }) {
     return (
       <div className="ad-stat-card">
@@ -77,7 +122,6 @@ function FormsList() {
             alignItems: "center",
             justifyContent: "center",
             marginBottom: "8px"
-
           }}
         >
           <i
@@ -92,7 +136,6 @@ function FormsList() {
       </div>
     );
   }
-
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -310,6 +353,19 @@ function FormsList() {
     }
   };
 
+  // Clear all filters function
+  const handleClearFilters = () => {
+    setFormSearchQuery("");
+    setFormSearchInput("");
+    setFormTypeFilter("All");
+    setFormDeliveryFilter("All");
+    setFormsPage(1);
+    toast.success("Filters cleared");
+  };
+
+  // Check if any filters are active
+  const hasActiveFilters = formSearchQuery !== "" || formTypeFilter !== "All" || formDeliveryFilter !== "All";
+
   const openDeadlineModal = (action) => {
     if (!selectedFormId) {
       toast.error("Please select a form first.");
@@ -422,7 +478,6 @@ function FormsList() {
   const handleView = (form) => {
     setViewFormDetails(form);
   };
-  
 
   const analytics = useMemo(() => {
     const totalForms = rows.length;
@@ -448,7 +503,6 @@ function FormsList() {
       <div className="flp-root">
         <Breadcrumb
           items={[
-            { label: 'Dashboard', path: '/hr/dashboard' },
             { label: 'Performance', path: '/hr/dashboard/performance' },
             { label: 'Initiate Form', path: null }
           ]}
@@ -507,6 +561,12 @@ function FormsList() {
                     placeholder="Search forms..."
                     value={formSearchInput}
                     onChange={(e) => setFormSearchInput(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        setFormSearchQuery(formSearchInput);
+                        setFormsPage(1);
+                      }
+                    }}
                     style={{
                       border: "none",
                       padding: "8px 12px",
@@ -514,67 +574,51 @@ function FormsList() {
                       flex: 1
                     }}
                   />
-                  {formSearchQuery ? (
-                    <button
-                      onClick={() => {
-                        setFormSearchQuery("");
-                        setFormSearchInput("");
-                        setFormsPage(1);
-                      }}
-                      style={{
-                        backgroundColor: "#27235c",
-                        color: "#fff",
-                        border: "none",
-                        padding: "8px 12px",
-                        cursor: "pointer"
-                      }}
-                    >
-                      Clear
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => {
-                        setFormSearchQuery(formSearchInput);
-                        setFormsPage(1);
-                      }}
-                      style={{
-                        backgroundColor: "#27235c",
-                        color: "#fff",
-                        border: "none",
-                        padding: "8px 12px",
-                        cursor: "pointer"
-                      }}
-                    >
-                      Search
-                    </button>
-                  )}
+                  <button
+                    onClick={() => {
+                      setFormSearchQuery(formSearchInput);
+                      setFormsPage(1);
+                    }}
+                    style={{
+                      backgroundColor: "#27235c",
+                      color: "#fff",
+                      border: "none",
+                      padding: "8px 12px",
+                      cursor: "pointer"
+                    }}
+                  >
+                    Search
+                  </button>
                 </div>
 
-                <select
-                  className="flp-filter-select"
+                <CustomDropdown
                   value={formTypeFilter}
-                  onChange={(e) => {
-                    setFormTypeFilter(e.target.value);
+                  onChange={(val) => {
+                    setFormTypeFilter(val);
                     setFormsPage(1);
                   }}
-                >
-                  {formTypes.map((type) => (
-                    <option key={type} value={type}>{type}</option>
-                  ))}
-                </select>
+                  options={formTypes}
+                  placeholder="All"
+                />
 
-                <select
-                  className="flp-filter-select"
+                <CustomDropdown
                   value={formDeliveryFilter}
-                  onChange={(e) => {
-                    setFormDeliveryFilter(e.target.value);
+                  onChange={(val) => {
+                    setFormDeliveryFilter(val);
                     setFormsPage(1);
                   }}
+                  options={formDeliveryOptions}
+                  placeholder="All"
+                />
+
+                <button
+                  onClick={handleClearFilters}
+                  className="flp-clear-filters-btn"
+                  disabled={!hasActiveFilters}
+                  title="Clear all filters"
                 >
-                  {formDeliveryOptions.map((option) => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
+                  Clear Filters
+                </button>
               </div>
             </div>
 
@@ -714,6 +758,12 @@ function FormsList() {
                       placeholder="Search users..."
                       value={userSearchInput}
                       onChange={(e) => setUserSearchInput(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          setUserSearchQuery(userSearchInput);
+                          setUsersPage(1);
+                        }
+                      }}
                       style={{
                         border: "none",
                         padding: "8px 12px",
@@ -721,40 +771,21 @@ function FormsList() {
                         flex: 1
                       }}
                     />
-                    {userSearchQuery ? (
-                      <button
-                        onClick={() => {
-                          setUserSearchQuery("");
-                          setUserSearchInput("");
-                          setUsersPage(1);
-                        }}
-                        style={{
-                          backgroundColor: "#27235c",
-                          color: "#fff",
-                          border: "none",
-                          padding: "8px 12px",
-                          cursor: "pointer"
-                        }}
-                      >
-                        Clear
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => {
-                          setUserSearchQuery(userSearchInput);
-                          setUsersPage(1);
-                        }}
-                        style={{
-                          backgroundColor: "#27235c",
-                          color: "#fff",
-                          border: "none",
-                          padding: "8px 12px",
-                          cursor: "pointer"
-                        }}
-                      >
-                        Search
-                      </button>
-                    )}
+                    <button
+                      onClick={() => {
+                        setUserSearchQuery(userSearchInput);
+                        setUsersPage(1);
+                      }}
+                      style={{
+                        backgroundColor: "#27235c",
+                        color: "#fff",
+                        border: "none",
+                        padding: "8px 12px",
+                        cursor: "pointer"
+                      }}
+                    >
+                      Search
+                    </button>
                   </div>
 
                   <button

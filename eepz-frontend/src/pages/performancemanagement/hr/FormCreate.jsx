@@ -1,10 +1,56 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../../services/performancemanagement/api/api";
 import { toast } from "sonner";
 import { useAuth } from "../../../contexts/auth/AuthContext";
 import "../../../styles/performancemanagement/hr/FormCreate.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
+
+/* Custom Dropdown Component */
+const CustomDropdown = ({ value, onChange, options, placeholder, disabled, error }) => {
+  const [open, setOpen] = useState(false);
+
+  const selected = options.find((o) => o.value === value) || { label: placeholder, value: "" };
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className={`custom-fc-dropdown ${error ? 'custom-fc-dropdown-error' : ''}`}
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+      style={{ position: "relative" }}
+    >
+      <div
+        className={`custom-fc-selected ${disabled ? 'custom-fc-disabled' : ''}`}
+        onClick={() => !disabled && setOpen((prev) => !prev)}
+      >
+        {selected.label}
+        <span className="custom-fc-arrow" />
+      </div>
+
+      {open && !disabled && (
+        <div className="custom-fc-menu">
+          {options.map((opt) => (
+            <div
+              key={opt.value || "default"}
+              className={
+                "custom-fc-option" +
+                (opt.value === value ? " custom-fc-option-active" : "")
+              }
+              onClick={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 function FormCreate() {
   const { user, loading } = useAuth();
@@ -13,6 +59,10 @@ function FormCreate() {
   const isEditMode = !!formId;
 
   const [currentStep, setCurrentStep] = useState(1);
+
+  // Refs for scrolling
+  const competencyRefs = useRef([]);
+  const competencySectionRef = useRef(null);
 
   // 1) INITIALIZE WITH ONE EMPTY COMPETENCY
   const [model, setModel] = useState({
@@ -90,6 +140,8 @@ function FormCreate() {
   };
 
   const addCompetency = () => {
+    const newIndex = model.competencies.length;
+
     setModel((m) => ({
       ...m,
       competencies: [
@@ -101,7 +153,25 @@ function FormCreate() {
         },
       ],
     }));
+    
     toast.success("Competency added");
+
+    // Scroll to the newly added competency
+    setTimeout(() => {
+      const container = competencySectionRef.current;
+      if (container && competencyRefs.current[newIndex]) {
+        const element = competencyRefs.current[newIndex];
+        const elementTop = element.offsetTop;
+        const elementHeight = element.offsetHeight;
+        const containerHeight = container.clientHeight;
+        
+        // Scroll container to show the new element at the bottom
+        container.scrollTo({
+          top: elementTop - containerHeight + elementHeight + 50,
+          behavior: 'smooth'
+        });
+      }
+    }, 100);
   };
 
   const updateComp = (index, key, value) => {
@@ -134,6 +204,18 @@ function FormCreate() {
       next.competencies.forEach((c, idx) => (c.displayOrder = idx + 1));
       return next;
     });
+
+    // Scroll to the moved competency
+    setTimeout(() => {
+      const container = competencySectionRef.current;
+      if (container && competencyRefs.current[index - 1]) {
+        const element = competencyRefs.current[index - 1];
+        container.scrollTo({
+          top: element.offsetTop - 100,
+          behavior: 'smooth'
+        });
+      }
+    }, 100);
   };
 
   const moveCompDown = (index) => {
@@ -147,6 +229,18 @@ function FormCreate() {
       next.competencies.forEach((c, idx) => (c.displayOrder = idx + 1));
       return next;
     });
+
+    // Scroll to the moved competency
+    setTimeout(() => {
+      const container = competencySectionRef.current;
+      if (container && competencyRefs.current[index + 1]) {
+        const element = competencyRefs.current[index + 1];
+        container.scrollTo({
+          top: element.offsetTop - 100,
+          behavior: 'smooth'
+        });
+      }
+    }, 100);
   };
 
   const validateStep1 = () => {
@@ -278,6 +372,19 @@ function FormCreate() {
       setBusy(false);
     }
   };
+
+  // Dropdown options
+  const formTypeOptions = [
+    { label: "Select form type", value: "" },
+    { label: "Self", value: "Self" },
+    { label: "Manager", value: "Manager" },
+  ];
+
+  const categoryOptions = [
+    { label: "Select category", value: "" },
+    { label: "Delivery", value: "Delivery" },
+    { label: "Enablement", value: "Enablement" },
+  ];
 
   if (loading) {
     return (
@@ -429,24 +536,20 @@ function FormCreate() {
                         FORM TYPE <span className="pmhr-fc-required">*</span>
                       </label>
                       <div className="pmhr-fc-error-wrapper">
-                        <select
-                          className={`pmhr-fc-select ${
-                            validationErrors.type ? "pmhr-fc-input-error" : ""
-                          }`}
+                        <CustomDropdown
                           value={model.type}
-                          onChange={(e) => {
-                            setModel({ ...model, type: e.target.value });
+                          onChange={(val) => {
+                            setModel({ ...model, type: val });
                             setValidationErrors({
                               ...validationErrors,
                               type: null,
                             });
                           }}
+                          options={formTypeOptions}
+                          placeholder="Select form type"
                           disabled={busy}
-                        >
-                          <option value="">Select form type</option>
-                          <option value="Self">Self</option>
-                          <option value="Manager">Manager</option>
-                        </select>
+                          error={validationErrors.type}
+                        />
                         {validationErrors.type && (
                           <span className="pmhr-fc-error-text">
                             <i className="bi bi-exclamation-circle"></i>
@@ -461,29 +564,23 @@ function FormCreate() {
                         CATEGORY <span className="pmhr-fc-required">*</span>
                       </label>
                       <div className="pmhr-fc-error-wrapper">
-                        <select
-                          className={`pmhr-fc-select ${
-                            validationErrors.deliveryEnablement
-                              ? "pmhr-fc-input-error"
-                              : ""
-                          }`}
+                        <CustomDropdown
                           value={model.deliveryEnablement}
-                          onChange={(e) => {
+                          onChange={(val) => {
                             setModel({
                               ...model,
-                              deliveryEnablement: e.target.value,
+                              deliveryEnablement: val,
                             });
                             setValidationErrors({
                               ...validationErrors,
                               deliveryEnablement: null,
                             });
                           }}
+                          options={categoryOptions}
+                          placeholder="Select category"
                           disabled={busy}
-                        >
-                          <option value="">Select category</option>
-                          <option value="Delivery">Delivery</option>
-                          <option value="Enablement">Enablement</option>
-                        </select>
+                          error={validationErrors.deliveryEnablement}
+                        />
                         {validationErrors.deliveryEnablement && (
                           <span className="pmhr-fc-error-text">
                             <i className="bi bi-exclamation-circle"></i>
@@ -549,7 +646,7 @@ function FormCreate() {
                     Add Competency
                   </button>
                 </div>
-                <div className="pmhr-fc-section-body">
+                <div className="pmhr-fc-section-body" ref={competencySectionRef}>
                   {validationErrors.competencies && (
                     <div className="pmhr-fc-alert-warning">
                       <i className="bi bi-exclamation-triangle"></i>
@@ -557,7 +654,11 @@ function FormCreate() {
                     </div>
                   )}
                   {model.competencies.map((comp, index) => (
-                    <div key={index} className="pmhr-fc-comp-card">
+                    <div 
+                      key={index} 
+                      className="pmhr-fc-comp-card"
+                      ref={(el) => (competencyRefs.current[index] = el)}
+                    >
                       <div className="pmhr-fc-comp-header">
                         <div className="pmhr-fc-comp-left">
                           <span className="pmhr-fc-comp-number">

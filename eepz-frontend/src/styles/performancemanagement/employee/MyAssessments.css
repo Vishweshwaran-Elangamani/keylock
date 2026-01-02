@@ -17,7 +17,7 @@
   padding: 12px 18px !important;
   max-width: 1600px;
   margin: 0 auto;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  /* font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; */
   background: var(--background);
   min-height: 100vh;
   padding-top: 0px !important;
@@ -146,7 +146,7 @@
   font-size: 20px !important;
   font-weight: 700;
   color: #FFFFFF;
-  font-family: 'Courier New', monospace;
+  /* font-family: 'Courier New', monospace; */
   line-height: 1;
 }
 
@@ -1013,7 +1013,7 @@
   font-size: 12px;
   min-height: 40px;
   resize: vertical;
-  font-family: inherit;
+  /* font-family: inherit; */
   transition: all 0.3s ease;
 }
 
@@ -1190,7 +1190,7 @@
   background-color: white;
   outline: none;
   transition: border-color 0.2s;
-  font-family: inherit;
+  /* font-family: inherit; */
 }
 
 .empass-textarea:focus {
@@ -1362,7 +1362,7 @@
   color: var(--text-muted, #6b6b80);
   margin: 0 !important;
   padding: 0 !important;
-  font-family: inherit !important;
+  /* font-family: inherit !important; */
   margin-top: 1px !important;
   margin-bottom: 4px !important;
 }
@@ -1463,7 +1463,6 @@
   font-size: 11px;
   min-height: 45px;
   resize: vertical;
-  font-family: inherit;
   transition: all 0.3s ease;
 }
 

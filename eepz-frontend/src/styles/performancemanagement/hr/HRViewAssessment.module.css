@@ -98,7 +98,7 @@
   margin-bottom: 24px;
   padding: 20px;
   background: #fff;
-  border: 2px solid #27235c;
+  border: 1px solid #27235c;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
@@ -109,10 +109,185 @@
   gap: 8px;
 }
 
+/* Search Group - Unified Input + Button */
+.hrViewAssessmentSearchGroup {
+  display: flex;
+  align-items: center;
+  border: 1px solid #27235c;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  flex: 1;
+  min-width: 250px;
+  max-width: 400px;
+}
+
+.hrViewAssessmentSearchInput {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a202c;
+  background: transparent;
+  outline: none;
+}
+
+.hrViewAssessmentSearchInput::placeholder {
+  color: #9ca3af;
+}
+
+.hrViewAssessmentSearchBtn {
+  padding: 10px 20px;
+  background: #27235c;
+  color: #fff;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.hrViewAssessmentSearchBtn:hover {
+  background: #1e1b45;
+}
+
+/* Custom Dropdown */
+.customDropdown {
+  position: relative;
+  min-width: 180px;
+  user-select: none;
+}
+
+.customSelected {
+  padding: 10px 16px;
+  border: 1px solid #27235c;
+  border-radius: 8px;
+  background: #fff;
+  color: #1a202c;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  transition: all 0.2s;
+}
+
+.customSelected:hover {
+  border-color: #1e1b45;
+  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+}
+
+.customDisabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.customArrow {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid #27235c;
+  transition: transform 0.2s;
+}
+
+.customDropdown[aria-expanded="true"] .customArrow {
+  transform: rotate(180deg);
+}
+
+.customMenu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #27235c;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-height: 250px;
+  overflow-y: auto;
+  z-index: 1000;
+  animation: dropdownSlideDown 0.2s ease-out;
+}
+
+@keyframes dropdownSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.customOption {
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a202c;
+  transition: all 0.15s;
+}
+
+.customOption:hover {
+  background:  #27235c;
+  color : white;
+}
+
+.customOptionActive {
+  background: #27235c;
+  color: #fff;
+}
+
+.customOptionActive:hover {
+  background: #1e1b45;
+}
+
+/* Clear Filters Button */
+.hrViewAssessmentBtnClearFilters {
+  padding: 10px 20px;
+  background: #fff;
+  color: #27235c;
+  border: 1px solid #27235c;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.hrViewAssessmentBtnClearFilters:hover:not(:disabled) {
+  /* background: #27235c; */
+  color: #27235c;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(39, 35, 92, 0.3);
+}
+
+.hrViewAssessmentBtnClearFilters:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.hrViewAssessmentBtnClearFilters i {
+  font-size: 16px;
+}
+
+/* Old Filter Group Inputs - Keep for backward compatibility */
 .hrViewAssessmentFilterGroup input[type="search"],
 .hrViewAssessmentFilterGroup select {
   padding: 10px 16px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #27235c;
   border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
@@ -147,6 +322,7 @@
   align-items: center;
   gap: 8px;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .hrViewAssessmentBtnExport:hover {
@@ -401,9 +577,28 @@
     padding: 16px;
   }
 
+  .hrViewAssessmentSearchGroup {
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  .hrViewAssessmentFilterGroup {
+    width: 100%;
+  }
+
+  .customDropdown {
+    width: 100%;
+  }
+
   .hrViewAssessmentFilterGroup input[type="search"],
   .hrViewAssessmentFilterGroup select {
     min-width: 100%;
+  }
+
+  .hrViewAssessmentBtnClearFilters,
+  .hrViewAssessmentBtnExport {
+    width: 100%;
+    justify-content: center;
   }
 
   .hrViewAssessmentTable {

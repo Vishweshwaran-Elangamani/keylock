@@ -6,6 +6,49 @@ import AppraisalDetailsModal from "../../../components/performance_management/mo
 import Breadcrumb from "../../../components/common/Breadcrumb";
 import styles from "../../../styles/performancemanagement/hr/HRViewAssessment.module.css";
 
+/* Custom Dropdown Component */
+const CustomDropdown = ({ value, onChange, options, placeholder, disabled }) => {
+  const [open, setOpen] = useState(false);
+
+  const selected = options.find((o) => o.value === value) || { label: placeholder || "Select", value: "" };
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className={styles.customDropdown}
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+      style={{ position: "relative" }}
+    >
+      <div
+        className={`${styles.customSelected} ${disabled ? styles.customDisabled : ''}`}
+        onClick={() => !disabled && setOpen((prev) => !prev)}
+      >
+        {selected.label}
+        <span className={styles.customArrow} />
+      </div>
+
+      {open && !disabled && (
+        <div className={styles.customMenu}>
+          {options.map((opt) => (
+            <div
+              key={opt.value}
+              className={`${styles.customOption} ${opt.value === value ? styles.customOptionActive : ''}`}
+              onClick={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 function exportToCsv(filename, rows) {
   if (!rows || !rows.length) return;
   const separator = ",";
@@ -54,14 +97,12 @@ function statusBadge(status) {
   if (s.startsWith("pending"))
     return (
       <span className={`${styles.hrViewAssessmentBadge} ${styles.hrViewAssessmentBadgePending}`}>
-        <i className="bi bi-hourglass-split" style={{ marginRight: 6 }}></i>
         Pending
       </span>
     );
   return (
     <span className={`${styles.hrViewAssessmentBadge} ${styles.hrViewAssessmentBadgeDefault}`}>
-      <i className="bi bi-dot" style={{ marginRight: 6 }}></i>
-      {status}
+      Completed
     </span>
   );
 }
@@ -71,6 +112,7 @@ function HRViewAppraisals() {
   const [appraisals, setAppraisals] = useState([]);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchInput, setSearchInput] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterProject, setFilterProject] = useState("all");
   const [modalRow, setModalRow] = useState(null);
@@ -142,13 +184,22 @@ function HRViewAppraisals() {
   }, [appraisals]);
 
   const uniqueProjects = useMemo(() => {
-    const projects = new Set();
-    projects.add("all");
+    const projects = [{ label: "All Projects", value: "all" }];
+    const projectSet = new Set();
     allSummaryRows.forEach((row) => {
-      if (row.projectName) projects.add(row.projectName);
+      if (row.projectName && !projectSet.has(row.projectName)) {
+        projectSet.add(row.projectName);
+        projects.push({ label: row.projectName, value: row.projectName });
+      }
     });
-    return Array.from(projects);
+    return projects;
   }, [allSummaryRows]);
+
+  const statusOptions = [
+    { label: "All Statuses", value: "all" },
+    { label: "Pending", value: "pending" },
+    { label: "Completed", value: "completed" }
+  ];
 
   const summaryRows = useMemo(() => {
     let filtered = [...allSummaryRows];
@@ -218,6 +269,21 @@ function HRViewAppraisals() {
     setModalAttachments(row.attachments || []);
   };
 
+  const handleSearch = () => {
+    setSearchTerm(searchInput);
+    setCurrentPage(1);
+  };
+
+  const handleClearFilters = () => {
+    setSearchTerm("");
+    setSearchInput("");
+    setFilterStatus("all");
+    setFilterProject("all");
+    setCurrentPage(1);
+  };
+
+  const hasActiveFilters = searchTerm !== "" || filterStatus !== "all" || filterProject !== "all";
+
   if (loading)
     return (
       <div className={styles.hrViewAssessmentLoading}>
@@ -257,46 +323,60 @@ function HRViewAppraisals() {
 
       <div className={styles.hrViewAssessmentContainer}>
         <div className={styles.hrViewAssessmentFilters}>
-          <div className={styles.hrViewAssessmentFilterGroup}>
+          <div className={styles.hrViewAssessmentSearchGroup}>
             <input
               type="search"
-              placeholder="Type to search..."
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
+              placeholder="Search by employee name..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleSearch();
+                }
+              }}
+              className={styles.hrViewAssessmentSearchInput}
+            />
+            <button
+              onClick={handleSearch}
+              className={styles.hrViewAssessmentSearchBtn}
+            >
+              Search
+            </button>
+          </div>
+
+          <div className={styles.hrViewAssessmentFilterGroup}>
+            <CustomDropdown
+              value={filterStatus}
+              onChange={(val) => {
+                setFilterStatus(val);
                 setCurrentPage(1);
               }}
+              options={statusOptions}
+              placeholder="All Statuses"
             />
           </div>
 
           <div className={styles.hrViewAssessmentFilterGroup}>
-            <select
-              value={filterStatus}
-              onChange={(e) => {
-                setFilterStatus(e.target.value);
+            <CustomDropdown
+              value={filterProject}
+              onChange={(val) => {
+                setFilterProject(val);
                 setCurrentPage(1);
               }}
-            >
-              <option value="all">All Statuses</option>
-              <option value="pending">Pending</option>
-              <option value="completed">Completed</option>
-            </select>
+              options={uniqueProjects}
+              placeholder="All Projects"
+            />
           </div>
 
           <div className={styles.hrViewAssessmentFilterGroup}>
-            <select
-              value={filterProject}
-              onChange={(e) => {
-                setFilterProject(e.target.value);
-                setCurrentPage(1);
-              }}
+            <button
+              className={styles.hrViewAssessmentBtnClearFilters}
+              onClick={handleClearFilters}
+              disabled={!hasActiveFilters}
+              title="Clear all filters"
             >
-              {uniqueProjects.map((p) => (
-                <option key={p} value={p}>
-                  {p === "all" ? "All Projects" : p}
-                </option>
-              ))}
-            </select>
+              Clear Filters
+            </button>
           </div>
 
           <div className={styles.hrViewAssessmentFilterGroup}>
