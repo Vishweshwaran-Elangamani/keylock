@@ -828,28 +828,25 @@ const ProjectList = () => {
 
   return (
     <div className="prj-list-wrapper">
-      <nav aria-label="breadcrumb" className="prj-list-breadcrumb-nav">
-        <ol className="prj-list-breadcrumb breadcrumb">
-          <li className="breadcrumb-item">
-            <button
-              type="button"
-              onClick={() =>
-                navigate("/hr/dashboard/projectmgmt")
-              }
-              className="prj-list-breadcrumb-link"
-            >
-              <Home size={14} />
-              <span>Dashboard /</span>
-            </button>
-            
-          </li>
-          <li className="breadcrumb-item active" aria-current="page">
-            <span className="prj-list-breadcrumb-active">
-              All Projects
-            </span>
-          </li>
-        </ol>
-      </nav>
+     <nav aria-label="breadcrumb" className="prj-list-breadcrumb-nav">
+  <ol className="prj-list-breadcrumb breadcrumb">
+    <li className="breadcrumb-item prj-list-breadcrumb-item">
+      <button
+        type="button"
+        onClick={() => navigate("/hr/dashboard/projectmgmt")}
+        className="prj-list-breadcrumb-link"
+      >
+        <Home size={14} className="prj-list-breadcrumb-icon" />
+        <span>Dashboard</span>
+      </button>
+    </li>
+
+    <li className="breadcrumb-item active prj-list-breadcrumb-item" aria-current="page">
+      <span className="prj-list-breadcrumb-active">All Projects</span>
+    </li>
+  </ol>
+</nav>
+
 
       <div className="prj-list-filter-bar">
         <div className="prj-list-filter-bar-content">

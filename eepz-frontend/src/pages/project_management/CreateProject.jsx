@@ -837,8 +837,7 @@ const handleManagerSearchKeyPress = (e) => {
   onClick={() => navigate("/hr/dashboard/projectmgmt")}
   className="prj-breadcrumb-link"
 >
-  <Home size={14} />
-  <span>Dashboard</span>
+  <Home size={16} />
 </button>
 
           </li>

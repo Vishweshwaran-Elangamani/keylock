@@ -187,19 +187,33 @@ const ManagerMomDashboard = () => {
     
       <div className="row justify-content-center">
         <div className="col-lg-10 col-xl-9">
-          <nav aria-label="breadcrumb" className="sched-breadcrumb-nav">
-            <ol className="breadcrumb mb-0 d-flex align-items-center sched-breadcrumb">
-              <li className="breadcrumb-item d-flex align-items-center">
-                <button 
-                  onClick={() => navigate('/manager/dashboard')} 
-                  className="sched-breadcrumb-link"
-                >
-                  <Home size={16} />
-                  <span className="ms-1"> Dashboard</span>
-                </button>
-              </li>        
-            </ol>
-          </nav>
+          <nav
+  aria-label="breadcrumb"
+  className="sched-breadcrumb-nav"
+  style={{ "--bs-breadcrumb-divider": "''" }}
+>
+  <ol className="breadcrumb mb-0 d-flex align-items-center sched-breadcrumb">
+    <li className="breadcrumb-item d-flex align-items-center">
+      <button
+        type="button"
+        onClick={() => navigate("/manager/dashboard")}
+        className="sched-breadcrumb-link"
+        aria-label="Dashboard"
+      >
+        <Home size={16}  />
+      </button>
+    </li>
+
+    <li className="breadcrumb-separator">
+      /
+    </li>
+
+    <li className="breadcrumb-item active" aria-current="page">
+      <span className="sched-breadcrumb-active"> Meetings and MoM</span>
+    </li>
+  </ol>
+</nav>
+
         </div>
       </div>
 

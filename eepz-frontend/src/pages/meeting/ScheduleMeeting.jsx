@@ -323,30 +323,47 @@ const ScheduleMeeting = () => {
         <div className="col-lg-10 col-xl-9">
           <nav aria-label="breadcrumb" className="sched-breadcrumb-nav">
             <ol className="breadcrumb mb-0 d-flex align-items-center sched-breadcrumb">
-              <li className="breadcrumb-item d-flex align-items-center">
-                <button
-                  onClick={() => navigate("/manager/dashboard/")}
-                  className="sched-breadcrumb-link"
-                >
-                  <Home size={16} />
-                  Dashboard
-                </button>
-              </li>
-              <li className="sched-breadcrumb-separator">/</li>
-              <li className="breadcrumb-item d-flex align-items-center">
-                <button
-                  onClick={() => navigate("/manager/dashboard/meetmom")}
-                  className="sched-breadcrumb-link"
-                >
-                Meeting and MoM 
-                </button>
-              </li>
-              <li className="sched-breadcrumb-separator">/</li>
-              <li className="breadcrumb-item active d-flex align-items-center">
-                <span className="sched-breadcrumb-current">
-                  Schedule Meeting
-                </span>
-              </li>
+            
+<li className="breadcrumb-item d-flex align-items-center">
+  <button
+    onClick={() => navigate("/manager/dashboard/")}
+    className="sched-breadcrumb-link"
+    style={{ display: "flex", alignItems: "center", padding: 0 }}
+  >
+    <Home size={16} />
+  </button>
+</li>
+
+<li
+  className="sched-breadcrumb-separator"
+  style={{ margin: "0 4px" }} // Reduce horizontal space
+>
+  /
+</li>
+
+<li className="breadcrumb-item d-flex align-items-center">
+  <button
+    onClick={() => navigate("/manager/dashboard/meetmom")}
+    className="sched-breadcrumb-link"
+    style={{ padding: 0, marginLeft: "2px" }} // Reduce space near separator
+  >
+    Meeting and MoM
+  </button>
+</li>
+
+<li
+  className="sched-breadcrumb-separator"
+  style={{ margin: "0 4px" }} // Same reduced spacing
+>
+  /
+</li>
+
+<li className="breadcrumb-item active d-flex align-items-center">
+  <span className="sched-breadcrumb-current" style={{ marginLeft: "2px" }}>
+    Schedule Meeting
+  </span>
+</li>
+
             </ol>
           </nav>
 

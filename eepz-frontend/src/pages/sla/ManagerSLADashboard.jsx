@@ -363,29 +363,30 @@ const ManagerSLADashboard = () => {
   return (
     <div className="mgr-sla-wrapper">
       <nav aria-label="breadcrumb" className="mgr-sla-breadcrumb-nav">
-        <ol className="mgr-sla-breadcrumb-list">
-          <li className="mgr-sla-breadcrumb-item">
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate("/manager/dashboard");
-              }}
-              className="mgr-sla-breadcrumb-link"
-            >
-              <Home size={14} /> Dashboard
-            </a>
-            /
-          </li>
-          <li className="mgr-sla-breadcrumb-item">
-            <span className="mgr-sla-breadcrumb">SLA Compliance</span>
-          </li>
-          /
-          <li className="mgr-sla-breadcrumb-item mgr-sla-breadcrumb-item-active">
-            <span className="mgr-sla-breadcrumb-active">Manager</span>
-          </li>
-        </ol>
-      </nav>
+  <ol className="mgr-sla-breadcrumb-list">
+    <li className="mgr-sla-breadcrumb-item">
+      <a
+        href="#"
+        onClick={(e) => {
+          e.preventDefault();
+          navigate("/manager/dashboard");
+        }}
+        className="mgr-sla-breadcrumb-link"
+      >
+        <Home size={14} />
+      </a>
+    </li>
+
+    <li className="mgr-sla-breadcrumb-separator" aria-hidden="true">
+      /
+    </li>
+
+    <li className="mgr-sla-breadcrumb-item">
+      <span className="mgr-sla-breadcrumb">SLA Compliance</span>
+    </li>
+  </ol>
+</nav>
+
 
       <div className="mgr-sla-stats-grid">
         {[

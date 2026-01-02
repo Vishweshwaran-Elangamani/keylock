@@ -18,9 +18,16 @@ const ProjectManagementBreadcrumb = ({ items }) => {
         <li className="pm-breadcrumb__item">
           <Link to="/hr/dashboard" className="pm-breadcrumb__link">
             <Home size={16} className="pm-breadcrumb__icon" />
-            <span>Dashboard</span>
           </Link>
         </li>
+        {items && items.length > 0 && (
+          <>
+            <li className="pm-breadcrumb__separator">/</li>
+            <li className="pm-breadcrumb__item pm-breadcrumb__item--active">
+              <span className="pm-breadcrumb__text">{items[0].label}</span>
+            </li>
+          </>
+        )}
       </ol>
     </nav>
   );
@@ -71,7 +78,7 @@ const ProjectManagementDashboard = () => {
   return (
     <div className="pm-dashboard">
       <div className="pm-dashboard__container">
-        <ProjectManagementBreadcrumb   items={[{ label: "Project Management" }]} />
+        <ProjectManagementBreadcrumb items={[{ label: "Project Management" }]} />
         <div className="pm-dashboard__stats-grid">
           <div className="pm-dashboard__stat-card pm-dashboard__stat-card--primary">
             <div className="pm-dashboard__stat-icon pm-dashboard__stat-icon--primary">

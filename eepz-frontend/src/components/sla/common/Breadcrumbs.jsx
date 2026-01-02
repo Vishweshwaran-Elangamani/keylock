@@ -1,101 +1,115 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Home } from "lucide-react";
 
 const Breadcrumb = ({ items, dynamicLabels = {} }) => {
   const navigate = useNavigate();
   const params = useParams();
-  const location = useLocation();
+  useLocation();
+
+  const [homeHover, setHomeHover] = useState(false);
+
+  const accent = "var(--color-accent-1)";
+
+  const css = useMemo(
+    () => `
+      .sla-bc-scope a,
+      .sla-bc-scope a:link,
+      .sla-bc-scope a:visited,
+      .sla-bc-scope a:hover,
+      .sla-bc-scope a:focus,
+      .sla-bc-scope a:active {
+        color: ${accent} !important;
+        text-decoration: none !important;
+      }
+
+      .sla-bc-scope a:focus {
+        outline: none !important;
+        box-shadow: none !important;
+      }
+    `,
+    [accent]
+  );
 
   const resolveDynamicLabel = (item) => {
     if (item.param && params[item.param]) {
-      if (dynamicLabels[item.param]) {
-        return dynamicLabels[item.param];
-      }
+      if (dynamicLabels[item.param]) return dynamicLabels[item.param];
       return `SLA #${params[item.param]}`;
     }
     return item.label;
   };
 
   return (
-    <nav
-      aria-label="breadcrumb"
-      className="mb-3"
-      style={{ "--bs-breadcrumb-divider": "''" }}
-    >
+    <nav aria-label="breadcrumb" className="mb-3 sla-bc-scope">
+      <style>{css}</style>
+
       <ol
-        className="breadcrumb mb-0 p-0"
+        className="breadcrumb mb-0 p-3 rounded"
         style={{
-          backgroundColor: "transparent",
+          backgroundColor: "rgba(255, 255, 255, 0.05)",
           fontSize: "0.875rem",
           display: "flex",
           alignItems: "center",
-          gap: "0.5rem",
+          gap: "0.4rem",
         }}
       >
-        <li className="breadcrumb-item d-flex align-items-center gap-1">
+        <li className="breadcrumb-item d-flex align-items-center">
           <a
             href="#"
             onClick={(e) => {
               e.preventDefault();
               navigate("/dashboard");
             }}
+            onMouseEnter={() => setHomeHover(true)}
+            onMouseLeave={() => setHomeHover(false)}
             style={{
-              color: "var(--color-accent-1)",
+              color: accent,
               textDecoration: "none",
-              display: "flex",
+              display: "inline-flex",
               alignItems: "center",
-              gap: "0.25rem",
-              fontWeight: 600,
+              backgroundColor: homeHover ? "transparent" : "transparent",
             }}
+            aria-label="Dashboard"
+            title="Dashboard"
           >
-            <Home size={14} />
-            Dashboard
+            <Home size={14} color={accent} />
           </a>
-          <span style={{ color: "var(--color-accent-1)" }}>/</span>
         </li>
+
+        {items?.length > 0 && <span style={{ color: "#9ca3af", userSelect: "none" }}>/</span>}
 
         {items.map((item, index) => {
           const resolvedLabel = resolveDynamicLabel(item);
           const isLast = index === items.length - 1;
 
           return (
-            <li
-              key={index}
-              className={`breadcrumb-item d-flex align-items-center gap-1 ${
-                isLast ? "active" : ""
-              }`}
-              aria-current={isLast ? "page" : undefined}
-            >
-              {isLast ? (
-                <span
-                  style={{
-                    color: "var(--color-accent-1)",
-                    fontWeight: 600,
-                  }}
-                >
-                  {resolvedLabel}
-                </span>
-              ) : (
-                <a
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (item.path) navigate(item.path);
-                  }}
-                  style={{
-                    color: "var(--color-accent-1)",
-                    textDecoration: "none",
-                  }}
-                >
-                  {resolvedLabel}
-                </a>
-              )}
+            <React.Fragment key={index}>
+              <li
+                className={`breadcrumb-item ${isLast ? "active" : ""}`}
+                aria-current={isLast ? "page" : undefined}
+              >
+                {isLast ? (
+                  <span style={{ color: "#000", fontWeight: 600 }}>{resolvedLabel}</span>
+                ) : (
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (item.path) navigate(item.path);
+                    }}
+                    style={{
+                      color: accent,
+                      textDecoration: "none",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {resolvedLabel}
+                  </a>
+                )}
+              </li>
 
-              {!isLast && (
-                <span style={{ color: "var(--color-accent-1)" }}>/</span>
-              )}
-            </li>
+              {!isLast && <span style={{ color: "#9ca3af", userSelect: "none" }}>/</span>}
+            </React.Fragment>
           );
         })}
       </ol>

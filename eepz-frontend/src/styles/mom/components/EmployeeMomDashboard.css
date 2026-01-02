@@ -78,8 +78,10 @@
   color: #7a1d65;
 }
 
-.emd-breadcrumb-home i {
-  font-size: 1rem;
+/* Updated: home icon is now lucide <svg>, not <i> */
+.emd-breadcrumb-home svg {
+  width: 1rem;
+  height: 1rem;
 }
 
 .emd-breadcrumb-separator {
@@ -306,7 +308,6 @@
   color: #6b7280;
 }
 
-
 .emd-activity-list {
   display: flex;
   flex-direction: column;
@@ -395,7 +396,6 @@
   align-self: center;
 }
 
-
 .emd-meetings-list {
   display: flex;
   flex-direction: column;
@@ -413,7 +413,7 @@
 }
 
 .emd-meeting-item:hover {
-  background-color: #f1f5f9;               
+  background-color: #f1f5f9;
   box-shadow: 0 6px 14px rgba(17, 24, 39, 0.12);
   transform: translateX(4px);
 }

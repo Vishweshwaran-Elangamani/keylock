@@ -1,12 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import {
-  Star,
-  User,
-  MessageSquare,
-  Calendar,
-  Eye,
-  ThumbsUp,
-} from "lucide-react";
+import { Star, User, MessageSquare, Calendar, Eye, ThumbsUp, Home } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { mentorFeedbackApi } from "../../../services/feedbackmanagement/feedbackApi";
 import axios from "axios";
@@ -33,9 +26,7 @@ export default function MentorFeedbackDashboard() {
   const user = useMemo(() => {
     try {
       const stored = localStorage.getItem("user");
-      return stored
-        ? JSON.parse(stored)
-        : { empId: 1, firstName: "John", lastName: "Smith" };
+      return stored ? JSON.parse(stored) : { empId: 1, firstName: "John", lastName: "Smith" };
     } catch {
       return { empId: 1, firstName: "John", lastName: "Smith" };
     }
@@ -66,7 +57,7 @@ export default function MentorFeedbackDashboard() {
         return `${firstName} ${lastName}`;
       }
       return `Employee ${employeeId}`;
-    } catch (err) {
+    } catch {
       return `Employee ${employeeId}`;
     }
   };
@@ -77,7 +68,6 @@ export default function MentorFeedbackDashboard() {
 
     try {
       const empId = user?.empId || user?.employeeId || 1;
-
       const response = await mentorFeedbackApi.aboutMe(empId);
 
       if (response.data?.success && Array.isArray(response.data.data)) {
@@ -86,36 +76,28 @@ export default function MentorFeedbackDashboard() {
 
           if (feedback.menteeName) {
             const menteeId = parseInt(feedback.menteeName, 10);
-
-            if (!isNaN(menteeId)) {
-              menteeName = await fetchEmployeeName(menteeId);
-            }
+            if (!isNaN(menteeId)) menteeName = await fetchEmployeeName(menteeId);
           } else if (feedback.menteeEmployeeId) {
             const menteeId = parseInt(feedback.menteeEmployeeId, 10);
-
-            if (!isNaN(menteeId)) {
-              menteeName = await fetchEmployeeName(menteeId);
-            }
+            if (!isNaN(menteeId)) menteeName = await fetchEmployeeName(menteeId);
           }
 
           return {
             ...feedback,
-            menteeEmployeeId:
-              feedback.menteeEmployeeId || parseInt(feedback.menteeName, 10),
-            menteeName: menteeName,
+            menteeEmployeeId: feedback.menteeEmployeeId || parseInt(feedback.menteeName, 10),
+            menteeName,
             createdAtFormatted: formatDate(feedback.createdAt),
           };
         });
 
         const enriched = await Promise.all(enrichedPromises);
-
         setFeedbacks(enriched);
         setFilteredFeedbacks(enriched);
       } else {
         setFeedbacks([]);
         setFilteredFeedbacks([]);
       }
-    } catch (err) {
+    } catch {
       setError("Failed to load feedback. Please try again.");
       setFeedbacks([]);
       setFilteredFeedbacks([]);
@@ -137,17 +119,9 @@ export default function MentorFeedbackDashboard() {
   useEffect(() => {
     let filtered = [...feedbacks];
 
-    if (filters.status !== "all") {
-      filtered = filtered.filter((f) => f.status === filters.status);
-    }
-
-    if (filters.rating !== "all") {
-      filtered = filtered.filter((f) => f.rating === Number(filters.rating));
-    }
-
-    if (filters.skill !== "all") {
-      filtered = filtered.filter((f) => f.skillName === filters.skill);
-    }
+    if (filters.status !== "all") filtered = filtered.filter((f) => f.status === filters.status);
+    if (filters.rating !== "all") filtered = filtered.filter((f) => f.rating === Number(filters.rating));
+    if (filters.skill !== "all") filtered = filtered.filter((f) => f.skillName === filters.skill);
 
     setFilteredFeedbacks(filtered);
   }, [filters, feedbacks]);
@@ -155,16 +129,13 @@ export default function MentorFeedbackDashboard() {
   const handleAcknowledge = async (trackingId) => {
     try {
       const response = await mentorFeedbackApi.acknowledge(trackingId);
-
       if (response.data?.success) {
         setFeedbacks((prev) =>
-          prev.map((f) =>
-            f.trackingId === trackingId ? { ...f, status: "Acknowledged" } : f
-          )
+          prev.map((f) => (f.trackingId === trackingId ? { ...f, status: "Acknowledged" } : f))
         );
         alert("✓ Feedback acknowledged successfully!");
       }
-    } catch (err) {
+    } catch {
       alert("Failed to acknowledge feedback");
     }
   };
@@ -172,14 +143,9 @@ export default function MentorFeedbackDashboard() {
   const stats = useMemo(() => {
     const total = feedbacks.length;
     const avgRating =
-      total > 0
-        ? (feedbacks.reduce((sum, f) => sum + f.rating, 0) / total).toFixed(1)
-        : 0;
+      total > 0 ? (feedbacks.reduce((sum, f) => sum + f.rating, 0) / total).toFixed(1) : 0;
     const pending = feedbacks.filter((f) => f.status === "Submitted").length;
-    const acknowledged = feedbacks.filter(
-      (f) => f.status === "Acknowledged"
-    ).length;
-
+    const acknowledged = feedbacks.filter((f) => f.status === "Acknowledged").length;
     return { total, avgRating, pending, acknowledged };
   }, [feedbacks]);
 
@@ -239,9 +205,7 @@ export default function MentorFeedbackDashboard() {
         <button
           type="button"
           className={`mfd-dropdown-trigger ${isOpen ? "mfd-dropdown-trigger-open" : ""}`}
-          onClick={() =>
-            setOpenDropdown((prev) => (prev === name ? null : name))
-          }
+          onClick={() => setOpenDropdown((prev) => (prev === name ? null : name))}
         >
           <span className="mfd-dropdown-placeholder">{selectedLabel}</span>
           <span className={`mfd-dropdown-arrow ${isOpen ? "mfd-dropdown-arrow-open" : ""}`}>
@@ -263,9 +227,7 @@ export default function MentorFeedbackDashboard() {
             {options.map((opt) => (
               <div
                 key={opt.value}
-                className={`mfd-dropdown-item ${
-                  opt.value === selectedValue ? "mfd-dropdown-item-selected" : ""
-                }`}
+                className={`mfd-dropdown-item ${opt.value === selectedValue ? "mfd-dropdown-item-selected" : ""}`}
                 onClick={() => {
                   setFilters((prev) => ({ ...prev, [name]: opt.value }));
                   setOpenDropdown(null);
@@ -298,12 +260,8 @@ export default function MentorFeedbackDashboard() {
       <nav aria-label="breadcrumb" className="mfd-breadcrumb-nav">
         <ol className="mfd-breadcrumb">
           <li className="mfd-breadcrumb-item">
-            <button
-              onClick={() => navigate("/employee/dashboard")}
-              className="mfd-breadcrumb-link"
-            >
-              <i className="bi bi-house-door mfd-breadcrumb-icon"></i>
-              Dashboard
+            <button onClick={() => navigate("/employee/dashboard")} className="mfd-breadcrumb-link" type="button">
+              <Home size={16} />
             </button>
           </li>
           <li className="mfd-breadcrumb-separator">/</li>
@@ -311,6 +269,7 @@ export default function MentorFeedbackDashboard() {
             <button
               onClick={() => navigate("/employee/dashboard/feedback")}
               className="mfd-breadcrumb-link"
+              type="button"
             >
               Feedbacks
             </button>
@@ -361,15 +320,9 @@ export default function MentorFeedbackDashboard() {
 
       <div className="mfd-filters-card">
         <div className="mfd-filters-grid">
-          <div className="mfd-filter-col">
-            {renderDropdown("status", statusOptions)}
-          </div>
-          <div className="mfd-filter-col">
-            {renderDropdown("rating", ratingOptions)}
-          </div>
-          <div className="mfd-filter-col">
-            {renderDropdown("skill", skillOptions)}
-          </div>
+          <div className="mfd-filter-col">{renderDropdown("status", statusOptions)}</div>
+          <div className="mfd-filter-col">{renderDropdown("rating", ratingOptions)}</div>
+          <div className="mfd-filter-col">{renderDropdown("skill", skillOptions)}</div>
         </div>
       </div>
 
@@ -416,16 +369,12 @@ export default function MentorFeedbackDashboard() {
                       </div>
                     </td>
                     <td>
-                      <span className="mfd-badge-skill">
-                        {feedback.skillName}
-                      </span>
+                      <span className="mfd-badge-skill">{feedback.skillName}</span>
                     </td>
                     <td>
                       <div className="mfd-rating-cell">
                         <Star size={16} className="mfd-rating-star" />
-                        <span className="mfd-rating-text">
-                          {feedback.rating}/5
-                        </span>
+                        <span className="mfd-rating-text">{feedback.rating}/5</span>
                       </div>
                     </td>
                     <td>
@@ -443,6 +392,7 @@ export default function MentorFeedbackDashboard() {
                             setSelectedFeedback(feedback);
                           }}
                           title="View details"
+                          type="button"
                         >
                           <Eye size={14} />
                         </button>
@@ -454,6 +404,7 @@ export default function MentorFeedbackDashboard() {
                               handleAcknowledge(feedback.trackingId);
                             }}
                             title="Acknowledge"
+                            type="button"
                           >
                             <ThumbsUp size={14} />
                           </button>
@@ -470,16 +421,11 @@ export default function MentorFeedbackDashboard() {
 
       {selectedFeedback && (
         <>
-          <div
-            className="mfd-modal-backdrop"
-            onClick={() => setSelectedFeedback(null)}
-          />
+          <div className="mfd-modal-backdrop" onClick={() => setSelectedFeedback(null)} />
           <div
             className="mfd-modal"
             onClick={(e) => {
-              if (e.target.classList.contains("mfd-modal")) {
-                setSelectedFeedback(null);
-              }
+              if (e.target.classList.contains("mfd-modal")) setSelectedFeedback(null);
             }}
           >
             <div className="mfd-modal-dialog">
@@ -499,40 +445,30 @@ export default function MentorFeedbackDashboard() {
                   <div className="mfd-modal-grid">
                     <div className="mfd-modal-field">
                       <small className="mfd-modal-label">Skill</small>
-                      <div className="mfd-modal-value">
-                        {selectedFeedback.skillName}
-                      </div>
+                      <div className="mfd-modal-value">{selectedFeedback.skillName}</div>
                     </div>
                     <div className="mfd-modal-field">
                       <small className="mfd-modal-label">Rating</small>
                       <div className="mfd-modal-rating">
                         {renderStars(selectedFeedback.rating)}
-                        <span className="mfd-modal-rating-value">
-                          {selectedFeedback.rating}/5
-                        </span>
+                        <span className="mfd-modal-rating-value">{selectedFeedback.rating}/5</span>
                       </div>
                     </div>
                     <div className="mfd-modal-field">
                       <small className="mfd-modal-label">From</small>
                       <div className="mfd-modal-value">
-                        {selectedFeedback.isAnonymous
-                          ? "Anonymous"
-                          : selectedFeedback.menteeName}
+                        {selectedFeedback.isAnonymous ? "Anonymous" : selectedFeedback.menteeName}
                       </div>
                     </div>
                     <div className="mfd-modal-field">
                       <small className="mfd-modal-label">Submitted</small>
-                      <div className="mfd-modal-value">
-                        {selectedFeedback.createdAtFormatted}
-                      </div>
+                      <div className="mfd-modal-value">{selectedFeedback.createdAtFormatted}</div>
                     </div>
                   </div>
 
                   <div className="mfd-modal-comments-section">
                     <small className="mfd-modal-label">Feedback Comments</small>
-                    <div className="mfd-modal-comments">
-                      {selectedFeedback.feedbackComments}
-                    </div>
+                    <div className="mfd-modal-comments">{selectedFeedback.feedbackComments}</div>
                   </div>
                 </div>
                 <div className="mfd-modal-footer">
@@ -543,6 +479,7 @@ export default function MentorFeedbackDashboard() {
                         handleAcknowledge(selectedFeedback.trackingId);
                         setSelectedFeedback(null);
                       }}
+                      type="button"
                     >
                       <ThumbsUp size={16} />
                       Acknowledge
@@ -551,6 +488,7 @@ export default function MentorFeedbackDashboard() {
                   <button
                     className="mfd-modal-btn mfd-modal-btn-close"
                     onClick={() => setSelectedFeedback(null)}
+                    type="button"
                   >
                     Close
                   </button>

@@ -133,34 +133,34 @@ const ProjectDetails = () => {
   if (error || !project) {
     return (
       <div className="prj-detail-wrapper prj-detail-wrapper--column">
-        <nav aria-label="breadcrumb" className="prj-detail-breadcrumb-nav">
-          <ol className="prj-detail-breadcrumb">
-            <li className="prj-detail-breadcrumb-item">
-              <button
-                type="button"
-                onClick={() => navigate("/hr/dashboard/projectmgmt")}
-                className="prj-detail-breadcrumb-link"
-              >
-                <Home size={14} />
-                <span>Dashboard</span>
-              </button>
-            </li>
-            <li className="prj-detail-breadcrumb-item">
-              <button
-                type="button"
-                onClick={() => navigate("/hr/dashboard/projectmgmt/list")}
-                className="prj-detail-breadcrumb-link"
-              >
-                <span>All Projects</span>
-              </button>
-            </li>
-            <li className="prj-detail-breadcrumb-item prj-detail-breadcrumb-item-active">
-              <span className="prj-detail-breadcrumb-active">
-                Project Details
-              </span>
-            </li>
-          </ol>
-        </nav>
+       <nav aria-label="breadcrumb" className="prj-detail-breadcrumb-nav">
+  <ol className="prj-detail-breadcrumb">
+    <li className="prj-detail-breadcrumb-item">
+      <button
+        type="button"
+        onClick={() => navigate("/hr/dashboard/projectmgmt")}
+        className="prj-detail-breadcrumb-link"
+      >
+        <Home size={14} />
+      </button>
+    </li>
+    <li className="prj-detail-breadcrumb-item">
+      <button
+        type="button"
+        onClick={() => navigate("/hr/dashboard/projectmgmt/list")}
+        className="prj-detail-breadcrumb-link"
+      >
+        <span>All Projects</span>
+      </button>
+    </li>
+    <li className="prj-detail-breadcrumb-item prj-detail-breadcrumb-item-active">
+      <span className="prj-detail-breadcrumb-active">
+        {project.projectName}
+      </span>
+    </li>
+  </ol>
+</nav>
+
         <div className="prj-detail-alert prj-detail-alert--danger">
           <AlertCircle size={20} />
           <span>{error || "Project not found"}</span>
@@ -182,7 +182,7 @@ const ProjectDetails = () => {
               className="prj-detail-breadcrumb-link"
             >
               <Home size={14} />
-              <span>Dashboard</span>
+             
             </button>
           </li>
           <li className="prj-detail-breadcrumb-item">

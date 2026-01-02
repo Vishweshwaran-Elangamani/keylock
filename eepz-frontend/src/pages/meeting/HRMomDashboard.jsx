@@ -173,7 +173,7 @@ const HRMomDashboard = () => {
           <Breadcrumb
             items={[
               { label: "Meetings and MoM", href: "/hr/dashboard/mom" },
-              { label: "HR" },
+             
             ]}
           />
         </div>

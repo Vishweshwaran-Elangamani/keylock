@@ -49,9 +49,34 @@
 }
 
 .hr-sla-breadcrumb-active {
-  color: #97247e;
+  color: black;
   font-weight: 600;
+
 }
+
+.hr-sla-breadcrumb-link,
+.hr-sla-breadcrumb-link:visited {
+  color: #97247e;
+}
+
+.hr-sla-breadcrumb-link svg {
+  color: currentColor;
+  stroke: currentColor;
+}
+
+.hr-sla-breadcrumb-link:hover,
+.hr-sla-breadcrumb-link:focus,
+.hr-sla-breadcrumb-link:active {
+  color: #97247e;
+}
+
+.hr-sla-breadcrumb-link:hover svg,
+.hr-sla-breadcrumb-link:focus svg,
+.hr-sla-breadcrumb-link:active svg {
+  color: #97247e;
+  stroke: #97247e;
+}
+
 
 .hr-sla-alert-error {
   background: #f8d7da;

@@ -416,7 +416,6 @@ const HRSLADashboard = () => {
               className="hr-sla-breadcrumb-link"
             >
               <Home size={14} />
-              Dashboard
             </a>
             /
           </li>

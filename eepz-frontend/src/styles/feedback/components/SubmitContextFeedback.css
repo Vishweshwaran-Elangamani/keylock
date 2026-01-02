@@ -43,6 +43,22 @@
   transition: color 0.2s ease;
 }
 
+/* Keep Home icon color same on hover/focus */
+.scf-breadcrumb-link,
+.scf-breadcrumb-link:visited,
+.scf-breadcrumb-link:hover,
+.scf-breadcrumb-link:focus,
+.scf-breadcrumb-link:active {
+  color: var(--color-accent-1) !important;
+  text-decoration: none !important;
+}
+
+/* Ensure the icon itself doesn't change color */
+.scf-breadcrumb-link:hover .scf-breadcrumb-icon,
+.scf-breadcrumb-link:focus .scf-breadcrumb-icon {
+  color: var(--color-accent-1) !important;
+}
+
 .scf-breadcrumb-link:hover {
   color: #e01950;
 }
@@ -58,7 +74,7 @@
 }
 
 .scf-breadcrumb-active span {
-  color: #97247e;
+  color: black;
   font-weight: 600;
 }
 

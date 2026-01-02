@@ -6,6 +6,7 @@ import toastr from "toastr";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import { Home } from "lucide-react";
 import MeetingDetailsModal from "../../components/meeting/modals/MeetingDetailsModal";
 import SharedMomsModal from "../../components/meeting/modals/SharedMomsModal";
 import "../../styles/mom/components/EmployeeMomDashboard.css";
@@ -49,20 +50,16 @@ const EmployeeMomDashboard = () => {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      const [myMomsRes, actionItemsRes, invitationsRes, sharedRes] =
-        await Promise.all([
-          momService.getMyMoms(),
-          momService.getMyActionItems(),
-          rsvpService.getMyInvitations(),
-          momService.getMomsSharedWithMe(),
-        ]);
+      const [myMomsRes, actionItemsRes, invitationsRes, sharedRes] = await Promise.all([
+        momService.getMyMoms(),
+        momService.getMyActionItems(),
+        rsvpService.getMyInvitations(),
+        momService.getMomsSharedWithMe(),
+      ]);
 
-      const pendingActions =
-        actionItemsRes.data?.filter((item) => item.status === "Pending") || [];
+      const pendingActions = actionItemsRes.data?.filter((item) => item.status === "Pending") || [];
       const pendingInvites =
-        invitationsRes.data?.filter(
-          (inv) => inv.rsvpStatus === "Pending"
-        ) || [];
+        invitationsRes.data?.filter((inv) => inv.rsvpStatus === "Pending") || [];
 
       setStats({
         myMoms: myMomsRes.data?.length || 0,
@@ -98,6 +95,7 @@ const EmployeeMomDashboard = () => {
           });
         });
       }
+
       setRecentActivity(
         activity
           .sort((a, b) => new Date(b.date) - new Date(a.date))
@@ -124,9 +122,7 @@ const EmployeeMomDashboard = () => {
   const closeMeetingDetails = () => setSelectedMeeting(null);
 
   const handleActivityClick = (item) => {
-    if (item.meetingData) {
-      openMeetingDetails(item.meetingData);
-    }
+    if (item.meetingData) openMeetingDetails(item.meetingData);
   };
 
   const openSharedModal = () => setShowSharedModal(true);
@@ -153,23 +149,19 @@ const EmployeeMomDashboard = () => {
               <button
                 onClick={() => navigate("/employee/dashboard")}
                 className="emd-breadcrumb-link emd-breadcrumb-home"
+                type="button"
               >
-                <i className="bi bi-house-door"></i>
-                Dashboard
+                <Home size={16} />
+
               </button>
             </li>
+
             <li className="emd-breadcrumb-separator">/</li>
-            <li className="emd-breadcrumb-item">
-              <button
-                onClick={() => navigate("/employee/dashboard")}
-                className="emd-breadcrumb-link"
-              >
-                Meetings and MoM
-              </button>
-            </li>
-            <li className="emd-breadcrumb-separator">/</li>
+
+            {/* Removed "Meetings and MoM" middle breadcrumb as requested */}
+
             <li className="emd-breadcrumb-item emd-breadcrumb-active">
-              <span>MOM Management</span>
+              <span>Meetings and MoM</span>
             </li>
           </ol>
         </nav>
@@ -209,7 +201,6 @@ const EmployeeMomDashboard = () => {
           />
         </div>
 
-      
         <div className="row g-3 emd-actions-row">
           <ActionButton
             icon="bi-file-earmark-text"
@@ -242,7 +233,6 @@ const EmployeeMomDashboard = () => {
         </div>
 
         <div className="row emd-content-row">
-    
           <div className="col-lg-6 mb-4">
             <div className="emd-card">
               <div className="emd-card-body">
@@ -251,28 +241,21 @@ const EmployeeMomDashboard = () => {
                     <i className="bi bi-clock-history"></i>
                     Recent Activity
                   </h5>
-                  <span className="emd-count-badge">
-                    {recentActivity.length} items
-                  </span>
+                  <span className="emd-count-badge">{recentActivity.length} items</span>
                 </div>
+
                 {recentActivity.length === 0 ? (
                   <div className="emd-empty-state">
                     <div className="emd-empty-icon">
                       <i className="bi bi-inbox"></i>
                     </div>
                     <h6 className="emd-empty-title">No recent activity</h6>
-                    <p className="emd-empty-text">
-                      Your recent MOMs and invitations will appear here
-                    </p>
+                    <p className="emd-empty-text">Your recent MOMs and invitations will appear here</p>
                   </div>
                 ) : (
                   <div className="emd-activity-list">
                     {recentActivity.map((item, idx) => (
-                      <ActivityItem
-                        key={idx}
-                        item={item}
-                        onClick={() => handleActivityClick(item)}
-                      />
+                      <ActivityItem key={idx} item={item} onClick={() => handleActivityClick(item)} />
                     ))}
                   </div>
                 )}
@@ -288,19 +271,16 @@ const EmployeeMomDashboard = () => {
                     <i className="bi bi-calendar3"></i>
                     My Meetings
                   </h5>
-                  <span className="emd-count-badge">
-                    {meetings.length} meetings
-                  </span>
+                  <span className="emd-count-badge">{meetings.length} meetings</span>
                 </div>
+
                 {meetings.length === 0 ? (
                   <div className="emd-empty-state">
                     <div className="emd-empty-icon">
                       <i className="bi bi-calendar-x"></i>
                     </div>
                     <h6 className="emd-empty-title">No meetings found</h6>
-                    <p className="emd-empty-text">
-                      Create your first meeting minute to get started
-                    </p>
+                    <p className="emd-empty-text">Create your first meeting minute to get started</p>
                   </div>
                 ) : (
                   <>
@@ -313,32 +293,25 @@ const EmployeeMomDashboard = () => {
                         >
                           <div className="emd-meeting-main">
                             <div className="emd-meeting-title-row">
-                              <span className="emd-meeting-title">
-                                {m.meetingTitle}
-                              </span>
-                              <span className="emd-meeting-type-pill">
-                                {m.meetingType}
-                              </span>
+                              <span className="emd-meeting-title">{m.meetingTitle}</span>
+                              <span className="emd-meeting-type-pill">{m.meetingType}</span>
                             </div>
                             <div className="emd-meeting-meta-row">
                               <span className="emd-meta-item">
                                 <i className="bi bi-calendar3"></i>
-                                {new Date(
-                                  m.meetingDate
-                                ).toLocaleDateString()}
+                                {new Date(m.meetingDate).toLocaleDateString()}
                               </span>
                               <span className="emd-meta-item">
                                 <i className="bi bi-clock"></i>
-                                {new Date(m.meetingDate).toLocaleTimeString(
-                                  [],
-                                  { hour: "2-digit", minute: "2-digit" }
-                                )}
+                                {new Date(m.meetingDate).toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
                               </span>
                               {m.actionItems && m.actionItems.length > 0 && (
                                 <span className="emd-meta-item">
                                   <i className="bi bi-check-circle"></i>
-                                  {m.actionItems.length} action
-                                  {m.actionItems.length !== 1 ? "s" : ""}
+                                  {m.actionItems.length} action{m.actionItems.length !== 1 ? "s" : ""}
                                 </span>
                               )}
                             </div>
@@ -347,13 +320,13 @@ const EmployeeMomDashboard = () => {
                         </div>
                       ))}
                     </div>
+
                     {meetings.length > 5 && (
                       <div className="emd-view-all">
                         <button
                           className="emd-view-all-btn"
-                          onClick={() =>
-                            navigate("/employee/dashboard/meetmom/my-moms")
-                          }
+                          onClick={() => navigate("/employee/dashboard/meetmom/my-moms")}
+                          type="button"
                         >
                           View All {meetings.length} Meetings
                           <i className="bi bi-arrow-right"></i>
@@ -384,10 +357,7 @@ const EmployeeMomDashboard = () => {
 const StatCard = ({ icon, bgColor, iconColor, count, label, onClick }) => (
   <div className="col-xl-3 col-lg-6 col-md-6 col-sm-6 col-12">
     <div className="emd-stat-card-horizontal" onClick={onClick}>
-      <div
-        className="emd-stat-icon-block"
-        style={{ backgroundColor: bgColor }}
-      >
+      <div className="emd-stat-icon-block" style={{ backgroundColor: bgColor }}>
         <i className={`${icon} emd-stat-icon`} style={{ color: iconColor }} />
       </div>
       <div className="emd-stat-center">
@@ -397,12 +367,10 @@ const StatCard = ({ icon, bgColor, iconColor, count, label, onClick }) => (
     </div>
   </div>
 );
+
 const ActionButton = ({ icon, label, color, count, onClick }) => (
   <div className="col-xl-3 col-lg-6 col-md-6 col-sm-6 col-12">
-    <button
-      className={`emd-action-btn emd-action-${color}`}
-      onClick={onClick}
-    >
+    <button className={`emd-action-btn emd-action-${color}`} onClick={onClick} type="button">
       <span className="emd-action-main">
         <i className={`${icon} emd-action-icon`} />
         {label}
@@ -412,13 +380,9 @@ const ActionButton = ({ icon, label, color, count, onClick }) => (
   </div>
 );
 
-
 const ActivityItem = ({ item, onClick }) => (
   <div className="emd-activity-item" onClick={onClick}>
-    <div
-      className={`emd-activity-icon-wrapper emd-activity-${item.color ||
-        "primary"}`}
-    >
+    <div className={`emd-activity-icon-wrapper emd-activity-${item.color || "primary"}`}>
       <i className={`${item.icon} emd-activity-icon`} />
     </div>
     <div className="emd-activity-main">
@@ -430,10 +394,7 @@ const ActivityItem = ({ item, onClick }) => (
         </span>
         <span className="emd-meta-item">
           <i className="bi bi-clock"></i>
-          {new Date(item.date).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
+          {new Date(item.date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
         </span>
       </div>
     </div>

@@ -407,12 +407,17 @@ export default function SubmitContextFeedback() {
       <div className="scf-content">
         <nav className="scf-breadcrumb" aria-label="breadcrumb">
           <ol className="scf-breadcrumb-list">
-            <li className="scf-breadcrumb-item">
-              <Link to={baseDashboard} className="scf-breadcrumb-link">
-                <Home size={18} className="scf-breadcrumb-icon" />
-                {baseLabel}
-              </Link>
-            </li>
+          <li className="scf-breadcrumb-item">
+  <Link
+    to={baseDashboard}
+    className="scf-breadcrumb-link"
+    aria-label="Dashboard"
+    title="Dashboard"
+  >
+    <Home size={18} className="scf-breadcrumb-icon" />
+  </Link>
+</li>
+
             <li className="scf-breadcrumb-separator">/</li>
             <li className="scf-breadcrumb-item">
               <Link to={feedbackDashboard} className="scf-breadcrumb-link">

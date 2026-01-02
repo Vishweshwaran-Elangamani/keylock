@@ -11,6 +11,7 @@ import {
   AlertCircle,
   Send,
   Mail,
+  Home,
 } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -62,9 +63,7 @@ const MeetingInvitations = () => {
       invitation.rsvpStatus || invitation.RSVPStatus || RSVP_STATUS.PENDING;
     const validStatuses = Object.values(RSVP_STATUS);
     setRsvpStatus(
-      validStatuses.includes(currentStatus)
-        ? currentStatus
-        : RSVP_STATUS.ACCEPTED
+      validStatuses.includes(currentStatus) ? currentStatus : RSVP_STATUS.ACCEPTED
     );
     setRsvpComment(invitation.rsvpComments || invitation.RSVPComments || "");
   };
@@ -78,8 +77,7 @@ const MeetingInvitations = () => {
   const handleRsvpSubmit = async () => {
     if (!selectedInvitation) return;
 
-    const meetingId =
-      selectedInvitation.meetingId || selectedInvitation.MeetingId;
+    const meetingId = selectedInvitation.meetingId || selectedInvitation.MeetingId;
 
     if (!meetingId || Number(meetingId) === 0) {
       setErrorMessage("Invalid meeting ID.");
@@ -217,15 +215,19 @@ const MeetingInvitations = () => {
     <div className="mi-page">
       <div className="row justify-content-center">
         <div className="col-lg-10 col-xl-9">
-          <nav aria-label="breadcrumb" className="mi-breadcrumb-nav">
+          <nav
+            aria-label="breadcrumb"
+            className="mi-breadcrumb-nav"
+            style={{ "--bs-breadcrumb-divider": "''" }}
+          >
             <ol className="breadcrumb mb-0 d-flex align-items-center mi-breadcrumb">
               <li className="breadcrumb-item mi-breadcrumb-item">
                 <button
                   onClick={() => navigate("/employee/dashboard")}
                   className="mi-breadcrumb-link-button"
+                  type="button"
                 >
-                  <i className="bi bi-house-door mi-breadcrumb-home-icon"></i>
-                  Dashboard
+                  <Home size={16} className="mi-breadcrumb-home-icon" />
                 </button>
               </li>
               <li className="mi-breadcrumb-separator">/</li>
@@ -233,6 +235,7 @@ const MeetingInvitations = () => {
                 <button
                   onClick={() => navigate("/employee/dashboard/meetmom")}
                   className="mi-breadcrumb-link-button"
+                  type="button"
                 >
                   Meetings and MoM
                 </button>
@@ -242,9 +245,7 @@ const MeetingInvitations = () => {
                 className="breadcrumb-item active mi-breadcrumb-item"
                 aria-current="page"
               >
-                <span className="mi-breadcrumb-current">
-                  Meeting Invitations
-                </span>
+                <span className="mi-breadcrumb-current">Meeting Invitations</span>
               </li>
             </ol>
           </nav>
@@ -268,11 +269,7 @@ const MeetingInvitations = () => {
                 const meetingTitle =
                   getField(inv, "meetingTitle", "MeetingTitle") ||
                   "Untitled Meeting";
-                const meetingDate = getField(
-                  inv,
-                  "meetingDate",
-                  "MeetingDate"
-                );
+                const meetingDate = getField(inv, "meetingDate", "MeetingDate");
                 const rsvpStatusValue =
                   getField(inv, "rsvpStatus", "RSVPStatus") ||
                   RSVP_STATUS.PENDING;
@@ -301,14 +298,13 @@ const MeetingInvitations = () => {
 
                           <div className="col">
                             <div className="mi-card-header-row">
-                              <h5 className="mi-meeting-title">
-                                {meetingTitle}
-                              </h5>
+                              <h5 className="mi-meeting-title">{meetingTitle}</h5>
                               <div className="mi-header-actions">
                                 {getStatusBadge(rsvpStatusValue)}
                                 <button
                                   className="btn mi-gradient-button mi-rsvp-button"
                                   onClick={() => openRsvpModal(inv)}
+                                  type="button"
                                 >
                                   <Send size={16} />
                                   RSVP
@@ -320,10 +316,7 @@ const MeetingInvitations = () => {
                               {schedulerName && (
                                 <div className="col-md-4">
                                   <div className="mi-info-row">
-                                    <User
-                                      size={18}
-                                      className="mi-info-icon"
-                                    />
+                                    <User size={18} className="mi-info-icon" />
                                     <div>
                                       <div className="mi-info-label">
                                         Organized by
@@ -342,10 +335,7 @@ const MeetingInvitations = () => {
                                 }
                               >
                                 <div className="mi-info-row">
-                                  <Clock
-                                    size={18}
-                                    className="mi-info-icon"
-                                  />
+                                  <Clock size={18} className="mi-info-icon" />
                                   <div>
                                     <div className="mi-info-label">
                                       Meeting Time
@@ -388,9 +378,7 @@ const MeetingInvitations = () => {
                 <div className="modal-content mi-modal-content">
                   <div className="modal-header mi-modal-header">
                     <div className="mi-modal-header-text">
-                      <h5 className="modal-title mi-modal-title">
-                        Confirm RSVP
-                      </h5>
+                      <h5 className="modal-title mi-modal-title">Confirm RSVP</h5>
                       <p className="mi-modal-subtitle">
                         Respond to meeting invitation
                       </p>
@@ -405,10 +393,7 @@ const MeetingInvitations = () => {
                   <div className="modal-body mi-modal-body">
                     {errorMessage && (
                       <div className="alert alert-danger mi-error-alert">
-                        <XCircle
-                          size={18}
-                          className="mi-error-icon"
-                        />
+                        <XCircle size={18} className="mi-error-icon" />
                         <div className="mi-error-text">
                           <strong>Error:</strong> {errorMessage}
                         </div>
@@ -431,10 +416,7 @@ const MeetingInvitations = () => {
                         </h6>
                         <div className="mi-modal-info-list">
                           <div className="mi-modal-info-row">
-                            <Clock
-                              size={16}
-                              className="mi-info-icon"
-                            />
+                            <Clock size={16} className="mi-info-icon" />
                             <span className="mi-modal-info-text">
                               {formatDateTime(
                                 getField(
@@ -454,10 +436,7 @@ const MeetingInvitations = () => {
                             "OrganizerName"
                           ) && (
                             <div className="mi-modal-info-row">
-                              <User
-                                size={16}
-                                className="mi-info-icon"
-                              />
+                              <User size={16} className="mi-info-icon" />
                               <span className="mi-modal-info-text">
                                 Organized by{" "}
                                 <strong>
@@ -606,6 +585,7 @@ const MeetingInvitations = () => {
                     <button
                       className="btn btn-light mi-cancel-button"
                       onClick={closeRsvpModal}
+                      type="button"
                     >
                       Cancel
                     </button>
@@ -613,6 +593,7 @@ const MeetingInvitations = () => {
                       className="btn mi-gradient-button mi-submit-button"
                       onClick={handleRsvpSubmit}
                       disabled={submitting}
+                      type="button"
                     >
                       {submitting ? (
                         <>

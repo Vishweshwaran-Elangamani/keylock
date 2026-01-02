@@ -1,4 +1,3 @@
-// src/.../CreateManagerReview.jsx
 import React, { useMemo, useState, useEffect } from "react";
 import {
   CheckCircle,
@@ -159,7 +158,6 @@ export default function CreateManagerReview() {
                   onClick={() => navigate("/manager/dashboard/")}
                 >
                   <Home size={16} className="cmr-breadcrumb-icon" />
-                  Dashboard
                 </button>
               </li>
               <li className="cmr-breadcrumb-separator">/</li>

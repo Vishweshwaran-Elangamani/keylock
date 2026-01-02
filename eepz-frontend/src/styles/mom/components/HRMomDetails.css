@@ -81,6 +81,32 @@
   margin-top: 15px;
 }
 
+.hrmom-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+  display: none;
+}
+
+.hrmom-breadcrumb-item {
+  display: flex;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.hrmom-breadcrumb-item a,
+.hrmom-breadcrumb-item a:link,
+.hrmom-breadcrumb-item a:visited,
+.hrmom-breadcrumb-item a:hover,
+.hrmom-breadcrumb-item a:focus,
+.hrmom-breadcrumb-item a:active {
+  color: #97247e !important;
+  text-decoration: none !important;
+}
+
+.hrmom-breadcrumb-item a:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+
 .hrmom-breadcrumb-link {
   color: #97247e;
   text-decoration: none;
@@ -104,7 +130,7 @@
 }
 
 .hrmom-breadcrumb-active {
-  color: #7a1d66;
+  color: black;
   font-weight: 600;
 }
 

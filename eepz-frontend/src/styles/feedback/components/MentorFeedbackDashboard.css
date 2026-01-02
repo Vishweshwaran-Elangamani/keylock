@@ -94,7 +94,7 @@ margin-bottom: 25px;
 
 
 .mfd-breadcrumb-active span {
-  color: #97247e;
+  color: black;
   font-size: 0.875rem;
   font-weight: 600;
 }
@@ -307,9 +307,9 @@ margin-bottom: 25px;
 
 
 .mfd-dropdown-item-selected {
-  background-color: #27235c;
-  color: white;
-  font-weight: 600;
+  background-color: #eeeeee;
+  color: #111827;
+  font-weight: 700;
 }
 
 

@@ -238,8 +238,8 @@ const EmployeeSLADashboard = () => {
     <div className="emp-sla-dashboard">
       <Breadcrumb
         items={[
-          { label: "SLA Compliance" },
-          { label: "My SLAs", active: true },
+          { label: "SLA Compliance", active: true },
+       
         ]}
       />
 
