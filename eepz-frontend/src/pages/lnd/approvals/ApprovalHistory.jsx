@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Download, Filter, ChevronUp, ChevronDown, Search } from "lucide-react";
-import Breadcrumb from "../../../components/lnd/common/Breadcrumb";
+import Breadcrumb from "../../../components/common/Breadcrumb";
 import Pagination from "../../../components/lnd/common/Pagination";
 import StatusBadge from "../../../components/lnd/common/StatusBadge";
 import EmptyState from "../../../components/lnd/common/EmptyState";
@@ -11,6 +11,7 @@ import {
 } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
 import styles from "../../../styles/lnd/pages/approvals/ApprovalHistory.module.css";
+
 
 const ApprovalHistory = () => {
   const [approvals, setApprovals] = useState([]);
@@ -65,7 +66,7 @@ const ApprovalHistory = () => {
       Admin: "/admin",
     };
     return prefixMap[role] || "/employee";
-  };
+  };       
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -295,8 +296,7 @@ const ApprovalHistory = () => {
     <div>
       <Breadcrumb
         items={[
-          { label: "", path: "/dashboard", icon: "house-door" },
-          { label: "LnD Dashboard", path: "/lnd/dashboard", icon: "" },
+          { label: "LnD Dashboard", path: `${rolePrefix}/lnd/dashboard` },
           { label: "Approval History" },
         ]}
       />

@@ -17,13 +17,21 @@ import {
   canUserComment,
   isOverdue,
 } from "../../utils/goals/goalHelpers";
-import Breadcrumb from "../../components/goals/common/Breadcrumb";
+import Breadcrumb from "../../components/common/Breadcrumb";
 import styles from "../../styles/goals/pages/ViewGoalPage.module.css";
 
 const ViewGoalPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const getRolePrefix = (role) => ({
+    Manager: "/manager",
+    "Department Head": "/department-head",
+    Leadership: "/leadership",
+    Employee: "/employee",
+  }[role] || "/employee");
+
+  const rolePrefix = getRolePrefix(user.role);
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -172,8 +180,8 @@ const ViewGoalPage = () => {
       {goal && (
         <Breadcrumb
           items={[
-            { label: "", path: "/dashboard", icon: "house-door" },
-            { label: "Goals Dashboard", path: "/dashboard/goals", icon: "" },
+            
+            { label: "Goals Dashboard", path: `${rolePrefix}/dashboard/goals` },
             { label: goal.title || "Goal Details", path: null, icon: "" },
           ]}
         />

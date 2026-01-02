@@ -9,12 +9,20 @@ import LoadingSpinner from "../../components/goals/common/LoadingSpinner";
 import Alert from "../../components/goals/common/Alert";
 import Pagination from "../../components/goals/common/Pagination";
 import { GOAL_TYPES } from "../../constants/goals/goalConstants";
-import Breadcrumb from "../../components/goals/common/Breadcrumb";
+import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
 import styles from "../../styles/goals/pages/YourGoalsPage.module.css";
 
 const YourGoalsPage = () => {
   const { user } = useAuth();
+  const getRolePrefix = (role) => ({
+    Manager: "/manager",
+    "Department Head": "/department-head",
+    Leadership: "/leadership",
+    Employee: "/employee",
+  }[role] || "/employee");
+
+  const rolePrefix = getRolePrefix(user.role);
 
   const [loading, setLoading] = useState(true);
   const [alert, setAlert] = useState(null);
@@ -273,8 +281,8 @@ const YourGoalsPage = () => {
       {/* Breadcrumb */}
       <Breadcrumb
         items={[
-          { label: "", path: "/dashboard", icon: "house-door" },
-          { label: "Goals Dashboard", path: "/dashboard/goals", icon: "" },
+          
+          { label: "Goals Dashboard", path: `${rolePrefix}/dashboard/goals` },
           { label: "Your Goals", path: null, icon: "" },
         ]}
       />

@@ -35,8 +35,8 @@ const Breadcrumb = ({ items }) => {
             <li
               key={index}
               className={`breadcrumb-item ${isLast ? "active" : ""} ${styles.breadcrumbItem}`}
-              aria-current={isLast ? "page" : undefined}
-            >
+              aria-current={isLast ? "page" : undefined}  
+            >                                                                                 
               {!isLast && fullPath ? (
                 <button
                   className={styles.breadcrumbLink}
@@ -63,6 +63,6 @@ const Breadcrumb = ({ items }) => {
       </ol>
     </nav>
   );
-};
+};                       
 
-export default Breadcrumb;
+export default Breadcrumb;  

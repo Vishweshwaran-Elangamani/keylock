@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Users, ChevronRight, Search, X } from "lucide-react";
-import Breadcrumb from "../../../components/lnd/common/Breadcrumb";
+import Breadcrumb from "../../../components/common/Breadcrumb";
 import Pagination from "../../../components/lnd/common/Pagination";
 import EmptyState from "../../../components/lnd/common/EmptyState";
 import EmployeeSkillsModal from "../../../components/lnd/modals/EmployeeSkillsModal";
@@ -138,8 +138,8 @@ const TeamSkills = () => {
     <div>
       <Breadcrumb
         items={[
-          { label: "", path: "/dashboard", icon: "house-door" },
-          { label: "LnD Dashboard", path: "/lnd/dashboard", icon: "" },
+         
+          { label: "LnD Dashboard", path: `${rolePrefix}/lnd/dashboard` },
           { label: "Team Skills" },
         ]}
       />

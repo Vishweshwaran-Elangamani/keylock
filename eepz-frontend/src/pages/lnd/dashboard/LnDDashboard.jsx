@@ -12,7 +12,7 @@ import {
   Building2,
   Briefcase,
 } from "lucide-react";
-import Breadcrumb from "../../../components/lnd/common/Breadcrumb";
+import Breadcrumb from "../../../components/common/Breadcrumb";
 import { lndService } from "../../../services/lnd/lndService";
 import { toast } from "sonner";
 import styles from "../../../styles/lnd/pages/dashboard/LnDDashboard.module.css";
@@ -47,8 +47,8 @@ const LnDDashboard = () => {
       Leadership: "/leadership",
       Employee: "/employee",
       HR: "/hr",
-      Admin: "/admin",
-    };
+      Admin: "/admin",   
+    }; 
     return prefixMap[role] || "/employee";
   };
 
@@ -196,10 +196,10 @@ const LnDDashboard = () => {
       {/* Breadcrumb */}
       <Breadcrumb
         items={[
-          { label: "", path: "/dashboard", icon: "house-door" },
-          { label: "LnD Dashboard" },
+          
+          { label: "LnD Dashboard" },                                        
         ]}
-      />
+      />     
 
       {/* Header Section */}
       <div className={styles.headerSection}>
@@ -274,4 +274,5 @@ const LnDDashboard = () => {
   );
 };
 
-export default LnDDashboard;
+export default LnDDashboard; 
+

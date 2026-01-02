@@ -7,11 +7,19 @@ import LoadingSpinner from "../../components/goals/common/LoadingSpinner";
 import Alert from "../../components/goals/common/Alert";
 import Pagination from "../../components/goals/common/Pagination";
 import { APPROVAL_TYPE_LABELS } from "../../constants/goals/goalConstants";
-import Breadcrumb from "../../components/goals/common/Breadcrumb";
+import Breadcrumb from "../../components/common/Breadcrumb";
 import styles from "../../styles/goals/pages/GoalApprovalsPage.module.css";
 
 const GoalApprovalsPage = () => {
   const { user } = useAuth();
+  const getRolePrefix = (role) => ({
+    Manager: "/manager",
+    "Department Head": "/department-head",
+    Leadership: "/leadership",
+    Employee: "/employee",
+  }[role] || "/employee");
+
+  const rolePrefix = getRolePrefix(user.role);
   const [loading, setLoading] = useState(true);
   const [alert, setAlert] = useState(null);
   const [allApprovals, setAllApprovals] = useState([]);
@@ -313,11 +321,11 @@ const GoalApprovalsPage = () => {
       <div className={`container-fluid ${styles.container}`}>
         <Breadcrumb
           items={[
-            { label: "", path: "/dashboard", icon: "house-door" },
-            { label: "Goals Dashboard", path: "/dashboard/goals", icon: "" },
+           
+            { label: "Goals Dashboard", path: `${rolePrefix}/dashboard/goals` },
             { label: "Approvals", path: null, icon: "" },
           ]}
-        />
+        />  
 
         {alert && (
           <Alert

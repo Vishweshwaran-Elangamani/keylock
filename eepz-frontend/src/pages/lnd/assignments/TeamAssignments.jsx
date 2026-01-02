@@ -8,7 +8,7 @@ import {
   Filter,
   AlertTriangle,
 } from "lucide-react";
-import Breadcrumb from "../../../components/lnd/common/Breadcrumb";
+import Breadcrumb from "../../../components/common/Breadcrumb";
 import Pagination from "../../../components/lnd/common/Pagination";
 import StatusBadge from "../../../components/lnd/common/StatusBadge";
 import EmptyState from "../../../components/lnd/common/EmptyState";
@@ -334,8 +334,8 @@ const TeamAssignments = () => {
     <div>
       <Breadcrumb
         items={[
-          { label: "", path: "/dashboard", icon: "house-door" },
-          { label: "LnD Dashboard", path: "/lnd/dashboard", icon: "" },
+         
+          { label: "LnD Dashboard", path: `${rolePrefix}/lnd/dashboard` },
           { label: "Team Assignments" },
         ]}
       />

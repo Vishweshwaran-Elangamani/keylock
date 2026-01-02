@@ -7,7 +7,7 @@ import {
   Filter,
   AlertTriangle,
 } from "lucide-react";
-import Breadcrumb from "../../../components/lnd/common/Breadcrumb";
+import Breadcrumb from "../../../components/common/Breadcrumb";
 import Pagination from "../../../components/lnd/common/Pagination";
 import StatusBadge from "../../../components/lnd/common/StatusBadge";
 import EmptyState from "../../../components/lnd/common/EmptyState";
@@ -99,7 +99,7 @@ const OrganizationAssignments = () => {
       if (response.data.success) {
         let items = response.data.data.items;
 
-       
+        // Client-side filtering for overdue
         if (statusFilter === ASSIGNMENT_STATUS.OVERDUE) {
           items = items.filter((a) => a.isOverdue === true);
         }
@@ -124,7 +124,7 @@ const OrganizationAssignments = () => {
 
 
       const response = await lndService.exportOrganizationAssignments(
-        statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter,  
+        statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter,  // Also handle overdue for export
         searchTerm,
         sortField,
         sortOrderAsc ? "asc" : "desc"
@@ -281,8 +281,8 @@ const OrganizationAssignments = () => {
     <div>
       <Breadcrumb
         items={[
-          { label: "", path: "/dashboard", icon: "house-door" },
-          { label: "LnD Dashboard", path: "/lnd/dashboard", icon: "" },
+        
+          { label: "LnD Dashboard", path: "/hr/lnd/dashboard", icon: "" },
           { label: "Organizational Assignments" },
         ]}
       />

@@ -9,13 +9,24 @@ import GoalFormModal from "../../components/goals/modals/GoalFormModal";
 import LoadingSpinner from "../../components/goals/common/LoadingSpinner";
 import Alert from "../../components/goals/common/Alert";
 import Pagination from "../../components/goals/common/Pagination";
-import Breadcrumb from "../../components/goals/common/Breadcrumb";
+import Breadcrumb from "../../components/common/Breadcrumb";
 import { GOAL_TYPES } from "../../constants/goals/goalConstants";
 import styles from "../../styles/goals/pages/GoalsDashboard.module.css";
+
 
 const GoalsDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  // Role prefix mapping for breadcrumb
+  const getRolePrefix = (role) => ({
+    Manager: "/manager",
+    "Department Head": "/department-head",
+    Leadership: "/leadership",
+    Employee: "/employee",
+  }[role] || "/employee");
+
+  const rolePrefix = getRolePrefix(user.role);
 
   const [loading, setLoading] = useState(true);
   const [loadingGoals, setLoadingGoals] = useState(false);
@@ -166,8 +177,7 @@ const GoalsDashboard = () => {
     <div className="container-fluid">
       <Breadcrumb
         items={[
-          { label: "", path: "/dashboard", icon: "house-door" },
-          { label: "Goals Dashboard", path: "/dashboard/goals", icon: "" },
+          { label: "Goals Dashboard", path: `${rolePrefix}/dashboard/goals` },
         ]}
       />
 
