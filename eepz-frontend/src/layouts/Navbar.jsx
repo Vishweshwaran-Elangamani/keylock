@@ -14,6 +14,7 @@ import "../styles/layout_styles/Navbar.css";
 
 const Navbar = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showAwardDropdown, setShowAwardDropdown] = useState(false);
   const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [nominations, setNominations] = useState([]);
@@ -92,6 +93,7 @@ const Navbar = () => {
     navigate("/employee/dashboard/performance/nominations", {
       state: { selectedNomination: nomination },
     });
+    setShowAwardDropdown(false);
   };
 
   const handleCameraClick = (e) => {
@@ -119,6 +121,9 @@ const Navbar = () => {
   const initials = getUserInitials(user);
   const displayEmail = getUserEmail(user);
 
+  // Check if we should show dropdown (3+ awards) or individual cards (1-2 awards)
+  const showDropdown = nominations.length > 2;
+
   return (
     <>
       <header className="nbd-navbar">
@@ -136,34 +141,91 @@ const Navbar = () => {
 
           {/* Right Section */}
           <div className="nbd-navbar-right">
-            {/* Individual Nomination Cards */}
-            {hasNominations &&
-              nominations.length > 0 &&
-              nominations.map((nomination, index) => (
-                <div
-                  key={nomination.nominationId || index}
-                  className="nbd-congrats-card"
-                  onClick={() => handleNavigateToNominations(nomination)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) =>
-                    (e.key === "Enter" || e.key === " ") &&
-                    handleNavigateToNominations(nomination)
-                  }
-                  aria-label="View Nominations"
-                >
-                  <div className="nbd-congrats-icon">
-                    <div className="nbd-star-icon">★</div>
-                  </div>
+            {/* Conditional Rendering: Dropdown for 3+ awards, Individual cards for 1-2 */}
+            {hasNominations && nominations.length > 0 && (
+              <>
+                {showDropdown ? (
+                  // DROPDOWN BADGE for 3+ awards
+                  <div className="nbd-award-dropdown">
+                    <button
+                      className="nbd-award-badge-btn"
+                      onClick={() => setShowAwardDropdown(!showAwardDropdown)}
+                      aria-label="View Awards"
+                    >
+                      <i className="bi bi-trophy-fill"></i>
+                      <span className="nbd-award-text">Awards</span>
+                      <span className="nbd-award-count">{nominations.length}</span>
+                      <i className={`bi bi-chevron-${showAwardDropdown ? 'up' : 'down'} nbd-chevron-icon`}></i>
+                    </button>
 
-                  <div className="nbd-congrats-content">
-                    <div className="nbd-congrats-title">Congratulations!</div>
-                    <div className="nbd-congrats-subtitle">
-                      {nomination.roleType}
-                    </div>
+                    {/* Award Dropdown Menu */}
+                    {showAwardDropdown && (
+                      <div className="nbd-award-dropdown-menu">
+                        <div className="nbd-award-dropdown-header">
+                          <i className="bi bi-trophy-fill"></i>
+                          <h5>Your Awards</h5>
+                        </div>
+                        <div className="nbd-award-dropdown-body">
+                          {nominations.map((nomination, index) => (
+                            <div
+                              key={nomination.nominationId || index}
+                              className="nbd-award-dropdown-item"
+                              onClick={() => handleNavigateToNominations(nomination)}
+                              role="button"
+                              tabIndex={0}
+                              onKeyDown={(e) =>
+                                (e.key === "Enter" || e.key === " ") &&
+                                handleNavigateToNominations(nomination)
+                              }
+                            >
+                              <div className="nbd-award-item-icon">
+                                <i className="bi bi-award-fill"></i>
+                              </div>
+                              <div className="nbd-award-item-content">
+                                <strong className="nbd-award-item-title">
+                                  Congratulations!
+                                </strong>
+                                <span className="nbd-award-item-subtitle">
+                                  {nomination.roleType}
+                                </span>
+                              </div>
+                              <i className="bi bi-chevron-right nbd-award-item-arrow"></i>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))}
+                ) : (
+                  // INDIVIDUAL CARDS for 1-2 awards
+                  nominations.map((nomination, index) => (
+                    <div
+                      key={nomination.nominationId || index}
+                      className="nbd-congrats-card"
+                      onClick={() => handleNavigateToNominations(nomination)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) =>
+                        (e.key === "Enter" || e.key === " ") &&
+                        handleNavigateToNominations(nomination)
+                      }
+                      aria-label="View Nominations"
+                    >
+                      <div className="nbd-congrats-icon">
+                        <div className="nbd-star-icon">★</div>
+                      </div>
+
+                      <div className="nbd-congrats-content">
+                        <div className="nbd-congrats-title">Congratulations!</div>
+                        <div className="nbd-congrats-subtitle">
+                          {nomination.roleType}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </>
+            )}
 
             {/* User Profile Dropdown */}
             <div className="nbd-profile-wrapper">
@@ -241,11 +303,19 @@ const Navbar = () => {
         </div>
       </header>
 
-      {/* Backdrop */}
+      {/* Backdrop for Profile Menu */}
       {showProfileMenu && (
         <div
           className="nbd-backdrop"
           onClick={() => setShowProfileMenu(false)}
+        />
+      )}
+
+      {/* Backdrop for Award Dropdown */}
+      {showAwardDropdown && (
+        <div
+          className="nbd-backdrop"
+          onClick={() => setShowAwardDropdown(false)}
         />
       )}
 

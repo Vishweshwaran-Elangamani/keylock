@@ -11,56 +11,6 @@ import "../../../styles/performancemanagement/hr/FormList.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 
-/* Custom Dropdown Component */
-const CustomFilterDropdown = ({ value, onChange, options, placeholder = "Select..." }) => {
-  const [open, setOpen] = useState(false);
-
-  const dropdownOptions = Array.isArray(options)
-    ? options.map(opt => typeof opt === 'string' ? { label: opt, value: opt } : opt)
-    : [];
-
-  const selected = dropdownOptions.find((o) => o.value === value) || dropdownOptions[0] || { label: placeholder, value: "" };
-
-  const handleSelect = (val) => {
-    onChange(val);
-    setOpen(false);
-  };
-
-  return (
-    <div
-      className="flp-custom-dropdown"
-      tabIndex={0}
-      onBlur={() => setTimeout(() => setOpen(false), 200)}
-      style={{ position: "relative" }}
-    >
-      <div
-        className="flp-custom-selected"
-        onClick={() => setOpen((prev) => !prev)}
-      >
-        {selected.label}
-        <span className="flp-custom-arrow" />
-      </div>
-
-      {open && (
-        <div className="flp-custom-menu">
-          {dropdownOptions.map((opt) => (
-            <div
-              key={opt.value}
-              className={
-                "flp-custom-option" +
-                (opt.value === value ? " flp-custom-option-active" : "")
-              }
-              onClick={() => handleSelect(opt.value)}
-            >
-              {opt.label}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
 function FormsList() {
   const navigate = useNavigate();
 
@@ -112,6 +62,7 @@ function FormsList() {
     "Assigned Users": "#e2e7fa",
   };
 
+
   function AnalyticsStatCard({ title, value }) {
     return (
       <div className="ad-stat-card">
@@ -126,6 +77,7 @@ function FormsList() {
             alignItems: "center",
             justifyContent: "center",
             marginBottom: "8px"
+
           }}
         >
           <i
@@ -140,6 +92,7 @@ function FormsList() {
       </div>
     );
   }
+
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -469,6 +422,7 @@ function FormsList() {
   const handleView = (form) => {
     setViewFormDetails(form);
   };
+  
 
   const analytics = useMemo(() => {
     const totalForms = rows.length;
@@ -596,27 +550,31 @@ function FormsList() {
                   )}
                 </div>
 
-                {/* UPDATED: Custom Dropdown for Form Type Filter */}
-                <CustomFilterDropdown
+                <select
+                  className="flp-filter-select"
                   value={formTypeFilter}
-                  onChange={(val) => {
-                    setFormTypeFilter(val);
+                  onChange={(e) => {
+                    setFormTypeFilter(e.target.value);
                     setFormsPage(1);
                   }}
-                  options={formTypes}
-                  placeholder="Form Type"
-                />
+                >
+                  {formTypes.map((type) => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
 
-                {/* UPDATED: Custom Dropdown for Delivery/Enablement Filter */}
-                <CustomFilterDropdown
+                <select
+                  className="flp-filter-select"
                   value={formDeliveryFilter}
-                  onChange={(val) => {
-                    setFormDeliveryFilter(val);
+                  onChange={(e) => {
+                    setFormDeliveryFilter(e.target.value);
                     setFormsPage(1);
                   }}
-                  options={formDeliveryOptions}
-                  placeholder="Delivery Type"
-                />
+                >
+                  {formDeliveryOptions.map((option) => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
               </div>
             </div>
 

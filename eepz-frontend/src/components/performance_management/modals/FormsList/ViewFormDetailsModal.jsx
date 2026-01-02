@@ -1,240 +1,173 @@
 import React from "react";
-import "../../../../styles/performancemanagement/components/ViewDetailsModal.css";
-
-const ViewDetailsModal = ({
-  showModal,
-  setShowModal,
-  detailsLoading,
-  selectedNominationDetails,
-  THEME,
-}) => {
-  if (!showModal) return null;
-
+import { useNavigate } from "react-router-dom";
+import "bootstrap-icons/font/bootstrap-icons.css";
+import "../../../../styles/performancemanagement/hr/ViewFormDetailsModal.css";
+ 
+ 
+function ViewFormDetailsModal({ formDetails, onClose }) {
+  const navigate = useNavigate();
+ 
+  if (!formDetails) return null;
+ 
   return (
-    <div className="view-details-modal-overlay" tabIndex="-1">
-      <div className="view-details-modal-dialog">
-        <div
-          className="view-details-modal-content"
-          style={{ background: THEME.card }}
-        >
-          {/* Header */}
-          <div
-            className="view-details-modal-header"
-            style={{ background: THEME.primary }}
-          >
-            <h5 className="view-details-modal-title">
-              <i className="bi bi-pencil-square view-details-modal-title-icon" title="Edit Details" />
-              Nomination Details
-            </h5>
-            <button
-              type="button"
-              onClick={() => setShowModal(false)}
-              className="view-details-modal-close-btn"
-              aria-label="Close"
-            >
-              ×
-            </button>
+    <>
+      <div className="vfdm-backdrop" onClick={onClose} />
+     
+      <div className="vfdm-container" onClick={e => e.stopPropagation()}>
+        {/* Header */}
+        <div className="vfdm-header">
+          <div className="vfdm-title">
+            <i className="bi bi-file-earmark-text-fill"></i>
+            Form Details
           </div>
-
-          {/* Body - Scrollable */}
-          <div className="view-details-modal-body">
-            {detailsLoading ? (
-              <div className="view-details-loading-container">
-                <div
-                  className="spinner-border view-details-spinner"
-                  role="status"
-                  style={{ color: THEME.primary }}
-                ></div>
-                <p className="view-details-loading-text">Loading details...</p>
+          <button
+            className="vfdm-close-btn"
+            onClick={onClose}
+            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+          >
+            ×
+          </button>
+        </div>
+ 
+        <div className="vfdm-body">
+          {/* Basic Info */}
+          <div className="vfdm-basic-section">
+            <h4 className="vfdm-section-title">
+              <i className="bi bi-info-circle-fill"></i>
+              Basic Information
+            </h4>
+            <div className="vfdm-grid">
+              <div className="vfdm-info-card">
+                <div className="vfdm-icon-box">
+                  <i className="bi bi-file-text"></i>
+                </div>
+                <div className="vfdm-content">
+                  <span className="vfdm-label">Form Name</span>
+                  <span className="vfdm-value">{formDetails.name}</span>
+                </div>
               </div>
-            ) : selectedNominationDetails ? (
-              <div>
-                {/* Info Card */}
-                <div className="view-details-info-card">
-                  <div className="view-details-info-row">
-                    <div
-                      className="view-details-info-label"
-                      style={{ color: THEME.textLight }}
-                    >
-                      Nominee Name
-                    </div>
-                    <div
-                      className="view-details-info-value"
-                      style={{ color: THEME.text }}
-                    >
-                      {selectedNominationDetails.nomineeName ||
-                        (selectedNominationDetails.nominee?.firstName
-                          ? `${selectedNominationDetails.nominee.firstName} ${selectedNominationDetails.nominee.lastName}`
-                          : "N/A")}
-                    </div>
-                  </div>
-
-                  <div className="view-details-info-row">
-                    <div
-                      className="view-details-info-label"
-                      style={{ color: THEME.textLight }}
-                    >
-                      Employee ID
-                    </div>
-                    <div
-                      className="view-details-info-value"
-                      style={{ color: THEME.text }}
-                    >
-                      {selectedNominationDetails.nomineeEmployeeId ||
-                        selectedNominationDetails.nominee?.employeeId ||
-                        "N/A"}
-                    </div>
-                  </div>
-
-                  <div className="view-details-info-row">
-                    <div
-                      className="view-details-info-label"
-                      style={{ color: THEME.textLight }}
-                    >
-                      Opportunity
-                    </div>
-                    <div
-                      className="view-details-info-value"
-                      style={{ color: THEME.text }}
-                    >
-                      {selectedNominationDetails.opportunityName ||
-                        selectedNominationDetails.opportunity?.opportunityName ||
-                        "N/A"}
-                    </div>
-                  </div>
-
-                  <div className="view-details-info-row">
-                    <div
-                      className="view-details-info-label"
-                      style={{ color: THEME.textLight }}
-                    >
-                      Submitted Date
-                    </div>
-                    <div
-                      className="view-details-info-value-medium"
-                      style={{ color: THEME.text }}
-                    >
-                      {selectedNominationDetails.submittedAt
-                        ? new Date(selectedNominationDetails.submittedAt).toLocaleString()
-                        : "N/A"}
-                    </div>
-                  </div>
+ 
+              <div className="vfdm-info-card">
+                <div className="vfdm-icon-box">
+                  <i className="bi bi-tag-fill"></i>
                 </div>
-
-                <hr className="view-details-divider" />
-
-                {/* Justification Section */}
-                <div className="view-details-section">
-                  <div
-                    className="view-details-section-title"
-                    style={{ color: THEME.textLight }}
-                  >
-                    Justification
-                  </div>
-                  <div
-                    className="view-details-justification-box"
-                    style={{
-                      background: THEME.background,
-                      color: THEME.text,
-                      border: `1.3px solid ${THEME.border}22`,
-                    }}
-                  >
-                    {selectedNominationDetails.justification || "No justification provided"}
-                  </div>
+                <div className="vfdm-content">
+                  <span className="vfdm-label">Type</span>
+                  <span className="vfdm-type-badge">{formDetails.type}</span>
                 </div>
-
-                {/* Parameters Section */}
-                {selectedNominationDetails.parameterValues &&
-                  selectedNominationDetails.parameterValues.length > 0 && (
-                    <div className="view-details-section">
-                      <div
-                        className="view-details-section-title"
-                        style={{ color: THEME.textLight }}
+              </div>
+ 
+              <div className="vfdm-info-card">
+                <div className="vfdm-icon-box">
+                  <i className="bi bi-briefcase-fill"></i>
+                </div>
+                <div className="vfdm-content">
+                  <span className="vfdm-label">Category</span>
+                  <span className="vfdm-value">{formDetails.deliveryEnablement || "N/A"}</span>
+                </div>
+              </div>
+ 
+              <div className="vfdm-info-card">
+                <div className="vfdm-icon-box">
+                  <i className="bi bi-list-check"></i>
+                </div>
+                <div className="vfdm-content">
+                  <span className="vfdm-label">Total Competencies</span>
+                  <span className="vfdm-total-count">{formDetails.competencies?.length || 0}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+ 
+          {/* Competencies Table */}
+          {formDetails.competencies && formDetails.competencies.length > 0 && (
+            <div className="vfdm-table-section">
+              <h4 className="vfdm-section-title">
+                <i className="bi bi-grid-3x3-gap-fill"></i>
+                Competencies Breakdown
+              </h4>
+              <div className="vfdm-table-container">
+                <table className="vfdm-table">
+                  <thead>
+                    <tr className="vfdm-table-head">
+                      <th className="vfdm-table-th-sno">S.NO</th>
+                      <th className="vfdm-table-th-name">Competency Name</th>
+                      <th className="vfdm-table-th-desc">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {formDetails.competencies.map((comp, index) => (
+                      <tr
+                        key={index}
+                        className="vfdm-table-row"
+                        onMouseEnter={(e) => e.currentTarget.style.background = '#f9fafb'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = '#ffffff'}
                       >
-                        Nomination Parameters
-                      </div>
-                      <div
-                        className="view-details-parameters-container"
-                        style={{ border: `1.3px solid ${THEME.border}19` }}
-                      >
-                        {selectedNominationDetails.parameterValues.map((param, index) => (
-                          <div
-                            key={param.parameterId || index}
-                            className={`view-details-parameter-row ${
-                              index < selectedNominationDetails.parameterValues.length - 1
-                                ? "has-border"
-                                : ""
-                            }`}
-                          >
-                            <div className="view-details-parameter-label-section">
-                              <div
-                                className="view-details-parameter-name"
-                                style={{ color: THEME.text }}
-                              >
-                                {param.parameterName}
-                                {param.isRequired && (
-                                  <span className="view-details-parameter-required">*</span>
-                                )}
-                              </div>
-                              <span
-                                className="view-details-parameter-type"
-                                style={{ color: THEME.textLight }}
-                              >
-                                Type: {param.parameterType}
-                              </span>
-                            </div>
-                            <div className="view-details-parameter-value-section">
-                              <div
-                                className="view-details-parameter-value-box"
-                                style={{
-                                  border: `1px solid ${THEME.border}19`,
-                                  color: THEME.text,
-                                }}
-                              >
-                                {param.parameterType === "Rating" ? (
-                                  <>
-                                    {"⭐".repeat(parseInt(param.parameterValue) || 0)}
-                                    <span
-                                      className="view-details-rating-text"
-                                      style={{ color: THEME.textLight }}
-                                    >
-                                      &nbsp;({param.parameterValue}/5)
-                                    </span>
-                                  </>
-                                ) : (
-                                  param.parameterValue
-                                )}
-                              </div>
-                            </div>
+                        <td className="vfdm-table-td vfdm-td-sno">
+                          <span className="vfdm-serial-number">
+                            {comp.displayOrder || index + 1}
+                          </span>
+                        </td>
+                        <td className="vfdm-table-td vfdm-td-name">
+                          <div className="vfdm-comp-container">
+                            <i className="bi bi-award-fill vfdm-comp-icon"></i>
+                            <strong className="vfdm-comp-name">{comp.name}</strong>
                           </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                        </td>
+                        <td className="vfdm-table-td vfdm-td-desc">
+                          {comp.description || (
+                            <span className="vfdm-no-desc">
+                              <i className="bi bi-dash-circle"></i>
+                              No description provided
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            ) : (
-              <p className="view-details-no-data">No details available</p>
-            )}
-          </div>
-
-          {/* Footer */}
-          <div
-            className="view-details-modal-footer"
-            style={{ borderTop: `1px solid ${THEME.border}` }}
+            </div>
+          )}
+ 
+          {(!formDetails.competencies || formDetails.competencies.length === 0) && (
+            <div className="vfdm-empty-state">
+              <i className="bi bi-inbox vfdm-empty-icon"></i>
+              <p className="vfdm-empty-text">No competencies defined for this form</p>
+            </div>
+          )}
+        </div>
+ 
+        {/* Footer */}
+        <div className="vfdm-footer">
+          <button
+            className="vfdm-btn vfdm-close-btn"
+            onClick={onClose}
+            onMouseEnter={(e) => e.currentTarget.style.background = '#5a6268'}
+            onMouseLeave={(e) => e.currentTarget.style.background = '#6c757d'}
           >
-            <button
-              type="button"
-              className="view-details-btn-close"
-              onClick={() => setShowModal(false)}
-            >
-              Close
-            </button>
-          </div>
+            Close
+          </button>
+          <button
+            className="vfdm-btn vfdm-edit-btn"
+            onClick={() => {
+              onClose();
+              navigate(`/hr/dashboard/performance/create/${formDetails.formId}`);
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+          >
+            <i className="bi bi-pencil-square"></i>
+            Edit Form
+          </button>
         </div>
       </div>
-    </div>
+    </>
   );
-};
-
-export default ViewDetailsModal;  
-  
+}
+ 
+export default ViewFormDetailsModal;
+ 
+ 
+ 

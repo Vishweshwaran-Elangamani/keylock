@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import Confetti from "react-confetti";
+import Breadcrumb from "../../../components/common/Breadcrumb";
 import { getEmployeeNominations } from "../../../services/performancemanagement/api/nominationapi";
 import "react-toastify/dist/ReactToastify.css";
-import "../../../styles/performancemanagement/employee/EmployeeHome.css";
+import "../../../styles/performancemanagement/employee/Nominations.css";
 
 export default function Nominations() {
   const navigate = useNavigate();
@@ -22,6 +23,18 @@ export default function Nominations() {
     width: window.innerWidth,
     height: window.innerHeight,
   });
+
+  // Breadcrumb items
+  const breadcrumbItems = [
+    {
+      label: "Performance",
+      path: "/employee/dashboard/performance",
+    },
+    {
+      label: "Nominations",
+      path: null,
+    },
+  ];
 
   useEffect(() => {
     const handleResize = () =>
@@ -49,7 +62,7 @@ export default function Nominations() {
       ) {
         setNominations(response.data.data || []);
         setShowConfetti(true);
-        
+
         // Set the first nomination as selected by default
         if (response.data.data && response.data.data.length > 0) {
           setSelectedNomination(response.data.data[0]);
@@ -82,43 +95,58 @@ export default function Nominations() {
     if (loadingNominations || !selectedNomination) return null;
 
     return (
-      <div
-        className="ehp-nomination-card"
-        style={{
-          marginTop: -200,
-          background: "#1e3c72",
-          borderRadius: "12px",
-          padding: "20px",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
-        }}
-      >
-        <div className="ehp-nomination-content d-flex align-items-center">
-          <span
-            className="badge text-dark me-3 position-relative"
-            style={{ fontSize: "6.5rem" }}
-          >
-            <i className="bi bi-award-fill" style={{ color: "#FFD700" }}></i>
-            <i
-              className="bi bi-star-fill position-absolute top-50 start-50"
-              style={{
-                color: "white",
-                fontSize: "2.5rem",
-                transform: "translate(-50%, -75%)",
-              }}
-            ></i>
-          </span>
+      <div className="nom-card-wrapper">
+        <div className="nom-decorative-bg-1" />
 
-          <div style={{ paddingLeft: "40px" }}>
-            <h3 className="ehp-nomination-title">Congratulations!</h3>
-            <p className="ehp-nomination-text">
-              You have been nominated for:{" "}
-              <strong style={{ textDecoration: "none" }}>
-                {selectedNomination.roleType}
-              </strong>
-            </p>
-            <p className="ehp-nomination-subtext" style={{ fontSize: "15px" }}>
-              Your hard work and dedication have been recognized!
-            </p>
+        {/* Main Award Card */}
+        <div className="nom-main-card">
+          {/* Content Grid */}
+          <div className="nom-card-grid">
+            {/* Icon Section */}
+            <div className="nom-icon-section">
+              {/* Glow Background */}
+              <div className="nom-glow-bg" />
+
+              {/* Icon Container */}
+              <div className="nom-icon-container">
+                <i className="bi bi-award-fill" />
+              </div>
+            </div>
+
+            {/* Content Section */}
+            <div className="nom-content-section">
+              
+
+              {/* Title */}
+              <h1 className="nom-title">Congratulations!</h1>
+
+              {/* Subtitle */}
+              <p className="nom-subtitle">
+                You have been recognized for your outstanding contribution and
+                excellence
+              </p>
+
+              {/* Award Details Box */}
+              <div className="nom-award-box">
+                <p className="nom-award-label">
+                  <i className="bi bi-badge-check" />
+                  Award
+                </p>
+                <h2 className="nom-award-name">
+                  {selectedNomination.roleType}
+                </h2>
+              </div>
+
+              {/* Message */}
+              <p className="nom-message">
+                <i className="bi bi-info-circle" />
+                <span>
+                  Your hard work, dedication, and exceptional performance have
+                  been recognized and appreciated by your organization and
+                  peers.
+                </span>
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -127,17 +155,22 @@ export default function Nominations() {
 
   if (loadingNominations) {
     return (
-      <div className="ehp-loading-container">
-        <div className="ehp-loading-content">
-          <div className="spinner-border" />
-          <p className="ehp-loading-text">Loading nominations...</p>
+      <div className="nom-page">
+        <Breadcrumb items={breadcrumbItems} />
+        <div className="nom-loading-container">
+          <div className="nom-loading-content">
+            <div className="spinner-border" />
+            <p className="nom-loading-text">Loading your achievements...</p>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="ehp-page">
+    <div className="nom-page">
+      <Breadcrumb items={breadcrumbItems} />
+
       <ToastContainer />
 
       {showConfetti && (
@@ -150,7 +183,24 @@ export default function Nominations() {
         />
       )}
 
-      <div className="ehp-container" style={{ padding: 24 }}>
+      <div className="nom-container">
+        {/* Page Header */}
+        <div className="nom-page-header">
+          <div className="nom-header-title">
+            <i className="bi bi-trophy-fill" />
+            <h1>Your Achievements</h1>
+          </div>
+
+          <div className="nom-header-badge">
+            <i className="bi bi-star-fill" />
+            <p>
+              {nominations.length} recognition{nominations.length !== 1 ? "s" : ""}{" "}
+              received
+            </p>
+          </div>
+        </div>
+
+        {/* Award Card */}
         {renderNominationCard()}
 
        
