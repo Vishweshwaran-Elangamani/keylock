@@ -4,7 +4,7 @@ import {
   getDeptHeadSubmittedRatings,
   approveDeptHeadEmployee,
   getApprovedEmployees, getAssessmentAttachments,
-  downloadAttachment,
+  downloadAttachment,getApprovedEmployeeDetails,
  
 } from "../../../services/performancemanagement/api/rolesapi";
 import { getEmployeeIdForFilter } from "../../../utils/PerformanceManagement/jwtDecoder";
@@ -276,7 +276,6 @@ export default function DeptHeadPage() {
 
   // 🔍 Try both possible field names (case-insensitive)
   const assessmentId = employee.assessmentId || employee.AssessmentId;
-  console.log("🔍 Pending assessmentId:", assessmentId, employee); // DEBUG
   
   if (assessmentId) {
     await fetchAttachments(assessmentId);
@@ -294,9 +293,7 @@ const handleViewApprovedDetails = async (approvalId) => {
       setApprovedDetails(data);
       setShowDetailsModal(true);
       
-      // 🔥 FULL DATA DEBUG - PASTE CONSOLE OUTPUT HERE!
-      console.log("🔥 FULL APPROVED DATA:", JSON.stringify(data, null, 2));
-      console.log("🔥 ALL KEYS:", Object.keys(data));
+    
       
       // Try ALL possible assessment ID field names
       const assessmentId = data.assessmentId || 
@@ -306,12 +303,11 @@ const handleViewApprovedDetails = async (approvalId) => {
                           data.assessment_id ||
                           data.Assessment_id;
       
-      console.log("🔍 Found assessmentId:", assessmentId);
       
       if (assessmentId) {
         await fetchAttachments(assessmentId);
       } else {
-        console.error("❌ NO assessmentId found in ANY field!");
+        console.error(" NO assessmentId found in ANY field!");
       }
     }
   } catch (error) {

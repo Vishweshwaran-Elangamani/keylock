@@ -349,10 +349,10 @@
 
 .empassper-clear-btn {
   padding: 10px 20px;
-  background-color: #6c757d;
-  color: white;
-  border: none;
-  border-radius: 6px;
+  background-color: white;
+  color:  #27235c;
+  border-color: 1px solid  #27235c;
+  border-radius: 12px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;

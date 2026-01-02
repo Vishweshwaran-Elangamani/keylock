@@ -16,8 +16,8 @@ const Navbar = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [profilePhoto, setProfilePhoto] = useState(null);
+  const [nominations, setNominations] = useState([]);
   const [hasNominations, setHasNominations] = useState(false);
-  const [awardName, setAwardName] = useState("");
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -42,18 +42,24 @@ const Navbar = () => {
   // Fetch nominations
   const fetchNominations = useCallback(async () => {
     if (!employeeId) return;
-    
+
     try {
       const response = await getEmployeeNominations(employeeId);
-      
-      if (response?.data?.success && response?.data?.data && response.data.data.length > 0) {
+
+      if (
+        response?.data?.success &&
+        response?.data?.data &&
+        response.data.data.length > 0
+      ) {
+        setNominations(response.data.data);
         setHasNominations(true);
-        setAwardName(response.data.data[0].roleType);
       } else {
+        setNominations([]);
         setHasNominations(false);
       }
     } catch (error) {
       console.error("Error fetching nominations:", error);
+      setNominations([]);
       setHasNominations(false);
     }
   }, [employeeId]);
@@ -82,8 +88,10 @@ const Navbar = () => {
     setShowProfileMenu(false);
   };
 
-  const handleNavigateToNominations = () => {
-    navigate("/employee/dashboard/performance/nominations");
+  const handleNavigateToNominations = (nomination) => {
+    navigate("/employee/dashboard/performance/nominations", {
+      state: { selectedNomination: nomination },
+    });
   };
 
   const handleCameraClick = (e) => {
@@ -128,30 +136,34 @@ const Navbar = () => {
 
           {/* Right Section */}
           <div className="nbd-navbar-right">
-            {/* Congratulations Card */}
-            {hasNominations && (
-              <div
-                className="nbd-congrats-card"
-                onClick={handleNavigateToNominations}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) =>
-                  (e.key === "Enter" || e.key === " ") && handleNavigateToNominations()
-                }
-                aria-label="View Nominations"
-              >
-                <div className="nbd-congrats-icon">
-                  <div className="nbd-star-icon">★</div>
-                </div>
+            {/* Individual Nomination Cards */}
+            {hasNominations &&
+              nominations.length > 0 &&
+              nominations.map((nomination, index) => (
+                <div
+                  key={nomination.nominationId || index}
+                  className="nbd-congrats-card"
+                  onClick={() => handleNavigateToNominations(nomination)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) =>
+                    (e.key === "Enter" || e.key === " ") &&
+                    handleNavigateToNominations(nomination)
+                  }
+                  aria-label="View Nominations"
+                >
+                  <div className="nbd-congrats-icon">
+                    <div className="nbd-star-icon">★</div>
+                  </div>
 
-                <div className="nbd-congrats-content">
-                  <div className="nbd-congrats-title">Congratulations!</div>
-                  <div className="nbd-congrats-subtitle">
-                    {awardName || "Recognition earned"}
+                  <div className="nbd-congrats-content">
+                    <div className="nbd-congrats-title">Congratulations!</div>
+                    <div className="nbd-congrats-subtitle">
+                      {nomination.roleType}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              ))}
 
             {/* User Profile Dropdown */}
             <div className="nbd-profile-wrapper">
@@ -185,7 +197,9 @@ const Navbar = () => {
                             className="nbd-dropdown-photo"
                           />
                         ) : (
-                          <span className="nbd-dropdown-initials">{initials}</span>
+                          <span className="nbd-dropdown-initials">
+                            {initials}
+                          </span>
                         )}
                       </div>
                     </div>

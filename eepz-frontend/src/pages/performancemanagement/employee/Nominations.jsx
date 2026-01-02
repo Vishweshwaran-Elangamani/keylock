@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import Confetti from "react-confetti";
 import { getEmployeeNominations } from "../../../services/performancemanagement/api/nominationapi";
@@ -8,14 +8,15 @@ import "../../../styles/performancemanagement/employee/EmployeeHome.css";
 
 export default function Nominations() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [nominations, setNominations] = useState([]);
   const [loadingNominations, setLoadingNominations] = useState(true);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [selectedNomination, setSelectedNomination] = useState(null);
 
   const user = JSON.parse(localStorage.getItem("user"));
   const empId = user ? user.empId : null;
   const [employeeId] = useState(() => empId);
-
 
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
@@ -48,19 +49,37 @@ export default function Nominations() {
       ) {
         setNominations(response.data.data || []);
         setShowConfetti(true);
+        
+        // Set the first nomination as selected by default
+        if (response.data.data && response.data.data.length > 0) {
+          setSelectedNomination(response.data.data[0]);
+        }
       } else {
         setNominations([]);
+        setSelectedNomination(null);
       }
     } catch (error) {
       console.error("Error fetching nominations:", error);
       setNominations([]);
+      setSelectedNomination(null);
     } finally {
       setLoadingNominations(false);
     }
   };
 
+  // Handle nomination card click from navbar
+  useEffect(() => {
+    if (location.state?.selectedNomination) {
+      setSelectedNomination(location.state.selectedNomination);
+    }
+  }, [location.state]);
+
+  const handleNominationClick = (nomination) => {
+    setSelectedNomination(nomination);
+  };
+
   const renderNominationCard = () => {
-    if (loadingNominations || nominations.length === 0) return null;
+    if (loadingNominations || !selectedNomination) return null;
 
     return (
       <div
@@ -70,18 +89,21 @@ export default function Nominations() {
           background: "#1e3c72",
           borderRadius: "12px",
           padding: "20px",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.3)"
+          boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
         }}
       >
-        <div className="ehp-nomination-content d-flex align-items-center" >
-          <span className="badge text-dark me-3 position-relative" style={{ fontSize: "6.5rem"}} >
+        <div className="ehp-nomination-content d-flex align-items-center">
+          <span
+            className="badge text-dark me-3 position-relative"
+            style={{ fontSize: "6.5rem" }}
+          >
             <i className="bi bi-award-fill" style={{ color: "#FFD700" }}></i>
             <i
               className="bi bi-star-fill position-absolute top-50 start-50"
               style={{
                 color: "white",
                 fontSize: "2.5rem",
-                transform: "translate(-50%, -75%)"
+                transform: "translate(-50%, -75%)",
               }}
             ></i>
           </span>
@@ -91,7 +113,7 @@ export default function Nominations() {
             <p className="ehp-nomination-text">
               You have been nominated for:{" "}
               <strong style={{ textDecoration: "none" }}>
-                {nominations.map((n) => n.roleType).join(", ")}
+                {selectedNomination.roleType}
               </strong>
             </p>
             <p className="ehp-nomination-subtext" style={{ fontSize: "15px" }}>
@@ -100,7 +122,6 @@ export default function Nominations() {
           </div>
         </div>
       </div>
-
     );
   };
 
@@ -132,15 +153,7 @@ export default function Nominations() {
       <div className="ehp-container" style={{ padding: 24 }}>
         {renderNominationCard()}
 
-        {nominations && nominations.length > 0 ? (
-          <div className="ehp-nomination-list" style={{ marginTop: 20 }}>
-
-          </div>
-        ) : (
-          <div style={{ textAlign: "center", padding: 40 }}>
-            <div className="text-muted">You have no nominations yet.</div>
-          </div>
-        )}
+       
       </div>
     </div>
   );
