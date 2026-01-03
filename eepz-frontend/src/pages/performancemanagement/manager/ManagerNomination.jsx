@@ -160,7 +160,6 @@ export default function ManagerNomination() {
 
       <Breadcrumb
         items={[
-          { label: "Dashboard", path: "/manager/dashboard" },
           { label: "Performance", path: "/manager/dashboard/performance" },
           { label: "Nominations", path: null }
         ]}

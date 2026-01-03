@@ -414,7 +414,6 @@ function FormCreate() {
         <div className="pmhr-fc-header-left">
           <Breadcrumb
             items={[
-              { label: "Dashboard", path: "/hr/dashboard" },
               { label: "Performance", path: "/hr/dashboard/performance" },
               {
                 label: isEditMode ? "Edit Form" : "Create Form",

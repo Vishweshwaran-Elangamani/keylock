@@ -340,7 +340,6 @@ function HRNominations() {
           }}>
             <Breadcrumb
               items={[
-                { label: "Dashboard", path: "/hr/dashboard" },
                 { label: "Performance", path: "/hr/dashboard/performance" },
                 { label: "Nominations", path: "/hr/dashboard/performance/nominations", isClickable: true, onClick: handleNominationsClick },
                 { label: selectedRewardName, path: null }

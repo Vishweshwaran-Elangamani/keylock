@@ -456,7 +456,6 @@ function MyAssessments() {
     <div className="empassper-container">
       <Breadcrumb
         items={[
-          { label: "Dashboard", path: "employee/dashboard" },
           { label: "My Assessments", path: null }
         ]}
       />

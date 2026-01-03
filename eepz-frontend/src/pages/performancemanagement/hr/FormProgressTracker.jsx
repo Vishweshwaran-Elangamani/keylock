@@ -95,7 +95,6 @@ export default function FormProgressTrackerPage() {
 
       <Breadcrumb
         items={[
-          { label: 'Dashbaord', path: '/hr/dashboard' },
           { label: 'Performance', path: '/hr/dashboard/performance' },
           { label: 'Form Progress', path: null }
         ]}

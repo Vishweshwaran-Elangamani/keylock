@@ -315,7 +315,6 @@ function HRViewAppraisals() {
     <div className={styles.hrViewAssessmentPage}>
       <Breadcrumb
         items={[
-          { label: "Dashboard", path: "/hr/dashboard" },
           { label: "Performance", path: "/hr/dashboard/performance" },
           { label: "Form Progress", path: null }
         ]}

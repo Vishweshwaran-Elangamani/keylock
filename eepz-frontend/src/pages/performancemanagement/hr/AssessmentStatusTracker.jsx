@@ -98,7 +98,6 @@ function AssessmentStatusTracker() {
 
       <Breadcrumb
         items={[
-          { label: "Dashboard", path: "/hr/dashboard" },
           { label: "Performance", path: "/hr/dashboard/performance" },
           { label: "Appraisal Status", path: null },
         ]}

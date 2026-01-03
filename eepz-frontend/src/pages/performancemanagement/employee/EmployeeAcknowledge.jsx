@@ -105,7 +105,6 @@ export default function EmployeeAcknowledgment() {
 
       <Breadcrumb
         items={[
-          { label: "Dashboard", path: "/employee/dashboard" },
           { label: "Employee Acknowledgements", path: null },
         ]}
       />

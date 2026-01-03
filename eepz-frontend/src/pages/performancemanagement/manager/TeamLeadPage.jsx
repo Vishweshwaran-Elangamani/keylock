@@ -767,7 +767,6 @@ function TeamLeadPage() {
       <div className="hrfcper-top-bar compact">
         <Breadcrumb
           items={[
-            { label: "Dashboard", path: "/manager/dashboard" },
             { label: "Performance", path: "/manager/dashboard/performance" },
             { label: "Performance Review", path: null }
           ]}

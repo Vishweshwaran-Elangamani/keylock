@@ -48,7 +48,6 @@ function HRSubmittedAssessments() {
     <div className={styles.hrSubmittedContainer}>
       <Breadcrumb
         items={[
-          { label: "Dashboard", path: "/hr/dashboard" },
           { label: "Performance", path: "/hr/dashboard/performance" },
           { label: "Submitted Assessments", path: null },
         ]}

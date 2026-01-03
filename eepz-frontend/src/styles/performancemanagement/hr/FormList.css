@@ -800,11 +800,6 @@
 }
 
 
-/* ============================================
-   CUSTOM DROPDOWN STYLES (REUSING FROM FORMCREATE.CSS)
-   ============================================ */
-
-
 /* Dropdown container */
 .formlistperf .custom-fc-dropdown {
   position: relative;
@@ -894,7 +889,6 @@
 }
 
 
-/* Fade-in animation */
 @keyframes fcDropdownFadeIn {
   from {
     opacity: 0;
@@ -906,8 +900,6 @@
   }
 }
 
-
-/* Scrollbar styling for dropdown menu */
 .formlistperf .custom-fc-menu::-webkit-scrollbar {
   width: 6px;
 }
@@ -953,8 +945,6 @@
   color: white;
 }
 
-
-/* Active/selected option */
 .formlistperf .custom-fc-option-active {
   background: rgba(39, 35, 92, 0.1);
   color: #27235c;
@@ -962,7 +952,6 @@
 }
 
 
-/* Active option on hover - UPDATED TO #27235c */
 .formlistperf .custom-fc-option-active:hover {
   background: #27235c;
   color: white;
