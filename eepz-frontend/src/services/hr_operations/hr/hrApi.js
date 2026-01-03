@@ -7,7 +7,6 @@ const hrApi = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  withCredentials: true,
 });
 
 //  Request Interceptor - Add JWT token to all HR API requests

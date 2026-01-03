@@ -2,7 +2,6 @@ import axios from "axios";
 
 const internalApi = axios.create({
   baseURL: import.meta.env.VITE_INTERNAL_API_URL+"/api",
-
   headers: {
     "Content-Type": "application/json",
   },
