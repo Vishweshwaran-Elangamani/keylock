@@ -11,6 +11,141 @@ import logoImage from "../../../assets/logodark.png";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 import "../../../styles/performancemanagement/manager/ManagerPerformanceDashboard.css";
 
+/* Custom Pagination Dropdown Component */
+const PaginationDropdown = ({ value, onChange, options }) => {
+  const [open, setOpen] = useState(false);
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="custom-mgr-pagination-dropdown"
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+    >
+      <div
+        className="custom-mgr-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {value}
+        <span className="custom-mgr-arrow" />
+      </div>
+
+      {open && (
+        <div className="custom-mgr-menu">
+          {options.map((opt) => (
+            <div
+              key={opt}
+              className={
+                "custom-mgr-option" +
+                (opt === value ? " custom-mgr-option-active" : "")
+              }
+              onClick={() => handleSelect(opt)}
+            >
+              {opt}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* Custom Rating Dropdown Component for Modal */
+/* Custom Rating Dropdown Component for Modal */
+const RatingDropdown = ({ value, onChange }) => {
+  const [open, setOpen] = useState(false);
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0, width: 0 });
+  const dropdownRef = useRef(null);
+
+  const options = [
+    { value: "", label: "-" },
+    { value: "1", label: "1 - Poor" },
+    { value: "2", label: "2 - Fair" },
+    { value: "3", label: "3 - Good" },
+    { value: "4", label: "4 - Very Good" },
+    { value: "5", label: "5 - Excellent" }
+  ];
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  const selectedLabel = options.find(opt => opt.value === value)?.label || "-";
+
+  const handleToggle = () => {
+    if (!open && dropdownRef.current) {
+      const rect = dropdownRef.current.getBoundingClientRect();
+      setMenuPosition({
+        top: rect.bottom + 2,
+        left: rect.left,
+        width: rect.width
+      });
+    }
+    setOpen((prev) => !prev);
+  };
+
+  useEffect(() => {
+    if (!open) return;
+
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [open]);
+
+  return (
+    <>
+      <div
+        ref={dropdownRef}
+        className="custom-modal-rating-dropdown"
+        tabIndex={0}
+      >
+        <div
+          className="custom-modal-rating-selected"
+          onClick={handleToggle}
+        >
+          {selectedLabel}
+          <span className="custom-modal-rating-arrow" />
+        </div>
+      </div>
+
+      {open && (
+        <div
+          className="custom-modal-rating-menu"
+          style={{
+            top: `${menuPosition.top}px`,
+            left: `${menuPosition.left}px`,
+            width: `${menuPosition.width}px`
+          }}
+        >
+          {options.map((opt) => (
+            <div
+              key={opt.value}
+              className={
+                "custom-modal-rating-option" +
+                (opt.value === value ? " custom-modal-rating-option-active" : "")
+              }
+              onClick={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </>
+  );
+};
+
+
 export default function ManagerDashboard() {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
@@ -24,6 +159,12 @@ export default function ManagerDashboard() {
   const [assessmentData, setAssessmentData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState("pending");
+
+  // Pagination states
+  const [pendingPage, setPendingPage] = useState(1);
+  const [pendingPerPage, setPendingPerPage] = useState(5);
+  const [completedPage, setCompletedPage] = useState(1);
+  const [completedPerPage, setCompletedPerPage] = useState(5);
 
   const recentToastsRef = useRef(new Set());
   const safeToast = (type, message, id, duration = 3000) => {
@@ -183,69 +324,144 @@ export default function ManagerDashboard() {
     .filter((a) => a.isCompleted)
     .filter((a) => a.formName.toLowerCase().includes(completedFormNameFilter.toLowerCase()));
 
-  const renderTable = (data, isCompleted) => (
-    <div className="manevap-table-container">
-      <table className="manevap-table">
-        <thead>
-          <tr>
-            <th><i className="bi bi-file-earmark-text"></i> Form Name</th>
-            <th><i className="bi bi-tag"></i> Type</th>
-            <th><i className="bi bi-calendar-event"></i> Assigned</th>
-            <th><i className="bi bi-calendar-check"></i> Deadline</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((assignment) => (
-            <tr key={assignment.assignmentId}>
-              <td><strong>{assignment.formName}</strong></td>
-              <td>
-                <span className={`manevap-badge ${isCompleted ? 'success' : 'info'}`}>
-                  <i className={`bi ${isCompleted ? 'bi-check-circle-fill' : 'bi-bookmark-fill'}`}></i>
-                  {assignment.formType}
-                </span>
-              </td>
-              <td>{new Date(assignment.assignedAt).toLocaleDateString()}</td>
-              <td>
-                {assignment.deadline
-                  ? new Date(assignment.deadline).toLocaleDateString()
-                  : "N/A"}
-              </td>
-              <td>
-                {!isCompleted ? (
-                  <button
-                    className="manevap-btn manevap-btn-submit"
-                    onClick={() => {
-                      setCurrentAssignment(assignment);
-                      setModalMode("submit");
-                      const initialData = assignment.competencies?.map((comp) => ({
-                        competencyId: comp.competencyId,
-                        competencyName: comp.name,
-                        competencyDescription: comp.description,
-                        rating: "",
-                        comments: "",
-                      })) || [];
-                      setAssessmentData(initialData);
-                      setShowModal(true);
-                    }}
-                  >
-                    Submit
-                  </button>
-                ) : (
-                  <button
-                    className="manevap-btn manevap-btn-view"
-                    onClick={() => handleViewCompleted(assignment)}
-                  >
-                    <i className="bi bi-eye-fill"></i> View
-                  </button>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+  // Pagination calculations
+  const pendingTotalPages = Math.ceil(pendingAssignments.length / pendingPerPage);
+  const pagedPendingAssignments = pendingAssignments.slice(
+    (pendingPage - 1) * pendingPerPage,
+    pendingPage * pendingPerPage
   );
+
+  const completedTotalPages = Math.ceil(completedAssignments.length / completedPerPage);
+  const pagedCompletedAssignments = completedAssignments.slice(
+    (completedPage - 1) * completedPerPage,
+    completedPage * completedPerPage
+  );
+
+  const handlePendingPageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= pendingTotalPages) {
+      setPendingPage(newPage);
+    }
+  };
+
+  const handleCompletedPageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= completedTotalPages) {
+      setCompletedPage(newPage);
+    }
+  };
+
+  const renderTable = (data, isCompleted) => {
+    const isPending = !isCompleted;
+    const currentPage = isPending ? pendingPage : completedPage;
+    const totalPages = isPending ? pendingTotalPages : completedTotalPages;
+    const perPage = isPending ? pendingPerPage : completedPerPage;
+    const totalItems = isPending ? pendingAssignments.length : completedAssignments.length;
+    const onPageChange = isPending ? handlePendingPageChange : handleCompletedPageChange;
+    const setPerPage = isPending ? setPendingPerPage : setCompletedPerPage;
+    const setPage = isPending ? setPendingPage : setCompletedPage;
+
+    return (
+      <>
+        <div className="manevap-table-container">
+          <table className="manevap-table">
+            <thead>
+              <tr>
+                <th>Form Name</th>
+                <th>Type</th>
+                <th>Assigned</th>
+                <th>Deadline</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((assignment) => (
+                <tr key={assignment.assignmentId}>
+                  <td><strong>{assignment.formName}</strong></td>
+                  <td>
+                    <span className={`manevap-badge ${isCompleted ? 'success' : 'info'}`}>
+                      <i className={`bi ${isCompleted ? 'bi-check-circle-fill' : 'bi-bookmark-fill'}`}></i>
+                      {assignment.formType}
+                    </span>
+                  </td>
+                  <td>{new Date(assignment.assignedAt).toLocaleDateString()}</td>
+                  <td>
+                    {assignment.deadline
+                      ? new Date(assignment.deadline).toLocaleDateString()
+                      : "N/A"}
+                  </td>
+                  <td>
+                    {!isCompleted ? (
+                      <button
+                        className="manevap-btn manevap-btn-submit"
+                        onClick={() => {
+                          setCurrentAssignment(assignment);
+                          setModalMode("submit");
+                          const initialData = assignment.competencies?.map((comp) => ({
+                            competencyId: comp.competencyId,
+                            competencyName: comp.name,
+                            competencyDescription: comp.description,
+                            rating: "",
+                            comments: "",
+                          })) || [];
+                          setAssessmentData(initialData);
+                          setShowModal(true);
+                        }}
+                      >
+                        Submit
+                      </button>
+                    ) : (
+                      <button
+                        className="manevap-btn manevap-btn-view"
+                        onClick={() => handleViewCompleted(assignment)}
+                      >
+                        <i className="bi bi-eye-fill"></i> View
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        <div className="manevap-pagination-container">
+          <div className="manevap-pagination-info">
+            <span className="manevap-pagination-label">Rows per page:</span>
+            <PaginationDropdown
+              value={perPage}
+              onChange={(val) => {
+                setPerPage(Number(val));
+                setPage(1);
+              }}
+              options={[5, 10, 15, 20]}
+            />
+          </div>
+
+          <nav className="manevap-pagination-nav">
+            <ul className="manevap-pagination">
+              <li className={`manevap-page-item ${currentPage === 1 ? "manevap-disabled" : ""}`}>
+                <button className="manevap-page-link" onClick={() => onPageChange(currentPage - 1)}>&laquo;</button>
+              </li>
+              {Array.from({ length: totalPages }, (_, i) => (
+                <li key={i + 1} className={`manevap-page-item ${currentPage === i + 1 ? "manevap-active" : ""}`}>
+                  <button className="manevap-page-link" onClick={() => onPageChange(i + 1)}>{i + 1}</button>
+                </li>
+              ))}
+              <li className={`manevap-page-item ${currentPage === totalPages ? "manevap-disabled" : ""}`}>
+                <button className="manevap-page-link" onClick={() => onPageChange(currentPage + 1)}>&raquo;</button>
+              </li>
+            </ul>
+          </nav>
+
+          <div className="manevap-pagination-status">
+            {totalItems === 0
+              ? "No items to display"
+              : `Showing ${Math.min((currentPage - 1) * perPage + 1, totalItems)}-${Math.min(currentPage * perPage, totalItems)} of ${totalItems} items`}
+          </div>
+        </div>
+      </>
+    );
+  };
 
   if (loading) {
     return (
@@ -311,6 +527,11 @@ export default function ManagerDashboard() {
                   placeholder="Search by form name..."
                   value={pendingFormNameInput}
                   onChange={(e) => setPendingFormNameInput(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      setPendingFormNameFilter(pendingFormNameInput);
+                    }
+                  }}
                   className="manevap-filter-input"
                 />
                 <button
@@ -321,17 +542,20 @@ export default function ManagerDashboard() {
                   Search
                 </button>
               </div>
-              {pendingFormNameFilter && (
-                <button
-                  onClick={() => {
-                    setPendingFormNameInput("");
-                    setPendingFormNameFilter("");
-                  }}
-                  className="manevap-clear-btn"
-                >
-                  Clear Filters
-                </button>
-              )}
+              <button
+                onClick={() => {
+                  setPendingFormNameInput("");
+                  setPendingFormNameFilter("");
+                }}
+                className="manevap-clear-btn"
+                disabled={!pendingFormNameFilter}
+                style={{
+                  opacity: pendingFormNameFilter ? 1 : 0.6,
+                  cursor: pendingFormNameFilter ? 'pointer' : 'not-allowed'
+                }}
+              >
+                Clear Filters
+              </button>
             </div>
           </div>
           {pendingAssignments.length === 0 ? (
@@ -349,7 +573,7 @@ export default function ManagerDashboard() {
               </p>
             </div>
           ) : (
-            renderTable(pendingAssignments, false)
+            renderTable(pagedPendingAssignments, false)
           )}
         </div>
       )}
@@ -364,6 +588,11 @@ export default function ManagerDashboard() {
                   placeholder="Search by form name..."
                   value={completedFormNameInput}
                   onChange={(e) => setCompletedFormNameInput(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      setCompletedFormNameFilter(completedFormNameInput);
+                    }
+                  }}
                   className="manevap-filter-input"
                 />
                 <button
@@ -371,20 +600,23 @@ export default function ManagerDashboard() {
                   onClick={() => setCompletedFormNameFilter(completedFormNameInput)}
                   type="button"
                 >
-                  <i className="bi bi-search"></i> Search
+                  Search
                 </button>
               </div>
-              {completedFormNameFilter && (
-                <button
-                  onClick={() => {
-                    setCompletedFormNameInput("");
-                    setCompletedFormNameFilter("");
-                  }}
-                  className="manevap-clear-btn"
-                >
-                  <i className="bi bi-x-circle"></i> Clear Filters
-                </button>
-              )}
+              <button
+                onClick={() => {
+                  setCompletedFormNameInput("");
+                  setCompletedFormNameFilter("");
+                }}
+                className="manevap-clear-btn"
+                disabled={!completedFormNameFilter}
+                style={{
+                  opacity: completedFormNameFilter ? 1 : 0.6,
+                  cursor: completedFormNameFilter ? 'pointer' : 'not-allowed'
+                }}
+              >
+                Clear Filters
+              </button>
             </div>
           </div>
           {completedAssignments.length === 0 ? (
@@ -402,7 +634,7 @@ export default function ManagerDashboard() {
               </p>
             </div>
           ) : (
-            renderTable(completedAssignments, true)
+            renderTable(pagedCompletedAssignments, true)
           )}
         </div>
       )}
@@ -474,20 +706,10 @@ export default function ManagerDashboard() {
                                 {item.rating ? `${item.rating} / 5` : '-'}
                               </div>
                             ) : (
-                              <select
+                              <RatingDropdown
                                 value={item.rating || ""}
-                                onChange={e =>
-                                  updateAssessmentData(item.competencyId, "rating", e.target.value)
-                                }
-                                className="manevap-modal-cell-input"
-                              >
-                                <option value="">-</option>
-                                <option value="1">1 - Poor</option>
-                                <option value="2">2 - Fair</option>
-                                <option value="3">3 - Good</option>
-                                <option value="4">4 - Very Good</option>
-                                <option value="5">5 - Excellent</option>
-                              </select>
+                                onChange={(val) => updateAssessmentData(item.competencyId, "rating", val)}
+                              />
                             )}
                           </td>
                           <td>

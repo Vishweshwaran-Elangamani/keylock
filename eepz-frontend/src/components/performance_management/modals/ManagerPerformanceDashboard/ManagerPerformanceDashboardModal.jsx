@@ -1,6 +1,64 @@
-import React from "react";
+import React, { useState } from "react";
 import logoImage from "../../../../assets/logodark.png"
 import "../../../../styles/performancemanagement/components/ManagerPerformanceDashboard.css"
+
+/* Custom Rating Dropdown Component */
+const RatingDropdown = ({ value, onChange, disabled }) => {
+  const [open, setOpen] = useState(false);
+
+  const options = [
+    { value: "", label: "-" },
+    { value: "1", label: "1" },
+    { value: "2", label: "2" },
+    { value: "3", label: "3" },
+    { value: "4", label: "4" },
+    { value: "5", label: "5" }
+  ];
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  const selectedLabel = options.find(opt => opt.value === value)?.label || "-";
+
+  if (disabled) {
+    return <div className="manevap-modal-cell-view">{value ? `${value} / 5` : '-'}</div>;
+  }
+
+  return (
+    <div
+      className="custom-modal-rating-dropdown"
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+    >
+      <div
+        className="custom-modal-rating-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {selectedLabel}
+        <span className="custom-modal-rating-arrow" />
+      </div>
+
+      {open && (
+        <div className="custom-modal-rating-menu">
+          {options.map((opt) => (
+            <div
+              key={opt.value}
+              className={
+                "custom-modal-rating-option" +
+                (opt.value === value ? " custom-modal-rating-option-active" : "")
+              }
+              onClick={() => handleSelect(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const ManagerPerformanceDashboardModal = ({
   showModal,
@@ -53,26 +111,11 @@ const ManagerPerformanceDashboardModal = ({
                       <td className="manevap-cell-bold">{item.competencyName}</td>
                       <td>{item.competencyDescription || ""}</td>
                       <td>
-                        {modalMode === "view" ? (
-                          <div className="manevap-modal-cell-view">
-                            {item.rating ? `${item.rating} / 5` : '-'}
-                          </div>
-                        ) : (
-                          <select
-                            value={item.rating}
-                            onChange={e =>
-                              updateAssessmentData(item.competencyId, "rating", e.target.value)
-                            }
-                            className="manevap-modal-cell-input"
-                          >
-                            <option value="">-</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                          </select>
-                        )}
+                        <RatingDropdown
+                          value={item.rating || ""}
+                          onChange={(val) => updateAssessmentData(item.competencyId, "rating", val)}
+                          disabled={modalMode === "view"}
+                        />
                       </td>
                       <td>
                         {modalMode === "view" ? (
@@ -116,5 +159,3 @@ const ManagerPerformanceDashboardModal = ({
 };
 
 export default ManagerPerformanceDashboardModal;
-
-

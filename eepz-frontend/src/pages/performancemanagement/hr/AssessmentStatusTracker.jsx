@@ -104,7 +104,7 @@ function AssessmentStatusTracker() {
       />
 
       <div className={styles.assessmentHeader}>
-        <h2 className={styles.assessmentTitle}>🎯 Detailed Appraisal Status Tracker</h2>
+        <h2 className={styles.assessmentTitle}> Detailed Appraisal Status Tracker</h2>
         <button
           className={styles.assessmentActionButton}
           onClick={() => window.location.reload()}
