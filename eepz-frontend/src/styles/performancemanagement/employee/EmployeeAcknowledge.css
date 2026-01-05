@@ -22,7 +22,6 @@
     margin: 0 auto;
     background-color: var(--ea-background);
     min-height: 100vh;
-    font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   }
   
   .ea-loading-card {
@@ -424,7 +423,6 @@
     border-radius: 6px;
     border: 1px solid var(--ea-border);
     font-size: 13px;
-    font-family: inherit;
     resize: vertical;
     outline: none;
     background-color: #ffffff;
