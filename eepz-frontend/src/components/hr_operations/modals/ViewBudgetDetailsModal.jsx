@@ -116,20 +116,6 @@ const ViewBudgetDetailsModal = ({ show, budget, onHide }) => {
                 <label className="vbdm-info-label">Fiscal Year:</label>
                 <span className="vbdm-info-value">{budget?.fiscalYear}</span>
               </div>
-
-              <div className="vbdm-info-card">
-                <label className="vbdm-info-label">Headcount:</label>
-                <span className="vbdm-info-value">
-                  {budget?.headcount || 0}
-                </span>
-              </div>
-
-              <div className="vbdm-info-card">
-                <label className="vbdm-info-label">Avg Cost/Employee:</label>
-                <span className="vbdm-info-value">
-                  {formatCurrency(budget?.avgCostPerEmployee)}
-                </span>
-              </div>
             </div>
 
             {/* BUDGET SUMMARY */}

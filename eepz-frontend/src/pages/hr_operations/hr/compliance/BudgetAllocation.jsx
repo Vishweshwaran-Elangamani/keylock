@@ -545,18 +545,6 @@ const BudgetAllocation = () => {
                       {budget.utilizationPercentage || 0}%
                     </span>
                   </div>
-                  <div className="ba-card-row">
-                    <span className="ba-card-label">Headcount</span>
-                    <span className="ba-card-value">
-                      {budget.headcount || 0}
-                    </span>
-                  </div>
-                  <div className="ba-card-row">
-                    <span className="ba-card-label">Avg Cost/Employee</span>
-                    <span className="ba-card-value">
-                      {formatCurrency(budget.avgCostPerEmployee)}
-                    </span>
-                  </div>
                 </div>
 
                 {isLeadership && (
@@ -694,8 +682,6 @@ const BudgetAllocation = () => {
                     <th>Total Budget</th>
                     <th>Allocated</th>
                     <th>Utilized</th>
-                    <th>Headcount</th>
-                    <th>Avg Cost/Employee</th>
                     {isLeadership && <th>Actions</th>}
                   </tr>
                 </thead>
@@ -709,10 +695,6 @@ const BudgetAllocation = () => {
                       <td>{formatCurrency(budget.totalBudget)}</td>
                       <td>{formatCurrency(budget.allocatedAmount)}</td>
                       <td>{formatCurrency(budget.utilizedAmount)}</td>
-                      <td className="ba-text-center">
-                        {budget.headcount || 0}
-                      </td>
-                      <td>{formatCurrency(budget.avgCostPerEmployee)}</td>
                       {isLeadership && (
                         <td>
                           <div className="ba-action-buttons">

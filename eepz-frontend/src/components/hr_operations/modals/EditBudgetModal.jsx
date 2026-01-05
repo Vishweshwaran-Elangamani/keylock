@@ -152,13 +152,6 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
                       : "N/A"}
                   </span>
                 </div>
-
-                <div className="ebm-info-card">
-                  <label className="ebm-info-label">Headcount:</label>
-                  <span className="ebm-info-value">
-                    {budget?.headcount || 0}
-                  </span>
-                </div>
               </div>
 
               <div className="ebm-form-grid">
