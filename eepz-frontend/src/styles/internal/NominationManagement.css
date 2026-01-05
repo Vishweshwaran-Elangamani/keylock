@@ -357,18 +357,19 @@
   background: #ffffff;
   border-radius: 12px;
   border: 1px solid #e5e7eb;
-  overflow: visible;
+  overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 
 .nm-table-wrapper {
-  overflow-x: auto;
+  overflow: visible;
 }
 
 .nm-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.875rem;
+  table-layout: auto;
 }
 
 .nm-table thead {
@@ -385,6 +386,14 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   white-space: nowrap;
+}
+
+.nm-table thead tr th:first-child {
+  border-top-left-radius: 11px;
+}
+
+.nm-table thead tr th:last-child {
+  border-top-right-radius: 11px;
 }
 
 .nm-table th:last-child {
@@ -410,6 +419,8 @@
   vertical-align: middle;
   text-align: left;
   font-size: 1rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .nm-table td:last-child {
@@ -579,13 +590,12 @@
   font-size: 0.875rem;
 }
 
-/* ===== PAGINATION STYLES ===== */
 .nm-pagination-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.25rem;
-  background: #f8f9fa;
+  background: #ffffff;
   border-top: 1px solid #e5e7eb;
   flex-wrap: wrap;
   gap: 1rem;
@@ -605,7 +615,6 @@
   font-weight: 500;
 }
 
-/* Custom Rows Per Page Dropdown */
 .nm-rows-dropdown-wrapper {
   position: relative;
   z-index: 100;
@@ -757,7 +766,6 @@
   gap: 1rem;
 }
 
-/* ===== RESPONSIVE STYLES ===== */
 @media (max-width: 1200px) {
   .nm-controls {
     flex-wrap: wrap;
@@ -809,6 +817,10 @@
     flex-direction: column;
     gap: 0.75rem;
   }
+  
+  .nm-table-wrapper {
+    overflow-x: auto;
+  }
 }
 
 @media (max-width: 576px) {
@@ -826,5 +838,3 @@
     padding: 0.625rem 0.75rem;
   }
 }
-  
-
