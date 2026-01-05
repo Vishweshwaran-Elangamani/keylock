@@ -490,7 +490,6 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
 {
     try
     {
-        // 1. Query SLA counts
         var slas = await _context.Slas
             .Where(s => s.DepartmentId == departmentId &&
                         s.Deadline >= periodStartDate.ToDateTime(TimeOnly.MinValue) &&
@@ -503,13 +502,11 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
         int extendedSlas = slas.Count(s => s.ComplianceStatus == "Extended");
         int pendingSlas = slas.Count(s => s.Status == "Open" || s.Status == "InProgress");
 
-        // 2. Check if compliance record exists
         var compliance = await _context.Slacompliances
             .FirstOrDefaultAsync(c => c.DepartmentId == departmentId && c.Period == period);
 
         if (compliance == null)
         {
-            // Insert new compliance record
             compliance = new Slacompliance
             {
                 DepartmentId = departmentId,
@@ -528,7 +525,6 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
         }
         else
         {
-            // Update existing compliance record
             compliance.PeriodStartDate = periodStartDate;   
             compliance.PeriodEndDate = periodEndDate;      
             compliance.TotalSlas = totalSlas;
@@ -541,8 +537,6 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
 
             _context.Slacompliances.Update(compliance);
         }
-
-        // 3. Save changes
         await _context.SaveChangesAsync();
 
         _logger.LogInformation($"Compliance calculated for Department ID: {departmentId}, Period: {period}");
@@ -594,7 +588,6 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
         if (sla == null)
             return false;
 
-        // Update SLA fields
         sla.ReopenCount += 1;
         sla.ReopenReason = reopenReason;
         sla.ReopenedByEmployeeId = reopenedByEmployeeId;
@@ -605,7 +598,6 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
 
         _context.Slas.Update(sla);
 
-        // Add history record
         var history = new Slahistory
         {
             Slaid = slaid,

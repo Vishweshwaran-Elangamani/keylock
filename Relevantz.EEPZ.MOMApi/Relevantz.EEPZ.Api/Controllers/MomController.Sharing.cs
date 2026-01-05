@@ -8,8 +8,6 @@ namespace eepzbackend.Controllers
     /// </summary>
     public partial class MomController
     {
-        // ========== SHARING OPERATIONS (3 endpoints) ==========
-
         /// <summary>
         /// Share a MOM with other employees
         /// </summary>

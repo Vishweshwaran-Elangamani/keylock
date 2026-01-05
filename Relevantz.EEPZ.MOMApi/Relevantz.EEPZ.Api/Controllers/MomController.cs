@@ -18,8 +18,6 @@ namespace eepzbackend.Controllers
             _momService = momService;
         }
 
-        // ========== CORE MOM OPERATIONS (5 endpoints) ==========
-
         /// <summary>
         /// Create a new MOM
         /// </summary>
@@ -134,8 +132,6 @@ namespace eepzbackend.Controllers
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
-
-        // ========== HELPER METHODS ==========
 
         /// <summary>
         /// Extract employee ID from JWT claims

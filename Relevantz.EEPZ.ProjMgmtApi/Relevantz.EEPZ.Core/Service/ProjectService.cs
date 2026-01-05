@@ -25,7 +25,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (await _projectRepository.ProjectNameExistsAsync(request.ProjectName))
                 return ApiResponse<ProjectResponse>.ErrorResponse("Project name already exists.");
 
-            // ✅ Fixed: Properly await all validations
             var validationErrors = new List<string>();
             await ValidateEmployeeExistenceAsync(validationErrors, request.ResourceOwnerEmployeeId, "Resource Owner employee does not exist.");
             await ValidateEmployeeExistenceAsync(validationErrors, request.L1ApproverEmployeeId, "L1 Approver employee does not exist.");
@@ -127,7 +126,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (!await _projectRepository.ProjectExistsAsync(request.ProjectId))
                 return ApiResponse<bool>.ErrorResponse("Project not found.");
 
-            // ✅ Fixed: Properly await all validations
             var validationErrors = new List<string>();
             await ValidateEmployeeExistenceAsync(validationErrors, request.ResourceOwnerEmployeeId, "Resource Owner employee does not exist.");
             await ValidateEmployeeExistenceAsync(validationErrors, request.L1ApproverEmployeeId, "L1 Approver employee does not exist.");

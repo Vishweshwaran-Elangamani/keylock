@@ -101,7 +101,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Service registrations
 builder.Services.AddScoped<IMeetingRepository, MeetingRepository>();
 builder.Services.AddScoped<IMeetingService, MeetingService>();
 builder.Services.AddSingleton<IDateTimeProvider, DateTimeProvider>();

@@ -14,7 +14,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
     {
         private readonly EEPZDbContext _context;
         private readonly ILogger<OrgGoalFeedbackRepository> _logger;
-        private const string ORG_GOAL_TYPE = "org"; // ✅ Define your org goal type
+        private const string ORG_GOAL_TYPE = "org"; 
 
         public OrgGoalFeedbackRepository(EEPZDbContext context, ILogger<OrgGoalFeedbackRepository> logger)
         {

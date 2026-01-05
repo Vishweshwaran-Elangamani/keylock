@@ -61,7 +61,6 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         Task<DepartmentDetailDto?> GetDepartmentByIdAsync(int departmentId);
     }
 
-    // DTOs for responses
     public class EmployeeDto
     {
         public int EmployeeMasterId { get; set; }

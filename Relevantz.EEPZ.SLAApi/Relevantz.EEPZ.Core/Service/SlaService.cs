@@ -91,7 +91,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         await _slaRepository.CreateEscalationAsync(escalation);
 
-        // Update SLA status
         sla.Status = "InProgress";
         await _slaRepository.UpdateSlaAsync(sla);
 
@@ -108,7 +107,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         await _slaRepository.AddHistoryAsync(history);
 
-        // Email notifications
         var employeeEmail = sla.Employee?.Userprofile?.PersonalEmail;
         var employeeName = GetEmployeeName(sla.Employee);
 

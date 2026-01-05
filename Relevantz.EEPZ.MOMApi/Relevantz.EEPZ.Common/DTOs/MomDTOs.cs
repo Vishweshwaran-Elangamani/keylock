@@ -112,8 +112,6 @@ namespace Relevantz.EEPZ.Common.DTOs
     public DateOnly DueDate { get; set; }
     public string Status { get; set; }
     public DateTime CreatedAt { get; set; }
-    
-    // THESE ARE MUST:
     public string? MeetingTitle { get; set; }
     public int? MomId { get; set; }
     public int? AssignedByEmployeeId { get; set; }

@@ -11,7 +11,7 @@ namespace eepzbackend.Controllers
     {
         private readonly EEPZDbContext _context;
         private readonly ILogger<OrgwideobjectivesController> _logger;
-        private const string ORG_GOAL_TYPE = "org"; // ✅ Filter for org-level goals
+        private const string ORG_GOAL_TYPE = "org"; 
 
         public OrgwideobjectivesController(EEPZDbContext context, ILogger<OrgwideobjectivesController> logger)
         {

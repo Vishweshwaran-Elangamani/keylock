@@ -8,8 +8,6 @@ namespace eepzbackend.Controllers
     /// </summary>
     public partial class MomController
     {
-        // ========== ACTION ITEM OPERATIONS (4 endpoints) ==========
-
         /// <summary>
         /// Update the status of an action item
         /// </summary>

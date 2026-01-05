@@ -9,8 +9,6 @@ namespace eepzbackend.Controllers
     /// </summary>
     public partial class MomController
     {
-        // ========== ADMIN/HR OPERATIONS (1 endpoint) ==========
-
         /// <summary>
         /// Get all MOMs with filtering and pagination (HR only)
         /// </summary>
