@@ -210,7 +210,7 @@ const MyMomsList = () => {
                   type="button"
                 >
                 
-                  <Home size={16} className="mm2-breadcrumb-home" />
+                  <Home size={18} className="mm2-breadcrumb-home" />
                 </button>
               </li>
 

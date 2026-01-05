@@ -396,7 +396,7 @@ const HRSLADashboard = () => {
         <ol className="hr-sla-breadcrumb-list">
           <li className="hr-sla-breadcrumb-item">
             <a href="#" onClick={(e) => { e.preventDefault(); navigate("/hr/dashboard"); }} className="hr-sla-breadcrumb-link">
-              <Home size={14} />
+              <Home size={18} />
             </a>
             /
           </li>

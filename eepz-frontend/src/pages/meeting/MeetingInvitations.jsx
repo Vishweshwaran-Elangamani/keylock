@@ -227,7 +227,7 @@ const getStatusBadge = (status) => {
                   className="mi-breadcrumb-link-button"
                   type="button"
                 >
-                  <Home size={16} className="mi-breadcrumb-home-icon" />
+                  <Home size={18} className="mi-breadcrumb-home-icon" />
                 </button>
               </li>
               <li className="mi-breadcrumb-separator">/</li>

@@ -141,7 +141,7 @@ const ProjectDetails = () => {
         onClick={() => navigate("/hr/dashboard/projectmgmt")}
         className="prj-detail-breadcrumb-link"
       >
-        <Home size={14} />
+        <Home size={20} />
       </button>
     </li>
     <li className="prj-detail-breadcrumb-item">

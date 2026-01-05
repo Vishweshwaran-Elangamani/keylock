@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Home } from 'lucide-react';
+import { Home } from "lucide-react";
 import momService from "../../services/meeting/momService";
 import meetingService from "../../services/meeting/meetingService";
 import rsvpService from "../../services/meeting/rsvpService";
@@ -11,19 +11,54 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import ManagerMeetingDetailsModal from "../../components/meeting/modals/ManagerMeetingDetailsModal";
 import "../../styles/mom/components/ManagerMomDashboard.css";
 
-const PaginationDropdown = ({ value, onChange, options }) => {
+const MomPaginationDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+  const triggerRef = useRef(null);
+  const dropdownRef = useRef(null);
   const selected = options.find((o) => o === value) || options[0];
 
+  useEffect(() => {
+    if (open && triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setPosition({
+        top: rect.bottom + window.scrollY + 4,
+        left: rect.left + window.scrollX,
+      });
+    }
+  }, [open]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target) &&
+        triggerRef.current &&
+        !triggerRef.current.contains(event.target)
+      ) {
+        setOpen(false);
+      }
+    };
+
+    if (open) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [open]);
+
   return (
-    <div className="pagination-dropdown">
+    <div className="mom-pagination-dropdown">
       <button
+        ref={triggerRef}
         type="button"
-        className={`pagination-dropdown-control ${open ? "open" : ""}`}
+        className={`mom-pagination-dropdown-control ${open ? "open" : ""}`}
         onClick={() => setOpen((p) => !p)}
       >
-        <span className="pagination-dropdown-value">{selected}</span>
-        <span className={`pagination-dropdown-icon ${open ? "open" : ""}`}>
+        <span className="mom-pagination-dropdown-value">{selected}</span>
+        <span className={`mom-pagination-dropdown-icon ${open ? "open" : ""}`}>
           <svg
             width="14"
             height="14"
@@ -45,14 +80,21 @@ const PaginationDropdown = ({ value, onChange, options }) => {
       {open && (
         <>
           <div
-            className="pagination-dropdown-backdrop"
+            className="mom-pagination-dropdown-backdrop"
             onClick={() => setOpen(false)}
           />
-          <div className="pagination-dropdown-menu">
+          <div
+            ref={dropdownRef}
+            className="mom-pagination-dropdown-menu"
+            style={{
+              top: `${position.top}px`,
+              left: `${position.left}px`,
+            }}
+          >
             {options.map((opt) => (
               <div
                 key={opt}
-                className={`pagination-dropdown-option ${
+                className={`mom-pagination-dropdown-option ${
                   opt === value ? "selected" : ""
                 }`}
                 onClick={() => {
@@ -124,7 +166,7 @@ const ManagerMomDashboard = () => {
       if (employeesRes.success && employeesRes.data) {
         const nameMap = {};
         employeesRes.data.forEach((emp) => {
-         nameMap[emp.employeeMasterId] = `${emp.firstName} ${emp.lastName}`;
+          nameMap[emp.employeeMasterId] = `${emp.firstName} ${emp.lastName}`;
         });
         setEmployeeMap(nameMap);
       }
@@ -234,7 +276,8 @@ const ManagerMomDashboard = () => {
   const totalPages = Math.max(1, Math.ceil(safeTotal / itemsPerPage));
   const validCurrentPage = Math.min(currentPage, totalPages);
   const startIndex = safeTotal === 0 ? 0 : (validCurrentPage - 1) * itemsPerPage;
-  const endIndex = safeTotal === 0 ? 0 : Math.min(validCurrentPage * itemsPerPage, safeTotal);
+  const endIndex =
+    safeTotal === 0 ? 0 : Math.min(validCurrentPage * itemsPerPage, safeTotal);
   const paginatedMeetings = upcomingMeetings.slice(startIndex, endIndex);
 
   const goToPage = (page) => {
@@ -297,16 +340,17 @@ const ManagerMomDashboard = () => {
                   className="sched-breadcrumb-link"
                   aria-label="Dashboard"
                 >
-                  <Home size={16}  />
+                  <Home size={18} />
                 </button>
               </li>
 
-              <li className="breadcrumb-separator">
-                /
-              </li>
+              <li className="breadcrumb-separator">/</li>
 
               <li className="breadcrumb-item active" aria-current="page">
-                <span className="sched-breadcrumb-active"> Meetings and MoM</span>
+                <span className="sched-breadcrumb-active">
+                  {" "}
+                  Meetings and MoM
+                </span>
               </li>
             </ol>
           </nav>
@@ -498,7 +542,7 @@ const ManagerMomDashboard = () => {
               <div className="managermom-pagination-footer">
                 <div className="managermom-pagination-left">
                   <span className="managermom-pagination-text">Show</span>
-                  <PaginationDropdown
+                  <MomPaginationDropdown
                     value={itemsPerPage}
                     onChange={(val) => {
                       setItemsPerPage(val);
@@ -511,8 +555,8 @@ const ManagerMomDashboard = () => {
 
                 <div className="managermom-pagination-center">
                   <span className="managermom-pagination-status">
-                    Showing {safeTotal === 0 ? 0 : startIndex + 1} to{" "}
-                    {endIndex} of {safeTotal} entries
+                    Showing {safeTotal === 0 ? 0 : startIndex + 1} to {endIndex}{" "}
+                    of {safeTotal} entries
                   </span>
                 </div>
 
@@ -582,10 +626,7 @@ const ManagerMomDashboard = () => {
               </div>
             ) : (
               upcomingMeetings.map((meeting) => (
-                <div
-                  key={meeting.meetingId}
-                  className="col-lg-4 col-md-6"
-                >
+                <div key={meeting.meetingId} className="col-lg-4 col-md-6">
                   <div
                     className="card h-100 managermom-meeting-card"
                     onClick={() => openMeetingDetails(meeting)}

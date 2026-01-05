@@ -767,7 +767,7 @@ const ProjectList = () => {
               onClick={() => navigate("/hr/dashboard/projectmgmt")}
               className="prj-list-breadcrumb-link"
             >
-              <Home size={14} className="prj-list-breadcrumb-icon" />
+              <Home size={18} className="prj-list-breadcrumb-icon" />
               <span>Dashboard</span>
             </button>
           </li>

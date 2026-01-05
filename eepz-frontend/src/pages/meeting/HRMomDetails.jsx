@@ -212,7 +212,7 @@ const HRMomDetails = () => {
                 }
                 style={homeStyle}
               >
-                <Home size={14} color={accent} />
+                <Home size={18} color={accent} />
               </a>
               <span className="hrmom-breadcrumb-slash">/</span>
             </li>

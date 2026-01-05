@@ -151,7 +151,7 @@ const EmployeeMomDashboard = () => {
                 className="emd-breadcrumb-link emd-breadcrumb-home"
                 type="button"
               >
-                <Home size={16} />
+                <Home size={18} />
 
               </button>
             </li>

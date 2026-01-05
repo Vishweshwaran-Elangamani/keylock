@@ -432,7 +432,7 @@ const ManagerSLADashboard = () => {
               }}
               className="mgr-sla-breadcrumb-link"
             >
-              <Home size={14} />
+              <Home size={18} />
             </a>
           </li>
 

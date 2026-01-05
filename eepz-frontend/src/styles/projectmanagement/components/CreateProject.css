@@ -27,24 +27,26 @@
 .prj-breadcrumb-item:not(:last-child)::after {
   content: "/";
   margin-left: 0.5rem;
-  margin-right: 0.75rem;
-  color: #8d8d8d;
+  margin-right: 0.5rem;
+  color: #97247e;
+  font-weight: 400;
 }
 
 .prj-breadcrumb-link {
   color: #97247e;
   text-decoration: none;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  transition: all 0.2s;
-  font-weight: 500;
+  transition: all 0.2s ease;
+  font-weight: 400;
   border: none;
   outline: none;
   background: transparent;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  padding: 0.375rem 0.5rem;
+  border-radius: 6px;
   cursor: pointer;
+  font-size: 0.875rem;
 }
 
 .prj-breadcrumb-link span {
@@ -52,16 +54,38 @@
 }
 
 .prj-breadcrumb-link:hover {
-  background-color: rgba(151, 36, 126, 0.1);
+  background-color: rgba(151, 36, 126, 0.08);
 }
 
 .prj-breadcrumb-icon {
   flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  color: #97247e;
+}
+
+.prj-breadcrumb-link svg {
+  width: 18px;
+  height: 18px;
+  color: #97247e;
+  stroke: currentColor;
+  transition: none;
+}
+
+.prj-breadcrumb-link:hover svg {
+  color: #97247e;
+  stroke: currentColor;
+}
+
+.prj-breadcrumb-link:hover .prj-breadcrumb-icon {
+  color: #97247e;
 }
 
 .prj-breadcrumb-current {
-  color: #000000;
+  color: #111827;
   font-weight: 600;
+  font-size: 0.875rem;
+  padding: 0.375rem 0.5rem;
 }
 
 .prj-breadcrumb-item-active {
@@ -1363,17 +1387,4 @@ input.prj-form-input:-webkit-autofill:focus {
 .prj-col-dept {
   width: 30%;
   text-align: left;
-}
-
-
-.prj-breadcrumb-link .prj-breadcrumb-icon,
-.prj-breadcrumb-link svg {
-  color: #97247e;         
-  stroke: currentColor;
-}
-
-.prj-breadcrumb-link:hover .prj-breadcrumb-icon,
-.prj-breadcrumb-link:hover svg {
-  color: #97247e;         
-  stroke: currentColor;
 }

@@ -79,7 +79,7 @@ const FeedbackBreadcrumb = ({ items }) => {
             aria-label="Home"
             title="Home"
           >
-            <Home size={14} color={accent} />
+            <Home size={18} color={accent} />
           </a>
           <span className="fb-breadcrumb-slash">/</span>
         </li>

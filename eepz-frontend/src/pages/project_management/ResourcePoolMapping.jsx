@@ -381,7 +381,7 @@ const ResourcePoolMapping = () => {
         aria-label="Dashboard"
         title="Dashboard"
       >
-        <Home size={14} />
+        <Home size={18} />
       </button>
     </li>
 

@@ -330,7 +330,7 @@ const ScheduleMeeting = () => {
     className="sched-breadcrumb-link"
     style={{ display: "flex", alignItems: "center", padding: 0 }}
   >
-    <Home size={16} />
+    <Home size={18} />
   </button>
 </li>
 
@@ -345,7 +345,7 @@ const ScheduleMeeting = () => {
   <button
     onClick={() => navigate("/manager/dashboard/meetmom")}
     className="sched-breadcrumb-link"
-    style={{ padding: 0, marginLeft: "2px" }} // Reduce space near separator
+    style={{ padding: 0, marginLeft: "2px" }} 
   >
     Meeting and MoM
   </button>
@@ -353,7 +353,7 @@ const ScheduleMeeting = () => {
 
 <li
   className="sched-breadcrumb-separator"
-  style={{ margin: "0 4px" }} // Same reduced spacing
+  style={{ margin: "0 4px" }} 
 >
   /
 </li>

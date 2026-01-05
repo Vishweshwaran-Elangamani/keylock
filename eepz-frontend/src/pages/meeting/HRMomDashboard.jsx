@@ -29,7 +29,7 @@ const HRMomDashboard = () => {
     startDate: "",
     endDate: "",
     pageNumber: 1,
-    pageSize: 5,
+    pageSize: 10,
   });
   const [loading, setLoading] = useState(false);
   const [totalMoms, setTotalMoms] = useState(0);

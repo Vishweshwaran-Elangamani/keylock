@@ -17,7 +17,7 @@ const ProjectManagementBreadcrumb = ({ items }) => {
       <ol className="pm-breadcrumb__list">
         <li className="pm-breadcrumb__item">
           <Link to="/hr/dashboard" className="pm-breadcrumb__link">
-            <Home size={16} className="pm-breadcrumb__icon" />
+            <Home size={18} className="pm-breadcrumb__icon" />
           </Link>
         </li>
         {items && items.length > 0 && (

@@ -157,7 +157,7 @@ export default function CreateManagerReview() {
                   className="cmr-breadcrumb-link"
                   onClick={() => navigate("/manager/dashboard/")}
                 >
-                  <Home size={16} className="cmr-breadcrumb-icon" />
+                  <Home size={18} className="cmr-breadcrumb-icon" />
                 </button>
               </li>
               <li className="cmr-breadcrumb-separator">/</li>

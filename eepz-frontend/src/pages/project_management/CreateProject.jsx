@@ -832,13 +832,9 @@ const handleManagerSearchKeyPress = (e) => {
       <nav aria-label="breadcrumb" className="prj-breadcrumb">
         <ol className="prj-breadcrumb-list">
           <li className="prj-breadcrumb-item">
-           <button
-  type="button"
-  onClick={() => navigate("/hr/dashboard/projectmgmt")}
-  className="prj-breadcrumb-link"
->
-  <Home size={16} />
-</button>
+           <button type="button"  onClick={() => navigate("/hr/dashboard/projectmgmt")} className="prj-breadcrumb-link">
+             <Home size={18} />
+           </button>
 
           </li>
           <li className="prj-breadcrumb-item-active">
