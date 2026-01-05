@@ -18,10 +18,10 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import "../../styles/mom/components/MeetingInvitations.css";
 
 const RSVP_STATUS = {
-  ACCEPTED: "Accepted",
-  DECLINED: "Declined",
-  TENTATIVE: "Tentative",
-  PENDING: "Pending",
+  ACCEPTED: { label: "Accepted", value: 1 },
+  DECLINED: { label: "Declined", value: 2 },
+  TENTATIVE: { label: "Tentative", value: 3 },
+  PENDING: { label: "Pending", value: 0 },
 };
 
 const MeetingInvitations = () => {
@@ -59,13 +59,12 @@ const MeetingInvitations = () => {
   const openRsvpModal = (invitation) => {
     setSelectedInvitation(invitation);
     setErrorMessage("");
-    const currentStatus =
-      invitation.rsvpStatus || invitation.RSVPStatus || RSVP_STATUS.PENDING;
-    const validStatuses = Object.values(RSVP_STATUS);
-    setRsvpStatus(
-      validStatuses.includes(currentStatus) ? currentStatus : RSVP_STATUS.ACCEPTED
-    );
-    setRsvpComment(invitation.rsvpComments || invitation.RSVPComments || "");
+
+    // backend sends integer (0,1,2,3)
+    const currentStatus = invitation.rsvpStatus ?? RSVP_STATUS.PENDING.value;
+
+    setRsvpStatus(currentStatus); // store integer value
+    setRsvpComment(invitation.rsvpComments || "");
   };
 
   const closeRsvpModal = () => {
@@ -128,34 +127,35 @@ const MeetingInvitations = () => {
     }
   };
 
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case RSVP_STATUS.ACCEPTED:
-        return (
-          <span className="mi-badge mi-badge-accepted">
-            <CheckCircle size={14} /> Accepted
-          </span>
-        );
-      case RSVP_STATUS.DECLINED:
-        return (
-          <span className="mi-badge mi-badge-declined">
-            <XCircle size={14} /> Declined
-          </span>
-        );
-      case RSVP_STATUS.TENTATIVE:
-        return (
-          <span className="mi-badge mi-badge-tentative">
-            <AlertCircle size={14} /> Tentative
-          </span>
-        );
-      default:
-        return (
-          <span className="mi-badge mi-badge-pending">
-            <Clock size={14} /> Pending
-          </span>
-        );
-    }
-  };
+const getStatusBadge = (status) => {
+  switch (status) {
+    case RSVP_STATUS.ACCEPTED.value:
+      return (
+        <span className="mi-badge mi-badge-accepted">
+          <CheckCircle size={14} /> Accepted
+        </span>
+      );
+    case RSVP_STATUS.DECLINED.value:
+      return (
+        <span className="mi-badge mi-badge-declined">
+          <XCircle size={14} /> Declined
+        </span>
+      );
+    case RSVP_STATUS.TENTATIVE.value:
+      return (
+        <span className="mi-badge mi-badge-tentative">
+          <AlertCircle size={14} /> Tentative
+        </span>
+      );
+    default:
+      return (
+        <span className="mi-badge mi-badge-pending">
+          <Clock size={14} /> Pending
+        </span>
+      );
+  }
+};
+
 
   const formatDateTime = (dateString) => {
     if (!dateString) return "Not scheduled";
@@ -504,9 +504,11 @@ const MeetingInvitations = () => {
                           className="btn-check"
                           name="rsvpStatus"
                           id="rsvp-accepted"
-                          value={RSVP_STATUS.ACCEPTED}
-                          checked={rsvpStatus === RSVP_STATUS.ACCEPTED}
-                          onChange={(e) => setRsvpStatus(e.target.value)}
+                          value={RSVP_STATUS.ACCEPTED.value}
+                          checked={rsvpStatus === RSVP_STATUS.ACCEPTED.value}
+                          onChange={(e) =>
+                            setRsvpStatus(Number(e.target.value))
+                          }
                         />
                         <label
                           className="btn btn-outline-success mi-rsvp-option"
@@ -521,9 +523,11 @@ const MeetingInvitations = () => {
                           className="btn-check"
                           name="rsvpStatus"
                           id="rsvp-tentative"
-                          value={RSVP_STATUS.TENTATIVE}
-                          checked={rsvpStatus === RSVP_STATUS.TENTATIVE}
-                          onChange={(e) => setRsvpStatus(e.target.value)}
+                          value={RSVP_STATUS.TENTATIVE.value}
+                          checked={rsvpStatus === RSVP_STATUS.TENTATIVE.value}
+                          onChange={(e) =>
+                            setRsvpStatus(Number(e.target.value))
+                          }
                         />
                         <label
                           className="btn btn-outline-info mi-rsvp-option"
@@ -538,9 +542,11 @@ const MeetingInvitations = () => {
                           className="btn-check"
                           name="rsvpStatus"
                           id="rsvp-declined"
-                          value={RSVP_STATUS.DECLINED}
-                          checked={rsvpStatus === RSVP_STATUS.DECLINED}
-                          onChange={(e) => setRsvpStatus(e.target.value)}
+                          value={RSVP_STATUS.DECLINED.value}
+                          checked={rsvpStatus === RSVP_STATUS.DECLINED.value}
+                          onChange={(e) =>
+                            setRsvpStatus(Number(e.target.value))
+                          }
                         />
                         <label
                           className="btn btn-outline-danger mi-rsvp-option"

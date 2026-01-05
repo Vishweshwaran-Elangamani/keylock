@@ -26,7 +26,7 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
   };
 
   const countAccepted =
-    meeting.rsvpParticipants?.filter((p) => p.rsvpStatus === "Accepted").length ||
+    meeting.rsvpParticipants?.filter((p) => p.rsvpStatus == 1).length ||
     0;
   const totalParticipants = meeting.rsvpParticipants?.length || 0;
 
