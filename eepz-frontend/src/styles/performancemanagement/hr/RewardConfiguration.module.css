@@ -405,7 +405,7 @@
   font-weight: 800;
   font-size: 18px;
   color: var(--rl-dark);
-  font-family: Montserrat, Nunito, sans-serif;
+  /* font-family: Montserrat, Nunito, sans-serif; */
   text-align: left;
   min-width: 0;
   white-space: nowrap;

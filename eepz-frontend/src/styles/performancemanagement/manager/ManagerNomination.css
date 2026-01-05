@@ -18,7 +18,6 @@
   max-width: 1200px;
   margin: 0 auto;
   background: var(--mn-bg);
-  font-family: 'Segoe UI', Arial, sans-serif;
   color: var(--mn-text);
   box-sizing: border-box;
 }

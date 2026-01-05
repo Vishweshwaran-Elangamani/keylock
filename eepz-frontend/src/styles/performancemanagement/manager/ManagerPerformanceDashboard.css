@@ -19,7 +19,6 @@
   padding: 32px;
   max-width: 1400px;
   margin: 0 auto;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: var(--manevap-background);
   min-height: 100vh;
 }
@@ -896,7 +895,6 @@
   border-radius: 4px;
   min-height: 70px;
   resize: vertical;
-  font-family: inherit;
   outline: none;
   transition: all 0.3s ease;
 }
@@ -914,7 +912,6 @@
   padding: 8px;
   font-size: 1rem;
   color: #23234C;
-  font-family: inherit;
   outline: none;
   box-sizing: border-box;
   transition: border 0.2s;
