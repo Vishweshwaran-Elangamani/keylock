@@ -498,6 +498,50 @@ function FormsList() {
     };
   }, [rows, assignedUserIds]);
 
+  /* Custom Pagination Dropdown Component */
+const PaginationDropdown = ({ value, onChange, options }) => {
+  const [open, setOpen] = useState(false);
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="custom-fc-dropdown custom-fc-pagination-dropdown"
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setOpen(false), 200)}
+    >
+      <div
+        className="custom-fc-selected"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {value}
+        <span className="custom-fc-arrow" />
+      </div>
+
+      {open && (
+        <div className="custom-fc-menu">
+          {options.map((opt) => (
+            <div
+              key={opt}
+              className={
+                "custom-fc-option" +
+                (opt === value ? " custom-fc-option-active" : "")
+              }
+              onClick={() => handleSelect(opt)}
+            >
+              {opt}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+
   return (
     <div className="formlistperf">
       <div className="flp-root">
@@ -698,20 +742,15 @@ function FormsList() {
               <div className="flp-pagination-container">
                 <div className="flp-pagination-info">
                   <span className="flp-pagination-label">Rows per page:</span>
-                  <select
-                    className="flp-pagination-select"
-                    value={formsPerPage}
-                    onChange={(e) => {
-                      setFormsPerPage(Number(e.target.value));
-                      setFormsPage(1);
-                    }}
-                  >
-                    <option value={5}>5</option>
-                    <option value={8}>8</option>
-                    <option value={10}>10</option>
-                    <option value={15}>15</option>
-                    <option value={20}>20</option>
-                  </select>
+                  <PaginationDropdown
+  value={formsPerPage}
+  onChange={(val) => {
+    setFormsPerPage(Number(val));
+    setFormsPage(1);
+  }}
+  options={[5, 8, 10, 15, 20]}
+/>
+
                 </div>
 
                 <nav className="flp-pagination-nav">
@@ -849,19 +888,15 @@ function FormsList() {
               <div className="flp-pagination-container">
                 <div className="flp-pagination-info">
                   <span className="flp-pagination-label">Rows per page:</span>
-                  <select
-                    className="flp-pagination-select"
-                    value={usersPerPage}
-                    onChange={(e) => {
-                      setUsersPerPage(Number(e.target.value));
-                      setUsersPage(1);
-                    }}
-                  >
-                    <option value={5}>5</option>
-                    <option value={10}>10</option>
-                    <option value={15}>15</option>
-                    <option value={20}>20</option>
-                  </select>
+                  <PaginationDropdown
+  value={usersPerPage}
+  onChange={(val) => {
+    setUsersPerPage(Number(val));
+    setUsersPage(1);
+  }}
+  options={[5, 10, 15, 20]}
+/>
+
                 </div>
 
                 <nav className="flp-pagination-nav">

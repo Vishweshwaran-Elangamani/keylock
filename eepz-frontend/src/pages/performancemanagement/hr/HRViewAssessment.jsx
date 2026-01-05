@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../../services/performancemanagement/api/api";
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -6,9 +6,9 @@ import AppraisalDetailsModal from "../../../components/performance_management/mo
 import Breadcrumb from "../../../components/common/Breadcrumb";
 import styles from "../../../styles/performancemanagement/hr/HRViewAssessment.module.css";
 
-/* Custom Dropdown Component */
 const CustomDropdown = ({ value, onChange, options, placeholder, disabled }) => {
   const [open, setOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const selected = options.find((o) => o.value === value) || { label: placeholder || "Select", value: "" };
 
@@ -17,12 +17,23 @@ const CustomDropdown = ({ value, onChange, options, placeholder, disabled }) => 
     setOpen(false);
   };
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
     <div
+      ref={dropdownRef}
       className={styles.customDropdown}
       tabIndex={0}
       onBlur={() => setTimeout(() => setOpen(false), 200)}
-      style={{ position: "relative" }}
     >
       <div
         className={`${styles.customSelected} ${disabled ? styles.customDisabled : ''}`}
@@ -41,6 +52,57 @@ const CustomDropdown = ({ value, onChange, options, placeholder, disabled }) => 
               onClick={() => handleSelect(opt.value)}
             >
               {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Pagination Dropdown Component
+const PaginationDropdown = ({ value, onChange, options }) => {
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div
+      ref={dropdownRef}
+      className={styles.paginationDropdown}
+      tabIndex={0}
+    >
+      <div
+        className={styles.paginationSelected}
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {value}
+        <span className={styles.paginationArrow} />
+      </div>
+
+      {open && (
+        <div className={styles.paginationMenu}>
+          {options.map((opt) => (
+            <div
+              key={opt}
+              className={`${styles.paginationOption} ${opt === value ? styles.paginationOptionActive : ''}`}
+              onClick={() => handleSelect(opt)}
+            >
+              {opt}
             </div>
           ))}
         </div>
@@ -395,11 +457,11 @@ function HRViewAppraisals() {
                 <tr>
                   <th>Employee Name</th>
                   <th>Project Name</th>
-                  <th style={{ textAlign: "center" }}>Emp Avg</th>
+                  <th >Emp Avg</th>
                   <th>L1 Reviewer</th>
-                  <th style={{ textAlign: "center" }}>L1 Avg</th>
+                  <th >L1 Avg</th>
                   <th>L2 Reviewer</th>
-                  <th style={{ textAlign: "center" }}>L2 Avg</th>
+                  <th >L2 Avg</th>
                   <th>Status</th>
                   <th className={styles.textCenter}>Actions</th>
                 </tr>
@@ -417,11 +479,11 @@ function HRViewAppraisals() {
                     <tr key={row.key}>
                       <td>{row.employeeName}</td>
                       <td>{row.projectName}</td>
-                      <td style={{ textAlign: "center" }}>{row.empAvg}</td>
+                      <td >{row.empAvg}</td>
                       <td>{row.l1ReviewerName}</td>
-                      <td style={{ textAlign: "center" }}>{row.l1Avg}</td>
+                      <td >{row.l1Avg}</td>
                       <td>{row.l2ReviewerName}</td>
-                      <td style={{ textAlign: "center" }}>{row.l2Avg}</td>
+                      <td >{row.l2Avg}</td>
                       <td>{statusBadge(row.status)}</td>
                       <td>
                         <div className={styles.hrViewAssessmentActionButtons}>
@@ -444,19 +506,14 @@ function HRViewAppraisals() {
           <div className={styles.hrViewAssessmentPaginationContainer}>
             <div className={styles.hrViewAssessmentPaginationInfo}>
               <span className={styles.hrViewAssessmentPaginationLabel}>Show</span>
-              <select
-                className={styles.hrViewAssessmentPaginationSelect}
+              <PaginationDropdown
                 value={rowsPerPage}
-                onChange={(e) => {
-                  setRowsPerPage(Number(e.target.value));
+                onChange={(val) => {
+                  setRowsPerPage(Number(val));
                   setCurrentPage(1);
                 }}
-              >
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-              </select>
+                options={[5, 10, 25, 50]}
+              />
               <span className={styles.hrViewAssessmentPaginationLabel}>entries</span>
             </div>
             <div className={styles.hrViewAssessmentPaginationStatus}>

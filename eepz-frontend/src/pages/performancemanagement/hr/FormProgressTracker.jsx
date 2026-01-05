@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate, useLocation } from "react-router-dom";
 import api from "../../../services/performancemanagement/api/api";
 import "../../../styles/performancemanagement/hr/FormProgressTracker.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
-
 
 export default function FormProgressTrackerPage() {
   const [trackers, setTrackers] = useState([]);
@@ -12,10 +11,23 @@ export default function FormProgressTrackerPage() {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(8);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchTrackers();
+  }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const fetchTrackers = async () => {
@@ -73,7 +85,6 @@ export default function FormProgressTrackerPage() {
     document.body.removeChild(link);
   };
 
-
   const totalPages = Math.ceil(trackers.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -85,20 +96,55 @@ export default function FormProgressTrackerPage() {
 
   const BoolIcon = ({ value }) => (
     <span className={value ? "fld-status-icon fld-icon-yes" : "fld-status-icon fld-icon-no"}>
-      {value ? <span>&#10003;</span> : <span>&#10007;</span>}
+      {value ? <span>✓</span> : <span>✗</span>}
     </span>
   );
+
+  // Custom Dropdown Component
+  const CustomDropdown = ({ value, onChange, options }) => {
+    return (
+      <div 
+        className="fld-custom-dropdown" 
+        ref={dropdownRef}
+        tabIndex={0}
+        onBlur={() => setIsDropdownOpen(false)}
+      >
+        <div
+          className="fld-custom-selected"
+          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+        >
+          {value}
+          <span className="fld-custom-arrow"></span>
+        </div>
+        {isDropdownOpen && (
+          <div className="fld-custom-menu">
+            {options.map((option) => (
+              <div
+                key={option}
+                className={`fld-custom-option ${value === option ? 'fld-custom-option-active' : ''}`}
+                onClick={() => {
+                  onChange(option);
+                  setIsDropdownOpen(false);
+                }}
+              >
+                {option}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="fld-root">
       <div className="fld-header-wrapper d-flex justify-content-between align-items-center">
-
-      <Breadcrumb
-        items={[
-          { label: 'Performance', path: '/hr/dashboard/performance' },
-          { label: 'Form Progress', path: null }
-        ]}
-      />
+        <Breadcrumb
+          items={[
+            { label: 'Performance', path: '/hr/dashboard/performance' },
+            { label: 'Form Progress', path: null }
+          ]}
+        />
 
         <div className="fld-header-row d-flex justify-content-end align-items-center">
           <button className="fld-btn-export" onClick={handleExportCSV}>
@@ -115,7 +161,6 @@ export default function FormProgressTrackerPage() {
 
       {trackers.length > 0 &&
         <div className="fld-card">
-
           <div
             className="fld-table-wrapper"
             style={{
@@ -180,22 +225,16 @@ export default function FormProgressTrackerPage() {
 
             <div className="fld-pagination-container" style={{ marginTop: "0.5rem" }}>
               <div className="fld-pagination-info">
-                <span className="fld-show-entries-label">Show&nbsp;</span>
-                <select
-                  className="fld-pagination-select"
+                <span className="fld-show-entries-label">Pages&nbsp;</span>
+                <CustomDropdown
                   value={itemsPerPage}
-                  onChange={e => {
-                    setItemsPerPage(Number(e.target.value));
+                  onChange={(val) => {
+                    setItemsPerPage(Number(val));
                     setCurrentPage(1);
                   }}
-                >
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                  <option value="20">20</option>
-                  <option value="25">25</option>
-                </select>
-                <span className="fld-show-entries-label">&nbsp;entries</span>
+                  options={[5, 10, 15, 20, 25]}
+                />
+                <span className="fld-show-entries-label">&nbsp;</span>
                 <span className="fld-pagination-status">
                   &nbsp;&nbsp;Showing {startIndex + 1} to {Math.min(endIndex, trackers.length)} of {trackers.length} entries
                 </span>
@@ -229,7 +268,6 @@ export default function FormProgressTrackerPage() {
               </div>
             </div>
           </div>
-
         </div>
       }
     </div>

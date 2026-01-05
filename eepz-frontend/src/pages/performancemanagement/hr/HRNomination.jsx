@@ -467,7 +467,6 @@ function HRNominations() {
       <div className="container-fluid">
         <Breadcrumb
           items={[
-            { label: "Dashboard", path: "/hr/dashboard" },
             { label: "Performance", path: "/hr/dashboard/performance" },
             { label: "Nominations", path: null }
           ]}
