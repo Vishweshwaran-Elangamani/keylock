@@ -8,7 +8,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import ViewDetailsModal from "../../../components/performance_management/modals/Hrnomination/ViewDetailsModal";
 import ActionModal from "../../../components/performance_management/modals/Hrnomination/ActionModal";
 import Breadcrumb from "../../../components/common/Breadcrumb";
-import styles from "../../../styles/performancemanagement/hr/HRNomination.module.css";
+import styles from "../../../styles/performancemanagement/hr/HrNomination.module.css";
 
 function HRNominations() {
   const [nominations, setNominations] = useState([]);
