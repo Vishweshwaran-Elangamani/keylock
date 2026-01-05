@@ -27,7 +27,6 @@
   color: #8d8d8d !important;
 }
 
-
 .prj-list-breadcrumb-link {
   color: #97247E !important;
   text-decoration: none !important;
@@ -350,7 +349,7 @@
 
 .prj-list-table-wrapper {
   border-radius: 12px !important;
-  overflow: hidden !important;
+  overflow: visible !important;
   border: 1px solid #dee2e6 !important;
   background: #FFFFFF !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
@@ -409,6 +408,7 @@
 
 .prj-list-table tbody td:first-child {
   padding-left: 24px !important;
+  border-top-left-radius: 12px !important;
 }
 
 .prj-list-table tbody tr:last-child td {
@@ -614,12 +614,16 @@
   margin: 0 !important;
   border-bottom-left-radius: 12px !important;
   border-bottom-right-radius: 12px !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 .prj-list-pagination-left {
   display: flex !important;
   align-items: center !important;
   gap: 0.5rem !important;
+  position: relative !important;
+  z-index: 100 !important;
 }
 
 .prj-list-pagination-text {
@@ -627,26 +631,102 @@
   color: #6c757d !important;
 }
 
-.prj-list-pagination-dropdown {
-  padding: 0.375rem 2rem 0.375rem 0.75rem !important;
-  border: 1px solid #dee2e6 !important;
-  border-radius: 6px !important;
+.prj-list-entries-dropdown {
+  position: relative !important;
+  width: 70px !important;
   font-size: 0.875rem !important;
-  color: #212529 !important;
-  background-color: #FFFFFF !important;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") !important;
-  background-repeat: no-repeat !important;
-  background-position: right 0.5rem center !important;
-  background-size: 12px 10px !important;
-  appearance: none !important;
-  cursor: pointer !important;
-  min-width: 70px !important;
+  z-index: 100 !important;
 }
 
-.prj-list-pagination-dropdown:focus {
-  outline: none !important;
+.prj-list-entries-selected {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  padding: 0.375rem 0.5rem !important;
+  background-color: #FFFFFF !important;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  color: #212529 !important;
+  transition: all 0.2s ease !important;
+  position: relative !important;
+  z-index: 101 !important;
+}
+
+.prj-list-entries-selected:hover {
+  border-color: #3c3862 !important;
+}
+
+.prj-list-entries-dropdown.open .prj-list-entries-selected {
   border-color: #0F62FE !important;
-  box-shadow: 0 0 0 0.2rem rgba(15, 98, 254, 0.1) !important;
+  box-shadow: 0 0 0 3px rgba(15, 98, 254, 0.1) !important;
+}
+
+.prj-list-entries-arrow {
+  width: 0 !important;
+  height: 0 !important;
+  border-left: 4px solid transparent !important;
+  border-right: 4px solid transparent !important;
+  border-top: 4px solid #343a40 !important;
+  margin-left: 0.5rem !important;
+  transition: transform 0.2s ease !important;
+}
+
+.prj-list-entries-dropdown.open .prj-list-entries-arrow {
+  transform: rotate(180deg) !important;
+}
+
+.prj-list-entries-options {
+  position: absolute !important;
+  top: calc(100% + 4px) !important;
+  bottom: auto !important;
+  left: 0 !important;
+  width: 100% !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  background-color: #FFFFFF !important;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 6px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  display: none !important;
+  flex-direction: column !important;
+  z-index: 102 !important;
+  overflow: hidden !important;
+}
+
+.prj-list-entries-dropdown.open .prj-list-entries-options {
+  display: flex !important;
+}
+
+.prj-list-entries-option {
+  padding: 0.5rem !important;
+  background: none !important;
+  border: none !important;
+  text-align: center !important;
+  cursor: pointer !important;
+  font-size: 0.875rem !important;
+  color: #212529 !important;
+  transition: background-color 0.1s, color 0.1s !important;
+  width: 100% !important;
+  font-weight: 500 !important;
+}
+
+.prj-list-entries-option:hover {
+  background-color: #252267 !important;
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+}
+
+.prj-list-entries-option.selected {
+  background-color: #f1f1f1 !important;
+  color: #252267 !important;
+  font-weight: 700 !important;
+}
+
+.prj-list-entries-option.selected:hover {
+  background-color: #252267 !important;
+  color: #FFFFFF !important;
 }
 
 .prj-list-pagination-center {

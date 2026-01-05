@@ -48,6 +48,9 @@ const HRSLADashboard = () => {
   const [slaToDelete, setSlaToDelete] = useState(null);
 
   const [openDropdown, setOpenDropdown] = useState(null);
+  
+
+  const entriesDropdownRef = useRef(null);
 
   useEffect(() => {
     fetchSLAs();
@@ -63,9 +66,14 @@ const HRSLADashboard = () => {
 
   useEffect(() => {
     const handleClickOutside = (e) => {
+     
       if (!e.target.closest(".hr-sla-custom-select")) {
-        setOpenDropdown(null);
+         if (!e.target.closest(".hr-sla-entries-dropdown")) {
+             setOpenDropdown(null);
+         }
       }
+      
+    
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -99,9 +107,7 @@ const HRSLADashboard = () => {
     if (activeSearchTerm) {
       filtered = filtered.filter(
         (sla) =>
-          sla.employeeName
-            ?.toLowerCase()
-            .includes(activeSearchTerm.toLowerCase()) ||
+          sla.employeeName?.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
           sla.slatype?.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
           sla.slaid.toString().includes(activeSearchTerm)
       );
@@ -241,28 +247,20 @@ const HRSLADashboard = () => {
 
   const getStatusBadgeClass = (status) => {
     switch (status) {
-      case "Open":
-        return "hr-sla-badge-open";
-      case "Closed":
-        return "hr-sla-badge-closed";
+      case "Open": return "hr-sla-badge-open";
+      case "Closed": return "hr-sla-badge-closed";
       case "In Progress":
-      case "InProgress":
-        return "hr-sla-badge-progress";
-      default:
-        return "hr-sla-badge-default";
+      case "InProgress": return "hr-sla-badge-progress";
+      default: return "hr-sla-badge-default";
     }
   };
 
   const getComplianceBadgeClass = (compliance) => {
     switch (compliance) {
-      case "OnTime":
-        return "hr-sla-badge-ontime";
-      case "Breached":
-        return "hr-sla-badge-breached";
-      case "Extended":
-        return "hr-sla-badge-extended";
-      default:
-        return "hr-sla-badge-default";
+      case "OnTime": return "hr-sla-badge-ontime";
+      case "Breached": return "hr-sla-badge-breached";
+      case "Extended": return "hr-sla-badge-extended";
+      default: return "hr-sla-badge-default";
     }
   };
 
@@ -275,16 +273,13 @@ const HRSLADashboard = () => {
     toast.info("Filters cleared");
   };
 
+  
   const CustomSelect = ({ value, onChange, options, placeholder, name }) => {
     const selectRef = useRef(null);
     const dropdownRef = useRef(null);
     const isOpen = openDropdown === name;
     const selectedOption = options.find((opt) => opt.value === value);
-    const [dropdownPosition, setDropdownPosition] = useState({
-      top: 0,
-      left: 0,
-      width: 0,
-    });
+    const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
 
     useEffect(() => {
       if (isOpen && selectRef.current) {
@@ -301,9 +296,7 @@ const HRSLADashboard = () => {
       <div className="hr-sla-custom-select" ref={selectRef}>
         <button
           type="button"
-          className={`hr-sla-custom-select-trigger ${
-            selectedOption && selectedOption.value !== "All" ? "has-value" : ""
-          }`}
+          className={`hr-sla-custom-select-trigger ${selectedOption && selectedOption.value !== "All" ? "has-value" : ""}`}
           onClick={() => setOpenDropdown(isOpen ? null : name)}
         >
           <span className="hr-sla-custom-select-value">
@@ -330,9 +323,7 @@ const HRSLADashboard = () => {
             {options.map((option) => (
               <div
                 key={option.value}
-                className={`hr-sla-custom-select-option ${
-                  value === option.value ? "selected" : ""
-                }`}
+                className={`hr-sla-custom-select-option ${value === option.value ? "selected" : ""}`}
                 onClick={() => {
                   onChange(option.value);
                   setOpenDropdown(null);
@@ -364,14 +355,12 @@ const HRSLADashboard = () => {
   const safeTotal = filteredSlas.length;
   const totalPages = Math.max(1, Math.ceil(safeTotal / itemsPerPage));
   const startIndex = safeTotal === 0 ? 0 : (currentPage - 1) * itemsPerPage;
-  const endIndex =
-    safeTotal === 0 ? 0 : Math.min(currentPage * itemsPerPage, safeTotal);
+  const endIndex = safeTotal === 0 ? 0 : Math.min(currentPage * itemsPerPage, safeTotal);
   const currentSLAs = filteredSlas.slice(startIndex, endIndex);
 
   const getVisiblePageNumbers = () => {
     const pages = [];
     const maxVisible = 2;
-    
     if (totalPages <= maxVisible) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -385,7 +374,6 @@ const HRSLADashboard = () => {
         pages.push(currentPage, currentPage + 1);
       }
     }
-    
     return pages;
   };
 
@@ -407,14 +395,7 @@ const HRSLADashboard = () => {
       <nav aria-label="breadcrumb" className="hr-sla-breadcrumb-nav">
         <ol className="hr-sla-breadcrumb-list">
           <li className="hr-sla-breadcrumb-item">
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate("/hr/dashboard");
-              }}
-              className="hr-sla-breadcrumb-link"
-            >
+            <a href="#" onClick={(e) => { e.preventDefault(); navigate("/hr/dashboard"); }} className="hr-sla-breadcrumb-link">
               <Home size={14} />
             </a>
             /
@@ -428,41 +409,17 @@ const HRSLADashboard = () => {
       {error && (
         <div className="hr-sla-alert-error" role="alert">
           <AlertTriangle size={20} />
-          <div>
-            <strong>Error:</strong> {error}
-          </div>
-          <button className="hr-sla-alert-retry-btn" onClick={fetchSLAs}>
-            Retry
-          </button>
+          <div><strong>Error:</strong> {error}</div>
+          <button className="hr-sla-alert-retry-btn" onClick={fetchSLAs}>Retry</button>
         </div>
       )}
 
       <div className="hr-sla-stats-grid">
         {[
-          {
-            label: "Total SLAs",
-            value: stats.total,
-            icon: FileText,
-            iconClass: "hr-sla-stat-bg-total",
-          },
-          {
-            label: "Open",
-            value: stats.open,
-            icon: Clock,
-            iconClass: "hr-sla-stat-bg-open",
-          },
-          {
-            label: "Closed",
-            value: stats.closed,
-            icon: CheckCircle,
-            iconClass: "hr-sla-stat-bg-closed",
-          },
-          {
-            label: "On Time",
-            value: stats.onTime,
-            icon: TrendingUp,
-            iconClass: "hr-sla-stat-bg-ontime",
-          },
+          { label: "Total SLAs", value: stats.total, icon: FileText, iconClass: "hr-sla-stat-bg-total" },
+          { label: "Open", value: stats.open, icon: Clock, iconClass: "hr-sla-stat-bg-open" },
+          { label: "Closed", value: stats.closed, icon: CheckCircle, iconClass: "hr-sla-stat-bg-closed" },
+          { label: "On Time", value: stats.onTime, icon: TrendingUp, iconClass: "hr-sla-stat-bg-ontime" },
         ].map(({ label, value, icon: Icon, iconClass }) => (
           <div key={label} className="hr-sla-stat-col">
             <div className="hr-sla-stat-card">
@@ -481,9 +438,7 @@ const HRSLADashboard = () => {
       <div className="hr-sla-filters-card">
         <div className="hr-sla-filters-row">
           <div className="hr-sla-search-wrapper">
-            <div className="hr-sla-search-icon">
-              <Search size={16} />
-            </div>
+            <div className="hr-sla-search-icon"><Search size={16} /></div>
             <input
               type="text"
               className="hr-sla-search-input"
@@ -494,64 +449,28 @@ const HRSLADashboard = () => {
             />
             <div className="hr-sla-search-separator" />
             {activeSearchTerm ? (
-              <button
-                type="button"
-                className="hr-sla-search-action-btn hr-sla-search-clear-btn"
-                onClick={handleCancelSearch}
-              >
-                <X size={14} />
-                Cancel
+              <button type="button" className="hr-sla-search-action-btn hr-sla-search-clear-btn" onClick={handleCancelSearch}>
+                <X size={14} /> Cancel
               </button>
             ) : (
-              <button
-                type="button"
-                className="hr-sla-search-action-btn hr-sla-search-btn"
-                onClick={handleSearch}
-              >
-                <Search size={10} />
-                Search
+              <button type="button" className="hr-sla-search-action-btn hr-sla-search-btn" onClick={handleSearch}>
+                <Search size={10} /> Search
               </button>
             )}
           </div>
 
           <div className="hr-sla-filter-status">
-            <CustomSelect
-              value={statusFilter}
-              onChange={setStatusFilter}
-              options={statusOptions}
-              placeholder="All Status"
-              name="status"
-            />
+            <CustomSelect value={statusFilter} onChange={setStatusFilter} options={statusOptions} placeholder="All Status" name="status" />
           </div>
 
-       
-
           <div className="hr-sla-filter-compliance">
-            <CustomSelect
-              value={complianceFilter}
-              onChange={setComplianceFilter}
-              options={complianceOptions}
-              placeholder="All Compliance"
-              name="compliance"
-            />
+            <CustomSelect value={complianceFilter} onChange={setComplianceFilter} options={complianceOptions} placeholder="All Compliance" name="compliance" />
           </div>
 
           <div className="hr-sla-filter-actions">
-            <button className="hr-sla-btn-clear" onClick={clearFilters}>
-              <Filter size={16} />
-              Clear
-            </button>
-            <button className="hr-sla-btn-export" onClick={handleExport}>
-              <Download size={16} />
-              Export
-            </button>
-            <button
-              className="hr-sla-btn-create"
-              onClick={() => setShowCreateModal(true)}
-            >
-              <Plus size={16} />
-              Create SLA
-            </button>
+            <button className="hr-sla-btn-clear" onClick={clearFilters}><Filter size={16} /> Clear</button>
+            <button className="hr-sla-btn-export" onClick={handleExport}><Download size={16} /> Export</button>
+            <button className="hr-sla-btn-create" onClick={() => setShowCreateModal(true)}><Plus size={16} /> Create SLA</button>
           </div>
         </div>
       </div>
@@ -561,14 +480,10 @@ const HRSLADashboard = () => {
           <div className="hr-sla-empty-state">
             <FileText size={64} className="hr-sla-empty-state-icon" />
             <h5 className="hr-sla-empty-state-title">
-              {filteredSlas.length === 0 && slas.length > 0
-                ? "No SLAs match your filters"
-                : "No SLAs found"}
+              {filteredSlas.length === 0 && slas.length > 0 ? "No SLAs match your filters" : "No SLAs found"}
             </h5>
             <p className="hr-sla-empty-state-text">
-              {filteredSlas.length === 0 && slas.length > 0
-                ? "Try adjusting your search criteria or filters"
-                : "Get started by creating your first SLA"}
+              {filteredSlas.length === 0 && slas.length > 0 ? "Try adjusting your search criteria or filters" : "Get started by creating your first SLA"}
             </p>
           </div>
         </div>
@@ -589,79 +504,25 @@ const HRSLADashboard = () => {
               </thead>
               <tbody>
                 {currentSLAs.map((sla) => (
-                  <tr
-                    key={sla.slaid}
-                    onClick={() => handleRowClick(sla.slaid)}
-                    className="hr-sla-clickable-row"
-                  >
+                  <tr key={sla.slaid} onClick={() => handleRowClick(sla.slaid)} className="hr-sla-clickable-row">
                     <td>
-                      <div className="hr-sla-employee-name">
-                        {sla.employeeName}
-                      </div>
-                      <div className="hr-sla-employee-email">
-                        {sla.employeeEmail}
-                      </div>
+                      <div className="hr-sla-employee-name">{sla.employeeName}</div>
+                      <div className="hr-sla-employee-email">{sla.employeeEmail}</div>
+                    </td>
+                    <td><span className="hr-sla-badge hr-sla-badge-type">{sla.slatype}</span></td>
+                    <td>
+                      {sla.assignedToName ? <span className="hr-sla-assigned-name">{sla.assignedToName}</span> : <span className="hr-sla-not-assigned">Not assigned</span>}
                     </td>
                     <td>
-                      <span className="hr-sla-badge hr-sla-badge-type">
-                        {sla.slatype}
-                      </span>
+                      <div className="hr-sla-deadline-date">{formatDate(sla.deadline)}</div>
+                      {sla.closedAt && <div className="hr-sla-closed-date">Closed: {formatDate(sla.closedAt)}</div>}
                     </td>
-                    <td>
-                      {sla.assignedToName ? (
-                        <span className="hr-sla-assigned-name">
-                          {sla.assignedToName}
-                        </span>
-                      ) : (
-                        <span className="hr-sla-not-assigned">
-                          Not assigned
-                        </span>
-                      )}
-                    </td>
-                    <td>
-                      <div className="hr-sla-deadline-date">
-                        {formatDate(sla.deadline)}
-                      </div>
-                      {sla.closedAt && (
-                        <div className="hr-sla-closed-date">
-                          Closed: {formatDate(sla.closedAt)}
-                        </div>
-                      )}
-                    </td>
-                    <td>
-                      <span
-                        className={`hr-sla-badge ${getStatusBadgeClass(
-                          sla.status
-                        )}`}
-                      >
-                        {sla.status}
-                      </span>
-                    </td>
-                    <td>
-                      <span
-                        className={`hr-sla-badge ${getComplianceBadgeClass(
-                          sla.complianceStatus
-                        )}`}
-                      >
-                        {sla.complianceStatus}
-                      </span>
-                    </td>
+                    <td><span className={`hr-sla-badge ${getStatusBadgeClass(sla.status)}`}>{sla.status}</span></td>
+                    <td><span className={`hr-sla-badge ${getComplianceBadgeClass(sla.complianceStatus)}`}>{sla.complianceStatus}</span></td>
                     <td>
                       <div className="hr-sla-actions">
-                        <button
-                          className="hr-sla-action-btn hr-sla-action-edit"
-                          onClick={(e) => handleEdit(e, sla)}
-                          title="Edit SLA"
-                        >
-                          <Edit3 size={14} />
-                        </button>
-                        <button
-                          className="hr-sla-action-btn hr-sla-action-delete"
-                          onClick={(e) => handleDelete(e, sla)}
-                          title="Delete SLA"
-                        >
-                          <Trash2 size={14} />
-                        </button>
+                        <button className="hr-sla-action-btn hr-sla-action-edit" onClick={(e) => handleEdit(e, sla)} title="Edit SLA"><Edit3 size={14} /></button>
+                        <button className="hr-sla-action-btn hr-sla-action-delete" onClick={(e) => handleDelete(e, sla)} title="Delete SLA"><Trash2 size={14} /></button>
                       </div>
                     </td>
                   </tr>
@@ -674,79 +535,60 @@ const HRSLADashboard = () => {
             <div className="hr-sla-pagination-footer">
               <div className="hr-sla-pagination-left">
                 <span className="hr-sla-pagination-text">Show</span>
-                <select
-                  className="hr-sla-pagination-dropdown"
-                  value={itemsPerPage}
-                  onChange={(e) => {
-                    setItemsPerPage(Number(e.target.value));
-                    setCurrentPage(1);
-                  }}
+                
+                <div 
+                  className={`hr-sla-entries-dropdown ${openDropdown === 'entries' ? 'open' : ''}`} 
+                  ref={entriesDropdownRef}
                 >
-                  <option value={5}>5</option>
-                  <option value={10}>10</option>
-                  <option value={25}>25</option>
-                  <option value={50}>50</option>
-                </select>
+                  <div 
+                    className="hr-sla-entries-selected"
+                    onClick={() => setOpenDropdown(openDropdown === 'entries' ? null : 'entries')}
+                  >
+                    <span>{itemsPerPage}</span>
+                    <div className="hr-sla-entries-arrow"></div>
+                  </div>
+                  
+                  {openDropdown === 'entries' && (
+                    <div className="hr-sla-entries-options">
+                      {[5, 10, 25, 50].map(opt => (
+                        <div 
+                          key={opt}
+                          className={`hr-sla-entries-option ${itemsPerPage === opt ? 'selected' : ''}`}
+                          onClick={() => {
+                            setItemsPerPage(opt);
+                            setCurrentPage(1);
+                            setOpenDropdown(null);
+                          }}
+                        >
+                          {opt}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+           
+
                 <span className="hr-sla-pagination-text">entries</span>
               </div>
 
               <div className="hr-sla-pagination-center">
                 <span className="hr-sla-pagination-status">
-                  Showing {safeTotal === 0 ? 0 : startIndex + 1} to {endIndex}{" "}
-                  of {safeTotal} entries
+                  Showing {safeTotal === 0 ? 0 : startIndex + 1} to {endIndex} of {safeTotal} entries
                 </span>
               </div>
 
               <div className="hr-sla-pagination-right">
                 <ul className="hr-sla-pagination-list">
-                  <li
-                    className={`hr-sla-page-item ${
-                      currentPage === 1 ? "disabled" : ""
-                    }`}
-                  >
-                    <button
-                      className="hr-sla-page-link"
-                      onClick={() =>
-                        setCurrentPage((prev) => Math.max(1, prev - 1))
-                      }
-                      disabled={currentPage === 1}
-                      aria-label="Previous page"
-                    >
-                      ‹
-                    </button>
+                  <li className={`hr-sla-page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                    <button className="hr-sla-page-link" onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))} disabled={currentPage === 1} aria-label="Previous page">‹</button>
                   </li>
-
                   {getVisiblePageNumbers().map((page) => (
-                    <li
-                      key={page}
-                      className={`hr-sla-page-item ${
-                        currentPage === page ? "active" : ""
-                      }`}
-                    >
-                      <button
-                        className="hr-sla-page-link"
-                        onClick={() => setCurrentPage(page)}
-                      >
-                        {page}
-                      </button>
+                    <li key={page} className={`hr-sla-page-item ${currentPage === page ? "active" : ""}`}>
+                      <button className="hr-sla-page-link" onClick={() => setCurrentPage(page)}>{page}</button>
                     </li>
                   ))}
-
-                  <li
-                    className={`hr-sla-page-item ${
-                      currentPage === totalPages ? "disabled" : ""
-                    }`}
-                  >
-                    <button
-                      className="hr-sla-page-link"
-                      onClick={() =>
-                        setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-                      }
-                      disabled={currentPage === totalPages}
-                      aria-label="Next page"
-                    >
-                      ›
-                    </button>
+                  <li className={`hr-sla-page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                    <button className="hr-sla-page-link" onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages} aria-label="Next page">›</button>
                   </li>
                 </ul>
               </div>
@@ -757,17 +599,10 @@ const HRSLADashboard = () => {
 
       <ConfirmationModal
         isOpen={showConfirmModal}
-        onClose={() => {
-          setShowConfirmModal(false);
-          setSlaToDelete(null);
-        }}
+        onClose={() => { setShowConfirmModal(false); setSlaToDelete(null); }}
         onConfirm={confirmDelete}
         title="Delete SLA"
-        message={
-          slaToDelete
-            ? `Are you sure you want to delete SLA #${slaToDelete.slaid} for ${slaToDelete.employeeName}? This action cannot be undone.`
-            : ""
-        }
+        message={slaToDelete ? `Are you sure you want to delete SLA #${slaToDelete.slaid} for ${slaToDelete.employeeName}? This action cannot be undone.` : ""}
         confirmText="Delete"
         cancelText="Cancel"
         confirmVariant="danger"
@@ -776,10 +611,7 @@ const HRSLADashboard = () => {
       {showEditModal && selectedSLA && (
         <EditSLAModal
           sla={selectedSLA}
-          onClose={() => {
-            setShowEditModal(false);
-            setSelectedSLA(null);
-          }}
+          onClose={() => { setShowEditModal(false); setSelectedSLA(null); }}
           onUpdate={handleUpdate}
         />
       )}
@@ -787,10 +619,7 @@ const HRSLADashboard = () => {
       {showCreateModal && (
         <CreateSLAModal
           onClose={() => setShowCreateModal(false)}
-          onSuccess={() => {
-            setShowCreateModal(false);
-            fetchSLAs();
-          }}
+          onSuccess={() => { setShowCreateModal(false); fetchSLAs(); }}
         />
       )}
     </div>

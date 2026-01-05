@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import momService from "../../services/meeting/momService";
 import toastr from "toastr";
@@ -9,6 +9,8 @@ import {
   Eye,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   CheckCircle,
   AlertCircle,
   MessageSquare,
@@ -32,11 +34,25 @@ const HRMomDashboard = () => {
   const [loading, setLoading] = useState(false);
   const [totalMoms, setTotalMoms] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [showFilters, setShowFilters] = useState(false);
+  
+  const [isPageSizeOpen, setIsPageSizeOpen] = useState(false);
+  const pageSizeRef = useRef(null);
 
   useEffect(() => {
     fetchMoms();
   }, [filters.pageNumber, filters.pageSize]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (pageSizeRef.current && !pageSizeRef.current.contains(event.target)) {
+        setIsPageSizeOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const fetchMoms = async () => {
     setLoading(true);
@@ -70,31 +86,13 @@ const HRMomDashboard = () => {
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleApplyFilters = () => {
-    setFilters((prev) => ({ ...prev, pageNumber: 1 }));
-    setTimeout(() => fetchMoms(), 100);
-  };
-
-  const handleResetFilters = () => {
-    setFilters({
-      searchTerm: "",
-      meetingType: "",
-      departmentId: "",
-      startDate: "",
-      endDate: "",
-      pageNumber: 1,
-      pageSize: 5,
-    });
-    setTimeout(() => fetchMoms(), 100);
-  };
-
   const handlePageChange = (newPage) => {
     setFilters((prev) => ({ ...prev, pageNumber: newPage }));
   };
 
-  const handlePageSizeChange = (e) => {
-    const newSize = Number(e.target.value) || 5;
-    setFilters((prev) => ({ ...prev, pageSize: newSize, pageNumber: 1 }));
+  const handlePageSizeSelect = (size) => {
+    setFilters((prev) => ({ ...prev, pageSize: size, pageNumber: 1 }));
+    setIsPageSizeOpen(false);
   };
 
   const getMeetingTypeBadge = (type) => {
@@ -166,6 +164,8 @@ const HRMomDashboard = () => {
     totalMoms === 0 ? 0 : (filters.pageNumber - 1) * filters.pageSize + 1;
   const toIndex = Math.min(filters.pageNumber * filters.pageSize, totalMoms);
 
+  const pageSizeOptions = [5, 10, 25, 50];
+
   return (
     <div className="hrmom-dashboard-container">
       <div className="hrmom-dashboard-wrapper">
@@ -173,7 +173,6 @@ const HRMomDashboard = () => {
           <Breadcrumb
             items={[
               { label: "Meetings and MoM", href: "/hr/dashboard/mom" },
-             
             ]}
           />
         </div>
@@ -386,16 +385,35 @@ const HRMomDashboard = () => {
                 <div className="hrmom-pagination-footer">
                   <div className="hrmom-page-size">
                     <span>Show</span>
-                    <select
-                      className="form-select form-select-sm hrmom-page-size-select"
-                      value={filters.pageSize}
-                      onChange={handlePageSizeChange}
-                    >
-                      <option value={5}>5</option>
-                      <option value={10}>10</option>
-                      <option value={25}>25</option>
-                      <option value={50}>50</option>
-                    </select>
+                    
+                    <div className="hrmom-custom-select" ref={pageSizeRef}>
+                        <div 
+                          className="hrmom-select-trigger" 
+                          onClick={() => setIsPageSizeOpen(!isPageSizeOpen)}
+                        >
+                          <span className="hrmom-trigger-text">{filters.pageSize}</span>
+                          {isPageSizeOpen ? (
+                             <ChevronUp size={14} className="hrmom-select-arrow" />
+                          ) : (
+                             <ChevronDown size={14} className="hrmom-select-arrow" />
+                          )}
+                        </div>
+                        
+                        {isPageSizeOpen && (
+                          <div className="hrmom-select-options">
+                            {pageSizeOptions.map(size => (
+                              <div 
+                                key={size}
+                                className={`hrmom-select-option ${filters.pageSize === size ? 'selected' : ''}`}
+                                onClick={() => handlePageSizeSelect(size)}
+                              >
+                                {size}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                    </div>
+
                     <span>entries</span>
                   </div>
 

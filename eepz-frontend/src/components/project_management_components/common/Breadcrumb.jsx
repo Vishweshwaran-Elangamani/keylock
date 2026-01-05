@@ -29,7 +29,7 @@ const Breadcrumb = ({ items }) => {
               gap: "0.25rem",
             }}
           >
-            <Home size={14} />
+            <Home size={18} />
             Dashboard
           </a>
         </li>

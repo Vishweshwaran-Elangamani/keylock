@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   AlertTriangle,
@@ -36,6 +36,9 @@ const EmployeeSLADashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
 
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
   useEffect(() => {
     try {
       const userData = JSON.parse(localStorage.getItem("user"));
@@ -59,6 +62,19 @@ const EmployeeSLADashboard = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [activeTab, slas.length, itemsPerPage]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const fetchSLAs = useCallback(
     async (empId) => {
@@ -239,7 +255,6 @@ const EmployeeSLADashboard = () => {
       <Breadcrumb
         items={[
           { label: "SLA Compliance", active: true },
-       
         ]}
       />
 
@@ -478,18 +493,43 @@ const EmployeeSLADashboard = () => {
               <div className="emp-sla-pagination-footer">
                 <div className="emp-sla-pagination-left">
                   <span className="emp-sla-pagination-text">Show</span>
-                  <select
-                    className="emp-sla-pagination-dropdown"
-                    value={itemsPerPage}
-                    onChange={(e) => {
-                      setItemsPerPage(Number(e.target.value));
-                      setCurrentPage(1);
-                    }}
+
+             
+                  <div
+                    className="emp-sla-entries-dropdown"
+                    ref={dropdownRef}
                   >
-                    <option value={5}>5</option>
-                    <option value={10}>10</option>
-                    <option value={25}>25</option>
-                  </select>
+                    <div
+                      className={`emp-sla-entries-selected ${
+                        isDropdownOpen ? "open" : ""
+                      }`}
+                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    >
+                      <span>{itemsPerPage}</span>
+                      <div className="emp-sla-entries-arrow"></div>
+                    </div>
+
+                    {isDropdownOpen && (
+                      <div className="emp-sla-entries-options">
+                        {[5, 10, 25, 50].map((opt) => (
+                          <div
+                            key={opt}
+                            className={`emp-sla-entries-option ${
+                              itemsPerPage === opt ? "selected" : ""
+                            }`}
+                            onClick={() => {
+                              setItemsPerPage(opt);
+                              setCurrentPage(1);
+                              setIsDropdownOpen(false);
+                            }}
+                          >
+                            {opt}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
                   <span className="emp-sla-pagination-text">entries</span>
                 </div>
 

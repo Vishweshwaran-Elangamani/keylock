@@ -73,6 +73,65 @@ const MgrSelect = ({ value, onChange, options }) => {
   );
 };
 
+const PaginationDropdown = ({ value, onChange, options }) => {
+  const [open, setOpen] = useState(false);
+  const selected = options.find((o) => o === value) || options[0];
+
+  return (
+    <div className="pagination-dropdown">
+      <button
+        type="button"
+        className={`pagination-dropdown-control ${open ? "open" : ""}`}
+        onClick={() => setOpen((p) => !p)}
+      >
+        <span className="pagination-dropdown-value">{selected}</span>
+        <span className={`pagination-dropdown-icon ${open ? "open" : ""}`}>
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <polyline
+              points="6 9 12 15 18 9"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </span>
+      </button>
+
+      {open && (
+        <>
+          <div
+            className="pagination-dropdown-backdrop"
+            onClick={() => setOpen(false)}
+          />
+          <div className="pagination-dropdown-menu">
+            {options.map((opt) => (
+              <div
+                key={opt}
+                className={`pagination-dropdown-option ${
+                  opt === value ? "selected" : ""
+                }`}
+                onClick={() => {
+                  onChange(opt);
+                  setOpen(false);
+                }}
+              >
+                {opt}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
 const statusOptionsMy = [
   { value: "All", label: "All Status" },
   { value: "Open", label: "Open" },
@@ -311,7 +370,7 @@ const ManagerSLADashboard = () => {
 
   const safeTotal = filteredSlas.length;
   const totalPages = Math.max(1, Math.ceil(safeTotal / pageSize));
-  
+
   const validCurrentPage = Math.min(currentPage, totalPages);
 
   const startIndex = safeTotal === 0 ? 0 : (validCurrentPage - 1) * pageSize;
@@ -363,30 +422,29 @@ const ManagerSLADashboard = () => {
   return (
     <div className="mgr-sla-wrapper">
       <nav aria-label="breadcrumb" className="mgr-sla-breadcrumb-nav">
-  <ol className="mgr-sla-breadcrumb-list">
-    <li className="mgr-sla-breadcrumb-item">
-      <a
-        href="#"
-        onClick={(e) => {
-          e.preventDefault();
-          navigate("/manager/dashboard");
-        }}
-        className="mgr-sla-breadcrumb-link"
-      >
-        <Home size={14} />
-      </a>
-    </li>
+        <ol className="mgr-sla-breadcrumb-list">
+          <li className="mgr-sla-breadcrumb-item">
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/manager/dashboard");
+              }}
+              className="mgr-sla-breadcrumb-link"
+            >
+              <Home size={14} />
+            </a>
+          </li>
 
-    <li className="mgr-sla-breadcrumb-separator" aria-hidden="true">
-      /
-    </li>
+          <li className="mgr-sla-breadcrumb-separator" aria-hidden="true">
+            /
+          </li>
 
-    <li className="mgr-sla-breadcrumb-item">
-      <span className="mgr-sla-breadcrumb">SLA Compliance</span>
-    </li>
-  </ol>
-</nav>
-
+          <li className="mgr-sla-breadcrumb-item">
+            <span className="mgr-sla-breadcrumb">SLA Compliance</span>
+          </li>
+        </ol>
+      </nav>
 
       <div className="mgr-sla-stats-grid">
         {[
@@ -752,18 +810,14 @@ const ManagerSLADashboard = () => {
                 <div className="mgr-sla-pagination-footer">
                   <div className="mgr-sla-pagination-left">
                     <span className="mgr-sla-pagination-text">Show</span>
-                    <select
-                      className="mgr-sla-pagination-dropdown"
+                    <PaginationDropdown
                       value={itemsPerPage}
-                      onChange={(e) => {
-                        setItemsPerPage(Number(e.target.value));
+                      onChange={(val) => {
+                        setItemsPerPage(val);
                         setCurrentPage(1);
                       }}
-                    >
-                      <option value={5}>5</option>
-                      <option value={10}>10</option>
-                      <option value={25}>25</option>
-                    </select>
+                      options={[5, 10, 25, 50]}
+                    />
                     <span className="mgr-sla-pagination-text">entries</span>
                   </div>
 
@@ -789,14 +843,13 @@ const ManagerSLADashboard = () => {
                           <span className="mgr-sla-arrow-icon">‹</span>
                         </button>
                       </li>
-
                       {getPageNumbers().map((page, idx) =>
                         page === "..." ? (
                           <li
                             key={`ellipsis-${idx}`}
                             className="mgr-sla-page-item disabled"
                           >
-                            <span className="mgr-sla-page-link">…</span>
+                            <span className="mgr-sla-page-link">...</span>
                           </li>
                         ) : (
                           <li
@@ -814,7 +867,6 @@ const ManagerSLADashboard = () => {
                           </li>
                         )
                       )}
-
                       <li
                         className={`mgr-sla-page-item ${
                           validCurrentPage === totalPages ? "disabled" : ""

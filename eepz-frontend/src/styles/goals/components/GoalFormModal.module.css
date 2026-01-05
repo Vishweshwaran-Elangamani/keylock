@@ -67,7 +67,7 @@
 }
 
 .modalHeader {
-  background: linear-gradient(90deg, rgb(39, 35, 92) 0%, rgb(59, 55, 142) 100%);
+  background: rgb(39, 35, 92);
   color: white;
   display: flex;
   align-items: center;

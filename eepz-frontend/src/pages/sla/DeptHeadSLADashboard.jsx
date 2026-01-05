@@ -14,6 +14,65 @@ import slaService from "../../services/sla/slaService";
 import Breadcrumb from "../../components/sla/common/Breadcrumbs";
 import "../../styles/sla/components/DeptHeadSLADashboard.css";
 
+const PaginationDropdown = ({ value, onChange, options }) => {
+  const [open, setOpen] = useState(false);
+  const selected = options.find((o) => o === value) || options[0];
+
+  return (
+    <div className="dh-pagination-dropdown">
+      <button
+        type="button"
+        className={`dh-pagination-dropdown-control ${open ? "open" : ""}`}
+        onClick={() => setOpen((p) => !p)}
+      >
+        <span className="dh-pagination-dropdown-value">{selected}</span>
+        <span className={`dh-pagination-dropdown-icon ${open ? "open" : ""}`}>
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <polyline
+              points="6 9 12 15 18 9"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </span>
+      </button>
+
+      {open && (
+        <>
+          <div
+            className="dh-pagination-dropdown-backdrop"
+            onClick={() => setOpen(false)}
+          />
+          <div className="dh-pagination-dropdown-menu">
+            {options.map((opt) => (
+              <div
+                key={opt}
+                className={`dh-pagination-dropdown-option ${
+                  opt === value ? "selected" : ""
+                }`}
+                onClick={() => {
+                  onChange(opt);
+                  setOpen(false);
+                }}
+              >
+                {opt}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
 const DeptHeadSLADashboard = () => {
   const navigate = useNavigate();
 
@@ -445,18 +504,14 @@ const DeptHeadSLADashboard = () => {
           <div className="dh-sla-pagination-footer">
             <div className="dh-sla-pagination-left">
               <span className="dh-sla-pagination-text">Show</span>
-              <select
-                className="dh-sla-pagination-dropdown"
+              <PaginationDropdown
                 value={itemsPerPage}
-                onChange={(e) => {
-                  setItemsPerPage(Number(e.target.value));
+                onChange={(val) => {
+                  setItemsPerPage(val);
                   setCurrentPage(1);
                 }}
-              >
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-              </select>
+                options={[5, 10, 25, 50]}
+              />
               <span className="dh-sla-pagination-text">entries</span>
             </div>
 

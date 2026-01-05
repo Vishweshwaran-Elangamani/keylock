@@ -182,7 +182,6 @@ const ProjectDetails = () => {
               className="prj-detail-breadcrumb-link"
             >
               <Home size={14} />
-             
             </button>
           </li>
           <li className="prj-detail-breadcrumb-item">
