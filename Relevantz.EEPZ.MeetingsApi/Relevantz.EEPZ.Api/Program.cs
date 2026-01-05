@@ -100,8 +100,11 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.Zero
     };
 });
+
+// Service registrations
 builder.Services.AddScoped<IMeetingRepository, MeetingRepository>();
 builder.Services.AddScoped<IMeetingService, MeetingService>();
+builder.Services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
 builder.Services.AddCors(options =>
 {
@@ -170,7 +173,7 @@ try
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, " MoM Application terminated unexpectedly");
+    Log.Fatal(ex, "MoM Application terminated unexpectedly");
 }
 finally
 {

@@ -1,7 +1,63 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 
 namespace Relevantz.EEPZ.Common.DTOs
 {
+    public class FutureDateAttribute : ValidationAttribute
+    {
+        public FutureDateAttribute()
+        {
+            ErrorMessage = "Date must be in the future";
+        }
+
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        {
+            if (value == null)
+                return ValidationResult.Success;
+
+            if (value is DateOnly dateOnlyValue)
+            {
+                var currentDate = DateOnly.FromDateTime(DateTime.Now);
+                if (dateOnlyValue <= currentDate)
+                {
+                    return new ValidationResult(ErrorMessage);
+                }
+            }
+            else if (value is DateTime dateTimeValue)
+            {
+                if (dateTimeValue <= DateTime.Now)
+                {
+                    return new ValidationResult(ErrorMessage);
+                }
+            }
+
+            return ValidationResult.Success;
+        }
+    }
+
+    public class UrlValidationAttribute : ValidationAttribute
+    {
+        public UrlValidationAttribute()
+        {
+            ErrorMessage = "Invalid URL format";
+        }
+
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        {
+            if (value == null || string.IsNullOrWhiteSpace(value.ToString()))
+                return ValidationResult.Success;
+
+            string url = value.ToString();
+            string pattern = @"^(http|https)://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?$";
+            
+            if (!Regex.IsMatch(url, pattern))
+            {
+                return new ValidationResult(ErrorMessage);
+            }
+
+            return ValidationResult.Success;
+        }
+    }
 
     public class CreateMomDto
     {
@@ -9,7 +65,7 @@ namespace Relevantz.EEPZ.Common.DTOs
 
         [Required(ErrorMessage = "Meeting title is required")]
         [StringLength(200, ErrorMessage = "Meeting title cannot exceed 200 characters")]
-        public string MeetingTitle { get; set; } = null!;
+        public string MeetingTitle { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Meeting type is required")]
         public string MeetingType { get; set; } = null!; 
@@ -29,7 +85,6 @@ namespace Relevantz.EEPZ.Common.DTOs
 
         public List<ActionItemDto>? ActionItems { get; set; }
     }
-
 
     public class UpdateMomDto
     {
@@ -54,6 +109,7 @@ namespace Relevantz.EEPZ.Common.DTOs
 
         public List<ActionItemDto>? ActionItems { get; set; }
     }
+
     public class DiscussionPointDto
     {
         public int? PointId { get; set; }
@@ -63,7 +119,6 @@ namespace Relevantz.EEPZ.Common.DTOs
 
         public int PointOrder { get; set; } = 1;
     }
-
 
     public class ActionItemDto
     {
@@ -77,11 +132,11 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int AssignedToEmployeeId { get; set; }
 
         [Required(ErrorMessage = "Due date is required")]
+        [FutureDate(ErrorMessage = "Due date must be in the future")]
         public DateOnly DueDate { get; set; }
 
         public string Status { get; set; } = "Pending"; 
     }
-
 
     public class MomResponseDto
     {
@@ -103,26 +158,22 @@ namespace Relevantz.EEPZ.Common.DTOs
         public List<ActionItemResponseDto> ActionItems { get; set; } = new();
     }
 
-   public class ActionItemResponseDto
-{
-    public int ActionItemId { get; set; }
-    public string TaskDescription { get; set; }
-    public int AssignedToEmployeeId { get; set; }
-    public string AssignedToEmployeeName { get; set; }
-    public DateOnly DueDate { get; set; }
-    public string Status { get; set; }
-    public DateTime CreatedAt { get; set; }
-    
-    // THESE ARE MUST:
-    public string? MeetingTitle { get; set; }
-    public int? MomId { get; set; }
-    public int? AssignedByEmployeeId { get; set; }
-    public string? AssignedByEmployeeName { get; set; }
-    public bool IsOverdue { get; set; }
-}
-
-
-
+    public class ActionItemResponseDto
+    {
+        public int ActionItemId { get; set; }
+        public string TaskDescription { get; set; } = null!;
+        public int AssignedToEmployeeId { get; set; }
+        public string AssignedToEmployeeName { get; set; } = null!;
+        public DateOnly DueDate { get; set; }
+        public string Status { get; set; } = null!;
+        public DateTime CreatedAt { get; set; }
+        
+        public string? MeetingTitle { get; set; }
+        public int? MomId { get; set; }
+        public int? AssignedByEmployeeId { get; set; }
+        public string? AssignedByEmployeeName { get; set; }
+        public bool IsOverdue { get; set; }
+    }
 
     public class DiscussionPointResponseDto
     {
@@ -130,7 +181,6 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string PointText { get; set; } = null!;
         public int PointOrder { get; set; }
     }
-
 
     public class PaginatedMomResponseDto
     {
@@ -142,7 +192,6 @@ namespace Relevantz.EEPZ.Common.DTOs
         public bool HasPreviousPage { get; set; }
         public bool HasNextPage { get; set; }
     }
-
 
     public class ShareMomDto
     {
@@ -166,7 +215,6 @@ namespace Relevantz.EEPZ.Common.DTOs
         public DateTime SharedAt { get; set; }
     }
 
-
     public class ScheduleMeetingDto
     {
         [Required(ErrorMessage = "Meeting title is required")]
@@ -181,6 +229,7 @@ namespace Relevantz.EEPZ.Common.DTOs
 
         [Required(ErrorMessage = "Meeting link is required")]
         [StringLength(500)]
+        [UrlValidation(ErrorMessage = "Meeting link must be a valid URL")]
         public string MeetingLink { get; set; } = null!;
 
         public string? Agenda { get; set; }
@@ -190,7 +239,6 @@ namespace Relevantz.EEPZ.Common.DTOs
         public List<int> ParticipantEmployeeIds { get; set; } = null!;
     }
 
-    
     public class MeetingResponseDto
     {
         public int MeetingId { get; set; }
@@ -213,27 +261,27 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string EmployeeName { get; set; } = null!;
     }
 
-
     public class OneOnOneReportDto
     {
         public int TotalMeetings { get; set; }
         public int CompletedMeetings { get; set; }
         public int ScheduledMeetings { get; set; }
         public int CancelledMeetings { get; set; }
-        public double CompletionRate { get; set; }
+        
+        public double CompletionRate => TotalMeetings > 0 ? (double)CompletedMeetings / TotalMeetings * 100 : 0;
 
         public int TotalActionItems { get; set; }
         public int CompletedActionItems { get; set; }
         public int PendingActionItems { get; set; }
         public int OverdueActionItems { get; set; }
-        public double ActionItemCompletionRate { get; set; }
+        
+        public double ActionItemCompletionRate => TotalActionItems > 0 ? (double)CompletedActionItems / TotalActionItems * 100 : 0;
    
         public double AverageActionItemsPerMeeting { get; set; }
         public double AverageDiscussionPointsPerMeeting { get; set; }
         public List<MeetingResponseDto> Meetings { get; set; } = new();
         public List<EmployeeOneOnOneStatsDto> EmployeeStats { get; set; } = new();
     }
-
 
     public class EmployeeOneOnOneStatsDto
     {
@@ -247,9 +295,9 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int TotalActionItems { get; set; }
         public int CompletedActionItems { get; set; }
         public int OverdueActionItems { get; set; }
+        
         public bool NeedsAttention => DaysSinceLastMeeting > 30 || OverdueActionItems > 0;
     }
-
 
     public class OneOnOneSummaryDto
     {
@@ -270,7 +318,6 @@ namespace Relevantz.EEPZ.Common.DTOs
  
         public List<RecentMeetingDto> RecentlyCompleted { get; set; } = new();
     }
-
 
     public class UpcomingMeetingDto
     {
@@ -295,10 +342,10 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int DaysSinceCompletion { get; set; }
     }
 
- 
     public class ActionItemFilterDto
     {
         public string? Status { get; set; } 
+        
         public bool? IsOverdue { get; set; }
         public int? AssignedToEmployeeId { get; set; }
         public DateTime? DueDateFrom { get; set; }
@@ -350,7 +397,6 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string SortOrder { get; set; } = "desc";
     }
 
- 
     public class MeetingFilterDto
     {
         public string? MeetingType { get; set; }
@@ -370,7 +416,6 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int PageSize { get; set; } = 20;
     }
 
-
     public class MomStatisticsDto
     {
         public int TotalMoms { get; set; }
@@ -380,6 +425,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int OneOnOneMeetings { get; set; }
         public int TeamMeetings { get; set; }
         public int Presentations { get; set; }
+        
         public Dictionary<string, int> MomsByDepartment { get; set; } = new();
         public Dictionary<string, int> MomsByMeetingType { get; set; } = new();
     }
