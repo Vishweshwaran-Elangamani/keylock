@@ -13,8 +13,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         private readonly EEPZDbContext _context;
 
         public RecognitionRewardRepository(EEPZDbContext context)
-        {
-            _context = context;
+        {         _context = context;
         }
 
         public async Task<List<RecognitionRewardDto>> GetRecognitionRewardsAsync()

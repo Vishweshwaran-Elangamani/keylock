@@ -40,7 +40,7 @@ namespace PerformanceManagement.Controllers
             try
             {
                 var result = await _service.GetNominationDetailsAsync(nominationId);
-                
+
                 if (!result.Success)
                 {
                     return NotFound(result);
@@ -61,7 +61,7 @@ namespace PerformanceManagement.Controllers
             try
             {
                 var result = await _service.ApproveNominationsAsync(dto);
-                
+
                 if (!result.Success)
                 {
                     return BadRequest(result);
@@ -82,7 +82,7 @@ namespace PerformanceManagement.Controllers
             try
             {
                 var result = await _service.RejectNominationsAsync(dto);
-                
+
                 if (!result.Success)
                 {
                     return BadRequest(result);
@@ -178,20 +178,21 @@ namespace PerformanceManagement.Controllers
             try
             {
                 _logger.LogInformation($"[UPDATE_REWARD_TYPE] Starting update for RewardTypeId: {rewardTypeId}");
-                
+
                 var result = await _service.UpdateRewardTypeAsync(rewardTypeId, dto);
-                
+
                 return Ok(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError($"[UPDATE_REWARD_TYPE] Exception: {ex.Message}");
                 _logger.LogError($"[UPDATE_REWARD_TYPE] Stack: {ex.StackTrace}");
-                
-                return StatusCode(500, new { 
-                    success = false, 
+
+                return StatusCode(500, new
+                {
+                    success = false,
                     message = "Error updating reward type",
-                    details = ex.Message 
+                    details = ex.Message
                 });
             }
         }
@@ -226,58 +227,82 @@ namespace PerformanceManagement.Controllers
             }
         }
 
-        [HttpPut("parameters/{parameterId}")]
-        public async Task<IActionResult> UpdateParameter(int parameterId, [FromBody] UpdateParameterDto dto)
+       [HttpPut("parameters/{parameterId}")]
+public async Task<IActionResult> UpdateParameter(int parameterId, [FromBody] UpdateParameterDto dto)
+{
+    try
+    {
+        var result = await _service.UpdateParameterAsync(parameterId, dto);
+        
+        // Check if result is null
+        if (result == null)
         {
-            try
+            return Ok(new { success = true, message = "Parameter updated successfully" });
+        }
+        
+        // Safe property check
+        var resultType = result.GetType();
+        var successProperty = resultType.GetProperty("success") ?? resultType.GetProperty("Success");
+        
+        if (successProperty != null)
+        {
+            var success = (bool)successProperty.GetValue(result);
+            if (!success)
             {
-                var result = await _service.UpdateParameterAsync(parameterId, dto);
-                var success = (bool)((dynamic)result).success;
-
-                if (!success)
-                {
-                    return NotFound(result);
-                }
-
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"[UPDATE_PARAMETER] Error: {ex.Message}");
-                return StatusCode(500, new { success = false, message = ex.Message });
+                return NotFound(result);
             }
         }
+
+        return Ok(result);
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError($"[UPDATE_PARAMETER] Error: {ex.Message}");
+        return StatusCode(500, new { success = false, message = ex.Message });
+    }
+}
+
 
         [HttpDelete("parameters/{parameterId}")]
         public async Task<IActionResult> DeleteParameter(int parameterId)
         {
             try
             {
-                var result = await _service.DeleteParameterAsync(parameterId);
-                var success = (bool)((dynamic)result).success;
+                await _service.DeleteParameterAsync(parameterId);
 
-                if (!success)
+                return Ok(new
                 {
-                    return NotFound(result);
-                }
-
-                return Ok(result);
+                    success = true,
+                    message = "Parameter deleted successfully"
+                });
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound(new
+                {
+                    success = false,
+                    message = "Parameter not found"
+                });
             }
             catch (Exception ex)
             {
                 _logger.LogError($"[DELETE_PARAMETER] Error: {ex.Message}");
-                return StatusCode(500, new { success = false, message = ex.Message });
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = ex.Message
+                });
             }
         }
-    }
 
-    public class ReviewMetricsDto
-    {
-        public int NominationId { get; set; }
-        public int ReviewedByEmployeeId { get; set; }
-        public decimal? MeritScore { get; set; }
-        public decimal? DiversityScore { get; set; }
-        public bool ConflictOfInterest { get; set; }
-        public string ReviewNotes { get; set; }
+        public class ReviewMetricsDto
+        {
+            public int NominationId { get; set; }
+            public int ReviewedByEmployeeId { get; set; }
+            public decimal? MeritScore { get; set; }
+            public decimal? DiversityScore { get; set; }
+            public bool ConflictOfInterest { get; set; }
+            public string ReviewNotes { get; set; }
+        }
     }
 }
