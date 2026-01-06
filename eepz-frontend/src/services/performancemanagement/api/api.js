@@ -165,7 +165,14 @@ export const getAllAppraisalDetails = () => {
 // Attachment APIs
 export const downloadAttachment = (attachmentId) => {
   return api.get(`/SelfAssessment/attachments/${attachmentId}/download`, {
-    responseType: 'blob', // Critical for binary file downloads
+    responseType: 'blob',
+  });
+};
+
+// ✅ NEW: HR Attachment Download API
+export const downloadHrAttachment = (attachmentId) => {
+  return api.get(`/AssessmentDetails/hrattachments/${attachmentId}/download`, {
+    responseType: 'blob',
   });
 };
 

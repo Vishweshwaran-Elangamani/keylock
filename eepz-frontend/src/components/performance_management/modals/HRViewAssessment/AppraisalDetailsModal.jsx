@@ -1,5 +1,5 @@
 import React from "react";
-import api from "../../../../services/performancemanagement/api/api";
+import { downloadHrAttachment } from "../../../../services/performancemanagement/api/api";
 import "../../../../styles/performancemanagement/components/AppraisalDetailsModal.css";
 
 function statusRender(status) {
@@ -148,24 +148,11 @@ const AppraisalDetailsModal = ({
       setDownloadingId(attachment.attachmentId);
       setError(null);
 
-      const downloadUrl = `${api.defaults.baseURL}/AppraisalProcess/hr/attachments/${attachment.attachmentId}/download`;
+      // ✅ Use the imported API function
+      const response = await downloadHrAttachment(attachment.attachmentId);
 
-      const response = await fetch(downloadUrl);
-      const contentType = response.headers.get("content-type");
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`[ERROR] HTTP ${response.status}:`, errorText);
-        throw new Error(`Download failed with status ${response.status}: ${errorText}`);
-      }
-
-      if (contentType && contentType.includes("text/html")) {
-        const errorText = await response.text();
-        console.error("[ERROR] Backend returned HTML error page:", errorText);
-        throw new Error("Backend returned error page. Check console for details.");
-      }
-
-      const blob = await response.blob();
+      const blob = response.data;
+      const contentType = response.headers['content-type'];
       let filename = attachment.fileName || "attachment";
 
       if (!hasExtension(filename)) {
@@ -195,7 +182,6 @@ const AppraisalDetailsModal = ({
       document.body.removeChild(link);
     } catch (err) {
       console.error("✗ Download error:", err);
-      console.error("Error stack:", err.stack);
       setError(`Failed to download ${attachment.fileName}: ${err.message}`);
     } finally {
       setDownloadingId(null);
