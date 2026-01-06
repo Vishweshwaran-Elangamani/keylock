@@ -9,7 +9,6 @@ namespace Relevantz.EEPZ.Common.DTOs
         Declined = 2,
         Tentative = 3
     }
-
     public enum MeetingStatus
     {
         Scheduled = 0,
@@ -17,7 +16,6 @@ namespace Relevantz.EEPZ.Common.DTOs
         Completed = 2,
         Cancelled = 3
     }
-
     public class RsvpResponseDto
     {
         [Required]
@@ -30,7 +28,6 @@ namespace Relevantz.EEPZ.Common.DTOs
         [StringLength(500, ErrorMessage = "Comments cannot exceed 500 characters")]
         public string? RsvpComments { get; set; }
     }
-
     public class MeetingInvitationDto
     {
         public int ParticipantId { get; set; }
@@ -50,7 +47,6 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int DaysUntilMeeting { get; set; }
         public bool RequiresResponse => RsvpStatus == RsvpStatus.Pending;
     }
-
     public class MeetingRsvpSummaryDto
     {
         public int MeetingId { get; set; }
@@ -60,12 +56,11 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int DeclinedCount { get; set; }
         public int TentativeCount { get; set; }
         public int PendingCount { get; set; }
-        public double ResponseRate => TotalInvitations > 0 
-            ? (double)(TotalInvitations - PendingCount) / TotalInvitations * 100 
+        public double ResponseRate => TotalInvitations > 0
+            ? (double)(TotalInvitations - PendingCount) / TotalInvitations * 100
             : 0;
         public List<ParticipantRsvpDto> Participants { get; set; } = new();
     }
-
     public class ParticipantRsvpDto
     {
         public int ParticipantId { get; set; }
@@ -75,7 +70,6 @@ namespace Relevantz.EEPZ.Common.DTOs
         public DateTime? RsvpResponseDate { get; set; }
         public string? RsvpComments { get; set; }
     }
-
     public class PaginatedMeetingInvitationDto
     {
         public List<MeetingInvitationDto> Invitations { get; set; } = new();
@@ -86,7 +80,6 @@ namespace Relevantz.EEPZ.Common.DTOs
         public bool HasPreviousPage { get; set; }
         public bool HasNextPage { get; set; }
     }
-
     public class MeetingInvitationFilterDto
     {
         [Range(1, int.MaxValue, ErrorMessage = "Page number must be at least 1")]
@@ -94,17 +87,11 @@ namespace Relevantz.EEPZ.Common.DTOs
 
         [Range(1, 100, ErrorMessage = "Page size must be between 1 and 100")]
         public int PageSize { get; set; } = 20;
-
         public RsvpStatus? RsvpStatus { get; set; }
-
         public MeetingStatus? MeetingStatus { get; set; }
-
         public DateTime? StartDate { get; set; }
-
         public DateTime? EndDate { get; set; }
-
         public string SortBy { get; set; } = "MeetingDate";
-
         public string SortOrder { get; set; } = "asc";
     }
 }

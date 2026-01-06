@@ -9,39 +9,32 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
     {
         [Required(ErrorMessage = "FeedbackType is required")]
         public string FeedbackType { get; set; }
-        
 
         public int? SubmittedByEmployeeId { get; set; }
-       
+
 
         [Required(ErrorMessage = "RecipientEmployeeId is required")]
         public int RecipientEmployeeId { get; set; }
-        
 
         public int? RelatedGoalId { get; set; }
-        
 
         public int? RelatedProjectId { get; set; }
-        
 
         public int? RelatedMentorId { get; set; }
-        
 
         public int? RelatedOrganizationGoalId { get; set; }
-        
+
 
         [Range(1, 5, ErrorMessage = "Rating must be between 1 and 5")]
         public int? Rating { get; set; }
-        
+
 
         [MaxLength(2000, ErrorMessage = "Comments cannot exceed 2000 characters")]
         public string Comments { get; set; }
-        
 
         public bool IsAnonymous { get; set; } = false;
-        
 
-        
+
         public List<FeedbackQuestionResponseRequestDto> QuestionResponses { get; set; } = new();
     }
 
@@ -68,16 +61,16 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         public int QuestionId { get; set; }
 
         public int? RatingValue { get; set; }
-      
+
 
         public bool? BooleanValue { get; set; }
-   
+
 
         public string TextValue { get; set; }
-  
+
 
         public List<int> SelectedOptions { get; set; }
-     
+
     }
 
     /// <summary>
@@ -92,10 +85,9 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         public int TargetEmployeeId { get; set; }
 
         public int? TargetGoalId { get; set; }
-      
 
         public int? TargetOrganizationGoalId { get; set; }
-  
+
 
         [Required(ErrorMessage = "Rating is required")]
         [Range(1, 5, ErrorMessage = "Rating must be between 1 and 5")]
@@ -112,31 +104,31 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
     {
         [Required]
         public int SmeId { get; set; }
-       
+
 
         [Required]
         public int MentorEmployeeId { get; set; }
-  
+
 
         [Required]
         public int MenteeEmployeeId { get; set; }
-   
+
 
         [Required]
         public int SkillIdReference { get; set; }
-     
+
 
         [Required]
         [Range(1, 5, ErrorMessage = "Rating must be between 1 and 5")]
         public int Rating { get; set; }
- 
+
 
         [MaxLength(2000)]
         public string FeedbackComments { get; set; }
 
         [Required]
         public int SubmittedByEmployeeId { get; set; }
-   
+
 
         [Required]
         public string FeedbackFrom { get; set; }
@@ -144,8 +136,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
 
         public bool IsAnonymous { get; set; } = false;
     }
-
-
 
     /// <summary>
     /// Request DTO for Peer Feedback
@@ -176,10 +166,8 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         [Required]
         public bool IsProfessional { get; set; }
 
-
         [Required]
         public bool IsRelevant { get; set; }
-
 
         public bool Approve { get; set; } = true;
 
@@ -199,7 +187,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
 
         [Required]
         public string FormType { get; set; }
-        
 
         [Required]
         public int CreatedByHRId { get; set; }
@@ -264,8 +251,8 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
     {
         public List<int> EmployeeIds { get; set; }
     }
-    
-       public class SubmitFeedbackRequest
+
+    public class SubmitFeedbackRequest
     {
         public int EmployeeId { get; set; }
         public int ProjectId { get; set; }
@@ -274,10 +261,10 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         public int Rating { get; set; }
     }
 
-     public class CreateGoalFeedbackRequestDto
+    public class CreateGoalFeedbackRequestDto
     {
         [Required]
-        public int GoalId { get; set; } 
+        public int GoalId { get; set; }
 
         [Required]
         public int SubmittedByEmployeeId { get; set; }
@@ -304,39 +291,27 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
 
         [MaxLength(2000)]
         public string FeedbackComments { get; set; }
-        
+
         public string Status { get; set; }
     }
 
+    public class CreateOrgGoalFeedbackRequestDto
+    {
+        [Required(ErrorMessage = "GoalId is required")]
+        public int GoalId { get; set; }
 
+        [Required(ErrorMessage = "SubmittedByEmployeeId is required")]
+        public int SubmittedByEmployeeId { get; set; }
 
-public class CreateOrgGoalFeedbackRequestDto
-{
-    [Required(ErrorMessage = "GoalId is required")]
-    public int GoalId { get; set; }
+        [Required(ErrorMessage = "RecipientEmployeeId is required")]
+        public int RecipientEmployeeId { get; set; }
 
-    [Required(ErrorMessage = "SubmittedByEmployeeId is required")]
-    public int SubmittedByEmployeeId { get; set; }
+        [Required(ErrorMessage = "Rating is required")]
+        [Range(1, 5, ErrorMessage = "Rating must be between 1 and 5")]
+        public int Rating { get; set; }
 
-    [Required(ErrorMessage = "RecipientEmployeeId is required")]
-    public int RecipientEmployeeId { get; set; }
-    
-
-    [Required(ErrorMessage = "Rating is required")]
-    [Range(1, 5, ErrorMessage = "Rating must be between 1 and 5")]
-    public int Rating { get; set; }
-
-    [MaxLength(2000, ErrorMessage = "Comments cannot exceed 2000 characters")]
-    public string FeedbackComments { get; set; }
-
-    public bool IsAnonymous { get; set; } = false;
+        [MaxLength(2000, ErrorMessage = "Comments cannot exceed 2000 characters")]
+        public string FeedbackComments { get; set; }
+        public bool IsAnonymous { get; set; } = false;
+    }
 }
-
-
-
-    
-}
-
-
-
-

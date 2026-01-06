@@ -61,7 +61,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         RatingValue = responseDto.RatingValue,
                         BooleanValue = responseDto.BooleanValue,
                         TextValue = responseDto.TextValue,
-                        SelectedOptions = responseDto.SelectedOptions != null 
+                        SelectedOptions = responseDto.SelectedOptions != null
                             ? JsonSerializer.Serialize(responseDto.SelectedOptions)
                             : null
                     };
@@ -79,7 +79,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-
 
         public async Task<FeedbackResponseDto> GetFeedbackByIdAsync(int feedbackId)
         {
@@ -354,7 +353,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-
         public async Task<FeedbackResponseDto> UpdateFeedbackAsync(int feedbackId, UpdateFeedbackRequestDto dto)
         {
             try
@@ -385,7 +383,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                             existingResponse.RatingValue = responseDto.RatingValue;
                             existingResponse.BooleanValue = responseDto.BooleanValue;
                             existingResponse.TextValue = responseDto.TextValue;
-                            existingResponse.SelectedOptions = responseDto.SelectedOptions != null 
+                            existingResponse.SelectedOptions = responseDto.SelectedOptions != null
                                 ? JsonSerializer.Serialize(responseDto.SelectedOptions)
                                 : null;
 
@@ -472,7 +470,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-
         public async Task<bool> CanEditFeedbackAsync(int feedbackId)
         {
             try
@@ -485,8 +482,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-
-
 
         private FeedbackResponseDto MapToResponseDto(Feedback feedback, List<Feedbackquestionresponse> responses)
         {
@@ -558,6 +553,5 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 QuestionResponses = responseList
             };
         }
-
     }
 }

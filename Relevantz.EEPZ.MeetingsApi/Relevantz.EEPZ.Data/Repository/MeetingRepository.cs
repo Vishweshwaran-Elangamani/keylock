@@ -22,7 +22,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             _context = context;
             _logger = logger;
         }
-
         public async Task<Meeting> CreateMeetingAsync(Meeting meeting, CancellationToken cancellationToken = default)
         {
             try
@@ -39,9 +38,8 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Meetingparticipant>> AddMeetingParticipantsAsync(
-            List<Meetingparticipant> participants, 
+            List<Meetingparticipant> participants,
             CancellationToken cancellationToken = default)
         {
             using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
@@ -61,9 +59,8 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Meeting>> GetMeetingsByManagerIdAsync(
-            int managerId, 
+            int managerId,
             CancellationToken cancellationToken = default)
         {
             try
@@ -87,7 +84,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<Meeting?> GetMeetingByIdAsync(int meetingId, CancellationToken cancellationToken = default)
         {
             try
@@ -109,9 +105,8 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Meeting>> GetMeetingsByParticipantIdAsync(
-            int participantId, 
+            int participantId,
             CancellationToken cancellationToken = default)
         {
             try
@@ -135,7 +130,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Meeting>> GetOneOnOneMeetingsByManagerAsync(
             int managerId,
             int? employeeId = null,
@@ -146,8 +140,8 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             try
             {
                 _logger.LogInformation(
-                    "Fetching one-on-one meetings for manager ID: {ManagerId}, Employee ID: {EmployeeId}", 
-                    managerId, 
+                    "Fetching one-on-one meetings for manager ID: {ManagerId}, Employee ID: {EmployeeId}",
+                    managerId,
                     employeeId);
 
                 var query = _context.Meetings
@@ -193,7 +187,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<Employee?> GetEmployeeByIdAsync(int employeeId, CancellationToken cancellationToken = default)
         {
             try
@@ -210,7 +203,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Employee>> GetTeamMembersByManagerIdAsync(
             int managerId,
             int pageNumber = 1,
@@ -220,9 +212,9 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             try
             {
                 _logger.LogInformation(
-                    "Fetching team members for manager ID: {ManagerId}, Page: {PageNumber}, Size: {PageSize}", 
-                    managerId, 
-                    pageNumber, 
+                    "Fetching team members for manager ID: {ManagerId}, Page: {PageNumber}, Size: {PageSize}",
+                    managerId,
+                    pageNumber,
                     pageSize);
 
                 return await _context.Employees
@@ -241,7 +233,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<int> GetTeamMembersCountAsync(int managerId, CancellationToken cancellationToken = default)
         {
             try
@@ -257,17 +248,16 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<Meetingparticipant?> GetMeetingParticipantAsync(
-            int meetingId, 
-            int employeeId, 
+            int meetingId,
+            int employeeId,
             CancellationToken cancellationToken = default)
         {
             try
             {
                 _logger.LogInformation(
-                    "Fetching meeting participant for Meeting ID: {MeetingId}, Employee ID: {EmployeeId}", 
-                    meetingId, 
+                    "Fetching meeting participant for Meeting ID: {MeetingId}, Employee ID: {EmployeeId}",
+                    meetingId,
                     employeeId);
 
                 return await _context.Meetingparticipants
@@ -277,23 +267,22 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     .Include(mp => mp.Employee)
                         .ThenInclude(e => e.Userprofile)
                     .FirstOrDefaultAsync(
-                        mp => mp.MeetingId == meetingId && mp.EmployeeId == employeeId, 
+                        mp => mp.MeetingId == meetingId && mp.EmployeeId == employeeId,
                         cancellationToken);
             }
             catch (Exception ex)
             {
                 _logger.LogError(
-                    ex, 
-                    "Error fetching meeting participant for Meeting ID: {MeetingId}, Employee ID: {EmployeeId}", 
-                    meetingId, 
+                    ex,
+                    "Error fetching meeting participant for Meeting ID: {MeetingId}, Employee ID: {EmployeeId}",
+                    meetingId,
                     employeeId);
                 throw;
             }
         }
-
         public async Task<Meetingparticipant> UpdateRsvpStatusAsync(
-            int participantId, 
-            string rsvpStatus, 
+            int participantId,
+            string rsvpStatus,
             string? rsvpComments,
             CancellationToken cancellationToken = default)
         {
@@ -326,8 +315,8 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 catch (DbUpdateConcurrencyException ex)
                 {
                     _logger.LogWarning(
-                        ex, 
-                        "Concurrency conflict when updating RSVP for participant ID: {ParticipantId}", 
+                        ex,
+                        "Concurrency conflict when updating RSVP for participant ID: {ParticipantId}",
                         participantId);
                     throw new Exception("The record was modified by another user. Please refresh and try again.", ex);
                 }
@@ -340,9 +329,8 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Meetingparticipant>> GetMeetingInvitationsAsync(
-            int employeeId, 
+            int employeeId,
             CancellationToken cancellationToken = default)
         {
             try
@@ -366,9 +354,8 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Meetingparticipant>> GetMeetingRsvpSummaryAsync(
-            int meetingId, 
+            int meetingId,
             CancellationToken cancellationToken = default)
         {
             try
@@ -388,9 +375,8 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<int> GetPendingRsvpCountAsync(
-            int employeeId, 
+            int employeeId,
             CancellationToken cancellationToken = default)
         {
             try
@@ -399,7 +385,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 var now = DateTime.Now;
                 return await _context.Meetingparticipants
                     .AsNoTracking()
-                    .Where(mp => mp.EmployeeId == employeeId 
+                    .Where(mp => mp.EmployeeId == employeeId
                         && mp.Rsvpstatus == "Pending"
                         && mp.Meeting.MeetingDate >= now
                         && mp.Meeting.Status == "Scheduled")

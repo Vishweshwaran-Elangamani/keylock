@@ -11,7 +11,7 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
 
         Task<List<Peerfeedbackqueue>> GetPendingFeedbackAsync();
 
- 
+
         Task<List<Peerfeedbackqueue>> GetUnderReviewFeedbackAsync();
 
 
@@ -25,7 +25,7 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
 
         Task<List<Peerfeedbackqueue>> GetFeedbackBySubmitterAsync(int employeeId);
 
- 
+
         Task<List<Peerfeedbackqueue>> GetAllPeerFeedbackAsync(int pageNumber = 1, int pageSize = 20);
 
 

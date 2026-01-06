@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
-
     public class PeerFeedbackQueueRepository : IPeerFeedbackQueueRepository
     {
         private readonly EEPZDbContext _context;
@@ -23,11 +22,11 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             try
             {
                 feedback.CreatedAt = DateTime.UtcNow;
-                feedback.Status = "Pending"; 
-                
+                feedback.Status = "Pending";
+
                 _context.Peerfeedbackqueues.Add(feedback);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Peer feedback created in queue: {feedback.QueueId}");
                 return feedback.QueueId;
             }
@@ -37,7 +36,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<Peerfeedbackqueue> GetQueueItemByIdAsync(int queueId)
         {
             try
@@ -54,7 +52,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Peerfeedbackqueue>> GetPendingFeedbackAsync()
         {
             try
@@ -72,7 +69,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Peerfeedbackqueue>> GetUnderReviewFeedbackAsync()
         {
             try
@@ -90,7 +86,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Peerfeedbackqueue>> GetApprovedFeedbackAsync()
         {
             try
@@ -108,7 +103,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Peerfeedbackqueue>> GetRejectedFeedbackAsync()
         {
             try
@@ -126,7 +120,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Peerfeedbackqueue>> GetFeedbackByRecipientAsync(int employeeId)
         {
             try
@@ -143,7 +136,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Peerfeedbackqueue>> GetFeedbackBySubmitterAsync(int employeeId)
         {
             try
@@ -160,7 +152,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Peerfeedbackqueue>> GetAllPeerFeedbackAsync(int pageNumber = 1, int pageSize = 20)
         {
             try
@@ -180,7 +171,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Peerfeedbackqueue>> GetFeedbackByStatusAsync(string status)
         {
             try
@@ -198,7 +188,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Peerfeedbackqueue>> GetAnonymousPeerFeedbackAsync()
         {
             try
@@ -215,14 +204,13 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<bool> UpdatePeerFeedbackAsync(Peerfeedbackqueue feedback)
         {
             try
             {
                 _context.Peerfeedbackqueues.Update(feedback);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Peer feedback updated: {feedback.QueueId}");
                 return true;
             }
@@ -232,7 +220,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<bool> ApprovePeerFeedbackAsync(int queueId, bool isProfessional, bool isRelevant, int approvedByHRId)
         {
             try
@@ -249,7 +236,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 _context.Peerfeedbackqueues.Update(feedback);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Peer feedback approved: {queueId}");
                 return true;
             }
@@ -259,7 +246,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<bool> RejectPeerFeedbackAsync(int queueId, int rejectedByHRId)
         {
             try
@@ -274,7 +260,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 _context.Peerfeedbackqueues.Update(feedback);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Peer feedback rejected: {queueId}");
                 return true;
             }
@@ -284,7 +270,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<bool> UpdateFeedbackStatusAsync(int queueId, string newStatus)
         {
             try
@@ -297,7 +282,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 _context.Peerfeedbackqueues.Update(feedback);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Peer feedback status updated: {queueId} → {newStatus}");
                 return true;
             }
@@ -320,7 +305,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 _context.Peerfeedbackqueues.Remove(feedback);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Peer feedback deleted: {queueId}");
                 return true;
             }
@@ -330,7 +315,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<bool> QueueItemExistsAsync(int queueId)
         {
             try

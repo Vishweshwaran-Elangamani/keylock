@@ -8,7 +8,7 @@ namespace Relevantz.EEPZ.Core.Services.Interfaces
     /// </summary>
     public interface IFeedbackService
     {
-        
+
         /// <summary>
         /// Submit feedback
         /// </summary>

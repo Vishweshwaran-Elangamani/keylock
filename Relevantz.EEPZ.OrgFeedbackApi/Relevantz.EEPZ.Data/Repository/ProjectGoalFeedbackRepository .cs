@@ -51,6 +51,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw new Exception($"Error retrieving feedback by project and goal: {ex.Message}");
             }
         }
+
         public async Task<List<Projectgoalfeedback>> GetFeedbackByProjectAsync(int projectId)
         {
             try
@@ -70,6 +71,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw new Exception($"Error retrieving feedback by project: {ex.Message}");
             }
         }
+
         public async Task<List<Projectgoalfeedback>> GetFeedbackByEmployeeAsync(int employeeId)
         {
             try
@@ -89,7 +91,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw new Exception($"Error retrieving feedback by employee: {ex.Message}");
             }
         }
-
+        
         public async Task<Projectgoalfeedback> GetFeedbackByIdAsync(int feedbackId)
         {
             try

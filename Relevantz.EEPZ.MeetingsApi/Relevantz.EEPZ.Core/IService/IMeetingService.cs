@@ -15,11 +15,11 @@ namespace Relevantz.EEPZ.Core.Services.Interfaces
             CancellationToken cancellationToken = default);
 
         Task<List<MeetingResponseDto>> GetMeetingsByManagerIdAsync(
-            int managerId, 
+            int managerId,
             CancellationToken cancellationToken = default);
 
         Task<MeetingResponseDto?> GetMeetingByIdAsync(
-            int meetingId, 
+            int meetingId,
             CancellationToken cancellationToken = default);
 
         Task<OneOnOneReportDto> GetOneOnOneReportsAsync(
@@ -31,12 +31,12 @@ namespace Relevantz.EEPZ.Core.Services.Interfaces
             CancellationToken cancellationToken = default);
 
         Task<OneOnOneSummaryDto> GetOneOnOneSummaryAsync(
-            int managerId, 
+            int managerId,
             string role,
             CancellationToken cancellationToken = default);
 
         Task<MeetingInvitationDto> SubmitRsvpAsync(
-            RsvpResponseDto rsvpDto, 
+            RsvpResponseDto rsvpDto,
             int employeeId,
             CancellationToken cancellationToken = default);
 
@@ -45,8 +45,8 @@ namespace Relevantz.EEPZ.Core.Services.Interfaces
             CancellationToken cancellationToken = default);
 
         Task<MeetingRsvpSummaryDto> GetMeetingRsvpSummaryAsync(
-            int meetingId, 
-            int managerId, 
+            int meetingId,
+            int managerId,
             string role,
             CancellationToken cancellationToken = default);
 

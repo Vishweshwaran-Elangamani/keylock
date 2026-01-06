@@ -25,7 +25,7 @@ Log.Logger = new LoggerConfiguration()
 try
 {
     Log.Information("Starting EEPZ Feedback Backend Application");
-    
+
     var builder = WebApplication.CreateBuilder(args);
     Console.WriteLine("Building........");
 
@@ -110,7 +110,7 @@ try
             var keyBytes = Encoding.UTF8.GetBytes(secretKey);
 
             options.SaveToken = true;
-            options.RequireHttpsMetadata = false; 
+            options.RequireHttpsMetadata = false;
 
             options.TokenValidationParameters = new TokenValidationParameters
             {
@@ -275,7 +275,7 @@ try
 
     Log.Information("Feedback API started successfully");
     Log.Information("Ready to accept requests...");
-    
+
     app.Run();
 }
 catch (Exception ex)

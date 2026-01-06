@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Relevantz.EEPZ.Common.DTOs.Request
 {
-  
     public class CreateSlaRequest
     {
         [Required(ErrorMessage = "SLA Type is required")]
@@ -13,7 +12,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         [Range(1, int.MaxValue, ErrorMessage = "Invalid Employee ID")]
         public int EmployeeId { get; set; }
 
-        
         public int? AssignedToEmployeeId { get; set; }
 
         [Required(ErrorMessage = "Deadline is required")]
@@ -42,11 +40,11 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         public int Slaid { get; set; }
 
         [Required(ErrorMessage = "Reason is required")]
-        [StringLength(200, MinimumLength = 3, 
+        [StringLength(200, MinimumLength = 3,
             ErrorMessage = "Reason must be between 3 and 200 characters")]
         public string Reason { get; set; } = null!;
 
-        [StringLength(500, 
+        [StringLength(500,
             ErrorMessage = "Description cannot exceed 500 characters")]
         public string? Description { get; set; }
 
@@ -54,7 +52,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         [RegularExpression("^(L1|L2|DeptHead|Leadership)$",
             ErrorMessage = "Escalation level must be L1, L2, DeptHead, or Leadership")]
         public string EscalationLevel { get; set; } = "L1";
-
 
         public int? EscalatedToEmployeeId { get; set; }
 
@@ -79,7 +76,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         public int ReopenedByEmployeeId { get; set; }
     }
 
-
     public class CalculateComplianceRequest
     {
         [Required]
@@ -97,7 +93,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
 
         public int? CalculatedBy { get; set; }
     }
-
 
     public class ResolveEscalationRequest
     {
@@ -126,22 +121,21 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         public string? ComplianceStatus { get; set; }
     }
 
-
     public class UpdateSlaRequest
     {
         public string? Slatype { get; set; }
-        
+
         public int? AssignedToEmployeeId { get; set; }
-        
+
         public DateTime? Deadline { get; set; }
-        
+
         public string? Status { get; set; }
-        
+
         public string? ComplianceStatus { get; set; }
-        
+
         [Required]
         public int UpdatedByEmployeeId { get; set; }
-        
+
         public string? UpdateReason { get; set; }
     }
 }

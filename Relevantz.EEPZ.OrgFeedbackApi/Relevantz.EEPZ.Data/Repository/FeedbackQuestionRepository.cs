@@ -160,10 +160,10 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             try
             {
                 question.CreatedAt = DateTime.UtcNow;
-                
+
                 _context.Feedbackquestions.Add(question);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Question created: {question.QuestionId}");
                 return question.QuestionId;
             }
@@ -178,10 +178,10 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             try
             {
                 question.UpdatedAt = DateTime.UtcNow;
-                
+
                 _context.Feedbackquestions.Update(question);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Question updated: {question.QuestionId}");
                 return true;
             }
@@ -205,7 +205,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 _context.Feedbackquestions.Update(question);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Question active status updated: {questionId} → {isActive}");
                 return true;
             }
@@ -231,7 +231,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 _context.Feedbackquestions.Remove(question);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Question deleted: {questionId}");
                 return true;
             }

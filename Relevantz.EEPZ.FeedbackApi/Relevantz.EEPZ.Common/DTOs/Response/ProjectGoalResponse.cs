@@ -164,13 +164,12 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public string DepartmentName { get; set; }
     }
 
-
-     public class GoalFeedbackResponseDto
+    public class GoalFeedbackResponseDto
     {
-        public int FeedbackId { get; set; }  
-        public int GoalId { get; set; } 
-        public string GoalTitle { get; set; }  
-        public string GoalType { get; set; } 
+        public int FeedbackId { get; set; }
+        public int GoalId { get; set; }
+        public string GoalTitle { get; set; }
+        public string GoalType { get; set; }
         public int SubmittedByEmployeeId { get; set; }
         public string SubmitterName { get; set; }
         public int? ManagerEmployeeId { get; set; }

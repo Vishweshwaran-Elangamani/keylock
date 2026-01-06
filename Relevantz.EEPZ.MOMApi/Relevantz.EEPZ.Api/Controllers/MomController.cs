@@ -52,7 +52,7 @@ namespace eepzbackend.Controllers
             {
                 var employeeId = GetEmployeeIdFromClaims();
                 var role = GetRoleFromClaims();
-                
+
                 var result = await _momService.UpdateMomAsync(updateMomDto, employeeId, role);
                 return Ok(new { success = true, message = "MOM updated successfully", data = result });
             }
@@ -115,9 +115,9 @@ namespace eepzbackend.Controllers
             {
                 var employeeId = GetEmployeeIdFromClaims();
                 var role = GetRoleFromClaims();
-                
+
                 var result = await _momService.DeleteMomAsync(momId, employeeId, role);
-                
+
                 if (!result)
                     return NotFound(new { success = false, message = "MOM not found" });
 
@@ -139,19 +139,19 @@ namespace eepzbackend.Controllers
         private int GetEmployeeIdFromClaims()
         {
             var employeeIdClaim = User.FindFirst("empId");
-            
+
             if (employeeIdClaim != null && int.TryParse(employeeIdClaim.Value, out int employeeId))
             {
                 return employeeId;
             }
-            
+
             var subClaim = User.FindFirst("sub") ?? User.FindFirst(ClaimTypes.NameIdentifier);
-            
+
             if (subClaim != null && int.TryParse(subClaim.Value, out int subId))
             {
                 return subId;
             }
-            
+
             throw new UnauthorizedAccessException("Employee ID not found in token");
         }
 
@@ -161,20 +161,20 @@ namespace eepzbackend.Controllers
         private string GetRoleFromClaims()
         {
             var roleClaim = User.FindFirst("http://schemas.microsoft.com/ws/2008/06/identity/claims/role");
-            
+
             if (roleClaim != null)
                 return roleClaim.Value;
-         
+
             roleClaim = User.FindFirst(ClaimTypes.Role);
-            
+
             if (roleClaim != null)
                 return roleClaim.Value;
-            
+
             roleClaim = User.FindFirst("role");
-            
+
             if (roleClaim != null)
                 return roleClaim.Value;
-           
+
             return "Employee";
         }
     }

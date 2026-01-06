@@ -226,28 +226,22 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return actionItem;
         }
 
-
         public async Task<List<Momactionitem>> GetActionItemsByEmployeeIdAsync(int employeeId)
         {
-         
-            
-            
+
             var actionItems = await _context.Momactionitems
                 .Where(ai => ai.AssignedToEmployeeId == employeeId)
                 .ToListAsync();
 
 
-           
             var momIds = actionItems.Select(ai => ai.Momid).Distinct().ToList();
-           
 
-            
+
             var moms = await _context.Moms
                 .Include(m => m.SubmittedByEmployee)
                     .ThenInclude(e => e.Userprofile)
                 .Where(m => momIds.Contains(m.Momid))
                 .ToListAsync();
-
 
 
             var employeeIds = actionItems.Select(ai => ai.AssignedToEmployeeId).Distinct().ToList();
@@ -261,17 +255,14 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 item.AssignedToEmployee = employees.FirstOrDefault(e => e.EmployeeId == item.AssignedToEmployeeId);
             }
 
-          
-
             return actionItems.OrderBy(ai => ai.DueDate).ToList();
         }
 
-        
         public async Task<List<Momactionitem>> GetActionItemsAssignedByEmployeeAsync(int employeeId)
         {
-            
-            
-            
+
+
+
             var momIds = await _context.Moms
                 .Where(m => m.SubmittedByEmployeeId == employeeId)
                 .Select(m => m.Momid)
@@ -279,14 +270,14 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
             Console.WriteLine($"[REPO] Found {momIds.Count} MOMs created by this employee");
 
-            
+
             var actionItems = await _context.Momactionitems
                 .Where(ai => momIds.Contains(ai.Momid))
                 .ToListAsync();
 
             Console.WriteLine($"[REPO] Found {actionItems.Count} action items assigned by this employee");
 
-            
+
             var moms = await _context.Moms
                 .Include(m => m.SubmittedByEmployee)
                     .ThenInclude(e => e.Userprofile)
@@ -295,7 +286,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
             Console.WriteLine($"[REPO] Loaded {moms.Count} MOMs");
 
-            
+
             foreach (var item in actionItems)
             {
                 item.Mom = moms.FirstOrDefault(m => m.Momid == item.Momid);
@@ -327,7 +318,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return sharings;
         }
 
-         public async Task<List<Momsharing>> GetMomSharingsByEmployeeIdAsync(int employeeId)
+        public async Task<List<Momsharing>> GetMomSharingsByEmployeeIdAsync(int employeeId)
         {
             return await _context.Momsharings
                 .Include(ms => ms.Mom)
@@ -339,6 +330,5 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 .OrderByDescending(ms => ms.SharedAt)
                 .ToListAsync();
         }
-
     }
 }

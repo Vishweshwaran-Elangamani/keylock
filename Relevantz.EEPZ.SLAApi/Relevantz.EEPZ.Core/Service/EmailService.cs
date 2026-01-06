@@ -123,7 +123,7 @@ namespace Relevantz.EEPZ.Core.Services
                 var client = CreateSmtpClient();
                 var message = CreateMessage(
                     toEmail,
-                    $"🔴 URGENT: SLA Overdue - {slaType}",
+                    $"URGENT: SLA Overdue - {slaType}",
                     $"Hello {employeeName},\n\n" +
                     $"Your '{slaType}' SLA was due on {dueDate:MMMM dd, yyyy} and is now {daysOverdue} day(s) overdue.\n\n" +
                     $"Please complete this task immediately to avoid escalation.\n\n" +
@@ -156,7 +156,7 @@ namespace Relevantz.EEPZ.Core.Services
                 var client = CreateSmtpClient();
                 var message = CreateMessage(
                     toEmail,
-                    $"✅ SLA Escalation Submitted - {slaType}",
+                    $"SLA Escalation Submitted - {slaType}",
                     $"Hello {employeeName},\n\n" +
                     $"Your escalation for '{slaType}' has been received.\n\n" +
                     $"Reason: {escalationReason}\n\n" +
@@ -193,7 +193,7 @@ namespace Relevantz.EEPZ.Core.Services
                 var client = CreateSmtpClient();
                 var message = CreateMessage(
                     toEmail,
-                    $"⚡ SLA Escalation - {slaType}",
+                    $"SLA Escalation - {slaType}",
                     $"Hello {managerName},\n\n" +
                     $"Your team member has an overdue SLA that requires your attention.\n\n" +
                     $"Employee: {employeeName}\n" +
@@ -234,7 +234,7 @@ namespace Relevantz.EEPZ.Core.Services
                 var client = CreateSmtpClient();
                 var message = CreateMessage(
                     toEmail,
-                    $"⚡ SLA Escalation (Level 2) - {slaType}",
+                    $"SLA Escalation (Level 2) - {slaType}",
                     $"Hello {deptHeadName},\n\n" +
                     $"An SLA escalation from Manager {managerName} requires your review.\n\n" +
                     $"Employee: {employeeName}\n" +
@@ -275,7 +275,7 @@ namespace Relevantz.EEPZ.Core.Services
                 var client = CreateSmtpClient();
                 var message = CreateMessage(
                     toEmail,
-                    $"⚠️ CRITICAL: SLA Escalation (Level 3) - {slaType}",
+                    $"CRITICAL: SLA Escalation (Level 3) - {slaType}",
                     $"Hello HR Team,\n\n" +
                     $"An SLA escalation has reached the HR level and requires immediate attention.\n\n" +
                     $"Employee: {employeeName}\n" +
@@ -315,7 +315,7 @@ namespace Relevantz.EEPZ.Core.Services
                 var client = CreateSmtpClient();
                 var message = CreateMessage(
                     toEmail,
-                    $"🔄 SLA Extended - {slaType}",
+                    $"SLA Extended - {slaType}",
                     $"Hello {employeeName},\n\n" +
                     $"Your '{slaType}' SLA has been reopened for 1 additional day by your manager.\n\n" +
                     $"New Due Date: {newDueDate:MMMM dd, yyyy}\n\n" +
@@ -349,7 +349,7 @@ namespace Relevantz.EEPZ.Core.Services
                 var client = CreateSmtpClient();
                 var message = CreateMessage(
                     toEmail,
-                    $"✅ SLA Completed - {slaType}",
+                    $"SLA Completed - {slaType}",
                     $"Hello {employeeName},\n\n" +
                     $"Your '{slaType}' SLA has been marked as complete.\n\n" +
                     $"Completion Date: {completionDate:MMMM dd, yyyy}\n\n" +
@@ -381,7 +381,7 @@ namespace Relevantz.EEPZ.Core.Services
                 var client = CreateSmtpClient();
                 var message = CreateMessage(
                     toEmail,
-                    $"📋 SLA Requires Resubmission - {slaType}",
+                    $"SLA Requires Resubmission - {slaType}",
                     $"Hello {employeeName},\n\n" +
                     $"Your '{slaType}' SLA submission has been reviewed and requires resubmission.\n\n" +
                     $"Reason: {rejectionReason}\n\n" +
@@ -416,13 +416,13 @@ namespace Relevantz.EEPZ.Core.Services
             try
             {
                 var client = CreateSmtpClient();
-                var compliancePercentage = totalSlas > 0 
-                    ? (completedSlas * 100) / totalSlas 
+                var compliancePercentage = totalSlas > 0
+                    ? (completedSlas * 100) / totalSlas
                     : 0;
 
                 var message = CreateMessage(
                     toEmail,
-                    $"📊 SLA Compliance Report - {notificationType}",
+                    $"SLA Compliance Report - {notificationType}",
                     $"Hello {recipientName},\n\n" +
                     $"Here is your SLA compliance summary:\n\n" +
                     $"Total SLAs: {totalSlas}\n" +

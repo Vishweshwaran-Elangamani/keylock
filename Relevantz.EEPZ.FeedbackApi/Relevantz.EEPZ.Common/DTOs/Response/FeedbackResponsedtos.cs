@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Relevantz.EEPZ.Common.DTOs.Response
 {
-       public class FeedbackResponseDto
+    public class FeedbackResponseDto
     {
         public int FeedbackId { get; set; }
         public string FeedbackType { get; set; }
@@ -105,44 +105,44 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public DateTime? ReviewedAt { get; set; }
     }
 
-/// <summary>
-/// Response DTO for organization goal feedback
-/// Maps from Feedback table where RelatedGoal.GoalType = "Organization"
-/// </summary>
-public class OrgGoalFeedbackResponseDto
-{
-    public int OrgGoalFeedbackId { get; set; }
-    
-    public int GoalId { get; set; }
-    
-    public string OrganizationGoalName { get; set; }
-    
-    public string GoalDescription { get; set; }
-    
-    public string GoalType { get; set; }  
-    
-    public int SubmittedByEmployeeId { get; set; }
-    
-    public string SubmitterName { get; set; }
-    
-    public int RecipientEmployeeId { get; set; }
-    
-    public string RecipientName { get; set; }
-    
-    public int Rating { get; set; }
-    
-    public string FeedbackComments { get; set; }
-    
-    public bool IsAnonymous { get; set; }
-    
-    public string Status { get; set; }
-    
-    public DateTime CreatedAt { get; set; }
-    
-    public DateTime? UpdatedAt { get; set; }
-    
-    public DateTime? SubmittedAt { get; set; }
-}
+    /// <summary>
+    /// Response DTO for organization goal feedback
+    /// Maps from Feedback table where RelatedGoal.GoalType = "Organization"
+    /// </summary>
+    public class OrgGoalFeedbackResponseDto
+    {
+        public int OrgGoalFeedbackId { get; set; }
+
+        public int GoalId { get; set; }
+
+        public string OrganizationGoalName { get; set; }
+
+        public string GoalDescription { get; set; }
+
+        public string GoalType { get; set; }
+
+        public int SubmittedByEmployeeId { get; set; }
+
+        public string SubmitterName { get; set; }
+
+        public int RecipientEmployeeId { get; set; }
+
+        public string RecipientName { get; set; }
+
+        public int Rating { get; set; }
+
+        public string FeedbackComments { get; set; }
+
+        public bool IsAnonymous { get; set; }
+
+        public string Status { get; set; }
+
+        public DateTime CreatedAt { get; set; }
+
+        public DateTime? UpdatedAt { get; set; }
+
+        public DateTime? SubmittedAt { get; set; }
+    }
 
     public class PeerFeedbackQueueResponseDto
     {
@@ -210,13 +210,13 @@ public class OrgGoalFeedbackResponseDto
         public Dictionary<string, object> FormResponse { get; set; }
     }
 
-public class DistributeFormResponse
-{
-    public bool Success { get; set; }
-    public int FormId { get; set; }
-    public int EmployeeCount { get; set; }
-    public string Message { get; set; }
-}
+    public class DistributeFormResponse
+    {
+        public bool Success { get; set; }
+        public int FormId { get; set; }
+        public int EmployeeCount { get; set; }
+        public string Message { get; set; }
+    }
     public class ApiResponseDto<T>
     {
         public bool Success { get; set; }
@@ -244,37 +244,37 @@ public class DistributeFormResponse
             };
         }
 
-    public class SubmitFeedbackResponse
-    {
-        public int FeedbackId { get; set; }
-        public int EmployeeId { get; set; }
-        public int ProjectId { get; set; }
-        public int GoalId { get; set; }
-        public DateTime SubmittedAt { get; set; }
-    }
+        public class SubmitFeedbackResponse
+        {
+            public int FeedbackId { get; set; }
+            public int EmployeeId { get; set; }
+            public int ProjectId { get; set; }
+            public int GoalId { get; set; }
+            public DateTime SubmittedAt { get; set; }
+        }
 
-    public class FeedbackListResponse
-    {
-        public int ProjectId { get; set; }
-        public string ProjectName { get; set; }
-        public int? GoalId { get; set; }
-        public string GoalName { get; set; }
-        public int TotalFeedbacks { get; set; }
-        public double AverageRating { get; set; }
-        public List<FeedbackItemResponse> Feedbacks { get; set; }
-    }
+        public class FeedbackListResponse
+        {
+            public int ProjectId { get; set; }
+            public string ProjectName { get; set; }
+            public int? GoalId { get; set; }
+            public string GoalName { get; set; }
+            public int TotalFeedbacks { get; set; }
+            public double AverageRating { get; set; }
+            public List<FeedbackItemResponse> Feedbacks { get; set; }
+        }
 
-    public class FeedbackItemResponse
-    {
-        public int FeedbackId { get; set; }
-        public int EmployeeId { get; set; }
-        public string EmployeeFirstName { get; set; }
-        public string EmployeeLastName { get; set; }
-        public string Email { get; set; }
-        public string FeedbackText { get; set; }
-        public int Rating { get; set; }
-        public DateTime SubmittedAt { get; set; }
-    }
+        public class FeedbackItemResponse
+        {
+            public int FeedbackId { get; set; }
+            public int EmployeeId { get; set; }
+            public string EmployeeFirstName { get; set; }
+            public string EmployeeLastName { get; set; }
+            public string Email { get; set; }
+            public string FeedbackText { get; set; }
+            public int Rating { get; set; }
+            public DateTime SubmittedAt { get; set; }
+        }
 
         public class FeedbackDetailResponse
         {
@@ -293,37 +293,25 @@ public class DistributeFormResponse
             public DateTime CreatedAt { get; set; }
             public DateTime UpdatedAt { get; set; }
         }
-    
 
+        /// <summary>
+        /// Response DTO for HR Feedback Form
+        /// </summary>
 
-/// <summary>
-/// Response DTO for HR Feedback Form
-/// </summary>
-
-public class HrFeedbackFormResponseDto
-{
-    public int FormId { get; set; }
-    public string FormName { get; set; }
-    public string FormDescription { get; set; }
-    public string FormType { get; set; }
-    public int CreatedByHRId { get; set; }
-    public string CreatedByHRName { get; set; }
-    public string Status { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime? Deadline { get; set; }
-    
-    public List<int> DistributedToEmployeeIds { get; set; } = new List<int>();
-    
-    public int TotalResponsesCount { get; set; }
-    public int SubmittedResponsesCount { get; set; }
-}
-
-
-
-
-
-
-
-
+        public class HrFeedbackFormResponseDto
+        {
+            public int FormId { get; set; }
+            public string FormName { get; set; }
+            public string FormDescription { get; set; }
+            public string FormType { get; set; }
+            public int CreatedByHRId { get; set; }
+            public string CreatedByHRName { get; set; }
+            public string Status { get; set; }
+            public DateTime CreatedAt { get; set; }
+            public DateTime? Deadline { get; set; }
+            public List<int> DistributedToEmployeeIds { get; set; } = new List<int>();
+            public int TotalResponsesCount { get; set; }
+            public int SubmittedResponsesCount { get; set; }
+        }
     }
 }

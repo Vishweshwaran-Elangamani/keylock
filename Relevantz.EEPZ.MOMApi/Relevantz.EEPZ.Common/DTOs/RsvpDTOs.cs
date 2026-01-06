@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Relevantz.EEPZ.Common.DTOs
 {
-
     public class RsvpResponseDto
     {
         [Required]
@@ -15,7 +14,6 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string? RsvpComments { get; set; }
     }
 
-
     public class MeetingInvitationDto
     {
         public int ParticipantId { get; set; }
@@ -27,15 +25,14 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string? Agenda { get; set; }
         public int ScheduledByEmployeeId { get; set; }
         public string ScheduledByEmployeeName { get; set; } = null!;
-        public string MeetingStatus { get; set; } = null!; 
-        public string RsvpStatus { get; set; } = null!; 
+        public string MeetingStatus { get; set; } = null!;
+        public string RsvpStatus { get; set; } = null!;
         public DateTime? RsvpResponseDate { get; set; }
         public string? RsvpComments { get; set; }
         public DateTime InvitedAt { get; set; }
         public int DaysUntilMeeting { get; set; }
         public bool RequiresResponse => RsvpStatus == "Pending";
     }
-
 
     public class MeetingRsvpSummaryDto
     {
@@ -46,12 +43,11 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int DeclinedCount { get; set; }
         public int TentativeCount { get; set; }
         public int PendingCount { get; set; }
-        public double ResponseRate => TotalInvitations > 0 
-            ? (double)(TotalInvitations - PendingCount) / TotalInvitations * 100 
+        public double ResponseRate => TotalInvitations > 0
+            ? (double)(TotalInvitations - PendingCount) / TotalInvitations * 100
             : 0;
         public List<ParticipantRsvpDto> Participants { get; set; } = new();
     }
-
 
     public class ParticipantRsvpDto
     {

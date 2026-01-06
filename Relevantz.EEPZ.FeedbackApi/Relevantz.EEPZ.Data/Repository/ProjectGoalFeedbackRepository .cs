@@ -31,7 +31,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw new Exception($"Error submitting feedback: {ex.Message}");
             }
         }
-
         public async Task<List<Projectgoalfeedback>> GetFeedbackByProjectAndGoalAsync(int projectId, int goalId)
         {
             try
@@ -89,7 +88,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw new Exception($"Error retrieving feedback by employee: {ex.Message}");
             }
         }
-
         public async Task<Projectgoalfeedback> GetFeedbackByIdAsync(int feedbackId)
         {
             try
@@ -107,7 +105,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw new Exception($"Error retrieving feedback by ID: {ex.Message}");
             }
         }
-
         public async Task<bool> EmployeeExistsAsync(int employeeId)
         {
             try
@@ -120,7 +117,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw new Exception($"Error checking employee existence: {ex.Message}");
             }
         }
-
         public async Task<bool> ProjectExistsAsync(int projectId)
         {
             try
@@ -133,7 +129,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw new Exception($"Error checking project existence: {ex.Message}");
             }
         }
-
         public async Task<bool> GoalExistsAsync(int goalId)
         {
             try
@@ -146,7 +141,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw new Exception($"Error checking goal existence: {ex.Message}");
             }
         }
-
         public async Task<bool> IsEmployeeInProjectAsync(int employeeId, int projectId)
         {
             try

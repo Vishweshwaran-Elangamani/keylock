@@ -1,20 +1,18 @@
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 
-namespace  Relevantz.EEPZ.Core.Services.Interfaces
+namespace Relevantz.EEPZ.Core.Services.Interfaces
 {
     /// <summary>
     /// Service interface for PeerFeedbackQueue business logic
     /// </summary>
     public interface IPeerFeedbackQueueService
     {
-        
         /// <summary>
         /// Create peer feedback in queue (pending HR review)
         /// </summary>
         Task<PeerFeedbackQueueResponseDto> CreatePeerFeedbackAsync(CreatePeerFeedbackRequestDto dto);
 
-      
         /// <summary>
         /// Get peer feedback queue item by ID
         /// </summary>
@@ -89,7 +87,7 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
         /// Delete peer feedback from queue
         /// </summary>
         Task<bool> DeleteQueueItemAsync(int queueId);
-        
+
         /// <summary>
         /// Check if queue item exists
         /// </summary>

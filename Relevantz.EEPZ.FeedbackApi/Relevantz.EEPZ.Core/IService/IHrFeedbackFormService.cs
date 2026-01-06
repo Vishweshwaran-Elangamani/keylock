@@ -28,9 +28,5 @@ namespace Relevantz.EEPZ.Core.Services.Interfaces
         Task<bool> DeleteFormResponseAsync(int responseId);
         Task<DistributeFormResponse> DistributeFormAsync(int formId, List<int> employeeIds);
 
-        
-
-
-        
     }
 }

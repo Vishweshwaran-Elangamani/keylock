@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
-
     public class ManagerReviewService : IManagerReviewService
     {
         private readonly IManagerReviewRepository _reviewRepo;
@@ -188,7 +187,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-
         public async Task<bool> SubmitReviewAsync(int reviewId)
         {
             try
@@ -215,7 +213,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-
         public async Task<bool> ModifyReviewAsync(int reviewId)
         {
             try
@@ -242,7 +239,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-
         public async Task<bool> FinalizeReviewAsync(int reviewId)
         {
             try
@@ -284,7 +280,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-
         public async Task<bool> CanEditReviewAsync(int reviewId)
         {
             try
@@ -297,25 +292,25 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-                private ManagerReviewResponseDto MapToResponseDto(Managerreviewcomment review)
+        private ManagerReviewResponseDto MapToResponseDto(Managerreviewcomment review)
         {
             return new ManagerReviewResponseDto
             {
                 ReviewcommentId = review.ReviewCommentId,
                 ManagerEmployeeId = review.ManagerEmployeeId,
-                ManagerName = review.ManagerEmployee != null 
-                    ? $"{review.ManagerEmployee.EmployeeId}" 
+                ManagerName = review.ManagerEmployee != null
+                    ? $"{review.ManagerEmployee.EmployeeId}"
                     : "Unknown",
                 TargetEmployeeId = review.TargetEmployeeId,
-                TargetEmployeeName = review.TargetEmployee != null 
-                    ? $"{review.TargetEmployee.EmployeeId}" 
+                TargetEmployeeName = review.TargetEmployee != null
+                    ? $"{review.TargetEmployee.EmployeeId}"
                     : "Unknown",
                 TargetGoalId = review.TargetGoalId,
-                TargetGoalName = review.TargetGoal != null 
-                    ? review.TargetGoal.GoalTitle 
+                TargetGoalName = review.TargetGoal != null
+                    ? review.TargetGoal.GoalTitle
                     : "N/A",
                 TargetOrganizationGoalId = review.TargetOrganizationGoalId,
-                
+
                 Rating = review.Rating,
                 ReviewComment = review.ReviewComment,
                 Status = review.Status,
@@ -324,6 +319,5 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 ModifiedAt = review.ModifiedAt
             };
         }
-
     }
 }

@@ -1,7 +1,7 @@
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 
-namespace  Relevantz.EEPZ.Core.Services.Interfaces
+namespace Relevantz.EEPZ.Core.Services.Interfaces
 {
     /// <summary>
     /// Service interface for MentorFeedbackTracking business logic
@@ -9,7 +9,7 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
     /// </summary>
     public interface IMentorFeedbackService
     {
-        
+
         /// <summary>
         /// Create mentor feedback
         /// </summary>

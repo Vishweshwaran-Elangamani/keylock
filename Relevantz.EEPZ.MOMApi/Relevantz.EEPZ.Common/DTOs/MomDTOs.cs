@@ -12,7 +12,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string MeetingTitle { get; set; } = null!;
 
         [Required(ErrorMessage = "Meeting type is required")]
-        public string MeetingType { get; set; } = null!; 
+        public string MeetingType { get; set; } = null!;
 
         [Required(ErrorMessage = "Meeting date is required")]
         public DateTime MeetingDate { get; set; }
@@ -29,7 +29,6 @@ namespace Relevantz.EEPZ.Common.DTOs
 
         public List<ActionItemDto>? ActionItems { get; set; }
     }
-
 
     public class UpdateMomDto
     {
@@ -64,7 +63,6 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int PointOrder { get; set; } = 1;
     }
 
-
     public class ActionItemDto
     {
         public int? ActionItemId { get; set; }
@@ -79,9 +77,8 @@ namespace Relevantz.EEPZ.Common.DTOs
         [Required(ErrorMessage = "Due date is required")]
         public DateOnly DueDate { get; set; }
 
-        public string Status { get; set; } = "Pending"; 
+        public string Status { get; set; } = "Pending";
     }
-
 
     public class MomResponseDto
     {
@@ -103,32 +100,27 @@ namespace Relevantz.EEPZ.Common.DTOs
         public List<ActionItemResponseDto> ActionItems { get; set; } = new();
     }
 
-   public class ActionItemResponseDto
-{
-    public int ActionItemId { get; set; }
-    public string TaskDescription { get; set; }
-    public int AssignedToEmployeeId { get; set; }
-    public string AssignedToEmployeeName { get; set; }
-    public DateOnly DueDate { get; set; }
-    public string Status { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public string? MeetingTitle { get; set; }
-    public int? MomId { get; set; }
-    public int? AssignedByEmployeeId { get; set; }
-    public string? AssignedByEmployeeName { get; set; }
-    public bool IsOverdue { get; set; }
-}
-
-
-
-
+    public class ActionItemResponseDto
+    {
+        public int ActionItemId { get; set; }
+        public string TaskDescription { get; set; }
+        public int AssignedToEmployeeId { get; set; }
+        public string AssignedToEmployeeName { get; set; }
+        public DateOnly DueDate { get; set; }
+        public string Status { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public string? MeetingTitle { get; set; }
+        public int? MomId { get; set; }
+        public int? AssignedByEmployeeId { get; set; }
+        public string? AssignedByEmployeeName { get; set; }
+        public bool IsOverdue { get; set; }
+    }
     public class DiscussionPointResponseDto
     {
         public int PointId { get; set; }
         public string PointText { get; set; } = null!;
         public int PointOrder { get; set; }
     }
-
 
     public class PaginatedMomResponseDto
     {
@@ -140,7 +132,6 @@ namespace Relevantz.EEPZ.Common.DTOs
         public bool HasPreviousPage { get; set; }
         public bool HasNextPage { get; set; }
     }
-
 
     public class ShareMomDto
     {
@@ -163,7 +154,6 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string SharedWithEmployeeName { get; set; } = null!;
         public DateTime SharedAt { get; set; }
     }
-
 
     public class ScheduleMeetingDto
     {
@@ -188,7 +178,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public List<int> ParticipantEmployeeIds { get; set; } = null!;
     }
 
-    
+
     public class MeetingResponseDto
     {
         public int MeetingId { get; set; }
@@ -219,19 +209,16 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int ScheduledMeetings { get; set; }
         public int CancelledMeetings { get; set; }
         public double CompletionRate { get; set; }
-
         public int TotalActionItems { get; set; }
         public int CompletedActionItems { get; set; }
         public int PendingActionItems { get; set; }
         public int OverdueActionItems { get; set; }
         public double ActionItemCompletionRate { get; set; }
-   
         public double AverageActionItemsPerMeeting { get; set; }
         public double AverageDiscussionPointsPerMeeting { get; set; }
         public List<MeetingResponseDto> Meetings { get; set; } = new();
         public List<EmployeeOneOnOneStatsDto> EmployeeStats { get; set; } = new();
     }
-
 
     public class EmployeeOneOnOneStatsDto
     {
@@ -248,27 +235,21 @@ namespace Relevantz.EEPZ.Common.DTOs
         public bool NeedsAttention => DaysSinceLastMeeting > 30 || OverdueActionItems > 0;
     }
 
-
     public class OneOnOneSummaryDto
     {
         public int TotalTeamMembers { get; set; }
         public int TotalOneOnOnes { get; set; }
-     
         public int ThisMonthOneOnOnes { get; set; }
         public int ThisQuarterOneOnOnes { get; set; }
         public int LastMonthOneOnOnes { get; set; }
-   
         public double AverageMeetingsPerEmployee { get; set; }
         public double AverageDaysBetweenMeetings { get; set; }
-
         public int EmployeesWithNoRecentMeeting { get; set; }
         public int OverdueActionItemsCount { get; set; }
-     
         public List<UpcomingMeetingDto> UpcomingMeetings { get; set; } = new();
- 
+
         public List<RecentMeetingDto> RecentlyCompleted { get; set; } = new();
     }
-
 
     public class UpcomingMeetingDto
     {
@@ -293,10 +274,9 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int DaysSinceCompletion { get; set; }
     }
 
- 
     public class ActionItemFilterDto
     {
-        public string? Status { get; set; } 
+        public string? Status { get; set; }
         public bool? IsOverdue { get; set; }
         public int? AssignedToEmployeeId { get; set; }
         public DateTime? DueDateFrom { get; set; }
@@ -313,7 +293,6 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string Status { get; set; } = null!;
         public DateTime CreatedAt { get; set; }
         public bool IsOverdue { get; set; }
-   
         public int MomId { get; set; }
         public string MeetingTitle { get; set; } = null!;
         public DateTime MeetingDate { get; set; }
@@ -341,33 +320,31 @@ namespace Relevantz.EEPZ.Common.DTOs
 
         public DateTime? EndDate { get; set; }
 
-        public string? SubmittedByRole { get; set; } 
+        public string? SubmittedByRole { get; set; }
 
         public string SortBy { get; set; } = "MeetingDate";
 
         public string SortOrder { get; set; } = "desc";
     }
 
- 
     public class MeetingFilterDto
     {
         public string? MeetingType { get; set; }
-        
-        public string? Status { get; set; } 
-        
+
+        public string? Status { get; set; }
+
         public int? ParticipantEmployeeId { get; set; }
-        
+
         public DateTime? StartDate { get; set; }
-        
+
         public DateTime? EndDate { get; set; }
-        
+
         [Range(1, int.MaxValue)]
         public int PageNumber { get; set; } = 1;
-        
+
         [Range(1, 100)]
         public int PageSize { get; set; } = 20;
     }
-
 
     public class MomStatisticsDto
     {

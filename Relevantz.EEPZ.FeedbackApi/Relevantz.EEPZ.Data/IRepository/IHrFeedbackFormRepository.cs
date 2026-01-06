@@ -116,8 +116,8 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         Task<bool> ResponseExistsAsync(int responseId);
 
         Task<bool> DistributeFormAsync(int formId, List<int> employeeIds);
-         
-         Task<List<int>> GetFormDistributionAsync(int formId);
+
+        Task<List<int>> GetFormDistributionAsync(int formId);
 
     }
 }

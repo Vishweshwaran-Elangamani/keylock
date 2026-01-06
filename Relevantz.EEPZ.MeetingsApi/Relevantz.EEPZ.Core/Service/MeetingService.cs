@@ -17,7 +17,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private readonly ILogger<MeetingService> _logger;
         private readonly IDateTimeProvider _dateTimeProvider;
 
-        private static readonly Dictionary<string, string> RoleMapping = 
+        private static readonly Dictionary<string, string> RoleMapping =
             new(StringComparer.OrdinalIgnoreCase)
             {
                 { "User", "Employee" },
@@ -47,14 +47,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             ILogger<MeetingService> logger,
             IDateTimeProvider dateTimeProvider)
         {
-            _meetingRepository = meetingRepository ?? 
+            _meetingRepository = meetingRepository ??
                 throw new ArgumentNullException(nameof(meetingRepository));
-            _logger = logger ?? 
+            _logger = logger ??
                 throw new ArgumentNullException(nameof(logger));
-            _dateTimeProvider = dateTimeProvider ?? 
+            _dateTimeProvider = dateTimeProvider ??
                 throw new ArgumentNullException(nameof(dateTimeProvider));
         }
-
         public async Task<MeetingResponseDto> ScheduleMeetingAsync(
             ScheduleMeetingDto scheduleMeetingDto,
             int scheduledByEmployeeId,
@@ -80,14 +79,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var employeeExists = await _meetingRepository.GetEmployeeByIdAsync(
                     scheduledByEmployeeId,
                     cancellationToken);
-                    
+
                 if (employeeExists == null)
                 {
                     throw new InvalidOperationException(
                         $"Scheduling employee with ID {scheduledByEmployeeId} does not exist in the employee table.");
                 }
 
-                if (scheduleMeetingDto.ParticipantEmployeeIds == null || 
+                if (scheduleMeetingDto.ParticipantEmployeeIds == null ||
                     !scheduleMeetingDto.ParticipantEmployeeIds.Any())
                 {
                     throw new ArgumentException("At least one participant is required.");
@@ -96,11 +95,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 foreach (var empId in scheduleMeetingDto.ParticipantEmployeeIds)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    
+
                     var participantExists = await _meetingRepository.GetEmployeeByIdAsync(
                         empId,
                         cancellationToken);
-                        
+
                     if (participantExists == null)
                     {
                         throw new ArgumentException($"Participant with employee ID {empId} does not exist.");
@@ -152,7 +151,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-
         public async Task<List<MeetingResponseDto>> GetMeetingsByManagerIdAsync(
             int managerId,
             CancellationToken cancellationToken = default)
@@ -166,7 +164,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var meetings = await _meetingRepository.GetMeetingsByManagerIdAsync(
                     managerId,
                     cancellationToken);
-                    
+
                 return meetings.Select(MapToMeetingResponseDto).ToList();
             }
             catch (Exception ex)
@@ -178,7 +176,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-
         public async Task<MeetingResponseDto?> GetMeetingByIdAsync(
             int meetingId,
             CancellationToken cancellationToken = default)
@@ -190,7 +187,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var meeting = await _meetingRepository.GetMeetingByIdAsync(
                     meetingId,
                     cancellationToken);
-                    
+
                 if (meeting == null)
                 {
                     _logger.LogWarning("Meeting not found: {MeetingId}", meetingId);
@@ -205,7 +202,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-
         public async Task<OneOnOneReportDto> GetOneOnOneReportsAsync(
             int managerId,
             string role,
@@ -263,7 +259,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var meetingsWithMoms = oneOnOneMeetings
                     .Where(m => m.Moms != null && m.Moms.Any())
                     .ToList();
-                    
+
                 var allMoms = meetingsWithMoms.SelectMany(m => m.Moms).ToList();
 
                 var totalActionItems = allMoms.Sum(m => m.Momactionitems?.Count ?? 0);
@@ -318,7 +314,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-
         public async Task<OneOnOneSummaryDto> GetOneOnOneSummaryAsync(
             int managerId,
             string role,
@@ -350,11 +345,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     null,
                     null,
                     cancellationToken);
-                    
+
                 var thisMonthMeetings = allMeetings.Count(m => m.MeetingDate >= startOfMonth);
                 var thisQuarterMeetings = allMeetings.Count(m => m.MeetingDate >= startOfQuarter);
-                var lastMonthMeetings = allMeetings.Count(m => 
-                    m.MeetingDate >= startOfLastMonth && 
+                var lastMonthMeetings = allMeetings.Count(m =>
+                    m.MeetingDate >= startOfLastMonth &&
                     m.MeetingDate < startOfMonth);
 
                 var teamMembers = await _meetingRepository.GetTeamMembersByManagerIdAsync(
@@ -362,7 +357,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     1,
                     1000,
                     cancellationToken);
-                    
+
                 var totalTeamMembers = teamMembers.Count;
 
                 var avgMeetingsPerEmployee = totalTeamMembers > 0
@@ -446,7 +441,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-
         public async Task<MeetingInvitationDto> SubmitRsvpAsync(
             RsvpResponseDto rsvpDto,
             int employeeId,
@@ -470,7 +464,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     rsvpDto.MeetingId,
                     employeeId,
                     cancellationToken);
-                    
+
                 if (participant == null)
                 {
                     throw new InvalidOperationException("Meeting invitation not found for this employee");
@@ -512,7 +506,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-
         public async Task<List<MeetingInvitationDto>> GetMyMeetingInvitationsAsync(
             int employeeId,
             CancellationToken cancellationToken = default)
@@ -526,7 +519,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var invitations = await _meetingRepository.GetMeetingInvitationsAsync(
                     employeeId,
                     cancellationToken);
-                    
+
                 return invitations.Select(MapToMeetingInvitationDto).ToList();
             }
             catch (Exception ex)
@@ -538,7 +531,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-
         public async Task<MeetingRsvpSummaryDto> GetMeetingRsvpSummaryAsync(
             int meetingId,
             int managerId,
@@ -563,7 +555,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var meeting = await _meetingRepository.GetMeetingByIdAsync(
                     meetingId,
                     cancellationToken);
-                    
+
                 if (meeting == null)
                 {
                     throw new InvalidOperationException("Meeting not found");
@@ -621,7 +613,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-
         public async Task<int> GetPendingRsvpCountAsync(
             int employeeId,
             CancellationToken cancellationToken = default)
@@ -643,7 +634,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         #region Private Helper Methods
-
         private string MapRoleToEnum(string role)
         {
             if (string.IsNullOrWhiteSpace(role))
@@ -655,8 +645,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
 
             var roleLower = role.ToLower();
-            if (roleLower.Contains("manager") || 
-                roleLower.Contains("lead") || 
+            if (roleLower.Contains("manager") ||
+                roleLower.Contains("lead") ||
                 roleLower.Contains("director"))
             {
                 return "Manager";
@@ -669,7 +659,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             return "Employee";
         }
-
         private async Task<List<EmployeeOneOnOneStatsDto>> GetEmployeeOneOnOneStatsAsync(
             int managerId,
             List<Meeting> meetings,
@@ -680,7 +669,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 1,
                 1000,
                 cancellationToken);
-                
+
             var now = _dateTimeProvider.Now;
             var today = _dateTimeProvider.Today;
 
@@ -698,7 +687,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var lastMeeting = employeeMeetings
                     .OrderByDescending(m => m.MeetingDate)
                     .FirstOrDefault();
-                    
+
                 var daysSinceLastMeeting = lastMeeting != null
                     ? (int)(now - lastMeeting.MeetingDate).TotalDays
                     : 999;
@@ -730,7 +719,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             return stats;
         }
-
         private double CalculateAvgDaysBetweenMeetings(List<Meeting> meetings)
         {
             var orderedMeetings = meetings.OrderBy(m => m.MeetingDate).ToList();
@@ -747,7 +735,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             return daysDifferences.Any() ? daysDifferences.Average() : 0;
         }
-
         private RsvpStatus ParseRsvpStatus(string status)
         {
             if (Enum.TryParse<RsvpStatus>(status, true, out var rsvpStatus))
@@ -756,7 +743,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
             return RsvpStatus.Pending;
         }
-
         private MeetingStatus ParseMeetingStatus(string status)
         {
             if (Enum.TryParse<MeetingStatus>(status, true, out var meetingStatus))
@@ -769,7 +755,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         #endregion
 
         #region Mapping Methods
-
         private MeetingResponseDto MapToMeetingResponseDto(Meeting meeting)
         {
             return new MeetingResponseDto
@@ -794,7 +779,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     .ToList() ?? new List<MeetingParticipantDto>()
             };
         }
-
         private MeetingInvitationDto MapToMeetingInvitationDto(Meetingparticipant participant)
         {
             var daysUntilMeeting = (int)(participant.Meeting.MeetingDate - _dateTimeProvider.Now).TotalDays;
@@ -817,7 +801,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 DaysUntilMeeting = daysUntilMeeting
             };
         }
-
         private string GetEmployeeName(Employee? employee)
         {
             if (employee?.Userprofile == null)
@@ -834,13 +817,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
     }
 
     #region External Interfaces
-
     public interface IDateTimeProvider
     {
         DateTime Now { get; }
         DateOnly Today { get; }
     }
-
     public class DateTimeProvider : IDateTimeProvider
     {
         public DateTime Now => DateTime.Now;

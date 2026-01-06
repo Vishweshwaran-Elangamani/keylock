@@ -100,7 +100,7 @@ namespace eepzbackend.Controllers
                 _logger.LogInformation("Starting bulk SLA creation for {Count} records", requests.Count);
 
                 var result = await _slaService.BulkCreateSla(requests);
-                
+
                 return result.Success ? Ok(result) : BadRequest(result);
             }
             catch (Exception ex)

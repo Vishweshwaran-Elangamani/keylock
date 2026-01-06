@@ -23,8 +23,6 @@ namespace Relevantz.EEPZ.Core.Services.Interfaces
         Task<ApiResponse<List<EscalationResponse>>> GetManagerEscalations(int managerId);
         Task<ApiResponse<SlaResponse>> UpdateSla(int slaid, UpdateSlaRequest request);
         Task<ApiResponse<string>> DeleteSla(int slaid);
-
-
         Task<ApiResponse<BulkCreateSlaResponse>> BulkCreateSla(List<CreateSlaRequest> requests);
     }
 }

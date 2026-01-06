@@ -31,7 +31,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 CommentsObservations = createMomDto.CommentsObservations,
                 SubmittedByEmployeeId = submittedByEmployeeId,
                 SubmittedByRole = mappedRole,
-                IsEditable = mappedRole == "Manager", 
+                IsEditable = mappedRole == "Manager",
                 CreatedAt = DateTime.Now
             };
 
@@ -297,7 +297,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return moms.Select(MapToMomResponseDto).ToList();
         }
 
-
         public async Task<bool> UpdateActionItemStatusAsync(int actionItemId, string status, int employeeId)
         {
             var actionItem = await _momRepository.GetActionItemByIdAsync(actionItemId);
@@ -317,13 +316,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         public async Task<List<ActionItemResponseDto>> GetMyActionItemsAsync(int employeeId)
         {
             var actionItems = await _momRepository.GetActionItemsByEmployeeIdAsync(employeeId);
-            
+
             Console.WriteLine($"[SERVICE] Found {actionItems.Count} action items for employee {employeeId}");
-            
-            var result = actionItems.Select(ai => {
+
+            var result = actionItems.Select(ai =>
+            {
                 var meetingTitle = ai.Mom?.MeetingTitle ?? "N/A";
                 Console.WriteLine($"[SERVICE] Action Item {ai.ActionItemId}: Meeting Title = '{meetingTitle}', MomId = {ai.Momid}");
-                
+
                 return new ActionItemResponseDto
                 {
                     ActionItemId = ai.ActionItemId,
@@ -336,12 +336,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     MeetingTitle = meetingTitle,
                     MomId = ai.Momid,
                     AssignedByEmployeeId = ai.Mom?.SubmittedByEmployeeId,
-                    AssignedByEmployeeName = ai.Mom?.SubmittedByEmployee != null 
-                        ? GetEmployeeName(ai.Mom.SubmittedByEmployee) 
+                    AssignedByEmployeeName = ai.Mom?.SubmittedByEmployee != null
+                        ? GetEmployeeName(ai.Mom.SubmittedByEmployee)
                         : null
                 };
             }).ToList();
-            
+
             Console.WriteLine($"[SERVICE] Returning {result.Count} action items");
             return result;
         }
@@ -361,8 +361,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 MeetingTitle = ai.Mom?.MeetingTitle ?? "N/A",
                 MomId = ai.Momid,
                 AssignedByEmployeeId = ai.Mom?.SubmittedByEmployeeId,
-                AssignedByEmployeeName = ai.Mom?.SubmittedByEmployee != null 
-                    ? GetEmployeeName(ai.Mom.SubmittedByEmployee) 
+                AssignedByEmployeeName = ai.Mom?.SubmittedByEmployee != null
+                    ? GetEmployeeName(ai.Mom.SubmittedByEmployee)
                     : null
             }).ToList();
         }
@@ -386,8 +386,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     MeetingTitle = ai.Mom?.MeetingTitle ?? "N/A",
                     MomId = ai.Momid,
                     AssignedByEmployeeId = ai.Mom?.SubmittedByEmployeeId,
-                    AssignedByEmployeeName = ai.Mom?.SubmittedByEmployee != null 
-                        ? GetEmployeeName(ai.Mom.SubmittedByEmployee) 
+                    AssignedByEmployeeName = ai.Mom?.SubmittedByEmployee != null
+                        ? GetEmployeeName(ai.Mom.SubmittedByEmployee)
                         : null
                 }).ToList();
 
@@ -426,7 +426,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 { "Engineer", "Employee" },
                 { "Analyst", "Employee" },
                 { "Designer", "Employee" },
-                
+
                 { "Manager", "Manager" },
                 { "Engineering Manager", "Manager" },
                 { "Department Manager", "Manager" },
@@ -435,7 +435,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 { "Senior Manager", "Manager" },
                 { "Director", "Manager" },
                 { "VP", "Manager" },
-                
+
                 { "HR", "HR" },
                 { "HR Manager", "HR" },
                 { "Human Resources", "HR" },
@@ -538,10 +538,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return string.IsNullOrWhiteSpace(fullName) ? "Unknown" : fullName;
         }
 
-
-        
-
-
         private MeetingInvitationDto MapToMeetingInvitationDto(Meetingparticipant participant)
         {
             var daysUntilMeeting = (int)(participant.Meeting.MeetingDate - DateTime.Now).TotalDays;
@@ -562,7 +558,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 RsvpResponseDate = participant.RsvpresponseDate,
                 RsvpComments = participant.Rsvpcomments,
                 DaysUntilMeeting = daysUntilMeeting,
-               // IsUpcoming = participant.Meeting.MeetingDate > DateTime.Now
+                // IsUpcoming = participant.Meeting.MeetingDate > DateTime.Now
             };
         }
     }

@@ -6,7 +6,6 @@ using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 
-
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
     public class ProjectRepository : IProjectRepository
@@ -204,27 +203,25 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         }
 
         public async Task<Project> UpdateProjectAsync(Project project)
-{
-    var existingProject = await _context.Projects
-        .FirstOrDefaultAsync(p => p.ProjectId == project.ProjectId);
-    
-    if (existingProject == null)
-        return null;
+        {
+            var existingProject = await _context.Projects
+                .FirstOrDefaultAsync(p => p.ProjectId == project.ProjectId);
 
-    existingProject.ProjectName = project.ProjectName;
-    existingProject.Description = project.Description;
-    existingProject.StartDate = project.StartDate;
-    existingProject.EndDate = project.EndDate;
-    existingProject.Status = project.Status;
-    existingProject.UpdatedAt = DateTime.UtcNow;
+            if (existingProject == null)
+                return null;
 
-    _context.Projects.Update(existingProject);
-    await _context.SaveChangesAsync();
+            existingProject.ProjectName = project.ProjectName;
+            existingProject.Description = project.Description;
+            existingProject.StartDate = project.StartDate;
+            existingProject.EndDate = project.EndDate;
+            existingProject.Status = project.Status;
+            existingProject.UpdatedAt = DateTime.UtcNow;
 
-    return existingProject;
-}
+            _context.Projects.Update(existingProject);
+            await _context.SaveChangesAsync();
 
-
+            return existingProject;
+        }
 
         public async Task<bool> DeleteProjectAsync(int projectId)
         {
@@ -339,89 +336,88 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return await query.AnyAsync();
         }
 
-       public async Task<bool> UpdateReportingManagersAsync(
-    int projectId,
-    int? resourceOwnerId,
-    int? l1ApproverId,
-    int? l2ApproverId)
-{
-    using var transaction = await _context.Database.BeginTransactionAsync();
-    try
-    {
-        var project = await _context.Projects.FindAsync(projectId);
-        if (project == null)
+        public async Task<bool> UpdateReportingManagersAsync(
+     int projectId,
+     int? resourceOwnerId,
+     int? l1ApproverId,
+     int? l2ApproverId)
         {
-            _logger.LogWarning("Project {ProjectId} not found for manager update", projectId);
-            return false;
-        }
-
-        _logger.LogInformation(
-            "Updating managers for Project {ProjectId}. ResourceOwner: {ResourceOwner}, L1: {L1}, L2: {L2}",
-            projectId, resourceOwnerId, l1ApproverId, l2ApproverId);
-
-        project.ResourceOwnerEmployeeId = resourceOwnerId;
-        project.L1approverEmployeeId = l1ApproverId;
-        project.L2approverEmployeeId = l2ApproverId;
-        project.UpdatedAt = DateTime.UtcNow;
-        await _context.SaveChangesAsync();
-
-        var managerMasterIds = new List<int?> { resourceOwnerId, l1ApproverId, l2ApproverId }
-            .Where(id => id.HasValue && id.Value > 0)
-            .Select(id => id!.Value)
-            .Distinct()
-            .ToList();
-
-        List<int> validManagerEmployeeIds = new List<int>();
-        if (managerMasterIds.Any())
-        {
-            validManagerEmployeeIds = await _context.Employeedetailsmasters
-                .Where(edm => managerMasterIds.Contains(edm.EmployeeMasterId))
-                .Select(edm => edm.EmployeeId)
-                .Where(eid => eid > 0)
-                .ToListAsync();
-
-            _logger.LogInformation(
-                "Found {FoundCount}/{TotalCount} managers for project {ProjectId}",
-                validManagerEmployeeIds.Count, managerMasterIds.Count, projectId);
-        }
-
-        if (validManagerEmployeeIds.Any())
-        {
-            var existingMappings = await _context.Projectemployees
-                .Where(pe => pe.ProjectId == projectId && validManagerEmployeeIds.Contains(pe.EmployeeId))
-                .Select(pe => pe.EmployeeId)
-                .ToListAsync();
-
-            var newManagerEmployeeIds = validManagerEmployeeIds.Except(existingMappings).ToList();
-
-            _logger.LogInformation(
-                "Managers to add: {NewCount}, already mapped: {ExistingCount}",
-                newManagerEmployeeIds.Count, existingMappings.Count);
-
-            if (newManagerEmployeeIds.Any())
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                var newProjectEmployees = newManagerEmployeeIds.Select(empId => new Projectemployee
+                var project = await _context.Projects.FindAsync(projectId);
+                if (project == null)
                 {
-                    ProjectId = projectId,
-                    EmployeeId = empId,
-                    IsPrimary = false,
-                }).ToList();
+                    _logger.LogWarning("Project {ProjectId} not found for manager update", projectId);
+                    return false;
+                }
 
-                await _context.Projectemployees.AddRangeAsync(newProjectEmployees);
+                _logger.LogInformation(
+                    "Updating managers for Project {ProjectId}. ResourceOwner: {ResourceOwner}, L1: {L1}, L2: {L2}",
+                    projectId, resourceOwnerId, l1ApproverId, l2ApproverId);
+
+                project.ResourceOwnerEmployeeId = resourceOwnerId;
+                project.L1approverEmployeeId = l1ApproverId;
+                project.L2approverEmployeeId = l2ApproverId;
+                project.UpdatedAt = DateTime.UtcNow;
                 await _context.SaveChangesAsync();
+
+                var managerMasterIds = new List<int?> { resourceOwnerId, l1ApproverId, l2ApproverId }
+                    .Where(id => id.HasValue && id.Value > 0)
+                    .Select(id => id!.Value)
+                    .Distinct()
+                    .ToList();
+
+                List<int> validManagerEmployeeIds = new List<int>();
+                if (managerMasterIds.Any())
+                {
+                    validManagerEmployeeIds = await _context.Employeedetailsmasters
+                        .Where(edm => managerMasterIds.Contains(edm.EmployeeMasterId))
+                        .Select(edm => edm.EmployeeId)
+                        .Where(eid => eid > 0)
+                        .ToListAsync();
+
+                    _logger.LogInformation(
+                        "Found {FoundCount}/{TotalCount} managers for project {ProjectId}",
+                        validManagerEmployeeIds.Count, managerMasterIds.Count, projectId);
+                }
+
+                if (validManagerEmployeeIds.Any())
+                {
+                    var existingMappings = await _context.Projectemployees
+                        .Where(pe => pe.ProjectId == projectId && validManagerEmployeeIds.Contains(pe.EmployeeId))
+                        .Select(pe => pe.EmployeeId)
+                        .ToListAsync();
+
+                    var newManagerEmployeeIds = validManagerEmployeeIds.Except(existingMappings).ToList();
+
+                    _logger.LogInformation(
+                        "Managers to add: {NewCount}, already mapped: {ExistingCount}",
+                        newManagerEmployeeIds.Count, existingMappings.Count);
+
+                    if (newManagerEmployeeIds.Any())
+                    {
+                        var newProjectEmployees = newManagerEmployeeIds.Select(empId => new Projectemployee
+                        {
+                            ProjectId = projectId,
+                            EmployeeId = empId,
+                            IsPrimary = false,
+                        }).ToList();
+
+                        await _context.Projectemployees.AddRangeAsync(newProjectEmployees);
+                        await _context.SaveChangesAsync();
+                    }
+                }
+
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                return false;
             }
         }
-
-        await transaction.CommitAsync();
-        return true;
-    }
-    catch
-    {
-        await transaction.RollbackAsync();
-        return false;
-    }
-}
-
 
         public async Task<List<Projectemployee>> GetProjectEmployeesAsync(int projectId)
         {
@@ -602,7 +598,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             var result = employeesWithPrimaryProjects.ToDictionary(
                 emp => emp.EmployeeMasterId,
                 emp => emp.PrimaryProject != null
-                    ? ((int ProjectId, string ProjectName)?) (emp.PrimaryProject.ProjectId, emp.PrimaryProject.ProjectName)
+                    ? ((int ProjectId, string ProjectName)?)(emp.PrimaryProject.ProjectId, emp.PrimaryProject.ProjectName)
                     : null);
 
             var withPrimaryCount = result.Count(kvp => kvp.Value.HasValue);

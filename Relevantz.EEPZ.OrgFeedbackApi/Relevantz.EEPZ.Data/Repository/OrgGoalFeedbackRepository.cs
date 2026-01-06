@@ -14,7 +14,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
     {
         private readonly EEPZDbContext _context;
         private readonly ILogger<OrgGoalFeedbackRepository> _logger;
-        private const string ORG_GOAL_TYPE = "org"; 
+        private const string ORG_GOAL_TYPE = "org";
 
         public OrgGoalFeedbackRepository(EEPZDbContext context, ILogger<OrgGoalFeedbackRepository> logger)
         {
@@ -36,10 +36,10 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 feedback.CreatedAt = DateTime.UtcNow;
                 feedback.Status = "Submitted";
                 feedback.FeedbackType = "OrganizationalGoal";
-                
+
                 _context.Feedbacks.Add(feedback);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Organization goal feedback created: {feedback.FeedbackId}");
                 return feedback.FeedbackId;
             }
@@ -49,6 +49,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
+        
         public async Task<Feedback> GetOrgGoalFeedbackByIdAsync(int feedbackId)
         {
             try
@@ -57,8 +58,8 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     .Include(f => f.RelatedGoal)
                     .Include(f => f.SubmittedByEmployee)
                     .Include(f => f.RecipientEmployee)
-                    .Where(f => f.FeedbackId == feedbackId 
-                        && f.RelatedGoal != null 
+                    .Where(f => f.FeedbackId == feedbackId
+                        && f.RelatedGoal != null
                         && f.RelatedGoal.GoalType == ORG_GOAL_TYPE)
                     .FirstOrDefaultAsync();
             }
@@ -77,7 +78,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     .Include(f => f.RelatedGoal)
                     .Include(f => f.SubmittedByEmployee)
                     .Include(f => f.RecipientEmployee)
-                    .Where(f => f.RelatedGoalId == goalId 
+                    .Where(f => f.RelatedGoalId == goalId
                         && f.RelatedGoal.GoalType == ORG_GOAL_TYPE
                         && f.Status != "Archived")
                     .OrderByDescending(f => f.CreatedAt)
@@ -97,7 +98,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 return await _context.Feedbacks
                     .Include(f => f.RelatedGoal)
                     .Include(f => f.RecipientEmployee)
-                    .Where(f => f.SubmittedByEmployeeId == employeeId 
+                    .Where(f => f.SubmittedByEmployeeId == employeeId
                         && f.RelatedGoal != null
                         && f.RelatedGoal.GoalType == ORG_GOAL_TYPE)
                     .OrderByDescending(f => f.CreatedAt)
@@ -139,7 +140,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     .Include(f => f.RelatedGoal)
                     .Include(f => f.SubmittedByEmployee)
                     .Include(f => f.RecipientEmployee)
-                    .Where(f => f.Status == status 
+                    .Where(f => f.Status == status
                         && f.RelatedGoal != null
                         && f.RelatedGoal.GoalType == ORG_GOAL_TYPE)
                     .OrderByDescending(f => f.CreatedAt)
@@ -159,7 +160,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 return await _context.Feedbacks
                     .Include(f => f.RelatedGoal)
                     .Include(f => f.RecipientEmployee)
-                    .Where(f => f.IsAnonymous 
+                    .Where(f => f.IsAnonymous
                         && f.Status != "Archived"
                         && f.RelatedGoal != null
                         && f.RelatedGoal.GoalType == ORG_GOAL_TYPE)
@@ -180,7 +181,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 _context.Feedbacks.Update(feedback);
                 feedback.UpdatedAt = DateTime.UtcNow;
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Organization goal feedback updated: {feedback.FeedbackId}");
                 return true;
             }
@@ -197,7 +198,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             {
                 var feedback = await _context.Feedbacks
                     .Include(f => f.RelatedGoal)
-                    .Where(f => f.FeedbackId == feedbackId 
+                    .Where(f => f.FeedbackId == feedbackId
                         && f.RelatedGoal != null
                         && f.RelatedGoal.GoalType == ORG_GOAL_TYPE)
                     .FirstOrDefaultAsync();
@@ -210,7 +211,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 _context.Feedbacks.Update(feedback);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Org goal feedback status updated: {feedbackId} → {newStatus}");
                 return true;
             }
@@ -227,7 +228,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             {
                 var feedback = await _context.Feedbacks
                     .Include(f => f.RelatedGoal)
-                    .Where(f => f.FeedbackId == feedbackId 
+                    .Where(f => f.FeedbackId == feedbackId
                         && f.RelatedGoal != null
                         && f.RelatedGoal.GoalType == ORG_GOAL_TYPE)
                     .FirstOrDefaultAsync();
@@ -240,7 +241,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 _context.Feedbacks.Remove(feedback);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Organization goal feedback deleted: {feedbackId}");
                 return true;
             }
@@ -256,7 +257,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             {
                 return await _context.Feedbacks
                     .Include(f => f.RelatedGoal)
-                    .AnyAsync(f => f.FeedbackId == feedbackId 
+                    .AnyAsync(f => f.FeedbackId == feedbackId
                         && f.RelatedGoal != null
                         && f.RelatedGoal.GoalType == ORG_GOAL_TYPE);
             }

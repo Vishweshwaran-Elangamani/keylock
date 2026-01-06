@@ -25,11 +25,11 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             try
             {
                 feedback.CreatedAt = DateTime.UtcNow;
-                feedback.Status = "Draft"; 
-                
+                feedback.Status = "Draft";
+
                 _context.Feedbacks.Add(feedback);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Feedback created: {feedback.FeedbackId}");
                 return feedback.FeedbackId;
             }
@@ -45,10 +45,10 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             try
             {
                 response.CreatedAt = DateTime.UtcNow;
-                
+
                 _context.Feedbackquestionresponses.Add(response);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Question response created: {response.ResponseId}");
                 return response.ResponseId;
             }
@@ -125,7 +125,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     return new List<Feedback>();
 
                 return await _context.Feedbacks
-                    .Where(f => (teamMemberIds.Contains(f.SubmittedByEmployeeId ?? 0) || 
+                    .Where(f => (teamMemberIds.Contains(f.SubmittedByEmployeeId ?? 0) ||
                                  teamMemberIds.Contains(f.RecipientEmployeeId)) &&
                                 f.Status == "Submitted")
                     .Include(f => f.SubmittedByEmployee)
@@ -291,10 +291,10 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             try
             {
                 feedback.UpdatedAt = DateTime.UtcNow;
-                
+
                 _context.Feedbacks.Update(feedback);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Feedback updated: {feedback.FeedbackId}");
                 return true;
             }
@@ -316,13 +316,13 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 feedback.Status = newStatus;
                 feedback.UpdatedAt = DateTime.UtcNow;
 
-               
+
                 if (newStatus == "Submitted" && feedback.SubmittedAt == null)
                     feedback.SubmittedAt = DateTime.UtcNow;
 
                 _context.Feedbacks.Update(feedback);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Feedback status updated: {feedbackId} → {newStatus}");
                 return true;
             }
@@ -349,7 +349,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 _context.Feedbacks.Update(feedback);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Feedback flagged for review: {feedbackId} (Bias: {isBias}, Fairness: {isFairness})");
                 return true;
             }
@@ -375,7 +375,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 _context.Feedbacks.Update(feedback);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"HR review set for feedback: {feedbackId}");
                 return true;
             }
@@ -392,7 +392,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             {
                 _context.Feedbackquestionresponses.Update(response);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Question response updated: {response.ResponseId}");
                 return true;
             }
@@ -421,7 +421,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 _context.Feedbackquestionresponses.RemoveRange(responses);
                 _context.Feedbacks.Remove(feedback);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Feedback deleted: {feedbackId}");
                 return true;
             }
@@ -442,7 +442,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 _context.Feedbackquestionresponses.Remove(response);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Question response deleted: {responseId}");
                 return true;
             }
@@ -452,6 +452,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
+        
         public async Task<bool> FeedbackExistsAsync(int feedbackId)
         {
             try

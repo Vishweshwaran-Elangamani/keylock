@@ -1,7 +1,7 @@
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
-using Relevantz.EEPZ.Core.Services.Interfaces; 
+using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Common.Entities;
 using Microsoft.Extensions.Logging;
 
@@ -12,7 +12,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
     /// Service implementation for MentorFeedbackTracking business logic
     /// Handles mentor feedback operations
     /// </summary>
-       public class MentorFeedbackService : IMentorFeedbackService
+    public class MentorFeedbackService : IMentorFeedbackService
     {
         private readonly IMentorFeedbackRepository _mentorFeedbackRepo;
         private readonly ILogger<MentorFeedbackService> _logger;
@@ -256,33 +256,32 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-       private MentorFeedbackResponseDto MapToResponseDto(Mentorfeedbacktracking feedback)
-{
-    return new MentorFeedbackResponseDto
-    {
-        TrackingId = feedback.TrackingId,
-        SmeId = feedback.SmeId,
-        MentorEmployeeId = feedback.MentorEmployeeId,
-        MentorName = feedback.MentorEmployee != null 
-            ? $"{feedback.MentorEmployee.EmployeeId}" 
-            : "Unknown",
-        MenteeEmployeeId = feedback.MenteeEmployeeId,
-        MenteeName = feedback.MenteeEmployee != null 
-            ? $"{feedback.MenteeEmployee.EmployeeId}" 
-            : "Unknown",
-        SkillIdReference = feedback.SkillIdReference,
-        SkillName = feedback.SkillIdReferenceNavigation != null 
-            ? feedback.SkillIdReferenceNavigation.SkillName 
-            : "Unknown",
-        Rating = feedback.Rating,
-        FeedbackComments = feedback.FeedbackComments,
-        FeedbackFrom = feedback.FeedbackFrom,
-        IsAnonymous = feedback.IsAnonymous,
-        Status = feedback.Status,
-        CreatedAt = feedback.CreatedAt,
-        ReviewedAt = feedback.ReviewedAt
-    };
-}
-
+        private MentorFeedbackResponseDto MapToResponseDto(Mentorfeedbacktracking feedback)
+        {
+            return new MentorFeedbackResponseDto
+            {
+                TrackingId = feedback.TrackingId,
+                SmeId = feedback.SmeId,
+                MentorEmployeeId = feedback.MentorEmployeeId,
+                MentorName = feedback.MentorEmployee != null
+                    ? $"{feedback.MentorEmployee.EmployeeId}"
+                    : "Unknown",
+                MenteeEmployeeId = feedback.MenteeEmployeeId,
+                MenteeName = feedback.MenteeEmployee != null
+                    ? $"{feedback.MenteeEmployee.EmployeeId}"
+                    : "Unknown",
+                SkillIdReference = feedback.SkillIdReference,
+                SkillName = feedback.SkillIdReferenceNavigation != null
+                    ? feedback.SkillIdReferenceNavigation.SkillName
+                    : "Unknown",
+                Rating = feedback.Rating,
+                FeedbackComments = feedback.FeedbackComments,
+                FeedbackFrom = feedback.FeedbackFrom,
+                IsAnonymous = feedback.IsAnonymous,
+                Status = feedback.Status,
+                CreatedAt = feedback.CreatedAt,
+                ReviewedAt = feedback.ReviewedAt
+            };
+        }
     }
 }

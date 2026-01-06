@@ -11,7 +11,7 @@ namespace eepzbackend.Controllers
     {
         private readonly EEPZDbContext _context;
         private readonly ILogger<OrgwideobjectivesController> _logger;
-        private const string ORG_GOAL_TYPE = "org"; 
+        private const string ORG_GOAL_TYPE = "org";
 
         public OrgwideobjectivesController(EEPZDbContext context, ILogger<OrgwideobjectivesController> logger)
         {
@@ -32,7 +32,7 @@ namespace eepzbackend.Controllers
                 _logger.LogInformation("Retrieving all organization-wide objectives from Goals table");
 
                 var objectives = await _context.Goals
-                    .Where(g => g.GoalType == ORG_GOAL_TYPE && 
+                    .Where(g => g.GoalType == ORG_GOAL_TYPE &&
                                (g.Goalstatus == "open" || g.Goalstatus == "inprogress"))
                     .OrderBy(g => g.GoalTitle)
                     .Select(g => new OrgObjectiveDto
@@ -47,7 +47,7 @@ namespace eepzbackend.Controllers
                     .ToListAsync();
 
                 return Ok(ApiResponse<List<OrgObjectiveDto>>.SuccessResponse(
-                    objectives, 
+                    objectives,
                     $"Retrieved {objectives.Count} organization objectives successfully."));
             }
             catch (Exception ex)
@@ -70,7 +70,7 @@ namespace eepzbackend.Controllers
 
                 var objectives = await _context.Goals
                     .Where(g => g.GoalType == ORG_GOAL_TYPE)
-                    .OrderByDescending(g => g.Goalcreatedat) 
+                    .OrderByDescending(g => g.Goalcreatedat)
                     .Select(g => new OrgObjectiveDto
                     {
                         ObjectiveId = g.GoalId,
@@ -83,7 +83,7 @@ namespace eepzbackend.Controllers
                     .ToListAsync();
 
                 return Ok(ApiResponse<List<OrgObjectiveDto>>.SuccessResponse(
-                    objectives, 
+                    objectives,
                     "Organization objectives retrieved successfully."));
             }
             catch (Exception ex)
@@ -126,7 +126,7 @@ namespace eepzbackend.Controllers
                 };
 
                 return Ok(ApiResponse<OrgObjectiveDto>.SuccessResponse(
-                    response, 
+                    response,
                     "Objective retrieved successfully."));
             }
             catch (Exception ex)
@@ -148,7 +148,7 @@ namespace eepzbackend.Controllers
                 _logger.LogInformation("Retrieving active organization objectives");
 
                 var objectives = await _context.Goals
-                    .Where(g => g.GoalType == ORG_GOAL_TYPE && 
+                    .Where(g => g.GoalType == ORG_GOAL_TYPE &&
                                (g.Goalstatus == "open" || g.Goalstatus == "inprogress"))
                     .OrderBy(g => g.GoalTitle)
                     .Select(g => new OrgObjectiveDto
@@ -161,7 +161,7 @@ namespace eepzbackend.Controllers
                     .ToListAsync();
 
                 return Ok(ApiResponse<List<OrgObjectiveDto>>.SuccessResponse(
-                    objectives, 
+                    objectives,
                     $"Retrieved {objectives.Count} active objectives."));
             }
             catch (Exception ex)
@@ -204,7 +204,7 @@ namespace eepzbackend.Controllers
                     .ToListAsync();
 
                 return Ok(ApiResponse<List<OrgObjectiveDto>>.SuccessResponse(
-                    objectives, 
+                    objectives,
                     $"Retrieved {objectives.Count} {status} objectives."));
             }
             catch (Exception ex)

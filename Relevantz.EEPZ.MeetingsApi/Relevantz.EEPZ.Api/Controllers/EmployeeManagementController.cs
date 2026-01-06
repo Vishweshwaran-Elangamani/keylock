@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Data.DBContexts;
-using Relevantz.EEPZ.Common.Entities;  
+using Relevantz.EEPZ.Common.Entities;
 
 namespace eepzbackend.Controllers
 {
@@ -10,12 +10,12 @@ namespace eepzbackend.Controllers
     public class EmployeeManagementController : ControllerBase
     {
         private readonly EEPZDbContext _context;
- 
+
         public EmployeeManagementController(EEPZDbContext context)
         {
             _context = context;
         }
- 
+
         /// <summary>
         /// Get all active employees with their details
         /// Used for Resource Owner dropdown
@@ -48,7 +48,7 @@ namespace eepzbackend.Controllers
                         DepartmentName = e.Department.DepartmentName
                     })
                     .ToListAsync();
- 
+
                 return Ok(new { success = true, data = employees });
             }
             catch (Exception ex)
@@ -61,7 +61,7 @@ namespace eepzbackend.Controllers
                 });
             }
         }
- 
+
         /// <summary>
         /// Get only managers/senior roles for approver dropdowns
         /// Used for L1 and L2 Approver dropdowns
@@ -77,7 +77,7 @@ namespace eepzbackend.Controllers
                 {
                     "Manager"
                 };
- 
+
                 var managers = await _context.Employeedetailsmasters
                     .Include(e => e.Employee)
                         .ThenInclude(e => e.Userprofile)
@@ -100,7 +100,7 @@ namespace eepzbackend.Controllers
                         DepartmentName = e.Department.DepartmentName
                     })
                     .ToListAsync();
- 
+
                 return Ok(new { success = true, data = managers });
             }
             catch (Exception ex)
@@ -113,7 +113,7 @@ namespace eepzbackend.Controllers
                 });
             }
         }
- 
+
         /// <summary>
         /// Get employee by ID with full details
         /// </summary>
@@ -146,7 +146,7 @@ namespace eepzbackend.Controllers
                         IsActive = e.Employee.IsActive
                     })
                     .FirstOrDefaultAsync();
- 
+
                 if (employee == null)
                 {
                     return NotFound(new
@@ -155,7 +155,7 @@ namespace eepzbackend.Controllers
                         message = "Employee not found"
                     });
                 }
- 
+
                 return Ok(new { success = true, data = employee });
             }
             catch (Exception ex)
@@ -168,7 +168,7 @@ namespace eepzbackend.Controllers
                 });
             }
         }
- 
+
         /// <summary>
         /// Search employees by name or employee company ID
         /// </summary>
@@ -187,9 +187,9 @@ namespace eepzbackend.Controllers
                         message = "Search query is required"
                     });
                 }
- 
+
                 var searchTerm = query.ToLower();
- 
+
                 var employees = await _context.Employeedetailsmasters
                     .Include(e => e.Employee)
                         .ThenInclude(e => e.Userprofile)
@@ -203,7 +203,7 @@ namespace eepzbackend.Controllers
                                 e.Employee.EmployeeCompanyId.ToLower().Contains(searchTerm) ||
                                 e.Employee.Userauthentication.Email.ToLower().Contains(searchTerm)))
                     .OrderBy(e => e.Employee.Userprofile.FirstName)
-                    .Take(50) 
+                    .Take(50)
                     .Select(e => new
                     {
                         e.EmployeeMasterId,
@@ -216,7 +216,7 @@ namespace eepzbackend.Controllers
                         DepartmentName = e.Department.DepartmentName
                     })
                     .ToListAsync();
- 
+
                 return Ok(new { success = true, data = employees, count = employees.Count });
             }
             catch (Exception ex)
@@ -229,7 +229,7 @@ namespace eepzbackend.Controllers
                 });
             }
         }
- 
+
         /// <summary>
         /// Get employees by department
         /// </summary>
@@ -261,7 +261,7 @@ namespace eepzbackend.Controllers
                         DepartmentName = e.Department.DepartmentName
                     })
                     .ToListAsync();
- 
+
                 return Ok(new { success = true, data = employees, count = employees.Count });
             }
             catch (Exception ex)
@@ -274,7 +274,7 @@ namespace eepzbackend.Controllers
                 });
             }
         }
- 
+
         /// <summary>
         /// Get employees by role
         /// </summary>
@@ -306,7 +306,7 @@ namespace eepzbackend.Controllers
                         DepartmentName = e.Department.DepartmentName
                     })
                     .ToListAsync();
- 
+
                 return Ok(new { success = true, data = employees, count = employees.Count });
             }
             catch (Exception ex)
@@ -319,7 +319,7 @@ namespace eepzbackend.Controllers
                 });
             }
         }
- 
+
         /// <summary>
         /// Get all departments
         /// Used for Department dropdown in project forms
@@ -341,7 +341,7 @@ namespace eepzbackend.Controllers
                         d.CostCenter
                     })
                     .ToListAsync();
- 
+
                 return Ok(new { success = true, data = departments });
             }
             catch (Exception ex)
@@ -354,7 +354,7 @@ namespace eepzbackend.Controllers
                 });
             }
         }
- 
+
         /// <summary>
         /// Get all business units (distinct from existing projects)
         /// Used for Business Unit dropdown in project forms
@@ -366,14 +366,14 @@ namespace eepzbackend.Controllers
         {
             try
             {
-               
+
                 var businessUnits = await _context.Projects
                     .Where(p => !string.IsNullOrEmpty(p.BusinessUnit))
                     .Select(p => p.BusinessUnit!)
                     .Distinct()
                     .OrderBy(bu => bu)
                     .ToListAsync();
- 
+
                 if (!businessUnits.Any())
                 {
                     businessUnits = new List<string>
@@ -387,7 +387,7 @@ namespace eepzbackend.Controllers
                         "Research and Development"
                     };
                 }
- 
+
                 return Ok(new { success = true, data = businessUnits });
             }
             catch (Exception ex)
@@ -400,7 +400,7 @@ namespace eepzbackend.Controllers
                 });
             }
         }
- 
+
         /// <summary>
         /// Get department by ID with details
         /// </summary>
@@ -424,7 +424,7 @@ namespace eepzbackend.Controllers
                         d.UpdatedAt
                     })
                     .FirstOrDefaultAsync();
- 
+
                 if (department == null)
                 {
                     return NotFound(new
@@ -433,7 +433,7 @@ namespace eepzbackend.Controllers
                         message = "Department not found"
                     });
                 }
- 
+
                 return Ok(new { success = true, data = department });
             }
             catch (Exception ex)
@@ -448,5 +448,4 @@ namespace eepzbackend.Controllers
         }
     }
 }
- 
- 
+

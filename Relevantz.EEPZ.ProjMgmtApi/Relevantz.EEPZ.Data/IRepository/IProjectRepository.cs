@@ -11,25 +11,19 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         Task<bool> DeleteProjectAsync(int projectId);
         Task<bool> ProjectExistsAsync(int projectId);
         Task<bool> ProjectNameExistsAsync(string projectName, int? excludeProjectId = null);
-
         Task<bool> UpdateReportingManagersAsync(int projectId, int? resourceOwnerId, int? l1ApproverId, int? l2ApproverId);
-
         Task<List<Projectemployee>> GetProjectEmployeesAsync(int projectId);
         Task<bool> MapEmployeesToProjectAsync(int projectId, List<Projectemployee> employees);
         Task<bool> UnmapEmployeesFromProjectAsync(int projectId, List<int> employeeIds);
         Task<bool> IsEmployeeMappedToProjectAsync(int projectId, int employeeId);
-
         Task<Employeedetailsmaster?> GetEmployeeDetailsByIdAsync(int employeeMasterId);
         Task<List<Employeedetailsmaster>> GetEmployeeDetailsByIdsAsync(List<int> employeeMasterIds);
         Task<bool> EmployeeMasterExistsAsync(int employeeMasterId);
         Task<Employee?> GetEmployeeByIdAsync(int employeeId);
         Task<List<Projectemployee>> GetProjectEmployeesByEmployeeIdAsync(int employeeId);
-
         Task<int?> GetEmployeeIdByMasterIdAsync(int employeeMasterId);
-
         Task<bool> UpdateEmployeeAsync(Employee employee);
         Task<bool> UpdateProjectEmployeePrimaryFlagsAsync(List<Projectemployee> projectEmployees);
-
         Task<Dictionary<int, (int ProjectId, string ProjectName)?>> GetAllEmployeesWithPrimaryProjectAsync();
 
         /// <summary>

@@ -7,7 +7,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public DateTime CreatedAt { get; set; }
     }
 
-
     public class SlaResponse
     {
         public int Slaid { get; set; }
@@ -34,7 +33,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public DateTime UpdatedAt { get; set; }
     }
 
-     public class BulkCreateSlaResponse
+    public class BulkCreateSlaResponse
     {
         public int TotalRequested { get; set; }
         public int SuccessfulInserts { get; set; }
@@ -44,38 +43,28 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public string Message { get; set; } = string.Empty;
     }
 
-
-   public class EscalationResponse
-{
-    public int EscalationId { get; set; }
-    public int Slaid { get; set; }
-    public string? Reason { get; set; }
-    public string? Description { get; set; }
-    public string? EscalationLevel { get; set; }
-    public string? EscalationStatus { get; set; }
-    public DateTime? SubmittedAt { get; set; }
-    
-
-    public int? EmployeeId { get; set; }
-    public string? EmployeeName { get; set; }  
-    public string? EmployeeEmail { get; set; }
-    
-    
-    public int? SubmittedByEmployeeId { get; set; }
-    public string? SubmittedByName { get; set; }
-    
-     public int? EscalatedToEmployeeId { get; set; }
-    public string? EscalatedToName { get; set; }
-    
-
-    public int? ResolvedByEmployeeId { get; set; }
-    public string? ResolvedByName { get; set; }
-    public string? ResolutionComments { get; set; }
-    public DateTime? ResolvedAt { get; set; }
-    
-    public string? Message { get; set; }
-}
-
+    public class EscalationResponse
+    {
+        public int EscalationId { get; set; }
+        public int Slaid { get; set; }
+        public string? Reason { get; set; }
+        public string? Description { get; set; }
+        public string? EscalationLevel { get; set; }
+        public string? EscalationStatus { get; set; }
+        public DateTime? SubmittedAt { get; set; }
+        public int? EmployeeId { get; set; }
+        public string? EmployeeName { get; set; }
+        public string? EmployeeEmail { get; set; }
+        public int? SubmittedByEmployeeId { get; set; }
+        public string? SubmittedByName { get; set; }
+        public int? EscalatedToEmployeeId { get; set; }
+        public string? EscalatedToName { get; set; }
+        public int? ResolvedByEmployeeId { get; set; }
+        public string? ResolvedByName { get; set; }
+        public string? ResolutionComments { get; set; }
+        public DateTime? ResolvedAt { get; set; }
+        public string? Message { get; set; }
+    }
 
     public class ReopenSlaResponse
     {
@@ -84,7 +73,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public DateTime NewDeadline { get; set; }
         public int ExtensionDays { get; set; }
     }
-
 
     public class TeamReviewTrackingResponse
     {
@@ -105,25 +93,22 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public string UrgencyStatus { get; set; } = string.Empty;
     }
 
-
     public class DepartmentComplianceResponse
-{
-    public int ComplianceId { get; set; }
-    public int DepartmentId { get; set; }
-    public string DepartmentName { get; set; } = string.Empty;
-    public string Period { get; set; } = string.Empty;
-    public DateOnly PeriodStartDate { get; set; }
-    public DateOnly PeriodEndDate { get; set; }
-    public int TotalSlas { get; set; }        
-    public int OnTimeSlas { get; set; }       
-    public int BreachedSlas { get; set; }     
-    public int ExtendedSlas { get; set; }     
-    public int PendingSlas { get; set; }      
-    public decimal CompliancePercentage { get; set; }
-    public DateTime CalculatedAt { get; set; }
-}
-
-
+    {
+        public int ComplianceId { get; set; }
+        public int DepartmentId { get; set; }
+        public string DepartmentName { get; set; } = string.Empty;
+        public string Period { get; set; } = string.Empty;
+        public DateOnly PeriodStartDate { get; set; }
+        public DateOnly PeriodEndDate { get; set; }
+        public int TotalSlas { get; set; }
+        public int OnTimeSlas { get; set; }
+        public int BreachedSlas { get; set; }
+        public int ExtendedSlas { get; set; }
+        public int PendingSlas { get; set; }
+        public decimal CompliancePercentage { get; set; }
+        public DateTime CalculatedAt { get; set; }
+    }
 
     public class SlaHistoryResponse
     {
@@ -141,7 +126,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public string? Reason { get; set; }
         public DateTime CreatedAt { get; set; }
     }
-
 
     public class ApiResponse<T>
     {

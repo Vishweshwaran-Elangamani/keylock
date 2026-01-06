@@ -1,11 +1,9 @@
 using Relevantz.EEPZ.Common.Entities;
 
 namespace Relevantz.EEPZ.Data.Repository.Interfaces
-{    
+{
     public interface IFeedbackQuestionRepository
     {
-       
-
         /// <summary>
         /// Get question by ID
         /// </summary>
@@ -49,13 +47,10 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         /// </summary>
         Task<List<Feedbackquestion>> GetQuestionsByResponseTypeAsync(string responseType);
 
- 
-
         /// <summary>
         /// Create new question (rarely used - questions seeded at DB init)
         /// </summary>
         Task<int> CreateQuestionAsync(Feedbackquestion question);
-
 
         /// <summary>
         /// Update question text/description
@@ -67,14 +62,11 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         /// </summary>
         Task<bool> SetQuestionActiveStatusAsync(int questionId, bool isActive);
 
-
         /// <summary>
         /// Delete question (use with caution - prefer deactivation)
         /// Only delete if no responses exist
         /// </summary>
         Task<bool> DeleteQuestionAsync(int questionId);
-
-
 
         /// <summary>
         /// Check if question exists

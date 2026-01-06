@@ -307,20 +307,20 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 QueueId = feedback.QueueId,
                 SubmittedByEmployeeId = feedback.SubmittedByEmployeeId,
-                SubmitterName = feedback.SubmittedByEmployee != null 
-                    ? $"{feedback.SubmittedByEmployee.EmployeeId}" 
+                SubmitterName = feedback.SubmittedByEmployee != null
+                    ? $"{feedback.SubmittedByEmployee.EmployeeId}"
                     : "Anonymous",
                 RecipientEmployeeId = feedback.RecipientEmployeeId,
-                RecipientName = feedback.RecipientEmployee != null 
-                    ? $"{feedback.RecipientEmployee.EmployeeId}" 
+                RecipientName = feedback.RecipientEmployee != null
+                    ? $"{feedback.RecipientEmployee.EmployeeId}"
                     : "Unknown",
                 FeedbackContent = feedback.FeedbackContent,
                 IsAnonymous = feedback.IsAnonymous,
                 IsProfessional = feedback.IsProfessional,
                 IsRelevant = feedback.IsRelevant,
                 ApprovedByHRId = feedback.ApprovedByHrid,
-                ApprovedByHRName = feedback.ApprovedByHr != null 
-                    ? $"{feedback.ApprovedByHr.EmployeeId}" 
+                ApprovedByHRName = feedback.ApprovedByHr != null
+                    ? $"{feedback.ApprovedByHr.EmployeeId}"
                     : "Unknown",
                 Status = feedback.Status,
                 CreatedAt = feedback.CreatedAt,

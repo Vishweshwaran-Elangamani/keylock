@@ -16,7 +16,7 @@ namespace eepzbackend.Controllers
         private readonly ILogger<EmployeeManagementController> _logger;
 
         public EmployeeManagementController(
-            IEmployeeService employeeService, 
+            IEmployeeService employeeService,
             ILogger<EmployeeManagementController> logger)
         {
             _employeeService = employeeService;
@@ -60,7 +60,7 @@ namespace eepzbackend.Controllers
         {
             _logger.LogInformation("HR requested employee details for ID: {EmployeeMasterId}", employeeMasterId);
             var result = await _employeeService.GetEmployeeByIdAsync(employeeMasterId);
-            
+
             if (!result.Success && result.Data == null)
                 return NotFound(result);
 
@@ -78,7 +78,7 @@ namespace eepzbackend.Controllers
         {
             _logger.LogInformation("HR requested employee search with query: {SearchQuery}", query);
             var result = await _employeeService.SearchEmployeesAsync(query);
-            
+
             if (!result.Success && result.Message == "Search query is required")
                 return BadRequest(result);
 
@@ -176,7 +176,7 @@ namespace eepzbackend.Controllers
         {
             _logger.LogInformation("HR requested department details for ID: {DepartmentId}", departmentId);
             var result = await _employeeService.GetDepartmentByIdAsync(departmentId);
-            
+
             if (!result.Success && result.Data == null)
                 return NotFound(result);
 

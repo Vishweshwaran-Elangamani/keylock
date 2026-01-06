@@ -269,7 +269,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 }
 
                 var existingMapping = await _context.Projectemployees
-                    .AnyAsync(pe => pe.ProjectId == resourcePoolProject.ProjectId && 
+                    .AnyAsync(pe => pe.ProjectId == resourcePoolProject.ProjectId &&
                                    pe.EmployeeId == empMasterId);
 
                 if (!existingMapping)

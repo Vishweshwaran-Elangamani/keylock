@@ -63,7 +63,7 @@ namespace EepzBackend.Controllers
         {
             try
             {
-                var result = await _service.GetReviewsForMeAsync(targetEmployeeId); 
+                var result = await _service.GetReviewsForMeAsync(targetEmployeeId);
                 return ApiResponseDto<List<ManagerReviewResponseDto>>.SuccessResponse(result, "Reviews retrieved");
             }
             catch (Exception ex)

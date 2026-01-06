@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace eepzbackend.Controllers
 {
-
     public partial class SlaController
     {
         /// <summary>

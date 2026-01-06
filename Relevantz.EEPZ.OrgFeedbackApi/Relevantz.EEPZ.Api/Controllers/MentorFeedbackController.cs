@@ -5,7 +5,7 @@ using Relevantz.EEPZ.Core.Services.Interfaces;
 
 namespace EepzBackend.Controllers
 {
-     [ApiController]
+    [ApiController]
     [Route("api/[controller]")]
     public class MentorFeedbackController : ControllerBase
     {

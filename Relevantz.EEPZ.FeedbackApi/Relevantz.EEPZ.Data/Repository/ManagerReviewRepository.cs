@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
-
     public class ManagerReviewRepository : IManagerReviewRepository
     {
         private readonly EEPZDbContext _context;
@@ -23,10 +22,10 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             {
                 review.CreatedAt = DateTime.UtcNow;
                 review.Status = "Draft";
-                
+
                 _context.Managerreviewcomments.Add(review);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Manager review created: {review.ReviewCommentId}");
                 return review.ReviewCommentId;
             }
@@ -52,7 +51,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Managerreviewcomment>> GetReviewsByManagerAsync(int managerId)
         {
             try
@@ -70,7 +68,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Managerreviewcomment>> GetReviewsForEmployeeAsync(int employeeId)
         {
             try
@@ -88,7 +85,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Managerreviewcomment>> GetReviewsByGoalAsync(int goalId)
         {
             try
@@ -106,7 +102,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Managerreviewcomment>> GetReviewsByOrgGoalAsync(int orgGoalId)
         {
             try
@@ -124,7 +119,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Managerreviewcomment>> GetAllReviewsAsync(int pageNumber = 1, int pageSize = 20)
         {
             try
@@ -143,7 +137,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Managerreviewcomment>> GetReviewsByStatusAsync(string status)
         {
             try
@@ -161,7 +154,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Managerreviewcomment>> GetPendingReviewsAsync(int managerId)
         {
             try
@@ -179,16 +171,15 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<bool> UpdateReviewAsync(Managerreviewcomment review)
         {
             try
             {
                 review.ModifiedAt = DateTime.UtcNow;
-                
+
                 _context.Managerreviewcomments.Update(review);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Manager review updated: {review.ReviewCommentId}");
                 return true;
             }
@@ -198,7 +189,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<bool> UpdateReviewStatusAsync(int reviewId, string newStatus)
         {
             try
@@ -215,7 +205,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 _context.Managerreviewcomments.Update(review);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Manager review status updated: {reviewId} → {newStatus}");
                 return true;
             }
@@ -225,7 +215,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<bool> DeleteReviewAsync(int reviewId)
         {
             try
@@ -239,7 +228,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 _context.Managerreviewcomments.Remove(review);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Manager review deleted: {reviewId}");
                 return true;
             }
@@ -249,7 +238,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<bool> ReviewExistsAsync(int reviewId)
         {
             try
@@ -262,7 +250,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<bool> CanEditReviewAsync(int reviewId)
         {
             try

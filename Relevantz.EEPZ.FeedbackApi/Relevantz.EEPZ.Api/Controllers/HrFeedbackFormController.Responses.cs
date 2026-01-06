@@ -7,7 +7,6 @@ namespace EepzBackend.Controllers
 
     public partial class HrFeedbackFormController
     {
-        
 
         /// <summary>
         /// Create a new form response (employee submits feedback)
@@ -77,7 +76,7 @@ namespace EepzBackend.Controllers
             catch (Exception ex)
             {
                 return ApiResponseDto<List<HrFeedbackFormResponseResponseDto>>.ErrorResponse(
-                    $"Error: {ex.Message}", 
+                    $"Error: {ex.Message}",
                     new List<string> { ex.Message }
                 );
             }

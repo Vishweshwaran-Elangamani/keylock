@@ -286,7 +286,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 kvp => kvp.Key,
                 kvp => kvp.Value.HasValue
                     ? new EmployeePrimaryProjectInfo
-                      { ProjectId = kvp.Value.Value.ProjectId, ProjectName = kvp.Value.Value.ProjectName }
+                    { ProjectId = kvp.Value.Value.ProjectId, ProjectName = kvp.Value.Value.ProjectName }
                     : null);
 
             return ApiResponse<Dictionary<int, EmployeePrimaryProjectInfo?>>.SuccessResponse(mapped, "Primary project info retrieved successfully.");

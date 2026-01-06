@@ -7,7 +7,7 @@ namespace EepzBackend.Controllers
 
     public partial class HrFeedbackFormController
     {
-        
+
 
         /// <summary>
         /// HR reviews a submitted form response
@@ -40,11 +40,11 @@ namespace EepzBackend.Controllers
 
                 var response = await _service.DistributeFormAsync(formId, request.EmployeeIds);
 
-                return Ok(new 
-                { 
+                return Ok(new
+                {
                     success = response.Success,
                     data = response,
-                    message = response.Message 
+                    message = response.Message
                 });
             }
             catch (ArgumentException ex)

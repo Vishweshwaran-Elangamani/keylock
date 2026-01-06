@@ -5,7 +5,6 @@ using Relevantz.EEPZ.Common.DTOs.Response;
 using System.Text.Json.Serialization;
 using Relevantz.EEPZ.Data.DBContexts;
 
-
 namespace eepzbackend.Controllers
 {
     [ApiController]
@@ -52,7 +51,7 @@ namespace eepzbackend.Controllers
                     .ToList();
 
                 var orgLevelGoals = allGoals
-                    .Where(g => g.Project == null) 
+                    .Where(g => g.Project == null)
                     .Select(MapToProjectGoalResponse)
                     .ToList();
 
@@ -65,7 +64,7 @@ namespace eepzbackend.Controllers
                 };
 
                 return Ok(ApiResponse<SegregatedGoalsResponse>.SuccessResponse(
-                    response, 
+                    response,
                     "Goals retrieved successfully."));
             }
             catch (Exception ex)
@@ -111,7 +110,7 @@ namespace eepzbackend.Controllers
                 var response = MapToProjectGoalResponse(goal);
 
                 return Ok(ApiResponse<ProjectGoalResponse>.SuccessResponse(
-                    response, 
+                    response,
                     "Goal retrieved successfully."));
             }
             catch (Exception ex)
@@ -151,7 +150,7 @@ namespace eepzbackend.Controllers
                 var responses = teamGoals.Select(MapToProjectGoalResponse).ToList();
 
                 return Ok(ApiResponse<List<ProjectGoalResponse>>.SuccessResponse(
-                    responses, 
+                    responses,
                     "Team goals retrieved successfully."));
             }
             catch (Exception ex)
@@ -185,13 +184,13 @@ namespace eepzbackend.Controllers
                     .Include(g => g.CreatedByNavigation)
                         .ThenInclude(e => e.Department)
                     .Include(g => g.Project)
-                    .Where(g => g.Project == null) 
+                    .Where(g => g.Project == null)
                     .ToListAsync();
 
                 var responses = orgGoals.Select(MapToProjectGoalResponse).ToList();
 
                 return Ok(ApiResponse<List<ProjectGoalResponse>>.SuccessResponse(
-                    responses, 
+                    responses,
                     "Organization level goals retrieved successfully."));
             }
             catch (Exception ex)
@@ -231,7 +230,7 @@ namespace eepzbackend.Controllers
                 var responses = projectGoals.Select(MapToProjectGoalResponse).ToList();
 
                 return Ok(ApiResponse<List<ProjectGoalResponse>>.SuccessResponse(
-                    responses, 
+                    responses,
                     "Project goals retrieved successfully."));
             }
             catch (Exception ex)
@@ -253,7 +252,7 @@ namespace eepzbackend.Controllers
                 CreatedBy = goal.CreatedByNavigation != null ? MapToEmployeeBasicInfo(goal.CreatedByNavigation) : null,
                 ClosedOn = goal.ClosedOn,
                 ClosureReason = goal.ClosureReason,
-              
+
             };
         }
 
@@ -310,9 +309,6 @@ namespace eepzbackend.Controllers
                     Errors = errors ?? new List<string>()
                 };
             }
-
-
         }
-
     }
 }

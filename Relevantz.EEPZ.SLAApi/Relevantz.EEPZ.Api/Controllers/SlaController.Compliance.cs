@@ -3,7 +3,6 @@ using Relevantz.EEPZ.Common.DTOs.Request;
 
 namespace eepzbackend.Controllers
 {
-
     public partial class SlaController
     {
         /// <summary>

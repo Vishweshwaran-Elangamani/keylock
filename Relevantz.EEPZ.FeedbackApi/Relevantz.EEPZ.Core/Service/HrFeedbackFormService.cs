@@ -12,7 +12,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
     {
         private readonly IHrFeedbackFormRepository _formRepo;
         private readonly ILogger<HrFeedbackFormService> _logger;
-
         public HrFeedbackFormService(
             IHrFeedbackFormRepository formRepo,
             ILogger<HrFeedbackFormService> logger)
@@ -20,8 +19,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _formRepo = formRepo;
             _logger = logger;
         }
-
-
 
         public async Task<HrFeedbackFormResponseDto> CreateFormAsync(CreateHRFeedbackFormRequestDto dto)
         {
@@ -187,8 +184,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-
-
 
         public async Task<HrFeedbackFormResponseResponseDto> CreateFormResponseAsync(SubmitHRFormResponseRequestDto dto)
         {
@@ -380,7 +375,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-
         private HrFeedbackFormResponseDto MapFormToResponseDto(Hrfeedbackform form)
         {
             return new HrFeedbackFormResponseDto
@@ -435,7 +429,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
-
         public async Task<DistributeFormResponse> DistributeFormAsync(int formId, List<int> employeeIds)
         {
             try
@@ -468,7 +461,5 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-        
-        
     }
 }

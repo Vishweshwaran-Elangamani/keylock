@@ -26,11 +26,11 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             try
             {
                 feedback.CreatedAt = DateTime.UtcNow;
-                feedback.Status = "Pending"; 
-                
+                feedback.Status = "Pending";
+
                 _context.Peerfeedbackqueues.Add(feedback);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Peer feedback created in queue: {feedback.QueueId}");
                 return feedback.QueueId;
             }
@@ -225,7 +225,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             {
                 _context.Peerfeedbackqueues.Update(feedback);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Peer feedback updated: {feedback.QueueId}");
                 return true;
             }
@@ -252,7 +252,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 _context.Peerfeedbackqueues.Update(feedback);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Peer feedback approved: {queueId}");
                 return true;
             }
@@ -277,7 +277,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 _context.Peerfeedbackqueues.Update(feedback);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Peer feedback rejected: {queueId}");
                 return true;
             }
@@ -300,7 +300,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 _context.Peerfeedbackqueues.Update(feedback);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Peer feedback status updated: {queueId} → {newStatus}");
                 return true;
             }
@@ -310,6 +310,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
+        
         public async Task<bool> DeleteQueueItemAsync(int queueId)
         {
             try
@@ -323,7 +324,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 _context.Peerfeedbackqueues.Remove(feedback);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Peer feedback deleted: {queueId}");
                 return true;
             }

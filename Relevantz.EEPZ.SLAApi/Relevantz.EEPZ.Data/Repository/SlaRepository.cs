@@ -5,11 +5,8 @@ using MySqlConnector;
 using Relevantz.EEPZ.Data.DBContexts;
 using Microsoft.Extensions.Logging;
 
-
-
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
-
     public class SlaRepository : ISlaRepository
     {
         private readonly EEPZDbContext _context;
@@ -23,39 +20,36 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
         #region Basic CRUD Operations
 
+        public async Task<List<Sla>> GetAllSlasAsync()
+        {
+            return await _context.Slas
+                .Include(s => s.Employee)
+                    .ThenInclude(e => e.Userprofile)
+                .Include(s => s.Employee)
+                    .ThenInclude(e => e.Userauthentication)
+                .Include(s => s.Department)
+                .Include(s => s.AssignedToEmployee)
+                    .ThenInclude(e => e.Userprofile)
+                .Include(s => s.AssignedToEmployee)
+                    .ThenInclude(e => e.Userauthentication)
+                .OrderByDescending(s => s.CreatedAt)
+                .ToListAsync();
+        }
 
-       public async Task<List<Sla>> GetAllSlasAsync()
-{
-    return await _context.Slas
-        .Include(s => s.Employee)
-            .ThenInclude(e => e.Userprofile)
-        .Include(s => s.Employee)
-            .ThenInclude(e => e.Userauthentication)
-        .Include(s => s.Department)
-        .Include(s => s.AssignedToEmployee)
-            .ThenInclude(e => e.Userprofile)
-        .Include(s => s.AssignedToEmployee)
-            .ThenInclude(e => e.Userauthentication)
-        .OrderByDescending(s => s.CreatedAt)
-        .ToListAsync();
-}
-
-
-public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
-{
-    try
-    {
-        return await _context.Employees
-            .Include(e => e.Userprofile)
-            .FirstOrDefaultAsync(e => e.EmployeeId == employeeId);
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, $"Error retrieving employee: {employeeId}");
-        throw;
-    }
-}
-
+        public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
+        {
+            try
+            {
+                return await _context.Employees
+                    .Include(e => e.Userprofile)
+                    .FirstOrDefaultAsync(e => e.EmployeeId == employeeId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error retrieving employee: {employeeId}");
+                throw;
+            }
+        }
 
         public async Task<Sla?> GetSlaByIdAsync(int slaid)
         {
@@ -118,7 +112,6 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
             }
         }
 
-  
         public async Task<Sla> CreateSlaAsync(Sla sla)
         {
             try
@@ -165,21 +158,21 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
         }
 
         public async Task<Slahistory> CreateHistoryAsync(Slahistory history)
-{
-    try
-    {
-        _context.Slahistories.Add(history);
-        await _context.SaveChangesAsync();
+        {
+            try
+            {
+                _context.Slahistories.Add(history);
+                await _context.SaveChangesAsync();
 
-        _logger.LogInformation($"History created successfully. SLA ID: {history.Slaid}");
-        return history;
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, "Error creating history");
-        throw;
-    }
-}
+                _logger.LogInformation($"History created successfully. SLA ID: {history.Slaid}");
+                return history;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating history");
+                throw;
+            }
+        }
 
         public async Task<Sla> UpdateSlaAsync(Sla sla)
         {
@@ -188,7 +181,7 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
                 sla.UpdatedAt = DateTime.Now;
                 _context.Slas.Update(sla);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"SLA updated successfully. SLA ID: {sla.Slaid}");
                 return sla;
             }
@@ -230,7 +223,7 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
             try
             {
                 var sla = await _context.Slas.FindAsync(slaid);
-                
+
                 if (sla == null)
                 {
                     _logger.LogWarning($"SLA not found. SLA ID: {slaid}");
@@ -320,23 +313,23 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
             }
         }
 
-       public async Task<Slaescalation> CreateEscalationAsync(Slaescalation escalation)
-{
-    try
-    {
-        escalation.SubmittedAt = DateTime.Now;
-        _context.Slaescalations.Add(escalation);
-        await _context.SaveChangesAsync();
+        public async Task<Slaescalation> CreateEscalationAsync(Slaescalation escalation)
+        {
+            try
+            {
+                escalation.SubmittedAt = DateTime.Now;
+                _context.Slaescalations.Add(escalation);
+                await _context.SaveChangesAsync();
 
-        _logger.LogInformation($"Escalation created successfully. Escalation ID: {escalation.EscalationId}");
-        return escalation;
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, "Error creating escalation");
-        throw;
-    }
-}
+                _logger.LogInformation($"Escalation created successfully. Escalation ID: {escalation.EscalationId}");
+                return escalation;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating escalation");
+                throw;
+            }
+        }
 
         public async Task<Slaescalation> UpdateEscalationAsync(Slaescalation escalation)
         {
@@ -344,7 +337,7 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
             {
                 _context.Slaescalations.Update(escalation);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Escalation updated successfully. Escalation ID: {escalation.EscalationId}");
                 return escalation;
             }
@@ -355,11 +348,9 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
             }
         }
 
-
         #endregion
 
         #region History Operations
-
         public async Task<List<Slahistory>> GetSlaHistoryAsync(int slaid)
         {
             try
@@ -381,7 +372,6 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
             }
         }
 
-
         public async Task<Slahistory> AddHistoryAsync(Slahistory history)
         {
             try
@@ -389,7 +379,7 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
                 history.CreatedAt = DateTime.Now;
                 _context.Slahistories.Add(history);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"History entry added. SLA ID: {history.Slaid}");
                 return history;
             }
@@ -487,68 +477,67 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
         }
 
         public async Task<bool> CalculateComplianceAsync(int departmentId, string period, DateOnly periodStartDate, DateOnly periodEndDate)
-{
-    try
-    {
-        var slas = await _context.Slas
-            .Where(s => s.DepartmentId == departmentId &&
-                        s.Deadline >= periodStartDate.ToDateTime(TimeOnly.MinValue) &&
-                        s.Deadline <= periodEndDate.ToDateTime(TimeOnly.MaxValue))
-            .ToListAsync();
-
-        int totalSlas = slas.Count;
-        int onTimeSlas = slas.Count(s => s.ComplianceStatus == "OnTime" && s.Status == "Closed");
-        int breachedSlas = slas.Count(s => s.ComplianceStatus == "Breached");
-        int extendedSlas = slas.Count(s => s.ComplianceStatus == "Extended");
-        int pendingSlas = slas.Count(s => s.Status == "Open" || s.Status == "InProgress");
-
-        var compliance = await _context.Slacompliances
-            .FirstOrDefaultAsync(c => c.DepartmentId == departmentId && c.Period == period);
-
-        if (compliance == null)
         {
-            compliance = new Slacompliance
+            try
             {
-                DepartmentId = departmentId,
-                Period = period,
-                PeriodStartDate = periodStartDate,   
-                PeriodEndDate = periodEndDate,       
-                TotalSlas = totalSlas,
-                OnTimeSlas = onTimeSlas,
-                BreachedSlas = breachedSlas,
-                ExtendedSlas = extendedSlas,
-                PendingSlas = pendingSlas,
-                CalculatedAt = DateTime.Now,
-                CreatedAt = DateTime.Now
-            };
-            _context.Slacompliances.Add(compliance);
+                var slas = await _context.Slas
+                    .Where(s => s.DepartmentId == departmentId &&
+                                s.Deadline >= periodStartDate.ToDateTime(TimeOnly.MinValue) &&
+                                s.Deadline <= periodEndDate.ToDateTime(TimeOnly.MaxValue))
+                    .ToListAsync();
+
+                int totalSlas = slas.Count;
+                int onTimeSlas = slas.Count(s => s.ComplianceStatus == "OnTime" && s.Status == "Closed");
+                int breachedSlas = slas.Count(s => s.ComplianceStatus == "Breached");
+                int extendedSlas = slas.Count(s => s.ComplianceStatus == "Extended");
+                int pendingSlas = slas.Count(s => s.Status == "Open" || s.Status == "InProgress");
+
+                var compliance = await _context.Slacompliances
+                    .FirstOrDefaultAsync(c => c.DepartmentId == departmentId && c.Period == period);
+
+                if (compliance == null)
+                {
+                    compliance = new Slacompliance
+                    {
+                        DepartmentId = departmentId,
+                        Period = period,
+                        PeriodStartDate = periodStartDate,
+                        PeriodEndDate = periodEndDate,
+                        TotalSlas = totalSlas,
+                        OnTimeSlas = onTimeSlas,
+                        BreachedSlas = breachedSlas,
+                        ExtendedSlas = extendedSlas,
+                        PendingSlas = pendingSlas,
+                        CalculatedAt = DateTime.Now,
+                        CreatedAt = DateTime.Now
+                    };
+                    _context.Slacompliances.Add(compliance);
+                }
+                else
+                {
+                    compliance.PeriodStartDate = periodStartDate;
+                    compliance.PeriodEndDate = periodEndDate;
+                    compliance.TotalSlas = totalSlas;
+                    compliance.OnTimeSlas = onTimeSlas;
+                    compliance.BreachedSlas = breachedSlas;
+                    compliance.ExtendedSlas = extendedSlas;
+                    compliance.PendingSlas = pendingSlas;
+                    compliance.CalculatedAt = DateTime.Now;
+                    compliance.UpdatedAt = DateTime.Now;
+
+                    _context.Slacompliances.Update(compliance);
+                }
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation($"Compliance calculated for Department ID: {departmentId}, Period: {period}");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error calculating compliance via EF Core");
+                throw;
+            }
         }
-        else
-        {
-            compliance.PeriodStartDate = periodStartDate;   
-            compliance.PeriodEndDate = periodEndDate;      
-            compliance.TotalSlas = totalSlas;
-            compliance.OnTimeSlas = onTimeSlas;
-            compliance.BreachedSlas = breachedSlas;
-            compliance.ExtendedSlas = extendedSlas;
-            compliance.PendingSlas = pendingSlas;
-            compliance.CalculatedAt = DateTime.Now;
-            compliance.UpdatedAt = DateTime.Now;
-
-            _context.Slacompliances.Update(compliance);
-        }
-        await _context.SaveChangesAsync();
-
-        _logger.LogInformation($"Compliance calculated for Department ID: {departmentId}, Period: {period}");
-        return true;
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, "Error calculating compliance via EF Core");
-        throw;
-    }
-}
-
 
         public async Task CallCalculateComplianceProcedureAsync(int departmentId, string period,
             DateOnly periodStartDate, DateOnly periodEndDate)
@@ -566,7 +555,7 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
                 await _context.Database.ExecuteSqlRawAsync(
                     "CALL sp_CalculateSLACompliance(@p_DepartmentId, @p_Period, @p_PeriodStartDate, @p_PeriodEndDate)",
                     parameters);
-                
+
                 _logger.LogInformation($"Compliance calculation executed for Department ID: {departmentId}, Period: {period}");
             }
             catch (Exception ex)
@@ -579,46 +568,44 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
         #endregion
 
         #region Reopen Operations
-
-       public async Task<bool> ReopenSlaAsync(int slaid, int extensionDays, string reopenReason, int reopenedByEmployeeId)
-{
-    try
-    {
-        var sla = await _context.Slas.FirstOrDefaultAsync(s => s.Slaid == slaid);
-        if (sla == null)
-            return false;
-
-        sla.ReopenCount += 1;
-        sla.ReopenReason = reopenReason;
-        sla.ReopenedByEmployeeId = reopenedByEmployeeId;
-        sla.ReopenedAt = DateTime.Now;
-        sla.ReopenExtensionDays = extensionDays;
-        sla.Deadline = DateTime.Now.AddDays(extensionDays);
-        sla.Status = "InProgress";
-
-        _context.Slas.Update(sla);
-
-        var history = new Slahistory
+        public async Task<bool> ReopenSlaAsync(int slaid, int extensionDays, string reopenReason, int reopenedByEmployeeId)
         {
-            Slaid = slaid,
-            ChangeType = "Reopened",
-            ChangedTo = sla.Deadline.ToString("yyyy-MM-dd"),
-            ChangedByEmployeeId = reopenedByEmployeeId,
-            Reason = reopenReason,
-            CreatedAt = DateTime.Now
-        };
-        _context.Slahistories.Add(history);
+            try
+            {
+                var sla = await _context.Slas.FirstOrDefaultAsync(s => s.Slaid == slaid);
+                if (sla == null)
+                    return false;
 
-        await _context.SaveChangesAsync();
-        return true;
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, "Error reopening SLA");
-        throw;
-    }
-}
+                sla.ReopenCount += 1;
+                sla.ReopenReason = reopenReason;
+                sla.ReopenedByEmployeeId = reopenedByEmployeeId;
+                sla.ReopenedAt = DateTime.Now;
+                sla.ReopenExtensionDays = extensionDays;
+                sla.Deadline = DateTime.Now.AddDays(extensionDays);
+                sla.Status = "InProgress";
 
+                _context.Slas.Update(sla);
+
+                var history = new Slahistory
+                {
+                    Slaid = slaid,
+                    ChangeType = "Reopened",
+                    ChangedTo = sla.Deadline.ToString("yyyy-MM-dd"),
+                    ChangedByEmployeeId = reopenedByEmployeeId,
+                    Reason = reopenReason,
+                    CreatedAt = DateTime.Now
+                };
+                _context.Slahistories.Add(history);
+
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error reopening SLA");
+                throw;
+            }
+        }
 
         #endregion
 
@@ -652,7 +639,6 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
             }
         }
 
-
         public async Task<List<Sla>> GetSlasWithDeadline(DateTime targetDate, int? departmentId = null)
         {
             try
@@ -685,7 +671,6 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
             }
         }
 
-
         public async Task<List<Slanotification>> GetEmployeeNotifications(int employeeId, bool unreadOnly = false)
         {
             try
@@ -710,7 +695,6 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
             }
         }
 
-
         public async Task<List<Employee>> GetEmployeesByIdsAsync(List<int> employeeIds)
         {
             return await _context.Employees
@@ -720,51 +704,47 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
                 .ToListAsync();
         }
 
-
         public string GetConnectionString()
         {
             return _context.Database.GetDbConnection().ConnectionString;
         }
 
-
-public async Task<int> BulkInsertSlasAsync(List<Sla> slas)
-{
-    try
-    {
-        if (slas == null || !slas.Any())
+        public async Task<int> BulkInsertSlasAsync(List<Sla> slas)
         {
-            _logger.LogWarning("BulkInsertSlasAsync called with empty or null list");
-            return 0;
+            try
+            {
+                if (slas == null || !slas.Any())
+                {
+                    _logger.LogWarning("BulkInsertSlasAsync called with empty or null list");
+                    return 0;
+                }
+
+                _logger.LogInformation($"Starting bulk insert of {slas.Count} SLAs");
+
+
+                _context.ChangeTracker.AutoDetectChangesEnabled = false;
+
+                try
+                {
+
+                    _context.Slas.AddRange(slas);
+                    var result = await _context.SaveChangesAsync();
+
+                    _logger.LogInformation($"Bulk insert completed: {result} SLAs inserted");
+                    return result;
+                }
+                finally
+                {
+
+                    _context.ChangeTracker.AutoDetectChangesEnabled = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in BulkInsertSlasAsync");
+                throw;
+            }
         }
-
-        _logger.LogInformation($"Starting bulk insert of {slas.Count} SLAs");
-
-        
-        _context.ChangeTracker.AutoDetectChangesEnabled = false;
-
-        try
-        {
-            
-            _context.Slas.AddRange(slas);
-            var result = await _context.SaveChangesAsync();
-            
-            _logger.LogInformation($"Bulk insert completed: {result} SLAs inserted");
-            return result;
-        }
-        finally
-        {
-            
-            _context.ChangeTracker.AutoDetectChangesEnabled = true;
-        }
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, "Error in BulkInsertSlasAsync");
-        throw;
-    }
-}
-
-
 
         public async Task<Slanotification> CreateNotificationAsync(Slanotification notification)
         {
@@ -773,7 +753,7 @@ public async Task<int> BulkInsertSlasAsync(List<Sla> slas)
                 notification.SentAt = DateTime.Now;
                 _context.Slanotifications.Add(notification);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Notification created. Notification ID: {notification.NotificationId}");
                 return notification;
             }
@@ -784,7 +764,6 @@ public async Task<int> BulkInsertSlasAsync(List<Sla> slas)
             }
         }
 
-
         public async Task MarkNotificationAsRead(int notificationId)
         {
             try
@@ -794,7 +773,7 @@ public async Task<int> BulkInsertSlasAsync(List<Sla> slas)
                 {
                     notification.ReadAt = DateTime.Now;
                     await _context.SaveChangesAsync();
-                    
+
                     _logger.LogInformation($"Notification marked as read. Notification ID: {notificationId}");
                 }
             }
@@ -804,7 +783,6 @@ public async Task<int> BulkInsertSlasAsync(List<Sla> slas)
                 throw;
             }
         }
-
 
         public async Task<bool> CanReopenSla(int slaid)
         {
@@ -819,7 +797,6 @@ public async Task<int> BulkInsertSlasAsync(List<Sla> slas)
                 throw;
             }
         }
-
 
         public async Task IncrementReopenCount(int slaid)
         {
@@ -841,42 +818,40 @@ public async Task<int> BulkInsertSlasAsync(List<Sla> slas)
             }
         }
 
-        
-
-public async Task<List<Slaescalation>> GetEscalationsByEscalatedToAsync(int employeeId)
-{
-    try
-    {
-        return await _context.Slaescalations
-            .AsNoTracking()
-            .Where(e => e.EscalatedToEmployeeId == employeeId)
-            .Include(e => e.Sla)
-                .ThenInclude(s => s.Employee!)
-                .ThenInclude(emp => emp.Userprofile)
-            .Include(e => e.Sla)
-                .ThenInclude(s => s.Employee!)
-                .ThenInclude(emp => emp.Userauthentication)
-            .Include(e => e.EscalatedToEmployee!)
-                .ThenInclude(emp => emp.Userprofile)
-            .Include(e => e.EscalatedToEmployee!)
-                .ThenInclude(emp => emp.Userauthentication)
-            .Include(e => e.SubmittedByEmployee!)
-                .ThenInclude(emp => emp.Userprofile)
-            .Include(e => e.SubmittedByEmployee!)
-                .ThenInclude(emp => emp.Userauthentication)
-            .Include(e => e.ResolvedByEmployee!)
-                .ThenInclude(emp => emp.Userprofile)
-            .Include(e => e.ResolvedByEmployee!)
-                .ThenInclude(emp => emp.Userauthentication)
-            .OrderByDescending(e => e.SubmittedAt)
-            .ToListAsync();
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, $"Error retrieving escalations for employee: {employeeId}");
-        throw;
-    }
-}
+        public async Task<List<Slaescalation>> GetEscalationsByEscalatedToAsync(int employeeId)
+        {
+            try
+            {
+                return await _context.Slaescalations
+                    .AsNoTracking()
+                    .Where(e => e.EscalatedToEmployeeId == employeeId)
+                    .Include(e => e.Sla)
+                        .ThenInclude(s => s.Employee!)
+                        .ThenInclude(emp => emp.Userprofile)
+                    .Include(e => e.Sla)
+                        .ThenInclude(s => s.Employee!)
+                        .ThenInclude(emp => emp.Userauthentication)
+                    .Include(e => e.EscalatedToEmployee!)
+                        .ThenInclude(emp => emp.Userprofile)
+                    .Include(e => e.EscalatedToEmployee!)
+                        .ThenInclude(emp => emp.Userauthentication)
+                    .Include(e => e.SubmittedByEmployee!)
+                        .ThenInclude(emp => emp.Userprofile)
+                    .Include(e => e.SubmittedByEmployee!)
+                        .ThenInclude(emp => emp.Userauthentication)
+                    .Include(e => e.ResolvedByEmployee!)
+                        .ThenInclude(emp => emp.Userprofile)
+                    .Include(e => e.ResolvedByEmployee!)
+                        .ThenInclude(emp => emp.Userauthentication)
+                    .OrderByDescending(e => e.SubmittedAt)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error retrieving escalations for employee: {employeeId}");
+                throw;
+            }
+        }
 
 
         /// <summary>
@@ -895,8 +870,8 @@ public async Task<List<Slaescalation>> GetEscalationsByEscalatedToAsync(int empl
                     .Include(s => s.AssignedToEmployee)
                         .ThenInclude(a => a.Userprofile)
                     .Include(s => s.Department)
-                    .Where(s => s.Deadline >= targetDate && 
-                               s.Deadline < nextDate && 
+                    .Where(s => s.Deadline >= targetDate &&
+                               s.Deadline < nextDate &&
                                s.Status != "Closed" &&
                                s.Status != "Completed")
                     .ToListAsync();
@@ -923,7 +898,7 @@ public async Task<List<Slaescalation>> GetEscalationsByEscalatedToAsync(int empl
                     .Include(s => s.AssignedToEmployee)
                         .ThenInclude(a => a.Userprofile)
                     .Include(s => s.Department)
-                    .Where(s => s.Deadline < cutoffDate && 
+                    .Where(s => s.Deadline < cutoffDate &&
                                s.Status != "Closed" &&
                                s.Status != "Completed")
                     .ToListAsync();
@@ -953,32 +928,27 @@ public async Task<List<Slaescalation>> GetEscalationsByEscalatedToAsync(int empl
                 throw;
             }
         }
-        
 
-public async Task<List<Slahistory>> GetAllSlaHistoryAsync()
-{
-    try
-    {
-        return await _context.Slahistories
-            .Include(h => h.Sla)
-                .ThenInclude(s => s.Employee!)
-                    .ThenInclude(e => e.Userprofile)
-            .Include(h => h.ChangedByEmployee!)
-                .ThenInclude(e => e.Userprofile)
-            .OrderByDescending(h => h.CreatedAt)
-            .ToListAsync();
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, "Error retrieving all SLA history");
-        throw;
+        public async Task<List<Slahistory>> GetAllSlaHistoryAsync()
+        {
+            try
+            {
+                return await _context.Slahistories
+                    .Include(h => h.Sla)
+                        .ThenInclude(s => s.Employee!)
+                            .ThenInclude(e => e.Userprofile)
+                    .Include(h => h.ChangedByEmployee!)
+                        .ThenInclude(e => e.Userprofile)
+                    .OrderByDescending(h => h.CreatedAt)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving all SLA history");
+                throw;
+            }
+        }
+
+        #endregion
     }
 }
-
-
-     
-        #endregion
-
-    } 
-
-} 

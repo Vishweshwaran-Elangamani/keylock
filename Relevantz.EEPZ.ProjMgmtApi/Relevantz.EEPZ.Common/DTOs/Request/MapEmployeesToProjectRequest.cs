@@ -16,7 +16,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         [Required]
         public int EmployeeId { get; set; }
 
-      
         public bool IsPrimary { get; set; }
     }
 }

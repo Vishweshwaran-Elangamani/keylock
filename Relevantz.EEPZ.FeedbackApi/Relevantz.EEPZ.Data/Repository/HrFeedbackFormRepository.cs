@@ -1,4 +1,3 @@
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
@@ -8,7 +7,6 @@ using Relevantz.EEPZ.Data.DBContexts;
 
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
-
     public class HrFeedbackFormRepository : IHrFeedbackFormRepository
     {
         private readonly EEPZDbContext _context;
@@ -24,11 +22,11 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             try
             {
                 form.CreatedAt = DateTime.UtcNow;
-                form.Status = "Draft"; 
-                
+                form.Status = "Draft";
+
                 _context.Hrfeedbackforms.Add(form);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"HR feedback form created: {form.FormId}");
                 return form.FormId;
             }
@@ -38,7 +36,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<Hrfeedbackform> GetFormByIdAsync(int formId)
         {
             try
@@ -53,7 +50,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Hrfeedbackform>> GetAllFormsAsync()
         {
             try
@@ -69,26 +65,24 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Hrfeedbackform>> GetActiveFormsAsync()
-{
-    try
-    {
-        var forms = await _context.Hrfeedbackforms
-            .Where(f => f.Status == "Active")
-            .Include(f => f.CreatedByHr)
-            .OrderByDescending(f => f.CreatedAt)
-            .ToListAsync();
-        
-        return forms;
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError($"Error getting active forms: {ex.Message}");
-        throw;
-    }
-}
+        {
+            try
+            {
+                var forms = await _context.Hrfeedbackforms
+                    .Where(f => f.Status == "Active")
+                    .Include(f => f.CreatedByHr)
+                    .OrderByDescending(f => f.CreatedAt)
+                    .ToListAsync();
 
+                return forms;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error getting active forms: {ex.Message}");
+                throw;
+            }
+        }
         public async Task<List<Hrfeedbackform>> GetFormsByTypeAsync(string formType)
         {
             try
@@ -105,7 +99,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Hrfeedbackform>> GetFormsByCreatorAsync(int hrUserId)
         {
             try
@@ -122,14 +115,13 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<bool> UpdateFormAsync(Hrfeedbackform form)
         {
             try
             {
                 _context.Hrfeedbackforms.Update(form);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"HR form updated: {form.FormId}");
                 return true;
             }
@@ -139,7 +131,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<bool> UpdateFormStatusAsync(int formId, string newStatus)
         {
             try
@@ -152,7 +143,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 _context.Hrfeedbackforms.Update(form);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"HR form status updated: {formId} → {newStatus}");
                 return true;
             }
@@ -162,7 +153,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<bool> DeleteFormAsync(int formId)
         {
             try
@@ -176,7 +166,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 _context.Hrfeedbackforms.Remove(form);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"HR form deleted: {formId}");
                 return true;
             }
@@ -186,7 +176,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<bool> FormExistsAsync(int formId)
         {
             try
@@ -199,17 +188,16 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<int> CreateFormResponseAsync(Hrfeedbackformresponse response)
         {
             try
             {
                 response.CreatedAt = DateTime.UtcNow;
-                response.Status = "Draft"; 
-                
+                response.Status = "Draft";
+
                 _context.Hrfeedbackformresponses.Add(response);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Form response created: {response.ResponseId}");
                 return response.ResponseId;
             }
@@ -219,7 +207,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<Hrfeedbackformresponse> GetFormResponseByIdAsync(int responseId)
         {
             try
@@ -236,7 +223,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Hrfeedbackformresponse>> GetResponsesByFormAsync(int formId)
         {
             try
@@ -254,7 +240,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Hrfeedbackformresponse>> GetResponsesBySubmitterAsync(int employeeId)
         {
             try
@@ -271,7 +256,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Hrfeedbackformresponse>> GetResponsesByStatusAsync(string status)
         {
             try
@@ -289,7 +273,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Hrfeedbackformresponse>> GetSubmittedResponsesAsync()
         {
             try
@@ -307,7 +290,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<List<Hrfeedbackformresponse>> GetPendingReviewResponsesAsync()
         {
             try
@@ -325,14 +307,13 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<bool> UpdateFormResponseAsync(Hrfeedbackformresponse response)
         {
             try
             {
                 _context.Hrfeedbackformresponses.Update(response);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Form response updated: {response.ResponseId}");
                 return true;
             }
@@ -342,7 +323,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<bool> UpdateResponseStatusAsync(int responseId, string newStatus)
         {
             try
@@ -358,7 +338,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 _context.Hrfeedbackformresponses.Update(response);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Form response status updated: {responseId} → {newStatus}");
                 return true;
             }
@@ -368,7 +348,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<bool> SetHRReviewAsync(int responseId, string hrComments, int reviewedByHRId)
         {
             try
@@ -384,7 +363,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 _context.Hrfeedbackformresponses.Update(response);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"HR review set for form response: {responseId}");
                 return true;
             }
@@ -394,7 +373,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<bool> DeleteFormResponseAsync(int responseId)
         {
             try
@@ -405,7 +383,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 _context.Hrfeedbackformresponses.Remove(response);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation($"Form response deleted: {responseId}");
                 return true;
             }
@@ -415,7 +393,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
         public async Task<bool> ResponseExistsAsync(int responseId)
         {
             try
@@ -428,49 +405,48 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-public async Task<bool> DistributeFormAsync(int formId, List<int> employeeIds)
-{
-    try
-    {
-        var form = await _context.Hrfeedbackforms.FindAsync(formId);
-        if (form == null)
-            return false;
+        public async Task<bool> DistributeFormAsync(int formId, List<int> employeeIds)
+        {
+            try
+            {
+                var form = await _context.Hrfeedbackforms.FindAsync(formId);
+                if (form == null)
+                    return false;
 
-        form.DistributedToEmployeeIds = JsonSerializer.Serialize(employeeIds);
-        form.Status = "Active";
+                form.DistributedToEmployeeIds = JsonSerializer.Serialize(employeeIds);
+                form.Status = "Active";
 
-        _context.Hrfeedbackforms.Update(form);
-        await _context.SaveChangesAsync();
+                _context.Hrfeedbackforms.Update(form);
+                await _context.SaveChangesAsync();
 
-        _logger.LogInformation($"Form {formId} distributed to {employeeIds.Count} employees");
-        return true;
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError($"Error distributing form: {ex.Message}");
-        return false;
-    }
-}
-public async Task<List<int>> GetFormDistributionAsync(int formId)
-{
-    try
-    {
-        var form = await _context.Hrfeedbackforms.FindAsync(formId);
-        if (form == null)
-            return new List<int>();
+                _logger.LogInformation($"Form {formId} distributed to {employeeIds.Count} employees");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error distributing form: {ex.Message}");
+                return false;
+            }
+        }
+        public async Task<List<int>> GetFormDistributionAsync(int formId)
+        {
+            try
+            {
+                var form = await _context.Hrfeedbackforms.FindAsync(formId);
+                if (form == null)
+                    return new List<int>();
 
-        var employeeIds = JsonSerializer.Deserialize<List<int>>(
-            form.DistributedToEmployeeIds ?? "[]"
-        ) ?? new List<int>();
+                var employeeIds = JsonSerializer.Deserialize<List<int>>(
+                    form.DistributedToEmployeeIds ?? "[]"
+                ) ?? new List<int>();
 
-        return employeeIds;
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError($"Error getting form distribution: {ex.Message}");
-        return new List<int>();
-    }
-}
-
+                return employeeIds;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error getting form distribution: {ex.Message}");
+                return new List<int>();
+            }
+        }
     }
 }

@@ -9,23 +9,23 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
     public interface IMeetingRepository
     {
         Task<Meeting> CreateMeetingAsync(
-            Meeting meeting, 
+            Meeting meeting,
             CancellationToken cancellationToken = default);
-        
+
         Task<List<Meetingparticipant>> AddMeetingParticipantsAsync(
-            List<Meetingparticipant> participants, 
+            List<Meetingparticipant> participants,
             CancellationToken cancellationToken = default);
-        
+
         Task<List<Meeting>> GetMeetingsByManagerIdAsync(
-            int managerId, 
+            int managerId,
             CancellationToken cancellationToken = default);
-        
+
         Task<Meeting?> GetMeetingByIdAsync(
-            int meetingId, 
+            int meetingId,
             CancellationToken cancellationToken = default);
-        
+
         Task<List<Meeting>> GetMeetingsByParticipantIdAsync(
-            int participantId, 
+            int participantId,
             CancellationToken cancellationToken = default);
 
         Task<List<Meeting>> GetOneOnOneMeetingsByManagerAsync(
@@ -36,40 +36,40 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
             CancellationToken cancellationToken = default);
 
         Task<Employee?> GetEmployeeByIdAsync(
-            int employeeId, 
+            int employeeId,
             CancellationToken cancellationToken = default);
-        
+
         Task<List<Employee>> GetTeamMembersByManagerIdAsync(
             int managerId,
             int pageNumber = 1,
             int pageSize = 20,
             CancellationToken cancellationToken = default);
-        
+
         Task<int> GetTeamMembersCountAsync(
-            int managerId, 
+            int managerId,
             CancellationToken cancellationToken = default);
 
         Task<Meetingparticipant?> GetMeetingParticipantAsync(
-            int meetingId, 
-            int employeeId, 
+            int meetingId,
+            int employeeId,
             CancellationToken cancellationToken = default);
-        
+
         Task<Meetingparticipant> UpdateRsvpStatusAsync(
-            int participantId, 
-            string rsvpStatus, 
+            int participantId,
+            string rsvpStatus,
             string? rsvpComments,
             CancellationToken cancellationToken = default);
-        
+
         Task<List<Meetingparticipant>> GetMeetingInvitationsAsync(
-            int employeeId, 
+            int employeeId,
             CancellationToken cancellationToken = default);
-        
+
         Task<List<Meetingparticipant>> GetMeetingRsvpSummaryAsync(
-            int meetingId, 
+            int meetingId,
             CancellationToken cancellationToken = default);
-        
+
         Task<int> GetPendingRsvpCountAsync(
-            int employeeId, 
+            int employeeId,
             CancellationToken cancellationToken = default);
     }
 }

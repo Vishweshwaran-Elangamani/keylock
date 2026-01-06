@@ -2,7 +2,6 @@ using Relevantz.EEPZ.Common.Entities;
 
 namespace Relevantz.EEPZ.Data.Repository.Interfaces
 {
-
     public interface IMentorFeedbackRepository
     {
 

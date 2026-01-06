@@ -37,9 +37,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 var feedback = new Feedback
                 {
-                    RelatedGoalId = dto.GoalId, 
+                    RelatedGoalId = dto.GoalId,
                     SubmittedByEmployeeId = dto.SubmittedByEmployeeId,
-                    RecipientEmployeeId = dto.SubmittedByEmployeeId, 
+                    RecipientEmployeeId = dto.SubmittedByEmployeeId,
                     Rating = dto.Rating,
                     Comments = dto.FeedbackComments,
                     IsAnonymous = dto.IsAnonymous,
@@ -60,7 +60,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-     public async Task<OrgGoalFeedbackResponseDto> GetOrgGoalFeedbackByIdAsync(int feedbackId)
+        public async Task<OrgGoalFeedbackResponseDto> GetOrgGoalFeedbackByIdAsync(int feedbackId)
         {
             try
             {
@@ -233,8 +233,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 GoalId = feedback.RelatedGoalId ?? 0,
                 OrganizationGoalName = feedback.RelatedGoal?.GoalTitle ?? "Unknown",
                 SubmittedByEmployeeId = feedback.SubmittedByEmployeeId ?? 0,
-                SubmitterName = feedback.IsAnonymous 
-                    ? "Anonymous" 
+                SubmitterName = feedback.IsAnonymous
+                    ? "Anonymous"
                     : $"{feedback.SubmittedByEmployee?.EmployeeId}",
                 RecipientEmployeeId = feedback.RecipientEmployeeId,
                 RecipientName = $"{feedback.RecipientEmployee?.EmployeeId}",
@@ -245,9 +245,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 CreatedAt = feedback.CreatedAt
             };
         }
-
-
-
         public Task<OrgGoalFeedbackResponseDto> CreateOrgGoalFeedbackAsync(CreateGoalFeedbackRequestDto dto)
         {
             throw new NotImplementedException();
