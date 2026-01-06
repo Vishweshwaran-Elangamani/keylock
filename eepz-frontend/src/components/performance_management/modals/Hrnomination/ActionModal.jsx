@@ -32,7 +32,6 @@ const ActionModal = ({
               {actionType === "approve" ? "Approval Remarks" : "Rejection Reason"}
             </h6>
 
-            {/* X Close Button - NO HOVER EVENTS */}
             <button
               onClick={onClose}
               className="action-modal-close-btn"

@@ -102,28 +102,33 @@
   padding: 5px;
   border-radius: 40px;
   display: inline-flex;
-  gap: 5px;
+  
 }
 
 .tabToggleBtn {
-  padding: 8px 26px;
-  border-radius: 40px;
+  padding: 8px ;
+  border-radius: 40px !important; 
   font-weight: 700;
   font-size: 13px;
   cursor: pointer;
   border: none;
   transition: all 0.18s ease;
   white-space: nowrap;
+  min-width: 120px; 
+  text-align: center; 
+  overflow: hidden; 
 }
 
 .tabToggleBtn.active {
   background: #fff;
   color: var(--rl-dark);
+  border-radius: 40px !important;
 }
 
 .tabToggleBtn.inactive {
   background: transparent;
   color: #fff;
+  border-radius: 40px !important; 
 }
 
 /* ============================================================================ */
@@ -405,7 +410,6 @@
   font-weight: 800;
   font-size: 18px;
   color: var(--rl-dark);
-  /* font-family: Montserrat, Nunito, sans-serif; */
   text-align: left;
   min-width: 0;
   white-space: nowrap;

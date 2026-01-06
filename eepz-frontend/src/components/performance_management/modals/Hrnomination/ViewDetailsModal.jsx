@@ -1,6 +1,7 @@
 import React from "react";
 import "../../../../styles/performancemanagement/components/ViewDetailsModal.css";
 
+
 const ViewDetailsModal = ({
   showModal,
   setShowModal,
@@ -9,6 +10,7 @@ const ViewDetailsModal = ({
   THEME,
 }) => {
   if (!showModal) return null;
+
 
   return (
     <div className="view-details-modal-overlay" tabIndex="-1">
@@ -23,7 +25,6 @@ const ViewDetailsModal = ({
             style={{ background: THEME.primary }}
           >
             <h5 className="view-details-modal-title">
-              <i className="bi bi-pencil-square view-details-modal-title-icon" title="Edit Details" />
               Nomination Details
             </h5>
             <button
@@ -35,6 +36,7 @@ const ViewDetailsModal = ({
               ×
             </button>
           </div>
+
 
           {/* Body - Scrollable */}
           <div className="view-details-modal-body">
@@ -69,6 +71,7 @@ const ViewDetailsModal = ({
                     </div>
                   </div>
 
+
                   <div className="view-details-info-row">
                     <div
                       className="view-details-info-label"
@@ -86,6 +89,7 @@ const ViewDetailsModal = ({
                     </div>
                   </div>
 
+
                   <div className="view-details-info-row">
                     <div
                       className="view-details-info-label"
@@ -102,6 +106,7 @@ const ViewDetailsModal = ({
                         "N/A"}
                     </div>
                   </div>
+
 
                   <div className="view-details-info-row">
                     <div
@@ -121,7 +126,9 @@ const ViewDetailsModal = ({
                   </div>
                 </div>
 
+
                 <hr className="view-details-divider" />
+
 
                 {/* Justification Section */}
                 <div className="view-details-section">
@@ -142,6 +149,7 @@ const ViewDetailsModal = ({
                     {selectedNominationDetails.justification || "No justification provided"}
                   </div>
                 </div>
+
 
                 {/* Parameters Section */}
                 {selectedNominationDetails.parameterValues &&
@@ -217,10 +225,10 @@ const ViewDetailsModal = ({
             )}
           </div>
 
+
           {/* Footer */}
           <div
             className="view-details-modal-footer"
-            style={{ borderTop: `1px solid ${THEME.border}` }}
           >
             <button
               type="button"
@@ -235,5 +243,6 @@ const ViewDetailsModal = ({
     </div>
   );
 };
+
 
 export default ViewDetailsModal;

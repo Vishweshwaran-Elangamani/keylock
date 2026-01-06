@@ -1,18 +1,24 @@
 import React from "react";
 import "../../../../styles/performancemanagement/components/ParameterModal.css";
 
-
 const ParameterModal = ({
   show, onClose, parameterForm, setParameterForm, onSubmit
 }) => {
   if (!show) return null;
-
 
   return (
     <div className="parameter-modal-overlay" onClick={onClose}>
       <div className="parameter-modal" onClick={e => e.stopPropagation()}>
         <div className="parameter-modal-header">
           <span className="parameter-modal-header-title">Add Parameter</span>
+          <button 
+            type="button" 
+            className="parameter-modal-close-btn" 
+            onClick={onClose}
+            aria-label="Close"
+          >
+            ×
+          </button>
         </div>
         <div className="parameter-modal-body">
           <form onSubmit={onSubmit} autoComplete="off">
@@ -29,7 +35,6 @@ const ParameterModal = ({
               required
               className="parameter-modal-input"
             />
-
 
             <label className="parameter-modal-label">
               Type <span className="parameter-modal-required">*</span>
@@ -49,7 +54,6 @@ const ParameterModal = ({
               <option value="Date">Date</option>
             </select>
 
-
             <label className="parameter-modal-checkbox-label">
               <input
                 type="checkbox"
@@ -61,7 +65,6 @@ const ParameterModal = ({
               /> Required Field
             </label>
 
-
             <label className="parameter-modal-label">Placeholder Text</label>
             <input
               type="text"
@@ -72,7 +75,6 @@ const ParameterModal = ({
               }
               className="parameter-modal-input"
             />
-
 
             {(parameterForm.parameterType === "Number" || parameterForm.parameterType === "Rating") && (
               <>
@@ -97,7 +99,6 @@ const ParameterModal = ({
               </>
             )}
 
-
             <label className="parameter-modal-label">Sort Order <span className="parameter-modal-required">*</span></label>
             <input
               type="number"
@@ -109,7 +110,6 @@ const ParameterModal = ({
               required
               className="parameter-modal-input"
             />
-
 
             <div className="parameter-modal-action-row">
               <button
@@ -128,6 +128,5 @@ const ParameterModal = ({
     </div>
   );
 };
-
 
 export default ParameterModal;

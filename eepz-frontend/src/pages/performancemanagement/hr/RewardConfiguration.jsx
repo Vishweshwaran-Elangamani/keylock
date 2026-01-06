@@ -262,22 +262,51 @@ function RewardConfiguration() {
   };
 
   const handleConfirmDelete = async () => {
+    if (!selectedRewardType) {
+      toast.error("No reward type selected");
+      setShowDeleteModal(false);
+      return;
+    }
+
     try {
       if (deleteType === "parameter") {
-        const response = await deleteParameter(toDeleteId);
-        if (response.data.success) {
-          toast.success("Parameter deleted successfully");
-          await fetchParameters(selectedRewardType.rewardTypeId);
-        }
+        await deleteParameter(toDeleteId);
+
+        toast.success("Parameter deleted successfully");
+
+        setParameters(prevParams =>
+          prevParams.filter(param => param.parameterId !== toDeleteId)
+        );
+
+        setParameterCounts(prev => ({
+          ...prev,
+          [selectedRewardType.rewardTypeId]: Math.max((prev[selectedRewardType.rewardTypeId] || 1) - 1, 0)
+        }));
       }
-    } catch {
-      toast.error("Error deleting");
+    } catch (error) {
+      console.error("Delete error:", error);
+
+      if (error?.response?.status === 200 || error?.response?.status === 204) {
+        toast.success("Parameter deleted successfully");
+
+        setParameters(prevParams =>
+          prevParams.filter(param => param.parameterId !== toDeleteId)
+        );
+
+        setParameterCounts(prev => ({
+          ...prev,
+          [selectedRewardType.rewardTypeId]: Math.max((prev[selectedRewardType.rewardTypeId] || 1) - 1, 0)
+        }));
+      } else {
+        toast.error(error?.response?.data?.message || "Error deleting parameter");
+      }
     } finally {
       setShowDeleteModal(false);
       setToDeleteId(null);
       setDeleteType("");
     }
   };
+
 
   const confirmStatusChange = (rt) => {
     setRewardTypeForStatus(rt);
@@ -320,8 +349,8 @@ function RewardConfiguration() {
             + Add Parameter
           </button>
         </div>
-        <div 
-          className={styles.rewardDescription} 
+        <div
+          className={styles.rewardDescription}
           style={{ minHeight: needsCollapse ? 75 : "auto" }}
         >
           <span>
@@ -360,9 +389,9 @@ function RewardConfiguration() {
           ]}
         />
 
-        <button 
-          onClick={openAddRewardTypeModal} 
-          className={styles.createRewardBtn} 
+        <button
+          onClick={openAddRewardTypeModal}
+          className={styles.createRewardBtn}
           title="Create a new Reward Type"
         >
           <i className="bi bi-plus-circle"></i>
@@ -371,7 +400,7 @@ function RewardConfiguration() {
       </div>
 
       <div className={styles.rewardConfigContent}>
-        {/* Left Panel - Reward List */}
+        {/*Reward List */}
         <div className={styles.rewardListPanel}>
           <div className={styles.rewardListHeader}>
             <div className={styles.tabToggleContainer}>
