@@ -261,7 +261,7 @@ export default function MentorFeedbackDashboard() {
         <ol className="mfd-breadcrumb">
           <li className="mfd-breadcrumb-item">
             <button onClick={() => navigate("/employee/dashboard")} className="mfd-breadcrumb-link" type="button">
-              <Home size={18} />
+              <Home size={20} />
             </button>
           </li>
           <li className="mfd-breadcrumb-separator">/</li>
@@ -271,7 +271,7 @@ export default function MentorFeedbackDashboard() {
               className="mfd-breadcrumb-link"
               type="button"
             >
-              Feedbacks
+              Feedback Management
             </button>
           </li>
           <li className="mfd-breadcrumb-separator">/</li>

@@ -30,8 +30,9 @@
 }
 
 .hrmom-container {
-  max-width: 600px;
+  max-width: 1000px;
   margin: 0 auto;
+
 }
 
 .hrmom-loading {
@@ -94,11 +95,15 @@
 .hrmom-breadcrumb-item a,
 .hrmom-breadcrumb-item a:link,
 .hrmom-breadcrumb-item a:visited,
-.hrmom-breadcrumb-item a:hover,
 .hrmom-breadcrumb-item a:focus,
 .hrmom-breadcrumb-item a:active {
   color: #97247e !important;
   text-decoration: none !important;
+}
+.hrmom-breadcrumb-item a:hover{
+    background: rgba(151, 36, 126, 0.08);
+
+  
 }
 
 .hrmom-breadcrumb-item a:focus {
@@ -120,6 +125,7 @@
 .hrmom-breadcrumb-link:hover {
   color: #7a1d66;
   text-decoration: none;
+
 }
 
 .hrmom-breadcrumb-slash {
@@ -831,6 +837,7 @@ body {
   max-height: calc(100vh - 2.5rem);
   overflow-y: auto;
   margin-top: -32px;
+  margin-right: 130px;
 }
 
 .hrmom-container::-webkit-scrollbar {

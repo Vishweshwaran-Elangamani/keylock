@@ -35,49 +35,63 @@
 }
 
 .scf-breadcrumb-link {
-  color: #97247e;
   display: flex;
   align-items: center;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s ease;
-}
-
-/* Keep Home icon color same on hover/focus */
-.scf-breadcrumb-link,
-.scf-breadcrumb-link:visited,
-.scf-breadcrumb-link:hover,
-.scf-breadcrumb-link:focus,
-.scf-breadcrumb-link:active {
-  color: var(--color-accent-1) !important;
+  gap: 0.375rem;
+  color: #97247e !important;
   text-decoration: none !important;
-}
-
-/* Ensure the icon itself doesn't change color */
-.scf-breadcrumb-link:hover .scf-breadcrumb-icon,
-.scf-breadcrumb-link:focus .scf-breadcrumb-icon {
-  color: var(--color-accent-1) !important;
+  font-weight: 500;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  position: relative;
+  line-height: 1.25;
 }
 
 .scf-breadcrumb-link:hover {
-  color: #e01950;
+  background: rgba(151, 36, 126, 0.08) !important;
+  color: #97247e !important;
+  text-decoration: none !important;
+}
+
+.scf-breadcrumb-link:hover .scf-breadcrumb-icon {
+  stroke: #97247e !important;
+}
+
+.scf-breadcrumb-link,
+.scf-breadcrumb-link:visited,
+.scf-breadcrumb-link:focus,
+.scf-breadcrumb-link:active {
+  color: #97247e !important;
+  text-decoration: none !important;
 }
 
 .scf-breadcrumb-icon {
-  margin-right: 5px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .scf-breadcrumb-separator {
   margin: 0 0.75rem;
   color: #97247e;
   font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.25;
 }
 
 .scf-breadcrumb-active span {
   color: black;
   font-weight: 600;
+  font-size: 0.875rem;
 }
 
+/* Rest of your existing styles unchanged */
 .scf-alert {
   display: flex;
   align-items: flex-start;
@@ -197,12 +211,8 @@
 }
 
 @keyframes scf-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .scf-loading-text {
@@ -318,7 +328,7 @@
   border-bottom: none;
 }
 
-.scf-dropdown-option:hover{
+.scf-dropdown-option:hover {
   background: #27235c;
   color: #ffffff;
   font-weight: 600;

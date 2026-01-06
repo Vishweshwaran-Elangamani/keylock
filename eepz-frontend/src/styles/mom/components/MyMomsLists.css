@@ -46,7 +46,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.875rem;
+  font-size: 0.975rem;
   font-weight: 500;
   text-decoration: none;
   transition: color 0.2s ease;
@@ -54,6 +54,8 @@
 
 .mm2-breadcrumb-link:hover {
   color: #7a1d65;
+ background: rgba(151, 36, 126, 0.08);
+
 }
 
 .mm2-breadcrumb-home {
@@ -71,7 +73,7 @@
 
 .mm2-breadcrumb-current {
   color: #1e293b;
-  font-size: 0.875rem;
+  font-size: 0.975rem;
   font-weight: 600;
 }
 

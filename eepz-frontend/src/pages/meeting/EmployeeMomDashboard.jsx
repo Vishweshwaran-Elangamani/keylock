@@ -3,7 +3,7 @@ import momService from "../../services/meeting/momService";
 import rsvpService from "../../services/meeting/rsvpService";
 import employeeService from "../../services/meeting/employeeservice";
 import toastr from "toastr";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { Home } from "lucide-react";
@@ -13,6 +13,7 @@ import "../../styles/mom/components/EmployeeMomDashboard.css";
 
 const EmployeeMomDashboard = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [employeeMap, setEmployeeMap] = useState({});
   const [stats, setStats] = useState({
@@ -25,12 +26,22 @@ const EmployeeMomDashboard = () => {
   const [meetings, setMeetings] = useState([]);
   const [selectedMeeting, setSelectedMeeting] = useState(null);
   const [showSharedModal, setShowSharedModal] = useState(false);
+  const [empMomActive, setEmpMomActive] = useState(null);
 
   useEffect(() => {
     loadDashboardData();
     fetchMeetings();
     loadAllEmployees();
   }, []);
+
+  useEffect(() => {
+    if (location.state?.fromPage) {
+      setEmpMomActive(location.state.fromPage);
+      if (location.state.fromPage === "sharedMoms") {
+        setShowSharedModal(true);
+      }
+    }
+  }, [location.state]);
 
   const loadAllEmployees = async () => {
     try {
@@ -58,8 +69,7 @@ const EmployeeMomDashboard = () => {
       ]);
 
       const pendingActions = actionItemsRes.data?.filter((item) => item.status === "Pending") || [];
-      const pendingInvites =
-        invitationsRes.data?.filter((inv) => inv.rsvpStatus === "Pending") || [];
+      const pendingInvites = invitationsRes.data?.filter((inv) => inv.rsvpStatus === "Pending") || [];
 
       setStats({
         myMoms: myMomsRes.data?.length || 0,
@@ -97,9 +107,7 @@ const EmployeeMomDashboard = () => {
       }
 
       setRecentActivity(
-        activity
-          .sort((a, b) => new Date(b.date) - new Date(a.date))
-          .slice(0, 5)
+        activity.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5)
       );
     } catch (error) {
       toastr.error("Failed to load dashboard data");
@@ -125,8 +133,15 @@ const EmployeeMomDashboard = () => {
     if (item.meetingData) openMeetingDetails(item.meetingData);
   };
 
-  const openSharedModal = () => setShowSharedModal(true);
-  const closeSharedModal = () => setShowSharedModal(false);
+  const openSharedModal = () => {
+    setEmpMomActive("sharedMoms");
+    setShowSharedModal(true);
+  };
+
+const closeSharedModal = () => {
+  setShowSharedModal(false);
+};
+
 
   if (loading)
     return (
@@ -151,15 +166,10 @@ const EmployeeMomDashboard = () => {
                 className="emd-breadcrumb-link emd-breadcrumb-home"
                 type="button"
               >
-                <Home size={18} />
-
+                <Home size={20} />
               </button>
             </li>
-
             <li className="emd-breadcrumb-separator">/</li>
-
-            {/* Removed "Meetings and MoM" middle breadcrumb as requested */}
-
             <li className="emd-breadcrumb-item emd-breadcrumb-active">
               <span>Meetings and MoM</span>
             </li>
@@ -201,35 +211,81 @@ const EmployeeMomDashboard = () => {
           />
         </div>
 
-        <div className="row g-3 emd-actions-row">
-          <ActionButton
-            icon="bi-file-earmark-text"
-            label="My MOMs"
-            color="primary"
-            count={stats.myMoms}
-            onClick={() => navigate("/employee/dashboard/meetmom/my-moms")}
-          />
-          <ActionButton
-            icon="bi-share"
-            label="Shared MOMs"
-            color="info"
-            count={stats.sharedMoms}
-            onClick={openSharedModal}
-          />
-          <ActionButton
-            icon="bi-list-check"
-            label="Action Items"
-            color="success"
-            count={stats.pendingActionItems}
-            onClick={() => navigate("/employee/dashboard/meetmom/action-items")}
-          />
-          <ActionButton
-            icon="bi-envelope"
-            label="Invitations"
-            color="warning"
-            count={stats.meetingInvitations}
-            onClick={() => navigate("/employee/dashboard/meetmom/invitations")}
-          />
+        <div className="emp-momupdate-toggle-wrapper">
+          <div className="emp-momupdate-toggle" role="tablist" aria-label="MOM actions">
+            <button
+              type="button"
+              role="tab"
+              className={`emp-momupdate-item ${empMomActive === "myMoms" ? "active" : ""}`}
+              aria-pressed={empMomActive === "myMoms"}
+              aria-selected={empMomActive === "myMoms"}
+              onClick={() => {
+                setEmpMomActive("myMoms");
+                navigate("/employee/dashboard/meetmom/my-moms");
+              }}
+              title="My MOMs"
+            >
+              <span className="emp-momupdate-icon" aria-hidden="true">
+                <i className="bi bi-person"></i>
+              </span>
+              <span className="emp-momupdate-label">My MOMs</span>
+            </button>
+
+            <button
+              type="button"
+              role="tab"
+              className={`emp-momupdate-item ${empMomActive === "sharedMoms" ? "active" : ""}`}
+              aria-pressed={empMomActive === "sharedMoms"}
+              aria-selected={empMomActive === "sharedMoms"}
+              onClick={() => {
+                setEmpMomActive("sharedMoms");
+                openSharedModal();
+              }}
+              title="Shared MOMs"
+            >
+              <span className="emp-momupdate-icon" aria-hidden="true">
+                <i className="bi bi-people"></i>
+              </span>
+              <span className="emp-momupdate-label">Shared MOMs</span>
+            </button>
+
+            <button
+              type="button"
+              role="tab"
+              className={`emp-momupdate-item ${empMomActive === "actionItems" ? "active" : ""}`}
+              aria-pressed={empMomActive === "actionItems"}
+              aria-selected={empMomActive === "actionItems"}
+              onClick={() => {
+                setEmpMomActive("actionItems");
+                navigate("/employee/dashboard/meetmom/action-items");
+              }}
+              title="Action Items"
+            >
+             <span className="emp-momupdate-icon" aria-hidden="true">
+             <i className="bi bi-list-check"></i>
+            </span>
+
+              <span className="emp-momupdate-label">Action Items</span>
+            </button>
+
+            <button
+              type="button"
+              role="tab"
+              className={`emp-momupdate-item ${empMomActive === "invitations" ? "active" : ""}`}
+              aria-pressed={empMomActive === "invitations"}
+              aria-selected={empMomActive === "invitations"}
+              onClick={() => {
+                setEmpMomActive("invitations");
+                navigate("/employee/dashboard/meetmom/invitations");
+              }}
+              title="Invitations"
+            >
+              <span className="emp-momupdate-icon" aria-hidden="true">
+                <i className="bi bi-envelope"></i>
+              </span>
+              <span className="emp-momupdate-label">Invitations</span>
+            </button>
+          </div>
         </div>
 
         <div className="row emd-content-row">
@@ -365,18 +421,6 @@ const StatCard = ({ icon, bgColor, iconColor, count, label, onClick }) => (
         <div className="emd-stat-center-label">{label}</div>
       </div>
     </div>
-  </div>
-);
-
-const ActionButton = ({ icon, label, color, count, onClick }) => (
-  <div className="col-xl-3 col-lg-6 col-md-6 col-sm-6 col-12">
-    <button className={`emd-action-btn emd-action-${color}`} onClick={onClick} type="button">
-      <span className="emd-action-main">
-        <i className={`${icon} emd-action-icon`} />
-        {label}
-      </span>
-      <span className={`emd-action-badge emd-badge-${color}`}>{count}</span>
-    </button>
   </div>
 );
 

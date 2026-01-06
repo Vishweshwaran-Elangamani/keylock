@@ -164,11 +164,15 @@ export default function AllManagerReviews() {
 
   return (
     <div className="amr-page">
-      <FeedbackBreadcrumb
-        items={[
-          { label: "Manager Reviews" }
-        ]}
-      />
+     
+
+<FeedbackBreadcrumb
+  items={[
+    { label: <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>Manager Reviews</span> }
+  ]}
+/>
+
+
       
       <div className="amr-container">
         <div className="amr-header">

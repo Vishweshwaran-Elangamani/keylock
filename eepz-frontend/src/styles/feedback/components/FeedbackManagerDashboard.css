@@ -88,15 +88,15 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease;
   cursor: pointer;
-  padding: 1.5rem;
+ padding: 0.85rem 1.35rem;
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+ gap: 1.2rem;
+  margin-top: -20px;
 }
 
 .fm-mgrdash-stat-card:hover {
   transform: translateY(-2px);
-  border-color: #0f62fe;
   box-shadow: 0 4px 12px rgba(39, 35, 92, 0.1);
 }
 
@@ -135,7 +135,7 @@
 }
 
 .fm-mgrdash-stat-card__value {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
   margin: 0 0 0.25rem 0;
   color: #1f2937;
@@ -213,6 +213,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1.25rem;
+  margin-top: -10px;
 }
 
 .fm-mgrdash-action-card {

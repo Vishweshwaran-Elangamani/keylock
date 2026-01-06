@@ -29,6 +29,84 @@
   margin: 0 auto 12px;
 }
 
+.emp-momupdate-toggle-wrapper {
+  margin: 1rem 0 2rem;
+  display: flex;
+  align-items: center;
+}
+
+.emp-momupdate-toggle {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(160px, 1fr));
+  gap: 12px;
+  background: #262459;
+  border-radius: 9999px;
+  padding: 10px 14px;
+  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.16);
+  width: 100%;
+  max-width: 980px;
+  margin-left: 60px;
+}
+
+.emp-momupdate-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 18px;
+  min-height: 44px;
+  border: none;
+  border-radius: 9999px;
+  background: transparent;
+  color: #e9ecf6;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.1px;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease, box-shadow 160ms ease, transform 100ms ease;
+}
+
+.emp-momupdate-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emp-momupdate-item .emp-momupdate-icon .bi {
+  font-size: 1.1rem;
+  color: #e9ecf6;
+  transition: color 160ms ease, filter 160ms ease;
+}
+
+.emp-momupdate-item.active {
+  background: #ffffff;
+  color: #121424;
+  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.16), inset 0 -1px 0 rgba(16, 24, 40, 0.06);
+}
+
+.emp-momupdate-item.active .emp-momupdate-icon .bi {
+  color: #121424;
+  filter: drop-shadow(1px 0px rgba(255, 72, 72, 0.85)) drop-shadow(-1px 0px rgba(72, 134, 255, 0.85));
+}
+
+.emp-momupdate-item:not(.active):hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.emp-momupdate-item:active {
+  transform: scale(0.98);
+}
+
+.emp-momupdate-item:focus-visible {
+  outline: 2px solid #7ea2ff;
+  outline-offset: 2px;
+}
+
+.emp-momupdate-item.active .emp-momupdate-label {
+  font-weight: 800;
+}
+
 @keyframes emd-spin {
   to {
     transform: rotate(360deg);
@@ -76,12 +154,12 @@
 
 .emd-breadcrumb-link:hover {
   color: #7a1d65;
+  background: rgba(151, 36, 126, 0.08);
 }
 
-/* Updated: home icon is now lucide <svg>, not <i> */
 .emd-breadcrumb-home svg {
-  width: 1rem;
-  height: 1rem;
+  width: 1.325rem;
+  height: 1.325rem;
 }
 
 .emd-breadcrumb-separator {
@@ -337,6 +415,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .emd-activity-primary {
@@ -394,6 +473,10 @@
   font-size: 1.1rem;
   color: #9ca3af;
   align-self: center;
+}
+
+.emd-content-row {
+  margin-top: 24px;
 }
 
 .emd-meetings-list {
@@ -476,10 +559,23 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.emd-view-all-btn:hover {
+  background-color: #2563eb;
+  color: #ffffff;
 }
 
 .emd-view-all-btn i {
   font-size: 0.95rem;
+}
+
+@media (max-width: 1200px) {
+  .emp-momupdate-toggle {
+    margin-left: 0;
+  }
 }
 
 @media (max-width: 992px) {
@@ -489,6 +585,17 @@
 
   .emd-stat-card-horizontal {
     margin-bottom: 6px;
+  }
+
+  .emp-momupdate-toggle {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 100%;
+    margin-left: 0;
+  }
+
+  .emp-momupdate-item {
+    padding: 10px 14px;
+    font-size: 0.875rem;
   }
 }
 
@@ -507,6 +614,22 @@
   .emd-meeting-meta-row {
     flex-direction: column;
     align-items: flex-start;
+    gap: 4px;
+  }
+
+  .emp-momupdate-toggle {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .emp-momupdate-item {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    min-height: 38px;
+  }
+
+  .emp-momupdate-item .emp-momupdate-icon .bi {
+    font-size: 1rem;
   }
 }
 
@@ -539,5 +662,15 @@
     width: 22px;
     height: 22px;
     font-size: 0.7rem;
+  }
+
+  .emp-momupdate-toggle {
+    grid-template-columns: 1fr;
+    border-radius: 16px;
+    padding: 8px;
+  }
+
+  .emp-momupdate-item {
+    border-radius: 12px;
   }
 }

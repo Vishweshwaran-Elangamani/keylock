@@ -150,12 +150,15 @@ const SharedMomsModal = ({ onClose }) => {
                 </ul>
               </div>
 
-              <button
-                type="button"
-                className="btn-close btn-close-white"
-                onClick={onClose}
-                aria-label="Close"
-              />
+            <button
+  type="button"
+  className="btn-close btn-close-white"
+  onClick={() => {
+    onClose();
+  }}
+  aria-label="Close"
+/>
+
             </div>
 
             <div className="smm-body modal-body p-0">
@@ -283,12 +286,15 @@ const SharedMomsModal = ({ onClose }) => {
                 {activeTab === "sharedByMe" ? "shared" : "received"} MOM
                 {currentMoms.length !== 1 ? "s" : ""}
               </span>
-              <button
-                className="smm-close-btn btn btn-secondary px-4"
-                onClick={onClose}
-              >
-                Close
-              </button>
+             <button
+  className="smm-close-btn btn btn-secondary px-4"
+  onClick={() => {
+    onClose();
+  }}
+>
+  Close
+</button>
+
             </div>
           </div>
         </div>

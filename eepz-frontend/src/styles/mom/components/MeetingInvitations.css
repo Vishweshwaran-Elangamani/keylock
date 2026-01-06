@@ -50,6 +50,9 @@
 
 .mi-breadcrumb-link-button:hover {
   color: #7a1d65;
+  background: rgba(151, 36, 126, 0.08);
+
+  
 }
 
 .mi-breadcrumb-home-icon {
@@ -221,6 +224,7 @@
   opacity: 0.9;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(151, 36, 126, 0.3);
+  color: #ffffff;
 }
 
 .mi-gradient-button:active {

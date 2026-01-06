@@ -13,6 +13,7 @@
 
 .hr-sla-breadcrumb-list {
   margin-bottom: 0;
+  list-style: none;
   padding: 1rem;
   border-radius: 8px;
   background: #f8fafc;
@@ -23,12 +24,14 @@
   margin-bottom: 1rem;
   margin-left: -55px;
 }
-
+.hr-sla-breadcrumb__separator{
+  color: #70205f;
+}
 .hr-sla-breadcrumb-item {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  font-size: 0.875rem;
+  font-size: 0.975rem;
   color: #6b7280;
 }
 
@@ -43,6 +46,7 @@
 
 .hr-sla-breadcrumb-link:hover {
   color: #e01950;
+  background: rgba(151, 36, 126, 0.08);
 }
 
 .hr-sla-breadcrumb-active {

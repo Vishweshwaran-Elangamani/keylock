@@ -385,29 +385,30 @@ const ManagerMomDashboard = () => {
           />
         </div>
 
-        <div className="managermom-toolbar">
-          <div className="btn-group" role="group">
-            <button
-              type="button"
-              className={`btn managermom-toggle-btn ${
-                showTableView ? "managermom-toggle-active" : ""
-              }`}
-              onClick={() => setShowTableView(true)}
-            >
-              <i className="bi bi-table me-1"></i>
-              Table View
-            </button>
-            <button
-              type="button"
-              className={`btn managermom-toggle-btn ${
-                !showTableView ? "managermom-toggle-active" : ""
-              }`}
-              onClick={() => setShowTableView(false)}
-            >
-              <i className="bi bi-grid-3x3-gap me-1"></i>
-              Card View
-            </button>
-          </div>
+       
+
+<div className="managermom-toolbar">
+  <div className="managermom-view-switch" role="group" aria-label="View switcher">
+    <button
+      type="button"
+      className={`mmview-btn ${showTableView ? "active" : ""}`}
+      onClick={() => setShowTableView(true)}
+      title="Table View"
+      aria-pressed={showTableView}
+    >
+      <i className="bi bi-grid-3x3-gap-fill"></i>
+    </button>
+
+    <button
+      type="button"
+      className={`mmview-btn ${!showTableView ? "active" : ""}`}
+      onClick={() => setShowTableView(false)}
+      title="Card View"
+      aria-pressed={!showTableView}
+    >
+      <i className="bi bi-grid-3x3-gap"></i>
+    </button>
+  </div>
 
           <div className="managermom-toolbar-right">
             <button

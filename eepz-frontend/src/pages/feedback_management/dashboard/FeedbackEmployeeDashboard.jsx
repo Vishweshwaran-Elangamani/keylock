@@ -316,18 +316,6 @@ export default function FeedbackEmployeeDashboard() {
         ))}
       </div>
 
-      <div className="fm-empdb-nav-wrapper">
-        <div className="fm-empdb-nav">
-          <button
-            className="fm-empdb-nav__tab fm-empdb-nav__tab--active"
-            onClick={() => setActiveTab("overview")}
-          >
-            <Zap size={16} />
-            Quick Actions
-          </button>
-        </div>
-      </div>
-
       <div className="fm-empdb-content">
         <div className="fm-empdb-actions-grid">
           <div className="fm-empdb-actions-grid__item">

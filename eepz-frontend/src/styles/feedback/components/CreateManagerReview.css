@@ -59,6 +59,8 @@
 
 .cmr-breadcrumb-link:hover {
   color: #7a1d65;
+  background: rgba(151, 36, 126, 0.08);
+
 }
 
 .cmr-breadcrumb-icon {

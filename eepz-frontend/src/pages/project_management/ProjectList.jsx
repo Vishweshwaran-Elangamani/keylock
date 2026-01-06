@@ -101,7 +101,6 @@ const ProjectList = () => {
     setManagerCurrentPage(1);
   }, [activeManagerSearchTerm, managerFilterRole, managerFilterDepartment]);
 
-  // ✅ NEW: close "Show entries" dropdown on outside click / Esc
   useEffect(() => {
     const onDocMouseDown = (e) => {
       if (!pageSizeRef.current) return;
@@ -750,7 +749,7 @@ const ProjectList = () => {
     ).length;
   };
 
-  // ✅ NEW: page size selection handler (keeps you on valid page)
+ 
   const handleItemsPerPageChange = (size) => {
     setItemsPerPage(size);
     setCurrentPage(1);

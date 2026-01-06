@@ -231,15 +231,16 @@ const getStatusBadge = (status) => {
                 </button>
               </li>
               <li className="mi-breadcrumb-separator">/</li>
-              <li className="breadcrumb-item mi-breadcrumb-item">
-                <button
-                  onClick={() => navigate("/employee/dashboard/meetmom")}
-                  className="mi-breadcrumb-link-button"
-                  type="button"
-                >
-                  Meetings and MoM
-                </button>
-              </li>
+             <li className="breadcrumb-item mi-breadcrumb-item">
+  <button
+    onClick={() => navigate("/employee/dashboard/meetmom", { state: { fromPage: "invitations" } })}
+    className="mi-breadcrumb-link-button"
+    type="button"
+  >
+    Meetings and MoM
+  </button>
+</li>
+
               <li className="mi-breadcrumb-separator">/</li>
               <li
                 className="breadcrumb-item active mi-breadcrumb-item"

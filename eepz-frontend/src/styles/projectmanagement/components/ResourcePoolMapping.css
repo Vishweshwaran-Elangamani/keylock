@@ -60,7 +60,7 @@
 }
 
 .rp-breadcrumb {
-  font-size: 0.875rem;
+  font-size: 0.975rem;
   background-color: transparent;
   padding: 0;
   margin-top: -20px;
@@ -68,7 +68,7 @@
 
 .rp-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
   content: "/";
-  color: #999;
+  color:  #97247e;
   padding: 0 0.35rem;
 }
 
@@ -88,6 +88,7 @@
 
 .rp-breadcrumb-link:hover {
   color: #7a1d66;
+  background: rgba(151, 36, 126, 0.08);
   
 }
 

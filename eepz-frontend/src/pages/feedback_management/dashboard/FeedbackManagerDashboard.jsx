@@ -284,23 +284,6 @@ export default function FeedbackManagerDashboard() {
         </div>
       </div>
 
-      <div className="fm-mgrdash-tabs-wrapper">
-        <ul className="fm-mgrdash-tabs">
-          <li className="fm-mgrdash-tabs__item">
-            <button
-              className={`fm-mgrdash-tabs__button ${
-                activeTab === "overview"
-                  ? "fm-mgrdash-tabs__button--active"
-                  : ""
-              }`}
-            >
-              <Briefcase size={16} />
-              <span>Quick Actions</span>
-            </button>
-          </li>
-        </ul>
-      </div>
-
       <div className="fm-mgrdash-content">
         {loading ? (
           <div className="fm-mgrdash-loading">

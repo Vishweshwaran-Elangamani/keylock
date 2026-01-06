@@ -13,12 +13,33 @@
   font-family: "popins";
 }
 
+/* Dashboard icon hover effect */
 .sched-breadcrumb-link {
   margin-left: 20px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  color: #97247e;
+}
+
+.sched-breadcrumb-link:hover {
+  background: rgba(151, 36, 126, 0.08) !important;
+}
+
+.sched-breadcrumb-link svg {
+  stroke: #97247e !important;
 }
 
 .sched-breadcrumb-active {
-  color: black;
+  color: #000000;
+  font-weight: 600;
 }
 
 .breadcrumb-separator {
@@ -176,14 +197,56 @@
   border-color: transparent;
 }
 
-.managermom-toolbar .btn-group .managermom-toggle-btn:first-child {
-  border-top-left-radius: 8px;
-  border-bottom-left-radius: 8px;
+
+.managermom-toolbar .managermom-view-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;         
+  border-radius: 12px;               
+  padding: 0.35rem 0.45rem;           
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06); 
 }
 
-.managermom-toolbar .btn-group .managermom-toggle-btn:last-child {
-  border-top-right-radius: 8px;
-  border-bottom-right-radius: 8px;
+.managermom-toolbar .mmview-btn {
+  width: 36px;                         
+  height: 36px;
+  border: none;
+  border-radius: 8px;                  
+  background: #ffffff;                  
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease, transform 120ms ease;
+  padding: 0;                          
+}
+
+.managermom-toolbar .mmview-btn .bi {
+  font-size: 1.1rem;                    
+  color: #9aa3ad;                      
+}
+
+.managermom-toolbar .mmview-btn:not(.active):hover {
+  background: #f3f4f6;                  
+}
+
+.managermom-toolbar .mmview-btn.active {
+  background: #27235c;                 
+}
+
+.managermom-toolbar .mmview-btn.active .bi {
+  color: #ffffff;                   
+}
+
+.managermom-toolbar .mmview-btn:active {
+  transform: scale(0.98);
+}
+
+.managermom-toolbar .mmview-btn:focus-visible {
+  outline: 2px solid #27235c33;
+  outline-offset: 2px;
 }
 
 .managermom-toolbar-right {

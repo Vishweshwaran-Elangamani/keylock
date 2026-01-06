@@ -13,16 +13,25 @@ const FeedbackBreadcrumb = ({ items }) => {
       .fb-breadcrumb-scope a,
       .fb-breadcrumb-scope a:link,
       .fb-breadcrumb-scope a:visited,
-      .fb-breadcrumb-scope a:hover,
       .fb-breadcrumb-scope a:focus,
       .fb-breadcrumb-scope a:active {
         color: ${accent} !important;
         text-decoration: none !important;
       }
 
+      .fb-breadcrumb-scope a:hover {
+        background: rgba(151, 36, 126, 0.08);
+      }
+
       .fb-breadcrumb-scope a:focus {
         outline: none !important;
         box-shadow: none !important;
+      }
+      
+      .fb-breadcrumb-slash {
+        color: ${accent} !important;
+        font-size: 1rem;
+        font-weight: 400;
       }
     `,
     [accent]
@@ -51,7 +60,7 @@ const FeedbackBreadcrumb = ({ items }) => {
         className="breadcrumb mb-0 p-0"
         style={{
           backgroundColor: "transparent",
-          fontSize: "0.875rem",
+          fontSize: "1rem",
           color: accent,
           display: "flex",
           alignItems: "center",
@@ -73,8 +82,11 @@ const FeedbackBreadcrumb = ({ items }) => {
               display: "flex",
               alignItems: "center",
               gap: "0.25rem",
-              fontWeight: 600,
-              backgroundColor: homeHover ? "transparent" : "transparent",
+              fontWeight: 700,
+              padding: "0.25rem",
+              borderRadius: "6px",
+              transition: "background-color 0.2s ease",
+              backgroundColor: homeHover ? "rgba(151, 36, 126, 0.08)" : "transparent",
             }}
             aria-label="Home"
             title="Home"
@@ -104,6 +116,9 @@ const FeedbackBreadcrumb = ({ items }) => {
                     color: accent,
                     textDecoration: "none",
                     fontWeight: 500,
+                    padding: "0.25rem 0.5rem",
+                    borderRadius: "6px",
+                    transition: "background-color 0.2s ease",
                   }}
                 >
                   {item.label}
