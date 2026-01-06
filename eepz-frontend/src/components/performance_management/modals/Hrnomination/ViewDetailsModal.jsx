@@ -1,5 +1,5 @@
 import React from "react";
-import "../../../../styles/performancemanagement/components/ViewDetailsModal.css";
+import "../../../../styles/performancemanagement/components/ViewDetailsModal.module.css";
 
 
 const ViewDetailsModal = ({
@@ -19,7 +19,7 @@ const ViewDetailsModal = ({
           className="view-details-modal-content"
           style={{ background: THEME.card }}
         >
-          {/* Header */}
+         
           <div
             className="view-details-modal-header"
             style={{ background: THEME.primary }}
@@ -51,7 +51,7 @@ const ViewDetailsModal = ({
               </div>
             ) : selectedNominationDetails ? (
               <div>
-                {/* Info Card */}
+             
                 <div className="view-details-info-card">
                   <div className="view-details-info-row">
                     <div
@@ -129,8 +129,12 @@ const ViewDetailsModal = ({
 
                 <hr className="view-details-divider" />
 
+<<<<<<< Updated upstream
 
                 {/* Justification Section */}
+=======
+             
+>>>>>>> Stashed changes
                 <div className="view-details-section">
                   <div
                     className="view-details-section-title"
@@ -150,8 +154,12 @@ const ViewDetailsModal = ({
                   </div>
                 </div>
 
+<<<<<<< Updated upstream
 
                 {/* Parameters Section */}
+=======
+             
+>>>>>>> Stashed changes
                 {selectedNominationDetails.parameterValues &&
                   selectedNominationDetails.parameterValues.length > 0 && (
                     <div className="view-details-section">

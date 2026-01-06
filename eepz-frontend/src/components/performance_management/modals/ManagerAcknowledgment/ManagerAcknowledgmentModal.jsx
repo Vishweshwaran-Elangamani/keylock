@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Breadcrumb from "../../../common/Breadcrumb";
-import "../../../../styles/performancemanagement/components/ManagerAcknowledgmentModal.css";
+import "../../../../styles/performancemanagement/components/ManagerAcknowledgmentModal.module.css";
 
 const ManagerAcknowledgmentModal = ({ ackList, error, loading }) => {
   const navigate = useNavigate();
@@ -13,7 +13,7 @@ const ManagerAcknowledgmentModal = ({ ackList, error, loading }) => {
 
   return (
     <div className="manager-ack-container">
-      {/* Breadcrumb */}
+     
       <Breadcrumb
         items={[
           { label: "Dashboard", path: "/manager/dashboard" },
@@ -22,10 +22,10 @@ const ManagerAcknowledgmentModal = ({ ackList, error, loading }) => {
         ]}
       />
 
-      {/* Page Title */}
+     
       <h2 className="manager-ack-title">Employee Acknowledgments</h2>
 
-      {/* Content Area */}
+   
       {loading ? (
         <div className="manager-ack-loading">Loading...</div>
       ) : error ? (
@@ -64,9 +64,9 @@ const ManagerAcknowledgmentModal = ({ ackList, error, loading }) => {
             </table>
           </div>
 
-          {/* Pagination Section */}
+          
           <div className="manager-ack-pagination">
-            {/* Entries Selector */}
+          
             <div className="manager-ack-entries-selector">
               <span>Show</span>
               <select className="manager-ack-entries-select">
@@ -78,7 +78,7 @@ const ManagerAcknowledgmentModal = ({ ackList, error, loading }) => {
               <span>entries</span>
             </div>
 
-            {/* Pagination Status */}
+            
             <div className="manager-ack-pagination-status">
               Showing 1 to {ackList.length} of {ackList.length} entries
             </div>

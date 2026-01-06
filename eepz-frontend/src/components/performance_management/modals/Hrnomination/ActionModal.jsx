@@ -1,5 +1,5 @@
 import React from "react";
-import "../../../../styles/performancemanagement/components/ActionModal.css";
+import "../../../../styles/performancemanagement/components/ActionModal.module.css";
 
 const ActionModal = ({
   show,
@@ -14,16 +14,16 @@ const ActionModal = ({
 
   return (
     <>
-      {/* Backdrop */}
+    
       <div className="action-modal-backdrop" onClick={onClose}></div>
 
-      {/* Modal Wrapper */}
+      
       <div className="action-modal-wrapper">
         <div
           className="action-modal-container"
           style={{ background: THEME.card }}
         >
-          {/* Header with X Button */}
+          
           <div
             className="action-modal-header"
             style={{ background: THEME.primary }}
@@ -32,6 +32,10 @@ const ActionModal = ({
               {actionType === "approve" ? "Approval Remarks" : "Rejection Reason"}
             </h6>
 
+<<<<<<< Updated upstream
+=======
+           
+>>>>>>> Stashed changes
             <button
               onClick={onClose}
               className="action-modal-close-btn"

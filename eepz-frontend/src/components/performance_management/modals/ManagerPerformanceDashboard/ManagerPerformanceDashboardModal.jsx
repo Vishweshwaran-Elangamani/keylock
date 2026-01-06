@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import logoImage from "../../../../assets/logodark.png"
-import "../../../../styles/performancemanagement/components/ManagerPerformanceDashboard.css"
+import "../../../../styles/performancemanagement/components/ManagerPerformanceDashboard.module.css"
 
-/* Custom Rating Dropdown Component */
+
 const RatingDropdown = ({ value, onChange, disabled }) => {
   const [open, setOpen] = useState(false);
 

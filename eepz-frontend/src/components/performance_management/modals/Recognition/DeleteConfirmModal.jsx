@@ -1,5 +1,5 @@
 import React from "react";
-import "../../../../styles/performancemanagement/components/DeleteConfirmModal.css";
+import "../../../../styles/performancemanagement/components/DeleteConfirmModal.module.css";
 
 
 const DeleteConfirmModal = ({ show, onClose, onConfirm, message }) => {

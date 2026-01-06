@@ -9,7 +9,7 @@ import {
 } from "../../../services/performancemanagement/api/rolesapi";
 import { getEmployeeIdForFilter } from "../../../utils/PerformanceManagement/jwtDecoder";
 import { toast } from "sonner";
-import "../../../styles/performancemanagement/depthead/DeptHeadPage.css"
+import "../../../styles/performancemanagement/depthead/DeptHeadPage.module.css"
 import Breadcrumb from "../../../components/common/Breadcrumb";
 
 

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate, useLocation } from "react-router-dom";
 import api from "../../../services/performancemanagement/api/api";
-import "../../../styles/performancemanagement/hr/FormProgressTracker.css";
+import "../../../styles/performancemanagement/hr/FormProgressTracker.module.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 
 export default function FormProgressTrackerPage() {
@@ -19,7 +19,7 @@ export default function FormProgressTrackerPage() {
     fetchTrackers();
   }, []);
 
-  // Close dropdown when clicking outside
+ 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -100,7 +100,7 @@ export default function FormProgressTrackerPage() {
     </span>
   );
 
-  // Custom Dropdown Component
+ 
   const CustomDropdown = ({ value, onChange, options }) => {
     return (
       <div 

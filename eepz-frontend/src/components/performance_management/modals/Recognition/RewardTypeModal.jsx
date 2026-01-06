@@ -1,5 +1,5 @@
 import React from "react";
-import "../../../../styles/performancemanagement/components/RewardTypeModal.css";
+import "../../../../styles/performancemanagement/components/RewardTypeModal.module.css";
 
 
 const RewardTypeModal = ({

@@ -19,7 +19,7 @@ import {
 } from "../../../services/performancemanagement/api/rolesapi";
 
 import { Toaster, toast } from "sonner";
-import "../../../styles/performancemanagement/manager/TeamLeadPage.css";
+import "../../../styles/performancemanagement/manager/TeamLeadPage.module.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import ReviewModal from "../../../components/performance_management/modals/TeamLeadPage/ReviewModal";
 import Breadcrumb from "../../../components/common/Breadcrumb";

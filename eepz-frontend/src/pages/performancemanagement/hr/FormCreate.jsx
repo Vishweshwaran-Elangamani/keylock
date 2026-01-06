@@ -3,10 +3,10 @@ import { useParams, useNavigate } from "react-router-dom";
 import api from "../../../services/performancemanagement/api/api";
 import { toast } from "sonner";
 import { useAuth } from "../../../contexts/auth/AuthContext";
-import "../../../styles/performancemanagement/hr/FormCreate.css";
+import "../../../styles/performancemanagement/hr/FormCreate.module.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 
-/* Custom Dropdown Component */
+
 const CustomDropdown = ({ value, onChange, options, placeholder, disabled, error }) => {
   const [open, setOpen] = useState(false);
 
@@ -60,11 +60,11 @@ function FormCreate() {
 
   const [currentStep, setCurrentStep] = useState(1);
 
-  // Refs for scrolling
+ 
   const competencyRefs = useRef([]);
   const competencySectionRef = useRef(null);
 
-  // 1) INITIALIZE WITH ONE EMPTY COMPETENCY
+  
   const [model, setModel] = useState({
     name: "",
     type: "",
@@ -98,7 +98,7 @@ function FormCreate() {
         const { data } = await api.get(`/FormManagement/${formId}`);
         const payload = data?.data ?? {};
 
-        // 2) WHEN EDITING, ENSURE AT LEAST ONE COMPETENCY ROW EXISTS
+       
         const loadedCompetencies =
           payload.competencies && payload.competencies.length > 0
             ? payload.competencies
@@ -156,7 +156,7 @@ function FormCreate() {
     
     toast.success("Competency added");
 
-    // Scroll to the newly added competency
+   
     setTimeout(() => {
       const container = competencySectionRef.current;
       if (container && competencyRefs.current[newIndex]) {
@@ -165,7 +165,7 @@ function FormCreate() {
         const elementHeight = element.offsetHeight;
         const containerHeight = container.clientHeight;
         
-        // Scroll container to show the new element at the bottom
+        
         container.scrollTo({
           top: elementTop - containerHeight + elementHeight + 50,
           behavior: 'smooth'
@@ -205,7 +205,7 @@ function FormCreate() {
       return next;
     });
 
-    // Scroll to the moved competency
+   
     setTimeout(() => {
       const container = competencySectionRef.current;
       if (container && competencyRefs.current[index - 1]) {
@@ -230,7 +230,7 @@ function FormCreate() {
       return next;
     });
 
-    // Scroll to the moved competency
+    
     setTimeout(() => {
       const container = competencySectionRef.current;
       if (container && competencyRefs.current[index + 1]) {
@@ -423,7 +423,7 @@ function FormCreate() {
           />
         </div>
 
-        {/* Step indicator aligned right in header, like dashboards */}
+        
         <div className="pmhr-fc-step-center">
           <div className="pmhr-fc-step-indicator">
             <div className="pmhr-fc-step-item">
@@ -483,7 +483,7 @@ function FormCreate() {
         </div>
       </div>
 
-      {/* Main content – wider & more compact form card */}
+     
       <div className="pmhr-fc-content">
         <form
           onSubmit={currentStep === 2 ? onSubmit : proceedToStep2}

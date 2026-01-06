@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getDeptHeadApprovedNominations } from "../../../services/performancemanagement/api/nominationapi";
 import Breadcrumb from "../../../components/common/Breadcrumb"; 
-import "../../../styles/performancemanagement/hr/TopPerformers.css";
+import "../../../styles/performancemanagement/hr/TopPerformers.module.css";
 
 export default function TopPerformers() {
   const navigate = useNavigate();

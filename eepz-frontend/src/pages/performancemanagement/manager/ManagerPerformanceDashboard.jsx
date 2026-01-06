@@ -9,9 +9,9 @@ import { getUserRole } from "../../../services/performancemanagement/api/rolesap
 import { toast, Toaster } from "sonner";
 import logoImage from "../../../assets/logodark.png";
 import Breadcrumb from "../../../components/common/Breadcrumb";
-import "../../../styles/performancemanagement/manager/ManagerPerformanceDashboard.css";
+import "../../../styles/performancemanagement/manager/ManagerPerformanceDashboard.module.css";
 
-/* Custom Pagination Dropdown Component */
+
 const PaginationDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
 
@@ -54,8 +54,7 @@ const PaginationDropdown = ({ value, onChange, options }) => {
   );
 };
 
-/* Custom Rating Dropdown Component for Modal */
-/* Custom Rating Dropdown Component for Modal */
+
 const RatingDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0, width: 0 });
@@ -160,7 +159,7 @@ export default function ManagerDashboard() {
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState("pending");
 
-  // Pagination states
+ 
   const [pendingPage, setPendingPage] = useState(1);
   const [pendingPerPage, setPendingPerPage] = useState(5);
   const [completedPage, setCompletedPage] = useState(1);

@@ -1,4 +1,4 @@
-/* Container and Background */
+
 .hrNominationContainer {
   background: #F8FAFC;
   min-height: 100vh;
@@ -6,7 +6,7 @@
   padding-bottom: 32px;
 }
 
-/* Loading State */
+
 .hrNominationLoadingWrapper {
   display: flex;
   justify-content: center;

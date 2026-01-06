@@ -1,5 +1,5 @@
 import React from "react";
-import "../../../../styles/performancemanagement/components/ParameterModal.css";
+import "../../../../styles/performancemanagement/components/ParameterModal.module.css";
 
 const ParameterModal = ({
   show, onClose, parameterForm, setParameterForm, onSubmit

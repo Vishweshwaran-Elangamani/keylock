@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import "../../../../styles/performancemanagement/components/ViewFormDetailsModal.css";
+import "../../../../styles/performancemanagement/components/ViewFormDetailsModal.module.css";
  
 function ViewFormDetailsModal({ formDetails, onClose }) {
   const navigate = useNavigate();

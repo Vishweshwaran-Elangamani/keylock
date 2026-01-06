@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import api from "../../../services/performancemanagement/hr/api";
 import toast, { Toaster } from "react-hot-toast";
 import Breadcrumb from "../../../components/common/Breadcrumb";
-import styles from "../../../styles/performancemanagement/hr/AssessmentStatusTracker";
+import styles from "../../../styles/performancemanagement/hr/AssessmentStatusTracker.module.css";
 
 const Badge = ({ status }) => {
   const getBadgeClass = () => {

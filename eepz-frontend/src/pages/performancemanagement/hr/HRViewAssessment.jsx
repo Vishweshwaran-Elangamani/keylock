@@ -17,7 +17,7 @@ const CustomDropdown = ({ value, onChange, options, placeholder, disabled }) => 
     setOpen(false);
   };
 
-  // Close dropdown when clicking outside
+ 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -60,7 +60,7 @@ const CustomDropdown = ({ value, onChange, options, placeholder, disabled }) => 
   );
 };
 
-// Pagination Dropdown Component
+
 const PaginationDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);

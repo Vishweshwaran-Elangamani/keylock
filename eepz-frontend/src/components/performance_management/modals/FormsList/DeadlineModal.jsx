@@ -1,7 +1,6 @@
-
 import React, { useEffect, useRef } from "react";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import "../../../../styles/performancemanagement/components/DeadlineModal.css";
+import "../../../../styles/performancemanagement/components/DeadlineModal.module.css";
 
 function DeadlineModal({
   isOpen,

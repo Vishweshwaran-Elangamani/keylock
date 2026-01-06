@@ -5,7 +5,7 @@ import Confetti from "react-confetti";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 import { getEmployeeNominations } from "../../../services/performancemanagement/api/nominationapi";
 import "react-toastify/dist/ReactToastify.css";
-import "../../../styles/performancemanagement/employee/Nominations.css";
+import "../../../styles/performancemanagement/employee/Nominations.module.css";
 
 export default function Nominations() {
   const navigate = useNavigate();
@@ -98,35 +98,35 @@ export default function Nominations() {
       <div className="nom-card-wrapper">
         <div className="nom-decorative-bg-1" />
 
-        {/* Main Award Card */}
+        
         <div className="nom-main-card">
-          {/* Content Grid */}
+          
           <div className="nom-card-grid">
-            {/* Icon Section */}
+            
             <div className="nom-icon-section">
-              {/* Glow Background */}
+             
               <div className="nom-glow-bg" />
 
-              {/* Icon Container */}
+             
               <div className="nom-icon-container">
                 <i className="bi bi-award-fill" />
               </div>
             </div>
 
-            {/* Content Section */}
+           
             <div className="nom-content-section">
               
 
-              {/* Title */}
+             
               <h1 className="nom-title">Congratulations!</h1>
 
-              {/* Subtitle */}
+            
               <p className="nom-subtitle">
                 You have been recognized for your outstanding contribution and
                 excellence
               </p>
 
-              {/* Award Details Box */}
+             
               <div className="nom-award-box">
                 <p className="nom-award-label">
                   <i className="bi bi-badge-check" />
@@ -200,7 +200,7 @@ export default function Nominations() {
           </div>
         </div>
 
-        {/* Award Card */}
+       
         {renderNominationCard()}
 
        
