@@ -2,6 +2,7 @@ namespace Relevantz.EEPZ.Core.Tests;
 
 public class Tests
 {
+
     [SetUp]
     public void Setup()
     {

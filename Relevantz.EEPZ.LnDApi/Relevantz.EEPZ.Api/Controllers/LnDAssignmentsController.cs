@@ -37,7 +37,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             var result = await _assignmentService.CheckAndMarkOverdueAssignments();
 
-            if (!result.Success)
+            if (!result.Success)                             
             {
                 Log.Warning("CheckOverdueAssignments API failed. Message={Message}", result.Message);
                 return BadRequest(result);

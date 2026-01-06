@@ -709,12 +709,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         public async Task<ApiResponse<FileDownloadDto>> GetAssignmentProof(
             int employeeId,
             int assignmentId
-        )
+        )      
         {
             Log.Information(
                 "GetAssignmentProof started. AssignmentId={AssignmentId}, EmployeeId={EmployeeId}",
-                assignmentId, employeeId
-            );
+                assignmentId, employeeId  
+            );                                                             
 
             try
             {
@@ -764,7 +764,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     assignmentId,
                     fileName,
                     fileBytes.Length
-                );
+                ); 
 
                 return new ApiResponse<FileDownloadDto>
                 {
@@ -792,7 +792,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     Success = false,
                     Message = "An error occurred",
                     Errors = new List<string> { ex.Message },
-                };
+                }; 
             }
         }
 
@@ -895,7 +895,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         public async Task<ApiResponse<FileDownloadDto>> PreviewAssignmentProof(
             int employeeId,
             int assignmentId
-        )
+        )                                                                      
         {
             Log.Debug(
                 "PreviewAssignmentProof started. AssignmentId={AssignmentId}, EmployeeId={EmployeeId}",
@@ -920,14 +920,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         "PreviewAssignmentProof: Assignment not found or access denied. AssignmentId={AssignmentId}, EmployeeId={EmployeeId}",
                         assignmentId,
                         employeeId
-                    );
+                    );   
 
                     return new ApiResponse<FileDownloadDto>
                     {
                         Success = false,
                         Message = "Assignment not found or access denied",
-                    };
-                }
+                    };   
+                }   
 
                 if (string.IsNullOrEmpty(assignment.ProofFilePath))
                 {

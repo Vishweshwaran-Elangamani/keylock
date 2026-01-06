@@ -14,7 +14,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
     [Authorize(Roles = LnDConstants.USER_ROLES.HR)]
     public class LnDHRController : BaseLnDController
     {
-        #region Dependencies
+        #region Dependencies  
 
         private readonly ILnDHRService _hrService;
         private readonly ILnDSmeService _smeService;
@@ -201,7 +201,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         #region SME Management
 
         /// <summary>Gets paginated list of all active SMEs with search capability (HR only).</summary>
-        [HttpGet("smes/all")]
+        [HttpGet("smes/all")] 
         public async Task<IActionResult> GetAllActiveSmes(
             [FromQuery] string? searchTerm,
             [FromQuery] int pageNumber = 1,

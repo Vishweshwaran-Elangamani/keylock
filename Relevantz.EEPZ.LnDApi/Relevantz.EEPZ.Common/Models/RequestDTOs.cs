@@ -7,7 +7,7 @@ namespace Relevantz.EEPZ.Common.DTOs
     {
         public int ApprovalId { get; set; }
         public bool IsApproved { get; set; }
-        public string? Notes { get; set; }
+        public string? Notes { get; set; }   
     }
 
     // Assignment requests

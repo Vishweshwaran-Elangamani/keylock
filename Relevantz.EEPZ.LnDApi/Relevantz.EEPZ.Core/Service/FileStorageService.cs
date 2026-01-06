@@ -30,7 +30,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
 
             _gridFSBucket = new GridFSBucket(database, bucketOptions);
-        }
+        }  
 
         public async Task<string> SaveFileAsync(IFormFile file, string subFolder)
         {
@@ -102,7 +102,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 return false;
             }
-        }
+        }  
 
         public async Task<(byte[] fileBytes, string contentType, string fileName)> GetFileForPreviewAsync(string fileId)
         {
@@ -135,7 +135,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 throw new FileNotFoundException($"File with ID {fileId} not found in GridFS");
             }
-        }
+        }     
 
         public async Task<FileMetadata?> GetFileMetadataAsync(string fileId)
         {

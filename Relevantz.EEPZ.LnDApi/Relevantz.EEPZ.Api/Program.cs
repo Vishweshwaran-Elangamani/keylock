@@ -14,8 +14,10 @@ using Relevantz.EEPZ.Data.Repositories.Interface;
 using Serilog;
 
 
+
 var builder = WebApplication.CreateBuilder(args);
 Console.WriteLine("Building EEPZ Backend........");
+
 
 
 // ===================================
@@ -34,12 +36,15 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 
+
 builder.Host.UseSerilog();
+
 
 
 // ===================================
 // Add Services to Container
 // ===================================
+
 
 
 // Add Controllers with JSON Options
@@ -67,7 +72,9 @@ builder
     });
 
 
+
 builder.Services.AddEndpointsApiExplorer();
+
 
 
 // ===================================
@@ -86,6 +93,7 @@ builder.Services.AddSwaggerGen(options =>
     );
 
 
+
     options.AddSecurityDefinition(
         "Bearer",
         new OpenApiSecurityScheme
@@ -99,6 +107,7 @@ builder.Services.AddSwaggerGen(options =>
                 "Enter 'Bearer' [space] and then your valid JWT token.\n\nExample: \"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"",
         }
     );
+
 
 
     options.AddSecurityRequirement(
@@ -120,10 +129,12 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 
+
 // ===================================
 // Configure MySQL Database
 // ===================================
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
 
 
 if (string.IsNullOrEmpty(connectionString))
@@ -135,7 +146,8 @@ if (string.IsNullOrEmpty(connectionString))
 }
 
 
-// Register EEPZDbContext (the main context used by LnDService)
+
+// Register EEPZDbContext (the main context used by LnDService)           
 builder.Services.AddDbContext<EEPZDbContext>(options =>
 {
     options.UseMySql(
@@ -153,13 +165,15 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
     );
 
 
-    // Enable sensitive data logging only in development
+
+    // Enable sensitive data logging only in development 
     if (builder.Environment.IsDevelopment())
     {
         options.EnableSensitiveDataLogging();
         options.EnableDetailedErrors();
     }
 });
+
 
 
 // ===================================
@@ -169,10 +183,12 @@ builder.Services.Configure<MongoDbSettings>(
     builder.Configuration.GetSection("MongoDbSettings"));
 
 
-// Validate MongoDB Configuration
+
+// Validate MongoDB Configuration  
 var mongoConfig = builder.Configuration.GetSection("MongoDbSettings");
 var mongoConnectionString = mongoConfig["ConnectionString"];
 var mongoDatabaseName = mongoConfig["DatabaseName"];
+
 
 
 if (string.IsNullOrEmpty(mongoConnectionString))
@@ -185,6 +201,7 @@ else
 }
 
 
+
 // ===================================
 // Configure JWT Authentication
 // ===================================
@@ -192,11 +209,13 @@ var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["SecretKey"];
 
 
+
 if (string.IsNullOrEmpty(secretKey))
 {
     Log.Fatal("JWT SecretKey is not configured!");
     throw new InvalidOperationException("JWT SecretKey not found in configuration.");
 }
+
 
 
 builder
@@ -218,6 +237,7 @@ builder
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
             ClockSkew = TimeSpan.Zero,
         };
+
 
 
         options.Events = new JwtBearerEvents
@@ -242,12 +262,15 @@ builder
     });
 
 
+
 builder.Services.AddAuthorization();
+
 
 
 // ===================================
 // Register Application Services (DI)
 // ===================================
+
 
 
 // ============================================
@@ -257,9 +280,11 @@ builder.Services.AddSingleton<IFileStorageService, FileStorageService>();
 Log.Information("File Storage Service registered with MongoDB GridFS");
 
 
+
 // ============================================
 // LnD Module - Complete Registration
 // ============================================
+
 
 
 // LnD Repositories
@@ -271,6 +296,7 @@ builder.Services.AddScoped<ILnDHRRepository, LnDHRRepository>();
 builder.Services.AddScoped<ILnDBaseRepository,LnDBaseRepository>();
 
 
+
 // LnD Services
 builder.Services.AddScoped<ILnDEmployeeSkillService, LnDEmployeeSkillService>();
 builder.Services.AddScoped<ILnDSmeService, LnDSmeService>();
@@ -279,8 +305,10 @@ builder.Services.AddScoped<ILnDApprovalService, LnDApprovalService>();
 builder.Services.AddScoped<ILnDHRService, LnDHRService>();
 
 
+
 // File Migration Service (Optional - for migrating existing files)
 // builder.Services.AddScoped<FileStorageMigrationService>();
+
 
 
 builder.Services.AddCors(options =>
@@ -292,6 +320,7 @@ builder.Services.AddCors(options =>
             policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
         }
     );
+
 
 
     // Production CORS policy (more restrictive)
@@ -313,10 +342,12 @@ builder.Services.AddCors(options =>
 });
 
 
+
 // ===================================
 // Add HTTP Client
 // ===================================
 builder.Services.AddHttpClient();
+
 
 
 // ===================================
@@ -332,10 +363,12 @@ builder.Services.AddSession(options =>
 });
 
 
+
 // ===================================
 // Add Memory Cache
 // ===================================
 builder.Services.AddMemoryCache();
+
 
 
 // ===================================
@@ -344,7 +377,9 @@ builder.Services.AddMemoryCache();
 var app = builder.Build();
 
 
+
 Log.Information("EEPZ Backend Application Starting...");
+
 
 
 // ===================================
@@ -352,8 +387,10 @@ Log.Information("EEPZ Backend Application Starting...");
 // ===================================
 
 
+
 // Enable CORS
 app.UseCors("AllowAll");
+
 
 
 // Enable Swagger
@@ -368,11 +405,12 @@ if (app.Environment.IsDevelopment())
     });
 
 
+
     Log.Information("Swagger UI enabled at: /swagger");
 }
 else
 {
-    // Enable Swagger in Production (optional - remove if not needed)
+    // Enable Swagger in Production 
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
@@ -380,6 +418,7 @@ else
         c.RoutePrefix = "swagger";
     });
 }
+
 
 
 // Enable Serilog Request Logging
@@ -395,16 +434,20 @@ app.UseSerilogRequestLogging(options =>
 });
 
 
+
 // HTTPS Redirection
 app.UseHttpsRedirection();
+
 
 
 // NOTE: Static files middleware removed as files are now stored in MongoDB GridFS
 // No longer using wwwroot for file storage
 
 
+
 // Enable Session
 app.UseSession();
+
 
 
 // Authentication & Authorization
@@ -412,8 +455,94 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 
+
 // Map Controllers
 app.MapControllers();
+
+
+
+// ===================================
+// Health Check Endpoint
+// ===================================
+app.MapGet("/health", async (EEPZDbContext eepzDbContext, IConfiguration config) =>
+{
+    bool mySqlConnected = false;
+    bool mongoConnected = false;
+    
+    try
+    {
+        mySqlConnected = await eepzDbContext.Database.CanConnectAsync();
+    }
+    catch (Exception)
+    {
+        // Health check failed silently
+    }
+
+    // Test MongoDB Connection
+    try
+    {
+        var fileStorageService = app.Services.GetRequiredService<IFileStorageService>();
+        mongoConnected = true;
+    }
+    catch (Exception)
+    {
+        mongoConnected = false;
+    }
+
+    return Results.Ok(new
+    {
+        status = "Healthy",
+        timestamp = DateTime.UtcNow,
+        service = "EEPZ Learning and Development API",
+        version = "v1.0",
+        environment = app.Environment.EnvironmentName,
+        
+        database = new
+        {
+            mySQL = new
+            {
+                connected = mySqlConnected,
+                provider = "MySQL (EF Core)",
+                connectionStringName = "DefaultConnection"
+            },
+            mongoDB = new
+            {
+                connected = mongoConnected,
+                provider = "MongoDB GridFS",
+                databaseName = config["MongoDbSettings:DatabaseName"]
+            }
+        },
+        
+        storage = new
+        {
+            type = "MongoDB GridFS",
+            enabled = !string.IsNullOrEmpty(config["MongoDbSettings:ConnectionString"])
+        },
+        
+        endpoints = new
+        {
+            categories = new[]
+            {
+                "LnD Employee Skills",
+                "LnD SME Management",
+                "LnD Assignments",
+                "LnD Approvals",
+                "LnD HR Operations"
+            }
+        },
+        
+        authentication = new
+        {
+            enabled = true,
+            type = "JWT Bearer",
+            issuerConfigured = !string.IsNullOrEmpty(config["JwtSettings:Issuer"])
+        },
+        
+        cors = "AllowAll Enabled",
+        swagger = app.Environment.IsDevelopment() || app.Environment.IsProduction()
+    });
+});
+
 
 
 // ===================================
@@ -427,12 +556,15 @@ app.UseExceptionHandler(errorApp =>
         context.Response.ContentType = "application/json";
 
 
+
         var exceptionHandlerPathFeature =
             context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerPathFeature>();
         var exception = exceptionHandlerPathFeature?.Error;
 
 
+
         Log.Error(exception, "Unhandled exception occurred: {Message}", exception?.Message);
+
 
 
         var response = new
@@ -444,9 +576,11 @@ app.UseExceptionHandler(errorApp =>
         };
 
 
+
         await context.Response.WriteAsJsonAsync(response);
     });
 });
+
 
 
 // ===================================
@@ -457,9 +591,11 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
 
 
+
     try
     {
         var eepzDbContext = services.GetRequiredService<EEPZDbContext>();
+
 
 
         // Ensure database connection is working
@@ -471,6 +607,7 @@ using (var scope = app.Services.CreateScope())
         {
             Log.Error("EEPZDbContext - Failed to connect to the MySQL database!");
         }
+
 
 
         // Test MongoDB Connection
@@ -489,12 +626,14 @@ using (var scope = app.Services.CreateScope())
         Log.Error(ex, "An error occurred during database initialization: {Message}", ex.Message);
 
 
-        if (app.Environment.IsDevelopment())
+
+        if (app.Environment.IsDevelopment())  
         {
             throw; // Re-throw in development to see the full error
         }
     }
 }
+
 
 
 // ===================================
@@ -511,11 +650,14 @@ try
     Log.Information("========================================");
 
 
+
     app.Run();
 
 
+
     Log.Information("EEPZ Backend Application Stopped Gracefully");
-}
+} 
+
 catch (Exception ex)
 {
     Log.Fatal(ex, "EEPZ Backend Application Terminated Unexpectedly");
@@ -525,3 +667,4 @@ finally
 {
     Log.CloseAndFlush();
 }
+

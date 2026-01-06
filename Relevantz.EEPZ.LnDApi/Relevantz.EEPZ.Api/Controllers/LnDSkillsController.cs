@@ -46,8 +46,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 Log.Warning("GetAllSkills API failed. Message={Message}", result.Message);
                 return BadRequest(result);
             }
-        }
-
+        } 
         /// <summary>Gets paginated skills for the logged-in employee.</summary>
         [HttpGet("my-skills")]
         public async Task<IActionResult> GetMySkills(

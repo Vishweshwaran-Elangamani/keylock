@@ -31,5 +31,6 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
             int pageSize
         );
         
+        
     }
 }

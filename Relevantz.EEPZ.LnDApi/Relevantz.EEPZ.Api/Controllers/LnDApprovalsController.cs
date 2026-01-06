@@ -58,7 +58,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 pageNumber,
                 pageSize,
                 searchTerm
-            );
+            );   
 
             if (result.Success)
             {
@@ -80,7 +80,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
         /// <summary>
         /// Processes an approval decision (approve or reject).
-        /// Triggers business workflows for SME registration, assignments, and acknowledgements.
+        /// Triggers business workflows for SME registration, assignments, and acknowledgements.  
         /// </summary>
         [HttpPost("process")]
         public async Task<IActionResult> ProcessApproval([FromBody] ApprovalDecisionRequest request)
@@ -92,7 +92,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 approverId, request.ApprovalId, request.IsApproved
             );
 
-            var result = await _approvalService.ProcessApproval(approverId, request);
+            var result = await _approvalService.ProcessApproval(approverId, request); 
 
             if (result.Success)
             {
