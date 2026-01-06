@@ -16,7 +16,6 @@ import nominationService from "../../../services/internal/nominationService";
 import { toast } from "sonner";
 import "../../../styles/internal/NominationGraphModal.css";
 
-
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -29,7 +28,6 @@ ChartJS.register(
   ArcElement
 );
 
-
 const SOLID_COLORS = [
   "#27235C", // Total Nominations - Dark Blue
   "#10b981", // Approved - Green
@@ -37,13 +35,11 @@ const SOLID_COLORS = [
   "#ef4444", // Rejected - Red
 ];
 
-
 const NominationGraphModal = ({ show, onHide }) => {
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [chartType, setChartType] = useState("bar");
   const [chartKey, setChartKey] = useState(0);
-
 
   useEffect(() => {
     if (show) {
@@ -51,11 +47,9 @@ const NominationGraphModal = ({ show, onHide }) => {
     }
   }, [show]);
 
-
   const fetchAnalytics = async () => {
     setLoading(true);
     const response = await nominationService.getMyNominationAnalytics();
-
 
     if (response.success) {
       setAnalytics(response.data);
@@ -66,10 +60,8 @@ const NominationGraphModal = ({ show, onHide }) => {
     setLoading(false);
   };
 
-
   const getChartData = () => {
     if (!analytics) return null;
-
 
     const values = [
       analytics.totalNominations,
@@ -78,8 +70,6 @@ const NominationGraphModal = ({ show, onHide }) => {
       analytics.rejected,
     ];
 
-
-    
     if (chartType === "line") {
       return {
         labels: ["Total Nominations", "Approved", "Pending", "Rejected"],
@@ -101,8 +91,6 @@ const NominationGraphModal = ({ show, onHide }) => {
       };
     }
 
-
-    
     return {
       labels: ["Total Nominations", "Approved", "Pending", "Rejected"],
       datasets: [
@@ -110,14 +98,14 @@ const NominationGraphModal = ({ show, onHide }) => {
           label: "Nomination Statistics",
           data: values,
           backgroundColor: SOLID_COLORS,
-          borderColor: SOLID_COLORS,
-          borderWidth: 2,
-          borderRadius: 8,
+          borderColor: "#ffffff",
+          borderWidth: 0,
+          spacing: 0,
+          borderRadius: 0,
         },
       ],
     };
   };
-
 
   const commonOptions = {
     responsive: true,
@@ -140,7 +128,6 @@ const NominationGraphModal = ({ show, onHide }) => {
     },
   };
 
-
   const barOptions = {
     ...commonOptions,
     plugins: { ...commonOptions.plugins, legend: { display: false } },
@@ -157,7 +144,6 @@ const NominationGraphModal = ({ show, onHide }) => {
     },
   };
 
-
   const pieOptions = {
     ...commonOptions,
     plugins: {
@@ -173,7 +159,6 @@ const NominationGraphModal = ({ show, onHide }) => {
       },
     },
   };
-
 
   const lineOptions = {
     ...commonOptions,
@@ -196,14 +181,11 @@ const NominationGraphModal = ({ show, onHide }) => {
     },
   };
 
-
   if (!show) return null;
-
 
   return (
     <>
       <div className="ngm-backdrop" onClick={onHide} />
-
 
       <div className="ngm-modal-wrapper">
         <div className="ngm-modal-dialog">
@@ -221,7 +203,6 @@ const NominationGraphModal = ({ show, onHide }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
 
           {/* Modal Body */}
           <div className="ngm-modal-body">
@@ -244,7 +225,6 @@ const NominationGraphModal = ({ show, onHide }) => {
                     Bar Chart
                   </button>
 
-
                   <button
                     onClick={() => setChartType("pie")}
                     className={`ngm-chart-btn ${
@@ -254,7 +234,6 @@ const NominationGraphModal = ({ show, onHide }) => {
                     <i className="bi bi-pie-chart-fill"></i>
                     Pie Chart
                   </button>
-
 
                   <button
                     onClick={() => setChartType("line")}
@@ -266,7 +245,6 @@ const NominationGraphModal = ({ show, onHide }) => {
                     Line Graph
                   </button>
                 </div>
-
 
                 {/* Chart Container */}
                 <div className="ngm-chart-container">
@@ -301,7 +279,6 @@ const NominationGraphModal = ({ show, onHide }) => {
             )}
           </div>
 
-
           {/* Modal Footer */}
           <div className="ngm-modal-footer">
             <button type="button" onClick={onHide} className="ngm-btn-close">
@@ -314,6 +291,5 @@ const NominationGraphModal = ({ show, onHide }) => {
     </>
   );
 };
-
 
 export default NominationGraphModal;
