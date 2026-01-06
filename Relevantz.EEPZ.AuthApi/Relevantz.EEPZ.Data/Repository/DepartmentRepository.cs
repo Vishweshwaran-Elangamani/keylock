@@ -14,8 +14,6 @@ namespace Relevantz.EEPZ.Data.Repository
             _context = context;
         }
 
-        #region Basic CRUD Operations
-
         public async Task<Department?> GetByIdAsync(int departmentId)
         {
             return await _context.Departments.FindAsync(departmentId);
@@ -68,10 +66,6 @@ namespace Relevantz.EEPZ.Data.Repository
             return true;
         }
 
-        #endregion
-
-        #region Validation Methods
-
         public async Task<bool> DepartmentNameExistsAsync(string departmentName, int? excludeDepartmentId = null)
         {
             return await _context.Departments
@@ -97,10 +91,6 @@ namespace Relevantz.EEPZ.Data.Repository
             return await _context.Employeedetailsmasters
                 .AnyAsync(e => e.DepartmentId == departmentId);
         }
-
-        #endregion
-
-        #region Hierarchy Operations
 
         public async Task<List<Department>> GetChildDepartmentsAsync(int parentDepartmentId)
         {
@@ -190,10 +180,6 @@ namespace Relevantz.EEPZ.Data.Repository
             return level;
         }
 
-        #endregion
-
-        #region HOD Operations
-
         public async Task<List<Department>> GetDepartmentsByHodAsync(int hodEmployeeId)
         {
             return await _context.Departments
@@ -209,10 +195,6 @@ namespace Relevantz.EEPZ.Data.Repository
             return await _context.Departments
                 .AnyAsync(d => d.HodEmployeeId == employeeId);
         }
-
-        #endregion
-
-        #region Advanced Queries
 
         public async Task<List<Department>> GetActiveDepartmentsAsync()
         {
@@ -276,7 +258,5 @@ namespace Relevantz.EEPZ.Data.Repository
             return await _context.Departments
                 .CountAsync(d => d.ParentDepartmentId == departmentId);
         }
-
-        #endregion
     }
 }

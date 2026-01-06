@@ -16,9 +16,7 @@ namespace Relevantz.EEPZ.Core.IService
         Task<NominationListResponseDto> GetPendingManagerReviewAsync(int managerId);
         Task<NominationListResponseDto> GetPendingDeptHeadReviewAsync(int deptHeadId);
         Task<NominationListResponseDto> GetAllNominationsAsync(string? status);
-        
         Task<List<NominationResponseDto>> GetManagerTeamNominationsAsync(int managerId, string? status = null);
-        
         Task<NominationResponseDto> ManagerReviewNominationAsync(int nominationId, int managerId, ManagerReviewRequestDto request);
         Task<NominationResponseDto> DepartmentHeadReviewAsync(int nominationId, int deptHeadId, DepartmentHeadReviewRequestDto request);
         Task<EligibilityCheckResponseDto> CheckEligibilityAsync(int employeeId, int opportunityId);

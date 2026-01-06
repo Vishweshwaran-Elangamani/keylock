@@ -16,7 +16,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Leadership: Create period-based budget allocation (e.g., 10L for Q1, 20L for Q2)
+        /// Leadership: Create period-based budget allocation
         /// </summary>
         [HttpPost("create")]
         public async Task<IActionResult> CreatePeriodAllocation([FromBody] CreatePeriodAllocationDto request)

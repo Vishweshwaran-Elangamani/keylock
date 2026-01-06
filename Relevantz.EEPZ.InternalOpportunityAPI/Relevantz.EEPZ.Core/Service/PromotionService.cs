@@ -32,15 +32,11 @@ namespace Relevantz.EEPZ.Core.Service
         {
             try
             {
-                Console.WriteLine($"Service: CreatePromotion - EmployeeUserId: {request.EmployeeUserId}, NominationId: {request.NominationId}");
-
-                // VALIDATION 1: NominationId must be provided
                 if (request.NominationId <= 0)
                 {
                     throw new Exception("NominationId is required for promotion");
                 }
 
-                // VALIDATION 2: Get and validate nomination
                 var nomination = await _nominationRepository.GetByIdAsync(request.NominationId);
 
                 if (nomination == null)
@@ -48,28 +44,19 @@ namespace Relevantz.EEPZ.Core.Service
                     throw new Exception($"Nomination ID {request.NominationId} not found");
                 }
 
-                // VALIDATION 3: Nomination MUST be approved
                 if (nomination.Status != NominationStatusConstants.Approved)
                 {
                     throw new Exception($"Cannot create promotion. Nomination status is '{nomination.Status}'. Only APPROVED nominations can be promoted.");
                 }
-
-                // VALIDATION 4: Employee ID must match nominee
                 if (nomination.NomineeUserId != request.EmployeeUserId)
                 {
                     throw new Exception($"Employee ID {request.EmployeeUserId} does not match the nomination nominee ID {nomination.NomineeUserId}");
                 }
-
-                // VALIDATION 5: Check if promotion already exists for this nomination
                 var existingPromotion = await _promotionRepository.GetByNominationIdAsync(request.NominationId);
                 if (existingPromotion != null)
                 {
                     throw new Exception($"Promotion already exists for Nomination ID {request.NominationId}");
                 }
-
-                Console.WriteLine($"All validations passed for NominationId={request.NominationId}");
-
-                // Create promotion
                 var promotion = new Promotion
                 {
                     NominationId = request.NominationId,
@@ -88,7 +75,6 @@ namespace Relevantz.EEPZ.Core.Service
 
                 var created = await _promotionRepository.CreateAsync(promotion);
 
-                // Load related data for response
                 var response = await GetPromotionByIdAsync(created.PromotionId);
 
                 return response;

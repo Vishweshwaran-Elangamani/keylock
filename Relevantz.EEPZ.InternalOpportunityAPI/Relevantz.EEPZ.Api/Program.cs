@@ -427,7 +427,7 @@ app.UseExceptionHandler(errorApp =>
 });
 
 
-// 5. Swagger (Development only)
+// 5. Swagger 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -525,7 +525,7 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions
 }).AllowAnonymous();
 
 
-// 12. Enhanced Health Endpoint (backward compatible)
+// 12. Health Endpoint (backward compatible)
 app.MapGet("/health", async (EEPZDbContext dbContext, IConfiguration config) =>
 {
     bool dbConnected = false;
@@ -589,7 +589,7 @@ app.MapGet("/health", async (EEPZDbContext dbContext, IConfiguration config) =>
 }).AllowAnonymous();
 
 
-// 13. API Info Endpoint (Development only)
+// 13. API Info Endpoint 
 if (app.Environment.IsDevelopment())
 {
     app.MapGet("/api/info", () =>

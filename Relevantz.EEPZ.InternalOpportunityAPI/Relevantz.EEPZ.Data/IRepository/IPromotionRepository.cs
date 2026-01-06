@@ -13,7 +13,6 @@ namespace Relevantz.EEPZ.Data.IRepository
         Task<List<Promotion>> GetByStatusAsync(string status);
         Task<List<Promotion>> GetPendingHrApprovalAsync();
         Task<Promotion?> GetByNominationIdAsync(int nominationId);
-        
         Task<Promotion> UpdateAsync(Promotion promotion);
         Task<bool> DeleteAsync(int id);
         Task<List<Promotionhistory>> GetPromotionHistoryByEmployeeAsync(int employeeUserId);

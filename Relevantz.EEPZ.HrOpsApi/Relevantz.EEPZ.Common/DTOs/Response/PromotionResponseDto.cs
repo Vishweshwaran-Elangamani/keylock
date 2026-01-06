@@ -19,7 +19,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public string? ApprovedByEmail { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? ApprovedAt { get; set; }
- 
         public string EmployeeFirstName { get; set; }
         public string EmployeeLastName { get; set; }
  

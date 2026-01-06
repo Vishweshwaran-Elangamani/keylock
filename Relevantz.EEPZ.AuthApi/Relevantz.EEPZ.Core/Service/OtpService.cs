@@ -28,28 +28,25 @@ namespace Relevantz.EEPZ.Core.Service
         }
 
         /// <summary>
-        /// Get IST timezone - works in both Windows and Linux/Docker
+        /// Get IST timezone
         /// </summary>
         private static TimeZoneInfo GetIstTimeZone()
         {
             try
             {
-                // Try Linux/IANA timezone ID first (works in Docker)
                 return TimeZoneInfo.FindSystemTimeZoneById("Asia/Kolkata");
             }
             catch (TimeZoneNotFoundException)
             {
                 try
                 {
-                    // Fallback to Windows timezone ID
                     return TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");
                 }
                 catch (TimeZoneNotFoundException)
                 {
-                    // Final fallback: Create custom IST timezone with +5:30 offset
                     return TimeZoneInfo.CreateCustomTimeZone(
                         "IST",
-                        new TimeSpan(5, 30, 0), // UTC +5:30
+                        new TimeSpan(5, 30, 0), 
                         "India Standard Time",
                         "IST");
                 }

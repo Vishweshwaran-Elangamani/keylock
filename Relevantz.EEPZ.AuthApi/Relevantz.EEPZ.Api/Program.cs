@@ -112,7 +112,7 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
 }, ServiceLifetime.Scoped);
 
 
-// Configure MongoDB Settings (without exposing sensitive data in logs)
+// Configure MongoDB Settings
 builder.Services.Configure<MongoDbSettings>(
     builder.Configuration.GetSection("MongoDbSettings"));
 
@@ -120,7 +120,7 @@ builder.Services.Configure<MongoDbSettings>(
 Log.Information("MongoDB configuration loaded successfully");
 
 
-// Configure JWT Authentication with enhanced security
+// Configure JWT Authentication with security
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = jwtSettings["SecretKey"] 
     ?? throw new InvalidOperationException("JWT Secret Key not configured");
@@ -296,7 +296,7 @@ builder.Services.AddHttpClient("DefaultClient")
     });
 
 
-// Configure Health Checks (Custom implementation - no extra package needed)
+// Configure Health Checks
 builder.Services.AddHealthChecks()
     .AddCheck("mysql-db", () =>
     {
@@ -386,7 +386,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 
-// Configure middleware pipeline (Order matters!)
+// Configure middleware pipeline
 
 
 // 1. Response Compression
@@ -406,7 +406,7 @@ app.Use(async (context, next) =>
 });
 
 
-// 3. Security Headers Middleware (EXCLUDING Swagger paths - THIS IS THE FIX)
+// 3. Security Headers Middleware
 // Security Headers Middleware
 app.Use(async (context, next) =>
 {
@@ -473,7 +473,7 @@ app.UseExceptionHandler(errorApp =>
 });
 
 
-// 5. Swagger (Development only)
+// 5. Swagger
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -571,7 +571,7 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions
 }).AllowAnonymous();
 
 
-// 13. API Info Endpoint (Development only)
+// 13. API Info Endpoint
 if (app.Environment.IsDevelopment())
 {
     app.MapGet("/api/info", () =>

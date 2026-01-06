@@ -128,8 +128,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(result);
         }
 
-        // ==================== NEW DEPARTMENT HIERARCHY ENDPOINTS ====================
-
         [HttpGet("department/hierarchy/tree")]
         [AllowAnonymous]
         public async Task<IActionResult> GetDepartmentHierarchyTree([FromQuery] int? rootDepartmentId = null)
@@ -174,8 +172,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(result);
         }
 
-        // ==================== DEPARTMENT STATUS ENDPOINTS ====================
-
         [HttpGet("department/status/active")]
         [AllowAnonymous]
         public async Task<IActionResult> GetActiveDepartments()
@@ -203,8 +199,6 @@ namespace Relevantz.EEPZ.Api.Controllers
 
             return Ok(result);
         }
-
-        // ==================== DEPARTMENT HOD ENDPOINTS ====================
 
         [HttpGet("department/hod/{hodEmployeeId}")]
         [AllowAnonymous]
@@ -238,8 +232,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             return Ok(result);
         }
 
-        // ==================== DEPARTMENT SEARCH & FILTER ENDPOINTS ====================
-
         [HttpGet("department/search")]
         [AllowAnonymous]
         public async Task<IActionResult> SearchDepartments([FromQuery] string searchTerm)
@@ -262,8 +254,6 @@ namespace Relevantz.EEPZ.Api.Controllers
 
             return Ok(result);
         }
-
-        // ==================== DEPARTMENT STATISTICS ENDPOINTS ====================
 
         [HttpGet("department/statistics/total")]
         [AllowAnonymous]

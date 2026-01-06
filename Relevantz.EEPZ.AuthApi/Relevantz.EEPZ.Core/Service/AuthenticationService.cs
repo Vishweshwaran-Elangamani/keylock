@@ -210,7 +210,6 @@ namespace Relevantz.EEPZ.Core.Service
 
                 if (user == null)
                 {
-                    // ❌ Email doesn't exist - return FAILURE with clear message
                     EEPZBusinessLog.Warning($"Password reset attempt for non-existent email: {request.Email}");
                     return ApiResponseDto<OtpResponseDto>.FailureResponse(
                         "This email address is not registered in our system. Please check your email or contact support."
@@ -254,7 +253,7 @@ namespace Relevantz.EEPZ.Core.Service
                     return ApiResponseDto<string>.FailureResponse(Constants.Messages.UserNotFound);
                 }
 
-                //  CHECK IF USER IS PROTECTED EMPLOYEE (EmployeeCompanyID = 1000) - DOUBLE SECURITY
+                //  CHECK IF USER IS PROTECTED EMPLOYEE (EmployeeCompanyID = 1000)
                 var employeeCompanyId = user.Employee?.EmployeeCompanyId;
                 if (!string.IsNullOrEmpty(employeeCompanyId) && employeeCompanyId == "1000")
                 {

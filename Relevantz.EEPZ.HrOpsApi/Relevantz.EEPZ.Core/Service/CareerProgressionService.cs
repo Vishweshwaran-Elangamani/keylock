@@ -18,8 +18,6 @@ namespace Relevantz.EEPZ.Core.Service
             _context = context;
             _logger = logger;
         }
-
-        // Pending nomination for employee
         public async Task<ApiResponseDto<PendingNominationCheckDto>> CheckPendingNominationAsync(int employeeUserId)
         {
             try
@@ -389,7 +387,7 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
 
-        // SUBMIT TO LEADERSHIP - Sets ApprovedAt timestamp
+        // SUBMIT TO LEADERSHIP
         public async Task<ApiResponseDto<PromotionResponseDto>> SubmitToLeadershipAsync(int promotionId)
         {
             try

@@ -361,8 +361,6 @@ using (var scope = app.Services.CreateScope())
 
 
 // Configure middleware pipeline
-
-
 // 1. Response Compression
 app.UseResponseCompression();
 
@@ -445,7 +443,7 @@ app.UseExceptionHandler(errorApp =>
 });
 
 
-// 5. Swagger (Development only)
+// 5. Swagger
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -546,7 +544,7 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions
 }).AllowAnonymous();
 
 
-// 13. Enhanced Health Endpoint (backward compatible with your existing /health)
+// 13. Health Endpoint
 app.MapGet("/health", async (EEPZDbContext dbContext, IConfiguration config) =>
 {
     bool dbConnected = false;
@@ -607,7 +605,7 @@ app.MapGet("/health", async (EEPZDbContext dbContext, IConfiguration config) =>
 }).AllowAnonymous();
 
 
-// 14. API Info Endpoint (Development only)
+// 14. API Info Endpoint
 if (app.Environment.IsDevelopment())
 {
     app.MapGet("/api/info", () =>

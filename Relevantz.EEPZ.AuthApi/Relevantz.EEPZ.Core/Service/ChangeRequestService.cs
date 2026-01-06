@@ -40,7 +40,7 @@ namespace Relevantz.EEPZ.Core.Service
                     return ApiResponseDto<ChangeRequestResponseDto>.FailureResponse(Constants.Messages.UserNotFound);
                 }
 
-                // ✅ CHECK IF USER IS PROTECTED EMPLOYEE (EmployeeCompanyID = 1000)
+                // CHECK IF USER IS PROTECTED EMPLOYEE (EmployeeCompanyID = 1000)
                 var employeeCompanyId = user.Employee?.EmployeeCompanyId;
                 if (!string.IsNullOrEmpty(employeeCompanyId) && employeeCompanyId == "1000")
                 {
@@ -72,8 +72,6 @@ namespace Relevantz.EEPZ.Core.Service
                 {
                     return ApiResponseDto<ChangeRequestResponseDto>.FailureResponse("You already have a pending change request. Please wait for admin approval or cancel the existing request.");
                 }
-
-                // Validate based on change type
                 string? currentValue = null;
                 string? newValue = null;
                 string? newEmail = null;
@@ -132,8 +130,6 @@ namespace Relevantz.EEPZ.Core.Service
                 {
                     return ApiResponseDto<ChangeRequestResponseDto>.FailureResponse($"Invalid change type: {request.ChangeType}. Only 'Email' and 'EmployeeCompanyId' are supported.");
                 }
-
-                // Create change request
                 var changeRequest = new Changerequest
                 {
                     EmployeeId = user.EmployeeId,
@@ -181,7 +177,7 @@ namespace Relevantz.EEPZ.Core.Service
                     return ApiResponseDto<ChangeRequestResponseDto>.FailureResponse("Change request already processed");
                 }
 
-                // ✅ DOUBLE CHECK: Prevent processing for protected employees (EmployeeCompanyID = 1000)
+                // Prevent processing for protected employees (EmployeeCompanyID = 1000)
                 var employee = await _employeeRepository.GetByIdAsync(changeRequest.EmployeeId);
                 if (employee != null && !string.IsNullOrEmpty(employee.EmployeeCompanyId) && employee.EmployeeCompanyId == "1000")
                 {

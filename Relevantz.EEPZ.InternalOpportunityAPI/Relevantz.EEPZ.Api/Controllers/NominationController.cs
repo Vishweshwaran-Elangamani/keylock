@@ -140,8 +140,6 @@ namespace Relevantz.EEPZ.Api.Controllers
 
         /// <summary>
         /// Get My Nomination History (Employee)
-        /// Shows: Self-nominations + Manager-nominated (where user is nominee)
-        /// All statuses: pending, approved, rejected
         /// </summary>
         [HttpGet("my-history")]
         [Authorize(Roles = "Employee,Manager")]
@@ -170,7 +168,6 @@ namespace Relevantz.EEPZ.Api.Controllers
 
         /// <summary>
         /// Get Manager Team Nominations
-        /// Shows: Nominations created BY this manager for their team members
         /// </summary>
         [HttpGet("manager-team-nominations")]
         [Authorize(Roles = "Manager")]
@@ -199,7 +196,6 @@ namespace Relevantz.EEPZ.Api.Controllers
 
         /// <summary>
         /// Get Pending Manager Review (L2 Manager)
-        /// Shows: Nominations requiring THIS manager's review
         /// </summary>
         [HttpGet("pending-manager-review")]
         [Authorize(Roles = "Manager")]
@@ -228,7 +224,6 @@ namespace Relevantz.EEPZ.Api.Controllers
 
         /// <summary>
         /// Get Pending DeptHead Review
-        /// Shows: Nominations requiring THIS department head's review
         /// </summary>
         [HttpGet("pending-depthead-review")]
         [Authorize(Roles = "Department Head,DepartmentHead,DEPTHEAD")]
@@ -256,8 +251,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         /// <summary>
-        /// Get All Nominations (Admin/HR)
-        /// Shows: All nominations with optional status filter
+        /// Get All Nominations
         /// </summary>
         [HttpGet("all-nominations")]
         [Authorize]
@@ -278,7 +272,6 @@ namespace Relevantz.EEPZ.Api.Controllers
 
         /// <summary>
         /// Manager Review (L2 Approve/Reject)
-        /// Action: "Approved" or "Rejected"
         /// </summary>
         [HttpPut("{id}/manager-review")]
         [Authorize(Roles = "Manager")]
@@ -317,8 +310,6 @@ namespace Relevantz.EEPZ.Api.Controllers
 
         /// <summary>
         /// Department Head Review (Final Approve/Send Back to L2)
-        /// Action: "Approved" or "Rejected"
-        /// All fields are OPTIONAL except Action
         /// </summary>
         [HttpPut("{id}/department-head-review")]
         [Authorize(Roles = "Department Head,DepartmentHead,DEPTHEAD")]

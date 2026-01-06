@@ -14,7 +14,7 @@ namespace Relevantz.EEPZ.Data.DBContexts
     public class DbInitializer
     {
         /// <summary>
-        /// Seeds all system roles and admin user
+        /// Seeds all system roles, admin user, departments, skills and resource pool
         /// </summary>
         public static async Task InitializeAsync(
             EEPZDbContext context,
@@ -383,7 +383,6 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 context.Employeedetailsmasters.Add(adminEmployeeDetails);
                 await context.SaveChangesAsync();
 
-                // Beautiful console output
                 Console.WriteLine(new string('=', 70));
                 Console.WriteLine("   ADMIN USER SEEDED SUCCESSFULLY!");
                 Console.WriteLine(new string('=', 70));

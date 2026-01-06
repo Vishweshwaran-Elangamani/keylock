@@ -21,14 +21,6 @@ namespace Relevantz.EEPZ.Core.Service
         {
             try
             {
-                Console.WriteLine("[CREATE] Starting responsibility distribution creation");
-                Console.WriteLine("[CREATE] Request Data:");
-                Console.WriteLine($"   - TeamId: {request.TeamId}");
-                Console.WriteLine($"   - ManagerUserId: {request.ManagerUserId}");
-                Console.WriteLine($"   - MemberCount: {request.MemberCount}");
-                Console.WriteLine($"   - TasksDistributed: {request.TasksDistributed}");
-                Console.WriteLine($"   - Status: {request.Status}");
-                Console.WriteLine($"   - EvaluationDate: {request.EvaluationDate}");
 
                 if (request.TeamId <= 0)
                 {

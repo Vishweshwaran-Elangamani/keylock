@@ -34,7 +34,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                     return Unauthorized(new { message = "User ID not found in token" });
                 }
 
-                Console.WriteLine($"✓ CreatePromotion - UserId: {userId}, NominationId: {request.NominationId}");
+                Console.WriteLine($"CreatePromotion - UserId: {userId}, NominationId: {request.NominationId}");
 
                 var result = await _promotionService.CreatePromotionAsync(request, userId);
 
@@ -109,7 +109,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                     return Unauthorized(new { message = "User ID not found in token" });
                 }
 
-                Console.WriteLine($"✓ ApprovePromotion - PromotionId: {id}, Remarks: {request.ApprovalRemarks}");
+                Console.WriteLine($"ApprovePromotion - PromotionId: {id}, Remarks: {request.ApprovalRemarks}");
 
                 var result = await _promotionService.ApprovePromotionAsync(id, userId, request.ApprovalRemarks);
                 return Ok(result);
@@ -134,7 +134,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                     return Unauthorized(new { message = "User ID not found in token" });
                 }
 
-                Console.WriteLine($"✓ RejectPromotion - PromotionId: {id}");
+                Console.WriteLine($"RejectPromotion - PromotionId: {id}");
 
                 var result = await _promotionService.RejectPromotionAsync(id, userId);
                 return Ok(result);
@@ -181,7 +181,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             try
             {
-                Console.WriteLine($"✓ GetPendingLeadershipApproval");
+                Console.WriteLine($"GetPendingLeadershipApproval");
 
                 var result = await _promotionService.GetPendingLeadershipApprovalAsync();
                 return Ok(result);
@@ -206,7 +206,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                     return Unauthorized(new { message = "User ID not found in token" });
                 }
 
-                Console.WriteLine($"✓ LeadershipApprovePromotion - PromotionId: {id}, Remarks: {request.ApprovalRemarks}");
+                Console.WriteLine($"LeadershipApprovePromotion - PromotionId: {id}, Remarks: {request.ApprovalRemarks}");
 
                 var result = await _promotionService.ApprovePromotionByLeadershipAsync(id, userId, request.ApprovalRemarks);
                 return Ok(result);
@@ -231,7 +231,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                     return Unauthorized(new { message = "User ID not found in token" });
                 }
 
-                Console.WriteLine($"✓ LeadershipRejectPromotion - PromotionId: {id}, Remarks: {request.ApprovalRemarks}");
+                Console.WriteLine($"LeadershipRejectPromotion - PromotionId: {id}, Remarks: {request.ApprovalRemarks}");
 
                 var result = await _promotionService.RejectPromotionByLeadershipAsync(id, userId, request.ApprovalRemarks);
                 return Ok(result);

@@ -15,9 +15,7 @@ namespace Relevantz.EEPZ.Data.IRepository
         Task<List<Nomination>> GetPendingManagerReviewByManagerIdAsync(int managerId);
         Task<List<Nomination>> GetPendingDeptHeadApprovalByDeptHeadIdAsync(int deptHeadId);
         Task<List<Nomination>> GetNominationHistoryByUserIdAsync(int userId, string? status);
-
         Task<List<Nomination>> GetManagerTeamNominationsAsync(int managerId, string? status);
-
         Task<bool> ExistsDuplicateAsync(int opportunityId, int employeeId);
         Task<int?> GetManagerFromProjectAsync(int employeeId);
         Task<int?> GetDeptHeadFromProjectAsync(int employeeId);

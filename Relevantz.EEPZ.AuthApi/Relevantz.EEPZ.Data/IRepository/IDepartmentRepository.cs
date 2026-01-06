@@ -11,14 +11,10 @@ namespace Relevantz.EEPZ.Data.IRepository
         Task<Department> CreateAsync(Department department);
         Task<Department> UpdateAsync(Department department);
         Task<bool> DeleteAsync(int departmentId);
-
-        // Validation methods
         Task<bool> DepartmentNameExistsAsync(string departmentName, int? excludeDepartmentId = null);
         Task<bool> DepartmentCodeExistsAsync(string departmentCode, int? excludeDepartmentId = null);
         Task<bool> HasChildDepartmentsAsync(int departmentId);
         Task<bool> HasEmployeesAsync(int departmentId);
-
-        // Hierarchy operations
         Task<List<Department>> GetChildDepartmentsAsync(int parentDepartmentId);
         Task<List<Department>> GetAllChildDepartmentsRecursiveAsync(int parentDepartmentId);
         Task<Department?> GetParentDepartmentAsync(int departmentId);
@@ -26,12 +22,8 @@ namespace Relevantz.EEPZ.Data.IRepository
         Task<List<Department>> GetDepartmentHierarchyAsync(int departmentId);
         Task<bool> IsCircularReferenceAsync(int departmentId, int? newParentDepartmentId);
         Task<int> GetDepartmentLevelAsync(int departmentId);
-
-        // HOD operations
         Task<List<Department>> GetDepartmentsByHodAsync(int hodEmployeeId);
         Task<bool> IsEmployeeHodOfAnyDepartmentAsync(int employeeId);
-
-        // Advanced queries
         Task<List<Department>> GetActiveDepartmentsAsync();
         Task<List<Department>> GetInactiveDepartmentsAsync();
         Task<List<Department>> GetDepartmentsByStatusAsync(string status);

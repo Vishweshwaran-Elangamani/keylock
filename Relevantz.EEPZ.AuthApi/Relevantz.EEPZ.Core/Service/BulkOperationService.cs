@@ -384,9 +384,6 @@ namespace Relevantz.EEPZ.Core.Service
 
 
                             if (isEmptyRow) continue;
-
-
-                            // FIXED: Remove +91- prefix, store only 10-digit number
                             var mobileNumber = worksheet.Cells[row, 10].Value?.ToString();
                             if (!string.IsNullOrWhiteSpace(mobileNumber))
                             {

@@ -10,7 +10,6 @@ namespace Relevantz.EEPZ.Common.ViewModels.Promotion.Response
         public int? NominationId { get; set; }
         public string? OpportunityName { get; set; }
         public string? NominationType { get; set; }
-
         public string? OldRole { get; set; }
         public string NewRole { get; set; } = null!;
         public decimal? OldSalary { get; set; }

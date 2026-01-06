@@ -24,7 +24,6 @@ namespace Relevantz.EEPZ.Api.Controllers
 
         /// <summary>
         /// Get current logged-in user's profile
-        /// GET: api/User/profile
         /// </summary>
         [HttpGet("profile")]
         public async Task<IActionResult> GetMyProfile()
@@ -55,7 +54,6 @@ namespace Relevantz.EEPZ.Api.Controllers
 
         /// <summary>
         /// Get profile by specific user ID (Admin/HR use)
-        /// GET: api/User/profile/{userId}
         /// </summary>
         [HttpGet("profile/{userId}")]
         [Authorize(Roles = "Admin,HR")]
@@ -80,7 +78,6 @@ namespace Relevantz.EEPZ.Api.Controllers
 
         /// <summary>
         /// Update current user's profile
-        /// PUT: api/User/profile
         /// </summary>
         [HttpPut("profile")]
         public async Task<IActionResult> UpdateMyProfile([FromBody] UpdateProfileRequestDto request)
@@ -116,7 +113,6 @@ namespace Relevantz.EEPZ.Api.Controllers
 
         /// <summary>
         /// Upload/Update profile photo only
-        /// PUT: api/User/profile/upload-photo
         /// </summary>
         [HttpPut("profile/upload-photo")]
         public async Task<IActionResult> UploadProfilePhoto([FromForm] IFormFile ProfilePhoto)
