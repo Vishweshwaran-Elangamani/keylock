@@ -1,12 +1,10 @@
-/* OrganizationAssignments.module.css */
 
-/* Loading Container */
 .loadingContainer {
   text-align: center;
   padding: 3rem;
 }
 
-/* Action Bar (Filters + Export) */
+
 .actionBar {
   margin-bottom: 1.5rem;
   display: flex;
@@ -35,7 +33,7 @@
   min-height: 35.7px;
 }
 
-/* Dropdown */
+
 .dropdownWrapper {
   position: relative;
 }
@@ -92,7 +90,7 @@
   color: white;
 }
 
-/* Export Button - Updated with purple gradient */
+
 .exportButton {
   display: flex;
   align-items: center;
@@ -153,14 +151,14 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
-/* Grid Layout for Header and Rows */
+
 .gridLayout {
   display: grid;
   grid-template-columns: 1.5fr 1.5fr 1fr 1.6fr 1.1fr 1.1fr 0.8fr;
   align-items: center;
 }
 
-/* Table Header */
+
 .tableHeader {
   background: rgb(39, 35, 92);
   border-bottom: 2px solid #abb4c5ff;
@@ -202,7 +200,7 @@
   color: lightpink;
 }
 
-/* Sort Icons */
+
 .sortIcon {
   margin-left: 4px;
 }
@@ -217,7 +215,7 @@
   font-weight: bold;
 }
 
-/* Table Rows */
+
 .tableRow {
   font-size: 0.875rem;
   color: #212529;
@@ -234,7 +232,7 @@
   border-bottom: 1px solid #f3f4f6;
 }
 
-/* Cell Styles */
+
 .cellName {
   font-weight: 600;
   text-overflow: ellipsis;

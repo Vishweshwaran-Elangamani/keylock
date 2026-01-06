@@ -1,12 +1,10 @@
-/* PendingApprovals.module.css */
 
-/* Loading State */
 .loadingContainer {
   text-align: center;
   padding: 3rem;
 }
 
-/* Search and Filter Container */
+
 .filterContainer {
   margin-bottom: 1.5rem;
   display: flex;
@@ -15,7 +13,7 @@
   align-items: center;
 }
 
-/* Search Form */
+
 .searchForm {
   display: flex;
   gap: 0.5rem;
@@ -27,7 +25,7 @@
   min-height: 35.7px;
 }
 
-/* Type Filter Dropdown */
+
 .dropdownWrapper {
   position: relative;
 }
@@ -84,7 +82,7 @@
   color: white;
 }
 
-/* Table Container */
+
 .tableContainer {
   min-height: 65vh;
   transition: opacity 0.2s;
@@ -101,7 +99,7 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
-/* Table Header */
+
 .tableHeader {
   display: grid;
   grid-template-columns: 2fr 1.5fr 1.5fr 1.2fr 1.3fr;
@@ -145,7 +143,7 @@
   color: lightpink;
 }
 
-/* Sort Icons */
+
 .sortIcon {
   margin-left: 4px;
 }
@@ -160,7 +158,7 @@
   font-weight: bold;
 }
 
-/* Table Row */
+
 .tableRow {
   display: grid;
   grid-template-columns: 2fr 1.5fr 1.5fr 1.2fr 1.3fr;
@@ -181,7 +179,7 @@
   border-bottom: 1px solid #f3f4f6;
 }
 
-/* Table Cell Styles */
+
 .cellRequestType {
   font-weight: 500;
 }
@@ -203,7 +201,7 @@
   justify-content: center;
 }
 
-/* Download Button */
+
 .downloadButton {
   padding: 0.4rem 0.75rem;
   background: #fff;
@@ -224,7 +222,7 @@
   color: #ac5098;
 }
 
-/* Review Button */
+
 .reviewButton {
   padding: 0.4rem 0.85rem;
   background: linear-gradient(135deg, #ac5098 0%, #97247e 100%);

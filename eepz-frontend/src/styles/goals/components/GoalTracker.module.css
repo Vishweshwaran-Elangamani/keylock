@@ -10,7 +10,7 @@
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Variants (border + colors) */
+
 
 .completed {
   border: 1px solid #28a745 !important;
@@ -44,7 +44,7 @@
   letter-spacing: 0.5px;
 }
 
-/* Title colors per variant */
+
 .completed .title {
   color: #155724;
 }
@@ -71,7 +71,7 @@
   font-size: 2rem;
 }
 
-/* Count colors per variant */
+
 .completed .count {
   color: #155724;
 }
@@ -106,7 +106,7 @@
   font-size: 1.5rem;
 }
 
-/* Icon colors per variant */
+
 .completed .icon {
   color: #28a745;
 }

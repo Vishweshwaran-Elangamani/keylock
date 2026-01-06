@@ -3,7 +3,7 @@
   flex: 1;
   background-color: rgb(39, 35, 92);
   border-radius: 50px;
-  padding: 8px 6px !important; /* equal vertical padding */
+  padding: 8px 6px !important; 
   margin-bottom: 1rem;
   width: 100%;
   max-width: 600px;
@@ -17,7 +17,7 @@
  
 .toggleButton {
   flex: 1;
-  padding: 8px 12px !important; /* match container's vertical padding */
+  padding: 8px 12px !important; 
   border: none;
   border-radius: 50px !important;
   background-color: rgb(39, 35, 92);
@@ -93,7 +93,7 @@
   background-color: rgba(39, 35, 92, 0.25);
 }
  
-/* Focus states for accessibility */
+
 .toggleButton:focus {
   outline: 2px solid rgba(255, 255, 255, 0.5);
   outline-offset: 2px;
@@ -103,7 +103,7 @@
   outline: 2px solid rgba(39, 35, 92, 0.5);
 }
  
-/* Responsive design */
+
 @media (max-width: 768px) {
   .toggleContainer {
     flex-direction: column;
@@ -151,8 +151,7 @@
     transform: scale(0.85);
   }
 }
- 
-/* High contrast mode support */
+
 @media (prefers-contrast: high) {
   .toggleButton.active {
     border: 2px solid #000;

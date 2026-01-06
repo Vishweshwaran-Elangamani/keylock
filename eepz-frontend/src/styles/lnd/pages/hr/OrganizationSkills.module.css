@@ -1,12 +1,10 @@
-/* OrganizationSkills.module.css */
 
-/* Loading Container */
 .loadingContainer {
   text-align: center;
   padding: 3rem;
 }
 
-/* Search Section */
+
 .searchSection {
   margin-bottom: 1.5rem;
 }
@@ -20,7 +18,7 @@
   min-height: 35.7px;
 }
 
-/* Content Container */
+
 .contentContainer {
   min-height: 65vh;
   transition: opacity 0.2s;
@@ -30,14 +28,14 @@
   opacity: 0.6;
 }
 
-/* Employee Grid */
+
 .employeeGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1rem;
 }
 
-/* Employee Card */
+
 .employeeCard {
   background: #fff;
   border: 1px solid rgba(39, 35, 92, 0.5);
@@ -56,7 +54,7 @@
   transform: translateY(-2px);
 }
 
-/* Card Internals */
+
 .cardContent {
   flex: 1;
 }
@@ -91,7 +89,7 @@
 
 .employeeEmail {
   margin: 0;
-  padding-left: 2rem; /* Kept from original code */
+  padding-left: 2rem;
   font-size: 0.875rem;
   color: #6c757d;
 }

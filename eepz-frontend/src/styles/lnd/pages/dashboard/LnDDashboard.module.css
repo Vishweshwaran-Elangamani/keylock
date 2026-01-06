@@ -1,12 +1,10 @@
-/* LnDDashboard.module.css */
 
-/* Loading Container */
 .loadingContainer {
   text-align: center;
   padding: 3rem;
 }
 
-/* Header Section */
+
 .headerSection {
   margin-bottom: 2rem;
 }
@@ -23,14 +21,14 @@
   margin: 0;
 }
 
-/* Navigation Cards Grid */
+
 .cardsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
 }
 
-/* Navigation Card */
+
 .navCard {
   background: #fff;
   border-radius: 12px;
@@ -48,9 +46,7 @@
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
 }
 
-/* Dynamic border color on hover handled in JS due to dynamic backgroundColor */
 
-/* Card Content Layout */
 .cardContent {
   display: flex;
   justify-content: space-between;
@@ -58,14 +54,13 @@
   gap: 1rem;
 }
 
-/* Left Section */
+
 .leftSection {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-/* Icon Container */
 .iconContainer {
   width: 48px;
   height: 48px;
@@ -76,9 +71,7 @@
   flex-shrink: 0;
 }
 
-/* Dynamic background and border colors handled inline due to dynamic values */
 
-/* Text Container */
 .textContainer {
   text-align: left;
 }
@@ -97,19 +90,19 @@
   line-height: 1.5;
 }
 
-/* Right Section */
+
 .rightSection {
   text-align: right;
 }
 
-/* Count Display */
+
 .countDisplay {
   font-size: 2rem;
   font-weight: 700;
   line-height: 1;
 }
 
-/* Badge Styles */
+
 .badge {
   padding: 0.375rem 0.75rem;
   border-radius: 12px;

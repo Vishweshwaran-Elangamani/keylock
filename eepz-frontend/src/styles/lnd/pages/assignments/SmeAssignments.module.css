@@ -1,12 +1,10 @@
-/* SmeAssignments.module.css */
 
-/* Loading Container */
 .loadingContainer {
   text-align: center;
   padding: 3rem;
 }
 
-/* Filters Container */
+
 .filterContainer {
   margin-bottom: 1.5rem;
   display: flex;
@@ -26,7 +24,7 @@
   min-height: 35.7px;
 }
 
-/* Custom Dropdown Styles */
+
 .dropdownWrapper {
   position: relative;
 }
@@ -88,7 +86,7 @@
   color: white;
 }
 
-/* Table Container */
+
 .tableContainer {
   min-height: 65vh;
   transition: opacity 0.2s;
@@ -107,7 +105,7 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
-/* Table Header */
+
 .tableHeader {
   display: grid;
   grid-template-columns: 1.5fr 1.3fr 1.2fr 1fr 1fr 0.7fr 0.7fr 0.8fr;
@@ -152,7 +150,7 @@
   color: lightpink;
 }
 
-/* Sort Icons */
+
 .sortIcon {
   margin-left: 4px;
 }
@@ -167,7 +165,7 @@
   font-weight: bold;
 }
 
-/* Table Row */
+
 .tableRow {
   display: grid;
   grid-template-columns: 1.5fr 1.3fr 1.2fr 1fr 1fr 0.7fr 0.7fr 0.8fr;
@@ -187,7 +185,7 @@
   border-bottom: 1px solid #f3f4f6;
 }
 
-/* Cell Styles */
+
 .cellMenteeName {
   font-weight: 600;
   text-overflow: ellipsis;
@@ -244,7 +242,7 @@
   color: #9ca3af;
 }
 
-/* Download Button */
+
 .downloadButton {
   padding: 0.4rem 0.75rem;
   background: #fff;
@@ -266,7 +264,7 @@
   color: white;
 }
 
-/* Comments Button */
+
 .commentsButton {
   background: transparent;
   border: none;
@@ -281,7 +279,7 @@
   text-decoration: underline;
 }
 
-/* Expanded Notes */
+
 .expandedNotes {
   padding: 1rem 1.5rem;
   background: #f9fafb;

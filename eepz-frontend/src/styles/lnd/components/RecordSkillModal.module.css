@@ -136,7 +136,7 @@
   color: #9ca3af;
 }
 
-/* Custom Dropdown Styles */
+
 .customDropdownContainer {
   position: relative;
 }
@@ -171,16 +171,16 @@
 }
 
 .customDropdownButtonDisabled {
-  background: #f3f4f6;  /* ✅ Slightly darker gray background */
+  background: #f3f4f6;  
   cursor: not-allowed;
-  color: rgb(39, 35, 92);  /* ✅ Purple text - visible! */
-  opacity: 1;  /* ✅ Full opacity */
-  font-weight: 600;  /* ✅ Bold for better visibility */
-  border: 1px solid #d1d5db;  /* ✅ Slightly darker border */
+  color: rgb(39, 35, 92);  
+  opacity: 1;  
+  font-weight: 600; 
+  border: 1px solid #d1d5db; 
 }
 
 .customDropdownButtonDisabled .customDropdownButtonText {
-  color: rgb(39, 35, 92);  /* ✅ Force purple color on text */
+  color: rgb(39, 35, 92);  
 }
 
 .customDropdownButtonText {
@@ -235,7 +235,7 @@
   pointer-events: none;
 }
 
-/* Old select styles - keep for backwards compatibility */
+
 .select {
   width: 100%;
   padding: 0.625rem;

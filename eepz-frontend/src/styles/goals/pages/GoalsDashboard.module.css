@@ -1,4 +1,4 @@
-/* Summary Section Layout */
+
 .summarySection {
   flex: 1;
 }
@@ -7,7 +7,6 @@
   min-width: 180px;
 }
 
-/* Action Buttons */
 .createGoalButton {
   background: linear-gradient(90deg, #97247E 0%, #E01950 100%);
   white-space: nowrap;
@@ -32,7 +31,7 @@
   color: white;
 }
 
-/* Section Header */
+
 .sectionTitle {
   font-weight: 600;
   margin-bottom: 0;
@@ -47,7 +46,7 @@
   font-weight: 400;
 }
 
-/* Loading State */
+
 .loadingContainer {
   text-align: center;
   padding-top: 3rem;
@@ -58,7 +57,7 @@
   margin-top: 1rem;
 }
 
-/* Empty State */
+
 .emptyStateCard {
   padding: 3rem;
   background-color: #f8f9fa;
@@ -73,7 +72,7 @@
   color: #6c757d;
 }
 
-/* Goals Grid Container */
+
 .goalsContainer {
   display: flex;
   flex-direction: column;
@@ -84,7 +83,7 @@
   flex-grow: 1;
 }
 
-/* Sticky Pagination */
+
 .stickyPagination {
   position: fixed;
   bottom: 0;

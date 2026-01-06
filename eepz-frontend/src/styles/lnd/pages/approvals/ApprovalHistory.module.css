@@ -1,12 +1,12 @@
-/* ApprovalHistory.module.css */
 
-/* Loading State */
+
+
 .loadingContainer {
   text-align: center;
   padding: 3rem;
 }
 
-/* Filters Container */
+
 .filtersContainer {
   margin-bottom: 1.5rem;
   display: flex;
@@ -15,7 +15,7 @@
   align-items: center;
 }
 
-/* Search Form */
+
 .searchForm {
   display: flex;
   gap: 0.5rem;
@@ -27,12 +27,12 @@
   min-height: 35.7px;
 }
 
-/* Dropdown Wrapper */
+
 .dropdownWrapper {
   position: relative;
 }
 
-/* Dropdown Button Base */
+
 .dropdownButton {
   padding: 0.5rem 0.875rem;
   border: 1px solid rgb(39, 35, 92, 0.5);
@@ -65,7 +65,7 @@
   margin-left: 0.5rem;
 }
 
-/* Dropdown Menu */
+
 .dropdownMenu {
   position: absolute;
   top: calc(100% + 4px);
@@ -90,7 +90,7 @@
   min-width: 160px;
 }
 
-/* Dropdown Item */
+
 .dropdownItem {
   padding: 0.625rem 0.875rem;
   cursor: pointer;
@@ -109,7 +109,7 @@
   color: white;
 }
 
-/* Table Container */
+
 .tableContainer {
   min-height: 65vh;
   transition: opacity 0.2s;
@@ -128,7 +128,7 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
-/* Table Header */
+
 .tableHeader {
   display: grid;
   grid-template-columns: 1.2fr 1fr 1.2fr 1.2fr 0.9fr 0.8fr 0.8fr 0.8fr;
@@ -165,7 +165,7 @@
   color: lightpink;
 }
 
-/* Sort Icons */
+
 .sortIcon {
   margin-left: 4px;
 }
@@ -180,7 +180,7 @@
   font-weight: bold;
 }
 
-/* Table Row */
+
 .tableRow {
   display: grid;
   grid-template-columns: 1.2fr 1fr 1.2fr 1.2fr 0.9fr 1fr 0.8fr 0.8fr;
@@ -201,7 +201,7 @@
   border-bottom: 1px solid #f3f4f6;
 }
 
-/* Cell Styles */
+
 .cellRequestType {
   font-weight: 500;
   padding-left: 5px;
@@ -236,7 +236,7 @@
   color: #9ca3af;
 }
 
-/* Download Button */
+
 .downloadButton {
   padding: 0.4rem 0.75rem;
   background: #fff;
@@ -258,7 +258,7 @@
   color: white;
 }
 
-/* Comments Button */
+
 .commentsButton {
   background: transparent;
   border: none;
@@ -273,7 +273,7 @@
   text-decoration: underline;
 }
 
-/* Expanded Notes */
+
 .expandedNotes {
   padding: 1rem 1.5rem;
   background: #f9fafb;

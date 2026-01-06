@@ -1,4 +1,4 @@
-/* GoalFilters.module.css - PRODUCTION-READY WITH PRIORITY */
+
 
 .backdrop {
   position: fixed;
@@ -299,7 +299,7 @@
   box-shadow: 0 12px 35px rgba(151, 36, 126, 0.6);
 }
 
-/* ANIMATIONS - PRODUCTION CRITICAL */
+
 @keyframes backdropFadeIn {
   0% {
     opacity: 0;
@@ -340,7 +340,7 @@
   }
 }
 
-/* RESPONSIVE - MOBILE FIRST */
+
 @media (max-width: 768px) {
   .dialog.centered {
     max-width: 95vw;
@@ -364,7 +364,7 @@
   }
 }
 
-/* ACCESSIBILITY & PERFORMANCE */
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms;

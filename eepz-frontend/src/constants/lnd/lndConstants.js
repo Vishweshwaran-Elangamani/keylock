@@ -7,9 +7,7 @@ import {
   Check,
 } from "lucide-react";
 
-/**
- * L&D Module Constants
- */
+
 
 // Assignment Status
 export const ASSIGNMENT_STATUS = {

@@ -67,7 +67,7 @@
   text-align: left;
 }
 
-/* Meta grid */
+
 
 .metaGrid {
   display: grid;
@@ -107,7 +107,7 @@
   color: #212529;
 }
 
-/* Deadline strip */
+
 
 .deadlineStripWarning,
 .deadlineStripInfo {
@@ -133,7 +133,7 @@
   color: #0c5460;
 }
 
-/* Progress card */
+
 
 .progressCard {
   background-color: #ffffff;
@@ -170,7 +170,7 @@
   font-weight: 600;
 }
 
-/* Progress colors */
+
 
 .progressHigh {
   color: #28a745;
@@ -188,7 +188,7 @@
   color: #dc3545;
 }
 
-/* Animations */
+
 
 @keyframes pulse {
   0%,

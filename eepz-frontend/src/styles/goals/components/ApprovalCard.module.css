@@ -1,4 +1,4 @@
-/* ApprovalCard.module.css */
+
 
 .card {
   border: 1px solid #dee2e6;
@@ -11,7 +11,7 @@
   padding: 1.25rem;
 }
 
-/* Header - Badges Row */
+
 .headerRow {
   display: flex;
   justify-content: space-between;
@@ -32,7 +32,7 @@
   font-weight: 600;
 }
 
-/* Goal Title */
+
 .goalTitle {
   font-weight: 600;
   color: #212529;
@@ -40,7 +40,7 @@
   margin-bottom: 0.75rem;
 }
 
-/* Requester Info */
+
 .requesterInfo {
   display: flex;
   align-items: center;
@@ -76,7 +76,7 @@
   color: #6c757d;
 }
 
-/* Attachments Section */
+
 .attachmentsSection {
   background-color: #e7f3ff;
   border: 1px solid #b3d9ff;
@@ -114,12 +114,12 @@
   white-space: nowrap;
 }
 
-/* No Attachments Warning */
+
 .noAttachmentsWarning {
   font-size: 0.875rem;
 }
 
-/* Action Buttons */
+
 .actionButtons {
   display: flex;
   gap: 0.5rem;
@@ -135,7 +135,7 @@
   flex-grow: 1;
 }
 
-/* Decision Result Alert */
+
 .decisionAlert {
   font-size: 0.875rem;
   margin-bottom: 0;
@@ -160,7 +160,7 @@
   margin-top: 0.25rem;
 }
 
-/* Permission Warning */
+
 .permissionWarning {
   font-size: 0.875rem;
   margin-bottom: 0;
