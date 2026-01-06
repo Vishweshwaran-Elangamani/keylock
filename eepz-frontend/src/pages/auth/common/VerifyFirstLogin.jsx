@@ -12,59 +12,48 @@
  *
  * @component
  */
-
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import authService from "../../../services/auth/authService";
 import { toast } from "sonner";
 import "../../../styles/auth/common/VerifyFirstLogin.css";
-
 const VerifyFirstLogin = () => {
   // ========================
   // HOOKS & NAVIGATION
   // ========================
   const navigate = useNavigate();
   const location = useLocation();
-
   /**
    * Email from route state or temporary user storage
    */
   const email = location.state?.email || authService.getTempUser()?.email;
-
   // ========================
   // STATE MANAGEMENT
   // ========================
-
   /**
    * OTP code state - stores the 6-digit verification code
    */
   const [otpCode, setOtpCode] = useState("");
-
   /**
    * New password state - stores the new password being set
    */
   const [newPassword, setNewPassword] = useState("");
-
   /**
    * Confirm password state - stores the password confirmation
    */
   const [confirmPassword, setConfirmPassword] = useState("");
-
   /**
    * Loading state - tracks form submission status
    * Used to disable form and show loading indicator
    */
   const [loading, setLoading] = useState(false);
-
   /**
    * Show password state - controls password visibility toggle
    */
   const [showPassword, setShowPassword] = useState(false);
-
   // ========================
   // PASSWORD VALIDATION
   // ========================
-
   /**
    * Validates password strength against requirements
    * Checks for:
@@ -81,30 +70,23 @@ const VerifyFirstLogin = () => {
     // Check minimum length
     if (password.length < 8)
       return "Password must be at least 8 characters long";
-
     // Check for uppercase letter
     if (!/[A-Z]/.test(password))
       return "Password must contain at least one uppercase letter";
-
     // Check for lowercase letter
     if (!/[a-z]/.test(password))
       return "Password must contain at least one lowercase letter";
-
     // Check for number
     if (!/\d/.test(password))
       return "Password must contain at least one number";
-
     // Check for special character
     if (!/[!@#$%^&*(),.?":{}|<>]/.test(password))
       return "Password must contain at least one special character";
-
     return null;
   };
-
   // ========================
   // FORM SUBMISSION
   // ========================
-
   /**
    * Handles first login password reset form submission
    * Validates OTP and password, then makes API call to set password
@@ -114,32 +96,26 @@ const VerifyFirstLogin = () => {
    */
   const handleResetPassword = async (e) => {
     e.preventDefault();
-
     // -------- Validate OTP --------
     if (!otpCode || otpCode.length !== 6) {
       toast.error("Please enter a valid 6-digit OTP");
       return;
     }
-
     // -------- Validate Passwords Match --------
     if (newPassword !== confirmPassword) {
       toast.error("Passwords do not match");
       return;
     }
-
     // -------- Validate Password Strength --------
     const passwordError = validatePassword(newPassword);
     if (passwordError) {
       toast.error(passwordError);
       return;
     }
-
     try {
       setLoading(true);
-
       // Show loading toast
       toast.loading("Setting password...");
-
       // -------- API Call --------
       // Call authService to reset password with OTP verification
       const response = await authService.resetPassword(
@@ -148,17 +124,14 @@ const VerifyFirstLogin = () => {
         newPassword,
         confirmPassword
       );
-
       // -------- Handle Success Response --------
       if (response.success) {
         // Clear temporary user data from storage
         authService.clearTempUser();
-
         toast.dismiss();
         toast.success(
           "Password set successfully! Please login with your new password."
         );
-
         // Redirect to login page after delay
         navigate("/login", { replace: true });
       } else {
@@ -176,11 +149,9 @@ const VerifyFirstLogin = () => {
       setLoading(false);
     }
   };
-
   // ========================
   // GUARD CLAUSE
   // ========================
-
   /**
    * Redirect to login if no email found
    * This ensures user accessed this page through proper flow
@@ -189,7 +160,6 @@ const VerifyFirstLogin = () => {
     navigate("/login");
     return null;
   }
-
   // ========================
   // RENDER LOGIC
   // ========================
@@ -204,16 +174,13 @@ const VerifyFirstLogin = () => {
           <div className="shield-icon-wrapper">
             <i className="bi bi-shield-lock"></i>
           </div>
-
           {/* Title */}
           <h2 className="verify-first-title">Set Your Password</h2>
-
           {/* Subtitle */}
           <p className="verify-first-subtitle">
             This is your first login. Please set a new password.
           </p>
         </div>
-
         {/* ======================== */}
         {/* BODY SECTION */}
         {/* ======================== */}
@@ -229,7 +196,6 @@ const VerifyFirstLogin = () => {
                     <i className="bi bi-key-fill"></i>
                     Enter OTP Code
                   </label>
-
                   {/* OTP Input Field */}
                   {/* Shows as dots/asterisks for security */}
                   <input
@@ -244,7 +210,6 @@ const VerifyFirstLogin = () => {
                     required
                     inputMode="numeric"
                   />
-
                   {/* Helper Text - Shows where OTP was sent */}
                   <small className="otp-hint">
                     <i className="bi bi-envelope"></i>
@@ -252,7 +217,6 @@ const VerifyFirstLogin = () => {
                   </small>
                 </div>
               </div>
-
               {/* -------- RIGHT COLUMN - PASSWORD FIELDS -------- */}
               <div className="form-column-first">
                 {/* New Password Field */}
@@ -280,7 +244,6 @@ const VerifyFirstLogin = () => {
                       </div>
                     </div>
                   </label>
-
                   {/* Password Input with Toggle Button */}
                   <div className="password-input-group">
                     <input
@@ -291,7 +254,6 @@ const VerifyFirstLogin = () => {
                       onChange={(e) => setNewPassword(e.target.value)}
                       required
                     />
-
                     {/* Show/Hide Password Toggle Button */}
                     <button
                       type="button"
@@ -307,14 +269,12 @@ const VerifyFirstLogin = () => {
                     </button>
                   </div>
                 </div>
-
                 {/* Confirm Password Field */}
                 <div className="form-group-first">
                   <label className="form-label-first">
                     <i className="bi bi-lock-fill"></i>
                     Confirm New Password
                   </label>
-
                   {/* Confirm Password Input */}
                   <div className="password-input-group">
                     <input
@@ -326,7 +286,6 @@ const VerifyFirstLogin = () => {
                       required
                     />
                   </div>
-
                   {/* -------- Password Match Indicator -------- */}
                   {/* Shows error if passwords don't match */}
                   {newPassword &&
@@ -337,7 +296,6 @@ const VerifyFirstLogin = () => {
                         Passwords do not match
                       </small>
                     )}
-
                   {/* Shows success if passwords match */}
                   {newPassword &&
                     confirmPassword &&
@@ -350,7 +308,6 @@ const VerifyFirstLogin = () => {
                 </div>
               </div>
             </div>
-
             {/* -------- Submit Button (Full Width) -------- */}
             <button
               type="submit"
@@ -377,5 +334,4 @@ const VerifyFirstLogin = () => {
     </div>
   );
 };
-
 export default VerifyFirstLogin;

@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import authService from "../../../services/auth/authService";
 import { toast } from "sonner";
 import "../../../styles/auth/common/VerifyResetOtp.css";
-
 const VerifyResetOtp = () => {
   // ========================
   // HOOKS & NAVIGATION
@@ -11,7 +10,6 @@ const VerifyResetOtp = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const email = location.state?.email;
-
   // ========================
   // STATE MANAGEMENT
   // ========================
@@ -20,11 +18,9 @@ const VerifyResetOtp = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
   // ========================
   // EMAIL DOMAIN VALIDATION
   // ========================
-
   /**
    * Validates that email belongs to Gmail domain
    * Only accepts @gmail.com addresses
@@ -37,9 +33,12 @@ const VerifyResetOtp = () => {
     const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
     const eepzRegex = /^[a-zA-Z0-9._%+-]+@eepz\.com$/i;
     const relevantzRegex = /^[a-zA-Z0-9._%+-]+@relevantz\.com$/i;
-    return gmailRegex.test(email) || eepzRegex.test(email) || relevantzRegex.test(email);
+    return (
+      gmailRegex.test(email) ||
+      eepzRegex.test(email) ||
+      relevantzRegex.test(email)
+    );
   };
-
   // ========================
   // PASSWORD VALIDATION
   // ========================
@@ -49,7 +48,6 @@ const VerifyResetOtp = () => {
     const hasLowerCase = /[a-z]/.test(password);
     const hasNumbers = /\d/.test(password);
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-
     if (password.length < minLength) {
       return "Password must be at least 8 characters long";
     }
@@ -67,20 +65,17 @@ const VerifyResetOtp = () => {
     }
     return null;
   };
-
   // ========================
   // FORM SUBMISSION
   // ========================
   const handleResetPassword = async (e) => {
     e.preventDefault();
-
     // -------- Validate Email Exists --------
     if (!email) {
       toast.error("Email address is missing. Please restart the process.");
       navigate("/reset-password");
       return;
     }
-
     // -------- Validate Gmail Domain --------
     if (!isValidGmailDomain(email)) {
       toast.error(
@@ -89,38 +84,31 @@ const VerifyResetOtp = () => {
       navigate("/reset-password");
       return;
     }
-
     // -------- Validate OTP --------
     if (!otpCode || otpCode.length !== 6) {
       toast.error("Please enter a valid 6-digit OTP");
       return;
     }
-
     // -------- Validate Passwords Match --------
     if (newPassword !== confirmPassword) {
       toast.error("Passwords do not match");
       return;
     }
-
     // -------- Validate Password Strength --------
     const passwordError = validatePassword(newPassword);
     if (passwordError) {
       toast.error(passwordError);
       return;
     }
-
     try {
       setLoading(true);
-
       toast.loading("Resetting password...");
-
       const response = await authService.resetPassword(
         email,
         otpCode,
         newPassword,
         confirmPassword
       );
-
       if (response.success) {
         toast.dismiss();
         toast.success(
@@ -143,7 +131,6 @@ const VerifyResetOtp = () => {
       setLoading(false);
     }
   };
-
   // ========================
   // RESEND OTP
   // ========================
@@ -155,7 +142,6 @@ const VerifyResetOtp = () => {
       toast.error("Failed to resend OTP. Please try again.");
     }
   };
-
   // ========================
   // GUARD CLAUSE - SILENT REDIRECT
   // ========================
@@ -163,7 +149,6 @@ const VerifyResetOtp = () => {
     navigate("/reset-password");
     return null;
   }
-
   // ========================
   // RENDER LOGIC
   // ========================
@@ -179,7 +164,6 @@ const VerifyResetOtp = () => {
             Enter OTP and set your new password
           </p>
         </div>
-
         <div className="verify-reset-body">
           <form onSubmit={handleResetPassword}>
             <div className="form-grid-reset">
@@ -207,7 +191,6 @@ const VerifyResetOtp = () => {
                     OTP sent to {email}
                   </small>
                 </div>
-
                 <div className="resend-section-inline">
                   <small>
                     Didn't receive OTP?
@@ -222,7 +205,6 @@ const VerifyResetOtp = () => {
                   </small>
                 </div>
               </div>
-
               {/* -------- RIGHT COLUMN - Passwords -------- */}
               <div className="form-column-reset">
                 <div className="form-group-reset">
@@ -268,7 +250,6 @@ const VerifyResetOtp = () => {
                     </button>
                   </div>
                 </div>
-
                 <div className="form-group-reset">
                   <label className="form-label-reset">
                     <i className="bi bi-lock-fill"></i>
@@ -284,7 +265,6 @@ const VerifyResetOtp = () => {
                       required
                     />
                   </div>
-
                   {newPassword &&
                     confirmPassword &&
                     newPassword !== confirmPassword && (
@@ -304,7 +284,6 @@ const VerifyResetOtp = () => {
                 </div>
               </div>
             </div>
-
             <button
               type="submit"
               className="btn-submit-reset"
@@ -323,7 +302,6 @@ const VerifyResetOtp = () => {
               )}
             </button>
           </form>
-
           <div className="reset-footer">
             <button
               className="btn-back-reset"
@@ -339,5 +317,4 @@ const VerifyResetOtp = () => {
     </div>
   );
 };
-
 export default VerifyResetOtp;

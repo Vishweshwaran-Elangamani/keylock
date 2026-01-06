@@ -5,23 +5,19 @@ import api from "../../../services/auth/api";
 import { toast } from "sonner";
 import "../../../styles/auth/common/ChangePassword.css";
 import logo from "../../../assets/logodarkbarred.png";
-
 const ChangePassword = () => {
   const [formData, setFormData] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
-
   const [confirmationText, setConfirmationText] = useState("");
   const CONFIRMATION_PHRASE = "CONFIRM PASSWORD CHANGE";
-
   const [showPasswords, setShowPasswords] = useState({
     current: false,
     new: false,
     confirm: false,
   });
-
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState("");
@@ -32,18 +28,13 @@ const ChangePassword = () => {
     hasDigit: false,
     hasSpecialChar: false,
   });
-
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
-
   const isFirstLogin = location.state?.isFirstLogin || false;
   const fromSettings = location.state?.fromSettings || false;
-
-  
   const PROTECTED_EMPLOYEE_ID = "1000";
   const isProtectedEmployee = user?.employeeCompanyId === PROTECTED_EMPLOYEE_ID;
-
   const PASSWORD_REQUIREMENTS = {
     requireUppercase: true,
     requireLowercase: true,
@@ -51,35 +42,29 @@ const ChangePassword = () => {
     requireSpecialChar: true,
     minLength: 8,
   };
-
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem("accessToken");
-
       if (token) {
       }
-
       if (user) {
       }
     };
-
     checkAuth();
   }, [user]);
-
   useEffect(() => {
     if (!isFirstLogin && !user) {
       toast.error("Please login first");
       navigate("/login");
       return;
     }
-
-   
     if (user && isProtectedEmployee && !isFirstLogin) {
-      toast.error("Password changes are not allowed for this account. Please contact system administrator.");
+      toast.error(
+        "Password changes are not allowed for this account. Please contact system administrator."
+      );
       navigate("/dashboard", { replace: true });
     }
   }, [user, isFirstLogin, isProtectedEmployee, navigate]);
-
   const evaluatePasswordStrength = (password) => {
     let score = 0;
     if (!password) return "";
@@ -89,12 +74,10 @@ const ChangePassword = () => {
     if (/[A-Z]/.test(password)) score++;
     if (/[0-9]/.test(password)) score++;
     if (/[^a-zA-Z0-9]/.test(password)) score++;
-
     if (score <= 2) return "weak";
     if (score <= 4) return "medium";
     return "strong";
   };
-
   const validatePasswordRequirements = (password) => {
     const newValidations = {
       minLength: password.length >= PASSWORD_REQUIREMENTS.minLength,
@@ -106,7 +89,6 @@ const ChangePassword = () => {
     setValidations(newValidations);
     return newValidations;
   };
-
   const validatePassword = (password) => {
     if (password.length < PASSWORD_REQUIREMENTS.minLength) {
       return `Password must be at least ${PASSWORD_REQUIREMENTS.minLength} characters long`;
@@ -128,82 +110,68 @@ const ChangePassword = () => {
     }
     return "";
   };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-
     if (name === "newPassword") {
       setPasswordStrength(evaluatePasswordStrength(value));
       validatePasswordRequirements(value);
-
       if (error && value.length > 0) {
         setError("");
       }
     }
-
     if (name === "confirmPassword" && error) {
       setError("");
     }
   };
-
   const handleConfirmationTextChange = (e) => {
     setConfirmationText(e.target.value);
     if (error) {
       setError("");
     }
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
-    
     if (isProtectedEmployee && !isFirstLogin) {
-      const errorMsg = "Password changes are not allowed for this account. Please contact system administrator.";
+      const errorMsg =
+        "Password changes are not allowed for this account. Please contact system administrator.";
       setError(errorMsg);
       toast.error(errorMsg);
       return;
     }
-
     if (!isFirstLogin && !formData.currentPassword) {
       setError("Current password is required");
       return;
     }
-
     const validationError = validatePassword(formData.newPassword);
     if (validationError) {
       setError(validationError);
       return;
     }
-
     if (formData.newPassword !== formData.confirmPassword) {
       setError("Passwords do not match");
       return;
     }
-
     if (!isFirstLogin && formData.currentPassword === formData.newPassword) {
       setError("New password must be different from current password");
       return;
     }
-
     if (confirmationText.trim().toUpperCase() !== CONFIRMATION_PHRASE) {
-      setError(`Please type "${CONFIRMATION_PHRASE}" to confirm password change`);
+      setError(
+        `Please type "${CONFIRMATION_PHRASE}" to confirm password change`
+      );
       toast.error(`Please type the confirmation phrase correctly`);
       return;
     }
-
     setLoading(true);
-
     try {
       toast.loading("Changing password...");
-
       const response = await api.post("/Authentication/change-password", {
         currentPassword: formData.currentPassword || "",
         newPassword: formData.newPassword,
         confirmPassword: formData.confirmPassword,
       });
-
       if (!response.data.success) {
         toast.dismiss();
         setError(response.data.message || "Failed to change password");
@@ -211,34 +179,27 @@ const ChangePassword = () => {
         setLoading(false);
         return;
       }
-
       if (isFirstLogin) {
         localStorage.removeItem("tempUser");
         localStorage.removeItem("firstLoginOtpLockout");
-
         toast.dismiss();
         toast.success(
           "Password set successfully! Please login with your new password."
         );
-
         setTimeout(() => {
           navigate("/login", { replace: true });
         }, 1500);
         return;
       }
-
       toast.dismiss();
       toast.success("Password changed successfully!");
-
       setTimeout(() => {
         navigate(-1);
       }, 1500);
     } catch (err) {
       console.error("Change password error:", err);
       console.error("Error response:", err.response?.data);
-
       let errorMessage = "Failed to change password";
-
       if (err.response?.status === 401) {
         errorMessage = "Current password is incorrect";
       } else if (err.response?.status === 400) {
@@ -254,7 +215,6 @@ const ChangePassword = () => {
       } else if (err.message) {
         errorMessage = err.message;
       }
-
       console.error("Error message:", errorMessage);
       toast.dismiss();
       toast.error(errorMessage);
@@ -263,7 +223,6 @@ const ChangePassword = () => {
       setLoading(false);
     }
   };
-
   const getStrengthColor = () => {
     switch (passwordStrength) {
       case "weak":
@@ -276,7 +235,6 @@ const ChangePassword = () => {
         return "#dee2e6";
     }
   };
-
   const getStrengthWidth = () => {
     switch (passwordStrength) {
       case "weak":
@@ -289,14 +247,12 @@ const ChangePassword = () => {
         return "0%";
     }
   };
-
   const allValidationsPassed = Object.values(validations).every((v) => v);
-  const isConfirmationValid = confirmationText.trim().toUpperCase() === CONFIRMATION_PHRASE;
-
+  const isConfirmationValid =
+    confirmationText.trim().toUpperCase() === CONFIRMATION_PHRASE;
   const handleCancel = () => {
     navigate(-1);
   };
-
   return (
     <div className="change-password-container">
       <div className="change-password-card">
@@ -330,30 +286,49 @@ const ChangePassword = () => {
             </div>
           )}
         </div>
-
         <div className="change-password-body">
           {/* SHOW WARNING FOR PROTECTED EMPLOYEE (except first login) */}
           {isProtectedEmployee && !isFirstLogin && (
-            <div className="error-alert-cp" style={{ marginBottom: "20px", background: "#fff3cd", borderColor: "#ffc107", color: "#856404" }}>
+            <div
+              className="error-alert-cp"
+              style={{
+                marginBottom: "20px",
+                background: "#fff3cd",
+                borderColor: "#ffc107",
+                color: "#856404",
+              }}
+            >
               <i className="bi bi-shield-exclamation"></i>
               <div>
                 <strong>Protected Account</strong>
-                <p style={{ marginTop: "8px", fontSize: "14px", marginBottom: 0 }}>
-                  Password changes are not allowed for this account. 
-                  Please contact system administrator if you need to update your credentials.
+                <p
+                  style={{
+                    marginTop: "8px",
+                    fontSize: "14px",
+                    marginBottom: 0,
+                  }}
+                >
+                  Password changes are not allowed for this account. Please
+                  contact system administrator if you need to update your
+                  credentials.
                 </p>
               </div>
             </div>
           )}
-
           <form onSubmit={handleSubmit}>
             {/*  DISABLE FORM FOR PROTECTED EMPLOYEE (except first login) */}
-            <fieldset disabled={isProtectedEmployee && !isFirstLogin} style={{ border: "none", padding: 0, margin: 0 }}>
+            <fieldset
+              disabled={isProtectedEmployee && !isFirstLogin}
+              style={{ border: "none", padding: 0, margin: 0 }}
+            >
               {!isFirstLogin ? (
                 <div className="form-grid-cp">
                   <div className="form-column-cp">
                     <div className="form-group-cp">
-                      <label htmlFor="currentPassword" className="form-label-cp">
+                      <label
+                        htmlFor="currentPassword"
+                        className="form-label-cp"
+                      >
                         <i className="bi bi-shield-lock"></i>
                         Current Password
                       </label>
@@ -394,7 +369,6 @@ const ChangePassword = () => {
                       </div>
                     </div>
                   </div>
-
                   <div className="form-column-cp">
                     <div className="form-group-cp">
                       <label htmlFor="newPassword" className="form-label-cp">
@@ -438,7 +412,9 @@ const ChangePassword = () => {
                             }))
                           }
                           title={
-                            showPasswords.new ? "Hide password" : "Show password"
+                            showPasswords.new
+                              ? "Hide password"
+                              : "Show password"
                           }
                         >
                           <i
@@ -450,7 +426,6 @@ const ChangePassword = () => {
                           ></i>
                         </button>
                       </div>
-
                       {formData.newPassword && (
                         <div className="strength-indicator">
                           <div className="strength-bar-wrapper">
@@ -476,9 +451,11 @@ const ChangePassword = () => {
                         </div>
                       )}
                     </div>
-
                     <div className="form-group-cp">
-                      <label htmlFor="confirmPassword" className="form-label-cp">
+                      <label
+                        htmlFor="confirmPassword"
+                        className="form-label-cp"
+                      >
                         <i className="bi bi-lock-fill"></i>
                         Confirm New Password
                       </label>
@@ -596,7 +573,6 @@ const ChangePassword = () => {
                         ></i>
                       </button>
                     </div>
-
                     {formData.newPassword && (
                       <div className="strength-indicator">
                         <div className="strength-bar-wrapper">
@@ -622,7 +598,6 @@ const ChangePassword = () => {
                       </div>
                     )}
                   </div>
-
                   <div className="form-group-cp">
                     <label htmlFor="confirmPassword" className="form-label-cp">
                       <i className="bi bi-lock-fill"></i>
@@ -686,7 +661,6 @@ const ChangePassword = () => {
                   </div>
                 </>
               )}
-
               <div className="form-group-cp">
                 <label htmlFor="confirmationText" className="form-label-cp">
                   <i className="bi bi-shield-check"></i>
@@ -702,12 +676,19 @@ const ChangePassword = () => {
                   onChange={handleConfirmationTextChange}
                   required
                   style={{
-                    borderColor: confirmationText && !isConfirmationValid ? "#dc3545" : confirmationText && isConfirmationValid ? "#198754" : "#ced4da"
+                    borderColor:
+                      confirmationText && !isConfirmationValid
+                        ? "#dc3545"
+                        : confirmationText && isConfirmationValid
+                        ? "#198754"
+                        : "#ced4da",
                   }}
                 />
                 {confirmationText && (
                   <small
-                    className={isConfirmationValid ? "match-success" : "match-error"}
+                    className={
+                      isConfirmationValid ? "match-success" : "match-error"
+                    }
                   >
                     <i
                       className={`bi ${
@@ -721,17 +702,32 @@ const ChangePassword = () => {
                       : `Please type "${CONFIRMATION_PHRASE}" exactly`}
                   </small>
                 )}
-                <small style={{ display: "block", marginTop: "6px", color: "#6c757d", fontSize: "12px" }}>
-                  <i className="bi bi-info-circle" style={{ marginRight: "4px" }}></i>
-                  This is a security measure to prevent accidental password changes
+                <small
+                  style={{
+                    display: "block",
+                    marginTop: "6px",
+                    color: "#6c757d",
+                    fontSize: "12px",
+                  }}
+                >
+                  <i
+                    className="bi bi-info-circle"
+                    style={{ marginRight: "4px" }}
+                  ></i>
+                  This is a security measure to prevent accidental password
+                  changes
                 </small>
               </div>
             </fieldset>
-
             <button
               type="submit"
               className="btn-submit-cp"
-              disabled={loading || !allValidationsPassed || !isConfirmationValid || (isProtectedEmployee && !isFirstLogin)}
+              disabled={
+                loading ||
+                !allValidationsPassed ||
+                !isConfirmationValid ||
+                (isProtectedEmployee && !isFirstLogin)
+              }
             >
               {loading ? (
                 <>
@@ -745,7 +741,6 @@ const ChangePassword = () => {
                 </>
               )}
             </button>
-
             {!isFirstLogin && (
               <div className="cancel-section">
                 <button
@@ -764,5 +759,4 @@ const ChangePassword = () => {
     </div>
   );
 };
-
 export default ChangePassword;

@@ -9,23 +9,18 @@ import { toast } from "sonner";
 import { FaSearch } from "react-icons/fa";
 import { Form } from "react-bootstrap";
 import "../../../../styles/auth/department/DepartmentList.css";
-
 const StatusDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
-
   const options = [
     { label: "All Status", value: "All" },
     { label: "Active", value: "Active" },
     { label: "Inactive", value: "Inactive" },
   ];
-
   const selected = options.find((o) => o.value === value) || options[0];
-
   const handleSelect = (val) => {
     onChange({ target: { value: val } });
     setOpen(false);
   };
-
   return (
     <div
       className="dlm-status-select custom-status-dropdown"
@@ -39,7 +34,6 @@ const StatusDropdown = ({ value, onChange }) => {
         {selected.label}
         <span className="custom-status-arrow" />
       </div>
-
       {open && (
         <div className="custom-status-menu">
           {options.map((opt) => (
@@ -59,7 +53,6 @@ const StatusDropdown = ({ value, onChange }) => {
     </div>
   );
 };
-
 const DepartmentList = () => {
   const navigate = useNavigate();
   const [departments, setDepartments] = useState([]);
@@ -68,22 +61,17 @@ const DepartmentList = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedDepartment, setSelectedDepartment] = useState(null);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
-
   const [viewMode, setViewMode] = useState("table");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [showRowsDropdown, setShowRowsDropdown] = useState(false);
   const rowsDropdownRef = useRef(null);
-
   useEffect(() => {
     fetchDepartments();
   }, []);
-
-  // Click outside handler for rows dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -93,18 +81,15 @@ const DepartmentList = () => {
         setShowRowsDropdown(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
   const fetchDepartments = async () => {
     try {
       setLoading(true);
       const response = await departmentService.getAllDepartments();
-
       if (response.success) {
         setDepartments(response.data || []);
         toast.dismiss();
@@ -120,20 +105,16 @@ const DepartmentList = () => {
       setLoading(false);
     }
   };
-
   const handleDelete = (dept) => {
     setSelectedDepartment(dept);
     setShowDeleteModal(true);
   };
-
   const handleDeleteConfirm = async () => {
     try {
       toast.loading("Deleting department...");
-
       const response = await departmentService.deleteDepartment(
         selectedDepartment.departmentId
       );
-
       if (response.success) {
         toast.dismiss();
         toast.success("Department deleted successfully");
@@ -150,27 +131,22 @@ const DepartmentList = () => {
       toast.error(error.message || "Error deleting department");
     }
   };
-
   const handleEdit = (department) => {
     setSelectedDepartment(department);
     setShowEditModal(true);
   };
-
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
     setCurrentPage(1);
   };
-
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
     setStatusFilter("All");
     setCurrentPage(1);
   };
-
   const applyFilters = () => {
     let filtered = [...departments];
-
     if (activeSearchTerm) {
       const term = activeSearchTerm.toLowerCase();
       filtered = filtered.filter(
@@ -180,16 +156,12 @@ const DepartmentList = () => {
           dept.description?.toLowerCase().includes(term)
       );
     }
-
     if (statusFilter !== "All") {
       filtered = filtered.filter((dept) => dept.status === statusFilter);
     }
-
     return filtered;
   };
-
   const filteredDepartments = applyFilters();
-
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredDepartments.slice(
@@ -197,11 +169,9 @@ const DepartmentList = () => {
     indexOfLastItem
   );
   const totalPages = Math.ceil(filteredDepartments.length / itemsPerPage) || 1;
-
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
-
     if (totalPages <= maxPagesToShow) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -223,10 +193,8 @@ const DepartmentList = () => {
         );
       }
     }
-
     return pages;
   };
-
   const formatDate = (date) => {
     return date
       ? new Date(date).toLocaleDateString("en-US", {
@@ -236,7 +204,6 @@ const DepartmentList = () => {
         })
       : "N/A";
   };
-
   const getDeptStats = () => {
     const total = filteredDepartments.length;
     const active = filteredDepartments.filter(
@@ -245,16 +212,13 @@ const DepartmentList = () => {
     const inactive = filteredDepartments.filter(
       (d) => d.status === "Inactive"
     ).length;
-
     return {
       totalDepartments: total,
       activeDepartments: active,
       inactiveDepartments: inactive,
     };
   };
-
   const stats = getDeptStats();
-
   if (loading) {
     return (
       <div className="dlm-loading-container">
@@ -264,7 +228,6 @@ const DepartmentList = () => {
       </div>
     );
   }
-
   return (
     <div className="dlm-page">
       <Breadcrumb
@@ -274,7 +237,6 @@ const DepartmentList = () => {
           },
         ]}
       />
-
       {/* KPI CARDS */}
       <div className="stats-cards-dl">
         <div className="stat-card-dl stat-total-dl">
@@ -286,7 +248,6 @@ const DepartmentList = () => {
             <div className="stat-label-dl">Total Departments</div>
           </div>
         </div>
-
         <div className="stat-card-dl stat-active-dl">
           <div className="stat-icon-dl">
             <i className="bi bi-check2-circle"></i>
@@ -296,7 +257,6 @@ const DepartmentList = () => {
             <div className="stat-label-dl">Active</div>
           </div>
         </div>
-
         <div className="stat-card-dl stat-inactive-dl">
           <div className="stat-icon-dl">
             <i className="bi bi-slash-circle"></i>
@@ -307,7 +267,6 @@ const DepartmentList = () => {
           </div>
         </div>
       </div>
-
       {/* CONTROLS BAR */}
       <div className="dlm-controls">
         <div className="dlm-search-input">
@@ -336,7 +295,6 @@ const DepartmentList = () => {
             </button>
           </div>
         </div>
-
         <div className="dlm-status-filter">
           <StatusDropdown
             value={statusFilter}
@@ -346,11 +304,9 @@ const DepartmentList = () => {
             }}
           />
         </div>
-
         <button className="dlm-btn-clear" onClick={clearFilters}>
           Clear Filters
         </button>
-
         <div className="dlm-view-switcher">
           <button
             className={`dlm-view-btn ${viewMode === "table" ? "active" : ""}`}
@@ -375,12 +331,10 @@ const DepartmentList = () => {
             <i className="bi bi-grid-3x3-gap-fill"></i>
           </button>
         </div>
-
         <div className="dlm-results-count">
           Showing {currentItems.length} of {filteredDepartments.length}{" "}
           departments
         </div>
-
         <button
           className="dlm-btn-create"
           onClick={() => setShowAddModal(true)}
@@ -389,7 +343,6 @@ const DepartmentList = () => {
           Create Department
         </button>
       </div>
-
       {/* EMPTY STATE */}
       {filteredDepartments.length === 0 ? (
         <div className="dlm-empty">
@@ -427,21 +380,17 @@ const DepartmentList = () => {
                             </span>
                           )}
                         </div>
-
                         <code className="dlm-card-code">
                           {dept.departmentCode}
                         </code>
                       </div>
                     </div>
-
                     {/* Card Body */}
                     <div className="dlm-card-body">
                       <h6 className="dlm-card-title">{dept.departmentName}</h6>
-
                       <p className="dlm-card-description">
                         {dept.description || "No description available"}
                       </p>
-
                       {/* Meta Info */}
                       <div className="dlm-card-meta">
                         <div className="dlm-meta-item">
@@ -453,7 +402,6 @@ const DepartmentList = () => {
                             </strong>
                           </span>
                         </div>
-
                         <div className="dlm-meta-item">
                           <i className="bi bi-person-badge dlm-meta-icon-secondary"></i>
                           <span className="dlm-meta-text">
@@ -463,7 +411,6 @@ const DepartmentList = () => {
                             </strong>
                           </span>
                         </div>
-
                         <div className="dlm-meta-item">
                           <i className="bi bi-diagram-3-fill dlm-meta-icon-info"></i>
                           <span className="dlm-meta-text">
@@ -475,7 +422,6 @@ const DepartmentList = () => {
                             </strong>
                           </span>
                         </div>
-
                         <div className="dlm-meta-item-date">
                           <i className="bi bi-calendar-check-fill"></i>
                           <div className="dlm-date-content">
@@ -487,7 +433,6 @@ const DepartmentList = () => {
                         </div>
                       </div>
                     </div>
-
                     {/* Card Footer - Actions */}
                     <div className="dlm-card-footer">
                       <button
@@ -497,7 +442,6 @@ const DepartmentList = () => {
                       >
                         <i className="bi bi-pencil-square"></i>
                       </button>
-
                       <button
                         onClick={() => handleDelete(dept)}
                         title="Delete Department"
@@ -509,7 +453,6 @@ const DepartmentList = () => {
                   </div>
                 ))}
               </div>
-
               {/* GRID PAGINATION */}
               {totalPages > 1 && (
                 <div className="dlm-pagination-wrapper">
@@ -529,7 +472,6 @@ const DepartmentList = () => {
                           <i className="bi bi-chevron-left"></i>
                         </button>
                       </li>
-
                       {getPageNumbers().map((page, index) => (
                         <li
                           key={index}
@@ -547,7 +489,6 @@ const DepartmentList = () => {
                           </button>
                         </li>
                       ))}
-
                       <li
                         className={`dlm-page-item ${
                           currentPage === totalPages ? "disabled" : ""
@@ -570,7 +511,6 @@ const DepartmentList = () => {
               )}
             </>
           )}
-
           {/* TABLE VIEW */}
           {viewMode === "table" && (
             <div className="dlm-table-card">
@@ -612,7 +552,9 @@ const DepartmentList = () => {
                             </span>
                           )}
                         </td>
-                        <td>{dept.parentDepartmentName || "Root Department"}</td>
+                        <td>
+                          {dept.parentDepartmentName || "Root Department"}
+                        </td>
                         <td>{dept.hodEmployeeName || "Not assigned"}</td>
                         <td>
                           {dept.hasChildren ? dept.childDepartmentCount : "−"}
@@ -641,12 +583,14 @@ const DepartmentList = () => {
                   </tbody>
                 </table>
               </div>
-
               {totalPages > 1 && filteredDepartments.length > 0 && (
                 <div className="dlm-pagination">
                   <div className="dlm-pagination-info">
                     <span>Show</span>
-                    <div ref={rowsDropdownRef} className="dlm-rows-dropdown-wrapper">
+                    <div
+                      ref={rowsDropdownRef}
+                      className="dlm-rows-dropdown-wrapper"
+                    >
                       <button
                         type="button"
                         onClick={() => setShowRowsDropdown(!showRowsDropdown)}
@@ -654,10 +598,11 @@ const DepartmentList = () => {
                       >
                         <span>{itemsPerPage}</span>
                         <i
-                          className={`bi bi-chevron-${showRowsDropdown ? "up" : "down"} dlm-rows-chevron`}
+                          className={`bi bi-chevron-${
+                            showRowsDropdown ? "up" : "down"
+                          } dlm-rows-chevron`}
                         ></i>
                       </button>
-
                       {showRowsDropdown && (
                         <div className="dlm-rows-dropdown">
                           {[5, 10, 25, 50].map((size) => (
@@ -680,16 +625,22 @@ const DepartmentList = () => {
                     </div>
                     <span>entries</span>
                   </div>
-
                   <div className="dlm-pagination-status">
-                    Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredDepartments.length)} of {filteredDepartments.length} entries
+                    Showing {indexOfFirstItem + 1} to{" "}
+                    {Math.min(indexOfLastItem, filteredDepartments.length)} of{" "}
+                    {filteredDepartments.length} entries
                   </div>
-
                   <nav className="dlm-pagination-nav">
                     <ul className="dlm-pagination-list">
-                      <li className={`dlm-page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                      <li
+                        className={`dlm-page-item ${
+                          currentPage === 1 ? "disabled" : ""
+                        }`}
+                      >
                         <button
-                          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                          onClick={() =>
+                            setCurrentPage((prev) => Math.max(prev - 1, 1))
+                          }
                           disabled={currentPage === 1}
                         >
                           <i className="bi bi-chevron-left"></i>
@@ -703,16 +654,26 @@ const DepartmentList = () => {
                           } ${typeof page !== "number" ? "disabled" : ""}`}
                         >
                           <button
-                            onClick={() => typeof page === "number" && setCurrentPage(page)}
+                            onClick={() =>
+                              typeof page === "number" && setCurrentPage(page)
+                            }
                             disabled={typeof page !== "number"}
                           >
                             {page}
                           </button>
                         </li>
                       ))}
-                      <li className={`dlm-page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                      <li
+                        className={`dlm-page-item ${
+                          currentPage === totalPages ? "disabled" : ""
+                        }`}
+                      >
                         <button
-                          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                          onClick={() =>
+                            setCurrentPage((prev) =>
+                              Math.min(prev + 1, totalPages)
+                            )
+                          }
                           disabled={currentPage === totalPages}
                         >
                           <i className="bi bi-chevron-right"></i>
@@ -726,7 +687,6 @@ const DepartmentList = () => {
           )}
         </>
       )}
-
       {/* MODALS */}
       {showAddModal && (
         <AddDepartmentModal
@@ -738,7 +698,6 @@ const DepartmentList = () => {
           }}
         />
       )}
-
       {showEditModal && selectedDepartment && (
         <EditDepartmentModal
           show={showEditModal}
@@ -754,7 +713,6 @@ const DepartmentList = () => {
           }}
         />
       )}
-
       {showDeleteModal && selectedDepartment && (
         <DeleteDepartmentModal
           show={showDeleteModal}
@@ -769,5 +727,4 @@ const DepartmentList = () => {
     </div>
   );
 };
-
 export default DepartmentList;

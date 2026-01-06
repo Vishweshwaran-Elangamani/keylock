@@ -9,23 +9,18 @@ import { toast } from "sonner";
 import { FaSearch } from "react-icons/fa";
 import { Form } from "react-bootstrap";
 import "../../../../styles/auth/roles/RoleList.css";
-
 const RoleTypeDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
-
   const options = [
     { label: "All Types", value: "" },
     { label: "System Roles", value: "system" },
     { label: "Custom Roles", value: "custom" },
   ];
-
   const selected = options.find((o) => o.value === value) || options[0];
-
   const handleSelect = (val) => {
     onChange(val);
     setOpen(false);
   };
-
   return (
     <div
       className="rlm-type-select custom-status-dropdown"
@@ -40,7 +35,6 @@ const RoleTypeDropdown = ({ value, onChange }) => {
         {selected.label}
         <span className="custom-status-arrow" />
       </div>
-
       {open && (
         <div className="custom-status-menu">
           {options.map((opt) => (
@@ -60,7 +54,6 @@ const RoleTypeDropdown = ({ value, onChange }) => {
     </div>
   );
 };
-
 const RoleList = () => {
   const navigate = useNavigate();
   const [roles, setRoles] = useState([]);
@@ -69,21 +62,17 @@ const RoleList = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedRole, setSelectedRole] = useState(null);
-  
   const [searchTerm, setSearchTerm] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
-  
   const [viewMode, setViewMode] = useState("table");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [showRowsDropdown, setShowRowsDropdown] = useState(false);
   const rowsDropdownRef = useRef(null);
-
   useEffect(() => {
     fetchRoles();
   }, []);
-
   // Click outside handler for rows dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -94,18 +83,15 @@ const RoleList = () => {
         setShowRowsDropdown(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
   const fetchRoles = async () => {
     try {
       setLoading(true);
       const response = await roleService.getAllRoles();
-
       if (response.success) {
         setRoles(response.data || []);
         toast.dismiss();
@@ -121,23 +107,18 @@ const RoleList = () => {
       setLoading(false);
     }
   };
-
   const handleDelete = (role) => {
     if (role.isSystemRole) {
       toast.warning("System roles cannot be deleted");
       return;
     }
-
     setSelectedRole(role);
     setShowDeleteModal(true);
   };
-
   const handleDeleteConfirm = async () => {
     try {
       toast.loading("Deleting role...");
-
       const response = await roleService.deleteRole(selectedRole.roleId);
-
       if (response.success) {
         toast.dismiss();
         toast.success("Role deleted successfully");
@@ -154,56 +135,51 @@ const RoleList = () => {
       toast.error(error.message || "Error deleting role");
     }
   };
-
   const handleEdit = (role) => {
     setSelectedRole(role);
     setShowEditModal(true);
   };
-
   const applyFilters = () => {
     let filtered = [...roles];
-
     if (activeSearchTerm) {
       filtered = filtered.filter(
         (role) =>
-          role.roleName?.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
-          role.roleCode?.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
-          role.description?.toLowerCase().includes(activeSearchTerm.toLowerCase())
+          role.roleName
+            ?.toLowerCase()
+            .includes(activeSearchTerm.toLowerCase()) ||
+          role.roleCode
+            ?.toLowerCase()
+            .includes(activeSearchTerm.toLowerCase()) ||
+          role.description
+            ?.toLowerCase()
+            .includes(activeSearchTerm.toLowerCase())
       );
     }
-
     if (typeFilter === "system") {
       filtered = filtered.filter((role) => role.isSystemRole === true);
     } else if (typeFilter === "custom") {
       filtered = filtered.filter((role) => role.isSystemRole === false);
     }
-
     return filtered;
   };
-
   const filteredRoles = applyFilters();
-
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
     setCurrentPage(1);
   };
-
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
     setTypeFilter("");
     setCurrentPage(1);
   };
-
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredRoles.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredRoles.length / itemsPerPage) || 1;
-
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
-
     if (totalPages <= maxPagesToShow) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -225,10 +201,8 @@ const RoleList = () => {
         );
       }
     }
-
     return pages;
   };
-
   const formatDate = (date) => {
     return date
       ? new Date(date).toLocaleDateString("en-US", {
@@ -238,17 +212,13 @@ const RoleList = () => {
         })
       : "N/A";
   };
-
   const getRoleStats = () => {
     const totalRoles = filteredRoles.length;
     const systemRoles = filteredRoles.filter((r) => r.isSystemRole).length;
     const customRoles = filteredRoles.filter((r) => !r.isSystemRole).length;
-
     return { totalRoles, systemRoles, customRoles };
   };
-
   const stats = getRoleStats();
-
   if (loading) {
     return (
       <div className="rlm-loading-container">
@@ -258,7 +228,6 @@ const RoleList = () => {
       </div>
     );
   }
-
   return (
     <div className="rlm-page">
       <Breadcrumb
@@ -268,7 +237,6 @@ const RoleList = () => {
           },
         ]}
       />
-
       {/* KPI CARDS */}
       <div className="stats-cards-rl">
         <div className="stat-card-rl stat-total-rl">
@@ -280,7 +248,6 @@ const RoleList = () => {
             <div className="stat-label-rl">Total Roles</div>
           </div>
         </div>
-
         <div className="stat-card-rl stat-system-rl">
           <div className="stat-icon-rl">
             <i className="bi bi-lock-fill"></i>
@@ -290,7 +257,6 @@ const RoleList = () => {
             <div className="stat-label-rl">System Roles</div>
           </div>
         </div>
-
         <div className="stat-card-rl stat-custom-rl">
           <div className="stat-icon-rl">
             <i className="bi bi-gear-fill"></i>
@@ -301,7 +267,6 @@ const RoleList = () => {
           </div>
         </div>
       </div>
-
       {/* CONTROLS BAR */}
       <div className="rlm-controls">
         <div className="rlm-search-input">
@@ -330,7 +295,6 @@ const RoleList = () => {
             </button>
           </div>
         </div>
-
         <div className="rlm-type-filter">
           <RoleTypeDropdown
             value={typeFilter}
@@ -340,11 +304,9 @@ const RoleList = () => {
             }}
           />
         </div>
-
         <button className="rlm-btn-clear" onClick={clearFilters}>
           Clear Filters
         </button>
-
         <div className="rlm-view-switcher">
           <button
             className={`rlm-view-btn ${viewMode === "table" ? "active" : ""}`}
@@ -369,17 +331,17 @@ const RoleList = () => {
             <i className="bi bi-grid-3x3-gap-fill"></i>
           </button>
         </div>
-
         <div className="rlm-results-count">
           Showing {currentItems.length} of {filteredRoles.length} roles
         </div>
-
-        <button className="rlm-btn-create" onClick={() => setShowAddModal(true)}>
+        <button
+          className="rlm-btn-create"
+          onClick={() => setShowAddModal(true)}
+        >
           <i className="bi bi-plus-circle"></i>
           Create Role
         </button>
       </div>
-
       {/* EMPTY STATE */}
       {filteredRoles.length === 0 ? (
         <div className="rlm-empty">
@@ -413,21 +375,15 @@ const RoleList = () => {
                             </span>
                           )}
                         </div>
-
-                        <code className="rlm-card-code">
-                          {role.roleCode}
-                        </code>
+                        <code className="rlm-card-code">{role.roleCode}</code>
                       </div>
                     </div>
-
                     {/* Card Body */}
                     <div className="rlm-card-body">
                       <h6 className="rlm-card-title">{role.roleName}</h6>
-
                       <p className="rlm-card-description">
                         {role.description || "No description available"}
                       </p>
-
                       {/* Meta Info */}
                       <div className="rlm-card-meta">
                         <div className="rlm-meta-item-date">
@@ -441,7 +397,6 @@ const RoleList = () => {
                         </div>
                       </div>
                     </div>
-
                     {/* Card Footer - Actions */}
                     <div className="rlm-card-footer">
                       <button
@@ -451,7 +406,6 @@ const RoleList = () => {
                       >
                         <i className="bi bi-pencil-square"></i>
                       </button>
-
                       <button
                         onClick={() => handleDelete(role)}
                         disabled={role.isSystemRole}
@@ -468,7 +422,6 @@ const RoleList = () => {
                   </div>
                 ))}
               </div>
-
               {/* GRID PAGINATION */}
               {totalPages > 1 && (
                 <div className="rlm-pagination-wrapper">
@@ -488,7 +441,6 @@ const RoleList = () => {
                           <i className="bi bi-chevron-left"></i>
                         </button>
                       </li>
-
                       {getPageNumbers().map((page, index) => (
                         <li
                           key={index}
@@ -506,7 +458,6 @@ const RoleList = () => {
                           </button>
                         </li>
                       ))}
-
                       <li
                         className={`rlm-page-item ${
                           currentPage === totalPages ? "disabled" : ""
@@ -529,7 +480,6 @@ const RoleList = () => {
               )}
             </>
           )}
-
           {/* TABLE VIEW */}
           {viewMode === "table" && (
             <div className="rlm-table-card">
@@ -597,12 +547,14 @@ const RoleList = () => {
                   </tbody>
                 </table>
               </div>
-
               {totalPages > 1 && filteredRoles.length > 0 && (
                 <div className="rlm-pagination">
                   <div className="rlm-pagination-info">
                     <span>Show</span>
-                    <div ref={rowsDropdownRef} className="rlm-rows-dropdown-wrapper">
+                    <div
+                      ref={rowsDropdownRef}
+                      className="rlm-rows-dropdown-wrapper"
+                    >
                       <button
                         type="button"
                         onClick={() => setShowRowsDropdown(!showRowsDropdown)}
@@ -610,10 +562,11 @@ const RoleList = () => {
                       >
                         <span>{itemsPerPage}</span>
                         <i
-                          className={`bi bi-chevron-${showRowsDropdown ? "up" : "down"} rlm-rows-chevron`}
+                          className={`bi bi-chevron-${
+                            showRowsDropdown ? "up" : "down"
+                          } rlm-rows-chevron`}
                         ></i>
                       </button>
-
                       {showRowsDropdown && (
                         <div className="rlm-rows-dropdown">
                           {[5, 10, 25, 50].map((size) => (
@@ -636,16 +589,22 @@ const RoleList = () => {
                     </div>
                     <span>entries</span>
                   </div>
-
                   <div className="rlm-pagination-status">
-                    Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredRoles.length)} of {filteredRoles.length} entries
+                    Showing {indexOfFirstItem + 1} to{" "}
+                    {Math.min(indexOfLastItem, filteredRoles.length)} of{" "}
+                    {filteredRoles.length} entries
                   </div>
-
                   <nav className="rlm-pagination-nav">
                     <ul className="rlm-pagination-list">
-                      <li className={`rlm-page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                      <li
+                        className={`rlm-page-item ${
+                          currentPage === 1 ? "disabled" : ""
+                        }`}
+                      >
                         <button
-                          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                          onClick={() =>
+                            setCurrentPage((prev) => Math.max(prev - 1, 1))
+                          }
                           disabled={currentPage === 1}
                         >
                           <i className="bi bi-chevron-left"></i>
@@ -659,16 +618,26 @@ const RoleList = () => {
                           } ${typeof page !== "number" ? "disabled" : ""}`}
                         >
                           <button
-                            onClick={() => typeof page === "number" && setCurrentPage(page)}
+                            onClick={() =>
+                              typeof page === "number" && setCurrentPage(page)
+                            }
                             disabled={typeof page !== "number"}
                           >
                             {page}
                           </button>
                         </li>
                       ))}
-                      <li className={`rlm-page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                      <li
+                        className={`rlm-page-item ${
+                          currentPage === totalPages ? "disabled" : ""
+                        }`}
+                      >
                         <button
-                          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                          onClick={() =>
+                            setCurrentPage((prev) =>
+                              Math.min(prev + 1, totalPages)
+                            )
+                          }
                           disabled={currentPage === totalPages}
                         >
                           <i className="bi bi-chevron-right"></i>
@@ -682,7 +651,6 @@ const RoleList = () => {
           )}
         </>
       )}
-
       {/* MODALS */}
       {showAddModal && (
         <AddRoleModal
@@ -694,7 +662,6 @@ const RoleList = () => {
           }}
         />
       )}
-
       {showEditModal && selectedRole && (
         <EditRoleModal
           show={showEditModal}
@@ -710,7 +677,6 @@ const RoleList = () => {
           }}
         />
       )}
-
       {showDeleteModal && selectedRole && (
         <DeleteRoleModal
           show={showDeleteModal}
@@ -725,5 +691,4 @@ const RoleList = () => {
     </div>
   );
 };
-
 export default RoleList;

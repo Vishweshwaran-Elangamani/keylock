@@ -12,7 +12,6 @@
  *
  * @component
  */
-
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts/auth/AuthContext";
@@ -20,72 +19,58 @@ import authService from "../../../services/auth/authService";
 import { toast } from "sonner";
 import "../../../styles/auth/common/VerifyCode.css";
 import logo from "../../../assets/logodarkbarred.png";
-
 const VerifyCode = () => {
   // ========================
   // STATE MANAGEMENT
   // ========================
-
   /**
    * OTP code state - stores 6 digits entered by user
    */
   const [code, setCode] = useState(["", "", "", "", "", ""]);
-
   /**
    * Error state - stores error messages
    */
   const [error, setError] = useState("");
-
   /**
    * Loading state - tracks form submission status
    */
   const [loading, setLoading] = useState(false);
-
   /**
    * User info state - stores temporary user data from login
    */
   const [userInfo, setUserInfo] = useState(null);
-
   /**
    * Show OTP state - controls OTP visibility
    */
   const [showOtp, setShowOtp] = useState(false);
-
   /**
    * Failed attempts state - tracks number of failed OTP attempts
    */
   const [failedAttempts, setFailedAttempts] = useState(0);
-
   /**
    * Locked state - tracks if user is locked out
    */
   const [isLocked, setIsLocked] = useState(false);
-
   /**
    * Lockout end time state - stores when lockout expires
    */
   const [lockoutEndTime, setLockoutEndTime] = useState(null);
-
   /**
    * Remaining time state - for countdown display
    */
   const [remainingTime, setRemainingTime] = useState(0);
-
   // ========================
   // REFS
   // ========================
   const inputRefs = useRef([]);
-
   // ========================
   // HOOKS
   // ========================
   const navigate = useNavigate();
   const { login } = useAuth();
-
   // ========================
   // EFFECTS
   // ========================
-
   /**
    * Effect: Initialize component on mount
    * - Checks for temporary user data from login
@@ -98,16 +83,13 @@ const VerifyCode = () => {
       navigate("/login");
       return;
     }
-
     const tempUser = JSON.parse(tempUserStr);
     setUserInfo(tempUser);
-
     // Check if there's an existing lockout from localStorage
     const lockoutData = localStorage.getItem("otpLockout");
     if (lockoutData) {
       const { endTime, attempts } = JSON.parse(lockoutData);
       const now = Date.now();
-
       if (now < endTime) {
         setIsLocked(true);
         setLockoutEndTime(endTime);
@@ -117,10 +99,8 @@ const VerifyCode = () => {
         localStorage.removeItem("otpLockout");
       }
     }
-
     inputRefs.current[0]?.focus();
   }, [navigate]);
-
   /**
    * Effect: Countdown timer for lockout
    * Updates remaining time every second
@@ -128,13 +108,10 @@ const VerifyCode = () => {
    */
   useEffect(() => {
     if (!isLocked || !lockoutEndTime) return;
-
     const interval = setInterval(() => {
       const now = Date.now();
       const remaining = Math.max(0, lockoutEndTime - now);
-
       setRemainingTime(remaining);
-
       if (remaining === 0) {
         setIsLocked(false);
         setFailedAttempts(0);
@@ -144,14 +121,11 @@ const VerifyCode = () => {
         inputRefs.current[0]?.focus();
       }
     }, 1000);
-
     return () => clearInterval(interval);
   }, [isLocked, lockoutEndTime]);
-
   // ========================
   // INPUT HANDLERS
   // ========================
-
   /**
    * Handles OTP digit input change
    * Only allows numeric characters (0-9)
@@ -165,19 +139,15 @@ const VerifyCode = () => {
     if (!/^[0-9]?$/.test(value)) {
       return;
     }
-
     if (value.length > 1) return;
-
     const newCode = [...code];
     newCode[index] = value;
     setCode(newCode);
-
     // Auto-focus next input
     if (value && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
   };
-
   /**
    * Handles backspace key in OTP inputs
    * Moves focus to previous input when backspace pressed on empty field
@@ -190,7 +160,6 @@ const VerifyCode = () => {
       inputRefs.current[index - 1]?.focus();
     }
   };
-
   /**
    * Handles paste event for OTP input
    * Only allows numeric characters
@@ -201,7 +170,6 @@ const VerifyCode = () => {
   const handlePaste = (e) => {
     e.preventDefault();
     const pastedData = e.clipboardData.getData("text").trim();
-
     // Only allow numeric characters in paste
     if (!/^\d+$/.test(pastedData)) {
       setError("Please paste numbers only");
@@ -209,20 +177,16 @@ const VerifyCode = () => {
       setTimeout(() => setError(""), 3000);
       return;
     }
-
     const pastedDigits = pastedData.slice(0, 6);
     const newCode = pastedDigits.split("");
     setCode([...newCode, ...Array(6 - newCode.length).fill("")]);
-
     if (newCode.length === 6) {
       inputRefs.current[5]?.focus();
     }
   };
-
   // ========================
   // UTILITY FUNCTIONS
   // ========================
-
   /**
    * Formats milliseconds to MM:SS format for lockout display
    *
@@ -235,14 +199,12 @@ const VerifyCode = () => {
     const seconds = totalSeconds % 60;
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
-
   /**
    * Toggles OTP visibility
    */
   const toggleOtpVisibility = () => {
     setShowOtp(!showOtp);
   };
-
   /**
    * Returns dashboard route based on user role
    * Maps role names to their respective dashboard paths
@@ -268,11 +230,9 @@ const VerifyCode = () => {
     };
     return routes[normalizedRole] || "/employee/dashboard";
   };
-
   // ========================
   // FORM SUBMISSION
   // ========================
-
   /**
    * Handles OTP verification form submission
    * Validates OTP and makes API call
@@ -283,52 +243,40 @@ const VerifyCode = () => {
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const verificationCode = code.join("");
-
     if (verificationCode.length !== 6) {
       setError("Please enter all 6 digits");
       toast.error("Please enter all 6 digits");
       return;
     }
-
     if (!userInfo) {
       setError("User information not found. Please login again.");
       toast.error("User information not found. Please login again.");
       navigate("/login");
       return;
     }
-
     setLoading(true);
     setError("");
-
     try {
-
       // Show loading toast
       toast.loading("Verifying OTP...");
-
       // -------- API Call --------
       const response = await authService.verifyOtp(
         userInfo.email,
         verificationCode
       );
-
       if (!response || response.success === false) {
         const errorMsg = response?.message || "Invalid verification code";
         console.error("Verification failed:", errorMsg);
-
         toast.dismiss();
-
         // Handle failed attempt
         const newFailedAttempts = failedAttempts + 1;
         setFailedAttempts(newFailedAttempts);
-
         if (newFailedAttempts >= 3) {
           // Lock for 3 minutes
           const lockoutEnd = Date.now() + 3 * 60 * 1000;
           setIsLocked(true);
           setLockoutEndTime(lockoutEnd);
-
           localStorage.setItem(
             "otpLockout",
             JSON.stringify({
@@ -336,7 +284,6 @@ const VerifyCode = () => {
               attempts: newFailedAttempts,
             })
           );
-
           const lockoutMsg =
             "Too many failed attempts. Please wait 3 minutes before trying again.";
           setError(lockoutMsg);
@@ -348,15 +295,12 @@ const VerifyCode = () => {
           setError(attemptsMsg);
           toast.error(attemptsMsg);
         }
-
         setCode(["", "", "", "", "", ""]);
         inputRefs.current[0]?.focus();
         return;
       }
-
       const data = response.data;
       const user = data.user;
-
       if (!user) {
         console.error("User object not found in response");
         setError("Invalid response from server");
@@ -365,9 +309,7 @@ const VerifyCode = () => {
         setLoading(false);
         return;
       }
-
       const userRole = user.roleName;
-
       const userData = {
         userId: user.userId,
         email: user.email,
@@ -375,18 +317,12 @@ const VerifyCode = () => {
         empId: user.employeeCompanyId,
         role: userRole,
       };
-
-     
       localStorage.removeItem("tempUser");
       localStorage.removeItem("otpLockout");
-
       toast.dismiss();
       toast.success("OTP verified successfully!");
-
       login(userData, data.accessToken);
-
       const dashboardRoute = getDashboardRoute(userRole);
-
       setTimeout(() => {
         navigate(dashboardRoute, { replace: true });
       }, 100);
@@ -394,9 +330,7 @@ const VerifyCode = () => {
       console.error("OTP verification error:", err);
       console.error("Error response:", err.response);
       console.error("Error data:", err.response?.data);
-
       let errorMessage = "Invalid verification code. Please try again.";
-
       if (err.response?.data) {
         if (typeof err.response.data === "string") {
           errorMessage = err.response.data;
@@ -409,20 +343,14 @@ const VerifyCode = () => {
           errorMessage = Object.values(errors).flat().join(", ");
         }
       }
-
       console.error("Error message:", errorMessage);
-
       toast.dismiss();
-
-     
       const newFailedAttempts = failedAttempts + 1;
       setFailedAttempts(newFailedAttempts);
-
       if (newFailedAttempts >= 3) {
         const lockoutEnd = Date.now() + 3 * 60 * 1000;
         setIsLocked(true);
         setLockoutEndTime(lockoutEnd);
-
         localStorage.setItem(
           "otpLockout",
           JSON.stringify({
@@ -430,7 +358,6 @@ const VerifyCode = () => {
             attempts: newFailedAttempts,
           })
         );
-
         const lockoutMsg =
           "Too many failed attempts. Please wait 3 minutes before trying again.";
         setError(lockoutMsg);
@@ -442,23 +369,19 @@ const VerifyCode = () => {
         setError(attemptsMsg);
         toast.error(attemptsMsg);
       }
-
       setCode(["", "", "", "", "", ""]);
       inputRefs.current[0]?.focus();
     } finally {
       setLoading(false);
     }
   };
-
   // ========================
   // COMPUTED VALUES
   // ========================
-
   /**
    * Checks if all 6 OTP digits are entered
    */
   const isCodeComplete = code.every((digit) => digit !== "");
-
   // ========================
   // RENDER LOGIC
   // ========================
@@ -487,7 +410,6 @@ const VerifyCode = () => {
             <small className="email-display">({userInfo.email})</small>
           )}
         </div>
-
         <div className="verify-code-body">
           {/* -------- Error Alert -------- */}
           {error && (
@@ -496,7 +418,6 @@ const VerifyCode = () => {
               <div>{error}</div>
             </div>
           )}
-
           {/* -------- Lockout Timer Alert -------- */}
           {isLocked && lockoutEndTime && (
             <div className="alert-warning-verify">
@@ -507,7 +428,6 @@ const VerifyCode = () => {
               </div>
             </div>
           )}
-
           <form onSubmit={handleSubmit}>
             {/* -------- OTP Input Fields -------- */}
             <div className="otp-wrapper">
@@ -532,7 +452,6 @@ const VerifyCode = () => {
                   />
                 ))}
               </div>
-
               {/* -------- Show/Hide OTP Toggle Button -------- */}
               <button
                 type="button"
@@ -549,7 +468,6 @@ const VerifyCode = () => {
                 ></i>
               </button>
             </div>
-
             {/* -------- Submit Button -------- */}
             <button
               type="submit"
@@ -568,7 +486,6 @@ const VerifyCode = () => {
                 </>
               )}
             </button>
-
             {/* -------- Back to Login -------- */}
             <div className="back-to-login-verify">
               <button
@@ -586,5 +503,4 @@ const VerifyCode = () => {
     </div>
   );
 };
-
 export default VerifyCode;

@@ -11,10 +11,8 @@ import { toast } from "sonner";
 import { FaSearch } from "react-icons/fa";
 import { Form } from "react-bootstrap";
 import "../../../../styles/auth/user/UserList.css";
-
 const RoleDropdown = ({ value, onChange, roles }) => {
   const [open, setOpen] = useState(false);
-
   const allOptions = [
     { label: "All Roles", value: "" },
     ...roles
@@ -22,12 +20,10 @@ const RoleDropdown = ({ value, onChange, roles }) => {
       .map((role) => ({ label: role.roleName, value: role.roleName })),
   ];
   const selected = allOptions.find((o) => o.value === value) || allOptions[0];
-
   const handleSelect = (val) => {
     onChange({ target: { value: val } });
     setOpen(false);
   };
-
   return (
     <div
       className="ul-filter-select custom-status-dropdown"
@@ -60,22 +56,18 @@ const RoleDropdown = ({ value, onChange, roles }) => {
     </div>
   );
 };
-
 const StatusDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
-
   const allOptions = [
     { label: "All Status", value: "" },
     { label: "Active", value: "Active" },
     { label: "Inactive", value: "Inactive" },
   ];
   const selected = allOptions.find((o) => o.value === value) || allOptions[0];
-
   const handleSelect = (val) => {
     onChange({ target: { value: val } });
     setOpen(false);
   };
-
   return (
     <div
       className="ul-filter-select custom-status-dropdown"
@@ -108,38 +100,31 @@ const StatusDropdown = ({ value, onChange }) => {
     </div>
   );
 };
-
 const UserList = () => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [roles, setRoles] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
-
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [showRowsDropdown, setShowRowsDropdown] = useState(false);
   const rowsDropdownRef = useRef(null);
-
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
   const [showBulkOperations, setShowBulkOperations] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-
   useEffect(() => {
     fetchData();
   }, []);
-
   useEffect(() => {
     filterUsers();
   }, [users, activeSearchTerm, selectedRole, selectedStatus]);
-
   // Click outside handler for rows dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -150,13 +135,11 @@ const UserList = () => {
         setShowRowsDropdown(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -180,14 +163,11 @@ const UserList = () => {
       setLoading(false);
     }
   };
-
   const getNonAdminUsers = () => {
     return users.filter((user) => user.roleName !== "Admin");
   };
-
   const filterUsers = () => {
     let filtered = getNonAdminUsers();
-
     if (activeSearchTerm) {
       filtered = filtered.filter(
         (user) =>
@@ -213,18 +193,15 @@ const UserList = () => {
     setFilteredUsers(filtered);
     setCurrentPage(1);
   };
-
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
   };
-
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
     setSelectedRole("");
     setSelectedStatus("");
   };
-
   const handleAddUser = () => setShowAddModal(true);
   const handleEditUser = (user) => {
     setSelectedUser(user);
@@ -246,19 +223,15 @@ const UserList = () => {
     setShowDeactivateModal(false);
     fetchData();
   };
-
   const handleBulkOperationsSuccess = () => {
     fetchData();
   };
-
   const getPaginatedUsers = () => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
     return filteredUsers.slice(startIndex, endIndex);
   };
-
   const totalPages = Math.ceil(filteredUsers.length / rowsPerPage) || 1;
-
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
@@ -285,13 +258,11 @@ const UserList = () => {
     }
     return pages;
   };
-
   const getInitials = (firstName, lastName) => {
     const first = firstName?.charAt(0)?.toUpperCase() || "";
     const last = lastName?.charAt(0)?.toUpperCase() || "";
     return `${first}${last}`;
   };
-
   if (loading) {
     return (
       <div className="ul-loading-container">
@@ -301,7 +272,6 @@ const UserList = () => {
       </div>
     );
   }
-
   return (
     <div className="ul-page">
       <Breadcrumb
@@ -311,7 +281,6 @@ const UserList = () => {
           },
         ]}
       />
-
       <div className="stats-cards-ul">
         <div className="stat-card-ul stat-total-ul">
           <div className="stat-icon-ul">
@@ -322,7 +291,6 @@ const UserList = () => {
             <div className="stat-label-ul">Total Users</div>
           </div>
         </div>
-
         <div className="stat-card-ul stat-active-ul">
           <div className="stat-icon-ul">
             <i className="bi bi-person-check-fill"></i>
@@ -334,7 +302,6 @@ const UserList = () => {
             <div className="stat-label-ul">Active Users</div>
           </div>
         </div>
-
         <div className="stat-card-ul stat-inactive-ul">
           <div className="stat-icon-ul">
             <i className="bi bi-person-x-fill"></i>
@@ -346,7 +313,6 @@ const UserList = () => {
             <div className="stat-label-ul">Inactive Users</div>
           </div>
         </div>
-
         <div className="stat-card-ul stat-new-ul">
           <div className="stat-icon-ul">
             <i className="bi bi-person-plus-fill"></i>
@@ -366,7 +332,6 @@ const UserList = () => {
           </div>
         </div>
       </div>
-
       <div className="ul-filters-card">
         <div className="ul-filters-content">
           <div className="ul-search-input">
@@ -395,7 +360,6 @@ const UserList = () => {
               </button>
             </div>
           </div>
-
           <div className="ul-role-filter">
             <RoleDropdown
               value={selectedRole}
@@ -403,22 +367,18 @@ const UserList = () => {
               roles={roles}
             />
           </div>
-
           <div className="ul-status-filter">
             <StatusDropdown
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
             />
           </div>
-
           <button className="ul-btn-clear" onClick={clearFilters}>
             Clear Filters
           </button>
-
           <div className="ul-results-count">
             Showing {getPaginatedUsers().length} of {filteredUsers.length} users
           </div>
-
           <button
             className="ul-btn-bulk"
             onClick={() => setShowBulkOperations(true)}
@@ -426,14 +386,12 @@ const UserList = () => {
             <i className="bi bi-database"></i>
             Bulk Operations
           </button>
-
           <button className="ul-btn-create" onClick={handleAddUser}>
             <i className="bi bi-plus-circle"></i>
             Create User
           </button>
         </div>
       </div>
-
       <div className="ul-table-card">
         <div className="ul-table-wrapper">
           <table className="ul-table">
@@ -531,7 +489,6 @@ const UserList = () => {
             </tbody>
           </table>
         </div>
-
         {filteredUsers.length > 0 && totalPages > 1 && (
           <div className="ul-pagination">
             <div className="ul-pagination-info">
@@ -544,10 +501,11 @@ const UserList = () => {
                 >
                   <span>{rowsPerPage}</span>
                   <i
-                    className={`bi bi-chevron-${showRowsDropdown ? "up" : "down"} ul-rows-chevron`}
+                    className={`bi bi-chevron-${
+                      showRowsDropdown ? "up" : "down"
+                    } ul-rows-chevron`}
                   ></i>
                 </button>
-
                 {showRowsDropdown && (
                   <div className="ul-rows-dropdown">
                     {[5, 10, 25, 50].map((size) => (
@@ -570,13 +528,11 @@ const UserList = () => {
               </div>
               <span>entries</span>
             </div>
-
             <div className="ul-pagination-status">
               Showing {(currentPage - 1) * rowsPerPage + 1} to{" "}
               {Math.min(currentPage * rowsPerPage, filteredUsers.length)} of{" "}
               {filteredUsers.length} entries
             </div>
-
             <nav className="ul-pagination-nav">
               <ul className="ul-pagination-list">
                 <li
@@ -593,7 +549,6 @@ const UserList = () => {
                     <i className="bi bi-chevron-left"></i>
                   </button>
                 </li>
-
                 {getPageNumbers().map((page, index) => (
                   <li
                     key={index}
@@ -611,7 +566,6 @@ const UserList = () => {
                     </button>
                   </li>
                 ))}
-
                 <li
                   className={`ul-page-item ${
                     currentPage === totalPages ? "disabled" : ""
@@ -619,9 +573,7 @@ const UserList = () => {
                 >
                   <button
                     onClick={() =>
-                      setCurrentPage((prev) =>
-                        Math.min(prev + 1, totalPages)
-                      )
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                     }
                     disabled={currentPage === totalPages}
                   >
@@ -633,7 +585,6 @@ const UserList = () => {
           </div>
         )}
       </div>
-
       {showAddModal && (
         <AddUserModal
           show={showAddModal}
@@ -671,5 +622,4 @@ const UserList = () => {
     </div>
   );
 };
-
 export default UserList;

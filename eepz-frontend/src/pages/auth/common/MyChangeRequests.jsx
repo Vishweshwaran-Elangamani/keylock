@@ -2,23 +2,18 @@ import { useState, useEffect } from "react";
 import ChangeRequestService from "../../../services/auth/changeRequestService";
 import { toast } from "sonner";
 import "../../../styles/auth/common/MyChangeRequests.css";
-
 const MyChangeRequests = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
-
   useEffect(() => {
     fetchMyRequests();
   }, []);
-
   const fetchMyRequests = async () => {
     try {
       setLoading(true);
       toast.loading("Loading change requests...");
-
       const response = await ChangeRequestService.getMyChangeRequests();
-
       if (response.success) {
         setRequests(response.data);
         toast.dismiss();
@@ -35,21 +30,17 @@ const MyChangeRequests = () => {
       setLoading(false);
     }
   };
-
   const handleCancel = async (requestId) => {
     if (
       !window.confirm("Are you sure you want to cancel this change request?")
     ) {
       return;
     }
-
     try {
       toast.loading("Cancelling request...");
-
       const response = await ChangeRequestService.cancelChangeRequest(
         requestId
       );
-
       if (response.success) {
         toast.dismiss();
         toast.success(response.message || "Request cancelled successfully");
@@ -64,7 +55,6 @@ const MyChangeRequests = () => {
       toast.error("Failed to cancel request");
     }
   };
-
   const getStatusBadge = (status) => {
     const badges = {
       Pending: "badge bg-warning text-dark",
@@ -73,7 +63,6 @@ const MyChangeRequests = () => {
     };
     return badges[status] || "badge bg-secondary";
   };
-
   const getChangeTypeLabel = (changeType) => {
     const labels = {
       EmployeeCompanyId: "Employee Company ID",
@@ -81,7 +70,6 @@ const MyChangeRequests = () => {
     };
     return labels[changeType] || changeType;
   };
-
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-GB", {
@@ -92,12 +80,10 @@ const MyChangeRequests = () => {
       minute: "2-digit",
     });
   };
-
   const filteredRequests = requests.filter((req) => {
     if (filter === "all") return true;
     return req.status.toLowerCase() === filter.toLowerCase();
   });
-
   if (loading) {
     return (
       <div
@@ -110,7 +96,6 @@ const MyChangeRequests = () => {
       </div>
     );
   }
-
   return (
     <div className="change-request-container">
       <div className="change-request-header">
@@ -122,7 +107,6 @@ const MyChangeRequests = () => {
           Track the status of your account change requests
         </p>
       </div>
-
       <div className="filter-tabs mb-4">
         <button
           className={`filter-tab ${filter === "all" ? "active" : ""}`}
@@ -130,21 +114,18 @@ const MyChangeRequests = () => {
         >
           All ({requests.length})
         </button>
-
         <button
           className={`filter-tab ${filter === "pending" ? "active" : ""}`}
           onClick={() => setFilter("pending")}
         >
           Pending ({requests.filter((r) => r.status === "Pending").length})
         </button>
-
         <button
           className={`filter-tab ${filter === "approved" ? "active" : ""}`}
           onClick={() => setFilter("approved")}
         >
           Approved ({requests.filter((r) => r.status === "Approved").length})
         </button>
-
         <button
           className={`filter-tab ${filter === "rejected" ? "active" : ""}`}
           onClick={() => setFilter("rejected")}
@@ -152,7 +133,6 @@ const MyChangeRequests = () => {
           Rejected ({requests.filter((r) => r.status === "Rejected").length})
         </button>
       </div>
-
       {filteredRequests.length === 0 ? (
         <div className="empty-state">
           <i className="bi bi-inbox"></i>
@@ -192,7 +172,6 @@ const MyChangeRequests = () => {
                   </button>
                 )}
               </div>
-
               <div className="request-card-body">
                 <div className="row align-items-center mb-3">
                   <div className="col-md-5">
@@ -211,7 +190,6 @@ const MyChangeRequests = () => {
                     </p>
                   </div>
                 </div>
-
                 <div className="request-reason mb-3">
                   <label className="request-label">
                     <i className="bi bi-chat-left-quote me-1"></i>
@@ -219,7 +197,6 @@ const MyChangeRequests = () => {
                   </label>
                   <p className="mb-0">{request.reason}</p>
                 </div>
-
                 <div className="request-meta">
                   <span>
                     <i className="bi bi-calendar me-1"></i>
@@ -232,7 +209,6 @@ const MyChangeRequests = () => {
                     </span>
                   )}
                 </div>
-
                 {request.adminRemarks && (
                   <div className="admin-remarks mt-3">
                     <label className="request-label">
@@ -250,5 +226,4 @@ const MyChangeRequests = () => {
     </div>
   );
 };
-
 export default MyChangeRequests;

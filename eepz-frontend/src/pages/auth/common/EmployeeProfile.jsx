@@ -6,11 +6,8 @@ import ChangeRequestModal from "../../../components/auth/Modal/common/ChangeRequ
 import ProfilePhotoUploadModal from "../../../components/auth/Modal/common/ProfilePhotoUploadModal";
 import { toast } from "sonner";
 import "../../../styles/auth/common/EmployeeProfile.css";
-
-
 const GenderDropdown = ({ value, onChange, disabled, showError }) => {
   const [open, setOpen] = useState(false);
-
   const options = [
     { label: "Select Gender", value: "" },
     { label: "Male", value: "Male" },
@@ -18,14 +15,11 @@ const GenderDropdown = ({ value, onChange, disabled, showError }) => {
     { label: "Other", value: "Other" },
     { label: "Prefer not to say", value: "Prefer not to say" },
   ];
-
   const selected = options.find((o) => o.value === value) || options[0];
-
   const handleSelect = (val) => {
     onChange(val);
     setOpen(false);
   };
-
   if (disabled) {
     return (
       <div className={`epda-form-control ${showError ? "epda-error" : ""}`}>
@@ -33,7 +27,6 @@ const GenderDropdown = ({ value, onChange, disabled, showError }) => {
       </div>
     );
   }
-
   return (
     <div
       className={`epda-custom-dropdown ${showError ? "epda-error" : ""}`}
@@ -47,7 +40,6 @@ const GenderDropdown = ({ value, onChange, disabled, showError }) => {
         {selected.label}
         <span className="epda-custom-arrow" />
       </div>
-
       {open && (
         <div className="epda-custom-menu">
           {options.map((opt) => (
@@ -67,23 +59,23 @@ const GenderDropdown = ({ value, onChange, disabled, showError }) => {
     </div>
   );
 };
-
-
-const NationalityDropdown = ({ value, onChange, disabled, showError, options }) => {
+const NationalityDropdown = ({
+  value,
+  onChange,
+  disabled,
+  showError,
+  options,
+}) => {
   const [open, setOpen] = useState(false);
-
   const allOptions = [
     { label: "Select Nationality", value: "" },
     ...options.map((nat) => ({ label: nat, value: nat })),
   ];
-
   const selected = allOptions.find((o) => o.value === value) || allOptions[0];
-
   const handleSelect = (val) => {
     onChange(val);
     setOpen(false);
   };
-
   if (disabled) {
     return (
       <div className={`epda-form-control ${showError ? "epda-error" : ""}`}>
@@ -91,7 +83,6 @@ const NationalityDropdown = ({ value, onChange, disabled, showError, options }) 
       </div>
     );
   }
-
   return (
     <div
       className={`epda-custom-dropdown ${showError ? "epda-error" : ""}`}
@@ -105,7 +96,6 @@ const NationalityDropdown = ({ value, onChange, disabled, showError, options }) 
         {selected.label}
         <span className="epda-custom-arrow" />
       </div>
-
       {open && (
         <div className="epda-custom-menu">
           {allOptions.map((opt) => (
@@ -125,24 +115,19 @@ const NationalityDropdown = ({ value, onChange, disabled, showError, options }) 
     </div>
   );
 };
-
 const MaritalStatusDropdown = ({ value, onChange, disabled, showError }) => {
   const [open, setOpen] = useState(false);
-
   const options = [
     { label: "Select Status", value: "" },
     { label: "Single", value: "Single" },
     { label: "Married", value: "Married" },
     { label: "Prefer not to say", value: "Prefer not to say" },
   ];
-
   const selected = options.find((o) => o.value === value) || options[0];
-
   const handleSelect = (val) => {
     onChange(val);
     setOpen(false);
   };
-
   if (disabled) {
     return (
       <div className={`epda-form-control ${showError ? "epda-error" : ""}`}>
@@ -150,7 +135,6 @@ const MaritalStatusDropdown = ({ value, onChange, disabled, showError }) => {
       </div>
     );
   }
-
   return (
     <div
       className={`epda-custom-dropdown ${showError ? "epda-error" : ""}`}
@@ -164,7 +148,6 @@ const MaritalStatusDropdown = ({ value, onChange, disabled, showError }) => {
         {selected.label}
         <span className="epda-custom-arrow" />
       </div>
-
       {open && (
         <div className="epda-custom-menu">
           {options.map((opt) => (
@@ -184,23 +167,17 @@ const MaritalStatusDropdown = ({ value, onChange, disabled, showError }) => {
     </div>
   );
 };
-
-
 const StateDropdown = ({ value, onChange, disabled, showError, options }) => {
   const [open, setOpen] = useState(false);
-
   const allOptions = [
     { label: "Select State", value: "" },
     ...options.map((state) => ({ label: state, value: state })),
   ];
-
   const selected = allOptions.find((o) => o.value === value) || allOptions[0];
-
   const handleSelect = (val) => {
     onChange(val);
     setOpen(false);
   };
-
   if (disabled) {
     return (
       <div className={`epda-form-control ${showError ? "epda-error" : ""}`}>
@@ -208,7 +185,6 @@ const StateDropdown = ({ value, onChange, disabled, showError, options }) => {
       </div>
     );
   }
-
   return (
     <div
       className={`epda-custom-dropdown ${showError ? "epda-error" : ""}`}
@@ -222,7 +198,6 @@ const StateDropdown = ({ value, onChange, disabled, showError, options }) => {
         {selected.label}
         <span className="epda-custom-arrow" />
       </div>
-
       {open && (
         <div className="epda-custom-menu">
           {allOptions.map((opt) => (
@@ -242,7 +217,6 @@ const StateDropdown = ({ value, onChange, disabled, showError, options }) => {
     </div>
   );
 };
-
 /**
  * EmployeeProfile Component
  * Displays and manages employee profile information with modern UI
@@ -251,7 +225,6 @@ const StateDropdown = ({ value, onChange, disabled, showError, options }) => {
 const EmployeeProfile = () => {
   // Get current user from auth context
   const { user } = useAuth();
-
   // State management
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -265,11 +238,9 @@ const EmployeeProfile = () => {
   const [hasPendingRequest, setHasPendingRequest] = useState(false);
   const [pendingRequestId, setPendingRequestId] = useState(null);
   const [checkingPending, setCheckingPending] = useState(false);
-
   // Profile photo states
   const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [profilePhoto, setProfilePhoto] = useState(null);
-
   // Nationality dropdown options
   const nationalityOptions = [
     "Indian",
@@ -286,7 +257,6 @@ const EmployeeProfile = () => {
     "Korean",
     "Other",
   ];
-
   // Indian states dropdown options
   const stateOptions = [
     "Andhra Pradesh",
@@ -321,7 +291,6 @@ const EmployeeProfile = () => {
     "Puducherry",
     "Other",
   ];
-
   /**
    * Fetch profile data and check pending requests on mount
    */
@@ -329,7 +298,6 @@ const EmployeeProfile = () => {
     fetchProfileData();
     checkPendingRequest();
   }, []);
-
   /**
    * Update profile photo when profile data loads
    */
@@ -340,7 +308,6 @@ const EmployeeProfile = () => {
       );
     }
   }, [profileData]);
-
   /**
    * Fetches employee profile data from backend
    */
@@ -348,9 +315,7 @@ const EmployeeProfile = () => {
     try {
       setLoading(true);
       toast.loading("Loading your profile...");
-
       const response = await EmployeeProfileService.getMyProfile();
-
       if (response.success) {
         setProfileData(response.data);
         initializeFormData(response.data);
@@ -366,7 +331,6 @@ const EmployeeProfile = () => {
       setLoading(false);
     }
   };
-
   /**
    * Checks if user has any pending change requests
    */
@@ -374,7 +338,6 @@ const EmployeeProfile = () => {
     try {
       setCheckingPending(true);
       const response = await ChangeRequestService.hasPendingRequest();
-
       if (response.success && response.data && response.data.requestId) {
         setHasPendingRequest(true);
         setPendingRequestId(response.data.requestId);
@@ -390,14 +353,12 @@ const EmployeeProfile = () => {
       setCheckingPending(false);
     }
   };
-
   /**
    * Handles camera icon click to open photo upload modal
    */
   const handleCameraClick = () => {
     setShowPhotoModal(true);
   };
-
   /**
    * Handles photo update callback from modal
    */
@@ -405,7 +366,6 @@ const EmployeeProfile = () => {
     setProfilePhoto(newPhotoUrl);
     await fetchProfileData();
   };
-
   /**
    * Initializes form data with profile data
    */
@@ -467,7 +427,6 @@ const EmployeeProfile = () => {
             pinCode: "",
           },
     });
-
     // Check if current and permanent addresses are same
     if (
       data.currentAddress &&
@@ -479,35 +438,28 @@ const EmployeeProfile = () => {
     } else {
       setSameAsCurrentAddress(false);
     }
-
     setErrors({});
     setTouched({});
   };
-
   /**
    * Handles change request submission
    */
   const handleChangeRequest = async (requestPayload) => {
     try {
       toast.loading("Submitting change request...");
-
       const response = await ChangeRequestService.submitChangeRequest(
         requestPayload
       );
-
       if (response.success) {
         toast.dismiss();
         toast.success(
           response.message || "Change request submitted successfully"
         );
-
         if (response.data && response.data.requestId) {
           setHasPendingRequest(true);
           setPendingRequestId(response.data.requestId);
         }
-
         setShowChangeRequestModal(false);
-
         setTimeout(async () => {
           await checkPendingRequest();
         }, 500);
@@ -521,13 +473,11 @@ const EmployeeProfile = () => {
         error.response?.data?.Message ||
         error.message ||
         "Failed to submit change request";
-
       toast.dismiss();
       toast.error(errorMessage);
       console.error("Error:", error);
     }
   };
-
   /**
    * Handles modal close event
    */
@@ -536,22 +486,18 @@ const EmployeeProfile = () => {
       setHasPendingRequest(false);
       setPendingRequestId(null);
       toast.success("Request cancelled. You can submit a new one now.");
-
       setTimeout(async () => {
         await checkPendingRequest();
       }, 300);
     }
-
     setShowChangeRequestModal(false);
   };
-
   /**
    * Validates individual field
    */
   const validateField = (name, value) => {
     let error = "";
     const stringValue = value != null ? String(value) : "";
-
     switch (name) {
       case "firstName":
         if (!stringValue || !stringValue.trim()) {
@@ -566,7 +512,6 @@ const EmployeeProfile = () => {
           error = "First name cannot contain consecutive spaces";
         }
         break;
-
       case "middleName":
         if (stringValue && stringValue.trim()) {
           if (stringValue.trim().length > 50) {
@@ -582,7 +527,6 @@ const EmployeeProfile = () => {
           }
         }
         break;
-
       case "lastName":
         if (!stringValue || !stringValue.trim()) {
           error = "Last name is required";
@@ -596,7 +540,6 @@ const EmployeeProfile = () => {
           error = "Last name cannot contain consecutive spaces";
         }
         break;
-
       case "callingName":
         if (!stringValue || !stringValue.trim()) {
           error = "Calling name is required";
@@ -612,7 +555,6 @@ const EmployeeProfile = () => {
             "Calling name cannot contain consecutive hyphens or apostrophes";
         }
         break;
-
       case "mobileNumber":
         if (!stringValue || !stringValue.trim()) {
           error = "Mobile number is required";
@@ -634,7 +576,6 @@ const EmployeeProfile = () => {
           }
         }
         break;
-
       case "alternateNumber":
         if (!stringValue || !stringValue.trim()) {
           error = "Alternate number is required";
@@ -646,14 +587,15 @@ const EmployeeProfile = () => {
             error = "Alternate number must be exactly 10 digits";
           } else if (!/^[6-9]/.test(cleanNumber)) {
             error = "Alternate number must start with 6, 7, 8, or 9";
-          } else if (cleanNumber === formData.mobileNumber?.replace(/\s+/g, "")) {
+          } else if (
+            cleanNumber === formData.mobileNumber?.replace(/\s+/g, "")
+          ) {
             error = "Alternate number must be different from mobile number";
           } else if (/^(\d)\1{9}$/.test(cleanNumber)) {
             error = "Alternate number cannot have all same digits";
           }
         }
         break;
-
       case "personalEmail":
         if (!stringValue || !stringValue.trim()) {
           error = "Personal email is required";
@@ -679,20 +621,17 @@ const EmployeeProfile = () => {
           }
         }
         break;
-
       case "gender":
         if (!stringValue || stringValue === "") {
           error = "Please select your gender";
         }
         break;
-
       case "dateOfBirthOfficial":
         if (!stringValue || !stringValue.trim()) {
           error = "Date of birth is required";
         } else {
           const birthDate = new Date(stringValue);
           const today = new Date();
-
           if (birthDate > today) {
             error = "Date of birth cannot be in the future";
           } else {
@@ -703,7 +642,6 @@ const EmployeeProfile = () => {
               (monthDiff === 0 && today.getDate() < birthDate.getDate())
                 ? age - 1
                 : age;
-
             if (actualAge < 18) {
               error = "You must be at least 18 years old";
             } else if (actualAge > 100) {
@@ -711,40 +649,33 @@ const EmployeeProfile = () => {
             } else if (actualAge > 65) {
               error = "Age cannot exceed 65 years for employment";
             }
-
             if (birthDate.getFullYear() < 1900) {
               error = "Please enter a valid date of birth";
             }
           }
         }
         break;
-
       case "nationality":
         if (!stringValue || stringValue === "") {
           error = "Please select your nationality";
         }
         break;
-
       case "maritalStatus":
         if (!stringValue || stringValue === "") {
           error = "Please select your marital status";
         }
         break;
-
       default:
         break;
     }
-
     return error;
   };
-
   /**
    * Validates address fields
    */
   const validateAddressField = (addressType, field, value) => {
     let error = "";
     const stringValue = value != null ? String(value) : "";
-
     switch (field) {
       case "doorNumber":
         if (!stringValue || !stringValue.trim()) {
@@ -757,7 +688,6 @@ const EmployeeProfile = () => {
           error = "Door number cannot contain consecutive spaces";
         }
         break;
-
       case "street":
         if (!stringValue || !stringValue.trim()) {
           error = "Street is required";
@@ -772,7 +702,6 @@ const EmployeeProfile = () => {
           error = "Street cannot contain consecutive spaces";
         }
         break;
-
       case "landmark":
         if (!stringValue || !stringValue.trim()) {
           error = "Landmark is required";
@@ -785,7 +714,6 @@ const EmployeeProfile = () => {
           error = "Landmark cannot contain consecutive spaces";
         }
         break;
-
       case "area":
         if (!stringValue || !stringValue.trim()) {
           error = "Area is required";
@@ -800,7 +728,6 @@ const EmployeeProfile = () => {
           error = "Area cannot contain consecutive spaces";
         }
         break;
-
       case "city":
         if (!stringValue || !stringValue.trim()) {
           error = "City is required";
@@ -816,13 +743,11 @@ const EmployeeProfile = () => {
           error = "City name is too short";
         }
         break;
-
       case "state":
         if (!stringValue || stringValue === "") {
           error = "Please select your state";
         }
         break;
-
       case "pinCode":
         if (!stringValue || !stringValue.trim()) {
           error = "PIN code is required";
@@ -839,7 +764,6 @@ const EmployeeProfile = () => {
           }
         }
         break;
-
       case "country":
         if (!stringValue || !stringValue.trim()) {
           error = "Country is required";
@@ -847,37 +771,30 @@ const EmployeeProfile = () => {
           error = "Country cannot exceed 50 characters";
         }
         break;
-
       default:
         break;
     }
-
     return error;
   };
-
   /**
    * Handles input field changes
    */
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-
     setTouched((prev) => ({
       ...prev,
       [name]: true,
     }));
-
     const error = validateField(name, value);
     setErrors((prev) => ({
       ...prev,
       [name]: error,
     }));
   };
-
   /**
    * Handles address field changes
    */
@@ -889,26 +806,22 @@ const EmployeeProfile = () => {
         [field]: value,
       },
     }));
-
     setTouched((prev) => ({
       ...prev,
       [`${addressType}.${field}`]: true,
     }));
-
     const error = validateAddressField(addressType, field, value);
     setErrors((prev) => ({
       ...prev,
       [`${addressType}.${field}`]: error,
     }));
   };
-
   /**
    * Handles "same as current address" checkbox
    */
   const handleSameAddressChange = (e) => {
     const isChecked = e.target.checked;
     setSameAsCurrentAddress(isChecked);
-
     if (isChecked) {
       setFormData((prev) => ({
         ...prev,
@@ -943,7 +856,6 @@ const EmployeeProfile = () => {
       }));
     }
   };
-
   /**
    * Auto-sync permanent address when current address changes
    */
@@ -955,13 +867,11 @@ const EmployeeProfile = () => {
       }));
     }
   }, [formData.currentAddress, sameAsCurrentAddress, isEditing]);
-
   /**
    * Validates entire form before submission
    */
   const validateForm = () => {
     const newErrors = {};
-
     const requiredFields = [
       "firstName",
       "lastName",
@@ -974,7 +884,6 @@ const EmployeeProfile = () => {
       "maritalStatus",
       "nationality",
     ];
-
     requiredFields.forEach((field) => {
       const fieldValue = formData[field];
       if (
@@ -986,7 +895,6 @@ const EmployeeProfile = () => {
           .trim()} is required`;
       }
     });
-
     Object.keys(formData).forEach((field) => {
       if (typeof formData[field] === "string" || formData[field] != null) {
         const error = validateField(field, formData[field]);
@@ -995,7 +903,6 @@ const EmployeeProfile = () => {
         }
       }
     });
-
     ["currentAddress", "permanentAddress"].forEach((addressType) => {
       if (formData[addressType]) {
         Object.keys(formData[addressType]).forEach((field) => {
@@ -1012,7 +919,6 @@ const EmployeeProfile = () => {
         });
       }
     });
-
     if (
       formData.alternateNumber &&
       formData.mobileNumber &&
@@ -1022,9 +928,7 @@ const EmployeeProfile = () => {
       newErrors.alternateNumber =
         "Alternate number must be different from mobile number";
     }
-
     setErrors(newErrors);
-
     const errorCount = Object.keys(newErrors).length;
     if (errorCount > 0) {
       toast.error(
@@ -1033,16 +937,13 @@ const EmployeeProfile = () => {
         } before submitting`
       );
     }
-
     return Object.keys(newErrors).length === 0;
   };
-
   /**
    * Handles form submission
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const allTouched = {};
     Object.keys(formData).forEach((key) => {
       if (typeof formData[key] === "object" && !Array.isArray(formData[key])) {
@@ -1054,7 +955,6 @@ const EmployeeProfile = () => {
       }
     });
     setTouched(allTouched);
-
     if (!validateForm()) {
       const firstErrorField = document.querySelector(
         ".epda-form-control.epda-error, .epda-custom-dropdown.epda-error"
@@ -1065,21 +965,16 @@ const EmployeeProfile = () => {
       }
       return;
     }
-
     try {
       setSaving(true);
       toast.loading("Updating your profile...");
-
       const response = await EmployeeProfileService.updateProfile(formData);
-
       if (response.success) {
         toast.dismiss();
         toast.success("Profile updated successfully!");
-
         setProfileData(response.data);
         initializeFormData(response.data);
         setIsEditing(false);
-
         if (
           response.data.currentAddress &&
           response.data.permanentAddress &&
@@ -1106,7 +1001,6 @@ const EmployeeProfile = () => {
       setSaving(false);
     }
   };
-
   /**
    * Handles cancel button
    */
@@ -1116,7 +1010,6 @@ const EmployeeProfile = () => {
     initializeFormData(profileData);
     toast.info("Changes discarded");
   };
-
   /**
    * Gets initials from first and last name
    */
@@ -1126,7 +1019,6 @@ const EmployeeProfile = () => {
     const last = lastName ? lastName[0] : "";
     return (first + last).toUpperCase();
   };
-
   /**
    * Formats date to readable format
    */
@@ -1138,7 +1030,6 @@ const EmployeeProfile = () => {
       year: "numeric",
     });
   };
-
   /**
    * Formats address object to readable string
    */
@@ -1156,7 +1047,6 @@ const EmployeeProfile = () => {
     ].filter(Boolean);
     return parts.length > 0 ? parts.join(", ") : null;
   };
-
   /**
    * Returns appropriate badge class for employment status
    */
@@ -1174,14 +1064,12 @@ const EmployeeProfile = () => {
         return "epda-badge-secondary";
     }
   };
-
   /**
    * Checks if field should show error
    */
   const showError = (fieldName) => {
     return touched[fieldName] && errors[fieldName];
   };
-
   // Loading state
   if (loading) {
     return (
@@ -1193,7 +1081,6 @@ const EmployeeProfile = () => {
       </div>
     );
   }
-
   // No data state
   if (!profileData) {
     return (
@@ -1210,7 +1097,6 @@ const EmployeeProfile = () => {
       </div>
     );
   }
-
   return (
     <div className="epda-profile-container">
       {/* Modern Profile Header */}
@@ -1263,7 +1149,6 @@ const EmployeeProfile = () => {
               </div>
             </div>
           </div>
-
           <div className="epda-profile-actions">
             {!isEditing ? (
               <>
@@ -1318,7 +1203,6 @@ const EmployeeProfile = () => {
           </div>
         </div>
       </div>
-
       {/* Main Content Grid */}
       <div className="epda-profile-content">
         <div className="epda-content-grid">
@@ -1364,7 +1248,6 @@ const EmployeeProfile = () => {
                 </div>
               </div>
             </div>
-
             {/* Employment Details Card */}
             <div className="epda-info-card">
               <div className="epda-card-header">
@@ -1400,46 +1283,48 @@ const EmployeeProfile = () => {
                 </div>
               </div>
             </div>
-
             {/* Address Card - Hide in Edit Mode */}
-{!isEditing && (
-  <div className="epda-info-card">
-    <div className="epda-card-header">
-      <i className="bi bi-geo-alt"></i>
-      <h3>Address</h3>
-    </div>
-    <div className="epda-card-content">
-      <div className="epda-info-grid">
-        {profileData.currentAddress && (
-          <div className="epda-info-item">
-            <label>Current Address</label>
-            <span>
-              {formatAddress(profileData.currentAddress) || "Not provided"}
-            </span>
+            {!isEditing && (
+              <div className="epda-info-card">
+                <div className="epda-card-header">
+                  <i className="bi bi-geo-alt"></i>
+                  <h3>Address</h3>
+                </div>
+                <div className="epda-card-content">
+                  <div className="epda-info-grid">
+                    {profileData.currentAddress && (
+                      <div className="epda-info-item">
+                        <label>Current Address</label>
+                        <span>
+                          {formatAddress(profileData.currentAddress) ||
+                            "Not provided"}
+                        </span>
+                      </div>
+                    )}
+                    {profileData.permanentAddress && (
+                      <div className="epda-info-item">
+                        <label>Permanent Address</label>
+                        <span>
+                          {formatAddress(profileData.permanentAddress) ||
+                            "Not provided"}
+                        </span>
+                      </div>
+                    )}
+                    {!profileData.currentAddress &&
+                      !profileData.permanentAddress && (
+                        <div className="epda-info-item">
+                          <span
+                            style={{ color: "#6c757d", fontStyle: "italic" }}
+                          >
+                            No address information available
+                          </span>
+                        </div>
+                      )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-        )}
-        {profileData.permanentAddress && (
-          <div className="epda-info-item">
-            <label>Permanent Address</label>
-            <span>
-              {formatAddress(profileData.permanentAddress) || "Not provided"}
-            </span>
-          </div>
-        )}
-        {!profileData.currentAddress && !profileData.permanentAddress && (
-          <div className="epda-info-item">
-            <span style={{ color: '#6c757d', fontStyle: 'italic' }}>
-              No address information available
-            </span>
-          </div>
-        )}
-      </div>
-    </div>
-  </div>
-)}
-
-          </div>
-
           {/* Main Section */}
           <div className="epda-main-section">
             {/* Editable Personal Information */}
@@ -1473,7 +1358,6 @@ const EmployeeProfile = () => {
                         </span>
                       )}
                     </div>
-
                     {/* Middle Name */}
                     <div className="epda-form-field">
                       <label>Middle Name</label>
@@ -1494,7 +1378,6 @@ const EmployeeProfile = () => {
                         </span>
                       )}
                     </div>
-
                     {/* Last Name */}
                     <div className="epda-form-field">
                       <label>
@@ -1517,7 +1400,6 @@ const EmployeeProfile = () => {
                         </span>
                       )}
                     </div>
-
                     {/* Calling Name */}
                     <div className="epda-form-field">
                       <label>
@@ -1540,7 +1422,6 @@ const EmployeeProfile = () => {
                         </span>
                       )}
                     </div>
-
                     {/* Gender */}
                     <div className="epda-form-field">
                       <label>
@@ -1558,10 +1439,11 @@ const EmployeeProfile = () => {
                         showError={showError("gender")}
                       />
                       {showError("gender") && (
-                        <span className="epda-error-message">{errors.gender}</span>
+                        <span className="epda-error-message">
+                          {errors.gender}
+                        </span>
                       )}
                     </div>
-
                     {/* Date of Birth */}
                     <div className="epda-form-field">
                       <label>
@@ -1584,7 +1466,6 @@ const EmployeeProfile = () => {
                         </span>
                       )}
                     </div>
-
                     {/* Marital Status */}
                     <div className="epda-form-field">
                       <label>
@@ -1616,7 +1497,6 @@ const EmployeeProfile = () => {
                         </span>
                       )}
                     </div>
-
                     {/* Nationality */}
                     <div className="epda-form-field">
                       <label>
@@ -1653,7 +1533,6 @@ const EmployeeProfile = () => {
                 </form>
               </div>
             </div>
-
             {/* Contact Information */}
             <div className="epda-form-card">
               <div className="epda-card-header">
@@ -1686,11 +1565,11 @@ const EmployeeProfile = () => {
                         </span>
                       )}
                     </div>
-
                     {/* Alternate Number */}
                     <div className="epda-form-field">
                       <label>
-                        Alternate Number <span className="epda-required">*</span>
+                        Alternate Number{" "}
+                        <span className="epda-required">*</span>
                       </label>
                       <input
                         type="tel"
@@ -1710,7 +1589,6 @@ const EmployeeProfile = () => {
                         </span>
                       )}
                     </div>
-
                     {/* Personal Email */}
                     <div className="epda-form-field">
                       <label>
@@ -1738,7 +1616,6 @@ const EmployeeProfile = () => {
                 </form>
               </div>
             </div>
-
             {/* Address Information - Edit Mode */}
             {isEditing && (
               <div className="epda-form-card">
@@ -1781,7 +1658,6 @@ const EmployeeProfile = () => {
                           </span>
                         )}
                       </div>
-
                       <div className="epda-form-field">
                         <label>
                           Street <span className="epda-required">*</span>
@@ -1797,7 +1673,9 @@ const EmployeeProfile = () => {
                             )
                           }
                           className={`epda-form-control ${
-                            showError("currentAddress.street") ? "epda-error" : ""
+                            showError("currentAddress.street")
+                              ? "epda-error"
+                              : ""
                           }`}
                           placeholder="Enter street"
                         />
@@ -1807,7 +1685,6 @@ const EmployeeProfile = () => {
                           </span>
                         )}
                       </div>
-
                       <div className="epda-form-field">
                         <label>
                           Landmark <span className="epda-required">*</span>
@@ -1823,7 +1700,9 @@ const EmployeeProfile = () => {
                             )
                           }
                           className={`epda-form-control ${
-                            showError("currentAddress.landmark") ? "epda-error" : ""
+                            showError("currentAddress.landmark")
+                              ? "epda-error"
+                              : ""
                           }`}
                           placeholder="Enter landmark"
                         />
@@ -1833,7 +1712,6 @@ const EmployeeProfile = () => {
                           </span>
                         )}
                       </div>
-
                       <div className="epda-form-field">
                         <label>
                           Area <span className="epda-required">*</span>
@@ -1859,7 +1737,6 @@ const EmployeeProfile = () => {
                           </span>
                         )}
                       </div>
-
                       <div className="epda-form-field">
                         <label>
                           City <span className="epda-required">*</span>
@@ -1885,7 +1762,6 @@ const EmployeeProfile = () => {
                           </span>
                         )}
                       </div>
-
                       <div className="epda-form-field">
                         <label>
                           State <span className="epda-required">*</span>
@@ -1905,7 +1781,6 @@ const EmployeeProfile = () => {
                           </span>
                         )}
                       </div>
-
                       <div className="epda-form-field">
                         <label>
                           Country <span className="epda-required">*</span>
@@ -1921,7 +1796,9 @@ const EmployeeProfile = () => {
                             )
                           }
                           className={`epda-form-control ${
-                            showError("currentAddress.country") ? "epda-error" : ""
+                            showError("currentAddress.country")
+                              ? "epda-error"
+                              : ""
                           }`}
                           placeholder="Enter country"
                         />
@@ -1931,7 +1808,6 @@ const EmployeeProfile = () => {
                           </span>
                         )}
                       </div>
-
                       <div className="epda-form-field">
                         <label>
                           PIN Code <span className="epda-required">*</span>
@@ -1947,7 +1823,9 @@ const EmployeeProfile = () => {
                             )
                           }
                           className={`epda-form-control ${
-                            showError("currentAddress.pinCode") ? "epda-error" : ""
+                            showError("currentAddress.pinCode")
+                              ? "epda-error"
+                              : ""
                           }`}
                           placeholder="Enter PIN code"
                           maxLength={6}
@@ -1960,7 +1838,6 @@ const EmployeeProfile = () => {
                       </div>
                     </div>
                   </div>
-
                   {/* Same as Current Address Checkbox */}
                   <div className="epda-address-checkbox">
                     <label className="epda-checkbox-label">
@@ -1973,14 +1850,12 @@ const EmployeeProfile = () => {
                       Permanent address is same as current address
                     </label>
                   </div>
-
                   {/* Permanent Address */}
                   <div className="epda-address-section">
                     <h4 className="epda-section-title">
                       <i className="bi bi-house"></i>
                       Permanent Address
                     </h4>
-
                     {sameAsCurrentAddress && (
                       <div className="epda-address-auto-filled">
                         <i className="bi bi-info-circle-fill"></i>
@@ -1990,7 +1865,6 @@ const EmployeeProfile = () => {
                         </span>
                       </div>
                     )}
-
                     <div className="epda-form-grid epda-address-grid">
                       <div className="epda-form-field">
                         <label>
@@ -2020,7 +1894,6 @@ const EmployeeProfile = () => {
                           </span>
                         )}
                       </div>
-
                       <div className="epda-form-field">
                         <label>
                           Street <span className="epda-required">*</span>
@@ -2037,7 +1910,9 @@ const EmployeeProfile = () => {
                           }
                           disabled={sameAsCurrentAddress}
                           className={`epda-form-control ${
-                            showError("permanentAddress.street") ? "epda-error" : ""
+                            showError("permanentAddress.street")
+                              ? "epda-error"
+                              : ""
                           }`}
                           placeholder="Enter street"
                         />
@@ -2047,7 +1922,6 @@ const EmployeeProfile = () => {
                           </span>
                         )}
                       </div>
-
                       <div className="epda-form-field">
                         <label>
                           Landmark <span className="epda-required">*</span>
@@ -2076,7 +1950,6 @@ const EmployeeProfile = () => {
                           </span>
                         )}
                       </div>
-
                       <div className="epda-form-field">
                         <label>
                           Area <span className="epda-required">*</span>
@@ -2093,7 +1966,9 @@ const EmployeeProfile = () => {
                           }
                           disabled={sameAsCurrentAddress}
                           className={`epda-form-control ${
-                            showError("permanentAddress.area") ? "epda-error" : ""
+                            showError("permanentAddress.area")
+                              ? "epda-error"
+                              : ""
                           }`}
                           placeholder="Enter area"
                         />
@@ -2103,7 +1978,6 @@ const EmployeeProfile = () => {
                           </span>
                         )}
                       </div>
-
                       <div className="epda-form-field">
                         <label>
                           City <span className="epda-required">*</span>
@@ -2120,7 +1994,9 @@ const EmployeeProfile = () => {
                           }
                           disabled={sameAsCurrentAddress}
                           className={`epda-form-control ${
-                            showError("permanentAddress.city") ? "epda-error" : ""
+                            showError("permanentAddress.city")
+                              ? "epda-error"
+                              : ""
                           }`}
                           placeholder="Enter city"
                         />
@@ -2130,7 +2006,6 @@ const EmployeeProfile = () => {
                           </span>
                         )}
                       </div>
-
                       <div className="epda-form-field">
                         <label>
                           State <span className="epda-required">*</span>
@@ -2154,16 +2029,13 @@ const EmployeeProfile = () => {
                           </span>
                         )}
                       </div>
-
                       <div className="epda-form-field">
                         <label>
                           Country <span className="epda-required">*</span>
                         </label>
                         <input
                           type="text"
-                          value={
-                            formData.permanentAddress?.country || "India"
-                          }
+                          value={formData.permanentAddress?.country || "India"}
                           onChange={(e) =>
                             handleAddressChange(
                               "permanentAddress",
@@ -2185,7 +2057,6 @@ const EmployeeProfile = () => {
                           </span>
                         )}
                       </div>
-
                       <div className="epda-form-field">
                         <label>
                           PIN Code <span className="epda-required">*</span>
@@ -2223,7 +2094,6 @@ const EmployeeProfile = () => {
           </div>
         </div>
       </div>
-
       {/* Change Request Modal */}
       {showChangeRequestModal && (
         <ChangeRequestModal
@@ -2234,7 +2104,6 @@ const EmployeeProfile = () => {
           pendingRequestId={pendingRequestId}
         />
       )}
-
       {/* Profile Photo Upload Modal */}
       {showPhotoModal && (
         <ProfilePhotoUploadModal
@@ -2247,5 +2116,4 @@ const EmployeeProfile = () => {
     </div>
   );
 };
-
 export default EmployeeProfile;

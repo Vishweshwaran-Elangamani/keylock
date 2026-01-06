@@ -3,76 +3,66 @@ import { useNavigate } from "react-router-dom";
 import authService from "../../../services/auth/authService";
 import { toast } from "sonner";
 import "../../../styles/auth/common/ResetPassword.css";
-
 const ResetPassword = () => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [emailTouched, setEmailTouched] = useState(false);
-
   const navigate = useNavigate();
-
   // Validate Gmail OR eepz.com OR relevantz.com
   const validateEmail = (email) => {
     const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
     const eepzRegex = /^[a-zA-Z0-9._%+-]+@eepz\.com$/i;
     const relevantzRegex = /^[a-zA-Z0-9._%+-]+@relevantz\.com$/i;
-    return gmailRegex.test(email) || eepzRegex.test(email) || relevantzRegex.test(email);
+    return (
+      gmailRegex.test(email) ||
+      eepzRegex.test(email) ||
+      relevantzRegex.test(email)
+    );
   };
-
   const isEmailValid = validateEmail(email);
   const showEmailError = emailTouched && email && !isEmailValid;
-
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
     setError("");
     setMessage("");
   };
-
   const handleEmailBlur = () => {
     setEmailTouched(true);
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateEmail(email)) {
-      const errorMsg = "Only Gmail (@gmail.com), Eepz (@eepz.com), or Relevantz (@relevantz.com) addresses are allowed for password reset";
+      const errorMsg =
+        "Only Gmail (@gmail.com), Eepz (@eepz.com), or Relevantz (@relevantz.com) addresses are allowed for password reset";
       setError(errorMsg);
       setEmailTouched(true);
       toast.error(errorMsg);
       return;
     }
-
     setLoading(true);
     setError("");
     setMessage("");
-
     try {
       toast.loading("Verifying email address...");
-
       const response = await authService.forgotPassword(email);
-
       toast.dismiss();
-
       if (response.success) {
         setMessage("OTP sent to your email successfully!");
         toast.success("OTP sent to your email successfully!");
-
         setTimeout(() => {
           navigate("/verify-reset-otp", { state: { email } });
         }, 2000);
       } else {
-        const errorMsg = response.message || "Failed to send reset instructions";
+        const errorMsg =
+          response.message || "Failed to send reset instructions";
         setError(errorMsg);
         toast.error(errorMsg);
       }
     } catch (err) {
       console.error("Reset password error:", err);
-
       let errorMessage = "Failed to send reset instructions";
-
       if (err.response?.data) {
         if (typeof err.response.data === "string") {
           errorMessage = err.response.data;
@@ -87,7 +77,6 @@ const ResetPassword = () => {
       } else if (err.message) {
         errorMessage = err.message;
       }
-
       console.error("Error message:", errorMessage);
       toast.dismiss();
       toast.error(errorMessage);
@@ -96,7 +85,6 @@ const ResetPassword = () => {
       setLoading(false);
     }
   };
-
   return (
     <div className="reset-password-container">
       <div className="reset-password-card">
@@ -112,7 +100,6 @@ const ResetPassword = () => {
             reset your password
           </p>
         </div>
-
         <div className="reset-password-body">
           <form onSubmit={handleSubmit}>
             <div className="form-group-reset">
@@ -157,7 +144,6 @@ const ResetPassword = () => {
                 </small>
               )}
             </div>
-
             <button
               type="submit"
               className="btn-submit-reset"
@@ -175,7 +161,6 @@ const ResetPassword = () => {
                 </>
               )}
             </button>
-
             <div className="back-to-login">
               <button
                 type="button"
@@ -188,12 +173,11 @@ const ResetPassword = () => {
               </button>
             </div>
           </form>
-
           <div className="security-note">
             <small>
               <i className="bi bi-shield-check"></i>
-              Password reset is only available for registered accounts. Your account
-              information is protected.
+              Password reset is only available for registered accounts. Your
+              account information is protected.
             </small>
           </div>
         </div>
@@ -201,5 +185,4 @@ const ResetPassword = () => {
     </div>
   );
 };
-
 export default ResetPassword;

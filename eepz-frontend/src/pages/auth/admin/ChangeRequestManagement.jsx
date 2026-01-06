@@ -8,19 +8,14 @@ import { Form } from "react-bootstrap";
 import ApproveEmailChangeModal from "../../../components/auth/Modal/changerequest/ApproveEmailChangeModal";
 import RejectEmailChangeModal from "../../../components/auth/Modal/changerequest/RejectEmailChangeModal";
 import "../../../styles/auth/admin/ChangeRequestManagement.css";
-
-
 const StatusDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
-
   const allOptions = [{ label: "All Status", value: "" }, ...options];
   const selected = allOptions.find((o) => o.value === value) || allOptions[0];
-
   const handleSelect = (val) => {
     onChange(val);
     setOpen(false);
   };
-
   return (
     <div
       className="crm-status-select custom-crm-dropdown"
@@ -53,8 +48,6 @@ const StatusDropdown = ({ value, onChange, options }) => {
     </div>
   );
 };
-
-
 const PendingRequests = ({
   requests,
   searchTerm,
@@ -75,14 +68,11 @@ const PendingRequests = ({
 }) => {
   const [filteredRequests, setFilteredRequests] = useState([]);
   const searchInputRef = useRef(null);
-
   useEffect(() => {
     applyFilters();
   }, [requests, activeSearchTerm, filterDate]);
-
   const applyFilters = () => {
     let filtered = requests.filter((req) => req.status === "Pending");
-
     if (activeSearchTerm.trim()) {
       const search = activeSearchTerm.toLowerCase();
       filtered = filtered.filter(
@@ -93,7 +83,6 @@ const PendingRequests = ({
           req.newValue?.toLowerCase().includes(search)
       );
     }
-
     if (filterDate) {
       filtered = filtered.filter((req) => {
         const requestDate = new Date(req.requestedAt);
@@ -101,23 +90,18 @@ const PendingRequests = ({
         return requestDate.toDateString() === filterDateObj.toDateString();
       });
     }
-
     setFilteredRequests(filtered);
     setCurrentPage(1);
   };
-
   const totalPages = Math.ceil(filteredRequests.length / rowsPerPage) || 1;
-
   const getPaginatedRequests = () => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
     return filteredRequests.slice(startIndex, endIndex);
   };
-
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
-
     if (totalPages <= maxPagesToShow) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -141,14 +125,12 @@ const PendingRequests = ({
     }
     return pages;
   };
-
   const handleSearchKeyDown = (e) => {
     if (e.key === "Enter") {
       handleSearch();
       if (searchInputRef.current) searchInputRef.current.blur();
     }
   };
-
   return (
     <>
       <div className="crm-filters-card">
@@ -176,25 +158,21 @@ const PendingRequests = ({
               </button>
             </div>
           </div>
-
           <input
             type="date"
             className="crm-filter-date"
             value={filterDate}
             onChange={(e) => setFilterDate(e.target.value)}
           />
-
           <button className="crm-btn-clear" onClick={clearFilters}>
             Clear Filters
           </button>
-
           <div className="crm-results-count">
             Showing {getPaginatedRequests().length} of {filteredRequests.length}{" "}
             requests
           </div>
         </div>
       </div>
-
       <div className="crm-table-card">
         <div className="crm-table-wrapper">
           <table className="crm-request-table">
@@ -286,7 +264,6 @@ const PendingRequests = ({
             </tbody>
           </table>
         </div>
-
         {filteredRequests.length > 0 && totalPages > 1 && (
           <div className="crm-pagination">
             <div className="crm-pagination-info">
@@ -305,13 +282,11 @@ const PendingRequests = ({
               </select>
               <span>entries</span>
             </div>
-
             <div className="crm-pagination-status">
               Showing {(currentPage - 1) * rowsPerPage + 1} to{" "}
               {Math.min(currentPage * rowsPerPage, filteredRequests.length)} of{" "}
               {filteredRequests.length} entries
             </div>
-
             <nav className="crm-pagination-nav">
               <ul className="crm-pagination-list">
                 <li
@@ -328,7 +303,6 @@ const PendingRequests = ({
                     <i className="bi bi-chevron-left"></i>
                   </button>
                 </li>
-
                 {getPageNumbers().map((page, index) => (
                   <li
                     key={index}
@@ -346,7 +320,6 @@ const PendingRequests = ({
                     </button>
                   </li>
                 ))}
-
                 <li
                   className={`crm-page-item ${
                     currentPage === totalPages ? "disabled" : ""
@@ -354,9 +327,7 @@ const PendingRequests = ({
                 >
                   <button
                     onClick={() =>
-                      setCurrentPage((prev) =>
-                        Math.min(prev + 1, totalPages)
-                      )
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                     }
                     disabled={currentPage === totalPages}
                   >
@@ -371,8 +342,6 @@ const PendingRequests = ({
     </>
   );
 };
-
-
 const AllRequests = ({
   requests,
   searchTerm,
@@ -395,14 +364,11 @@ const AllRequests = ({
 }) => {
   const [filteredRequests, setFilteredRequests] = useState([]);
   const searchInputRef = useRef(null);
-
   useEffect(() => {
     applyFilters();
   }, [requests, activeSearchTerm, filterStatus, filterDate]);
-
   const applyFilters = () => {
     let filtered = [...requests];
-
     if (activeSearchTerm.trim()) {
       const search = activeSearchTerm.toLowerCase();
       filtered = filtered.filter(
@@ -413,11 +379,9 @@ const AllRequests = ({
           req.newValue?.toLowerCase().includes(search)
       );
     }
-
     if (filterStatus) {
       filtered = filtered.filter((req) => req.status === filterStatus);
     }
-
     if (filterDate) {
       filtered = filtered.filter((req) => {
         const requestDate = new Date(req.requestedAt);
@@ -425,23 +389,18 @@ const AllRequests = ({
         return requestDate.toDateString() === filterDateObj.toDateString();
       });
     }
-
     setFilteredRequests(filtered);
     setCurrentPage(1);
   };
-
   const totalPages = Math.ceil(filteredRequests.length / rowsPerPage) || 1;
-
   const getPaginatedRequests = () => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
     return filteredRequests.slice(startIndex, endIndex);
   };
-
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
-
     if (totalPages <= maxPagesToShow) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -465,21 +424,18 @@ const AllRequests = ({
     }
     return pages;
   };
-
   const handleSearchKeyDown = (e) => {
     if (e.key === "Enter") {
       handleSearch();
       if (searchInputRef.current) searchInputRef.current.blur();
     }
   };
-
   const statusOptions = [
     { label: "Pending", value: "Pending" },
     { label: "Approved", value: "Approved" },
     { label: "Rejected", value: "Rejected" },
     { label: "Cancelled", value: "Cancelled" },
   ];
-
   return (
     <>
       <div className="crm-filters-card">
@@ -507,31 +463,26 @@ const AllRequests = ({
               </button>
             </div>
           </div>
-
           <StatusDropdown
             value={filterStatus}
             onChange={(val) => setFilterStatus(val)}
             options={statusOptions}
           />
-
           <input
             type="date"
             className="crm-filter-date"
             value={filterDate}
             onChange={(e) => setFilterDate(e.target.value)}
           />
-
           <button className="crm-btn-clear" onClick={clearFilters}>
             Clear Filters
           </button>
-
           <div className="crm-results-count">
             Showing {getPaginatedRequests().length} of {filteredRequests.length}{" "}
             requests
           </div>
         </div>
       </div>
-
       <div className="crm-table-card">
         <div className="crm-table-wrapper">
           <table className="crm-request-table">
@@ -641,7 +592,6 @@ const AllRequests = ({
             </tbody>
           </table>
         </div>
-
         {filteredRequests.length > 0 && totalPages > 1 && (
           <div className="crm-pagination">
             <div className="crm-pagination-info">
@@ -660,13 +610,11 @@ const AllRequests = ({
               </select>
               <span>entries</span>
             </div>
-
             <div className="crm-pagination-status">
               Showing {(currentPage - 1) * rowsPerPage + 1} to{" "}
               {Math.min(currentPage * rowsPerPage, filteredRequests.length)} of{" "}
               {filteredRequests.length} entries
             </div>
-
             <nav className="crm-pagination-nav">
               <ul className="crm-pagination-list">
                 <li
@@ -683,7 +631,6 @@ const AllRequests = ({
                     <i className="bi bi-chevron-left"></i>
                   </button>
                 </li>
-
                 {getPageNumbers().map((page, index) => (
                   <li
                     key={index}
@@ -701,7 +648,6 @@ const AllRequests = ({
                     </button>
                   </li>
                 ))}
-
                 <li
                   className={`crm-page-item ${
                     currentPage === totalPages ? "disabled" : ""
@@ -709,9 +655,7 @@ const AllRequests = ({
                 >
                   <button
                     onClick={() =>
-                      setCurrentPage((prev) =>
-                        Math.min(prev + 1, totalPages)
-                      )
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                     }
                     disabled={currentPage === totalPages}
                   >
@@ -726,43 +670,32 @@ const AllRequests = ({
     </>
   );
 };
-
-
 const ChangeRequestManagement = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(null);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
-
   const [filterStatus, setFilterStatus] = useState("");
   const [filterDate, setFilterDate] = useState("");
-
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
-
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [processing, setProcessing] = useState(false);
-
   const getActiveTab = () => {
     const path = location.pathname;
     if (path.includes("/pending")) return "pending";
     if (path.includes("/all")) return "all";
     return "pending";
   };
-
   const [activeTab, setActiveTab] = useState(getActiveTab());
-
   useEffect(() => {
     setActiveTab(getActiveTab());
   }, [location.pathname]);
-
   const tabs = [
     {
       key: "pending",
@@ -777,7 +710,6 @@ const ChangeRequestManagement = () => {
       icon: "bi-list-ul",
     },
   ];
-
   useEffect(() => {
     fetchRequests();
     const refreshInterval = setInterval(() => {
@@ -785,12 +717,10 @@ const ChangeRequestManagement = () => {
     }, 30000000);
     return () => clearInterval(refreshInterval);
   }, []);
-
   const fetchRequests = async (silent = false) => {
     try {
       setLoading(true);
       const response = await ChangeRequestService.getAllChangeRequests();
-
       if (response.success) {
         setRequests(response.data || []);
         setLastUpdated(new Date());
@@ -809,25 +739,21 @@ const ChangeRequestManagement = () => {
       setLoading(false);
     }
   };
-
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
   };
-
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
     setFilterStatus("");
     setFilterDate("");
   };
-
   const handleTabChange = (tab) => {
     setActiveTab(tab.key);
     navigate(tab.path);
     clearFilters();
     setCurrentPage(1);
   };
-
   const handleProcessClick = (request, action) => {
     setSelectedRequest(request);
     if (action === "Approved") {
@@ -837,22 +763,18 @@ const ChangeRequestManagement = () => {
     }
     toast.info(`Processing email change request #${request.requestId}`);
   };
-
   const handleApprove = async (adminRemarks) => {
     try {
       setProcessing(true);
       toast.loading("Approving email change request...");
-
       const processData = {
         RequestId: selectedRequest.requestId,
         Status: "Approved",
         AdminRemarks: adminRemarks.trim() || null,
       };
-
       const response = await ChangeRequestService.processChangeRequest(
         processData
       );
-
       if (response.success) {
         toast.dismiss();
         toast.success(
@@ -879,22 +801,18 @@ const ChangeRequestManagement = () => {
       setProcessing(false);
     }
   };
-
   const handleReject = async (adminRemarks) => {
     try {
       setProcessing(true);
       toast.loading("Rejecting email change request...");
-
       const processData = {
         RequestId: selectedRequest.requestId,
         Status: "Rejected",
         AdminRemarks: adminRemarks.trim(),
       };
-
       const response = await ChangeRequestService.processChangeRequest(
         processData
       );
-
       if (response.success) {
         toast.dismiss();
         toast.success(
@@ -921,7 +839,6 @@ const ChangeRequestManagement = () => {
       setProcessing(false);
     }
   };
-
   const getStatusBadge = (status) => {
     const statusClasses = {
       Pending: "crm-status-pending",
@@ -933,7 +850,6 @@ const ChangeRequestManagement = () => {
       statusClasses[status] || "crm-status-badge-default"
     }`;
   };
-
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -944,7 +860,6 @@ const ChangeRequestManagement = () => {
       minute: "2-digit",
     });
   };
-
   const getInitials = (name) => {
     if (!name) return "NA";
     const parts = name.split(" ");
@@ -955,12 +870,10 @@ const ChangeRequestManagement = () => {
     }
     return name.substring(0, 2).toUpperCase();
   };
-
   const getCurrentTabLabel = () => {
     const currentTab = tabs.find((tab) => tab.key === activeTab);
     return currentTab ? currentTab.label : "Pending Requests";
   };
-
   if (loading) {
     return (
       <div className="crm-loading-container">
@@ -970,7 +883,6 @@ const ChangeRequestManagement = () => {
       </div>
     );
   }
-
   return (
     <div className="crm-page">
       <Breadcrumb
@@ -984,7 +896,6 @@ const ChangeRequestManagement = () => {
           },
         ]}
       />
-
       <div className="stats-cards-crm">
         <div className="stat-card-crm stat-total-crm">
           <div className="stat-icon-crm">
@@ -995,7 +906,6 @@ const ChangeRequestManagement = () => {
             <div className="stat-label-crm">Total Requests</div>
           </div>
         </div>
-
         <div className="stat-card-crm stat-pending-crm">
           <div className="stat-icon-crm">
             <i className="bi bi-hourglass-split"></i>
@@ -1007,7 +917,6 @@ const ChangeRequestManagement = () => {
             <div className="stat-label-crm">Pending</div>
           </div>
         </div>
-
         <div className="stat-card-crm stat-approved-crm">
           <div className="stat-icon-crm">
             <i className="bi bi-check-circle-fill"></i>
@@ -1019,7 +928,6 @@ const ChangeRequestManagement = () => {
             <div className="stat-label-crm">Approved</div>
           </div>
         </div>
-
         <div className="stat-card-crm stat-rejected-crm">
           <div className="stat-icon-crm">
             <i className="bi bi-x-circle-fill"></i>
@@ -1032,7 +940,6 @@ const ChangeRequestManagement = () => {
           </div>
         </div>
       </div>
-
       <div className="crm-request-tabs">
         {tabs.map((tab) => (
           <button
@@ -1051,7 +958,6 @@ const ChangeRequestManagement = () => {
           </button>
         ))}
       </div>
-
       <div className="tab-content-crm">
         <Routes>
           <Route
@@ -1077,7 +983,6 @@ const ChangeRequestManagement = () => {
               />
             }
           />
-
           <Route
             path="all"
             element={
@@ -1103,7 +1008,6 @@ const ChangeRequestManagement = () => {
               />
             }
           />
-
           <Route
             path="*"
             element={
@@ -1129,7 +1033,6 @@ const ChangeRequestManagement = () => {
           />
         </Routes>
       </div>
-
       <ApproveEmailChangeModal
         show={showApproveModal}
         request={selectedRequest}
@@ -1137,7 +1040,6 @@ const ChangeRequestManagement = () => {
         onApprove={handleApprove}
         processing={processing}
       />
-
       <RejectEmailChangeModal
         show={showRejectModal}
         request={selectedRequest}
@@ -1148,5 +1050,4 @@ const ChangeRequestManagement = () => {
     </div>
   );
 };
-
 export default ChangeRequestManagement;
