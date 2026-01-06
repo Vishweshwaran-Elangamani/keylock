@@ -1,11 +1,6 @@
 import React from "react";
-<<<<<<< Updated upstream
-import { downloadHrAttachment } from "../../../../services/performancemanagement/api/api";
-import "../../../../styles/performancemanagement/components/AppraisalDetailsModal.css";
-=======
 import api from "../../../../services/performancemanagement/api/api";
 import "../../../../styles/performancemanagement/components/AppraisalDetailsModal.module.css";
->>>>>>> Stashed changes
 
 function statusRender(status) {
   if (typeof status !== "string") return "-";

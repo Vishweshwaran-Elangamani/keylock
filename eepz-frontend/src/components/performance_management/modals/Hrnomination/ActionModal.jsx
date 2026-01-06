@@ -31,11 +31,6 @@ const ActionModal = ({
             <h6 className="action-modal-title">
               {actionType === "approve" ? "Approval Remarks" : "Rejection Reason"}
             </h6>
-
-<<<<<<< Updated upstream
-=======
-           
->>>>>>> Stashed changes
             <button
               onClick={onClose}
               className="action-modal-close-btn"

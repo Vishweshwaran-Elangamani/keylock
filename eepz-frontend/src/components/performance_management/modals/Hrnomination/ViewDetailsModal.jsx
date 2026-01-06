@@ -129,12 +129,7 @@ const ViewDetailsModal = ({
 
                 <hr className="view-details-divider" />
 
-<<<<<<< Updated upstream
-
-                {/* Justification Section */}
-=======
              
->>>>>>> Stashed changes
                 <div className="view-details-section">
                   <div
                     className="view-details-section-title"
@@ -154,12 +149,7 @@ const ViewDetailsModal = ({
                   </div>
                 </div>
 
-<<<<<<< Updated upstream
-
-                {/* Parameters Section */}
-=======
              
->>>>>>> Stashed changes
                 {selectedNominationDetails.parameterValues &&
                   selectedNominationDetails.parameterValues.length > 0 && (
                     <div className="view-details-section">

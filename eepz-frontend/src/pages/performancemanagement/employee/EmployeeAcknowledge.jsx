@@ -6,7 +6,7 @@ import {
 } from "../../../services/performancemanagement/api/rolesapi";
 import { Toaster, toast } from "sonner";
 import Breadcrumb from "../../../components/common/Breadcrumb";
-import "../../../styles/performancemanagement/employee/EmployeeAcknowledgment.module.css";
+import "../../../styles/performancemanagement/employee/EmployeeAcknowledge.module.css";
 
 export default function EmployeeAcknowledgment() {
   const navigate = useNavigate();
