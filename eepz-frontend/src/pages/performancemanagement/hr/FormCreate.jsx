@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import api from "../../../services/performancemanagement/api/api";
 import { toast } from "sonner";
 import { useAuth } from "../../../contexts/auth/AuthContext";
-import "../../../styles/performancemanagement/hr/FormCreate.module.css";
+import "../../../styles/performancemanagement/hr/FormCreate.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 
 

@@ -9,7 +9,7 @@ import { getUserRole } from "../../../services/performancemanagement/api/rolesap
 import { toast, Toaster } from "sonner";
 import logoImage from "../../../assets/logodark.png";
 import Breadcrumb from "../../../components/common/Breadcrumb";
-import "../../../styles/performancemanagement/manager/ManagerPerformanceDashboard.module.css";
+import "../../../styles/performancemanagement/manager/ManagerPerformanceDashboard.css";
 
 
 const PaginationDropdown = ({ value, onChange, options }) => {

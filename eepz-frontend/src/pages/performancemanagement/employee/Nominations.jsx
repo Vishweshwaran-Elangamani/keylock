@@ -5,7 +5,7 @@ import Confetti from "react-confetti";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 import { getEmployeeNominations } from "../../../services/performancemanagement/api/nominationapi";
 import "react-toastify/dist/ReactToastify.css";
-import "../../../styles/performancemanagement/employee/Nominations.module.css";
+import "../../../styles/performancemanagement/employee/Nominations.css";
 
 export default function Nominations() {
   const navigate = useNavigate();

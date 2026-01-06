@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Breadcrumb from "../../../common/Breadcrumb";
-import "../../../../styles/performancemanagement/components/ManagerAcknowledgmentModal.module.css";
+import "../../../../styles/performancemanagement/components/ManagerAcknowledgment.css";
 
 const ManagerAcknowledgmentModal = ({ ackList, error, loading }) => {
   const navigate = useNavigate();

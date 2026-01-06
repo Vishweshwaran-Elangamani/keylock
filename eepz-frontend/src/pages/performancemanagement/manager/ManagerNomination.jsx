@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Toaster, toast } from "sonner";
 import * as managerNominationApi from "../../../services/performancemanagement/manager/managernominationapi";
 import NominationModal from "../../../components/performance_management/modals/ManagerNomination/NominationModal";
-import "../../../styles/performancemanagement/manager/ManagerNomination.module.css";
+import "../../../styles/performancemanagement/manager/ManagerNomination.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 
 const safeText = (...vals) => {

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import logoImage from "../../../../assets/logodark.png"
-import "../../../../styles/performancemanagement/components/ManagerPerformanceDashboard.module.css"
+import "../../../../styles/performancemanagement/components/ManagerPerformanceDashboard.css"
 
 
 const RatingDropdown = ({ value, onChange, disabled }) => {

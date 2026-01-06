@@ -1,5 +1,5 @@
 import React from "react";
-import "../../../../styles/performancemanagement/components/ActionModal.module.css";
+import "../../../../styles/performancemanagement/components/ActionModal.css";
 
 const ActionModal = ({
   show,

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import "../../../styles/performancemanagement/manager/PerformanceManagerHome.module.css";
+import "../../../styles/performancemanagement/manager/PerformanceManagerHome.css";
 
 export default function PerformanceManagerHome() {
   const navigate = useNavigate();

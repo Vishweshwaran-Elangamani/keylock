@@ -1,5 +1,5 @@
 import React from "react";
-import "../../../../styles/performancemanagement/components/ViewDetailsModal.module.css";
+import "../../../../styles/performancemanagement/components/ViewDetailsModal.css";
 
 
 const ViewDetailsModal = ({

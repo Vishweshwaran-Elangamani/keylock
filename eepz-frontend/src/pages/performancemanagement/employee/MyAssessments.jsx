@@ -8,7 +8,7 @@ import {
   downloadAttachment 
 } from "../../../services/performancemanagement/api/api";
 import logoImage from "../../../assets/logodark.png";
-import "../../../styles/performancemanagement/employee/MyAssessments.module.css";
+import "../../../styles/performancemanagement/employee/MyAssessments.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 
 function getTimeLeft(deadline) {

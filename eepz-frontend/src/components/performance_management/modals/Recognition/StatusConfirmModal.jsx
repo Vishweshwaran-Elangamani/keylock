@@ -1,5 +1,5 @@
 import React from "react";
-import "../../../../styles/performancemanagement/components/StatusConfirmModal.module.css";
+import "../../../../styles/performancemanagement/components/StatusConfirmModal.css";
 
 
 const StatusConfirmModal = ({

@@ -1,6 +1,6 @@
 import React from "react";
 import api from "../../../../services/performancemanagement/api/api";
-import "../../../../styles/performancemanagement/components/AppraisalDetailsModal.module.css";
+import "../../../../styles/performancemanagement/components/AppraisalDetailsModal.css";
 
 function statusRender(status) {
   if (typeof status !== "string") return "-";

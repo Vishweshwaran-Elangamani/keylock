@@ -7,7 +7,7 @@ import { apiPort5113 } from "../../../services/performancemanagement/api/rolesap
 
 import ViewFormDetailsModal from "../../../components/performance_management/modals/FormsList/ViewFormDetailsModal";
 import DeadlineModal from "../../../components/performance_management/modals/FormsList/DeadlineModal";
-import "../../../styles/performancemanagement/hr/FormList.module.css";
+import "../../../styles/performancemanagement/hr/FormList.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 

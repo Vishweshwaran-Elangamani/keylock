@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../../../styles/performancemanagement/employee/EmployeeHome.module.css";
+import "../../../styles/performancemanagement/employee/EmployeeHome.css";
 
 export default function EmployeeHome() {
   const navigate = useNavigate();

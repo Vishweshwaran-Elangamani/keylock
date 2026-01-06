@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate, useLocation } from "react-router-dom";
 import api from "../../../services/performancemanagement/api/api";
-import "../../../styles/performancemanagement/hr/FormProgressTracker.module.css";
+import "../../../styles/performancemanagement/hr/FormProgressTracker.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 
 export default function FormProgressTrackerPage() {
