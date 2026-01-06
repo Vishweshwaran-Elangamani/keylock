@@ -24,8 +24,6 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             _baseService = baseService;
         }
 
-        // ==================== COMMENTS ====================
-
         /// <summary>
         /// Add a comment to a goal
         /// </summary>
@@ -94,7 +92,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
         }
 
-        // ==================== TIMELINE ====================
+        //  TIMELINE
 
         /// <summary>
         /// Get timeline of all events for a goal (progress, approvals, comments, etc.)
@@ -139,7 +137,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
         }
 
-        // ==================== DASHBOARD ====================
+        // DASHBOARD 
 
         /// <summary>
         /// Get dashboard summary (completed, ongoing, pending counts)
@@ -204,7 +202,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
         }
 
-        // ==================== PERMISSIONS VALIDATION ====================
+        //  PERMISSIONS VALIDATION 
 
         /// <summary>
         /// Check if user can mark goal as complete
@@ -345,7 +343,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
         }
 
-        // ==================== PROJECTS ====================
+        //  PROJECTS 
 
         /// <summary>
         /// Get project subordinates for assignment

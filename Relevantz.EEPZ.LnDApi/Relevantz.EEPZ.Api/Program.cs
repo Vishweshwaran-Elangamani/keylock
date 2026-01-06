@@ -20,9 +20,9 @@ Console.WriteLine("Building EEPZ Backend........");
 
 
 
-// ===================================
+
 // Configure Serilog for Logging
-// ===================================
+
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .WriteTo.File(
@@ -41,9 +41,9 @@ builder.Host.UseSerilog();
 
 
 
-// ===================================
+
 // Add Services to Container
-// ===================================
+
 
 
 
@@ -77,9 +77,9 @@ builder.Services.AddEndpointsApiExplorer();
 
 
 
-// ===================================
+
 // Configure Swagger with JWT Support
-// ===================================
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc(
@@ -130,9 +130,9 @@ builder.Services.AddSwaggerGen(options =>
 
 
 
-// ===================================
+
 // Configure MySQL Database
-// ===================================
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 
@@ -176,9 +176,9 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
 
 
 
-// ===================================
+
 // Configure MongoDB Settings
-// ===================================
+
 builder.Services.Configure<MongoDbSettings>(
     builder.Configuration.GetSection("MongoDbSettings"));
 
@@ -202,9 +202,9 @@ else
 
 
 
-// ===================================
+
 // Configure JWT Authentication
-// ===================================
+
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["SecretKey"];
 
@@ -267,23 +267,23 @@ builder.Services.AddAuthorization();
 
 
 
-// ===================================
+
 // Register Application Services (DI)
-// ===================================
 
 
 
-// ============================================
+
+
 // File Storage Service - MongoDB GridFS
-// ============================================
+
 builder.Services.AddSingleton<IFileStorageService, FileStorageService>();
 Log.Information("File Storage Service registered with MongoDB GridFS");
 
 
 
-// ============================================
+
 // LnD Module - Complete Registration
-// ============================================
+
 
 
 
@@ -293,7 +293,7 @@ builder.Services.AddScoped<ILnDSmeRepository, LnDSmeRepository>();
 builder.Services.AddScoped<ILnDAssignmentRepository, LnDAssignmentRepository>();
 builder.Services.AddScoped<ILnDApprovalRepository, LnDApprovalRepository>();
 builder.Services.AddScoped<ILnDHRRepository, LnDHRRepository>();
-builder.Services.AddScoped<ILnDBaseRepository,LnDBaseRepository>();
+builder.Services.AddScoped<ILnDBaseRepository, LnDBaseRepository>();
 
 
 
@@ -343,16 +343,16 @@ builder.Services.AddCors(options =>
 
 
 
-// ===================================
+
 // Add HTTP Client
-// ===================================
+
 builder.Services.AddHttpClient();
 
 
 
-// ===================================
+
 // Configure Session (if needed)
-// ===================================
+
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -364,16 +364,15 @@ builder.Services.AddSession(options =>
 
 
 
-// ===================================
+
 // Add Memory Cache
-// ===================================
+
 builder.Services.AddMemoryCache();
 
 
 
-// ===================================
 // Build Application
-// ===================================
+
 var app = builder.Build();
 
 
@@ -382,9 +381,9 @@ Log.Information("EEPZ Backend Application Starting...");
 
 
 
-// ===================================
+
 // Configure HTTP Request Pipeline
-// ===================================
+
 
 
 
@@ -440,35 +439,24 @@ app.UseHttpsRedirection();
 
 
 
-// NOTE: Static files middleware removed as files are now stored in MongoDB GridFS
 // No longer using wwwroot for file storage
-
-
 
 // Enable Session
 app.UseSession();
-
-
-
 // Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
-
-
 // Map Controllers
 app.MapControllers();
 
-
-
-// ===================================
 // Health Check Endpoint
-// ===================================
+
 app.MapGet("/health", async (EEPZDbContext eepzDbContext, IConfiguration config) =>
 {
     bool mySqlConnected = false;
     bool mongoConnected = false;
-    
+
     try
     {
         mySqlConnected = await eepzDbContext.Database.CanConnectAsync();
@@ -496,7 +484,7 @@ app.MapGet("/health", async (EEPZDbContext eepzDbContext, IConfiguration config)
         service = "EEPZ Learning and Development API",
         version = "v1.0",
         environment = app.Environment.EnvironmentName,
-        
+
         database = new
         {
             mySQL = new
@@ -512,13 +500,13 @@ app.MapGet("/health", async (EEPZDbContext eepzDbContext, IConfiguration config)
                 databaseName = config["MongoDbSettings:DatabaseName"]
             }
         },
-        
+
         storage = new
         {
             type = "MongoDB GridFS",
             enabled = !string.IsNullOrEmpty(config["MongoDbSettings:ConnectionString"])
         },
-        
+
         endpoints = new
         {
             categories = new[]
@@ -530,24 +518,22 @@ app.MapGet("/health", async (EEPZDbContext eepzDbContext, IConfiguration config)
                 "LnD HR Operations"
             }
         },
-        
+
         authentication = new
         {
             enabled = true,
             type = "JWT Bearer",
             issuerConfigured = !string.IsNullOrEmpty(config["JwtSettings:Issuer"])
         },
-        
+
         cors = "AllowAll Enabled",
         swagger = app.Environment.IsDevelopment() || app.Environment.IsProduction()
     });
 });
 
 
-
-// ===================================
 // Global Exception Handler
-// ===================================
+
 app.UseExceptionHandler(errorApp =>
 {
     errorApp.Run(async context =>
@@ -583,9 +569,8 @@ app.UseExceptionHandler(errorApp =>
 
 
 
-// ===================================
 // Database Migration and Initialization
-// ===================================
+
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -627,7 +612,7 @@ using (var scope = app.Services.CreateScope())
 
 
 
-        if (app.Environment.IsDevelopment())  
+        if (app.Environment.IsDevelopment())
         {
             throw; // Re-throw in development to see the full error
         }
@@ -635,10 +620,8 @@ using (var scope = app.Services.CreateScope())
 }
 
 
-
-// ===================================
 // Application Startup
-// ===================================
+
 try
 {
     Log.Information("========================================");
@@ -656,7 +639,7 @@ try
 
 
     Log.Information("EEPZ Backend Application Stopped Gracefully");
-} 
+}
 
 catch (Exception ex)
 {

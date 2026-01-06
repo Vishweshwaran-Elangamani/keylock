@@ -109,14 +109,14 @@ builder
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme; 
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
     })
     .AddJwtBearer(options =>
     {
         var keyBytes = Encoding.UTF8.GetBytes(secretKey);
 
 
-        options.SaveToken = true; 
+        options.SaveToken = true;
         options.RequireHttpsMetadata = false; // Set to true in production
 
 
@@ -171,8 +171,8 @@ builder
                 var empMasterIdClaim = context.Principal?.FindFirst("empMasterId");
 
 
-                // FIX: Use ClaimTypes.Role instead of "role"
-                var roleClaim = context.Principal?.FindFirst(ClaimTypes.Role); // ← CHANGED
+
+                var roleClaim = context.Principal?.FindFirst(ClaimTypes.Role);
 
 
                 if (empMasterIdClaim == null)
@@ -294,7 +294,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 
-// CRITICAL: Order matters!
+
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
@@ -303,14 +303,14 @@ app.UseAuthorization();
 app.MapControllers();
 
 
-// ===================================
+
 // Health Check Endpoint
-// ===================================
+
 app.MapGet("/health", async (EEPZDbContext eepzDbContext, IConfiguration config) =>
 {
     bool mySqlConnected = false;
     bool mongoConnected = false;
-    
+
     try
     {
         mySqlConnected = await eepzDbContext.Database.CanConnectAsync();
@@ -338,7 +338,7 @@ app.MapGet("/health", async (EEPZDbContext eepzDbContext, IConfiguration config)
         service = "EEPZ Goal Management API",
         version = "v1.0",
         environment = app.Environment.EnvironmentName,
-        
+
         database = new
         {
             mySQL = new
@@ -354,13 +354,13 @@ app.MapGet("/health", async (EEPZDbContext eepzDbContext, IConfiguration config)
                 databaseName = config["MongoDbSettings:DatabaseName"]
             }
         },
-        
+
         storage = new
         {
             type = "MongoDB GridFS",
             enabled = !string.IsNullOrEmpty(config["MongoDbSettings:ConnectionString"])
         },
-        
+
         endpoints = new
         {
             categories = new[]
@@ -372,7 +372,7 @@ app.MapGet("/health", async (EEPZDbContext eepzDbContext, IConfiguration config)
                 "Goal Progress"
             }
         },
-        
+
         authentication = new
         {
             enabled = true,
@@ -380,7 +380,7 @@ app.MapGet("/health", async (EEPZDbContext eepzDbContext, IConfiguration config)
             issuerConfigured = !string.IsNullOrEmpty(config["JwtSettings:Issuer"]),
             audienceConfigured = !string.IsNullOrEmpty(config["JwtSettings:Audience"])
         },
-        
+
         cors = "AllowAll Enabled",
         swagger = app.Environment.IsDevelopment()
     });
