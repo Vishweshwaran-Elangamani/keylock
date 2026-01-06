@@ -34,7 +34,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _logger = logger;
 
 
-            // Initialize MongoDB GridFS
+           
             try
             {
                 var connectionString = _configuration["MongoDbSettings:ConnectionString"];
@@ -136,30 +136,18 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     {
                         var profile = profiles.FirstOrDefault(up => up.EmployeeId == pe.EmployeeId);
                         if (profile == null) continue;
-
-
                         var userAuth = userAuths.FirstOrDefault(ua => ua.EmployeeId == pe.EmployeeId);
                         if (userAuth == null) continue;
-
-
                         var project = projects.FirstOrDefault(p => p.ProjectId == pe.ProjectId);
                         if (project == null) continue;
-
-
                         var employeeAssessments = selfAssessments
                             .Where(sa => sa.EmployeeId == userAuth.UserId && sa.Assessmentdetails != null && sa.Assessmentdetails.Any())
                             .OrderByDescending(sa => sa.SubmittedAt)
                             .ToList();
-
-
                         if (!employeeAssessments.Any()) continue;
-
-
                         foreach (var selfAssessment in employeeAssessments)
                         {
                             var approval = await _repository.GetDeptHeadApprovalAsync(pe.EmployeeId, pe.ProjectId, selfAssessment.AssessmentId);
-
-
                             if (approval != null)
                             {
                                 _logger.LogDebug($"Skipping AssessmentId {selfAssessment.AssessmentId} - Already department head approved");
@@ -431,7 +419,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                         // ← NEW: Fetch assessment and calculate average ratings
                         var selfAssessment = await _repository.GetAssessmentWithDetailsAsync(approval.AssessmentId);
-                        
+
                         double avgEmployeeRating = 0;
                         double avgL1Rating = 0;
                         double avgL2Rating = 0;
@@ -845,14 +833,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     : $"Employee {approval.EmployeeId}";
 
 
-               var dto = new DeptHeadPerformanceDTO
-{
-    EmployeeId = approval.EmployeeId,
-    EmployeeName = employeeName,
-    ProjectName = project.ProjectName ?? "Unknown",
-    AssessmentId = approval.AssessmentId,     
-    Competencies = competencies
-};
+                var dto = new DeptHeadPerformanceDTO
+                {
+                    EmployeeId = approval.EmployeeId,
+                    EmployeeName = employeeName,
+                    ProjectName = project.ProjectName ?? "Unknown",
+                    AssessmentId = approval.AssessmentId,
+                    Competencies = competencies
+                };
 
 
 
