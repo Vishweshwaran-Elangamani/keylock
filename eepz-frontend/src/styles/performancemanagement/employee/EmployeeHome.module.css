@@ -1,0 +1,334 @@
+.ehp-page {
+  min-height: 100vh;
+  background: #f8f9fa;
+  padding: 40px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ehp-container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+
+.ehp-loading-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+}
+
+.ehp-loading-content {
+  text-align: center;
+}
+
+.ehp-loading-content .spinner-border {
+  width: 3rem;
+  height: 3rem;
+  border-width: 0.3rem;
+  border-color: #2563eb;
+  border-right-color: transparent;
+  animation: spinner-border 0.75s linear infinite;
+  border-radius: 50%;
+  border-style: solid;
+}
+
+
+.ehp-loading-text {
+  margin-top: 16px;
+  color: #6c757d;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+
+.ehp-nomination-card {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 40px;
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  animation: bounceIn 0.6s ease;
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  50% {
+    transform: scale(1.02);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.ehp-nomination-icon {
+  font-size: 56px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 50%;
+  width: 88px;
+  height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.ehp-nomination-content {
+  flex: 1;
+}
+
+.ehp-nomination-title {
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  color: #fff;
+}
+
+.ehp-nomination-text {
+  font-size: 16px;
+  margin: 0 0 6px 0;
+  opacity: 0.95;
+  line-height: 1.5;
+}
+
+.ehp-nomination-text strong {
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.ehp-nomination-subtext {
+  font-size: 14px;
+  margin: 0;
+  opacity: 0.85;
+}
+
+
+.ehp-assessment-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ehp-assessment-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 48px;
+  max-width: 600px;
+  width: 100%;
+  border: 2px solid #e0e0e0;
+  transition: all 0.4s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp 0.6s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ehp-assessment-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(50%, -50%);
+  transition: all 0.4s ease;
+}
+
+.ehp-assessment-card:hover {
+  transform: translateY(-12px);
+  box-shadow: 0 20px 40px rgba(37, 99, 235, 0.2);
+  border-color: #2563eb;
+}
+
+.ehp-assessment-card:hover::before {
+  transform: translate(40%, -40%) scale(1.5);
+}
+
+.ehp-assessment-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  color: #fff;
+  margin: 0 auto 24px;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+  transition: all 0.4s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.ehp-assessment-card:hover .ehp-assessment-icon {
+  transform: scale(1.15) rotate(5deg);
+  box-shadow: 0 12px 28px rgba(37, 99, 235, 0.5);
+}
+
+.ehp-assessment-content {
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.ehp-assessment-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0 0 16px 0;
+}
+
+.ehp-assessment-description {
+  font-size: 16px;
+  color: #6c757d;
+  line-height: 1.7;
+  margin: 0 0 24px 0;
+}
+
+.ehp-assessment-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  background: rgba(37, 99, 235, 0.1);
+  border-radius: 10px;
+  color: #2563eb;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.ehp-assessment-card:hover .ehp-assessment-link {
+  background: #2563eb;
+  color: #fff;
+  transform: translateX(4px);
+}
+
+.ehp-assessment-link i {
+  transition: transform 0.3s ease;
+}
+
+.ehp-assessment-card:hover .ehp-assessment-link i {
+  transform: translateX(4px);
+}
+
+
+@media (max-width: 768px) {
+  .ehp-page {
+    padding: 24px 16px;
+  }
+
+  .ehp-nomination-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 24px;
+    margin-bottom: 32px;
+  }
+
+  .ehp-nomination-icon {
+    width: 72px;
+    height: 72px;
+    font-size: 40px;
+  }
+
+  .ehp-assessment-card {
+    padding: 36px 28px;
+  }
+
+  .ehp-assessment-icon {
+    width: 68px;
+    height: 68px;
+    font-size: 30px;
+  }
+
+  .ehp-assessment-title {
+    font-size: 24px;
+  }
+
+  .ehp-assessment-description {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 576px) {
+  .ehp-nomination-title {
+    font-size: 22px;
+  }
+
+  .ehp-assessment-card {
+    padding: 28px 20px;
+  }
+
+  .ehp-assessment-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 28px;
+  }
+
+  .ehp-assessment-title {
+    font-size: 22px;
+  }
+
+  .ehp-assessment-description {
+    font-size: 14px;
+  }
+
+  .ehp-assessment-link {
+    padding: 12px 24px;
+    font-size: 15px;
+  }
+}
+
+
+.ehp-assessment-card:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+
+@media print {
+  .ehp-page {
+    background: #fff;
+  }
+
+  .ehp-assessment-card {
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+
+  .ehp-assessment-card:hover {
+    transform: none;
+  }
+}

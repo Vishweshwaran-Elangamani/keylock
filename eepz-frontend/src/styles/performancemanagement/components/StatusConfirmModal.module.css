@@ -1,0 +1,109 @@
+/* StatusConfirmModal.css - Unique page-specific styles */
+
+.status-confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(39, 35, 92, 0.13);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1500;
+  }
+  
+  .status-confirm-modal {
+    background-color: #fff;
+    border-radius: 22px;
+    box-shadow: 0 10px 36px rgba(39, 35, 92, 0.17);
+    max-width: 390px;
+    min-width: 270px;
+    width: 94vw;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .status-confirm-header {
+    background: #27235C;
+    color: #fff;
+    font-weight: 800;
+    font-size: 1.08rem;
+    text-align: left;
+    letter-spacing: 0.01em;
+    padding: 19px 26px 11px 26px;
+    border-top-left-radius: 22px;
+    border-top-right-radius: 22px;
+    box-sizing: border-box;
+  }
+  
+  .status-confirm-body {
+    background: #fff;
+    padding: 20px 26px 5px 26px;
+  }
+  
+  .status-confirm-prompt {
+    margin: 0;
+    font-size: 15.5px;
+    color: #27235C;
+    font-weight: 600;
+    text-align: left;
+    letter-spacing: 0.01em;
+    line-height: 1.6;
+  }
+  
+  .status-confirm-highlight {
+    color: #27235C;
+  }
+  
+  .status-confirm-footer {
+    background: #fff;
+    display: flex;
+    justify-content: flex-end;
+    gap: 14px;
+    padding: 22px 26px 19px 26px;
+    border-bottom-left-radius: 22px;
+    border-bottom-right-radius: 22px;
+  }
+  
+  .status-confirm-btn-cancel {
+    padding: 9px 24px;
+    border-radius: 8px;
+    border: none;
+    background: #6C757D;
+    color: #fff;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: background 0.15s;
+  }
+  
+  .status-confirm-btn-cancel:hover {
+    background: #5a6268;
+  }
+  
+  .status-confirm-btn-confirm {
+    padding: 9px 24px;
+    border-radius: 8px;
+    border: none;
+    color: #fff;
+    font-weight: 700;
+    font-size: 15px;
+    background: linear-gradient(90deg, #97247E 0%, #E01950 100%);
+    box-shadow: 0 2px 8px rgba(151, 36, 126, 0.09);
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: filter 0.13s;
+  }
+  
+  .status-confirm-btn-confirm:hover {
+    filter: brightness(1.11);
+  }
+  
+  /* Hide scrollbar for elements with overflow */
+  .status-confirm-modal div[style*="overflow-y: auto"]::-webkit-scrollbar {
+    display: none;
+  }
+  
