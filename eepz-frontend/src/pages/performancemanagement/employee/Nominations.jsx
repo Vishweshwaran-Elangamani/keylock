@@ -177,8 +177,8 @@ export default function Nominations() {
         <Confetti
           width={windowSize.width}
           height={windowSize.height}
-          recycle={false}
-          numberOfPieces={200}
+          recycle={true}
+          numberOfPieces={100}
           gravity={0.7}
         />
       )}
