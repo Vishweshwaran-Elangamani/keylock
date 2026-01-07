@@ -18,7 +18,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public string EmployeeType { get; set; } = string.Empty;
         public int NoticePeriodDays { get; set; }
         public bool IsActive { get; set; }
-
         // Profile Information
         public string FirstName { get; set; } = string.Empty;
         public string? MiddleName { get; set; }

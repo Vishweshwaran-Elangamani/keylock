@@ -1,5 +1,4 @@
 namespace Relevantz.EEPZ.Common.DTOs.Request;
-
 public class UpdateChatPatternRequestDto
 {
     public int PatternId { get; set; }

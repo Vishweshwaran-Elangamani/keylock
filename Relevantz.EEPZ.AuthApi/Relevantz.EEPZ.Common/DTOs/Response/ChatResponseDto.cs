@@ -1,5 +1,4 @@
 namespace Relevantz.EEPZ.Common.DTOs.Response;
-
 public class ChatResponseDto
 {
     public string Response { get; set; } = string.Empty;

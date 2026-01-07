@@ -1,5 +1,4 @@
 namespace Relevantz.EEPZ.Common.DTOs.Response;
-
 public class ConversationHistoryDto
 {
     public int MessageId { get; set; }

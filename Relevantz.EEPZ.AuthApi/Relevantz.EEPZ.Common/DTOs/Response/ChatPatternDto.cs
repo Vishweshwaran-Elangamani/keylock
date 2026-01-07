@@ -1,5 +1,4 @@
 namespace Relevantz.EEPZ.Common.DTOs.Response;
-
 public class ChatPatternDto
 {
     public int PatternId { get; set; }

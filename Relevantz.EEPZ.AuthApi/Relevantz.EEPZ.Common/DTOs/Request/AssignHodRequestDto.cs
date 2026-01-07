@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-
 namespace Relevantz.EEPZ.Common.DTOs.Request
 {
     public class AssignHodRequestDto

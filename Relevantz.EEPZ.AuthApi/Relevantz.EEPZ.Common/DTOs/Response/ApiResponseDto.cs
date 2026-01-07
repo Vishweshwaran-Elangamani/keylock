@@ -6,7 +6,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public string Message { get; set; } = string.Empty;
         public T? Data { get; set; }
         public List<string>? Errors { get; set; }
-
         public static ApiResponseDto<T> SuccessResponse(T data, string message = "Operation successful")
         {
             return new ApiResponseDto<T>
@@ -16,7 +15,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
                 Data = data
             };
         }
-
         public static ApiResponseDto<T> FailureResponse(string message, List<string>? errors = null)
         {
             return new ApiResponseDto<T>

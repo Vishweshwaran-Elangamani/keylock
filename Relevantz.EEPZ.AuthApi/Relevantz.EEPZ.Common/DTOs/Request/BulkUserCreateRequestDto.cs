@@ -4,7 +4,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
     {
         public List<CreateUserRequestDto> Users { get; set; } = new List<CreateUserRequestDto>();
     }
-
     public class BulkUserCreateItem
     {
         public string EmployeeCompanyId { get; set; } = string.Empty;
@@ -21,5 +20,3 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         public string? Gender { get; set; }
     }
 }
-
-

@@ -14,7 +14,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public string? HodEmployeeCompanyId { get; set; }
         public decimal? BudgetAllocated { get; set; }
         public string? CostCenter { get; set; }
-
         // Timestamps
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }

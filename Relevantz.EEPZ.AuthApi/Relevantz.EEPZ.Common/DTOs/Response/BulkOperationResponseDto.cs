@@ -9,7 +9,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public List<SuccessfulUserDto> SuccessfulUsers { get; set; } = new List<SuccessfulUserDto>();
         public string Message { get; set; }
     }
-
     public class SuccessfulUserDto
     {
         public string Email { get; set; }
@@ -19,5 +18,4 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public string Role { get; set; }
         public string Department { get; set; }
     }
-
 }
