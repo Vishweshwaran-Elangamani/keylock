@@ -2,8 +2,8 @@
 import api from "./index_feedback";
 import axios from "axios";
 import org_api from "./index_org";
-
-
+ 
+ 
 // Manager Reviews
 export const managerReviewApi = {
   create: (body) => api.post("/managerreview/create", body),
@@ -21,36 +21,90 @@ export const managerReviewApi = {
     }),
   byStatus: (status) => api.get(`/managerreview/status/${status}`),
 };
-
-// Mentor Feedback (Employee -> SME)
+ 
+/**
+ * Mentor Feedback API Service
+ * Handles all mentor feedback operations (Employee -> SME/Mentor)
+ */
 export const mentorFeedbackApi = {
+  /**
+   * Create new mentor feedback
+   * @param {Object} body - Mentor feedback creation request
+   * @returns {Promise} API response with created feedback
+   */
   create: (body) => org_api.post("/mentorfeedback/create", body),
-  getById: (id) => org_api.get(`/mentorfeedback/${id}`),
+ 
+  /**
+   * Get mentor feedback by tracking ID
+   * @param {number} id - Tracking identifier
+   * @returns {Promise} API response with feedback details
+   */
+  getById: (id) => org_api.get(`/mentorfeedback/track/${id}`),
+ 
+  /**
+   * Get all feedback received by a mentor (feedback about me)
+   * @param {number} mentorId - Mentor employee identifier
+   * @returns {Promise} API response with list of feedback received
+   */
   aboutMe: (mentorId) => org_api.get(`/mentorfeedback/about-me/${mentorId}`),
+ 
+  /**
+   * Get all feedback given by a mentee (my feedback)
+   * @param {number} menteeId - Mentee employee identifier
+   * @returns {Promise} API response with list of feedback given
+   */
   myFeedback: (menteeId) => org_api.get(`/mentorfeedback/my-feedback/${menteeId}`),
-  update: (id, body) => org_api.put(`/mentorfeedback/${id}`, body),
-  acknowledge: (id) => org_api.post(`/mentorfeedback/${id}/acknowledge`),
-  remove: (id) => org_api.delete(`/mentorfeedback/${id}`),
+ 
+  /**
+   * Update existing mentor feedback
+   * @param {number} id - Tracking identifier
+   * @param {Object} body - Mentor feedback update request
+   * @returns {Promise} API response with updated feedback
+   */
+  update: (id, body) => org_api.put(`/mentorfeedback/track/${id}`, body),
+ 
+  /**
+   * Acknowledge mentor feedback
+   * @param {number} id - Tracking identifier
+   * @returns {Promise} API response with acknowledgement status
+   */
+  acknowledge: (id) => org_api.post(`/mentorfeedback/track/${id}/acknowledge`),
+ 
+  /**
+   * Delete mentor feedback
+   * @param {number} id - Tracking identifier
+   * @returns {Promise} API response with deletion status
+   */
+  remove: (id) => org_api.delete(`/mentorfeedback/track/${id}`),
+ 
+  /**
+   * Get all mentor feedback with pagination
+   * @param {number} page - Page number (default: 1)
+   * @param {number} size - Page size (default: 20)
+   * @returns {Promise} API response with paginated feedback list
+   */
   list: (page = 1, size = 20) =>
     org_api.get("/mentorfeedback/all", {
       params: { pageNumber: page, pageSize: size },
     }),
 };
-
+ 
+ 
 // Org Goal Feedback
 export const orgGoalFeedbackApi = {
   create: (body) => org_api.post("/orggoalfeedback/create", body),
-  getById: (id) => org_api.get(`/orggoalfeedback/${id}`),
+  getById: (id) => org_api.get(`/orggoalfeedback/feedback/${id}`),
   getByObjective: (objectiveId) =>
     org_api.get(`/orggoalfeedback/goal/${objectiveId}`),
-  update: (id, body) => org_api.put(`/orggoalfeedback/${id}`, body),
-  remove: (id) => api.delete(`/orggoalfeedback/${id}`),
+  update: (id, body) => org_api.put(`/orggoalfeedback/feedback/${id}`, body),
+  remove: (id) => org_api.delete(`/orggoalfeedback/feedback/${id}`),
   list: (page = 1, size = 20) =>
-    org_api.get("/orggoalfeedback/all", {
+    org_api.get("/orggoalfeedback/feedback", {
       params: { pageNumber: page, pageSize: size },
     }),
 };
-
+ 
+ 
 // Peer Feedback Queue (HR Approval)
 export const peerQueueApi = {
   create: (body) => api.post("/peerfeedbackqueue/create", body),
@@ -71,7 +125,7 @@ export const peerQueueApi = {
       params: { pageNumber: page, pageSize: size },
     }),
 };
-
+ 
 // HR Forms & Responses
 export const hrFormApi = {
   createForm: (body) => api.post("/hrfeedbackform/forms/create", body),
@@ -80,7 +134,7 @@ export const hrFormApi = {
   getActiveForms: () => api.get("/hrfeedbackform/forms/active"),
   updateForm: (id, body) => api.put(`/hrfeedbackform/forms/${id}`, body),
   removeForm: (id) => api.delete(`/hrfeedbackform/forms/${id}`),
-
+ 
   createResponse: (body) => api.post("/hrfeedbackform/responses/create", body),
   getResponse: (id) => api.get(`/hrfeedbackform/responses/${id}`),
   getResponsesByFormId: (formId) =>
@@ -95,7 +149,7 @@ export const hrFormApi = {
     }),
   deleteResponse: (id) => api.delete(`/hrfeedbackform/responses/${id}`),
 };
-
+ 
 // SME API (Subject Matter Experts / Mentors)
 export const smeApi = {
   getActive: () => org_api.get("/sme/active"),
@@ -105,7 +159,7 @@ export const smeApi = {
   list: (page = 1, size = 20) =>
     org_api.get("/sme/all", { params: { pageNumber: page, pageSize: size } }),
 };
-
+ 
 // FEEDBACK ANALYSIS API
 export const feedbackAnalysisApi = {
   analyze: async (sentence) => {
@@ -117,11 +171,11 @@ export const feedbackAnalysisApi = {
         },
         body: JSON.stringify({ sentence }),
       });
-
+ 
       if (!response.ok) {
         throw new Error(`Analysis failed: ${response.statusText}`);
       }
-
+ 
       return await response.json();
     } catch (error) {
       console.error("Error analyzing feedback:", error);
@@ -129,7 +183,7 @@ export const feedbackAnalysisApi = {
     }
   },
 };
-
+ 
 // Shared date helpers
 export const dateHelpers = {
   daysRemaining: (iso) => {
@@ -149,30 +203,30 @@ export const dateHelpers = {
     return { status: "On Track", color: "#24A148", icon: "✅" };
   },
 };
-
+ 
 // Base URLs
 const PROJECT_API_URL = import.meta.env.VITE_PROJECT_API_URL;
 const LND_API_URL = import.meta.env.VITE_LND_API_URL;
-
+ 
 // Employee API
 export const employeeApi = {
   getAll: () =>
     axios.get(`${PROJECT_API_URL}/api/employeemanagement/all`),
-
+ 
   getById: (employeeId) =>
     axios.get(`${PROJECT_API_URL}/api/employeemanagement/${employeeId}`),
-
+ 
   getByDepartment: (departmentId) =>
     axios.get(`${PROJECT_API_URL}/api/employeemanagement/department/${departmentId}`),
-
+ 
   getByRole: (roleId) =>
     axios.get(`${PROJECT_API_URL}/api/employeemanagement/role/${roleId}`),
-
+ 
   search: (query) =>
     axios.get(`${PROJECT_API_URL}/api/employeemanagement/search`, {
       params: { q: query },
     }),
-
+ 
   getSubordinates: async () => {
     try {
       // Get access token from storage (adjust as needed)
@@ -192,13 +246,15 @@ export const employeeApi = {
     }
   },
 };
-
-
+ 
+ 
 // Goals API
 export const goalsApi = {
   getAll: () =>org_api.get("/Goals"),
   getById: (goalId) => org_api.get(`/Goals/${goalId}`),
-  getTeamAll: () => org_api.get("/Goals/team/all"),
+  getTeamAll: () => org_api.get("/Goals/team"),
   getOrganizationLevel: () => org_api.get("/Goals/organization-level"),
   getByProject: (projectId) => org_api.get(`/Goals/project/${projectId}`),
 };
+ 
+ 
