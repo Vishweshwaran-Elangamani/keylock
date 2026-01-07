@@ -1,5 +1,8 @@
 global using Serilog;
 global using Serilog.Events;
+global using Relevantz.EEPZ.Core.IService;
+global using Relevantz.EEPZ.Common.DTOs.Response;
+global using Relevantz.EEPZ.Data.IRepository;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -12,6 +15,10 @@ using Relevantz.EEPZ.Data.Repository.Implementations;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Core.Services.Implementations;
 using Relevantz.EEPZ.Data.DBContexts;
+using Relevantz.EEPZ.Common;
+using Relevantz.EEPZ.Core.Service;
+
+using Relevantz.EEPZ.Data.Repository;
 
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
@@ -39,6 +46,11 @@ try
 
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
+Log.Information("Global Exception Handler configured");
 
     builder.Services.AddSwaggerGen(options =>
     {
@@ -215,6 +227,15 @@ try
 
     builder.Services.AddScoped<IMentorFeedbackService, MentorFeedbackService>();
     builder.Services.AddScoped<IOrgGoalFeedbackService, OrgGoalFeedbackService>();
+    builder.Services.AddScoped<IGoalService,GoalService>();
+    builder.Services.AddScoped<IGoalRepository, GoalRepository>();
+    builder.Services.AddScoped<IOrgwideObjectivesRepository, OrgwideObjectivesRepository>();
+    builder.Services.AddScoped<IOrgwideObjectivesService, OrgwideObjectivesService>();
+    builder.Services.AddScoped<ISmeRepository, SmeRepository>();
+    builder.Services.AddScoped<ISmeService, SmeService>();
+
+Log.Information("Global Exception Handler configured");
+
 
 
     Log.Information("Dependency Injection configured - 5 repositories, 5 services");

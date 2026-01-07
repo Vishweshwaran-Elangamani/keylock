@@ -1,48 +1,32 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Relevantz.EEPZ.Data.DBContexts;
-
-namespace EepzBackend.Controllers
+using Relevantz.EEPZ.Core.IService;
+using Relevantz.EEPZ.Common.DTOs.Response;
+using Relevantz.EEPZ.Common.Models;
+namespace Relevantz.EEPZ.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     public class SmeController : ControllerBase
     {
-        private readonly EEPZDbContext _context;
+        private readonly ISmeService _service;
+        private readonly ILogger<SmeController> _logger;
 
-        public SmeController(EEPZDbContext context)
+        public SmeController(ISmeService service, ILogger<SmeController> logger)
         {
-            _context = context;
+            _service = service;
+            _logger = logger;
         }
 
+        /// <summary>
+        /// Get all active SMEs with Employee and Skill details
+        /// </summary>
         [HttpGet("active")]
+        [ProducesResponseType(typeof(ApiResponse<List<SmeDto>>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetActiveSmes()
         {
-            try
-            {
-                var smes = await _context.Lndsmes
-                    .Where(s => (bool)s.IsActive)
-                    .Include(s => s.Employee)
-                    .Include(s => s.Skill)
-                    .Select(s => new
-                    {
-                        smeId = s.SmeId,
-                        employeeId = s.EmployeeId,
-                        skillName = s.Skill.SkillName,
-                        skillIdReference = s.SkillId,
-                        employeeName = s.Employee.EmployeeCompanyId,
-                        isActive = s.IsActive,
-                        approvedOn = s.ApprovedOn
-                    })
-                    .ToListAsync();
-
-                return Ok(new { success = true, data = smes });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { success = false, message = ex.Message });
-            }
+            _logger.LogInformation("Retrieving active SMEs");
+            var response = await _service.GetActiveSmesAsync();
+            return Ok(response);
         }
     }
 }
-
