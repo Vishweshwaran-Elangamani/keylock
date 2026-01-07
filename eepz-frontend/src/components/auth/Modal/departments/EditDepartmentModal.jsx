@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect, useRef } from "react";
 import { Spinner, CloseButton } from "react-bootstrap";
 import departmentService from "../../../../services/auth/departmentService";
@@ -56,7 +54,7 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
       // Fetch ALL users and filter for Department Head role on frontend
       const usersResponse = await userService.getAllUsers();
       if (usersResponse.success) {
-        // Filter only users with Department Head role (RoleCode === "DEPT_HEAD")
+        // Filter only users with Department Head role
         const filteredHeads = (usersResponse.data || []).filter(
           (user) =>
             user.roleName === "Department Head" && user.status === "Active"
@@ -83,7 +81,7 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
   };
 
   // ========================
-  // CUSTOM DROPDOWN COMPONENT
+  // CUSTOM DROPDOWN COMPONENT - NO INLINE STYLES
   // ========================
 
   const CustomDropdown = ({
@@ -127,115 +125,32 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
     return (
       <div
         ref={dropdownRef}
-        style={{
-          position: "relative",
-          width: "100%",
-          userSelect: "none",
-          zIndex: isOpen ? 1000 : 10,
-        }}
         className={`edm-custom-dropdown ${isOpen ? "active" : ""} ${
           error ? "error" : ""
         } ${disabled ? "disabled" : ""}`}
+        tabIndex={disabled ? -1 : 0}
+        onBlur={() => setTimeout(() => setIsOpen(false), 200)}
       >
-        <div
-          style={{
-            padding: "8px 2rem 8px 10px",
-            display: "flex",
-            alignItems: "center",
-            position: "relative",
-            fontSize: "13px",
-            border: `1px solid ${
-              error ? "#dc3545" : isOpen ? "#27235c" : "#cbd5e1"
-            }`,
-            borderRadius: "6px",
-            backgroundColor: "#ffffff",
-            cursor: disabled ? "not-allowed" : "pointer",
-            minHeight: "37px",
-            color: "#334155",
-            opacity: disabled ? 0.6 : 1,
-            transition: "all 0.2s ease",
-          }}
-          className="edm-custom-dropdown-selected"
-          onClick={toggleDropdown}
-          tabIndex={disabled ? -1 : 0}
-        >
+        <div className="edm-custom-dropdown-selected" onClick={toggleDropdown}>
           <span
-            style={{
-              flex: 1,
-              color: selectedOption ? "#334155" : "#9ca3af",
-              textAlign: "left",
-              fontWeight: 400,
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
             className={`edm-custom-dropdown-text ${
               !selectedOption ? "placeholder" : ""
             }`}
           >
             {selectedOption ? selectedOption.label : placeholder}
           </span>
-          <span
-            style={{
-              position: "absolute",
-              right: "0.75rem",
-              top: "50%",
-              transform: isOpen
-                ? "translateY(-25%) rotate(-135deg)"
-                : "translateY(-50%) rotate(45deg)",
-              width: "7px",
-              height: "7px",
-              borderRight: "2px solid #64748b",
-              borderBottom: "2px solid #64748b",
-              pointerEvents: "none",
-              transition: "transform 0.2s ease",
-            }}
-            className={`edm-custom-dropdown-arrow ${isOpen ? "open" : ""}`}
-          ></span>
+          <span className="edm-custom-dropdown-arrow"></span>
         </div>
 
         {isOpen && (
-          <div
-            style={{
-              position: "absolute",
-              top: "calc(100% + 4px)",
-              left: 0,
-              right: 0,
-              background: "#ffffff",
-              border: "1px solid #cbd5e1",
-              borderRadius: "6px",
-              boxShadow: "0 8px 20px rgba(0, 0, 0, 0.25)",
-              zIndex: 10000,
-              maxHeight: "220px",
-              overflowY: "auto",
-            }}
-            className="edm-custom-dropdown-menu"
-          >
+          <div className="edm-custom-dropdown-menu">
             {options.map((option) => (
               <div
-                key={option.value}
-                style={{
-                  padding: "9px 12px",
-                  fontSize: "13px",
-                  color: "#334155",
-                  cursor: "pointer",
-                  textAlign: "left",
-                  backgroundColor: "#ffffff",
-                  transition: "all 0.15s ease",
-                  borderBottom: "1px solid #f1f5f9",
-                }}
+                key={option.value || "empty"}
                 className={`edm-custom-dropdown-option ${
-                  value === option.value ? "selected" : ""
+                  value === option.value ? "edm-custom-dropdown-option-active" : ""
                 }`}
                 onClick={() => handleSelect(option.value)}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = "#27235c";
-                  e.target.style.color = "#ffffff";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = "#ffffff";
-                  e.target.style.color = "#334155";
-                }}
               >
                 {option.label}
               </div>
@@ -278,12 +193,10 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
       setLoading(true);
       toast.loading("Updating department...");
 
-     
       const payload = {
         departmentId: formData.departmentId,
         description: formData.description.trim() || null,
         status: formData.status,
-        
         parentDepartmentId:
           formData.parentDepartmentId === "" ||
           formData.parentDepartmentId === null
@@ -393,7 +306,7 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
                     />
                   </div>
 
-                  {/* Row 3: Status & Parent Department (EDITABLE - CUSTOM DROPDOWNS) */}
+                  {/* Row 3: Status & Parent Department (CUSTOM DROPDOWNS) */}
                   <div className="edm-form-row">
                     {/* Status - CUSTOM DROPDOWN */}
                     <div className="edm-form-group">
@@ -428,7 +341,7 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
                     </div>
                   </div>
 
-                  {/* Row 4: HOD (EDITABLE - CUSTOM DROPDOWN) */}
+                  {/* Row 4: HOD (CUSTOM DROPDOWN) */}
                   <div className="edm-form-row-full">
                     <label className="edm-form-label">
                       Head of Department (HOD)
