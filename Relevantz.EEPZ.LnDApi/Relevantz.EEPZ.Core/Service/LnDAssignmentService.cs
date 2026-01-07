@@ -315,7 +315,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     Log.Warning(
                         "CompleteAssignment: Assignment not found or access denied. AssignmentId={AssignmentId}, ManagerId={ManagerId}",
                         request.AssignmentId, managerId
-                    );        
+                    );
 
                     return new ApiResponse<bool>
                     {
@@ -375,14 +375,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 if (pendingApproval != null)
                 {
                     pendingApproval.Status = LnDConstants.APPROVAL_STATUS.APPROVED;
-                    pendingApproval.UpdatedOn = DateOnly.FromDateTime(DateTime.Now); 
+                    pendingApproval.UpdatedOn = DateOnly.FromDateTime(DateTime.Now);
                     pendingApproval.Notes = request.Notes;
                     await _approvalRepository.UpdateApprovalAsync(pendingApproval);
 
                     Log.Debug(
                         "CompleteAssignment: Approval updated. ApprovalId={ApprovalId}",
                         pendingApproval.ApprovalId
-                    );   
+                    );
                 }
 
                 await _baseRepository.SaveChangesAsync();
@@ -693,7 +693,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                             SmeName = $"{a.Sme.Employee.Userprofile.FirstName} {a.Sme.Employee.Userprofile.LastName}",
                             SkillId = a.SkillId,
                             SkillName = a.Skill.SkillName,
-                            Deadline = a.Deadline,  
+                            Deadline = a.Deadline,
                             Status = a.Status,
                             ProofFilePath = a.ProofFilePath,
                             CompletionNotes = a.CompletionNotes,

@@ -160,7 +160,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                         && a.CompletionNotes.ToLower().Contains(lowerSearchTerm)
                     )
                 );
-            }  
+            }
 
             var totalCount = await query.CountAsync();
 
@@ -391,9 +391,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             Log.Information(
                 "GetSmeAssignmentsAsync completed. SmeEmployeeId={SmeEmployeeId}, ReturnedCount={Count}, TotalCount={TotalCount}",
                 smeEmployeeId, items.Count, totalCount
-            ); 
+            );
 
-            return (items, totalCount); 
+            return (items, totalCount);
         }
 
         /// <summary>Gets all team assignments for Excel export without pagination.</summary>
@@ -450,10 +450,10 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             Log.Information(
                 "GetAllTeamAssignmentsForExportAsync completed. ManagerId={ManagerId}, TotalCount={Count}",
-                managerId, items.Count 
+                managerId, items.Count
             );
 
-            return items;  
+            return items;
         }
 
         #endregion
@@ -483,7 +483,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 assignment.AssignmentId, assignment.Status
             );
 
-            _context.Lndassignments.Update(assignment);   
+            _context.Lndassignments.Update(assignment);
 
             Log.Debug("UpdateAssignmentAsync: Assignment updated in context. Pending SaveChanges");
         }
@@ -507,7 +507,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             {
                 LnDConstants.SORT_FIELDS.SKILL_NAME => isAscending
                     ? query.OrderBy(a => a.Skill.SkillName)
-                    : query.OrderByDescending(a => a.Skill.SkillName),           
+                    : query.OrderByDescending(a => a.Skill.SkillName),
                 LnDConstants.SORT_FIELDS.SME_NAME => isAscending
                     ? query
                         .OrderBy(a => a.Sme.Employee.Userprofile.FirstName)
@@ -520,7 +520,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                     : query.OrderByDescending(a => a.Status),
                 LnDConstants.SORT_FIELDS.CREATED_ON => isAscending
                     ? query.OrderBy(a => a.CreatedOn)
-                    : query.OrderByDescending(a => a.CreatedOn), 
+                    : query.OrderByDescending(a => a.CreatedOn),
                 LnDConstants.SORT_FIELDS.DEADLINE => isAscending
                     ? query.OrderBy(a => a.Deadline)
                     : query.OrderByDescending(a => a.Deadline),

@@ -12,7 +12,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
     public class FileStorageService : IFileStorageService
     {
         private readonly GridFSBucket _gridFSBucket;
-        private readonly MongoDbSettings _mongoSettings;     
+        private readonly MongoDbSettings _mongoSettings;
 
         public FileStorageService(IOptions<MongoDbSettings> mongoSettings)
         {
@@ -20,7 +20,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             var client = new MongoClient(_mongoSettings.ConnectionString);
             var database = client.GetDatabase(_mongoSettings.DatabaseName);
-            
+
             var bucketOptions = new GridFSBucketOptions
             {
                 BucketName = _mongoSettings.GridFSBucketName,
@@ -30,7 +30,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
 
             _gridFSBucket = new GridFSBucket(database, bucketOptions);
-        }  
+        }
 
         public async Task<string> SaveFileAsync(IFormFile file, string subFolder)
         {
@@ -102,7 +102,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 return false;
             }
-        }  
+        }
 
         public async Task<(byte[] fileBytes, string contentType, string fileName)> GetFileForPreviewAsync(string fileId)
         {
@@ -126,7 +126,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var contentType = fileInfo.Metadata?.Contains("contentType") == true
                     ? fileInfo.Metadata["contentType"].AsString
                     : GetContentType(fileInfo.Filename);
-                
+
                 var fileName = fileInfo.Filename;
 
                 return (bytes, contentType, fileName);
@@ -135,7 +135,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 throw new FileNotFoundException($"File with ID {fileId} not found in GridFS");
             }
-        }     
+        }
 
         public async Task<FileMetadata?> GetFileMetadataAsync(string fileId)
         {
@@ -194,7 +194,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
     }
-}          
+}
 
 
 

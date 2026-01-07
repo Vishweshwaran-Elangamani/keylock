@@ -20,7 +20,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
         public LnDSmeController(ILnDSmeService smeService)
         {
-            _smeService = smeService; 
+            _smeService = smeService;
         }
 
         #endregion 
@@ -60,7 +60,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         #region SME Application
 
         /// <summary>Submits an SME application with supporting documents for approval.</summary>
-        [HttpPost("apply")]   
+        [HttpPost("apply")]
         public async Task<IActionResult> ApplyToBecomeSme([FromForm] BecomeSmeRequest request)
         {
             var employeeId = GetCurrentEmployeeId();
@@ -101,7 +101,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             [FromQuery] string? searchTerm,
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10
-        )  
+        )
         {
             Log.Information(
                 "GetAvailableSmes API called. SkillId={SkillId}, SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",

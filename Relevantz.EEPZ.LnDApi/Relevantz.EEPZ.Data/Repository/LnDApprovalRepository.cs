@@ -384,7 +384,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             Log.Debug("AddAttachmentAsync: Attachment added to context. Pending SaveChanges");
 
-            return attachment; 
+            return attachment;
         }
 
         /// <summary>
@@ -404,7 +404,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 Log.Warning("GetAttachmentByIdAsync: Attachment not found. AttachmentId={AttachmentId}", attachmentId);
             }
 
-            return attachment; 
+            return attachment;
         }
 
         #endregion
@@ -473,7 +473,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         #endregion
     }
-}   
+}
 
-                             
+
 

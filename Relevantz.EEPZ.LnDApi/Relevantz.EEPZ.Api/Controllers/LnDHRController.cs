@@ -68,7 +68,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         }
 
         /// <summary>Exports all organization assignments to Excel file (HR only).</summary>
-        [HttpGet("api/lnd-hr/assignments/organization/export")] 
+        [HttpGet("api/lnd-hr/assignments/organization/export")]
         public async Task<IActionResult> ExportOrganizationAssignments(
             [FromQuery] ExportOrganizationAssignmentsRequestModel request
         )
@@ -113,7 +113,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         #region Employee Management
 
         /// <summary>Gets paginated list of all organization employees with search capability (HR only).</summary>
-        [HttpGet("api/lnd-hr/employees/organization")]  
+        [HttpGet("api/lnd-hr/employees/organization")]
         public async Task<IActionResult> GetAllOrganizationEmployees(
             [FromQuery] OrganizationEmployeesRequestModel request
         )
@@ -145,7 +145,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 );
                 return BadRequest(result);
             }
-        }            
+        }
 
         /// <summary>Gets paginated skills for a specific employee by ID (HR only).</summary>
         [HttpGet("api/lnd-hr/skills/employee/{employeeId}")]

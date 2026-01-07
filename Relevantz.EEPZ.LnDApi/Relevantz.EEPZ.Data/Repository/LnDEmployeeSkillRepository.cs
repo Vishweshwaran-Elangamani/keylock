@@ -13,7 +13,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         private readonly EEPZDbContext _context;
 
-        public LnDEmployeeSkillRepository(EEPZDbContext context)    
+        public LnDEmployeeSkillRepository(EEPZDbContext context)
         {
             _context = context;
         }
@@ -32,14 +32,14 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .Include(e => e.Userauthentication)
                 .Include(e => e.Employeedetailsmasters)
                 .ThenInclude(ed => ed.Department)
-                .FirstOrDefaultAsync(e => e.EmployeeId == employeeId);         
+                .FirstOrDefaultAsync(e => e.EmployeeId == employeeId);
 
             if (employee == null)
             {
                 Log.Warning("GetEmployeeByIdAsync: Employee not found. EmployeeId={EmployeeId}", employeeId);
             }
 
-            return employee;                                              
+            return employee;
         }
 
         /// <summary>Gets paginated subordinate employees with search across name, email, and department.</summary>
@@ -398,7 +398,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 approvals.Count
             );
 
-            return approvals;  
+            return approvals;
         }
 
         /// <summary>Gets active assignments for a specific employee and skill.</summary>

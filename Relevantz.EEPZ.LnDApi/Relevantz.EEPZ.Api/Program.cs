@@ -614,7 +614,7 @@ using (var scope = app.Services.CreateScope())
 
         if (app.Environment.IsDevelopment())
         {
-            throw; // Re-throw in development to see the full error
+            throw;
         }
     }
 }

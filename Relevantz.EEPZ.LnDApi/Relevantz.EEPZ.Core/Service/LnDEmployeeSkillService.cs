@@ -16,7 +16,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private readonly ILnDEmployeeSkillRepository _repository;
         private readonly ILnDSmeRepository _smeRepository;
         private readonly ILnDBaseRepository _baseRepository;
-       
+
 
         public LnDEmployeeSkillService(
             ILnDEmployeeSkillRepository repository,

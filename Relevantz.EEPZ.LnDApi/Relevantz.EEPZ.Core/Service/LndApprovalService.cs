@@ -4,7 +4,7 @@ using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repositories.Interface;
-using Serilog;     
+using Serilog;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -13,7 +13,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private readonly ILnDApprovalRepository _approvalRepository;
         private readonly ILnDSmeRepository _smeRepository;
         private readonly ILnDAssignmentRepository _assignmentRepository;
-        private readonly IFileStorageService _fileStorage; 
+        private readonly IFileStorageService _fileStorage;
         private readonly ILnDBaseRepository _baseRepository;
 
         #region Constructor   
@@ -24,14 +24,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             ILnDAssignmentRepository assignmentRepository,
             IFileStorageService fileStorage,
             ILnDBaseRepository baseRepository
-        ) 
+        )
         {
             _approvalRepository = approvalRepository;
             _smeRepository = smeRepository;
             _assignmentRepository = assignmentRepository;
             _fileStorage = fileStorage;
             _baseRepository = baseRepository;
-        }  
+        }
 
         #endregion
 
@@ -369,14 +369,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     "ProcessApproval failed. ApprovalId={ApprovalId}, ApproverId={ApproverId}",
                     request.ApprovalId,
                     approverId
-                );   
+                );
 
                 return new ApiResponse<bool>
                 {
                     Success = false,
                     Message = "An error occurred",
                     Errors = new List<string> { ex.Message },
-                };   
+                };
             }
         }
 
@@ -709,25 +709,25 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         public async Task<ApiResponse<FileDownloadDto>> GetAssignmentProof(
             int employeeId,
             int assignmentId
-        )      
+        )
         {
             Log.Information(
                 "GetAssignmentProof started. AssignmentId={AssignmentId}, EmployeeId={EmployeeId}",
-                assignmentId, employeeId  
-            );                                                             
+                assignmentId, employeeId
+            );
 
             try
             {
                 var assignment = await _assignmentRepository.GetAssignmentByIdAsync(assignmentId);
 
-                if(
+                if (
                     assignment == null
                     || (
                         assignment.MenteeEmployeeId != employeeId
                         && assignment.Sme.EmployeeId != employeeId
                         && assignment.MenteeEmployee.ReportingManagerEmployeeId != employeeId
                     )
-                )            
+                )
                 {
                     Log.Warning(
                         "GetAssignmentProof: Assignment not found or access denied. AssignmentId={AssignmentId}, EmployeeId={EmployeeId}",
@@ -757,14 +757,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
 
                 var fileBytes = await _fileStorage.GetFileAsync(assignment.ProofFilePath);
-                var fileName = Path.GetFileName(assignment.ProofFilePath);        
+                var fileName = Path.GetFileName(assignment.ProofFilePath);
 
                 Log.Information(
                     "GetAssignmentProof succeeded. AssignmentId={AssignmentId}, FileName={FileName}, FileSize={FileSize}",
                     assignmentId,
                     fileName,
                     fileBytes.Length
-                ); 
+                );
 
                 return new ApiResponse<FileDownloadDto>
                 {
@@ -792,7 +792,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     Success = false,
                     Message = "An error occurred",
                     Errors = new List<string> { ex.Message },
-                }; 
+                };
             }
         }
 
@@ -850,8 +850,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
 
                 var (fileBytes, contentType, fileName) = await _fileStorage.GetFileForPreviewAsync(
-                    approval.Attachment.FilePath  
-                ); 
+                    approval.Attachment.FilePath
+                );
 
                 Log.Debug(
                     "PreviewApprovalAttachment succeeded. ApprovalId={ApprovalId}, FileName={FileName}",
@@ -870,7 +870,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         FileSize = fileBytes.Length,
                     },
                 };
-            }  
+            }
             catch (Exception ex)
             {
                 Log.Error(
@@ -895,7 +895,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         public async Task<ApiResponse<FileDownloadDto>> PreviewAssignmentProof(
             int employeeId,
             int assignmentId
-        )                                                                      
+        )
         {
             Log.Debug(
                 "PreviewAssignmentProof started. AssignmentId={AssignmentId}, EmployeeId={EmployeeId}",
@@ -920,14 +920,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         "PreviewAssignmentProof: Assignment not found or access denied. AssignmentId={AssignmentId}, EmployeeId={EmployeeId}",
                         assignmentId,
                         employeeId
-                    );   
+                    );
 
                     return new ApiResponse<FileDownloadDto>
                     {
                         Success = false,
                         Message = "Assignment not found or access denied",
-                    };   
-                }   
+                    };
+                }
 
                 if (string.IsNullOrEmpty(assignment.ProofFilePath))
                 {
@@ -945,7 +945,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 var (fileBytes, contentType, fileName) = await _fileStorage.GetFileForPreviewAsync(
                     assignment.ProofFilePath
-                );   
+                );
 
                 Log.Debug(
                     "PreviewAssignmentProof succeeded. AssignmentId={AssignmentId}, FileName={FileName}",

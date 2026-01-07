@@ -15,10 +15,10 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             if (string.IsNullOrEmpty(employeeIdClaim))
             {
-                throw new UnauthorizedAccessException("Employee ID not found in token");                    
+                throw new UnauthorizedAccessException("Employee ID not found in token");
             }
 
-            return int.Parse(employeeIdClaim); 
+            return int.Parse(employeeIdClaim);
         }
     }
 }

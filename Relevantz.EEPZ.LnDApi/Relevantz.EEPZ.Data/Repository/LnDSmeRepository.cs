@@ -97,7 +97,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         /// <summary>Gets in-progress assignment count for a specific SME.</summary>
         public async Task<int> GetSmeInProgressAssignmentCountAsync(int smeId)
         {
-            Log.Debug("GetSmeInProgressAssignmentCountAsync called. SmeId={SmeId}", smeId);  
+            Log.Debug("GetSmeInProgressAssignmentCountAsync called. SmeId={SmeId}", smeId);
 
             var count = await _context.Lndassignments.CountAsync(a =>
                 a.SmeId == smeId && a.Status == LnDConstants.ASSIGNMENT_STATUS.IN_PROGRESS
@@ -327,4 +327,4 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         #endregion
     }
-}     
+}
