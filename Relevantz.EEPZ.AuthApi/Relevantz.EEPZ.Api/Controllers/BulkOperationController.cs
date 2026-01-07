@@ -6,8 +6,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Relevantz.EEPZ.Common.Utils;
-
-
 namespace Relevantz.EEPZ.Api.Controllers
 {
     [ApiController]
@@ -17,15 +15,11 @@ namespace Relevantz.EEPZ.Api.Controllers
     {
         private readonly IBulkOperationService _bulkOperationService;
         private readonly IExportService _exportService;
-
-
         public BulkOperationController(IBulkOperationService bulkOperationService, IExportService exportService)
         {
             _bulkOperationService = bulkOperationService;
             _exportService = exportService;
         }
-
-
         [HttpPost("bulk-create-users")]
         public async Task<IActionResult> BulkCreateUsers([FromBody] BulkUserCreateRequestDto request)
         {
@@ -33,8 +27,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _bulkOperationService.BulkCreateUsersAsync(request.Users, performedByUserId);
             return Ok(result);
         }
-
-
         [HttpPost("bulk-inactivate-users")]
         public async Task<IActionResult> BulkInactivateUsers([FromBody] BulkUserInactivateRequestDto request)
         {
@@ -42,37 +34,24 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _bulkOperationService.BulkInactivateUsersAsync(request, performedByUserId);
             return Ok(result);
         }
-
-
         [HttpPost("bulk-create-from-excel")]
         public async Task<IActionResult> BulkCreateUsersFromExcel(IFormFile file)
         {
             if (file == null || file.Length == 0)
                 return BadRequest(new { success = false, message = "Please upload a valid Excel file" });
-
-
             // File validation
             var allowedExtensions = new[] { ".xlsx", ".xls" };
             var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
-
             if (!allowedExtensions.Contains(fileExtension))
                 return BadRequest(new { success = false, message = "Only .xlsx and .xls files are allowed" });
-
-
             // File size validation (5MB max)
             if (file.Length > 5 * 1024 * 1024)
                 return BadRequest(new { success = false, message = "File size exceeds 5MB limit" });
-
-
             var performedByUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-
             using var stream = file.OpenReadStream();
             var result = await _bulkOperationService.BulkCreateUsersFromExcelAsync(stream, performedByUserId);
-
             return Ok(result);
         }
-
-
         [HttpGet("download-template")]
         [Authorize]
         public async Task<IActionResult> DownloadExcelTemplate()
@@ -80,7 +59,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             try
             {
                 var templateBytes = await _bulkOperationService.GenerateExcelTemplateAsync();
-
                 return File(
                     templateBytes,
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -93,9 +71,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, "Failed to generate template");
             }
         }
-
-
-
         /// <summary>
         /// Export all roles to Excel
         /// </summary>
@@ -106,7 +81,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 var fileBytes = await _exportService.ExportRolesToExcelAsync();
                 var fileName = $"Roles_Export_{DateTime.UtcNow:yyyyMMdd_HHmmss}.xlsx";
-
                 return File(fileBytes,
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     fileName);
@@ -116,8 +90,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return BadRequest(new { success = false, message = "Error exporting roles", error = ex.Message });
             }
         }
-
-
         /// <summary>
         /// Export all departments to Excel
         /// </summary>
@@ -128,7 +100,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 var fileBytes = await _exportService.ExportDepartmentsToExcelAsync();
                 var fileName = $"Departments_Export_{DateTime.UtcNow:yyyyMMdd_HHmmss}.xlsx";
-
                 return File(fileBytes,
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     fileName);
@@ -138,8 +109,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return BadRequest(new { success = false, message = "Error exporting departments", error = ex.Message });
             }
         }
-
-
         /// <summary>
         /// Export all users to Excel
         /// </summary>
@@ -150,7 +119,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 var fileBytes = await _exportService.ExportUsersToExcelAsync();
                 var fileName = $"Users_Export_{DateTime.UtcNow:yyyyMMdd_HHmmss}.xlsx";
-
                 return File(fileBytes,
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     fileName);
@@ -160,8 +128,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return BadRequest(new { success = false, message = "Error exporting users", error = ex.Message });
             }
         }
-
-
         /// <summary>
         /// Export all data (Roles, Departments, Users) in a single Excel file with multiple sheets
         /// </summary>
@@ -172,7 +138,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 var fileBytes = await _exportService.ExportAllDataToExcelAsync();
                 var fileName = $"EEPZ_Complete_Export_{DateTime.UtcNow:yyyyMMdd_HHmmss}.xlsx";
-
                 return File(fileBytes,
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     fileName);
