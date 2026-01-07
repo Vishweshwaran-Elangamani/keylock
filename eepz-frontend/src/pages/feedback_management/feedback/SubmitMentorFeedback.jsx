@@ -29,7 +29,12 @@ const getFeedbackDashboardPath = (roleName) => {
 };
 
 const DropdownIcon = ({ open }) => (
-  <svg width="18" height="18" viewBox="0 0 24 24" className={`smf-dropdown-icon ${open ? "smf-dropdown-icon--open" : ""}`}>
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    className={`smf-dropdown-icon ${open ? "smf-dropdown-icon--open" : ""}`}
+  >
     <polyline
       points="6 9 12 15 18 9"
       fill="none"
@@ -77,7 +82,9 @@ const CustomSelect = ({
   return (
     <div className="smf-dropdown-wrapper" ref={dropdownRef}>
       <div
-        className={`smf-dropdown-select ${isOpen ? "smf-dropdown-select--open" : ""} ${disabled ? "smf-dropdown-select--disabled" : ""}`}
+        className={`smf-dropdown-select ${
+          isOpen ? "smf-dropdown-select--open" : ""
+        } ${disabled ? "smf-dropdown-select--disabled" : ""}`}
         onClick={() => !disabled && setIsOpen((o) => !o)}
       >
         <span className="smf-dropdown-value">{getDisplayValue()}</span>
@@ -307,7 +314,9 @@ export default function SubmitMentorFeedback() {
         <button
           key={index}
           type="button"
-          className={`smf-star-button ${rating <= form.rating ? "smf-star-button--active" : ""}`}
+          className={`smf-star-button ${
+            rating <= form.rating ? "smf-star-button--active" : ""
+          }`}
           onClick={() => handleStarClick(rating)}
           aria-label={`Rate ${rating} star${rating > 1 ? "s" : ""}`}
         >
@@ -370,9 +379,13 @@ export default function SubmitMentorFeedback() {
           <div className="smf-card-body">
             <form onSubmit={handleSubmit} noValidate>
               <div className="smf-form-group">
-                <label htmlFor="smeSelect" className="smf-label smf-label-with-loader">
+                <label
+                  htmlFor="smeSelect"
+                  className="smf-label smf-label-with-loader"
+                >
                   <span>
-                    Select Your Mentor/SME <span className="smf-required">*</span>
+                    Select Your Mentor/SME{" "}
+                    <span className="smf-required">*</span>
                   </span>
                   {isLoading && (
                     <Loader size={16} className="smf-loader-inline" />
@@ -414,9 +427,7 @@ export default function SubmitMentorFeedback() {
                     </h6>
                     <div className="smf-sme-details-grid">
                       <div className="smf-sme-detail-item">
-                        <div className="smf-detail-label">
-                          Expertise Area
-                        </div>
+                        <div className="smf-detail-label">Expertise Area</div>
                         <div className="smf-detail-value">
                           {smeDetails.skillName}
                         </div>
@@ -427,9 +438,7 @@ export default function SubmitMentorFeedback() {
                         )}
                       </div>
                       <div className="smf-sme-detail-item">
-                        <div className="smf-detail-label">
-                          SME
-                        </div>
+                        <div className="smf-detail-label">SME</div>
                         <div className="smf-detail-value">
                           {smeDetails.employeeName}
                         </div>

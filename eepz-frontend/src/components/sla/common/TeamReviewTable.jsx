@@ -2,7 +2,6 @@ import React from "react";
 import { Eye, Clock, AlertTriangle, CheckCircle } from "lucide-react";
 
 const TeamReviewTable = ({ reviews, onViewDetails }) => {
-  //  Debug logging
   React.useEffect(() => {
     if (reviews.length > 0) {
     }

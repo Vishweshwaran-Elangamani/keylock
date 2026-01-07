@@ -101,9 +101,7 @@ export default function ReviewQueue() {
       <div className="rq-header">
         <div className="rq-header-content">
           <h2 className="rq-title">Review Queue (HR)</h2>
-          <p className="rq-subtitle">
-            Approve or reject pending peer feedback
-          </p>
+          <p className="rq-subtitle">Approve or reject pending peer feedback</p>
         </div>
         <button
           className="rq-refresh-btn"
@@ -127,15 +125,12 @@ export default function ReviewQueue() {
           </button>
         </div>
       )}
-      
+
       {successMsg && (
         <div className="rq-alert rq-alert-success">
           <CheckCircle size={18} className="rq-alert-icon" />
           <div className="rq-alert-message">{successMsg}</div>
-          <button
-            className="rq-alert-close"
-            onClick={() => setSuccessMsg("")}
-          >
+          <button className="rq-alert-close" onClick={() => setSuccessMsg("")}>
             ×
           </button>
         </div>

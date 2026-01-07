@@ -51,7 +51,9 @@ const SLAHistoryTimeline = ({ history }) => {
     return (
       <div className="sla-history-empty">
         <Clock size={48} className="sla-history-empty-icon" />
-        <p className="sla-history-empty-text">No history available for this SLA</p>
+        <p className="sla-history-empty-text">
+          No history available for this SLA
+        </p>
       </div>
     );
   }
@@ -65,22 +67,19 @@ const SLAHistoryTimeline = ({ history }) => {
 
         return (
           <div key={item.historyId || index} className="sla-history-item">
-            
-
             <div className="sla-history-content">
-              <div className="sla-history-card" style={{ borderLeftColor: color }}>
+              <div
+                className="sla-history-card"
+                style={{ borderLeftColor: color }}
+              >
                 <div className="sla-history-card-header">
                   <div className="sla-history-title-section">
-                  <div
-              className=""
-              style={{ borderColor: color }}
-            >
-              <Icon size={20} color={color} strokeWidth={2.5} />
-            
-                    <h3 className="sla-history-title" style={{ color }}>
-                      {label}
-                      
-                    </h3>
+                    <div className="" style={{ borderColor: color }}>
+                      <Icon size={20} color={color} strokeWidth={2.5} />
+
+                      <h3 className="sla-history-title" style={{ color }}>
+                        {label}
+                      </h3>
                     </div>
                     <div className="sla-history-meta">
                       <span className="sla-history-meta-item">

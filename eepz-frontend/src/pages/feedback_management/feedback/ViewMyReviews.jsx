@@ -47,7 +47,7 @@ export default function ViewMyReviews() {
       let empMap = {};
       try {
         const empRes = await employeeApi.getAll();
-        
+
         if (empRes?.data) {
           const employees = Array.isArray(empRes.data)
             ? empRes.data
@@ -63,7 +63,7 @@ export default function ViewMyReviews() {
       }
 
       const reviewRes = await managerReviewApi.getByTargetEmployee(empId);
-      
+
       if (reviewRes?.data) {
         const reviewsData = Array.isArray(reviewRes.data)
           ? reviewRes.data
@@ -108,10 +108,7 @@ export default function ViewMyReviews() {
     <div className="vmr-container">
       <div className="vmr-content">
         <div className="vmr-header">
-          <button
-            className="vmr-back-button"
-            onClick={() => navigate(-1)}
-          >
+          <button className="vmr-back-button" onClick={() => navigate(-1)}>
             <ArrowLeft size={16} />
           </button>
           <div className="vmr-header-text">
@@ -169,8 +166,7 @@ export default function ViewMyReviews() {
                   </div>
                 </div>
                 <h3 className="vmr-stat-value vmr-stat-value-green">
-                  <Star size={20} className="vmr-star-inline" />{" "}
-                  {averageRating}
+                  <Star size={20} className="vmr-star-inline" /> {averageRating}
                 </h3>
                 <p className="vmr-stat-label">Average Rating</p>
               </div>
@@ -197,7 +193,9 @@ export default function ViewMyReviews() {
                     <div className="vmr-review-manager">
                       <div className="vmr-manager-info">
                         <User size={16} className="vmr-manager-icon" />
-                        <h6 className="vmr-manager-name">{review.managerName}</h6>
+                        <h6 className="vmr-manager-name">
+                          {review.managerName}
+                        </h6>
                       </div>
                       <div className="vmr-review-date">
                         <Calendar size={14} className="vmr-date-icon" />
@@ -213,7 +211,9 @@ export default function ViewMyReviews() {
                             key={i}
                             size={18}
                             className={`vmr-star ${
-                              i < review.rating ? "vmr-star-filled" : "vmr-star-empty"
+                              i < review.rating
+                                ? "vmr-star-filled"
+                                : "vmr-star-empty"
                             }`}
                           />
                         ))}
@@ -224,9 +224,7 @@ export default function ViewMyReviews() {
 
                   <div className="vmr-review-content">
                     <h6 className="vmr-review-label">Review</h6>
-                    <p className="vmr-review-text">
-                      {review.reviewComment}
-                    </p>
+                    <p className="vmr-review-text">{review.reviewComment}</p>
                   </div>
 
                   {(review.projectContext || review.goalContext) && (
@@ -246,10 +244,10 @@ export default function ViewMyReviews() {
                       {review.goalContext && (
                         <div className="vmr-context-item">
                           <div className="vmr-context-box">
-                            <h6 className="vmr-context-label">
-                              Goal Context
-                            </h6>
-                            <p className="vmr-context-text">{review.goalContext}</p>
+                            <h6 className="vmr-context-label">Goal Context</h6>
+                            <p className="vmr-context-text">
+                              {review.goalContext}
+                            </p>
                           </div>
                         </div>
                       )}

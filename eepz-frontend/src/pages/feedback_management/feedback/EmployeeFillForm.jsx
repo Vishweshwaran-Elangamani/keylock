@@ -47,7 +47,8 @@ export default function EmployeeFillForm() {
   const QUESTION_TEMPLATES = {
     PerformanceReview: {
       label: "Performance Appraisal Process",
-      description: "Evaluate the effectiveness of our performance appraisal and review process",
+      description:
+        "Evaluate the effectiveness of our performance appraisal and review process",
       questions: [
         {
           id: 1,
@@ -113,7 +114,8 @@ export default function EmployeeFillForm() {
     },
     GeneralFeedback: {
       label: "General Feedback",
-      description: "Provide feedback on workplace environment and organizational practices",
+      description:
+        "Provide feedback on workplace environment and organizational practices",
       questions: [
         {
           id: 1,
@@ -149,7 +151,8 @@ export default function EmployeeFillForm() {
     },
     BiasReview: {
       label: "Bias & Inclusion Review",
-      description: "Assess organizational fairness, diversity, and inclusion practices",
+      description:
+        "Assess organizational fairness, diversity, and inclusion practices",
       questions: [
         {
           id: 1,
@@ -197,7 +200,8 @@ export default function EmployeeFillForm() {
     },
     ProfessionalismReview: {
       label: "Professionalism Standards Review",
-      description: "Evaluate organizational policies and professional conduct standards",
+      description:
+        "Evaluate organizational policies and professional conduct standards",
       questions: [
         {
           id: 1,
@@ -356,7 +360,10 @@ export default function EmployeeFillForm() {
       if (typeof dateValue === "string") {
         parsedDate = new Date(dateValue);
       } else if (typeof dateValue === "number") {
-        parsedDate = dateValue > 10000000000 ? new Date(dateValue) : new Date(dateValue * 1000);
+        parsedDate =
+          dateValue > 10000000000
+            ? new Date(dateValue)
+            : new Date(dateValue * 1000);
       } else {
         parsedDate = new Date(dateValue);
       }
@@ -403,7 +410,9 @@ export default function EmployeeFillForm() {
         const response = await hrFormApi.getFormById(formId);
         if (response?.data) {
           const formData = response.data;
-          const templateData = QUESTION_TEMPLATES[formData.formType] || QUESTION_TEMPLATES.GeneralFeedback;
+          const templateData =
+            QUESTION_TEMPLATES[formData.formType] ||
+            QUESTION_TEMPLATES.GeneralFeedback;
           setForm({ ...formData, ...templateData });
         } else {
           throw new Error("Invalid form data");
@@ -428,7 +437,9 @@ export default function EmployeeFillForm() {
     setSuccess("");
 
     if (!form || Object.keys(responses).length < form.questions?.length) {
-      setError(`Please answer all ${form.questions?.length} questions before submitting`);
+      setError(
+        `Please answer all ${form.questions?.length} questions before submitting`
+      );
       return;
     }
 
@@ -449,7 +460,9 @@ export default function EmployeeFillForm() {
     try {
       const createResponse = await hrFormApi.createResponse(payload);
       if (createResponse?.success || createResponse?.data?.success) {
-        const responseId = createResponse.data?.responseId || createResponse.data?.data?.responseId;
+        const responseId =
+          createResponse.data?.responseId ||
+          createResponse.data?.data?.responseId;
         if (!responseId) {
           throw new Error("Response ID not returned from create endpoint");
         }
@@ -458,7 +471,9 @@ export default function EmployeeFillForm() {
           setSuccess("Form submitted successfully!");
           setTimeout(() => navigate(-1), 2000);
         } else {
-          setError("Response saved as draft but failed to submit. Please contact support.");
+          setError(
+            "Response saved as draft but failed to submit. Please contact support."
+          );
         }
       } else {
         setError(createResponse?.message || "Failed to create form response");
@@ -476,7 +491,9 @@ export default function EmployeeFillForm() {
     }
   };
 
-  const progress = form ? (Object.keys(responses).length / form.questions.length) * 100 : 0;
+  const progress = form
+    ? (Object.keys(responses).length / form.questions.length) * 100
+    : 0;
   const daysLeft = form ? calculateDaysLeft(form.deadline) : null;
   const formattedDeadline = form ? formatDate(form.deadline) : "";
 
@@ -497,7 +514,10 @@ export default function EmployeeFillForm() {
         <nav aria-label="breadcrumb" className="eaf-breadcrumb-wrapper">
           <ol className="eaf-breadcrumb">
             <li className="eaf-breadcrumb-item">
-              <Link to={feedbackDashboardPath.replace("/feedback", "")} className="eaf-breadcrumb-link">
+              <Link
+                to={feedbackDashboardPath.replace("/feedback", "")}
+                className="eaf-breadcrumb-link"
+              >
                 <Home size={16} className="eaf-breadcrumb-icon" />
                 Dashboard
               </Link>
@@ -509,7 +529,9 @@ export default function EmployeeFillForm() {
               </Link>
             </li>
             <li className="eaf-breadcrumb-separator">/</li>
-            <li className="eaf-breadcrumb-item eaf-breadcrumb-active">Assigned Forms</li>
+            <li className="eaf-breadcrumb-item eaf-breadcrumb-active">
+              Assigned Forms
+            </li>
           </ol>
         </nav>
 
@@ -517,10 +539,15 @@ export default function EmployeeFillForm() {
           <AlertTriangle size={20} />
           <div>
             <strong>Error</strong>
-            <p className="eaf-alert-message">Form not found or failed to load</p>
+            <p className="eaf-alert-message">
+              Form not found or failed to load
+            </p>
           </div>
         </div>
-        <button className="eaf-btn eaf-btn-primary" onClick={() => navigate(-1)}>
+        <button
+          className="eaf-btn eaf-btn-primary"
+          onClick={() => navigate(-1)}
+        >
           Back to Assigned Forms
         </button>
       </div>
@@ -534,20 +561,30 @@ export default function EmployeeFillForm() {
           <nav aria-label="breadcrumb" className="eaf-breadcrumb-wrapper">
             <ol className="eaf-breadcrumb">
               <li className="eaf-breadcrumb-item">
-                <Link to={feedbackDashboardPath.replace("/feedback", "")} className="eaf-breadcrumb-link">
+                <Link
+                  to={feedbackDashboardPath.replace("/feedback", "")}
+                  className="eaf-breadcrumb-link"
+                >
                   <Home size={16} className="eaf-breadcrumb-icon" />
                   Dashboard
                 </Link>
               </li>
               <li className="eaf-breadcrumb-separator">/</li>
               <li className="eaf-breadcrumb-item">
-                <Link to={feedbackDashboardPath} className="eaf-breadcrumb-link">
+                <Link
+                  to={feedbackDashboardPath}
+                  className="eaf-breadcrumb-link"
+                >
                   Feedback Management
                 </Link>
               </li>
               <li className="eaf-breadcrumb-separator">/</li>
               <li className="eaf-breadcrumb-item">
-                <button type="button" onClick={() => navigate(-1)} className="eaf-breadcrumb-button">
+                <button
+                  type="button"
+                  onClick={() => navigate(-1)}
+                  className="eaf-breadcrumb-button"
+                >
                   Assigned Forms
                 </button>
               </li>
@@ -572,12 +609,15 @@ export default function EmployeeFillForm() {
                   />
                 </svg>
                 <div className="eaf-progress-label">
-                  <div className="eaf-progress-value">{Math.round(progress)}%</div>
+                  <div className="eaf-progress-value">
+                    {Math.round(progress)}%
+                  </div>
                   <div className="eaf-progress-text">Complete</div>
                 </div>
               </div>
               <div className="eaf-progress-info">
-                {Object.keys(responses).length} of {form.questions.length} answered
+                {Object.keys(responses).length} of {form.questions.length}{" "}
+                answered
               </div>
             </div>
 
@@ -590,16 +630,28 @@ export default function EmployeeFillForm() {
                       key={q.id}
                       className="eaf-question-item"
                       onClick={() => {
-                        document.getElementById(`question-${q.id}`)?.scrollIntoView({
-                          behavior: "smooth",
-                          block: "center",
-                        });
+                        document
+                          .getElementById(`question-${q.id}`)
+                          ?.scrollIntoView({
+                            behavior: "smooth",
+                            block: "center",
+                          });
                       }}
                     >
-                      <div className={`eaf-question-number ${responses[q.id] ? "eaf-question-number-answered" : ""}`}>
+                      <div
+                        className={`eaf-question-number ${
+                          responses[q.id] ? "eaf-question-number-answered" : ""
+                        }`}
+                      >
                         {responses[q.id] ? <CheckCircle size={16} /> : idx + 1}
                       </div>
-                      <small className={`eaf-question-category ${responses[q.id] ? "eaf-question-category-answered" : ""}`}>
+                      <small
+                        className={`eaf-question-category ${
+                          responses[q.id]
+                            ? "eaf-question-category-answered"
+                            : ""
+                        }`}
+                      >
                         {q.category}
                       </small>
                     </div>
@@ -619,7 +671,9 @@ export default function EmployeeFillForm() {
 
             <div className="eaf-badges">
               <span className="eaf-badge eaf-badge-primary">{form.label}</span>
-              <span className="eaf-badge eaf-badge-secondary">{form.questions.length} Questions</span>
+              <span className="eaf-badge eaf-badge-secondary">
+                {form.questions.length} Questions
+              </span>
             </div>
           </div>
 
@@ -627,7 +681,11 @@ export default function EmployeeFillForm() {
             <div className="eaf-alert eaf-alert-danger eaf-alert-dismissible">
               <AlertTriangle size={16} className="eaf-alert-icon" />
               <strong>Error:</strong> {error}
-              <button type="button" className="eaf-alert-close" onClick={() => setError("")}>
+              <button
+                type="button"
+                className="eaf-alert-close"
+                onClick={() => setError("")}
+              >
                 ×
               </button>
             </div>
@@ -641,7 +699,17 @@ export default function EmployeeFillForm() {
           )}
 
           {form.deadline && (
-            <div className={`eaf-deadline-alert ${daysLeft === null ? "eaf-deadline-none" : daysLeft > 3 ? "eaf-deadline-safe" : daysLeft > 0 ? "eaf-deadline-warning" : "eaf-deadline-danger"}`}>
+            <div
+              className={`eaf-deadline-alert ${
+                daysLeft === null
+                  ? "eaf-deadline-none"
+                  : daysLeft > 3
+                  ? "eaf-deadline-safe"
+                  : daysLeft > 0
+                  ? "eaf-deadline-warning"
+                  : "eaf-deadline-danger"
+              }`}
+            >
               <Clock size={18} className="eaf-deadline-icon" />
               <div className="eaf-deadline-content">
                 <strong>Deadline: </strong>
@@ -668,20 +736,31 @@ export default function EmployeeFillForm() {
                 </div>
 
                 {form.questions.map((q, idx) => (
-                  <div key={q.id} id={`question-${q.id}`} className="eaf-question-wrapper">
+                  <div
+                    key={q.id}
+                    id={`question-${q.id}`}
+                    className="eaf-question-wrapper"
+                  >
                     <div className="eaf-question-layout">
                       <div className="eaf-question-index">{idx + 1}</div>
 
                       <div className="eaf-question-content">
                         <div className="eaf-question-header">
                           <h6 className="eaf-question-text">{q.text}</h6>
-                          <span className="eaf-question-badge">{q.category}</span>
+                          <span className="eaf-question-badge">
+                            {q.category}
+                          </span>
                         </div>
 
                         {q.helpText && (
                           <div className="eaf-question-help">
-                            <HelpCircle size={14} className="eaf-question-help-icon" />
-                            <small className="eaf-question-help-text">{q.helpText}</small>
+                            <HelpCircle
+                              size={14}
+                              className="eaf-question-help-icon"
+                            />
+                            <small className="eaf-question-help-text">
+                              {q.helpText}
+                            </small>
                           </div>
                         )}
 
@@ -690,7 +769,11 @@ export default function EmployeeFillForm() {
                             <button
                               key={rating}
                               type="button"
-                              className={`eaf-rating-btn ${responses[q.id] === rating ? "eaf-rating-btn-active" : ""}`}
+                              className={`eaf-rating-btn ${
+                                responses[q.id] === rating
+                                  ? "eaf-rating-btn-active"
+                                  : ""
+                              }`}
                               onClick={() => handleRatingChange(q.id, rating)}
                               disabled={submitting}
                               title={`Rate as ${RATING_LABELS[rating]}`}
@@ -703,11 +786,16 @@ export default function EmployeeFillForm() {
                         <div className="eaf-question-status">
                           {responses[q.id] ? (
                             <small className="eaf-question-status-answered">
-                              <CheckCircle size={12} className="eaf-question-status-icon" />
+                              <CheckCircle
+                                size={12}
+                                className="eaf-question-status-icon"
+                              />
                               Rated: {RATING_LABELS[responses[q.id]]}
                             </small>
                           ) : (
-                            <small className="eaf-question-status-pending">Response required</small>
+                            <small className="eaf-question-status-pending">
+                              Response required
+                            </small>
                           )}
                         </div>
                       </div>
@@ -720,7 +808,9 @@ export default function EmployeeFillForm() {
                     <MessageSquare size={16} className="eaf-comments-icon" />
                     Additional Comments
                   </label>
-                  <small className="eaf-comments-hint">Optional - Maximum 1000 characters</small>
+                  <small className="eaf-comments-hint">
+                    Optional - Maximum 1000 characters
+                  </small>
                   <textarea
                     id="comments"
                     className="eaf-comments-textarea"
@@ -731,18 +821,26 @@ export default function EmployeeFillForm() {
                     disabled={submitting}
                     maxLength={1000}
                   />
-                  <small className="eaf-comments-counter">{comments.length} / 1000 characters</small>
+                  <small className="eaf-comments-counter">
+                    {comments.length} / 1000 characters
+                  </small>
                 </div>
 
                 <div className="eaf-submit-wrapper">
                   <button
                     type="submit"
                     className="eaf-submit-btn"
-                    disabled={submitting || Object.keys(responses).length < form.questions.length}
+                    disabled={
+                      submitting ||
+                      Object.keys(responses).length < form.questions.length
+                    }
                   >
                     {submitting ? (
                       <>
-                        <Loader size={16} className="eaf-submit-icon eaf-submit-spinner" />
+                        <Loader
+                          size={16}
+                          className="eaf-submit-icon eaf-submit-spinner"
+                        />
                         Submitting Form...
                       </>
                     ) : (

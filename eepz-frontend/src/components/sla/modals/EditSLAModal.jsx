@@ -8,7 +8,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-import "../../../styles/sla/modals/EditSLAModal.css"
+import "../../../styles/sla/modals/EditSLAModal.css";
 
 const EditSLAModal = ({ sla, onClose, onUpdate }) => {
   const [deadline, setDeadline] = useState("");
@@ -180,8 +180,18 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
   const selectedDate = deadline ? new Date(deadline) : null;
 
   const monthNames = [
-    "January", "February", "March", "April", "May", "June", "July", 
-    "August","September","October","November","December",
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
   const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
@@ -192,7 +202,9 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
           <h5 className="esla-title">Edit SLA - {sla?.employeeName}</h5>
           <button
             type="button"
-            className={`esla-close-btn ${updating ? "esla-close-btn--disabled" : ""}`}
+            className={`esla-close-btn ${
+              updating ? "esla-close-btn--disabled" : ""
+            }`}
             onClick={onClose}
             disabled={updating}
           >
@@ -230,11 +242,15 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
                   onClick={() => setCalendarOpen((o) => !o)}
                   disabled={updating}
                   placeholder="Select date"
-                  className={`esla-input esla-deadline-input ${updating ? "esla-input--disabled" : ""}`}
+                  className={`esla-input esla-deadline-input ${
+                    updating ? "esla-input--disabled" : ""
+                  }`}
                 />
                 <button
                   type="button"
-                  className={`esla-calendar-trigger ${updating ? "esla-calendar-trigger--disabled" : ""}`}
+                  className={`esla-calendar-trigger ${
+                    updating ? "esla-calendar-trigger--disabled" : ""
+                  }`}
                   onClick={() => setCalendarOpen((o) => !o)}
                   disabled={updating}
                 >
@@ -288,9 +304,9 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
                 {calendarOpen && (
                   <div className="esla-calendar-dropdown">
                     <div className="esla-calendar-header">
-                      <button 
-                        type="button" 
-                        className="esla-calendar-nav-btn" 
+                      <button
+                        type="button"
+                        className="esla-calendar-nav-btn"
                         onClick={goPrevMonth}
                       >
                         <ChevronLeft size={16} />
@@ -298,9 +314,9 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
                       <span className="esla-calendar-title">
                         {monthNames[month]} {year}
                       </span>
-                      <button 
-                        type="button" 
-                        className="esla-calendar-nav-btn" 
+                      <button
+                        type="button"
+                        className="esla-calendar-nav-btn"
                         onClick={goNextMonth}
                       >
                         <ChevronRight size={16} />
@@ -309,7 +325,9 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
 
                     <div className="esla-calendar-weekdays">
                       {weekdays.map((w) => (
-                        <div key={w} className="esla-weekday">{w}</div>
+                        <div key={w} className="esla-weekday">
+                          {w}
+                        </div>
                       ))}
                     </div>
 
@@ -335,8 +353,12 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
                             className={`esla-calendar-day 
                               ${c.current ? "esla-calendar-day--current" : ""} 
                               ${isToday ? "esla-calendar-day--today" : ""} 
-                              ${isSelected ? "esla-calendar-day--selected" : ""}`}
-                            onClick={() => handleSelectCalendarDay(c.day, c.current)}
+                              ${
+                                isSelected ? "esla-calendar-day--selected" : ""
+                              }`}
+                            onClick={() =>
+                              handleSelectCalendarDay(c.day, c.current)
+                            }
                           >
                             {c.day}
                           </div>
@@ -345,7 +367,11 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
                     </div>
 
                     <div className="esla-calendar-footer">
-                      <button type="button" className="esla-today-btn" onClick={goToday}>
+                      <button
+                        type="button"
+                        className="esla-today-btn"
+                        onClick={goToday}
+                      >
                         Today
                       </button>
                     </div>
@@ -362,16 +388,24 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
               <div ref={statusRef} className="esla-status-container">
                 <button
                   type="button"
-                  className={`esla-status-trigger ${updating ? "esla-status-trigger--disabled" : ""}`}
+                  className={`esla-status-trigger ${
+                    updating ? "esla-status-trigger--disabled" : ""
+                  }`}
                   onClick={() => setStatusOpen((o) => !o)}
                   disabled={updating}
                 >
-                  <span className={`esla-status-value ${status ? "" : "esla-status-value--placeholder"}`}>
+                  <span
+                    className={`esla-status-value ${
+                      status ? "" : "esla-status-value--placeholder"
+                    }`}
+                  >
                     {status || "Select Status"}
                   </span>
-                  <ChevronDown 
-                    className={`esla-chevron ${statusOpen ? "esla-chevron--open" : ""}`} 
-                    size={18} 
+                  <ChevronDown
+                    className={`esla-chevron ${
+                      statusOpen ? "esla-chevron--open" : ""
+                    }`}
+                    size={18}
                   />
                 </button>
 
@@ -383,7 +417,9 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
                         <button
                           key={opt}
                           type="button"
-                          className={`esla-status-option ${selected ? "esla-status-option--selected" : ""}`}
+                          className={`esla-status-option ${
+                            selected ? "esla-status-option--selected" : ""
+                          }`}
                           onClick={() => {
                             setStatus(opt);
                             setStatusOpen(false);
@@ -409,7 +445,9 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
                 onChange={(e) => setUpdateReason(e.target.value)}
                 maxLength={250}
                 disabled={updating}
-                className={`esla-textarea ${updating ? "esla-textarea--disabled" : ""}`}
+                className={`esla-textarea ${
+                  updating ? "esla-textarea--disabled" : ""
+                }`}
               />
               <small className="esla-char-count">
                 {updateReason.length}/250 characters
@@ -421,7 +459,9 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
         <div className="esla-footer">
           <button
             type="button"
-            className={`esla-btn esla-btn--cancel ${updating ? "esla-btn--disabled" : ""}`}
+            className={`esla-btn esla-btn--cancel ${
+              updating ? "esla-btn--disabled" : ""
+            }`}
             onClick={onClose}
             disabled={updating}
           >
@@ -431,7 +471,9 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
           <button
             type="submit"
             className={`esla-btn esla-btn--update ${
-              updating || !deadline || !updateReason.trim() ? "esla-btn--disabled" : ""
+              updating || !deadline || !updateReason.trim()
+                ? "esla-btn--disabled"
+                : ""
             }`}
             onClick={handleSubmit}
             disabled={updating || !deadline || !updateReason.trim()}

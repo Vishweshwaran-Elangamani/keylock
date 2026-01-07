@@ -78,9 +78,7 @@ const ResolveEscalationModal = ({ escalation, onClose, onResolve }) => {
               </div>
               <div className="resolve-info-row">
                 <span className="resolve-info-label">Reason:</span>
-                <span className="resolve-info-value">
-                  {escalation.reason}
-                </span>
+                <span className="resolve-info-value">{escalation.reason}</span>
               </div>
             </div>
 

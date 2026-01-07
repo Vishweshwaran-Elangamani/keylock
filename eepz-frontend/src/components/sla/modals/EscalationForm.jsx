@@ -151,10 +151,7 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
   };
 
   return (
-    <div
-      className="esc-overlay modal show d-block"
-      onClick={onClose}
-    >
+    <div className="esc-overlay modal show d-block" onClick={onClose}>
       <div
         className="esc-dialog modal-dialog modal-dialog-centered"
         onClick={(e) => e.stopPropagation()}
@@ -197,9 +194,7 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                     className="flex-shrink-0 esc-manager-error-icon"
                   />
                   <div>
-                    <strong className="d-block mb-1">
-                      Manager Not Found
-                    </strong>
+                    <strong className="d-block mb-1">Manager Not Found</strong>
                     <small>{managerError}</small>
                   </div>
                 </div>
@@ -233,10 +228,7 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
 
                 {managerName && (
                   <div className="esc-manager-info alert d-flex align-items-start gap-2 mb-3">
-                    <AlertCircle
-                      size={16}
-                      className="esc-manager-info-icon"
-                    />
+                    <AlertCircle size={16} className="esc-manager-info-icon" />
                     <small className="esc-manager-info-text">
                       This will be escalated to <strong>{managerName}</strong>
                     </small>
@@ -244,10 +236,7 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                 )}
 
                 <div className="esc-field">
-                  <label
-                    htmlFor="reason"
-                    className="esc-label"
-                  >
+                  <label htmlFor="reason" className="esc-label">
                     Reason <span className="esc-required">*</span>
                   </label>
                   <div className="esc-select-wrapper">
@@ -272,10 +261,7 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                 </div>
 
                 <div className="esc-field esc-comment-field">
-                  <label
-                    htmlFor="details"
-                    className="esc-label"
-                  >
+                  <label htmlFor="details" className="esc-label">
                     Your Comment <span className="esc-required">*</span>
                   </label>
                   <textarea
@@ -301,10 +287,7 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                 </div>
 
                 <div className="esc-level-info">
-                  <AlertCircle
-                    size={16}
-                    className="esc-level-info-icon"
-                  />
+                  <AlertCircle size={16} className="esc-level-info-icon" />
                   <small className="esc-level-info-text">
                     <strong>Level 1 (L1)</strong> escalation to your manager for
                     immediate review.

@@ -141,10 +141,7 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
                   </h6>
                   <div className="d-flex flex-column gap-3">
                     {meeting.actionItems.map((ai, i) => (
-                      <div
-                        key={i}
-                        className="mdm-action-card p-3 rounded"
-                      >
+                      <div key={i} className="mdm-action-card p-3 rounded">
                         <div className="d-flex justify-content-between align-items-start mb-3">
                           <h6 className="fw-semibold mb-0 flex-grow-1 pe-2">
                             {ai.taskDescription}
@@ -190,7 +187,10 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
               </button>
 
               {showCreateMom && (
-                <CreateMomModal meetingData={meeting} onClose={toggleCreateMom} />
+                <CreateMomModal
+                  meetingData={meeting}
+                  onClose={toggleCreateMom}
+                />
               )}
             </div>
 

@@ -205,10 +205,20 @@ const ComplianceCard = ({
                 <CheckCircle size={20} color="#FFFFFF" />
               </div>
               <div>
-                <p className="mb-0" style={{ fontSize: "0.75rem", color: "#047857", fontWeight: 500 }}>
+                <p
+                  className="mb-0"
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "#047857",
+                    fontWeight: 500,
+                  }}
+                >
                   On Time
                 </p>
-                <h4 className="mb-0 fw-bold" style={{ fontSize: "1.5rem", color: "#10B981" }}>
+                <h4
+                  className="mb-0 fw-bold"
+                  style={{ fontSize: "1.5rem", color: "#10B981" }}
+                >
                   {onTimeSlas}
                 </h4>
               </div>
@@ -232,10 +242,20 @@ const ComplianceCard = ({
                 <AlertCircle size={20} color="#FFFFFF" />
               </div>
               <div>
-                <p className="mb-0" style={{ fontSize: "0.75rem", color: "#991B1B", fontWeight: 500 }}>
+                <p
+                  className="mb-0"
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "#991B1B",
+                    fontWeight: 500,
+                  }}
+                >
                   Breached
                 </p>
-                <h4 className="mb-0 fw-bold" style={{ fontSize: "1.5rem", color: "#EF4444" }}>
+                <h4
+                  className="mb-0 fw-bold"
+                  style={{ fontSize: "1.5rem", color: "#EF4444" }}
+                >
                   {breachedSlas}
                 </h4>
               </div>
@@ -259,10 +279,20 @@ const ComplianceCard = ({
                 <Clock size={20} color="#FFFFFF" />
               </div>
               <div>
-                <p className="mb-0" style={{ fontSize: "0.75rem", color: "#92400E", fontWeight: 500 }}>
+                <p
+                  className="mb-0"
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "#92400E",
+                    fontWeight: 500,
+                  }}
+                >
                   Extended
                 </p>
-                <h4 className="mb-0 fw-bold" style={{ fontSize: "1.5rem", color: "#F59E0B" }}>
+                <h4
+                  className="mb-0 fw-bold"
+                  style={{ fontSize: "1.5rem", color: "#F59E0B" }}
+                >
                   {extendedSlas}
                 </h4>
               </div>
@@ -286,10 +316,20 @@ const ComplianceCard = ({
                 <TrendingUp size={20} color="#FFFFFF" />
               </div>
               <div>
-                <p className="mb-0" style={{ fontSize: "0.75rem", color: "#1E40AF", fontWeight: 500 }}>
+                <p
+                  className="mb-0"
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "#1E40AF",
+                    fontWeight: 500,
+                  }}
+                >
                   Total
                 </p>
-                <h4 className="mb-0 fw-bold" style={{ fontSize: "1.5rem", color: "#5B93FF" }}>
+                <h4
+                  className="mb-0 fw-bold"
+                  style={{ fontSize: "1.5rem", color: "#5B93FF" }}
+                >
                   {closedSlas}
                 </h4>
               </div>
@@ -317,7 +357,10 @@ const ComplianceCard = ({
           </div>
         )}
 
-        <div className="text-muted small mb-0 text-center" style={{ fontSize: "0.75rem" }}>
+        <div
+          className="text-muted small mb-0 text-center"
+          style={{ fontSize: "0.75rem" }}
+        >
           <Clock size={12} className="me-1" />
           Last Updated:{" "}
           {formatDate(

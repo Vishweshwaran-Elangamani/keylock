@@ -40,9 +40,13 @@ const StatCard = ({ label, value, Icon, bgColor, iconColor }) => (
   <div className="fm-empdb-stat-card">
     <div
       className="fm-empdb-stat-card__icon-wrapper"
-      data-bg={bgColor.replace('#', '')}
+      data-bg={bgColor.replace("#", "")}
     >
-      <Icon size={24} data-color={iconColor.replace('#', '')} strokeWidth={2.5} />
+      <Icon
+        size={24}
+        data-color={iconColor.replace("#", "")}
+        strokeWidth={2.5}
+      />
     </div>
     <div className="fm-empdb-stat-card__content">
       <h2 className="fm-empdb-stat-card__value">{value}</h2>
@@ -338,7 +342,10 @@ export default function FeedbackEmployeeDashboard() {
               className="fm-empdb-action-card"
             >
               <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--primary">
-                <MessageSquare size={20} className="fm-empdb-action-card__icon" />
+                <MessageSquare
+                  size={20}
+                  className="fm-empdb-action-card__icon"
+                />
               </div>
               <span className="fm-empdb-action-card__label">
                 Context Feedback

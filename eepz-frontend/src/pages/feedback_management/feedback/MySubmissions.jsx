@@ -1,9 +1,4 @@
-import React, {
-  useEffect,
-  useMemo,
-  useState,
-  useCallback,
-} from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import {
   RefreshCw,
   AlertTriangle,
@@ -225,8 +220,7 @@ export default function MySubmissions() {
         const enriched = mentorData.map((m) => ({
           ...m,
           mentorNameFull:
-            employeeMap[m.mentorEmployeeId] ||
-            `Employee ${m.mentorEmployeeId}`,
+            employeeMap[m.mentorEmployeeId] || `Employee ${m.mentorEmployeeId}`,
           createdAtFormatted: formatDate(m.createdAt),
           trackingId: m.mentorFeedbackId || m.trackingId || m.id,
         }));
@@ -318,7 +312,8 @@ export default function MySubmissions() {
       const normalized = {
         ...raw,
         submittedByName: fullName,
-        submittedAt: raw.createdAt || raw.submittedAt || raw.submittedAtFormatted,
+        submittedAt:
+          raw.createdAt || raw.submittedAt || raw.submittedAtFormatted,
         rating: raw.rating,
         comments: raw.feedbackComments,
       };
@@ -494,9 +489,7 @@ export default function MySubmissions() {
               <Send size={15} />
               <span>Mentor</span>
               {mentor.length > 0 && (
-                <span className="fm-mysub-tab-btn__badge">
-                  {mentor.length}
-                </span>
+                <span className="fm-mysub-tab-btn__badge">{mentor.length}</span>
               )}
             </button>
 
@@ -510,9 +503,7 @@ export default function MySubmissions() {
               <Users size={15} />
               <span>Peer</span>
               {peer.length > 0 && (
-                <span className="fm-mysub-tab-btn__badge">
-                  {peer.length}
-                </span>
+                <span className="fm-mysub-tab-btn__badge">{peer.length}</span>
               )}
             </button>
           </div>

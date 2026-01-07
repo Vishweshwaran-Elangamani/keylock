@@ -1,5 +1,3 @@
-// src/components/FeedbackManagement/ResponseViewModal.jsx
-
 import React, { useState, useEffect } from "react";
 import {
   User,
@@ -227,9 +225,7 @@ const ResponseViewModal = ({ show, response, onClose, type }) => {
                         <span
                           className="rvm-rating-item__badge"
                           style={{
-                            backgroundColor: `${getRatingColor(
-                              item.rating
-                            )}20`,
+                            backgroundColor: `${getRatingColor(item.rating)}20`,
                             color: getRatingColor(item.rating),
                           }}
                         >
@@ -355,11 +351,7 @@ const ResponseViewModal = ({ show, response, onClose, type }) => {
         </div>
 
         <div className="rvm-footer">
-          <button
-            type="button"
-            onClick={onClose}
-            className="rvm-footer__btn"
-          >
+          <button type="button" onClick={onClose} className="rvm-footer__btn">
             Close
           </button>
         </div>

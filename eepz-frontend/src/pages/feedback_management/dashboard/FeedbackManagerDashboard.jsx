@@ -149,7 +149,10 @@ export default function FeedbackManagerDashboard() {
               submittedIds.add(form.formId);
             }
           } catch (formErr) {
-            console.warn(`Error checking form ${form.formId}:`, formErr.message);
+            console.warn(
+              `Error checking form ${form.formId}:`,
+              formErr.message
+            );
           }
         }
 
@@ -206,8 +209,9 @@ export default function FeedbackManagerDashboard() {
   }, [user?.empId, fetchDashboardData]);
 
   const stats = useMemo(() => {
-    const pending = allForms.filter((f) => !submittedFormIds.has(f.formId))
-      .length;
+    const pending = allForms.filter(
+      (f) => !submittedFormIds.has(f.formId)
+    ).length;
 
     return {
       myReviews: myReviews.length,
@@ -268,7 +272,9 @@ export default function FeedbackManagerDashboard() {
             <FileText size={24} strokeWidth={2.5} />
           </div>
           <div className="fm-mgrdash-stat-card__content">
-            <h2 className="fm-mgrdash-stat-card__value">{stats.pendingForms}</h2>
+            <h2 className="fm-mgrdash-stat-card__value">
+              {stats.pendingForms}
+            </h2>
             <p className="fm-mgrdash-stat-card__label">PENDING FORMS</p>
           </div>
         </div>
@@ -278,7 +284,9 @@ export default function FeedbackManagerDashboard() {
             <Users size={24} strokeWidth={2.5} />
           </div>
           <div className="fm-mgrdash-stat-card__content">
-            <h2 className="fm-mgrdash-stat-card__value">{stats.peerFeedback}</h2>
+            <h2 className="fm-mgrdash-stat-card__value">
+              {stats.peerFeedback}
+            </h2>
             <p className="fm-mgrdash-stat-card__label">PEER FEEDBACK</p>
           </div>
         </div>
@@ -311,9 +319,7 @@ export default function FeedbackManagerDashboard() {
               <div className="fm-mgrdash-action-card__icon-wrapper fm-mgrdash-action-card__icon-wrapper--primary">
                 <Eye size={20} />
               </div>
-              <span className="fm-mgrdash-action-card__label">
-                All Reviews
-              </span>
+              <span className="fm-mgrdash-action-card__label">All Reviews</span>
             </Link>
 
             <Link

@@ -113,10 +113,7 @@ export default function EditFeedback() {
           <h2 className="fm-editfb-title">Edit Feedback</h2>
           <p className="fm-editfb-subtitle">Update your submitted feedback</p>
         </div>
-        <button
-          className="fm-editfb-back-btn"
-          onClick={() => navigate(-1)}
-        >
+        <button className="fm-editfb-back-btn" onClick={() => navigate(-1)}>
           <ArrowLeft size={16} />
           <span>Back</span>
         </button>
@@ -129,7 +126,10 @@ export default function EditFeedback() {
             <strong>Error</strong>
             <p>{error}</p>
           </div>
-          <button className="fm-editfb-alert-close" onClick={() => setError("")}>
+          <button
+            className="fm-editfb-alert-close"
+            onClick={() => setError("")}
+          >
             ×
           </button>
         </div>
@@ -164,9 +164,7 @@ export default function EditFeedback() {
                   </div>
                 </div>
                 <div className="fm-editfb-form-group fm-editfb-form-group--full">
-                  <label className="fm-editfb-label">
-                    Feedback Comments *
-                  </label>
+                  <label className="fm-editfb-label">Feedback Comments *</label>
                   <textarea
                     className="fm-editfb-textarea"
                     rows={4}

@@ -23,8 +23,19 @@ const CustomCalendar = ({ value, onChange, onClose, minDate }) => {
     value ? new Date(value + "T00:00:00") : null
   );
 
-   const monthNames = [
-    "January","February","March","April","May","June","July","August","September","October","November","December",
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
 
   const daysInMonth = (date) =>
@@ -174,11 +185,7 @@ const CustomCalendar = ({ value, onChange, onClose, minDate }) => {
         ))}
       </div>
       <div className="epm-cal-grid">{renderCalendarDays()}</div>
-      <button
-        type="button"
-        className="epm-cal-today-btn"
-        onClick={handleToday}
-      >
+      <button type="button" className="epm-cal-today-btn" onClick={handleToday}>
         Today
       </button>
     </div>
@@ -216,8 +223,7 @@ const CustomDropdown = ({
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   useEffect(() => {
@@ -264,9 +270,7 @@ const CustomDropdown = ({
           </span>
           <ChevronDown
             size={16}
-            className={`epm-dd-chevron ${
-              isOpen ? "epm-dd-chevron--open" : ""
-            }`}
+            className={`epm-dd-chevron ${isOpen ? "epm-dd-chevron--open" : ""}`}
           />
         </button>
         {isOpen &&
@@ -327,7 +331,18 @@ const DateInput = ({
   const calendarMenuRef = useRef(null);
 
   const monthNames = [
-    "January","February","March","April","May","June","July","August","September","October","November","December",
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
   const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
@@ -344,8 +359,7 @@ const DateInput = ({
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   useEffect(() => {
@@ -558,9 +572,7 @@ const DateInput = ({
                     <div
                       key={idx}
                       className={classes.filter(Boolean).join(" ")}
-                      onClick={() =>
-                        handleSelectCalendarDay(c.day, c.current)
-                      }
+                      onClick={() => handleSelectCalendarDay(c.day, c.current)}
                     >
                       {c.day}
                     </div>

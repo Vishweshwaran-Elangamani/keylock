@@ -296,7 +296,11 @@ export default function SubmitOrgGoalFeedback() {
                 >
                   {loading ? (
                     <>
-                      <span className="sogf-button-spinner" role="status" aria-hidden="true"></span>
+                      <span
+                        className="sogf-button-spinner"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
                       Submitting...
                     </>
                   ) : (

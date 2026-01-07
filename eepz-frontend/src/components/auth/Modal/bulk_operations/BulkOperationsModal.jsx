@@ -269,13 +269,11 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
     }
   };
 
-  
   const handleClose = () => {
     toast.dismiss();
 
-    
     if (uploadResult && uploadResult.successCount > 0) {
-      onSuccess?.(); 
+      onSuccess?.();
     }
 
     setSelectedFile(null);
@@ -547,7 +545,6 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                       </div>
                     </div>
 
-                    
                     {uploadResult.successCount > 0 && (
                       <div className="bom-success-details-container">
                         <details
@@ -622,7 +619,9 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                                   }}
                                 >
                                   {uploadResult.successCount} user
-                                  {uploadResult.successCount !== 1 ? "s" : ""}{" "}
+                                  {uploadResult.successCount !== 1
+                                    ? "s"
+                                    : ""}{" "}
                                   imported successfully!
                                 </p>
                                 <small style={{ color: "#047857" }}>

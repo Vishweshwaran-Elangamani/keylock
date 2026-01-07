@@ -6,7 +6,7 @@ import {
   FileText,
   Calendar,
   Loader,
-  Lock
+  Lock,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import hrFormApi from "../../../services/feedbackmanagement/hrFormApi";
@@ -36,7 +36,6 @@ export default function EmployeeAssignedForms() {
   const [error, setError] = useState("");
   const [lastFetchTime, setLastFetchTime] = useState(null);
 
-  // Fetch ALL forms using hrFormApi.getAllForms()
   const fetchForms = useCallback(
     async (retryCount = 0) => {
       if (!user?.empId) {
@@ -80,7 +79,6 @@ export default function EmployeeAssignedForms() {
     [user?.empId]
   );
 
-  
   const fetchSubmittedForms = useCallback(async () => {
     if (!user?.empId) return;
     try {
@@ -107,7 +105,6 @@ export default function EmployeeAssignedForms() {
     }
   }, [user?.empId, fetchForms, fetchSubmittedForms]);
 
- 
   const stats = useMemo(() => {
     const submitted = submittedFormIds.size;
     const total = allForms.length;
@@ -124,7 +121,7 @@ export default function EmployeeAssignedForms() {
       BiasReview: "Bias Review",
       ProfessionalismReview: "Professionalism Review",
       SurveyForm: "Survey",
-      EvaluationForm: "Evaluation"
+      EvaluationForm: "Evaluation",
     };
     return types[formType] || formType || "—";
   }, []);
@@ -134,22 +131,19 @@ export default function EmployeeAssignedForms() {
     fetchSubmittedForms();
   }, [fetchForms, fetchSubmittedForms]);
 
-  
-  const feedbackDashboardPath = user?.roleName 
-    ? getFeedbackDashboardPath(user.roleName) 
+  const feedbackDashboardPath = user?.roleName
+    ? getFeedbackDashboardPath(user.roleName)
     : "/hr/dashboard/feedback";
-
 
   return (
     <div className="employee-forms-container">
-       <Breadcrumb
-          items={[
-            { label: "Feedback Management", path: feedbackDashboardPath },
-            { label: "Assigned Forms" },
-          ]}
-        />
+      <Breadcrumb
+        items={[
+          { label: "Feedback Management", path: feedbackDashboardPath },
+          { label: "Assigned Forms" },
+        ]}
+      />
 
-     
       {error && (
         <div className="employee-forms-alert-error">
           <AlertTriangle size={18} className="employee-forms-alert-icon" />
@@ -167,7 +161,6 @@ export default function EmployeeAssignedForms() {
         </div>
       )}
 
-     
       <div className="employee-forms-stats-grid">
         <div className="employee-forms-stat-card">
           <div
@@ -231,7 +224,7 @@ export default function EmployeeAssignedForms() {
                 ? new Date(form.deadline).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
-                    year: "numeric"
+                    year: "numeric",
                   })
                 : "—";
               return (
@@ -260,9 +253,10 @@ export default function EmployeeAssignedForms() {
                     </div>
                   </div>
                   <div className="employee-forms-card-body">
-
                     <div className="employee-forms-card-row">
-                      <span className="employee-forms-card-label">Description</span>
+                      <span className="employee-forms-card-label">
+                        Description
+                      </span>
                       <span
                         className="employee-forms-card-description"
                         title={form.formDescription}
@@ -271,19 +265,23 @@ export default function EmployeeAssignedForms() {
                       </span>
                     </div>
                     <div className="employee-forms-card-row">
-                      <span className="employee-forms-card-label">Form Type</span>
+                      <span className="employee-forms-card-label">
+                        Form Type
+                      </span>
                       <span className="employee-forms-card-value">
                         {getFormTypeLabel(form.formType)}
                       </span>
                     </div>
                     <div className="employee-forms-card-row">
-                      <span className="employee-forms-card-label">Deadline</span>
+                      <span className="employee-forms-card-label">
+                        Deadline
+                      </span>
                       <span className="employee-forms-card-deadline-value">
                         {deadlineStr}
                       </span>
                     </div>
                   </div>
-                 
+
                   <div className="employee-forms-card-footer">
                     {isSubmitted ? (
                       <button

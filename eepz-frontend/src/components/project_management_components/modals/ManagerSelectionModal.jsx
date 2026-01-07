@@ -25,8 +25,7 @@ const CustomDropdown = ({ value, onChange, options, placeholder }) => {
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleSelect = (optionValue) => {
@@ -56,9 +55,7 @@ const CustomDropdown = ({ value, onChange, options, placeholder }) => {
         </span>
         <ChevronDown
           size={16}
-          className={`msm-dd-chevron ${
-            isOpen ? "msm-dd-chevron--open" : ""
-          }`}
+          className={`msm-dd-chevron ${isOpen ? "msm-dd-chevron--open" : ""}`}
         />
       </div>
       {isOpen && (
@@ -407,9 +404,7 @@ const ManagerSelectionModal = ({
                   <select
                     className="msm-page-size-select"
                     value={itemsPerPage}
-                    onChange={(e) =>
-                      onPageSizeChange(Number(e.target.value))
-                    }
+                    onChange={(e) => onPageSizeChange(Number(e.target.value))}
                   >
                     <option value={5}>5</option>
                     <option value={10}>10</option>

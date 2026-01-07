@@ -47,11 +47,17 @@ const CustomSelect = ({
         type="button"
         id={id}
         onClick={() => !disabled && setIsOpen((o) => !o)}
-        className={`scf-dropdown-select ${isOpen ? "scf-dropdown-select--open" : ""}`}
+        className={`scf-dropdown-select ${
+          isOpen ? "scf-dropdown-select--open" : ""
+        }`}
         disabled={disabled}
       >
         <span className="scf-dropdown-value">{displayLabel}</span>
-        <span className={`scf-dropdown-arrow ${isOpen ? "scf-dropdown-arrow--open" : ""}`}>
+        <span
+          className={`scf-dropdown-arrow ${
+            isOpen ? "scf-dropdown-arrow--open" : ""
+          }`}
+        >
           <svg width="18" height="18" viewBox="0 0 24 24">
             <polyline
               points="6 9 12 15 18 9"
@@ -225,7 +231,10 @@ export default function SubmitContextFeedback() {
     setSuccessMsg("");
     setError("");
 
-    if (!goalForm.organizationObjectiveId || !goalForm.feedbackComments?.trim()) {
+    if (
+      !goalForm.organizationObjectiveId ||
+      !goalForm.feedbackComments?.trim()
+    ) {
       setError("Goal and comments are required.");
       return;
     }
@@ -407,16 +416,16 @@ export default function SubmitContextFeedback() {
       <div className="scf-content">
         <nav className="scf-breadcrumb" aria-label="breadcrumb">
           <ol className="scf-breadcrumb-list">
-          <li className="scf-breadcrumb-item">
-  <Link
-    to={baseDashboard}
-    className="scf-breadcrumb-link"
-    aria-label="Dashboard"
-    title="Dashboard"
-  >
-    <Home size={18} className="scf-breadcrumb-icon" />
-  </Link>
-</li>
+            <li className="scf-breadcrumb-item">
+              <Link
+                to={baseDashboard}
+                className="scf-breadcrumb-link"
+                aria-label="Dashboard"
+                title="Dashboard"
+              >
+                <Home size={18} className="scf-breadcrumb-icon" />
+              </Link>
+            </li>
 
             <li className="scf-breadcrumb-separator">/</li>
             <li className="scf-breadcrumb-item">
@@ -499,7 +508,8 @@ export default function SubmitContextFeedback() {
               <form onSubmit={submitGoal}>
                 <div className="scf-form-group">
                   <label className="scf-label">
-                    Select Organization Goal <span className="scf-required">*</span>
+                    Select Organization Goal{" "}
+                    <span className="scf-required">*</span>
                   </label>
                   <CustomSelect
                     id="goalSelect"
@@ -538,7 +548,9 @@ export default function SubmitContextFeedback() {
                     Rating <span className="scf-required">*</span>
                   </label>
                   <div className="scf-rating-box">
-                    <div className="scf-stars">{renderStars(goalForm.rating)}</div>
+                    <div className="scf-stars">
+                      {renderStars(goalForm.rating)}
+                    </div>
                     <span className="scf-rating-value">
                       {goalForm.rating}/5
                     </span>
@@ -564,7 +576,9 @@ export default function SubmitContextFeedback() {
                     maxLength={1000}
                   />
                   <div className="scf-textarea-footer">
-                    <span className="scf-textarea-hint">Be specific and constructive</span>
+                    <span className="scf-textarea-hint">
+                      Be specific and constructive
+                    </span>
                     <span
                       className={`scf-textarea-count ${
                         goalForm.feedbackComments.length > 900
@@ -694,7 +708,9 @@ export default function SubmitContextFeedback() {
                     maxLength={1000}
                   />
                   <div className="scf-textarea-footer">
-                    <span className="scf-textarea-hint">Be specific and constructive</span>
+                    <span className="scf-textarea-hint">
+                      Be specific and constructive
+                    </span>
                     <span
                       className={`scf-textarea-count ${
                         contextForm.feedbackContent.length > 900

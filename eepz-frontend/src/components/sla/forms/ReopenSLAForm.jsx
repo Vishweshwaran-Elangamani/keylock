@@ -153,7 +153,14 @@ const ReopenSLAForm = ({ sla, onClose, onSuccess }) => {
                 style={{ color: "#E01950", flexShrink: 0, marginTop: "2px" }}
               />
               <div style={{ flex: 1 }}>
-                <p style={{ margin: 0, color: "#991b1b", fontSize: "0.875rem", textAlign: "left" }}>
+                <p
+                  style={{
+                    margin: 0,
+                    color: "#991b1b",
+                    fontSize: "0.875rem",
+                    textAlign: "left",
+                  }}
+                >
                   {error}
                 </p>
               </div>
@@ -260,7 +267,14 @@ const ReopenSLAForm = ({ sla, onClose, onSuccess }) => {
                 size={18}
                 style={{ color: "#1E40AF", flexShrink: 0, marginTop: "2px" }}
               />
-              <p style={{ margin: 0, color: "#1E40AF", fontSize: "0.875rem", textAlign: "left" }}>
+              <p
+                style={{
+                  margin: 0,
+                  color: "#1E40AF",
+                  fontSize: "0.875rem",
+                  textAlign: "left",
+                }}
+              >
                 This SLA will be extended by <strong>1 day only</strong>
               </p>
             </div>
@@ -380,7 +394,8 @@ const ReopenSLAForm = ({ sla, onClose, onSuccess }) => {
               color: "white",
               border: "none",
               borderRadius: "8px",
-              cursor: loading || !formData.reason.trim() ? "not-allowed" : "pointer",
+              cursor:
+                loading || !formData.reason.trim() ? "not-allowed" : "pointer",
               fontSize: "0.875rem",
               fontWeight: 600,
               display: "flex",
@@ -395,12 +410,14 @@ const ReopenSLAForm = ({ sla, onClose, onSuccess }) => {
             onMouseEnter={(e) => {
               if (!(loading || !formData.reason.trim())) {
                 e.currentTarget.style.transform = "translateY(-2px)";
-                e.currentTarget.style.boxShadow = "0 6px 16px rgba(151, 36, 126, 0.4)";
+                e.currentTarget.style.boxShadow =
+                  "0 6px 16px rgba(151, 36, 126, 0.4)";
               }
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "0 4px 12px rgba(151, 36, 126, 0.3)";
+              e.currentTarget.style.boxShadow =
+                "0 4px 12px rgba(151, 36, 126, 0.3)";
             }}
           >
             {loading ? (

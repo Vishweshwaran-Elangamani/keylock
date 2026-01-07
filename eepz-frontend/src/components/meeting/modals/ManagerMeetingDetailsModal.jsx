@@ -26,8 +26,7 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
   };
 
   const countAccepted =
-    meeting.rsvpParticipants?.filter((p) => p.rsvpStatus == 1).length ||
-    0;
+    meeting.rsvpParticipants?.filter((p) => p.rsvpStatus == 1).length || 0;
   const totalParticipants = meeting.rsvpParticipants?.length || 0;
 
   const acceptedPercentage =
@@ -76,7 +75,9 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
               <div className="mmdm-meeting-link-card">
                 <div className="mmdm-meeting-link-header">
                   <i className="bi bi-link-45deg mmdm-meeting-link-icon"></i>
-                  <small className="mmdm-meeting-link-label">Meeting Link</small>
+                  <small className="mmdm-meeting-link-label">
+                    Meeting Link
+                  </small>
                 </div>
                 <a
                   href={meeting.meetingLink}
@@ -97,7 +98,9 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
               Participants
             </span>
             {totalParticipants > 0 && (
-              <span className="mmdm-participants-count">{totalParticipants}</span>
+              <span className="mmdm-participants-count">
+                {totalParticipants}
+              </span>
             )}
           </h6>
 

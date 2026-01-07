@@ -41,10 +41,7 @@ const DeleteConfirmationModal = ({
 
             {project && (
               <div className="delete-project-info">
-                <AlertCircle
-                  size={18}
-                  className="delete-warning-icon"
-                />
+                <AlertCircle size={18} className="delete-warning-icon" />
                 <div className="delete-project-details">
                   <strong className="delete-project-name">
                     {project.projectName}
@@ -57,8 +54,8 @@ const DeleteConfirmationModal = ({
             )}
 
             <p className="delete-modal-warning">
-              <strong>This action cannot be undone.</strong> All
-              associated data will be permanently deleted.
+              <strong>This action cannot be undone.</strong> All associated data
+              will be permanently deleted.
             </p>
           </div>
 

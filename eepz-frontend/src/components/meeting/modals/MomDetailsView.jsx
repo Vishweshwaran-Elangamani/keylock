@@ -12,19 +12,14 @@ const MomDetailsView = ({ mom, onClose }) => {
       tabIndex="-1"
       onClick={onClose}
     >
-      <div
-        className="mdv-dialog"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="mdv-dialog" onClick={(e) => e.stopPropagation()}>
         <div className="mdv-content modal-content border-0 shadow-lg">
           <div className="mdv-header modal-header border-0">
             <div>
               <h5 className="mdv-title modal-title fw-bold mb-1">
                 {mom.meetingTitle}
               </h5>
-              <span className="mdv-type-pill">
-                {mom.meetingType}
-              </span>
+              <span className="mdv-type-pill">{mom.meetingType}</span>
             </div>
             <button
               type="button"
@@ -147,10 +142,7 @@ const MomDetailsView = ({ mom, onClose }) => {
               {mom.actionItems?.length > 0 ? (
                 <div className="d-flex flex-column gap-3">
                   {mom.actionItems.map((ai, index) => (
-                    <div
-                      key={index}
-                      className="mdv-action-item p-3 rounded"
-                    >
+                    <div key={index} className="mdv-action-item p-3 rounded">
                       <div className="d-flex justify-content-between align-items-start mb-3">
                         <h6 className="fw-semibold mb-0">
                           {ai.taskDescription}
@@ -186,11 +178,7 @@ const MomDetailsView = ({ mom, onClose }) => {
           </div>
 
           <div className="mdv-footer modal-footer border-0">
-            <button
-              type="button"
-              onClick={onClose}
-              className="mdv-close-btn"
-            >
+            <button type="button" onClick={onClose} className="mdv-close-btn">
               Close
             </button>
           </div>

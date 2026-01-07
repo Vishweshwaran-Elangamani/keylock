@@ -42,7 +42,6 @@ const SLATable = ({ slas, onViewDetails, onEscalate, showActions = true }) => {
 
   return (
     <div>
-     
       <div
         className="card border-0 shadow-sm mb-3"
         style={{ borderRadius: "12px" }}

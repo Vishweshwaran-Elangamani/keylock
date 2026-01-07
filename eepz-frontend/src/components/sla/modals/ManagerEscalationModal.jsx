@@ -12,19 +12,18 @@ const MgrSelect = ({ value, onChange, options, placeholder }) => {
     <div className="mgr-select">
       <button
         type="button"
-        className={`mgr-select-control ${open ? "mgr-select-control--open" : ""}`}
+        className={`mgr-select-control ${
+          open ? "mgr-select-control--open" : ""
+        }`}
         onClick={() => setOpen((p) => !p)}
       >
         <span className="mgr-select-value">
           {selected ? selected.label : placeholder}
         </span>
-        <span className={`mgr-select-icon ${open ? "mgr-select-icon--open" : ""}`}>
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-          >
+        <span
+          className={`mgr-select-icon ${open ? "mgr-select-icon--open" : ""}`}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <polyline
               points="6 9 12 15 18 9"
               stroke="currentColor"
@@ -115,7 +114,8 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
         const deptHeadInSameDepartment = response.data.find(
           (emp) =>
             emp.departmentName === user.departmentName &&
-            (emp.roleName === "Department Head" || emp.role === "Department Head")
+            (emp.roleName === "Department Head" ||
+              emp.role === "Department Head")
         );
         setDeptHead(deptHeadInSameDepartment || null);
       } else {
@@ -176,9 +176,7 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
             className="spinner-border text-primary mgr-loading-spinner"
             role="status"
           />
-          <p className="mgr-loading-text">
-            Loading escalation details...
-          </p>
+          <p className="mgr-loading-text">Loading escalation details...</p>
         </div>
       </div>
     );
@@ -193,22 +191,14 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
         >
           <div className="mgr-modal-header mgr-modal-header--primary">
             <h5 className="mgr-modal-title">Already Escalated</h5>
-            <button
-              className="mgr-close-btn"
-              onClick={onClose}
-            >
+            <button className="mgr-close-btn" onClick={onClose}>
               <X size={24} />
             </button>
           </div>
 
           <div className="mgr-modal-body mgr-modal-body--center">
-            <AlertTriangle
-              size={48}
-              className="mgr-icon-warning"
-            />
-            <h6 className="mgr-modal-subtitle">
-              Escalation Already Pending
-            </h6>
+            <AlertTriangle size={48} className="mgr-icon-warning" />
+            <h6 className="mgr-modal-subtitle">Escalation Already Pending</h6>
             <p className="mgr-modal-text">
               This SLA has already been escalated to the Department Head and is
               awaiting response.
@@ -216,10 +206,7 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
           </div>
 
           <div className="mgr-modal-footer mgr-modal-footer--single">
-            <button
-              className="mgr-btn mgr-btn--close-full"
-              onClick={onClose}
-            >
+            <button className="mgr-btn mgr-btn--close-full" onClick={onClose}>
               Close
             </button>
           </div>
@@ -237,32 +224,21 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
         >
           <div className="mgr-modal-header mgr-modal-header--primary">
             <h5 className="mgr-modal-title">Error</h5>
-            <button
-              className="mgr-close-btn"
-              onClick={onClose}
-            >
+            <button className="mgr-close-btn" onClick={onClose}>
               <X size={24} />
             </button>
           </div>
 
           <div className="mgr-modal-body mgr-modal-body--center">
-            <AlertTriangle
-              size={48}
-              className="mgr-icon-error"
-            />
-            <h6 className="mgr-modal-subtitle">
-              No Department Head Available
-            </h6>
+            <AlertTriangle size={48} className="mgr-icon-error" />
+            <h6 className="mgr-modal-subtitle">No Department Head Available</h6>
             <p className="mgr-modal-text">
               Cannot escalate: No department head found for your department.
             </p>
           </div>
 
           <div className="mgr-modal-footer mgr-modal-footer--single">
-            <button
-              className="mgr-btn mgr-btn--close-full"
-              onClick={onClose}
-            >
+            <button className="mgr-btn mgr-btn--close-full" onClick={onClose}>
               Close
             </button>
           </div>
@@ -274,20 +250,17 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
   const isValid = reason && comments.trim().length >= 10;
 
   return (
-    <div
-      className="mgr-overlay"
-      onClick={!loading ? onClose : undefined}
-    >
+    <div className="mgr-overlay" onClick={!loading ? onClose : undefined}>
       <div
         className="mgr-modal mgr-modal--main"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mgr-modal-header mgr-modal-header--primary">
-          <h5 className="mgr-modal-title">
-            Escalate to Department Head
-          </h5>
+          <h5 className="mgr-modal-title">Escalate to Department Head</h5>
           <button
-            className={`mgr-close-btn ${loading ? "mgr-close-btn--disabled" : ""}`}
+            className={`mgr-close-btn ${
+              loading ? "mgr-close-btn--disabled" : ""
+            }`}
             onClick={onClose}
             disabled={loading}
           >
@@ -298,10 +271,7 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
         <div className="mgr-modal-body mgr-modal-body--main">
           {error && (
             <div className="mgr-error-alert">
-              <AlertCircle
-                size={20}
-                className="mgr-error-icon"
-              />
+              <AlertCircle size={20} className="mgr-error-icon" />
               <div className="mgr-error-text-wrapper">
                 <p className="mgr-error-text">{error}</p>
               </div>
@@ -320,9 +290,7 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
               <strong className="mgr-card-title">
                 {review.employeeName} - {review.slatype}
               </strong>
-              <small className="mgr-card-subtitle">
-                SLA #{review.slaid}
-              </small>
+              <small className="mgr-card-subtitle">SLA #{review.slaid}</small>
             </div>
 
             <div className="mgr-card mgr-card--target">

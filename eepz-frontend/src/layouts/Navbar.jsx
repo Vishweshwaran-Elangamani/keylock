@@ -24,13 +24,14 @@ const Navbar = () => {
 
   const employeeId = user?.empId || null;
 
-  // Fetch profile photo on mount
   useEffect(() => {
     const fetchProfilePhoto = async () => {
       try {
         const response = await EmployeeProfileService.getProfile();
         if (response.success && response.data?.profilePhotoBase64) {
-          setProfilePhoto(`data:image/jpeg;base64,${response.data.profilePhotoBase64}`);
+          setProfilePhoto(
+            `data:image/jpeg;base64,${response.data.profilePhotoBase64}`
+          );
         }
       } catch (error) {
         console.error("Error fetching profile photo:", error);
@@ -40,7 +41,6 @@ const Navbar = () => {
     fetchProfilePhoto();
   }, []);
 
-  // Fetch nominations
   const fetchNominations = useCallback(async () => {
     if (!employeeId) return;
 
@@ -121,7 +121,6 @@ const Navbar = () => {
   const initials = getUserInitials(user);
   const displayEmail = getUserEmail(user);
 
-  // Check if we should show dropdown (3+ awards) or individual cards (1-2 awards)
   const showDropdown = nominations.length > 2;
 
   return (
@@ -145,7 +144,6 @@ const Navbar = () => {
             {hasNominations && nominations.length > 0 && (
               <>
                 {showDropdown ? (
-                  // DROPDOWN BADGE for 3+ awards
                   <div className="nbd-award-dropdown">
                     <button
                       className="nbd-award-badge-btn"
@@ -154,8 +152,14 @@ const Navbar = () => {
                     >
                       <i className="bi bi-trophy-fill"></i>
                       <span className="nbd-award-text">Awards</span>
-                      <span className="nbd-award-count">{nominations.length}</span>
-                      <i className={`bi bi-chevron-${showAwardDropdown ? 'up' : 'down'} nbd-chevron-icon`}></i>
+                      <span className="nbd-award-count">
+                        {nominations.length}
+                      </span>
+                      <i
+                        className={`bi bi-chevron-${
+                          showAwardDropdown ? "up" : "down"
+                        } nbd-chevron-icon`}
+                      ></i>
                     </button>
 
                     {/* Award Dropdown Menu */}
@@ -170,7 +174,9 @@ const Navbar = () => {
                             <div
                               key={nomination.nominationId || index}
                               className="nbd-award-dropdown-item"
-                              onClick={() => handleNavigateToNominations(nomination)}
+                              onClick={() =>
+                                handleNavigateToNominations(nomination)
+                              }
                               role="button"
                               tabIndex={0}
                               onKeyDown={(e) =>
@@ -197,7 +203,6 @@ const Navbar = () => {
                     )}
                   </div>
                 ) : (
-                  // INDIVIDUAL CARDS for 1-2 awards
                   nominations.map((nomination, index) => (
                     <div
                       key={nomination.nominationId || index}
@@ -216,7 +221,9 @@ const Navbar = () => {
                       </div>
 
                       <div className="nbd-congrats-content">
-                        <div className="nbd-congrats-title">Congratulations!</div>
+                        <div className="nbd-congrats-title">
+                          Congratulations!
+                        </div>
                         <div className="nbd-congrats-subtitle">
                           {nomination.roleType}
                         </div>

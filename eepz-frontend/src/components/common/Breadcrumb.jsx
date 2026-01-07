@@ -1,23 +1,19 @@
-import { Home } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import '../../styles/common/Breadcrumb.css';
-
+import { Home } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import "../../styles/common/Breadcrumb.css";
 
 const Breadcrumb = ({ items = [] }) => {
   const navigate = useNavigate();
 
-
   const handleHomeClick = () => {
-    navigate('/dashboard');
+    navigate("/dashboard");
   };
 
- 
   const handleItemClick = (path) => {
     if (path) {
       navigate(path);
     }
   };
-
 
   return (
     <nav className="breadcrumb-nav" aria-label="Breadcrumb">
@@ -46,19 +42,17 @@ const Breadcrumb = ({ items = [] }) => {
                   {/* If it's the last item, always show as current (non-clickable) */}
                   {isLast ? (
                     <span className="breadcrumb-current">{item.label}</span>
+                  ) : /* If not last and has path, make it clickable */
+                  hasPath ? (
+                    <button
+                      className="breadcrumb-link-btn"
+                      onClick={() => handleItemClick(item.path)}
+                    >
+                      {item.label}
+                    </button>
                   ) : (
-                    /* If not last and has path, make it clickable */
-                    hasPath ? (
-                      <button
-                        className="breadcrumb-link-btn"
-                        onClick={() => handleItemClick(item.path)}
-                      >
-                        {item.label}
-                      </button>
-                    ) : (
-                      /* If not last but no path, show as plain text */
-                      <span className="breadcrumb-text">{item.label}</span>
-                    )
+                    /* If not last but no path, show as plain text */
+                    <span className="breadcrumb-text">{item.label}</span>
                   )}
                 </div>
               );
@@ -69,6 +63,5 @@ const Breadcrumb = ({ items = [] }) => {
     </nav>
   );
 };
-
 
 export default Breadcrumb;

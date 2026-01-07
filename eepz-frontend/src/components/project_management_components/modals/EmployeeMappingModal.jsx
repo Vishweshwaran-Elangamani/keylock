@@ -24,8 +24,7 @@ const CustomDropdown = ({ value, onChange, options, placeholder }) => {
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleSelect = (optionValue) => {
@@ -55,9 +54,7 @@ const CustomDropdown = ({ value, onChange, options, placeholder }) => {
         </span>
         <ChevronDown
           size={16}
-          className={`emm-dd-chevron ${
-            isOpen ? "emm-dd-chevron--open" : ""
-          }`}
+          className={`emm-dd-chevron ${isOpen ? "emm-dd-chevron--open" : ""}`}
         />
       </div>
       {isOpen && (
@@ -183,7 +180,10 @@ const EmployeeMappingModal = ({
           <div className="emm-modal-header">
             <h5 className="emm-modal-title">
               <Users size={20} />
-              <span>Map/Unmap Employees{project?.projectName && ` - ${project.projectName}`}</span>
+              <span>
+                Map/Unmap Employees
+                {project?.projectName && ` - ${project.projectName}`}
+              </span>
             </h5>
             <button
               type="button"
@@ -381,8 +381,7 @@ const EmployeeMappingModal = ({
                       ) : (
                         displayEmployees.map((emp) => {
                           const isMapped = mappedEmployees.some(
-                            (m) =>
-                              m.employeeMasterId === emp.employeeMasterId
+                            (m) => m.employeeMasterId === emp.employeeMasterId
                           );
                           const isSelected = selectedEmployeeIds.includes(
                             emp.employeeMasterId

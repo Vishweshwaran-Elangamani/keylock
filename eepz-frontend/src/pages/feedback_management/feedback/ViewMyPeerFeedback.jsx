@@ -44,7 +44,6 @@ export default function ViewMyPeerFeedback() {
     }
   };
 
-  // Check if feedback is anonymous
   const checkIsAnonymous = (feedback) => {
     return Boolean(
       feedback.isAnonymous === true ||
@@ -72,7 +71,6 @@ export default function ViewMyPeerFeedback() {
     );
   };
 
-  // Fetch peer feedback
   const fetchPeerFeedback = async () => {
     setLoading(true);
     setError("");
@@ -86,11 +84,10 @@ export default function ViewMyPeerFeedback() {
         return;
       }
 
-      // Fetch employee map
       let empMap = {};
       try {
         const empRes = await employeeApi.getAll();
-        
+
         if (empRes?.data) {
           const employees = Array.isArray(empRes.data)
             ? empRes.data
@@ -105,7 +102,6 @@ export default function ViewMyPeerFeedback() {
         console.warn("Error fetching employee map:", err.message);
       }
 
-      // Fetch peer feedback
       try {
         const peerRes = await peerQueueApi.list(1, 1000);
 
@@ -188,7 +184,10 @@ export default function ViewMyPeerFeedback() {
       <div className="fm-viewpeer-container">
         <FeedbackBreadcrumb
           items={[
-            { label: "Feedback Management", path: "/employee/dashboard/feedback" },
+            {
+              label: "Feedback Management",
+              path: "/employee/dashboard/feedback",
+            },
             { label: "Peer Feedback Received" },
           ]}
         />
@@ -207,7 +206,7 @@ export default function ViewMyPeerFeedback() {
             />
           </div>
         )}
-    
+
         {peerFeedback.length > 0 && (
           <div className="fm-viewpeer-stats">
             <div className="fm-viewpeer-stat-card">
@@ -243,9 +242,7 @@ export default function ViewMyPeerFeedback() {
                 <div
                   className="fm-viewpeer-card"
                   key={
-                    feedback.queueId ||
-                    feedback.QueueId ||
-                    feedback.peerQueueId
+                    feedback.queueId || feedback.QueueId || feedback.peerQueueId
                   }
                 >
                   <div
@@ -259,13 +256,21 @@ export default function ViewMyPeerFeedback() {
                   <div className="fm-viewpeer-card__header">
                     <div className="fm-viewpeer-card__sender">
                       {isAnon ? (
-                        <Lock size={18} className="fm-viewpeer-card__icon fm-viewpeer-card__icon--anonymous" />
+                        <Lock
+                          size={18}
+                          className="fm-viewpeer-card__icon fm-viewpeer-card__icon--anonymous"
+                        />
                       ) : (
-                        <User size={18} className="fm-viewpeer-card__icon fm-viewpeer-card__icon--peer" />
+                        <User
+                          size={18}
+                          className="fm-viewpeer-card__icon fm-viewpeer-card__icon--peer"
+                        />
                       )}
-                      <h6 className={`fm-viewpeer-card__name ${
-                        isAnon ? "fm-viewpeer-card__name--anonymous" : ""
-                      }`}>
+                      <h6
+                        className={`fm-viewpeer-card__name ${
+                          isAnon ? "fm-viewpeer-card__name--anonymous" : ""
+                        }`}
+                      >
                         {getSenderDisplayName(feedback)}
                       </h6>
                     </div>
@@ -304,9 +309,7 @@ export default function ViewMyPeerFeedback() {
                     {(feedback.context || feedback.feedbackContext) && (
                       <div className="fm-viewpeer-card__context">
                         <h6>Context</h6>
-                        <p>
-                          {feedback.context || feedback.feedbackContext}
-                        </p>
+                        <p>{feedback.context || feedback.feedbackContext}</p>
                       </div>
                     )}
                   </div>

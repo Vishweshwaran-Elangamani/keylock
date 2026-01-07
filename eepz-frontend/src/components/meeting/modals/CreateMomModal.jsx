@@ -90,7 +90,8 @@ const CreateMomModal = ({ meetingData, onClose }) => {
       );
       if (!clickedAssign) setAssignOpenIndex(null);
       if (!clickedStatus) setStatusOpenIndex(null);
-      if (!clickedCal) setCalendarState((prev) => ({ ...prev, openIndex: null }));
+      if (!clickedCal)
+        setCalendarState((prev) => ({ ...prev, openIndex: null }));
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -331,7 +332,11 @@ const CreateMomModal = ({ meetingData, onClose }) => {
             <i className="bi bi-file-text"></i>
             Create Meeting Minutes
           </h6>
-          <button type="button" className="cmm-close-btn" onClick={onClose}></button>
+          <button
+            type="button"
+            className="cmm-close-btn"
+            onClick={onClose}
+          ></button>
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -370,7 +375,9 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                     onChange={handleInputChange}
                     placeholder="Enter attendees (comma separated)..."
                   />
-                  <small className="cmm-help-text">List all meeting participants</small>
+                  <small className="cmm-help-text">
+                    List all meeting participants
+                  </small>
                 </div>
               </div>
             </div>
@@ -396,7 +403,6 @@ const CreateMomModal = ({ meetingData, onClose }) => {
               <label className="cmm-section-label cmm-flex-gap">
                 <i className="bi bi-chat-dots"></i>
                 Discussion Points
-               
               </label>
               <button
                 type="button"
@@ -453,7 +459,6 @@ const CreateMomModal = ({ meetingData, onClose }) => {
               <label className="cmm-section-label cmm-flex-gap">
                 <i className="bi bi-check2-square"></i>
                 Action Items
-               
               </label>
               <button
                 type="button"
@@ -471,7 +476,8 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                 <div>
                   <p className="cmm-empty-title">No action items added</p>
                   <small className="cmm-empty-subtitle">
-                    Click "Add Action" to create tasks and assign them to team members
+                    Click "Add Action" to create tasks and assign them to team
+                    members
                   </small>
                 </div>
               </div>
@@ -479,13 +485,17 @@ const CreateMomModal = ({ meetingData, onClose }) => {
               <div className="cmm-action-list">
                 {formData.actionItems.map((item, index) => {
                   const isCalendarOpen = calendarState.openIndex === index;
-                  const selectedDate = item.dueDate ? new Date(item.dueDate) : null;
+                  const selectedDate = item.dueDate
+                    ? new Date(item.dueDate)
+                    : null;
 
                   return (
                     <div key={index} className="cmm-action-item">
                       <div className="cmm-action-body">
                         <div className="cmm-mb-3">
-                          <label className="cmm-label">Task Description *</label>
+                          <label className="cmm-label">
+                            Task Description *
+                          </label>
                           <input
                             type="text"
                             className="cmm-input"
@@ -514,7 +524,9 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                               <button
                                 type="button"
                                 className={`cmm-dropdown-trigger ${
-                                  assignOpenIndex === index ? "cmm-dropdown-open" : ""
+                                  assignOpenIndex === index
+                                    ? "cmm-dropdown-open"
+                                    : ""
                                 }`}
                                 onClick={() =>
                                   setAssignOpenIndex(
@@ -524,14 +536,19 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                               >
                                 <span className="cmm-dropdown-text">
                                   {item.assignedToEmployeeId
-                                    ? getEmployeeName(item.assignedToEmployeeId) ||
-                                      "Select employee..."
+                                    ? getEmployeeName(
+                                        item.assignedToEmployeeId
+                                      ) || "Select employee..."
                                     : loadingEmployees
                                     ? "Loading..."
                                     : "Select employee..."}
                                 </span>
                                 <span className="cmm-dropdown-arrow">
-                                  <svg width="18" height="18" viewBox="0 0 24 24">
+                                  <svg
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                  >
                                     <polyline
                                       points="6 9 12 15 18 9"
                                       fill="none"
@@ -545,39 +562,51 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                               </button>
                               {assignOpenIndex === index && (
                                 <div className="cmm-dropdown-list">
-                                  {(loadingEmployees ? [] : employees).map((emp) => {
-                                    const active =
-                                      String(item.assignedToEmployeeId) ===
-                                      String(emp.employeeMasterId);
-                                    return (
-                                      <div
-                                        key={emp.employeeMasterId}
-                                        className={`cmm-dropdown-item ${
-                                          active ? "cmm-active" : ""
-                                        }`}
-                                        onClick={() => {
-                                          handleActionItemChange(
-                                            index,
-                                            "assignedToEmployeeId",
-                                            emp.employeeMasterId
-                                          );
-                                          setAssignOpenIndex(null);
-                                        }}
-                                      >
-                                        {emp.firstName} {emp.lastName} - {emp.roleName}
-                                      </div>
-                                    );
-                                  })}
-                                  {!loadingEmployees && employees.length === 0 && (
-                                    <div className="cmm-no-employees">No employees</div>
+                                  {(loadingEmployees ? [] : employees).map(
+                                    (emp) => {
+                                      const active =
+                                        String(item.assignedToEmployeeId) ===
+                                        String(emp.employeeMasterId);
+                                      return (
+                                        <div
+                                          key={emp.employeeMasterId}
+                                          className={`cmm-dropdown-item ${
+                                            active ? "cmm-active" : ""
+                                          }`}
+                                          onClick={() => {
+                                            handleActionItemChange(
+                                              index,
+                                              "assignedToEmployeeId",
+                                              emp.employeeMasterId
+                                            );
+                                            setAssignOpenIndex(null);
+                                          }}
+                                        >
+                                          {emp.firstName} {emp.lastName} -{" "}
+                                          {emp.roleName}
+                                        </div>
+                                      );
+                                    }
                                   )}
+                                  {!loadingEmployees &&
+                                    employees.length === 0 && (
+                                      <div className="cmm-no-employees">
+                                        No employees
+                                      </div>
+                                    )}
                                 </div>
                               )}
                             </div>
-                            {errors[`actionItem_${index}_assignedToEmployeeId`] && (
+                            {errors[
+                              `actionItem_${index}_assignedToEmployeeId`
+                            ] && (
                               <div className="cmm-error">
                                 <i className="bi bi-exclamation-circle me-1"></i>
-                                {errors[`actionItem_${index}_assignedToEmployeeId`]}
+                                {
+                                  errors[
+                                    `actionItem_${index}_assignedToEmployeeId`
+                                  ]
+                                }
                               </div>
                             )}
                             {item.assignedToEmployeeId &&
@@ -694,17 +723,24 @@ const CreateMomModal = ({ meetingData, onClose }) => {
 
                                   <div className="cmm-calendar-days">
                                     {cells.map((c, idx) => {
-                                      const cellDate = new Date(year, month, c.day);
+                                      const cellDate = new Date(
+                                        year,
+                                        month,
+                                        c.day
+                                      );
                                       const isToday =
                                         c.current &&
-                                        cellDate.getDate() === today.getDate() &&
-                                        cellDate.getMonth() === today.getMonth() &&
+                                        cellDate.getDate() ===
+                                          today.getDate() &&
+                                        cellDate.getMonth() ===
+                                          today.getMonth() &&
                                         cellDate.getFullYear() ===
                                           today.getFullYear();
                                       const isSelected =
                                         selectedDate &&
                                         c.current &&
-                                        cellDate.getDate() === selectedDate.getDate() &&
+                                        cellDate.getDate() ===
+                                          selectedDate.getDate() &&
                                         cellDate.getMonth() ===
                                           selectedDate.getMonth() &&
                                         cellDate.getFullYear() ===
@@ -761,7 +797,9 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                               <button
                                 type="button"
                                 className={`cmm-dropdown-trigger ${
-                                  statusOpenIndex === index ? "cmm-dropdown-open" : ""
+                                  statusOpenIndex === index
+                                    ? "cmm-dropdown-open"
+                                    : ""
                                 }`}
                                 onClick={() =>
                                   setStatusOpenIndex(
@@ -773,7 +811,11 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                                   {item.status}
                                 </span>
                                 <span className="cmm-dropdown-arrow">
-                                  <svg width="18" height="18" viewBox="0 0 24 24">
+                                  <svg
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                  >
                                     <polyline
                                       points="6 9 12 15 18 9"
                                       fill="none"
@@ -796,7 +838,11 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                                           active ? "cmm-active" : ""
                                         }`}
                                         onClick={() => {
-                                          handleActionItemChange(index, "status", st);
+                                          handleActionItemChange(
+                                            index,
+                                            "status",
+                                            st
+                                          );
                                           setStatusOpenIndex(null);
                                         }}
                                       >

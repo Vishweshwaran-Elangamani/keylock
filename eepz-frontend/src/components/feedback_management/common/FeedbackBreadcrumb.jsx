@@ -53,7 +53,11 @@ const FeedbackBreadcrumb = ({ items }) => {
   };
 
   return (
-    <nav aria-label="breadcrumb" className="mb-3 fb-breadcrumb-scope" style={{ "--bs-breadcrumb-divider": "''" }}>
+    <nav
+      aria-label="breadcrumb"
+      className="mb-3 fb-breadcrumb-scope"
+      style={{ "--bs-breadcrumb-divider": "''" }}
+    >
       <style>{css}</style>
 
       <ol
@@ -86,7 +90,9 @@ const FeedbackBreadcrumb = ({ items }) => {
               padding: "0.25rem",
               borderRadius: "6px",
               transition: "background-color 0.2s ease",
-              backgroundColor: homeHover ? "rgba(151, 36, 126, 0.08)" : "transparent",
+              backgroundColor: homeHover
+                ? "rgba(151, 36, 126, 0.08)"
+                : "transparent",
             }}
             aria-label="Home"
             title="Home"
@@ -124,7 +130,9 @@ const FeedbackBreadcrumb = ({ items }) => {
                   {item.label}
                 </a>
               ) : (
-                <span style={{ color: "#000", fontWeight: 600 }}>{item.label}</span>
+                <span style={{ color: "#000", fontWeight: 600 }}>
+                  {item.label}
+                </span>
               )}
 
               {!isLast && <span className="fb-breadcrumb-slash">/</span>}

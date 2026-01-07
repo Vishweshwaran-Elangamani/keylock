@@ -244,7 +244,8 @@ export default function SubmitPeerFeedback() {
             <div className="spf-form-row">
               <div className="spf-form-col">
                 <label htmlFor="recipientSelect" className="spf-label">
-                  Select Recipient Employee <span className="spf-required">*</span>
+                  Select Recipient Employee{" "}
+                  <span className="spf-required">*</span>
                 </label>
                 <div className="spf-select-wrapper">
                   <select

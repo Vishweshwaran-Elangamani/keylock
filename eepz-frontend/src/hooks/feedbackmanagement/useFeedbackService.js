@@ -11,7 +11,6 @@ export default function useFeedbackService() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Loads
   const loadEmployee = useCallback(async (empId, opts = {}) => {
     setError(null);
     setLoading(true);
@@ -82,24 +81,19 @@ export default function useFeedbackService() {
     }
   }, []);
 
-  // Actions
   const actions = {
-    // Manager
     submitReview: (id) => managerReviewApi.submit(id),
     modifyReview: (id) => managerReviewApi.modify(id),
     finalizeReview: (id) => managerReviewApi.finalize(id),
     updateReview: (id, body) => managerReviewApi.update(id, body),
 
-    // Mentor/SMM
     createMentorFeedback: (body) => mentorFeedbackApi.create(body),
     acknowledgeMentor: (id) => mentorFeedbackApi.acknowledge(id),
 
-    // HR
     approvePeer: (id, payload) => peerQueueApi.approve(id, payload),
     rejectPeer: (id, payload) => peerQueueApi.reject(id, payload),
     hrSetReview: (id, payload) => hrFormApi.hrReview(id, payload),
 
-    // Forms
     createForm: (body) => hrFormApi.createForm(body),
     createFormResponse: (body) => hrFormApi.createResponse(body),
     submitFormResponse: (id) => hrFormApi.submitResponse(id),

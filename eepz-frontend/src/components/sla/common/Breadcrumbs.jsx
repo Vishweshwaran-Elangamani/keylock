@@ -136,8 +136,9 @@ const Breadcrumb = ({ items, dynamicLabels = {} }) => {
           </div>
         </li>
 
-       {items?.length > 0 && <span style={{ color: "#97247e", userSelect: "none" }}>/ </span>}
-
+        {items?.length > 0 && (
+          <span style={{ color: "#97247e", userSelect: "none" }}>/ </span>
+        )}
 
         {items.map((item, index) => {
           const resolvedLabel = resolveDynamicLabel(item);
@@ -150,7 +151,9 @@ const Breadcrumb = ({ items, dynamicLabels = {} }) => {
                 aria-current={isLast ? "page" : undefined}
               >
                 {isLast ? (
-                  <span style={{ color: "#000", fontWeight: 500 }}>{resolvedLabel}</span>
+                  <span style={{ color: "#000", fontWeight: 500 }}>
+                    {resolvedLabel}
+                  </span>
                 ) : (
                   <a
                     href="#"
@@ -165,7 +168,9 @@ const Breadcrumb = ({ items, dynamicLabels = {} }) => {
                 )}
               </li>
 
-{!isLast && <span style={{ color: "#97247e", userSelect: "none" }}>/</span>}
+              {!isLast && (
+                <span style={{ color: "#97247e", userSelect: "none" }}>/</span>
+              )}
             </React.Fragment>
           );
         })}

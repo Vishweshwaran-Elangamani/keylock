@@ -31,7 +31,10 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
       toast.error("Please select a reason");
       return;
     }
-    if (!formData.description.trim() || formData.description.trim().length < 10) {
+    if (
+      !formData.description.trim() ||
+      formData.description.trim().length < 10
+    ) {
       toast.error("Description must be at least 10 characters");
       return;
     }
@@ -143,7 +146,6 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                 </div>
               </div>
 
-              
               <div className="esc-form-group">
                 <label className="esc-form-label">
                   Reason <span className="esc-required">*</span>
@@ -158,7 +160,9 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                   >
                     <span
                       className={
-                        formData.reason ? "esc-dropdown-value" : "esc-dropdown-placeholder"
+                        formData.reason
+                          ? "esc-dropdown-value"
+                          : "esc-dropdown-placeholder"
                       }
                     >
                       {formData.reason || "Select Reason"}

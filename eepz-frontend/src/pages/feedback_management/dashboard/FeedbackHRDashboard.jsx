@@ -29,11 +29,12 @@ import "../../../styles/feedback/components/FeedbackHRDashboard.css";
 const StatCard = ({ label, value, Icon, color, bgColor }) => (
   <div className="fb-hr-stat-card">
     <div className="fb-hr-stat-card__row">
-      <div 
-        className="fb-hr-stat-card__icon" 
-        data-bg={bgColor.replace('#', '')}
-      >
-        <Icon size={28} className="fb-hr-stat-card__icon-svg" data-color={color.replace('#', '')} />
+      <div className="fb-hr-stat-card__icon" data-bg={bgColor.replace("#", "")}>
+        <Icon
+          size={28}
+          className="fb-hr-stat-card__icon-svg"
+          data-color={color.replace("#", "")}
+        />
       </div>
       <div className="fb-hr-stat-card__info">
         <h2 className="fb-hr-stat-card__value">{value}</h2>
@@ -43,14 +44,25 @@ const StatCard = ({ label, value, Icon, color, bgColor }) => (
   </div>
 );
 
-const HeroActionCard = ({ title, description, icon: Icon, to, iconBg, iconColor }) => (
+const HeroActionCard = ({
+  title,
+  description,
+  icon: Icon,
+  to,
+  iconBg,
+  iconColor,
+}) => (
   <Link to={to} className="fb-hr-action-card-link">
     <div className="fb-hr-action-card">
-      <div 
-        className="fb-hr-action-card__icon-wrapper" 
-        data-bg={iconBg.replace('#', '')}
+      <div
+        className="fb-hr-action-card__icon-wrapper"
+        data-bg={iconBg.replace("#", "")}
       >
-        <Icon size={24} className="fb-hr-action-card__icon-svg" data-color={iconColor.replace('#', '')} />
+        <Icon
+          size={24}
+          className="fb-hr-action-card__icon-svg"
+          data-color={iconColor.replace("#", "")}
+        />
       </div>
       <div className="fb-hr-action-card__content">
         <h5 className="fb-hr-action-card__title">{title}</h5>
@@ -322,7 +334,8 @@ export default function FeedbackHRDashboard() {
               <div>
                 <h5 className="fb-hr-peer__title">Peer Feedback Received</h5>
                 <p className="fb-hr-peer__desc">
-                  {myPeerFeedback.length} feedback{myPeerFeedback.length !== 1 ? "s" : ""} from your colleagues
+                  {myPeerFeedback.length} feedback
+                  {myPeerFeedback.length !== 1 ? "s" : ""} from your colleagues
                 </p>
               </div>
             </div>
@@ -331,7 +344,9 @@ export default function FeedbackHRDashboard() {
               {myPeerFeedback.map((feedbackItem) => (
                 <div
                   className="fb-hr-peer-feedback-list__col"
-                  key={feedbackItem.peerQueueId || feedbackItem.contextFeedbackId}
+                  key={
+                    feedbackItem.peerQueueId || feedbackItem.contextFeedbackId
+                  }
                 >
                   <div className="fb-hr-peer-feedback-card">
                     <div className="fb-hr-peer-feedback-card__row">
@@ -341,12 +356,16 @@ export default function FeedbackHRDashboard() {
                         </h6>
                         <small className="fb-hr-peer-feedback-card__date">
                           {feedbackItem.submittedDate
-                            ? new Date(feedbackItem.submittedDate).toLocaleDateString("en-US", {
+                            ? new Date(
+                                feedbackItem.submittedDate
+                              ).toLocaleDateString("en-US", {
                                 year: "numeric",
                                 month: "long",
                                 day: "numeric",
                               })
-                            : new Date(feedbackItem.createdAt).toLocaleDateString("en-US", {
+                            : new Date(
+                                feedbackItem.createdAt
+                              ).toLocaleDateString("en-US", {
                                 year: "numeric",
                                 month: "long",
                                 day: "numeric",
