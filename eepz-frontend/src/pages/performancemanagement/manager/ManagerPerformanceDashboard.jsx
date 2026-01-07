@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import ReactDOM from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { 
   getEmployeeAssignments, 
@@ -10,7 +11,6 @@ import { toast, Toaster } from "sonner";
 import logoImage from "../../../assets/logodark.png";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 import "../../../styles/performancemanagement/manager/ManagerPerformanceDashboard.css";
-
 
 const PaginationDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
@@ -54,7 +54,6 @@ const PaginationDropdown = ({ value, onChange, options }) => {
   );
 };
 
-
 const RatingDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0, width: 0 });
@@ -76,12 +75,13 @@ const RatingDropdown = ({ value, onChange }) => {
 
   const selectedLabel = options.find(opt => opt.value === value)?.label || "-";
 
-  const handleToggle = () => {
+  const handleToggle = (e) => {
+    e.stopPropagation();
     if (!open && dropdownRef.current) {
       const rect = dropdownRef.current.getBoundingClientRect();
       setMenuPosition({
-        top: rect.bottom + 2,
-        left: rect.left,
+        top: rect.bottom + window.scrollY + 2,
+        left: rect.left + window.scrollX,
         width: rect.width
       });
     }
@@ -92,13 +92,21 @@ const RatingDropdown = ({ value, onChange }) => {
     if (!open) return;
 
     const handleClickOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+      const menu = document.querySelector('.custom-modal-rating-menu');
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target) && 
+          menu && !menu.contains(e.target)) {
         setOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    const timer = setTimeout(() => {
+      document.addEventListener('mousedown', handleClickOutside);
+    }, 100);
+
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, [open]);
 
   return (
@@ -117,13 +125,15 @@ const RatingDropdown = ({ value, onChange }) => {
         </div>
       </div>
 
-      {open && (
+      {open && ReactDOM.createPortal(
         <div
           className="custom-modal-rating-menu"
           style={{
+            position: 'fixed',
             top: `${menuPosition.top}px`,
             left: `${menuPosition.left}px`,
-            width: `${menuPosition.width}px`
+            width: `${menuPosition.width}px`,
+            zIndex: 999999
           }}
         >
           {options.map((opt) => (
@@ -133,17 +143,21 @@ const RatingDropdown = ({ value, onChange }) => {
                 "custom-modal-rating-option" +
                 (opt.value === value ? " custom-modal-rating-option-active" : "")
               }
-              onClick={() => handleSelect(opt.value)}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleSelect(opt.value);
+              }}
             >
               {opt.label}
             </div>
           ))}
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
 };
-
 
 export default function ManagerDashboard() {
   const navigate = useNavigate();
@@ -159,7 +173,6 @@ export default function ManagerDashboard() {
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState("pending");
 
- 
   const [pendingPage, setPendingPage] = useState(1);
   const [pendingPerPage, setPendingPerPage] = useState(5);
   const [completedPage, setCompletedPage] = useState(1);
@@ -323,7 +336,6 @@ export default function ManagerDashboard() {
     .filter((a) => a.isCompleted)
     .filter((a) => a.formName.toLowerCase().includes(completedFormNameFilter.toLowerCase()));
 
-  // Pagination calculations
   const pendingTotalPages = Math.ceil(pendingAssignments.length / pendingPerPage);
   const pagedPendingAssignments = pendingAssignments.slice(
     (pendingPage - 1) * pendingPerPage,
@@ -422,7 +434,6 @@ export default function ManagerDashboard() {
           </table>
         </div>
 
-        {/* Pagination */}
         <div className="manevap-pagination-container">
           <div className="manevap-pagination-info">
             <span className="manevap-pagination-label">Rows per page:</span>
@@ -656,7 +667,7 @@ export default function ManagerDashboard() {
 
                 <div className="manevap-title-section">
                   <div className="manevap-title-main">
-                    Appraisal Form
+                    MANAGER FORM
                   </div>
                   <div className="manevap-title-sub">
                     {currentAssignment?.formName || ""}
@@ -681,55 +692,57 @@ export default function ManagerDashboard() {
             ) : (
               <>
                 <div className="manevap-strict-form-body">
-                  <table className="manevap-strict-table">
-                    <thead>
-                      <tr>
-                        <th>COMPETENCY NAME</th>
-                        <th>DESCRIPTION</th>
-                        <th>RATING</th>
-                        <th>COMMENTS</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {assessmentData.map((item, idx) => (
-                        <tr key={item.competencyId || idx}>
-                          <td className="manevap-cell-bold">
-                            {item.competencyName}
-                          </td>
-                          <td>
-                            {item.competencyDescription || ""}
-                          </td>
-                          <td>
-                            {modalMode === "view" ? (
-                              <div className="manevap-modal-cell-view">
-                                {item.rating ? `${item.rating} / 5` : '-'}
-                              </div>
-                            ) : (
-                              <RatingDropdown
-                                value={item.rating || ""}
-                                onChange={(val) => updateAssessmentData(item.competencyId, "rating", val)}
-                              />
-                            )}
-                          </td>
-                          <td>
-                            {modalMode === "view" ? (
-                              <div className="manevap-modal-cell-view">{item.comments || "-"}</div>
-                            ) : (
-                              <input
-                                className="manevap-modal-cell-input"
-                                type="text"
-                                value={item.comments}
-                                onChange={e =>
-                                  updateAssessmentData(item.competencyId, "comments", e.target.value)
-                                }
-                                placeholder="-"
-                              />
-                            )}
-                          </td>
+                  <div className="manevap-strict-form-wrapper">
+                    <table className="manevap-strict-table">
+                      <thead>
+                        <tr>
+                          <th>COMPETENCY NAME</th>
+                          <th>DESCRIPTION</th>
+                          <th>RATING</th>
+                          <th>COMMENTS</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {assessmentData.map((item, idx) => (
+                          <tr key={item.competencyId || idx}>
+                            <td className="manevap-cell-bold">
+                              {item.competencyName}
+                            </td>
+                            <td>
+                              {item.competencyDescription || ""}
+                            </td>
+                            <td>
+                              {modalMode === "view" ? (
+                                <div className="manevap-modal-cell-view">
+                                  {item.rating ? `${item.rating} / 5` : '-'}
+                                </div>
+                              ) : (
+                                <RatingDropdown
+                                  value={item.rating || ""}
+                                  onChange={(val) => updateAssessmentData(item.competencyId, "rating", val)}
+                                />
+                              )}
+                            </td>
+                            <td>
+                              {modalMode === "view" ? (
+                                <div className="manevap-modal-cell-view">{item.comments || "-"}</div>
+                              ) : (
+                                <input
+                                  className="manevap-modal-cell-input"
+                                  type="text"
+                                  value={item.comments}
+                                  onChange={e =>
+                                    updateAssessmentData(item.competencyId, "comments", e.target.value)
+                                  }
+                                  placeholder="-"
+                                />
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
 
                 <div className="manevap-modal-actions">
