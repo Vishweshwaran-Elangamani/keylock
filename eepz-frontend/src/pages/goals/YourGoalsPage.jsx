@@ -219,7 +219,7 @@ const YourGoalsPage = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Updated search handlers - similar to PendingApprovals
+  // Updated search handlers 
   const handleSearchInputChange = (e) => {
     setSearchInput(e.target.value);
   };

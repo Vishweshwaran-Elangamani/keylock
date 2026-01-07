@@ -166,7 +166,6 @@ const GoalsDashboard = () => {
 
   const handleItemsPerPageChange = (newSize) => {
     setItemsPerPage(newSize);
-    // Page reset is handled by the Pagination component itself
   };
 
   const handleTypeChange = (type) => {

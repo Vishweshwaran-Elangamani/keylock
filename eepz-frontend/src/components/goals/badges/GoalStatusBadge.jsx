@@ -62,7 +62,6 @@ const GetStatusStyle = (status) => {
   return {};
 };
 
-// Format status from backend casing to frontend display (PascalCase)
 const FormatStatusKey = (status) => {
   if (!status) return "";
 
@@ -92,7 +91,6 @@ const GoalStatusBadge = ({ status, size = "md", showTooltip = true }) => {
   const config = SIZE_CONFIG[size];
   const statusStyle = GetStatusStyle(status);
 
-  // Tooltip text for each status
   const GetTooltipText = () => {
     const tooltips = {
       pending: "Awaiting activation",
