@@ -1,5 +1,4 @@
 using Relevantz.EEPZ.Common.Entities;
-
 namespace Relevantz.EEPZ.Data.IRepository
 {
     public interface IOtpRepository

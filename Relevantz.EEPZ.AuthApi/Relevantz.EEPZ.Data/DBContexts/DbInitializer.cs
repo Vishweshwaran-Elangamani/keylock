@@ -7,8 +7,6 @@ using Microsoft.Extensions.Configuration;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Utils;
 using Relevantz.EEPZ.Data.DBContexts;
-
-
 namespace Relevantz.EEPZ.Data.DBContexts
 {
     public class DbInitializer
@@ -26,22 +24,16 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 Console.WriteLine("\n" + new string('=', 70));
                 Console.WriteLine("   STARTING DATABASE INITIALIZATION");
                 Console.WriteLine(new string('=', 70) + "\n");
-
                 // Seed roles first
                 await SeedRolesAsync(context);
-
                 // Seed default departments
                 await SeedDepartmentsAsync(context);
-
                 // Seed admin user
                 await SeedAdminUserAsync(context, configuration);
-
                 // Seed Resource Pool Project
                 await SeedResourcePoolProjectAsync(context);
-
                 // Seed Master Skills
                 await SeedMasterSkillsAsync(context);
-
                 Console.WriteLine("\n" + new string('=', 70));
                 Console.WriteLine("   DATABASE INITIALIZATION COMPLETED SUCCESSFULLY!");
                 Console.WriteLine(new string('=', 70) + "\n");
@@ -52,14 +44,12 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 throw;
             }
         }
-
         /// <summary>
         /// Seeds all system roles with enhanced console output
         /// </summary>
         private static async Task SeedRolesAsync(EEPZDbContext context)
         {
             Console.WriteLine("Seeding roles...");
-
             var roles = new List<Role>
             {
                 new Role
@@ -111,16 +101,13 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     CreatedAt = DateTime.UtcNow,
                 },
             };
-
             int addedCount = 0;
             int skippedCount = 0;
-
             foreach (var role in roles)
             {
                 var existingRole = await context.Roles.FirstOrDefaultAsync(r =>
                     r.RoleCode == role.RoleCode
                 );
-
                 if (existingRole == null)
                 {
                     context.Roles.Add(role);
@@ -131,22 +118,18 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     skippedCount++;
                 }
             }
-
             await context.SaveChangesAsync();
-
             // Beautiful console output
             Console.WriteLine("Roles seeding completed!");
             Console.WriteLine($"Added: {addedCount} | Skipped: {skippedCount} | Total: {roles.Count}");
             Console.WriteLine(new string('-', 70) + "\n");
         }
-
         /// <summary>
         /// Seeds default departments with enhanced console output
         /// </summary>
         private static async Task SeedDepartmentsAsync(EEPZDbContext context)
         {
             Console.WriteLine("Seeding departments...");
-
             var departments = new List<Department>
             {
                 new Department
@@ -254,16 +237,13 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     UpdatedAt = DateTime.UtcNow,
                 },
             };
-
             int addedCount = 0;
             int skippedCount = 0;
-
             foreach (var department in departments)
             {
                 var existingDepartment = await context.Departments.FirstOrDefaultAsync(d =>
                     d.DepartmentCode == department.DepartmentCode
                 );
-
                 if (existingDepartment == null)
                 {
                     context.Departments.Add(department);
@@ -274,15 +254,12 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     skippedCount++;
                 }
             }
-
             await context.SaveChangesAsync();
-
             // Beautiful console output
             Console.WriteLine("Departments seeding completed!");
             Console.WriteLine($"Added: {addedCount} | Skipped: {skippedCount} | Total: {departments.Count}");
             Console.WriteLine(new string('-', 70) + "\n");
         }
-
         /// <summary>
         /// Seeds admin user with enhanced console output
         /// </summary>
@@ -292,7 +269,6 @@ namespace Relevantz.EEPZ.Data.DBContexts
         )
         {
             Console.WriteLine("Seeding admin user...");
-
             try
             {
                 // Check if admin already exists
@@ -301,14 +277,12 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 var existingAdmin = await context.Userauthentications.FirstOrDefaultAsync(u =>
                     u.Email == adminEmail
                 );
-
                 if (existingAdmin != null)
                 {
                     Console.WriteLine("Admin user already exists. Skipping seed.");
                     Console.WriteLine(new string('-', 70) + "\n");
                     return;
                 }
-
                 // Get Admin Role
                 var adminRole = await context.Roles.FirstOrDefaultAsync(r => r.RoleCode == "ADMIN");
                 if (adminRole == null)
@@ -317,7 +291,6 @@ namespace Relevantz.EEPZ.Data.DBContexts
                         "Admin role not found. Please ensure roles are seeded first."
                     );
                 }
-
                 // Get Administration Department
                 var adminDepartment = await context.Departments.FirstOrDefaultAsync(d =>
                     d.DepartmentName == "Administration"
@@ -328,7 +301,6 @@ namespace Relevantz.EEPZ.Data.DBContexts
                         "Administration department not found. Please ensure departments are seeded first."
                     );
                 }
-
                 // Create Admin Employee
                 var adminEmployee = new Employee
                 {
@@ -345,7 +317,6 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 };
                 context.Employees.Add(adminEmployee);
                 await context.SaveChangesAsync();
-
                 // Create Admin Authentication
                 var adminPassword = configuration["AdminSeedData:Password"] ?? "rZ@26012025#Rix";
                 var adminAuth = new Userauthentication
@@ -359,7 +330,6 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 };
                 context.Userauthentications.Add(adminAuth);
                 await context.SaveChangesAsync();
-
                 // Create Admin Profile
                 var adminProfile = new Userprofile
                 {
@@ -372,7 +342,6 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 };
                 context.Userprofiles.Add(adminProfile);
                 await context.SaveChangesAsync();
-
                 // Assign Role and Department to Admin
                 var adminEmployeeDetails = new Employeedetailsmaster
                 {
@@ -382,7 +351,6 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 };
                 context.Employeedetailsmasters.Add(adminEmployeeDetails);
                 await context.SaveChangesAsync();
-
                 Console.WriteLine(new string('=', 70));
                 Console.WriteLine("   ADMIN USER SEEDED SUCCESSFULLY!");
                 Console.WriteLine(new string('=', 70));
@@ -399,20 +367,16 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 throw;
             }
         }
-
         /// <summary>
         /// Seeds resource pool project
         /// </summary>
         public static async Task SeedResourcePoolProjectAsync(EEPZDbContext context)
         {
             Console.WriteLine("Seeding resource pool project...");
-
             await context.Database.EnsureCreatedAsync();
-
             var existingProject = await context.Projects.FirstOrDefaultAsync(p =>
                 p.ProjectName == "ORG.RZ.RESOURCEPOOL"
             );
-
             if (existingProject == null)
             {
                 var resourcePoolProject = new Project
@@ -436,27 +400,22 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,
                 };
-
                 context.Projects.Add(resourcePoolProject);
                 await context.SaveChangesAsync();
-
                 Console.WriteLine("Resource pool project seeded successfully!");
             }
             else
             {
                 Console.WriteLine("Resource pool project already exists.");
             }
-
             Console.WriteLine(new string('-', 70) + "\n");
         }
-
         /// <summary>
         /// Seeds master skills with enhanced console output
         /// </summary>
         private static async Task SeedMasterSkillsAsync(EEPZDbContext context)
         {
             Console.WriteLine("Seeding master skills...");
-
             var skills = new List<MasterSkill>
             {
                 // Programming Skills
@@ -624,16 +583,13 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     Category = "Tools",
                 },
             };
-
             int addedCount = 0;
             int skippedCount = 0;
-
             foreach (var skill in skills)
             {
                 var existingSkill = await context.MasterSkills.FirstOrDefaultAsync(s =>
                     s.SkillName == skill.SkillName
                 );
-
                 if (existingSkill == null)
                 {
                     context.MasterSkills.Add(skill);
@@ -644,9 +600,7 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     skippedCount++;
                 }
             }
-
             await context.SaveChangesAsync();
-
             // Beautiful console output
             Console.WriteLine("Master skills seeding completed!");
             Console.WriteLine($"Added: {addedCount} | Skipped: {skippedCount} | Total: {skills.Count}");
