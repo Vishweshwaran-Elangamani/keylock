@@ -8,33 +8,20 @@ function statusRender(status) {
   if (s === "pending") {
     return (
       <span className="appraisal-status-pending">
-        <i className="bi bi-hourglass-split appraisal-status-icon"></i>
+        <i className="bi bi-hourglass-split"></i>
         Pending
       </span>
     );
   } else if (s === "completed") {
     return (
       <span className="appraisal-status-completed">
-        <i className="bi bi-check-circle-fill appraisal-status-icon"></i>
+        <i className="bi bi-check-circle-fill"></i>
         Completed
       </span>
     );
   }
   return <span>{status}</span>;
 }
-
-const fieldOrder = [
-  ["Competency", "competencyName"],
-  ["Employee Rating", "employeeRating"],
-  ["Employee Comments", "employeeComments"],
-  ["L1 Reviewer", "l1ReviewerName"],
-  ["L1 Rating", "l1Rating"],
-  ["L1 Comments", "l1Comments"],
-  ["L2 Reviewer", "l2ReviewerName"],
-  ["L2 Rating", "l2Rating"],
-  ["L2 Comments", "l2Comments"],
-  ["Status", "status"],
-];
 
 function formatFileSize(bytes) {
   if (!bytes || bytes === 0) return "0 B";
@@ -61,33 +48,33 @@ function formatDate(dateString) {
 }
 
 function getFileIcon(fileType, fileName) {
-  if (!fileType && !fileName) return "bi-file";
+  if (!fileType && !fileName) return "bi-file-earmark";
 
   const name = (fileName || "").toLowerCase();
   const type = (fileType || "").toLowerCase();
 
-  if (type.includes("pdf") || name.endsWith(".pdf")) return "bi-file-pdf";
+  if (type.includes("pdf") || name.endsWith(".pdf")) return "bi-file-pdf-fill";
   if (type.includes("word") || name.endsWith(".doc") || name.endsWith(".docx"))
-    return "bi-file-word";
+    return "bi-file-word-fill";
   if (
     type.includes("excel") ||
     type.includes("spreadsheet") ||
     name.endsWith(".xls") ||
     name.endsWith(".xlsx")
   )
-    return "bi-file-earmark-spreadsheet";
+    return "bi-file-earmark-spreadsheet-fill";
   if (type.includes("image") || name.match(/\.(jpg|jpeg|png|gif)$/i))
-    return "bi-file-image";
+    return "bi-file-image-fill";
   if (type.includes("video") || name.match(/\.(mp4|avi|mov)$/i))
-    return "bi-file-play";
+    return "bi-file-play-fill";
   if (type.includes("audio") || name.match(/\.(mp3|wav|m4a)$/i))
-    return "bi-file-music";
-  if (type === "text/csv" || name.endsWith(".csv")) return "bi-file-earmark-text";
-  if (type.includes("text") || name.endsWith(".txt")) return "bi-file-text";
+    return "bi-file-music-fill";
+  if (type === "text/csv" || name.endsWith(".csv")) return "bi-file-earmark-text-fill";
+  if (type.includes("text") || name.endsWith(".txt")) return "bi-file-text-fill";
   if (type.includes("zip") || type.includes("compressed") || name.match(/\.(zip|rar|7z)$/i))
-    return "bi-file-zip";
+    return "bi-file-zip-fill";
 
-  return "bi-file";
+  return "bi-file-earmark-fill";
 }
 
 function getExtensionFromMime(mimeType) {
@@ -148,8 +135,7 @@ const AppraisalDetailsModal = ({
       setDownloadingId(attachment.attachmentId);
       setError(null);
 
-      // ✅ Use the imported API function
-      const response = await downloadHrAttachment(attachment.attachmentId);
+      const response = await api.downloadHrAttachment(attachment.attachmentId);
 
       const blob = response.data;
       const contentType = response.headers['content-type'];
@@ -200,10 +186,15 @@ const AppraisalDetailsModal = ({
         {/* Header */}
         <div className="appraisal-modal-header">
           <div className="appraisal-modal-header-content">
-            <div className="appraisal-modal-title">Appraisal Details</div>
+            <div className="appraisal-modal-title">
+              <i className="bi bi-clipboard-data-fill"></i>
+              Appraisal Details
+            </div>
             <div className="appraisal-modal-subtitle">
+              <i className="bi bi-person-circle"></i>
               <span className="appraisal-modal-subtitle-name">{employeeName}</span>
-              <span className="appraisal-modal-subtitle-separator">|</span>
+              <span className="appraisal-modal-subtitle-separator">•</span>
+              <i className="bi bi-briefcase-fill"></i>
               {projectName}
             </div>
           </div>
@@ -230,52 +221,74 @@ const AppraisalDetailsModal = ({
         <div className="appraisal-modal-body">
           {error && (
             <div className="appraisal-modal-error">
-              <i className="bi bi-exclamation-circle appraisal-modal-error-icon"></i>
+              <i className="bi bi-exclamation-circle-fill appraisal-modal-error-icon"></i>
               {error}
             </div>
           )}
 
-          {/* Competency Evaluations */}
+          {/* Competency Evaluations - TABLE FORMAT */}
           <div className="appraisal-section">
             <div className="appraisal-section-title">
               <i className="bi bi-list-check appraisal-section-title-icon"></i>
               Competency Evaluations
             </div>
             {competencies.length === 0 ? (
-              <div className="appraisal-no-data">No competencies found</div>
+              <div className="appraisal-no-data">
+                <i className="bi bi-inbox"></i>
+                <p>No competencies found</p>
+              </div>
             ) : (
-              competencies.map((c, idx) => (
-                <div key={idx} className="appraisal-competency-card">
-                  <div className="appraisal-competency-title">
-                    #{idx + 1} &nbsp; {c.competencyName}
-                  </div>
+              <div className="appraisal-table-wrapper">
+  <table className="appraisal-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Competency</th>
+        <th>Employee Rating</th>
+        <th>Employee Comments</th>
+        <th>L1 Reviewer</th>
+        <th>L1 Rating</th>
+        <th>L1 Comments</th>
+        <th>L2 Reviewer</th>
+        <th>L2 Rating</th>
+        <th>L2 Comments</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {competencies.map((c, idx) => (
+        <tr key={idx}>
+          <td className="appraisal-table-index">{idx + 1}</td>
+          <td className="appraisal-table-competency">
+            <strong>{c.competencyName || "-"}</strong>
+          </td>
+          <td className="appraisal-table-rating">
+            {c.employeeRating || "-"}
+          </td>
+          <td className="appraisal-table-comment">
+            {c.employeeComments || "-"}
+          </td>
+          <td>{c.l1ReviewerName || "-"}</td>
+          <td className="appraisal-table-rating">
+            {c.l1Rating || "-"}
+          </td>
+          <td className="appraisal-table-comment">
+            {c.l1Comments || "-"}
+          </td>
+          <td>{c.l2ReviewerName || "-"}</td>
+          <td className="appraisal-table-rating">
+            {c.l2Rating || "-"}
+          </td>
+          <td className="appraisal-table-comment">
+            {c.l2Comments || "-"}
+          </td>
+          <td>{statusRender(c.status)}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
 
-                  <div className="appraisal-competency-fields">
-                    {fieldOrder.map(([label, key]) =>
-                      key === "competencyName" ? null : (
-                        <div key={key} className="appraisal-field-row">
-                          <span className="appraisal-field-label">{label}</span>
-                          <span
-                            className={`appraisal-field-value ${
-                              key === "employeeComments" ||
-                              key === "l1Comments" ||
-                              key === "l2Comments"
-                                ? "is-comment"
-                                : ""
-                            } ${key === "status" ? "is-status" : ""}`}
-                          >
-                            {key === "status"
-                              ? statusRender(c.status)
-                              : c[key] !== undefined && c[key] !== null && c[key] !== ""
-                              ? c[key]
-                              : "-"}
-                          </span>
-                        </div>
-                      )
-                    )}
-                  </div>
-                </div>
-              ))
             )}
           </div>
 
@@ -285,24 +298,37 @@ const AppraisalDetailsModal = ({
               <div className="appraisal-attachments-header">
                 <i className="bi bi-paperclip"></i>
                 <span>Employee Attachments</span>
+                <span className="appraisal-attachments-count">({attachments.length})</span>
               </div>
 
               <div className="appraisal-attachments-list">
                 {attachments.map((att, idx) => (
                   <div key={idx} className="appraisal-attachment-item">
                     <div className="appraisal-attachment-info">
-                      <i
-                        className={`bi ${getFileIcon(att.fileType, att.fileName)} appraisal-attachment-icon`}
-                      ></i>
+                      <div className="appraisal-attachment-icon-wrapper">
+                        <i
+                          className={`bi ${getFileIcon(att.fileType, att.fileName)} appraisal-attachment-icon`}
+                        ></i>
+                      </div>
 
                       <div className="appraisal-attachment-details">
                         <div className="appraisal-attachment-name">{att.fileName}</div>
                         <div className="appraisal-attachment-meta">
+                          <i className="bi bi-hdd"></i>
                           {formatFileSize(att.fileSize)}
-                          {att.uploadedAt && ` • ${formatDate(att.uploadedAt)}`}
+                          {att.uploadedAt && (
+                            <>
+                              <span className="meta-separator">•</span>
+                              <i className="bi bi-clock"></i>
+                              {formatDate(att.uploadedAt)}
+                            </>
+                          )}
                         </div>
                         {att.note && (
-                          <div className="appraisal-attachment-note">Note: {att.note}</div>
+                          <div className="appraisal-attachment-note">
+                            <i className="bi bi-sticky"></i>
+                            {att.note}
+                          </div>
                         )}
                       </div>
                     </div>
@@ -314,7 +340,7 @@ const AppraisalDetailsModal = ({
                     >
                       {downloadingId === att.attachmentId ? (
                         <>
-                          <i className="bi bi-hourglass-split"></i>
+                          <span className="appraisal-spinner"></span>
                           Downloading...
                         </>
                       ) : (
@@ -334,6 +360,7 @@ const AppraisalDetailsModal = ({
         {/* Footer */}
         <div className="appraisal-modal-footer">
           <button className="appraisal-btn-close" onClick={onClose}>
+            <i className="bi bi-x-circle"></i>
             Close
           </button>
         </div>

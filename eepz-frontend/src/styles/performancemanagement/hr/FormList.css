@@ -13,11 +13,13 @@
   --action-grad: linear-gradient(90deg, #97247e 0%, #e01950 100%);
 }
 
+
 .formlistperf * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+
 
 .formlistperf .flp-root {
   padding: 20px 24px 64px 24px;
@@ -26,6 +28,7 @@
   background: #f8f9fc;
   min-height: 100vh;
 }
+
 
 .formlistperf .ad-stat-card {
   min-height: 100px;
@@ -36,12 +39,14 @@
   padding: 1.5rem;
 }
 
+
 .formlistperf .flp-main-area {
   display: grid;
   grid-template-columns: 1fr 380px;
   gap: 1.5rem;
   align-items: start;
 }
+
 
 .formlistperf .flp-forms-section {
   background: #ffffff;
@@ -50,6 +55,7 @@
   border: 1px solid #e5e7eb;
   overflow: visible;
 }
+
 
 .formlistperf .flp-section-header {
   padding: 1.25rem 1.5rem;
@@ -60,17 +66,20 @@
   background: #ffffff;
 }
 
+
 .formlistperf .flp-header-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
+
 .formlistperf .flp-header-left {
   display: flex;
   align-items: center;
   gap: 0.75rem;
 }
+
 
 .formlistperf .flp-header-left h3 {
   margin: 0;
@@ -82,10 +91,12 @@
   gap: 0.5rem;
 }
 
+
 .formlistperf .flp-header-left h3 i {
   font-size: 1.3rem;
   color: #27235c;
 }
+
 
 .formlistperf .flp-count-badge {
   background: #27235c;
@@ -96,6 +107,7 @@
   font-weight: 600;
 }
 
+
 .formlistperf .flp-header-right {
   display: flex;
   align-items: center;
@@ -103,11 +115,13 @@
   flex-wrap: nowrap;
 }
 
+
 .formlistperf .flp-search-box {
   position: relative;
   min-width: 180px;
   flex: 1 1 180px;
 }
+
 
 .formlistperf .flp-search-icon {
   position: absolute;
@@ -117,6 +131,7 @@
   color: #64748b;
   pointer-events: none;
 }
+
 
 .formlistperf .flp-search-box input {
   width: 100%;
@@ -129,15 +144,18 @@
   transition: all 0.2s ease;
 }
 
+
 .formlistperf .flp-search-box input:focus {
   outline: none;
   border-color: #27235c;
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
 }
 
+
 .formlistperf .flp-search-box input::placeholder {
   color: #9ca3af;
 }
+
 
 .formlistperf .flp-filter-select {
   min-width: 140px;
@@ -151,11 +169,13 @@
   transition: all 0.2s ease;
 }
 
+
 .formlistperf .flp-filter-select:focus {
   outline: none;
   border-color: #27235c;
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
 }
+
 
 .formlistperf .flp-clear-filters-btn {
   padding: 0.55rem 1rem;
@@ -173,24 +193,29 @@
   gap: 0.5rem;
 }
 
+
 .formlistperf .flp-clear-filters-btn:hover {
   color: #27235c;
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
 }
 
+
 .formlistperf .flp-clear-filters-btn i {
   font-size: 1rem;
 }
+
 
 .formlistperf .flp-table-card {
   overflow: visible;
 }
 
+
 .formlistperf .flp-table-wrapper {
   overflow-x: auto;
   overflow-y: visible;
 }
+
 
 .formlistperf .flp-pagination-container {
   overflow: visible;
@@ -204,16 +229,19 @@
   gap: 1rem;
 }
 
+
 .formlistperf .flp-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 1rem;
 }
 
+
 .formlistperf .flp-table thead {
   background: #27235c;
   border-bottom: 3px solid #1a1842;
 }
+
 
 .formlistperf .flp-table thead th {
   padding: 1rem 1.25rem;
@@ -226,27 +254,33 @@
   white-space: nowrap;
 }
 
+
 .formlistperf .flp-table thead th.text-center {
   text-align: center;
 }
+
 
 .formlistperf .flp-table tbody tr {
   border-bottom: 1px solid #e5e7eb;
   transition: all 0.2s ease;
 }
 
+
 .formlistperf .flp-table tbody tr:hover {
   background: rgba(39, 35, 92, 0.03);
 }
+
 
 .formlistperf .flp-table tbody tr.flp-selected-row {
   background: rgba(39, 35, 92, 0.05);
   border-left: 4px solid #27235c;
 }
 
+
 .formlistperf .flp-table tbody tr:last-child {
   border-bottom: none;
 }
+
 
 .formlistperf .flp-table tbody td {
   padding: 1rem 1.25rem;
@@ -255,6 +289,7 @@
   text-align: left;
   font-size: 1.1rem;
 }
+
 
 .formlistperf .flp-type-badge {
   display: inline-flex;
@@ -268,11 +303,13 @@
   border: 1px solid rgba(99, 102, 241, 0.3);
 }
 
+
 .formlistperf .flp-action-buttons {
   display: flex;
   justify-content: center;
   gap: 0.5rem;
 }
+
 
 .formlistperf .themed-action-btn {
   width: 40px;
@@ -291,39 +328,48 @@
   cursor: pointer;
 }
 
+
 .formlistperf .themed-action-btn:last-child {
   margin-right: 0;
 }
+
 
 .formlistperf .btn-view {
   border-color: #b6cdfc;
 }
 
+
 .formlistperf .btn-view i {
   color: #477af2;
 }
+
 
 .formlistperf .btn-edit {
   border-color: #ffe0a6;
 }
 
+
 .formlistperf .btn-edit i {
   color: #e6a814;
 }
+
 
 .formlistperf .btn-choose {
   border-color: #bcf3d9;
 }
 
+
 .formlistperf .btn-choose i {
   color: #20b47a;
 }
+
 
 .formlistperf .btn-choose.btn-active {
   border-color: #13ae69;
   background: #f5fcf6;
   box-shadow: 0 0 0 2px #13ae6940;
 }
+
 
 .formlistperf .themed-action-btn:hover,
 .formlistperf .themed-action-btn:focus {
@@ -332,15 +378,18 @@
   background: #fafbff;
 }
 
+
 .formlistperf .themed-action-btn:active {
   opacity: 0.93;
   box-shadow: none;
 }
 
+
 .formlistperf .flp-empty-state {
   text-align: center;
   padding: 3rem 1rem !important;
 }
+
 
 .formlistperf .flp-empty-state i {
   font-size: 3rem;
@@ -350,11 +399,13 @@
   display: block;
 }
 
+
 .formlistperf .flp-empty-state p {
   color: #6c757d;
   margin: 0;
   font-size: 1rem;
 }
+
 
 .formlistperf .flp-users-panel {
   background: #ffffff;
@@ -370,6 +421,7 @@
   overflow: hidden;
 }
 
+
 .formlistperf .flp-panel-header {
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid #e5e7eb;
@@ -381,6 +433,7 @@
   justify-content: space-between;
 }
 
+
 .formlistperf .flp-panel-header h3 {
   margin: 0;
   font-size: 1.15rem;
@@ -391,10 +444,12 @@
   gap: 0.5rem;
 }
 
+
 .formlistperf .flp-panel-header h3 i {
   font-size: 1.3rem;
   color: #27235c;
 }
+
 
 .formlistperf .flp-users-filters {
   display: flex;
@@ -402,6 +457,7 @@
   align-items: center;
   flex-wrap: wrap;
 }
+
 
 .formlistperf .flp-user-search-input {
   min-width: 160px;
@@ -413,15 +469,18 @@
   transition: all 0.2s ease;
 }
 
+
 .formlistperf .flp-user-search-input:focus {
   outline: none;
   border-color: #27235c;
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
 }
 
+
 .formlistperf .flp-user-search-input::placeholder {
   color: #9ca3af;
 }
+
 
 .formlistperf .flp-btn-select-all {
   padding: 0.55rem 1rem;
@@ -438,14 +497,17 @@
   white-space: nowrap;
 }
 
+
 .formlistperf .flp-btn-select-all:hover {
   opacity: 0.9;
   transform: translateY(-1px);
 }
 
+
 .formlistperf .flp-btn-select-all i {
   font-size: 1.05rem;
 }
+
 
 .formlistperf .flp-panel-body {
   flex: 1 1 auto;
@@ -454,6 +516,7 @@
   padding: 0.5rem 1rem;
   background: #fff;
 }
+
 
 .formlistperf .flp-empty-box {
   display: flex;
@@ -464,6 +527,7 @@
   text-align: center;
 }
 
+
 .formlistperf .flp-empty-box i {
   font-size: 3rem;
   color: #6c757d;
@@ -471,11 +535,13 @@
   margin-bottom: 1rem;
 }
 
+
 .formlistperf .flp-empty-box p {
   color: #6c757d;
   margin: 0;
   font-size: 1rem;
 }
+
 
 .formlistperf .flp-selected-count {
   display: flex;
@@ -489,15 +555,18 @@
   color: #2c3e50;
 }
 
+
 .formlistperf .flp-selected-count i {
   font-size: 1.05rem;
   color: #10b981;
 }
 
+
 .formlistperf .flp-selected-count strong {
   color: #27235c;
   font-weight: 700;
 }
+
 
 .formlistperf .flp-user-card {
   padding: 0.875rem 1rem;
@@ -512,10 +581,12 @@
   background: #ffffff;
 }
 
+
 .formlistperf .flp-user-card:hover:not(.flp-disabled) {
   background: rgba(39, 35, 92, 0.03);
   border-color: #27235c;
 }
+
 
 .formlistperf .flp-user-card.flp-selected {
   background: rgba(39, 35, 92, 0.05);
@@ -523,11 +594,13 @@
   border-width: 2px;
 }
 
+
 .formlistperf .flp-user-card.flp-disabled {
   opacity: 0.5;
   cursor: not-allowed;
   background: #f8f9fa;
 }
+
 
 .formlistperf .flp-user-card input[type="checkbox"] {
   width: 18px;
@@ -536,9 +609,11 @@
   accent-color: #27235c;
 }
 
+
 .formlistperf .flp-user-card.flp-disabled input[type="checkbox"] {
   cursor: not-allowed;
 }
+
 
 .formlistperf .flp-user-info {
   flex: 1;
@@ -548,10 +623,12 @@
   gap: 0.5rem;
 }
 
+
 .formlistperf .flp-user-info strong {
   font-size: 0.95rem;
   color: #1e293b;
 }
+
 
 .formlistperf .flp-assigned-tag {
   display: inline-flex;
@@ -565,9 +642,11 @@
   font-weight: 600;
 }
 
+
 .formlistperf .flp-assigned-tag i {
   font-size: 0.8rem;
 }
+
 
 .formlistperf .flp-panel-footer {
   padding: 1.25rem 1.5rem;
@@ -576,6 +655,7 @@
   gap: 0.75rem;
   background: #ffffff;
 }
+
 
 .formlistperf .flp-btn-share,
 .formlistperf .flp-btn-draft {
@@ -593,16 +673,19 @@
   gap: 0.5rem;
 }
 
+
 .formlistperf .flp-btn-share {
   background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
   color: #ffffff;
   box-shadow: 0 2px 8px rgba(151, 36, 126, 0.25);
 }
 
+
 .formlistperf .flp-btn-share:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(151, 36, 126, 0.35);
 }
+
 
 .formlistperf .flp-btn-draft {
   background: #27235c;
@@ -610,11 +693,13 @@
   box-shadow: 0 2px 8px rgba(39, 35, 92, 0.25);
 }
 
+
 .formlistperf .flp-btn-draft:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(39, 35, 92, 0.35);
   background: #1a1842;
 }
+
 
 .formlistperf .flp-btn-share:disabled,
 .formlistperf .flp-btn-draft:disabled {
@@ -623,21 +708,25 @@
   transform: none;
 }
 
+
 .formlistperf .flp-pagination-info {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
+
 .formlistperf .flp-pagination-label {
   color: #6c757d;
   font-size: 0.9rem;
 }
 
+
 .formlistperf .flp-pagination-status {
   color: #6c757d;
   font-size: 0.9rem;
 }
+
 
 .formlistperf .flp-pagination-nav .flp-pagination {
   display: flex;
@@ -647,9 +736,11 @@
   padding: 0;
 }
 
+
 .formlistperf .flp-pagination .flp-page-item {
   list-style: none;
 }
+
 
 .formlistperf .flp-pagination .flp-page-link {
   display: flex;
@@ -668,12 +759,14 @@
   transition: all 0.12s ease;
 }
 
+
 .formlistperf .flp-pagination .flp-page-link:hover:not(:disabled) {
   background: rgba(39, 35, 92, 0.05);
   border-color: #27235c;
   color: #27235c;
   transform: translateY(-1px);
 }
+
 
 .formlistperf .flp-pagination .flp-page-item.flp-active .flp-page-link {
   background: #27235c;
@@ -682,13 +775,15 @@
   box-shadow: 0 2px 6px rgba(39, 35, 92, 0.3);
 }
 
+
 .formlistperf .flp-pagination .flp-page-item.flp-disabled .flp-page-link {
   opacity: 0.5;
   cursor: not-allowed;
   pointer-events: none;
 }
 
-/* General Dropdown - MODERATELY WIDER FOR FILTERS */
+
+/* General Dropdown - LEFT ALIGNED */
 .formlistperf .custom-fc-dropdown {
   position: relative;
   padding: 0;
@@ -700,6 +795,7 @@
   min-width: 150px;
   max-width: 165px;
 }
+
 
 .formlistperf .custom-fc-selected {
   padding: 0.5rem 1.85rem 0.5rem 0.85rem;
@@ -720,7 +816,9 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-align: left;
 }
+
 
 .formlistperf .custom-fc-dropdown:focus-within .custom-fc-selected,
 .formlistperf .custom-fc-selected:focus {
@@ -728,11 +826,13 @@
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
 }
 
+
 .formlistperf .custom-fc-selected.custom-fc-disabled {
   cursor: not-allowed;
   opacity: 0.6;
   background: #f9fafb;
 }
+
 
 .formlistperf .custom-fc-arrow {
   position: absolute;
@@ -747,9 +847,11 @@
   transition: transform 0.2s ease;
 }
 
+
 .formlistperf .custom-fc-dropdown:focus-within .custom-fc-arrow {
   transform: translateY(-50%) rotate(225deg);
 }
+
 
 .formlistperf .custom-fc-menu {
   position: absolute;
@@ -767,6 +869,7 @@
   animation: fcDropdownFadeIn 0.15s ease-out;
 }
 
+
 @keyframes fcDropdownFadeIn {
   from {
     opacity: 0;
@@ -778,23 +881,28 @@
   }
 }
 
+
 .formlistperf .custom-fc-menu::-webkit-scrollbar {
   width: 6px;
 }
+
 
 .formlistperf .custom-fc-menu::-webkit-scrollbar-track {
   background: #f1f5f9;
   border-radius: 3px;
 }
 
+
 .formlistperf .custom-fc-menu::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 3px;
 }
 
+
 .formlistperf .custom-fc-menu::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
+
 
 .formlistperf .custom-fc-option {
   padding: 0.5rem 0.65rem;
@@ -804,7 +912,9 @@
   color: #27235c;
   transition: all 0.15s ease;
   border-bottom: 1px solid #f3f4f6;
+  text-align: left;
 }
+
 
 .formlistperf .custom-fc-option:last-child {
   border-bottom: none;
@@ -812,10 +922,12 @@
   border-bottom-right-radius: 6px;
 }
 
+
 .formlistperf .custom-fc-option:hover {
   background: #27235c;
   color: white;
 }
+
 
 .formlistperf .custom-fc-option-active {
   background: rgba(39, 35, 92, 0.1);
@@ -823,18 +935,20 @@
   font-weight: 600;
 }
 
+
 .formlistperf .custom-fc-option-active:hover {
   background: #27235c;
   color: white;
 }
 
-/* Pagination Dropdown - ULTRA COMPACT */
+
 /* Pagination Dropdown - ULTRA COMPACT WITH UPWARD MENU */
 .formlistperf .custom-fc-pagination-dropdown {
   min-width: 70px !important;
   max-width: 70px !important;
   width: 70px !important;
 }
+
 
 .formlistperf .custom-fc-pagination-dropdown .custom-fc-selected {
   min-width: 70px !important;
@@ -844,18 +958,22 @@
   height: 36px !important;
   font-size: 0.85rem !important;
   text-align: center !important;
+  justify-content: center !important;
 }
+
 
 .formlistperf .custom-fc-pagination-dropdown .custom-fc-arrow {
   right: 0.4rem !important;
   width: 6px !important;
   height: 6px !important;
-  transform: translateY(-50%) rotate(-135deg) !important; /* Flip arrow upward */
+  transform: translateY(-50%) rotate(-135deg) !important;
 }
 
+
 .formlistperf .custom-fc-pagination-dropdown:focus-within .custom-fc-arrow {
-  transform: translateY(-50%) rotate(45deg) !important; /* Flip back when open */
+  transform: translateY(-50%) rotate(45deg) !important;
 }
+
 
 /* Menu slides UP from bottom */
 .formlistperf .custom-fc-pagination-dropdown .custom-fc-menu {
@@ -864,18 +982,19 @@
   width: 70px !important;
   left: 0 !important;
   right: auto !important;
-  top: auto !important; /* Remove default top positioning */
-  bottom: calc(100% - 1px) !important; /* Position ABOVE the button */
-  border-top: 1.5px solid #27235C !important; /* Move border to top */
+  top: auto !important;
+  bottom: calc(100% - 1px) !important;
+  border-top: 1.5px solid #27235C !important;
   border-bottom: none !important;
-  border-radius: 6px 6px 0 0 !important; /* Rounded corners at top */
+  border-radius: 6px 6px 0 0 !important;
   animation: fcDropdownSlideUp 0.15s ease-out !important;
 }
+
 
 @keyframes fcDropdownSlideUp {
   from {
     opacity: 0;
-    transform: translateY(8px); /* Slide from below */
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -883,16 +1002,19 @@
   }
 }
 
+
 .formlistperf .custom-fc-pagination-dropdown .custom-fc-option {
   padding: 0.5rem 0.5rem !important;
   font-size: 0.85rem !important;
   text-align: center !important;
 }
 
+
 .formlistperf .custom-fc-pagination-dropdown .custom-fc-option:first-child {
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
 }
+
 
 .formlistperf .custom-fc-pagination-dropdown .custom-fc-option:last-child {
   border-bottom-left-radius: 0 !important;
@@ -900,16 +1022,11 @@
 }
 
 
-.formlistperf .custom-fc-pagination-dropdown .custom-fc-option {
-  padding: 0.5rem 0.5rem !important;
-  font-size: 0.85rem !important;
-  text-align: center !important;
-}
-
 @media (max-width: 1200px) {
   .formlistperf .flp-main-area {
     grid-template-columns: 1fr;
   }
+
 
   .formlistperf .flp-users-panel {
     background: #ffffff;
@@ -925,6 +1042,7 @@
     overflow: hidden;
   }
 
+
   .formlistperf .flp-panel-header,
   .formlistperf .flp-pagination-container,
   .formlistperf .flp-panel-footer {
@@ -932,15 +1050,18 @@
   }
 }
 
+
 @media (max-width: 768px) {
   .formlistperf .flp-root {
     padding: 16px 12px 48px 12px;
   }
 
+
   .formlistperf .flp-section-header {
     flex-direction: column;
     align-items: stretch;
   }
+
 
   .formlistperf .flp-header-right {
     flex-direction: row;
@@ -949,43 +1070,52 @@
     flex-wrap: wrap;
   }
 
+
   .formlistperf .flp-search-box {
     min-width: 100%;
     flex: 1 1 100%;
   }
+
 
   .formlistperf .flp-filter-select {
     min-width: 140px;
     flex: none;
   }
 
+
   .formlistperf .flp-table-wrapper {
     overflow-x: scroll;
     overflow-y: visible;
   }
 
+
   .formlistperf .flp-table {
     min-width: 700px;
   }
+
 
   .formlistperf .flp-users-filters {
     flex-wrap: wrap;
     justify-content: center;
   }
 
+
   .formlistperf .flp-user-search-input {
     min-width: 140px;
   }
+
 
   .formlistperf .flp-clear-filters-btn {
     flex: 1 1 100%;
     width: 100%;
   }
 
+
   .formlistperf .custom-fc-dropdown {
     min-width: 140px;
     max-width: 155px;
   }
+
 
   .formlistperf .custom-fc-pagination-dropdown,
   .formlistperf .custom-fc-pagination-dropdown .custom-fc-selected,
@@ -996,10 +1126,12 @@
   }
 }
 
+
 @media (max-width: 576px) {
   .formlistperf .flp-table {
     min-width: 600px;
   }
+
 
   .formlistperf .flp-table thead th,
   .formlistperf .flp-table tbody td {
@@ -1007,16 +1139,19 @@
     font-size: 0.9rem;
   }
 
+
   .formlistperf .flp-panel-header h3 {
     font-size: 1rem;
     flex-direction: column;
     align-items: flex-start;
   }
 
+
   .formlistperf .flp-pagination-container {
     flex-direction: column;
     gap: 1rem;
   }
+
 
   .formlistperf .flp-pagination-info,
   .formlistperf .flp-pagination-status {
@@ -1025,19 +1160,23 @@
     text-align: center;
   }
 
+
   .formlistperf .flp-pagination-nav {
     width: 100%;
   }
+
 
   .formlistperf .flp-pagination-nav .flp-pagination {
     justify-content: center;
     flex-wrap: wrap;
   }
 
+
   .formlistperf .custom-fc-dropdown {
     min-width: 130px;
     max-width: 145px;
   }
+
 
   .formlistperf .custom-fc-pagination-dropdown,
   .formlistperf .custom-fc-pagination-dropdown .custom-fc-selected,
@@ -1047,15 +1186,18 @@
     width: 60px !important;
   }
 
+
   .formlistperf .custom-fc-selected {
     font-size: 0.875rem;
     padding: 0.45rem 1.65rem 0.45rem 0.75rem;
   }
 
+
   .formlistperf .custom-fc-option {
     font-size: 0.875rem;
     padding: 0.45rem 0.6rem;
   }
+
 
   .formlistperf .custom-fc-arrow {
     right: 0.6rem;
