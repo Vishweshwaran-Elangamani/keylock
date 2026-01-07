@@ -12,7 +12,6 @@ import {
 import { toast } from "sonner";
 import styles from "../../../styles/lnd/pages/approvals/ApprovalHistory.module.css";
 
-
 const ApprovalHistory = () => {
   const [approvals, setApprovals] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -66,7 +65,7 @@ const ApprovalHistory = () => {
       Admin: "/admin",
     };
     return prefixMap[role] || "/employee";
-  };       
+  };
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -256,10 +255,14 @@ const ApprovalHistory = () => {
 
   const renderSortIcon = (field) => {
     const isActive = sortField === field;
-    const iconClass = isActive ? styles.sortIconActive : styles.sortIconInactive;
+    const iconClass = isActive
+      ? styles.sortIconActive
+      : styles.sortIconInactive;
 
     if (!isActive) {
-      return <ChevronUp size={14} className={`${styles.sortIcon} ${iconClass}`} />;
+      return (
+        <ChevronUp size={14} className={`${styles.sortIcon} ${iconClass}`} />
+      );
     }
     return sortOrderAsc ? (
       <ChevronUp size={14} className={`${styles.sortIcon} ${iconClass}`} />
@@ -340,12 +343,16 @@ const ApprovalHistory = () => {
           >
             <span>{getRoleLabel(roleFilter)}</span>
             <i
-              className={`bi bi-chevron-${showRoleDropdown ? "up" : "down"} ${styles.dropdownIcon}`}
+              className={`bi bi-chevron-${showRoleDropdown ? "up" : "down"} ${
+                styles.dropdownIcon
+              }`}
             ></i>
           </button>
 
           {showRoleDropdown && (
-            <div className={`${styles.dropdownMenu} ${styles.dropdownMenuRole}`}>
+            <div
+              className={`${styles.dropdownMenu} ${styles.dropdownMenuRole}`}
+            >
               {roleOptions.map((option) => (
                 <div
                   key={option.value}
@@ -372,12 +379,16 @@ const ApprovalHistory = () => {
           >
             <span>{getTypeLabel(typeFilter)}</span>
             <i
-              className={`bi bi-chevron-${showTypeDropdown ? "up" : "down"} ${styles.dropdownIcon}`}
+              className={`bi bi-chevron-${showTypeDropdown ? "up" : "down"} ${
+                styles.dropdownIcon
+              }`}
             ></i>
           </button>
 
           {showTypeDropdown && (
-            <div className={`${styles.dropdownMenu} ${styles.dropdownMenuType}`}>
+            <div
+              className={`${styles.dropdownMenu} ${styles.dropdownMenuType}`}
+            >
               {typeOptions.map((option) => (
                 <div
                   key={option.value}
@@ -404,12 +415,16 @@ const ApprovalHistory = () => {
           >
             <span>{getStatusLabel(statusFilter)}</span>
             <i
-              className={`bi bi-chevron-${showStatusDropdown ? "up" : "down"} ${styles.dropdownIcon}`}
+              className={`bi bi-chevron-${showStatusDropdown ? "up" : "down"} ${
+                styles.dropdownIcon
+              }`}
             ></i>
           </button>
 
           {showStatusDropdown && (
-            <div className={`${styles.dropdownMenu} ${styles.dropdownMenuStatus}`}>
+            <div
+              className={`${styles.dropdownMenu} ${styles.dropdownMenuStatus}`}
+            >
               {statusOptions.map((option) => (
                 <div
                   key={option.value}
@@ -480,10 +495,16 @@ const ApprovalHistory = () => {
                     <div className={styles.cellSkill}>
                       {approval.skillName || "None"}
                     </div>
-                    <div className={styles.cellName} title={approval.requesterName}>
+                    <div
+                      className={styles.cellName}
+                      title={approval.requesterName}
+                    >
                       {approval.requesterName}
                     </div>
-                    <div className={styles.cellName} title={approval.approverName}>
+                    <div
+                      className={styles.cellName}
+                      title={approval.approverName}
+                    >
                       {approval.approverName || "None"}
                     </div>
                     <div>
@@ -530,7 +551,9 @@ const ApprovalHistory = () => {
                               : "Show comments"
                           }
                         >
-                          {expandedNotes?.[approval.approvalId] ? "Hide" : "View"}
+                          {expandedNotes?.[approval.approvalId]
+                            ? "Hide"
+                            : "View"}
                         </button>
                       ) : (
                         <span className={styles.cellNone}>None</span>
@@ -544,7 +567,9 @@ const ApprovalHistory = () => {
                     approval.notes && (
                       <div
                         className={`${styles.expandedNotes} ${
-                          idx < approvals.length - 1 ? styles.expandedNotesBorder : ""
+                          idx < approvals.length - 1
+                            ? styles.expandedNotesBorder
+                            : ""
                         }`}
                       >
                         <strong className={styles.expandedNotesLabel}>

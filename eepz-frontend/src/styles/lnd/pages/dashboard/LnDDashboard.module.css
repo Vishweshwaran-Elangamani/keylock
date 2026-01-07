@@ -1,9 +1,7 @@
-
 .loadingContainer {
   text-align: center;
   padding: 3rem;
 }
-
 
 .headerSection {
   margin-bottom: 2rem;
@@ -21,13 +19,11 @@
   margin: 0;
 }
 
-
 .cardsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
 }
-
 
 .navCard {
   background: #fff;
@@ -46,14 +42,12 @@
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
 }
 
-
 .cardContent {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
 }
-
 
 .leftSection {
   display: flex;
@@ -70,7 +64,6 @@
   justify-content: center;
   flex-shrink: 0;
 }
-
 
 .textContainer {
   text-align: left;
@@ -90,18 +83,15 @@
   line-height: 1.5;
 }
 
-
 .rightSection {
   text-align: right;
 }
-
 
 .countDisplay {
   font-size: 2rem;
   font-weight: 700;
   line-height: 1;
 }
-
 
 .badge {
   padding: 0.375rem 0.75rem;

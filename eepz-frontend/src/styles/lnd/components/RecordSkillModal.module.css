@@ -25,7 +25,7 @@
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 1500;  
+  z-index: 1500;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -136,7 +136,6 @@
   color: #9ca3af;
 }
 
-
 .customDropdownContainer {
   position: relative;
 }
@@ -171,16 +170,16 @@
 }
 
 .customDropdownButtonDisabled {
-  background: #f3f4f6;  
+  background: #f3f4f6;
   cursor: not-allowed;
-  color: rgb(39, 35, 92);  
-  opacity: 1;  
-  font-weight: 600; 
-  border: 1px solid #d1d5db; 
+  color: rgb(39, 35, 92);
+  opacity: 1;
+  font-weight: 600;
+  border: 1px solid #d1d5db;
 }
 
 .customDropdownButtonDisabled .customDropdownButtonText {
-  color: rgb(39, 35, 92);  
+  color: rgb(39, 35, 92);
 }
 
 .customDropdownButtonText {
@@ -234,7 +233,6 @@
   cursor: default;
   pointer-events: none;
 }
-
 
 .select {
   width: 100%;

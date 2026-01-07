@@ -4,12 +4,12 @@ import { RATING } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
 import { useState } from "react";
 import styles from "../../../styles/lnd/components/CompleteAssignmentModal.module.css";
- 
+
 const CompleteAssignmentModal = ({ assignment, onClose, onSuccess }) => {
   const [rating, setRating] = useState(5);
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
- 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!notes.trim()) {
@@ -38,26 +38,26 @@ const CompleteAssignmentModal = ({ assignment, onClose, onSuccess }) => {
       setLoading(false);
     }
   };
- 
+
   const getRatingLabel = (rating) => {
     if (rating < RATING.MIN_REQUEST_SME) return "Needs Improvement";
     if (rating < RATING.MIN_SME) return "Competent";
     return "Expert (SME Eligible)";
   };
- 
+
   const getRatingColor = (rating) => {
     if (rating < RATING.MIN_REQUEST_SME) return "#dc3545";
     if (rating < RATING.MIN_SME) return "#0d6efd";
     return "#198754";
   };
- 
+
   const ratingColorClass =
     rating < RATING.MIN_REQUEST_SME
       ? styles.ratingBtnLow
       : rating < RATING.MIN_SME
       ? styles.ratingBtnMedium
       : styles.ratingBtnHigh;
- 
+
   return (
     <>
       {/* Backdrop */}
@@ -81,7 +81,7 @@ const CompleteAssignmentModal = ({ assignment, onClose, onSuccess }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
- 
+
           {/* Body - Scrollable Container */}
           <div className={styles.body}>
             {/* Assignment Info */}
@@ -93,7 +93,7 @@ const CompleteAssignmentModal = ({ assignment, onClose, onSuccess }) => {
               <p className={styles.infoLabel}>SME</p>
               <p className={styles.infoValueSmall}>{assignment.smeName}</p>
             </div>
- 
+
             {/* Info Alert */}
             <div className={styles.alert}>
               <CheckCircle
@@ -104,12 +104,12 @@ const CompleteAssignmentModal = ({ assignment, onClose, onSuccess }) => {
               <div>
                 <p className={styles.alertTitle}>SME Acknowledged</p>
                 <p className={styles.alertText}>
-                  The SME has reviewed and acknowledged the completion. Set
-                  the new skill rating and complete the assignment.
+                  The SME has reviewed and acknowledged the completion. Set the
+                  new skill rating and complete the assignment.
                 </p>
               </div>
             </div>
- 
+
             {/* SME's Completion Notes */}
             {assignment.completionNotes && (
               <div className={styles.smeNotesContainer}>
@@ -119,7 +119,7 @@ const CompleteAssignmentModal = ({ assignment, onClose, onSuccess }) => {
                 </div>
               </div>
             )}
- 
+
             {/* New Rating Buttons */}
             <div>
               <label className={styles.ratingLabel}>
@@ -156,7 +156,7 @@ const CompleteAssignmentModal = ({ assignment, onClose, onSuccess }) => {
                 {getRatingLabel(rating)}
               </div>
             </div>
- 
+
             {/* Manager's Completion Notes */}
             <div>
               <label className={styles.notesLabel}>
@@ -172,7 +172,7 @@ const CompleteAssignmentModal = ({ assignment, onClose, onSuccess }) => {
               />
             </div>
           </div>
- 
+
           {/* Footer */}
           <form onSubmit={handleSubmit}>
             <div className={styles.footer}>
@@ -213,5 +213,5 @@ const CompleteAssignmentModal = ({ assignment, onClose, onSuccess }) => {
     </>
   );
 };
- 
+
 export default CompleteAssignmentModal;

@@ -1,9 +1,7 @@
-
 .loadingContainer {
   text-align: center;
   padding: 3rem;
 }
-
 
 .actionBar {
   margin-bottom: 1.5rem;
@@ -38,7 +36,7 @@
 }
 
 .dropdownButton {
-  padding: 0.5rem 0.875rem; 
+  padding: 0.5rem 0.875rem;
   border: 1px solid rgb(39, 35, 92, 0.5);
   border-radius: 8px;
   font-size: 0.875rem;
@@ -89,7 +87,6 @@
   color: white;
 }
 
-
 .exportButton {
   display: flex;
   align-items: center;
@@ -121,7 +118,6 @@
   transform: none;
 }
 
-
 .tableContainer {
   min-height: 49vh;
   transition: opacity 0.2s;
@@ -140,13 +136,11 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
-
 .gridLayout {
   display: grid;
   grid-template-columns: 1.5fr 1.3fr 1.2fr 1.5fr 1fr 1fr 0.7fr 0.7fr 1fr;
   align-items: center;
 }
-
 
 .tableHeader {
   background: rgb(39, 35, 92);
@@ -189,7 +183,6 @@
   color: lightpink;
 }
 
-
 .sortIcon {
   margin-left: 4px;
 }
@@ -203,7 +196,6 @@
   color: lightpink;
   font-weight: bold;
 }
-
 
 .tableRow {
   font-size: 0.875rem;
@@ -220,7 +212,6 @@
 .tableRowBorder {
   border-bottom: 1px solid #f3f4f6;
 }
-
 
 .cellName {
   font-weight: 600;
@@ -255,13 +246,13 @@
 
 .cellDateOverdue {
   text-align: left;
-  color: #DC2626;
+  color: #dc2626;
   font-weight: 600;
 }
 
 .overdueIcon {
   margin-right: 0.25rem;
-  color: #DC2626;
+  color: #dc2626;
   display: inline-block;
   vertical-align: middle;
 }
@@ -282,8 +273,8 @@
 .downloadButton {
   padding: 0.4rem 0.75rem;
   background: #fff;
-  border: 1px solid #97247E;
-  color: #97247E;
+  border: 1px solid #97247e;
+  color: #97247e;
   border-radius: 8px;
   font-size: 0.85rem;
   font-weight: 600;
@@ -302,7 +293,7 @@
 
 .completeButton {
   padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, #AC5098 0%, #97247E 100%);
+  background: linear-gradient(135deg, #ac5098 0%, #97247e 100%);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -325,7 +316,7 @@
 .notesButton {
   background: transparent;
   border: none;
-  color: #97247E;
+  color: #97247e;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.875rem;
@@ -336,7 +327,6 @@
   text-decoration: underline;
 }
 
-
 .expandedNotes {
   padding: 1rem 1.5rem;
   background: #f9fafb;
@@ -344,7 +334,7 @@
   color: #4b5563;
   white-space: pre-wrap;
   text-align: left;
-  border-left: 3px solid #97247E;
+  border-left: 3px solid #97247e;
   margin-left: 1.5rem;
 }
 

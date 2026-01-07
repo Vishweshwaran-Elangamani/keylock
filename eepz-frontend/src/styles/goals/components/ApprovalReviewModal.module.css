@@ -1,9 +1,11 @@
-
-
 :global {
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
   @keyframes slideUp {
@@ -151,7 +153,7 @@
 }
 
 .checklistTitle {
-    padding-left: 5px;
+  padding-left: 5px;
   font-size: 14px;
   text-align: left;
 }
@@ -209,8 +211,8 @@
   flex-shrink: 0;
 }
 
-.attachmentTitle{
-    text-align: left;
+.attachmentTitle {
+  text-align: left;
 }
 
 .reopeningCard {

@@ -34,7 +34,7 @@ const OrganizationSkills = () => {
       const response = await lndService.getAllOrganizationEmployees(
         currentPage,
         searchTerm,
-        itemsPerPage 
+        itemsPerPage
       );
 
       if (response.data.success) {
@@ -111,7 +111,6 @@ const OrganizationSkills = () => {
       .toUpperCase();
   };
 
-
   if (loading && employees.length === 0) {
     return (
       <div className={styles.loadingContainer}>
@@ -126,7 +125,6 @@ const OrganizationSkills = () => {
     <div>
       <Breadcrumb
         items={[
-          
           { label: "LnD Dashboard", path: "/hr/lnd/dashboard", icon: "" },
           { label: "Organizational Skills" },
         ]}
@@ -201,9 +199,7 @@ const OrganizationSkills = () => {
                         <h5 className={styles.employeeName}>
                           {employee.employeeName}
                         </h5>
-                        <p className={styles.employeeEmail}>
-                          {employee.email}
-                        </p>
+                        <p className={styles.employeeEmail}>{employee.email}</p>
                       </div>
                     </div>
                     {employee.departmentName && (

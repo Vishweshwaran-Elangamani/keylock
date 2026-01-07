@@ -1,9 +1,7 @@
-
 .loadingContainer {
   text-align: center;
   padding: 3rem;
 }
-
 
 .filterContainer {
   margin-bottom: 1.5rem;
@@ -23,7 +21,6 @@
 .searchInput {
   min-height: 35.7px;
 }
-
 
 .dropdownWrapper {
   position: relative;
@@ -81,7 +78,6 @@
   color: white;
 }
 
-
 .tableContainer {
   min-height: 65vh;
   transition: opacity 0.2s;
@@ -99,7 +95,6 @@
   padding-bottom: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
-
 
 .tableHeader {
   display: grid;
@@ -145,7 +140,6 @@
   color: lightpink;
 }
 
-
 .sortIcon {
   margin-left: 4px;
 }
@@ -159,7 +153,6 @@
   color: lightpink;
   font-weight: bold;
 }
-
 
 .tableRow {
   display: grid;
@@ -179,7 +172,6 @@
 .tableRowBorder {
   border-bottom: 1px solid #f3f4f6;
 }
-
 
 .cellSkillName {
   font-weight: 600;
@@ -238,7 +230,6 @@
   color: #9ca3af;
 }
 
-
 .downloadButton {
   padding: 0.4rem 0.75rem;
   background: #fff;
@@ -259,7 +250,6 @@
   background-color: rgb(39, 35, 92);
   color: white;
 }
-
 
 .uploadButton {
   padding: 0.5rem 1rem;

@@ -190,10 +190,14 @@ const MyAssignments = () => {
 
   const renderSortIcon = (field) => {
     const isActive = sortField === field;
-    const iconClass = isActive ? styles.sortIconActive : styles.sortIconInactive;
+    const iconClass = isActive
+      ? styles.sortIconActive
+      : styles.sortIconInactive;
 
     if (!isActive) {
-      return <ChevronUp size={14} className={`${styles.sortIcon} ${iconClass}`} />;
+      return (
+        <ChevronUp size={14} className={`${styles.sortIcon} ${iconClass}`} />
+      );
     }
     return sortOrderAsc ? (
       <ChevronUp size={14} className={`${styles.sortIcon} ${iconClass}`} />
@@ -205,7 +209,8 @@ const MyAssignments = () => {
   const getStatusLabel = (value) => {
     const statusMap = {
       "": "All Statuses",
-      [ASSIGNMENT_STATUS.PENDING_SME_ACKNOWLEDGEMENT]: "Pending Acknowledgement",
+      [ASSIGNMENT_STATUS.PENDING_SME_ACKNOWLEDGEMENT]:
+        "Pending Acknowledgement",
       [ASSIGNMENT_STATUS.IN_PROGRESS]: "In Progress",
       [ASSIGNMENT_STATUS.PENDING_MANAGER_ACKNOWLEDGEMENT]: "Pending Completion",
       [ASSIGNMENT_STATUS.COMPLETED]: "Completed",
@@ -231,7 +236,10 @@ const MyAssignments = () => {
 
   const getHeaderCellClass = (field, align) => {
     const baseClass = styles.tableHeaderCell;
-    const alignClass = align === "center" ? styles.tableHeaderCellCenter : styles.tableHeaderCellLeft;
+    const alignClass =
+      align === "center"
+        ? styles.tableHeaderCellCenter
+        : styles.tableHeaderCellLeft;
     const sortableClass = field ? styles.tableHeaderCellSortable : "";
     const activeClass = sortField === field ? styles.tableHeaderCellActive : "";
     return `${baseClass} ${alignClass} ${sortableClass} ${activeClass}`.trim();
@@ -257,7 +265,6 @@ const MyAssignments = () => {
     <div>
       <Breadcrumb
         items={[
-         
           { label: "LnD Dashboard", path: `${rolePrefix}/lnd/dashboard` },
           { label: "My Assignments" },
         ]}
@@ -301,7 +308,9 @@ const MyAssignments = () => {
           >
             <span>{getStatusLabel(statusFilter)}</span>
             <i
-              className={`bi bi-chevron-${showStatusDropdown ? "up" : "down"} ${styles.dropdownIcon}`}
+              className={`bi bi-chevron-${showStatusDropdown ? "up" : "down"} ${
+                styles.dropdownIcon
+              }`}
             ></i>
           </button>
 
@@ -343,10 +352,18 @@ const MyAssignments = () => {
                 {[
                   { label: "Skill Name", field: "skillName", align: "left" },
                   { label: "SME Assigned", field: "smeName", align: "left" },
-                  { label: "Assignment Status", field: "status", align: "center" },
+                  {
+                    label: "Assignment Status",
+                    field: "status",
+                    align: "center",
+                  },
                   { label: "Start Date", field: "createdOn", align: "left" },
                   { label: "Due Date", field: "deadline", align: "left" },
-                  { label: "Score", field: "completionRating", align: "center" },
+                  {
+                    label: "Score",
+                    field: "completionRating",
+                    align: "center",
+                  },
                   { label: "Proof", field: null, align: "center" },
                   { label: "Request Ack", field: null, align: "center" },
                 ].map(({ label, field, align }) => (
@@ -369,12 +386,18 @@ const MyAssignments = () => {
                   }`}
                 >
                   {/* Skill Name */}
-                  <div className={styles.cellSkillName} title={assignment.skillName}>
+                  <div
+                    className={styles.cellSkillName}
+                    title={assignment.skillName}
+                  >
                     {assignment.skillName}
                   </div>
 
                   {/* SME Assigned */}
-                  <div className={styles.cellSmeName} title={assignment.smeName}>
+                  <div
+                    className={styles.cellSmeName}
+                    title={assignment.smeName}
+                  >
                     {assignment.smeName}
                   </div>
 
@@ -393,11 +416,20 @@ const MyAssignments = () => {
                   </div>
 
                   {/* Due Date */}
-                  <div className={assignment.isOverdue ? styles.cellDateOverdue : styles.cellDate}>
+                  <div
+                    className={
+                      assignment.isOverdue
+                        ? styles.cellDateOverdue
+                        : styles.cellDate
+                    }
+                  >
                     {assignment.deadline ? (
                       <>
                         {assignment.isOverdue && (
-                          <AlertTriangle size={14} className={styles.overdueIcon} />
+                          <AlertTriangle
+                            size={14}
+                            className={styles.overdueIcon}
+                          />
                         )}
                         {new Date(assignment.deadline).toLocaleDateString()}
                       </>

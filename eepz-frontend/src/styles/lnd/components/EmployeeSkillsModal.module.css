@@ -1,14 +1,18 @@
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
-  from { 
+  from {
     opacity: 0;
     transform: translateY(20px);
   }
-  to { 
+  to {
     opacity: 1;
     transform: translateY(0);
   }
@@ -37,7 +41,7 @@
   max-height: 85vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.3s ease-out;
 }
 
@@ -62,7 +66,7 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #AC5098 0%, #97247E 100%);
+  background: linear-gradient(135deg, #ac5098 0%, #97247e 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -167,7 +171,7 @@
 
 .skillItem:hover {
   background: #fff;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .skillContent {
@@ -260,7 +264,7 @@
   padding: 0.375rem 0.5rem;
   border: none;
   border-radius: 4px;
-  background: linear-gradient(135deg, #AC5098 0%, #97247E 100%);
+  background: linear-gradient(135deg, #ac5098 0%, #97247e 100%);
   color: #fff;
   cursor: pointer;
   display: flex;
@@ -298,7 +302,7 @@
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 6px;
-  background: linear-gradient(90deg, #97247E 0%, #E01950 100%);
+  background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
   color: #fff;
   font-size: 0.825rem;
   font-weight: 600;
@@ -312,20 +316,20 @@
   .modal {
     margin: 0.5rem;
   }
-  
+
   .skillItem {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.75rem;
   }
-  
+
   .ratingContainer {
     margin-right: 0;
     margin-top: 0.5rem;
     order: 3;
     width: 100%;
   }
-  
+
   .actionButtons {
     order: 2;
     width: 100%;

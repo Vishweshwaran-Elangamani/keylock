@@ -183,10 +183,14 @@ const MySkills = () => {
 
   const renderSortIcon = (field) => {
     const isActive = sortField === field;
-    const iconClass = isActive ? styles.sortIconActive : styles.sortIconInactive;
+    const iconClass = isActive
+      ? styles.sortIconActive
+      : styles.sortIconInactive;
 
     if (!isActive) {
-      return <ChevronUp size={14} className={`${styles.sortIcon} ${iconClass}`} />;
+      return (
+        <ChevronUp size={14} className={`${styles.sortIcon} ${iconClass}`} />
+      );
     }
     return sortOrderAsc ? (
       <ChevronUp size={14} className={`${styles.sortIcon} ${iconClass}`} />
@@ -197,7 +201,10 @@ const MySkills = () => {
 
   const getHeaderCellClass = (field, align) => {
     const baseClass = styles.tableHeaderCell;
-    const alignClass = align === "center" ? styles.tableHeaderCellCenter : styles.tableHeaderCellLeft;
+    const alignClass =
+      align === "center"
+        ? styles.tableHeaderCellCenter
+        : styles.tableHeaderCellLeft;
     const sortableClass = field ? styles.tableHeaderCellSortable : "";
     const activeClass = sortField === field ? styles.tableHeaderCellActive : "";
     return `${baseClass} ${alignClass} ${sortableClass} ${activeClass}`.trim();
@@ -217,7 +224,6 @@ const MySkills = () => {
     <div>
       <Breadcrumb
         items={[
-         
           { label: "LnD Dashboard", path: `${rolePrefix}/lnd/dashboard` },
           { label: "My Skills" },
         ]}
@@ -307,7 +313,9 @@ const MySkills = () => {
 
                   <div className={styles.proficiencyContainer}>
                     <div
-                      className={`${styles.ratingBadge} ${getRatingClass(skill.rating)}`}
+                      className={`${styles.ratingBadge} ${getRatingClass(
+                        skill.rating
+                      )}`}
                       style={{
                         background: `${getRatingColor(skill.rating)}15`,
                         border: `1px solid ${getRatingColor(skill.rating)}30`,
@@ -340,7 +348,9 @@ const MySkills = () => {
                           className={styles.pendingButton}
                           title="SME Activation request is pending approval"
                         >
-                          <i className={`bi bi-hourglass-split ${styles.pendingIcon}`}></i>
+                          <i
+                            className={`bi bi-hourglass-split ${styles.pendingIcon}`}
+                          ></i>
                           Pending
                         </button>
                       ) : (

@@ -18,7 +18,6 @@ import { ASSIGNMENT_STATUS } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
 import styles from "../../../styles/lnd/pages/assignments/TeamAssignments.module.css";
 
-
 const TeamAssignments = () => {
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,22 +28,18 @@ const TeamAssignments = () => {
   const [expandedNotes, setExpandedNotes] = useState({});
   const [exporting, setExporting] = useState(false);
 
-
   // Search
   const [searchTerm, setSearchTerm] = useState("");
   const [searchInput, setSearchInput] = useState("");
-
 
   // Filter
   const [statusFilter, setStatusFilter] = useState("");
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const dropdownRef = useRef(null);
 
-
   // Sorting
   const [sortField, setSortField] = useState("");
   const [sortOrderAsc, setSortOrderAsc] = useState(true);
-
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -52,14 +47,12 @@ const TeamAssignments = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
-
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const roleName = user?.role || "";
     setUserRole(roleName);
     setRolePrefix(getRolePrefix(roleName));
   }, []);
-
 
   const getRolePrefix = (role) => {
     const prefixMap = {
@@ -73,7 +66,6 @@ const TeamAssignments = () => {
     return prefixMap[role] || "/employee";
   };
 
-
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -82,13 +74,11 @@ const TeamAssignments = () => {
       }
     };
 
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
 
   useEffect(() => {
     fetchTeamAssignments();
@@ -101,25 +91,22 @@ const TeamAssignments = () => {
     sortOrderAsc,
   ]);
 
-
   const fetchTeamAssignments = async () => {
     try {
       setLoading(true);
-      
+
       // Pass empty string to backend when overdue is selected
-      const backendStatusFilter = statusFilter === ASSIGNMENT_STATUS.OVERDUE 
-        ? "" 
-        : statusFilter;
-      
+      const backendStatusFilter =
+        statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter;
+
       const response = await lndService.getTeamAssignments(
         currentPage,
-        backendStatusFilter,  // Use modified filter
+        backendStatusFilter, // Use modified filter
         searchTerm,
         sortField,
         sortOrderAsc ? "asc" : "desc",
         itemsPerPage
       );
-
 
       if (response.data.success) {
         let items = response.data.data.items;
@@ -141,20 +128,17 @@ const TeamAssignments = () => {
     }
   };
 
-
   const handleExportToExcel = async () => {
     try {
       setExporting(true);
       toast.loading("Preparing Excel export...");
 
-
       const response = await lndService.exportTeamAssignments(
-        statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter,  // Also update export
+        statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter, // Also update export
         searchTerm,
         sortField,
         sortOrderAsc ? "asc" : "desc"
       );
-
 
       const timestamp = new Date()
         .toISOString()
@@ -162,9 +146,7 @@ const TeamAssignments = () => {
         .slice(0, -5);
       const filename = `TeamAssignments_${timestamp}.xlsx`;
 
-
       downloadFile(response.data, filename);
-
 
       toast.dismiss();
       toast.success("Excel file downloaded successfully!");
@@ -177,11 +159,9 @@ const TeamAssignments = () => {
     }
   };
 
-
   const handleSearchInputChange = (e) => {
     setSearchInput(e.target.value);
   };
-
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -189,13 +169,11 @@ const TeamAssignments = () => {
     setCurrentPage(1);
   };
 
-
   const handleCancelSearch = () => {
     setSearchInput("");
     setSearchTerm("");
     setCurrentPage(1);
   };
-
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
@@ -203,12 +181,10 @@ const TeamAssignments = () => {
     }
   };
 
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
 
   const handleItemsPerPageChange = (newSize) => {
     setItemsPerPage(newSize);
@@ -216,19 +192,16 @@ const TeamAssignments = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-
   const handleCompleteAssignment = (assignment) => {
     setSelectedAssignment(assignment);
     setShowCompleteModal(true);
   };
-
 
   const handleCompleteSuccess = () => {
     setShowCompleteModal(false);
     toast.success("Assignment completed successfully!");
     fetchTeamAssignments();
   };
-
 
   const handleDownloadProof = async (assignment) => {
     try {
@@ -244,7 +217,6 @@ const TeamAssignments = () => {
     }
   };
 
-
   const onSortClick = (field) => {
     if (sortField === field) {
       setSortOrderAsc(!sortOrderAsc);
@@ -255,11 +227,11 @@ const TeamAssignments = () => {
     setCurrentPage(1);
   };
 
-
   const renderSortIcon = (field) => {
     const isActive = sortField === field;
-    const iconClass = isActive ? styles.sortIconActive : styles.sortIconInactive;
-
+    const iconClass = isActive
+      ? styles.sortIconActive
+      : styles.sortIconInactive;
 
     if (!isActive) {
       return (
@@ -273,7 +245,6 @@ const TeamAssignments = () => {
     );
   };
 
-
   const getStatusLabel = (value) => {
     const statusMap = {
       "": "All Statuses",
@@ -285,7 +256,6 @@ const TeamAssignments = () => {
     };
     return statusMap[value] || "All Statuses";
   };
-
 
   const statusOptions = [
     { value: "", label: "All Statuses" },
@@ -302,22 +272,22 @@ const TeamAssignments = () => {
     { value: ASSIGNMENT_STATUS.OVERDUE, label: "Overdue" },
   ];
 
-
   const getHeaderCellClass = (field, align) => {
     const baseClass = styles.tableHeaderCell;
-    const alignClass = align === "center" ? styles.tableHeaderCellCenter : styles.tableHeaderCellLeft;
+    const alignClass =
+      align === "center"
+        ? styles.tableHeaderCellCenter
+        : styles.tableHeaderCellLeft;
     const sortableClass = field ? styles.tableHeaderCellSortable : "";
     const activeClass = sortField === field ? styles.tableHeaderCellActive : "";
     return `${baseClass} ${alignClass} ${sortableClass} ${activeClass}`.trim();
   };
-
 
   const getDropdownItemClass = (currentValue, optionValue) => {
     return `${styles.dropdownItem} ${
       currentValue === optionValue ? styles.dropdownItemActive : ""
     }`.trim();
   };
-
 
   if (loading && assignments.length === 0) {
     return (
@@ -329,17 +299,14 @@ const TeamAssignments = () => {
     );
   }
 
-
   return (
     <div>
       <Breadcrumb
         items={[
-         
           { label: "LnD Dashboard", path: `${rolePrefix}/lnd/dashboard` },
           { label: "Team Assignments" },
         ]}
       />
-
 
       <div className={styles.actionBar}>
         <div className={styles.filterGroup}>
@@ -371,7 +338,6 @@ const TeamAssignments = () => {
             </div>
           </form>
 
-
           {/* CUSTOM DROPDOWN */}
           <div ref={dropdownRef} className={styles.dropdownWrapper}>
             <button
@@ -386,7 +352,6 @@ const TeamAssignments = () => {
                 } ${styles.dropdownIcon}`}
               ></i>
             </button>
-
 
             {showStatusDropdown && (
               <div className={styles.dropdownMenu}>
@@ -407,7 +372,6 @@ const TeamAssignments = () => {
             )}
           </div>
         </div>
-
 
         <button
           onClick={handleExportToExcel}
@@ -431,7 +395,6 @@ const TeamAssignments = () => {
           )}
         </button>
       </div>
-
 
       {assignments.length === 0 && !loading ? (
         <EmptyState
@@ -486,7 +449,6 @@ const TeamAssignments = () => {
                 ))}
               </div>
 
-
               {assignments.map((assignment, idx) => (
                 <div key={assignment.assignmentId}>
                   <div
@@ -494,15 +456,19 @@ const TeamAssignments = () => {
                       idx < assignments.length - 1 ? styles.tableRowBorder : ""
                     }`}
                   >
-                    <div className={styles.cellName} title={assignment.menteeName}>
+                    <div
+                      className={styles.cellName}
+                      title={assignment.menteeName}
+                    >
                       {assignment.menteeName}
                     </div>
 
-
-                    <div className={styles.cellText} title={assignment.skillName}>
+                    <div
+                      className={styles.cellText}
+                      title={assignment.skillName}
+                    >
                       {assignment.skillName}
                     </div>
-
 
                     <div
                       className={`${styles.cellText} ${styles.cellSme}`}
@@ -511,11 +477,9 @@ const TeamAssignments = () => {
                       {assignment.smeName}
                     </div>
 
-
                     <div className={styles.cellCenter}>
                       <StatusBadge status={assignment.status} />
                     </div>
-
 
                     <div className={styles.cellDate}>
                       {assignment.createdOn ? (
@@ -524,7 +488,6 @@ const TeamAssignments = () => {
                         <span className={styles.cellNone}>None</span>
                       )}
                     </div>
-
 
                     <div
                       className={
@@ -536,7 +499,10 @@ const TeamAssignments = () => {
                       {assignment.deadline ? (
                         <>
                           {assignment.isOverdue && (
-                            <AlertTriangle size={14} className={styles.overdueIcon} />
+                            <AlertTriangle
+                              size={14}
+                              className={styles.overdueIcon}
+                            />
                           )}
                           {new Date(assignment.deadline).toLocaleDateString()}
                         </>
@@ -545,7 +511,6 @@ const TeamAssignments = () => {
                       )}
                     </div>
 
-
                     <div className={styles.cellScore}>
                       {assignment.completionRating ? (
                         `${assignment.completionRating}/10`
@@ -553,7 +518,6 @@ const TeamAssignments = () => {
                         <span className={styles.cellNone}>None</span>
                       )}
                     </div>
-
 
                     <div className={styles.cellCenter}>
                       {assignment.proofFilePath ? (
@@ -566,9 +530,8 @@ const TeamAssignments = () => {
                         </button>
                       ) : (
                         <span className={styles.cellNone}>None</span>
-                      )} 
+                      )}
                     </div>
-
 
                     <div className={styles.cellCenter}>
                       {assignment.status ===
@@ -609,7 +572,6 @@ const TeamAssignments = () => {
                     </div>
                   </div>
 
-
                   {expandedNotes?.[assignment.assignmentId] &&
                     assignment.completionNotes && (
                       <div
@@ -630,7 +592,6 @@ const TeamAssignments = () => {
             </div>
           </div>
 
-
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -644,7 +605,6 @@ const TeamAssignments = () => {
         </>
       )}
 
-
       {showCompleteModal && (
         <CompleteAssignmentModal
           assignment={selectedAssignment}
@@ -655,6 +615,5 @@ const TeamAssignments = () => {
     </div>
   );
 };
-
 
 export default TeamAssignments;

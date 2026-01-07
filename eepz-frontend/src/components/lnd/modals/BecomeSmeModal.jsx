@@ -40,18 +40,18 @@ const BecomeSmeModal = ({ skill, onClose, onSuccess }) => {
     // Validate file type
     if (!FILE_UPLOAD.ALLOWED_TYPES.includes(selectedFile.type)) {
       toast.error("Invalid file type. Allowed: PDF, DOC, DOCX, Images, ZIP");
-      return; 
+      return;
     }
 
     setFile(selectedFile);
-  }; 
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!file) {
       toast.error("Please upload a proof document");
-      return; 
+      return;
     }
 
     try {
@@ -59,7 +59,7 @@ const BecomeSmeModal = ({ skill, onClose, onSuccess }) => {
 
       const formData = new FormData();
       formData.append("skillId", skill.skillId);
-      formData.append("proofDocument", file); 
+      formData.append("proofDocument", file);
 
       const response = await lndService.applyToBecomeSme(formData);
 
@@ -81,20 +81,12 @@ const BecomeSmeModal = ({ skill, onClose, onSuccess }) => {
   return (
     <>
       {/* Backdrop */}
-      <div
-        className={styles.backdrop}
-        onClick={onClose}
-      >
+      <div className={styles.backdrop} onClick={onClose}>
         {/* Modal */}
-        <div
-          className={styles.modal}
-          onClick={(e) => e.stopPropagation()}
-        >
+        <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
           {/* Header */}
           <div className={styles.header}>
-            <h5 className={styles.headerTitle}>
-              Apply to Become SME
-            </h5>
+            <h5 className={styles.headerTitle}>Apply to Become SME</h5>
             <button
               type="button"
               className={`btn-close-white ${styles.btnClose}`}
@@ -116,9 +108,7 @@ const BecomeSmeModal = ({ skill, onClose, onSuccess }) => {
               {/* Skill Info */}
               <div className={styles.skillInfo}>
                 <p className={styles.skillLabel}>Skill</p>
-                <p className={styles.skillName}>
-                  {skill.skillName}
-                </p>
+                <p className={styles.skillName}>{skill.skillName}</p>
                 <p className={styles.skillRating}>
                   Current Rating: <strong>{skill.rating}/10</strong>
                 </p>
@@ -133,7 +123,9 @@ const BecomeSmeModal = ({ skill, onClose, onSuccess }) => {
                 {!file ? (
                   <div
                     className={`${styles.uploadArea} ${
-                      dragActive ? styles.uploadAreaDragActive : styles.uploadAreaNoFile
+                      dragActive
+                        ? styles.uploadAreaDragActive
+                        : styles.uploadAreaNoFile
                     }`}
                     onDragEnter={handleDrag}
                     onDragLeave={handleDrag}
@@ -167,9 +159,7 @@ const BecomeSmeModal = ({ skill, onClose, onSuccess }) => {
                     <div className={styles.fileInfo}>
                       <FileText size={24} className={styles.fileIcon} />
                       <div>
-                        <p className={styles.fileName}>
-                          {file.name}
-                        </p>
+                        <p className={styles.fileName}>{file.name}</p>
                         <p className={styles.fileSize}>
                           {(file.size / 1024 / 1024).toFixed(2)} MB
                         </p>
@@ -201,7 +191,7 @@ const BecomeSmeModal = ({ skill, onClose, onSuccess }) => {
                 type="submit"
                 className={`
                   ${styles.btnSubmit}
-                  ${file && !uploading ? styles.btnSubmitEnabled : ''}
+                  ${file && !uploading ? styles.btnSubmitEnabled : ""}
                 `}
                 disabled={!file || uploading}
               >

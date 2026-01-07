@@ -74,7 +74,6 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
       canPreview = true;
     }
   }
-
   const handlePreview = async () => {
     if (!canPreview) {
       toast.warning(
@@ -82,14 +81,12 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
       );
       return;
     }
-
     try {
       toast.info("Loading preview...");
 
       const response = await lndService.previewApprovalAttachment(
         approval.approvalId
       );
-
       if (response?.data) {
         const contentType =
           response.headers["content-type"] || "application/pdf";
@@ -394,7 +391,6 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
                       />
                     </div>
                   )}
-
                 {/* Notes */}
                 {approval.approvalType !== APPROVAL_TYPE.SME_REQUEST && (
                   <div className="mb-4">

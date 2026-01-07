@@ -53,7 +53,11 @@
   top: 20px;
   bottom: 20px;
   width: 2px;
-  background: linear-gradient(180deg, #dee2e6 0%, rgba(222, 226, 230, 0.3) 100%);
+  background: linear-gradient(
+    180deg,
+    #dee2e6 0%,
+    rgba(222, 226, 230, 0.3) 100%
+  );
 }
 
 .eventWrapper {

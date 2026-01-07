@@ -89,12 +89,11 @@ const SmeAssignments = () => {
   const fetchSmeAssignments = async () => {
     try {
       setLoading(true);
-      
+
       // Pass empty string to backend when overdue is selected
-      const backendStatusFilter = statusFilter === ASSIGNMENT_STATUS.OVERDUE 
-        ? "" 
-        : statusFilter;
-      
+      const backendStatusFilter =
+        statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter;
+
       const response = await lndService.getSmeAssignments(
         currentPage,
         backendStatusFilter,
@@ -252,7 +251,6 @@ const SmeAssignments = () => {
     <div>
       <Breadcrumb
         items={[
-          
           { label: "LnD Dashboard", path: `${rolePrefix}/lnd/dashboard` },
           { label: "SME Assignments" },
         ]}
@@ -296,7 +294,9 @@ const SmeAssignments = () => {
           >
             <span>{getStatusLabel(statusFilter)}</span>
             <i
-              className={`bi bi-chevron-${showStatusDropdown ? "up" : "down"} ${styles.dropdownIcon}`}
+              className={`bi bi-chevron-${showStatusDropdown ? "up" : "down"} ${
+                styles.dropdownIcon
+              }`}
             ></i>
           </button>
 

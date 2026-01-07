@@ -1,9 +1,7 @@
-
 .loadingContainer {
   text-align: center;
   padding: 3rem;
 }
-
 
 .filterContainer {
   margin-bottom: 1.5rem;
@@ -23,7 +21,6 @@
 .searchInput {
   min-height: 35.7px;
 }
-
 
 .dropdownWrapper {
   position: relative;
@@ -86,7 +83,6 @@
   color: white;
 }
 
-
 .tableContainer {
   min-height: 65vh;
   transition: opacity 0.2s;
@@ -104,7 +100,6 @@
   min-width: 0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
-
 
 .tableHeader {
   display: grid;
@@ -150,7 +145,6 @@
   color: lightpink;
 }
 
-
 .sortIcon {
   margin-left: 4px;
 }
@@ -164,7 +158,6 @@
   color: lightpink;
   font-weight: bold;
 }
-
 
 .tableRow {
   display: grid;
@@ -184,7 +177,6 @@
 .tableRowBorder {
   border-bottom: 1px solid #f3f4f6;
 }
-
 
 .cellMenteeName {
   font-weight: 600;
@@ -242,12 +234,11 @@
   color: #9ca3af;
 }
 
-
 .downloadButton {
   padding: 0.4rem 0.75rem;
   background: #fff;
-  border: 1px solid #97247E;
-  color: #97247E;
+  border: 1px solid #97247e;
+  color: #97247e;
   border-radius: 8px;
   font-size: 0.85rem;
   font-weight: 600;
@@ -264,11 +255,10 @@
   color: white;
 }
 
-
 .commentsButton {
   background: transparent;
   border: none;
-  color: #97247E;
+  color: #97247e;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.875rem;
@@ -279,7 +269,6 @@
   text-decoration: underline;
 }
 
-
 .expandedNotes {
   padding: 1rem 1.5rem;
   background: #f9fafb;
@@ -287,7 +276,7 @@
   color: #4b5563;
   white-space: pre-wrap;
   text-align: left;
-  border-left: 3px solid #97247E;
+  border-left: 3px solid #97247e;
   margin-left: 1.5rem;
 }
 

@@ -47,8 +47,8 @@ const LnDDashboard = () => {
       Leadership: "/leadership",
       Employee: "/employee",
       HR: "/hr",
-      Admin: "/admin",   
-    }; 
+      Admin: "/admin",
+    };
     return prefixMap[role] || "/employee";
   };
 
@@ -194,12 +194,7 @@ const LnDDashboard = () => {
   return (
     <div>
       {/* Breadcrumb */}
-      <Breadcrumb
-        items={[
-          
-          { label: "LnD Dashboard" },                                        
-        ]}
-      />     
+      <Breadcrumb items={[{ label: "LnD Dashboard" }]} />
 
       {/* Header Section */}
       <div className={styles.headerSection}>
@@ -256,11 +251,13 @@ const LnDDashboard = () => {
                   {/* Right Section: Count or Badge */}
                   <div className={styles.rightSection}>
                     {card.count !== undefined ? (
-                      <span className={styles.countDisplay}>
-                        {card.count}
-                      </span>
+                      <span className={styles.countDisplay}>{card.count}</span>
                     ) : card.badge ? (
-                      <span className={`${styles.badge} ${getBadgeClass(stats.isSme)}`}>
+                      <span
+                        className={`${styles.badge} ${getBadgeClass(
+                          stats.isSme
+                        )}`}
+                      >
                         {card.badge}
                       </span>
                     ) : null}
@@ -274,5 +271,4 @@ const LnDDashboard = () => {
   );
 };
 
-export default LnDDashboard; 
-
+export default LnDDashboard;

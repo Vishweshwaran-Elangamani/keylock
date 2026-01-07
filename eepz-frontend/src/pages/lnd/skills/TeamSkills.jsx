@@ -138,7 +138,6 @@ const TeamSkills = () => {
     <div>
       <Breadcrumb
         items={[
-         
           { label: "LnD Dashboard", path: `${rolePrefix}/lnd/dashboard` },
           { label: "Team Skills" },
         ]}
@@ -208,9 +207,7 @@ const TeamSkills = () => {
                         <h5 className={styles.employeeName}>
                           {employee.employeeName}
                         </h5>
-                        <p className={styles.employeeEmail}>
-                          {employee.email}
-                        </p>
+                        <p className={styles.employeeEmail}>{employee.email}</p>
                       </div>
                     </div>
                     {employee.departmentName && (

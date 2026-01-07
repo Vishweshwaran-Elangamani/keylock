@@ -74,7 +74,7 @@ const UploadProofModal = ({ assignment, onClose, onSuccess }) => {
         error.response?.data?.message || "Failed to upload completion proof"
       );
     } finally {
-      setUploading(false); 
+      setUploading(false);
     }
   };
 
@@ -96,7 +96,7 @@ const UploadProofModal = ({ assignment, onClose, onSuccess }) => {
               }}
               aria-label="Close"
             >
-              <i className="bi bi-x-lg"></i>     
+              <i className="bi bi-x-lg"></i>
             </button>
           </div>
 

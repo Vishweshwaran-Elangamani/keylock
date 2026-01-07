@@ -1,6 +1,6 @@
 import axios from "axios";
 
-// ==================== LnD MODULE BASE URL ====================
+// LnD MODULE BASE URL
 const API_BASE_URL = import.meta.env.VITE_LND_API_URL + "/api";
 
 /**
@@ -61,7 +61,7 @@ const handleError = (error) => {
  * L&D Service - All API calls for Learning & Development module
  */
 export const lndService = {
-  // ==================== SKILLS (LnDSkillsController) ====================
+  // SKILLS (LnDSkillsController)
 
   /**
    * Get current user's skills
@@ -238,7 +238,7 @@ export const lndService = {
     }
   },
 
-  // ==================== SME (LnDSmeController) ====================
+  //  SME (LnDSmeController)
 
   /**
    * Check if current user is an SME
@@ -293,7 +293,7 @@ export const lndService = {
     }
   },
 
-  // ==================== ASSIGNMENTS (LnDAssignmentsController) ====================
+  // ASSIGNMENTS (LnDAssignmentsController)
 
   /**
    * Get current user's assignments (as mentee)
@@ -494,7 +494,7 @@ export const lndService = {
     }
   },
 
-  // ==================== HR MANAGEMENT (LnDHRController) ====================
+  // HR MANAGEMENT (LnDHRController)
 
   /**
    * Get all organization employees (HR only)
@@ -660,7 +660,7 @@ export const lndService = {
     }
   },
 
-  // ==================== APPROVALS (LnDApprovalsController) ====================
+  //  APPROVALS (LnDApprovalsController)
 
   /**
    * Get current user's pending approvals (as approver)

@@ -1,14 +1,11 @@
-
 .loadingContainer {
   text-align: center;
   padding: 3rem;
 }
 
-
 .searchInput {
   min-height: 35.7px;
 }
-
 
 .tableContainer {
   min-height: 65vh;
@@ -25,7 +22,6 @@
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
-
 
 .tableHeader {
   display: grid;
@@ -70,7 +66,6 @@
   color: lightpink;
 }
 
-
 .sortIcon {
   margin-left: 4px;
 }
@@ -84,7 +79,6 @@
   color: lightpink;
   font-weight: bold;
 }
-
 
 .tableRow {
   display: grid;
@@ -102,7 +96,6 @@
 .tableRowBorder {
   border-bottom: 1px solid #f3f4f6;
 }
-
 
 .cellLeft {
   text-align: left;
@@ -147,7 +140,6 @@
   font-size: 0.875rem;
 }
 
-
 .smeBadge {
   display: inline-flex;
   align-items: center;
@@ -182,7 +174,7 @@
 
 .applyButton {
   padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, #AC5098 0%, #97247E 100%);
+  background: linear-gradient(135deg, #ac5098 0%, #97247e 100%);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -210,7 +202,6 @@
   background: #f3f4f6;
   color: #6c757d;
 }
-
 
 .ratingLow {
   background: #dc354515;

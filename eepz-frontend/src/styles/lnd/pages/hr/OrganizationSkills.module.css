@@ -1,9 +1,7 @@
-
 .loadingContainer {
   text-align: center;
   padding: 3rem;
 }
-
 
 .searchSection {
   margin-bottom: 1.5rem;
@@ -18,7 +16,6 @@
   min-height: 35.7px;
 }
 
-
 .contentContainer {
   min-height: 65vh;
   transition: opacity 0.2s;
@@ -28,13 +25,11 @@
   opacity: 0.6;
 }
 
-
 .employeeGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1rem;
 }
-
 
 .employeeCard {
   background: #fff;
@@ -50,10 +45,9 @@
 
 .employeeCard:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  border-color: #97247E;
+  border-color: #97247e;
   transform: translateY(-2px);
 }
-
 
 .cardContent {
   flex: 1;
@@ -106,5 +100,5 @@
 }
 
 .chevronIcon {
-  color: #97247E;
+  color: #97247e;
 }

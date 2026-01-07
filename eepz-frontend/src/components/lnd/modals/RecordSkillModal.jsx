@@ -7,12 +7,17 @@ import { toast } from "sonner";
 import styles from "../../../styles/lnd/components/RecordSkillModal.module.css";
 
 // Custom Dropdown Component
-const CustomDropdown = ({ value, onChange, options, disabled, placeholder }) => {
+const CustomDropdown = ({
+  value,
+  onChange,
+  options,
+  disabled,
+  placeholder,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
-
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
@@ -38,9 +43,7 @@ const CustomDropdown = ({ value, onChange, options, disabled, placeholder }) => 
           disabled ? styles.customDropdownButtonDisabled : ""
         }`}
       >
-        <span className={styles.customDropdownButtonText}>
-          {displayText}
-        </span>
+        <span className={styles.customDropdownButtonText}>{displayText}</span>
         <i
           className={`bi bi-chevron-${isOpen ? "up" : "down"}`}
           style={{ fontSize: "0.7rem", marginLeft: "0.5rem", flexShrink: 0 }}
@@ -67,7 +70,9 @@ const CustomDropdown = ({ value, onChange, options, disabled, placeholder }) => 
               }}
               className={`${styles.customDropdownItem} ${
                 value === option.value ? styles.customDropdownItemActive : ""
-              } ${option.value === "" ? styles.customDropdownItemDisabled : ""}`}
+              } ${
+                option.value === "" ? styles.customDropdownItemDisabled : ""
+              }`}
             >
               {option.label}
             </div>
@@ -98,7 +103,7 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [pendingSubmit, setPendingSubmit] = useState(null);
 
-  const isEditMode = !!skill?.mapperId; 
+  const isEditMode = !!skill?.mapperId;
 
   // Load employees and all skills on mount
   useEffect(() => {
@@ -195,7 +200,7 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
     setSelectedEmployeeId(e.target.value);
     setSelectedSkillId("");
     setAvailableSkills([]);
-  };  
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -211,7 +216,7 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
     } else {
       submitSkill();
     }
-  };  
+  };
 
   const submitSkill = async () => {
     try {
@@ -341,7 +346,7 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
                 ) : (
                   <>
                     <div className={styles.formField}>
-                      <label className={styles.formLabel}>  
+                      <label className={styles.formLabel}>
                         Employee <span className={styles.required}> *</span>
                       </label>
                       <CustomDropdown
@@ -398,7 +403,7 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
                       {rating}
                     </span>
                     <span className={styles.ratingScaleLabel}>/10</span>
-                  </label> 
+                  </label>
 
                   <div className={styles.ratingButtons}>
                     {[...Array(10)].map((_, index) => {
@@ -452,7 +457,7 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
                     <div className={styles.ratingScaleMax}>
                       <span className={styles.ratingScaleLabel}>Max</span>
                       <span className={styles.ratingScaleValueMax}>10</span>
-                    </div>                                                                 
+                    </div>
                   </div>
                 </div>
               </div>
@@ -522,4 +527,4 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
   );
 };
 
-export default RecordSkillModal; 
+export default RecordSkillModal;

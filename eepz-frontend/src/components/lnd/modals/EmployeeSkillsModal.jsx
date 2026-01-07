@@ -57,7 +57,7 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
       }
     } catch (error) {
       console.error("Failed to fetch employee skills:", error);
-      toast.error("Failed to load employee skills");  
+      toast.error("Failed to load employee skills");
     } finally {
       setLoading(false);
     }
@@ -67,13 +67,12 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
     try {
       setLoading(true);
 
-   
       const response = await lndService.getTeamAssignments(
         1,
-        "", 
+        "",
         employee.employeeName,
         "",
-        "desc"    
+        "desc"
       );
 
       if (response.data.success) {
@@ -93,7 +92,7 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
     } finally {
       setLoading(false);
     }
-  };           
+  };
 
   const fetchApprovalHistory = async () => {
     try {
@@ -146,7 +145,7 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
     return assignments.some(
       (assignment) =>
         assignment.skillId === skillId &&
-              assignment.menteeEmployeeId === employee.employeeId &&
+        assignment.menteeEmployeeId === employee.employeeId &&
         ACTIVE_STATUSES.includes(assignment.status)
     );
   };
@@ -237,7 +236,7 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
               <div className={styles.loading}>
                 <div
                   className={`spinner-border text-primary ${styles.loadingSpinner}`}
-                  role="status" 
+                  role="status"
                 >
                   <span className="visually-hidden">Loading...</span>
                 </div>
@@ -245,13 +244,13 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
             ) : skills.length === 0 ? (
               <div className={styles.emptyState}>
                 <Award size={40} color="#d1d5db" className={styles.emptyIcon} />
-                <h5 className={styles.emptyTitle}> 
+                <h5 className={styles.emptyTitle}>
                   {isReadOnly ? "No Skills Recorded" : "No Skills Recorded"}
                 </h5>
                 <p className={styles.emptyText}>
                   {isReadOnly
-                    ? "This employee has no recorded skills" 
-                    : "Start by recording the first skill for this employee"} 
+                    ? "This employee has no recorded skills"
+                    : "Start by recording the first skill for this employee"}
                 </p>
               </div>
             ) : (
@@ -312,7 +311,7 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
                               title="SME assignment is in progress or under review."
                             >
                               <i
-                                className="bi bi-hourglass-split" 
+                                className="bi bi-hourglass-split"
                                 style={{ fontSize: "12px" }}
                               />
                               Assigned
@@ -400,5 +399,5 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
       )}
     </>
   );
-};       
-export default EmployeeSkillsModal;                                       
+};
+export default EmployeeSkillsModal;

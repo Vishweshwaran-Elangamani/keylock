@@ -1,9 +1,7 @@
-
 .loadingContainer {
   text-align: center;
   padding: 3rem;
 }
-
 
 .actionBar {
   margin-bottom: 1.5rem;
@@ -22,7 +20,6 @@
 .searchInput {
   min-height: 35.7px;
 }
-
 
 .exportButton {
   display: flex;
@@ -66,7 +63,6 @@
   transform: none;
 }
 
-
 .tableContainer {
   min-height: 65vh;
   transition: opacity 0.2s;
@@ -84,12 +80,10 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
-
 .gridLayout {
   display: grid;
   grid-template-columns: 2fr 1.5fr 1.2fr 1fr;
 }
-
 
 .tableHeader {
   background: rgb(39, 35, 92);
@@ -101,7 +95,6 @@
   text-transform: uppercase;
   letter-spacing: 0.025em;
 }
-
 
 .tableRow {
   align-items: center;
@@ -119,7 +112,6 @@
 .tableRowBorder {
   border-bottom: 1px solid #f3f4f6;
 }
-
 
 .cellLeft {
   text-align: left;
