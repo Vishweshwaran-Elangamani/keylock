@@ -298,14 +298,16 @@
 
 .edm-custom-dropdown-option:first-child {
   border-radius: 6px 6px 0 0;
-  background-color: #f8f9fa;
-  color: #6c757d;
+  background-color: #f3f4f6;
+  color: #334155;
+  font-weight: 600; 
 }
 
 .edm-custom-dropdown-option:first-child:hover {
   background-color: #27235c;
   color: #ffffff;
   font-style: normal;
+  font-weight: 600; 
 }
 
 .edm-custom-dropdown-option:last-child {

@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Spinner, CloseButton } from "react-bootstrap";
 import departmentService from "../../../../services/auth/departmentService";
@@ -64,34 +62,41 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
   };
 
   // ========================
-  // MEMOIZED OPTIONS 
+  // MEMOIZED OPTIONS
   // ========================
-  
-  const statusOptions = useMemo(() => [
-    { value: "Active", label: "Active" },
-    { value: "Inactive", label: "Inactive" },
-  ], []);
+  const statusOptions = useMemo(
+    () => [
+      { value: "Active", label: "Active" },
+      { value: "Inactive", label: "Inactive" },
+    ],
+    []
+  );
 
-  const parentDepartmentOptions = useMemo(() => [
-    { value: "", label: "-- None (Root Department) --" },
-    ...departments.map((dept) => ({
-      value: dept.departmentId.toString(),
-      label: `${dept.departmentName} (${dept.departmentCode})`,
-    })),
-  ], [departments]);
+  const parentDepartmentOptions = useMemo(
+    () => [
+      { value: "", label: "-- None (Root Department) --" },
+      ...departments.map((dept) => ({
+        value: dept.departmentId.toString(),
+        label: `${dept.departmentName} (${dept.departmentCode})`,
+      })),
+    ],
+    [departments]
+  );
 
-  const hodOptions = useMemo(() => [
-    { value: "", label: "-- Select HOD --" },
-    ...departmentHeads.map((emp) => ({
-      value: emp.employeeId.toString(),
-      label: `${emp.firstName} ${emp.lastName} (${emp.employeeCompanyId})`,
-    })),
-  ], [departmentHeads]);
+  const hodOptions = useMemo(
+    () => [
+      { value: "", label: "-- Select HOD --" },
+      ...departmentHeads.map((emp) => ({
+        value: emp.employeeId.toString(),
+        label: `${emp.firstName} ${emp.lastName} (${emp.employeeCompanyId})`,
+      })),
+    ],
+    [departmentHeads]
+  );
 
   // ========================
-  // CUSTOM DROPDOWN COMPONENT
+  // CUSTOM DROPDOWN COMPONENT - NO INLINE STYLES
   // ========================
-
   const CustomDropdown = ({
     options,
     value,
@@ -101,7 +106,6 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
     name,
     disabled,
     forceUpward = false,
-    zIndex = 10,
   }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [openUpward, setOpenUpward] = useState(forceUpward);
@@ -148,8 +152,7 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
         }
       };
       document.addEventListener("mousedown", handleClickOutside);
-      return () =>
-        document.removeEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
     const selectedOption = options.find((opt) => opt.value === value);
@@ -160,13 +163,10 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
         className={`adm-custom-dropdown ${isOpen ? "active" : ""} ${
           error ? "error" : ""
         } ${disabled ? "disabled" : ""}`}
-        style={{ zIndex: isOpen ? zIndex : 1 }}
+        tabIndex={disabled ? -1 : 0}
+        onBlur={() => setTimeout(() => setIsOpen(false), 200)}
       >
-        <div
-          className="adm-custom-dropdown-selected"
-          onClick={toggleDropdown}
-          tabIndex={disabled ? -1 : 0}
-        >
+        <div className="adm-custom-dropdown-selected" onClick={toggleDropdown}>
           <span
             className={`adm-custom-dropdown-text ${
               !selectedOption ? "placeholder" : ""
@@ -174,9 +174,7 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
           >
             {selectedOption ? selectedOption.label : placeholder}
           </span>
-          <span
-            className={`adm-custom-dropdown-arrow ${isOpen ? "open" : ""}`}
-          ></span>
+          <span className="adm-custom-dropdown-arrow"></span>
         </div>
 
         {isOpen && (
@@ -189,7 +187,9 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
               <div
                 key={`${name}-${index}-${option.value}`}
                 className={`adm-custom-dropdown-option ${
-                  value === option.value ? "selected" : ""
+                  value === option.value
+                    ? "adm-custom-dropdown-option-active"
+                    : ""
                 }`}
                 onClick={() => handleSelect(option.value)}
               >
@@ -228,6 +228,7 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!validateForm()) {
       toast.error("Please fix the validation errors");
       return;
@@ -369,7 +370,7 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
 
                   {/* Row 3: Status & Parent Department */}
                   <div className="adm-form-row">
-                    {/* Status - z-index 5 (lowest) */}
+                    {/* Status */}
                     <div className="adm-form-group">
                       <label className="adm-form-label">
                         Status <span className="adm-required-asterisk">*</span>
@@ -383,11 +384,10 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
                         disabled={loading}
                         error={errors.status}
                         forceUpward={false}
-                        zIndex={5}
                       />
                     </div>
 
-                    {/* Parent Department - z-index 10 (middle) */}
+                    {/* Parent Department */}
                     <div className="adm-form-group">
                       <label className="adm-form-label">
                         Parent Department
@@ -401,12 +401,11 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
                         disabled={loading}
                         error={errors.parentDepartmentId}
                         forceUpward={true}
-                        zIndex={10}
                       />
                     </div>
                   </div>
 
-                  {/* Row 4: HOD - z-index 15 (highest) */}
+                  {/* Row 4: HOD */}
                   <div className="adm-form-row-full">
                     <label className="adm-form-label">
                       Head of Department (HOD)
@@ -420,7 +419,6 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
                       disabled={loading}
                       error={errors.hodEmployeeId}
                       forceUpward={true}
-                      zIndex={15}
                     />
                     {departmentHeads.length === 0 && !loadingDropdowns && (
                       <div className="adm-info-message">
@@ -441,6 +439,7 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
                 disabled={loading}
                 className="adm-btn-cancel"
               >
+                <i className="bi bi-x-circle"></i>
                 Cancel
               </button>
               <button
