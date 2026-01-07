@@ -139,7 +139,7 @@ export default function Nominations() {
 
               {/* Message */}
               <p className="nom-message">
-                <i className="bi bi-info-circle" />
+                {/* <i className="bi bi-info-circle" /> */}
                 <span>
                   Your hard work, dedication, and exceptional performance have
                   been recognized and appreciated by your organization and
