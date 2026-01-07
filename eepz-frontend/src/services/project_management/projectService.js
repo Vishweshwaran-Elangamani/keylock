@@ -1,22 +1,25 @@
-// src/services/projectService.js
-import apiClient from './api';
- 
+import apiClient from "./api";
+
 const projectService = {
-  // ==================== PROJECT CRUD OPERATIONS ====================
- 
+  // PROJECT CRUD OPERATIONS
+
   /**
    * Get all projects
    * @returns {Promise} Array of all projects
    */
   getAllProjects: async () => {
     try {
-      const response = await apiClient.get('/ProjectManagement');
+      const response = await apiClient.get("/ProjectManagement");
       return response.data;
     } catch (error) {
-      throw error.response?.data || { message: error.message || 'Failed to fetch projects' };
+      throw (
+        error.response?.data || {
+          message: error.message || "Failed to fetch projects",
+        }
+      );
     }
   },
- 
+
   /**
    * Get project by ID
    * @param {number} projectId - Project ID
@@ -27,39 +30,42 @@ const projectService = {
       const response = await apiClient.get(`/ProjectManagement/${projectId}`);
       return response.data;
     } catch (error) {
-      throw error.response?.data || { message: 'Failed to fetch project' };
+      throw error.response?.data || { message: "Failed to fetch project" };
     }
   },
- 
+
   /**
-   * Create new project (US146)
+   * Create new project
    * @param {Object} projectData - Project data
    * @returns {Promise} Created project
    */
   createProject: async (projectData) => {
     try {
-      const response = await apiClient.post('/ProjectManagement', projectData);
+      const response = await apiClient.post("/ProjectManagement", projectData);
       return response.data;
     } catch (error) {
-      throw error.response?.data || { message: 'Failed to create project' };
+      throw error.response?.data || { message: "Failed to create project" };
     }
   },
- 
+
   /**
-   * Update project (US148)
+   * Update project
    * @param {number} projectId - Project ID
    * @param {Object} projectData - Updated project data
    * @returns {Promise} Updated project
    */
   updateProject: async (projectId, projectData) => {
     try {
-      const response = await apiClient.put(`/ProjectManagement/${projectId}`, projectData);
+      const response = await apiClient.put(
+        `/ProjectManagement/${projectId}`,
+        projectData
+      );
       return response.data;
     } catch (error) {
-      throw error.response?.data || { message: 'Failed to update project' };
+      throw error.response?.data || { message: "Failed to update project" };
     }
   },
- 
+
   /**
    * Delete project
    * @param {number} projectId - Project ID
@@ -67,17 +73,19 @@ const projectService = {
    */
   deleteProject: async (projectId) => {
     try {
-      const response = await apiClient.delete(`/ProjectManagement/${projectId}`);
+      const response = await apiClient.delete(
+        `/ProjectManagement/${projectId}`
+      );
       return response.data;
     } catch (error) {
-      throw error.response?.data || { message: 'Failed to delete project' };
+      throw error.response?.data || { message: "Failed to delete project" };
     }
   },
- 
-  // ==================== REPORTING MANAGERS (US147) ====================
- 
+
+  //  REPORTING MANAGERS
+
   /**
-   * Update reporting managers of a project (US147)
+   * Update reporting managers of a project
    * @param {number} projectId - Project ID
    * @param {Object} managersData - Managers data
    * @returns {Promise} Update result
@@ -90,14 +98,18 @@ const projectService = {
       );
       return response.data;
     } catch (error) {
-      throw error.response?.data || { message: 'Failed to update reporting managers' };
+      throw (
+        error.response?.data || {
+          message: "Failed to update reporting managers",
+        }
+      );
     }
   },
- 
-  // ==================== EMPLOYEE MAPPING (US149) ====================
- 
+
+  // EMPLOYEE MAPPING
+
   /**
-   * ✅ Map employees to project with isPrimary support (US149)
+   * Map employees to project with isPrimary support
    * @param {number} projectId - Project ID
    * @param {Array} employees - Array of employee objects with employeeId and isPrimary
    * @returns {Promise} Mapping result
@@ -117,17 +129,17 @@ const projectService = {
         `/ProjectManagement/${projectId}/employees/map`,
         {
           projectId: projectId,
-          employees: employees  // ✅ Correct property name matching backend DTO
+          employees: employees,
         }
       );
       return response.data;
     } catch (error) {
-      throw error.response?.data || { message: 'Failed to map employees' };
+      throw error.response?.data || { message: "Failed to map employees" };
     }
   },
- 
+
   /**
-   * Unmap employees from project (US149)
+   * Unmap employees from project
    * @param {number} projectId - Project ID
    * @param {Array} employeeIds - Array of employee IDs
    * @returns {Promise} Unmapping result
@@ -140,51 +152,59 @@ const projectService = {
       );
       return response.data;
     } catch (error) {
-      throw error.response?.data || { message: 'Failed to unmap employees' };
+      throw error.response?.data || { message: "Failed to unmap employees" };
     }
   },
- 
+
   /**
    * Get available employees for mapping
    * @returns {Promise} Array of available employees
    */
   getAvailableEmployees: async () => {
     try {
-      const response = await apiClient.get('/ProjectManagement/employees/available');
+      const response = await apiClient.get(
+        "/ProjectManagement/employees/available"
+      );
       return response.data;
     } catch (error) {
-      throw error.response?.data || { message: 'Failed to fetch available employees' };
+      throw (
+        error.response?.data || {
+          message: "Failed to fetch available employees",
+        }
+      );
     }
   },
- 
-  // ==================== EMPLOYEE DATA FOR DROPDOWNS ====================
- 
+
+  //  EMPLOYEE DATA FOR DROPDOWNS
+
   /**
    * Get all active employees with details (for Resource Owner dropdown)
    * @returns {Promise} Array of all employees
    */
   getAllEmployees: async () => {
     try {
-      const response = await apiClient.get('/EmployeeManagement/all');
+      const response = await apiClient.get("/EmployeeManagement/all");
       return response.data;
     } catch (error) {
-      throw error.response?.data || { message: 'Failed to fetch all employees' };
+      throw (
+        error.response?.data || { message: "Failed to fetch all employees" }
+      );
     }
   },
- 
+
   /**
    * Get managers only (for L1/L2 Approver dropdowns)
    * @returns {Promise} Array of managers
    */
   getManagers: async () => {
     try {
-      const response = await apiClient.get('/EmployeeManagement/managers');
+      const response = await apiClient.get("/EmployeeManagement/managers");
       return response.data;
     } catch (error) {
-      throw error.response?.data || { message: 'Failed to fetch managers' };
+      throw error.response?.data || { message: "Failed to fetch managers" };
     }
   },
- 
+
   /**
    * Get employee by ID
    * @param {number} employeeMasterId - Employee Master ID
@@ -192,13 +212,15 @@ const projectService = {
    */
   getEmployeeById: async (employeeMasterId) => {
     try {
-      const response = await apiClient.get(`/EmployeeManagement/${employeeMasterId}`);
+      const response = await apiClient.get(
+        `/EmployeeManagement/${employeeMasterId}`
+      );
       return response.data;
     } catch (error) {
-      throw error.response?.data || { message: 'Failed to fetch employee' };
+      throw error.response?.data || { message: "Failed to fetch employee" };
     }
   },
- 
+
   /**
    * Search employees by query
    * @param {string} query - Search query
@@ -206,28 +228,30 @@ const projectService = {
    */
   searchEmployees: async (query) => {
     try {
-      const response = await apiClient.get(`/EmployeeManagement/search?query=${encodeURIComponent(query)}`);
+      const response = await apiClient.get(
+        `/EmployeeManagement/search?query=${encodeURIComponent(query)}`
+      );
       return response.data;
     } catch (error) {
-      throw error.response?.data || { message: 'Failed to search employees' };
+      throw error.response?.data || { message: "Failed to search employees" };
     }
   },
- 
-  // ==================== DEPARTMENT & BUSINESS UNIT DATA ====================
- 
+
+  //  DEPARTMENT & BUSINESS UNIT DATA
+
   /**
    * Get all departments (for Department dropdown)
    * @returns {Promise} Array of departments
    */
   getAllDepartments: async () => {
     try {
-      const response = await apiClient.get('/EmployeeManagement/departments');
+      const response = await apiClient.get("/EmployeeManagement/departments");
       return response.data;
     } catch (error) {
-      throw error.response?.data || { message: 'Failed to fetch departments' };
+      throw error.response?.data || { message: "Failed to fetch departments" };
     }
   },
- 
+
   /**
    * Get department by ID
    * @param {number} departmentId - Department ID
@@ -235,26 +259,32 @@ const projectService = {
    */
   getDepartmentById: async (departmentId) => {
     try {
-      const response = await apiClient.get(`/EmployeeManagement/departments/${departmentId}`);
+      const response = await apiClient.get(
+        `/EmployeeManagement/departments/${departmentId}`
+      );
       return response.data;
     } catch (error) {
-      throw error.response?.data || { message: 'Failed to fetch department' };
+      throw error.response?.data || { message: "Failed to fetch department" };
     }
   },
- 
+
   /**
    * Get all business units (for Business Unit dropdown)
    * @returns {Promise} Array of business units
    */
   getAllBusinessUnits: async () => {
     try {
-      const response = await apiClient.get('/EmployeeManagement/business-units');
+      const response = await apiClient.get(
+        "/EmployeeManagement/business-units"
+      );
       return response.data;
     } catch (error) {
-      throw error.response?.data || { message: 'Failed to fetch business units' };
+      throw (
+        error.response?.data || { message: "Failed to fetch business units" }
+      );
     }
   },
- 
+
   /**
    * Get employees by department
    * @param {number} departmentId - Department ID
@@ -262,13 +292,19 @@ const projectService = {
    */
   getEmployeesByDepartment: async (departmentId) => {
     try {
-      const response = await apiClient.get(`/EmployeeManagement/department/${departmentId}`);
+      const response = await apiClient.get(
+        `/EmployeeManagement/department/${departmentId}`
+      );
       return response.data;
     } catch (error) {
-      throw error.response?.data || { message: 'Failed to fetch employees by department' };
+      throw (
+        error.response?.data || {
+          message: "Failed to fetch employees by department",
+        }
+      );
     }
   },
- 
+
   /**
    * Get employees by role
    * @param {number} roleId - Role ID
@@ -276,17 +312,21 @@ const projectService = {
    */
   getEmployeesByRole: async (roleId) => {
     try {
-      const response = await apiClient.get(`/EmployeeManagement/role/${roleId}`);
+      const response = await apiClient.get(
+        `/EmployeeManagement/role/${roleId}`
+      );
       return response.data;
     } catch (error) {
-      throw error.response?.data || { message: 'Failed to fetch employees by role' };
+      throw (
+        error.response?.data || { message: "Failed to fetch employees by role" }
+      );
     }
   },
- 
-  // ==================== ✅ RESOURCE POOL OPERATIONS (NEW) ====================
- 
+
+  //  RESOURCE POOL OPERATIONS (NEW)
+
   /**
-   * ✅ Get employees with null reporting manager (Initial Stage Employees)
+   * Get employees with null reporting manager (Initial Stage Employees)
    * @returns {Promise} Array of initial stage employees
    *
    * Returns employees who have:
@@ -295,29 +335,35 @@ const projectService = {
    */
   getInitialStageEmployees: async () => {
     try {
-      const response = await apiClient.get('/EmployeeManagement/initial-stage');
+      const response = await apiClient.get("/EmployeeManagement/initial-stage");
       return response.data;
     } catch (error) {
-      console.error('Error fetching initial stage employees:', error);
-      throw error.response?.data || { message: 'Failed to fetch initial stage employees' };
+      console.error("Error fetching initial stage employees:", error);
+      throw (
+        error.response?.data || {
+          message: "Failed to fetch initial stage employees",
+        }
+      );
     }
   },
 
   getPrimaryProjects: async (employeeIds) => {
     try {
       const response = await apiClient.get(
-        '/ProjectManagement/employees/primary-projects',
+        "/ProjectManagement/employees/primary-projects",
         { employeeIds }
       );
       return response.data;
     } catch (error) {
-      console.error('Error fetching primary projects:', error);
-      throw error.response?.data || { message: 'Failed to fetch primary projects' };
+      console.error("Error fetching primary projects:", error);
+      throw (
+        error.response?.data || { message: "Failed to fetch primary projects" }
+      );
     }
   },
- 
+
   /**
-   * ✅ Map employees to resource pool (org.rz.resourcepool)
+   * Map employees to resource pool (org.rz.resourcepool)
    * @param {Array|Object} input - Array of employee master IDs or { employeeMasterIds: [...] }
    * @returns {Promise} Mapping result
    *
@@ -334,44 +380,58 @@ const projectService = {
    */
   mapToResourcePool: async (input) => {
     try {
-      // ✅ FIXED: More robust input handling - log for debugging and handle edge cases
-     
       let employeeMasterIds = [];
-     
+
       if (Array.isArray(input)) {
         employeeMasterIds = input;
-      } else if (input && typeof input === 'object' && Array.isArray(input.employeeMasterIds)) {
+      } else if (
+        input &&
+        typeof input === "object" &&
+        Array.isArray(input.employeeMasterIds)
+      ) {
         employeeMasterIds = input.employeeMasterIds;
       } else if (input === null || input === undefined) {
-        throw new Error('Input cannot be null or undefined. Please provide an array of employeeMasterIds.');
+        throw new Error(
+          "Input cannot be null or undefined. Please provide an array of employeeMasterIds."
+        );
       } else {
         // Try to extract array from unexpected input (e.g., if passed a non-array primitive)
         if (Array.isArray(input.value) || Array.isArray(input.ids)) {
           employeeMasterIds = input.value || input.ids || [];
         } else {
-          throw new Error(`Invalid input type: Expected array or object with employeeMasterIds array. Received: ${JSON.stringify(input)}`);
+          throw new Error(
+            `Invalid input type: Expected array or object with employeeMasterIds array. Received: ${JSON.stringify(
+              input
+            )}`
+          );
         }
       }
-     
-      // ✅ Handle empty array gracefully (backend should return success with mappedCount: 0)
+
+      // Handle empty array gracefully (backend should return success with mappedCount: 0)
       if (employeeMasterIds.length === 0) {
-        console.warn('No employeeMasterIds provided - returning empty success response');
+        console.warn(
+          "No employeeMasterIds provided - returning empty success response"
+        );
         return { success: true, data: { mappedCount: 0, errors: [] } };
       }
-     
+
       const payload = { employeeMasterIds };
-     
-      const response = await apiClient.post('/EmployeeManagement/map-to-resource-pool', payload);
+
+      const response = await apiClient.post(
+        "/EmployeeManagement/map-to-resource-pool",
+        payload
+      );
       return response.data;
     } catch (error) {
-      console.error('Error mapping to resource pool:', error);
-      throw error.response?.data || {
-        message: error.message || 'Failed to map employees to resource pool',
-        success: false
-      };
+      console.error("Error mapping to resource pool:", error);
+      throw (
+        error.response?.data || {
+          message: error.message || "Failed to map employees to resource pool",
+          success: false,
+        }
+      );
     }
   },
 };
- 
 
 export default projectService;

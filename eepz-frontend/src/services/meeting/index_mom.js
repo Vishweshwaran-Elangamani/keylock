@@ -1,11 +1,9 @@
 import axios from "axios";
 
 const api_mom = axios.create({
-  baseURL: import.meta.env.VITE_MOM_API_URL+"/api",
+  baseURL: import.meta.env.VITE_MOM_API_URL + "/api",
 });
 
-
-// Add a request interceptor to include authorization header with token from localStorage
 api_mom.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");

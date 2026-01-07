@@ -1,10 +1,13 @@
-// src/services/feedbackmanagement/feedbackApi.js
 import api from "./index_feedback";
 import axios from "axios";
 import org_api from "./index_org";
+<<<<<<< Updated upstream
  
  
 // Manager Reviews
+=======
+
+>>>>>>> Stashed changes
 export const managerReviewApi = {
   create: (body) => api.post("/managerreview/create", body),
   getById: (id) => api.get(`/managerreview/${id}`),
@@ -47,6 +50,7 @@ export const mentorFeedbackApi = {
    * @returns {Promise} API response with list of feedback received
    */
   aboutMe: (mentorId) => org_api.get(`/mentorfeedback/about-me/${mentorId}`),
+<<<<<<< Updated upstream
  
   /**
    * Get all feedback given by a mentee (my feedback)
@@ -83,6 +87,13 @@ export const mentorFeedbackApi = {
    * @param {number} size - Page size (default: 20)
    * @returns {Promise} API response with paginated feedback list
    */
+=======
+  myFeedback: (menteeId) =>
+    org_api.get(`/mentorfeedback/my-feedback/${menteeId}`),
+  update: (id, body) => org_api.put(`/mentorfeedback/${id}`, body),
+  acknowledge: (id) => org_api.post(`/mentorfeedback/${id}/acknowledge`),
+  remove: (id) => org_api.delete(`/mentorfeedback/${id}`),
+>>>>>>> Stashed changes
   list: (page = 1, size = 20) =>
     org_api.get("/mentorfeedback/all", {
       params: { pageNumber: page, pageSize: size },
@@ -164,6 +175,7 @@ export const smeApi = {
 export const feedbackAnalysisApi = {
   analyze: async (sentence) => {
     try {
+<<<<<<< Updated upstream
       const response = await fetch(import.meta.env.VITE_AI_API_URL+"/analyze", {
         method: "POST",
         headers: {
@@ -172,6 +184,19 @@ export const feedbackAnalysisApi = {
         body: JSON.stringify({ sentence }),
       });
  
+=======
+      const response = await fetch(
+        import.meta.env.VITE_AI_API_URL + "/analyze",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ sentence }),
+        }
+      );
+
+>>>>>>> Stashed changes
       if (!response.ok) {
         throw new Error(`Analysis failed: ${response.statusText}`);
       }
@@ -210,15 +235,27 @@ const LND_API_URL = import.meta.env.VITE_LND_API_URL;
  
 // Employee API
 export const employeeApi = {
+<<<<<<< Updated upstream
   getAll: () =>
     axios.get(`${PROJECT_API_URL}/api/employeemanagement/all`),
  
+=======
+  getAll: () => axios.get(`${PROJECT_API_URL}/api/employeemanagement/all`),
+
+>>>>>>> Stashed changes
   getById: (employeeId) =>
     axios.get(`${PROJECT_API_URL}/api/employeemanagement/${employeeId}`),
  
   getByDepartment: (departmentId) =>
+<<<<<<< Updated upstream
     axios.get(`${PROJECT_API_URL}/api/employeemanagement/department/${departmentId}`),
  
+=======
+    axios.get(
+      `${PROJECT_API_URL}/api/employeemanagement/department/${departmentId}`
+    ),
+
+>>>>>>> Stashed changes
   getByRole: (roleId) =>
     axios.get(`${PROJECT_API_URL}/api/employeemanagement/role/${roleId}`),
  
@@ -246,11 +283,15 @@ export const employeeApi = {
     }
   },
 };
+<<<<<<< Updated upstream
  
  
+=======
+
+>>>>>>> Stashed changes
 // Goals API
 export const goalsApi = {
-  getAll: () =>org_api.get("/Goals"),
+  getAll: () => org_api.get("/Goals"),
   getById: (goalId) => org_api.get(`/Goals/${goalId}`),
   getTeamAll: () => org_api.get("/Goals/team"),
   getOrganizationLevel: () => org_api.get("/Goals/organization-level"),

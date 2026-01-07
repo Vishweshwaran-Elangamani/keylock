@@ -1,8 +1,7 @@
-
 import axios from "axios";
 
 const org_api = axios.create({
-  baseURL: import.meta.env.VITE_ORGFEEDBACK_API_URL+"/api",
+  baseURL: import.meta.env.VITE_ORGFEEDBACK_API_URL + "/api",
   timeout: 30000,
   headers: { "Content-Type": "application/json" },
 });

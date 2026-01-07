@@ -35,6 +35,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -53,7 +54,7 @@
 .amr-header-content {
   flex: 1;
   min-width: 250px;
-  
+
 }
 
 .amr-title {
@@ -222,7 +223,7 @@
 
 
 .amr-dd-open .amr-dd-arrow::before {
-  transform: translateY(-40%) rotate(-135deg); 
+  transform: translateY(-40%) rotate(-135deg);
 }
 
 
@@ -231,7 +232,7 @@
   top: calc(100% + 4px);
   left: 0;
   right: 0;
- 
+
   border-radius: 14px;
   box-shadow: 0 12px 24px rgba(15, 23, 42, 0.18);
   overflow: hidden;
@@ -256,11 +257,11 @@
 }
 
 .amr-dd-item:not(.amr-dd-header):hover {
-  background-color:  #27235C;
+  background-color: #27235C;
   color: white;
 }
 
-.amr-dd-item + .amr-dd-item {
+.amr-dd-item+.amr-dd-item {
   border-top: 1px solid #f1f2f7;
 }
 
@@ -382,7 +383,7 @@
   overflow: hidden;
 }
 
-.amr-feedback-content .amr-badge + .amr-feedback-text {
+.amr-feedback-content .amr-badge+.amr-feedback-text {
   margin-top: 0.75rem;
 }
 

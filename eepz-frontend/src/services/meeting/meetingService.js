@@ -3,9 +3,7 @@ import api_meet from "../../services/meeting/index_meet";
 import axios from "axios";
 
 const meetingService = {
-
-   getAll: () => api_meet.get("/employeemanagement/all"),
- 
+  getAll: () => api_meet.get("/employeemanagement/all"),
 
   scheduleMeeting: async (meetingData) => {
     try {
@@ -37,7 +35,7 @@ const meetingService = {
     }
   },
 
-  // =========== ONE-ON-ONE REPORTS (Manager) ===========
+  //ONE-ON-ONE REPORTS (Manager)
 
   getOneOnOneReports: async (filters = {}) => {
     try {
@@ -46,7 +44,9 @@ const meetingService = {
       if (filters.startDate) params.append("startDate", filters.startDate);
       if (filters.endDate) params.append("endDate", filters.endDate);
 
-      const response = await api_meet.get(`/Meeting/one-on-one-reports?${params.toString()}`);
+      const response = await api_meet.get(
+        `/Meeting/one-on-one-reports?${params.toString()}`
+      );
       return response.data;
     } catch (error) {
       console.error("Get one-on-one reports error:", error);
@@ -64,25 +64,26 @@ const meetingService = {
     }
   },
 
-  // =========== NEW: Get Subordinates from LnD API ===========
+  //NEW: Get Subordinates from LnD API
 
   getSubordinates: async () => {
     try {
       // Get access token from storage (adjust as needed)
       const accessToken = localStorage.getItem("accessToken");
       const response = await axios.get(
-  `${import.meta.env.VITE_LND_API_URL}/api/LnD/employees/subordinates`,
-  {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-      });
+        `${import.meta.env.VITE_LND_API_URL}/api/LnD/employees/subordinates`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
       return response.data;
     } catch (error) {
       console.error("Get subordinates error:", error);
       throw error.response?.data || error;
     }
-  }
+  },
 };
 
 export default meetingService;

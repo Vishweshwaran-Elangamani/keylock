@@ -1,8 +1,7 @@
-// src/services/meeting/employeeservice.js
-import api_meet from "./index_meet"; // Use the same API instance as momService
+import api_meet from "./index_meet";
 
 const employeeService = {
-  // ========= EMPLOYEE OPERATIONS =========
+  //EMPLOYEE OPERATIONS
 
   /**
    * Get all active employees
@@ -11,7 +10,7 @@ const employeeService = {
   getAllEmployees: async () => {
     try {
       const response = await api_meet.get("/EmployeeManagement/all");
-      return response.data; // { success: true, data: [...] }
+      return response.data;
     } catch (error) {
       console.error("Get all employees error:", error);
       throw error.response?.data || error;
@@ -27,7 +26,7 @@ const employeeService = {
       const response = await api_meet.get(
         `/EmployeeManagement/${employeeMasterId}`
       );
-      return response.data; // { success: true, data: {...} }
+      return response.data;
     } catch (error) {
       console.error(`Get employee ${employeeMasterId} error:`, error);
       throw error.response?.data || error;
@@ -85,7 +84,7 @@ const employeeService = {
     }
   },
 
-  // ========= DEPARTMENT OPERATIONS =========
+  //DEPARTMENT OPERATIONS
 
   getAllDepartments: async () => {
     try {
@@ -111,9 +110,7 @@ const employeeService = {
 
   getAllBusinessUnits: async () => {
     try {
-      const response = await api_meet.get(
-        "/EmployeeManagement/business-units"
-      );
+      const response = await api_meet.get("/EmployeeManagement/business-units");
       return response.data;
     } catch (error) {
       console.error("Get all business units error:", error);
