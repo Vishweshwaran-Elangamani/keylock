@@ -191,7 +191,6 @@
 }
 
 .emd-stat-card-horizontal:hover {
-  border-color: #0a65ff;
   box-shadow: 0 8px 22px rgba(15, 23, 42, 0.16);
   transform: translateY(-2px);
 }

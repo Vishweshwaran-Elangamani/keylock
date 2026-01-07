@@ -99,11 +99,11 @@
   gap: 1rem;
   min-height: 100px;
   cursor: pointer;
+  margin-top: -15px;
 }
 
 .dh-sla-stat-card:hover {
   transform: translateY(-2px);
-  border-color: #0f62fe;
   box-shadow: 0 4px 12px rgba(39, 35, 92, 0.1);
 }
 
@@ -176,8 +176,10 @@
   background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-
+  margin-top: 50px;
   overflow: visible;
+  position: relative;
+  z-index: 1;
 }
 
 .dh-sla-table-responsive {
@@ -399,11 +401,12 @@
   display: block;
 }
 
+/* UPDATED PAGINATION DROPDOWN STYLES - FIX FOR VISIBILITY */
 .dh-pagination-dropdown {
   position: relative;
   display: inline-block;
   font-size: 0.875rem;
-  z-index: 100;
+  z-index: 200;
 }
 
 .dh-pagination-dropdown-control {
@@ -423,7 +426,7 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   outline: none;
   position: relative;
-  z-index: 101;
+  z-index: 201;
 }
 
 .dh-pagination-dropdown-control:hover {
@@ -464,17 +467,22 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 99;
+  z-index: 199;
+  background: transparent;
 }
 
 .dh-pagination-dropdown-menu {
-  position: fixed;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
   border-radius: 6px;
   background: #ffffff;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-  z-index: 102;
+  z-index: 202;
   border: 1px solid #e5e7eb;
   min-width: 70px;
+  overflow: hidden;
 }
 
 .dh-pagination-dropdown-option {
@@ -519,7 +527,7 @@
   border-bottom-left-radius: 12px;
   border-bottom-right-radius: 12px;
   position: relative;
-  z-index: 1;
+  z-index: 10;
 }
 
 .dh-sla-pagination-left,
@@ -533,7 +541,7 @@
 .dh-sla-pagination-left {
   font-size: 0.875rem;
   position: relative;
-  z-index: 100;
+  z-index: 200;
 }
 
 .dh-sla-pagination-text {

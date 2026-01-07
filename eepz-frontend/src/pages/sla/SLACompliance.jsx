@@ -265,7 +265,7 @@ const SLACompliance = () => {
             aria-pressed={viewMode === "table"}
           >
             <i
-              className="bi bi-grid-3x3-gap-fill sla-toggle-icon"
+              className="bi bi-table sla-toggle-icon"
               aria-hidden="true"
             ></i>
             <span className="visually-hidden">Table View</span>
@@ -281,7 +281,7 @@ const SLACompliance = () => {
             aria-pressed={viewMode === "cards"}
           >
             <i
-              className="bi bi-grid-3x3-gap sla-toggle-icon inactive-multitone"
+              className="bi bi-grid-3x3-gap-fill sla-toggle-icon"
               aria-hidden="true"
             ></i>
             <span className="visually-hidden">Cards View</span>

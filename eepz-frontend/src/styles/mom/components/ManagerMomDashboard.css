@@ -8,12 +8,11 @@
   padding: 16px 24px 24px;
 }
 
-.breadcrumb-item active {
+.breadcrumb-item.active {
   color: #111827;
-  font-family: "popins";
+  font-family: 'Poppins', sans-serif;
 }
 
-/* Dashboard icon hover effect */
 .sched-breadcrumb-link {
   margin-left: 20px;
   position: relative;
@@ -79,7 +78,6 @@
 }
 
 .managermom-stat-card:hover {
-  border-color: #0f62fe;
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
   transform: translateY(-2px);
 }
@@ -171,82 +169,39 @@
   gap: 12px;
 }
 
-.managermom-toggle-btn {
-  font-weight: 500;
-  font-size: 0.875rem;
-  border-radius: 999px;
-  border: 1px solid #2563eb;
-  color: #2563eb;
-  background-color: #ffffff;
-  padding: 6px 14px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: background-color 0.15s ease, color 0.15s ease,
-    box-shadow 0.15s ease;
+.managermom-view-switch {
+  display: flex;
+  gap: 0.25rem;
+  background: #fff;
+  padding: 0.25rem;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
 }
 
-.managermom-toggle-btn i {
-  font-size: 0.95rem;
-}
-
-.managermom-toggle-active {
-  background: linear-gradient(90deg, #3b3b82 0%, #4b4fb0 100%);
-  color: #ffffff;
-  box-shadow: 0 2px 6px rgba(59, 59, 130, 0.35);
-  border-color: transparent;
-}
-
-
-.managermom-toolbar .managermom-view-switch {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;         
-  border-radius: 12px;               
-  padding: 0.35rem 0.45rem;           
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06); 
-}
-
-.managermom-toolbar .mmview-btn {
-  width: 36px;                         
-  height: 36px;
+.mmview-btn {
+  padding: 0.375rem 0.625rem;
+  background: transparent;
   border: none;
-  border-radius: 8px;                  
-  background: #ffffff;                  
-  display: inline-flex;
+  border-radius: 6px;
+  color: #6c757d;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+  height: 32px;
+  width: 32px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: background-color 160ms ease, color 160ms ease, transform 120ms ease;
-  padding: 0;                          
 }
 
-.managermom-toolbar .mmview-btn .bi {
-  font-size: 1.1rem;                    
-  color: #9aa3ad;                      
+.mmview-btn:hover {
+  color: #27235c;
+  background: rgba(39, 35, 92, 0.05);
 }
 
-.managermom-toolbar .mmview-btn:not(.active):hover {
-  background: #f3f4f6;                  
-}
-
-.managermom-toolbar .mmview-btn.active {
-  background: #27235c;                 
-}
-
-.managermom-toolbar .mmview-btn.active .bi {
-  color: #ffffff;                   
-}
-
-.managermom-toolbar .mmview-btn:active {
-  transform: scale(0.98);
-}
-
-.managermom-toolbar .mmview-btn:focus-visible {
-  outline: 2px solid #27235c33;
-  outline-offset: 2px;
+.mmview-btn.active {
+  background: #27235c;
+  color: #fff;
 }
 
 .managermom-toolbar-right {
@@ -299,8 +254,6 @@
   font-size: 0.75rem;
 }
 
-/* table */
-
 .managermom-table-shell {
   border: 1px solid #e5e7eb;
   border-radius: 12px;
@@ -348,6 +301,7 @@
   color: #1e293b;
   border-bottom: 1px solid #f1f5f9;
   vertical-align: middle;
+  text-align: left;
 }
 
 .managermom-table tbody tr:last-child td {
@@ -364,6 +318,18 @@
 
 .managermom-table tbody td:last-child {
   text-align: center;
+}
+
+.managermom-table tbody td:nth-child(2),
+.managermom-table tbody td:nth-child(3),
+.managermom-table tbody td:nth-child(5) {
+  text-align: left;
+  padding-left: 16px;
+}
+
+.managermom-table tbody td:nth-child(4) {
+  text-align: left;
+  padding-left: 16px;
 }
 
 .managermom-table-row {
@@ -404,6 +370,9 @@
   color: #111827;
   border: 1px solid #e5e7eb;
   font-size: 0.75rem;
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
 }
 
 .managermom-attendance {
@@ -444,16 +413,23 @@
   color: #6b7280;
 }
 
+.bi.bi-clock.me-1 {
+  align-items: start;
+}
+
 .managermom-meeting-card {
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.3s ease;
   border-radius: 12px;
-  border: 1px solid #27235c;
+  border: 1px solid #000000;
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .managermom-meeting-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border-color: #000000;
 }
 
 .managermom-meeting-card-header {
@@ -491,8 +467,6 @@
   height: 8px;
 }
 
-/* MoM-specific pagination dropdown (no conflict with SLA) */
-
 .mom-pagination-dropdown {
   position: relative;
   display: inline-block;
@@ -528,19 +502,15 @@
 }
 
 .mom-pagination-dropdown-value {
-  font-weight: 500;
-  color: #111827;
+  font-weight: 600;
 }
 
 .mom-pagination-dropdown-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #6b7280;
   transition: transform 0.2s ease;
-  flex-shrink: 0;
-  font-size: 0.7rem;
-  margin-left: 20px;
+  color: #6b7280;
 }
 
 .mom-pagination-dropdown-icon.open {
@@ -550,19 +520,19 @@
 .mom-pagination-dropdown-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 1000;
+  z-index: 9998;
   background: transparent;
 }
 
 .mom-pagination-dropdown-menu {
   position: fixed;
-  width: 96px;
-  border-radius: 8px;
-  overflow: hidden;
+  min-width: 78px;
   background: #ffffff;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
-  z-index: 10001;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+  overflow: hidden;
   animation: momDropdownFadeIn 0.15s ease;
 }
 
@@ -579,20 +549,13 @@
 
 .mom-pagination-dropdown-option {
   padding: 8px 12px;
-  font-size: 0.875rem;
   text-align: center;
   cursor: pointer;
-  background-color: #ffffff;
+  font-size: 0.875rem;
   color: #1e293b;
-  transition: all 0.15s ease;
   font-weight: 500;
-  border: none;
-}
-
-.mom-pagination-dropdown-option:not(.selected):hover {
-  background-color: #27235c;
-  color: #ffffff;
-  font-weight: 600;
+  transition: all 0.15s ease;
+  background-color: #ffffff;
 }
 
 .mom-pagination-dropdown-option.selected {
@@ -601,15 +564,16 @@
   font-weight: 600;
 }
 
-.mom-pagination-dropdown-option.selected:hover {
+.mom-pagination-dropdown-option:hover {
   background-color: #27235c;
   color: #ffffff;
+  font-weight: 600;
 }
 
 .managermom-pagination-footer {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   padding: 0.875rem 1rem;
   background: #ffffff;
   border-top: 1px solid #e5e7eb;
@@ -617,182 +581,146 @@
   border-bottom-right-radius: 12px;
   flex-wrap: wrap;
   gap: 0.75rem;
-  margin: 0;
   position: relative;
 }
 
-.managermom-pagination-left {
+.managermom-pagination-left,
+.managermom-pagination-center,
+.managermom-pagination-right {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.managermom-pagination-text {
+.managermom-pagination-left {
   font-size: 0.875rem;
+  position: relative;
+}
+
+.managermom-pagination-text {
   color: #6b7280;
   font-weight: 500;
 }
 
 .managermom-pagination-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   flex: 1;
+  justify-content: center;
 }
 
 .managermom-pagination-status {
-  font-size: 0.875rem;
   color: #6b7280;
+  font-size: 0.875rem;
   white-space: nowrap;
-}
-
-.managermom-pagination-right {
-  display: flex;
-  align-items: center;
 }
 
 .managermom-pagination-list {
   display: flex;
   align-items: center;
-  gap: 4px;
   list-style: none;
-  margin: 0;
   padding: 0;
+  margin: 0;
+  gap: 4px;
 }
 
 .managermom-page-item {
-  list-style: none;
-}
-
-.managermom-page-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 32px;
-  height: 32px;
-  padding: 0;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  background-color: #ffffff;
-  color: #1e293b;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.managermom-page-link:hover:not(:disabled) {
-  background-color: #27235c;
-  border-color: #27235c;
-  color: #ffffff;
-}
-
-.managermom-page-item.active .managermom-page-link {
-  background-color: #27235c;
-  border-color: #27235c;
-  color: #ffffff;
-  font-weight: 600;
+  display: flex;
 }
 
 .managermom-page-item.disabled .managermom-page-link {
   opacity: 0.5;
   cursor: not-allowed;
-  pointer-events: none;
-  background-color: #f9fafb;
+  background: #f9fafb;
+  color: #9ca3af;
+}
+
+.managermom-page-item.active .managermom-page-link {
+  background: #27235c;
+  color: #ffffff;
+  border-color: #27235c;
+  font-weight: 600;
+}
+
+.managermom-page-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  padding: 0;
+  font-size: 0.875rem;
+  color: #1e293b;
+  cursor: pointer;
+  min-width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  text-align: center;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.managermom-page-link:hover:not(.disabled) {
+  background: #27235c;
+  color: #ffffff;
+  border-color: #27235c;
 }
 
 .managermom-page-arrow {
-  padding: 0;
-  min-width: 32px;
+  font-weight: 700;
 }
 
 .managermom-arrow-icon {
-  font-size: 1rem;
+  font-size: 1.1rem;
   line-height: 1;
 }
 
-/* responsive */
-
-@media (max-width: 1200px) {
-  .managermom-pagination-footer {
-    flex-wrap: wrap;
-  }
+.managermom-grid-pagination-wrapper {
+  background: #ffffff;
+  border-radius: 12px 12px 0 0;
+  border: 1px solid #e5e7eb;
+  border-bottom: none;
+  overflow: hidden;
+  margin-top: 1.5rem;
+  margin-bottom: 0;
 }
 
-@media (max-width: 992px) {
-  .managermom-container {
-    padding: 14px 16px 20px;
-  }
+.managermom-grid-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid #e5e7eb;
+  background: #ffffff;
+  border-radius: 0 0 12px 12px;
+  position: relative;
+  overflow: visible;
+}
 
-  .managermom-pagination-footer {
+@media (max-width: 768px) {
+  .managermom-toolbar {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .managermom-pagination-left,
-  .managermom-pagination-center,
-  .managermom-pagination-right {
+  .managermom-view-switch {
     justify-content: center;
   }
-}
 
-@media (max-width: 768px) {
-  .managermom-container {
-    padding: 12px 12px 18px;
-  }
-
-  .managermom-toolbar {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .managermom-table thead th,
-  .managermom-table tbody td {
-    padding: 10px 12px;
-    font-size: 0.75rem;
-  }
-
-  .managermom-stat-card {
-    height: 92px;
-  }
-
-  .managermom-stat-inner {
-    padding: 12px 16px;
-    gap: 12px;
-  }
-
-  .managermom-stat-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-  }
-
-  .managermom-stat-count {
-    font-size: 1.4rem;
-  }
-
-  .managermom-stat-label {
-    font-size: 0.7rem;
-  }
-
-  .managermom-page-link {
-    min-width: 32px;
-    height: 32px;
-    padding: 0.375rem 0.5rem;
-    font-size: 0.8125rem;
-  }
-}
-
-@media (max-width: 576px) {
-  .managermom-container {
-    padding: 10px 10px 16px;
-  }
-
-  .managermom-stat-inner {
-    padding: 12px 14px;
+  .managermom-toolbar-right {
+    justify-content: center;
   }
 
   .managermom-pagination-footer {
-    padding: 0.75rem 1rem;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .managermom-pagination-left,
+  .managermom-pagination-center {
+    justify-content: center;
+  }
+
+  .managermom-pagination-right {
+    justify-content: center;
   }
 }

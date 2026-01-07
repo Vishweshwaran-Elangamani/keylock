@@ -126,11 +126,11 @@ const ManagerMomDashboard = () => {
   const [employeeMap, setEmployeeMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [showTableView, setShowTableView] = useState(true);
+  const [viewMode, setViewMode] = useState("table");
   const [selectedMeeting, setSelectedMeeting] = useState(null);
   const [actionItemFilter, setActionItemFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   useEffect(() => {
     loadDashboardData();
@@ -233,7 +233,7 @@ const ManagerMomDashboard = () => {
   };
 
   const formatDateTime = (isoString) => {
-    if (!isoString) return "-";
+    if (!isoString) return "−";
     const date = new Date(isoString);
     const dd = String(date.getDate()).padStart(2, "0");
     const mm = String(date.getMonth() + 1).padStart(2, "0");
@@ -244,7 +244,7 @@ const ManagerMomDashboard = () => {
   };
 
   const formatDate = (isoString) => {
-    if (!isoString) return "-";
+    if (!isoString) return "−";
     const date = new Date(isoString);
     return date.toLocaleDateString("en-US", {
       year: "numeric",
@@ -269,12 +269,12 @@ const ManagerMomDashboard = () => {
   };
 
   const safeTotal = upcomingMeetings.length;
-  const totalPages = Math.max(1, Math.ceil(safeTotal / itemsPerPage));
+  const perPage = viewMode === "grid" ? 9 : itemsPerPage;
+  const totalPages = Math.max(1, Math.ceil(safeTotal / perPage));
   const validCurrentPage = Math.min(currentPage, totalPages);
-  const startIndex =
-    safeTotal === 0 ? 0 : (validCurrentPage - 1) * itemsPerPage;
+const startIndex = safeTotal === 0 ? 0 : (validCurrentPage - 1) * perPage;
   const endIndex =
-    safeTotal === 0 ? 0 : Math.min(validCurrentPage * itemsPerPage, safeTotal);
+    safeTotal === 0 ? 0 : Math.min(validCurrentPage * perPage, safeTotal);
   const paginatedMeetings = upcomingMeetings.slice(startIndex, endIndex);
 
   const goToPage = (page) => {
@@ -345,7 +345,6 @@ const ManagerMomDashboard = () => {
 
               <li className="breadcrumb-item active" aria-current="page">
                 <span className="sched-breadcrumb-active">
-                  {" "}
                   Meetings and MoM
                 </span>
               </li>
@@ -383,29 +382,31 @@ const ManagerMomDashboard = () => {
         </div>
 
         <div className="managermom-toolbar">
-          <div
-            className="managermom-view-switch"
-            role="group"
-            aria-label="View switcher"
-          >
+          <div className="managermom-view-switch" role="group" aria-label="View switcher">
             <button
               type="button"
-              className={`mmview-btn ${showTableView ? "active" : ""}`}
-              onClick={() => setShowTableView(true)}
+              className={`mmview-btn ${viewMode === "table" ? "active" : ""}`}
+              onClick={() => {
+                setViewMode("table");
+                setCurrentPage(1);
+              }}
               title="Table View"
-              aria-pressed={showTableView}
+              aria-pressed={viewMode === "table"}
             >
-              <i className="bi bi-grid-3x3-gap-fill"></i>
+              <i className="bi bi-table"></i>
             </button>
 
             <button
               type="button"
-              className={`mmview-btn ${!showTableView ? "active" : ""}`}
-              onClick={() => setShowTableView(false)}
-              title="Card View"
-              aria-pressed={!showTableView}
+              className={`mmview-btn ${viewMode === "grid" ? "active" : ""}`}
+              onClick={() => {
+                setViewMode("grid");
+                setCurrentPage(1);
+              }}
+              title="Grid View"
+              aria-pressed={viewMode === "grid"}
             >
-              <i className="bi bi-grid-3x3-gap"></i>
+              <i className="bi bi-grid-3x3-gap-fill"></i>
             </button>
           </div>
 
@@ -427,7 +428,7 @@ const ManagerMomDashboard = () => {
           </span>
         </div>
 
-        {showTableView ? (
+        {viewMode === "table" ? (
           <div className="managermom-table-shell">
             <div className="table-responsive">
               <table className="table align-middle managermom-table">
@@ -460,9 +461,6 @@ const ManagerMomDashboard = () => {
                       >
                         <td>
                           <div className="managermom-meeting-title-cell">
-                            <div className="managermom-meeting-avatar">
-                              <i className="bi bi-calendar-event managermom-meeting-avatar-icon"></i>
-                            </div>
                             <span className="fw-semibold">
                               {meeting.meetingTitle}
                             </span>
@@ -470,7 +468,6 @@ const ManagerMomDashboard = () => {
                         </td>
                         <td>
                           <span className="text-muted">
-                            <i className="bi bi-clock me-1"></i>
                             {formatDateTime(meeting.meetingDate)}
                           </span>
                         </td>
@@ -618,65 +615,126 @@ const ManagerMomDashboard = () => {
             )}
           </div>
         ) : (
-          <div className="row g-3">
-            {upcomingMeetings.length === 0 ? (
-              <div className="col-12 managermom-empty-card-wrapper">
-                <i className="bi bi-calendar-x managermom-empty-icon"></i>
-                <p className="managermom-empty-text">No upcoming meetings</p>
-              </div>
-            ) : (
-              upcomingMeetings.map((meeting) => (
-                <div key={meeting.meetingId} className="col-lg-4 col-md-6">
-                  <div
-                    className="card h-100 managermom-meeting-card"
-                    onClick={() => openMeetingDetails(meeting)}
-                  >
-                    <div className="card-body">
-                      <div className="managermom-meeting-card-header">
-                        <div className="managermom-card-avatar">
-                          <i className="bi bi-calendar-event managermom-card-avatar-icon"></i>
-                        </div>
-                        <span className="badge managermom-type-badge">
-                          {meeting.meetingType || "General"}
-                        </span>
-                      </div>
-                      <h6 className="card-title fw-semibold mb-2">
-                        {meeting.meetingTitle}
-                      </h6>
-                      <p className="text-muted small mb-3">
-                        <i className="bi bi-clock me-1"></i>
-                        {formatDateTime(meeting.meetingDate)}
-                      </p>
-                      <div className="managermom-meeting-card-footer">
-                        <div>
-                          <small className="text-muted">Attendance</small>
-                          <div className="fw-semibold">
-                            {meeting.rsvpAcceptedCount}/
-                            {meeting.rsvpTotalInvitations}
+          <>
+            <div className="row g-3">
+              {paginatedMeetings.length === 0 ? (
+                <div className="col-12 managermom-empty-card-wrapper">
+                  <i className="bi bi-calendar-x managermom-empty-icon"></i>
+                  <p className="managermom-empty-text">No upcoming meetings</p>
+                </div>
+              ) : (
+                paginatedMeetings.map((meeting) => (
+                  <div key={meeting.meetingId} className="col-lg-4 col-md-6">
+                    <div
+                      className="h-100 managermom-meeting-card"
+                      onClick={() => openMeetingDetails(meeting)}
+                    >
+                      <div className="card-body">
+                        <div className="managermom-meeting-card-header">
+                          <div className="managermom-card-avatar">
+                            <i className="bi bi-calendar-event managermom-card-avatar-icon"></i>
                           </div>
+                          <span className="badge managermom-type-badge">
+                            {meeting.meetingType || "General"}
+                          </span>
                         </div>
-                        <div className="progress managermom-card-progress">
-                          <div
-                            className="progress-bar bg-success"
-                            role="progressbar"
-                            style={{
-                              width: `${
-                                meeting.rsvpTotalInvitations > 0
-                                  ? (meeting.rsvpAcceptedCount /
-                                      meeting.rsvpTotalInvitations) *
-                                    100
-                                  : 0
-                              }%`,
-                            }}
-                          ></div>
+                        <h6 className="card-title fw-semibold mb-2">
+                          {meeting.meetingTitle}
+                        </h6>
+                        <p className="text-muted small mb-3">
+                          <i className="bi bi-clock me-1"></i>
+                          {formatDateTime(meeting.meetingDate)}
+                        </p>
+                        <div className="managermom-meeting-card-footer">
+                          <div>
+                            <small className="text-muted">Attendance</small>
+                            <div className="fw-semibold">
+                              {meeting.rsvpAcceptedCount}/
+                              {meeting.rsvpTotalInvitations}
+                            </div>
+                          </div>
+                          <div className="progress managermom-card-progress">
+                            <div
+                              className="progress-bar bg-success"
+                              role="progressbar"
+                              style={{
+                                width: `${
+                                  meeting.rsvpTotalInvitations > 0
+                                    ? (meeting.rsvpAcceptedCount /
+                                        meeting.rsvpTotalInvitations) *
+                                      100
+                                    : 0
+                                }%`,
+                              }}
+                            ></div>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
+                ))
+              )}
+            </div>
+
+            {safeTotal > 0 && totalPages > 1 && (
+              <div className="managermom-grid-pagination-wrapper">
+                <div className="managermom-grid-pagination">
+                  <ul className="managermom-pagination-list">
+                    <li
+                      className={`managermom-page-item ${
+                        validCurrentPage === 1 ? "disabled" : ""
+                      }`}
+                    >
+                      <button
+                        className="managermom-page-link managermom-page-arrow"
+                        onClick={() => goToPage(validCurrentPage - 1)}
+                        disabled={validCurrentPage === 1}
+                      >
+                        <span className="managermom-arrow-icon">‹</span>
+                      </button>
+                    </li>
+                    {getPageNumbers().map((page, idx) =>
+                      page === "..." ? (
+                        <li
+                          key={`ellipsis-${idx}`}
+                          className="managermom-page-item disabled"
+                        >
+                          <span className="managermom-page-link">...</span>
+                        </li>
+                      ) : (
+                        <li
+                          key={page}
+                          className={`managermom-page-item ${
+                            validCurrentPage === page ? "active" : ""
+                          }`}
+                        >
+                          <button
+                            className="managermom-page-link"
+                            onClick={() => goToPage(page)}
+                          >
+                            {page}
+                          </button>
+                        </li>
+                      )
+                    )}
+                    <li
+                      className={`managermom-page-item ${
+                        validCurrentPage === totalPages ? "disabled" : ""
+                      }`}
+                    >
+                      <button
+                        className="managermom-page-link managermom-page-arrow"
+                        onClick={() => goToPage(validCurrentPage + 1)}
+                        disabled={validCurrentPage === totalPages}
+                      >
+                        <span className="managermom-arrow-icon">›</span>
+                      </button>
+                    </li>
+                  </ul>
                 </div>
-              ))
+              </div>
             )}
-          </div>
+          </>
         )}
 
         {selectedMeeting && (
