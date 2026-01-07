@@ -60,10 +60,9 @@ const MeetingInvitations = () => {
     setSelectedInvitation(invitation);
     setErrorMessage("");
 
-    // backend sends integer (0,1,2,3)
     const currentStatus = invitation.rsvpStatus ?? RSVP_STATUS.PENDING.value;
 
-    setRsvpStatus(currentStatus); // store integer value
+    setRsvpStatus(currentStatus);
     setRsvpComment(invitation.rsvpComments || "");
   };
 
@@ -76,7 +75,8 @@ const MeetingInvitations = () => {
   const handleRsvpSubmit = async () => {
     if (!selectedInvitation) return;
 
-    const meetingId = selectedInvitation.meetingId || selectedInvitation.MeetingId;
+    const meetingId =
+      selectedInvitation.meetingId || selectedInvitation.MeetingId;
 
     if (!meetingId || Number(meetingId) === 0) {
       setErrorMessage("Invalid meeting ID.");
@@ -127,35 +127,34 @@ const MeetingInvitations = () => {
     }
   };
 
-const getStatusBadge = (status) => {
-  switch (status) {
-    case RSVP_STATUS.ACCEPTED.value:
-      return (
-        <span className="mi-badge mi-badge-accepted">
-          <CheckCircle size={14} /> Accepted
-        </span>
-      );
-    case RSVP_STATUS.DECLINED.value:
-      return (
-        <span className="mi-badge mi-badge-declined">
-          <XCircle size={14} /> Declined
-        </span>
-      );
-    case RSVP_STATUS.TENTATIVE.value:
-      return (
-        <span className="mi-badge mi-badge-tentative">
-          <AlertCircle size={14} /> Tentative
-        </span>
-      );
-    default:
-      return (
-        <span className="mi-badge mi-badge-pending">
-          <Clock size={14} /> Pending
-        </span>
-      );
-  }
-};
-
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case RSVP_STATUS.ACCEPTED.value:
+        return (
+          <span className="mi-badge mi-badge-accepted">
+            <CheckCircle size={14} /> Accepted
+          </span>
+        );
+      case RSVP_STATUS.DECLINED.value:
+        return (
+          <span className="mi-badge mi-badge-declined">
+            <XCircle size={14} /> Declined
+          </span>
+        );
+      case RSVP_STATUS.TENTATIVE.value:
+        return (
+          <span className="mi-badge mi-badge-tentative">
+            <AlertCircle size={14} /> Tentative
+          </span>
+        );
+      default:
+        return (
+          <span className="mi-badge mi-badge-pending">
+            <Clock size={14} /> Pending
+          </span>
+        );
+    }
+  };
 
   const formatDateTime = (dateString) => {
     if (!dateString) return "Not scheduled";
@@ -231,22 +230,28 @@ const getStatusBadge = (status) => {
                 </button>
               </li>
               <li className="mi-breadcrumb-separator">/</li>
-             <li className="breadcrumb-item mi-breadcrumb-item">
-  <button
-    onClick={() => navigate("/employee/dashboard/meetmom", { state: { fromPage: "invitations" } })}
-    className="mi-breadcrumb-link-button"
-    type="button"
-  >
-    Meetings and MoM
-  </button>
-</li>
+              <li className="breadcrumb-item mi-breadcrumb-item">
+                <button
+                  onClick={() =>
+                    navigate("/employee/dashboard/meetmom", {
+                      state: { fromPage: "invitations" },
+                    })
+                  }
+                  className="mi-breadcrumb-link-button"
+                  type="button"
+                >
+                  Meetings and MoM
+                </button>
+              </li>
 
               <li className="mi-breadcrumb-separator">/</li>
               <li
                 className="breadcrumb-item active mi-breadcrumb-item"
                 aria-current="page"
               >
-                <span className="mi-breadcrumb-current">Meeting Invitations</span>
+                <span className="mi-breadcrumb-current">
+                  Meeting Invitations
+                </span>
               </li>
             </ol>
           </nav>
@@ -299,7 +304,9 @@ const getStatusBadge = (status) => {
 
                           <div className="col">
                             <div className="mi-card-header-row">
-                              <h5 className="mi-meeting-title">{meetingTitle}</h5>
+                              <h5 className="mi-meeting-title">
+                                {meetingTitle}
+                              </h5>
                               <div className="mi-header-actions">
                                 {getStatusBadge(rsvpStatusValue)}
                                 <button
@@ -379,7 +386,9 @@ const getStatusBadge = (status) => {
                 <div className="modal-content mi-modal-content">
                   <div className="modal-header mi-modal-header">
                     <div className="mi-modal-header-text">
-                      <h5 className="modal-title mi-modal-title">Confirm RSVP</h5>
+                      <h5 className="modal-title mi-modal-title">
+                        Confirm RSVP
+                      </h5>
                       <p className="mi-modal-subtitle">
                         Respond to meeting invitation
                       </p>

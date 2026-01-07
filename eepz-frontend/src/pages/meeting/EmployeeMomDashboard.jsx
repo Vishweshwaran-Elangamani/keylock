@@ -61,15 +61,19 @@ const EmployeeMomDashboard = () => {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      const [myMomsRes, actionItemsRes, invitationsRes, sharedRes] = await Promise.all([
-        momService.getMyMoms(),
-        momService.getMyActionItems(),
-        rsvpService.getMyInvitations(),
-        momService.getMomsSharedWithMe(),
-      ]);
+      const [myMomsRes, actionItemsRes, invitationsRes, sharedRes] =
+        await Promise.all([
+          momService.getMyMoms(),
+          momService.getMyActionItems(),
+          rsvpService.getMyInvitations(),
+          momService.getMomsSharedWithMe(),
+        ]);
 
-      const pendingActions = actionItemsRes.data?.filter((item) => item.status === "Pending") || [];
-      const pendingInvites = invitationsRes.data?.filter((inv) => inv.rsvpStatus === "Pending") || [];
+      const pendingActions =
+        actionItemsRes.data?.filter((item) => item.status === "Pending") || [];
+      const pendingInvites =
+        invitationsRes.data?.filter((inv) => inv.rsvpStatus === "Pending") ||
+        [];
 
       setStats({
         myMoms: myMomsRes.data?.length || 0,
@@ -138,10 +142,9 @@ const EmployeeMomDashboard = () => {
     setShowSharedModal(true);
   };
 
-const closeSharedModal = () => {
-  setShowSharedModal(false);
-};
-
+  const closeSharedModal = () => {
+    setShowSharedModal(false);
+  };
 
   if (loading)
     return (
@@ -212,11 +215,17 @@ const closeSharedModal = () => {
         </div>
 
         <div className="emp-momupdate-toggle-wrapper">
-          <div className="emp-momupdate-toggle" role="tablist" aria-label="MOM actions">
+          <div
+            className="emp-momupdate-toggle"
+            role="tablist"
+            aria-label="MOM actions"
+          >
             <button
               type="button"
               role="tab"
-              className={`emp-momupdate-item ${empMomActive === "myMoms" ? "active" : ""}`}
+              className={`emp-momupdate-item ${
+                empMomActive === "myMoms" ? "active" : ""
+              }`}
               aria-pressed={empMomActive === "myMoms"}
               aria-selected={empMomActive === "myMoms"}
               onClick={() => {
@@ -234,7 +243,9 @@ const closeSharedModal = () => {
             <button
               type="button"
               role="tab"
-              className={`emp-momupdate-item ${empMomActive === "sharedMoms" ? "active" : ""}`}
+              className={`emp-momupdate-item ${
+                empMomActive === "sharedMoms" ? "active" : ""
+              }`}
               aria-pressed={empMomActive === "sharedMoms"}
               aria-selected={empMomActive === "sharedMoms"}
               onClick={() => {
@@ -252,7 +263,9 @@ const closeSharedModal = () => {
             <button
               type="button"
               role="tab"
-              className={`emp-momupdate-item ${empMomActive === "actionItems" ? "active" : ""}`}
+              className={`emp-momupdate-item ${
+                empMomActive === "actionItems" ? "active" : ""
+              }`}
               aria-pressed={empMomActive === "actionItems"}
               aria-selected={empMomActive === "actionItems"}
               onClick={() => {
@@ -261,9 +274,9 @@ const closeSharedModal = () => {
               }}
               title="Action Items"
             >
-             <span className="emp-momupdate-icon" aria-hidden="true">
-             <i className="bi bi-list-check"></i>
-            </span>
+              <span className="emp-momupdate-icon" aria-hidden="true">
+                <i className="bi bi-list-check"></i>
+              </span>
 
               <span className="emp-momupdate-label">Action Items</span>
             </button>
@@ -271,7 +284,9 @@ const closeSharedModal = () => {
             <button
               type="button"
               role="tab"
-              className={`emp-momupdate-item ${empMomActive === "invitations" ? "active" : ""}`}
+              className={`emp-momupdate-item ${
+                empMomActive === "invitations" ? "active" : ""
+              }`}
               aria-pressed={empMomActive === "invitations"}
               aria-selected={empMomActive === "invitations"}
               onClick={() => {
@@ -297,7 +312,9 @@ const closeSharedModal = () => {
                     <i className="bi bi-clock-history"></i>
                     Recent Activity
                   </h5>
-                  <span className="emd-count-badge">{recentActivity.length} items</span>
+                  <span className="emd-count-badge">
+                    {recentActivity.length} items
+                  </span>
                 </div>
 
                 {recentActivity.length === 0 ? (
@@ -306,12 +323,18 @@ const closeSharedModal = () => {
                       <i className="bi bi-inbox"></i>
                     </div>
                     <h6 className="emd-empty-title">No recent activity</h6>
-                    <p className="emd-empty-text">Your recent MOMs and invitations will appear here</p>
+                    <p className="emd-empty-text">
+                      Your recent MOMs and invitations will appear here
+                    </p>
                   </div>
                 ) : (
                   <div className="emd-activity-list">
                     {recentActivity.map((item, idx) => (
-                      <ActivityItem key={idx} item={item} onClick={() => handleActivityClick(item)} />
+                      <ActivityItem
+                        key={idx}
+                        item={item}
+                        onClick={() => handleActivityClick(item)}
+                      />
                     ))}
                   </div>
                 )}
@@ -327,7 +350,9 @@ const closeSharedModal = () => {
                     <i className="bi bi-calendar3"></i>
                     My Meetings
                   </h5>
-                  <span className="emd-count-badge">{meetings.length} meetings</span>
+                  <span className="emd-count-badge">
+                    {meetings.length} meetings
+                  </span>
                 </div>
 
                 {meetings.length === 0 ? (
@@ -336,7 +361,9 @@ const closeSharedModal = () => {
                       <i className="bi bi-calendar-x"></i>
                     </div>
                     <h6 className="emd-empty-title">No meetings found</h6>
-                    <p className="emd-empty-text">Create your first meeting minute to get started</p>
+                    <p className="emd-empty-text">
+                      Create your first meeting minute to get started
+                    </p>
                   </div>
                 ) : (
                   <>
@@ -349,8 +376,12 @@ const closeSharedModal = () => {
                         >
                           <div className="emd-meeting-main">
                             <div className="emd-meeting-title-row">
-                              <span className="emd-meeting-title">{m.meetingTitle}</span>
-                              <span className="emd-meeting-type-pill">{m.meetingType}</span>
+                              <span className="emd-meeting-title">
+                                {m.meetingTitle}
+                              </span>
+                              <span className="emd-meeting-type-pill">
+                                {m.meetingType}
+                              </span>
                             </div>
                             <div className="emd-meeting-meta-row">
                               <span className="emd-meta-item">
@@ -359,15 +390,19 @@ const closeSharedModal = () => {
                               </span>
                               <span className="emd-meta-item">
                                 <i className="bi bi-clock"></i>
-                                {new Date(m.meetingDate).toLocaleTimeString([], {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })}
+                                {new Date(m.meetingDate).toLocaleTimeString(
+                                  [],
+                                  {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  }
+                                )}
                               </span>
                               {m.actionItems && m.actionItems.length > 0 && (
                                 <span className="emd-meta-item">
                                   <i className="bi bi-check-circle"></i>
-                                  {m.actionItems.length} action{m.actionItems.length !== 1 ? "s" : ""}
+                                  {m.actionItems.length} action
+                                  {m.actionItems.length !== 1 ? "s" : ""}
                                 </span>
                               )}
                             </div>
@@ -381,7 +416,9 @@ const closeSharedModal = () => {
                       <div className="emd-view-all">
                         <button
                           className="emd-view-all-btn"
-                          onClick={() => navigate("/employee/dashboard/meetmom/my-moms")}
+                          onClick={() =>
+                            navigate("/employee/dashboard/meetmom/my-moms")
+                          }
                           type="button"
                         >
                           View All {meetings.length} Meetings
@@ -426,7 +463,11 @@ const StatCard = ({ icon, bgColor, iconColor, count, label, onClick }) => (
 
 const ActivityItem = ({ item, onClick }) => (
   <div className="emd-activity-item" onClick={onClick}>
-    <div className={`emd-activity-icon-wrapper emd-activity-${item.color || "primary"}`}>
+    <div
+      className={`emd-activity-icon-wrapper emd-activity-${
+        item.color || "primary"
+      }`}
+    >
       <i className={`${item.icon} emd-activity-icon`} />
     </div>
     <div className="emd-activity-main">
@@ -438,7 +479,10 @@ const ActivityItem = ({ item, onClick }) => (
         </span>
         <span className="emd-meta-item">
           <i className="bi bi-clock"></i>
-          {new Date(item.date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+          {new Date(item.date).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
         </span>
       </div>
     </div>

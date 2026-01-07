@@ -62,7 +62,10 @@ export default function ManagerEmployeeList() {
             <h2 className="mrev-title">Team Members:</h2>
             <p className="mrev-subtitle">Employees you manage</p>
           </div>
-          <Link to="/manager/dashboard/feedback" className="mrev-btn mrev-btn-outline">
+          <Link
+            to="/manager/dashboard/feedback"
+            className="mrev-btn mrev-btn-outline"
+          >
             Back to Dashboard
           </Link>
         </div>

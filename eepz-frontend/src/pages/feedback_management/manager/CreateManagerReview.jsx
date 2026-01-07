@@ -88,7 +88,6 @@ export default function CreateManagerReview() {
     };
 
     fetchEmployees();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -184,10 +183,7 @@ export default function CreateManagerReview() {
               <strong className="cmr-alert-title">Error</strong>
               <p className="cmr-alert-text">{error}</p>
             </div>
-            <button
-              className="cmr-alert-close"
-              onClick={() => setError("")}
-            />
+            <button className="cmr-alert-close" onClick={() => setError("")} />
           </div>
         )}
 
@@ -283,9 +279,7 @@ export default function CreateManagerReview() {
                       className={`cmr-rating-btn ${
                         form.rating === rating ? "cmr-rating-btn-active" : ""
                       }`}
-                      onClick={() =>
-                        setForm((prev) => ({ ...prev, rating }))
-                      }
+                      onClick={() => setForm((prev) => ({ ...prev, rating }))}
                     >
                       <div className="cmr-rating-content">
                         <div className="cmr-rating-number">{rating}</div>
@@ -341,8 +335,7 @@ export default function CreateManagerReview() {
 
               <div className="col-12">
                 <label className="cmr-label">
-                  Goal Context{" "}
-                  <span className="cmr-optional">(Optional)</span>
+                  Goal Context <span className="cmr-optional">(Optional)</span>
                 </label>
                 <textarea
                   className="cmr-textarea"

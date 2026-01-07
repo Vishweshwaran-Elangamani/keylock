@@ -13,7 +13,10 @@ import {
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { employeeApi, managerReviewApi } from '../../../services/feedbackmanagement/feedbackApi';
+import {
+  employeeApi,
+  managerReviewApi,
+} from "../../../services/feedbackmanagement/feedbackApi";
 import FeedbackBreadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb";
 import "../../../styles/feedback/components/ManagerReviewsList.css";
 
@@ -39,7 +42,6 @@ export default function ManagerReviewsList() {
   const [employeeMap, setEmployeeMap] = useState({});
   const [employees, setEmployees] = useState([]);
 
-  // Edit Modal State
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingReview, setEditingReview] = useState(null);
   const [editForm, setEditForm] = useState({
@@ -51,7 +53,6 @@ export default function ManagerReviewsList() {
   });
   const [editLoading, setEditLoading] = useState(false);
 
-  // Enrich reviews with employee names
   const enrichReviews = (reviewsList, empMap) => {
     return reviewsList.map((review) => ({
       ...review,
@@ -65,7 +66,6 @@ export default function ManagerReviewsList() {
     }));
   };
 
-  // Fetch data
   const fetchReviews = async () => {
     setLoading(true);
     setError("");
@@ -111,12 +111,10 @@ export default function ManagerReviewsList() {
     fetchReviews();
   }, [user?.empId]);
 
-  // Handle view
   const handleView = (id) => {
     navigate(`/manager/dashboard/feedback/review/${id}`);
   };
 
-  // Handle edit - open modal
   const handleEdit = async (review) => {
     setEditingReview(review);
     setEditForm({
@@ -129,7 +127,6 @@ export default function ManagerReviewsList() {
     setShowEditModal(true);
   };
 
-  // Handle edit - save
   const handleSaveEdit = async (e) => {
     e.preventDefault();
 
@@ -156,7 +153,6 @@ export default function ManagerReviewsList() {
     }
   };
 
-  // Handle edit - close modal
   const handleCloseEditModal = () => {
     setShowEditModal(false);
     setEditingReview(null);
@@ -224,13 +220,11 @@ export default function ManagerReviewsList() {
                   {selectedEmployee && (
                     <div className="col-12">
                       <div className="fm-mgrrev-employee-info">
-                        <strong>Reviewing:</strong>{" "}
-                        {selectedEmployee.firstName}{" "}
+                        <strong>Reviewing:</strong> {selectedEmployee.firstName}{" "}
                         {selectedEmployee.lastName}
                         <br />
                         <small>
-                          {selectedEmployee.email} •{" "}
-                          {selectedEmployee.roleName}
+                          {selectedEmployee.email} • {selectedEmployee.roleName}
                         </small>
                       </div>
                     </div>
@@ -245,9 +239,7 @@ export default function ManagerReviewsList() {
                         <button
                           key={rating}
                           type="button"
-                          onClick={() =>
-                            setEditForm({ ...editForm, rating })
-                          }
+                          onClick={() => setEditForm({ ...editForm, rating })}
                           className={`fm-mgrrev-rating-btn ${
                             editForm.rating === rating
                               ? "fm-mgrrev-rating-btn--active"
@@ -363,7 +355,10 @@ export default function ManagerReviewsList() {
           <div className="fm-mgrrev-header">
             <FeedbackBreadcrumb
               items={[
-                { label: "Feedback Management", path: "/manager/dashboard/feedback" },
+                {
+                  label: "Feedback Management",
+                  path: "/manager/dashboard/feedback",
+                },
                 { label: "My Reviews" },
               ]}
             />
@@ -386,7 +381,10 @@ export default function ManagerReviewsList() {
 
           {loading ? (
             <div className="fm-mgrrev-loading">
-              <div className="spinner-border fm-mgrrev-loading__spinner" role="status">
+              <div
+                className="spinner-border fm-mgrrev-loading__spinner"
+                role="status"
+              >
                 <span className="visually-hidden">Loading...</span>
               </div>
               <p className="fm-mgrrev-loading__text">Loading reviews...</p>
@@ -431,15 +429,19 @@ export default function ManagerReviewsList() {
                       </div>
 
                       <div className="fm-mgrrev-card__date">
-                        <Calendar size={14} className="fm-mgrrev-card__calendar-icon" />
+                        <Calendar
+                          size={14}
+                          className="fm-mgrrev-card__calendar-icon"
+                        />
                         <span className="fm-mgrrev-card__date-text">
                           {review.createdAt
-                            ? new Date(review.createdAt).toLocaleDateString("en-GB")
+                            ? new Date(review.createdAt).toLocaleDateString(
+                                "en-GB"
+                              )
                             : "—"}
                         </span>
                       </div>
 
-                    
                       <div className="fm-mgrrev-card__comment">
                         <p className="fm-mgrrev-card__comment-text">
                           {review.reviewComment || "No comment"}

@@ -336,7 +336,7 @@ const ScheduleMeeting = () => {
 
 <li
   className="sched-breadcrumb-separator"
-  style={{ margin: "0 4px" }} // Reduce horizontal space
+  style={{ margin: "0 4px" }} 
 >
   /
 </li>

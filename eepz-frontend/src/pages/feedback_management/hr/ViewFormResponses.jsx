@@ -78,9 +78,7 @@ export default function ViewFormResponses() {
               <div className="hfrp-card">
                 <div className="hfrp-card-body">
                   <div className="hfrp-card-header">
-                    <h6 className="hfrp-employee-name">
-                      {resp.employeeName}
-                    </h6>
+                    <h6 className="hfrp-employee-name">{resp.employeeName}</h6>
                     <span className="hfrp-status-badge">
                       <CheckCircle
                         size={12}
@@ -91,8 +89,7 @@ export default function ViewFormResponses() {
                   </div>
 
                   <small className="hfrp-submitted-text">
-                    Submitted:{" "}
-                    {new Date(resp.submittedAt).toLocaleDateString()}
+                    Submitted: {new Date(resp.submittedAt).toLocaleDateString()}
                   </small>
 
                   <div className="hfrp-answers-block">
@@ -102,15 +99,11 @@ export default function ViewFormResponses() {
                         resp.answers.split(",").map((ans, idx) => (
                           <div key={idx} className="hfrp-answer-row">
                             Q{idx + 1}:{" "}
-                            <span className="hfrp-answer-badge">
-                              {ans} ⭐
-                            </span>
+                            <span className="hfrp-answer-badge">{ans} ⭐</span>
                           </div>
                         ))
                       ) : (
-                        <p className="hfrp-no-answers">
-                          No answers recorded
-                        </p>
+                        <p className="hfrp-no-answers">No answers recorded</p>
                       )}
                     </div>
                   </div>

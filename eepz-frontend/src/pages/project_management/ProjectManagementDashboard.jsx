@@ -78,7 +78,9 @@ const ProjectManagementDashboard = () => {
   return (
     <div className="pm-dashboard">
       <div className="pm-dashboard__container">
-        <ProjectManagementBreadcrumb items={[{ label: "Project Management" }]} />
+        <ProjectManagementBreadcrumb
+          items={[{ label: "Project Management" }]}
+        />
         <div className="pm-dashboard__stats-grid">
           <div className="pm-dashboard__stat-card pm-dashboard__stat-card--primary">
             <div className="pm-dashboard__stat-icon pm-dashboard__stat-icon--primary">
@@ -150,8 +152,8 @@ const ProjectManagementDashboard = () => {
             <FolderKanban size={64} className="pm-dashboard__main-icon" />
             <h4 className="pm-dashboard__main-title">Project Management</h4>
             <p className="pm-dashboard__main-description">
-              Create new projects, assign managers, map employees, and manage all
-              project activities
+              Create new projects, assign managers, map employees, and manage
+              all project activities
             </p>
             <div className="pm-dashboard__actions">
               <button

@@ -99,7 +99,13 @@ const DeptHeadSLADashboard = () => {
 
   useEffect(() => {
     applyFilters();
-  }, [selectedPeriod, searchQuery, selectedStatus, activeTab, allL2Escalations]);
+  }, [
+    selectedPeriod,
+    searchQuery,
+    selectedStatus,
+    activeTab,
+    allL2Escalations,
+  ]);
 
   useEffect(() => {
     setCurrentPage(1);

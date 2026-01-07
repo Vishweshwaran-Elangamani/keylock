@@ -328,7 +328,8 @@ export default function ManageTeamSubmissions() {
           <div className="mts-header-text">
             <h2 className="mts-title">Department Team Submissions</h2>
             <p className="mts-subtitle">
-              View all feedback from your department ({departmentEmployees.length} employees)
+              View all feedback from your department (
+              {departmentEmployees.length} employees)
             </p>
           </div>
         </div>
@@ -372,9 +373,7 @@ export default function ManageTeamSubmissions() {
             >
               <span>Goal Feedback</span>
               {goalFeedback.length > 0 && (
-                <span className="mts-toggle-count">
-                  {goalFeedback.length}
-                </span>
+                <span className="mts-toggle-count">{goalFeedback.length}</span>
               )}
             </button>
 
@@ -558,9 +557,7 @@ export default function ManageTeamSubmissions() {
                         </div>
                         <div className="mts-mentor-name-row">
                           <User size={14} className="mts-mentor-icon" />
-                          <h6 className="mts-card-title">
-                            {m.mentorNameFull}
-                          </h6>
+                          <h6 className="mts-card-title">{m.mentorNameFull}</h6>
                         </div>
                       </div>
                       <span className="mts-mentor-rating-badge">

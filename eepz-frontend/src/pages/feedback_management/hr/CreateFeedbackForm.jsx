@@ -59,7 +59,13 @@ export default function CreateFeedbackForm() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const CustomSelect = ({ value, onChange, options, placeholder, disabled }) => {
+  const CustomSelect = ({
+    value,
+    onChange,
+    options,
+    placeholder,
+    disabled,
+  }) => {
     const selectRef = useRef(null);
     const dropdownRef = useRef(null);
     const selectedOption = options.find((opt) => opt.value === value);
@@ -86,15 +92,21 @@ export default function CreateFeedbackForm() {
       <div className="cff-custom-select" ref={selectRef}>
         <button
           type="button"
-          className={`cff-select-trigger ${disabled ? "cff-select-disabled" : ""} ${
-            isHovered && !disabled ? "cff-select-hovered" : ""
-          } ${openDropdown ? "cff-select-open" : ""}`}
+          className={`cff-select-trigger ${
+            disabled ? "cff-select-disabled" : ""
+          } ${isHovered && !disabled ? "cff-select-hovered" : ""} ${
+            openDropdown ? "cff-select-open" : ""
+          }`}
           onClick={() => !disabled && setOpenDropdown(!openDropdown)}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
           disabled={disabled}
         >
-          <span className={`cff-select-value ${!value ? "cff-select-placeholder" : ""}`}>
+          <span
+            className={`cff-select-value ${
+              !value ? "cff-select-placeholder" : ""
+            }`}
+          >
             {selectedOption?.label || placeholder}
           </span>
           <ChevronDown size={18} className="cff-select-icon" strokeWidth={2} />
@@ -115,9 +127,13 @@ export default function CreateFeedbackForm() {
                 key={option.value}
                 className={`cff-select-option ${
                   value === option.value ? "cff-select-option-selected" : ""
-                } ${hoveredOption === option.value ? "cff-select-option-hovered" : ""} ${
-                  index === 0 ? "cff-select-option-first" : ""
-                } ${index === options.length - 1 ? "cff-select-option-last" : ""}`}
+                } ${
+                  hoveredOption === option.value
+                    ? "cff-select-option-hovered"
+                    : ""
+                } ${index === 0 ? "cff-select-option-first" : ""} ${
+                  index === options.length - 1 ? "cff-select-option-last" : ""
+                }`}
                 onClick={() => {
                   onChange(option.value);
                   setOpenDropdown(false);
@@ -199,7 +215,18 @@ export default function CreateFeedbackForm() {
   const selectedDate = form.deadline ? new Date(form.deadline) : null;
 
   const monthNames = [
-    "January","February","March","April","May","June","July","August","September","October","November","December",
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
   const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
@@ -321,30 +348,30 @@ export default function CreateFeedbackForm() {
   return (
     <div className="cff-page">
       <div className="cff-breadcrumb">
-      <FeedbackBreadcrumb
-        items={[
-          { label: "Feedback Management", path: "/hr/dashboard/feedback" },
-          { label: "Create Feedback Form" },
-        ]}
-      />
+        <FeedbackBreadcrumb
+          items={[
+            { label: "Feedback Management", path: "/hr/dashboard/feedback" },
+            { label: "Create Feedback Form" },
+          ]}
+        />
 
-      {error && (
-        <div className="cff-alert cff-alert-error">
-          <AlertTriangle size={18} className="cff-alert-icon" />
-          <div className="cff-alert-content">
-            <strong>Error:</strong> {error}
+        {error && (
+          <div className="cff-alert cff-alert-error">
+            <AlertTriangle size={18} className="cff-alert-icon" />
+            <div className="cff-alert-content">
+              <strong>Error:</strong> {error}
+            </div>
+            <button
+              type="button"
+              className="cff-alert-close"
+              onClick={() => setError("")}
+              aria-label="Close"
+            >
+              ×
+            </button>
           </div>
-          <button
-            type="button"
-            className="cff-alert-close"
-            onClick={() => setError("")}
-            aria-label="Close"
-          >
-            ×
-          </button>
-        </div>
-      )}
-    </div>      
+        )}
+      </div>
 
       {success && (
         <div className="cff-alert cff-alert-success">

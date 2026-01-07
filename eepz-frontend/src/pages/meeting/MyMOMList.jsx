@@ -199,7 +199,10 @@ const MyMomsList = () => {
   if (loading) {
     return (
       <div className="mml-loading-wrapper">
-        <div className="spinner-border text-primary mml-loading-spinner" role="status">
+        <div
+          className="spinner-border text-primary mml-loading-spinner"
+          role="status"
+        >
           <span className="visually-hidden">Loading...</span>
         </div>
       </div>
@@ -446,8 +449,8 @@ const MyMomsList = () => {
                       <div className="alert alert-info d-flex align-items-center gap-2 mb-3">
                         <Users size={18} />
                         <span>
-                          <strong>{selectedEmployees.length}</strong> employee(s)
-                          selected
+                          <strong>{selectedEmployees.length}</strong>{" "}
+                          employee(s) selected
                         </span>
                       </div>
                     )}
@@ -471,9 +474,7 @@ const MyMomsList = () => {
                                   employee.employeeId
                                 )}
                                 onChange={() =>
-                                  toggleEmployeeSelection(
-                                    employee.employeeId
-                                  )
+                                  toggleEmployeeSelection(employee.employeeId)
                                 }
                               />
                               <div className="mml-employee-text">
@@ -556,10 +557,7 @@ const MyMomsList = () => {
                         <div className="row g-3">
                           <div className="col-md-6">
                             <div className="mml-detail-row">
-                              <Calendar
-                                size={16}
-                                className="text-primary"
-                              />
+                              <Calendar size={16} className="text-primary" />
                               <small className="text-muted">
                                 Meeting Date:
                               </small>
@@ -572,10 +570,7 @@ const MyMomsList = () => {
                           {selectedMom.meetingLink && (
                             <div className="col-md-6">
                               <div className="mml-detail-row">
-                                <LinkIcon
-                                  size={16}
-                                  className="text-primary"
-                                />
+                                <LinkIcon size={16} className="text-primary" />
                                 <small className="text-muted">
                                   Meeting Link:
                                 </small>
@@ -620,7 +615,6 @@ const MyMomsList = () => {
                     {selectedMom.commentsObservations && (
                       <div className="mb-4">
                         <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2">
-                        
                           Comments & Observations
                         </h6>
                         <div className="alert alert-secondary mb-0">
@@ -631,7 +625,6 @@ const MyMomsList = () => {
 
                     <div className="mb-4">
                       <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2">
-                     
                         Discussion Points
                       </h6>
                       {selectedMom.discussionPoints?.length > 0 ? (
@@ -661,7 +654,6 @@ const MyMomsList = () => {
 
                     <div className="mb-4">
                       <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2">
-                      
                         Action Items
                       </h6>
                       {selectedMom.actionItems?.length > 0 ? (

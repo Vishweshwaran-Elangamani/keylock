@@ -118,10 +118,7 @@ const ProjectDetails = () => {
     return (
       <div className="prj-detail-wrapper prj-detail-wrapper--center">
         <div className="prj-detail-loading">
-          <div
-            className="prj-detail-spinner"
-            role="status"
-          >
+          <div className="prj-detail-spinner" role="status">
             <span className="prj-detail-visually-hidden">Loading...</span>
           </div>
           <p className="prj-detail-loading-text">Loading project details...</p>
@@ -133,33 +130,33 @@ const ProjectDetails = () => {
   if (error || !project) {
     return (
       <div className="prj-detail-wrapper prj-detail-wrapper--column">
-       <nav aria-label="breadcrumb" className="prj-detail-breadcrumb-nav">
-  <ol className="prj-detail-breadcrumb">
-    <li className="prj-detail-breadcrumb-item">
-      <button
-        type="button"
-        onClick={() => navigate("/hr/dashboard/projectmgmt")}
-        className="prj-detail-breadcrumb-link"
-      >
-        <Home size={20} />
-      </button>
-    </li>
-    <li className="prj-detail-breadcrumb-item">
-      <button
-        type="button"
-        onClick={() => navigate("/hr/dashboard/projectmgmt/list")}
-        className="prj-detail-breadcrumb-link"
-      >
-        <span>All Projects</span>
-      </button>
-    </li>
-    <li className="prj-detail-breadcrumb-item prj-detail-breadcrumb-item-active">
-      <span className="prj-detail-breadcrumb-active">
-        {project.projectName}
-      </span>
-    </li>
-  </ol>
-</nav>
+        <nav aria-label="breadcrumb" className="prj-detail-breadcrumb-nav">
+          <ol className="prj-detail-breadcrumb">
+            <li className="prj-detail-breadcrumb-item">
+              <button
+                type="button"
+                onClick={() => navigate("/hr/dashboard/projectmgmt")}
+                className="prj-detail-breadcrumb-link"
+              >
+                <Home size={20} />
+              </button>
+            </li>
+            <li className="prj-detail-breadcrumb-item">
+              <button
+                type="button"
+                onClick={() => navigate("/hr/dashboard/projectmgmt/list")}
+                className="prj-detail-breadcrumb-link"
+              >
+                <span>All Projects</span>
+              </button>
+            </li>
+            <li className="prj-detail-breadcrumb-item prj-detail-breadcrumb-item-active">
+              <span className="prj-detail-breadcrumb-active">
+                {project.projectName}
+              </span>
+            </li>
+          </ol>
+        </nav>
 
         <div className="prj-detail-alert prj-detail-alert--danger">
           <AlertCircle size={20} />
@@ -217,9 +214,7 @@ const ProjectDetails = () => {
                         <Target size={20} />
                       </div>
                       <div className="prj-detail-info-content">
-                        <label className="prj-detail-label">
-                          Project Name
-                        </label>
+                        <label className="prj-detail-label">Project Name</label>
                         <p className="prj-detail-value">
                           {project.projectName}
                         </p>
@@ -233,9 +228,7 @@ const ProjectDetails = () => {
                         <User size={20} />
                       </div>
                       <div className="prj-detail-info-content">
-                        <label className="prj-detail-label">
-                          Client Name
-                        </label>
+                        <label className="prj-detail-label">Client Name</label>
                         <p className="prj-detail-value">{clientName}</p>
                       </div>
                     </div>
@@ -329,9 +322,7 @@ const ProjectDetails = () => {
                         <Calendar size={20} />
                       </div>
                       <div className="prj-detail-info-content">
-                        <label className="prj-detail-label">
-                          Start Date
-                        </label>
+                        <label className="prj-detail-label">Start Date</label>
                         <p className="prj-detail-value">
                           {formatDate(project.startDate)}
                         </p>
@@ -380,7 +371,9 @@ const ProjectDetails = () => {
                         >
                           <div
                             className={`prj-detail-employee-card ${
-                              isPrimaryEmployee ? "prj-detail-employee-card--primary" : ""
+                              isPrimaryEmployee
+                                ? "prj-detail-employee-card--primary"
+                                : ""
                             }`}
                           >
                             <div className="prj-detail-employee-badge">
@@ -433,10 +426,7 @@ const ProjectDetails = () => {
                   </div>
                 ) : (
                   <div className="prj-detail-empty-state">
-                    <Users
-                      size={48}
-                      className="prj-detail-empty-icon"
-                    />
+                    <Users size={48} className="prj-detail-empty-icon" />
                     <p className="prj-detail-empty-text">
                       No employees mapped to this project
                     </p>

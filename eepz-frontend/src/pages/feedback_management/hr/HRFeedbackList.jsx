@@ -1,5 +1,3 @@
-// src/pages/feedback_management/hr/HRFeedbackList.jsx
-
 import React, { useEffect, useState } from "react";
 import {
   AlertTriangle,
@@ -69,7 +67,9 @@ export default function HRFeedbackList() {
       employees.forEach((emp) => {
         const empId = emp.employeeId || emp.id || emp.EmployeeID;
         if (empId) {
-          const fullName = `${emp.firstName || ""} ${emp.lastName || ""}`.trim();
+          const fullName = `${emp.firstName || ""} ${
+            emp.lastName || ""
+          }`.trim();
           employeeMap[empId] = fullName;
           employeeMap[String(empId)] = fullName;
           employeeMap[Number(empId)] = fullName;
@@ -86,30 +86,34 @@ export default function HRFeedbackList() {
         : mentorResponse?.data?.data || [];
 
       const enrichedMentorData = mentorData.map((m) => {
-        const mentorName = employeeMap[m.mentorEmployeeId] || 
-                          employeeMap[String(m.mentorEmployeeId)] || 
-                          employeeMap[Number(m.mentorEmployeeId)] || 
-                          null;
+        const mentorName =
+          employeeMap[m.mentorEmployeeId] ||
+          employeeMap[String(m.mentorEmployeeId)] ||
+          employeeMap[Number(m.mentorEmployeeId)] ||
+          null;
 
-        const submitterId = m.menteeEmployeeId || 
-                           m.employeeId || 
-                           m.submittedByEmployeeId || 
-                           m.submitterEmployeeId ||
-                           m.createdByEmployeeId;
+        const submitterId =
+          m.menteeEmployeeId ||
+          m.employeeId ||
+          m.submittedByEmployeeId ||
+          m.submitterEmployeeId ||
+          m.createdByEmployeeId;
 
         let submitterName = null;
         if (m.menteeName && isNaN(m.menteeName)) {
           submitterName = m.menteeName;
         } else if (submitterId) {
-          submitterName = employeeMap[submitterId] || 
-                         employeeMap[String(submitterId)] || 
-                         employeeMap[Number(submitterId)] || 
-                         null;
+          submitterName =
+            employeeMap[submitterId] ||
+            employeeMap[String(submitterId)] ||
+            employeeMap[Number(submitterId)] ||
+            null;
         }
 
         return {
           ...m,
-          mentorNameFull: mentorName || `Employee ${m.mentorEmployeeId || "Unknown"}`,
+          mentorNameFull:
+            mentorName || `Employee ${m.mentorEmployeeId || "Unknown"}`,
           submitterNameFull: submitterName || "Anonymous Feedback",
         };
       });
@@ -125,25 +129,28 @@ export default function HRFeedbackList() {
         if (p.recipientName && isNaN(p.recipientName)) {
           recipientName = p.recipientName;
         } else if (p.recipientEmployeeId) {
-          recipientName = employeeMap[p.recipientEmployeeId] || 
-                         employeeMap[String(p.recipientEmployeeId)] || 
-                         employeeMap[Number(p.recipientEmployeeId)] || 
-                         null;
+          recipientName =
+            employeeMap[p.recipientEmployeeId] ||
+            employeeMap[String(p.recipientEmployeeId)] ||
+            employeeMap[Number(p.recipientEmployeeId)] ||
+            null;
         }
 
         let submitterName = null;
         if (p.submitterName && isNaN(p.submitterName)) {
           submitterName = p.submitterName;
         } else if (p.submittedByEmployeeId) {
-          submitterName = employeeMap[p.submittedByEmployeeId] || 
-                         employeeMap[String(p.submittedByEmployeeId)] || 
-                         employeeMap[Number(p.submittedByEmployeeId)] || 
-                         null;
+          submitterName =
+            employeeMap[p.submittedByEmployeeId] ||
+            employeeMap[String(p.submittedByEmployeeId)] ||
+            employeeMap[Number(p.submittedByEmployeeId)] ||
+            null;
         }
 
         return {
           ...p,
-          recipientNameFull: recipientName || `Employee ${p.recipientEmployeeId || "Unknown"}`,
+          recipientNameFull:
+            recipientName || `Employee ${p.recipientEmployeeId || "Unknown"}`,
           submitterNameFull: submitterName || "Anonymous Feedback",
         };
       });
@@ -209,9 +216,11 @@ export default function HRFeedbackList() {
     try {
       let feedbackText = "";
       if (type === "Mentor") {
-        feedbackText = feedbackData.feedbackComments || feedbackData.comments || "";
+        feedbackText =
+          feedbackData.feedbackComments || feedbackData.comments || "";
       } else if (type === "Peer") {
-        feedbackText = feedbackData.feedbackContent || feedbackData.content || "";
+        feedbackText =
+          feedbackData.feedbackContent || feedbackData.content || "";
       }
 
       if (!feedbackText || feedbackText.trim() === "") {
@@ -249,10 +258,17 @@ export default function HRFeedbackList() {
     if (!deleteFeedbackData) return "";
 
     if (deleteFeedbackType === "Mentor") {
-      return deleteFeedbackData.mentorNameFull || `Employee ${deleteFeedbackData.mentorEmployeeId}`;
+      return (
+        deleteFeedbackData.mentorNameFull ||
+        `Employee ${deleteFeedbackData.mentorEmployeeId}`
+      );
     } else if (deleteFeedbackType === "Peer") {
-      const submitter = deleteFeedbackData.submitterNameFull || `Employee ${deleteFeedbackData.submittedByEmployeeId}`;
-      const recipient = deleteFeedbackData.recipientNameFull || `Employee ${deleteFeedbackData.recipientEmployeeId}`;
+      const submitter =
+        deleteFeedbackData.submitterNameFull ||
+        `Employee ${deleteFeedbackData.submittedByEmployeeId}`;
+      const recipient =
+        deleteFeedbackData.recipientNameFull ||
+        `Employee ${deleteFeedbackData.recipientEmployeeId}`;
       return `From ${submitter} to ${recipient}`;
     } else if (deleteFeedbackType === "HR") {
       return deleteFeedbackData.formName || "HR Form";
@@ -369,7 +385,9 @@ export default function HRFeedbackList() {
               (mentor.length === 0 ? (
                 <div className="hrfeedback-empty-state">
                   <AlertTriangle size={48} className="hrfeedback-empty-icon" />
-                  <h5 className="hrfeedback-empty-title">No Mentor Feedback Yet</h5>
+                  <h5 className="hrfeedback-empty-title">
+                    No Mentor Feedback Yet
+                  </h5>
                   <p className="hrfeedback-empty-text">
                     There are no mentor feedback submissions.
                   </p>
@@ -377,13 +395,19 @@ export default function HRFeedbackList() {
               ) : (
                 <div className="row g-3">
                   {mentor.map((m) => (
-                    <div className="col-md-6 col-lg-4" key={m.trackingId || m.id}>
+                    <div
+                      className="col-md-6 col-lg-4"
+                      key={m.trackingId || m.id}
+                    >
                       <div className="hrfeedback-card">
                         <div className="hrfeedback-card-header">
                           <div className="fm-hrlist-card__header-wrapper">
                             <div className="hrfeedback-card-label">Mentor</div>
                             <div className="hrfeedback-card-name-row">
-                              <User size={14} className="hrfeedback-card-user-icon" />
+                              <User
+                                size={14}
+                                className="hrfeedback-card-user-icon"
+                              />
                               <h6 className="hrfeedback-card-name">
                                 {m.mentorNameFull}
                               </h6>
@@ -436,7 +460,9 @@ export default function HRFeedbackList() {
               (peer.length === 0 ? (
                 <div className="hrfeedback-empty-state">
                   <AlertTriangle size={48} className="hrfeedback-empty-icon" />
-                  <h5 className="hrfeedback-empty-title">No Peer Feedback Yet</h5>
+                  <h5 className="hrfeedback-empty-title">
+                    No Peer Feedback Yet
+                  </h5>
                   <p className="hrfeedback-empty-text">
                     There are no peer feedback submissions.
                   </p>
@@ -450,14 +476,20 @@ export default function HRFeedbackList() {
                           <div className="fm-hrlist-card__header-wrapper">
                             <div className="hrfeedback-card-label">From</div>
                             <div className="hrfeedback-card-name-row hrfeedback-mb-2">
-                              <User size={14} className="fm-hrlist-card__user-icon--muted" />
+                              <User
+                                size={14}
+                                className="fm-hrlist-card__user-icon--muted"
+                              />
                               <h6 className="hrfeedback-card-name-small">
                                 {p.submitterNameFull}
                               </h6>
                             </div>
                             <div className="hrfeedback-card-label">To</div>
                             <div className="hrfeedback-card-name-row">
-                              <User size={14} className="hrfeedback-card-user-icon" />
+                              <User
+                                size={14}
+                                className="hrfeedback-card-user-icon"
+                              />
                               <h6 className="hrfeedback-card-name">
                                 {p.recipientNameFull}
                               </h6>
@@ -531,7 +563,10 @@ export default function HRFeedbackList() {
       />
 
       {showDeleteModal && (
-        <div className="hrfeedback-modal-overlay" onClick={handleCloseDeleteModal}>
+        <div
+          className="hrfeedback-modal-overlay"
+          onClick={handleCloseDeleteModal}
+        >
           <div
             className="hrfeedback-delete-modal"
             onClick={(e) => e.stopPropagation()}
@@ -548,7 +583,9 @@ export default function HRFeedbackList() {
             <div className="hrfeedback-delete-body">
               <AlertTriangle size={48} className="hrfeedback-delete-icon" />
               <p className="hrfeedback-delete-message">{getDeleteMessage()}</p>
-              <div className="hrfeedback-delete-name">{getDeleteItemName()}</div>
+              <div className="hrfeedback-delete-name">
+                {getDeleteItemName()}
+              </div>
             </div>
             <div className="hrfeedback-delete-footer">
               <button

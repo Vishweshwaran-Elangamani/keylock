@@ -206,9 +206,11 @@ const ProjectList = () => {
           .toLowerCase()
           .includes(activeManagerSearchTerm.toLowerCase());
 
-      const roleMatch = managerFilterRole === "All" || emp.roleName === managerFilterRole;
+      const roleMatch =
+        managerFilterRole === "All" || emp.roleName === managerFilterRole;
       const deptMatch =
-        managerFilterDepartment === "All" || emp.departmentName === managerFilterDepartment;
+        managerFilterDepartment === "All" ||
+        emp.departmentName === managerFilterDepartment;
 
       return searchMatch && roleMatch && deptMatch;
     });
@@ -225,10 +227,14 @@ const ProjectList = () => {
   };
 
   const filteredManagers = getFilteredManagers();
-  const managerTotalPages = Math.ceil(filteredManagers.length / managerItemsPerPage) || 1;
+  const managerTotalPages =
+    Math.ceil(filteredManagers.length / managerItemsPerPage) || 1;
   const managerStartIndex = (managerCurrentPage - 1) * managerItemsPerPage;
   const managerEndIndex = managerStartIndex + managerItemsPerPage;
-  const paginatedManagers = filteredManagers.slice(managerStartIndex, managerEndIndex);
+  const paginatedManagers = filteredManagers.slice(
+    managerStartIndex,
+    managerEndIndex
+  );
 
   const goToManagerPage = (page) => {
     setManagerCurrentPage(Math.max(1, Math.min(page, managerTotalPages)));
@@ -248,11 +254,13 @@ const ProjectList = () => {
       } else if (managerCurrentPage >= managerTotalPages - 2) {
         pages.push(1);
         pages.push("...");
-        for (let i = managerTotalPages - 3; i <= managerTotalPages; i++) pages.push(i);
+        for (let i = managerTotalPages - 3; i <= managerTotalPages; i++)
+          pages.push(i);
       } else {
         pages.push(1);
         pages.push("...");
-        for (let i = managerCurrentPage - 1; i <= managerCurrentPage + 1; i++) pages.push(i);
+        for (let i = managerCurrentPage - 1; i <= managerCurrentPage + 1; i++)
+          pages.push(i);
         pages.push("...");
         pages.push(managerTotalPages);
       }
@@ -291,9 +299,11 @@ const ProjectList = () => {
           .toLowerCase()
           .includes(activeEmployeeSearchTerm.toLowerCase());
 
-      const roleMatch = employeeFilterRole === "All" || emp.roleName === employeeFilterRole;
+      const roleMatch =
+        employeeFilterRole === "All" || emp.roleName === employeeFilterRole;
       const deptMatch =
-        employeeFilterDepartment === "All" || emp.departmentName === employeeFilterDepartment;
+        employeeFilterDepartment === "All" ||
+        emp.departmentName === employeeFilterDepartment;
       const statusMatch =
         employeeFilterStatus === "All" ||
         (employeeFilterStatus === "Mapped" && isMapped) ||
@@ -317,7 +327,9 @@ const ProjectList = () => {
     const availableEmployees = allEmployees.filter(
       (emp) => !managerIds.includes(emp.employeeMasterId)
     );
-    const depts = [...new Set(availableEmployees.map((emp) => emp.departmentName))];
+    const depts = [
+      ...new Set(availableEmployees.map((emp) => emp.departmentName)),
+    ];
     return depts.sort();
   };
 
@@ -403,7 +415,10 @@ const ProjectList = () => {
       );
 
       if (response.success) {
-        setModalMessage({ type: "success", text: "Project updated successfully!" });
+        setModalMessage({
+          type: "success",
+          text: "Project updated successfully!",
+        });
         toast.success("Project updated successfully!");
         setTimeout(() => {
           setShowEditModal(false);
@@ -457,7 +472,8 @@ const ProjectList = () => {
     try {
       const managersData = {
         projectId: selectedProject.projectId,
-        resourceOwnerEmployeeId: selectedResourceOwner?.employeeMasterId || null,
+        resourceOwnerEmployeeId:
+          selectedResourceOwner?.employeeMasterId || null,
         l1ApproverEmployeeId: selectedL1Approver?.employeeMasterId || null,
         l2ApproverEmployeeId: selectedL2Approver?.employeeMasterId || null,
       };
@@ -501,7 +517,9 @@ const ProjectList = () => {
 
     setIsLoadingModalData(true);
     try {
-      const projectResponse = await projectService.getProjectById(project.projectId);
+      const projectResponse = await projectService.getProjectById(
+        project.projectId
+      );
       if (projectResponse.success && projectResponse.data) {
         setMappedEmployees(projectResponse.data.mappedEmployees || []);
         const primaryEmps =
@@ -537,7 +555,8 @@ const ProjectList = () => {
 
   const handlePrimaryToggle = (employeeId) => {
     if (!selectedEmployeeIds.includes(employeeId)) {
-      const errorMessage = "Please select the employee first before marking as primary";
+      const errorMessage =
+        "Please select the employee first before marking as primary";
       setModalMessage({ type: "error", text: errorMessage });
       toast.warning(errorMessage);
       setTimeout(() => setModalMessage(null), 3000);
@@ -545,7 +564,8 @@ const ProjectList = () => {
     }
 
     setPrimaryEmployeeIds((prev) => {
-      if (prev.includes(employeeId)) return prev.filter((id) => id !== employeeId);
+      if (prev.includes(employeeId))
+        return prev.filter((id) => id !== employeeId);
       return [...prev, employeeId];
     });
   };
@@ -558,8 +578,12 @@ const ProjectList = () => {
 
     if (allVisible && visibleEmployees.length > 0) {
       const idsToRemove = visibleEmployees.map((emp) => emp.employeeMasterId);
-      setSelectedEmployeeIds((prev) => prev.filter((id) => !idsToRemove.includes(id)));
-      setPrimaryEmployeeIds((prev) => prev.filter((id) => !idsToRemove.includes(id)));
+      setSelectedEmployeeIds((prev) =>
+        prev.filter((id) => !idsToRemove.includes(id))
+      );
+      setPrimaryEmployeeIds((prev) =>
+        prev.filter((id) => !idsToRemove.includes(id))
+      );
     } else {
       const newIds = visibleEmployees.map((emp) => emp.employeeMasterId);
       setSelectedEmployeeIds((prev) => [...new Set([...prev, ...newIds])]);
@@ -594,8 +618,12 @@ const ProjectList = () => {
       );
 
       if (response.success) {
-        const primaryCount = employeesWithPrimary.filter((e) => e.isPrimary).length;
-        const successMessage = `${employeesToMap.length} employee(s) mapped successfully!${
+        const primaryCount = employeesWithPrimary.filter(
+          (e) => e.isPrimary
+        ).length;
+        const successMessage = `${
+          employeesToMap.length
+        } employee(s) mapped successfully!${
           primaryCount > 0 ? ` (${primaryCount} marked as primary)` : ""
         }`;
         setModalMessage({ type: "success", text: successMessage });
@@ -605,7 +633,9 @@ const ProjectList = () => {
         setPrimaryEmployeeIds([]);
 
         setTimeout(async () => {
-          const projectResponse = await projectService.getProjectById(selectedProject.projectId);
+          const projectResponse = await projectService.getProjectById(
+            selectedProject.projectId
+          );
           if (projectResponse.success && projectResponse.data) {
             setMappedEmployees(projectResponse.data.mappedEmployees || []);
             const primaryEmps =
@@ -655,10 +685,14 @@ const ProjectList = () => {
         toast.success(successMessage);
 
         setSelectedEmployeeIds([]);
-        setPrimaryEmployeeIds((prev) => prev.filter((id) => !employeesToUnmap.includes(id)));
+        setPrimaryEmployeeIds((prev) =>
+          prev.filter((id) => !employeesToUnmap.includes(id))
+        );
 
         setTimeout(async () => {
-          const projectResponse = await projectService.getProjectById(selectedProject.projectId);
+          const projectResponse = await projectService.getProjectById(
+            selectedProject.projectId
+          );
           if (projectResponse.success && projectResponse.data) {
             setMappedEmployees(projectResponse.data.mappedEmployees || []);
             const primaryEmps =
@@ -690,7 +724,9 @@ const ProjectList = () => {
 
     setIsDeletingProject(true);
     try {
-      const response = await projectService.deleteProject(projectToDelete.projectId);
+      const response = await projectService.deleteProject(
+        projectToDelete.projectId
+      );
 
       if (response.success) {
         toast.success("Project deleted successfully!");
@@ -704,7 +740,9 @@ const ProjectList = () => {
     } catch (error) {
       console.error("Failed to delete project:", error);
       const errorMessage =
-        error.message || error.response?.data?.message || "Failed to delete project. Please try again.";
+        error.message ||
+        error.response?.data?.message ||
+        "Failed to delete project. Please try again.";
       toast.error(errorMessage, { duration: 5000 });
     } finally {
       setIsDeletingProject(false);
@@ -749,7 +787,6 @@ const ProjectList = () => {
     ).length;
   };
 
- 
   const handleItemsPerPageChange = (size) => {
     setItemsPerPage(size);
     setCurrentPage(1);
@@ -821,11 +858,15 @@ const ProjectList = () => {
               <div
                 className="prj-list-custom-dropdown-selected"
                 onClick={() => {
-                  const dropdown = document.querySelector(".prj-list-custom-dropdown");
+                  const dropdown = document.querySelector(
+                    ".prj-list-custom-dropdown"
+                  );
                   dropdown.classList.toggle("prj-list-dropdown-open");
                 }}
               >
-                <span>{filterStatus === "All" ? "All Status" : filterStatus}</span>
+                <span>
+                  {filterStatus === "All" ? "All Status" : filterStatus}
+                </span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="12"
@@ -844,22 +885,26 @@ const ProjectList = () => {
                 </svg>
               </div>
               <div className="prj-list-custom-dropdown-options">
-                {["All", "Active", "On Hold", "Completed", "Cancelled"].map((status) => (
-                  <div
-                    key={status}
-                    className={`prj-list-custom-option ${
-                      filterStatus === status ? "prj-list-option-selected" : ""
-                    }`}
-                    onClick={() => {
-                      setFilterStatus(status);
-                      document
-                        .querySelector(".prj-list-custom-dropdown")
-                        .classList.remove("prj-list-dropdown-open");
-                    }}
-                  >
-                    {status === "All" ? "All Status" : status}
-                  </div>
-                ))}
+                {["All", "Active", "On Hold", "Completed", "Cancelled"].map(
+                  (status) => (
+                    <div
+                      key={status}
+                      className={`prj-list-custom-option ${
+                        filterStatus === status
+                          ? "prj-list-option-selected"
+                          : ""
+                      }`}
+                      onClick={() => {
+                        setFilterStatus(status);
+                        document
+                          .querySelector(".prj-list-custom-dropdown")
+                          .classList.remove("prj-list-dropdown-open");
+                      }}
+                    >
+                      {status === "All" ? "All Status" : status}
+                    </div>
+                  )
+                )}
               </div>
             </div>
           </div>
@@ -958,7 +1003,10 @@ const ProjectList = () => {
                     <td>
                       <div className="prj-list-cell-with-icon">
                         <div className="prj-list-icon-wrapper prj-list-icon-business">
-                          <Building size={16} className="prj-list-icon-filled" />
+                          <Building
+                            size={16}
+                            className="prj-list-icon-filled"
+                          />
                         </div>
                         <span>{project.businessUnit || "N/A"}</span>
                       </div>
@@ -967,7 +1015,10 @@ const ProjectList = () => {
                     <td>
                       <div className="prj-list-cell-with-icon">
                         <div className="prj-list-icon-wrapper prj-list-icon-department">
-                          <Briefcase size={16} className="prj-list-icon-filled" />
+                          <Briefcase
+                            size={16}
+                            className="prj-list-icon-filled"
+                          />
                         </div>
                         <span>{project.department || "N/A"}</span>
                       </div>
@@ -976,7 +1027,10 @@ const ProjectList = () => {
                     <td>
                       <div className="prj-list-cell-with-icon">
                         <div className="prj-list-icon-wrapper prj-list-icon-calendar">
-                          <Calendar size={16} className="prj-list-icon-filled" />
+                          <Calendar
+                            size={16}
+                            className="prj-list-icon-filled"
+                          />
                         </div>
                         <span>{formatDate(project.startDate)}</span>
                       </div>
@@ -994,7 +1048,9 @@ const ProjectList = () => {
                           </span>
                         </div>
                       ) : (
-                        <span className="prj-list-not-assigned">Not Assigned</span>
+                        <span className="prj-list-not-assigned">
+                          Not Assigned
+                        </span>
                       )}
                     </td>
 
@@ -1061,7 +1117,9 @@ const ProjectList = () => {
                     aria-haspopup="listbox"
                     aria-expanded={isPageSizeOpen}
                   >
-                    <span className="prj-list-entries-value">{itemsPerPage}</span>
+                    <span className="prj-list-entries-value">
+                      {itemsPerPage}
+                    </span>
                     <span className="prj-list-entries-arrow" />
                   </button>
 
@@ -1092,14 +1150,19 @@ const ProjectList = () => {
 
               <div className="prj-list-pagination-center">
                 <span className="prj-list-pagination-status">
-                  Showing {startIndex + 1} to {Math.min(endIndex, filteredProjects.length)} of{" "}
+                  Showing {startIndex + 1} to{" "}
+                  {Math.min(endIndex, filteredProjects.length)} of{" "}
                   {filteredProjects.length} entries
                 </span>
               </div>
 
               <div className="prj-list-pagination-right">
                 <ul className="prj-list-pagination-list">
-                  <li className={`prj-list-page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                  <li
+                    className={`prj-list-page-item ${
+                      currentPage === 1 ? "disabled" : ""
+                    }`}
+                  >
                     <button
                       className="prj-list-page-link prj-list-page-arrow"
                       type="button"
@@ -1112,13 +1175,18 @@ const ProjectList = () => {
 
                   {getPageNumbers().map((page, index) =>
                     page === "..." ? (
-                      <li key={`ellipsis-${index}`} className="prj-list-page-ellipsis">
+                      <li
+                        key={`ellipsis-${index}`}
+                        className="prj-list-page-ellipsis"
+                      >
                         <span className="prj-list-page-dots">...</span>
                       </li>
                     ) : (
                       <li
                         key={page}
-                        className={`prj-list-page-item ${currentPage === page ? "active" : ""}`}
+                        className={`prj-list-page-item ${
+                          currentPage === page ? "active" : ""
+                        }`}
                       >
                         <button
                           className="prj-list-page-link"

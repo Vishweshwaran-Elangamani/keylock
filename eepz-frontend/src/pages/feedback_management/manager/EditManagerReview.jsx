@@ -74,7 +74,6 @@ export default function EditManagerReview() {
     }
   }, [id]);
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");

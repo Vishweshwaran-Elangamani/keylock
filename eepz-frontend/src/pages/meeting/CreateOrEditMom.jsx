@@ -314,9 +314,7 @@ const CreateOrEditMom = ({ isEdit = false }) => {
                   </h5>
                   <div className="row g-3">
                     <div className="col-12">
-                      <label className="momce-label">
-                        Meeting Title
-                      </label>
+                      <label className="momce-label">Meeting Title</label>
                       <input
                         type="text"
                         className="form-control momce-input"
@@ -325,9 +323,7 @@ const CreateOrEditMom = ({ isEdit = false }) => {
                       />
                     </div>
                     <div className="col-md-4">
-                      <label className="momce-label">
-                        Meeting Type
-                      </label>
+                      <label className="momce-label">Meeting Type</label>
                       <input
                         type="text"
                         className="form-control momce-input"
@@ -353,15 +349,15 @@ const CreateOrEditMom = ({ isEdit = false }) => {
                       <input
                         type="text"
                         className="form-control momce-input"
-                        value={`${meetingData.attendees?.length || 0} participants`}
+                        value={`${
+                          meetingData.attendees?.length || 0
+                        } participants`}
                         disabled
                       />
                     </div>
                     {meetingData.meetingLink && (
                       <div className="col-12">
-                        <label className="momce-label">
-                          Meeting Link
-                        </label>
+                        <label className="momce-label">Meeting Link</label>
                         <input
                           type="text"
                           className="form-control momce-input"
@@ -392,7 +388,8 @@ const CreateOrEditMom = ({ isEdit = false }) => {
                   </div>
                   {formData.discussionPoints.length === 0 ? (
                     <div className="alert alert-secondary mb-0">
-                      No discussion points added yet. Click "Add Point" to start.
+                      No discussion points added yet. Click "Add Point" to
+                      start.
                     </div>
                   ) : (
                     <div className="d-flex flex-column gap-3">
@@ -543,9 +540,7 @@ const CreateOrEditMom = ({ isEdit = false }) => {
                                 <button
                                   type="button"
                                   className="btn momce-remove-btn-full w-100"
-                                  onClick={() =>
-                                    handleRemoveActionItem(index)
-                                  }
+                                  onClick={() => handleRemoveActionItem(index)}
                                 >
                                   <Trash2 size={16} />
                                 </button>

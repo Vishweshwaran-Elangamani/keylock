@@ -228,7 +228,7 @@ export default function ManagerPeerFeedback() {
         </div>
       )}
 
-            <div className="mgrpeer-content">
+      <div className="mgrpeer-content">
         {peerFeedback.length === 0 ? (
           <div className="mgrpeer-empty">
             <Users size={64} className="mgrpeer-empty-icon" />
@@ -246,14 +246,16 @@ export default function ManagerPeerFeedback() {
                 <div
                   className="mgrpeer-card"
                   key={
-                    feedback.queueId ||
-                    feedback.QueueId ||
-                    feedback.peerQueueId
+                    feedback.queueId || feedback.QueueId || feedback.peerQueueId
                   }
                 >
                   <div className="mgrpeer-card-header">
                     <div className="mgrpeer-card-sender">
-                      <div className={`mgrpeer-card-avatar ${isAnon ? 'mgrpeer-card-avatar--anonymous' : ''}`}>
+                      <div
+                        className={`mgrpeer-card-avatar ${
+                          isAnon ? "mgrpeer-card-avatar--anonymous" : ""
+                        }`}
+                      >
                         {isAnon ? <Lock size={18} /> : <User size={18} />}
                       </div>
                       <div className="mgrpeer-card-info">

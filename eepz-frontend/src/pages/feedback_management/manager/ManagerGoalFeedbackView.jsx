@@ -179,10 +179,7 @@ export default function ManagerGoalFeedbackView() {
   }, [user?.empId]);
 
   const renderFeedbackCard = (feedback, showSubmitter = false) => (
-    <div
-      className="mgfv-col"
-      key={feedback.orgGoalFeedbackId}
-    >
+    <div className="mgfv-col" key={feedback.orgGoalFeedbackId}>
       <div className="mgfv-card">
         <div className="mgfv-card-body">
           <div className="mgfv-card-header">
@@ -211,9 +208,7 @@ export default function ManagerGoalFeedbackView() {
             <div className="mgfv-header-right">
               <div className="mgfv-rating-row">
                 <Star size={16} className="mgfv-star-icon" />
-                <span className="mgfv-rating-value">
-                  {feedback.rating}/5
-                </span>
+                <span className="mgfv-rating-value">{feedback.rating}/5</span>
               </div>
               <span className="mgfv-rating-badge">
                 {RATING_LABELS[feedback.rating] || "N/A"}

@@ -23,7 +23,6 @@ const PRIMARY = "#27235C";
 const CreateProject = () => {
   const navigate = useNavigate();
 
-
   const [formData, setFormData] = useState({
     projectName: "",
     clientName: "",
@@ -81,8 +80,7 @@ const CreateProject = () => {
     "Consulting",
     "Retainer",
   ];
-  const PROJECTNAMEREGEX =
-    /^ORG\.[A-Za-zA-Za-z0-9-]+\.[A-Za-zA-Za-z0-9-]+$/;
+  const PROJECTNAMEREGEX = /^ORG\.[A-Za-zA-Za-z0-9-]+\.[A-Za-zA-Za-z0-9-]+$/;
 
   useEffect(() => {
     setManagerCurrentPage(1);
@@ -177,8 +175,7 @@ const CreateProject = () => {
     if (!formData.clientName.trim()) {
       newErrors.clientName = "Client name is required";
     } else if (formData.clientName.trim().length < 2) {
-      newErrors.clientName =
-        "Client name must be at least 2 characters";
+      newErrors.clientName = "Client name must be at least 2 characters";
     }
 
     if (!formData.startDate) {
@@ -229,10 +226,8 @@ const CreateProject = () => {
           : null,
         resourceOwnerEmployeeId:
           selectedResourceOwner?.employeeMasterId || null,
-        l1ApproverEmployeeId:
-          selectedL1Approver?.employeeMasterId || null,
-        l2ApproverEmployeeId:
-          selectedL2Approver?.employeeMasterId || null,
+        l1ApproverEmployeeId: selectedL1Approver?.employeeMasterId || null,
+        l2ApproverEmployeeId: selectedL2Approver?.employeeMasterId || null,
       };
 
       await projectService.createProject(projectData);
@@ -240,16 +235,11 @@ const CreateProject = () => {
         type: "success",
         message: "Project created successfully! Redirecting...",
       });
-      setTimeout(
-        () => navigate("/hr/dashboard/projectmgmt/list"),
-        2000
-      );
+      setTimeout(() => navigate("/hr/dashboard/projectmgmt/list"), 2000);
     } catch (error) {
       setSubmitStatus({
         type: "error",
-        message:
-          error.message ||
-          "Failed to create project. Please try again.",
+        message: error.message || "Failed to create project. Please try again.",
       });
     } finally {
       setIsSubmitting(false);
@@ -299,26 +289,24 @@ const CreateProject = () => {
     setShowManagerModal(false);
   };
 
- const handleManagerSearch = () => {
-  if (!managerSearchInput.trim()) return;
-  setManagerSearchTerm(managerSearchInput.trim());
-  setManagerCurrentPage(1);
-};
+  const handleManagerSearch = () => {
+    if (!managerSearchInput.trim()) return;
+    setManagerSearchTerm(managerSearchInput.trim());
+    setManagerCurrentPage(1);
+  };
 
-const handleCancelSearch = () => {
-  setManagerSearchInput("");
-  setManagerSearchTerm("");
-  setManagerCurrentPage(1);
-};
+  const handleCancelSearch = () => {
+    setManagerSearchInput("");
+    setManagerSearchTerm("");
+    setManagerCurrentPage(1);
+  };
 
-const handleManagerSearchKeyPress = (e) => {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    handleManagerSearch();
-  }
-};
-
-
+  const handleManagerSearchKeyPress = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleManagerSearch();
+    }
+  };
 
   const handleSearchKeyPress = (e) => {
     if (e.key === "Enter") {
@@ -335,8 +323,7 @@ const handleManagerSearchKeyPress = (e) => {
           .toLowerCase()
           .includes(managerSearchTerm.toLowerCase());
       const roleMatch =
-        managerFilterRole === "All" ||
-        emp.roleName === managerFilterRole;
+        managerFilterRole === "All" || emp.roleName === managerFilterRole;
       const deptMatch =
         managerFilterDepartment === "All" ||
         emp.departmentName === managerFilterDepartment;
@@ -350,9 +337,7 @@ const handleManagerSearchKeyPress = (e) => {
   };
 
   const getUniqueManagerDepartments = () => {
-    const depts = [
-      ...new Set(employees.map((emp) => emp.departmentName)),
-    ];
+    const depts = [...new Set(employees.map((emp) => emp.departmentName))];
     return depts.sort((a, b) => a.localeCompare(b));
   };
 
@@ -360,8 +345,7 @@ const handleManagerSearchKeyPress = (e) => {
   const managerTotalPages = Math.ceil(
     filteredManagers.length / managerItemsPerPage
   );
-  const managerStartIndex =
-    (managerCurrentPage - 1) * managerItemsPerPage;
+  const managerStartIndex = (managerCurrentPage - 1) * managerItemsPerPage;
   const managerEndIndex = managerStartIndex + managerItemsPerPage;
   const paginatedManagers = filteredManagers.slice(
     managerStartIndex,
@@ -369,9 +353,7 @@ const handleManagerSearchKeyPress = (e) => {
   );
 
   const goToManagerPage = (page) => {
-    setManagerCurrentPage(
-      Math.max(1, Math.min(page, managerTotalPages))
-    );
+    setManagerCurrentPage(Math.max(1, Math.min(page, managerTotalPages)));
   };
 
   const getManagerPageNumbers = () => {
@@ -387,20 +369,12 @@ const handleManagerSearchKeyPress = (e) => {
     } else if (managerCurrentPage >= managerTotalPages - 2) {
       pages.push(1);
       pages.push("...");
-      for (
-        let i = managerTotalPages - 3;
-        i <= managerTotalPages;
-        i++
-      )
+      for (let i = managerTotalPages - 3; i <= managerTotalPages; i++)
         pages.push(i);
     } else {
       pages.push(1);
       pages.push("...");
-      for (
-        let i = managerCurrentPage - 1;
-        i <= managerCurrentPage + 1;
-        i++
-      )
+      for (let i = managerCurrentPage - 1; i <= managerCurrentPage + 1; i++)
         pages.push(i);
       pages.push("...");
       pages.push(managerTotalPages);
@@ -419,7 +393,19 @@ const handleManagerSearchKeyPress = (e) => {
   };
 
   const monthNames = [
-    "January","February","March","April","May","June","July","August","September","October","November","December",];
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
   const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
   const getCalendarMatrix = () => {
@@ -597,11 +583,9 @@ const handleManagerSearchKeyPress = (e) => {
         <div className="prj-dropdown-wrapper">
           <button
             type="button"
-            className={`prj-dropdown-select ${
-              isOpen ? "open" : ""
-            } ${error ? "error" : ""} ${
-              disabled ? "prj-dropdown-disabled" : ""
-            }`}
+            className={`prj-dropdown-select ${isOpen ? "open" : ""} ${
+              error ? "error" : ""
+            } ${disabled ? "prj-dropdown-disabled" : ""}`}
             onClick={() => !disabled && setIsOpen(!isOpen)}
           >
             <span className="prj-dropdown-value">
@@ -650,12 +634,7 @@ const handleManagerSearchKeyPress = (e) => {
     );
   };
 
-  const CustomFilterDropdown = ({
-    value,
-    onChange,
-    options,
-    placeholder,
-  }) => {
+  const CustomFilterDropdown = ({ value, onChange, options, placeholder }) => {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
 
@@ -679,15 +658,10 @@ const handleManagerSearchKeyPress = (e) => {
     };
 
     return (
-      <div
-        className="prj-custom-filter-dropdown"
-        ref={dropdownRef}
-      >
+      <div className="prj-custom-filter-dropdown" ref={dropdownRef}>
         <button
           type="button"
-          className={`prj-custom-filter-select ${
-            isOpen ? "open" : ""
-          }`}
+          className={`prj-custom-filter-select ${isOpen ? "open" : ""}`}
           onClick={() => setIsOpen(!isOpen)}
         >
           <span className="prj-custom-filter-value">
@@ -698,9 +672,7 @@ const handleManagerSearchKeyPress = (e) => {
               width="18"
               height="18"
               viewBox="0 0 24 24"
-              className={
-                isOpen ? "prj-custom-filter-arrow-svg-open" : ""
-              }
+              className={isOpen ? "prj-custom-filter-arrow-svg-open" : ""}
             >
               <polyline
                 points="6 9 12 15 18 9"
@@ -771,10 +743,7 @@ const handleManagerSearchKeyPress = (e) => {
 
       <div className="prj-calendar-weekdays">
         {weekdays.map((w) => (
-          <div
-            key={w}
-            className="prj-calendar-weekday-cell"
-          >
+          <div key={w} className="prj-calendar-weekday-cell">
             {w}
           </div>
         ))}
@@ -805,9 +774,7 @@ const handleManagerSearchKeyPress = (e) => {
               key={idx}
               type="button"
               className={cellClass}
-              onClick={() =>
-                handleSelectCalendarDay(c.day, c.current)
-              }
+              onClick={() => handleSelectCalendarDay(c.day, c.current)}
             >
               {c.day}
             </button>
@@ -832,23 +799,22 @@ const handleManagerSearchKeyPress = (e) => {
       <nav aria-label="breadcrumb" className="prj-breadcrumb">
         <ol className="prj-breadcrumb-list">
           <li className="prj-breadcrumb-item">
-           <button type="button"  onClick={() => navigate("/hr/dashboard/projectmgmt")} className="prj-breadcrumb-link">
-             <Home size={18} />
-           </button>
-
+            <button
+              type="button"
+              onClick={() => navigate("/hr/dashboard/projectmgmt")}
+              className="prj-breadcrumb-link"
+            >
+              <Home size={18} />
+            </button>
           </li>
           <li className="prj-breadcrumb-item-active">
-            <span className="prj-breadcrumb-current">
-            Create Project
-            </span>
+            <span className="prj-breadcrumb-current">Create Project</span>
           </li>
         </ol>
       </nav>
 
       {submitStatus && (
-        <div
-          className={`prj-alert prj-alert-${submitStatus.type}`}
-        >
+        <div className={`prj-alert prj-alert-${submitStatus.type}`}>
           <div className="prj-alert-content">
             {submitStatus.type === "success" ? (
               <CheckCircle size={20} />
@@ -873,9 +839,7 @@ const handleManagerSearchKeyPress = (e) => {
             <div className="prj-form-grid">
               <div className="prj-section-card">
                 <div className="prj-section-header">
-                  <h5 className="prj-section-title">
-                    Basic Information
-                  </h5>
+                  <h5 className="prj-section-title">Basic Information</h5>
                 </div>
                 <div className="prj-section-content">
                   <div className="prj-form-group">
@@ -942,9 +906,7 @@ const handleManagerSearchKeyPress = (e) => {
                   />
 
                   <div className="prj-form-group">
-                    <label className="prj-form-label">
-                      Description
-                    </label>
+                    <label className="prj-form-label">Description</label>
                     <textarea
                       name="description"
                       value={formData.description}
@@ -959,13 +921,8 @@ const handleManagerSearchKeyPress = (e) => {
 
               <div className="prj-section-card">
                 <div className="prj-section-header">
-                  <Building
-                    size={20}
-                    className="prj-section-icon"
-                  />
-                  <h5 className="prj-section-title">
-                    Organization Details
-                  </h5>
+                  <Building size={20} className="prj-section-icon" />
+                  <h5 className="prj-section-title">Organization Details</h5>
                 </div>
                 <div className="prj-section-content">
                   <CustomSelect
@@ -1016,13 +973,8 @@ const handleManagerSearchKeyPress = (e) => {
 
               <div className="prj-section-card">
                 <div className="prj-section-header">
-                  <CalendarIcon
-                    size={20}
-                    className="prj-section-icon"
-                  />
-                  <h5 className="prj-section-title">
-                    Project Timeline
-                  </h5>
+                  <CalendarIcon size={20} className="prj-section-icon" />
+                  <h5 className="prj-section-title">Project Timeline</h5>
                 </div>
                 <div className="prj-section-content">
                   <div className="prj-form-group">
@@ -1034,12 +986,8 @@ const handleManagerSearchKeyPress = (e) => {
                       <input
                         type="text"
                         readOnly
-                        value={formatDisplayDate(
-                          formData.startDate
-                        )}
-                        onClick={() =>
-                          openCalendarForField("startDate")
-                        }
+                        value={formatDisplayDate(formData.startDate)}
+                        onClick={() => openCalendarForField("startDate")}
                         placeholder="Select start date"
                         className={`prj-form-input prj-date-input ${
                           errors.startDate ? "error" : ""
@@ -1049,14 +997,11 @@ const handleManagerSearchKeyPress = (e) => {
                       <button
                         type="button"
                         className="prj-date-icon-btn"
-                        onClick={() =>
-                          openCalendarForField("startDate")
-                        }
+                        onClick={() => openCalendarForField("startDate")}
                       >
                         <CalendarIcon size={18} />
                       </button>
-                      {startCalendarOpen &&
-                        renderCalendarPopup("start")}
+                      {startCalendarOpen && renderCalendarPopup("start")}
                     </div>
                     {errors.startDate && (
                       <div className="prj-error-message">
@@ -1068,21 +1013,15 @@ const handleManagerSearchKeyPress = (e) => {
                   <div className="prj-form-group">
                     <label className="prj-form-label">
                       End Date
-                      <span className="prj-optional">
-                        Optional
-                      </span>
+                      <span className="prj-optional">Optional</span>
                     </label>
                     <div className="prj-date-input-wrapper">
                       <input
                         ref={endInputRef}
                         type="text"
                         readOnly
-                        value={formatDisplayDate(
-                          formData.endDate
-                        )}
-                        onClick={() =>
-                          openCalendarForField("endDate")
-                        }
+                        value={formatDisplayDate(formData.endDate)}
+                        onClick={() => openCalendarForField("endDate")}
                         placeholder="Select end date"
                         className={`prj-form-input prj-date-input ${
                           errors.endDate ? "error" : ""
@@ -1091,17 +1030,13 @@ const handleManagerSearchKeyPress = (e) => {
                       <button
                         type="button"
                         className="prj-date-icon-btn"
-                        onClick={() =>
-                          openCalendarForField("endDate")
-                        }
+                        onClick={() => openCalendarForField("endDate")}
                       >
                         <CalendarIcon size={18} />
                       </button>
                     </div>
                     {errors.endDate && (
-                      <div className="prj-error-message">
-                        {errors.endDate}
-                      </div>
+                      <div className="prj-error-message">{errors.endDate}</div>
                     )}
                   </div>
                 </div>
@@ -1109,13 +1044,8 @@ const handleManagerSearchKeyPress = (e) => {
 
               <div className="prj-section-card">
                 <div className="prj-section-header">
-                  <Users
-                    size={20}
-                    className="prj-section-icon"
-                  />
-                  <h5 className="prj-section-title">
-                    Reporting Managers
-                  </h5>
+                  <Users size={20} className="prj-section-icon" />
+                  <h5 className="prj-section-title">Reporting Managers</h5>
                 </div>
                 <div className="prj-section-content">
                   {isLoadingData ? (
@@ -1125,23 +1055,17 @@ const handleManagerSearchKeyPress = (e) => {
                   ) : (
                     <>
                       <div className="prj-form-group">
-                        <label className="prj-form-label">
-                          Resource Owner
-                        </label>
+                        <label className="prj-form-label">Resource Owner</label>
                         <button
                           type="button"
                           className="prj-manager-box"
-                          onClick={() =>
-                            handleOpenManagerModal("resource")
-                          }
+                          onClick={() => handleOpenManagerModal("resource")}
                         >
                           {selectedResourceOwner ? (
                             <div>
                               <div className="prj-manager-name">
                                 {selectedResourceOwner.firstName}{" "}
-                                {
-                                  selectedResourceOwner.lastName
-                                }
+                                {selectedResourceOwner.lastName}
                               </div>
                               <span className="prj-manager-role">
                                 {selectedResourceOwner.roleName}
@@ -1157,15 +1081,11 @@ const handleManagerSearchKeyPress = (e) => {
                       </div>
 
                       <div className="prj-form-group">
-                        <label className="prj-form-label">
-                          L1 Approver
-                        </label>
+                        <label className="prj-form-label">L1 Approver</label>
                         <button
                           type="button"
                           className="prj-manager-box"
-                          onClick={() =>
-                            handleOpenManagerModal("l1")
-                          }
+                          onClick={() => handleOpenManagerModal("l1")}
                         >
                           {selectedL1Approver ? (
                             <div>
@@ -1187,15 +1107,11 @@ const handleManagerSearchKeyPress = (e) => {
                       </div>
 
                       <div className="prj-form-group">
-                        <label className="prj-form-label">
-                          L2 Approver
-                        </label>
+                        <label className="prj-form-label">L2 Approver</label>
                         <button
                           type="button"
                           className="prj-manager-box"
-                          onClick={() =>
-                            handleOpenManagerModal("l2")
-                          }
+                          onClick={() => handleOpenManagerModal("l2")}
                         >
                           {selectedL2Approver ? (
                             <div>
@@ -1266,9 +1182,7 @@ const handleManagerSearchKeyPress = (e) => {
               <div className="prj-modal-header">
                 <div className="prj-modal-header-content">
                   <UserCog size={24} />
-                  <h3 className="prj-modal-title">
-                    Select Manager
-                  </h3>
+                  <h3 className="prj-modal-title">Select Manager</h3>
                 </div>
                 <button
                   type="button"
@@ -1283,22 +1197,14 @@ const handleManagerSearchKeyPress = (e) => {
                 <button
                   type="button"
                   className={`prj-modal-tab ${
-                    activeManagerTab === "resource"
-                      ? "active"
-                      : ""
+                    activeManagerTab === "resource" ? "active" : ""
                   }`}
-                  onClick={() =>
-                    setActiveManagerTab("resource")
-                  }
+                  onClick={() => setActiveManagerTab("resource")}
                 >
                   <span>Resource Owner</span>
-                  {activeManagerTab === "resource" &&
-                    selectedResourceOwner && (
-                      <CheckCircle
-                        size={16}
-                        className="prj-tab-icon"
-                      />
-                    )}
+                  {activeManagerTab === "resource" && selectedResourceOwner && (
+                    <CheckCircle size={16} className="prj-tab-icon" />
+                  )}
                 </button>
                 <button
                   type="button"
@@ -1308,13 +1214,9 @@ const handleManagerSearchKeyPress = (e) => {
                   onClick={() => setActiveManagerTab("l1")}
                 >
                   <span>L1 Approver</span>
-                  {activeManagerTab === "l1" &&
-                    selectedL1Approver && (
-                      <CheckCircle
-                        size={16}
-                        className="prj-tab-icon"
-                      />
-                    )}
+                  {activeManagerTab === "l1" && selectedL1Approver && (
+                    <CheckCircle size={16} className="prj-tab-icon" />
+                  )}
                 </button>
                 <button
                   type="button"
@@ -1324,39 +1226,27 @@ const handleManagerSearchKeyPress = (e) => {
                   onClick={() => setActiveManagerTab("l2")}
                 >
                   <span>L2 Approver</span>
-                  {activeManagerTab === "l2" &&
-                    selectedL2Approver && (
-                      <CheckCircle
-                        size={16}
-                        className="prj-tab-icon"
-                      />
-                    )}
+                  {activeManagerTab === "l2" && selectedL2Approver && (
+                    <CheckCircle size={16} className="prj-tab-icon" />
+                  )}
                 </button>
               </div>
 
-              {(activeManagerTab === "resource" &&
-                selectedResourceOwner) ||
-              (activeManagerTab === "l1" &&
-                selectedL1Approver) ||
-              (activeManagerTab === "l2" &&
-                selectedL2Approver) ? (
+              {(activeManagerTab === "resource" && selectedResourceOwner) ||
+              (activeManagerTab === "l1" && selectedL1Approver) ||
+              (activeManagerTab === "l2" && selectedL2Approver) ? (
                 <div className="prj-modal-info">
                   <span className="prj-info-icon" />
                   <div className="prj-info-content">
-                    <span className="prj-info-label">
-                      Currently Selected
-                    </span>
+                    <span className="prj-info-label">Currently Selected</span>
                     <span className="prj-info-badge">
-                      {activeManagerTab === "resource" &&
-                      selectedResourceOwner
+                      {activeManagerTab === "resource" && selectedResourceOwner
                         ? `${selectedResourceOwner.firstName} ${selectedResourceOwner.lastName}`
                         : ""}
-                      {activeManagerTab === "l1" &&
-                      selectedL1Approver
+                      {activeManagerTab === "l1" && selectedL1Approver
                         ? `${selectedL1Approver.firstName} ${selectedL1Approver.lastName}`
                         : ""}
-                      {activeManagerTab === "l2" &&
-                      selectedL2Approver
+                      {activeManagerTab === "l2" && selectedL2Approver
                         ? `${selectedL2Approver.firstName} ${selectedL2Approver.lastName}`
                         : ""}
                     </span>
@@ -1364,139 +1254,143 @@ const handleManagerSearchKeyPress = (e) => {
                 </div>
               ) : null}
 
-           <div className="prj-modal-filters">
-  <div className="prj-filter-search-container">
-    <Search size={18} className="prj-search-icon-left" />
-    <input
-      type="text"
-      className="prj-search-input-with-btn"
-      placeholder="Search by name, role, or department..."
-      value={managerSearchInput}
-      onChange={(e) => setManagerSearchInput(e.target.value)}
-      onKeyPress={handleManagerSearchKeyPress}
-    />
+              <div className="prj-modal-filters">
+                <div className="prj-filter-search-container">
+                  <Search size={18} className="prj-search-icon-left" />
+                  <input
+                    type="text"
+                    className="prj-search-input-with-btn"
+                    placeholder="Search by name, role, or department..."
+                    value={managerSearchInput}
+                    onChange={(e) => setManagerSearchInput(e.target.value)}
+                    onKeyPress={handleManagerSearchKeyPress}
+                  />
 
-    {managerSearchInput && (
-      <button
-        type="button"
-        className="prj-search-clear-btn"
-        onClick={handleCancelSearch}
-      >
-        <X size={16} />
-      </button>
-    )}
+                  {managerSearchInput && (
+                    <button
+                      type="button"
+                      className="prj-search-clear-btn"
+                      onClick={handleCancelSearch}
+                    >
+                      <X size={16} />
+                    </button>
+                  )}
 
-    {managerSearchTerm ? (
-      <button
-        type="button"
-        className="prj-search-btn-inside prj-btn-cancel"
-        onClick={handleCancelSearch}
-      >
-        <X size={16} />
-        <span>Cancel</span>
-      </button>
-    ) : (
-      <button
-        type="button"
-        onClick={handleManagerSearch}
-        className="prj-search-btn-inside"
-      >
-        <Search size={16} />
-        <span>Search</span>
-      </button>
-    )}
-  </div>
+                  {managerSearchTerm ? (
+                    <button
+                      type="button"
+                      className="prj-search-btn-inside prj-btn-cancel"
+                      onClick={handleCancelSearch}
+                    >
+                      <X size={16} />
+                      <span>Cancel</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleManagerSearch}
+                      className="prj-search-btn-inside"
+                    >
+                      <Search size={16} />
+                      <span>Search</span>
+                    </button>
+                  )}
+                </div>
 
-  <CustomFilterDropdown
-    value={
-      managerFilterRole === "All" ? "All Roles" : managerFilterRole
-    }
-    onChange={(v) =>
-      setManagerFilterRole(v === "All Roles" ? "All" : v)
-    }
-    options={["All Roles", ...getUniqueManagerRoles()]}
-    placeholder="All Roles"
-  />
-
-  <CustomFilterDropdown
-    value={
-      managerFilterDepartment === "All"
-        ? "All Departments"
-        : managerFilterDepartment
-    }
-    onChange={(v) =>
-      setManagerFilterDepartment(
-        v === "All Departments" ? "All" : v
-      )
-    }
-    options={["All Departments", ...getUniqueManagerDepartments()]}
-    placeholder="All Departments"
-  />
-</div>
-
-
-<div className="prj-modal-body">
- <div className="prj-table-wrapper">
-  <table className="prj-table">
-    <thead>
-      <tr>
-        <th className="prj-table-select-col">Select</th>
-        <th className="prj-col-name">Employee Name</th>
-        <th className="prj-col-role">Role</th>
-        <th className="prj-col-dept">Department</th>
-      </tr>
-    </thead>
-    <tbody>
-      {paginatedManagers.length === 0 ? (
-        <tr>
-          <td colSpan={4} className="prj-table-empty">
-            No employees found for the selected filters.
-          </td>
-        </tr>
-      ) : (
-        paginatedManagers.map((emp) => {
-          const isSelected =
-            (activeManagerTab === "resource" &&
-              selectedResourceOwner?.employeeMasterId ===
-                emp.employeeMasterId) ||
-            (activeManagerTab === "l1" &&
-              selectedL1Approver?.employeeMasterId ===
-                emp.employeeMasterId) ||
-            (activeManagerTab === "l2" &&
-              selectedL2Approver?.employeeMasterId ===
-                emp.employeeMasterId);
-
-          return (
-            <tr
-              key={emp.employeeMasterId}
-              className={isSelected ? "prj-table-row-selected" : ""}
-              onClick={() => handleManagerSelect(emp)}
-            >
-              <td className="prj-table-select-col">
-                <input
-                  type="radio"
-                  className="prj-radio"
-                  checked={isSelected}
-                  onChange={() => handleManagerSelect(emp)}
+                <CustomFilterDropdown
+                  value={
+                    managerFilterRole === "All"
+                      ? "All Roles"
+                      : managerFilterRole
+                  }
+                  onChange={(v) =>
+                    setManagerFilterRole(v === "All Roles" ? "All" : v)
+                  }
+                  options={["All Roles", ...getUniqueManagerRoles()]}
+                  placeholder="All Roles"
                 />
-              </td>
-              <td className="prj-col-name">
-                {emp.firstName} {emp.lastName}
-              </td>
-              <td className="prj-col-role">
-                {emp.roleName}
-              </td>
-              <td className="prj-col-dept">
-                {emp.departmentName}
-              </td>
-            </tr>
-          );
-        })
-      )}
-    </tbody>
-  </table>
-</div>
-</div>
+
+                <CustomFilterDropdown
+                  value={
+                    managerFilterDepartment === "All"
+                      ? "All Departments"
+                      : managerFilterDepartment
+                  }
+                  onChange={(v) =>
+                    setManagerFilterDepartment(
+                      v === "All Departments" ? "All" : v
+                    )
+                  }
+                  options={[
+                    "All Departments",
+                    ...getUniqueManagerDepartments(),
+                  ]}
+                  placeholder="All Departments"
+                />
+              </div>
+
+              <div className="prj-modal-body">
+                <div className="prj-table-wrapper">
+                  <table className="prj-table">
+                    <thead>
+                      <tr>
+                        <th className="prj-table-select-col">Select</th>
+                        <th className="prj-col-name">Employee Name</th>
+                        <th className="prj-col-role">Role</th>
+                        <th className="prj-col-dept">Department</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {paginatedManagers.length === 0 ? (
+                        <tr>
+                          <td colSpan={4} className="prj-table-empty">
+                            No employees found for the selected filters.
+                          </td>
+                        </tr>
+                      ) : (
+                        paginatedManagers.map((emp) => {
+                          const isSelected =
+                            (activeManagerTab === "resource" &&
+                              selectedResourceOwner?.employeeMasterId ===
+                                emp.employeeMasterId) ||
+                            (activeManagerTab === "l1" &&
+                              selectedL1Approver?.employeeMasterId ===
+                                emp.employeeMasterId) ||
+                            (activeManagerTab === "l2" &&
+                              selectedL2Approver?.employeeMasterId ===
+                                emp.employeeMasterId);
+
+                          return (
+                            <tr
+                              key={emp.employeeMasterId}
+                              className={
+                                isSelected ? "prj-table-row-selected" : ""
+                              }
+                              onClick={() => handleManagerSelect(emp)}
+                            >
+                              <td className="prj-table-select-col">
+                                <input
+                                  type="radio"
+                                  className="prj-radio"
+                                  checked={isSelected}
+                                  onChange={() => handleManagerSelect(emp)}
+                                />
+                              </td>
+                              <td className="prj-col-name">
+                                {emp.firstName} {emp.lastName}
+                              </td>
+                              <td className="prj-col-role">{emp.roleName}</td>
+                              <td className="prj-col-dept">
+                                {emp.departmentName}
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
 
               <div className="prj-modal-footer">
                 <button

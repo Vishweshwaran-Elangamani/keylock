@@ -127,10 +127,7 @@ export default function ViewManagerReview() {
   if (loading) {
     return (
       <div className="vmr-overlay vmr-overlay-loading" onClick={handleClose}>
-        <div
-          className="vmr-loading-modal"
-          onClick={(e) => e.stopPropagation()}
-        >
+        <div className="vmr-loading-modal" onClick={(e) => e.stopPropagation()}>
           <div className="vmr-loading-spinner spinner-border" role="status">
             <span className="visually-hidden">Loading...</span>
           </div>
@@ -177,10 +174,7 @@ export default function ViewManagerReview() {
 
   return (
     <div className="vmr-overlay" onClick={handleClose}>
-      <div
-        className="vmr-modal"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="vmr-modal" onClick={(e) => e.stopPropagation()}>
         <div className="vmr-header">
           <div className="vmr-header-text">
             <h2 className="vmr-header-title">Manager Review</h2>
@@ -261,9 +255,7 @@ export default function ViewManagerReview() {
               </div>
               <h3 className="vmr-section-title">Review comment</h3>
             </div>
-            <div className="vmr-section-body-text">
-              {review.reviewComment}
-            </div>
+            <div className="vmr-section-body-text">{review.reviewComment}</div>
           </div>
 
           {(review.projectContext || review.goalContext) && (

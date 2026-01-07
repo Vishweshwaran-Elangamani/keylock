@@ -63,7 +63,8 @@ export default function FormsList() {
   };
 
   const handleDeleteForm = async (formId) => {
-    if (!window.confirm("Delete this form? This action cannot be undone.")) return;
+    if (!window.confirm("Delete this form? This action cannot be undone."))
+      return;
     try {
       const res = await hrFormApi.deleteForm(formId);
       if (res.data?.success === true || res.status === 200) {
@@ -133,10 +134,7 @@ export default function FormsList() {
             disabled={loading}
             title="Refresh"
           >
-            <RefreshCw
-              size={16}
-              className={loading ? "fl-icon-spin" : ""}
-            />
+            <RefreshCw size={16} className={loading ? "fl-icon-spin" : ""} />
           </button>
           <Link to="/hr/create-form" className="fl-btn fl-btn-primary">
             <Plus size={16} className="fl-btn-icon-left" />
@@ -167,7 +165,10 @@ export default function FormsList() {
       {forms.length === 0 ? (
         <div className="fl-card fl-card-empty">
           <p className="fl-empty-text">No forms created yet</p>
-          <Link to="/hr/create-form" className="fl-btn fl-btn-primary fl-btn-sm">
+          <Link
+            to="/hr/create-form"
+            className="fl-btn fl-btn-primary fl-btn-sm"
+          >
             Create First Form
           </Link>
         </div>
@@ -202,9 +203,7 @@ export default function FormsList() {
                       <tr className="fl-row-main">
                         <td className="fl-td fl-td-name">{form.formName}</td>
                         <td className="fl-td">
-                          <span className="fl-badge-type">
-                            {form.formType}
-                          </span>
+                          <span className="fl-badge-type">{form.formType}</span>
                         </td>
                         <td className="fl-td fl-td-center">
                           <div className="fl-deadline-cell">

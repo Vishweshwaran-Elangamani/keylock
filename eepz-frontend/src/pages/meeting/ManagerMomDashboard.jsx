@@ -151,17 +151,13 @@ const ManagerMomDashboard = () => {
         setRefreshing(true);
       }
 
-      const [
-        myMomsRes,
-        meetingsRes,
-        employeesRes,
-        actionItemsAssignedByMeRes,
-      ] = await Promise.all([
-        momService.getMyMoms(),
-        meetingService.getMyMeetings(),
-        employeeService.getAllEmployees(),
-        momService.getActionItemsAssignedByMe(),
-      ]);
+      const [myMomsRes, meetingsRes, employeesRes, actionItemsAssignedByMeRes] =
+        await Promise.all([
+          momService.getMyMoms(),
+          meetingService.getMyMeetings(),
+          employeeService.getAllEmployees(),
+          momService.getActionItemsAssignedByMe(),
+        ]);
 
       if (employeesRes.success && employeesRes.data) {
         const nameMap = {};
@@ -275,7 +271,8 @@ const ManagerMomDashboard = () => {
   const safeTotal = upcomingMeetings.length;
   const totalPages = Math.max(1, Math.ceil(safeTotal / itemsPerPage));
   const validCurrentPage = Math.min(currentPage, totalPages);
-  const startIndex = safeTotal === 0 ? 0 : (validCurrentPage - 1) * itemsPerPage;
+  const startIndex =
+    safeTotal === 0 ? 0 : (validCurrentPage - 1) * itemsPerPage;
   const endIndex =
     safeTotal === 0 ? 0 : Math.min(validCurrentPage * itemsPerPage, safeTotal);
   const paginatedMeetings = upcomingMeetings.slice(startIndex, endIndex);
@@ -385,30 +382,32 @@ const ManagerMomDashboard = () => {
           />
         </div>
 
-       
+        <div className="managermom-toolbar">
+          <div
+            className="managermom-view-switch"
+            role="group"
+            aria-label="View switcher"
+          >
+            <button
+              type="button"
+              className={`mmview-btn ${showTableView ? "active" : ""}`}
+              onClick={() => setShowTableView(true)}
+              title="Table View"
+              aria-pressed={showTableView}
+            >
+              <i className="bi bi-grid-3x3-gap-fill"></i>
+            </button>
 
-<div className="managermom-toolbar">
-  <div className="managermom-view-switch" role="group" aria-label="View switcher">
-    <button
-      type="button"
-      className={`mmview-btn ${showTableView ? "active" : ""}`}
-      onClick={() => setShowTableView(true)}
-      title="Table View"
-      aria-pressed={showTableView}
-    >
-      <i className="bi bi-grid-3x3-gap-fill"></i>
-    </button>
-
-    <button
-      type="button"
-      className={`mmview-btn ${!showTableView ? "active" : ""}`}
-      onClick={() => setShowTableView(false)}
-      title="Card View"
-      aria-pressed={!showTableView}
-    >
-      <i className="bi bi-grid-3x3-gap"></i>
-    </button>
-  </div>
+            <button
+              type="button"
+              className={`mmview-btn ${!showTableView ? "active" : ""}`}
+              onClick={() => setShowTableView(false)}
+              title="Card View"
+              aria-pressed={!showTableView}
+            >
+              <i className="bi bi-grid-3x3-gap"></i>
+            </button>
+          </div>
 
           <div className="managermom-toolbar-right">
             <button

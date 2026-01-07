@@ -87,7 +87,6 @@ export default function ViewMyPeerFeedback() {
 
   useEffect(() => {
     fetchPeerFeedback();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.empId]);
 
   const handleRefresh = async () => {
@@ -143,10 +142,7 @@ export default function ViewMyPeerFeedback() {
                 <p className="hrq-alert-text">{error}</p>
               </div>
             </div>
-            <button
-              className="hrq-alert-close"
-              onClick={() => setError("")}
-            >
+            <button className="hrq-alert-close" onClick={() => setError("")}>
               ×
             </button>
           </div>
@@ -187,10 +183,7 @@ export default function ViewMyPeerFeedback() {
                     <div className="hrq-feedback-header">
                       <div>
                         <div className="hrq-feedback-peer-row">
-                          <User
-                            size={16}
-                            className="hrq-feedback-peer-icon"
-                          />
+                          <User size={16} className="hrq-feedback-peer-icon" />
                           <h6 className="hrq-feedback-peer-name">
                             {feedback.submittedByName}
                           </h6>
@@ -227,9 +220,7 @@ export default function ViewMyPeerFeedback() {
                           size={16}
                           className="hrq-feedback-comment-icon"
                         />
-                        <h6 className="hrq-feedback-comment-title">
-                          Feedback
-                        </h6>
+                        <h6 className="hrq-feedback-comment-title">Feedback</h6>
                       </div>
                       <p className="hrq-feedback-comment-text">
                         {feedback.comment ||
@@ -240,9 +231,7 @@ export default function ViewMyPeerFeedback() {
 
                     {(feedback.context || feedback.feedbackContext) && (
                       <div className="hrq-feedback-context-box">
-                        <h6 className="hrq-feedback-context-title">
-                          Context
-                        </h6>
+                        <h6 className="hrq-feedback-context-title">Context</h6>
                         <p className="hrq-feedback-context-text">
                           {feedback.context || feedback.feedbackContext}
                         </p>

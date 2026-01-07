@@ -8,7 +8,10 @@ import {
   User,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { employeeApi, peerQueueApi } from "../../../services/feedbackmanagement/feedbackApi";
+import {
+  employeeApi,
+  peerQueueApi,
+} from "../../../services/feedbackmanagement/feedbackApi";
 import FeedbackBreadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb";
 import "../../../styles/feedback/components/AllManagerReviews.css";
 
@@ -35,8 +38,6 @@ export default function AllManagerReviews() {
   const [managers, setManagers] = useState([]);
   const [selectedManager, setSelectedManager] = useState("All");
   const [isManagerOpen, setIsManagerOpen] = useState(false);
-
-  // ... all your existing functions remain EXACTLY the same ...
 
   const fetchEmployeeMap = async () => {
     try {
@@ -164,21 +165,23 @@ export default function AllManagerReviews() {
 
   return (
     <div className="amr-page">
-     
+      <FeedbackBreadcrumb
+        items={[
+          {
+            label: (
+              <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>
+                Manager Reviews
+              </span>
+            ),
+          },
+        ]}
+      />
 
-<FeedbackBreadcrumb
-  items={[
-    { label: <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>Manager Reviews</span> }
-  ]}
-/>
-
-
-      
       <div className="amr-container">
         <div className="amr-header">
           <div className="amr-header-content">
             <h5 className="amr-title">Manager Feedbacks</h5>
-          
+
             <p className="amr-subtitle">
               View the feedback submitted by managers to their team members
             </p>
@@ -212,10 +215,14 @@ export default function AllManagerReviews() {
               <div className="amr-dd">
                 <button
                   type="button"
-                  className={`amr-dd-trigger ${isManagerOpen ? "amr-dd-open" : ""}`}
+                  className={`amr-dd-trigger ${
+                    isManagerOpen ? "amr-dd-open" : ""
+                  }`}
                   onClick={() => setIsManagerOpen((o) => !o)}
                 >
-                  <span className="amr-dd-trigger-text">{selectedManagerLabel}</span>
+                  <span className="amr-dd-trigger-text">
+                    {selectedManagerLabel}
+                  </span>
                   <span className="amr-dd-arrow" />
                 </button>
 

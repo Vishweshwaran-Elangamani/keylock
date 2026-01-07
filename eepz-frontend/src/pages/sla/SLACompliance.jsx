@@ -197,12 +197,8 @@ const SLACompliance = () => {
 
   return (
     <div className="sla-compliance-wrapper">
-      <Breadcrumb
-        items={[
-          { label: "SLA Compliance" }
-        ]}
-      />
-      
+      <Breadcrumb items={[{ label: "SLA Compliance" }]} />
+
       <div className="sla-compliance-header">
         <div className="sla-compliance-header-text">
           <p className="sla-compliance-subtitle">
@@ -253,36 +249,45 @@ const SLACompliance = () => {
         </div>
       </div>
 
-     
+      <div className="sla-compliance-view-toggle-wrapper">
+        <div
+          className="sla-compliance-view-toggle"
+          role="group"
+          aria-label="View switcher"
+        >
+          <button
+            type="button"
+            className={`sla-compliance-toggle-btn ${
+              viewMode === "table" ? "sla-compliance-toggle-btn-active" : ""
+            }`}
+            onClick={() => setViewMode("table")}
+            title="Table View"
+            aria-pressed={viewMode === "table"}
+          >
+            <i
+              className="bi bi-grid-3x3-gap-fill sla-toggle-icon"
+              aria-hidden="true"
+            ></i>
+            <span className="visually-hidden">Table View</span>
+          </button>
 
-<div className="sla-compliance-view-toggle-wrapper">
-  <div className="sla-compliance-view-toggle" role="group" aria-label="View switcher">
-   
-    <button
-      type="button"
-      className={`sla-compliance-toggle-btn ${viewMode === "table" ? "sla-compliance-toggle-btn-active" : ""}`}
-      onClick={() => setViewMode("table")}
-      title="Table View"
-      aria-pressed={viewMode === "table"}
-    >
-      <i className="bi bi-grid-3x3-gap-fill sla-toggle-icon" aria-hidden="true"></i>
-      <span className="visually-hidden">Table View</span>
-    </button>
-
-    <button
-      type="button"
-      className={`sla-compliance-toggle-btn ${viewMode === "cards" ? "sla-compliance-toggle-btn-active" : ""}`}
-      onClick={() => setViewMode("cards")}
-      title="Cards View"
-      aria-pressed={viewMode === "cards"}
-    >
-      <i className="bi bi-grid-3x3-gap sla-toggle-icon inactive-multitone" aria-hidden="true"></i>
-      <span className="visually-hidden">Cards View</span>
-    </button>
-  </div>
-</div>
-
-
+          <button
+            type="button"
+            className={`sla-compliance-toggle-btn ${
+              viewMode === "cards" ? "sla-compliance-toggle-btn-active" : ""
+            }`}
+            onClick={() => setViewMode("cards")}
+            title="Cards View"
+            aria-pressed={viewMode === "cards"}
+          >
+            <i
+              className="bi bi-grid-3x3-gap sla-toggle-icon inactive-multitone"
+              aria-hidden="true"
+            ></i>
+            <span className="visually-hidden">Cards View</span>
+          </button>
+        </div>
+      </div>
 
       {error && (
         <div className="sla-compliance-alert">

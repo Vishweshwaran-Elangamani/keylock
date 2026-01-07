@@ -5,7 +5,7 @@ import toastr from "toastr";
 import "../../styles/mom/components/MomDetails.css";
 
 const PRIMARY = "#27235C";
-const RSVP_STATUS = {}; 
+const RSVP_STATUS = {};
 
 const MomDetails = () => {
   const { momId } = useParams();
@@ -108,9 +108,7 @@ const MomDetails = () => {
                 ))}
               </ul>
             ) : (
-              <p className="momd-muted-text">
-                No discussion points recorded.
-              </p>
+              <p className="momd-muted-text">No discussion points recorded.</p>
             )}
           </section>
 
@@ -120,11 +118,9 @@ const MomDetails = () => {
               <ul className="momd-list">
                 {mom.actionItems.map((ai) => (
                   <li key={ai.actionItemId} className="momd-list-item">
-                    <strong>
-                      {ai.task || ai.taskDescription}
-                    </strong>{" "}
-                    - Assigned to:{" "}
-                    {ai.assignTo || ai.assignedToEmployeeName || "N/A"} - Due:{" "}
+                    <strong>{ai.task || ai.taskDescription}</strong> - Assigned
+                    to: {ai.assignTo || ai.assignedToEmployeeName || "N/A"} -
+                    Due:{" "}
                     {ai.dueDate
                       ? new Date(ai.dueDate).toLocaleDateString()
                       : "N/A"}{" "}

@@ -34,7 +34,7 @@ const HRMomDashboard = () => {
   const [loading, setLoading] = useState(false);
   const [totalMoms, setTotalMoms] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  
+
   const [isPageSizeOpen, setIsPageSizeOpen] = useState(false);
   const pageSizeRef = useRef(null);
 
@@ -103,9 +103,7 @@ const HRMomDashboard = () => {
       Other: "secondary",
     };
     return (
-      <span
-        className={`badge hrmom-badge bg-${badgeMap[type] || "secondary"}`}
-      >
+      <span className={`badge hrmom-badge bg-${badgeMap[type] || "secondary"}`}>
         {type}
       </span>
     );
@@ -171,9 +169,7 @@ const HRMomDashboard = () => {
       <div className="hrmom-dashboard-wrapper">
         <div className="hrmom-header">
           <Breadcrumb
-            items={[
-              { label: "Meetings and MoM", href: "/hr/dashboard/mom" },
-            ]}
+            items={[{ label: "Meetings and MoM", href: "/hr/dashboard/mom" }]}
           />
         </div>
 
@@ -213,9 +209,7 @@ const HRMomDashboard = () => {
                   <CheckCircle className="hrmom-top-icon-svg hrmom-top-icon-ok" />
                 </div>
                 <div className="hrmom-top-center">
-                  <div className="hrmom-top-count">
-                    {getTotalActionItems()}
-                  </div>
+                  <div className="hrmom-top-count">{getTotalActionItems()}</div>
                   <div className="hrmom-top-label">ACTION ITEMS</div>
                 </div>
               </div>
@@ -385,33 +379,40 @@ const HRMomDashboard = () => {
                 <div className="hrmom-pagination-footer">
                   <div className="hrmom-page-size">
                     <span>Show</span>
-                    
+
                     <div className="hrmom-custom-select" ref={pageSizeRef}>
-                        <div 
-                          className="hrmom-select-trigger" 
-                          onClick={() => setIsPageSizeOpen(!isPageSizeOpen)}
-                        >
-                          <span className="hrmom-trigger-text">{filters.pageSize}</span>
-                          {isPageSizeOpen ? (
-                             <ChevronUp size={14} className="hrmom-select-arrow" />
-                          ) : (
-                             <ChevronDown size={14} className="hrmom-select-arrow" />
-                          )}
-                        </div>
-                        
-                        {isPageSizeOpen && (
-                          <div className="hrmom-select-options">
-                            {pageSizeOptions.map(size => (
-                              <div 
-                                key={size}
-                                className={`hrmom-select-option ${filters.pageSize === size ? 'selected' : ''}`}
-                                onClick={() => handlePageSizeSelect(size)}
-                              >
-                                {size}
-                              </div>
-                            ))}
-                          </div>
+                      <div
+                        className="hrmom-select-trigger"
+                        onClick={() => setIsPageSizeOpen(!isPageSizeOpen)}
+                      >
+                        <span className="hrmom-trigger-text">
+                          {filters.pageSize}
+                        </span>
+                        {isPageSizeOpen ? (
+                          <ChevronUp size={14} className="hrmom-select-arrow" />
+                        ) : (
+                          <ChevronDown
+                            size={14}
+                            className="hrmom-select-arrow"
+                          />
                         )}
+                      </div>
+
+                      {isPageSizeOpen && (
+                        <div className="hrmom-select-options">
+                          {pageSizeOptions.map((size) => (
+                            <div
+                              key={size}
+                              className={`hrmom-select-option ${
+                                filters.pageSize === size ? "selected" : ""
+                              }`}
+                              onClick={() => handlePageSizeSelect(size)}
+                            >
+                              {size}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
                     <span>entries</span>

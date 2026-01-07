@@ -123,7 +123,6 @@ export default function HRFeedbackReport() {
 
   useEffect(() => {
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleViewResponse = (response) => {
@@ -158,9 +157,7 @@ export default function HRFeedbackReport() {
     >
       <Icon size={14} className="hfr-tab-icon" />
       {label}
-      {count !== undefined && (
-        <span className="hfr-tab-count">{count}</span>
-      )}
+      {count !== undefined && <span className="hfr-tab-count">{count}</span>}
     </button>
   );
 
@@ -179,10 +176,7 @@ export default function HRFeedbackReport() {
           onClick={fetchData}
           disabled={refreshing || loading}
         >
-          <RefreshCw
-            size={18}
-            className={refreshing ? "hfr-icon-spin" : ""}
-          />
+          <RefreshCw size={18} className={refreshing ? "hfr-icon-spin" : ""} />
           Refresh
         </button>
       </div>
@@ -196,10 +190,7 @@ export default function HRFeedbackReport() {
               <p className="hfr-alert-text">{error}</p>
             </div>
           </div>
-          <button
-            className="hfr-alert-close"
-            onClick={() => setError("")}
-          >
+          <button className="hfr-alert-close" onClick={() => setError("")}>
             ×
           </button>
         </div>
@@ -261,9 +252,7 @@ export default function HRFeedbackReport() {
                       <div className="hfr-form-card">
                         <div className="hfr-form-card-body">
                           <div className="hfr-form-header">
-                            <h6 className="hfr-form-name">
-                              {form.formName}
-                            </h6>
+                            <h6 className="hfr-form-name">{form.formName}</h6>
                             <Badge
                               text={`${formResponses.length}`}
                               color="#0F62FE"
@@ -308,17 +297,12 @@ export default function HRFeedbackReport() {
                       (1000 * 60 * 60 * 24)
                   );
                   return (
-                    <div
-                      className="hfr-response-col"
-                      key={response.responseId}
-                    >
+                    <div className="hfr-response-col" key={response.responseId}>
                       <div className="hfr-response-card">
                         <div className="hfr-response-card-body">
                           <div className="hfr-response-header">
                             <div>
-                              <h6 className="hfr-response-form-label">
-                                Form:
-                              </h6>
+                              <h6 className="hfr-response-form-label">Form:</h6>
                               <p className="hfr-response-form-name">
                                 {response.formName}
                               </p>
@@ -328,10 +312,7 @@ export default function HRFeedbackReport() {
 
                           <div className="hfr-response-employee-box">
                             <h6 className="hfr-response-employee-label">
-                              <User
-                                size={12}
-                                className="hfr-inline-icon"
-                              />
+                              <User size={12} className="hfr-inline-icon" />
                               Employee:
                             </h6>
                             <p className="hfr-response-employee-name">
@@ -340,10 +321,7 @@ export default function HRFeedbackReport() {
                           </div>
 
                           <small className="hfr-response-time">
-                            <Clock
-                              size={12}
-                              className="hfr-inline-icon"
-                            />
+                            <Clock size={12} className="hfr-inline-icon" />
                             {new Date(
                               response.submittedDate
                             ).toLocaleDateString()}{" "}

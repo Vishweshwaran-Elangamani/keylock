@@ -14,9 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import slaService, {
-  dateHelpers,
-} from "../../services/sla/slaService";
+import slaService, { dateHelpers } from "../../services/sla/slaService";
 import Breadcrumb from "../../components/sla/common/Breadcrumbs";
 import "../../styles/sla/components/EmployeeSLADashboard.css";
 
@@ -197,8 +195,7 @@ const EmployeeSLADashboard = () => {
   const safeTotal = filteredSLAs.length;
   const totalPages = Math.max(1, Math.ceil(safeTotal / itemsPerPage));
 
-  const startIndex =
-    safeTotal === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+  const startIndex = safeTotal === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
   const endIndex =
     safeTotal === 0 ? 0 : Math.min(currentPage * itemsPerPage, safeTotal);
 
@@ -252,11 +249,7 @@ const EmployeeSLADashboard = () => {
 
   return (
     <div className="emp-sla-dashboard">
-      <Breadcrumb
-        items={[
-          { label: "SLA Compliance", active: true },
-        ]}
-      />
+      <Breadcrumb items={[{ label: "SLA Compliance", active: true }]} />
 
       {error && (
         <div className="emp-sla-alert-error">
@@ -494,11 +487,7 @@ const EmployeeSLADashboard = () => {
                 <div className="emp-sla-pagination-left">
                   <span className="emp-sla-pagination-text">Show</span>
 
-             
-                  <div
-                    className="emp-sla-entries-dropdown"
-                    ref={dropdownRef}
-                  >
+                  <div className="emp-sla-entries-dropdown" ref={dropdownRef}>
                     <div
                       className={`emp-sla-entries-selected ${
                         isDropdownOpen ? "open" : ""
@@ -610,7 +599,9 @@ const EmployeeSLADashboard = () => {
               return (
                 <div key={sla.key} className="emp-sla-card">
                   <div className="emp-sla-card-header">
-                    <div className={`emp-sla-card-icon ${statusStyle.className}`}>
+                    <div
+                      className={`emp-sla-card-icon ${statusStyle.className}`}
+                    >
                       <IconComponent size={20} strokeWidth={2} />
                     </div>
                     <div className="emp-sla-card-header-text">
@@ -633,9 +624,7 @@ const EmployeeSLADashboard = () => {
                       </span>
                     </div>
                     <div className="emp-sla-card-row">
-                      <span className="emp-sla-card-label">
-                        Days Remaining
-                      </span>
+                      <span className="emp-sla-card-label">Days Remaining</span>
                       <span
                         className={`emp-sla-card-value ${
                           overdue

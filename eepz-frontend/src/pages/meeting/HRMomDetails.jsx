@@ -80,7 +80,9 @@ const HRMomDetails = () => {
       Other: "hrmom-badge-secondary",
     };
     return (
-      <span className={`hrmom-badge ${badgeMap[type] || "hrmom-badge-secondary"}`}>
+      <span
+        className={`hrmom-badge ${badgeMap[type] || "hrmom-badge-secondary"}`}
+      >
         {type}
       </span>
     );
@@ -104,7 +106,11 @@ const HRMomDetails = () => {
       Low: "hrmom-badge-secondary",
     };
     return (
-      <span className={`hrmom-badge ${badgeMap[priority] || "hrmom-badge-secondary"}`}>
+      <span
+        className={`hrmom-badge ${
+          badgeMap[priority] || "hrmom-badge-secondary"
+        }`}
+      >
         {priority}
       </span>
     );
@@ -148,8 +154,11 @@ const HRMomDetails = () => {
 
     return {
       total: mom.actionItems.length,
-      completed: mom.actionItems.filter((ai) => ai.status === "Completed").length,
-      pending: mom.actionItems.filter((ai) => ai.status === "Pending" && !ai.isOverdue).length,
+      completed: mom.actionItems.filter((ai) => ai.status === "Completed")
+        .length,
+      pending: mom.actionItems.filter(
+        (ai) => ai.status === "Pending" && !ai.isOverdue
+      ).length,
       overdue: mom.actionItems.filter((ai) => ai.isOverdue).length,
     };
   };
@@ -174,7 +183,10 @@ const HRMomDetails = () => {
           <div className="hrmom-error-card">
             <AlertCircle size={48} className="hrmom-error-icon" />
             <h3 className="hrmom-error-title">{error || "MOM not found"}</h3>
-            <button className="hrmom-btn hrmom-btn-primary" onClick={() => navigate(-1)}>
+            <button
+              className="hrmom-btn hrmom-btn-primary"
+              onClick={() => navigate(-1)}
+            >
               <ArrowLeft size={18} />
               Go Back
             </button>
@@ -189,7 +201,11 @@ const HRMomDetails = () => {
   return (
     <div className="hrmom-wrapper">
       <div className="hrmom-container">
-        <nav aria-label="breadcrumb" className="hrmom-breadcrumb-nav" style={{ "--bs-breadcrumb-divider": "''" }}>
+        <nav
+          aria-label="breadcrumb"
+          className="hrmom-breadcrumb-nav"
+          style={{ "--bs-breadcrumb-divider": "''" }}
+        >
           <ol className="breadcrumb hrmom-breadcrumb">
             <li className="breadcrumb-item hrmom-breadcrumb-item">
               <a
@@ -243,7 +259,10 @@ const HRMomDetails = () => {
               <span className="hrmom-breadcrumb-slash">/</span>
             </li>
 
-            <li className="breadcrumb-item active hrmom-breadcrumb-item" aria-current="page">
+            <li
+              className="breadcrumb-item active hrmom-breadcrumb-item"
+              aria-current="page"
+            >
               <span className="hrmom-breadcrumb-active">Details</span>
             </li>
           </ol>
@@ -252,10 +271,15 @@ const HRMomDetails = () => {
         <div className="hrmom-stats-grid">
           <div className="hrmom-stat-card">
             <div className="hrmom-stat-content">
-              <MessageSquare size={24} className="hrmom-stat-icon hrmom-stat-icon-info" />
+              <MessageSquare
+                size={24}
+                className="hrmom-stat-icon hrmom-stat-icon-info"
+              />
               <div className="hrmom-stat-info">
                 <div className="hrmom-stat-value">
-                  {Array.isArray(mom.discussionPoints) ? mom.discussionPoints.length : 0}
+                  {Array.isArray(mom.discussionPoints)
+                    ? mom.discussionPoints.length
+                    : 0}
                 </div>
                 <div className="hrmom-stat-label">Discussion Points</div>
               </div>
@@ -264,7 +288,10 @@ const HRMomDetails = () => {
 
           <div className="hrmom-stat-card">
             <div className="hrmom-stat-content">
-              <CheckCircle size={24} className="hrmom-stat-icon hrmom-stat-icon-success" />
+              <CheckCircle
+                size={24}
+                className="hrmom-stat-icon hrmom-stat-icon-success"
+              />
               <div className="hrmom-stat-info">
                 <div className="hrmom-stat-value">{actionStats.total}</div>
                 <div className="hrmom-stat-label">Action Items</div>
@@ -274,7 +301,10 @@ const HRMomDetails = () => {
 
           <div className="hrmom-stat-card">
             <div className="hrmom-stat-content">
-              <AlertCircle size={24} className="hrmom-stat-icon hrmom-stat-icon-danger" />
+              <AlertCircle
+                size={24}
+                className="hrmom-stat-icon hrmom-stat-icon-danger"
+              />
               <div className="hrmom-stat-info">
                 <div className="hrmom-stat-value">{actionStats.overdue}</div>
                 <div className="hrmom-stat-label">Overdue Tasks</div>
@@ -309,8 +339,12 @@ const HRMomDetails = () => {
               <div className="hrmom-detail-item">
                 <Calendar size={20} className="hrmom-detail-icon" />
                 <div className="hrmom-detail-content">
-                  <div className="hrmom-detail-label">Meeting Date &amp; Time</div>
-                  <div className="hrmom-detail-value">{formatDateTime(mom.meetingDate)}</div>
+                  <div className="hrmom-detail-label">
+                    Meeting Date &amp; Time
+                  </div>
+                  <div className="hrmom-detail-value">
+                    {formatDateTime(mom.meetingDate)}
+                  </div>
                 </div>
               </div>
 
@@ -319,7 +353,12 @@ const HRMomDetails = () => {
                   <LinkIcon size={20} className="hrmom-detail-icon" />
                   <div className="hrmom-detail-content">
                     <div className="hrmom-detail-label">Meeting Link</div>
-                    <a href={mom.meetingLink} target="_blank" rel="noreferrer" className="hrmom-detail-link">
+                    <a
+                      href={mom.meetingLink}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="hrmom-detail-link"
+                    >
                       Join Meeting <LinkIcon size={12} />
                     </a>
                   </div>
@@ -330,8 +369,14 @@ const HRMomDetails = () => {
                 <User size={20} className="hrmom-detail-icon" />
                 <div className="hrmom-detail-content">
                   <div className="hrmom-detail-label">Submitted By</div>
-                  <div className="hrmom-detail-value">{mom.submittedByEmployeeName || "Unknown"}</div>
-                  {mom.submittedByRole && <small className="hrmom-detail-meta">{mom.submittedByRole}</small>}
+                  <div className="hrmom-detail-value">
+                    {mom.submittedByEmployeeName || "Unknown"}
+                  </div>
+                  {mom.submittedByRole && (
+                    <small className="hrmom-detail-meta">
+                      {mom.submittedByRole}
+                    </small>
+                  )}
                 </div>
               </div>
 
@@ -339,9 +384,13 @@ const HRMomDetails = () => {
                 <Clock size={20} className="hrmom-detail-icon" />
                 <div className="hrmom-detail-content">
                   <div className="hrmom-detail-label">Tracking</div>
-                  <div className="hrmom-detail-value hrmom-detail-value-sm">Created: {formatDate(mom.createdAt)}</div>
+                  <div className="hrmom-detail-value hrmom-detail-value-sm">
+                    Created: {formatDate(mom.createdAt)}
+                  </div>
                   {mom.updatedAt && (
-                    <div className="hrmom-detail-value hrmom-detail-value-sm">Updated: {formatDate(mom.updatedAt)}</div>
+                    <div className="hrmom-detail-value hrmom-detail-value-sm">
+                      Updated: {formatDate(mom.updatedAt)}
+                    </div>
                   )}
                 </div>
               </div>
@@ -358,7 +407,9 @@ const HRMomDetails = () => {
               </h5>
             </div>
             <div className="hrmom-card-body">
-              <div className="hrmom-comments-box">{mom.commentsObservations}</div>
+              <div className="hrmom-comments-box">
+                {mom.commentsObservations}
+              </div>
             </div>
           </div>
         )}
@@ -368,16 +419,27 @@ const HRMomDetails = () => {
             <div className="hrmom-card-header">
               <h5 className="hrmom-card-title">
                 <MessageSquare size={22} />
-                Discussion Points ({Array.isArray(mom.discussionPoints) ? mom.discussionPoints.length : 0})
+                Discussion Points (
+                {Array.isArray(mom.discussionPoints)
+                  ? mom.discussionPoints.length
+                  : 0}
+                )
               </h5>
             </div>
             <div className="hrmom-card-body">
-              {mom.discussionPoints && Array.isArray(mom.discussionPoints) && mom.discussionPoints.length > 0 ? (
+              {mom.discussionPoints &&
+              Array.isArray(mom.discussionPoints) &&
+              mom.discussionPoints.length > 0 ? (
                 <div className="hrmom-discussion-list">
                   {mom.discussionPoints.map((dp, index) => (
-                    <div key={dp.pointId || index} className="hrmom-discussion-item">
+                    <div
+                      key={dp.pointId || index}
+                      className="hrmom-discussion-item"
+                    >
                       <div className="hrmom-discussion-content">
-                        <p className="hrmom-discussion-text">{dp.pointText || dp.point || "No details"}</p>
+                        <p className="hrmom-discussion-text">
+                          {dp.pointText || dp.point || "No details"}
+                        </p>
                         {dp.timestamp && (
                           <small className="hrmom-discussion-time">
                             <Clock size={12} />
@@ -389,7 +451,9 @@ const HRMomDetails = () => {
                   ))}
                 </div>
               ) : (
-                <div className="hrmom-empty-state">No discussion points recorded</div>
+                <div className="hrmom-empty-state">
+                  No discussion points recorded
+                </div>
               )}
             </div>
           </div>
@@ -402,26 +466,43 @@ const HRMomDetails = () => {
               </h5>
             </div>
             <div className="hrmom-card-body">
-              {mom.actionItems && Array.isArray(mom.actionItems) && mom.actionItems.length > 0 ? (
+              {mom.actionItems &&
+              Array.isArray(mom.actionItems) &&
+              mom.actionItems.length > 0 ? (
                 <div className="hrmom-action-items-list">
                   {mom.actionItems.map((ai, index) => (
-                    <div key={ai.actionItemId || index} className="hrmom-action-item">
+                    <div
+                      key={ai.actionItemId || index}
+                      className="hrmom-action-item"
+                    >
                       <div className="hrmom-action-item-header">
                         <div className="hrmom-action-item-content">
                           <div className="hrmom-action-item-title">
                             {ai.taskDescription || ai.task || "No description"}
                           </div>
-                          {ai.notes && <small className="hrmom-action-item-notes">{ai.notes}</small>}
+                          {ai.notes && (
+                            <small className="hrmom-action-item-notes">
+                              {ai.notes}
+                            </small>
+                          )}
                         </div>
                       </div>
                       <div className="hrmom-action-item-details">
                         <div className="hrmom-action-item-detail">
                           <User size={14} />
-                          <span>{ai.assignedToEmployeeName || ai.assignTo || "Unassigned"}</span>
+                          <span>
+                            {ai.assignedToEmployeeName ||
+                              ai.assignTo ||
+                              "Unassigned"}
+                          </span>
                         </div>
                         <div className="hrmom-action-item-detail">
                           <Calendar size={14} />
-                          <span className={ai.isOverdue ? "hrmom-date-overdue" : ""}>{formatDate(ai.dueDate)}</span>
+                          <span
+                            className={ai.isOverdue ? "hrmom-date-overdue" : ""}
+                          >
+                            {formatDate(ai.dueDate)}
+                          </span>
                         </div>
                       </div>
                       <div className="hrmom-action-item-badges">
@@ -432,7 +513,9 @@ const HRMomDetails = () => {
                   ))}
                 </div>
               ) : (
-                <div className="hrmom-empty-state">No action items recorded</div>
+                <div className="hrmom-empty-state">
+                  No action items recorded
+                </div>
               )}
             </div>
           </div>

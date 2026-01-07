@@ -287,9 +287,7 @@ const RSVPSummary = () => {
                     <div
                       className="progress-bar bg-info d-flex align-items-center justify-content-center"
                       style={{
-                        width: `${
-                          (tentativeCount / totalInvitations) * 100
-                        }%`,
+                        width: `${(tentativeCount / totalInvitations) * 100}%`,
                       }}
                     >
                       {tentativeCount > 0 && (
@@ -352,7 +350,10 @@ const RSVPSummary = () => {
 
               {participants.length === 0 ? (
                 <div className="text-center py-5 text-muted">
-                  <Users size={48} className="mb-3 rsvp-sum-participants-icon" />
+                  <Users
+                    size={48}
+                    className="mb-3 rsvp-sum-participants-icon"
+                  />
                   <p className="mb-0">No participants data available</p>
                 </div>
               ) : (

@@ -224,8 +224,7 @@ const ManagerSLADashboard = () => {
   };
 
   const filteredSlas = useMemo(() => {
-    let result =
-      activeTab === "team-escalation" ? managerEscalations : mySLAs;
+    let result = activeTab === "team-escalation" ? managerEscalations : mySLAs;
 
     if (activeTab === "my-escalation") {
       if (activeSearchTerm) {
