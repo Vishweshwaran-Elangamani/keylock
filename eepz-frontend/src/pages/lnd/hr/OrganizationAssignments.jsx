@@ -70,27 +70,29 @@ const OrganizationAssignments = () => {
   const fetchAssignments = async () => {
     try {
       setLoading(true);
-
-      const backendStatusFilter =
-        statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter;
-
-      const response = await lndService.getAllOrganizationAssignments(
-        currentPage,
-        backendStatusFilter,
-        searchTerm,
-        sortField,
-        sortOrderAsc ? "asc" : "desc",
-        itemsPerPage
-      );
-
+      
+      const backendStatusFilter = statusFilter === ASSIGNMENT_STATUS.OVERDUE 
+        ? "" 
+        : statusFilter;
+      
+      // FIXED: Use object parameters with PascalCase
+      const response = await lndService.getAllOrganizationAssignments({
+        PageNumber: currentPage,
+        StatusFilter: backendStatusFilter,
+        SearchTerm: searchTerm,
+        SortField: sortField,
+        SortOrder: sortOrderAsc ? "asc" : "desc",
+        PageSize: itemsPerPage
+      });  
+  
       if (response.data.success) {
         let items = response.data.data.items;
-
+  
         // Client-side filtering for overdue
         if (statusFilter === ASSIGNMENT_STATUS.OVERDUE) {
           items = items.filter((a) => a.isOverdue === true);
         }
-
+  
         setAssignments(items);
         setTotalItems(response.data.data.totalCount);
         setTotalPages(response.data.data.totalPages);
@@ -102,27 +104,28 @@ const OrganizationAssignments = () => {
       setLoading(false);
     }
   };
-
+  
   const handleExportToExcel = async () => {
     try {
       setExporting(true);
       toast.loading("Preparing Excel export...");
-
-      const response = await lndService.exportOrganizationAssignments(
-        statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter, // Also handle overdue for export
-        searchTerm,
-        sortField,
-        sortOrderAsc ? "asc" : "desc"
-      );
-
+  
+      //  FIXED: Use object parameters with PascalCase
+      const response = await lndService.exportOrganizationAssignments({
+        StatusFilter: statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter,
+        SearchTerm: searchTerm,
+        SortField: sortField,
+        SortOrder: sortOrderAsc ? "asc" : "desc"
+      });
+  
       const timestamp = new Date()
         .toISOString()
         .replace(/[:.]/g, "-")
         .slice(0, -5);
       const filename = `OrganizationalAssignments_${timestamp}.xlsx`;
-
+  
       downloadFile(response.data, filename);
-
+  
       toast.dismiss();
       toast.success("Excel file downloaded successfully!");
     } catch (error) {
@@ -133,7 +136,7 @@ const OrganizationAssignments = () => {
       setExporting(false);
     }
   };
-
+  
   const handleSearchInputChange = (e) => {
     setSearchInput(e.target.value);
   };

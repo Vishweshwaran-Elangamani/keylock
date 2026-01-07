@@ -92,22 +92,25 @@ const MyAssignments = () => {
   const fetchAssignments = async () => {
     try {
       setLoading(true);
-      const response = await lndService.getMyAssignments(
-        currentPage,
-        statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter,
-        searchTerm,
-        sortField,
-        sortOrderAsc ? "asc" : "desc",
-        itemsPerPage
-      );
-
+      
+      // ✅ FIXED: Use object parameters with PascalCase
+      const response = await lndService.getMyAssignments({
+        PageNumber: currentPage,
+        StatusFilter: statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter,
+        SearchTerm: searchTerm,
+        SortField: sortField,
+        SortOrder: sortOrderAsc ? "asc" : "desc",
+        PageSize: itemsPerPage
+      });
+  
       if (response.data.success) {
         let items = response.data.data.items;
-
+  
+        // Client-side filter for overdue (if needed)
         if (statusFilter === ASSIGNMENT_STATUS.OVERDUE) {
           items = items.filter((a) => a.isOverdue === true);
         }
-
+  
         setAssignments(items);
         setTotalItems(response.data.data.totalCount);
         setTotalPages(response.data.data.totalPages);
@@ -119,7 +122,7 @@ const MyAssignments = () => {
       setLoading(false);
     }
   };
-
+  
   const handleSearchInputChange = (e) => {
     setSearchInput(e.target.value);
   };

@@ -93,17 +93,25 @@ const PendingApprovals = () => {
   const fetchPendingApprovals = async () => {
     try {
       setLoading(true);
-      const response = await lndService.getMyApprovals(
-        currentPage,
-        typeFilter,
-        "PENDING",
-        sortField,
-        sortOrderAsc ? "asc" : "desc",
-        itemsPerPage,
-        searchTerm
-      );
-
+      
+      const response = await lndService.getMyApprovals({
+        pageNumber: currentPage,
+        approvalType: typeFilter,
+        status: "PENDING",
+        sortField: sortField,
+        sortOrder: sortOrderAsc ? "asc" : "desc",
+        pageSize: itemsPerPage,
+        searchTerm: searchTerm
+      });
+  
       if (response.data.success) {
+        console.log("📊 Debug Info:", {
+          totalItems: response.data.data.totalCount,
+          itemsReceived: response.data.data.items.length,
+          currentPage,
+          itemsPerPage
+        });
+  
         setApprovals(response.data.data.items);
         setTotalItems(response.data.data.totalCount);
         setTotalPages(response.data.data.totalPages);
@@ -115,7 +123,7 @@ const PendingApprovals = () => {
       setLoading(false);
     }
   };
-
+  
   const handleSearchInputChange = (e) => {
     setSearchInput(e.target.value);
   };
@@ -214,14 +222,10 @@ const PendingApprovals = () => {
 
   const renderSortIcon = (field) => {
     const isActive = sortField === field;
-    const iconClass = isActive
-      ? styles.sortIconActive
-      : styles.sortIconInactive;
+    const iconClass = isActive ? styles.sortIconActive : styles.sortIconInactive;
 
     if (!isActive) {
-      return (
-        <ChevronUp size={14} className={`${styles.sortIcon} ${iconClass}`} />
-      );
+      return <ChevronUp size={14} className={`${styles.sortIcon} ${iconClass}`} />;
     }
     return sortOrderAsc ? (
       <ChevronUp size={14} className={`${styles.sortIcon} ${iconClass}`} />
@@ -232,10 +236,7 @@ const PendingApprovals = () => {
 
   const getHeaderCellClass = (field, align) => {
     const baseClass = styles.tableHeaderCell;
-    const alignClass =
-      align === "center"
-        ? styles.tableHeaderCellCenter
-        : styles.tableHeaderCellLeft;
+    const alignClass = align === "center" ? styles.tableHeaderCellCenter : styles.tableHeaderCellLeft;
     const sortableClass = field ? styles.tableHeaderCellSortable : "";
     const activeClass = sortField === field ? styles.tableHeaderCellActive : "";
     return `${baseClass} ${alignClass} ${sortableClass} ${activeClass}`.trim();
@@ -262,10 +263,11 @@ const PendingApprovals = () => {
     <div>
       <Breadcrumb
         items={[
+          
           { label: "LnD Dashboard", path: `${rolePrefix}/lnd/dashboard` },
           { label: "Pending Approval" },
         ]}
-      />
+      /> 
 
       {/* Search and Filter */}
       <div className={styles.filterContainer}>
@@ -307,9 +309,7 @@ const PendingApprovals = () => {
           >
             <span>{getTypeLabel(typeFilter)}</span>
             <i
-              className={`bi bi-chevron-${showTypeDropdown ? "up" : "down"} ${
-                styles.dropdownIcon
-              }`}
+              className={`bi bi-chevron-${showTypeDropdown ? "up" : "down"} ${styles.dropdownIcon}`}
             ></i>
           </button>
 
@@ -355,26 +355,10 @@ const PendingApprovals = () => {
               {/* Table Header */}
               <div className={styles.tableHeader}>
                 {[
-                  {
-                    label: "Request Type",
-                    field: "approvalType",
-                    align: "left",
-                  },
-                  {
-                    label: "Submitted By",
-                    field: "requesterName",
-                    align: "left",
-                  },
-                  {
-                    label: "Assigned To",
-                    field: "approverName",
-                    align: "left",
-                  },
-                  {
-                    label: "Submission Date",
-                    field: "requestedOn",
-                    align: "left",
-                  },
+                  { label: "Request Type", field: "approvalType", align: "left" },
+                  { label: "Submitted By", field: "requesterName", align: "left" },
+                  { label: "Assigned To", field: "approverName", align: "left" },
+                  { label: "Submission Date", field: "requestedOn", align: "left" },
                   { label: "Quick Actions", field: null, align: "center" },
                 ].map(({ label, field, align }) => (
                   <div
@@ -463,4 +447,4 @@ const PendingApprovals = () => {
   );
 };
 
-export default PendingApprovals;
+export default PendingApprovals;        

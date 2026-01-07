@@ -778,7 +778,7 @@ const AppRoutes = () => {
           <ProtectedRoute allowedRoles={["Leadership"]}>
             <DashboardLayout role="Leadership">
               <GoalApprovalsPage />
-            </DashboardLayout>
+            </DashboardLayout> 
           </ProtectedRoute>
         }
       />
@@ -805,7 +805,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      <Route
+      <Route  
         path="/manager/goals/your-goals"
         element={
           <ProtectedRoute allowedRoles={["Manager", "Department Head"]}>

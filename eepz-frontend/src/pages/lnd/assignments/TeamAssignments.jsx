@@ -96,17 +96,19 @@ const TeamAssignments = () => {
       setLoading(true);
 
       // Pass empty string to backend when overdue is selected
-      const backendStatusFilter =
-        statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter;
-
-      const response = await lndService.getTeamAssignments(
-        currentPage,
-        backendStatusFilter, // Use modified filter
-        searchTerm,
-        sortField,
-        sortOrderAsc ? "asc" : "desc",
-        itemsPerPage
-      );
+      const backendStatusFilter = statusFilter === ASSIGNMENT_STATUS.OVERDUE 
+        ? "" 
+        : statusFilter;
+      
+      // UPDATED: Pass parameters as an object
+      const response = await lndService.getTeamAssignments({
+        pageNumber: currentPage,
+        statusFilter: backendStatusFilter,
+        searchTerm: searchTerm,
+        sortField: sortField,
+        sortOrder: sortOrderAsc ? "asc" : "desc",
+        pageSize: itemsPerPage
+      });
 
       if (response.data.success) {
         let items = response.data.data.items;
@@ -133,12 +135,13 @@ const TeamAssignments = () => {
       setExporting(true);
       toast.loading("Preparing Excel export...");
 
-      const response = await lndService.exportTeamAssignments(
-        statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter, // Also update export
-        searchTerm,
-        sortField,
-        sortOrderAsc ? "asc" : "desc"
-      );
+      // UPDATED: Pass parameters as an object
+      const response = await lndService.exportTeamAssignments({
+        statusFilter: statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter,
+        searchTerm: searchTerm,
+        sortField: sortField,
+        sortOrder: sortOrderAsc ? "asc" : "desc"
+      });
 
       const timestamp = new Date()
         .toISOString()
@@ -229,9 +232,7 @@ const TeamAssignments = () => {
 
   const renderSortIcon = (field) => {
     const isActive = sortField === field;
-    const iconClass = isActive
-      ? styles.sortIconActive
-      : styles.sortIconInactive;
+    const iconClass = isActive ? styles.sortIconActive : styles.sortIconInactive;
 
     if (!isActive) {
       return (
@@ -463,10 +464,7 @@ const TeamAssignments = () => {
                       {assignment.menteeName}
                     </div>
 
-                    <div
-                      className={styles.cellText}
-                      title={assignment.skillName}
-                    >
+                    <div className={styles.cellText} title={assignment.skillName}>
                       {assignment.skillName}
                     </div>
 

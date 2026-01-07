@@ -112,16 +112,19 @@ const ApprovalHistory = () => {
   const fetchApprovalHistory = async () => {
     try {
       setLoading(true);
-      const response = await lndService.getApprovalHistory(
-        currentPage,
-        roleFilter,
-        typeFilter,
-        statusFilter,
-        searchTerm,
-        sortField,
-        sortOrderAsc ? "asc" : "desc",
-        itemsPerPage
-      );
+      
+      // UPDATED: Pass parameters as an object
+      const response = await lndService.getApprovalHistory({
+        pageNumber: currentPage,
+        role: roleFilter,
+        approvalType: typeFilter,
+        status: statusFilter,
+        searchTerm: searchTerm,
+        sortField: sortField,
+        sortOrder: sortOrderAsc ? "asc" : "desc",
+        pageSize: itemsPerPage
+      });
+
       if (response.data.success) {
         setApprovals(response.data.data.items);
         setTotalItems(response.data.data.totalCount);
@@ -443,7 +446,7 @@ const ApprovalHistory = () => {
         </div>
       </div>
 
-      {/* Approval History Table */}
+      {/* Approval History Table */}  
       {approvals.length === 0 && !loading ? (
         <EmptyState
           icon={Filter}

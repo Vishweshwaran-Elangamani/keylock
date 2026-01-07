@@ -297,31 +297,24 @@ export const lndService = {
 
   /**
    * Get current user's assignments (as mentee)
-   * @param {number} pageNumber - Page number
-   * @param {string} statusFilter - Status filter (optional)
-   * @param {string} searchTerm - Search term (optional)
-   * @param {string} sortField - Sort field (optional)
-   * @param {string} sortOrder - Sort order (optional)
-   * @param {number} pageSize - Items per page (default: 10)
+   * UPDATED: Now uses request model instead of individual parameters
+   * @param {object} params - { pageNumber, statusFilter, searchTerm, sortField, sortOrder, pageSize }
    * @returns {Promise} API response
    */
-  getMyAssignments: async (
-    pageNumber = 1,
-    statusFilter = "",
-    searchTerm = "",
-    sortField = "",
-    sortOrder = "",
-    pageSize = 10
-  ) => {
+  getMyAssignments: async (params = {}) => {
     try {
-      const query = buildQueryString({
-        pageNumber,
-        statusFilter,
-        searchTerm,
-        sortField,
-        sortOrder,
-        pageSize,
-      });
+      const defaultParams = {
+        pageNumber: 1,
+        statusFilter: "",
+        searchTerm: "",
+        sortField: "",
+        sortOrder: "",
+        pageSize: 10,
+      };
+
+      const finalParams = { ...defaultParams, ...params };
+      const query = buildQueryString(finalParams);
+
       const response = await axios.get(
         `${API_BASE_URL}/lnd-assignments/my-assignments${query}`,
         { headers: getHeaders() }
@@ -334,31 +327,24 @@ export const lndService = {
 
   /**
    * Get team assignments (Manager only)
-   * @param {number} pageNumber - Page number
-   * @param {string} statusFilter - Status filter (optional)
-   * @param {string} searchTerm - Search term (optional)
-   * @param {string} sortField - Sort field (optional)
-   * @param {string} sortOrder - Sort order (default: asc)
-   * @param {number} pageSize - Items per page (default: 10)
+   * UPDATED: Now uses request model instead of individual parameters
+   * @param {object} params - { pageNumber, statusFilter, searchTerm, sortField, sortOrder, pageSize }
    * @returns {Promise} API response
    */
-  getTeamAssignments: async (
-    pageNumber = 1,
-    statusFilter = "",
-    searchTerm = "",
-    sortField = "",
-    sortOrder = "asc",
-    pageSize = 100
-  ) => {
+  getTeamAssignments: async (params = {}) => {
     try {
-      const query = buildQueryString({
-        pageNumber,
-        statusFilter,
-        searchTerm,
-        sortField,
-        sortOrder,
-        pageSize,
-      });
+      const defaultParams = {
+        pageNumber: 1,
+        statusFilter: "",
+        searchTerm: "",
+        sortField: "",
+        sortOrder: "asc",
+        pageSize: 100,
+      };
+
+      const finalParams = { ...defaultParams, ...params };
+      const query = buildQueryString(finalParams);
+
       const response = await axios.get(
         `${API_BASE_URL}/lnd-assignments/team${query}`,
         { headers: getHeaders() }
@@ -371,25 +357,22 @@ export const lndService = {
 
   /**
    * Export all team assignments to Excel (Manager only)
-   * @param {string} statusFilter - Status filter (optional)
-   * @param {string} searchTerm - Search term (optional)
-   * @param {string} sortField - Sort field (optional)
-   * @param {string} sortOrder - Sort order (optional)
+   * UPDATED: Now uses request model instead of individual parameters
+   * @param {object} params - { statusFilter, searchTerm, sortField, sortOrder }
    * @returns {Promise} Blob response
    */
-  exportTeamAssignments: async (
-    statusFilter = "",
-    searchTerm = "",
-    sortField = "",
-    sortOrder = ""
-  ) => {
+  exportTeamAssignments: async (params = {}) => {
     try {
-      const query = buildQueryString({
-        statusFilter,
-        searchTerm,
-        sortField,
-        sortOrder,
-      });
+      const defaultParams = {
+        statusFilter: "",
+        searchTerm: "",
+        sortField: "",
+        sortOrder: "",
+      };
+
+      const finalParams = { ...defaultParams, ...params };
+      const query = buildQueryString(finalParams);
+
       const response = await axios.get(
         `${API_BASE_URL}/lnd-assignments/team/export${query}`,
         {
@@ -405,31 +388,24 @@ export const lndService = {
 
   /**
    * Get SME assignments (SME only)
-   * @param {number} pageNumber - Page number
-   * @param {string} statusFilter - Status filter (optional)
-   * @param {string} searchTerm - Search term (optional)
-   * @param {string} sortField - Sort field (optional)
-   * @param {string} sortOrder - Sort order (default: asc)
-   * @param {number} pageSize - Items per page (default: 10)
+   * UPDATED: Now uses request model instead of individual parameters
+   * @param {object} params - { pageNumber, statusFilter, searchTerm, sortField, sortOrder, pageSize }
    * @returns {Promise} API response
    */
-  getSmeAssignments: async (
-    pageNumber = 1,
-    statusFilter = "",
-    searchTerm = "",
-    sortField = "",
-    sortOrder = "asc",
-    pageSize = 10
-  ) => {
+  getSmeAssignments: async (params = {}) => {
     try {
-      const query = buildQueryString({
-        pageNumber,
-        statusFilter,
-        searchTerm,
-        sortField,
-        sortOrder,
-        pageSize,
-      });
+      const defaultParams = {
+        pageNumber: 1,
+        statusFilter: "",
+        searchTerm: "",
+        sortField: "",
+        sortOrder: "asc",
+        pageSize: 10,
+      };
+
+      const finalParams = { ...defaultParams, ...params };
+      const query = buildQueryString(finalParams);
+
       const response = await axios.get(
         `${API_BASE_URL}/lnd-assignments/sme${query}`,
         { headers: getHeaders() }
@@ -498,18 +474,21 @@ export const lndService = {
 
   /**
    * Get all organization employees (HR only)
-   * @param {number} pageNumber - Page number (default: 1)
-   * @param {string} searchTerm - Search term (optional)
-   * @param {number} pageSize - Items per page (default: 12)
+   * UPDATED: Now uses request model instead of individual parameters
+   * @param {object} params - { pageNumber, searchTerm, pageSize }
    * @returns {Promise} API response
    */
-  getAllOrganizationEmployees: async (
-    pageNumber = 1,
-    searchTerm = "",
-    pageSize = 12
-  ) => {
+  getAllOrganizationEmployees: async (params = {}) => {
     try {
-      const query = buildQueryString({ pageNumber, searchTerm, pageSize });
+      const defaultParams = {
+        pageNumber: 1,
+        searchTerm: "",
+        pageSize: 12,
+      };
+
+      const finalParams = { ...defaultParams, ...params };
+      const query = buildQueryString(finalParams);
+
       const response = await axios.get(
         `${API_BASE_URL}/lnd-hr/employees/organization${query}`,
         { headers: getHeaders() }
@@ -518,35 +497,28 @@ export const lndService = {
     } catch (error) {
       return handleError(error);
     }
-  },
+  }, 
 
   /**
    * Get all organization assignments (HR only)
-   * @param {number} pageNumber - Page number (default: 1)
-   * @param {string} statusFilter - Status filter (optional)
-   * @param {string} searchTerm - Search term (optional)
-   * @param {string} sortField - Sort field (optional)
-   * @param {string} sortOrder - Sort order (optional)
-   * @param {number} pageSize - Items per page (default: 10)
+   * UPDATED: Now uses request model instead of individual parameters
+   * @param {object} params - { pageNumber, statusFilter, searchTerm, sortField, sortOrder, pageSize }
    * @returns {Promise} API response
    */
-  getAllOrganizationAssignments: async (
-    pageNumber = 1,
-    statusFilter = "",
-    searchTerm = "",
-    sortField = "",
-    sortOrder = "",
-    pageSize = 10
-  ) => {
+  getAllOrganizationAssignments: async (params = {}) => {
     try {
-      const query = buildQueryString({
-        pageNumber,
-        statusFilter,
-        searchTerm,
-        sortField,
-        sortOrder,
-        pageSize,
-      });
+      const defaultParams = {
+        pageNumber: 1,
+        statusFilter: "",
+        searchTerm: "",
+        sortField: "",
+        sortOrder: "",
+        pageSize: 10,
+      };
+
+      const finalParams = { ...defaultParams, ...params };
+      const query = buildQueryString(finalParams);
+
       const response = await axios.get(
         `${API_BASE_URL}/lnd-hr/assignments/organization${query}`,
         { headers: getHeaders() }
@@ -559,25 +531,22 @@ export const lndService = {
 
   /**
    * Export all organization assignments to Excel (HR only)
-   * @param {string} statusFilter - Status filter (optional)
-   * @param {string} searchTerm - Search term (optional)
-   * @param {string} sortField - Sort field (optional)
-   * @param {string} sortOrder - Sort order (optional)
-   * @returns {Promise} Blob response
+   * UPDATED: Now uses request model instead of individual parameters
+   * @param {object} params - { statusFilter, searchTerm, sortField, sortOrder }
+   * @returns {Promise} Blob response 
    */
-  exportOrganizationAssignments: async (
-    statusFilter = "",
-    searchTerm = "",
-    sortField = "",
-    sortOrder = ""
-  ) => {
+  exportOrganizationAssignments: async (params = {}) => {
     try {
-      const query = buildQueryString({
-        statusFilter,
-        searchTerm,
-        sortField,
-        sortOrder,
-      });
+      const defaultParams = {
+        statusFilter: "",
+        searchTerm: "",
+        sortField: "",
+        sortOrder: "",
+      };   
+
+      const finalParams = { ...defaultParams, ...params };
+      const query = buildQueryString(finalParams);
+
       const response = await axios.get(
         `${API_BASE_URL}/lnd-hr/assignments/organization/export${query}`,
         {
@@ -593,14 +562,21 @@ export const lndService = {
 
   /**
    * Get all active SMEs (HR only)
-   * @param {number} pageNumber - Page number (default: 1)
-   * @param {string} searchTerm - Search term (optional)
-   * @param {number} pageSize - Items per page (default: 10)
+   * UPDATED: Now uses request model instead of individual parameters
+   * @param {object} params - { pageNumber, searchTerm, pageSize }
    * @returns {Promise} API response
    */
-  getAllActiveSmes: async (pageNumber = 1, searchTerm = "", pageSize = 10) => {
+  getAllActiveSmes: async (params = {}) => {
     try {
-      const query = buildQueryString({ pageNumber, searchTerm, pageSize });
+      const defaultParams = {
+        pageNumber: 1,
+        searchTerm: "",
+        pageSize: 10,
+      };
+
+      const finalParams = { ...defaultParams, ...params };
+      const query = buildQueryString(finalParams);
+
       const response = await axios.get(
         `${API_BASE_URL}/lnd-hr/smes/all${query}`,
         { headers: getHeaders() }
@@ -613,14 +589,19 @@ export const lndService = {
 
   /**
    * Export all active SMEs to Excel (HR only)
-   * @param {string} searchTerm - Search term (optional)
+   * UPDATED: Now uses request model instead of individual parameters
+   * @param {object} params - { searchTerm }
    * @returns {Promise} Blob response
    */
-  exportAllActiveSmes: async (searchTerm = "") => {
+  exportAllActiveSmes: async (params = {}) => {
     try {
-      const query = buildQueryString({
-        searchTerm,
-      });
+      const defaultParams = {
+        searchTerm: "",
+      };
+
+      const finalParams = { ...defaultParams, ...params };
+      const query = buildQueryString(finalParams);
+
       const response = await axios.get(
         `${API_BASE_URL}/lnd-hr/smes/export${query}`,
         {
@@ -636,20 +617,22 @@ export const lndService = {
 
   /**
    * Get employee skills for HR view
+   * UPDATED: Now uses request model instead of individual parameters
    * @param {number} employeeId - Employee ID
-   * @param {number} pageNumber - Page number (default: 1)
-   * @param {string} searchTerm - Search term (optional)
-   * @param {string} sortBy - Sort by field (default: 'skillname')
-   * @returns {Promise} API response
+   * @param {object} params - { pageNumber, searchTerm, sortBy }
+   * @returns {Promise} API response    
    */
-  getEmployeeSkillsForHR: async (
-    employeeId,
-    pageNumber = 1,
-    searchTerm = "",
-    sortBy = "skillname"
-  ) => {
+  getEmployeeSkillsForHR: async (employeeId, params = {}) => {
     try {
-      const query = buildQueryString({ pageNumber, searchTerm, sortBy });
+      const defaultParams = {
+        pageNumber: 1,
+        searchTerm: "",
+        sortBy: "skillname",
+      };
+
+      const finalParams = { ...defaultParams, ...params };
+      const query = buildQueryString(finalParams);
+
       const response = await axios.get(
         `${API_BASE_URL}/lnd-hr/skills/employee/${employeeId}${query}`,
         { headers: getHeaders() }
@@ -664,43 +647,39 @@ export const lndService = {
 
   /**
    * Get current user's pending approvals (as approver)
-   * @param {number} pageNumber - Page number
-   * @param {string} approvalType - Approval type filter (optional)
-   * @param {string} status - Status filter (optional)
-   * @param {string} sortField - Sort field (optional)
-   * @param {string} sortOrder - Sort order (default: asc)
-   * @param {number} pageSize - Items per page (default: 10)
-   * @param {string} searchTerm
+   * UPDATED: Now uses query string instead of individual parameters
+   * @param {object} params - { pageNumber, approvalType, status, sortField, sortOrder, pageSize, searchTerm }
    * @returns {Promise} API response
    */
-  getMyApprovals: async (
-    pageNumber = 1,
-    approvalType = "",
-    status = "",
-    sortField = "",
-    sortOrder = "asc",
-    pageSize = 10,
-    searchTerm = ""
-  ) => {
-    try {
-      const query = buildQueryString({
-        pageNumber,
-        approvalType,
-        status,
-        sortField,
-        sortOrder,
-        pageSize,
-        searchTerm,
-      });
-      const response = await axios.get(
-        `${API_BASE_URL}/lnd-approvals/my-approvals${query}`,
-        { headers: getHeaders() }
-      );
-      return response;
-    } catch (error) {
-      return handleError(error);
-    }
-  },
+ /**
+ * Get current user's pending approvals (as approver)
+ * Backend Model: MyApprovalsRequestModel (PascalCase)
+ */
+getMyApprovals: async (params = {}) => {
+  try {
+    const defaultParams = {
+      PageNumber: 1,        //  PascalCase
+      ApprovalType: "",     //  PascalCase
+      Status: "",           //  PascalCase
+      SortField: "",        //  PascalCase
+      SortOrder: "asc",     // PascalCase
+      PageSize: 10,         // PascalCase
+      SearchTerm: "",       //  PascalCase
+    };
+
+    const finalParams = { ...defaultParams, ...params };
+    const query = buildQueryString(finalParams);
+
+    const response = await axios.get(
+      `${API_BASE_URL}/lnd-approvals/my-approvals${query}`,
+      { headers: getHeaders() }
+    );
+    return response;
+  } catch (error) {
+    return handleError(error);
+  }
+},
+
 
   /**
    * Process approval (approve/reject)
@@ -722,37 +701,26 @@ export const lndService = {
 
   /**
    * Get approval history
-   * @param {number} pageNumber - Page number
-   * @param {string} role - Role filter: 'all', 'requester', 'approver'
-   * @param {string} approvalType - Approval type filter (optional)
-   * @param {string} status - Status filter (optional)
-   * @param {string} searchTerm - Search term (optional)
-   * @param {string} sortField - Sort field (optional)
-   * @param {string} sortOrder - Sort order (optional)
-   * @param {number} pageSize - Items per page (default: 10)
+   * UPDATED: Now uses request model instead of individual parameters
+   * @param {object} params - { pageNumber, role, approvalType, status, searchTerm, sortField, sortOrder, pageSize }
    * @returns {Promise} API response
    */
-  getApprovalHistory: async (
-    pageNumber = 1,
-    role = "all",
-    approvalType = "",
-    status = "",
-    searchTerm = "",
-    sortField = "",
-    sortOrder = "",
-    pageSize = 10
-  ) => {
+  getApprovalHistory: async (params = {}) => {
     try {
-      const query = buildQueryString({
-        pageNumber,
-        role,
-        approvalType,
-        status,
-        searchTerm,
-        sortField,
-        sortOrder,
-        pageSize,
-      });
+      const defaultParams = {
+        pageNumber: 1,
+        role: "all",
+        approvalType: "",
+        status: "",
+        searchTerm: "",
+        sortField: "",
+        sortOrder: "",
+        pageSize: 10,
+      };
+
+      const finalParams = { ...defaultParams, ...params };
+      const query = buildQueryString(finalParams);
+
       const response = await axios.get(
         `${API_BASE_URL}/lnd-approvals/history${query}`,
         { headers: getHeaders() }
@@ -765,13 +733,14 @@ export const lndService = {
 
   /**
    * Get detailed approval information
+   * UPDATED: Route changed from /lnd-approvals/{id}/details to /approvals/{id}/details
    * @param {number} approvalId - Approval ID
    * @returns {Promise} API response
    */
   getApprovalDetails: async (approvalId) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/lnd-approvals/${approvalId}/details`,
+        `${API_BASE_URL}/approvals/${approvalId}/details`,
         { headers: getHeaders() }
       );
       return response;
@@ -802,13 +771,14 @@ export const lndService = {
 
   /**
    * Preview approval attachment in browser
+   * UPDATED: Route changed from /lnd-approvals/{id}/attachment/preview to /approvals/{id}/preview-attachment
    * @param {number} approvalId - Approval ID
    * @returns {Promise} Blob response for inline viewing
    */
   previewApprovalAttachment: async (approvalId) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/lnd-approvals/${approvalId}/attachment/preview`,
+        `${API_BASE_URL}/approvals/${approvalId}/preview-attachment`,
         {
           headers: getHeaders(),
           responseType: "blob",
@@ -822,7 +792,7 @@ export const lndService = {
 
   /**
    * Download assignment completion proof
-   *  ROUTE CHANGED: Moved from /assignments to /approvals
+   * ROUTE CHANGED: Moved from /assignments to /approvals
    * @param {number} assignmentId - Assignment ID
    * @returns {Promise} Blob response
    */

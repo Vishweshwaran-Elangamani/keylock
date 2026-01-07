@@ -57,17 +57,35 @@ const LnDDashboard = () => {
       const [skillsRes, assignmentsRes, approvalsRes, smeRes] =
         await Promise.all([
           lndService
-            .getMySkills(1)
+            .getMySkills(1)  //  Keep as-is (single parameter)
             .catch(() => ({ data: { data: { totalCount: 0 } } })),
+          
           lndService
-            .getMyAssignments(1, "IN_PROGRESS")
+            .getMyAssignments({  //  Object parameter with PascalCase
+              PageNumber: 1,
+              StatusFilter: "IN_PROGRESS",
+              SearchTerm: "",
+              SortField: "",
+              SortOrder: "asc",
+              PageSize: 10
+            })
             .catch(() => ({ data: { data: { totalCount: 0 } } })),
+          
           lndService
-            .getMyApprovals(1, "", "PENDING")
+            .getMyApprovals({  //  Object parameter with PascalCase
+              PageNumber: 1,
+              ApprovalType: "",
+              Status: "PENDING",
+              SortField: "",
+              SortOrder: "asc",
+              PageSize: 10,
+              SearchTerm: ""
+            })
             .catch(() => ({ data: { data: { totalCount: 0 } } })),
+          
           lndService.checkIfSme().catch(() => ({ data: { data: false } })),
         ]);
-
+  
       setStats({
         mySkills: skillsRes.data.data.totalCount,
         activeAssignments: assignmentsRes.data.data.totalCount,
@@ -81,6 +99,7 @@ const LnDDashboard = () => {
       setLoading(false);
     }
   };
+  
 
   const isManager = ["Manager", "Department Head", "Leadership"].includes(
     userRole
