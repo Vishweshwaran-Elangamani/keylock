@@ -10,7 +10,6 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
     /// Approvals Management - Processing, History, and File Downloads
     /// </summary>
     [ApiController]
-    [Route("api/lnd-approvals")]
     [Authorize]
     public class LnDApprovalsController : BaseLnDController
     {
@@ -31,34 +30,26 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Gets pending approvals assigned to the current user as approver.
         /// Supports filtering by type, status, search term, and pagination.
         /// </summary>
-        [HttpGet("my-approvals")]
-        public async Task<IActionResult> GetMyApprovals(
-            [FromQuery] string? approvalType,
-            [FromQuery] string? status,
-            [FromQuery] string? sortField,
-            [FromQuery] string? sortOrder,
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 10,
-            [FromQuery] string? searchTerm = null
-        )
+        [HttpGet("api/lnd-approvals/my-approvals")]
+        public async Task<IActionResult> GetMyApprovals([FromQuery] MyApprovalsRequestModel request)
         {
             var employeeId = GetCurrentEmployeeId();
 
             Log.Information(
                 "GetMyApprovals API called. EmployeeId={EmployeeId}, ApprovalType={ApprovalType}, Status={Status}, Page={PageNumber}, PageSize={PageSize}",
-                employeeId, approvalType ?? "all", status ?? "all", pageNumber, pageSize
+                employeeId, request.ApprovalType ?? "all", request.Status ?? "all", request.PageNumber, request.PageSize
             );
 
             var result = await _approvalService.GetMyApprovals(
                 employeeId,
-                approvalType,
-                status,
-                sortField,
-                sortOrder,
-                pageNumber,
-                pageSize,
-                searchTerm
-            );   
+                request.ApprovalType,
+                request.Status,
+                request.SortField,
+                request.SortOrder,
+                request.PageNumber,
+                request.PageSize,
+                request.SearchTerm
+            );
 
             if (result.Success)
             {
@@ -82,7 +73,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Processes an approval decision (approve or reject).
         /// Triggers business workflows for SME registration, assignments, and acknowledgements.  
         /// </summary>
-        [HttpPost("process")]
+        [HttpPost("api/lnd-approvals/process")]
         public async Task<IActionResult> ProcessApproval([FromBody] ApprovalDecisionRequest request)
         {
             var approverId = GetCurrentEmployeeId();
@@ -92,7 +83,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 approverId, request.ApprovalId, request.IsApproved
             );
 
-            var result = await _approvalService.ProcessApproval(approverId, request); 
+            var result = await _approvalService.ProcessApproval(approverId, request);
 
             if (result.Success)
             {
@@ -120,35 +111,30 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Gets complete approval history for the logged-in user as requester or approver.
         /// Supports filtering by role, type, status, and search term with pagination.
         /// </summary>
-        [HttpGet("history")]
-        public async Task<IActionResult> GetApprovalHistory(
-            [FromQuery] string? approvalType,
-            [FromQuery] string? status,
-            [FromQuery] string? role,
-            [FromQuery] string? searchTerm,
-            [FromQuery] string? sortField,
-            [FromQuery] string? sortOrder,
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 10
-        )
+        /// <summary>
+        /// Gets complete approval history for the logged-in user as requester or approver.
+        /// Supports filtering by role, type, status, and search term with pagination.
+        /// </summary>
+        [HttpGet("api/lnd-approvals/history")]
+        public async Task<IActionResult> GetApprovalHistory([FromQuery] ApprovalHistoryRequestModel request)
         {
             var employeeId = GetCurrentEmployeeId();
 
             Log.Information(
                 "GetApprovalHistory API called. EmployeeId={EmployeeId}, Role={Role}, ApprovalType={ApprovalType}, Status={Status}",
-                employeeId, role ?? "all", approvalType ?? "all", status ?? "all"
+                employeeId, request.Role ?? "all", request.ApprovalType ?? "all", request.Status ?? "all"
             );
 
             var result = await _approvalService.GetApprovalHistory(
                 employeeId,
-                approvalType,
-                status,
-                role,
-                searchTerm,
-                sortField,
-                sortOrder,
-                pageNumber,
-                pageSize
+                request.ApprovalType,
+                request.Status,
+                request.Role,
+                request.SearchTerm,
+                request.SortField,
+                request.SortOrder,
+                request.PageNumber,
+                request.PageSize
             );
 
             if (result.Success)
@@ -169,11 +155,12 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             }
         }
 
+
         /// <summary>
         /// Gets detailed approval information including all attachments and assignment details.
         /// Enforces access control for requester and approver only.
         /// </summary>
-        [HttpGet("{approvalId}/details")]
+        [HttpGet("api/approvals/{approvalId}/details")]
         public async Task<IActionResult> GetApprovalDetails(int approvalId)
         {
             var employeeId = GetCurrentEmployeeId();
@@ -208,7 +195,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Downloads attachment file from approval record.
         /// Returns file with appropriate MIME type and content disposition header.
         /// </summary>
-        [HttpGet("{approvalId}/download")]
+        [HttpGet("api/lnd-approvals/{approvalId}/download")]
         public async Task<IActionResult> DownloadApprovalAttachment(int approvalId)
         {
             var employeeId = GetCurrentEmployeeId();
@@ -238,8 +225,6 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 approvalId, fileName, fileBytes.Length
             );
 
-            Response.Headers.Add("Access-Control-Expose-Headers", "Content-Disposition");
-
             return File(fileBytes, contentType, fileName);
         }
 
@@ -247,7 +232,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Downloads assignment completion proof document.
         /// Validates access for mentee, SME, or reporting manager only.
         /// </summary>
-        [HttpGet("assignments/{assignmentId}/download-proof")]
+        [HttpGet("api/lnd-approvals/assignments/{assignmentId}/download-proof")]
         public async Task<IActionResult> DownloadAssignmentProof(int assignmentId)
         {
             var employeeId = GetCurrentEmployeeId();
@@ -277,7 +262,6 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 assignmentId, fileName, fileBytes.Length
             );
 
-            Response.Headers.Add("Access-Control-Expose-Headers", "Content-Disposition");
             return File(fileBytes, contentType, fileName);
         }
 
@@ -289,13 +273,13 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Previews approval attachment in browser without download.
         /// Supports range processing for video and large file streaming.
         /// </summary>
-        [HttpGet("{approvalId}/attachment/preview")]  
-        public async Task<IActionResult> PreviewApprovalAttachment(int approvalId)
+        [HttpGet("api/approvals/{approvalId}/preview-attachment")]
+        public async Task<IActionResult> GetApprovalAttachmentPreview(int approvalId)
         {
-            var employeeId = GetCurrentEmployeeId(); 
+            var employeeId = GetCurrentEmployeeId();
 
             Log.Debug(
-                "PreviewApprovalAttachment API called. ApprovalId={ApprovalId}, EmployeeId={EmployeeId}",
+                "GetApprovalAttachmentPreview API called. ApprovalId={ApprovalId}, EmployeeId={EmployeeId}",
                 approvalId, employeeId
             );
 
@@ -304,14 +288,14 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             if (!result.Success)
             {
                 Log.Warning(
-                    "PreviewApprovalAttachment API failed. ApprovalId={ApprovalId}, Message={Message}",
+                    "GetApprovalAttachmentPreview API failed. ApprovalId={ApprovalId}, Message={Message}",
                     approvalId, result.Message
                 );
-                return BadRequest(result); 
+                return BadRequest(result);
             }
 
             Log.Debug(
-                "PreviewApprovalAttachment API succeeded. ApprovalId={ApprovalId}, FileName={FileName}",
+                "GetApprovalAttachmentPreview API succeeded. ApprovalId={ApprovalId}, FileName={FileName}",
                 approvalId, result.Data.FileName
             );
 
@@ -327,13 +311,13 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Previews assignment proof document in browser without download.
         /// Supports range processing for video and large file streaming.
         /// </summary>
-        [HttpGet("assignments/{assignmentId}/proof/preview")]
-        public async Task<IActionResult> PreviewAssignmentProof(int assignmentId)
+        [HttpGet("api/lnd-approvals/assignments/{assignmentId}/proof/preview")]
+        public async Task<IActionResult> GetAssignmentProofPreview(int assignmentId)
         {
             var employeeId = GetCurrentEmployeeId();
 
             Log.Debug(
-                "PreviewAssignmentProof API called. AssignmentId={AssignmentId}, EmployeeId={EmployeeId}",
+                "GetAssignmentProofPreview API called. AssignmentId={AssignmentId}, EmployeeId={EmployeeId}",
                 assignmentId, employeeId
             );
 
@@ -342,14 +326,14 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             if (!result.Success)
             {
                 Log.Warning(
-                    "PreviewAssignmentProof API failed. AssignmentId={AssignmentId}, Message={Message}",
+                    "GetAssignmentProofPreview API failed. AssignmentId={AssignmentId}, Message={Message}",
                     assignmentId, result.Message
                 );
                 return BadRequest(result);
             }
 
             Log.Debug(
-                "PreviewAssignmentProof API succeeded. AssignmentId={AssignmentId}, FileName={FileName}",
+                "GetAssignmentProofPreview API succeeded. AssignmentId={AssignmentId}, FileName={FileName}",
                 assignmentId, result.Data.FileName
             );
 
@@ -363,6 +347,4 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
         #endregion
     }
-}   
-
-
+}

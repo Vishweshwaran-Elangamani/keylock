@@ -7,7 +7,7 @@ namespace Relevantz.EEPZ.Common.DTOs
     {
         public int ApprovalId { get; set; }
         public bool IsApproved { get; set; }
-        public string? Notes { get; set; }   
+        public string? Notes { get; set; }
     }
 
     // Assignment requests
@@ -55,7 +55,7 @@ namespace Relevantz.EEPZ.Common.DTOs
     public class BecomeSmeRequest
     {
         public int SkillId { get; set; }
-        public IFormFile ProofDocument { get; set; }  
+        public IFormFile ProofDocument { get; set; }
     }
 
     public class SmeRequestDto
@@ -65,4 +65,123 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int MenteeEmployeeId { get; set; }
         public DateTime? Deadline { get; set; }
     }
+
+    public class MyApprovalsRequestModel
+    {
+        public string? ApprovalType { get; set; }
+        public string? Status { get; set; }
+        public string? SortField { get; set; }
+        public string? SortOrder { get; set; }
+        public int PageNumber { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+        public string? SearchTerm { get; set; }
+    }
+
+
+    
+    public class ApprovalHistoryRequestModel
+    {
+        public string? ApprovalType { get; set; }
+        public string? Status { get; set; }
+        public string? Role { get; set; }
+        public string? SearchTerm { get; set; }
+        public string? SortField { get; set; }
+        public string? SortOrder { get; set; }
+        public int PageNumber { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+    }
+
+    /// <summary>
+    /// Request model for fetching assignments with filtering and pagination
+    /// </summary>
+    public class AssignmentRequestModel
+    {
+        public string? StatusFilter { get; set; }
+        public string? SearchTerm { get; set; }
+        public string? SortField { get; set; }
+        public string? SortOrder { get; set; }
+        public int PageNumber { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+    }
+
+    /// <summary>
+    /// Request model for exporting assignments
+    /// </summary>
+    public class ExportAssignmentRequestModel
+    {
+        public string? StatusFilter { get; set; }
+        public string? SearchTerm { get; set; }
+        public string? SortField { get; set; }
+        public string? SortOrder { get; set; }
+    }
+
+    /// <summary>
+    /// Request model for organization assignments with filtering and pagination
+    /// </summary>
+    public class OrganizationAssignmentsRequestModel
+    {
+        public string? StatusFilter { get; set; }
+        public string? SearchTerm { get; set; }
+        public string? SortField { get; set; }
+        public string? SortOrder { get; set; }
+        public int PageNumber { get; set; } = 1;  
+        public int PageSize { get; set; } = 10; 
+    }
+
+    /// <summary>
+    /// Request model for exporting organization assignments
+    /// </summary>
+    public class ExportOrganizationAssignmentsRequestModel
+    {
+        public string? StatusFilter { get; set; }
+        public string? SearchTerm { get; set; }
+        public string? SortField { get; set; }
+        public string? SortOrder { get; set; }
+    }
+
+    /// <summary>
+    /// Request model for organization employees with pagination
+    /// </summary>
+    public class OrganizationEmployeesRequestModel
+    {
+        public string? SearchTerm { get; set; }
+        public int PageNumber { get; set; } = 1;
+        public int PageSize { get; set; } = 9;
+    }
+
+    /// <summary>
+    /// Request model for employee skills by ID
+    /// </summary>
+    public class EmployeeSkillsByIdRequestModel
+    {
+        public int PageNumber { get; set; } = 1;
+        public string? SearchTerm { get; set; }
+        public string? SortBy { get; set; } = "skillname";
+    }
+
+    /// <summary>
+    /// Request model for all active SMEs with pagination
+    /// </summary>
+    public class ActiveSmesRequestModel
+    {
+        public string? SearchTerm { get; set; }
+        public int PageNumber { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+    }
+
+    /// <summary>
+    /// Request model for exporting active SMEs
+    /// </summary>
+    public class ExportActiveSmesRequestModel
+    {
+        public string? SearchTerm { get; set; }
+    }
 }
+
+
+
+
+
+
+
+

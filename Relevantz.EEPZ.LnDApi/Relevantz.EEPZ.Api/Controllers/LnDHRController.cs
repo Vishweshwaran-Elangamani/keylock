@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.Constants;
+using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Serilog;
 
@@ -10,7 +11,6 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
     /// HR Management - Organization-wide Views and Exports
     /// </summary>
     [ApiController]
-    [Route("api/lnd-hr")]
     [Authorize(Roles = LnDConstants.USER_ROLES.HR)]
     public class LnDHRController : BaseLnDController
     {
@@ -23,35 +23,30 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         {
             _hrService = hrService;
             _smeService = smeService;
-        } 
- 
+        }
+
         #endregion
 
         #region Assignment Management
 
         /// <summary>Gets paginated organization-wide assignments with filtering and search (HR only).</summary>
-        [HttpGet("assignments/organization")]
+        [HttpGet("api/lnd-hr/assignments/organization")]
         public async Task<IActionResult> GetAllOrganizationAssignments(
-            [FromQuery] string? statusFilter,
-            [FromQuery] string? searchTerm,
-            [FromQuery] string? sortField,
-            [FromQuery] string? sortOrder,
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 10
+            [FromQuery] OrganizationAssignmentsRequestModel request
         )
         {
             Log.Information(
                 "GetAllOrganizationAssignments API called. StatusFilter={StatusFilter}, Page={PageNumber}, PageSize={PageSize}",
-                statusFilter ?? "all", pageNumber, pageSize
+                request.StatusFilter ?? "all", request.PageNumber, request.PageSize
             );
 
             var result = await _hrService.GetAllOrganizationAssignments(
-                statusFilter,
-                searchTerm,
-                sortField,
-                sortOrder,
-                pageNumber,
-                pageSize
+                request.StatusFilter,
+                request.SearchTerm,
+                request.SortField,
+                request.SortOrder,
+                request.PageNumber,
+                request.PageSize
             );
 
             if (result.Success)
@@ -73,24 +68,21 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         }
 
         /// <summary>Exports all organization assignments to Excel file (HR only).</summary>
-        [HttpGet("assignments/organization/export")]
+        [HttpGet("api/lnd-hr/assignments/organization/export")] 
         public async Task<IActionResult> ExportOrganizationAssignments(
-            [FromQuery] string? statusFilter,
-            [FromQuery] string? searchTerm,
-            [FromQuery] string? sortField,
-            [FromQuery] string? sortOrder
+            [FromQuery] ExportOrganizationAssignmentsRequestModel request
         )
         {
             Log.Information(
                 "ExportOrganizationAssignments API called. StatusFilter={StatusFilter}",
-                statusFilter ?? "all"
+                request.StatusFilter ?? "all"
             );
 
             var result = await _hrService.ExportOrganizationAssignmentsToExcel(
-                statusFilter,
-                searchTerm,
-                sortField,
-                sortOrder
+                request.StatusFilter,
+                request.SearchTerm,
+                request.SortField,
+                request.SortOrder
             );
 
             if (!result.Success)
@@ -121,22 +113,20 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         #region Employee Management
 
         /// <summary>Gets paginated list of all organization employees with search capability (HR only).</summary>
-        [HttpGet("employees/organization")]
+        [HttpGet("api/lnd-hr/employees/organization")]  
         public async Task<IActionResult> GetAllOrganizationEmployees(
-            [FromQuery] string? searchTerm,
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 9
+            [FromQuery] OrganizationEmployeesRequestModel request
         )
         {
             Log.Information(
                 "GetAllOrganizationEmployees API called. SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
-                searchTerm ?? "none", pageNumber, pageSize
+                request.SearchTerm ?? "none", request.PageNumber, request.PageSize
             );
 
             var result = await _hrService.GetAllOrganizationEmployees(
-                searchTerm,
-                pageNumber,
-                pageSize
+                request.SearchTerm,
+                request.PageNumber,
+                request.PageSize
             );
 
             if (result.Success)
@@ -155,27 +145,25 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 );
                 return BadRequest(result);
             }
-        }
+        }            
 
         /// <summary>Gets paginated skills for a specific employee by ID (HR only).</summary>
-        [HttpGet("skills/employee/{employeeId}")]
+        [HttpGet("api/lnd-hr/skills/employee/{employeeId}")]
         public async Task<IActionResult> GetEmployeeSkillsById(
             int employeeId,
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] string? searchTerm = "",
-            [FromQuery] string? sortBy = LnDConstants.DEFAULTS.SORT_BY_SKILL_NAME
+            [FromQuery] EmployeeSkillsByIdRequestModel request
         )
         {
             Log.Information(
                 "GetEmployeeSkillsById API called. EmployeeId={EmployeeId}, Page={PageNumber}, SearchTerm={SearchTerm}",
-                employeeId, pageNumber, searchTerm ?? "none"
+                employeeId, request.PageNumber, request.SearchTerm ?? "none"
             );
 
             var result = await _hrService.GetEmployeeSkillsById(
                 employeeId,
-                pageNumber,
-                searchTerm,
-                sortBy
+                request.PageNumber,
+                request.SearchTerm,
+                request.SortBy ?? LnDConstants.DEFAULTS.SORT_BY_SKILL_NAME
             );
 
             if (result.Success)
@@ -201,19 +189,21 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         #region SME Management
 
         /// <summary>Gets paginated list of all active SMEs with search capability (HR only).</summary>
-        [HttpGet("smes/all")] 
+        [HttpGet("api/lnd-hr/smes/all")]
         public async Task<IActionResult> GetAllActiveSmes(
-            [FromQuery] string? searchTerm,
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 10
+            [FromQuery] ActiveSmesRequestModel request
         )
         {
             Log.Information(
                 "GetAllActiveSmes API called. SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
-                searchTerm ?? "none", pageNumber, pageSize
+                request.SearchTerm ?? "none", request.PageNumber, request.PageSize
             );
 
-            var result = await _smeService.GetAllActiveSmes(searchTerm, pageNumber, pageSize);
+            var result = await _smeService.GetAllActiveSmes(
+                request.SearchTerm,
+                request.PageNumber,
+                request.PageSize
+            );
 
             if (result.Success)
             {
@@ -234,15 +224,17 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         }
 
         /// <summary>Exports all active SMEs to Excel file (HR only).</summary>
-        [HttpGet("smes/export")]
-        public async Task<IActionResult> ExportAllActiveSmes([FromQuery] string? searchTerm)
+        [HttpGet("api/lnd-hr/smes/export")]
+        public async Task<IActionResult> ExportAllActiveSmes(
+            [FromQuery] ExportActiveSmesRequestModel request
+        )
         {
             Log.Information(
                 "ExportAllActiveSmes API called. SearchTerm={SearchTerm}",
-                searchTerm ?? "none"
+                request.SearchTerm ?? "none"
             );
 
-            var result = await _smeService.ExportAllActiveSmesToExcel(searchTerm);
+            var result = await _smeService.ExportAllActiveSmesToExcel(request.SearchTerm);
 
             if (!result.Success)
             {
@@ -270,3 +262,4 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         #endregion
     }
 }
+

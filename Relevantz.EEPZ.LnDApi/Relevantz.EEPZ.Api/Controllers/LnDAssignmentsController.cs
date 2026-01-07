@@ -11,7 +11,6 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
     /// Assignment Management - Requests, Tracking, and Completion
     /// </summary>
     [ApiController]
-    [Route("api/lnd-assignments")]
     [Authorize]
     public class LnDAssignmentsController : BaseLnDController
     {
@@ -29,7 +28,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         #region Assignment Operations
 
         /// <summary>Checks and marks overdue assignments (scheduled job endpoint for HR only).</summary>
-        [HttpPost("check-overdue")]
+        [HttpPost("api/lnd-assignments/check-overdue")]
         [Authorize(Roles = LnDConstants.USER_ROLES.HR)]
         public async Task<IActionResult> CheckOverdueAssignments()
         {
@@ -37,7 +36,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             var result = await _assignmentService.CheckAndMarkOverdueAssignments();
 
-            if (!result.Success)                             
+            if (!result.Success)
             {
                 Log.Warning("CheckOverdueAssignments API failed. Message={Message}", result.Message);
                 return BadRequest(result);
@@ -48,7 +47,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         }
 
         /// <summary>Requests SME assignment for a team member (manager initiates request).</summary>
-        [HttpPost("request-sme")]
+        [HttpPost("api/lnd-assignments/request-sme")]
         public async Task<IActionResult> RequestSmeAssignment([FromBody] SmeRequestDto request)
         {
             var managerId = GetCurrentEmployeeId();
@@ -79,7 +78,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         }
 
         /// <summary>Uploads completion proof document for an assignment (mentee uploads proof).</summary>
-        [HttpPost("upload-proof")]
+        [HttpPost("api/lnd-assignments/upload-proof")]
         public async Task<IActionResult> UploadCompletionProof(
             [FromForm] UploadCompletionProofRequest request
         )
@@ -112,7 +111,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         }
 
         /// <summary>Completes an assignment with rating and acknowledgment (manager approves completion).</summary>
-        [HttpPost("complete")]
+        [HttpPost("api/lnd-assignments/complete")]
         public async Task<IActionResult> CompleteAssignment(
             [FromBody] CompleteAssignmentRequest request
         )
@@ -149,31 +148,24 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         #region Assignment Retrieval
 
         /// <summary>Gets assignments for the logged-in employee as mentee with filtering and pagination.</summary>
-        [HttpGet("my-assignments")]
-        public async Task<IActionResult> GetMyAssignments(
-            [FromQuery] string? statusFilter,
-            [FromQuery] string? searchTerm,
-            [FromQuery] string? sortField,
-            [FromQuery] string? sortOrder,
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 10
-        )
+        [HttpGet("api/lnd-assignments/my-assignments")]
+        public async Task<IActionResult> GetMyAssignments([FromQuery] AssignmentRequestModel request)
         {
             var employeeId = GetCurrentEmployeeId();
 
             Log.Information(
                 "GetMyAssignments API called. EmployeeId={EmployeeId}, StatusFilter={StatusFilter}, Page={PageNumber}",
-                employeeId, statusFilter ?? "all", pageNumber
+                employeeId, request.StatusFilter ?? "all", request.PageNumber
             );
 
             var result = await _assignmentService.GetMyAssignments(
                 employeeId,
-                statusFilter,
-                searchTerm,
-                sortField,
-                sortOrder,
-                pageNumber,
-                pageSize
+                request.StatusFilter,
+                request.SearchTerm,
+                request.SortField,
+                request.SortOrder,
+                request.PageNumber,
+                request.PageSize
             );
 
             if (result.Success)
@@ -195,31 +187,24 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         }
 
         /// <summary>Gets assignments for the manager's team members with filtering and pagination.</summary>
-        [HttpGet("team")]
-        public async Task<IActionResult> GetTeamAssignments(
-            [FromQuery] string? statusFilter,
-            [FromQuery] string? searchTerm,
-            [FromQuery] string? sortField,
-            [FromQuery] string? sortOrder,
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 10
-        )
+        [HttpGet("api/lnd-assignments/team")]
+        public async Task<IActionResult> GetTeamAssignments([FromQuery] AssignmentRequestModel request)
         {
             var managerId = GetCurrentEmployeeId();
 
             Log.Information(
                 "GetTeamAssignments API called. ManagerId={ManagerId}, StatusFilter={StatusFilter}, Page={PageNumber}",
-                managerId, statusFilter ?? "all", pageNumber
+                managerId, request.StatusFilter ?? "all", request.PageNumber
             );
 
             var result = await _assignmentService.GetTeamAssignments(
                 managerId,
-                statusFilter,
-                searchTerm,
-                sortField,
-                sortOrder,
-                pageNumber,
-                pageSize
+                request.StatusFilter,
+                request.SearchTerm,
+                request.SortField,
+                request.SortOrder,
+                request.PageNumber,
+                request.PageSize
             );
 
             if (result.Success)
@@ -241,31 +226,24 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         }
 
         /// <summary>Gets assignments where the logged-in employee is the assigned SME with filtering and pagination.</summary>
-        [HttpGet("sme")]
-        public async Task<IActionResult> GetSmeAssignments(
-            [FromQuery] string? statusFilter,
-            [FromQuery] string? searchTerm,
-            [FromQuery] string? sortField,
-            [FromQuery] string? sortOrder,
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 10
-        )
+        [HttpGet("api/lnd-assignments/sme")]
+        public async Task<IActionResult> GetSmeAssignments([FromQuery] AssignmentRequestModel request)
         {
             var smeEmployeeId = GetCurrentEmployeeId();
 
             Log.Information(
                 "GetSmeAssignments API called. SmeEmployeeId={SmeEmployeeId}, StatusFilter={StatusFilter}, Page={PageNumber}",
-                smeEmployeeId, statusFilter ?? "all", pageNumber
+                smeEmployeeId, request.StatusFilter ?? "all", request.PageNumber
             );
 
             var result = await _assignmentService.GetSmeAssignments(
                 smeEmployeeId,
-                statusFilter,
-                searchTerm,
-                sortField,
-                sortOrder,
-                pageNumber,
-                pageSize
+                request.StatusFilter,
+                request.SearchTerm,
+                request.SortField,
+                request.SortOrder,
+                request.PageNumber,
+                request.PageSize
             );
 
             if (result.Success)
@@ -291,28 +269,23 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         #region Export
 
         /// <summary>Exports team assignments to Excel file (manager only).</summary>
-        [HttpGet("team/export")]
+        [HttpGet("api/lnd-assignments/team/export")]
         [Authorize(Roles = LnDConstants.USER_ROLES.MANAGER)]
-        public async Task<IActionResult> ExportTeamAssignments(
-            [FromQuery] string? statusFilter,
-            [FromQuery] string? searchTerm,
-            [FromQuery] string? sortField,
-            [FromQuery] string? sortOrder
-        )
+        public async Task<IActionResult> ExportTeamAssignments([FromQuery] ExportAssignmentRequestModel request)
         {
             var managerId = GetCurrentEmployeeId();
 
             Log.Information(
                 "ExportTeamAssignments API called. ManagerId={ManagerId}, StatusFilter={StatusFilter}",
-                managerId, statusFilter ?? "all"
+                managerId, request.StatusFilter ?? "all"
             );
 
             var result = await _assignmentService.ExportTeamAssignmentsToExcel(
                 managerId,
-                statusFilter,
-                searchTerm,
-                sortField,
-                sortOrder
+                request.StatusFilter,
+                request.SearchTerm,
+                request.SortField,
+                request.SortOrder
             );
 
             if (!result.Success)

@@ -101,7 +101,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             [FromQuery] string? searchTerm,
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10
-        )
+        )  
         {
             Log.Information(
                 "GetAvailableSmes API called. SkillId={SkillId}, SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
