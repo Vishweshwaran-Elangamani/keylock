@@ -2,18 +2,22 @@ import React from "react";
 import "../../../../styles/performancemanagement/components/ParameterModall.css";
 
 const ParameterModal = ({
-  show, onClose, parameterForm, setParameterForm, onSubmit
+  show,
+  onClose,
+  parameterForm,
+  setParameterForm,
+  onSubmit,
 }) => {
   if (!show) return null;
 
   return (
     <div className="parameter-modal-overlay" onClick={onClose}>
-      <div className="parameter-modal" onClick={e => e.stopPropagation()}>
+      <div className="parameter-modal" onClick={(e) => e.stopPropagation()}>
         <div className="parameter-modal-header">
           <span className="parameter-modal-header-title">Add Parameter</span>
-          <button 
-            type="button" 
-            className="parameter-modal-close-btn" 
+          <button
+            type="button"
+            className="parameter-modal-close-btn"
             onClick={onClose}
             aria-label="Close"
           >
@@ -29,8 +33,11 @@ const ParameterModal = ({
               type="text"
               placeholder="e.g. Goal Achievement Rating"
               value={parameterForm.parameterName}
-              onChange={e =>
-                setParameterForm({ ...parameterForm, parameterName: e.target.value })
+              onChange={(e) =>
+                setParameterForm({
+                  ...parameterForm,
+                  parameterName: e.target.value,
+                })
               }
               required
               className="parameter-modal-input"
@@ -41,8 +48,11 @@ const ParameterModal = ({
             </label>
             <select
               value={parameterForm.parameterType}
-              onChange={e =>
-                setParameterForm({ ...parameterForm, parameterType: e.target.value })
+              onChange={(e) =>
+                setParameterForm({
+                  ...parameterForm,
+                  parameterType: e.target.value,
+                })
               }
               required
               className="parameter-modal-select"
@@ -58,11 +68,15 @@ const ParameterModal = ({
               <input
                 type="checkbox"
                 checked={parameterForm.isRequired}
-                onChange={e =>
-                  setParameterForm({ ...parameterForm, isRequired: e.target.checked })
+                onChange={(e) =>
+                  setParameterForm({
+                    ...parameterForm,
+                    isRequired: e.target.checked,
+                  })
                 }
                 className="parameter-modal-checkbox"
-              /> Required Field
+              />{" "}
+              Required Field
             </label>
 
             <label className="parameter-modal-label">Placeholder Text</label>
@@ -70,20 +84,27 @@ const ParameterModal = ({
               type="text"
               placeholder="Hint text for the field..."
               value={parameterForm.placeholderText}
-              onChange={e =>
-                setParameterForm({ ...parameterForm, placeholderText: e.target.value })
+              onChange={(e) =>
+                setParameterForm({
+                  ...parameterForm,
+                  placeholderText: e.target.value,
+                })
               }
               className="parameter-modal-input"
             />
 
-            {(parameterForm.parameterType === "Number" || parameterForm.parameterType === "Rating") && (
+            {(parameterForm.parameterType === "Number" ||
+              parameterForm.parameterType === "Rating") && (
               <>
                 <label className="parameter-modal-label">Min Value</label>
                 <input
                   type="number"
                   value={parameterForm.minimumValue}
-                  onChange={e =>
-                    setParameterForm({ ...parameterForm, minimumValue: e.target.value })
+                  onChange={(e) =>
+                    setParameterForm({
+                      ...parameterForm,
+                      minimumValue: e.target.value,
+                    })
                   }
                   className="parameter-modal-input"
                 />
@@ -91,21 +112,29 @@ const ParameterModal = ({
                 <input
                   type="number"
                   value={parameterForm.maximumValue}
-                  onChange={e =>
-                    setParameterForm({ ...parameterForm, maximumValue: e.target.value })
+                  onChange={(e) =>
+                    setParameterForm({
+                      ...parameterForm,
+                      maximumValue: e.target.value,
+                    })
                   }
                   className="parameter-modal-input"
                 />
               </>
             )}
 
-            <label className="parameter-modal-label">Sort Order <span className="parameter-modal-required">*</span></label>
+            <label className="parameter-modal-label">
+              Sort Order <span className="parameter-modal-required">*</span>
+            </label>
             <input
               type="number"
               min="1"
               value={parameterForm.sortOrder}
-              onChange={e =>
-                setParameterForm({ ...parameterForm, sortOrder: parseInt(e.target.value) })
+              onChange={(e) =>
+                setParameterForm({
+                  ...parameterForm,
+                  sortOrder: parseInt(e.target.value),
+                })
               }
               required
               className="parameter-modal-input"
@@ -116,11 +145,12 @@ const ParameterModal = ({
                 type="button"
                 onClick={onClose}
                 className="parameter-modal-cancel-btn"
-              >Cancel</button>
-              <button
-                type="submit"
-                className="parameter-modal-submit-btn"
-              >Add Parameter</button>
+              >
+                Cancel
+              </button>
+              <button type="submit" className="parameter-modal-submit-btn">
+                Add Parameter
+              </button>
             </div>
           </form>
         </div>

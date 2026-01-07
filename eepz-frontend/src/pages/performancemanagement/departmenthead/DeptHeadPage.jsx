@@ -3,34 +3,37 @@ import { Link } from "react-router-dom";
 import {
   getDeptHeadSubmittedRatings,
   approveDeptHeadEmployee,
-  getApprovedEmployees, getAssessmentAttachments,
-  downloadAttachment,getApprovedEmployeeDetails,
- 
+  getApprovedEmployees,
+  getAssessmentAttachments,
+  downloadAttachment,
+  getApprovedEmployeeDetails,
 } from "../../../services/performancemanagement/api/rolesapi";
 import { getEmployeeIdForFilter } from "../../../utils/PerformanceManagement/jwtDecoder";
 import { toast } from "sonner";
-import "../../../styles/performancemanagement/depthead/DeptHeadPage.css"
+import "../../../styles/performancemanagement/depthead/DeptHeadPage.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
-
 
 const getExtensionFromContentType = (contentType) => {
   if (!contentType) return null;
 
   const mimeToExt = {
-    'application/pdf': '.pdf',
-    'application/msword': '.doc',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
-    'application/vnd.ms-excel': '.xls',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '.xlsx',
-    'application/vnd.ms-powerpoint': '.ppt',
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation': '.pptx',
-    'text/plain': '.txt',
-    'text/csv': '.csv',
-    'image/jpeg': '.jpg',
-    'image/png': '.png',
-    'image/gif': '.gif',
-    'application/zip': '.zip',
-    'application/x-zip-compressed': '.zip',
+    "application/pdf": ".pdf",
+    "application/msword": ".doc",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+      ".docx",
+    "application/vnd.ms-excel": ".xls",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+      ".xlsx",
+    "application/vnd.ms-powerpoint": ".ppt",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+      ".pptx",
+    "text/plain": ".txt",
+    "text/csv": ".csv",
+    "image/jpeg": ".jpg",
+    "image/png": ".png",
+    "image/gif": ".gif",
+    "application/zip": ".zip",
+    "application/x-zip-compressed": ".zip",
   };
 
   return mimeToExt[contentType.toLowerCase()] || null;
@@ -42,7 +45,7 @@ const ProjectFilterDropdown = ({ value, onChange, projects }) => {
 
   const options = [
     { label: "All Projects", value: "" },
-    ...projects.map(project => ({ label: project, value: project }))
+    ...projects.map((project) => ({ label: project, value: project })),
   ];
 
   const selected = options.find((o) => o.value === value) || options[0];
@@ -88,7 +91,6 @@ const ProjectFilterDropdown = ({ value, onChange, projects }) => {
 };
 
 export default function DeptHeadPage() {
-
   const [pendingRequests, setPendingRequests] = useState([]);
   const [approvedRequests, setApprovedRequests] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -117,7 +119,6 @@ export default function DeptHeadPage() {
   const [approvedDetails, setApprovedDetails] = useState(null);
   const [approvedLoading, setApprovedLoading] = useState(false);
 
-
   useEffect(() => {
     fetchData();
 
@@ -130,7 +131,13 @@ export default function DeptHeadPage() {
 
   useEffect(() => {
     applyFilters();
-  }, [pendingRequests, approvedRequests, activeTab, appliedSearch, filterProject]);
+  }, [
+    pendingRequests,
+    approvedRequests,
+    activeTab,
+    appliedSearch,
+    filterProject,
+  ]);
 
   const fetchData = async (silent = false) => {
     try {
@@ -173,7 +180,10 @@ export default function DeptHeadPage() {
     setLoadingAttachments(true);
     try {
       const departmentHeadId = getEmployeeIdForFilter();
-      const response = await getAssessmentAttachments(departmentHeadId, assessmentId);
+      const response = await getAssessmentAttachments(
+        departmentHeadId,
+        assessmentId
+      );
 
       if (response.data.success) {
         setAttachments(response.data.data || []);
@@ -193,36 +203,40 @@ export default function DeptHeadPage() {
       const departmentHeadId = getEmployeeIdForFilter();
       const response = await downloadAttachment(departmentHeadId, attachmentId);
 
-      let filename = 'attachment';
+      let filename = "attachment";
 
-      const contentDisposition = response.headers['content-disposition'];
+      const contentDisposition = response.headers["content-disposition"];
 
       if (contentDisposition) {
         const matches = contentDisposition.match(/filename\s*=\s*"([^"]+)"/);
         if (matches && matches[1]) {
           filename = matches[1].trim();
         } else {
-          const matches2 = contentDisposition.match(/filename\s*=\s*([^;,\n]+)/);
+          const matches2 = contentDisposition.match(
+            /filename\s*=\s*([^;,\n]+)/
+          );
           if (matches2 && matches2[1]) {
             filename = matches2[1].trim();
           }
         }
       }
 
-      const contentType = response.headers['content-type'];
+      const contentType = response.headers["content-type"];
 
-      if (!filename.includes('.') && contentType) {
+      if (!filename.includes(".") && contentType) {
         const extension = getExtensionFromContentType(contentType);
         if (extension) {
           filename = `${filename}${extension}`;
         }
       }
 
-      const blob = new Blob([response.data], { type: contentType || 'application/octet-stream' });
+      const blob = new Blob([response.data], {
+        type: contentType || "application/octet-stream",
+      });
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.setAttribute('download', filename);
+      link.setAttribute("download", filename);
 
       document.body.appendChild(link);
       link.click();
@@ -240,7 +254,8 @@ export default function DeptHeadPage() {
   };
 
   const applyFilters = () => {
-    let filtered = activeTab === "pending" ? [...pendingRequests] : [...approvedRequests];
+    let filtered =
+      activeTab === "pending" ? [...pendingRequests] : [...approvedRequests];
 
     if (appliedSearch) {
       const search = appliedSearch.toLowerCase();
@@ -271,54 +286,49 @@ export default function DeptHeadPage() {
   };
 
   const handleViewDetails = async (employee) => {
-  setSelectedEmployee(employee);
-  setShowDetailsModal(true);
+    setSelectedEmployee(employee);
+    setShowDetailsModal(true);
 
-  // 🔍 Try both possible field names (case-insensitive)
-  const assessmentId = employee.assessmentId || employee.AssessmentId;
-  
-  if (assessmentId) {
-    await fetchAttachments(assessmentId);
-  }
-};
+    // 🔍 Try both possible field names (case-insensitive)
+    const assessmentId = employee.assessmentId || employee.AssessmentId;
 
+    if (assessmentId) {
+      await fetchAttachments(assessmentId);
+    }
+  };
 
   // ← NEW: Handle approved details with attachments
-const handleViewApprovedDetails = async (approvalId) => {
-  setApprovedLoading(true);
-  try {
-    const response = await getApprovedEmployeeDetails(approvalId);
-    if (response.data.success) {
-      const data = response.data.data;
-      setApprovedDetails(data);
-      setShowDetailsModal(true);
-      
-    
-      
-      // Try ALL possible assessment ID field names
-      const assessmentId = data.assessmentId || 
-                          data.AssessmentId || 
-                          data.id || 
-                          data.Id ||
-                          data.assessment_id ||
-                          data.Assessment_id;
-      
-      
-      if (assessmentId) {
-        await fetchAttachments(assessmentId);
-      } else {
-        console.error(" NO assessmentId found in ANY field!");
+  const handleViewApprovedDetails = async (approvalId) => {
+    setApprovedLoading(true);
+    try {
+      const response = await getApprovedEmployeeDetails(approvalId);
+      if (response.data.success) {
+        const data = response.data.data;
+        setApprovedDetails(data);
+        setShowDetailsModal(true);
+
+        // Try ALL possible assessment ID field names
+        const assessmentId =
+          data.assessmentId ||
+          data.AssessmentId ||
+          data.id ||
+          data.Id ||
+          data.assessment_id ||
+          data.Assessment_id;
+
+        if (assessmentId) {
+          await fetchAttachments(assessmentId);
+        } else {
+          console.error(" NO assessmentId found in ANY field!");
+        }
       }
+    } catch (error) {
+      console.error("Error fetching approved details:", error);
+      toast.error("Failed to load approved assessment details");
+    } finally {
+      setApprovedLoading(false);
     }
-  } catch (error) {
-    console.error("Error fetching approved details:", error);
-    toast.error("Failed to load approved assessment details");
-  } finally {
-    setApprovedLoading(false);
-  }
-};
-
-
+  };
 
   const handleApproveClick = (employee) => {
     setSelectedEmployee(employee);
@@ -340,7 +350,9 @@ const handleViewApprovedDetails = async (approvalId) => {
 
       if (res.data.success) {
         toast.dismiss();
-        toast.success(`${selectedEmployee.employeeName} approved successfully!`);
+        toast.success(
+          `${selectedEmployee.employeeName} approved successfully!`
+        );
 
         setShowApproveModal(false);
         setSelectedEmployee(null);
@@ -349,7 +361,8 @@ const handleViewApprovedDetails = async (approvalId) => {
       }
     } catch (err) {
       console.error("Error approving employee:", err);
-      const errorMsg = err.response?.data?.message || "Failed to approve employee";
+      const errorMsg =
+        err.response?.data?.message || "Failed to approve employee";
       toast.dismiss();
       toast.error(errorMsg);
     } finally {
@@ -379,7 +392,9 @@ const handleViewApprovedDetails = async (approvalId) => {
 
   const getAvgRating = (competencies, key) => {
     if (!competencies || competencies.length === 0) return "-";
-    const vals = competencies.filter((c) => c[key] != null && c[key] !== -1).map((c) => c[key]);
+    const vals = competencies
+      .filter((c) => c[key] != null && c[key] !== -1)
+      .map((c) => c[key]);
     if (vals.length === 0) return "-";
     const total = vals.reduce((a, b) => a + b, 0);
     return (total / vals.length).toFixed(2);
@@ -427,14 +442,18 @@ const handleViewApprovedDetails = async (approvalId) => {
     if (!name) return "NA";
     const parts = name.split(" ");
     if (parts.length >= 2) {
-      return parts[0].charAt(0).toUpperCase() + parts[1].charAt(0).toUpperCase();
+      return (
+        parts[0].charAt(0).toUpperCase() + parts[1].charAt(0).toUpperCase()
+      );
     }
     return name.substring(0, 2).toUpperCase();
   };
 
   const getUniqueProjects = () => {
     const projects =
-      activeTab === "pending" ? pendingRequests.map((emp) => emp.projectName) : approvedRequests.map((emp) => emp.projectName);
+      activeTab === "pending"
+        ? pendingRequests.map((emp) => emp.projectName)
+        : approvedRequests.map((emp) => emp.projectName);
     return [...new Set(projects)].filter(Boolean);
   };
 
@@ -443,16 +462,19 @@ const handleViewApprovedDetails = async (approvalId) => {
     const k = 1024;
     const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + " " + sizes[i];
+    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
   };
 
   const getFileIcon = (fileType) => {
     if (!fileType) return "bi-file-earmark";
     if (fileType.includes("pdf")) return "bi-file-earmark-pdf";
-    if (fileType.includes("word") || fileType.includes("document")) return "bi-file-earmark-word";
-    if (fileType.includes("excel") || fileType.includes("spreadsheet")) return "bi-file-earmark-excel";
+    if (fileType.includes("word") || fileType.includes("document"))
+      return "bi-file-earmark-word";
+    if (fileType.includes("excel") || fileType.includes("spreadsheet"))
+      return "bi-file-earmark-excel";
     if (fileType.includes("image")) return "bi-file-earmark-image";
-    if (fileType.includes("zip") || fileType.includes("compressed")) return "bi-file-earmark-zip";
+    if (fileType.includes("zip") || fileType.includes("compressed"))
+      return "bi-file-earmark-zip";
     return "bi-file-earmark";
   };
 
@@ -465,11 +487,11 @@ const handleViewApprovedDetails = async (approvalId) => {
     const data = tab === "pending" ? pendingRequests : approvedRequests;
 
     const filtered = filteredData
-      ? filteredData.filter(item =>
-        tab === "pending"
-          ? pendingRequests.includes(item)
-          : approvedRequests.includes(item)
-      )
+      ? filteredData.filter((item) =>
+          tab === "pending"
+            ? pendingRequests.includes(item)
+            : approvedRequests.includes(item)
+        )
       : data;
 
     return filtered.slice(startIndex, endIndex);
@@ -489,7 +511,15 @@ const handleViewApprovedDetails = async (approvalId) => {
       } else if (currentPage >= totalPages - 2) {
         pages.push(1, "...", totalPages - 2, totalPages - 1, totalPages);
       } else {
-        pages.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages);
+        pages.push(
+          1,
+          "...",
+          currentPage - 1,
+          currentPage,
+          currentPage + 1,
+          "...",
+          totalPages
+        );
       }
     }
 
@@ -534,13 +564,18 @@ const handleViewApprovedDetails = async (approvalId) => {
                   </div>
                   <div className="dp-detail-row">
                     <div className="dp-detail-label">Project:</div>
-                    <div className="dp-detail-value">{selectedEmployee.projectName}</div>
+                    <div className="dp-detail-value">
+                      {selectedEmployee.projectName}
+                    </div>
                   </div>
                   <div className="dp-detail-row">
                     <div className="dp-detail-label">Avg Employee Rating:</div>
                     <div className="dp-detail-value">
                       <span className="dp-rating-badge emp-rating">
-                        {getAvgRating(selectedEmployee.competencies, "employeeRating")}
+                        {getAvgRating(
+                          selectedEmployee.competencies,
+                          "employeeRating"
+                        )}
                       </span>
                     </div>
                   </div>
@@ -548,7 +583,10 @@ const handleViewApprovedDetails = async (approvalId) => {
                     <div className="dp-detail-label">Avg L1 Rating:</div>
                     <div className="dp-detail-value">
                       <span className="dp-rating-badge l1-rating">
-                        {getAvgRating(selectedEmployee.competencies, "l1Rating")}
+                        {getAvgRating(
+                          selectedEmployee.competencies,
+                          "l1Rating"
+                        )}
                       </span>
                     </div>
                   </div>
@@ -556,7 +594,10 @@ const handleViewApprovedDetails = async (approvalId) => {
                     <div className="dp-detail-label">Avg L2 Rating:</div>
                     <div className="dp-detail-value">
                       <span className="dp-rating-badge l2-rating">
-                        {getAvgRating(selectedEmployee.competencies, "l2Rating")}
+                        {getAvgRating(
+                          selectedEmployee.competencies,
+                          "l2Rating"
+                        )}
                       </span>
                     </div>
                   </div>
@@ -574,8 +615,9 @@ const handleViewApprovedDetails = async (approvalId) => {
               <div className="dp-info-alert">
                 <i className="bi bi-info-circle"></i>
                 <div>
-                  <strong>Note:</strong> Approving this assessment will finalize the performance review process.
-                  The employee will be notified via system notification.
+                  <strong>Note:</strong> Approving this assessment will finalize
+                  the performance review process. The employee will be notified
+                  via system notification.
                 </div>
               </div>
             </div>
@@ -587,7 +629,7 @@ const handleViewApprovedDetails = async (approvalId) => {
                 onClick={handleModalClose}
                 disabled={approvingEmployeeId}
               >
-                 Cancel
+                Cancel
               </button>
               <button
                 type="button"
@@ -600,9 +642,7 @@ const handleViewApprovedDetails = async (approvalId) => {
                     <span className="dp-spinner"></span> Approving...
                   </>
                 ) : (
-                  <>
-                     Approve Assessment
-                  </>
+                  <>Approve Assessment</>
                 )}
               </button>
             </div>
@@ -625,7 +665,9 @@ const handleViewApprovedDetails = async (approvalId) => {
             <div className="dp-modal-header dp-modal-header-primary">
               <div className="dp-modal-title">
                 <i className="bi bi-file-text-fill"></i>
-                {approvedDetails ? "Approved Assessment Details" : "Assessment Details"}
+                {approvedDetails
+                  ? "Approved Assessment Details"
+                  : "Assessment Details"}
               </div>
               <button
                 type="button"
@@ -671,7 +713,10 @@ const handleViewApprovedDetails = async (approvalId) => {
                         <i className="bi bi-person"></i>&nbsp;Employee
                       </span>
                       <span className="dp-details-rating-value dp-rating-emp">
-                        {getAvgRating(displayData.competencies, "employeeRating")}
+                        {getAvgRating(
+                          displayData.competencies,
+                          "employeeRating"
+                        )}
                       </span>
                     </div>
                     <div className="dp-details-rating-item">
@@ -716,26 +761,45 @@ const handleViewApprovedDetails = async (approvalId) => {
                       </tr>
                     </thead>
                     <tbody>
-                      {displayData.competencies && displayData.competencies.length > 0 ? (
+                      {displayData.competencies &&
+                      displayData.competencies.length > 0 ? (
                         displayData.competencies.map((c, idx) => (
                           <tr key={idx}>
                             <td>{c.competencyName}</td>
-                            <td><strong className="emp-rating">{c.employeeRating || "-"}</strong></td>
+                            <td>
+                              <strong className="emp-rating">
+                                {c.employeeRating || "-"}
+                              </strong>
+                            </td>
                             <td>{c.employeeComments || "-"}</td>
                             <td>{c.l1ReviewerName || "No L1"}</td>
-                            <td><strong className="l1-rating">{c.l1Rating || "-"}</strong></td>
+                            <td>
+                              <strong className="l1-rating">
+                                {c.l1Rating || "-"}
+                              </strong>
+                            </td>
                             <td>{c.l1Comments || "-"}</td>
                             <td>{c.l2ReviewerName || "No L2"}</td>
-                            <td><strong className="l2-rating">{c.l2Rating || "-"}</strong></td>
+                            <td>
+                              <strong className="l2-rating">
+                                {c.l2Rating || "-"}
+                              </strong>
+                            </td>
                             <td>{c.l2Comments || "-"}</td>
                             <td>
-                              <span className={`dp-status-badge status-${c.status?.toLowerCase()}`}>{c.status}</span>
+                              <span
+                                className={`dp-status-badge status-${c.status?.toLowerCase()}`}
+                              >
+                                {c.status}
+                              </span>
                             </td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={10} className="dp-no-data">No competencies found</td>
+                          <td colSpan={10} className="dp-no-data">
+                            No competencies found
+                          </td>
                         </tr>
                       )}
                     </tbody>
@@ -750,7 +814,10 @@ const handleViewApprovedDetails = async (approvalId) => {
                 </div>
                 {loadingAttachments ? (
                   <div className="dp-loading-attachments">
-                    <div className="spinner-border spinner-border-sm" role="status">
+                    <div
+                      className="spinner-border spinner-border-sm"
+                      role="status"
+                    >
                       <span className="visually-hidden">Loading...</span>
                     </div>
                     <p>Loading attachments...</p>
@@ -760,13 +827,19 @@ const handleViewApprovedDetails = async (approvalId) => {
                 ) : (
                   <div className="dp-attachments-list">
                     {attachments.map((attachment) => (
-                      <div key={attachment.attachmentId} className="dp-attachment-item">
+                      <div
+                        key={attachment.attachmentId}
+                        className="dp-attachment-item"
+                      >
                         <div className="dp-attachment-info">
                           <div className="dp-attachment-filename">
                             {attachment.fileName}
                           </div>
                           <div className="dp-attachment-meta">
-                            {formatFileSize(attachment.fileSize)} • Uploaded {new Date(attachment.uploadedAt).toLocaleDateString()}
+                            {formatFileSize(attachment.fileSize)} • Uploaded{" "}
+                            {new Date(
+                              attachment.uploadedAt
+                            ).toLocaleDateString()}
                           </div>
                           {attachment.attachmentNote && (
                             <div className="dp-attachment-note">
@@ -775,7 +848,9 @@ const handleViewApprovedDetails = async (approvalId) => {
                           )}
                         </div>
                         <button
-                          onClick={() => handleDownloadAttachment(attachment.attachmentId)}
+                          onClick={() =>
+                            handleDownloadAttachment(attachment.attachmentId)
+                          }
                           className="dp-attachment-download-btn"
                         >
                           <i className="bi bi-download"></i> Download
@@ -792,17 +867,26 @@ const handleViewApprovedDetails = async (approvalId) => {
                     <i className="bi bi-bullseye"></i>
                     Goals
                   </div>
-                  {selectedEmployee.goals && selectedEmployee.goals.length === 0 ? (
+                  {selectedEmployee.goals &&
+                  selectedEmployee.goals.length === 0 ? (
                     <p className="dp-no-data">No goals assigned.</p>
                   ) : (
                     selectedEmployee.goals?.map((goal) => {
                       const latestProgressLog = goal.goalProgressLogs?.length
-                        ? goal.goalProgressLogs.sort((a, b) => new Date(b.updatedOn) - new Date(a.updatedOn))[0]
+                        ? goal.goalProgressLogs.sort(
+                            (a, b) =>
+                              new Date(b.updatedOn) - new Date(a.updatedOn)
+                          )[0]
                         : null;
 
-                      const latestProgress = latestProgressLog ? latestProgressLog.progressPercent : 0;
-                      const checklistProgress = getAvgChecklistProgress(goal.goalChecklists);
-                      const overallProgress = latestProgress || checklistProgress;
+                      const latestProgress = latestProgressLog
+                        ? latestProgressLog.progressPercent
+                        : 0;
+                      const checklistProgress = getAvgChecklistProgress(
+                        goal.goalChecklists
+                      );
+                      const overallProgress =
+                        latestProgress || checklistProgress;
 
                       return (
                         <div key={goal.goalId} className="dp-goal-card">
@@ -811,19 +895,28 @@ const handleViewApprovedDetails = async (approvalId) => {
                               <h5 className="dp-goal-title">
                                 {goal.goalTitle}
                               </h5>
-                              <p className="dp-goal-description">{goal.goalDescription}</p>
+                              <p className="dp-goal-description">
+                                {goal.goalDescription}
+                              </p>
                             </div>
-                            <span className={`dp-goal-status-badge status-${goal.goalstatus?.toLowerCase()}`}>
+                            <span
+                              className={`dp-goal-status-badge status-${goal.goalstatus?.toLowerCase()}`}
+                            >
                               {goal.goalstatus}
                             </span>
                           </div>
                           <div className="dp-progress-container">
                             <div className="dp-progress-label">
                               <span>Progress</span>
-                              <span className="dp-progress-value">{overallProgress}%</span>
+                              <span className="dp-progress-value">
+                                {overallProgress}%
+                              </span>
                             </div>
                             <div className="dp-progress-bar-bg">
-                              <div className="dp-progress-bar-fill" style={{ width: `${overallProgress}%` }} />
+                              <div
+                                className="dp-progress-bar-fill"
+                                style={{ width: `${overallProgress}%` }}
+                              />
                             </div>
                           </div>
                         </div>
@@ -840,7 +933,7 @@ const handleViewApprovedDetails = async (approvalId) => {
                 className="dp-btn-cancel"
                 onClick={handleModalClose}
               >
-                 Close
+                Close
               </button>
             </div>
           </div>
@@ -865,30 +958,32 @@ const handleViewApprovedDetails = async (approvalId) => {
     <div className="dp-page">
       <div className="dp-breadcrumb-wrapper">
         <nav className="hrfcper-breadcrumb-nav" aria-label="breadcrumb">
-          <Breadcrumb
-            items={[{ label: 'Department Head Dashboard' }]}
-          />
+          <Breadcrumb items={[{ label: "Department Head Dashboard" }]} />
         </nav>
       </div>
-  
+
       <div className="dp-tab-toggle-wrapper">
         <div className="dp-tab-toggle">
           <button
-            className={`dp-tab-toggle-btn ${activeTab === "pending" ? "active" : ""}`}
+            className={`dp-tab-toggle-btn ${
+              activeTab === "pending" ? "active" : ""
+            }`}
             onClick={() => setActiveTab("pending")}
           >
             Pending
           </button>
-  
+
           <button
-            className={`dp-tab-toggle-btn ${activeTab === "approved" ? "active" : ""}`}
+            className={`dp-tab-toggle-btn ${
+              activeTab === "approved" ? "active" : ""
+            }`}
             onClick={() => setActiveTab("approved")}
           >
             Approved
           </button>
         </div>
       </div>
-  
+
       <div className="dp-filters-card">
         <div className="dp-filter-controls">
           <div className="dp-search-wrapper">
@@ -907,7 +1002,7 @@ const handleViewApprovedDetails = async (approvalId) => {
                 className="dp-search-input-field"
               />
             </div>
-  
+
             <button
               onClick={handleSearchClick}
               className="dp-search-submit-btn"
@@ -915,14 +1010,11 @@ const handleViewApprovedDetails = async (approvalId) => {
               Search
             </button>
           </div>
-  
-          <button
-            onClick={handleClearFilters}
-            className="dp-clear-filters-btn"
-          >
+
+          <button onClick={handleClearFilters} className="dp-clear-filters-btn">
             Clear Filters
           </button>
-  
+
           <ProjectFilterDropdown
             value={filterProject}
             onChange={(val) => setFilterProject(val)}
@@ -930,7 +1022,7 @@ const handleViewApprovedDetails = async (approvalId) => {
           />
         </div>
       </div>
-  
+
       <div className="dp-table-card dp-table-card-bordered">
         <div className="dp-table-wrapper">
           {activeTab === "pending" ? (
@@ -962,9 +1054,13 @@ const handleViewApprovedDetails = async (approvalId) => {
                       <tr>
                         <td>
                           <div className="dp-user-info">
-                            <div className="dp-user-avatar">{getInitials(emp.employeeName)}</div>
+                            <div className="dp-user-avatar">
+                              {getInitials(emp.employeeName)}
+                            </div>
                             <div>
-                              <span className="dp-user-name">{emp.employeeName}</span>
+                              <span className="dp-user-name">
+                                {emp.employeeName}
+                              </span>
                             </div>
                           </div>
                         </td>
@@ -1043,11 +1139,17 @@ const handleViewApprovedDetails = async (approvalId) => {
                       <tr>
                         <td>
                           <div className="dp-user-info">
-                            <div className="dp-user-avatar">{getInitials(emp.employeeName)}</div>
+                            <div className="dp-user-avatar">
+                              {getInitials(emp.employeeName)}
+                            </div>
                             <div>
-                              <span className="dp-user-name">{emp.employeeName}</span>
+                              <span className="dp-user-name">
+                                {emp.employeeName}
+                              </span>
                               {emp.employeeCompanyId && (
-                                <small className="dp-user-id">@{emp.employeeCompanyId}</small>
+                                <small className="dp-user-id">
+                                  @{emp.employeeCompanyId}
+                                </small>
                               )}
                             </div>
                           </div>
@@ -1068,12 +1170,16 @@ const handleViewApprovedDetails = async (approvalId) => {
                             {emp.l2AvgRating || "-"}
                           </span>
                         </td>
-                        <td className="text-muted">{formatDate(emp.approvedAt)}</td>
+                        <td className="text-muted">
+                          {formatDate(emp.approvedAt)}
+                        </td>
                         <td>
                           <div className="dp-action-buttons">
                             <button
                               className="dp-action-btn dp-action-btn-view"
-                              onClick={() => handleViewApprovedDetails(emp.approvalId)}
+                              onClick={() =>
+                                handleViewApprovedDetails(emp.approvalId)
+                              }
                               title="View Details"
                               disabled={approvedLoading}
                             >
@@ -1089,7 +1195,7 @@ const handleViewApprovedDetails = async (approvalId) => {
             </table>
           )}
         </div>
-  
+
         {filteredData.length > 0 && (
           <div className="dp-pagination-container dp-pagination-bordered">
             <div className="dp-pagination-info">
@@ -1111,14 +1217,21 @@ const handleViewApprovedDetails = async (approvalId) => {
             </div>
             <div className="dp-pagination-status">
               Showing {(currentPage - 1) * rowsPerPage + 1} to{" "}
-              {Math.min(currentPage * rowsPerPage, filteredData.length)} of {filteredData.length} entries
+              {Math.min(currentPage * rowsPerPage, filteredData.length)} of{" "}
+              {filteredData.length} entries
             </div>
             <nav className="dp-pagination-nav">
               <ul className="dp-pagination">
-                <li className={`dp-page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                <li
+                  className={`dp-page-item ${
+                    currentPage === 1 ? "disabled" : ""
+                  }`}
+                >
                   <button
                     className="dp-page-link"
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
                     disabled={currentPage === 1}
                   >
                     <i className="bi bi-chevron-left"></i>
@@ -1127,22 +1240,31 @@ const handleViewApprovedDetails = async (approvalId) => {
                 {getPageNumbers().map((page, index) => (
                   <li
                     key={index}
-                    className={`dp-page-item ${page === currentPage ? "active" : ""} ${typeof page !== "number" ? "disabled" : ""
-                      }`}
+                    className={`dp-page-item ${
+                      page === currentPage ? "active" : ""
+                    } ${typeof page !== "number" ? "disabled" : ""}`}
                   >
                     <button
                       className="dp-page-link"
-                      onClick={() => typeof page === "number" && setCurrentPage(page)}
+                      onClick={() =>
+                        typeof page === "number" && setCurrentPage(page)
+                      }
                       disabled={typeof page !== "number"}
                     >
                       {page}
                     </button>
                   </li>
                 ))}
-                <li className={`dp-page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                <li
+                  className={`dp-page-item ${
+                    currentPage === totalPages ? "disabled" : ""
+                  }`}
+                >
                   <button
                     className="dp-page-link"
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
                     disabled={currentPage === totalPages}
                   >
                     <i className="bi bi-chevron-right"></i>
@@ -1153,7 +1275,7 @@ const handleViewApprovedDetails = async (approvalId) => {
           </div>
         )}
       </div>
-  
+
       {renderApproveModal()}
       {renderDetailsModal()}
     </div>

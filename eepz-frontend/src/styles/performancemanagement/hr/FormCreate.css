@@ -308,7 +308,8 @@
   border-radius: 4px;
 }
 
-.pmhr-fc-competencies-section .pmhr-fc-section-body::-webkit-scrollbar-thumb:hover {
+.pmhr-fc-competencies-section
+  .pmhr-fc-section-body::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
 
@@ -441,7 +442,7 @@
   cursor: pointer;
   user-select: none;
   background: #ffffff;
-  border: 1.5px solid #27235C;
+  border: 1.5px solid #27235c;
   border-radius: 6px;
   font-size: 0.95rem;
   font-weight: 500;
@@ -485,7 +486,7 @@
   left: -1.5px;
   right: -1.5px;
   background: #ffffff;
-  border: 1.5px solid #27235C;
+  border: 1.5px solid #27235c;
   border-top: none;
   border-radius: 0 0 6px 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
@@ -539,7 +540,7 @@
 }
 
 .custom-fc-option:hover {
-  background:#27235c;
+  background: #27235c;
   color: white;
 }
 

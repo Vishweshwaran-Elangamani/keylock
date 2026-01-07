@@ -104,9 +104,7 @@ export default function EmployeeAcknowledgment() {
       <Toaster position="top-right" duration={3000} />
 
       <Breadcrumb
-        items={[
-          { label: "Employee Acknowledgements", path: null },
-        ]}
+        items={[{ label: "Employee Acknowledgements", path: null }]}
       />
 
       {loading && (
@@ -285,7 +283,10 @@ export default function EmployeeAcknowledgment() {
                         <textarea
                           value={comments[rating.approvalId] || ""}
                           onChange={(e) =>
-                            handleCommentChange(rating.approvalId, e.target.value)
+                            handleCommentChange(
+                              rating.approvalId,
+                              e.target.value
+                            )
                           }
                           placeholder="Enter your acknowledgement comments here..."
                           className="ea-textarea"

@@ -53,13 +53,17 @@ export default function PerformanceManagerHome() {
   return (
     <div className="managerperfromancehome-container">
       <header className="managerperfromancehome-header">
-        <h1 className="managerperfromancehome-main-title">Perfomance Management </h1>
+        <h1 className="managerperfromancehome-main-title">
+          Perfomance Management{" "}
+        </h1>
       </header>
       <div className="managerperfromancehome-cards-grid">
         {cards.map((card, index) => (
           <div
             key={index}
-            className={`managerperfromancehome-card-admin ${hoveredCard === index ? "hovered" : ""}`}
+            className={`managerperfromancehome-card-admin ${
+              hoveredCard === index ? "hovered" : ""
+            }`}
             onMouseEnter={() => setHoveredCard(index)}
             onMouseLeave={() => setHoveredCard(null)}
             onClick={() => navigate(card.path)}
@@ -75,8 +79,12 @@ export default function PerformanceManagerHome() {
               <i className={`bi ${card.icon}`}></i>
             </div>
             <div className="managerperfromancehome-card-content">
-              <h3 className="managerperfromancehome-card-title">{card.title}</h3>
-              <p className="managerperfromancehome-card-description">{card.description}</p>
+              <h3 className="managerperfromancehome-card-title">
+                {card.title}
+              </h3>
+              <p className="managerperfromancehome-card-description">
+                {card.description}
+              </p>
             </div>
             <div className="managerperfromancehome-card-arrow">
               <i className="bi bi-arrow-right"></i>
@@ -87,4 +95,3 @@ export default function PerformanceManagerHome() {
     </div>
   );
 }
-

@@ -17,13 +17,15 @@ const createApiInstance = (baseURL) => {
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       } else {
-        console.warn(`⚠️ No JWT Token Found | ${config.method.toUpperCase()} ${config.url}`);
+        console.warn(
+          ` No JWT Token Found | ${config.method.toUpperCase()} ${config.url}`
+        );
       }
 
       return config;
     },
     (error) => {
-      console.error("❌ Request Configuration Error:", error);
+      console.error(" Request Configuration Error:", error);
       return Promise.reject(error);
     }
   );
@@ -40,7 +42,7 @@ const createApiInstance = (baseURL) => {
       const errorMessage = error.message;
 
       console.error(
-        `❌ API Error | Status: ${errorStatus} | URL: ${error.config?.url} | Message: ${errorMessage}`
+        ` API Error | Status: ${errorStatus} | URL: ${error.config?.url} | Message: ${errorMessage}`
       );
 
       if (errorStatus === 401 && !originalRequest._retry) {
@@ -49,7 +51,7 @@ const createApiInstance = (baseURL) => {
         const refreshToken = authService.getRefreshToken();
 
         if (!refreshToken) {
-          console.warn("⚠️ No refresh token available. Redirecting to login...");
+          console.warn(" No refresh token available. Redirecting to login...");
           authService.clearAuthData();
           window.location.href = "/login";
           return Promise.reject(error);
@@ -64,13 +66,13 @@ const createApiInstance = (baseURL) => {
 
             return instance(originalRequest);
           } else {
-            console.error("❌ Token refresh failed:", refreshResponse.message);
+            console.error(" Token refresh failed:", refreshResponse.message);
             authService.clearAuthData();
             window.location.href = "/login";
             return Promise.reject(refreshResponse);
           }
         } catch (refreshError) {
-          console.error("❌ Token refresh error:", refreshError);
+          console.error(" Token refresh error:", refreshError);
           authService.clearAuthData();
           window.location.href = "/login";
           return Promise.reject(refreshError);
@@ -78,21 +80,26 @@ const createApiInstance = (baseURL) => {
       }
 
       if (errorStatus === 403) {
-        console.error("🚫 Access Denied: You don't have permission to access this resource");
+        console.error(
+          " Access Denied: You don't have permission to access this resource"
+        );
       }
 
       if (errorStatus === 404) {
-        console.error("🔍 Resource Not Found:", error.config?.url);
+        console.error(" Resource Not Found:", error.config?.url);
       }
 
       if (errorStatus === 500) {
-        console.error("⚠️ Server Error: The backend API encountered an error");
+        console.error(" Server Error: The backend API encountered an error");
         console.error("   Details:", errorData?.message || errorMessage);
       }
 
       if (!error.response) {
-        console.error("🌐 Network Error: Could not reach the API server");
-        console.error("   Make sure the backend is running at:", instance.defaults.baseURL);
+        console.error(" Network Error: Could not reach the API server");
+        console.error(
+          "   Make sure the backend is running at:",
+          instance.defaults.baseURL
+        );
       }
 
       return Promise.reject(error);
@@ -165,14 +172,14 @@ export const getAllAppraisalDetails = () => {
 // Attachment APIs
 export const downloadAttachment = (attachmentId) => {
   return api.get(`/SelfAssessment/attachments/${attachmentId}/download`, {
-    responseType: 'blob',
+    responseType: "blob",
   });
 };
 
-// ✅ NEW: HR Attachment Download API
+//  HR Attachment Download API
 export const downloadHrAttachment = (attachmentId) => {
   return api.get(`/AssessmentDetails/hrattachments/${attachmentId}/download`, {
-    responseType: 'blob',
+    responseType: "blob",
   });
 };
 

@@ -4,12 +4,12 @@ import "../../../styles/performancemanagement/employee/EmployeeHome.css";
 
 export default function EmployeeHome() {
   const navigate = useNavigate();
-  
+
   const [user] = useState(() => {
     const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
   });
-  
+
   const employeeId = user?.empId || null;
 
   useEffect(() => {
@@ -27,7 +27,10 @@ export default function EmployeeHome() {
   }
 
   return (
-    <div className="ehp-page" style={{ position: "relative", minHeight: "80vh" }}>
+    <div
+      className="ehp-page"
+      style={{ position: "relative", minHeight: "80vh" }}
+    >
       <div
         className="ehp-container"
         style={{ padding: 24, paddingTop: 40, position: "relative" }}
@@ -46,7 +49,8 @@ export default function EmployeeHome() {
             role="button"
             tabIndex={0}
             onKeyDown={(e) =>
-              (e.key === "Enter" || e.key === " ") && handleNavigateToAssessments()
+              (e.key === "Enter" || e.key === " ") &&
+              handleNavigateToAssessments()
             }
             aria-label="Go to My Assessments"
             style={{
@@ -61,15 +65,17 @@ export default function EmployeeHome() {
               background: "#fff",
               border: "1px solid darkblue",
               transition: "all 0.3s ease",
-              marginBottom:"110px"
+              marginBottom: "110px",
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = "translateY(-4px)";
-              e.currentTarget.style.boxShadow = "0 20px 40px rgba(20,30,60,0.12)";
+              e.currentTarget.style.boxShadow =
+                "0 20px 40px rgba(20,30,60,0.12)";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "0 14px 32px rgba(20,30,60,0.06)";
+              e.currentTarget.style.boxShadow =
+                "0 14px 32px rgba(20,30,60,0.06)";
             }}
           >
             <div
@@ -94,16 +100,26 @@ export default function EmployeeHome() {
             <div className="ehp-assessment-content" style={{ flex: 1 }}>
               <h3
                 className="ehp-assessment-title"
-                style={{ fontSize: 24, margin: 0, color: "#0f172a", marginBottom: "8px" }}
+                style={{
+                  fontSize: 24,
+                  margin: 0,
+                  color: "#0f172a",
+                  marginBottom: "8px",
+                }}
               >
                 My Assessments
               </h3>
               <p
                 className="ehp-assessment-description"
-                style={{ marginTop: "8px", color: "#6b7280", fontSize: 13, lineHeight: 1.6 }}
+                style={{
+                  marginTop: "8px",
+                  color: "#6b7280",
+                  fontSize: 13,
+                  lineHeight: 1.6,
+                }}
               >
-                Complete your performance assessments and track your progress across
-                all assigned evaluations.
+                Complete your performance assessments and track your progress
+                across all assigned evaluations.
               </p>
 
               <div style={{ marginTop: 14 }}>

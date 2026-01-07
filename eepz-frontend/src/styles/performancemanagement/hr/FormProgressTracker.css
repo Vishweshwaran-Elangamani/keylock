@@ -46,7 +46,7 @@
 .fld-card {
   background: #fff;
   border-radius: 14px;
-  box-shadow: 0 2px 8px rgba(39, 35, 92, .07);
+  box-shadow: 0 2px 8px rgba(39, 35, 92, 0.07);
   overflow: visible;
   margin-top: 32px;
 }
@@ -58,7 +58,7 @@
 
 .fld-table-formhrp th {
   padding: 18px 8px 14px 16px;
-  background: #27235C;
+  background: #27235c;
   color: #fdfdfd;
   font-weight: 900;
   text-align: left;
@@ -156,7 +156,6 @@
   margin-bottom: 1.2rem;
 }
 
-/* PAGINATION CONTAINER - FIXED */
 .fld-pagination-container {
   background: #fcfcff;
   padding: 17px 22px 13px 22px;
@@ -182,11 +181,10 @@
 
 .fld-show-entries-label {
   color: #5b647a;
-  font-size: .99rem;
+  font-size: 0.99rem;
   white-space: nowrap;
 }
 
-/* CUSTOM DROPDOWN - OPENS UPWARD */
 .fld-custom-dropdown {
   position: relative;
   padding: 0;
@@ -208,7 +206,7 @@
   cursor: pointer;
   user-select: none;
   background: #ffffff;
-  border: 1.5px solid #27235C;
+  border: 1.5px solid #27235c;
   border-radius: 6px;
   font-size: 0.95rem;
   font-weight: 600;
@@ -246,7 +244,7 @@
   left: -1.5px;
   right: -1.5px;
   background: #ffffff;
-  border: 1.5px solid #27235C;
+  border: 1.5px solid #27235c;
   border-bottom: none;
   border-radius: 6px 6px 0 0;
   box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.12);
@@ -322,7 +320,7 @@
 
 .fld-pagination-status {
   color: #5b647a;
-  font-size: .99rem;
+  font-size: 0.99rem;
   white-space: nowrap;
 }
 
@@ -379,11 +377,11 @@
   .fld-pagination-controls {
     justify-content: center;
   }
-  
+
   .fld-pagination-info {
     justify-content: flex-start;
   }
-  
+
   .fld-custom-dropdown {
     min-width: 60px;
     max-width: 70px;
@@ -413,32 +411,32 @@
   .fld-page-title {
     font-size: 1.18rem;
   }
-  
+
   .fld-custom-dropdown {
     min-width: 55px;
     max-width: 65px;
   }
-  
+
   .fld-custom-selected {
     font-size: 0.875rem;
     padding: 0.45rem 1.6rem 0.45rem 0.6rem;
   }
-  
+
   .fld-custom-option {
     font-size: 0.875rem;
     padding: 0.45rem 0.6rem;
   }
-  
+
   .fld-custom-arrow {
     right: 0.5rem;
     width: 6px;
     height: 6px;
   }
-  
+
   .fld-show-entries-label {
     font-size: 0.9rem;
   }
-  
+
   .fld-pagination-status {
     font-size: 0.9rem;
   }

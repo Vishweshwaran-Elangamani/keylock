@@ -1,7 +1,8 @@
 import axios from "axios";
 import authService from "../../auth/authService";
 
-const BASE_URL_5114 = import.meta.env.VITE_PERFORMANCE_Nominations_API_URL + "/api";
+const BASE_URL_5114 =
+  import.meta.env.VITE_PERFORMANCE_Nominations_API_URL + "/api";
 
 const createApiInstance = (baseURL) => {
   const instance = axios.create({
@@ -17,7 +18,9 @@ const createApiInstance = (baseURL) => {
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       } else {
-        console.warn(`No JWT Token Found | ${config.method.toUpperCase()} ${config.url}`);
+        console.warn(
+          `No JWT Token Found | ${config.method.toUpperCase()} ${config.url}`
+        );
       }
 
       return config;
@@ -59,7 +62,6 @@ const createApiInstance = (baseURL) => {
           const refreshResponse = await authService.refreshAccessToken();
 
           if (refreshResponse.success) {
-
             const newToken = authService.getToken();
             originalRequest.headers.Authorization = `Bearer ${newToken}`;
 
@@ -79,7 +81,9 @@ const createApiInstance = (baseURL) => {
       }
 
       if (errorStatus === 403) {
-        console.error("Access Denied: You don't have permission to access this resource");
+        console.error(
+          "Access Denied: You don't have permission to access this resource"
+        );
       }
 
       if (errorStatus === 404) {
@@ -93,7 +97,10 @@ const createApiInstance = (baseURL) => {
 
       if (!error.response) {
         console.error("Network Error: Could not reach the API server");
-        console.error("   Make sure the backend is running at:", instance.defaults.baseURL);
+        console.error(
+          "   Make sure the backend is running at:",
+          instance.defaults.baseURL
+        );
       }
 
       return Promise.reject(error);
@@ -134,7 +141,9 @@ export const getStatistics = () => {
 };
 
 export const getRewardTypes = (activeOnly = false) => {
-  return apiPort5114.get("/HRNomination/reward-types", { params: { activeOnly } });
+  return apiPort5114.get("/HRNomination/reward-types", {
+    params: { activeOnly },
+  });
 };
 
 export const createRewardType = (payload) => {
@@ -146,7 +155,9 @@ export const updateRewardType = (rewardTypeId, payload) => {
 };
 
 export const getParametersByRewardType = (rewardTypeId) => {
-  return apiPort5114.get(`/HRNomination/reward-types/${rewardTypeId}/parameters`);
+  return apiPort5114.get(
+    `/HRNomination/reward-types/${rewardTypeId}/parameters`
+  );
 };
 
 export const createParameter = (payload) => {
@@ -162,12 +173,14 @@ export const deleteParameter = (parameterId) => {
 };
 
 export const getDeptHeadApprovedNominations = (deptHeadId) => {
-  return apiPort5114.get(`/DepartmentHeadNomination/depthead/${deptHeadId}/approved-nominations`);
+  return apiPort5114.get(
+    `/DepartmentHeadNomination/depthead/${deptHeadId}/approved-nominations`
+  );
 };
 
 export const getEmployeeNominations = (employeeId) => {
-  return apiPort5114.get('/EmployeeNomination/search', {
-    params: { employeeId } 
+  return apiPort5114.get("/EmployeeNomination/search", {
+    params: { employeeId },
   });
 };
 

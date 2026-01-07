@@ -46,7 +46,7 @@ export default function ManagerNomination() {
   useEffect(() => {
     fetchRewardTypes();
   }, []);
-  
+
   useEffect(() => {
     if (managerId) {
       fetchTeamMembers();
@@ -133,9 +133,7 @@ export default function ManagerNomination() {
         {pages.map((p) => (
           <button
             key={p}
-            className={`managernomination-pg-btn ${
-              p === page ? "active" : ""
-            }`}
+            className={`managernomination-pg-btn ${p === page ? "active" : ""}`}
             onClick={() => setPage(p)}
             aria-current={p === page ? "page" : undefined}
           >
@@ -161,7 +159,7 @@ export default function ManagerNomination() {
       <Breadcrumb
         items={[
           { label: "Performance", path: "/manager/dashboard/performance" },
-          { label: "Nominations", path: null }
+          { label: "Nominations", path: null },
         ]}
       />
 
@@ -194,7 +192,11 @@ export default function ManagerNomination() {
         </div>
 
         <div className="managernomination-table-wrapper managernomination-table-wrapper-transparent">
-          <table className="managernomination-table" role="table" aria-label="Team members">
+          <table
+            className="managernomination-table"
+            role="table"
+            aria-label="Team members"
+          >
             <thead>
               <tr>
                 <th className="col-index">SNO</th>
@@ -206,9 +208,7 @@ export default function ManagerNomination() {
             <tbody>
               {teamMembersPager.paged.map((member, i) => {
                 const name = safeText(
-                  `${member?.firstName || ""} ${
-                    member?.lastName || ""
-                  }`.trim(),
+                  `${member?.firstName || ""} ${member?.lastName || ""}`.trim(),
                   member?.name
                 );
                 const dept = safeText(
@@ -240,7 +240,9 @@ export default function ManagerNomination() {
               {teamMembers.length === 0 && (
                 <tr>
                   <td colSpan={4} className="managernomination-empty-row">
-                    {loading ? "Loading team members..." : "No team members found"}
+                    {loading
+                      ? "Loading team members..."
+                      : "No team members found"}
                   </td>
                 </tr>
               )}
@@ -262,7 +264,9 @@ export default function ManagerNomination() {
               <div className="managernomination-section-icon">
                 <i className="bi bi-list-check"></i>
               </div>
-              <h3 className="managernomination-section-title">My Nominations</h3>
+              <h3 className="managernomination-section-title">
+                My Nominations
+              </h3>
             </div>
             <button
               onClick={() => setShowNominationsView(false)}
@@ -279,9 +283,7 @@ export default function ManagerNomination() {
           >
             <button
               className={`managernomination-tab ${
-                activeTab === "pending"
-                  ? "managernomination-tab-active"
-                  : ""
+                activeTab === "pending" ? "managernomination-tab-active" : ""
               }`}
               onClick={() => setActiveTab("pending")}
               role="tab"
@@ -292,9 +294,7 @@ export default function ManagerNomination() {
 
             <button
               className={`managernomination-tab ${
-                activeTab === "approved"
-                  ? "managernomination-tab-active"
-                  : ""
+                activeTab === "approved" ? "managernomination-tab-active" : ""
               }`}
               onClick={() => setActiveTab("approved")}
               role="tab"
@@ -305,9 +305,7 @@ export default function ManagerNomination() {
 
             <button
               className={`managernomination-tab ${
-                activeTab === "rejected"
-                  ? "managernomination-tab-active"
-                  : ""
+                activeTab === "rejected" ? "managernomination-tab-active" : ""
               }`}
               onClick={() => setActiveTab("rejected")}
               role="tab"
@@ -357,8 +355,7 @@ export default function ManagerNomination() {
                     return (
                       <tr key={nom?.nominationId || i}>
                         <td className="col-index">
-                          {(pendingPager.page - 1) *
-                            pendingPager.pageSize +
+                          {(pendingPager.page - 1) * pendingPager.pageSize +
                             i +
                             1}
                         </td>
@@ -393,8 +390,7 @@ export default function ManagerNomination() {
                     return (
                       <tr key={nom?.nominationId || i}>
                         <td className="col-index">
-                          {(approvedPager.page - 1) *
-                            approvedPager.pageSize +
+                          {(approvedPager.page - 1) * approvedPager.pageSize +
                             i +
                             1}
                         </td>
@@ -429,8 +425,7 @@ export default function ManagerNomination() {
                     return (
                       <tr key={nom?.nominationId || i}>
                         <td className="col-index">
-                          {(rejectedPager.page - 1) *
-                            rejectedPager.pageSize +
+                          {(rejectedPager.page - 1) * rejectedPager.pageSize +
                             i +
                             1}
                         </td>

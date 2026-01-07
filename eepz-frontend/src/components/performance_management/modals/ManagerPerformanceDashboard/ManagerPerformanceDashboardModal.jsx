@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import logoImage from "../../../../assets/logodark.png"
-import "../../../../styles/performancemanagement/components/ManagerPerformanceDashboard.css"
-
+import logoImage from "../../../../assets/logodark.png";
+import "../../../../styles/performancemanagement/components/ManagerPerformanceDashboard.css";
 
 const RatingDropdown = ({ value, onChange, disabled }) => {
   const [open, setOpen] = useState(false);
@@ -12,7 +11,7 @@ const RatingDropdown = ({ value, onChange, disabled }) => {
     { value: "2", label: "2" },
     { value: "3", label: "3" },
     { value: "4", label: "4" },
-    { value: "5", label: "5" }
+    { value: "5", label: "5" },
   ];
 
   const handleSelect = (val) => {
@@ -20,10 +19,15 @@ const RatingDropdown = ({ value, onChange, disabled }) => {
     setOpen(false);
   };
 
-  const selectedLabel = options.find(opt => opt.value === value)?.label || "-";
+  const selectedLabel =
+    options.find((opt) => opt.value === value)?.label || "-";
 
   if (disabled) {
-    return <div className="manevap-modal-cell-view">{value ? `${value} / 5` : '-'}</div>;
+    return (
+      <div className="manevap-modal-cell-view">
+        {value ? `${value} / 5` : "-"}
+      </div>
+    );
   }
 
   return (
@@ -47,7 +51,9 @@ const RatingDropdown = ({ value, onChange, disabled }) => {
               key={opt.value}
               className={
                 "custom-modal-rating-option" +
-                (opt.value === value ? " custom-modal-rating-option-active" : "")
+                (opt.value === value
+                  ? " custom-modal-rating-option-active"
+                  : "")
               }
               onClick={() => handleSelect(opt.value)}
             >
@@ -74,16 +80,25 @@ const ManagerPerformanceDashboardModal = ({
 
   return (
     <div className="manevap-modal-overlay" onClick={() => setShowModal(false)}>
-      <div className="manevap-modal-content" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="manevap-modal-content"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="manevap-form-header-strict">
           <div className="manevap-form-header-inner">
             <div className="manevap-form-logo-wrap">
-              <img src={logoImage} alt="EEPZ Logo" className="manevap-modal-logo" />
+              <img
+                src={logoImage}
+                alt="EEPZ Logo"
+                className="manevap-modal-logo"
+              />
               <div className="manevap-form-logo-label">APPRAISAL FORM</div>
             </div>
             <div className="manevap-form-title-wrap">
               <div className="manevap-form-title-main">Appraisal Form</div>
-              <div className="manevap-form-title-small">{currentAssignment?.formName || ""}</div>
+              <div className="manevap-form-title-small">
+                {currentAssignment?.formName || ""}
+              </div>
             </div>
           </div>
         </div>
@@ -108,25 +123,39 @@ const ManagerPerformanceDashboardModal = ({
                 <tbody>
                   {assessmentData.map((item, idx) => (
                     <tr key={item.competencyId || idx}>
-                      <td className="manevap-cell-bold">{item.competencyName}</td>
+                      <td className="manevap-cell-bold">
+                        {item.competencyName}
+                      </td>
                       <td>{item.competencyDescription || ""}</td>
                       <td>
                         <RatingDropdown
                           value={item.rating || ""}
-                          onChange={(val) => updateAssessmentData(item.competencyId, "rating", val)}
+                          onChange={(val) =>
+                            updateAssessmentData(
+                              item.competencyId,
+                              "rating",
+                              val
+                            )
+                          }
                           disabled={modalMode === "view"}
                         />
                       </td>
                       <td>
                         {modalMode === "view" ? (
-                          <div className="manevap-modal-cell-view">{item.comments || "-"}</div>
+                          <div className="manevap-modal-cell-view">
+                            {item.comments || "-"}
+                          </div>
                         ) : (
                           <input
                             className="manevap-modal-cell-input"
                             type="text"
                             value={item.comments}
-                            onChange={e =>
-                              updateAssessmentData(item.competencyId, "comments", e.target.value)
+                            onChange={(e) =>
+                              updateAssessmentData(
+                                item.competencyId,
+                                "comments",
+                                e.target.value
+                              )
                             }
                             placeholder="-"
                           />
@@ -138,7 +167,10 @@ const ManagerPerformanceDashboardModal = ({
               </table>
             </div>
             <div className="manevap-modal-actions">
-              <button onClick={() => setShowModal(false)} className="manevap-btn-close">
+              <button
+                onClick={() => setShowModal(false)}
+                className="manevap-btn-close"
+              >
                 Cancel
               </button>
               {modalMode === "submit" && (

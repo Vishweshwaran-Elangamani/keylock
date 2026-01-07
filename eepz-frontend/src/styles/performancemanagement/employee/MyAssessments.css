@@ -1,15 +1,15 @@
 :root {
-  --primary: #27235C;
-  --secondary: #AC5098;
-  --accent: #3B4B8C;
-  --background: #F8F9FA;
-  --card: #FFFFFF;
-  --text: #2C3E50;
-  --text-light: #6C757D;
-  --border: #E0E0E0;
-  --success: #10B981;
-  --danger: #EF4444;
-  --warning: #F59E0B;
+  --primary: #27235c;
+  --secondary: #ac5098;
+  --accent: #3b4b8c;
+  --background: #f8f9fa;
+  --card: #ffffff;
+  --text: #2c3e50;
+  --text-light: #6c757d;
+  --border: #e0e0e0;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
   --empassper-top-offset: 1px;
 }
 
@@ -23,7 +23,7 @@
   margin-top: 0px !important;
 }
 
-.empassper-container>*:first-child {
+.empassper-container > *:first-child {
   margin-top: 0 !important;
   padding-top: 0 !important;
 }
@@ -128,7 +128,7 @@
   box-shadow: 0 4px 12px rgba(39, 35, 92, 0.25);
   text-align: center;
   min-width: 160px !important;
-  color: #FFFFFF;
+  color: #ffffff;
   flex-shrink: 0;
 }
 
@@ -144,7 +144,7 @@
 .empassper-timer-display {
   font-size: 20px !important;
   font-weight: 700;
-  color: #FFFFFF;
+  color: #ffffff;
   line-height: 1;
 }
 
@@ -202,21 +202,21 @@
 }
 
 .empassper-timer-bar-icon {
-  color: #FFFFFF;
+  color: #ffffff;
   font-size: 20px;
   display: flex;
   align-items: center;
 }
 
 .empassper-timer-bar-label {
-  color: #FFFFFF;
+  color: #ffffff;
   font-size: 14px;
   font-weight: 600;
   flex: 1;
 }
 
 .empassper-timer-bar-time {
-  color: #FFFFFF;
+  color: #ffffff;
   font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
@@ -296,7 +296,6 @@
   letter-spacing: 0.5px;
 }
 
-/* Search and Filter Container */
 .empassper-search-filter-container {
   display: flex;
   gap: 8px;
@@ -310,7 +309,7 @@
   align-items: stretch;
   gap: 0px;
   flex: 1;
-  border: 1px solid #27235C;
+  border: 1px solid #27235c;
   border-radius: 6px;
   overflow: hidden;
 }
@@ -326,7 +325,7 @@
 
 .empassper-search-btn {
   padding: 10px 20px;
-  background-color: #27235C;
+  background-color: #27235c;
   color: white;
   border: none;
   font-size: 14px;
@@ -348,8 +347,8 @@
 .empassper-clear-btn {
   padding: 10px 20px;
   background-color: white;
-  color:  #27235c;
-  border-color: 1px solid  #27235c;
+  color: #27235c;
+  border-color: 1px solid #27235c;
   border-radius: 12px;
   font-size: 14px;
   font-weight: 600;
@@ -424,7 +423,6 @@
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
 }
 
-/* Pill Tabs */
 .empassper-pill-tabs-wrapper {
   display: flex;
   justify-content: flex-start;
@@ -503,7 +501,7 @@
 
 .empassper-tab-button.active {
   background: var(--primary);
-  color: #FFFFFF;
+  color: #ffffff;
   border-color: var(--primary);
   box-shadow: 0 4px 12px rgba(39, 35, 92, 0.3);
 }
@@ -539,7 +537,7 @@
   border-spacing: 0;
   border: 1px solid black;
   border-radius: 8px;
-  overflow: hidden; 
+  overflow: hidden;
 }
 
 .empassper-table thead {
@@ -558,7 +556,7 @@
 .empassper-table thead th {
   padding: 8px 10px !important;
   text-align: left;
-  color: #FFFFFF;
+  color: #ffffff;
   font-weight: 600;
   font-size: 12px !important;
   text-transform: uppercase;
@@ -569,7 +567,7 @@
   height: auto;
   padding-bottom: 15px !important;
   padding-top: 15px !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.1); 
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .empassper-table thead th:first-child {
@@ -578,7 +576,6 @@
 
 .empassper-table thead th:last-child {
   border-top-right-radius: 8px;
-  
 }
 
 .empassper-table tr {
@@ -587,7 +584,7 @@
 }
 
 .empassper-table tbody tr {
-  background: #FFFFFF;
+  background: #ffffff;
   min-height: 36px;
 }
 
@@ -597,7 +594,7 @@
 }
 
 .empassper-table tbody tr:last-child td {
-  border-bottom: none;  
+  border-bottom: none;
 }
 
 .empassper-table tbody tr:last-child td:first-child {
@@ -614,13 +611,12 @@
   color: var(--text);
   text-align: left;
   vertical-align: middle;
-  border-right: 1px solid var(--border); 
+  border-right: 1px solid var(--border);
 }
 
 .empassper-table td:last-child {
   border-right: none;
 }
-
 
 .empassper-table tr {
   border-bottom: 1px solid var(--border);
@@ -628,7 +624,7 @@
 }
 
 .empassper-table tbody tr {
-  background: #FFFFFF;
+  background: #ffffff;
   min-height: 36px;
 }
 
@@ -672,7 +668,7 @@
   display: inline-block;
   padding: 6px 12px;
   background: rgba(59, 75, 140, 0.12);
-  color: #3B4B8C;
+  color: #3b4b8c;
   border-radius: 8px;
   font-size: 12px;
   font-weight: 600;
@@ -684,7 +680,7 @@
   gap: 6px;
   padding: 6px 14px;
   background: rgba(245, 158, 11, 0.12);
-  color: #F59E0B;
+  color: #f59e0b;
   border-radius: 8px;
   font-size: 12px;
   font-weight: 600;
@@ -696,7 +692,7 @@
   gap: 6px;
   padding: 6px 14px;
   background: rgba(16, 185, 129, 0.12);
-  color: #10B981;
+  color: #10b981;
   border-radius: 8px;
   font-size: 12px;
   font-weight: 600;
@@ -762,7 +758,6 @@
   margin: 0;
 }
 
-/* Modal Styles */
 .empassper-modal-overlay {
   position: fixed !important;
   inset: 0 !important;
@@ -793,7 +788,6 @@
   overflow: hidden;
 }
 
-/* Form Header */
 .empass-form-header {
   display: flex;
   align-items: center;
@@ -861,7 +855,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #97247E;
+  background: #97247e;
   padding: 6px 12px;
   border-radius: 8px;
   position: absolute;
@@ -886,11 +880,10 @@
   line-height: 0;
 }
 
-/* Form Body */
 .empass-form-body {
   flex: 1;
   padding: 12px 16px;
-  background: #FFFFFF;
+  background: #ffffff;
   overflow-y: auto;
   min-height: 320px;
   padding-top: 24px;
@@ -902,16 +895,16 @@
 }
 
 .empass-form-body::-webkit-scrollbar-track {
-  background: #F1F5F9;
+  background: #f1f5f9;
 }
 
 .empass-form-body::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: #cbd5e1;
   border-radius: 4px;
 }
 
 .empass-form-body::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: #94a3b8;
 }
 
 .empass-loading-body {
@@ -929,7 +922,6 @@
   text-align: center;
 }
 
-/* Form Table */
 .empass-form-table {
   width: 100%;
   margin-top: 0px;
@@ -952,7 +944,7 @@
   padding: 10px 6px;
   text-align: left;
   background: var(--primary);
-  color: #FFFFFF;
+  color: #ffffff;
   font-weight: 700;
   font-size: 11px;
   text-transform: uppercase;
@@ -970,7 +962,7 @@
 }
 
 .empass-form-table tr {
-  background: #FFFFFF;
+  background: #ffffff;
 }
 
 .empass-form-table td {
@@ -1030,7 +1022,6 @@
   font-size: 12px;
 }
 
-/* Attachments Section */
 .empass-attachments-section {
   margin-top: 24px;
   padding: 0 16px;
@@ -1088,7 +1079,7 @@
   border-radius: 8px;
   margin-bottom: 16px;
   background-color: #f9fafb;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .empass-attachment-header {
@@ -1215,7 +1206,6 @@
   margin-bottom: 8px;
 }
 
-/* View Mode Attachments */
 .empass-view-attachments-list {
   display: flex;
   flex-direction: column;
@@ -1231,7 +1221,7 @@
 }
 
 .empass-view-attachment-item:hover {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .empass-view-attachment-content {
@@ -1297,20 +1287,19 @@
   cursor: not-allowed;
 }
 
-/* Form Footer */
 .empass-form-footer {
   display: flex;
   gap: 10px;
   justify-content: flex-end;
   padding: 14px 24px;
   border-top: 1px solid var(--border);
-  background: #F8F9FA;
+  background: #f8f9fa;
   flex-shrink: 0;
 }
 
 .empass-btn-cancel {
   padding: 10px 24px;
-  background: #6B7280;
+  background: #6b7280;
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -1321,7 +1310,7 @@
 }
 
 .empass-btn-cancel:hover {
-  background: #4B5563;
+  background: #4b5563;
 }
 
 .empass-btn-cancel:disabled {
@@ -1352,7 +1341,6 @@
   cursor: not-allowed;
 }
 
-/* Breadcrumbs */
 .empassper-breadcrumbs {
   font-size: 14px;
   color: var(--text-muted, #6b6b80);
@@ -1416,7 +1404,6 @@
   font-size: 13px !important;
   vertical-align: middle !important;
 }
-
 
 .ma-form-select {
   width: 100%;
@@ -1483,7 +1470,7 @@
   justify-content: flex-end;
   padding: 14px 24px;
   border-top: 1px solid var(--border);
-  background: #F8F9FA;
+  background: #f8f9fa;
   flex-shrink: 0;
 }
 
@@ -1523,7 +1510,6 @@
   background: var(--header-bg, #2b2350);
 }
 
-/* Dense Mode */
 .empassper-container.dense-mode .empassper-table td,
 .empassper-container.dense-mode .empassper-table th {
   padding: 6px 8px !important;
@@ -1534,7 +1520,6 @@
   padding: 8px 10px !important;
 }
 
-/* Focus Styles */
 .empassper-btn:focus-visible,
 .empassper-tab-button:focus-visible,
 .empassper-search-box input:focus-visible,
@@ -1543,7 +1528,6 @@
   outline-offset: 2px;
 }
 
-/* Responsive Design */
 @media (max-width: 1024px) {
   .empassper-container {
     padding: 10px 12px !important;

@@ -1,17 +1,22 @@
 import React from "react";
 import "../../../../styles/performancemanagement/components/StatusConfirmModal.css";
 
-
 const StatusConfirmModal = ({
-  show, onClose, onConfirm, actionType, rewardName
+  show,
+  onClose,
+  onConfirm,
+  actionType,
+  rewardName,
 }) => {
   if (!show) return null;
   const isActivating = actionType === "activate";
 
-
   return (
     <div className="status-confirm-overlay" onClick={onClose}>
-      <div className="status-confirm-modal" onClick={e => e.stopPropagation()}>
+      <div
+        className="status-confirm-modal"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="status-confirm-header">
           {isActivating ? "Activate" : "Deactivate"} Recognition
         </div>
@@ -22,16 +27,10 @@ const StatusConfirmModal = ({
           </p>
         </div>
         <div className="status-confirm-footer">
-          <button
-            className="status-confirm-btn-cancel"
-            onClick={onClose}
-          >
+          <button className="status-confirm-btn-cancel" onClick={onClose}>
             Cancel
           </button>
-          <button
-            className="status-confirm-btn-confirm"
-            onClick={onConfirm}
-          >
+          <button className="status-confirm-btn-confirm" onClick={onConfirm}>
             {isActivating ? "Activate" : "Deactivate"}
           </button>
         </div>
@@ -39,6 +38,5 @@ const StatusConfirmModal = ({
     </div>
   );
 };
-
 
 export default StatusConfirmModal;

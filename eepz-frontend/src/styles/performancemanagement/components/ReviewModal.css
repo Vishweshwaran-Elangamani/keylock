@@ -9,7 +9,7 @@
   font-size: 13px;
   text-transform: uppercase !important;
   letter-spacing: 0.5px;
-  background: #26225A !important;
+  background: #26225a !important;
   color: #fff !important;
   white-space: nowrap;
 }
@@ -25,7 +25,6 @@
   font-weight: 600;
 }
 
-/* Header – aligned with page style */
 .tl-modal {
   max-width: 960px;
   background: #fff;
@@ -68,7 +67,7 @@
 .tl-modal-title {
   font-size: 18px;
   font-weight: 700;
-  color: #26225A;
+  color: #26225a;
   line-height: 1.2;
 }
 
@@ -93,10 +92,9 @@
 }
 
 .tl-modal-close:hover {
-  color: #26225A;
+  color: #26225a;
 }
 
-/* Overlay */
 .tl-modal-overlay {
   position: fixed;
   inset: 0;
@@ -107,7 +105,6 @@
   z-index: 9999;
 }
 
-/* Info strip */
 .tl-modal-info {
   padding: 12px 24px;
   background: #f8f9fa;
@@ -130,10 +127,9 @@
 
 .tl-value {
   font-weight: 500;
-  color: #26225A;
+  color: #26225a;
 }
 
-/* Rejection */
 .tl-rejection {
   padding: 16px 24px;
   background: #fef2f2;
@@ -157,7 +153,6 @@
   margin: 0;
 }
 
-/* Attachments */
 .tl-attachments-section {
   margin: 20px 0 10px 0;
   padding: 14px 16px;
@@ -173,7 +168,7 @@
   margin-bottom: 10px;
   font-weight: 600;
   font-size: 13px;
-  color: #26225A;
+  color: #26225a;
 }
 
 .tl-attachments-list {
@@ -194,7 +189,7 @@
 }
 
 .tl-attachment-item:hover {
-  border-color: #26225A;
+  border-color: #26225a;
   box-shadow: 0 2px 4px rgba(38, 34, 90, 0.1);
 }
 
@@ -207,7 +202,7 @@
 
 .tl-attachment-icon {
   font-size: 20px;
-  color: #26225A;
+  color: #26225a;
 }
 
 .tl-attachment-details {
@@ -236,7 +231,7 @@
 
 .tl-attachment-download {
   padding: 6px 12px;
-  background: #26225A;
+  background: #26225a;
   color: white;
   border: none;
   border-radius: 4px;
@@ -263,7 +258,7 @@
   width: 120px;
   padding: 6px 32px 6px 10px;
   border-radius: 6px;
-  border: 1.8px solid #26225A;
+  border: 1.8px solid #26225a;
   font-size: 14px;
   color: #111827;
   background-color: #ffffff;
@@ -339,9 +334,8 @@
   border-color: #9ca3af;
 }
 
-/* L1 submit gradient, no hover change */
 .tl-btn-l1-submit {
-  background: linear-gradient(135deg, #97247E 0%, #E01950 100%);
+  background: linear-gradient(135deg, #97247e 0%, #e01950 100%);
   color: #ffffff;
   border: 1px solid transparent;
   box-shadow: 0 2px 8px rgba(151, 36, 126, 0.4);
@@ -350,7 +344,7 @@
 .tl-btn-l1-submit:hover:not(:disabled),
 .tl-btn-l1-submit:focus:not(:disabled),
 .tl-btn-l1-submit:active:not(:disabled) {
-  background: linear-gradient(135deg, #97247E 0%, #E01950 100%);
+  background: linear-gradient(135deg, #97247e 0%, #e01950 100%);
   color: #ffffff;
   border-color: transparent;
   box-shadow: 0 4px 12px rgba(151, 36, 126, 0.5);
@@ -406,7 +400,6 @@
   margin-top: 16px;
 }
 
-/* Inputs */
 .tl-input-text {
   width: 100%;
   padding: 8px 12px;
@@ -419,7 +412,7 @@
 
 .tl-input-text:focus {
   outline: none;
-  border-color: #26225A;
+  border-color: #26225a;
   box-shadow: 0 0 0 3px rgba(38, 34, 90, 0.1);
 }
 

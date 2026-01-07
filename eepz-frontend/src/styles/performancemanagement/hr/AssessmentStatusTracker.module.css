@@ -1,140 +1,139 @@
 .assessmentContainer {
-    padding: 30px;
-    background-color: #f4f7f9;
-    min-height: 100vh;
-  }
-  
-  .assessmentHeader {
-    margin-bottom: 20px;
-    border-bottom: 2px solid #e0e0e0;
-    padding-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .assessmentTitle {
-    color: #27235C;
-    font-size: 24px;
-    font-weight: 700;
-  }
-  
-  .assessmentCard {
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    margin-bottom: 30px;
-  }
-  
-  .assessmentCardHeader {
-    padding: 15px 25px;
-    border-bottom: 1px solid #e0e0e0;
-  }
-  
-  .assessmentCardTitle {
-    margin: 0;
-    color: #27235C;
-    font-weight: 600;
-  }
-  
-  .assessmentTableContainer {
-    overflow-x: auto;
-  }
-  
-  .assessmentTable {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .assessmentTableHead {
-    background-color: #F7F9FA;
-  }
-  
-  .assessmentTh {
-    padding: 12px 20px;
-    text-align: left;
-    color: #5C5C5C;
-    font-size: 14px;
-    font-weight: 600;
-    text-transform: uppercase;
-    border-bottom: 2px solid #e0e0e0;
-  }
-  
-  .assessmentTd {
-    padding: 15px 20px;
-    border-bottom: 1px solid #f0f0f0;
-    font-size: 14px;
-    vertical-align: top;
-  }
-  
-  .assessmentTableRow {
-    cursor: default;
-    transition: background-color 0.2s;
-  }
-  
-  .assessmentTableRow:hover {
-    background-color: #f8f9fa;
-  }
-  
-  .assessmentBadge {
-    display: inline-block;
-    padding: 5px 10px;
-    border-radius: 15px;
-    font-size: 12px;
-    font-weight: 600;
-    min-width: 80px;
-    text-align: center;
-  }
-  
-  .assessmentBadgeCompleted {
-    background-color: #24A148;
-    color: #FFFFFF;
-  }
-  
-  .assessmentBadgePending {
-    background-color: #ffc107;
-    color: #FFFFFF;
-  }
-  
-  .assessmentBadgeNotStarted {
-    background-color: #6c757d;
-    color: #FFFFFF;
-  }
-  
-  .assessmentBadgeNA {
-    background-color: #e9ecef;
-    color: #495057;
-  }
-  
-  .assessmentBadgeDefault {
-    background-color: #97247E;
-    color: #FFFFFF;
-  }
-  
-  .assessmentLoadingContainer {
-    text-align: center;
-    padding: 50px;
-  }
-  
-  .assessmentEmptyState {
-    text-align: center;
-    padding: 40px;
-    color: #6c757d;
-  }
-  
-  .assessmentActionButton {
-    padding: 8px 15px;
-    font-size: 14px;
-    border-radius: 6px;
-    cursor: pointer;
-    border: none;
-    background-color: #97247E;
-    color: #FFFFFF;
-    font-weight: 600;
-    transition: background-color 0.2s;
-  }
-  
-  .assessmentActionButton:hover {
-    background-color: #7a1e65;
-  }
-  
+  padding: 30px;
+  background-color: #f4f7f9;
+  min-height: 100vh;
+}
+
+.assessmentHeader {
+  margin-bottom: 20px;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.assessmentTitle {
+  color: #27235c;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.assessmentCard {
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
+}
+
+.assessmentCardHeader {
+  padding: 15px 25px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.assessmentCardTitle {
+  margin: 0;
+  color: #27235c;
+  font-weight: 600;
+}
+
+.assessmentTableContainer {
+  overflow-x: auto;
+}
+
+.assessmentTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.assessmentTableHead {
+  background-color: #f7f9fa;
+}
+
+.assessmentTh {
+  padding: 12px 20px;
+  text-align: left;
+  color: #5c5c5c;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.assessmentTd {
+  padding: 15px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+  vertical-align: top;
+}
+
+.assessmentTableRow {
+  cursor: default;
+  transition: background-color 0.2s;
+}
+
+.assessmentTableRow:hover {
+  background-color: #f8f9fa;
+}
+
+.assessmentBadge {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 80px;
+  text-align: center;
+}
+
+.assessmentBadgeCompleted {
+  background-color: #24a148;
+  color: #ffffff;
+}
+
+.assessmentBadgePending {
+  background-color: #ffc107;
+  color: #ffffff;
+}
+
+.assessmentBadgeNotStarted {
+  background-color: #6c757d;
+  color: #ffffff;
+}
+
+.assessmentBadgeNA {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+.assessmentBadgeDefault {
+  background-color: #97247e;
+  color: #ffffff;
+}
+
+.assessmentLoadingContainer {
+  text-align: center;
+  padding: 50px;
+}
+
+.assessmentEmptyState {
+  text-align: center;
+  padding: 40px;
+  color: #6c757d;
+}
+
+.assessmentActionButton {
+  padding: 8px 15px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  background-color: #97247e;
+  color: #ffffff;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.assessmentActionButton:hover {
+  background-color: #7a1e65;
+}

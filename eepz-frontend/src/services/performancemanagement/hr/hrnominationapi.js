@@ -23,27 +23,20 @@ export const getRewardTypes = (activeOnly = false) =>
 export const createRewardType = (payload) =>
   api.post("/HRNomination/reward-types", payload);
 
-
 export const updateRewardType = (rewardTypeId, payload) =>
   api.put(`/HRNomination/reward-types/${rewardTypeId}`, payload);
-
 
 export const deleteRewardType = (rewardTypeId) =>
   api.delete(`/HRNomination/reward-types/${rewardTypeId}`);
 
-
-
 export const getParametersByRewardType = (rewardTypeId) =>
   api.get(`/HRNomination/reward-types/${rewardTypeId}/parameters`);
-
 
 export const createParameter = (payload) =>
   api.post("/HRNomination/parameters", payload);
 
-
 export const updateParameter = (parameterId, payload) =>
   api.put(`/HRNomination/parameters/${parameterId}`, payload);
-
 
 export const deleteParameter = (parameterId) =>
   api.delete(`/HRNomination/parameters/${parameterId}`);

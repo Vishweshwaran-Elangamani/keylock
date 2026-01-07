@@ -1,6 +1,5 @@
-
 .deadline-modal {
-  --dm-navy: #27235C;
+  --dm-navy: #27235c;
   --dm-body: #64748b;
   --dm-label: #334155;
   --dm-border: #d7deea;
@@ -11,8 +10,8 @@
   --dm-shadow: 0 22px 40px rgba(0, 0, 0, 0.18);
 
   --dm-secondary: #6c757d;
-  --dm-primary-start: #97247E;
-  --dm-primary-end: #E01950;
+  --dm-primary-start: #97247e;
+  --dm-primary-end: #e01950;
   --dm-primary-shadow: 0 6px 18px rgba(151, 36, 126, 0.25);
 }
 
@@ -24,7 +23,6 @@
   -webkit-backdrop-filter: blur(10px);
   z-index: 1040;
 }
-
 
 .deadline-modal.dm-container {
   position: fixed;
@@ -61,7 +59,6 @@
   color: var(--dm-navy);
 }
 
-
 .deadline-modal .dm-title {
   color: var(--dm-navy);
   font-weight: 800;
@@ -78,7 +75,6 @@
   text-align: center;
   margin: 0 0 22px;
 }
-
 
 .deadline-modal .dm-input-group {
   width: 100%;
@@ -99,7 +95,6 @@
   color: var(--dm-navy);
   font-size: 18px;
 }
-
 
 .deadline-modal .dm-input {
   background-color: #fff;
@@ -131,7 +126,6 @@
   -moz-appearance: textfield;
 }
 
-
 .deadline-modal .dm-actions {
   width: 100%;
   display: flex;
@@ -139,7 +133,6 @@
   justify-content: center;
   align-items: center;
 }
-
 
 .deadline-modal .dm-actions .dm-btn {
   display: inline-flex;
@@ -160,7 +153,6 @@
   border: none;
 }
 
-
 .deadline-modal .dm-actions .dm-btn-secondary {
   background-color: var(--dm-secondary);
   color: #ffffff;
@@ -172,9 +164,12 @@
   box-shadow: none;
 }
 
-
 .deadline-modal .dm-actions .dm-btn-primary {
-  background: linear-gradient(90deg, var(--dm-primary-start) 0%, var(--dm-primary-end) 100%);
+  background: linear-gradient(
+    90deg,
+    var(--dm-primary-start) 0%,
+    var(--dm-primary-end) 100%
+  );
   color: #ffffff;
   box-shadow: var(--dm-primary-shadow);
 }
@@ -182,11 +177,9 @@
   transform: translateY(-2px);
 }
 
-
 .deadline-modal .dm-actions .dm-btn i {
   color: inherit;
 }
-
 
 .deadline-modal .dm-actions .dm-btn:focus-visible {
   outline: none;

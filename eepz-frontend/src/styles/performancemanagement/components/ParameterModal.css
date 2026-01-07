@@ -1,5 +1,3 @@
-/* ParameterModal.css - Unique page-specific styles */
-
 .parameter-modal-overlay {
   position: fixed;
   inset: 0;
@@ -27,13 +25,13 @@
 }
 
 .parameter-modal-header {
-  background: #27235C;
+  background: #27235c;
   color: #fff;
   border-top-left-radius: 24px;
   border-top-right-radius: 24px;
   padding: 22px 28px 17px 28px;
   text-align: left;
-  position: relative; /* For positioning close button */
+  position: relative;
 }
 
 .parameter-modal-header-title {
@@ -42,7 +40,6 @@
   letter-spacing: 0.01em;
 }
 
-/* Close Button (X) */
 .parameter-modal-close-btn {
   position: absolute;
   top: 18px;
@@ -81,7 +78,6 @@
   overflow-y: auto;
 }
 
-/* Style scrollbar */
 .parameter-modal-body::-webkit-scrollbar {
   width: 8px;
 }
@@ -105,12 +101,12 @@
   font-weight: 700;
   font-size: 15.5px;
   margin: 14px 0 5px 0;
-  color: #27235C;
+  color: #27235c;
   text-align: left;
 }
 
 .parameter-modal-required {
-  color: #E01950;
+  color: #e01950;
   font-weight: 800;
   font-size: 15px;
   margin-left: 2px;
@@ -124,13 +120,13 @@
   border-radius: 7px;
   border: 1px solid #d1d5db;
   background: #fff;
-  color: #27235C;
+  color: #27235c;
   outline: none;
   box-sizing: border-box;
 }
 
 .parameter-modal-input:focus {
-  border-color: #27235C;
+  border-color: #27235c;
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
 }
 
@@ -141,14 +137,14 @@
   border-radius: 7px;
   border: 1px solid #d1d5db;
   background: #fff;
-  color: #27235C;
+  color: #27235c;
   margin-bottom: 0;
   outline: none;
   box-sizing: border-box;
 }
 
 .parameter-modal-select:focus {
-  border-color: #27235C;
+  border-color: #27235c;
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
 }
 
@@ -158,12 +154,12 @@
   gap: 7px;
   margin: 14px 0 0 0;
   font-weight: 600;
-  color: #27235C;
+  color: #27235c;
   font-size: 15px;
 }
 
 .parameter-modal-checkbox {
-  accent-color: #97247E;
+  accent-color: #97247e;
   width: 18px;
   height: 18px;
   margin-right: 6px;
@@ -180,7 +176,7 @@
 }
 
 .parameter-modal-cancel-btn {
-  background: #6C757D;
+  background: #6c757d;
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -196,7 +192,7 @@
 }
 
 .parameter-modal-submit-btn {
-  background: linear-gradient(90deg, #97247E 0%, #E01950 100%);
+  background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -204,7 +200,7 @@
   cursor: pointer;
   font-weight: 700;
   font-size: 15px;
-  box-shadow: 0 2px 8px rgba(151, 36, 126, 0.10);
+  box-shadow: 0 2px 8px rgba(151, 36, 126, 0.1);
   letter-spacing: 0.015em;
   transition: filter 0.13s;
 }

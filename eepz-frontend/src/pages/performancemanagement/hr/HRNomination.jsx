@@ -17,17 +17,18 @@ function HRNominations() {
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState("table");
   const [showModal, setShowModal] = useState(false);
-  const [selectedNominationDetails, setSelectedNominationDetails] = useState(null);
+  const [selectedNominationDetails, setSelectedNominationDetails] =
+    useState(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [showActionModal, setShowActionModal] = useState(false);
   const [actionType, setActionType] = useState("");
   const [actionNominationId, setActionNominationId] = useState(null);
   const [actionRemarks, setActionRemarks] = useState("");
-  
+
   const [showEmployeeList, setShowEmployeeList] = useState(false);
   const [selectedRewardEmployees, setSelectedRewardEmployees] = useState([]);
   const [selectedRewardName, setSelectedRewardName] = useState("");
-  
+
   const navigate = useNavigate();
 
   const [statistics, setStatistics] = useState({
@@ -145,10 +146,10 @@ function HRNominations() {
 
   const groupByRewardType = (nominations) => {
     const grouped = {};
-    
+
     nominations.forEach((opp) => {
       const rewardName = opp.rewardType?.rewardName || "Unknown Reward";
-      
+
       if (!grouped[rewardName]) {
         grouped[rewardName] = {
           rewardName: rewardName,
@@ -157,7 +158,7 @@ function HRNominations() {
           totalCount: 0,
         };
       }
-      
+
       opp.nominations.forEach((nom) => {
         if (nom.status === activeTab) {
           grouped[rewardName].employees.push(nom);
@@ -165,8 +166,8 @@ function HRNominations() {
         }
       });
     });
-    
-    return Object.values(grouped).filter(group => group.totalCount > 0);
+
+    return Object.values(grouped).filter((group) => group.totalCount > 0);
   };
 
   const filterNominationsByStatus = (status) => {
@@ -180,7 +181,7 @@ function HRNominations() {
 
   const filteredNominations = filterNominationsByStatus(activeTab);
   const groupedRewards = groupByRewardType(filteredNominations);
-  
+
   const totalPages = Math.ceil(groupedRewards.length / itemsPerPage);
   const paginatedRewards = groupedRewards.slice(
     (currentPage - 1) * itemsPerPage,
@@ -206,7 +207,7 @@ function HRNominations() {
       toast.warning("Please enter remarks");
       return;
     }
-  
+
     try {
       if (actionType === "approve") {
         const payload = {
@@ -215,18 +216,18 @@ function HRNominations() {
           approvalRemarks: actionRemarks,
           rejectionRemarks: "Not selected in final round",
         };
-  
+
         const { data } = await api.approveNominations(payload);
-  
+
         if (data.success || data.Success) {
           toast.success(`✓ Nomination approved successfully!`);
           setShowActionModal(false);
           setActionRemarks("");
-          
-          setSelectedRewardEmployees(prev => 
-            prev.filter(emp => emp.nominationId !== actionNominationId)
+
+          setSelectedRewardEmployees((prev) =>
+            prev.filter((emp) => emp.nominationId !== actionNominationId)
           );
-          
+
           fetchNominations();
           fetchStatistics();
         }
@@ -236,16 +237,16 @@ function HRNominations() {
           hrUserId: 1,
           rejectionRemarks: actionRemarks,
         });
-  
+
         if (data.success || data.Success) {
           toast.success(`✓ Nomination rejected successfully!`);
           setShowActionModal(false);
           setActionRemarks("");
-          
-          setSelectedRewardEmployees(prev => 
-            prev.filter(emp => emp.nominationId !== actionNominationId)
+
+          setSelectedRewardEmployees((prev) =>
+            prev.filter((emp) => emp.nominationId !== actionNominationId)
           );
-          
+
           fetchNominations();
           fetchStatistics();
         }
@@ -255,7 +256,7 @@ function HRNominations() {
       toast.error("Error: " + (error.response?.data?.message || error.message));
     }
   };
-  
+
   const viewDetails = async (nominationId) => {
     try {
       setDetailsLoading(true);
@@ -291,16 +292,16 @@ function HRNominations() {
 
   const statIcons = {
     "Total Nominations": "bi-bar-chart-fill",
-    "Pending": "bi-hourglass-split",
-    "Approved": "bi-check2-circle",
-    "Rejected": "bi-x-circle",
+    Pending: "bi-hourglass-split",
+    Approved: "bi-check2-circle",
+    Rejected: "bi-x-circle",
   };
 
   const statColors = {
     "Total Nominations": styles.hrNominationStatIconPrimary,
-    "Pending": styles.hrNominationStatIconWarning,
-    "Approved": styles.hrNominationStatIconSuccess,
-    "Rejected": styles.hrNominationStatIconDanger,
+    Pending: styles.hrNominationStatIconWarning,
+    Approved: styles.hrNominationStatIconSuccess,
+    Rejected: styles.hrNominationStatIconDanger,
   };
 
   const StatCard = ({ title, value }) => (
@@ -319,7 +320,10 @@ function HRNominations() {
     return (
       <div className={styles.hrNominationLoadingWrapper}>
         <div className={styles.hrNominationLoadingContent}>
-          <div className={`spinner-border mb-3 ${styles.hrNominationSpinner}`} role="status"></div>
+          <div
+            className={`spinner-border mb-3 ${styles.hrNominationSpinner}`}
+            role="status"
+          ></div>
           <p className="text-muted">Loading nominations...</p>
         </div>
       </div>
@@ -330,19 +334,29 @@ function HRNominations() {
     return (
       <div className={styles.hrNominationContainer}>
         <ToastContainer position="top-right" autoClose={3000} />
-        
+
         <div className="container-fluid">
-          <div onClick={(e) => {
-            const target = e.target;
-            if (target.textContent === "Nominations" || target.closest('[data-breadcrumb="nominations"]')) {
-              handleNominationsClick(e);
-            }
-          }}>
+          <div
+            onClick={(e) => {
+              const target = e.target;
+              if (
+                target.textContent === "Nominations" ||
+                target.closest('[data-breadcrumb="nominations"]')
+              ) {
+                handleNominationsClick(e);
+              }
+            }}
+          >
             <Breadcrumb
               items={[
                 { label: "Performance", path: "/hr/dashboard/performance" },
-                { label: "Nominations", path: "/hr/dashboard/performance/nominations", isClickable: true, onClick: handleNominationsClick },
-                { label: selectedRewardName, path: null }
+                {
+                  label: "Nominations",
+                  path: "/hr/dashboard/performance/nominations",
+                  isClickable: true,
+                  onClick: handleNominationsClick,
+                },
+                { label: selectedRewardName, path: null },
               ]}
             />
           </div>
@@ -378,7 +392,7 @@ function HRNominations() {
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className={styles.hrNominationEmployeeInfoGrid}>
                     <div className={styles.hrNominationEmployeeInfoBox}>
                       <span className={styles.hrNominationEmployeeInfoLabel}>
@@ -400,7 +414,9 @@ function HRNominations() {
 
                   {employee.justification && (
                     <div className={styles.hrNominationEmployeeJustification}>
-                      <p className={styles.hrNominationEmployeeJustificationText}>
+                      <p
+                        className={styles.hrNominationEmployeeJustificationText}
+                      >
                         {employee.justification}
                       </p>
                     </div>
@@ -417,7 +433,9 @@ function HRNominations() {
                     {activeTab === "Pending" && (
                       <>
                         <button
-                          onClick={() => openApproveModal(employee.nominationId)}
+                          onClick={() =>
+                            openApproveModal(employee.nominationId)
+                          }
                           title="Approve"
                           className={`${styles.hrNominationEmployeeActionBtn} ${styles.hrNominationEmployeeActionBtnApprove}`}
                         >
@@ -468,27 +486,39 @@ function HRNominations() {
         <Breadcrumb
           items={[
             { label: "Performance", path: "/hr/dashboard/performance" },
-            { label: "Nominations", path: null }
+            { label: "Nominations", path: null },
           ]}
         />
 
         {statsLoading ? (
           <div className="text-center mb-3">
-            <div className="spinner-border spinner-border-sm" role="status"></div>
+            <div
+              className="spinner-border spinner-border-sm"
+              role="status"
+            ></div>
           </div>
         ) : (
           <div className="row row-cols-2 row-cols-md-4 g-4 mb-3">
             <div className="col">
-              <StatCard title="Total Nominations" value={statistics.totalNominations} />
+              <StatCard
+                title="Total Nominations"
+                value={statistics.totalNominations}
+              />
             </div>
             <div className="col">
               <StatCard title="Pending" value={statistics.pendingNominations} />
             </div>
             <div className="col">
-              <StatCard title="Approved" value={statistics.approvedNominations} />
+              <StatCard
+                title="Approved"
+                value={statistics.approvedNominations}
+              />
             </div>
             <div className="col">
-              <StatCard title="Rejected" value={statistics.rejectedNominations} />
+              <StatCard
+                title="Rejected"
+                value={statistics.rejectedNominations}
+              />
             </div>
           </div>
         )}
@@ -496,19 +526,31 @@ function HRNominations() {
         <div className={styles.hrNominationHeader}>
           <div className={styles.hrNominationStatusTabs}>
             <button
-              className={`${styles.hrNominationStatusTab} ${activeTab === "Pending" ? styles.hrNominationStatusTabActive : ""}`}
+              className={`${styles.hrNominationStatusTab} ${
+                activeTab === "Pending"
+                  ? styles.hrNominationStatusTabActive
+                  : ""
+              }`}
               onClick={() => setActiveTab("Pending")}
             >
               Pending
             </button>
             <button
-              className={`${styles.hrNominationStatusTab} ${activeTab === "Approved" ? styles.hrNominationStatusTabActive : ""}`}
+              className={`${styles.hrNominationStatusTab} ${
+                activeTab === "Approved"
+                  ? styles.hrNominationStatusTabActive
+                  : ""
+              }`}
               onClick={() => setActiveTab("Approved")}
             >
               Approved
             </button>
             <button
-              className={`${styles.hrNominationStatusTab} ${activeTab === "Rejected" ? styles.hrNominationStatusTabActive : ""}`}
+              className={`${styles.hrNominationStatusTab} ${
+                activeTab === "Rejected"
+                  ? styles.hrNominationStatusTabActive
+                  : ""
+              }`}
               onClick={() => setActiveTab("Rejected")}
             >
               Rejected
@@ -520,7 +562,9 @@ function HRNominations() {
               onClick={() => setViewMode("grid")}
               title="Grid View"
               aria-label="Grid View"
-              className={`${styles.hrNominationViewButton} ${viewMode === "grid" ? styles.hrNominationViewButtonActive : ""}`}
+              className={`${styles.hrNominationViewButton} ${
+                viewMode === "grid" ? styles.hrNominationViewButtonActive : ""
+              }`}
             >
               <i className="bi bi-grid-3x3-gap-fill" style={{ fontSize: 18 }} />
             </button>
@@ -529,7 +573,9 @@ function HRNominations() {
               onClick={() => setViewMode("table")}
               title="Table View"
               aria-label="Table View"
-              className={`${styles.hrNominationViewButton} ${viewMode === "table" ? styles.hrNominationViewButtonActive : ""}`}
+              className={`${styles.hrNominationViewButton} ${
+                viewMode === "table" ? styles.hrNominationViewButtonActive : ""
+              }`}
             >
               <i className="bi bi-table" style={{ fontSize: 18 }} />
             </button>
@@ -551,13 +597,19 @@ function HRNominations() {
               <table className={styles.hrNominationTable}>
                 <thead className={styles.hrNominationTableHead}>
                   <tr>
-                    <th className={`${styles.hrNominationTableTh} ${styles.hrNominationTableThLeft}`}>
+                    <th
+                      className={`${styles.hrNominationTableTh} ${styles.hrNominationTableThLeft}`}
+                    >
                       Reward Type
                     </th>
-                    <th className={`${styles.hrNominationTableTh} ${styles.hrNominationTableThCenter}`}>
+                    <th
+                      className={`${styles.hrNominationTableTh} ${styles.hrNominationTableThCenter}`}
+                    >
                       Nominated Employees
                     </th>
-                    <th className={`${styles.hrNominationTableTh} ${styles.hrNominationTableThCenter}`}>
+                    <th
+                      className={`${styles.hrNominationTableTh} ${styles.hrNominationTableThCenter}`}
+                    >
                       Actions
                     </th>
                   </tr>
@@ -580,14 +632,22 @@ function HRNominations() {
                           </div>
                         </div>
                       </td>
-                      <td className={`${styles.hrNominationTableTd} ${styles.hrNominationTableTdCenter}`}>
+                      <td
+                        className={`${styles.hrNominationTableTd} ${styles.hrNominationTableTdCenter}`}
+                      >
                         <div className={styles.hrNominationEmployeeCountBadge}>
                           <i className="bi bi-people-fill" />
                           {reward.totalCount}
                         </div>
                       </td>
                       <td className={styles.hrNominationTableTd}>
-                        <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "8px",
+                            justifyContent: "center",
+                          }}
+                        >
                           <button
                             onClick={() => viewEmployeeList(reward)}
                             title="View Employees"
@@ -604,9 +664,16 @@ function HRNominations() {
             </div>
 
             {totalPages > 1 && (
-              <nav aria-label="Page navigation" className={styles.hrNominationPagination}>
+              <nav
+                aria-label="Page navigation"
+                className={styles.hrNominationPagination}
+              >
                 <ul className="pagination justify-content-center">
-                  <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                  <li
+                    className={`page-item ${
+                      currentPage === 1 ? "disabled" : ""
+                    }`}
+                  >
                     <button
                       className={`page-link ${styles.hrNominationPaginationButton}`}
                       onClick={() => setCurrentPage(1)}
@@ -616,11 +683,23 @@ function HRNominations() {
                     </button>
                   </li>
                   {[...Array(Math.min(5, totalPages))].map((_, i) => {
-                    const pageNum = currentPage - 2 + i > 0 ? currentPage - 2 + i : 1;
+                    const pageNum =
+                      currentPage - 2 + i > 0 ? currentPage - 2 + i : 1;
                     return pageNum <= totalPages ? (
-                      <li key={pageNum} className={`page-item ${currentPage === pageNum ? "active" : ""}`}>
+                      <li
+                        key={pageNum}
+                        className={`page-item ${
+                          currentPage === pageNum ? "active" : ""
+                        }`}
+                      >
                         <button
-                          className={`page-link ${styles.hrNominationPaginationButton} ${currentPage === pageNum ? styles.hrNominationPaginationButtonActive : ""}`}
+                          className={`page-link ${
+                            styles.hrNominationPaginationButton
+                          } ${
+                            currentPage === pageNum
+                              ? styles.hrNominationPaginationButtonActive
+                              : ""
+                          }`}
                           onClick={() => setCurrentPage(pageNum)}
                         >
                           {pageNum}
@@ -628,7 +707,11 @@ function HRNominations() {
                       </li>
                     ) : null;
                   })}
-                  <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                  <li
+                    className={`page-item ${
+                      currentPage === totalPages ? "disabled" : ""
+                    }`}
+                  >
                     <button
                       className={`page-link ${styles.hrNominationPaginationButton}`}
                       onClick={() => setCurrentPage(totalPages)}
@@ -650,11 +733,11 @@ function HRNominations() {
                     <div className={styles.hrNominationGridCardIcon}>
                       <i className="bi bi-award-fill" />
                     </div>
-                    
+
                     <h5 className={styles.hrNominationGridCardTitle}>
                       {reward.rewardName}
                     </h5>
-                    
+
                     {reward.rewardCategory && (
                       <p className={styles.hrNominationGridCardCategory}>
                         {reward.rewardCategory}
@@ -662,7 +745,9 @@ function HRNominations() {
                     )}
 
                     <div className={styles.hrNominationGridCardCount}>
-                      <i className={`bi bi-people-fill ${styles.hrNominationGridCardCountIcon}`} />
+                      <i
+                        className={`bi bi-people-fill ${styles.hrNominationGridCardCountIcon}`}
+                      />
                       <div>
                         <div className={styles.hrNominationGridCardCountValue}>
                           {reward.totalCount}
@@ -685,9 +770,16 @@ function HRNominations() {
             </div>
 
             {totalPages > 1 && (
-              <nav aria-label="Page navigation" className={styles.hrNominationPagination}>
+              <nav
+                aria-label="Page navigation"
+                className={styles.hrNominationPagination}
+              >
                 <ul className="pagination justify-content-center">
-                  <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                  <li
+                    className={`page-item ${
+                      currentPage === 1 ? "disabled" : ""
+                    }`}
+                  >
                     <button
                       className={`page-link ${styles.hrNominationPaginationButton}`}
                       onClick={() => setCurrentPage(1)}
@@ -697,11 +789,23 @@ function HRNominations() {
                     </button>
                   </li>
                   {[...Array(Math.min(5, totalPages))].map((_, i) => {
-                    const pageNum = currentPage - 2 + i > 0 ? currentPage - 2 + i : 1;
+                    const pageNum =
+                      currentPage - 2 + i > 0 ? currentPage - 2 + i : 1;
                     return pageNum <= totalPages ? (
-                      <li key={pageNum} className={`page-item ${currentPage === pageNum ? "active" : ""}`}>
+                      <li
+                        key={pageNum}
+                        className={`page-item ${
+                          currentPage === pageNum ? "active" : ""
+                        }`}
+                      >
                         <button
-                          className={`page-link ${styles.hrNominationPaginationButton} ${currentPage === pageNum ? styles.hrNominationPaginationButtonActive : ""}`}
+                          className={`page-link ${
+                            styles.hrNominationPaginationButton
+                          } ${
+                            currentPage === pageNum
+                              ? styles.hrNominationPaginationButtonActive
+                              : ""
+                          }`}
                           onClick={() => setCurrentPage(pageNum)}
                         >
                           {pageNum}
@@ -709,7 +813,11 @@ function HRNominations() {
                       </li>
                     ) : null;
                   })}
-                  <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                  <li
+                    className={`page-item ${
+                      currentPage === totalPages ? "disabled" : ""
+                    }`}
+                  >
                     <button
                       className={`page-link ${styles.hrNominationPaginationButton}`}
                       onClick={() => setCurrentPage(totalPages)}

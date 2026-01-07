@@ -1,15 +1,15 @@
 :root {
-  --primary: #27235C;
-  --secondary: #AC5098;
-  --accent: #3B4B8C;
-  --bg: #F8F9FA;
-  --card: #FFFFFF;
-  --text: #2C3E50;
-  --text-light: #6C757D;
-  --border: #E0E0E0;
-  --success: #10B981;
-  --danger: #EF4444;
-  --warning: #F59E0B;
+  --primary: #27235c;
+  --secondary: #ac5098;
+  --accent: #3b4b8c;
+  --bg: #f8f9fa;
+  --card: #ffffff;
+  --text: #2c3e50;
+  --text-light: #6c757d;
+  --border: #e0e0e0;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
   --action-grad: linear-gradient(90deg, #97247e 0%, #e01950 100%);
 }
 
@@ -355,7 +355,8 @@ body {
   justify-content: center;
   padding: 0;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .tl-icon-btn i {

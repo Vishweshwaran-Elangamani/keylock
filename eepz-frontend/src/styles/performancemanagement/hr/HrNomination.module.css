@@ -1,18 +1,16 @@
-
 .hrNominationContainer {
-  background: #F8FAFC;
+  background: #f8fafc;
   min-height: 100vh;
   padding-top: 16px;
   padding-bottom: 32px;
 }
-
 
 .hrNominationLoadingWrapper {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: #F8FAFC;
+  background: #f8fafc;
 }
 
 .hrNominationLoadingContent {
@@ -23,14 +21,12 @@
   color: #27235c;
 }
 
-/* Statistics Cards */
-/* Statistics Cards - FIXED BORDERS */
 .hrNominationStatCard {
   background: #ffffff;
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border: 2px solid #27235c;  /* Changed from 1px #e9ecef to 2px #27235c */
+  border: 2px solid #27235c;
   transition: box-shadow 0.2s, transform 0.2s;
   display: flex;
   align-items: center;
@@ -41,8 +37,6 @@
   box-shadow: 0 4px 16px rgba(39, 35, 92, 0.15);
   transform: translateY(-2px);
 }
-
-
 
 .hrNominationStatIcon {
   width: 48px;
@@ -88,7 +82,6 @@
   font-weight: 500;
 }
 
-/* Status Tabs */
 .hrNominationStatusTabs {
   background: #27235c;
   border-radius: 999px;
@@ -119,7 +112,6 @@
   box-shadow: 0 2px 6px rgba(39, 35, 92, 0.08);
 }
 
-/* View Mode Toggle */
 .hrNominationViewToggle {
   display: flex;
   border: 2px solid #27235c;
@@ -150,7 +142,6 @@
   color: #fff !important;
 }
 
-/* Header Section */
 .hrNominationHeader {
   display: flex;
   justify-content: space-between;
@@ -160,7 +151,6 @@
   gap: 1rem;
 }
 
-/* Employee List View Header */
 .hrNominationEmployeeHeader {
   background: #fff;
   border: 2px solid #27235c;
@@ -194,7 +184,6 @@
   font-weight: 700;
 }
 
-/* Employee Card */
 .hrNominationEmployeeCard {
   background: #fff;
   border: 2px solid #e5e7eb;
@@ -333,7 +322,6 @@
   border-color: #ef4444;
 }
 
-/* Empty State */
 .hrNominationEmptyState {
   background: #fff;
   border: 2px solid #27235c;
@@ -355,7 +343,6 @@
   color: #718096;
 }
 
-/* Table View */
 .hrNominationTableWrapper {
   background: #fff;
   border: 2px solid #27235c;
@@ -465,7 +452,6 @@
   box-shadow: 0 4px 12px rgba(39, 35, 92, 0.3);
 }
 
-/* Grid View */
 .hrNominationGridCard {
   background: #fff;
   border: 2px solid #27235c;
@@ -558,7 +544,6 @@
   background: #1e1b45;
 }
 
-/* Pagination */
 .hrNominationPagination .pagination {
   margin-bottom: 0;
 }

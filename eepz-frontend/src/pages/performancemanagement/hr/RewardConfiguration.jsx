@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { getRewardTypes, getParametersByRewardType, createRewardType, updateRewardType, createParameter, deleteParameter } from "../../../services/performancemanagement/api/nominationapi";
+import {
+  getRewardTypes,
+  getParametersByRewardType,
+  createRewardType,
+  updateRewardType,
+  createParameter,
+  deleteParameter,
+} from "../../../services/performancemanagement/api/nominationapi";
 import RewardTypeModal from "../../../components/performance_management/modals/Recognition/RewardTypeModal";
 import ParameterModal from "../../../components/performance_management/modals/Recognition/ParameterModal";
 import DeleteConfirmModal from "../../../components/performance_management/modals/Recognition/DeleteConfirmModal";
@@ -95,9 +102,9 @@ function RewardConfiguration() {
       const response = await getParametersByRewardType(rewardTypeId);
       if (response.data.success) {
         setParameters(response.data.data);
-        setParameterCounts(prev => ({
+        setParameterCounts((prev) => ({
           ...prev,
-          [rewardTypeId]: response.data.data.length
+          [rewardTypeId]: response.data.data.length,
         }));
       }
     } catch (error) {
@@ -154,7 +161,10 @@ function RewardConfiguration() {
     e.preventDefault();
     try {
       if (isEditMode) {
-        const response = await updateRewardType(editingRewardTypeId, rewardTypeForm);
+        const response = await updateRewardType(
+          editingRewardTypeId,
+          rewardTypeForm
+        );
         if (response.data.success) {
           toast.success("Reward type updated successfully!");
           closeRewardTypeModal();
@@ -182,11 +192,16 @@ function RewardConfiguration() {
         rewardName: rewardType.rewardName,
         description: rewardType.description || "",
         isActive: !rewardType.isActive,
-        isVisibleForManagerNomination: rewardType.isVisibleForManagerNomination || false
+        isVisibleForManagerNomination:
+          rewardType.isVisibleForManagerNomination || false,
       });
 
       if (response.data.success) {
-        toast.success(`Reward type ${rewardType.isActive ? "deactivated" : "activated"} successfully!`);
+        toast.success(
+          `Reward type ${
+            rewardType.isActive ? "deactivated" : "activated"
+          } successfully!`
+        );
         fetchRewardTypes();
         if (selectedRewardType?.rewardTypeId === rewardType.rewardTypeId) {
           setSelectedRewardType(null);
@@ -207,7 +222,9 @@ function RewardConfiguration() {
       return;
     }
 
-    const allVisible = activeRewards.every((rt) => rt.isVisibleForManagerNomination === true);
+    const allVisible = activeRewards.every(
+      (rt) => rt.isVisibleForManagerNomination === true
+    );
     const newVisibility = !allVisible;
 
     try {
@@ -223,7 +240,9 @@ function RewardConfiguration() {
       await Promise.all(updatePromises);
 
       toast.success(
-        `All active rewards ${newVisibility ? "now visible to" : "hidden from"} managers!`
+        `All active rewards ${
+          newVisibility ? "now visible to" : "hidden from"
+        } managers!`
       );
       fetchRewardTypes();
     } catch (error) {
@@ -242,8 +261,12 @@ function RewardConfiguration() {
       const response = await createParameter({
         ...parameterForm,
         rewardTypeId: selectedRewardType.rewardTypeId,
-        minimumValue: parameterForm.minimumValue ? parseInt(parameterForm.minimumValue) : null,
-        maximumValue: parameterForm.maximumValue ? parseInt(parameterForm.maximumValue) : null,
+        minimumValue: parameterForm.minimumValue
+          ? parseInt(parameterForm.minimumValue)
+          : null,
+        maximumValue: parameterForm.maximumValue
+          ? parseInt(parameterForm.maximumValue)
+          : null,
       });
       if (response.data.success) {
         toast.success("Parameter created successfully!");
@@ -274,13 +297,16 @@ function RewardConfiguration() {
 
         toast.success("Parameter deleted successfully");
 
-        setParameters(prevParams =>
-          prevParams.filter(param => param.parameterId !== toDeleteId)
+        setParameters((prevParams) =>
+          prevParams.filter((param) => param.parameterId !== toDeleteId)
         );
 
-        setParameterCounts(prev => ({
+        setParameterCounts((prev) => ({
           ...prev,
-          [selectedRewardType.rewardTypeId]: Math.max((prev[selectedRewardType.rewardTypeId] || 1) - 1, 0)
+          [selectedRewardType.rewardTypeId]: Math.max(
+            (prev[selectedRewardType.rewardTypeId] || 1) - 1,
+            0
+          ),
         }));
       }
     } catch (error) {
@@ -289,16 +315,21 @@ function RewardConfiguration() {
       if (error?.response?.status === 200 || error?.response?.status === 204) {
         toast.success("Parameter deleted successfully");
 
-        setParameters(prevParams =>
-          prevParams.filter(param => param.parameterId !== toDeleteId)
+        setParameters((prevParams) =>
+          prevParams.filter((param) => param.parameterId !== toDeleteId)
         );
 
-        setParameterCounts(prev => ({
+        setParameterCounts((prev) => ({
           ...prev,
-          [selectedRewardType.rewardTypeId]: Math.max((prev[selectedRewardType.rewardTypeId] || 1) - 1, 0)
+          [selectedRewardType.rewardTypeId]: Math.max(
+            (prev[selectedRewardType.rewardTypeId] || 1) - 1,
+            0
+          ),
         }));
       } else {
-        toast.error(error?.response?.data?.message || "Error deleting parameter");
+        toast.error(
+          error?.response?.data?.message || "Error deleting parameter"
+        );
       }
     } finally {
       setShowDeleteModal(false);
@@ -306,7 +337,6 @@ function RewardConfiguration() {
       setDeleteType("");
     }
   };
-
 
   const confirmStatusChange = (rt) => {
     setRewardTypeForStatus(rt);
@@ -321,9 +351,12 @@ function RewardConfiguration() {
 
   const activeRewardTypes = rewardTypes.filter((rt) => rt.isActive === true);
   const inactiveRewardTypes = rewardTypes.filter((rt) => rt.isActive === false);
-  const displayedRewards = activeTab === "Active" ? activeRewardTypes : inactiveRewardTypes;
+  const displayedRewards =
+    activeTab === "Active" ? activeRewardTypes : inactiveRewardTypes;
 
-  const allActiveVisible = activeRewardTypes.length > 0 && activeRewardTypes.every((rt) => rt.isVisibleForManagerNomination === true);
+  const allActiveVisible =
+    activeRewardTypes.length > 0 &&
+    activeRewardTypes.every((rt) => rt.isVisibleForManagerNomination === true);
 
   const getParameterCount = (rewardTypeId) => {
     return parameterCounts[rewardTypeId] ?? 0;
@@ -345,7 +378,10 @@ function RewardConfiguration() {
             {selectedRewardType.rewardName}
           </div>
           <span className={styles.rewardCategoryBadge}>Recognition</span>
-          <button onClick={openParameterModal} className={styles.addParameterBtn}>
+          <button
+            onClick={openParameterModal}
+            className={styles.addParameterBtn}
+          >
             + Add Parameter
           </button>
         </div>
@@ -355,9 +391,14 @@ function RewardConfiguration() {
         >
           <span>
             {visibleDesc}
-            {showReadMore && !descExpanded && <span className={styles.ellipsis}>...</span>}
+            {showReadMore && !descExpanded && (
+              <span className={styles.ellipsis}>...</span>
+            )}
             {showReadMore && (
-              <button onClick={() => setDescExpanded((e) => !e)} className={styles.readMoreBtn}>
+              <button
+                onClick={() => setDescExpanded((e) => !e)}
+                className={styles.readMoreBtn}
+              >
                 {descExpanded ? "Read Less" : "Read More"}
               </button>
             )}
@@ -385,7 +426,7 @@ function RewardConfiguration() {
         <Breadcrumb
           items={[
             { label: "Performance", path: "/hr/dashboard/performance" },
-            { label: "Rewards", path: null }
+            { label: "Rewards", path: null },
           ]}
         />
 
@@ -406,13 +447,17 @@ function RewardConfiguration() {
             <div className={styles.tabToggleContainer}>
               <button
                 onClick={() => setActiveTab("Active")}
-                className={`${styles.tabToggleBtn} ${activeTab === "Active" ? styles.active : styles.inactive}`}
+                className={`${styles.tabToggleBtn} ${
+                  activeTab === "Active" ? styles.active : styles.inactive
+                }`}
               >
                 Active ({activeRewardTypes.length})
               </button>
               <button
                 onClick={() => setActiveTab("Inactive")}
-                className={`${styles.tabToggleBtn} ${activeTab === "Inactive" ? styles.active : styles.inactive}`}
+                className={`${styles.tabToggleBtn} ${
+                  activeTab === "Inactive" ? styles.active : styles.inactive
+                }`}
               >
                 Inactive ({inactiveRewardTypes.length})
               </button>
@@ -420,14 +465,32 @@ function RewardConfiguration() {
 
             {activeTab === "Active" && activeRewardTypes.length > 0 && (
               <div className={styles.visibilityWrapper}>
-                <span className={styles.visibilityLabel}>Manager Visibility:</span>
+                <span className={styles.visibilityLabel}>
+                  Manager Visibility:
+                </span>
                 <button
                   onClick={handleBulkToggleActiveRewards}
-                  className={`${styles.visibilityToggle} ${allActiveVisible ? styles.visible : styles.hidden}`}
-                  title={allActiveVisible ? "Hide all active rewards from managers" : "Show all active rewards to managers"}
+                  className={`${styles.visibilityToggle} ${
+                    allActiveVisible ? styles.visible : styles.hidden
+                  }`}
+                  title={
+                    allActiveVisible
+                      ? "Hide all active rewards from managers"
+                      : "Show all active rewards to managers"
+                  }
                 >
-                  <div className={`${styles.visibilityIndicator} ${allActiveVisible ? styles.visible : styles.hidden}`}>
-                    <i className={allActiveVisible ? "bi bi-eye-fill" : "bi bi-eye-slash-fill"} />
+                  <div
+                    className={`${styles.visibilityIndicator} ${
+                      allActiveVisible ? styles.visible : styles.hidden
+                    }`}
+                  >
+                    <i
+                      className={
+                        allActiveVisible
+                          ? "bi bi-eye-fill"
+                          : "bi bi-eye-slash-fill"
+                      }
+                    />
                   </div>
                 </button>
               </div>
@@ -437,7 +500,9 @@ function RewardConfiguration() {
           <div className={styles.rewardListContent}>
             {loading ? (
               <div className={styles.loadingContainer}>
-                <div className={`spinner-border ${styles.loadingSpinner}`}></div>
+                <div
+                  className={`spinner-border ${styles.loadingSpinner}`}
+                ></div>
                 <div className={styles.loadingText}>Loading...</div>
               </div>
             ) : displayedRewards.length === 0 ? (
@@ -448,10 +513,16 @@ function RewardConfiguration() {
               displayedRewards.map((rt) => (
                 <div
                   key={rt.rewardTypeId}
-                  className={`${styles.rewardCard} ${selectedRewardType?.rewardTypeId === rt.rewardTypeId ? styles.selected : ""}`}
+                  className={`${styles.rewardCard} ${
+                    selectedRewardType?.rewardTypeId === rt.rewardTypeId
+                      ? styles.selected
+                      : ""
+                  }`}
                 >
                   <div className={styles.rewardCardContent}>
-                    <div className={styles.rewardCardTitle}>{rt.rewardName}</div>
+                    <div className={styles.rewardCardTitle}>
+                      {rt.rewardName}
+                    </div>
                     <div className={styles.rewardCardDesc}>
                       {rt.description || "—"}
                     </div>
@@ -459,7 +530,11 @@ function RewardConfiguration() {
                       <span className={styles.paramCount}>
                         {getParameterCount(rt.rewardTypeId)} parameters
                       </span>
-                      <span className={`${styles.statusBadge} ${rt.isActive ? styles.active : styles.inactive}`}>
+                      <span
+                        className={`${styles.statusBadge} ${
+                          rt.isActive ? styles.active : styles.inactive
+                        }`}
+                      >
                         {rt.isActive ? "Active" : "Inactive"}
                       </span>
                     </div>
@@ -474,10 +549,20 @@ function RewardConfiguration() {
                     </button>
                     <button
                       onClick={() => confirmStatusChange(rt)}
-                      title={rt.isActive ? "Deactivate Reward Type" : "Activate Reward Type"}
-                      className={`${styles.actionBtn} ${styles.toggle} ${rt.isActive ? styles.deactivate : ""}`}
+                      title={
+                        rt.isActive
+                          ? "Deactivate Reward Type"
+                          : "Activate Reward Type"
+                      }
+                      className={`${styles.actionBtn} ${styles.toggle} ${
+                        rt.isActive ? styles.deactivate : ""
+                      }`}
                     >
-                      <i className={rt.isActive ? "bi bi-x-circle" : "bi bi-check2-circle"} />
+                      <i
+                        className={
+                          rt.isActive ? "bi bi-x-circle" : "bi bi-check2-circle"
+                        }
+                      />
                     </button>
                     <ChooseButton
                       onClick={() => {
@@ -503,7 +588,9 @@ function RewardConfiguration() {
                 <div className={styles.spacer14} />
                 {parameters.length === 0 ? (
                   <div className={styles.noParamsEmpty}>
-                    <div className={styles.noParamsTitle}>No parameters configured</div>
+                    <div className={styles.noParamsTitle}>
+                      No parameters configured
+                    </div>
                     <div className={styles.noParamsSubtitle}>
                       Add parameters to customize nomination forms
                     </div>
@@ -522,8 +609,12 @@ function RewardConfiguration() {
                     <tbody>
                       {parameters.map((param) => (
                         <tr key={param.parameterId}>
-                          <td className={styles.paramName}>{param.parameterName}</td>
-                          <td className={styles.paramType}>{param.parameterType}</td>
+                          <td className={styles.paramName}>
+                            {param.parameterName}
+                          </td>
+                          <td className={styles.paramType}>
+                            {param.parameterType}
+                          </td>
                           <td className={styles.paramRequired}>
                             {param.isRequired ? (
                               <span className={styles.requiredYes}>Yes</span>
@@ -531,10 +622,14 @@ function RewardConfiguration() {
                               <span className={styles.requiredNo}>No</span>
                             )}
                           </td>
-                          <td className={styles.paramOrder}>{param.sortOrder}</td>
+                          <td className={styles.paramOrder}>
+                            {param.sortOrder}
+                          </td>
                           <td>
                             <button
-                              onClick={() => confirmDelete(param.parameterId, "parameter")}
+                              onClick={() =>
+                                confirmDelete(param.parameterId, "parameter")
+                              }
                               className={styles.deleteBtn}
                               title="Delete Parameter"
                             >
@@ -552,7 +647,9 @@ function RewardConfiguration() {
                 <div className={styles.selectTitle}>
                   Select a recognition reward to view parameters
                 </div>
-                <div className={styles.selectSubtitle}>Choose from Active or Inactive rewards</div>
+                <div className={styles.selectSubtitle}>
+                  Choose from Active or Inactive rewards
+                </div>
               </div>
             )}
           </div>

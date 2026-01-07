@@ -2,18 +2,17 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "../../../../styles/performancemanagement/components/ViewFormDetailsModal.css";
- 
+
 function ViewFormDetailsModal({ formDetails, onClose }) {
   const navigate = useNavigate();
- 
+
   if (!formDetails) return null;
- 
+
   return (
     <>
       <div className="view-form-backdrop" onClick={onClose} />
-     
-      <div className="view-form-container" onClick={e => e.stopPropagation()}>
-        {/* HEADER */}
+
+      <div className="view-form-container" onClick={(e) => e.stopPropagation()}>
         <div className="view-form-header">
           <div className="header-title">
             <i className="bi bi-file-earmark-text-fill"></i>
@@ -22,15 +21,14 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
           <button
             className="header-close"
             onClick={onClose}
-            onMouseEnter={e => e.currentTarget.classList.add('hover')}
-            onMouseLeave={e => e.currentTarget.classList.remove('hover')}
+            onMouseEnter={(e) => e.currentTarget.classList.add("hover")}
+            onMouseLeave={(e) => e.currentTarget.classList.remove("hover")}
           >
             ×
           </button>
         </div>
- 
+
         <div className="view-form-body">
-          {/* Basic Info */}
           <div className="basic-section">
             <h4 className="section-title">
               <i className="bi bi-info-circle-fill"></i>
@@ -46,7 +44,7 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
                   <span className="item-value">{formDetails.name}</span>
                 </div>
               </div>
- 
+
               <div className="info-item">
                 <div className="item-icon">
                   <i className="bi bi-tag-fill"></i>
@@ -56,30 +54,33 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
                   <span className="type-tag">{formDetails.type}</span>
                 </div>
               </div>
- 
+
               <div className="info-item">
                 <div className="item-icon">
                   <i className="bi bi-briefcase-fill"></i>
                 </div>
                 <div className="item-content">
                   <span className="item-label">Category</span>
-                  <span className="item-value">{formDetails.deliveryEnablement || "N/A"}</span>
+                  <span className="item-value">
+                    {formDetails.deliveryEnablement || "N/A"}
+                  </span>
                 </div>
               </div>
- 
+
               <div className="info-item total-item">
                 <div className="item-icon">
                   <i className="bi bi-list-check"></i>
                 </div>
                 <div className="item-content">
                   <span className="item-label">Total Competencies</span>
-                  <span className="total-number">{formDetails.competencies?.length || 0}</span>
+                  <span className="total-number">
+                    {formDetails.competencies?.length || 0}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
- 
-          {/* Table Section */}
+
           {formDetails.competencies?.length > 0 && (
             <div className="table-section">
               <h4 className="section-title">
@@ -100,12 +101,16 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
                       <tr
                         className="table-row"
                         key={comp.id || index}
-                        onMouseEnter={e => e.currentTarget.classList.add('hover')}
-                        onMouseLeave={e => e.currentTarget.classList.remove('hover')}
+                        onMouseEnter={(e) =>
+                          e.currentTarget.classList.add("hover")
+                        }
+                        onMouseLeave={(e) =>
+                          e.currentTarget.classList.remove("hover")
+                        }
                       >
                         <td className="sno-td">
                           <span className="sno-circle">
-                            {comp.displayOrder || (index + 1)}
+                            {comp.displayOrder || index + 1}
                           </span>
                         </td>
                         <td className="name-td">
@@ -129,22 +134,22 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
               </div>
             </div>
           )}
- 
-          {(!formDetails.competencies || formDetails.competencies.length === 0) && (
+
+          {(!formDetails.competencies ||
+            formDetails.competencies.length === 0) && (
             <div className="no-data">
               <i className="bi bi-inbox"></i>
               <p>No competencies defined for this form</p>
             </div>
           )}
         </div>
- 
-        {/* Footer */}
+
         <div className="form-footer">
           <button
             className="footer-button close-button"
             onClick={onClose}
-            onMouseEnter={e => e.currentTarget.classList.add('hover')}
-            onMouseLeave={e => e.currentTarget.classList.remove('hover')}
+            onMouseEnter={(e) => e.currentTarget.classList.add("hover")}
+            onMouseLeave={(e) => e.currentTarget.classList.remove("hover")}
           >
             Close
           </button>
@@ -152,10 +157,12 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
             className="footer-button edit-button"
             onClick={() => {
               onClose();
-              navigate(`/hr/dashboard/performance/create/${formDetails.formId}`);
+              navigate(
+                `/hr/dashboard/performance/create/${formDetails.formId}`
+              );
             }}
-            onMouseEnter={e => e.currentTarget.classList.add('hover')}
-            onMouseLeave={e => e.currentTarget.classList.remove('hover')}
+            onMouseEnter={(e) => e.currentTarget.classList.add("hover")}
+            onMouseLeave={(e) => e.currentTarget.classList.remove("hover")}
           >
             <i className="bi bi-pencil-square"></i>
             Edit Form
@@ -165,7 +172,5 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
     </>
   );
 }
- 
+
 export default ViewFormDetailsModal;
- 
- 

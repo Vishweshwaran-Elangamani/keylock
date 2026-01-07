@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Toaster, toast } from "sonner";
-import { 
-  getEmployeeAssignments, 
-  submitSelfAssessment, 
+import {
+  getEmployeeAssignments,
+  submitSelfAssessment,
   viewSelfAssessment,
-  downloadAttachment 
+  downloadAttachment,
 } from "../../../services/performancemanagement/api/api";
 import logoImage from "../../../assets/logodark.png";
 import "../../../styles/performancemanagement/employee/MyAssessments.css";
@@ -83,24 +83,26 @@ function MyAssessments() {
   }, [assignments]);
 
   function getExtensionFromMime(mimeType) {
-    if (!mimeType) return '';
+    if (!mimeType) return "";
     const type = mimeType.toLowerCase().trim();
     const mimeMap = {
-      'application/pdf': '.pdf',
-      'text/csv': '.csv',
-      'text/plain': '.txt',
-      'application/msword': '.doc',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
-      'application/vnd.ms-excel': '.xls',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '.xlsx',
-      'image/jpeg': '.jpg',
-      'image/png': '.png',
-      'image/gif': '.gif',
-      'application/zip': '.zip',
-      'audio/mpeg': '.mp3',
-      'video/mp4': '.mp4',
+      "application/pdf": ".pdf",
+      "text/csv": ".csv",
+      "text/plain": ".txt",
+      "application/msword": ".doc",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        ".docx",
+      "application/vnd.ms-excel": ".xls",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+        ".xlsx",
+      "image/jpeg": ".jpg",
+      "image/png": ".png",
+      "image/gif": ".gif",
+      "application/zip": ".zip",
+      "audio/mpeg": ".mp3",
+      "video/mp4": ".mp4",
     };
-    return mimeMap[type] || '';
+    return mimeMap[type] || "";
   }
 
   function hasExtension(filename) {
@@ -109,17 +111,19 @@ function MyAssessments() {
 
   function extractFilenameFromHeader(contentDisposition) {
     if (!contentDisposition) return null;
-    const matchUtf8 = contentDisposition.match(/filename\*=(?:UTF-8'')?([^;]+)(?:;|$)/i);
+    const matchUtf8 = contentDisposition.match(
+      /filename\*=(?:UTF-8'')?([^;]+)(?:;|$)/i
+    );
     if (matchUtf8 && matchUtf8[1]) {
       try {
-        return decodeURIComponent(matchUtf8[1].replace(/"/g, '').trim());
+        return decodeURIComponent(matchUtf8[1].replace(/"/g, "").trim());
       } catch (e) {
-        return matchUtf8[1].replace(/"/g, '').trim();
+        return matchUtf8[1].replace(/"/g, "").trim();
       }
     }
     const matchNormal = contentDisposition.match(/filename=([^;]+)(?:;|$)/i);
     if (matchNormal && matchNormal[1]) {
-      return matchNormal[1].replace(/"/g, '').trim();
+      return matchNormal[1].replace(/"/g, "").trim();
     }
     return null;
   }
@@ -127,24 +131,24 @@ function MyAssessments() {
   const handleDownloadViewAttachment = async (attachment) => {
     try {
       setDownloadingAttachmentId(attachment.attachmentId);
-      
+
       const response = await downloadAttachment(attachment.attachmentId);
-  
+
       const blob = response.data;
-      
+
       let filename = attachment.fileName || "attachment";
-      
-      const contentDisposition = response.headers['content-disposition'];
+
+      const contentDisposition = response.headers["content-disposition"];
       if (contentDisposition) {
         const headerFilename = extractFilenameFromHeader(contentDisposition);
         if (headerFilename) {
           filename = headerFilename;
         }
       }
-  
+
       if (!hasExtension(filename)) {
-        let extension = '';
-        const contentType = response.headers['content-type'];
+        let extension = "";
+        const contentType = response.headers["content-type"];
         if (contentType) {
           extension = getExtensionFromMime(contentType);
         }
@@ -152,24 +156,24 @@ function MyAssessments() {
           extension = getExtensionFromMime(attachment.fileType);
         }
         if (!extension) {
-          extension = '.bin';
+          extension = ".bin";
         }
         filename += extension;
       }
-  
+
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
       link.download = filename;
       document.body.appendChild(link);
       link.click();
-      
+
       setTimeout(() => {
         window.URL.revokeObjectURL(url);
         document.body.removeChild(link);
       }, 100);
-      
-      toast.success('File downloaded successfully!');
+
+      toast.success("File downloaded successfully!");
     } catch (err) {
       console.error("Download error:", err);
       toast.error(`Failed to download attachment: ${err.message}`);
@@ -215,7 +219,7 @@ function MyAssessments() {
     setModalMode("view");
     setSubmitting(true);
     try {
-     const { data } = await viewSelfAssessment(assignment.formId, userId);
+      const { data } = await viewSelfAssessment(assignment.formId, userId);
       if (data.success) {
         const viewData = (data.data.details || []).map((detail) => ({
           competencyId: detail.competencyId,
@@ -241,7 +245,9 @@ function MyAssessments() {
 
   const updateAssessmentData = (competencyId, field, value) => {
     setAssessmentData((prev) =>
-      prev.map((item) => (item.competencyId === competencyId ? { ...item, [field]: value } : item))
+      prev.map((item) =>
+        item.competencyId === competencyId ? { ...item, [field]: value } : item
+      )
     );
   };
 
@@ -280,7 +286,9 @@ function MyAssessments() {
 
   const updateAttachmentNote = (index, note) => {
     setAttachments((prev) =>
-      prev.map((att, i) => (i === index ? { ...att, attachmentNote: note } : att))
+      prev.map((att, i) =>
+        i === index ? { ...att, attachmentNote: note } : att
+      )
     );
   };
 
@@ -295,7 +303,9 @@ function MyAssessments() {
       return;
     }
 
-    const incompleteComments = assessmentData.filter((item) => !item.comments || item.comments.trim() === "");
+    const incompleteComments = assessmentData.filter(
+      (item) => !item.comments || item.comments.trim() === ""
+    );
     if (incompleteComments.length > 0) {
       toast.error("Please provide comments for all competencies.");
       return;
@@ -322,7 +332,7 @@ function MyAssessments() {
     };
 
     try {
-     const { data } = await submitSelfAssessment(payload);
+      const { data } = await submitSelfAssessment(payload);
       if (data.success) {
         toast.success("Assessment submitted successfully!");
         setShowModal(false);
@@ -357,9 +367,10 @@ function MyAssessments() {
         assignment.formName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         assignment.formType.toLowerCase().includes(searchQuery.toLowerCase());
 
-      const matchDate = !dateFilter ||
+      const matchDate =
+        !dateFilter ||
         new Date(assignment.deadline).toLocaleDateString("en-GB") ===
-        new Date(dateFilter).toLocaleDateString("en-GB");
+          new Date(dateFilter).toLocaleDateString("en-GB");
 
       return matchSearch && matchDate;
     });
@@ -387,9 +398,7 @@ function MyAssessments() {
             <th>TYPE</th>
             <th>DEADLINE</th>
             <th>STATUS</th>
-            <th>
-              {activeTab === "pending" ? "SUBMISSION" : "VIEW"}
-            </th>
+            <th>{activeTab === "pending" ? "SUBMISSION" : "VIEW"}</th>
           </tr>
         </thead>
         <tbody>
@@ -407,27 +416,47 @@ function MyAssessments() {
                 <td>
                   <div className="empassper-date-cell">
                     <i className="bi bi-calendar-event"></i>
-                    {new Date(assignment.deadline || new Date()).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      year: 'numeric'
+                    {new Date(
+                      assignment.deadline || new Date()
+                    ).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
                     })}
                   </div>
                 </td>
                 <td>
-                  <span className={assignment.isCompleted ? "empassper-badge-success" : "empassper-badge-pending"}>
-                    <i className={`bi ${assignment.isCompleted ? 'bi-check-circle-fill' : 'bi-clock-fill'}`}></i>
+                  <span
+                    className={
+                      assignment.isCompleted
+                        ? "empassper-badge-success"
+                        : "empassper-badge-pending"
+                    }
+                  >
+                    <i
+                      className={`bi ${
+                        assignment.isCompleted
+                          ? "bi-check-circle-fill"
+                          : "bi-clock-fill"
+                      }`}
+                    ></i>
                     {assignment.isCompleted ? "Completed" : "Pending"}
                   </span>
                 </td>
                 <td>
                   {!assignment.isCompleted ? (
-                    <button className="empassper-btn empassper-btn-submit" onClick={() => openSubmitModal(assignment)}>
+                    <button
+                      className="empassper-btn empassper-btn-submit"
+                      onClick={() => openSubmitModal(assignment)}
+                    >
                       <i className="bi bi-pencil-square"></i>
                       Submit
                     </button>
                   ) : (
-                    <button className="empassper-btn empassper-btn-view" onClick={() => openViewModal(assignment)}>
+                    <button
+                      className="empassper-btn empassper-btn-view"
+                      onClick={() => openViewModal(assignment)}
+                    >
                       <i className="bi bi-eye-fill"></i>
                     </button>
                   )}
@@ -443,7 +472,7 @@ function MyAssessments() {
   if (loading) {
     return (
       <div className="empassper-container">
-        <Toaster position="top-right"  />
+        <Toaster position="top-right" />
         <div className="empassper-loading-state">
           <div className="spinner-border"></div>
           <p>Loading assessments...</p>
@@ -454,11 +483,7 @@ function MyAssessments() {
 
   return (
     <div className="empassper-container">
-      <Breadcrumb
-        items={[
-          { label: "My Assessments", path: null }
-        ]}
-      />
+      <Breadcrumb items={[{ label: "My Assessments", path: null }]} />
       <Toaster position="top-right" />
 
       <div className="empassper-header-section">
@@ -466,30 +491,40 @@ function MyAssessments() {
           <div className="empassper-header-text"></div>
         </div>
 
-        {showModal && currentAssignment && timers[currentAssignment.assignmentId] && (
-          <div className="empassper-timer-container">
-            <div className="empassper-timer-label">Time Remaining</div>
-            <div className="empassper-timer-display">
-              {timers[currentAssignment.assignmentId].days > 0
-                ? `${timers[currentAssignment.assignmentId].days} days`
-                : "Expired"}
+        {showModal &&
+          currentAssignment &&
+          timers[currentAssignment.assignmentId] && (
+            <div className="empassper-timer-container">
+              <div className="empassper-timer-label">Time Remaining</div>
+              <div className="empassper-timer-display">
+                {timers[currentAssignment.assignmentId].days > 0
+                  ? `${timers[currentAssignment.assignmentId].days} days`
+                  : "Expired"}
+              </div>
+              <div className="empassper-timer-subtext">
+                Deadline:{" "}
+                {new Date(currentAssignment.deadline).toLocaleDateString()}
+              </div>
             </div>
-            <div className="empassper-timer-subtext">
-              Deadline: {new Date(currentAssignment.deadline).toLocaleDateString()}
-            </div>
-          </div>
-        )}
+          )}
       </div>
 
       {visibleTimers.length > 0 && (
         <div className="empassper-timer-bars-container">
           {visibleTimers.map((timer) => (
-            <div key={timer.id} className={`empassper-timer-bar ${timer.isExpired ? 'expired' : ''}`}>
+            <div
+              key={timer.id}
+              className={`empassper-timer-bar ${
+                timer.isExpired ? "expired" : ""
+              }`}
+            >
               <div className="empassper-timer-bar-content">
                 <span className="empassper-timer-bar-icon">
                   <i className="bi bi-alarm"></i>
                 </span>
-                <span className="empassper-timer-bar-label">{timer.formName}</span>
+                <span className="empassper-timer-bar-label">
+                  {timer.formName}
+                </span>
                 <span className="empassper-timer-bar-time">
                   {timer.days > 0 ? `${timer.days} days left` : "Expired"}
                 </span>
@@ -507,10 +542,12 @@ function MyAssessments() {
             placeholder="Search by form name or type..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSearch();
+            }}
             aria-label="Search assessments"
           />
-          <button 
+          <button
             onClick={handleSearch}
             className="empassper-search-btn"
             aria-label="Search"
@@ -518,7 +555,7 @@ function MyAssessments() {
             Search
           </button>
         </div>
-        <button 
+        <button
           onClick={handleClearFilters}
           className="empassper-clear-btn"
           aria-label="Clear Filters"
@@ -534,26 +571,38 @@ function MyAssessments() {
         />
       </div>
 
-      <div className="empassper-pill-tabs-wrapper" role="tablist" aria-label="Assessment tabs">
+      <div
+        className="empassper-pill-tabs-wrapper"
+        role="tablist"
+        aria-label="Assessment tabs"
+      >
         <div className="empassper-pill-tabs">
           <button
             role="tab"
             aria-pressed={activeTab === "pending"}
-            className={`empassper-pill ${activeTab === "pending" ? "empassper-pill--active" : ""}`}
+            className={`empassper-pill ${
+              activeTab === "pending" ? "empassper-pill--active" : ""
+            }`}
             onClick={() => setActiveTab("pending")}
           >
             <span className="empassper-pill-text">Pending Assessments</span>
-            <span className="empassper-pill-count">({filteredPending.length})</span>
+            <span className="empassper-pill-count">
+              ({filteredPending.length})
+            </span>
           </button>
 
           <button
             role="tab"
             aria-pressed={activeTab === "completed"}
-            className={`empassper-pill ${activeTab === "completed" ? "empassper-pill--active" : ""}`}
+            className={`empassper-pill ${
+              activeTab === "completed" ? "empassper-pill--active" : ""
+            }`}
             onClick={() => setActiveTab("completed")}
           >
             <span className="empassper-pill-text">Completed Assessments</span>
-            <span className="empassper-pill-count">({filteredCompleted.length})</span>
+            <span className="empassper-pill-count">
+              ({filteredCompleted.length})
+            </span>
           </button>
         </div>
       </div>
@@ -587,7 +636,9 @@ function MyAssessments() {
               <div className="empassper-empty-icon">
                 <i className="bi bi-clipboard-check"></i>
               </div>
-              <h3 className="empassper-empty-title">No Completed Assessments</h3>
+              <h3 className="empassper-empty-title">
+                No Completed Assessments
+              </h3>
               <p className="empassper-empty-text">
                 Complete your pending assessments to see them here.
               </p>
@@ -611,23 +662,30 @@ function MyAssessments() {
                 <div className="empass-appraisal-label">Appraisal Form</div>
               </div>
               <div className="empass-form-title-container">
-                <h2 className="empass-form-title">{currentAssignment?.formName}</h2>
+                <h2 className="empass-form-title">
+                  {currentAssignment?.formName}
+                </h2>
                 <p className="empass-form-subtitle">
                   {currentAssignment?.formType} Assessment Form
                 </p>
               </div>
 
               {((modalMode === "submit" && attachments.length > 0) ||
-                (modalMode === "view" && viewAttachments && viewAttachments.length > 0)) && (
-                  <div className="empass-attachment-badge">
-                    <span className="empass-attachment-badge-text">
-                      {modalMode === "submit"
-                        ? `${attachments.length} ${attachments.length === 1 ? "File" : "Files"}`
-                        : `${viewAttachments.length} ${viewAttachments.length === 1 ? "File" : "Files"}`
-                      }
-                    </span>
-                  </div>
-                )}
+                (modalMode === "view" &&
+                  viewAttachments &&
+                  viewAttachments.length > 0)) && (
+                <div className="empass-attachment-badge">
+                  <span className="empass-attachment-badge-text">
+                    {modalMode === "submit"
+                      ? `${attachments.length} ${
+                          attachments.length === 1 ? "File" : "Files"
+                        }`
+                      : `${viewAttachments.length} ${
+                          viewAttachments.length === 1 ? "File" : "Files"
+                        }`}
+                  </span>
+                </div>
+              )}
             </div>
 
             <div className="empass-form-divider"></div>
@@ -636,9 +694,7 @@ function MyAssessments() {
               <div className="empass-form-body empass-loading-body">
                 <div>
                   <div className="spinner-border"></div>
-                  <p className="empass-loading-text">
-                    Loading assessment...
-                  </p>
+                  <p className="empass-loading-text">Loading assessment...</p>
                 </div>
               </div>
             ) : (
@@ -725,7 +781,8 @@ function MyAssessments() {
                             htmlFor="file-upload"
                             className="empass-upload-btn"
                           >
-                            <i className="bi bi-cloud-upload"></i> Add Attachment
+                            <i className="bi bi-cloud-upload"></i> Add
+                            Attachment
                           </label>
                           <input
                             id="file-upload"
@@ -736,7 +793,8 @@ function MyAssessments() {
                             disabled={submitting}
                           />
                           <span className="empass-file-count">
-                            {attachments.length > 0 && `${attachments.length} file(s) selected`}
+                            {attachments.length > 0 &&
+                              `${attachments.length} file(s) selected`}
                           </span>
                         </div>
 
@@ -755,7 +813,8 @@ function MyAssessments() {
                                         Original: {att.fileName}
                                       </div>
                                       <div className="empass-attachment-meta">
-                                        {(att.fileSize / 1024).toFixed(2)} KB • {att.fileType || 'Unknown type'}
+                                        {(att.fileSize / 1024).toFixed(2)} KB •{" "}
+                                        {att.fileType || "Unknown type"}
                                       </div>
                                     </div>
                                   </div>
@@ -770,12 +829,18 @@ function MyAssessments() {
 
                                 <div className="empass-attachment-name-section">
                                   <label className="empass-input-label">
-                                    <i className="bi bi-tag"></i> Attachment Name *
+                                    <i className="bi bi-tag"></i> Attachment
+                                    Name *
                                   </label>
                                   <input
                                     type="text"
                                     value={att.customName}
-                                    onChange={(e) => updateAttachmentName(index, e.target.value)}
+                                    onChange={(e) =>
+                                      updateAttachmentName(
+                                        index,
+                                        e.target.value
+                                      )
+                                    }
                                     placeholder="Enter a name for this attachment"
                                     className="empass-input"
                                     disabled={submitting}
@@ -784,11 +849,17 @@ function MyAssessments() {
 
                                 <div>
                                   <label className="empass-input-label">
-                                    <i className="bi bi-chat-left-text"></i> Description (Optional)
+                                    <i className="bi bi-chat-left-text"></i>{" "}
+                                    Description (Optional)
                                   </label>
                                   <textarea
                                     value={att.attachmentNote}
-                                    onChange={(e) => updateAttachmentNote(index, e.target.value)}
+                                    onChange={(e) =>
+                                      updateAttachmentNote(
+                                        index,
+                                        e.target.value
+                                      )
+                                    }
                                     placeholder="Add a description or notes for this attachment..."
                                     className="empass-textarea"
                                     disabled={submitting}
@@ -802,7 +873,8 @@ function MyAssessments() {
                         {attachments.length === 0 && (
                           <div className="empass-no-attachments">
                             <i className="bi bi-inbox empass-no-attachments-icon"></i>
-                            No attachments added yet. Click "Add Attachment" to upload files.
+                            No attachments added yet. Click "Add Attachment" to
+                            upload files.
                           </div>
                         )}
                       </div>
@@ -825,22 +897,27 @@ function MyAssessments() {
 
                                     {att.attachmentNote && (
                                       <div className="empass-view-attachment-note">
-                                        <strong>Description:</strong> {att.attachmentNote}
+                                        <strong>Description:</strong>{" "}
+                                        {att.attachmentNote}
                                       </div>
                                     )}
 
                                     <div className="empass-view-attachment-meta">
                                       {att.fileSize && (
                                         <span>
-                                          <i className="bi bi-hdd"></i> {(att.fileSize / 1024).toFixed(2)} KB
+                                          <i className="bi bi-hdd"></i>{" "}
+                                          {(att.fileSize / 1024).toFixed(2)} KB
                                         </span>
                                       )}
                                       {att.uploadedAt && (
                                         <span>
-                                          <i className="bi bi-calendar3"></i> {new Date(att.uploadedAt).toLocaleDateString('en-US', {
-                                            year: 'numeric',
-                                            month: 'short',
-                                            day: 'numeric'
+                                          <i className="bi bi-calendar3"></i>{" "}
+                                          {new Date(
+                                            att.uploadedAt
+                                          ).toLocaleDateString("en-US", {
+                                            year: "numeric",
+                                            month: "short",
+                                            day: "numeric",
                                           })}
                                         </span>
                                       )}
@@ -848,11 +925,17 @@ function MyAssessments() {
                                   </div>
 
                                   <button
-                                    onClick={() => handleDownloadViewAttachment(att)}
-                                    disabled={downloadingAttachmentId === att.attachmentId}
+                                    onClick={() =>
+                                      handleDownloadViewAttachment(att)
+                                    }
+                                    disabled={
+                                      downloadingAttachmentId ===
+                                      att.attachmentId
+                                    }
                                     className="empass-download-btn"
                                   >
-                                    {downloadingAttachmentId === att.attachmentId ? (
+                                    {downloadingAttachmentId ===
+                                    att.attachmentId ? (
                                       <>
                                         <i className="bi bi-hourglass-split"></i>
                                         Downloading...

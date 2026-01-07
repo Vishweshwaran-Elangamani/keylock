@@ -23,10 +23,8 @@ function DeadlineModal({
 
   return (
     <>
-      
       <div className="deadline-modal dm-overlay" onClick={onClose} />
 
-     
       <div
         className="deadline-modal dm-container"
         onClick={(e) => e.stopPropagation()}
@@ -35,23 +33,24 @@ function DeadlineModal({
         aria-modal="true"
         ref={containerRef}
       >
-       
         <div className="dm-icon-badge" aria-hidden="true">
           <i className="bi bi-calendar-check dm-icon"></i>
         </div>
 
-        
-        <h3 id="dm-title" className="dm-title">Set Deadline</h3>
+        <h3 id="dm-title" className="dm-title">
+          Set Deadline
+        </h3>
 
-       
         <p className="dm-subtitle">
           How many days should employees have to complete this form?
         </p>
 
-       
         <div className="dm-input-group">
           <label htmlFor="deadlineInput" className="dm-label">
-            <i className="bi bi-clock-history dm-label-icon" aria-hidden="true"></i>
+            <i
+              className="bi bi-clock-history dm-label-icon"
+              aria-hidden="true"
+            ></i>
             <span>Deadline (in days):</span>
           </label>
 
@@ -61,12 +60,13 @@ function DeadlineModal({
             min="1"
             max="365"
             value={deadlineInDays}
-            onChange={(e) => onDeadlineChange(parseInt(e.target.value, 10) || 7)}
+            onChange={(e) =>
+              onDeadlineChange(parseInt(e.target.value, 10) || 7)
+            }
             className="dm-input"
           />
         </div>
 
-       
         <div className="dm-actions">
           <button
             type="button"
@@ -91,4 +91,3 @@ function DeadlineModal({
 }
 
 export default DeadlineModal;
-

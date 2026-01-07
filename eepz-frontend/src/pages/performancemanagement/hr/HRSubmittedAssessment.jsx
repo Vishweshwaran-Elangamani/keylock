@@ -57,7 +57,9 @@ function HRSubmittedAssessments() {
         <h2 className={styles.hrSubmittedTitle}>
           Submitted Assessments
           <span className={styles.hrSubmittedStatsBadge}>
-            <i className={`bi bi-file-earmark-check ${styles.hrSubmittedStatsIcon}`}></i>
+            <i
+              className={`bi bi-file-earmark-check ${styles.hrSubmittedStatsIcon}`}
+            ></i>
             {submissions.length}
           </span>
         </h2>
@@ -69,11 +71,10 @@ function HRSubmittedAssessments() {
       {submissions.length === 0 ? (
         <div className={styles.hrSubmittedEmptyState}>
           <i className={`bi bi-inbox ${styles.hrSubmittedEmptyIcon}`}></i>
-          <h3 className={styles.hrSubmittedEmptyTitle}>
-            No Submissions Yet
-          </h3>
+          <h3 className={styles.hrSubmittedEmptyTitle}>No Submissions Yet</h3>
           <p className={styles.hrSubmittedEmptyText}>
-            Employee assessment submissions will appear here once they are completed.
+            Employee assessment submissions will appear here once they are
+            completed.
           </p>
         </div>
       ) : (

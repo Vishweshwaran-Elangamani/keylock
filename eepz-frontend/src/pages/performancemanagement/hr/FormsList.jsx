@@ -11,8 +11,13 @@ import "../../../styles/performancemanagement/hr/FormList.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 
-
-const CustomDropdown = ({ value, onChange, options, placeholder, disabled }) => {
+const CustomDropdown = ({
+  value,
+  onChange,
+  options,
+  placeholder,
+  disabled,
+}) => {
   const [open, setOpen] = useState(false);
 
   const selected = options.find((o) => o === value) || placeholder || "All";
@@ -30,7 +35,7 @@ const CustomDropdown = ({ value, onChange, options, placeholder, disabled }) => 
       style={{ position: "relative" }}
     >
       <div
-        className={`custom-fc-selected ${disabled ? 'custom-fc-disabled' : ''}`}
+        className={`custom-fc-selected ${disabled ? "custom-fc-disabled" : ""}`}
         onClick={() => !disabled && setOpen((prev) => !prev)}
       >
         {selected}
@@ -86,10 +91,10 @@ function FormsList() {
   const [formSearchInput, setFormSearchInput] = useState("");
   const [userSearchInput, setUserSearchInput] = useState("");
 
-  const formTypes = useMemo(() => [
-    "All",
-    ...new Set(rows.map((f) => f.type).filter(Boolean)),
-  ], [rows]);
+  const formTypes = useMemo(
+    () => ["All", ...new Set(rows.map((f) => f.type).filter(Boolean))],
+    [rows]
+  );
   const formDeliveryOptions = ["All", "Delivery", "Enablement"];
 
   const analyticsIcons = {
@@ -121,7 +126,7 @@ function FormsList() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            marginBottom: "8px"
+            marginBottom: "8px",
           }}
         >
           <i
@@ -151,7 +156,9 @@ function FormsList() {
           setCurrentUserId(userId);
           localStorage.setItem("userId", userId.toString());
         } else {
-          toast.error("Unable to retrieve user information. Please login again.");
+          toast.error(
+            "Unable to retrieve user information. Please login again."
+          );
         }
       } catch (error) {
         console.error("Error fetching current user:", error);
@@ -252,7 +259,13 @@ function FormsList() {
       }
     };
     fetchUsersBasedOnFormType();
-  }, [selectedFormId, rows, fetchAssignedUsers, userSearchQuery, userRoleFilter]);
+  }, [
+    selectedFormId,
+    rows,
+    fetchAssignedUsers,
+    userSearchQuery,
+    userRoleFilter,
+  ]);
 
   const filteredForms = useMemo(() => {
     return rows.filter((form) => {
@@ -306,7 +319,9 @@ function FormsList() {
     usersPage * usersPerPage
   );
 
-  const eligibleUsers = users.filter((u) => !assignedUserIds.includes(u.userId));
+  const eligibleUsers = users.filter(
+    (u) => !assignedUserIds.includes(u.userId)
+  );
   const allEligibleSelected =
     eligibleUsers.length > 0 &&
     eligibleUsers.every((u) => selectedUserIds.includes(u.userId));
@@ -335,12 +350,16 @@ function FormsList() {
       return;
     }
     setSelectedUserIds((prev) =>
-      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
+      prev.includes(userId)
+        ? prev.filter((id) => id !== userId)
+        : [...prev, userId]
     );
   };
 
   const handleSelectAll = () => {
-    const eligibleUsers = users.filter((u) => !assignedUserIds.includes(u.userId));
+    const eligibleUsers = users.filter(
+      (u) => !assignedUserIds.includes(u.userId)
+    );
     const allSelected = eligibleUsers.every((u) =>
       selectedUserIds.includes(u.userId)
     );
@@ -364,7 +383,10 @@ function FormsList() {
   };
 
   // Check if any filters are active
-  const hasActiveFilters = formSearchQuery !== "" || formTypeFilter !== "All" || formDeliveryFilter !== "All";
+  const hasActiveFilters =
+    formSearchQuery !== "" ||
+    formTypeFilter !== "All" ||
+    formDeliveryFilter !== "All";
 
   const openDeadlineModal = (action) => {
     if (!selectedFormId) {
@@ -421,14 +443,19 @@ function FormsList() {
 
         const alreadyAssignedIds = Array.isArray(skipped)
           ? skipped
-            .filter((s) => s.Reason === "Already Assigned")
-            .map((s) => s.UserId || s.userId || s.EmployeeId || s.employeeId)
-            .filter(Boolean)
+              .filter((s) => s.Reason === "Already Assigned")
+              .map((s) => s.UserId || s.userId || s.EmployeeId || s.employeeId)
+              .filter(Boolean)
           : [];
 
-        const allProcessedUserIds = [...successfulUserIds, ...alreadyAssignedIds];
+        const allProcessedUserIds = [
+          ...successfulUserIds,
+          ...alreadyAssignedIds,
+        ];
 
-        setAssignedUserIds((prev) => [...new Set([...prev, ...allProcessedUserIds])]);
+        setAssignedUserIds((prev) => [
+          ...new Set([...prev, ...allProcessedUserIds]),
+        ]);
 
         setUsers((prevUsers) =>
           prevUsers.filter(
@@ -440,7 +467,9 @@ function FormsList() {
 
         if (appraisals.length > 0) {
           toast.success(
-            `Successfully ${actionType === "Send" ? "shared" : "saved"} form to ${appraisals.length} user(s)!`,
+            `Successfully ${
+              actionType === "Send" ? "shared" : "saved"
+            } form to ${appraisals.length} user(s)!`,
             { id: loadingToast }
           );
         }
@@ -466,7 +495,9 @@ function FormsList() {
       const errorMsg =
         e?.response?.data?.message ||
         e?.response?.data?.title ||
-        (actionType === "Send" ? "Failed to share form." : "Failed to save draft.");
+        (actionType === "Send"
+          ? "Failed to share form."
+          : "Failed to save draft.");
       toast.error(errorMsg, { id: loadingToast });
       console.error(" Error details:", e.response?.data);
     } finally {
@@ -498,74 +529,88 @@ function FormsList() {
   }, [rows, assignedUserIds]);
 
   /* Custom Pagination Dropdown Component */
-const PaginationDropdown = ({ value, onChange, options }) => {
-  const [open, setOpen] = useState(false);
+  const PaginationDropdown = ({ value, onChange, options }) => {
+    const [open, setOpen] = useState(false);
 
-  const handleSelect = (val) => {
-    onChange(val);
-    setOpen(false);
-  };
+    const handleSelect = (val) => {
+      onChange(val);
+      setOpen(false);
+    };
 
-  return (
-    <div
-      className="custom-fc-dropdown custom-fc-pagination-dropdown"
-      tabIndex={0}
-      onBlur={() => setTimeout(() => setOpen(false), 200)}
-    >
+    return (
       <div
-        className="custom-fc-selected"
-        onClick={() => setOpen((prev) => !prev)}
+        className="custom-fc-dropdown custom-fc-pagination-dropdown"
+        tabIndex={0}
+        onBlur={() => setTimeout(() => setOpen(false), 200)}
       >
-        {value}
-        <span className="custom-fc-arrow" />
-      </div>
-
-      {open && (
-        <div className="custom-fc-menu">
-          {options.map((opt) => (
-            <div
-              key={opt}
-              className={
-                "custom-fc-option" +
-                (opt === value ? " custom-fc-option-active" : "")
-              }
-              onClick={() => handleSelect(opt)}
-            >
-              {opt}
-            </div>
-          ))}
+        <div
+          className="custom-fc-selected"
+          onClick={() => setOpen((prev) => !prev)}
+        >
+          {value}
+          <span className="custom-fc-arrow" />
         </div>
-      )}
-    </div>
-  );
-};
 
+        {open && (
+          <div className="custom-fc-menu">
+            {options.map((opt) => (
+              <div
+                key={opt}
+                className={
+                  "custom-fc-option" +
+                  (opt === value ? " custom-fc-option-active" : "")
+                }
+                onClick={() => handleSelect(opt)}
+              >
+                {opt}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="formlistperf">
       <div className="flp-root">
         <Breadcrumb
           items={[
-            { label: 'Performance', path: '/hr/dashboard/performance' },
-            { label: 'Initiate Form', path: null }
+            { label: "Performance", path: "/hr/dashboard/performance" },
+            { label: "Initiate Form", path: null },
           ]}
         />
 
         <div className="row row-cols-2 row-cols-lg-3 row-cols-xl-5 g-4 mb-3">
           <div className="col">
-            <AnalyticsStatCard title="Total Forms" value={analytics.totalForms} />
+            <AnalyticsStatCard
+              title="Total Forms"
+              value={analytics.totalForms}
+            />
           </div>
           <div className="col">
-            <AnalyticsStatCard title="Manager Forms" value={analytics.managerForms} />
+            <AnalyticsStatCard
+              title="Manager Forms"
+              value={analytics.managerForms}
+            />
           </div>
           <div className="col">
-            <AnalyticsStatCard title="Delivery Forms" value={analytics.deliveryForms} />
+            <AnalyticsStatCard
+              title="Delivery Forms"
+              value={analytics.deliveryForms}
+            />
           </div>
           <div className="col">
-            <AnalyticsStatCard title="Enablement Forms" value={analytics.enablementForms} />
+            <AnalyticsStatCard
+              title="Enablement Forms"
+              value={analytics.enablementForms}
+            />
           </div>
           <div className="col">
-            <AnalyticsStatCard title="Assigned Users" value={analytics.assignedUsersCount} />
+            <AnalyticsStatCard
+              title="Assigned Users"
+              value={analytics.assignedUsersCount}
+            />
           </div>
         </div>
 
@@ -592,20 +637,22 @@ const PaginationDropdown = ({ value, onChange, options }) => {
                 <span className="flp-count-badge">{filteredForms.length}</span>
               </div>
               <div className="flp-header-right">
-                <div style={{
-                  display: "flex",
-                  alignItems: "center",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "6px",
-                  overflow: "hidden"
-                }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "6px",
+                    overflow: "hidden",
+                  }}
+                >
                   <input
                     type="text"
                     placeholder="Search forms..."
                     value={formSearchInput}
                     onChange={(e) => setFormSearchInput(e.target.value)}
                     onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
+                      if (e.key === "Enter") {
                         setFormSearchQuery(formSearchInput);
                         setFormsPage(1);
                       }
@@ -614,7 +661,7 @@ const PaginationDropdown = ({ value, onChange, options }) => {
                       border: "none",
                       padding: "8px 12px",
                       outline: "none",
-                      flex: 1
+                      flex: 1,
                     }}
                   />
                   <button
@@ -627,7 +674,7 @@ const PaginationDropdown = ({ value, onChange, options }) => {
                       color: "#fff",
                       border: "none",
                       padding: "8px 12px",
-                      cursor: "pointer"
+                      cursor: "pointer",
                     }}
                   >
                     Search
@@ -695,16 +742,24 @@ const PaginationDropdown = ({ value, onChange, options }) => {
                       pagedForms.map((f) => (
                         <tr
                           key={f.formId}
-                          className={selectedFormId === f.formId ? "flp-selected-row" : ""}
+                          className={
+                            selectedFormId === f.formId
+                              ? "flp-selected-row"
+                              : ""
+                          }
                         >
-                          <td><strong>{f.name}</strong></td>
-                          <td><span className="flp-type-badge">{f.type}</span></td>
+                          <td>
+                            <strong>{f.name}</strong>
+                          </td>
+                          <td>
+                            <span className="flp-type-badge">{f.type}</span>
+                          </td>
                           <td>
                             {f.deliveryEnablement === "Delivery"
                               ? "Delivery"
                               : f.deliveryEnablement === "Enablement"
-                                ? "Enablement"
-                                : "Delivery and Enablement"}
+                              ? "Enablement"
+                              : "Delivery and Enablement"}
                           </td>
                           <td>
                             <div className="flp-action-buttons">
@@ -717,13 +772,21 @@ const PaginationDropdown = ({ value, onChange, options }) => {
                               </button>
                               <button
                                 className="themed-action-btn btn-edit"
-                                onClick={() => navigate(`/hr/dashboard/performance/create/${f.formId}`)}
+                                onClick={() =>
+                                  navigate(
+                                    `/hr/dashboard/performance/create/${f.formId}`
+                                  )
+                                }
                                 title="Edit Form"
                               >
                                 <i className="bi bi-pencil" />
                               </button>
                               <button
-                                className={`themed-action-btn btn-choose${selectedFormId === f.formId ? " btn-active" : ""}`}
+                                className={`themed-action-btn btn-choose${
+                                  selectedFormId === f.formId
+                                    ? " btn-active"
+                                    : ""
+                                }`}
                                 onClick={() => handleFormSelect(f.formId)}
                                 title="Choose Form"
                               >
@@ -742,28 +805,55 @@ const PaginationDropdown = ({ value, onChange, options }) => {
                 <div className="flp-pagination-info">
                   <span className="flp-pagination-label">Rows per page:</span>
                   <PaginationDropdown
-  value={formsPerPage}
-  onChange={(val) => {
-    setFormsPerPage(Number(val));
-    setFormsPage(1);
-  }}
-  options={[5, 8, 10, 15, 20]}
-/>
-
+                    value={formsPerPage}
+                    onChange={(val) => {
+                      setFormsPerPage(Number(val));
+                      setFormsPage(1);
+                    }}
+                    options={[5, 8, 10, 15, 20]}
+                  />
                 </div>
 
                 <nav className="flp-pagination-nav">
                   <ul className="flp-pagination">
-                    <li className={`flp-page-item ${formsPage === 1 ? "flp-disabled" : ""}`}>
-                      <button className="flp-page-link" onClick={() => onFormsPageChange(formsPage - 1)}>&laquo;</button>
+                    <li
+                      className={`flp-page-item ${
+                        formsPage === 1 ? "flp-disabled" : ""
+                      }`}
+                    >
+                      <button
+                        className="flp-page-link"
+                        onClick={() => onFormsPageChange(formsPage - 1)}
+                      >
+                        &laquo;
+                      </button>
                     </li>
                     {Array.from({ length: formsTotalPages }, (_, i) => (
-                      <li key={i + 1} className={`flp-page-item ${formsPage === i + 1 ? "flp-active" : ""}`}>
-                        <button className="flp-page-link" onClick={() => onFormsPageChange(i + 1)}>{i + 1}</button>
+                      <li
+                        key={i + 1}
+                        className={`flp-page-item ${
+                          formsPage === i + 1 ? "flp-active" : ""
+                        }`}
+                      >
+                        <button
+                          className="flp-page-link"
+                          onClick={() => onFormsPageChange(i + 1)}
+                        >
+                          {i + 1}
+                        </button>
                       </li>
                     ))}
-                    <li className={`flp-page-item ${formsPage === formsTotalPages ? "flp-disabled" : ""}`}>
-                      <button className="flp-page-link" onClick={() => onFormsPageChange(formsPage + 1)}>&raquo;</button>
+                    <li
+                      className={`flp-page-item ${
+                        formsPage === formsTotalPages ? "flp-disabled" : ""
+                      }`}
+                    >
+                      <button
+                        className="flp-page-link"
+                        onClick={() => onFormsPageChange(formsPage + 1)}
+                      >
+                        &raquo;
+                      </button>
                     </li>
                   </ul>
                 </nav>
@@ -771,145 +861,193 @@ const PaginationDropdown = ({ value, onChange, options }) => {
                 <div className="flp-pagination-status">
                   {formsCount === 0
                     ? "No forms to display"
-                    : `Showing ${Math.min((formsPage - 1) * formsPerPage + 1, formsCount)}-${Math.min(formsPage * formsPerPage, formsCount)} of ${formsCount} forms`}
+                    : `Showing ${Math.min(
+                        (formsPage - 1) * formsPerPage + 1,
+                        formsCount
+                      )}-${Math.min(
+                        formsPage * formsPerPage,
+                        formsCount
+                      )} of ${formsCount} forms`}
                 </div>
               </div>
             </div>
           </div>
-{/* Users Panel */}
+          {/* Users Panel */}
 
-<div className="flp-users-panel">
-  <div className="flp-panel-header">
-    <h3><i className="bi bi-people-fill"></i> Select Users</h3>
-    {selectedFormId && (
-      <div className="flp-users-filters">
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          border: "1px solid #d1d5db",
-          borderRadius: "6px",
-          overflow: "hidden",
-          flex: 1
-        }}>
-          <input
-            type="text"
-            placeholder="Search users..."
-            value={userSearchInput}
-            onChange={(e) => setUserSearchInput(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.key === 'Enter') {
-                setUserSearchQuery(userSearchInput);
-                setUsersPage(1);
-              }
-            }}
-            style={{
-              border: "none",
-              padding: "8px 12px",
-              outline: "none",
-              flex: 1
-            }}
-          />
-          <button
-            onClick={() => {
-              setUserSearchQuery(userSearchInput);
-              setUsersPage(1);
-            }}
-            style={{
-              backgroundColor: "#27235c",
-              color: "#fff",
-              border: "none",
-              padding: "8px 12px",
-              cursor: "pointer"
-            }}
-          >
-            <i className="bi bi-search"></i>
-          </button>
-        </div>
+          <div className="flp-users-panel">
+            <div className="flp-panel-header">
+              <h3>
+                <i className="bi bi-people-fill"></i> Select Users
+              </h3>
+              {selectedFormId && (
+                <div className="flp-users-filters">
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      border: "1px solid #d1d5db",
+                      borderRadius: "6px",
+                      overflow: "hidden",
+                      flex: 1,
+                    }}
+                  >
+                    <input
+                      type="text"
+                      placeholder="Search users..."
+                      value={userSearchInput}
+                      onChange={(e) => setUserSearchInput(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === "Enter") {
+                          setUserSearchQuery(userSearchInput);
+                          setUsersPage(1);
+                        }
+                      }}
+                      style={{
+                        border: "none",
+                        padding: "8px 12px",
+                        outline: "none",
+                        flex: 1,
+                      }}
+                    />
+                    <button
+                      onClick={() => {
+                        setUserSearchQuery(userSearchInput);
+                        setUsersPage(1);
+                      }}
+                      style={{
+                        backgroundColor: "#27235c",
+                        color: "#fff",
+                        border: "none",
+                        padding: "8px 12px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <i className="bi bi-search"></i>
+                    </button>
+                  </div>
 
-        <button
-          onClick={handleSelectAll}
-          className="flp-btn-select-all"
-          style={{
-            background: allEligibleSelected ? "#AC5098" : "#27235C",
-            color: "#fff"
-          }}
-          title={allEligibleSelected ? "Deselect All" : "Select All"}
-        >
-          {allEligibleSelected ? "Deselect All" : "Select All"}
-        </button>
-      </div>
-    )}
-  </div>
-
-  <div className="flp-panel-body">
-    {!selectedFormId ? (
-      <div className="flp-empty-box">
-        <i className="bi bi-hand-index"></i>
-        <p>Please choose a form to select users</p>
-      </div>
-    ) : pagedUsers.length === 0 ? (
-      <div className="flp-empty-box">
-        <i className="bi bi-inbox"></i>
-        <p>No users available</p>
-      </div>
-    ) : (
-      <>
-        <div className="flp-selected-count">
-          <i className="bi bi-check-circle-fill"></i>
-          <strong>{selectedUserIds.length}</strong> user(s) selected
-        </div>
-        {pagedUsers.map((user) => {
-          const isAssigned = assignedUserIds.map(String).includes(String(user.userId));
-          const isSelected = selectedUserIds.includes(user.userId);
-          return (
-            <div
-              key={user.userId}
-              className={`flp-user-card ${isSelected ? "flp-selected" : ""} ${isAssigned ? "flp-disabled" : ""}`}
-              onClick={() => !isAssigned && toggleUser(user.userId)}
-            >
-              <input type="checkbox" checked={isSelected} readOnly disabled={isAssigned} />
-              <div className="flp-user-info">
-                <strong>{user.firstName} {user.lastName}</strong>
-                {isAssigned && (
-                  <span className="flp-assigned-tag">
-                    <i className="bi bi-lock-fill"></i> Assigned
-                  </span>
-                )}
-              </div>
+                  <button
+                    onClick={handleSelectAll}
+                    className="flp-btn-select-all"
+                    style={{
+                      background: allEligibleSelected ? "#AC5098" : "#27235C",
+                      color: "#fff",
+                    }}
+                    title={allEligibleSelected ? "Deselect All" : "Select All"}
+                  >
+                    {allEligibleSelected ? "Deselect All" : "Select All"}
+                  </button>
+                </div>
+              )}
             </div>
-          );
-        })}
-      </>
-    )}
-  </div>
 
-  {usersTotalPages > 0 && (
-    <div className="flp-pagination-container">
-      <div className="flp-pagination-info">
-        <span className="flp-pagination-label">Rows per page:</span>
-        <PaginationDropdown
-          value={usersPerPage}
-          onChange={(val) => {
-            setUsersPerPage(Number(val));
-            setUsersPage(1);
-          }}
-          options={[5, 10, 15, 20]}
-        />
-      </div>
+            <div className="flp-panel-body">
+              {!selectedFormId ? (
+                <div className="flp-empty-box">
+                  <i className="bi bi-hand-index"></i>
+                  <p>Please choose a form to select users</p>
+                </div>
+              ) : pagedUsers.length === 0 ? (
+                <div className="flp-empty-box">
+                  <i className="bi bi-inbox"></i>
+                  <p>No users available</p>
+                </div>
+              ) : (
+                <>
+                  <div className="flp-selected-count">
+                    <i className="bi bi-check-circle-fill"></i>
+                    <strong>{selectedUserIds.length}</strong> user(s) selected
+                  </div>
+                  {pagedUsers.map((user) => {
+                    const isAssigned = assignedUserIds
+                      .map(String)
+                      .includes(String(user.userId));
+                    const isSelected = selectedUserIds.includes(user.userId);
+                    return (
+                      <div
+                        key={user.userId}
+                        className={`flp-user-card ${
+                          isSelected ? "flp-selected" : ""
+                        } ${isAssigned ? "flp-disabled" : ""}`}
+                        onClick={() => !isAssigned && toggleUser(user.userId)}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          readOnly
+                          disabled={isAssigned}
+                        />
+                        <div className="flp-user-info">
+                          <strong>
+                            {user.firstName} {user.lastName}
+                          </strong>
+                          {isAssigned && (
+                            <span className="flp-assigned-tag">
+                              <i className="bi bi-lock-fill"></i> Assigned
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </>
+              )}
+            </div>
 
+            {usersTotalPages > 0 && (
+              <div className="flp-pagination-container">
+                <div className="flp-pagination-info">
+                  <span className="flp-pagination-label">Rows per page:</span>
+                  <PaginationDropdown
+                    value={usersPerPage}
+                    onChange={(val) => {
+                      setUsersPerPage(Number(val));
+                      setUsersPage(1);
+                    }}
+                    options={[5, 10, 15, 20]}
+                  />
+                </div>
 
                 <nav className="flp-pagination-nav">
                   <ul className="flp-pagination">
-                    <li className={`flp-page-item ${usersPage === 1 ? "flp-disabled" : ""}`}>
-                      <button className="flp-page-link" onClick={() => onUsersPageChange(usersPage - 1)}>&laquo;</button>
+                    <li
+                      className={`flp-page-item ${
+                        usersPage === 1 ? "flp-disabled" : ""
+                      }`}
+                    >
+                      <button
+                        className="flp-page-link"
+                        onClick={() => onUsersPageChange(usersPage - 1)}
+                      >
+                        &laquo;
+                      </button>
                     </li>
                     {Array.from({ length: usersTotalPages }, (_, i) => (
-                      <li key={i + 1} className={`flp-page-item ${usersPage === i + 1 ? "flp-active" : ""}`}>
-                        <button className="flp-page-link" onClick={() => onUsersPageChange(i + 1)}>{i + 1}</button>
+                      <li
+                        key={i + 1}
+                        className={`flp-page-item ${
+                          usersPage === i + 1 ? "flp-active" : ""
+                        }`}
+                      >
+                        <button
+                          className="flp-page-link"
+                          onClick={() => onUsersPageChange(i + 1)}
+                        >
+                          {i + 1}
+                        </button>
                       </li>
                     ))}
-                    <li className={`flp-page-item ${usersPage === usersTotalPages ? "flp-disabled" : ""}`}>
-                      <button className="flp-page-link" onClick={() => onUsersPageChange(usersPage + 1)}>&raquo;</button>
+                    <li
+                      className={`flp-page-item ${
+                        usersPage === usersTotalPages ? "flp-disabled" : ""
+                      }`}
+                    >
+                      <button
+                        className="flp-page-link"
+                        onClick={() => onUsersPageChange(usersPage + 1)}
+                      >
+                        &raquo;
+                      </button>
                     </li>
                   </ul>
                 </nav>
@@ -920,7 +1058,11 @@ const PaginationDropdown = ({ value, onChange, options }) => {
               <button
                 className="flp-btn-share"
                 onClick={() => openDeadlineModal("Send")}
-                disabled={!selectedFormId || selectedUserIds.length === 0 || !currentUserId}
+                disabled={
+                  !selectedFormId ||
+                  selectedUserIds.length === 0 ||
+                  !currentUserId
+                }
               >
                 <i className="bi bi-send-fill"></i> Share
               </button>

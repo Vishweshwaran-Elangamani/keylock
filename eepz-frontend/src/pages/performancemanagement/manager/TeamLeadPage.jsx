@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { 
+import {
   getApproverAssessments,
   getApproverReworkForms,
   getApproverSubmittedL1Ratings,
@@ -15,7 +15,7 @@ import {
   getReviewerAssessmentAttachments,
   submitReviewerReviews,
   submitReviewerDecision,
-  downloadReviewerAttachment
+  downloadReviewerAttachment,
 } from "../../../services/performancemanagement/api/rolesapi";
 
 import { Toaster, toast } from "sonner";
@@ -125,7 +125,9 @@ function TeamLeadPage() {
         const [pendingResp, reworkResp, submittedResp] = await Promise.all([
           getApproverAssessments(userId, 1, 25),
           getApproverReworkForms(userId, 1, 25).catch(() => ({ data: [] })),
-          getApproverSubmittedL1Ratings(userId, 1, 25).catch(() => ({ data: [] })),
+          getApproverSubmittedL1Ratings(userId, 1, 25).catch(() => ({
+            data: [],
+          })),
         ]);
 
         const extractAssessments = (resp) => {
@@ -144,7 +146,7 @@ function TeamLeadPage() {
         const pendingAssessments = extractAssessments(pendingResp);
         const reworkAssessmentsList = extractAssessments(reworkResp);
         const submittedAssessmentsBasic = extractAssessments(submittedResp);
-        
+
         const allAssessmentIds = [
           ...pendingAssessments.map((a) => a.assessmentId),
           ...reworkAssessmentsList.map((a) => a.assessmentId),
@@ -153,7 +155,10 @@ function TeamLeadPage() {
         const allWithDetails = await Promise.all(
           allAssessmentIds.map(async (assessmentId) => {
             try {
-              const detailResp = await getApproverAssessmentDetail(userId, assessmentId);
+              const detailResp = await getApproverAssessmentDetail(
+                userId,
+                assessmentId
+              );
               return detailResp.data;
             } catch (err) {
               return (
@@ -171,7 +176,10 @@ function TeamLeadPage() {
         const withNotes = await Promise.all(
           allWithDetails.map(async (a) => {
             try {
-              const decisionResp = await getApproverAssessmentDecision(userId, a.assessmentId);
+              const decisionResp = await getApproverAssessmentDecision(
+                userId,
+                a.assessmentId
+              );
               return {
                 ...a,
                 l2DecisionNote: decisionResp.data?.note || "",
@@ -190,7 +198,10 @@ function TeamLeadPage() {
         const submittedWithDetails = await Promise.all(
           submittedAssessmentsBasic.map(async (basic) => {
             try {
-              const detailResp = await getApproverAssessmentDetail(userId, basic.assessmentId);
+              const detailResp = await getApproverAssessmentDetail(
+                userId,
+                basic.assessmentId
+              );
               return detailResp.data;
             } catch (err) {
               return basic;
@@ -203,9 +214,11 @@ function TeamLeadPage() {
       } else {
         const [pendingResp, submittedResp] = await Promise.all([
           getReviewerAssessments(userId, 1, 25),
-          getReviewerSubmittedRatings(userId, 1, 25).catch(() => ({ data: [] })),
+          getReviewerSubmittedRatings(userId, 1, 25).catch(() => ({
+            data: [],
+          })),
         ]);
-        
+
         const respData = pendingResp?.data;
         const assessments = Array.isArray(respData)
           ? respData
@@ -216,25 +229,28 @@ function TeamLeadPage() {
           : Array.isArray(respData?.assessments)
           ? respData.assessments
           : [];
-          
+
         const submittedData = submittedResp?.data;
         const submittedAssessmentsBasic = Array.isArray(submittedData)
           ? submittedData
           : Array.isArray(submittedData?.data)
           ? submittedData.data
           : [];
-        
+
         const submittedWithDetails = await Promise.all(
           submittedAssessmentsBasic.map(async (basic) => {
             try {
-              const detailResp = await getReviewerAssessmentDetail(userId, basic.assessmentId);
+              const detailResp = await getReviewerAssessmentDetail(
+                userId,
+                basic.assessmentId
+              );
               return detailResp.data;
             } catch (err) {
               return basic;
             }
           })
         );
-          
+
         setL2Subs(assessments);
         setSubmittedL2(submittedWithDetails);
       }
@@ -268,9 +284,10 @@ function TeamLeadPage() {
     setRejectionReason("");
 
     try {
-      const attachmentsResp = active === "l1"
-        ? await getApproverAssessmentAttachments(userId, assess.assessmentId)
-        : await getReviewerAssessmentAttachments(userId, assess.assessmentId);
+      const attachmentsResp =
+        active === "l1"
+          ? await getApproverAssessmentAttachments(userId, assess.assessmentId)
+          : await getReviewerAssessmentAttachments(userId, assess.assessmentId);
       const attachments =
         attachmentsResp.data?.data || attachmentsResp.data || [];
 
@@ -381,11 +398,18 @@ function TeamLeadPage() {
         assessmentId: modalData.assessmentId,
         items,
       });
-      await submitReviewerDecision(userId, modalData.assessmentId, "approved", "");
-      
+      await submitReviewerDecision(
+        userId,
+        modalData.assessmentId,
+        "approved",
+        ""
+      );
+
       // Optimistically remove from pending list
-      setL2Subs(prevSubs => prevSubs.filter(sub => sub.assessmentId !== modalData.assessmentId));
-      
+      setL2Subs((prevSubs) =>
+        prevSubs.filter((sub) => sub.assessmentId !== modalData.assessmentId)
+      );
+
       toast.success("Review approved successfully!");
       closeModal();
       await fetchData();
@@ -406,11 +430,18 @@ function TeamLeadPage() {
     }
     setL2ActionLoading(true);
     try {
-      await submitReviewerDecision(userId, modalData.assessmentId, "rejected", rejectionReason);
-      
+      await submitReviewerDecision(
+        userId,
+        modalData.assessmentId,
+        "rejected",
+        rejectionReason
+      );
+
       // Optimistically remove from pending list
-      setL2Subs(prevSubs => prevSubs.filter(sub => sub.assessmentId !== modalData.assessmentId));
-      
+      setL2Subs((prevSubs) =>
+        prevSubs.filter((sub) => sub.assessmentId !== modalData.assessmentId)
+      );
+
       toast.success("Review rejected and returned to L1.");
       closeModal();
       await fetchData();
@@ -426,9 +457,10 @@ function TeamLeadPage() {
 
   const handleDownloadAttachment = async (attachmentId) => {
     try {
-      const response = active === "l1"
-        ? await downloadApproverAttachment(userId, attachmentId)
-        : await downloadReviewerAttachment(userId, attachmentId);
+      const response =
+        active === "l1"
+          ? await downloadApproverAttachment(userId, attachmentId)
+          : await downloadReviewerAttachment(userId, attachmentId);
 
       let filename = "attachment";
 
@@ -480,7 +512,11 @@ function TeamLeadPage() {
     const categories = getL1Categories(allL1);
     const tabs = [
       { key: "Pending", label: "Pending L1 Review", subs: categories.pending },
-      { key: "Rejected", label: "Rejected (Rework)", subs: categories.rejected },
+      {
+        key: "Rejected",
+        label: "Rejected (Rework)",
+        subs: categories.rejected,
+      },
       { key: "Submitted", label: "Submitted L1 Ratings", subs: submittedL1 },
     ];
     const currentSubs = tabs.find((t) => t.key === activeL1Tab)?.subs || [];
@@ -495,9 +531,7 @@ function TeamLeadPage() {
               onClick={() => setActiveL1Tab(tab.key)}
             >
               {tab.label}
-              <span className="tl-count">
-                {tab.subs.length}
-              </span>
+              <span className="tl-count">{tab.subs.length}</span>
             </button>
           ))}
         </div>
@@ -525,8 +559,9 @@ function TeamLeadPage() {
                   const l1Complete = isL1Complete(assess);
                   const isSubmittedTab = activeL1Tab === "Submitted";
                   const showReviewBtn =
-                    !isSubmittedTab && (!l1Complete || assess.l2Decision === "Rejected");
-                  
+                    !isSubmittedTab &&
+                    (!l1Complete || assess.l2Decision === "Rejected");
+
                   return (
                     <tr key={assess.assessmentId}>
                       <td>{assess.employeeName}</td>
@@ -566,7 +601,8 @@ function TeamLeadPage() {
                             className="cg-bulk-btn"
                             onClick={() => openModal(assess, false)}
                           >
-                            <i className="bi bi-pencil-square"></i> Review &amp; Submit
+                            <i className="bi bi-pencil-square"></i> Review &amp;
+                            Submit
                           </button>
                         )}
                         {isSubmittedTab && (
@@ -595,7 +631,8 @@ function TeamLeadPage() {
                 <span className="pagination-label">entries</span>
               </div>
               <div className="pagination-status">
-                Showing 1 to {currentSubs.length} of {currentSubs.length} entries
+                Showing 1 to {currentSubs.length} of {currentSubs.length}{" "}
+                entries
               </div>
               <nav className="pagination-nav">
                 <ul className="pagination">
@@ -628,7 +665,7 @@ function TeamLeadPage() {
     ];
     const currentSubs = tabs.find((t) => t.key === activeL2Tab)?.subs || [];
     const isSubmittedTab = activeL2Tab === "Submitted";
-    
+
     return (
       <>
         <div className="tl-tabs-bar">
@@ -639,13 +676,11 @@ function TeamLeadPage() {
               onClick={() => setActiveL2Tab(tab.key)}
             >
               {tab.label}
-              <span className="tl-count">
-                {tab.subs.length}
-              </span>
+              <span className="tl-count">{tab.subs.length}</span>
             </button>
           ))}
         </div>
-        
+
         {currentSubs.length === 0 ? (
           <div className="tl-empty">
             <i className="bi bi-inbox"></i>
@@ -674,8 +709,10 @@ function TeamLeadPage() {
                   const l1Avg =
                     l1Ratings.length > 0
                       ? (
-                          l1Ratings.reduce((sum, i) => sum + i.approverRating, 0) /
-                          l1Ratings.length
+                          l1Ratings.reduce(
+                            (sum, i) => sum + i.approverRating,
+                            0
+                          ) / l1Ratings.length
                         ).toFixed(2)
                       : 0;
                   return (
@@ -693,7 +730,11 @@ function TeamLeadPage() {
                         </span>
                       </td>
                       <td>
-                        <span className={`cg-days-badge ${isSubmittedTab ? "badge-success" : "badge-info"}`}>
+                        <span
+                          className={`cg-days-badge ${
+                            isSubmittedTab ? "badge-success" : "badge-info"
+                          }`}
+                        >
                           {isSubmittedTab ? "Submitted" : "Awaiting"}
                         </span>
                       </td>
@@ -734,7 +775,8 @@ function TeamLeadPage() {
                 <span className="pagination-label">entries</span>
               </div>
               <div className="pagination-status">
-                Showing 1 to {currentSubs.length} of {currentSubs.length} entries
+                Showing 1 to {currentSubs.length} of {currentSubs.length}{" "}
+                entries
               </div>
               <nav className="pagination-nav">
                 <ul className="pagination">
@@ -768,7 +810,7 @@ function TeamLeadPage() {
         <Breadcrumb
           items={[
             { label: "Performance", path: "/manager/dashboard/performance" },
-            { label: "Performance Review", path: null }
+            { label: "Performance Review", path: null },
           ]}
         />
 

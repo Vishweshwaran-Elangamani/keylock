@@ -11,4 +11,3 @@ export const getAppraisalByAssignmentId = (assignmentId) =>
 
 export const getDeptHeadRatings = () =>
   api.get("/DeptHeadApprovals/depthead/submitted-ratings");
-

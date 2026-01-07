@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getDeptHeadApprovedNominations } from "../../../services/performancemanagement/api/nominationapi";
-import Breadcrumb from "../../../components/common/Breadcrumb"; 
+import Breadcrumb from "../../../components/common/Breadcrumb";
 import "../../../styles/performancemanagement/hr/TopPerformers.css";
 
 export default function TopPerformers() {
@@ -14,10 +14,7 @@ export default function TopPerformers() {
   const user = JSON.parse(localStorage.getItem("user"));
   const deptHeadId = user ? user.empId : null;
 
-  
-  const breadcrumbItems = [
-    { label: "Top Performers" }
-  ];
+  const breadcrumbItems = [{ label: "Top Performers" }];
 
   useEffect(() => {
     if (!deptHeadId) {
@@ -31,7 +28,9 @@ export default function TopPerformers() {
     try {
       const response = await getDeptHeadApprovedNominations(deptHeadId);
       if (response.status === 200 && response.data.success) {
-        const allNominations = response.data.data.flatMap(group => group.nominations);
+        const allNominations = response.data.data.flatMap(
+          (group) => group.nominations
+        );
         setNominations(allNominations);
       }
     } catch (error) {
@@ -80,16 +79,19 @@ export default function TopPerformers() {
             <div className="dtp-detail-row">
               <div className="dtp-detail-col">
                 <label className="dtp-detail-label">NOMINEE NAME</label>
-                <p className="dtp-detail-value">{selectedNomination.nominee.fullName}</p>
+                <p className="dtp-detail-value">
+                  {selectedNomination.nominee.fullName}
+                </p>
               </div>
               <div className="dtp-detail-col">
                 <label className="dtp-detail-label">REWARD TYPE</label>
-                <p className="dtp-detail-value">{selectedNomination.rewardType.rewardName}</p>
+                <p className="dtp-detail-value">
+                  {selectedNomination.rewardType.rewardName}
+                </p>
               </div>
             </div>
 
-            <div className="dtp-detail-row">
-            </div>
+            <div className="dtp-detail-row"></div>
 
             <div className="dtp-detail-section">
               <label className="dtp-detail-label">JUSTIFICATION</label>
@@ -98,22 +100,29 @@ export default function TopPerformers() {
               </div>
             </div>
 
-            {selectedNomination.parameterValues && selectedNomination.parameterValues.length > 0 && (
-              <div className="dtp-detail-section">
-                <label className="dtp-detail-label">NOMINATION PARAMETERS</label>
-                {selectedNomination.parameterValues.map((param, idx) => (
-                  <div key={idx} className="dtp-parameter-card">
-                    <div className="dtp-parameter-info">
-                      <p className="dtp-parameter-name">{param.parameterName}</p>
-                      <p className="dtp-parameter-type">{param.parameterType}</p>
+            {selectedNomination.parameterValues &&
+              selectedNomination.parameterValues.length > 0 && (
+                <div className="dtp-detail-section">
+                  <label className="dtp-detail-label">
+                    NOMINATION PARAMETERS
+                  </label>
+                  {selectedNomination.parameterValues.map((param, idx) => (
+                    <div key={idx} className="dtp-parameter-card">
+                      <div className="dtp-parameter-info">
+                        <p className="dtp-parameter-name">
+                          {param.parameterName}
+                        </p>
+                        <p className="dtp-parameter-type">
+                          {param.parameterType}
+                        </p>
+                      </div>
+                      <div className="dtp-parameter-value">
+                        {formatParameterValue(param)}
+                      </div>
                     </div>
-                    <div className="dtp-parameter-value">
-                      {formatParameterValue(param)}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              )}
           </div>
 
           <div className="dtp-modal-footer">
@@ -159,7 +168,10 @@ export default function TopPerformers() {
         ) : (
           <div className="dtp-grid">
             {nominations.map((nomination) => (
-              <div key={nomination.nominationId} className="dtp-nomination-card">
+              <div
+                key={nomination.nominationId}
+                className="dtp-nomination-card"
+              >
                 <div className="dtp-employee-section">
                   <div className="dtp-avatar">
                     {getInitials(nomination.nominee)}

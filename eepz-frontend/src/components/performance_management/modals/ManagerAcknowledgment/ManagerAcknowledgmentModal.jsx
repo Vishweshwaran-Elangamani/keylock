@@ -8,33 +8,31 @@ const ManagerAcknowledgmentModal = ({ ackList, error, loading }) => {
 
   const breadcrumbItems = [
     { label: "Performance", path: "/hr/dashboard/performance" },
-    { label: "Employee Acknowledgments", path: null }
+    { label: "Employee Acknowledgments", path: null },
   ];
 
   return (
     <div className="manager-ack-container">
-     
       <Breadcrumb
         items={[
           { label: "Dashboard", path: "/manager/dashboard" },
           { label: "Performance", path: "/manager/dashboard/performance" },
-          { label: "Employee Acknowledgements", path: null }
+          { label: "Employee Acknowledgements", path: null },
         ]}
       />
 
-     
       <h2 className="manager-ack-title">Employee Acknowledgments</h2>
 
-   
       {loading ? (
         <div className="manager-ack-loading">Loading...</div>
       ) : error ? (
         <div className="manager-ack-error">{error}</div>
       ) : ackList.length === 0 ? (
-        <div className="manager-ack-no-data">No employee acknowledgments found.</div>
+        <div className="manager-ack-no-data">
+          No employee acknowledgments found.
+        </div>
       ) : (
         <div className="manager-ack-content">
-          {/* Table Container */}
           <div className="manager-ack-table-container">
             <table className="manager-ack-table">
               <thead>
@@ -51,11 +49,14 @@ const ManagerAcknowledgmentModal = ({ ackList, error, loading }) => {
                     <td className="cell-comment">{row.employeeComments}</td>
                     <td className="cell-date">
                       {row.acknowledgedAt
-                        ? new Date(row.acknowledgedAt).toLocaleDateString("en-US", {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric"
-                          })
+                        ? new Date(row.acknowledgedAt).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                            }
+                          )
                         : "-"}
                     </td>
                   </tr>
@@ -64,9 +65,7 @@ const ManagerAcknowledgmentModal = ({ ackList, error, loading }) => {
             </table>
           </div>
 
-          
           <div className="manager-ack-pagination">
-          
             <div className="manager-ack-entries-selector">
               <span>Show</span>
               <select className="manager-ack-entries-select">
@@ -78,7 +77,6 @@ const ManagerAcknowledgmentModal = ({ ackList, error, loading }) => {
               <span>entries</span>
             </div>
 
-            
             <div className="manager-ack-pagination-status">
               Showing 1 to {ackList.length} of {ackList.length} entries
             </div>
@@ -92,7 +90,9 @@ const ManagerAcknowledgmentModal = ({ ackList, error, loading }) => {
                   </button>
                 </li>
                 <li>
-                  <button className="manager-ack-pagination-btn active">1</button>
+                  <button className="manager-ack-pagination-btn active">
+                    1
+                  </button>
                 </li>
                 <li>
                   <button className="manager-ack-pagination-btn" disabled>

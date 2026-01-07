@@ -65,8 +65,9 @@ const NominationModal = ({
 
     if (rewardTypeId) {
       try {
-        const { data } =
-          await managerNominationApi.getNominationParameters(rewardTypeId);
+        const { data } = await managerNominationApi.getNominationParameters(
+          rewardTypeId
+        );
         if (data?.success) {
           setParameters(data.data || []);
         } else {
@@ -101,9 +102,7 @@ const NominationModal = ({
   };
 
   const isRewardAlreadyNominated = (rewardTypeId) => {
-    return existingNominations.some(
-      (nom) => nom.rewardTypeId === rewardTypeId
-    );
+    return existingNominations.some((nom) => nom.rewardTypeId === rewardTypeId);
   };
 
   const getNominatedRewardNames = () => {
@@ -210,11 +209,7 @@ const NominationModal = ({
         );
       case "textarea":
         return (
-          <textarea
-            rows={3}
-            {...commonProps}
-            className="nomination-textarea"
-          />
+          <textarea rows={3} {...commonProps} className="nomination-textarea" />
         );
       case "number":
       case "rating":
@@ -251,19 +246,18 @@ const NominationModal = ({
   return (
     <div className="nomination-modal-overlay" onClick={handleClose}>
       <div
-        className={`nomination-modal ${categoryRewards.length === 1 ? 'compact' : ''}`}
+        className={`nomination-modal ${
+          categoryRewards.length === 1 ? "compact" : ""
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <div className="nomination-modal-header">
           <div className="nomination-modal-header-content">
             <div className="nomination-modal-icon-wrapper">
               <i className="bi bi-award-fill nomination-modal-icon"></i>
             </div>
             <div className="nomination-modal-header-text">
-              <h5 className="nomination-modal-title">
-                Employee Nomination
-              </h5>
+              <h5 className="nomination-modal-title">Employee Nomination</h5>
               <div className="nomination-modal-subtitle">
                 <i className="bi bi-person-fill"></i>
                 <span className="nomination-modal-employee-name">
@@ -287,31 +281,30 @@ const NominationModal = ({
           </button>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="nomination-modal-form">
-  <div className="nomination-modal-body">
-    {existingNominations.length > 0 && !selectedRewardType && (
-      <div className="nomination-warning-banner">
-        <i className="bi bi-exclamation-triangle-fill nomination-warning-icon"></i>
-        <div className="nomination-warning-content">
-          <div className="nomination-warning-title">
-            Already Nominated
-          </div>
-          <div className="nomination-warning-text">
-            This employee has already been nominated for:{" "}
-            <strong>{getNominatedRewardNames()}</strong>
-          </div>
-        </div>
-      </div>
-    )}
+          <div className="nomination-modal-body">
+            {existingNominations.length > 0 && !selectedRewardType && (
+              <div className="nomination-warning-banner">
+                <i className="bi bi-exclamation-triangle-fill nomination-warning-icon"></i>
+                <div className="nomination-warning-content">
+                  <div className="nomination-warning-title">
+                    Already Nominated
+                  </div>
+                  <div className="nomination-warning-text">
+                    This employee has already been nominated for:{" "}
+                    <strong>{getNominatedRewardNames()}</strong>
+                  </div>
+                </div>
+              </div>
+            )}
 
-            {/* Reward Type Selection */}
             {!selectedRewardType && (
               <div className="nomination-section">
                 <div className="nomination-section-header">
                   <i className="bi bi-trophy-fill"></i>
                   <label className="nomination-section-label">
-                    Select Recognition Reward <span className="nomination-required">*</span>
+                    Select Recognition Reward{" "}
+                    <span className="nomination-required">*</span>
                   </label>
                 </div>
 
@@ -324,11 +317,16 @@ const NominationModal = ({
                       No Recognition Rewards Available
                     </div>
                     <div className="nomination-empty-description">
-                      There are currently no active recognition reward types configured. Please contact HR administration.
+                      There are currently no active recognition reward types
+                      configured. Please contact HR administration.
                     </div>
                   </div>
                 ) : (
-                  <div className={`nomination-reward-grid ${categoryRewards.length === 1 ? 'single-reward' : ''}`}>
+                  <div
+                    className={`nomination-reward-grid ${
+                      categoryRewards.length === 1 ? "single-reward" : ""
+                    }`}
+                  >
                     {categoryRewards.map((reward) => {
                       const isDisabled = isRewardAlreadyNominated(
                         reward.rewardTypeId
@@ -350,21 +348,22 @@ const NominationModal = ({
                         >
                           {isDisabled && (
                             <div className="nomination-nominated-badge">
-                              <i className="bi bi-check-circle-fill"></i> Nominated
+                              <i className="bi bi-check-circle-fill"></i>{" "}
+                              Nominated
                             </div>
                           )}
 
                           <div className="nomination-reward-icon">
                             <i className="bi bi-star-fill"></i>
                           </div>
-                          <div 
+                          <div
                             className="nomination-reward-name"
                             title={reward?.rewardName}
                           >
                             {reward?.rewardName || "Unnamed reward"}
                           </div>
                           {reward?.description && (
-                            <div 
+                            <div
                               className="nomination-reward-description"
                               title={reward.description}
                             >
@@ -384,7 +383,6 @@ const NominationModal = ({
               </div>
             )}
 
-            {/* Selected Reward & Form */}
             {selectedRewardType && (
               <div className="nomination-selected-section">
                 <div className="nomination-selected-badge">
@@ -414,7 +412,6 @@ const NominationModal = ({
                   </button>
                 </div>
 
-                {/* Justification */}
                 <div className="nomination-field-wrapper">
                   <label className="nomination-field-label">
                     <i className="bi bi-chat-left-text-fill"></i> Justification{" "}
@@ -433,7 +430,6 @@ const NominationModal = ({
                   </div>
                 </div>
 
-                {/* Parameters */}
                 {parameters.length > 0 && (
                   <div className="nomination-parameters-section">
                     <div className="nomination-parameters-header">
@@ -464,7 +460,6 @@ const NominationModal = ({
             )}
           </div>
 
-          {/* Footer */}
           <div className="nomination-modal-footer">
             <button
               type="button"

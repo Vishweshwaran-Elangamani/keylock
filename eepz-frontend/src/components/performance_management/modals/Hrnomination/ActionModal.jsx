@@ -14,22 +14,21 @@ const ActionModal = ({
 
   return (
     <>
-    
       <div className="action-modal-backdrop" onClick={onClose}></div>
 
-      
       <div className="action-modal-wrapper">
         <div
           className="action-modal-container"
           style={{ background: THEME.card }}
         >
-          
           <div
             className="action-modal-header"
             style={{ background: THEME.primary }}
           >
             <h6 className="action-modal-title">
-              {actionType === "approve" ? "Approval Remarks" : "Rejection Reason"}
+              {actionType === "approve"
+                ? "Approval Remarks"
+                : "Rejection Reason"}
             </h6>
             <button
               onClick={onClose}
@@ -40,11 +39,7 @@ const ActionModal = ({
             </button>
           </div>
 
-          {/* Body */}
-          <div
-            className="action-modal-body"
-            style={{ background: THEME.card }}
-          >
+          <div className="action-modal-body" style={{ background: THEME.card }}>
             <label
               className="action-modal-label"
               style={{ color: THEME.textLight }}
@@ -67,7 +62,6 @@ const ActionModal = ({
             />
           </div>
 
-          {/* Footer */}
           <div
             className="action-modal-footer"
             style={{
@@ -76,10 +70,7 @@ const ActionModal = ({
             }}
           >
             <div className="action-modal-footer-buttons">
-              <button
-                className="btn action-modal-btn-cancel"
-                onClick={onClose}
-              >
+              <button className="btn action-modal-btn-cancel" onClick={onClose}>
                 Cancel
               </button>
               <button

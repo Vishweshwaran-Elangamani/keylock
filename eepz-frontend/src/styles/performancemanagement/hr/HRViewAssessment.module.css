@@ -1,6 +1,5 @@
-/* Page Container */
 .hrViewAssessmentPage {
-  background: #F8FAFC;
+  background: #f8fafc;
   min-height: 100vh;
   padding: 20px;
 }
@@ -10,7 +9,6 @@
   margin: 0 auto;
 }
 
-/* Loading State */
 .hrViewAssessmentLoading {
   display: flex;
   flex-direction: column;
@@ -42,7 +40,6 @@
   font-weight: 500;
 }
 
-/* Error State */
 .hrViewAssessmentError {
   display: flex;
   align-items: center;
@@ -62,7 +59,6 @@
   font-size: 24px;
 }
 
-/* Alert */
 .hrViewAssessmentAlert {
   display: flex;
   align-items: center;
@@ -81,7 +77,6 @@
   font-size: 24px;
 }
 
-/* Page Title */
 .hrViewAssessmentPageTitle {
   font-size: 28px;
   font-weight: 700;
@@ -89,7 +84,6 @@
   margin: 0 0 24px 0;
 }
 
-/* Filters */
 .hrViewAssessmentFilters {
   display: flex;
   align-items: center;
@@ -109,7 +103,6 @@
   gap: 8px;
 }
 
-/* Search Group - Unified Input + Button */
 .hrViewAssessmentSearchGroup {
   display: flex;
   align-items: center;
@@ -153,7 +146,6 @@
   background: #1e1b45;
 }
 
-/* Custom Dropdown - UPWARD OPENING */
 .customDropdown {
   position: relative;
   min-width: 180px;
@@ -194,7 +186,7 @@
   position: absolute;
   right: 12px;
   top: 50%;
-  transform: translateY(-50%) rotate(45deg);  
+  transform: translateY(-50%) rotate(45deg);
   width: 7px;
   height: 7px;
   border-right: 2px solid #27235c;
@@ -204,36 +196,35 @@
 }
 
 .customDropdown:focus-within .customArrow {
-  transform: translateY(-50%) rotate(225deg);  
+  transform: translateY(-50%) rotate(225deg);
 }
 
 .customMenu {
   position: absolute;
-  top: calc(100% + 4px);  
+  top: calc(100% + 4px);
   left: 0;
   right: 0;
   background: #fff;
   border: 1.5px solid #27235c;
-  border-top: none;  
-  border-radius: 0 0 8px 8px;  
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);  
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   max-height: 250px;
   overflow-y: auto;
   z-index: 10000;
-  animation: dropdownSlideDown 0.2s ease-out;  
+  animation: dropdownSlideDown 0.2s ease-out;
 }
 
 @keyframes dropdownSlideDown {
   from {
     opacity: 0;
-    transform: translateY(-10px);  
+    transform: translateY(-10px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
-
 
 .customOption {
   padding: 10px 16px;
@@ -270,7 +261,6 @@
   color: white;
 }
 
-/* Pagination Dropdown */
 .paginationDropdown {
   position: relative;
   padding: 0;
@@ -292,7 +282,7 @@
   cursor: pointer;
   user-select: none;
   background: #ffffff;
-  border: 1.5px solid #27235C;
+  border: 1.5px solid #27235c;
   border-radius: 6px;
   font-size: 0.95rem;
   font-weight: 600;
@@ -330,7 +320,7 @@
   left: -1.5px;
   right: -1.5px;
   background: #ffffff;
-  border: 1.5px solid #27235C;
+  border: 1.5px solid #27235c;
   border-bottom: none;
   border-radius: 6px 6px 0 0;
   box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.12);
@@ -404,7 +394,6 @@
   color: white;
 }
 
-/* Clear Filters Button */
 .hrViewAssessmentBtnClearFilters {
   padding: 10px 20px;
   background: #fff;
@@ -437,7 +426,6 @@
   font-size: 16px;
 }
 
-/* Export Button */
 .hrViewAssessmentBtnExport {
   padding: 10px 20px;
   background: #27235c;
@@ -464,11 +452,10 @@
   font-size: 16px;
 }
 
-/* Table Card */
 .hrViewAssessmentTableCard {
   background: #fff;
   border: 2px solid #27235c;
-  /* border-radius: 12px; */
+
   overflow: visible;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
@@ -478,7 +465,6 @@
   overflow-y: visible;
 }
 
-/* Table */
 .hrViewAssessmentTable {
   width: 100%;
   border-collapse: collapse;
@@ -491,7 +477,7 @@
 
 .hrViewAssessmentTable th {
   padding: 16px 20px;
-  text-align: left !important;  
+  text-align: left !important;
   font-weight: 700;
   color: #fff;
   font-size: 13px;
@@ -503,8 +489,6 @@
 .hrViewAssessmentTable th.textCenter {
   text-align: left !important;
 }
-
-
 
 .hrViewAssessmentTable tbody {
   background: #fff;
@@ -528,11 +512,9 @@
   color: #1a202c;
   font-size: 14px;
   vertical-align: middle;
-  text-align: left !important;  
+  text-align: left !important;
 }
 
-
-/* Status Badges */
 .hrViewAssessmentBadge {
   display: inline-flex;
   align-items: center;
@@ -558,7 +540,6 @@
   color: #374151;
 }
 
-/* Action Buttons */
 .hrViewAssessmentActionButtons {
   display: flex;
   gap: 8px;
@@ -590,7 +571,6 @@
   box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
 }
 
-/* Empty State */
 .hrViewAssessmentEmptyState {
   text-align: center;
   padding: 60px 20px;
@@ -610,7 +590,6 @@
   margin: 0;
 }
 
-/* Pagination Container */
 .hrViewAssessmentPaginationContainer {
   display: flex;
   justify-content: space-between;
@@ -704,7 +683,6 @@
   cursor: not-allowed;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .hrViewAssessmentPage {
     padding: 12px;

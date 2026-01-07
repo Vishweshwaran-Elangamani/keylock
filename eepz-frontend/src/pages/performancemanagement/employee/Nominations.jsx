@@ -98,35 +98,24 @@ export default function Nominations() {
       <div className="nom-card-wrapper">
         <div className="nom-decorative-bg-1" />
 
-        
         <div className="nom-main-card">
-          
           <div className="nom-card-grid">
-            
             <div className="nom-icon-section">
-             
               <div className="nom-glow-bg" />
 
-             
               <div className="nom-icon-container">
                 <i className="bi bi-award-fill" />
               </div>
             </div>
 
-           
             <div className="nom-content-section">
-              
-
-             
               <h1 className="nom-title">Congratulations!</h1>
 
-            
               <p className="nom-subtitle">
                 You have been recognized for your outstanding contribution and
                 excellence
               </p>
 
-             
               <div className="nom-award-box">
                 <p className="nom-award-label">
                   <i className="bi bi-badge-check" />
@@ -194,16 +183,13 @@ export default function Nominations() {
           <div className="nom-header-badge">
             <i className="bi bi-star-fill" />
             <p>
-              {nominations.length} recognition{nominations.length !== 1 ? "s" : ""}{" "}
-              received
+              {nominations.length} recognition
+              {nominations.length !== 1 ? "s" : ""} received
             </p>
           </div>
         </div>
 
-       
         {renderNominationCard()}
-
-       
       </div>
     </div>
   );

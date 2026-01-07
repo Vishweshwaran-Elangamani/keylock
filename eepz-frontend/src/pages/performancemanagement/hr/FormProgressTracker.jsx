@@ -19,7 +19,6 @@ export default function FormProgressTrackerPage() {
     fetchTrackers();
   }, []);
 
- 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -53,11 +52,23 @@ export default function FormProgressTrackerPage() {
       return;
     }
     const headers = [
-      "Tracker ID", "Assignment ID", "Employee", "L1", "L2",
-      "Initiated", "Sent To Employee", "Employee Completed", "Sent To Manager", "Manager Completed",
-      "Sent To Dept Head", "DeptHead Approved", "Emp Acknowledged", "Sent To Leadership", "Last Updated"
+      "Tracker ID",
+      "Assignment ID",
+      "Employee",
+      "L1",
+      "L2",
+      "Initiated",
+      "Sent To Employee",
+      "Employee Completed",
+      "Sent To Manager",
+      "Manager Completed",
+      "Sent To Dept Head",
+      "DeptHead Approved",
+      "Emp Acknowledged",
+      "Sent To Leadership",
+      "Last Updated",
     ];
-    const rows = trackers.map(tracker => [
+    const rows = trackers.map((tracker) => [
       tracker.trackerId,
       tracker.assignmentId,
       tracker.employeeName,
@@ -72,14 +83,20 @@ export default function FormProgressTrackerPage() {
       tracker.deptHeadApproved ? "Yes" : "No",
       tracker.empAcknowledged ? "Yes" : "No",
       tracker.sentToLeadership ? "Yes" : "No",
-      tracker.lastUpdated ? new Date(tracker.lastUpdated).toLocaleString() : "N/A"
+      tracker.lastUpdated
+        ? new Date(tracker.lastUpdated).toLocaleString()
+        : "N/A",
     ]);
-    const csvContent = [headers.join(","),
-    ...rows.map(r => r.map(c => `"${c}"`).join(","))].join("\n");
+    const csvContent = [
+      headers.join(","),
+      ...rows.map((r) => r.map((c) => `"${c}"`).join(",")),
+    ].join("\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `FormProgressTracker_${new Date().toISOString().slice(0, 10)}.csv`;
+    link.download = `FormProgressTracker_${new Date()
+      .toISOString()
+      .slice(0, 10)}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -90,21 +107,24 @@ export default function FormProgressTrackerPage() {
   const endIndex = startIndex + itemsPerPage;
   const currentTrackers = trackers.slice(startIndex, endIndex);
 
-  const goToPage = p => setCurrentPage(p);
-  const goToPrev = () => setCurrentPage(cp => Math.max(1, cp - 1));
-  const goToNext = () => setCurrentPage(cp => Math.min(totalPages, cp + 1));
+  const goToPage = (p) => setCurrentPage(p);
+  const goToPrev = () => setCurrentPage((cp) => Math.max(1, cp - 1));
+  const goToNext = () => setCurrentPage((cp) => Math.min(totalPages, cp + 1));
 
   const BoolIcon = ({ value }) => (
-    <span className={value ? "fld-status-icon fld-icon-yes" : "fld-status-icon fld-icon-no"}>
+    <span
+      className={
+        value ? "fld-status-icon fld-icon-yes" : "fld-status-icon fld-icon-no"
+      }
+    >
       {value ? <span>✓</span> : <span>✗</span>}
     </span>
   );
 
- 
   const CustomDropdown = ({ value, onChange, options }) => {
     return (
-      <div 
-        className="fld-custom-dropdown" 
+      <div
+        className="fld-custom-dropdown"
         ref={dropdownRef}
         tabIndex={0}
         onBlur={() => setIsDropdownOpen(false)}
@@ -121,7 +141,9 @@ export default function FormProgressTrackerPage() {
             {options.map((option) => (
               <div
                 key={option}
-                className={`fld-custom-option ${value === option ? 'fld-custom-option-active' : ''}`}
+                className={`fld-custom-option ${
+                  value === option ? "fld-custom-option-active" : ""
+                }`}
                 onClick={() => {
                   onChange(option);
                   setIsDropdownOpen(false);
@@ -141,8 +163,8 @@ export default function FormProgressTrackerPage() {
       <div className="fld-header-wrapper d-flex justify-content-between align-items-center">
         <Breadcrumb
           items={[
-            { label: 'Performance', path: '/hr/dashboard/performance' },
-            { label: 'Form Progress', path: null }
+            { label: "Performance", path: "/hr/dashboard/performance" },
+            { label: "Form Progress", path: null },
           ]}
         />
 
@@ -153,13 +175,19 @@ export default function FormProgressTrackerPage() {
         </div>
       </div>
 
-      {loading && <div className="fld-loading"><div>Loading...</div></div>}
+      {loading && (
+        <div className="fld-loading">
+          <div>Loading...</div>
+        </div>
+      )}
       {error && <div className="fld-error">{error}</div>}
-      {!loading && !error && trackers.length === 0 &&
-        <div className="fld-empty-state"><p>No progress tracker data available.</p></div>
-      }
+      {!loading && !error && trackers.length === 0 && (
+        <div className="fld-empty-state">
+          <p>No progress tracker data available.</p>
+        </div>
+      )}
 
-      {trackers.length > 0 &&
+      {trackers.length > 0 && (
         <div className="fld-card">
           <div
             className="fld-table-wrapper"
@@ -170,7 +198,7 @@ export default function FormProgressTrackerPage() {
               display: "flex",
               flexDirection: "column",
               padding: "0.5rem",
-              borderRadius: "14px"
+              borderRadius: "14px",
             }}
           >
             <table
@@ -192,30 +220,54 @@ export default function FormProgressTrackerPage() {
                 </tr>
               </thead>
               <tbody>
-                {currentTrackers.map(tracker => (
+                {currentTrackers.map((tracker) => (
                   <tr key={tracker.trackerId}>
-                    <td style={{ textAlign: "left" }}>{tracker.employeeName}</td>
+                    <td style={{ textAlign: "left" }}>
+                      {tracker.employeeName}
+                    </td>
                     <td>{tracker.l1Name}</td>
                     <td>{tracker.l2Name}</td>
                     <td style={{ color: tracker.initiated ? "green" : "red" }}>
                       {tracker.initiated ? "✔" : "✖"}
                     </td>
-                    <td style={{ color: tracker.sentToEmployee ? "green" : "red" }}>
+                    <td
+                      style={{
+                        color: tracker.sentToEmployee ? "green" : "red",
+                      }}
+                    >
                       {tracker.sentToEmployee ? "✔" : "✖"}
                     </td>
-                    <td style={{ color: tracker.employeeCompleted ? "green" : "red" }}>
+                    <td
+                      style={{
+                        color: tracker.employeeCompleted ? "green" : "red",
+                      }}
+                    >
                       {tracker.employeeCompleted ? "✔" : "✖"}
                     </td>
-                    <td style={{ color: tracker.sentToManager ? "green" : "red" }}>
+                    <td
+                      style={{ color: tracker.sentToManager ? "green" : "red" }}
+                    >
                       {tracker.sentToManager ? "✔" : "✖"}
                     </td>
-                    <td style={{ color: tracker.managerCompleted ? "green" : "red" }}>
+                    <td
+                      style={{
+                        color: tracker.managerCompleted ? "green" : "red",
+                      }}
+                    >
                       {tracker.managerCompleted ? "✔" : "✖"}
                     </td>
-                    <td style={{ color: tracker.deptHeadApproved ? "green" : "red" }}>
+                    <td
+                      style={{
+                        color: tracker.deptHeadApproved ? "green" : "red",
+                      }}
+                    >
                       {tracker.deptHeadApproved ? "✔" : "✖"}
                     </td>
-                    <td style={{ color: tracker.empAcknowledged ? "green" : "red" }}>
+                    <td
+                      style={{
+                        color: tracker.empAcknowledged ? "green" : "red",
+                      }}
+                    >
                       {tracker.empAcknowledged ? "✔" : "✖"}
                     </td>
                   </tr>
@@ -223,7 +275,10 @@ export default function FormProgressTrackerPage() {
               </tbody>
             </table>
 
-            <div className="fld-pagination-container" style={{ marginTop: "0.5rem" }}>
+            <div
+              className="fld-pagination-container"
+              style={{ marginTop: "0.5rem" }}
+            >
               <div className="fld-pagination-info">
                 <span className="fld-show-entries-label">Pages&nbsp;</span>
                 <CustomDropdown
@@ -236,7 +291,9 @@ export default function FormProgressTrackerPage() {
                 />
                 <span className="fld-show-entries-label">&nbsp;</span>
                 <span className="fld-pagination-status">
-                  &nbsp;&nbsp;Showing {startIndex + 1} to {Math.min(endIndex, trackers.length)} of {trackers.length} entries
+                  &nbsp;&nbsp;Showing {startIndex + 1} to{" "}
+                  {Math.min(endIndex, trackers.length)} of {trackers.length}{" "}
+                  entries
                 </span>
               </div>
               <div className="fld-pagination-controls">
@@ -252,7 +309,9 @@ export default function FormProgressTrackerPage() {
                   <button
                     key={i + 1}
                     onClick={() => goToPage(i + 1)}
-                    className={`fld-pagination-btn${currentPage === i + 1 ? " fld-pagination-btn-active" : ""}`}
+                    className={`fld-pagination-btn${
+                      currentPage === i + 1 ? " fld-pagination-btn-active" : ""
+                    }`}
                   >
                     {i + 1}
                   </button>
@@ -269,7 +328,7 @@ export default function FormProgressTrackerPage() {
             </div>
           </div>
         </div>
-      }
+      )}
     </div>
   );
 }

@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import { useNavigate } from "react-router-dom";
-import { 
-  getEmployeeAssignments, 
-  submitSelfAssessment, 
-  viewSelfAssessment 
+import {
+  getEmployeeAssignments,
+  submitSelfAssessment,
+  viewSelfAssessment,
 } from "../../../services/performancemanagement/api/api";
 import { getUserRole } from "../../../services/performancemanagement/api/rolesapi";
 import { toast, Toaster } from "sonner";
@@ -56,7 +56,11 @@ const PaginationDropdown = ({ value, onChange, options }) => {
 
 const RatingDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
-  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0, width: 0 });
+  const [menuPosition, setMenuPosition] = useState({
+    top: 0,
+    left: 0,
+    width: 0,
+  });
   const dropdownRef = useRef(null);
 
   const options = [
@@ -65,7 +69,7 @@ const RatingDropdown = ({ value, onChange }) => {
     { value: "2", label: "2 - Fair" },
     { value: "3", label: "3 - Good" },
     { value: "4", label: "4 - Very Good" },
-    { value: "5", label: "5 - Excellent" }
+    { value: "5", label: "5 - Excellent" },
   ];
 
   const handleSelect = (val) => {
@@ -73,7 +77,8 @@ const RatingDropdown = ({ value, onChange }) => {
     setOpen(false);
   };
 
-  const selectedLabel = options.find(opt => opt.value === value)?.label || "-";
+  const selectedLabel =
+    options.find((opt) => opt.value === value)?.label || "-";
 
   const handleToggle = (e) => {
     e.stopPropagation();
@@ -82,7 +87,7 @@ const RatingDropdown = ({ value, onChange }) => {
       setMenuPosition({
         top: rect.bottom + window.scrollY + 2,
         left: rect.left + window.scrollX,
-        width: rect.width
+        width: rect.width,
       });
     }
     setOpen((prev) => !prev);
@@ -92,20 +97,24 @@ const RatingDropdown = ({ value, onChange }) => {
     if (!open) return;
 
     const handleClickOutside = (e) => {
-      const menu = document.querySelector('.custom-modal-rating-menu');
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target) && 
-          menu && !menu.contains(e.target)) {
+      const menu = document.querySelector(".custom-modal-rating-menu");
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target) &&
+        menu &&
+        !menu.contains(e.target)
+      ) {
         setOpen(false);
       }
     };
 
     const timer = setTimeout(() => {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }, 100);
 
     return () => {
       clearTimeout(timer);
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [open]);
 
@@ -116,45 +125,45 @@ const RatingDropdown = ({ value, onChange }) => {
         className="custom-modal-rating-dropdown"
         tabIndex={0}
       >
-        <div
-          className="custom-modal-rating-selected"
-          onClick={handleToggle}
-        >
+        <div className="custom-modal-rating-selected" onClick={handleToggle}>
           {selectedLabel}
           <span className="custom-modal-rating-arrow" />
         </div>
       </div>
 
-      {open && ReactDOM.createPortal(
-        <div
-          className="custom-modal-rating-menu"
-          style={{
-            position: 'fixed',
-            top: `${menuPosition.top}px`,
-            left: `${menuPosition.left}px`,
-            width: `${menuPosition.width}px`,
-            zIndex: 999999
-          }}
-        >
-          {options.map((opt) => (
-            <div
-              key={opt.value}
-              className={
-                "custom-modal-rating-option" +
-                (opt.value === value ? " custom-modal-rating-option-active" : "")
-              }
-              onMouseDown={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleSelect(opt.value);
-              }}
-            >
-              {opt.label}
-            </div>
-          ))}
-        </div>,
-        document.body
-      )}
+      {open &&
+        ReactDOM.createPortal(
+          <div
+            className="custom-modal-rating-menu"
+            style={{
+              position: "fixed",
+              top: `${menuPosition.top}px`,
+              left: `${menuPosition.left}px`,
+              width: `${menuPosition.width}px`,
+              zIndex: 999999,
+            }}
+          >
+            {options.map((opt) => (
+              <div
+                key={opt.value}
+                className={
+                  "custom-modal-rating-option" +
+                  (opt.value === value
+                    ? " custom-modal-rating-option-active"
+                    : "")
+                }
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleSelect(opt.value);
+                }}
+              >
+                {opt.label}
+              </div>
+            ))}
+          </div>,
+          document.body
+        )}
     </>
   );
 };
@@ -219,7 +228,11 @@ export default function ManagerDashboard() {
 
   const fetchAssignments = async () => {
     if (!userId) {
-      safeToast("error", "Unable to load manager ID. Please login again.", "no-manager-id");
+      safeToast(
+        "error",
+        "Unable to load manager ID. Please login again.",
+        "no-manager-id"
+      );
       return;
     }
 
@@ -239,9 +252,17 @@ export default function ManagerDashboard() {
       const assignmentRes = await getEmployeeAssignments(userId);
       if (assignmentRes.data.success) {
         setAssignments(assignmentRes.data.data);
-        const pending = assignmentRes.data.data.filter((a) => !a.isCompleted).length;
-        const completed = assignmentRes.data.data.filter((a) => a.isCompleted).length;
-        safeToast("success", `Found ${pending} pending and ${completed} completed assessments.`, "found-assignments");
+        const pending = assignmentRes.data.data.filter(
+          (a) => !a.isCompleted
+        ).length;
+        const completed = assignmentRes.data.data.filter(
+          (a) => a.isCompleted
+        ).length;
+        safeToast(
+          "success",
+          `Found ${pending} pending and ${completed} completed assessments.`,
+          "found-assignments"
+        );
       }
     } catch (error) {
       console.error("Fetch error:", error);
@@ -262,13 +283,23 @@ export default function ManagerDashboard() {
   const handleSubmitAssessment = async () => {
     const incompleteRating = assessmentData.filter((item) => !item.rating);
     if (incompleteRating.length > 0) {
-      safeToast("warning", "Please provide ratings for all competencies.", "incomplete-ratings");
+      safeToast(
+        "warning",
+        "Please provide ratings for all competencies.",
+        "incomplete-ratings"
+      );
       return;
     }
 
-    const incompleteComments = assessmentData.filter((item) => !item.comments || item.comments.trim() === "");
+    const incompleteComments = assessmentData.filter(
+      (item) => !item.comments || item.comments.trim() === ""
+    );
     if (incompleteComments.length > 0) {
-      safeToast("warning", "Please provide comments for all competencies.", "incomplete-comments");
+      safeToast(
+        "warning",
+        "Please provide comments for all competencies.",
+        "incomplete-comments"
+      );
       return;
     }
 
@@ -291,10 +322,18 @@ export default function ManagerDashboard() {
         setShowModal(false);
         await fetchAssignments();
       } else {
-        safeToast("error", response.data?.message || "Failed.", "submit-failed");
+        safeToast(
+          "error",
+          response.data?.message || "Failed.",
+          "submit-failed"
+        );
       }
     } catch (error) {
-      safeToast("error", error.response?.data?.message || "Failed.", "submit-error");
+      safeToast(
+        "error",
+        error.response?.data?.message || "Failed.",
+        "submit-error"
+      );
     } finally {
       setSubmitting(false);
     }
@@ -316,13 +355,26 @@ export default function ManagerDashboard() {
         }));
         setAssessmentData(viewData);
         setShowModal(true);
-        safeToast("info", "Assessment loaded successfully", "assessment-loaded");
+        safeToast(
+          "info",
+          "Assessment loaded successfully",
+          "assessment-loaded"
+        );
       } else {
-        safeToast("error", "Failed to load submitted assessment.", "assessment-load-failed");
+        safeToast(
+          "error",
+          "Failed to load submitted assessment.",
+          "assessment-load-failed"
+        );
       }
     } catch (error) {
       console.error("View error:", error);
-      safeToast("error", "Error loading assessment: " + (error.response?.data?.message || error.message), "assessment-load-error");
+      safeToast(
+        "error",
+        "Error loading assessment: " +
+          (error.response?.data?.message || error.message),
+        "assessment-load-error"
+      );
     } finally {
       setSubmitting(false);
     }
@@ -330,19 +382,27 @@ export default function ManagerDashboard() {
 
   const pendingAssignments = assignments
     .filter((a) => !a.isCompleted)
-    .filter((a) => a.formName.toLowerCase().includes(pendingFormNameFilter.toLowerCase()));
+    .filter((a) =>
+      a.formName.toLowerCase().includes(pendingFormNameFilter.toLowerCase())
+    );
 
   const completedAssignments = assignments
     .filter((a) => a.isCompleted)
-    .filter((a) => a.formName.toLowerCase().includes(completedFormNameFilter.toLowerCase()));
+    .filter((a) =>
+      a.formName.toLowerCase().includes(completedFormNameFilter.toLowerCase())
+    );
 
-  const pendingTotalPages = Math.ceil(pendingAssignments.length / pendingPerPage);
+  const pendingTotalPages = Math.ceil(
+    pendingAssignments.length / pendingPerPage
+  );
   const pagedPendingAssignments = pendingAssignments.slice(
     (pendingPage - 1) * pendingPerPage,
     pendingPage * pendingPerPage
   );
 
-  const completedTotalPages = Math.ceil(completedAssignments.length / completedPerPage);
+  const completedTotalPages = Math.ceil(
+    completedAssignments.length / completedPerPage
+  );
   const pagedCompletedAssignments = completedAssignments.slice(
     (completedPage - 1) * completedPerPage,
     completedPage * completedPerPage
@@ -365,8 +425,12 @@ export default function ManagerDashboard() {
     const currentPage = isPending ? pendingPage : completedPage;
     const totalPages = isPending ? pendingTotalPages : completedTotalPages;
     const perPage = isPending ? pendingPerPage : completedPerPage;
-    const totalItems = isPending ? pendingAssignments.length : completedAssignments.length;
-    const onPageChange = isPending ? handlePendingPageChange : handleCompletedPageChange;
+    const totalItems = isPending
+      ? pendingAssignments.length
+      : completedAssignments.length;
+    const onPageChange = isPending
+      ? handlePendingPageChange
+      : handleCompletedPageChange;
     const setPerPage = isPending ? setPendingPerPage : setCompletedPerPage;
     const setPage = isPending ? setPendingPage : setCompletedPage;
 
@@ -386,14 +450,28 @@ export default function ManagerDashboard() {
             <tbody>
               {data.map((assignment) => (
                 <tr key={assignment.assignmentId}>
-                  <td><strong>{assignment.formName}</strong></td>
                   <td>
-                    <span className={`manevap-badge ${isCompleted ? 'success' : 'info'}`}>
-                      <i className={`bi ${isCompleted ? 'bi-check-circle-fill' : 'bi-bookmark-fill'}`}></i>
+                    <strong>{assignment.formName}</strong>
+                  </td>
+                  <td>
+                    <span
+                      className={`manevap-badge ${
+                        isCompleted ? "success" : "info"
+                      }`}
+                    >
+                      <i
+                        className={`bi ${
+                          isCompleted
+                            ? "bi-check-circle-fill"
+                            : "bi-bookmark-fill"
+                        }`}
+                      ></i>
                       {assignment.formType}
                     </span>
                   </td>
-                  <td>{new Date(assignment.assignedAt).toLocaleDateString()}</td>
+                  <td>
+                    {new Date(assignment.assignedAt).toLocaleDateString()}
+                  </td>
                   <td>
                     {assignment.deadline
                       ? new Date(assignment.deadline).toLocaleDateString()
@@ -406,13 +484,14 @@ export default function ManagerDashboard() {
                         onClick={() => {
                           setCurrentAssignment(assignment);
                           setModalMode("submit");
-                          const initialData = assignment.competencies?.map((comp) => ({
-                            competencyId: comp.competencyId,
-                            competencyName: comp.name,
-                            competencyDescription: comp.description,
-                            rating: "",
-                            comments: "",
-                          })) || [];
+                          const initialData =
+                            assignment.competencies?.map((comp) => ({
+                              competencyId: comp.competencyId,
+                              competencyName: comp.name,
+                              competencyDescription: comp.description,
+                              rating: "",
+                              comments: "",
+                            })) || [];
                           setAssessmentData(initialData);
                           setShowModal(true);
                         }}
@@ -449,16 +528,44 @@ export default function ManagerDashboard() {
 
           <nav className="manevap-pagination-nav">
             <ul className="manevap-pagination">
-              <li className={`manevap-page-item ${currentPage === 1 ? "manevap-disabled" : ""}`}>
-                <button className="manevap-page-link" onClick={() => onPageChange(currentPage - 1)}>&laquo;</button>
+              <li
+                className={`manevap-page-item ${
+                  currentPage === 1 ? "manevap-disabled" : ""
+                }`}
+              >
+                <button
+                  className="manevap-page-link"
+                  onClick={() => onPageChange(currentPage - 1)}
+                >
+                  &laquo;
+                </button>
               </li>
               {Array.from({ length: totalPages }, (_, i) => (
-                <li key={i + 1} className={`manevap-page-item ${currentPage === i + 1 ? "manevap-active" : ""}`}>
-                  <button className="manevap-page-link" onClick={() => onPageChange(i + 1)}>{i + 1}</button>
+                <li
+                  key={i + 1}
+                  className={`manevap-page-item ${
+                    currentPage === i + 1 ? "manevap-active" : ""
+                  }`}
+                >
+                  <button
+                    className="manevap-page-link"
+                    onClick={() => onPageChange(i + 1)}
+                  >
+                    {i + 1}
+                  </button>
                 </li>
               ))}
-              <li className={`manevap-page-item ${currentPage === totalPages ? "manevap-disabled" : ""}`}>
-                <button className="manevap-page-link" onClick={() => onPageChange(currentPage + 1)}>&raquo;</button>
+              <li
+                className={`manevap-page-item ${
+                  currentPage === totalPages ? "manevap-disabled" : ""
+                }`}
+              >
+                <button
+                  className="manevap-page-link"
+                  onClick={() => onPageChange(currentPage + 1)}
+                >
+                  &raquo;
+                </button>
               </li>
             </ul>
           </nav>
@@ -466,7 +573,13 @@ export default function ManagerDashboard() {
           <div className="manevap-pagination-status">
             {totalItems === 0
               ? "No items to display"
-              : `Showing ${Math.min((currentPage - 1) * perPage + 1, totalItems)}-${Math.min(currentPage * perPage, totalItems)} of ${totalItems} items`}
+              : `Showing ${Math.min(
+                  (currentPage - 1) * perPage + 1,
+                  totalItems
+                )}-${Math.min(
+                  currentPage * perPage,
+                  totalItems
+                )} of ${totalItems} items`}
           </div>
         </div>
       </>
@@ -497,8 +610,11 @@ export default function ManagerDashboard() {
         <div className="breadcrumb-wrapper">
           <Breadcrumb
             items={[
-              { label: 'Performance Management', path: '/manager/dashboard/performance' },
-              { label: 'Manager Form' }
+              {
+                label: "Performance Management",
+                path: "/manager/dashboard/performance",
+              },
+              { label: "Manager Form" },
             ]}
           />
         </div>
@@ -508,22 +624,36 @@ export default function ManagerDashboard() {
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
       />
 
-      <div className="mgrdash-pill-toggle" role="tablist" aria-label="Assignments">
+      <div
+        className="mgrdash-pill-toggle"
+        role="tablist"
+        aria-label="Assignments"
+      >
         <button
-          className={`mgrdash-pill-tab ${activeTab === "pending" ? "active" : ""}`}
+          className={`mgrdash-pill-tab ${
+            activeTab === "pending" ? "active" : ""
+          }`}
           onClick={() => setActiveTab("pending")}
           type="button"
           aria-selected={activeTab === "pending"}
         >
-          Pending <span className="mgrdash-pill-count">{pendingAssignments.length}</span>
+          Pending{" "}
+          <span className="mgrdash-pill-count">
+            {pendingAssignments.length}
+          </span>
         </button>
         <button
-          className={`mgrdash-pill-tab ${activeTab === "completed" ? "active" : ""}`}
+          className={`mgrdash-pill-tab ${
+            activeTab === "completed" ? "active" : ""
+          }`}
           onClick={() => setActiveTab("completed")}
           type="button"
           aria-selected={activeTab === "completed"}
         >
-          Completed <span className="mgrdash-pill-count">{completedAssignments.length}</span>
+          Completed{" "}
+          <span className="mgrdash-pill-count">
+            {completedAssignments.length}
+          </span>
         </button>
       </div>
 
@@ -538,7 +668,7 @@ export default function ManagerDashboard() {
                   value={pendingFormNameInput}
                   onChange={(e) => setPendingFormNameInput(e.target.value)}
                   onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
+                    if (e.key === "Enter") {
                       setPendingFormNameFilter(pendingFormNameInput);
                     }
                   }}
@@ -561,7 +691,7 @@ export default function ManagerDashboard() {
                 disabled={!pendingFormNameFilter}
                 style={{
                   opacity: pendingFormNameFilter ? 1 : 0.6,
-                  cursor: pendingFormNameFilter ? 'pointer' : 'not-allowed'
+                  cursor: pendingFormNameFilter ? "pointer" : "not-allowed",
                 }}
               >
                 Clear Filters
@@ -599,7 +729,7 @@ export default function ManagerDashboard() {
                   value={completedFormNameInput}
                   onChange={(e) => setCompletedFormNameInput(e.target.value)}
                   onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
+                    if (e.key === "Enter") {
                       setCompletedFormNameFilter(completedFormNameInput);
                     }
                   }}
@@ -607,7 +737,9 @@ export default function ManagerDashboard() {
                 />
                 <button
                   className="manevap-btn-primary"
-                  onClick={() => setCompletedFormNameFilter(completedFormNameInput)}
+                  onClick={() =>
+                    setCompletedFormNameFilter(completedFormNameInput)
+                  }
                   type="button"
                 >
                   Search
@@ -622,7 +754,7 @@ export default function ManagerDashboard() {
                 disabled={!completedFormNameFilter}
                 style={{
                   opacity: completedFormNameFilter ? 1 : 0.6,
-                  cursor: completedFormNameFilter ? 'pointer' : 'not-allowed'
+                  cursor: completedFormNameFilter ? "pointer" : "not-allowed",
                 }}
               >
                 Clear Filters
@@ -650,8 +782,14 @@ export default function ManagerDashboard() {
       )}
 
       {showModal && currentAssignment && (
-        <div className="manevap-modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="manevap-modal-content" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="manevap-modal-overlay"
+          onClick={() => setShowModal(false)}
+        >
+          <div
+            className="manevap-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="manevap-form-header-strict">
               <div className="manevap-header-inner">
                 <div className="manevap-logo-section">
@@ -660,15 +798,11 @@ export default function ManagerDashboard() {
                     alt="EEPZ Logo"
                     className="manevap-modal-logo"
                   />
-                  <div className="manevap-logo-subtitle">
-                    MANAGER FORM
-                  </div>
+                  <div className="manevap-logo-subtitle">MANAGER FORM</div>
                 </div>
 
                 <div className="manevap-title-section">
-                  <div className="manevap-title-main">
-                    MANAGER FORM
-                  </div>
+                  <div className="manevap-title-main">MANAGER FORM</div>
                   <div className="manevap-title-sub">
                     {currentAssignment?.formName || ""}
                   </div>
@@ -708,31 +842,41 @@ export default function ManagerDashboard() {
                             <td className="manevap-cell-bold">
                               {item.competencyName}
                             </td>
-                            <td>
-                              {item.competencyDescription || ""}
-                            </td>
+                            <td>{item.competencyDescription || ""}</td>
                             <td>
                               {modalMode === "view" ? (
                                 <div className="manevap-modal-cell-view">
-                                  {item.rating ? `${item.rating} / 5` : '-'}
+                                  {item.rating ? `${item.rating} / 5` : "-"}
                                 </div>
                               ) : (
                                 <RatingDropdown
                                   value={item.rating || ""}
-                                  onChange={(val) => updateAssessmentData(item.competencyId, "rating", val)}
+                                  onChange={(val) =>
+                                    updateAssessmentData(
+                                      item.competencyId,
+                                      "rating",
+                                      val
+                                    )
+                                  }
                                 />
                               )}
                             </td>
                             <td>
                               {modalMode === "view" ? (
-                                <div className="manevap-modal-cell-view">{item.comments || "-"}</div>
+                                <div className="manevap-modal-cell-view">
+                                  {item.comments || "-"}
+                                </div>
                               ) : (
                                 <input
                                   className="manevap-modal-cell-input"
                                   type="text"
                                   value={item.comments}
-                                  onChange={e =>
-                                    updateAssessmentData(item.competencyId, "comments", e.target.value)
+                                  onChange={(e) =>
+                                    updateAssessmentData(
+                                      item.competencyId,
+                                      "comments",
+                                      e.target.value
+                                    )
                                   }
                                   placeholder="-"
                                 />
@@ -756,7 +900,9 @@ export default function ManagerDashboard() {
                     <button
                       onClick={handleSubmitAssessment}
                       disabled={submitting}
-                      className={`manevap-btn-submit-form ${submitting ? 'disabled' : ''}`}
+                      className={`manevap-btn-submit-form ${
+                        submitting ? "disabled" : ""
+                      }`}
                     >
                       {submitting ? "Submitting..." : "Submit Assessment"}
                     </button>
@@ -766,7 +912,7 @@ export default function ManagerDashboard() {
             )}
           </div>
         </div>
-      )}      
+      )}
     </div>
   );
 }

@@ -14,7 +14,7 @@ export default function HRHome() {
       icon: "bi-journal-plus",
       accent: "#7C3AED",
       chipBg: "#F3E8FF",
-      path: "/hr/dashboard/performance/formslist"
+      path: "/hr/dashboard/performance/formslist",
     },
     {
       title: "Create Form",
@@ -22,7 +22,7 @@ export default function HRHome() {
       icon: "bi-ui-checks",
       accent: "#10B981",
       chipBg: "#ECFDF5",
-      path: "/hr/dashboard/performance/create"
+      path: "/hr/dashboard/performance/create",
     },
     {
       title: "Form Details",
@@ -30,7 +30,7 @@ export default function HRHome() {
       icon: "bi-file-earmark-text",
       accent: "#36D1DC",
       chipBg: "#E6F4FA",
-      path: "/hr/dashboard/performance/status"
+      path: "/hr/dashboard/performance/status",
     },
     {
       title: "Progress Tracker",
@@ -38,7 +38,7 @@ export default function HRHome() {
       icon: "bi-bar-chart-steps",
       accent: "#3B82F6",
       chipBg: "#EEF2FF",
-      path: "/hr/dashboard/performance/progress"
+      path: "/hr/dashboard/performance/progress",
     },
     {
       title: "Reward Setup",
@@ -46,7 +46,7 @@ export default function HRHome() {
       icon: "bi-award",
       accent: "#8E2DE2",
       chipBg: "#F4F1FB",
-      path: "/hr/dashboard/performance/reward"
+      path: "/hr/dashboard/performance/reward",
     },
     {
       title: "Nominations",
@@ -54,8 +54,8 @@ export default function HRHome() {
       icon: "bi-person-badge",
       accent: "#FF416C",
       chipBg: "#FFF3F8",
-      path: "/hr/dashboard/performance/nominations"
-    }
+      path: "/hr/dashboard/performance/nominations",
+    },
   ];
 
   return (

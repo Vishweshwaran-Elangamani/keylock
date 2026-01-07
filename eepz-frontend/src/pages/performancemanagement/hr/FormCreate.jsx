@@ -6,11 +6,20 @@ import { useAuth } from "../../../contexts/auth/AuthContext";
 import "../../../styles/performancemanagement/hr/FormCreate.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 
-
-const CustomDropdown = ({ value, onChange, options, placeholder, disabled, error }) => {
+const CustomDropdown = ({
+  value,
+  onChange,
+  options,
+  placeholder,
+  disabled,
+  error,
+}) => {
   const [open, setOpen] = useState(false);
 
-  const selected = options.find((o) => o.value === value) || { label: placeholder, value: "" };
+  const selected = options.find((o) => o.value === value) || {
+    label: placeholder,
+    value: "",
+  };
 
   const handleSelect = (val) => {
     onChange(val);
@@ -19,13 +28,15 @@ const CustomDropdown = ({ value, onChange, options, placeholder, disabled, error
 
   return (
     <div
-      className={`custom-fc-dropdown ${error ? 'custom-fc-dropdown-error' : ''}`}
+      className={`custom-fc-dropdown ${
+        error ? "custom-fc-dropdown-error" : ""
+      }`}
       tabIndex={0}
       onBlur={() => setTimeout(() => setOpen(false), 200)}
       style={{ position: "relative" }}
     >
       <div
-        className={`custom-fc-selected ${disabled ? 'custom-fc-disabled' : ''}`}
+        className={`custom-fc-selected ${disabled ? "custom-fc-disabled" : ""}`}
         onClick={() => !disabled && setOpen((prev) => !prev)}
       >
         {selected.label}
@@ -60,11 +71,9 @@ function FormCreate() {
 
   const [currentStep, setCurrentStep] = useState(1);
 
- 
   const competencyRefs = useRef([]);
   const competencySectionRef = useRef(null);
 
-  
   const [model, setModel] = useState({
     name: "",
     type: "",
@@ -98,7 +107,6 @@ function FormCreate() {
         const { data } = await api.get(`/FormManagement/${formId}`);
         const payload = data?.data ?? {};
 
-       
         const loadedCompetencies =
           payload.competencies && payload.competencies.length > 0
             ? payload.competencies
@@ -153,10 +161,9 @@ function FormCreate() {
         },
       ],
     }));
-    
+
     toast.success("Competency added");
 
-   
     setTimeout(() => {
       const container = competencySectionRef.current;
       if (container && competencyRefs.current[newIndex]) {
@@ -164,11 +171,10 @@ function FormCreate() {
         const elementTop = element.offsetTop;
         const elementHeight = element.offsetHeight;
         const containerHeight = container.clientHeight;
-        
-        
+
         container.scrollTo({
           top: elementTop - containerHeight + elementHeight + 50,
-          behavior: 'smooth'
+          behavior: "smooth",
         });
       }
     }, 100);
@@ -205,14 +211,13 @@ function FormCreate() {
       return next;
     });
 
-   
     setTimeout(() => {
       const container = competencySectionRef.current;
       if (container && competencyRefs.current[index - 1]) {
         const element = competencyRefs.current[index - 1];
         container.scrollTo({
           top: element.offsetTop - 100,
-          behavior: 'smooth'
+          behavior: "smooth",
         });
       }
     }, 100);
@@ -230,14 +235,13 @@ function FormCreate() {
       return next;
     });
 
-    
     setTimeout(() => {
       const container = competencySectionRef.current;
       if (container && competencyRefs.current[index + 1]) {
         const element = competencyRefs.current[index + 1];
         container.scrollTo({
           top: element.offsetTop - 100,
-          behavior: 'smooth'
+          behavior: "smooth",
         });
       }
     }, 100);
@@ -356,7 +360,9 @@ function FormCreate() {
       toast.dismiss();
       toast.success(
         data.message ||
-          (isEditMode ? "Form updated successfully!" : "Form created successfully!")
+          (isEditMode
+            ? "Form updated successfully!"
+            : "Form created successfully!")
       );
       setTimeout(() => {
         navigate("/hr/dashboard/performance/formslist");
@@ -423,7 +429,6 @@ function FormCreate() {
           />
         </div>
 
-        
         <div className="pmhr-fc-step-center">
           <div className="pmhr-fc-step-indicator">
             <div className="pmhr-fc-step-item">
@@ -465,7 +470,9 @@ function FormCreate() {
                 onClick={() => navigateToStep(2)}
                 disabled={!isStep1Complete() || currentStep === 2}
                 title={
-                  isStep1Complete() ? "Add Competencies" : "Complete Step 1 first"
+                  isStep1Complete()
+                    ? "Add Competencies"
+                    : "Complete Step 1 first"
                 }
               >
                 {isStep2Complete() ? (
@@ -483,7 +490,6 @@ function FormCreate() {
         </div>
       </div>
 
-     
       <div className="pmhr-fc-content">
         <form
           onSubmit={currentStep === 2 ? onSubmit : proceedToStep2}
@@ -645,7 +651,10 @@ function FormCreate() {
                     Add Competency
                   </button>
                 </div>
-                <div className="pmhr-fc-section-body" ref={competencySectionRef}>
+                <div
+                  className="pmhr-fc-section-body"
+                  ref={competencySectionRef}
+                >
                   {validationErrors.competencies && (
                     <div className="pmhr-fc-alert-warning">
                       <i className="bi bi-exclamation-triangle"></i>
@@ -653,8 +662,8 @@ function FormCreate() {
                     </div>
                   )}
                   {model.competencies.map((comp, index) => (
-                    <div 
-                      key={index} 
+                    <div
+                      key={index}
                       className="pmhr-fc-comp-card"
                       ref={(el) => (competencyRefs.current[index] = el)}
                     >
@@ -748,7 +757,11 @@ function FormCreate() {
                               rows="2"
                               value={comp.description || ""}
                               onChange={(e) => {
-                                updateComp(index, "description", e.target.value);
+                                updateComp(
+                                  index,
+                                  "description",
+                                  e.target.value
+                                );
                                 setValidationErrors({
                                   ...validationErrors,
                                   [`comp_${index}_description`]: null,
@@ -759,11 +772,7 @@ function FormCreate() {
                             {validationErrors[`comp_${index}_description`] && (
                               <span className="pmhr-fc-error-text">
                                 <i className="bi bi-exclamation-circle"></i>
-                                {
-                                  validationErrors[
-                                    `comp_${index}_description`
-                                  ]
-                                }
+                                {validationErrors[`comp_${index}_description`]}
                               </span>
                             )}
                           </div>

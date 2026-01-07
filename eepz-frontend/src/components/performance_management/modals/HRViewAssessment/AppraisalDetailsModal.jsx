@@ -69,9 +69,15 @@ function getFileIcon(fileType, fileName) {
     return "bi-file-play-fill";
   if (type.includes("audio") || name.match(/\.(mp3|wav|m4a)$/i))
     return "bi-file-music-fill";
-  if (type === "text/csv" || name.endsWith(".csv")) return "bi-file-earmark-text-fill";
-  if (type.includes("text") || name.endsWith(".txt")) return "bi-file-text-fill";
-  if (type.includes("zip") || type.includes("compressed") || name.match(/\.(zip|rar|7z)$/i))
+  if (type === "text/csv" || name.endsWith(".csv"))
+    return "bi-file-earmark-text-fill";
+  if (type.includes("text") || name.endsWith(".txt"))
+    return "bi-file-text-fill";
+  if (
+    type.includes("zip") ||
+    type.includes("compressed") ||
+    name.match(/\.(zip|rar|7z)$/i)
+  )
     return "bi-file-zip-fill";
 
   return "bi-file-earmark-fill";
@@ -87,11 +93,14 @@ function getExtensionFromMime(mimeType) {
     "text/csv": ".csv",
     "text/plain": ".txt",
     "application/msword": ".doc",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": ".docx",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+      ".docx",
     "application/vnd.ms-excel": ".xls",
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": ".xlsx",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+      ".xlsx",
     "application/vnd.ms-powerpoint": ".ppt",
-    "application/vnd.openxmlformats-officedocument.presentationml.presentation": ".pptx",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+      ".pptx",
     "image/jpeg": ".jpg",
     "image/png": ".png",
     "image/gif": ".gif",
@@ -138,7 +147,7 @@ const AppraisalDetailsModal = ({
       const response = await api.downloadHrAttachment(attachment.attachmentId);
 
       const blob = response.data;
-      const contentType = response.headers['content-type'];
+      const contentType = response.headers["content-type"];
       let filename = attachment.fileName || "attachment";
 
       if (!hasExtension(filename)) {
@@ -178,12 +187,12 @@ const AppraisalDetailsModal = ({
 
   return (
     <>
-      {/* Overlay */}
       <div className="appraisal-modal-overlay" onClick={onClose} />
 
-      {/* Modal Container */}
-      <div className="appraisal-modal-container" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
+      <div
+        className="appraisal-modal-container"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="appraisal-modal-header">
           <div className="appraisal-modal-header-content">
             <div className="appraisal-modal-title">
@@ -192,7 +201,9 @@ const AppraisalDetailsModal = ({
             </div>
             <div className="appraisal-modal-subtitle">
               <i className="bi bi-person-circle"></i>
-              <span className="appraisal-modal-subtitle-name">{employeeName}</span>
+              <span className="appraisal-modal-subtitle-name">
+                {employeeName}
+              </span>
               <span className="appraisal-modal-subtitle-separator">•</span>
               <i className="bi bi-briefcase-fill"></i>
               {projectName}
@@ -203,7 +214,8 @@ const AppraisalDetailsModal = ({
             <div className="appraisal-modal-attachment-badge">
               <i className="bi bi-paperclip appraisal-modal-attachment-icon"></i>
               <span className="appraisal-modal-attachment-count">
-                {attachments.length} {attachments.length === 1 ? "File" : "Files"}
+                {attachments.length}{" "}
+                {attachments.length === 1 ? "File" : "Files"}
               </span>
             </div>
           )}
@@ -217,7 +229,6 @@ const AppraisalDetailsModal = ({
           </button>
         </div>
 
-        {/* Scrollable Content */}
         <div className="appraisal-modal-body">
           {error && (
             <div className="appraisal-modal-error">
@@ -226,7 +237,6 @@ const AppraisalDetailsModal = ({
             </div>
           )}
 
-          {/* Competency Evaluations - TABLE FORMAT */}
           <div className="appraisal-section">
             <div className="appraisal-section-title">
               <i className="bi bi-list-check appraisal-section-title-icon"></i>
@@ -239,66 +249,66 @@ const AppraisalDetailsModal = ({
               </div>
             ) : (
               <div className="appraisal-table-wrapper">
-  <table className="appraisal-table">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Competency</th>
-        <th>Employee Rating</th>
-        <th>Employee Comments</th>
-        <th>L1 Reviewer</th>
-        <th>L1 Rating</th>
-        <th>L1 Comments</th>
-        <th>L2 Reviewer</th>
-        <th>L2 Rating</th>
-        <th>L2 Comments</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      {competencies.map((c, idx) => (
-        <tr key={idx}>
-          <td className="appraisal-table-index">{idx + 1}</td>
-          <td className="appraisal-table-competency">
-            <strong>{c.competencyName || "-"}</strong>
-          </td>
-          <td className="appraisal-table-rating">
-            {c.employeeRating || "-"}
-          </td>
-          <td className="appraisal-table-comment">
-            {c.employeeComments || "-"}
-          </td>
-          <td>{c.l1ReviewerName || "-"}</td>
-          <td className="appraisal-table-rating">
-            {c.l1Rating || "-"}
-          </td>
-          <td className="appraisal-table-comment">
-            {c.l1Comments || "-"}
-          </td>
-          <td>{c.l2ReviewerName || "-"}</td>
-          <td className="appraisal-table-rating">
-            {c.l2Rating || "-"}
-          </td>
-          <td className="appraisal-table-comment">
-            {c.l2Comments || "-"}
-          </td>
-          <td>{statusRender(c.status)}</td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-</div>
-
+                <table className="appraisal-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Competency</th>
+                      <th>Employee Rating</th>
+                      <th>Employee Comments</th>
+                      <th>L1 Reviewer</th>
+                      <th>L1 Rating</th>
+                      <th>L1 Comments</th>
+                      <th>L2 Reviewer</th>
+                      <th>L2 Rating</th>
+                      <th>L2 Comments</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {competencies.map((c, idx) => (
+                      <tr key={idx}>
+                        <td className="appraisal-table-index">{idx + 1}</td>
+                        <td className="appraisal-table-competency">
+                          <strong>{c.competencyName || "-"}</strong>
+                        </td>
+                        <td className="appraisal-table-rating">
+                          {c.employeeRating || "-"}
+                        </td>
+                        <td className="appraisal-table-comment">
+                          {c.employeeComments || "-"}
+                        </td>
+                        <td>{c.l1ReviewerName || "-"}</td>
+                        <td className="appraisal-table-rating">
+                          {c.l1Rating || "-"}
+                        </td>
+                        <td className="appraisal-table-comment">
+                          {c.l1Comments || "-"}
+                        </td>
+                        <td>{c.l2ReviewerName || "-"}</td>
+                        <td className="appraisal-table-rating">
+                          {c.l2Rating || "-"}
+                        </td>
+                        <td className="appraisal-table-comment">
+                          {c.l2Comments || "-"}
+                        </td>
+                        <td>{statusRender(c.status)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
 
-          {/* Attachments */}
           {attachments && attachments.length > 0 && (
             <div className="appraisal-attachments-section">
               <div className="appraisal-attachments-header">
                 <i className="bi bi-paperclip"></i>
                 <span>Employee Attachments</span>
-                <span className="appraisal-attachments-count">({attachments.length})</span>
+                <span className="appraisal-attachments-count">
+                  ({attachments.length})
+                </span>
               </div>
 
               <div className="appraisal-attachments-list">
@@ -307,12 +317,17 @@ const AppraisalDetailsModal = ({
                     <div className="appraisal-attachment-info">
                       <div className="appraisal-attachment-icon-wrapper">
                         <i
-                          className={`bi ${getFileIcon(att.fileType, att.fileName)} appraisal-attachment-icon`}
+                          className={`bi ${getFileIcon(
+                            att.fileType,
+                            att.fileName
+                          )} appraisal-attachment-icon`}
                         ></i>
                       </div>
 
                       <div className="appraisal-attachment-details">
-                        <div className="appraisal-attachment-name">{att.fileName}</div>
+                        <div className="appraisal-attachment-name">
+                          {att.fileName}
+                        </div>
                         <div className="appraisal-attachment-meta">
                           <i className="bi bi-hdd"></i>
                           {formatFileSize(att.fileSize)}
@@ -357,7 +372,6 @@ const AppraisalDetailsModal = ({
           )}
         </div>
 
-        {/* Footer */}
         <div className="appraisal-modal-footer">
           <button className="appraisal-btn-close" onClick={onClose}>
             <i className="bi bi-x-circle"></i>
