@@ -4,38 +4,37 @@ using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Serilog;
-
+ 
 namespace Relevantz.EEPZ.Api.Controllers.LnD
 {
     /// <summary>
-    /// Employee Skills Management 
+    /// Employee Skills Management
     /// </summary>
     [ApiController]
-    [Route("api/lnd-skills")]
     [Authorize]
     public class LnDSkillsController : BaseLnDController
     {
         #region Dependencies
-
+ 
         private readonly ILnDEmployeeSkillService _employeeSkillService;
-
+ 
         public LnDSkillsController(ILnDEmployeeSkillService employeeSkillService)
         {
             _employeeSkillService = employeeSkillService;
         }
-
+ 
         #endregion
-
+ 
         #region Skill Retrieval
-
+ 
         /// <summary>Gets all available skills for dropdown selection.</summary>
-        [HttpGet("all")]
+        [HttpGet("api/lnd-skills/all")]  
         public async Task<IActionResult> GetAllSkills()
         {
             Log.Information("GetAllSkills API called");
-
+ 
             var result = await _employeeSkillService.GetAllSkills();
-
+ 
             if (result.Success)
             {
                 Log.Information("GetAllSkills API succeeded. SkillCount={Count}", result.Data?.Count ?? 0);
@@ -46,29 +45,27 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 Log.Warning("GetAllSkills API failed. Message={Message}", result.Message);
                 return BadRequest(result);
             }
-        }
+        }  
+ 
         /// <summary>Gets paginated skills for the logged-in employee.</summary>
-        [HttpGet("my-skills")]
-        public async Task<IActionResult> GetMySkills(
-            [FromQuery] string? searchTerm,
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 10
-        )
+        [HttpGet("api/lnd-skills/my-skills")]
+        public async Task<IActionResult> GetMySkills([FromQuery] MySkillsRequestModel request)
         {
             var employeeId = GetCurrentEmployeeId();
-
+ 
             Log.Information(
                 "GetMySkills API called. EmployeeId={EmployeeId}, SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
-                employeeId, searchTerm ?? "none", pageNumber, pageSize
-            );
-
+                employeeId, request.SearchTerm ?? "none", request.PageNumber, request.PageSize
+            );  
+ 
             var result = await _employeeSkillService.GetMySkills(
                 employeeId,
-                searchTerm,
-                pageNumber,
-                pageSize
-            );
-
+                request.SearchTerm,
+                request.PageNumber,
+                request.PageSize
+               
+            );    
+ 
             if (result.Success)
             {
                 Log.Information(
@@ -86,32 +83,27 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 return BadRequest(result);
             }
         }
-
+ 
         /// <summary>Gets skills for subordinate employees with optional employee filter and search.</summary>
-        [HttpGet("subordinates")]
-        public async Task<IActionResult> GetSubordinateSkills(
-            [FromQuery] int? employeeId,
-            [FromQuery] string? searchTerm,
-            [FromQuery] string? sortBy = LnDConstants.DEFAULTS.SORT_BY_EMPLOYEE_NAME,
-            [FromQuery] int pageNumber = 1
-        )
+        [HttpGet("api/lnd-skills/subordinates")]  
+        public async Task<IActionResult> GetSubordinateSkills([FromQuery] SubordinateSkillsRequestModel request)
         {
             var managerId = GetCurrentEmployeeId();
-
+ 
             Log.Information(
                 "GetSubordinateSkills API called. ManagerId={ManagerId}, EmployeeId={EmployeeId}, SearchTerm={SearchTerm}, SortBy={SortBy}, Page={PageNumber}",
-                managerId, employeeId?.ToString() ?? "all", searchTerm ?? "none", sortBy, pageNumber
+                managerId, request.EmployeeId?.ToString() ?? "all", request.SearchTerm ?? "none", request.SortBy, request.PageNumber
             );
-
+ 
             var result = await _employeeSkillService.GetSubordinateSkills(
                 managerId,
-                employeeId,
-                searchTerm,
-                sortBy,
-                pageNumber,
+                request.EmployeeId,
+                request.SearchTerm,
+                request.SortBy,
+                request.PageNumber,
                 1_000_000
             );
-
+ 
             if (result.Success)
             {
                 Log.Information(
@@ -129,33 +121,29 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 return BadRequest(result);
             }
         }
-
+ 
         #endregion
-
+ 
         #region Employee Management
-
+ 
         /// <summary>Gets paginated list of subordinate employees with search capability.</summary>
-        [HttpGet("employees/subordinates")]
-        public async Task<IActionResult> GetSubordinateEmployees(
-            [FromQuery] string? searchTerm,
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 12
-        )
+        [HttpGet("api/lnd-skills/employees/subordinates")]
+        public async Task<IActionResult> GetSubordinateEmployees([FromQuery] SubordinateEmployeesRequestModel request)
         {
             var managerId = GetCurrentEmployeeId();
-
+ 
             Log.Information(
                 "GetSubordinateEmployees API called. ManagerId={ManagerId}, SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
-                managerId, searchTerm ?? "none", pageNumber, pageSize
+                managerId, request.SearchTerm ?? "none", request.PageNumber, request.PageSize
             );
-
+ 
             var result = await _employeeSkillService.GetSubordinateEmployees(
                 managerId,
-                searchTerm,
-                pageNumber,
-                pageSize
-            );
-
+                request.SearchTerm,
+                request.PageNumber,
+                request.PageSize
+            );  
+ 
             if (result.Success)
             {
                 Log.Information(
@@ -173,24 +161,24 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 return BadRequest(result);
             }
         }
-
+ 
         #endregion
-
+ 
         #region Skill Modifications
-
+ 
         /// <summary>Records a single skill rating for an employee.</summary>
-        [HttpPost("record")]
+        [HttpPost("api/lnd-skills/record")]
         public async Task<IActionResult> RecordEmployeeSkill([FromBody] RecordSkillRequest request)
         {
             var managerId = GetCurrentEmployeeId();
-
+ 
             Log.Information(
                 "RecordEmployeeSkill API called. ManagerId={ManagerId}, EmployeeId={EmployeeId}, SkillId={SkillId}, Rating={Rating}",
                 managerId, request.EmployeeId, request.SkillId, request.Rating
             );
-
+ 
             var result = await _employeeSkillService.RecordEmployeeSkill(managerId, request);
-
+ 
             if (result.Success)
             {
                 Log.Information(
@@ -208,22 +196,20 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 return BadRequest(result);
             }
         }
-
+ 
         /// <summary>Records multiple skill ratings for an employee in a single transaction.</summary>
-        [HttpPost("record-bulk")]
-        public async Task<IActionResult> BulkRecordEmployeeSkills(
-            [FromBody] BulkRecordSkillRequest request
-        )
+        [HttpPost("api/lnd-skills/record-bulk")]
+        public async Task<IActionResult> BulkRecordEmployeeSkills([FromBody] BulkRecordSkillRequest request)
         {
             var managerId = GetCurrentEmployeeId();
-
+ 
             Log.Information(
                 "BulkRecordEmployeeSkills API called. ManagerId={ManagerId}, EmployeeId={EmployeeId}, SkillCount={Count}",
                 managerId, request.EmployeeId, request.Skills?.Count ?? 0
             );
-
+ 
             var result = await _employeeSkillService.BulkRecordEmployeeSkills(managerId, request);
-
+ 
             if (result.Success)
             {
                 Log.Information(
@@ -241,22 +227,20 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 return BadRequest(result);
             }
         }
-
+ 
         /// <summary>Updates an existing employee skill rating.</summary>
-        [HttpPut("update-rating")]
-        public async Task<IActionResult> UpdateEmployeeSkillRating(
-            [FromBody] UpdateSkillRatingRequest request
-        )
+        [HttpPut("api/lnd-skills/rating")]
+        public async Task<IActionResult> UpdateEmployeeSkillRating([FromBody] UpdateSkillRatingRequest request)
         {
             var managerId = GetCurrentEmployeeId();
-
+ 
             Log.Information(
                 "UpdateEmployeeSkillRating API called. ManagerId={ManagerId}, MapperId={MapperId}, NewRating={NewRating}",
                 managerId, request.MapperId, request.Rating
             );
-
+ 
             var result = await _employeeSkillService.UpdateEmployeeSkillRating(managerId, request);
-
+ 
             if (result.Success)
             {
                 Log.Information(
@@ -274,20 +258,20 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 return BadRequest(result);
             }
         }
-
+ 
         /// <summary>Deletes an employee skill mapping by mapper ID.</summary>
-        [HttpDelete("{mapperId}")]
+        [HttpDelete("api/lnd-skills/{mapperId}")]
         public async Task<IActionResult> DeleteEmployeeSkill(int mapperId)
         {
             var managerId = GetCurrentEmployeeId();
-
+ 
             Log.Information(
                 "DeleteEmployeeSkill API called. ManagerId={ManagerId}, MapperId={MapperId}",
                 managerId, mapperId
             );
-
+ 
             var result = await _employeeSkillService.DeleteEmployeeSkill(managerId, mapperId);
-
+ 
             if (result.Success)
             {
                 Log.Information(
@@ -305,7 +289,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 return BadRequest(result);
             }
         }
-
+ 
         #endregion
     }
 }
+ 
