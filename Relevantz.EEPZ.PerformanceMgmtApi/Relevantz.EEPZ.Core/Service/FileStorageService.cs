@@ -10,9 +10,9 @@ using Relevantz.EEPZ.Core.IService;
 
 namespace Relevantz.EEPZ.Core.Service
 {
-    /// <summary>
-    /// Implementation of file storage service using MongoDB GridFS
-    /// </summary>
+
+
+
     public class FileStorageService : IFileStorageService
     {
         private readonly GridFSBucket _gridFSBucket;
@@ -26,7 +26,7 @@ namespace Relevantz.EEPZ.Core.Service
             _mongoSettings = mongoSettings.Value;
             _logger = logger;
 
-            // Validate configuration
+
             if (string.IsNullOrEmpty(_mongoSettings.ConnectionString))
                 throw new ArgumentException("MongoDB ConnectionString is not configured");
 
@@ -35,11 +35,11 @@ namespace Relevantz.EEPZ.Core.Service
 
             try
             {
-                // Initialize MongoDB client
+
                 var client = new MongoClient(_mongoSettings.ConnectionString);
                 var database = client.GetDatabase(_mongoSettings.DatabaseName);
 
-                // Configure GridFS bucket options
+
                 var bucketOptions = new GridFSBucketOptions
                 {
                     BucketName = _mongoSettings.GridFSBucketName,
@@ -70,7 +70,7 @@ namespace Relevantz.EEPZ.Core.Service
                 throw new ArgumentException("File is empty or null");
             }
 
-            // Validate file size
+
             if (file.Length > _mongoSettings.MaxFileSizeBytes)
             {
                 var maxSizeMB = _mongoSettings.MaxFileSizeBytes / (1024 * 1024);
@@ -84,7 +84,7 @@ namespace Relevantz.EEPZ.Core.Service
             var fileName = file.FileName;
             var contentType = file.ContentType;
 
-            // Create metadata document
+
             var metadata = new BsonDocument
             {
                 { "subfolder", subFolder },
@@ -209,7 +209,7 @@ namespace Relevantz.EEPZ.Core.Service
 
             try
             {
-                //  FIX: Use field name "_id" directly instead of x => x.Id
+
                 var filter = Builders<GridFSFileInfo>.Filter.Eq("_id", objectId);
                 var cursor = await _gridFSBucket.FindAsync(filter);
                 var fileInfo = await cursor.FirstOrDefaultAsync();
@@ -220,10 +220,10 @@ namespace Relevantz.EEPZ.Core.Service
                     throw new FileNotFoundException($"File with ID {fileId} not found");
                 }
 
-                // Download file bytes
+
                 var bytes = await _gridFSBucket.DownloadAsBytesAsync(objectId);
 
-                // Extract content type from metadata
+
                 var contentType = fileInfo.Metadata?.Contains("contentType") == true
                     ? fileInfo.Metadata["contentType"].AsString
                     : GetContentTypeFromFileName(fileInfo.Filename);
@@ -266,7 +266,7 @@ namespace Relevantz.EEPZ.Core.Service
 
             try
             {
-                //  FIX: Use field name "_id" directly instead of x => x.Id
+
                 var filter = Builders<GridFSFileInfo>.Filter.Eq("_id", objectId);
                 var cursor = await _gridFSBucket.FindAsync(filter);
                 var fileInfo = await cursor.FirstOrDefaultAsync();
@@ -314,7 +314,7 @@ namespace Relevantz.EEPZ.Core.Service
 
             try
             {
-                //  FIX: Use field name "_id" directly instead of x => x.Id
+
                 var filter = Builders<GridFSFileInfo>.Filter.Eq("_id", objectId);
                 var cursor = await _gridFSBucket.FindAsync(filter);
                 var fileInfo = await cursor.FirstOrDefaultAsync();
@@ -344,7 +344,7 @@ namespace Relevantz.EEPZ.Core.Service
 
             try
             {
-                //  FIX: Use field name "_id" directly instead of x => x.Id
+
                 var filter = Builders<GridFSFileInfo>.Filter.In("_id", validObjectIds);
                 var cursor = await _gridFSBucket.FindAsync(filter);
                 var fileInfos = await cursor.ToListAsync();
@@ -381,9 +381,9 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
 
-        /// <summary>
-        /// Get MIME content type from file extension
-        /// </summary>
+
+
+
         private string GetContentTypeFromFileName(string fileName)
         {
             if (string.IsNullOrEmpty(fileName))

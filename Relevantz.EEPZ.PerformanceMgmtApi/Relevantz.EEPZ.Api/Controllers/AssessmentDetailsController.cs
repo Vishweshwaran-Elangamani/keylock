@@ -50,8 +50,8 @@ namespace PerformanceManagement.Controllers
                 if (!result.Success)
                 {
                     _logger.LogWarning(
-                        "Failed to get HR attachment {AttachmentId}: {Error}", 
-                        attachmentId, 
+                        "Failed to get HR attachment {AttachmentId}: {Error}",
+                        attachmentId,
                         result.ErrorMessage);
                     return NotFound(new { success = false, message = result.ErrorMessage ?? "Attachment not found" });
                 }
@@ -71,7 +71,7 @@ namespace PerformanceManagement.Controllers
                     contentType,
                     result.FileBytes.Length);
 
-                // Add proper headers for download
+
                 Response.Headers.Add("Content-Disposition", $"attachment; filename=\"{fileName}\"");
                 Response.Headers.Add("X-Content-Type-Options", "nosniff");
 
@@ -89,9 +89,9 @@ namespace PerformanceManagement.Controllers
             }
         }
 
-        /// <summary>
-        /// Test endpoint to verify MongoDB GridFS connectivity
-        /// </summary>
+
+
+
         [HttpGet("test-file/{fileId}")]
         public async Task<IActionResult> TestFileExists(string fileId)
         {
@@ -140,9 +140,9 @@ namespace PerformanceManagement.Controllers
             }
         }
 
-        /// <summary>
-        /// Get file metadata without downloading
-        /// </summary>
+
+
+
         [HttpGet("hrattachments/{attachmentId}/info")]
         public async Task<IActionResult> GetAttachmentInfo(int attachmentId)
         {
