@@ -10,7 +10,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public bool IsApproved { get; set; }
         public string? Notes { get; set; }
     }
- 
+
     // Assignment requests
     public class UploadCompletionProofRequest
     {
@@ -18,14 +18,14 @@ namespace Relevantz.EEPZ.Common.DTOs
         public IFormFile ProofDocument { get; set; }
         public string? CompletionNotes { get; set; }
     }
- 
+
     public class CompleteAssignmentRequest
     {
         public int AssignmentId { get; set; }
         public int NewRating { get; set; }
         public string? Notes { get; set; }
     }
- 
+
     // Employee skill requests
     public class RecordSkillRequest
     {
@@ -33,32 +33,32 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int SkillId { get; set; }
         public int Rating { get; set; }
     }
- 
+
     public class BulkRecordSkillRequest
     {
         public int EmployeeId { get; set; }
         public List<SkillRating> Skills { get; set; }
     }
- 
+
     public class SkillRating
     {
         public int SkillId { get; set; }
         public int Rating { get; set; }
     }
- 
+
     public class UpdateSkillRatingRequest
     {
         public int MapperId { get; set; }
         public int Rating { get; set; }
     }
- 
+
     // SME requests
     public class BecomeSmeRequest
     {
         public int SkillId { get; set; }
         public IFormFile ProofDocument { get; set; }
     }
- 
+
     public class SmeRequestDto
     {
         public int SkillId { get; set; }
@@ -66,7 +66,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int MenteeEmployeeId { get; set; }
         public DateTime? Deadline { get; set; }
     }
- 
+
     public class MyApprovalsRequestModel
     {
         public string? ApprovalType { get; set; }
@@ -77,9 +77,9 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int PageSize { get; set; } = 10;
         public string? SearchTerm { get; set; }
     }
- 
- 
- 
+
+
+
     public class ApprovalHistoryRequestModel
     {
         public string? ApprovalType { get; set; }
@@ -91,7 +91,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;
     }
- 
+
     /// <summary>
     /// Request model for fetching assignments with filtering and pagination
     /// </summary>
@@ -104,7 +104,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;
     }
- 
+
     /// <summary>
     /// Request model for exporting assignments
     /// </summary>
@@ -115,7 +115,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string? SortField { get; set; }
         public string? SortOrder { get; set; }
     }
- 
+
     /// <summary>
     /// Request model for organization assignments with filtering and pagination
     /// </summary>
@@ -128,7 +128,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;
     }
- 
+
     /// <summary>
     /// Request model for exporting organization assignments
     /// </summary>
@@ -139,7 +139,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string? SortField { get; set; }
         public string? SortOrder { get; set; }
     }
- 
+
     /// <summary>
     /// Request model for organization employees with pagination
     /// </summary>
@@ -149,7 +149,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 9;
     }
- 
+
     /// <summary>
     /// Request model for employee skills by ID
     /// </summary>
@@ -159,7 +159,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string? SearchTerm { get; set; }
         public string? SortBy { get; set; } = "skillname";
     }
- 
+
     /// <summary>
     /// Request model for all active SMEs with pagination
     /// </summary>
@@ -169,7 +169,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;
     }
- 
+
     /// <summary>
     /// Request model for exporting active SMEs
     /// </summary>
@@ -177,7 +177,7 @@ namespace Relevantz.EEPZ.Common.DTOs
     {
         public string? SearchTerm { get; set; }
     }
- 
+
     /// <summary>
     /// Request model for fetching my skills with pagination
     /// </summary>
@@ -192,7 +192,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;
     }
- 
+
     /// <summary>
     /// Request model for fetching subordinate skills
     /// </summary>
@@ -203,7 +203,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string? SortBy { get; set; } = LnDConstants.DEFAULTS.SORT_BY_EMPLOYEE_NAME;
         public int PageNumber { get; set; } = 1;
     }
- 
+
     /// <summary>
     /// Request model for fetching subordinate employees
     /// </summary>
@@ -213,6 +213,22 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 12;
     }
+    
+      public class AvailableSmesRequestModel
+
+    {
+
+        public  int SkillId{ get; set; }
+
+        public string? SearchTerm{ get; set; }
+
+        public int PageNumber { get; set; } = 1;
+
+        public int PageSize { get; set; } = 10;
+ 
+    }
+
+ 
  
 }
  
