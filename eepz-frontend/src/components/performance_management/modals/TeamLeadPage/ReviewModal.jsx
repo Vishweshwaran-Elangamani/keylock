@@ -246,7 +246,7 @@ const ReviewModal = ({
           >
             <thead>
               <tr>
-                <th>COMPETENCY NAME</th>
+                <th>COMPETENCIES NAME</th>
                 {active === "l2" && <th>EMP RATING</th>}
                 {active === "l2" && <th>EMP COMMENTS</th>}
                 {active === "l2" && <th>L1 RATING</th>}

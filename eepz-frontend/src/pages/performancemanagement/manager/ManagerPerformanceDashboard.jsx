@@ -420,6 +420,54 @@ export default function ManagerDashboard() {
     }
   };
 
+  // Statistics calculation
+  const getStatistics = () => {
+    return {
+      total: assignments.length,
+      pending: pendingAssignments.length,
+      completed: completedAssignments.length,
+    };
+  };
+
+  // Statistics Cards Component
+  const StatisticsCards = () => {
+    const stats = getStatistics();
+
+    return (
+      <div className="mgr-stats-grid">
+        <div className="mgr-stat-card mgr-stat-total">
+          <div className="mgr-stat-icon">
+            <i className="bi bi-clipboard-data"></i>
+          </div>
+          <div className="mgr-stat-content">
+            <div className="mgr-stat-value">{stats.total}</div>
+            <div className="mgr-stat-label">Total Assessments</div>
+          </div>
+        </div>
+
+        <div className="mgr-stat-card mgr-stat-pending">
+          <div className="mgr-stat-icon">
+            <i className="bi bi-hourglass-split"></i>
+          </div>
+          <div className="mgr-stat-content">
+            <div className="mgr-stat-value">{stats.pending}</div>
+            <div className="mgr-stat-label">Pending Forms</div>
+          </div>
+        </div>
+
+        <div className="mgr-stat-card mgr-stat-completed">
+          <div className="mgr-stat-icon">
+            <i className="bi bi-check-circle"></i>
+          </div>
+          <div className="mgr-stat-content">
+            <div className="mgr-stat-value">{stats.completed}</div>
+            <div className="mgr-stat-label">Completed Forms</div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderTable = (data, isCompleted) => {
     const isPending = !isCompleted;
     const currentPage = isPending ? pendingPage : completedPage;
@@ -440,11 +488,11 @@ export default function ManagerDashboard() {
           <table className="manevap-table">
             <thead>
               <tr>
-                <th>Form Name</th>
-                <th>Type</th>
-                <th>Assigned</th>
-                <th>Deadline</th>
-                <th>Action</th>
+                <th><i className="bi bi-file-earmark-text"></i> Form Name</th>
+                <th><i className="bi bi-tag"></i> Type</th>
+                <th><i className="bi bi-calendar-check"></i> Assigned</th>
+                <th><i className="bi bi-calendar-x"></i> Deadline</th>
+                <th><i className="bi bi-gear"></i> Action</th>
               </tr>
             </thead>
             <tbody>
@@ -470,11 +518,19 @@ export default function ManagerDashboard() {
                     </span>
                   </td>
                   <td>
-                    {new Date(assignment.assignedAt).toLocaleDateString()}
+                    {new Date(assignment.assignedAt).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric'
+                    })}
                   </td>
                   <td>
                     {assignment.deadline
-                      ? new Date(assignment.deadline).toLocaleDateString()
+                      ? new Date(assignment.deadline).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric'
+                        })
                       : "N/A"}
                   </td>
                   <td>
@@ -496,7 +552,7 @@ export default function ManagerDashboard() {
                           setShowModal(true);
                         }}
                       >
-                        Submit
+                        <i className="bi bi-pencil-square"></i> Submit
                       </button>
                     ) : (
                       <button
@@ -515,7 +571,7 @@ export default function ManagerDashboard() {
 
         <div className="manevap-pagination-container">
           <div className="manevap-pagination-info">
-            <span className="manevap-pagination-label">Rows per page:</span>
+            <span className="manevap-pagination-label">Show</span>
             <PaginationDropdown
               value={perPage}
               onChange={(val) => {
@@ -524,6 +580,7 @@ export default function ManagerDashboard() {
               }}
               options={[5, 10, 15, 20]}
             />
+            <span className="manevap-pagination-label">entries</span>
           </div>
 
           <nav className="manevap-pagination-nav">
@@ -537,7 +594,7 @@ export default function ManagerDashboard() {
                   className="manevap-page-link"
                   onClick={() => onPageChange(currentPage - 1)}
                 >
-                  &laquo;
+                  <i className="bi bi-chevron-left"></i>
                 </button>
               </li>
               {Array.from({ length: totalPages }, (_, i) => (
@@ -564,7 +621,7 @@ export default function ManagerDashboard() {
                   className="manevap-page-link"
                   onClick={() => onPageChange(currentPage + 1)}
                 >
-                  &raquo;
+                  <i className="bi bi-chevron-right"></i>
                 </button>
               </li>
             </ul>
@@ -624,6 +681,8 @@ export default function ManagerDashboard() {
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
       />
 
+      {!loading && <StatisticsCards />}
+
       <div
         className="mgrdash-pill-toggle"
         role="tablist"
@@ -637,6 +696,7 @@ export default function ManagerDashboard() {
           type="button"
           aria-selected={activeTab === "pending"}
         >
+          <i className="bi bi-hourglass-split"></i>
           Pending{" "}
           <span className="mgrdash-pill-count">
             {pendingAssignments.length}
@@ -650,6 +710,7 @@ export default function ManagerDashboard() {
           type="button"
           aria-selected={activeTab === "completed"}
         >
+          <i className="bi bi-check-circle"></i>
           Completed{" "}
           <span className="mgrdash-pill-count">
             {completedAssignments.length}
@@ -679,7 +740,7 @@ export default function ManagerDashboard() {
                   onClick={() => setPendingFormNameFilter(pendingFormNameInput)}
                   type="button"
                 >
-                  Search
+                  <i className="bi bi-search"></i> Search
                 </button>
               </div>
               <button
@@ -694,13 +755,15 @@ export default function ManagerDashboard() {
                   cursor: pendingFormNameFilter ? "pointer" : "not-allowed",
                 }}
               >
-                Clear Filters
+                <i className="bi bi-x-circle"></i> Clear
               </button>
             </div>
           </div>
           {pendingAssignments.length === 0 ? (
             <div className="manevap-empty-state">
-              <i className="bi bi-inbox"></i>
+              <div className="manevap-empty-icon">
+                <i className="bi bi-inbox"></i>
+              </div>
               <h3>
                 {pendingFormNameFilter
                   ? "No Matching Assessments"
@@ -742,7 +805,7 @@ export default function ManagerDashboard() {
                   }
                   type="button"
                 >
-                  Search
+                  <i className="bi bi-search"></i> Search
                 </button>
               </div>
               <button
@@ -757,13 +820,15 @@ export default function ManagerDashboard() {
                   cursor: completedFormNameFilter ? "pointer" : "not-allowed",
                 }}
               >
-                Clear Filters
+                <i className="bi bi-x-circle"></i> Clear
               </button>
             </div>
           </div>
           {completedAssignments.length === 0 ? (
             <div className="manevap-empty-state">
-              <i className="bi bi-clipboard-check"></i>
+              <div className="manevap-empty-icon">
+                <i className="bi bi-clipboard-check"></i>
+              </div>
               <h3>
                 {completedFormNameFilter
                   ? "No Matching Assessments"
@@ -862,27 +927,26 @@ export default function ManagerDashboard() {
                               )}
                             </td>
                             <td>
-  {modalMode === "view" ? (
-    <div className="manevap-modal-cell-view-comment">
-      {item.comments || "-"}
-    </div>
-  ) : (
-    <textarea
-      className="manevap-modal-cell-textarea"
-      value={item.comments}
-      onChange={(e) =>
-        updateAssessmentData(
-          item.competencyId,
-          "comments",
-          e.target.value
-        )
-      }
-      placeholder="Enter your comments here..."
-      rows="3"
-    />
-  )}
-</td>
-
+                              {modalMode === "view" ? (
+                                <div className="manevap-modal-cell-view-comment">
+                                  {item.comments || "-"}
+                                </div>
+                              ) : (
+                                <textarea
+                                  className="manevap-modal-cell-textarea"
+                                  value={item.comments}
+                                  onChange={(e) =>
+                                    updateAssessmentData(
+                                      item.competencyId,
+                                      "comments",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder="Enter your comments here..."
+                                  rows="3"
+                                />
+                              )}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -895,7 +959,7 @@ export default function ManagerDashboard() {
                     onClick={() => setShowModal(false)}
                     className="manevap-btn-close"
                   >
-                    Cancel
+                    <i className="bi bi-x-lg"></i> Cancel
                   </button>
                   {modalMode === "submit" && (
                     <button
@@ -905,6 +969,7 @@ export default function ManagerDashboard() {
                         submitting ? "disabled" : ""
                       }`}
                     >
+                      <i className="bi bi-check-lg"></i>
                       {submitting ? "Submitting..." : "Submit Assessment"}
                     </button>
                   )}
