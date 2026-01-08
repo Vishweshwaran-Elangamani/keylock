@@ -862,26 +862,27 @@ export default function ManagerDashboard() {
                               )}
                             </td>
                             <td>
-                              {modalMode === "view" ? (
-                                <div className="manevap-modal-cell-view">
-                                  {item.comments || "-"}
-                                </div>
-                              ) : (
-                                <input
-                                  className="manevap-modal-cell-input"
-                                  type="text"
-                                  value={item.comments}
-                                  onChange={(e) =>
-                                    updateAssessmentData(
-                                      item.competencyId,
-                                      "comments",
-                                      e.target.value
-                                    )
-                                  }
-                                  placeholder="-"
-                                />
-                              )}
-                            </td>
+  {modalMode === "view" ? (
+    <div className="manevap-modal-cell-view-comment">
+      {item.comments || "-"}
+    </div>
+  ) : (
+    <textarea
+      className="manevap-modal-cell-textarea"
+      value={item.comments}
+      onChange={(e) =>
+        updateAssessmentData(
+          item.competencyId,
+          "comments",
+          e.target.value
+        )
+      }
+      placeholder="Enter your comments here..."
+      rows="3"
+    />
+  )}
+</td>
+
                           </tr>
                         ))}
                       </tbody>

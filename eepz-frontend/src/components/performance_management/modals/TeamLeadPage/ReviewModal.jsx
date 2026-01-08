@@ -1,6 +1,130 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
+import ReactDOM from "react-dom";
 import logoImage from "../../../../assets/logodark.png";
 import "../../../../styles/performancemanagement/components/ReviewModal.css";
+
+const CustomRatingDropdown = ({ value, onChange, isReadOnly, competencyName }) => {
+  const [open, setOpen] = useState(false);
+  const [menuPosition, setMenuPosition] = useState({
+    top: 0,
+    left: 0,
+    width: 0,
+  });
+  const dropdownRef = useRef(null);
+
+  const options = [
+    { value: "", label: "-" },
+    { value: "1", label: "1 - Poor" },
+    { value: "2", label: "2 - Fair" },
+    { value: "3", label: "3 - Good" },
+    { value: "4", label: "4 - Very Good" },
+    { value: "5", label: "5 - Excellent" },
+  ];
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setOpen(false);
+  };
+
+  const selectedLabel =
+    options.find((opt) => opt.value === value)?.label || "-";
+
+  const handleToggle = (e) => {
+    e.stopPropagation();
+    if (!open && dropdownRef.current) {
+      const rect = dropdownRef.current.getBoundingClientRect();
+      setMenuPosition({
+        top: rect.bottom + window.scrollY + 2,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+      });
+    }
+    setOpen((prev) => !prev);
+  };
+
+  useEffect(() => {
+    if (!open) return;
+
+    const handleClickOutside = (e) => {
+      const menu = document.querySelector(".tl-custom-rating-menu");
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target) &&
+        menu &&
+        !menu.contains(e.target)
+      ) {
+        setOpen(false);
+      }
+    };
+
+    const timer = setTimeout(() => {
+      document.addEventListener("mousedown", handleClickOutside);
+    }, 100);
+
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [open]);
+
+  if (isReadOnly) {
+    return (
+      <span className="tl-read-only-text">
+        {value || "-"}
+      </span>
+    );
+  }
+
+  return (
+    <>
+      <div
+        ref={dropdownRef}
+        className="tl-custom-rating-dropdown"
+        tabIndex={0}
+      >
+        <div className="tl-custom-rating-selected" onClick={handleToggle}>
+          {selectedLabel}
+          <span className="tl-custom-rating-arrow" />
+        </div>
+      </div>
+
+      {open &&
+        ReactDOM.createPortal(
+          <div
+            className="tl-custom-rating-menu"
+            style={{
+              position: "fixed",
+              top: `${menuPosition.top}px`,
+              left: `${menuPosition.left}px`,
+              width: `${menuPosition.width}px`,
+              zIndex: 999999,
+            }}
+          >
+            {options.map((opt) => (
+              <div
+                key={opt.value}
+                className={
+                  "tl-custom-rating-option" +
+                  (opt.value === value
+                    ? " tl-custom-rating-option-active"
+                    : "")
+                }
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleSelect(opt.value);
+                }}
+              >
+                {opt.label}
+              </div>
+            ))}
+          </div>,
+          document.body
+        )}
+    </>
+  );
+};
+
 const ReviewModal = ({
   showModal,
   closeModal,
@@ -156,44 +280,19 @@ const ReviewModal = ({
                   {active === "l1" && <td>{item.employeeComments || "-"}</td>}
 
                   <td className="tl-center">
-                    {isReadOnly ? (
-                      <span className="tl-read-only-text">
-                        {modalRatings[item.detailId]?.rating || "-"}
-                      </span>
-                    ) : (
-                      <select
-                        className="tl-rating-select"
-                        value={modalRatings[item.detailId]?.rating ?? ""}
-                        onChange={(e) =>
-                          handleInputChange(
-                            item.detailId,
-                            "rating",
-                            e.target.value
-                          )
-                        }
-                        aria-label={`Rating for ${item.competencyName}`}
-                      >
-                        <option value="">-</option>
-                        <option value="1">1 - Poor</option>
-                        <option value="2">2 - Fair</option>
-                        <option value="3">3 - Good</option>
-                        <option value="4">4 - Very Good</option>
-                        <option value="5">5 - Excellent</option>
-                      </select>
-                    )}
+                    <CustomRatingDropdown
+                      value={modalRatings[item.detailId]?.rating ?? ""}
+                      onChange={(val) =>
+                        handleInputChange(item.detailId, "rating", val)
+                      }
+                      isReadOnly={isReadOnly}
+                      competencyName={item.competencyName}
+                    />
                   </td>
 
                   <td>
                     {isReadOnly ? (
-                      <div
-                        style={{
-                          padding: "8px 10px",
-                          background: "#f3f4f6",
-                          borderRadius: "6px",
-                          minHeight: "40px",
-                          color: "#374151",
-                        }}
-                      >
+                      <div className="tl-read-only-comment">
                         {modalRatings[item.detailId]?.comment || "-"}
                       </div>
                     ) : (
@@ -207,8 +306,8 @@ const ReviewModal = ({
                           )
                         }
                         className="tl-input-text"
-                        placeholder="Justify through comments"
-                        rows="2"
+                        placeholder="Enter your comments here..."
+                        rows="3"
                         aria-label={`Comments for ${item.competencyName}`}
                       />
                     )}

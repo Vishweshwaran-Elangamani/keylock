@@ -1,5 +1,6 @@
 import React from "react";
-import api from "../../../../services/performancemanagement/api/api";
+import api, { downloadHrAttachment } from "../../../../services/performancemanagement/api/api";
+
 import "../../../../styles/performancemanagement/components/AppraisalDetailsModal.css";
 
 function statusRender(status) {
@@ -144,7 +145,8 @@ const AppraisalDetailsModal = ({
       setDownloadingId(attachment.attachmentId);
       setError(null);
 
-      const response = await api.downloadHrAttachment(attachment.attachmentId);
+      const response = await downloadHrAttachment(attachment.attachmentId);
+
 
       const blob = response.data;
       const contentType = response.headers["content-type"];
