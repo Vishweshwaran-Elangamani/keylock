@@ -71,31 +71,27 @@ export const lndService = {
    * @param {string} sortOrder - Sort order: 'asc' or 'desc' (optional)
    * @param {number} pageSize - Items per page (default: 10)
    * @returns {Promise} API response
-   */
-  getMySkills: async (
-    pageNumber = 1,
-    searchTerm = "",
-    sortField = "",
-    sortOrder = "asc",
-    pageSize = 10
-  ) => {
-    try {
-      const query = buildQueryString({
-        pageNumber,
-        searchTerm,
-        sortField,
-        sortOrder,
-        pageSize,
-      });
-      const response = await axios.get(
-        `${API_BASE_URL}/lnd-skills/my-skills${query}`,
-        { headers: getHeaders() }
-      );
-      return response;
-    } catch (error) {
-      return handleError(error);
-    }
-  },
+   */// ✅ CORRECT - Use params object
+getMySkills: async (params = {}) => {
+  try {
+    const defaultParams = {
+      searchTerm: "",
+      pageNumber: 1,
+      pageSize: 10,
+    };
+
+    const finalParams = { ...defaultParams, ...params };
+    const query = buildQueryString(finalParams);
+
+    const response = await axios.get(
+      `${API_BASE_URL}/lnd-skills/my-skills${query}`,
+      { headers: getHeaders() }
+    );
+    return response;
+  } catch (error) {
+    return handleError(error);
+  }
+},
 
   /**
    * Get subordinate employees' skills (Manager only)
@@ -206,22 +202,33 @@ export const lndService = {
    * @param {number} pageSize - Items per page (default: 12)
    * @returns {Promise} API response with paginated employees
    */
-  getSubordinateEmployees: async (
-    pageNumber = 1,
-    searchTerm = "",
-    pageSize = 12
-  ) => {
-    try {
-      const query = buildQueryString({ pageNumber, searchTerm, pageSize });
-      const response = await axios.get(
-        `${API_BASE_URL}/lnd-skills/employees/subordinates${query}`,
-        { headers: getHeaders() }
-      );
-      return response;
-    } catch (error) {
-      return handleError(error);
-    }
-  },
+  /**
+ * Get subordinate employees for manager with pagination and search
+ * UPDATED: Now uses request model instead of individual parameters
+ * @param {object} params - { pageNumber, searchTerm, pageSize }
+ * @returns {Promise} API response with paginated employees
+ */
+getSubordinateEmployees: async (params = {}) => {
+  try {
+    const defaultParams = {
+      PageNumber: 1,
+      SearchTerm: "",
+      PageSize: 12,
+    };
+
+    const finalParams = { ...defaultParams, ...params };
+    const query = buildQueryString(finalParams);
+
+    const response = await axios.get(
+      `${API_BASE_URL}/lnd-skills/employees/subordinates${query}`,
+      { headers: getHeaders() }
+    );
+    return response;
+  } catch (error) {
+    return handleError(error);
+  }
+},
+
 
   /**
    * Get all available skills for dropdown

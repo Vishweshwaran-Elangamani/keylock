@@ -51,11 +51,13 @@ const TeamSkills = () => {
   const fetchEmployees = async () => {
     try {
       setLoading(true);
-      const response = await lndService.getSubordinateEmployees(
-        currentPage,
-        searchTerm,
-        itemsPerPage // Dynamic page size
-      );
+      
+      // UPDATED: Pass params as a single object
+      const response = await lndService.getSubordinateEmployees({
+        PageNumber: currentPage,
+        SearchTerm: searchTerm,
+        PageSize: itemsPerPage,
+      });
 
       if (response.data.success) {
         setEmployees(response.data.data.items);
@@ -248,3 +250,4 @@ const TeamSkills = () => {
 };
 
 export default TeamSkills;
+ 

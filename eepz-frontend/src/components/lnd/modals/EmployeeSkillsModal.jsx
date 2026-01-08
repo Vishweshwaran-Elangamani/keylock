@@ -126,14 +126,25 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
   };
 
   const hasPendingSmeRequest = (skillId) => {
-    return approvals.some(
-      (approval) =>
+    return approvals.some((approval) => {
+      if (
         approval.skillId === skillId &&
-        approval.status === APPROVAL_STATUS.PENDING &&
-        JSON.parse(approval.notes || "{}").MenteeEmployeeId ===
-          employee.employeeId
-    );
+        approval.status === APPROVAL_STATUS.PENDING
+      ) {
+        try {
+          // Try to parse notes as JSON
+          const notes = JSON.parse(approval.notes || "{}");
+          return notes.MenteeEmployeeId === employee.employeeId;
+        } catch (error) {
+          // If notes is not valid JSON, skip this approval
+          console.warn("Invalid JSON in approval notes:", approval.notes);
+          return false;
+        }
+      }
+      return false;
+    });
   };
+  
 
   const hasOngoingAssignments = (skillId) => {
     const ACTIVE_STATUSES = [

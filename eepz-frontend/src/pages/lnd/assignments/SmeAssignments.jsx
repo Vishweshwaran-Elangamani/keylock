@@ -33,8 +33,8 @@ const SmeAssignments = () => {
   const dropdownRef = useRef(null);
 
   // Sorting
-  const [sortField, setSortField] = useState("");
-  const [sortOrderAsc, setSortOrderAsc] = useState(true);
+  const [sortField, setSortField] = useState("");          
+  const [sortOrderAsc, setSortOrderAsc] = useState(true);                 
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -46,7 +46,7 @@ const SmeAssignments = () => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const roleName = user?.role || "";
     setUserRole(roleName);
-    setRolePrefix(getRolePrefix(roleName));
+    setRolePrefix(getRolePrefix(roleName)); 
   }, []);
 
   const getRolePrefix = (role) => {
@@ -94,14 +94,16 @@ const SmeAssignments = () => {
       const backendStatusFilter =
         statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter;
 
-      const response = await lndService.getSmeAssignments(
-        currentPage,
-        backendStatusFilter,
-        searchTerm,
-        sortField,
-        sortOrderAsc ? "asc" : "desc",
-        itemsPerPage
-      );
+     //  NEW - Params object
+const response = await lndService.getSmeAssignments({
+  pageNumber: currentPage,
+  statusFilter: backendStatusFilter,
+  searchTerm: searchTerm,
+  sortField: sortField,
+  sortOrder: sortOrderAsc ? "asc" : "desc",
+  pageSize: itemsPerPage,
+});
+
 
       if (response.data.success) {
         let items = response.data.data.items;

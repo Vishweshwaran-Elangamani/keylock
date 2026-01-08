@@ -69,13 +69,14 @@ const MySkills = () => {
   const fetchSkills = async () => {
     try {
       setLoading(true);
-      const response = await lndService.getMySkills(
-        currentPage,
-        searchTerm,
-        sortField,
-        sortOrderAsc ? "asc" : "desc",
-        itemsPerPage
-      );
+      
+      // UPDATED: Include sortField and sortOrder
+      const response = await lndService.getMySkills({
+        searchTerm: searchTerm,
+        pageNumber: currentPage,
+        
+        pageSize: itemsPerPage,
+      });
 
       if (response.data.success) {
         setSkills(response.data.data.items);
@@ -92,15 +93,17 @@ const MySkills = () => {
 
   const fetchApprovalHistory = async () => {
     try {
-      const response = await lndService.getApprovalHistory(
-        1,
-        "",
-        APPROVAL_TYPE.SME_REGISTRATION,
-        APPROVAL_STATUS.PENDING,
-        "",
-        "",
-        "desc"
-      );
+      // UPDATED: Use params object instead of individual parameters
+      const response = await lndService.getApprovalHistory({
+        pageNumber: 1,
+        role: "",
+        approvalType: APPROVAL_TYPE.SME_REGISTRATION,
+        status: APPROVAL_STATUS.PENDING,
+        searchTerm: "",
+        sortField: "",
+        sortOrder: "desc",
+      });
+      
       if (response.data.success) {
         setApprovals(response.data.data.items);
       }
