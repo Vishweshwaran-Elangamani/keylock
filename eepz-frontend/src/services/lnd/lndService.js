@@ -168,7 +168,7 @@ getMySkills: async (params = {}) => {
   updateSkillRating: async (data) => {
     try {
       const response = await axios.put(
-        `${API_BASE_URL}/lnd-skills/update-rating`,
+        `${API_BASE_URL}/lnd-skills/rating`,
         data,
         { headers: getHeaders() }
       );
