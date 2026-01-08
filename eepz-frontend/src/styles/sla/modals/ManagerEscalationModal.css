@@ -359,10 +359,10 @@
 }
 
 .mgr-select-option--selected {
-   background-color: #efefef !important;
+  background-color: #efefef !important;
   color: #000 !important;
   font-weight: 500 !important;
- 
+
 }
 
 .mgr-textarea {
@@ -454,12 +454,14 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
 }
 
 @media (max-width: 576px) {
+
   .mgr-modal--main,
   .mgr-modal--small {
     width: 95%;

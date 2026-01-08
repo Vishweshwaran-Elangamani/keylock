@@ -365,11 +365,11 @@
 }
 
 .prj-list-table-header {
-  background: #252267  !important;
+  background: #252267 !important;
 }
 
 .prj-list-table-header th {
-  background: #252267  !important;
+  background: #252267 !important;
   color: #ffffff !important;
   border: none !important;
   font-weight: 700 !important;
@@ -518,7 +518,7 @@
   font-size: 0.875rem !important;
 }
 
-.prj-list-table tbody td:last-child > div {
+.prj-list-table tbody td:last-child>div {
   display: flex !important;
   gap: 0.5rem !important;
   justify-content: center !important;

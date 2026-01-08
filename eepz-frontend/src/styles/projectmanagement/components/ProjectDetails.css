@@ -80,9 +80,9 @@
   margin-top: -40px;
 }
 
-.prj-detail-breadcrumb-item + .prj-detail-breadcrumb-item::before {
+.prj-detail-breadcrumb-item+.prj-detail-breadcrumb-item::before {
   content: "/";
-  color:#7a1d66;
+  color: #7a1d66;
   margin: 0 0.25rem;
 }
 

@@ -97,7 +97,6 @@ import ManagerAcknowledgment from "./pages/performancemanagement/manager/Manager
 import MentorFeedbackDashboard from "./pages/feedback_management/feedback/MentorFeedbackDashboard";
 import ViewManagerReview from "./pages/feedback_management/manager/ViewManagerReview";
 
-
 //Meeting and MOM
 
 import EmployeeMomDashboard from "./pages/meeting/EmployeeMomDashboard";
@@ -285,7 +284,6 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-    
       <Route
         path="/hr/dashboard/performance/status"
         element={
@@ -317,17 +315,16 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-            <Route
-  path="/hr/dashboard/performance/create/:formId"
-  element={
-    <ProtectedRoute allowedRoles={["HR"]}>
-      <DashboardLayout role="HR">
-        <FormCreate />
-      </DashboardLayout>
-    </ProtectedRoute>
-  }
-/>
- 
+      <Route
+        path="/hr/dashboard/performance/create/:formId"
+        element={
+          <ProtectedRoute allowedRoles={["HR"]}>
+            <DashboardLayout role="HR">
+              <FormCreate />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/hr/dashboard/projectmgmt/list"
         element={
@@ -657,8 +654,8 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      //endregion INTERNAL OPPORTUNITIES MANAGER
-      //region INTERNAL OPPORTUNITIES EMPLOYEE
+      //endregion INTERNAL OPPORTUNITIES MANAGER //region INTERNAL OPPORTUNITIES
+      EMPLOYEE
       <Route
         path="/employee/dashboard"
         element={
@@ -778,7 +775,7 @@ const AppRoutes = () => {
           <ProtectedRoute allowedRoles={["Leadership"]}>
             <DashboardLayout role="Leadership">
               <GoalApprovalsPage />
-            </DashboardLayout> 
+            </DashboardLayout>
           </ProtectedRoute>
         }
       />
@@ -805,7 +802,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      <Route  
+      <Route
         path="/manager/goals/your-goals"
         element={
           <ProtectedRoute allowedRoles={["Manager", "Department Head"]}>
@@ -1389,7 +1386,6 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      
       <Route
         path="/manager/dashboard/feedback/team"
         element={
@@ -1451,7 +1447,6 @@ const AppRoutes = () => {
         }
       />
       {/* Feedback - depthead */}
-     
       <Route
         path="/department-head/dashboard/feedback/allreviews"
         element={
@@ -1639,21 +1634,20 @@ const AppRoutes = () => {
         }
       />
       {/*  NOMINATION HISTORY - View finalized self & team nominations */}
-<Route
-  path="/internal/nomination-history"
-  element={
-    <ProtectedRoute
-      allowedRoles={["Employee", "Manager", "Department Head", "HR"]}
-    >
-      <DashboardLayout
-        role={["Employee", "Manager", "Department Head", "HR"]}
-      >
-        <NominationHistory />
-      </DashboardLayout>
-    </ProtectedRoute>
-  }
-/>
-
+      <Route
+        path="/internal/nomination-history"
+        element={
+          <ProtectedRoute
+            allowedRoles={["Employee", "Manager", "Department Head", "HR"]}
+          >
+            <DashboardLayout
+              role={["Employee", "Manager", "Department Head", "HR"]}
+            >
+              <NominationHistory />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
       {/* HR ROUTES */}
       <Route
         path="/hr/dasboard/meetmom"

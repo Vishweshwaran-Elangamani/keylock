@@ -26,9 +26,11 @@
   margin-bottom: 1rem;
   margin-left: -55px;
 }
-.hr-sla-breadcrumb__separator{
+
+.hr-sla-breadcrumb__separator {
   color: #70205f;
 }
+
 .hr-sla-breadcrumb-item {
   display: inline-flex;
   align-items: center;
@@ -459,8 +461,15 @@
 }
 
 @keyframes hr-sla-dropdownFadeIn {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .hr-sla-custom-select-option {
@@ -728,14 +737,45 @@
   white-space: nowrap;
 }
 
-.hr-sla-badge-type { background: #dbeafe; color: #1e40af; }
-.hr-sla-badge-open { background: #dbeafe; color: #1e40af; }
-.hr-sla-badge-closed { background: #dcfce7; color: #15803d; }
-.hr-sla-badge-progress { background: #e0e7ff; color: #4338ca; }
-.hr-sla-badge-ontime { background: #d1fae5; color: #047857; }
-.hr-sla-badge-breached { background: #fee2e2; color: #b91c1c; }
-.hr-sla-badge-extended { background: #fef3c7; color: #b45309; }
-.hr-sla-badge-default { background: #f3f4f6; color: #6b7280; }
+.hr-sla-badge-type {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.hr-sla-badge-open {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.hr-sla-badge-closed {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.hr-sla-badge-progress {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+
+.hr-sla-badge-ontime {
+  background: #d1fae5;
+  color: #047857;
+}
+
+.hr-sla-badge-breached {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.hr-sla-badge-extended {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.hr-sla-badge-default {
+  background: #f3f4f6;
+  color: #6b7280;
+}
 
 .hr-sla-actions {
   display: flex;
@@ -1035,7 +1075,9 @@
 }
 
 @keyframes hr-sla-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .hr-sla-loading-text {
@@ -1045,14 +1087,16 @@
 }
 
 @media (max-width: 1400px) {
-  .hr-sla-search-wrapper { 
-    width: 380px; 
+  .hr-sla-search-wrapper {
+    width: 380px;
   }
-  .hr-sla-filter-status { 
-    width: 140px; 
+
+  .hr-sla-filter-status {
+    width: 140px;
   }
-  .hr-sla-filter-compliance { 
-    width: 140px; 
+
+  .hr-sla-filter-compliance {
+    width: 140px;
   }
 }
 
@@ -1060,111 +1104,133 @@
   .hr-sla-wrapper {
     padding: 1.5rem 1rem;
   }
-  .hr-sla-search-wrapper { 
-    width: 350px; 
+
+  .hr-sla-search-wrapper {
+    width: 350px;
   }
-  .hr-sla-filters-row { 
-    gap: 0.6rem; 
+
+  .hr-sla-filters-row {
+    gap: 0.6rem;
   }
 }
 
 @media (max-width: 992px) {
-  .hr-sla-wrapper { 
-    padding: 1rem; 
+  .hr-sla-wrapper {
+    padding: 1rem;
   }
-  .hr-sla-filters-card { 
-    padding: 1rem; 
+
+  .hr-sla-filters-card {
+    padding: 1rem;
   }
-  .hr-sla-filters-row { 
-    flex-wrap: wrap; 
+
+  .hr-sla-filters-row {
+    flex-wrap: wrap;
   }
-  .hr-sla-search-wrapper { 
-    width: 100%; 
-    flex: 1 1 100%; 
+
+  .hr-sla-search-wrapper {
+    width: 100%;
+    flex: 1 1 100%;
   }
+
   .hr-sla-filter-status,
-  .hr-sla-filter-compliance { 
-    flex: 1 1 calc(50% - 0.5rem); 
-    width: auto; 
+  .hr-sla-filter-compliance {
+    flex: 1 1 calc(50% - 0.5rem);
+    width: auto;
     margin-bottom: 0.5rem;
   }
-  .hr-sla-filter-actions { 
-    width: 100%; 
-    justify-content: center; 
-    flex: 1 1 100%; 
+
+  .hr-sla-filter-actions {
+    width: 100%;
+    justify-content: center;
+    flex: 1 1 100%;
   }
-  .hr-sla-pagination-footer { 
-    flex-direction: column; 
-    align-items: stretch; 
+
+  .hr-sla-pagination-footer {
+    flex-direction: column;
+    align-items: stretch;
   }
+
   .hr-sla-pagination-left,
   .hr-sla-pagination-center,
-  .hr-sla-pagination-right { 
-    justify-content: center; 
+  .hr-sla-pagination-right {
+    justify-content: center;
   }
 }
 
 @media (max-width: 768px) {
-  .hr-sla-stat-card { 
-    padding: 1rem; 
+  .hr-sla-stat-card {
+    padding: 1rem;
   }
-  .hr-sla-stat-value { 
-    font-size: 1.75rem; 
+
+  .hr-sla-stat-value {
+    font-size: 1.75rem;
   }
-  .hr-sla-action-btn { 
-    width: 32px; 
-    height: 32px; 
+
+  .hr-sla-action-btn {
+    width: 32px;
+    height: 32px;
   }
-  .hr-sla-action-btn svg { 
-    width: 14px; 
-    height: 14px; 
+
+  .hr-sla-action-btn svg {
+    width: 14px;
+    height: 14px;
   }
-  .hr-sla-filters-row { 
-    flex-direction: column; 
-    align-items: stretch; 
+
+  .hr-sla-filters-row {
+    flex-direction: column;
+    align-items: stretch;
   }
+
   .hr-sla-search-wrapper,
   .hr-sla-filter-status,
-  .hr-sla-filter-compliance { 
-    max-width: none; 
-    width: 100%; 
-    flex: 1 1 100%; 
+  .hr-sla-filter-compliance {
+    max-width: none;
+    width: 100%;
+    flex: 1 1 100%;
   }
-  .hr-sla-filter-actions { 
-    flex-direction: row; 
-    justify-content: center; 
+
+  .hr-sla-filter-actions {
+    flex-direction: row;
+    justify-content: center;
   }
-  .hr-sla-btn-clear, 
-  .hr-sla-btn-export, 
-  .hr-sla-btn-create { 
-    flex: none; 
-    min-width: auto; 
+
+  .hr-sla-btn-clear,
+  .hr-sla-btn-export,
+  .hr-sla-btn-create {
+    flex: none;
+    min-width: auto;
   }
-  .hr-sla-table-header th, 
-  .hr-sla-table tbody td { 
-    padding: 0.75rem 0.5rem; 
-    font-size: 0.8rem; 
+
+  .hr-sla-table-header th,
+  .hr-sla-table tbody td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.8rem;
   }
-  .hr-sla-employee-name, 
-  .hr-sla-employee-email, 
-  .hr-sla-deadline-date { 
-    font-size: 0.8rem; 
+
+  .hr-sla-employee-name,
+  .hr-sla-employee-email,
+  .hr-sla-deadline-date {
+    font-size: 0.8rem;
   }
 }
 
 @media (max-width: 576px) {
-  .hr-sla-stats-grid { 
-    grid-template-columns: 1fr; 
+  .hr-sla-stats-grid {
+    grid-template-columns: 1fr;
   }
-  .hr-sla-pagination-footer { 
-    padding: 0.75rem 1rem; 
+
+  .hr-sla-pagination-footer {
+    padding: 0.75rem 1rem;
   }
-  .hr-sla-table-responsive { 
-    font-size: 0.85rem; 
+
+  .hr-sla-table-responsive {
+    font-size: 0.85rem;
   }
-  .hr-sla-search-wrapper { 
-    width: 100%; 
+
+  .hr-sla-search-wrapper {
+    width: 100%;
   }
+
   .hr-sla-wrapper {
     padding: 1rem 0.5rem;
   }
