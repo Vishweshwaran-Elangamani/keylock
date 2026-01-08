@@ -9,7 +9,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public List<MonthlyGoalTrendDto> MonthlyTrend { get; set; } = new();
         public List<GoalTypeDistributionDto> GoalTypeDistribution { get; set; } = new();
     }
-
     public class MonthlyGoalTrendDto
     {
         public int Year { get; set; }
@@ -17,7 +16,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public string MonthName { get; set; } = string.Empty;
         public int NewGoals { get; set; }
     }
-
     public class GoalTypeDistributionDto
     {
         public string GoalType { get; set; } = string.Empty;

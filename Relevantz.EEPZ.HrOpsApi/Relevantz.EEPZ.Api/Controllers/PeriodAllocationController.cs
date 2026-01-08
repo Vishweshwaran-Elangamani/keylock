@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Core.IService;
-
 namespace Relevantz.EEPZ.Api.Controllers
 {
     [Route("api/[controller]")]
@@ -9,12 +8,10 @@ namespace Relevantz.EEPZ.Api.Controllers
     public class PeriodAllocationController : ControllerBase
     {
         private readonly IPeriodAllocationService _periodAllocationService;
-
         public PeriodAllocationController(IPeriodAllocationService periodAllocationService)
         {
             _periodAllocationService = periodAllocationService;
         }
-
         /// <summary>
         /// Leadership: Create period-based budget allocation
         /// </summary>
@@ -24,10 +21,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             try
             {
                 var result = await _periodAllocationService.CreatePeriodAllocationAsync(request);
-
                 if (!result.Success)
                     return BadRequest(result);
-
                 return Ok(result);
             }
             catch (Exception ex)
@@ -41,7 +36,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-
         /// <summary>
         /// Leadership: Update period allocation amount
         /// </summary>
@@ -51,10 +45,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             try
             {
                 var result = await _periodAllocationService.UpdatePeriodAllocationAsync(request);
-
                 if (!result.Success)
                     return BadRequest(result);
-
                 return Ok(result);
             }
             catch (Exception ex)
@@ -68,7 +60,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-
         /// <summary>
         /// Leadership: Delete period allocation (only if no sub-allocations exist)
         /// </summary>
@@ -78,10 +69,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             try
             {
                 var result = await _periodAllocationService.DeletePeriodAllocationAsync(periodAllocationId);
-
                 if (!result.Success)
                     return BadRequest(result);
-
                 return Ok(result);
             }
             catch (Exception ex)
@@ -95,7 +84,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-
         /// <summary>
         /// Get period allocation by ID
         /// </summary>
@@ -105,10 +93,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             try
             {
                 var result = await _periodAllocationService.GetPeriodAllocationByIdAsync(periodAllocationId);
-
                 if (!result.Success)
                     return NotFound(result);
-
                 return Ok(result);
             }
             catch (Exception ex)
@@ -122,7 +108,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-
         /// <summary>
         /// Get all period allocations
         /// </summary>
@@ -145,7 +130,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-
         /// <summary>
         /// Get all period allocations for a specific budget
         /// </summary>

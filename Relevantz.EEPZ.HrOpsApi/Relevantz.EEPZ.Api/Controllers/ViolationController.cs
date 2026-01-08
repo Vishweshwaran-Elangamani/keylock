@@ -7,7 +7,6 @@ using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Data.IRepository;
-
 namespace Relevantz.EEPZ.Api.Controllers
 {
     [ApiController]
@@ -18,7 +17,6 @@ namespace Relevantz.EEPZ.Api.Controllers
         private readonly IViolationService _violationService;
         private readonly ISlaEscalationRepository _slaEscalationRepository;
         private readonly ILogger<ViolationController> _logger;
-
         public ViolationController(
             IViolationService violationService,
             ISlaEscalationRepository slaEscalationRepository,
@@ -28,7 +26,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             _slaEscalationRepository = slaEscalationRepository;
             _logger = logger;
         }
-
         /// <summary>
         /// Get all violations - HR ONLY
         /// </summary>
@@ -47,7 +44,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred" });
             }
         }
-
         /// <summary>
         /// Get violation by ID - HR and Manager
         /// </summary>
@@ -58,10 +54,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             try
             {
                 var result = await _violationService.GetViolationByIdAsync(id);
-
                 if (!result.Success)
                     return NotFound(result);
-
                 return Ok(result);
             }
             catch (Exception ex)
@@ -70,7 +64,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred" });
             }
         }
-
         /// <summary>
         /// Get violations by employee
         /// Role-based access: HR sees all, Employee sees own only
@@ -83,22 +76,18 @@ namespace Relevantz.EEPZ.Api.Controllers
                 // Get current user ID from JWT
                 var currentUserIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                     ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-
                 if (string.IsNullOrEmpty(currentUserIdClaim) || !int.TryParse(currentUserIdClaim, out int currentUserId))
                 {
                     return Unauthorized(new { success = false, message = "Invalid user authentication" });
                 }
-
                 // Check if user has HR role
                 var isHR = User.IsInRole("Admin") || User.IsInRole("HR");
-
                 // If not HR, only allow viewing own violations
                 if (!isHR && currentUserId != EmployeeUserId)
                 {
                     _logger.LogWarning($"User {currentUserId} attempted to access violations of user {EmployeeUserId}");
                     return Forbid("You can only view your own violations");
                 }
-
                 var result = await _violationService.GetViolationsByEmployeeAsync(EmployeeUserId);
                 return Ok(result);
             }
@@ -108,7 +97,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred" });
             }
         }
-
         /// <summary>
         /// Get violations by policy - HR ONLY
         /// </summary>
@@ -127,7 +115,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred" });
             }
         }
-
         /// <summary>
         /// Report violation - HR and Manager
         /// </summary>
@@ -140,20 +127,15 @@ namespace Relevantz.EEPZ.Api.Controllers
                 // Get user ID from JWT token
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                     ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-
                 if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int reportedByUserId))
                 {
                     _logger.LogWarning("Unable to extract user ID from JWT token for reporting violation");
                     return Unauthorized(new { success = false, message = "Invalid user authentication" });
                 }
-
                 _logger.LogInformation($"User {reportedByUserId} reporting violation for employee {request.EmployeeUserId}");
-
                 var result = await _violationService.ReportViolationAsync(request, reportedByUserId);
-
                 if (!result.Success)
                     return BadRequest(result);
-
                 return Ok(result);
             }
             catch (Exception ex)
@@ -162,7 +144,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred while reporting violation" });
             }
         }
-
         /// <summary>
         /// Resolve violation - HR ONLY
         /// </summary>
@@ -175,17 +156,13 @@ namespace Relevantz.EEPZ.Api.Controllers
                 // Get user ID from JWT
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                     ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-
                 if (!string.IsNullOrEmpty(userIdClaim) && int.TryParse(userIdClaim, out int userId))
                 {
                     _logger.LogInformation($"User {userId} resolving violation {id}");
                 }
-
                 var result = await _violationService.ResolveViolationAsync(id, request);
-
                 if (!result.Success)
                     return BadRequest(result);
-
                 return Ok(result);
             }
             catch (Exception ex)
@@ -194,7 +171,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred while resolving violation" });
             }
         }
-
         /// <summary>
         /// Get violation statistics - HR ONLY
         /// </summary>
@@ -213,7 +189,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred" });
             }
         }
-
         /// <summary>
         /// Get all SLA escalations - HR ONLY
         /// </summary>
@@ -225,9 +200,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 _logger.LogInformation("Fetching all SLA escalations");
                 var escalations = await _slaEscalationRepository.GetAllAsync();
-
                 var response = escalations.Select(MapToEscalationResponse).ToList();
-
                 return Ok(new
                 {
                     success = true,
@@ -241,7 +214,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred" });
             }
         }
-
         /// <summary>
         /// Get SLA escalations by employee
         /// Role-based access: HR sees all, Employee sees own only
@@ -254,25 +226,20 @@ namespace Relevantz.EEPZ.Api.Controllers
                 // Get current user ID from JWT
                 var currentUserIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                     ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-
                 if (string.IsNullOrEmpty(currentUserIdClaim) || !int.TryParse(currentUserIdClaim, out int currentUserId))
                 {
                     return Unauthorized(new { success = false, message = "Invalid user authentication" });
                 }
-
                 // Check if user has HR role
                 var isHR = User.IsInRole("Admin") || User.IsInRole("HR");
-
                 // If not HR, only allow viewing own escalations
                 if (!isHR && currentUserId != EmployeeUserId)
                 {
                     _logger.LogWarning($"User {currentUserId} attempted to access escalations of user {EmployeeUserId}");
                     return Forbid("You can only view your own SLA escalations");
                 }
-
                 var escalations = await _slaEscalationRepository.GetByEmployeeUserIdAsync(EmployeeUserId);
                 var response = escalations.Select(MapToEscalationResponse).ToList();
-
                 return Ok(new
                 {
                     success = true,
@@ -286,7 +253,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred" });
             }
         }
-
         /// <summary>
         /// Get SLA escalation by ID - HR and assigned employees
         /// </summary>
@@ -296,30 +262,24 @@ namespace Relevantz.EEPZ.Api.Controllers
             try
             {
                 var escalation = await _slaEscalationRepository.GetByIdAsync(escalationId);
-
                 if (escalation == null)
                 {
                     return NotFound(new { success = false, message = "Escalation not found" });
                 }
-
                 // Authorization check
                 var currentUserIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                     ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-
                 if (!string.IsNullOrEmpty(currentUserIdClaim) && int.TryParse(currentUserIdClaim, out int currentUserId))
                 {
                     var isHR = User.IsInRole("Admin") || User.IsInRole("HR");
                     var isOwner = escalation.Sla?.EmployeeId == currentUserId;
                     var isEscalatedTo = escalation.EscalatedToEmployeeId == currentUserId;
-
                     if (!isHR && !isOwner && !isEscalatedTo)
                     {
                         return Forbid("You don't have permission to view this escalation");
                     }
                 }
-
                 var response = MapToEscalationResponse(escalation);
-
                 return Ok(new
                 {
                     success = true,
@@ -333,7 +293,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred" });
             }
         }
-
         /// <summary>
         /// Get combined violations and SLA escalations - HR ONLY
         /// </summary>
@@ -345,10 +304,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 // Get regular violations
                 var violationsResult = await _violationService.GetAllViolationsAsync();
-
                 // Get SLA escalations
                 var escalations = await _slaEscalationRepository.GetAllAsync();
-
                 var escalationData = escalations.Select(e => new
                 {
                     type = "SLA Escalation",
@@ -366,7 +323,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                         daysOverdue = CalculateDaysOverdue(e.Sla?.Deadline)
                     }
                 }).ToList();
-
                 return Ok(new
                 {
                     success = true,
@@ -390,7 +346,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred" });
             }
         }
-
         /// <summary>
         /// Get SLA escalation statistics - HR ONLY
         /// </summary>
@@ -401,7 +356,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             try
             {
                 var escalations = await _slaEscalationRepository.GetAllAsync();
-
                 var stats = new
                 {
                     totalEscalations = escalations.Count,
@@ -426,7 +380,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                         })
                         .ToList()
                 };
-
                 return Ok(new
                 {
                     success = true,
@@ -440,7 +393,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred" });
             }
         }
-
         private SlaEscalationResponseDto MapToEscalationResponse(Common.Entities.Slaescalation escalation)
         {
             return new SlaEscalationResponseDto
@@ -471,23 +423,18 @@ namespace Relevantz.EEPZ.Api.Controllers
                 Severity = GetSeverityLevel(CalculateDaysOverdue(escalation.Sla?.Deadline))
             };
         }
-
-
-
         private string GetEmployeeName(Common.Entities.Userprofile? userprofile)
         {
             if (userprofile == null)
                 return "Unknown";
             return $"{userprofile.FirstName} {userprofile.LastName}";
         }
-
         private int CalculateDaysOverdue(DateTime? deadline)
         {
             if (!deadline.HasValue || deadline.Value >= DateTime.Now)
                 return 0;
             return (int)(DateTime.Now - deadline.Value).TotalDays;
         }
-
         private string GetSeverityLevel(int daysOverdue)
         {
             if (daysOverdue >= 7)

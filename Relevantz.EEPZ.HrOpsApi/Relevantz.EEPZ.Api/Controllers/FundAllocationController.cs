@@ -4,8 +4,6 @@ using Relevantz.EEPZ.Core.IService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Common.Entities;
-
-
 namespace Relevantz.EEPZ.Api.Controllers
 {
     [Route("api/[controller]")]
@@ -14,7 +12,6 @@ namespace Relevantz.EEPZ.Api.Controllers
     {
         private readonly IFundAllocationService _fundAllocationService;
         private readonly EEPZDbContext _context;
-
         public FundAllocationController(
             IFundAllocationService fundAllocationService,
             EEPZDbContext context)
@@ -22,7 +19,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             _fundAllocationService = fundAllocationService;
             _context = context;
         }
-
         [HttpPost("create")]
         public async Task<IActionResult> CreateFundAllocation([FromBody] CreateFundAllocationRequestDto request)
         {
@@ -42,7 +38,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-
         [HttpPut("update")]
         public async Task<IActionResult> UpdateFundAllocation([FromBody] UpdateFundAllocationRequestDto request)
         {
@@ -62,7 +57,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-
         [HttpDelete("{allocationId}")]
         public async Task<IActionResult> DeleteFundAllocation(int allocationId)
         {
@@ -82,7 +76,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-
         [HttpGet("all")]
         public async Task<IActionResult> GetAllFundAllocations()
         {
@@ -102,7 +95,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-
         [HttpGet("{allocationId}")]
         public async Task<IActionResult> GetFundAllocationById(int allocationId)
         {
@@ -122,7 +114,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-
         [HttpGet("by-department/{departmentId}")]
         public async Task<IActionResult> GetFundAllocationsByDepartment(int departmentId)
         {
@@ -142,7 +133,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-
         [HttpGet("by-type/{allocationType}")]
         public async Task<IActionResult> GetFundAllocationsByType(string allocationType)
         {
@@ -162,21 +152,17 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-
         [HttpGet("department-budgets/all")]
         public async Task<IActionResult> GetAllDepartmentBudgets()
         {
             try
             {
                 Console.WriteLine(" Controller: GetAllDepartmentBudgets called");
-
                 var budgets = await _context.Departmentbudgets
                     .AsNoTracking()
                     .OrderBy(b => b.DepartmentId)
                     .ToListAsync();
-
                 Console.WriteLine($" Controller: Found {budgets.Count} department budgets");
-
                 var response = new List<object>();
                 foreach (var budget in budgets)
                 {
@@ -186,7 +172,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                         var dept = await _context.Departments
                             .AsNoTracking()
                             .FirstOrDefaultAsync(d => d.DepartmentId == budget.DepartmentId);
-
                         if (dept != null && !string.IsNullOrEmpty(dept.DepartmentName))
                         {
                             departmentName = dept.DepartmentName;
@@ -196,7 +181,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                     {
                         Console.WriteLine($" Error fetching department name: {ex.Message}");
                     }
-
                     response.Add(new
                     {
                         budget.BudgetId,
@@ -213,9 +197,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                         budget.UpdatedAt
                     });
                 }
-
                 Console.WriteLine($" Controller: Returning {response.Count} department budgets");
-
                 return Ok(new
                 {
                     success = true,
@@ -227,7 +209,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 Console.WriteLine($" Controller Error in GetAllDepartmentBudgets: {ex.Message}");
                 Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-
                 return StatusCode(500, new
                 {
                     success = false,
@@ -236,14 +217,12 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-
         [HttpGet("department-budgets/department/{departmentId}")]
         public async Task<IActionResult> GetDepartmentBudget(int departmentId)
         {
             try
             {
                 Console.WriteLine($" Controller: GetDepartmentBudget called for department {departmentId}");
-
                 if (departmentId <= 0)
                 {
                     return BadRequest(new
@@ -253,11 +232,9 @@ namespace Relevantz.EEPZ.Api.Controllers
                         data = (object)null
                     });
                 }
-
                 var budget = await _context.Departmentbudgets
                     .AsNoTracking()
                     .FirstOrDefaultAsync(b => b.DepartmentId == departmentId);
-
                 if (budget == null)
                 {
                     return NotFound(new
@@ -267,14 +244,12 @@ namespace Relevantz.EEPZ.Api.Controllers
                         data = (object)null
                     });
                 }
-
                 string departmentName = "Unknown";
                 try
                 {
                     var dept = await _context.Departments
                         .AsNoTracking()
                         .FirstOrDefaultAsync(d => d.DepartmentId == budget.DepartmentId);
-
                     if (dept != null && !string.IsNullOrEmpty(dept.DepartmentName))
                     {
                         departmentName = dept.DepartmentName;
@@ -284,7 +259,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 {
                     Console.WriteLine($" Error fetching department name: {ex.Message}");
                 }
-
                 var response = new
                 {
                     budget.BudgetId,
@@ -300,7 +274,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                     budget.CreatedAt,
                     budget.UpdatedAt
                 };
-
                 return Ok(new
                 {
                     success = true,
@@ -319,14 +292,12 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-
         [HttpGet("department-budgets/year/{fiscalYear}")]
         public async Task<IActionResult> GetDepartmentBudgetsByYear(int fiscalYear)
         {
             try
             {
                 Console.WriteLine($" Controller: GetDepartmentBudgetsByYear called for year {fiscalYear}");
-
                 if (fiscalYear <= 0)
                 {
                     return BadRequest(new
@@ -336,13 +307,11 @@ namespace Relevantz.EEPZ.Api.Controllers
                         data = (object)null
                     });
                 }
-
                 var budgets = await _context.Departmentbudgets
                     .AsNoTracking()
                     .Where(b => b.FiscalYear == fiscalYear)
                     .OrderBy(b => b.DepartmentId)
                     .ToListAsync();
-
                 var response = new List<object>();
                 foreach (var budget in budgets)
                 {
@@ -352,7 +321,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                         var dept = await _context.Departments
                             .AsNoTracking()
                             .FirstOrDefaultAsync(d => d.DepartmentId == budget.DepartmentId);
-
                         if (dept != null && !string.IsNullOrEmpty(dept.DepartmentName))
                         {
                             departmentName = dept.DepartmentName;
@@ -362,7 +330,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                     {
                         Console.WriteLine($" Error fetching department name: {ex.Message}");
                     }
-
                     response.Add(new
                     {
                         budget.BudgetId,
@@ -379,7 +346,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                         budget.UpdatedAt
                     });
                 }
-
                 return Ok(new
                 {
                     success = true,
@@ -398,7 +364,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-
         [HttpPost("department-budgets/create")]
         public async Task<IActionResult> CreateDepartmentBudget([FromBody] CreateDepartmentBudgetDto request)
         {
@@ -406,7 +371,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 Console.WriteLine($" Controller: CreateDepartmentBudget called");
                 Console.WriteLine($"Request: Department={request.DepartmentId}, Year={request.FiscalYear}, Total={request.TotalBudget}");
-
                 if (request.DepartmentId <= 0)
                 {
                     return BadRequest(new
@@ -416,7 +380,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                         data = (object)null
                     });
                 }
-
                 if (request.FiscalYear <= 0)
                 {
                     return BadRequest(new
@@ -426,7 +389,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                         data = (object)null
                     });
                 }
-
                 if (request.TotalBudget <= 0)
                 {
                     return BadRequest(new
@@ -436,10 +398,8 @@ namespace Relevantz.EEPZ.Api.Controllers
                         data = (object)null
                     });
                 }
-
                 var departmentExists = await _context.Departments
                     .AnyAsync(d => d.DepartmentId == request.DepartmentId);
-
                 if (!departmentExists)
                 {
                     return NotFound(new
@@ -449,10 +409,8 @@ namespace Relevantz.EEPZ.Api.Controllers
                         data = (object)null
                     });
                 }
-
                 var existingBudget = await _context.Departmentbudgets
                     .FirstOrDefaultAsync(b => b.DepartmentId == request.DepartmentId && b.FiscalYear == request.FiscalYear);
-
                 if (existingBudget != null)
                 {
                     return BadRequest(new
@@ -462,7 +420,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                         data = (object)null
                     });
                 }
-
                 var newBudget = new Departmentbudget
                 {
                     DepartmentId = request.DepartmentId,
@@ -476,12 +433,9 @@ namespace Relevantz.EEPZ.Api.Controllers
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now
                 };
-
                 _context.Departmentbudgets.Add(newBudget);
                 await _context.SaveChangesAsync();
-
                 Console.WriteLine($" Budget created with ID: {newBudget.BudgetId}");
-
                 return Ok(new
                 {
                     success = true,
@@ -501,7 +455,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 Console.WriteLine($" Error in CreateDepartmentBudget: {ex.Message}");
                 Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-
                 return StatusCode(500, new
                 {
                     success = false,
@@ -510,14 +463,12 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-
         [HttpPut("department-budgets/update")]
         public async Task<IActionResult> UpdateDepartmentBudget([FromBody] UpdateDepartmentBudgetDto request)
         {
             try
             {
                 Console.WriteLine($" Controller: UpdateDepartmentBudget called");
-
                 if (request.BudgetId <= 0)
                 {
                     return BadRequest(new
@@ -527,10 +478,8 @@ namespace Relevantz.EEPZ.Api.Controllers
                         data = (object)null
                     });
                 }
-
                 var budget = await _context.Departmentbudgets
                     .FirstOrDefaultAsync(b => b.BudgetId == request.BudgetId);
-
                 if (budget == null)
                 {
                     return NotFound(new
@@ -540,7 +489,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                         data = (object)null
                     });
                 }
-
                 if (request.TotalBudget <= 0)
                 {
                     return BadRequest(new
@@ -550,7 +498,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                         data = (object)null
                     });
                 }
-
                 if (request.AllocatedAmount > request.TotalBudget)
                 {
                     return BadRequest(new
@@ -560,16 +507,12 @@ namespace Relevantz.EEPZ.Api.Controllers
                         data = (object)null
                     });
                 }
-
                 budget.TotalBudget = request.TotalBudget;
                 budget.AllocatedAmount = request.AllocatedAmount;
                 budget.UpdatedAt = DateTime.Now;
-
                 _context.Departmentbudgets.Update(budget);
                 await _context.SaveChangesAsync();
-
                 Console.WriteLine($" Budget updated successfully");
-
                 return Ok(new
                 {
                     success = true,
@@ -594,14 +537,12 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-
         [HttpDelete("department-budgets/{budgetId}")]
         public async Task<IActionResult> DeleteDepartmentBudget(int budgetId)
         {
             try
             {
                 Console.WriteLine($" Controller: DeleteDepartmentBudget called for budget {budgetId}");
-
                 if (budgetId <= 0)
                 {
                     return BadRequest(new
@@ -611,10 +552,8 @@ namespace Relevantz.EEPZ.Api.Controllers
                         data = (object)null
                     });
                 }
-
                 var budget = await _context.Departmentbudgets
                     .FirstOrDefaultAsync(b => b.BudgetId == budgetId);
-
                 if (budget == null)
                 {
                     return NotFound(new
@@ -624,22 +563,17 @@ namespace Relevantz.EEPZ.Api.Controllers
                         data = (object)null
                     });
                 }
-
                 var allocations = await _context.Budgetallocations
                     .Where(a => a.DepartmentId == budget.DepartmentId)
                     .ToListAsync();
-
                 if (allocations.Count > 0)
                 {
                     _context.Budgetallocations.RemoveRange(allocations);
                     Console.WriteLine($" Deleted {allocations.Count} associated allocations");
                 }
-
                 _context.Departmentbudgets.Remove(budget);
                 await _context.SaveChangesAsync();
-
                 Console.WriteLine($" Budget deleted successfully");
-
                 return Ok(new
                 {
                     success = true,
@@ -661,14 +595,12 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-
         [HttpPut("department-budgets/update-utilized")]
         public async Task<IActionResult> UpdateUtilizedAmount([FromBody] UpdateUtilizedAmountDto request)
         {
             try
             {
                 Console.WriteLine($" Controller: UpdateUtilizedAmount called");
-
                 if (request.BudgetId <= 0)
                 {
                     return BadRequest(new
@@ -678,10 +610,8 @@ namespace Relevantz.EEPZ.Api.Controllers
                         data = (object)null
                     });
                 }
-
                 var budget = await _context.Departmentbudgets
                     .FirstOrDefaultAsync(b => b.BudgetId == request.BudgetId);
-
                 if (budget == null)
                 {
                     return NotFound(new
@@ -691,7 +621,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                         data = (object)null
                     });
                 }
-
                 if (request.UtilizedAmount < 0)
                 {
                     return BadRequest(new
@@ -701,7 +630,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                         data = (object)null
                     });
                 }
-
                 if (request.UtilizedAmount > (budget.AllocatedAmount ?? 0))
                 {
                     return BadRequest(new
@@ -711,22 +639,17 @@ namespace Relevantz.EEPZ.Api.Controllers
                         data = (object)null
                     });
                 }
-
                 decimal utilizationPercentage = 0;
                 if (budget.AllocatedAmount > 0)
                 {
                     utilizationPercentage = (request.UtilizedAmount / budget.AllocatedAmount.Value) * 100;
                 }
-
                 budget.UtilizedAmount = request.UtilizedAmount;
                 budget.UtilizationPercentage = utilizationPercentage;
                 budget.UpdatedAt = DateTime.Now;
-
                 _context.Departmentbudgets.Update(budget);
                 await _context.SaveChangesAsync();
-
                 Console.WriteLine($" Utilized amount updated successfully");
-
                 return Ok(new
                 {
                     success = true,
@@ -752,14 +675,12 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-
         [HttpPut("update-utilization")]
         public async Task<IActionResult> UpdateUtilization([FromBody] UpdateUtilizationDto request)
         {
             try
             {
                 Console.WriteLine($"Controller: UpdateUtilization called for allocation {request.AllocationId}");
-
                 if (request.AllocationId <= 0)
                 {
                     return BadRequest(new
@@ -769,21 +690,17 @@ namespace Relevantz.EEPZ.Api.Controllers
                         data = (object)null
                     });
                 }
-
                 // Get the allocation first
                 var allocation = await _context.Budgetallocations
                     .FirstOrDefaultAsync(a => a.AllocationId == request.AllocationId);
-
                 if (allocation == null)
                 {
                     Console.WriteLine($"Allocation not found: {request.AllocationId}");
-
                     // DEBUG: Check what allocations exist
                     var existingAllocations = await _context.Budgetallocations
                         .Select(a => a.AllocationId)
                         .ToListAsync();
                     Console.WriteLine($"Existing AllocationIds: {string.Join(", ", existingAllocations)}");
-
                     return NotFound(new
                     {
                         success = false,
@@ -791,7 +708,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                         data = (object)null
                     });
                 }
-
                 if (request.UtilizedAmount < 0)
                 {
                     return BadRequest(new
@@ -801,7 +717,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                         data = (object)null
                     });
                 }
-
                 if (request.UtilizedAmount > allocation.Amount)
                 {
                     return BadRequest(new
@@ -811,23 +726,16 @@ namespace Relevantz.EEPZ.Api.Controllers
                         data = (object)null
                     });
                 }
-
                 // Update allocation
                 allocation.UtilizedAmount = request.UtilizedAmount;
                 allocation.UtilizationPercentage = request.UtilizationPercentage;
-
                 if (!string.IsNullOrEmpty(request.Notes))
                     allocation.Notes = request.Notes;
-
                 allocation.UpdatedAt = DateTime.UtcNow;
-
                 _context.Budgetallocations.Update(allocation);
                 await _context.SaveChangesAsync();
-
                 Console.WriteLine($"Allocation {allocation.AllocationId} utilization updated successfully");
-
                 await UpdateDepartmentBudgetTotals(allocation.DepartmentId);
-
                 return Ok(new
                 {
                     success = true,
@@ -854,29 +762,24 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-
         private async Task UpdateDepartmentBudgetTotals(int departmentId)
         {
             try
             {
                 var budget = await _context.Departmentbudgets
                     .FirstOrDefaultAsync(b => b.DepartmentId == departmentId);
-
                 if (budget != null)
                 {
                     var totalUtilized = await _context.Budgetallocations
                         .Where(a => a.DepartmentId == departmentId)
                         .SumAsync(a => a.UtilizedAmount ?? 0);
-
                     budget.UtilizedAmount = totalUtilized;
                     budget.UtilizationPercentage = budget.AllocatedAmount > 0
                         ? (totalUtilized / budget.AllocatedAmount.Value) * 100
                         : 0;
                     budget.UpdatedAt = DateTime.UtcNow;
-
                     _context.Departmentbudgets.Update(budget);
                     await _context.SaveChangesAsync();
-
                     Console.WriteLine($" Department budget totals updated");
                 }
             }
@@ -891,7 +794,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             try
             {
                 Console.WriteLine($" Getting allocations for budget: {budgetId}");
-
                 var allocations = await _context.Budgetallocations
                     .AsNoTracking()
                     .Where(a => a.BudgetId == budgetId)
@@ -917,9 +819,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                         a.PeriodYear
                     })
                     .ToListAsync();
-
                 Console.WriteLine($"Found {allocations.Count} allocations for budget {budgetId}");
-
                 return Ok(new
                 {
                     success = true,
@@ -938,9 +838,5 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-
-
     }
 }
-
-

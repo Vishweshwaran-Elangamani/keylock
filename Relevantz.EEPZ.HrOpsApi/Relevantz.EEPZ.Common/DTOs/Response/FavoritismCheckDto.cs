@@ -3,7 +3,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
     public class FavoritismCheckDto
     {
         public int PromotionId { get; set; }
-        
         public int ManagerId { get; set; }
         public string? ManagerName { get; set; }
         public string? ManagerEmail { get; set; }
@@ -14,7 +13,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public int PreviousNominationCount { get; set; }
         public List<PreviousNominationDto> PreviousNominations { get; set; } = new();
     }
-
     public class PreviousNominationDto
     {
         public int PreviousPromotionId { get; set; }

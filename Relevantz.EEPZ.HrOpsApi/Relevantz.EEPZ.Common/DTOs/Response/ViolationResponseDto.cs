@@ -1,5 +1,4 @@
 using System;
-
 namespace Relevantz.EEPZ.Common.DTOs.Response
 {
     public class ViolationResponseDto

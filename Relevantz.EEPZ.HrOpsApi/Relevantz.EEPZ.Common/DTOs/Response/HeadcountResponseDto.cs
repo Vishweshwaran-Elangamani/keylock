@@ -8,5 +8,3 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public DateTime Timestamp { get; set; }
     }
 }
- 
- 

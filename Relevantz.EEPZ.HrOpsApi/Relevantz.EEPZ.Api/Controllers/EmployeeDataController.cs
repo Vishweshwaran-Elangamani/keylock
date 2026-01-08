@@ -11,7 +11,6 @@ using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using System.Security.Claims;
-
 namespace Relevantz.EEPZ.Api.Controllers
 {
     [ApiController]
@@ -23,7 +22,6 @@ namespace Relevantz.EEPZ.Api.Controllers
         private readonly EEPZDbContext _context;
         private readonly IEmailService _emailService;
         private readonly ILogger<EmployeeDataController> _logger;
-
         public EmployeeDataController(
             IComplianceService complianceService,
             IPolicyService policyService,
@@ -37,7 +35,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             _emailService = emailService;
             _logger = logger;
         }
-
         /// <summary>
         /// Get overall compliance overview - HR ONLY
         /// </summary>
@@ -47,7 +44,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             var result = await _complianceService.GetComplianceOverviewAsync();
             return Ok(result);
         }
-
         /// <summary>
         /// Get employees who have not set any goals
         /// Excludes Admin users and current logged-in user
@@ -60,7 +56,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                     ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
                     ?? User.FindFirst("sub")?.Value;
-
                 int? currentUserId = null;
                 if (!string.IsNullOrEmpty(userIdClaim) && int.TryParse(userIdClaim, out int parsedUserId))
                 {
@@ -71,7 +66,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 {
                     _logger.LogWarning("Unable to extract user ID from JWT token");
                 }
-
                 var allUsers = _context.Userauthentications
                     .Include(u => u.Employee)
                         .ThenInclude(e => e.Userprofile)
@@ -83,13 +77,11 @@ namespace Relevantz.EEPZ.Api.Controllers
                             .ThenInclude(ed => ed.Role)
                     .Where(u => u.Status == "Active")
                     .ToList();
-
                 var employeesWithGoals = await _context.Goals
                     .Where(g => g.CreatedBy != null)
                     .Select(g => g.CreatedBy)
                     .Distinct()
                     .ToListAsync();
-
                 var usersWithoutGoals = allUsers
                     .Where(u => !employeesWithGoals.Contains(u.EmployeeId)
                              && (!currentUserId.HasValue || u.UserId != currentUserId.Value)
@@ -109,9 +101,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                             .FirstOrDefault()?.Department?.DepartmentName ?? string.Empty
                     })
                     .ToList();
-
                 _logger.LogInformation($"Found {usersWithoutGoals.Count} employees without goals (excluding Admins and user ID: {currentUserId})");
-
                 return Ok(new
                 {
                     success = true,
@@ -129,8 +119,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
-
-
         /// <summary>
         /// Get personalized goal suggestions for an employee
         /// </summary>
@@ -142,19 +130,15 @@ namespace Relevantz.EEPZ.Api.Controllers
                 var user = await _context.Userauthentications
                     .Include(u => u.Employee)
                     .FirstOrDefaultAsync(u => u.UserId == userId);
-
                 if (user == null)
                     return NotFound(new { success = false, message = "User not found" });
-
                 // Get existing goal types for this employee
                 var existingGoalTypes = await _context.Goals
                     .Where(g => g.CreatedBy == user.EmployeeId)
                     .Select(g => g.GoalType)
                     .Distinct()
                     .ToListAsync();
-
                 var suggestions = new List<GoalSuggestionDto>();
-
                 // Suggestion 1: Training/Certification (if not exists)
                 if (!existingGoalTypes.Contains("Training"))
                 {
@@ -169,7 +153,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                         PolicyCompliant = true
                     });
                 }
-
                 // Suggestion 2: Leadership (if not exists)
                 if (!existingGoalTypes.Contains("Leadership"))
                 {
@@ -184,7 +167,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                         PolicyCompliant = true
                     });
                 }
-
                 // Suggestion 3: Process Improvement (always show)
                 suggestions.Add(new GoalSuggestionDto
                 {
@@ -196,7 +178,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                     EstimatedDuration = "1-2 months",
                     PolicyCompliant = true
                 });
-
                 // Suggestion 4: Soft Skills (always show)
                 suggestions.Add(new GoalSuggestionDto
                 {
@@ -208,7 +189,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                     EstimatedDuration = "1 month",
                     PolicyCompliant = true
                 });
-
                 // Suggestion 5: Mentorship (always show)
                 suggestions.Add(new GoalSuggestionDto
                 {
@@ -220,7 +200,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                     EstimatedDuration = "Ongoing",
                     PolicyCompliant = true
                 });
-
                 return Ok(new
                 {
                     success = true,
@@ -241,7 +220,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
-
         /// <summary>
         /// Send goal setting reminders to employees via email
         /// Supports single, multiple, or bulk sending
@@ -253,16 +231,13 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 var sentTo = new List<object>();
                 var failedSends = new List<object>();
-
                 if (request.SendType == "single" && request.UserId.HasValue)
                 {
                     // Send to single user
                     var user = await _context.Userauthentications
                         .FirstOrDefaultAsync(u => u.UserId == request.UserId.Value);
-
                     if (user == null)
                         return NotFound(new { success = false, message = "User not found" });
-
                     // Get goal suggestions if requested
                     List<string> suggestions = new();
                     if (request.IncludeGoalSuggestions)
@@ -276,15 +251,12 @@ namespace Relevantz.EEPZ.Api.Controllers
                             "Mentor a Junior Team Member"
                         };
                     }
-
                     var userName = user.Email.Split('@')[0];
-
                     var emailSent = await _emailService.SendGoalReminderEmailAsync(
                         user.Email,
                         userName,
                         suggestions
                     );
-
                     if (emailSent)
                     {
                         sentTo.Add(new
@@ -312,7 +284,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                     var users = await _context.Userauthentications
                         .Where(u => request.UserIds.Contains(u.UserId))
                         .ToListAsync();
-
                     foreach (var user in users)
                     {
                         List<string> suggestions = new();
@@ -327,14 +298,12 @@ namespace Relevantz.EEPZ.Api.Controllers
                                 "Mentor a Junior Team Member"
                             };
                         }
-
                         var userName = user.Email.Split('@')[0];
                         var emailSent = await _emailService.SendGoalReminderEmailAsync(
                             user.Email,
                             userName,
                             suggestions
                         );
-
                         if (emailSent)
                         {
                             sentTo.Add(new
@@ -354,10 +323,8 @@ namespace Relevantz.EEPZ.Api.Controllers
                                 error = "Email delivery failed"
                             });
                         }
-
                         await Task.Delay(100);
                     }
-
                     _logger.LogInformation($" Bulk reminders sent: {sentTo.Count} successful, {failedSends.Count} failed");
                 }
                 else if (request.SendType == "all")
@@ -366,24 +333,20 @@ namespace Relevantz.EEPZ.Api.Controllers
                     var allUsers = await _context.Userauthentications
                         .Where(u => u.Status == "Active")
                         .ToListAsync();
-
                     var employeesWithGoals = await _context.Goals
                         .Where(g => g.CreatedBy != null)
                         .Select(g => g.CreatedBy)
                         .Distinct()
                         .ToListAsync();
-
                     var usersWithoutGoals = allUsers
                         .Where(u => !employeesWithGoals.Contains(u.EmployeeId))
                         .ToList();
-
                     if (request.FilterByDays.HasValue)
                     {
                         usersWithoutGoals = usersWithoutGoals
                             .Where(u => (DateTime.Now - u.CreatedAt).Days >= request.FilterByDays.Value)
                             .ToList();
                     }
-
                     foreach (var user in usersWithoutGoals)
                     {
                         List<string> suggestions = new();
@@ -398,14 +361,12 @@ namespace Relevantz.EEPZ.Api.Controllers
                                 "Mentor a Junior Team Member"
                             };
                         }
-
                         var userName = user.Email.Split('@')[0];
                         var emailSent = await _emailService.SendGoalReminderEmailAsync(
                             user.Email,
                             userName,
                             suggestions
                         );
-
                         if (emailSent)
                         {
                             sentTo.Add(new
@@ -425,13 +386,10 @@ namespace Relevantz.EEPZ.Api.Controllers
                                 error = "Email delivery failed"
                             });
                         }
-
                         await Task.Delay(100);
                     }
-
                     _logger.LogInformation($" Mass reminders sent: {sentTo.Count} successful, {failedSends.Count} failed");
                 }
-
                 return Ok(new
                 {
                     success = true,
@@ -452,7 +410,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
-
         /// <summary>
         /// Get goal adoption rate statistics across the organization
         /// </summary>
@@ -464,17 +421,14 @@ namespace Relevantz.EEPZ.Api.Controllers
                 var totalEmployees = await _context.Userauthentications
                     .Where(u => u.Status == "Active")
                     .CountAsync();
-
                 var employeesWithGoals = await _context.Goals
                     .Where(g => g.CreatedBy != null)
                     .Select(g => g.CreatedBy)
                     .Distinct()
                     .CountAsync();
-
                 var adoptionRate = totalEmployees > 0
                     ? Math.Round((double)employeesWithGoals / totalEmployees * 100, 2)
                     : 0;
-
                 // Monthly trend (last 6 months)
                 var sixMonthsAgo = DateTime.Now.AddMonths(-6);
                 var monthlyTrend = await _context.Goals
@@ -489,7 +443,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                     })
                     .OrderBy(g => g.Year).ThenBy(g => g.Month)
                     .ToListAsync();
-
                 // Goal type distribution
                 var goalTypeDistribution = await _context.Goals
                     .GroupBy(g => g.GoalType ?? "Unspecified")
@@ -503,7 +456,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                     })
                     .OrderByDescending(g => g.Count)
                     .ToListAsync();
-
                 var result = new GoalAdoptionRateDto
                 {
                     TotalEmployees = totalEmployees,
@@ -513,7 +465,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                     MonthlyTrend = monthlyTrend,
                     GoalTypeDistribution = goalTypeDistribution
                 };
-
                 return Ok(new { success = true, message = "Success", data = result });
             }
             catch (Exception ex)
@@ -522,7 +473,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
-
         /// <summary>
         /// Get detailed goal statistics for HR dashboard
         /// </summary>
@@ -532,26 +482,20 @@ namespace Relevantz.EEPZ.Api.Controllers
             try
             {
                 var totalGoals = await _context.Goals.CountAsync();
-
                 var completedGoals = await _context.Goals
                     .CountAsync(g => g.Goalstatus == "completed");
-
                 var inProgressGoals = await _context.Goals
                     .CountAsync(g => g.Goalstatus == "inprogress");
-
                 var expiredGoals = await _context.Goals
                     .CountAsync(g => g.Goalendat < DateTime.Now
                               && g.Goalstatus != "completed"
                               && g.Goalstatus != "closed");
-
                 var completionRate = totalGoals > 0
                     ? Math.Round((double)completedGoals / totalGoals * 100, 2)
                     : 0;
-
                 var goalsByStatus = await _context.Goals
                     .GroupBy(g => g.Goalstatus ?? "unknown")
                     .ToDictionaryAsync(g => g.Key, g => g.Count());
-
                 var topGoalTypes = await _context.Goals
                     .GroupBy(g => g.GoalType ?? "Unspecified")
                     .Select(g => new GoalTypeCountDto
@@ -562,7 +506,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                     .OrderByDescending(g => g.Count)
                     .Take(5)
                     .ToListAsync();
-
                 var result = new GoalStatisticsDto
                 {
                     TotalGoals = totalGoals,
@@ -573,7 +516,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                     GoalsByStatus = goalsByStatus,
                     TopGoalTypes = topGoalTypes
                 };
-
                 return Ok(new { success = true, message = "Success", data = result });
             }
             catch (Exception ex)
@@ -582,14 +524,12 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
-
         [HttpGet("department/all")]
         public async Task<IActionResult> GetAllDepartments()
         {
             try
             {
                 Console.WriteLine(" Backend: Getting all departments");
-
                 var departments = await _context.Departments
                     .AsNoTracking()
                     .OrderBy(d => d.DepartmentName)
@@ -599,9 +539,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                         d.DepartmentName
                     })
                     .ToListAsync();
-
                 Console.WriteLine($" Backend: Found {departments.Count} departments");
-
                 return Ok(new
                 {
                     success = true,
@@ -619,7 +557,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-
         [HttpGet("department/{id}")]
         public async Task<IActionResult> GetDepartmentById(int id)
         {
@@ -628,7 +565,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 var department = await _context.Departments
                     .AsNoTracking()
                     .FirstOrDefaultAsync(d => d.DepartmentId == id);
-
                 if (department == null)
                 {
                     return NotFound(new
@@ -637,7 +573,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                         message = "Department not found"
                     });
                 }
-
                 return Ok(new
                 {
                     success = true,
@@ -653,7 +588,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-
         [HttpGet("policy/published")]
         [Authorize]
         public async Task<IActionResult> GetPublishedPolicies()
@@ -662,13 +596,9 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
                 var userRole = User.FindFirst(ClaimTypes.Role)?.Value ?? "Unknown";
-
                 _logger.LogInformation($" User {userId} (Role: {userRole}) fetching published policies");
-
                 var response = await _policyService.GetPublishedPoliciesAsync();
-
                 _logger.LogInformation($" Returned {response.Data?.Count ?? 0} published policies to user {userId}");
-
                 return Ok(response);
             }
             catch (Exception ex)
@@ -677,7 +607,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "Failed to fetch policies" });
             }
         }
-
         [HttpGet("policy/{policyId}")]
         [Authorize]
         public async Task<IActionResult> GetPolicyById(int policyId)
@@ -686,24 +615,19 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
                 var userRole = User.FindFirst(ClaimTypes.Role)?.Value ?? "Unknown";
-
                 _logger.LogInformation($" User {userId} (Role: {userRole}) requesting policy {policyId}");
-
                 var response = await _policyService.GetPolicyByIdAsync(policyId);
-
                 if (!response.Success)
                 {
                     _logger.LogWarning($" Policy {policyId} not found for user {userId}");
                     return NotFound(response);
                 }
-
                 // Only return if published
                 if (!response.Data.IsPublished)
                 {
                     _logger.LogWarning($" Policy {policyId} is not published. Access denied for user {userId}");
                     return NotFound(new { success = false, message = "Policy not found or not published" });
                 }
-
                 _logger.LogInformation($" User {userId} viewed policy {policyId}: {response.Data.PolicyName}");
                 return Ok(response);
             }

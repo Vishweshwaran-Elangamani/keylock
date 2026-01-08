@@ -21,5 +21,4 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
     public string? Period { get; set; }
     public int? PeriodYear { get; set; }
 }
-
 }

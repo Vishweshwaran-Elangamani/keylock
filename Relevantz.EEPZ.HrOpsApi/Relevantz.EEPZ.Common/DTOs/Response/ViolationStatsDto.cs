@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-
 namespace Relevantz.EEPZ.Common.DTOs.Response
 {
     public class ViolationStatsDto

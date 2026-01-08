@@ -10,7 +10,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public Dictionary<string, int> GoalsByStatus { get; set; } = new();
         public List<GoalTypeCountDto> TopGoalTypes { get; set; } = new();
     }
-
     public class GoalTypeCountDto
     {
         public string GoalType { get; set; } = string.Empty;

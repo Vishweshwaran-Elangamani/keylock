@@ -16,5 +16,3 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public DateTime CreatedAt { get; set; }
     }
 }
- 
- 

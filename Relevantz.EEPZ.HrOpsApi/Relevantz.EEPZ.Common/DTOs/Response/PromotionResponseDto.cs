@@ -21,7 +21,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public DateTime? ApprovedAt { get; set; }
         public string EmployeeFirstName { get; set; }
         public string EmployeeLastName { get; set; }
- 
         public string EmployeeFullName
         {
             get
@@ -29,11 +28,5 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
                 return $"{EmployeeFirstName} {EmployeeLastName}".Trim() ?? "Unknown";
             }
         }
- 
     }
- 
- 
 }
- 
- 
- 

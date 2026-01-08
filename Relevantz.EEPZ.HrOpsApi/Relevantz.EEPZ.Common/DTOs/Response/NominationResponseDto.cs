@@ -19,5 +19,3 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public DateTime? ReviewedAt { get; set; }
     }
 }
- 
- 
