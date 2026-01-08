@@ -24,13 +24,13 @@
   padding: 0;
   display: inline-flex;
   align-items: center;
-  gap: 1px; 
+  gap: 1px;
   font-size: 0.875rem;
   font-weight: 500;
   text-decoration: none;
   transition: color 0.2s ease;
 
-  
+
 }
 
 .sched-breadcrumb-link:hover {
@@ -41,7 +41,7 @@
   display: flex;
   align-items: center;
   color: #97247e;
-  margin: 0 2px; 
+  margin: 0 2px;
   font-size: 1rem;
   font-weight: 500;
 }
@@ -52,7 +52,7 @@
   font-weight: 600;
 }
 
-.breadcrumb-item + .breadcrumb-item::before {
+.breadcrumb-item+.breadcrumb-item::before {
   display: none;
 }
 
@@ -152,7 +152,7 @@
 
 .sched-dropdown-item-active {
   background-color: #efefef;
-  color: #000 ;
+  color: #000;
   font-weight: 600;
 }
 

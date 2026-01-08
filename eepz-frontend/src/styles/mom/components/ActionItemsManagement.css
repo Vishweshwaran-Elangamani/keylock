@@ -87,7 +87,7 @@
   font-weight: 600;
 }
 
-.aim-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+.aim-breadcrumb .breadcrumb-item+.breadcrumb-item::before {
   display: none !important;
   content: none !important;
 }

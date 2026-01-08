@@ -255,7 +255,7 @@
 }
 
 .fm-mgrrev-card__stars {
-  display: none; 
+  display: none;
 }
 
 .fm-mgrrev-modal-backdrop {
@@ -444,6 +444,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }

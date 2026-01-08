@@ -89,14 +89,17 @@
     flex: 1 1 calc(50% - 0.5rem);
     max-width: calc(50% - 0.5rem);
   }
+
   .cmm-col-md-5 {
     flex: 1 1 calc(41.666% - 0.5rem);
     max-width: calc(41.666% - 0.5rem);
   }
+
   .cmm-col-md-4 {
     flex: 1 1 calc(33.333% - 0.5rem);
     max-width: calc(33.333% - 0.5rem);
   }
+
   .cmm-col-md-3 {
     flex: 1 1 calc(25% - 0.5rem);
     max-width: calc(25% - 0.5rem);
@@ -381,7 +384,7 @@
 
 .cmm-dropdown-text {
   overflow: hidden;
-  text-align: left; 
+  text-align: left;
   text-overflow: ellipsis;
   white-space: nowrap;
   flex: 1;
@@ -414,7 +417,7 @@
 
 .cmm-dropdown-item {
   padding: 0.75rem 1rem;
-  text-align: left; 
+  text-align: left;
   cursor: pointer;
   font-size: 0.85rem;
   border-bottom: 1px solid #f3f4f6;
@@ -452,7 +455,7 @@
 .cmm-calendar {
   position: absolute;
   top: calc(100% + 0.5rem);
-  right:-150px;
+  right: -150px;
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 16px 44px rgba(15, 23, 42, 0.2);
@@ -674,9 +677,11 @@
   .cmm-card-body {
     padding: 1rem;
   }
+
   .cmm-actions {
     flex-direction: column;
   }
+
   .cmm-calendar {
     width: calc(500vw - 2rem);
     left: 0;

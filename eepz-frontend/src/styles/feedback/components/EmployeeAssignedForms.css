@@ -3,7 +3,7 @@
   background-color: #F9FAFB;
   min-height: 100vh;
   margin-top: -20px;
-  
+
 }
 
 
@@ -113,6 +113,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -182,7 +183,7 @@
 
 .sla-stat-card {
   justify-content: flex-start;
-  
+
 }
 
 
@@ -512,12 +513,12 @@
 
 @media (max-width: 1024px) {
   .employee-forms-stats-grid {
-   display: grid;
-  grid-template-columns: repeat(4, auto);  
-  justify-content: flex-start;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+    justify-content: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+
   }
 
   .employee-forms-grid {
@@ -541,7 +542,7 @@
 
   .employee-forms-stats-grid {
     grid-template-columns: 1fr;
-    
+
   }
 
   .employee-forms-grid {

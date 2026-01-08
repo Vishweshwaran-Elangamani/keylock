@@ -8,7 +8,7 @@
   margin-top: -25px;
 }
 
-.cff-breadcrumb{
+.cff-breadcrumb {
   margin-left: -150px;
   margin-bottom: 25px;
 }
@@ -240,6 +240,7 @@
     opacity: 0;
     transform: translateY(-4px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -276,12 +277,13 @@
   color: #000000;
 }
 
-.cff-select-option-hovered{
+.cff-select-option-hovered {
 
   background: #27235c;
   color: #ffffff;
 
 }
+
 .cff-select-option-selected {
   font-weight: 600;
 }
@@ -478,6 +480,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }

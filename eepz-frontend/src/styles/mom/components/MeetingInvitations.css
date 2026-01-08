@@ -15,8 +15,8 @@
 
 .mi-breadcrumb-nav {
   margin-bottom: 1.5rem;
-  text-align: left; 
-  margin-left: -160px; 
+  text-align: left;
+  margin-left: -160px;
 }
 
 .mi-breadcrumb {
@@ -52,7 +52,7 @@
   color: #7a1d65;
   background: rgba(151, 36, 126, 0.08);
 
-  
+
 }
 
 .mi-breadcrumb-home-icon {
@@ -110,7 +110,7 @@
   border-radius: 0.75rem;
   margin-left: -100px;
 
-  
+
 }
 
 .mi-card-body {
@@ -254,7 +254,7 @@
 }
 
 .mi-modal-dialog {
-  max-width: 650px;       
+  max-width: 650px;
   width: 100%;
   margin: 0;
   transform: none !important;
@@ -434,7 +434,7 @@
   padding-inline: 1.5rem;
 }
 
-.breadcrumb-item + .breadcrumb-item::before {
+.breadcrumb-item+.breadcrumb-item::before {
   display: none;
 }
 
