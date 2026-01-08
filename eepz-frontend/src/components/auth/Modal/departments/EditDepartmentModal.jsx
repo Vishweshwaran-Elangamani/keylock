@@ -81,7 +81,7 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
   };
 
   // ========================
-  // CUSTOM DROPDOWN COMPONENT - NO INLINE STYLES
+  // CUSTOM DROPDOWN COMPONENT - NATIONALITY STYLE
   // ========================
 
   const CustomDropdown = ({
@@ -125,30 +125,26 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
     return (
       <div
         ref={dropdownRef}
-        className={`edm-custom-dropdown ${isOpen ? "active" : ""} ${
-          error ? "error" : ""
-        } ${disabled ? "disabled" : ""}`}
+        className={`edm-custom-dropdown ${error ? "edm-error" : ""} ${
+          disabled ? "edm-disabled" : ""
+        }`}
         tabIndex={disabled ? -1 : 0}
         onBlur={() => setTimeout(() => setIsOpen(false), 200)}
       >
-        <div className="edm-custom-dropdown-selected" onClick={toggleDropdown}>
-          <span
-            className={`edm-custom-dropdown-text ${
-              !selectedOption ? "placeholder" : ""
-            }`}
-          >
+        <div className="edm-custom-selected" onClick={toggleDropdown}>
+          <span className={!selectedOption ? "edm-placeholder-text" : ""}>
             {selectedOption ? selectedOption.label : placeholder}
           </span>
-          <span className="edm-custom-dropdown-arrow"></span>
+          <span className="edm-custom-arrow"></span>
         </div>
 
         {isOpen && (
-          <div className="edm-custom-dropdown-menu">
+          <div className="edm-custom-menu">
             {options.map((option) => (
               <div
                 key={option.value || "empty"}
-                className={`edm-custom-dropdown-option ${
-                  value === option.value ? "edm-custom-dropdown-option-active" : ""
+                className={`edm-custom-option ${
+                  value === option.value ? "edm-custom-option-active" : ""
                 }`}
                 onClick={() => handleSelect(option.value)}
               >

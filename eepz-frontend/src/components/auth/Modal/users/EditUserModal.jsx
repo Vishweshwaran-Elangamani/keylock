@@ -70,7 +70,7 @@ const EditUserModal = ({
   };
 
   // ========================
-  // CUSTOM DROPDOWN COMPONENT - NO INLINE STYLES
+  // CUSTOM DROPDOWN COMPONENT - NATIONALITY STYLE
   // ========================
   const CustomDropdown = ({
     options,
@@ -135,36 +135,30 @@ const EditUserModal = ({
     return (
       <div
         ref={dropdownRef}
-        className={`eum-custom-dropdown ${isOpen ? "active" : ""} ${
-          error ? "error" : ""
-        } ${disabled ? "disabled" : ""}`}
+        className={`eum-custom-dropdown ${error ? "eum-error" : ""} ${
+          disabled ? "eum-disabled" : ""
+        }`}
         tabIndex={disabled ? -1 : 0}
         onBlur={() => setTimeout(() => setIsOpen(false), 200)}
       >
-        <div className="eum-custom-dropdown-selected" onClick={toggleDropdown}>
-          <span
-            className={`eum-custom-dropdown-text ${
-              !selectedOption ? "placeholder" : ""
-            }`}
-          >
+        <div className="eum-custom-selected" onClick={toggleDropdown}>
+          <span className={!selectedOption ? "eum-placeholder-text" : ""}>
             {selectedOption ? selectedOption.label : placeholder}
           </span>
-          <span className="eum-custom-dropdown-arrow"></span>
+          <span className="eum-custom-arrow"></span>
         </div>
 
         {isOpen && (
           <div
-            className={`eum-custom-dropdown-menu ${
-              openUpward ? "open-upward" : ""
+            className={`eum-custom-menu ${
+              openUpward ? "eum-menu-upward" : ""
             }`}
           >
             {options.map((option, index) => (
               <div
                 key={`${name}-${index}-${option.value}`}
-                className={`eum-custom-dropdown-option ${
-                  value === option.value
-                    ? "eum-custom-dropdown-option-active"
-                    : ""
+                className={`eum-custom-option ${
+                  value === option.value ? "eum-custom-option-active" : ""
                 }`}
                 onClick={() => handleSelect(option.value)}
               >
@@ -387,7 +381,7 @@ const EditUserModal = ({
                     onChange={handleChange}
                     disabled={loading}
                     className={`eum-form-input ${
-                      errors.exitDate ? "error" : ""
+                      errors.exitDate ? "eum-input-error" : ""
                     }`}
                   />
                   {errors.exitDate && (
@@ -410,7 +404,7 @@ const EditUserModal = ({
                     disabled={loading}
                     maxLength={100}
                     className={`eum-form-input ${
-                      errors.workLocation ? "error" : ""
+                      errors.workLocation ? "eum-input-error" : ""
                     }`}
                   />
                   {errors.workLocation && (
@@ -455,7 +449,7 @@ const EditUserModal = ({
                     min="0"
                     max="365"
                     className={`eum-form-input ${
-                      errors.noticePeriodDays ? "error" : ""
+                      errors.noticePeriodDays ? "eum-input-error" : ""
                     }`}
                   />
                   {errors.noticePeriodDays && (

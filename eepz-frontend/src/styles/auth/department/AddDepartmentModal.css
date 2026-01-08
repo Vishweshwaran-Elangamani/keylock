@@ -18,7 +18,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   width: 95%;
-  max-width: 650px; /* ← ORIGINAL WIDTH PRESERVED */
+  max-width: 650px;
   max-height: 90vh;
   overflow-y: auto;
   z-index: 1050;
@@ -59,7 +59,7 @@
 
 /* ==================== BODY ==================== */
 .adm-modal-body {
-  padding: 20px 18px; /* ← ORIGINAL PADDING PRESERVED */
+  padding: 20px 18px;
   background: #fff;
   overflow: visible;
 }
@@ -71,7 +71,7 @@
 /* ==================== LOADING STATE ==================== */
 .adm-loading-container {
   text-align: center;
-  padding: 30px 20px; /* ← ORIGINAL PADDING PRESERVED */
+  padding: 30px 20px;
 }
 
 .adm-loading-text {
@@ -84,13 +84,13 @@
 .adm-form-content {
   display: flex;
   flex-direction: column;
-  gap: 18px; /* ← ORIGINAL GAP PRESERVED */
+  gap: 18px;
 }
 
 .adm-form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px; /* ← ORIGINAL GAP PRESERVED */
+  gap: 16px;
 }
 
 .adm-form-row-full {
@@ -117,7 +117,7 @@
   font-weight: 600;
   font-size: 13px;
   color: #64748b;
-  margin-bottom: 4px; 
+  margin-bottom: 4px;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -132,11 +132,11 @@
 .adm-form-input {
   border: 1px solid #cbd5e1;
   border-radius: 6px;
-  padding: 10px 12px; /* ← ORIGINAL PADDING PRESERVED */
+  padding: 10px 12px;
   font-size: 13px;
   background: #fff;
   color: #334155;
-  min-height: 42px; /* ← ORIGINAL HEIGHT PRESERVED */
+  min-height: 42px;
 }
 
 .adm-form-input::placeholder {
@@ -154,7 +154,7 @@
   cursor: not-allowed;
 }
 
-.adm-form-input.error {
+.adm-form-input.adm-input-error {
   border: 1px solid #dc3545;
 }
 
@@ -164,27 +164,30 @@
 
 .adm-form-textarea {
   resize: vertical;
-  min-height: 70px; /* ← ORIGINAL HEIGHT PRESERVED */
+  min-height: 70px;
 }
 
 .adm-form-error {
   color: #dc3545;
   font-size: 11px;
-  margin-top: 4px; 
+  margin-top: 4px;
 }
 
-/* ==================== CUSTOM DROPDOWN - CLEAN, NO LINES ==================== */
+/* ============================================
+   CUSTOM DROPDOWN - NATIONALITY STYLE
+   ============================================ */
+
 .adm-custom-dropdown {
   position: relative;
-  padding: 10px 2.5rem 10px 12px; 
+  padding: 0.75rem 1rem 0.75rem 1rem;
   border: 1px solid #cbd5e1;
   border-radius: 6px;
-  font-size: 13px;
+  font-size: 0.9375rem;
   background: #ffffff;
-  color: #334155;
+  color: #212529;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 42px; 
+  min-height: 44px;
   display: flex;
   align-items: center;
   user-select: none;
@@ -201,22 +204,22 @@
   border-color: #27235c;
 }
 
-.adm-custom-dropdown.disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  background: #f1f5f9;
-}
-
-.adm-custom-dropdown.error {
+.adm-custom-dropdown.adm-error {
   border-color: #dc3545;
   background: rgba(220, 53, 69, 0.02);
 }
 
-.adm-custom-dropdown.error:focus {
+.adm-custom-dropdown.adm-error:focus {
   box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
 }
 
-.adm-custom-dropdown-selected {
+.adm-custom-dropdown.adm-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #f8f9fa;
+}
+
+.adm-custom-selected {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -224,67 +227,63 @@
   position: relative;
   cursor: pointer;
   user-select: none;
+  padding-right: 1.5rem;
 }
 
-.adm-custom-dropdown-text {
+.adm-custom-selected span:first-child {
   flex: 1;
-  color: #334155;
   text-align: left;
-  font-weight: 400;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.adm-custom-dropdown-text.placeholder {
-  color: #9ca3af;
-  font-weight: 400;
+.adm-placeholder-text {
+  color: #adb5bd;
+  opacity: 0.8;
 }
 
 /* Arrow positioned close to edge */
-.adm-custom-dropdown-arrow {
+.adm-custom-arrow {
   position: absolute;
-  right: 0.85rem; 
+  right: 0.75rem;
   top: 50%;
   transform: translateY(-50%) rotate(45deg);
-  width: 7px;
-  height: 7px;
-  border-right: 2px solid #64748b;
-  border-bottom: 2px solid #64748b;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #6c757d;
+  border-bottom: 2px solid #6c757d;
   pointer-events: none;
   transition: transform 0.2s ease;
 }
 
 /* Arrow rotation when open */
-.adm-custom-dropdown:focus-within .adm-custom-dropdown-arrow {
-  transform: translateY(-25%) rotate(-135deg);
+.adm-custom-dropdown:focus-within .adm-custom-arrow {
+  transform: translateY(-50%) rotate(225deg);
 }
 
 /* Dropdown menu */
-.adm-custom-dropdown-menu {
+.adm-custom-menu {
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
   right: 0;
   background: #ffffff;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   z-index: 9999;
-  max-height: 250px; 
+  max-height: 200px;
   overflow-y: auto;
-  animation: adm-dropdown-fade-in 0.15s ease-out;
+  animation: admDropdownFadeIn 0.15s ease-out;
   min-width: 100%;
 }
 
 /* OPEN UPWARD */
-.adm-custom-dropdown-menu.open-upward {
+.adm-custom-menu.adm-menu-upward {
   top: auto;
   bottom: calc(100% + 4px);
-  animation: adm-dropdown-fade-in-upward 0.15s ease-out;
+  animation: admDropdownFadeInUpward 0.15s ease-out;
 }
 
-@keyframes adm-dropdown-fade-in {
+@keyframes admDropdownFadeIn {
   from {
     opacity: 0;
     transform: translateY(-8px);
@@ -295,7 +294,7 @@
   }
 }
 
-@keyframes adm-dropdown-fade-in-upward {
+@keyframes admDropdownFadeInUpward {
   from {
     opacity: 0;
     transform: translateY(8px);
@@ -306,72 +305,60 @@
   }
 }
 
-/* Dropdown options - NO LINES, CLEAN DESIGN */
-.adm-custom-dropdown-option {
-  padding: 10px 12px; /* ← ORIGINAL PADDING PRESERVED */
-  font-size: 13px;
-  color: #334155;
+.adm-custom-option {
+  padding: 0.75rem 1rem;
   cursor: pointer;
-  transition: all 0.12s ease;
-  text-align: left;
-  background-color: #ffffff;
   display: block;
-  border: none;
+  text-align: left;
+  transition: all 0.12s ease;
+  font-size: 0.9375rem;
+  color: #111827;
 }
 
-.adm-custom-dropdown-option:hover {
+.adm-custom-option:hover {
   background-color: #27235c;
   color: #ffffff;
 }
 
-.adm-custom-dropdown-option:first-child {
-  border-radius: 6px 6px 0 0;
-  background-color: #f3f4f6;
-  color: #334155;
-  font-weight: 600;
+.adm-custom-option:first-child {
+  border-radius: 10px 10px 0 0;
 }
 
-.adm-custom-dropdown-option:first-child:hover {
-  background-color: #27235c;
-  color: #ffffff;
+.adm-custom-option:last-child {
+  border-radius: 0 0 10px 10px;
 }
 
-.adm-custom-dropdown-option:last-child {
-  border-radius: 0 0 6px 6px;
-}
-
-.adm-custom-dropdown-option-active {
+.adm-custom-option-active {
   background-color: #f3f4f6;
   font-weight: 600;
-  color: #334155;
 }
 
-.adm-custom-dropdown-option-active:hover {
+.adm-custom-option-active:hover {
   background-color: #27235c;
   color: #ffffff;
 }
 
-/* Scrollbar styling - PURPLE THEME */
-.adm-custom-dropdown-menu::-webkit-scrollbar {
+/* Scrollbar styling - EXACT MATCH TO NATIONALITY DROPDOWN */
+.adm-custom-menu::-webkit-scrollbar {
   width: 6px;
 }
 
-.adm-custom-dropdown-menu::-webkit-scrollbar-track {
+.adm-custom-menu::-webkit-scrollbar-track {
   background: #f1f1f1;
-  border-radius: 6px;
+  border-radius: 10px;
 }
 
-.adm-custom-dropdown-menu::-webkit-scrollbar-thumb {
+.adm-custom-menu::-webkit-scrollbar-thumb {
   background: #27235c;
-  border-radius: 6px;
+  border-radius: 10px;
 }
 
-.adm-custom-dropdown-menu::-webkit-scrollbar-thumb:hover {
+.adm-custom-menu::-webkit-scrollbar-thumb:hover {
   background: #1f1c4b;
 }
 
 /* Firefox scrollbar */
-.adm-custom-dropdown-menu {
+.adm-custom-menu {
   scrollbar-width: thin;
   scrollbar-color: #27235c #f1f1f1;
 }
@@ -379,8 +366,8 @@
 /* ==================== INFO MESSAGE ==================== */
 .adm-info-message {
   font-size: 11px;
-  color: #f59e0b; 
-  margin-top: 5px; 
+  color: #f59e0b;
+  margin-top: 5px;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -388,12 +375,12 @@
 
 /* ==================== FOOTER ==================== */
 .adm-modal-footer {
-  padding: 14px 18px; 
+  padding: 14px 18px;
   border-top: 1px solid #e2e8f0;
   background: #fff;
   display: flex;
   justify-content: flex-end;
-  gap: 10px; 
+  gap: 10px;
 }
 
 /* ==================== BUTTONS ==================== */
@@ -402,7 +389,7 @@
   border: none;
   color: #fff;
   font-weight: 600;
-  padding: 9px 16px; 
+  padding: 9px 16px;
   font-size: 12px;
   border-radius: 5px;
   cursor: pointer;
@@ -426,7 +413,7 @@
   border: none;
   color: #fff;
   font-weight: 600;
-  padding: 9px 16px; 
+  padding: 9px 16px;
   font-size: 12px;
   border-radius: 5px;
   box-shadow: 0 2px 8px rgba(151, 36, 126, 0.25);

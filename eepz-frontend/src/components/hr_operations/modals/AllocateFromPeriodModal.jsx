@@ -1,8 +1,87 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import budgetAllocationService from "../../../services/hr_operations/hr/budgetAllocationService";
 import { formatCurrency } from "../../../utils/auth/currencyFormatter";
 import "../../../styles/hr_operations/hr/AllocateFromPeriodModal.css";
+
+/* Custom Dropdown Component */
+const CustomDropdown = ({
+  value,
+  onChange,
+  options,
+  placeholder,
+  name,
+  error,
+  disabled,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const selectedOption = options.find((opt) => opt.value === value);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+
+  const handleSelect = (optionValue) => {
+    if (!disabled) {
+      onChange({ target: { name, value: optionValue } });
+      setIsOpen(false);
+    }
+  };
+
+  const toggleDropdown = () => {
+    if (!disabled) {
+      setIsOpen(!isOpen);
+    }
+  };
+
+  return (
+    <div
+      ref={dropdownRef}
+      className={`afpm-custom-dropdown ${error ? "afpm-error" : ""} ${
+        disabled ? "afpm-disabled" : ""
+      } ${isOpen ? "afpm-dropdown-open" : ""}`}
+      tabIndex={disabled ? -1 : 0}
+      onBlur={() => setTimeout(() => setIsOpen(false), 200)}
+    >
+      <div className="afpm-custom-selected" onClick={toggleDropdown}>
+        <span className={!selectedOption ? "afpm-placeholder-text" : ""}>
+          {selectedOption ? selectedOption.label : placeholder}
+        </span>
+        <span className="afpm-custom-arrow"></span>
+      </div>
+
+      {isOpen && (
+        <div className="afpm-custom-menu">
+          {options.map((option) => (
+            <div
+              key={option.value}
+              className={`afpm-custom-option ${
+                value === option.value ? "afpm-custom-option-active" : ""
+              }`}
+              onClick={() => handleSelect(option.value)}
+            >
+              {option.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -13,7 +92,12 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const allocationTypes = ["Training", "Promotion", "Bonus", "Other"];
+  const allocationTypeOptions = [
+    { value: "Training", label: "Training" },
+    { value: "Promotion", label: "Promotion" },
+    { value: "Bonus", label: "Bonus" },
+    { value: "Other", label: "Other" },
+  ];
 
   const validateForm = () => {
     const newErrors = {};
@@ -24,6 +108,10 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
 
     if (parseFloat(formData.amount) > period.remainingAmount) {
       newErrors.amount = `Amount exceeds remaining period allocation`;
+    }
+
+    if (!formData.notes || !formData.notes.trim()) {
+      newErrors.notes = "Allocation name is required";
     }
 
     setErrors(newErrors);
@@ -83,7 +171,7 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
     <>
       <div className="afpm-backdrop" onClick={onClose} />
 
-      <div className="afpm-modal-container">
+      <div className="afpm-modal-wrapper">
         <div className="afpm-modal-dialog">
           {/* HEADER - Fixed */}
           <div className="afpm-modal-header">
@@ -178,19 +266,14 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
                   Allocation Type{" "}
                   <span className="afpm-required-asterisk">*</span>
                 </label>
-                <select
+                <CustomDropdown
                   name="allocationType"
                   value={formData.allocationType}
                   onChange={handleChange}
-                  required
-                  className="afpm-form-input afpm-form-select"
-                >
-                  {allocationTypes.map((type) => (
-                    <option key={type} value={type}>
-                      {type}
-                    </option>
-                  ))}
-                </select>
+                  options={allocationTypeOptions}
+                  placeholder="Select Allocation Type"
+                  disabled={loading}
+                />
                 <small className="afpm-form-hint">
                   Select the purpose of this allocation
                 </small>
@@ -211,7 +294,9 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
                   min="0"
                   max={period.remainingAmount}
                   required
-                  className={`afpm-form-input ${errors.amount ? "error" : ""}`}
+                  className={`afpm-form-input ${
+                    errors.amount ? "afpm-input-error" : ""
+                  }`}
                 />
                 {errors.amount && (
                   <div className="afpm-form-error">{errors.amount}</div>
@@ -228,16 +313,24 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
 
               {/* Notes */}
               <div className="afpm-form-group">
-                <label className="afpm-form-label-block">Allocation Name<span className="afpm-required-asterisk">*</span></label>
-                <input 
-                type="text"
+                <label className="afpm-form-label">
+                  Allocation Name
+                  <span className="afpm-required-asterisk">*</span>
+                </label>
+                <input
+                  type="text"
                   name="notes"
                   value={formData.notes}
                   onChange={handleChange}
-                  placeholder="Enter Allocation Name" 
-                  className="afpm-form-input"                 
+                  placeholder="Enter Allocation Name"
+                  className={`afpm-form-input ${
+                    errors.notes ? "afpm-input-error" : ""
+                  }`}
                   required
                 />
+                {errors.notes && (
+                  <div className="afpm-form-error">{errors.notes}</div>
+                )}
               </div>
 
               {/* Info Alert */}
@@ -267,6 +360,7 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
                 disabled={loading}
                 className="afpm-btn-cancel"
               >
+                <i className="bi bi-x-circle"></i>
                 Cancel
               </button>
 

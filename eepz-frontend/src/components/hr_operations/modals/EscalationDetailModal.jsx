@@ -21,7 +21,7 @@ const EscalationDetailModal = ({
     <>
       <div className="edm-backdrop" onClick={onHide} />
 
-      <div className="edm-modal-container">
+      <div className="esdm-modal-container">
         <div className="edm-modal-dialog">
           {/* HEADER  */}
           <div className="edm-modal-header">

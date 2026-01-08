@@ -95,7 +95,7 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
   );
 
   // ========================
-  // CUSTOM DROPDOWN COMPONENT - NO INLINE STYLES
+  // CUSTOM DROPDOWN COMPONENT - NATIONALITY STYLE
   // ========================
   const CustomDropdown = ({
     options,
@@ -160,36 +160,30 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
     return (
       <div
         ref={dropdownRef}
-        className={`adm-custom-dropdown ${isOpen ? "active" : ""} ${
-          error ? "error" : ""
-        } ${disabled ? "disabled" : ""}`}
+        className={`adm-custom-dropdown ${error ? "adm-error" : ""} ${
+          disabled ? "adm-disabled" : ""
+        }`}
         tabIndex={disabled ? -1 : 0}
         onBlur={() => setTimeout(() => setIsOpen(false), 200)}
       >
-        <div className="adm-custom-dropdown-selected" onClick={toggleDropdown}>
-          <span
-            className={`adm-custom-dropdown-text ${
-              !selectedOption ? "placeholder" : ""
-            }`}
-          >
+        <div className="adm-custom-selected" onClick={toggleDropdown}>
+          <span className={!selectedOption ? "adm-placeholder-text" : ""}>
             {selectedOption ? selectedOption.label : placeholder}
           </span>
-          <span className="adm-custom-dropdown-arrow"></span>
+          <span className="adm-custom-arrow"></span>
         </div>
 
         {isOpen && (
           <div
-            className={`adm-custom-dropdown-menu ${
-              openUpward ? "open-upward" : ""
+            className={`adm-custom-menu ${
+              openUpward ? "adm-menu-upward" : ""
             }`}
           >
             {options.map((option, index) => (
               <div
                 key={`${name}-${index}-${option.value}`}
-                className={`adm-custom-dropdown-option ${
-                  value === option.value
-                    ? "adm-custom-dropdown-option-active"
-                    : ""
+                className={`adm-custom-option ${
+                  value === option.value ? "adm-custom-option-active" : ""
                 }`}
                 onClick={() => handleSelect(option.value)}
               >
@@ -318,7 +312,7 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
                         maxLength={100}
                         autoFocus
                         className={`adm-form-input ${
-                          errors.departmentName ? "error" : ""
+                          errors.departmentName ? "adm-input-error" : ""
                         }`}
                       />
                       {errors.departmentName && (
@@ -342,7 +336,7 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
                         disabled={loading}
                         maxLength={20}
                         className={`adm-form-input adm-form-input-uppercase ${
-                          errors.departmentCode ? "error" : ""
+                          errors.departmentCode ? "adm-input-error" : ""
                         }`}
                       />
                       {errors.departmentCode && (

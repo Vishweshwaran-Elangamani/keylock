@@ -1,89 +1,80 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import periodAllocationService from "../../../services/hr_operations/hr/periodAllocationService";
 import { formatCurrency } from "../../../utils/auth/currencyFormatter";
 import "../../../styles/hr_operations/hr/CreatePeriodAllocationModal.css";
 
-/* Custom Period Dropdown */
-const PeriodDropdown = ({ value, onChange, periods }) => {
-  const [open, setOpen] = useState(false);
+/* Custom Dropdown Component */
+const CustomDropdown = ({
+  value,
+  onChange,
+  options,
+  placeholder,
+  name,
+  error,
+  disabled,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
-  const selected = periods.find((p) => p.value === value) || periods[0];
+  const selectedOption = options.find((opt) => opt.value === value);
 
-  const handleSelect = (val) => {
-    onChange({ target: { name: "period", value: val } });
-    setOpen(false);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+
+  const handleSelect = (optionValue) => {
+    if (!disabled) {
+      onChange({ target: { name, value: optionValue } });
+      setIsOpen(false);
+    }
+  };
+
+  const toggleDropdown = () => {
+    if (!disabled) {
+      setIsOpen(!isOpen);
+    }
   };
 
   return (
     <div
-      className="cpam-custom-dropdown"
-      tabIndex={0}
-      onBlur={() => setTimeout(() => setOpen(false), 200)}
+      ref={dropdownRef}
+      className={`cpam-custom-dropdown ${error ? "cpam-error" : ""} ${
+        disabled ? "cpam-disabled" : ""
+      } ${isOpen ? "cpam-dropdown-open" : ""}`}
+      tabIndex={disabled ? -1 : 0}
+      onBlur={() => setTimeout(() => setIsOpen(false), 200)}
     >
-      <div
-        className="cpam-custom-selected"
-        onClick={() => setOpen((prev) => !prev)}
-      >
-        {selected.label}
-        <i className={`bi bi-chevron-${open ? "up" : "down"} cpam-custom-arrow`}></i>
+      <div className="cpam-custom-selected" onClick={toggleDropdown}>
+        <span className={!selectedOption ? "cpam-placeholder-text" : ""}>
+          {selectedOption ? selectedOption.label : placeholder}
+        </span>
+        <span className="cpam-custom-arrow"></span>
       </div>
 
-      {open && (
+      {isOpen && (
         <div className="cpam-custom-menu">
-          {periods.map((period) => (
+          {options.map((option) => (
             <div
-              key={period.value}
-              className={
-                "cpam-custom-option" +
-                (period.value === value ? " cpam-custom-option-active" : "")
-              }
-              onClick={() => handleSelect(period.value)}
+              key={option.value}
+              className={`cpam-custom-option ${
+                value === option.value ? "cpam-custom-option-active" : ""
+              }`}
+              onClick={() => handleSelect(option.value)}
             >
-              {period.label}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
-/* Custom Year Dropdown */
-const YearDropdown = ({ value, onChange, years }) => {
-  const [open, setOpen] = useState(false);
-
-  const handleSelect = (val) => {
-    onChange({ target: { name: "periodYear", value: val } });
-    setOpen(false);
-  };
-
-  return (
-    <div
-      className="cpam-custom-dropdown"
-      tabIndex={0}
-      onBlur={() => setTimeout(() => setOpen(false), 200)}
-    >
-      <div
-        className="cpam-custom-selected"
-        onClick={() => setOpen((prev) => !prev)}
-      >
-        {value}
-        <i className={`bi bi-chevron-${open ? "up" : "down"} cpam-custom-arrow`}></i>
-      </div>
-
-      {open && (
-        <div className="cpam-custom-menu">
-          {years.map((year) => (
-            <div
-              key={year}
-              className={
-                "cpam-custom-option" +
-                (year === value ? " cpam-custom-option-active" : "")
-              }
-              onClick={() => handleSelect(year)}
-            >
-              {year}
+              {option.label}
             </div>
           ))}
         </div>
@@ -114,7 +105,13 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
     { value: "H2", label: "H2 - Half Year 2" },
   ];
 
-  const years = [2024, 2025, 2026, 2027];
+  const currentYear = new Date().getFullYear();
+  const yearOptions = [
+    { value: currentYear, label: currentYear.toString() },
+    { value: currentYear + 1, label: (currentYear + 1).toString() },
+    { value: currentYear + 2, label: (currentYear + 2).toString() },
+    { value: currentYear + 3, label: (currentYear + 3).toString() },
+  ];
 
   const validateForm = () => {
     const newErrors = {};
@@ -186,7 +183,7 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
     <>
       <div className="cpam-backdrop" onClick={onClose} />
 
-      <div className="cpam-modal-container">
+      <div className="cpam-modal-wrapper">
         <div className="cpam-modal-dialog">
           {/* HEADER - Fixed */}
           <div className="cpam-modal-header">
@@ -244,26 +241,32 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
               {/* Period and Year Row */}
               <div className="cpam-form-row">
                 {/* Period */}
-                <div>
+                <div className="cpam-form-group-inline">
                   <label className="cpam-form-label">
                     Period <span className="cpam-required-asterisk">*</span>
                   </label>
-                  <PeriodDropdown
+                  <CustomDropdown
+                    name="period"
                     value={formData.period}
                     onChange={handleChange}
-                    periods={periods}
+                    options={periods}
+                    placeholder="Select Period"
+                    disabled={loading}
                   />
                 </div>
 
                 {/* Year */}
-                <div>
+                <div className="cpam-form-group-inline">
                   <label className="cpam-form-label">
                     Year <span className="cpam-required-asterisk">*</span>
                   </label>
-                  <YearDropdown
+                  <CustomDropdown
+                    name="periodYear"
                     value={formData.periodYear}
                     onChange={handleChange}
-                    years={years}
+                    options={yearOptions}
+                    placeholder="Select Year"
+                    disabled={loading}
                   />
                 </div>
               </div>
@@ -285,7 +288,7 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
                   max={availableBudget}
                   required
                   className={`cpam-form-input ${
-                    errors.allocatedAmount ? "error" : ""
+                    errors.allocatedAmount ? "cpam-input-error" : ""
                   }`}
                 />
                 {errors.allocatedAmount && (
@@ -302,7 +305,7 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
 
               {/* Notes */}
               <div className="cpam-form-group">
-                <label className="cpam-form-label-block">Notes</label>
+                <label className="cpam-form-label">Notes</label>
                 <textarea
                   name="notes"
                   value={formData.notes}
@@ -322,6 +325,7 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
                 disabled={loading}
                 className="cpam-btn-cancel"
               >
+                <i className="bi bi-x-circle"></i>
                 Cancel
               </button>
 
@@ -338,7 +342,7 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
                 ) : (
                   <>
                     <i className="bi bi-check-circle"></i>
-                    Create Period Allocation
+                    Create Allocation
                   </>
                 )}
               </button>

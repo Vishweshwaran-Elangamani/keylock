@@ -9,82 +9,80 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   z-index: 1040;
+  transition: all 0.3s ease;
 }
 
-/* ==================== MODAL CONTAINER ==================== */
-.cpam-modal-container {
+/* ==================== MODAL WRAPPER ==================== */
+.cpam-modal-wrapper {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 95%;
-  max-width: 800px;
-  max-height: 75vh;
-  z-index: 1050;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  padding: 20px;
 }
 
 /* ==================== MODAL DIALOG ==================== */
 .cpam-modal-dialog {
-  border-radius: 0.5rem;
-  background: #fff;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
-  overflow: hidden;
   width: 100%;
+  max-width: 800px;
   max-height: 85vh;
   display: flex;
   flex-direction: column;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  background-color: #ffffff;
 }
 
 /* ==================== HEADER ==================== */
 .cpam-modal-header {
   background: #27235c;
-  color: #fff;
-  padding: 13px 15px;
+  color: #ffffff;
+  padding: 16px 20px;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  font-size: 15px;
-  font-weight: 600;
-  border-radius: 0.5rem 0.5rem 0 0;
+  align-items: center;
   flex-shrink: 0;
 }
 
 .cpam-header-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #fff;
-  font-size: 15px;
-  font-weight: 600;
+  color: #ffffff;
 }
 
 .cpam-close-button {
   background: none;
   border: none;
-  color: #fff;
+  color: #ffffff;
   font-size: 18px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0;
+  transition: opacity 0.2s ease;
+}
+
+.cpam-close-button:hover:not(:disabled) {
+  opacity: 0.8;
 }
 
 .cpam-close-button:disabled {
   cursor: not-allowed;
-  opacity: 0.7;
+  opacity: 0.5;
 }
 
-/* ==================== BODY ==================== */
-.cpam-modal-body {
-  padding: 20px;
-  background: #fff;
-  text-align: left;
-  overflow-y: auto;
-  flex: 1;
-}
-
+/* ==================== FORM ==================== */
 .cpam-form {
   display: flex;
   flex-direction: column;
@@ -92,12 +90,22 @@
   overflow: hidden;
 }
 
+/* ==================== BODY ==================== */
+.cpam-modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  overflow-x: visible;
+  flex: 1;
+  background-color: #ffffff;
+  max-height: calc(85vh - 140px);
+}
+
 /* ==================== BUDGET SUMMARY CARD ==================== */
 .cpam-budget-summary {
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   background: #f9fafb;
-  padding: 1rem;
+  padding: 16px;
   margin-bottom: 20px;
 }
 
@@ -119,7 +127,8 @@
 }
 
 .cpam-summary-item {
-  /* Base item styling */
+  display: flex;
+  flex-direction: column;
 }
 
 .cpam-summary-label {
@@ -146,6 +155,8 @@
   padding: 8px;
   border-radius: 6px;
   border: 1px solid #86efac;
+  display: flex;
+  flex-direction: column;
 }
 
 .cpam-summary-label-highlight {
@@ -168,29 +179,28 @@
   grid-template-columns: 1fr 1fr;
   gap: 20px;
   margin-bottom: 16px;
+  overflow: visible;
 }
 
 /* ==================== FORM GROUPS ==================== */
 .cpam-form-group {
   margin-bottom: 16px;
+  position: relative;
+  overflow: visible;
+}
+
+.cpam-form-group-inline {
+  position: relative;
+  overflow: visible;
 }
 
 .cpam-form-label {
-  font-weight: 600;
-  font-size: 13px;
-  color: #334155;
-  margin-bottom: 6px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.cpam-form-label-block {
-  font-weight: 600;
-  font-size: 13px;
-  color: #334155;
-  margin-bottom: 6px;
   display: block;
+  font-weight: 600;
+  font-size: 13px;
+  color: #334155;
+  margin-bottom: 6px;
+  text-align: left;
 }
 
 .cpam-required-asterisk {
@@ -201,30 +211,36 @@
 /* ==================== FORM INPUTS ==================== */
 .cpam-form-input {
   width: 100%;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
   padding: 8px 10px;
   font-size: 13px;
-  background: #fff;
-  color: #22223b;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  outline: none;
+  transition: all 0.2s ease;
+  background-color: #ffffff;
+  min-height: 44px;
 }
 
 .cpam-form-input:focus {
-  outline: none;
   border-color: #27235c;
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
 }
 
-.cpam-form-input.error {
-  border: 1px solid #ef4444;
+.cpam-form-input.cpam-input-error {
+  border-color: #ef4444;
+}
+
+.cpam-form-input.cpam-input-error:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
 }
 
 .cpam-form-textarea {
   resize: vertical;
-  min-height: 80px;
-  max-height: 120px;
   font-family: inherit;
   line-height: 1.4;
+  min-height: 80px;
+  max-height: 120px;
 }
 
 .cpam-form-error {
@@ -238,68 +254,117 @@
   color: #22c55e;
   margin-top: 4px;
   display: block;
+  font-weight: 600;
 }
 
-/* ==================== CUSTOM DROPDOWN ==================== */
+/* ============================================
+   CUSTOM DROPDOWN - NATIONALITY STYLE
+   ============================================ */
+
 .cpam-custom-dropdown {
   position: relative;
-  width: 100%;
-  height: 38px;
+  padding: 0.75rem 1rem 0.75rem 1rem;
   border: 1px solid #cbd5e1;
   border-radius: 6px;
+  font-size: 0.9375rem;
   background: #ffffff;
+  color: #212529;
   cursor: pointer;
   transition: all 0.2s ease;
-  user-select: none;
+  min-height: 44px;
   display: flex;
   align-items: center;
+  user-select: none;
+  z-index: 1;
 }
 
-.cpam-custom-dropdown:focus-within {
+/* When dropdown is open, increase z-index */
+.cpam-custom-dropdown.cpam-dropdown-open {
+  z-index: 100;
+}
+
+.cpam-custom-dropdown:focus {
+  outline: none;
   border-color: #27235c;
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
 }
 
+.cpam-custom-dropdown:hover {
+  border-color: #27235c;
+}
+
+.cpam-custom-dropdown.cpam-error {
+  border-color: #dc3545;
+  background: rgba(220, 53, 69, 0.02);
+}
+
+.cpam-custom-dropdown.cpam-error:focus {
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+.cpam-custom-dropdown.cpam-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .cpam-custom-selected {
-  width: 100%;
-  padding: 0 2.5rem 0 0.75rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
   position: relative;
   cursor: pointer;
   user-select: none;
-  font-size: 13px;
-  font-weight: 500;
-  color: #1f2937;
-  height: 100%;
+  padding-right: 1.5rem;
 }
 
+.cpam-custom-selected span:first-child {
+  flex: 1;
+  text-align: left;
+}
+
+.cpam-placeholder-text {
+  color: #adb5bd;
+  opacity: 0.8;
+}
+
+/* Arrow positioned close to edge */
 .cpam-custom-arrow {
   position: absolute;
   right: 0.75rem;
-  font-size: 11px;
-  color: #6b7280;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #6c757d;
+  border-bottom: 2px solid #6c757d;
   pointer-events: none;
   transition: transform 0.2s ease;
 }
 
+/* Arrow rotation when open */
+.cpam-custom-dropdown:focus-within .cpam-custom-arrow {
+  transform: translateY(-50%) rotate(225deg);
+}
+
+/* Dropdown menu */
 .cpam-custom-menu {
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
   right: 0;
   background: #ffffff;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
-  max-height: 250px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  z-index: 10000;
+  max-height: 200px;
   overflow-y: auto;
-  animation: dropdownFadeIn 0.15s ease-out;
+  animation: cpamDropdownFadeIn 0.15s ease-out;
+  min-width: 100%;
 }
 
-@keyframes dropdownFadeIn {
+@keyframes cpamDropdownFadeIn {
   from {
     opacity: 0;
     transform: translateY(-8px);
@@ -311,82 +376,90 @@
 }
 
 .cpam-custom-option {
-  padding: 0.65rem 0.75rem;
+  padding: 0.75rem 1rem;
   cursor: pointer;
   display: block;
   text-align: left;
-  transition: all 0.15s ease;
-  font-size: 13px;
-  color: #1f2937;
-  border-bottom: 1px solid #f3f4f6;
+  transition: all 0.12s ease;
+  font-size: 0.9375rem;
+  color: #111827;
 }
 
-.cpam-custom-option:last-child {
-  border-bottom: none;
-}
-
-/* ONLY HOVER - DARK NAVY BLUE */
 .cpam-custom-option:hover {
   background-color: #27235c;
   color: #ffffff;
 }
 
-/* Selected option styling  */
+.cpam-custom-option:first-child {
+  border-radius: 10px 10px 0 0;
+}
+
+.cpam-custom-option:last-child {
+  border-radius: 0 0 10px 10px;
+}
+
 .cpam-custom-option-active {
   background-color: #f3f4f6;
   font-weight: 600;
 }
 
-/* When hovering over selected option  */
 .cpam-custom-option-active:hover {
   background-color: #27235c;
   color: #ffffff;
 }
 
+/* Scrollbar styling - EXACT MATCH TO NATIONALITY DROPDOWN */
 .cpam-custom-menu::-webkit-scrollbar {
   width: 6px;
 }
 
 .cpam-custom-menu::-webkit-scrollbar-track {
-  background: #f9fafb;
+  background: #f1f1f1;
+  border-radius: 10px;
 }
 
 .cpam-custom-menu::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
+  background: #27235c;
+  border-radius: 10px;
 }
 
 .cpam-custom-menu::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #1f1c4b;
+}
+
+/* Firefox scrollbar */
+.cpam-custom-menu {
+  scrollbar-width: thin;
+  scrollbar-color: #27235c #f1f1f1;
 }
 
 /* ==================== FOOTER ==================== */
 .cpam-modal-footer {
-  padding: 10px 15px;
+  padding: 12px 20px;
   border-top: 1px solid #e2e8f0;
-  background: #fff;
+  background: #ffffff;
+  flex-shrink: 0;
   display: flex;
   justify-content: flex-end;
   gap: 8px;
   border-bottom-left-radius: 0.5rem;
   border-bottom-right-radius: 0.5rem;
-  flex-shrink: 0;
 }
 
 /* ==================== BUTTONS ==================== */
 .cpam-btn-cancel {
-  background: #6c757d;
-  border: none;
-  color: #fff;
+  padding: 8px 16px;
+  font-size: 13px;
   font-weight: 600;
-  padding: 7px 12px;
-  font-size: 12px;
-  border-radius: 5px;
+  border: none;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  display: inline-flex;
+  background: #6c757d;
+  color: #ffffff;
+  display: flex;
   align-items: center;
   gap: 6px;
+  transition: all 0.2s ease;
 }
 
 .cpam-btn-cancel:hover:not(:disabled) {
@@ -395,44 +468,45 @@
 
 .cpam-btn-cancel:disabled {
   cursor: not-allowed;
-  opacity: 0.7;
+  opacity: 0.65;
 }
 
 .cpam-btn-submit {
-  background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
-  border: none;
-  color: #fff;
+  padding: 8px 16px;
+  font-size: 13px;
   font-weight: 600;
-  padding: 7px 12px;
-  font-size: 12px;
-  border-radius: 5px;
-  box-shadow: 0 2px 8px rgba(151, 36, 126, 0.25);
-  display: inline-flex;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
+  color: #ffffff;
+  display: flex;
   align-items: center;
   gap: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.12s ease;
+  box-shadow: 0 2px 8px rgba(151, 36, 126, 0.25);
+  min-width: 190px;
+  justify-content: center;
 }
 
 .cpam-btn-submit:hover:not(:disabled) {
-  opacity: 0.93;
+  opacity: 0.9;
 }
 
 .cpam-btn-submit:disabled {
   cursor: not-allowed;
-  opacity: 0.85;
+  opacity: 0.65;
 }
 
 /* ==================== SPINNER ==================== */
 .cpam-spinner {
   width: 14px;
   height: 14px;
-  border: 2px solid #fff;
-  border-top: 2px solid #e01950;
+  border: 2px solid #ffffff;
+  border-top-color: transparent;
   border-radius: 50%;
-  animation: cpam-spin 0.7s linear infinite;
+  animation: cpam-spin 0.6s linear infinite;
   display: inline-block;
-  margin-right: 6px;
 }
 
 @keyframes cpam-spin {
@@ -446,11 +520,43 @@
 
 /* ==================== RESPONSIVE ==================== */
 @media (max-width: 768px) {
+  .cpam-modal-wrapper {
+    padding: 10px;
+  }
+
+  .cpam-modal-dialog {
+    max-width: 100%;
+  }
+
+  .cpam-modal-body {
+    padding: 16px;
+  }
+
   .cpam-form-row {
     grid-template-columns: 1fr;
   }
 
   .cpam-summary-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .cpam-modal-header {
+    padding: 12px 16px;
+  }
+
+  .cpam-header-title {
+    font-size: 14px;
+  }
+
+  .cpam-modal-footer {
+    flex-direction: column;
+  }
+
+  .cpam-btn-cancel,
+  .cpam-btn-submit {
+    width: 100%;
+    justify-content: center;
   }
 }

@@ -1,12 +1,17 @@
-
 import { useState, useMemo, useRef, useEffect } from "react";
 import { CloseButton } from "react-bootstrap";
 import internalOpportunityService from "../../../services/internal/internalOpportunityService";
 import { toast } from "sonner";
 import "../../../styles/internal/CreateOpportunityModal.css";
 
-
-const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) => {
+const CustomDropdown = ({
+  value,
+  onChange,
+  options,
+  placeholder,
+  name,
+  error,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -36,27 +41,24 @@ const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) 
   return (
     <div
       ref={dropdownRef}
-      className={`com-custom-dropdown ${error ? "error" : ""}`}
+      className={`com-custom-dropdown ${error ? "com-error" : ""}`}
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setIsOpen(false), 200)}
     >
-      <div
-        className="com-custom-dropdown-selected"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <span className="com-custom-dropdown-text">
+      <div className="com-custom-selected" onClick={() => setIsOpen(!isOpen)}>
+        <span className={!selectedOption ? "com-placeholder-text" : ""}>
           {selectedOption ? selectedOption.label : placeholder}
         </span>
-        <span className={`com-custom-dropdown-arrow ${isOpen ? "open" : ""}`}>
-          <i className="bi bi-chevron-down"></i>
-        </span>
+        <span className="com-custom-arrow"></span>
       </div>
 
       {isOpen && (
-        <div className="com-custom-dropdown-menu">
+        <div className="com-custom-menu">
           {options.map((option) => (
             <div
               key={option.value}
-              className={`com-custom-dropdown-option ${
-                value === option.value ? "selected" : ""
+              className={`com-custom-option ${
+                value === option.value ? "com-custom-option-active" : ""
               }`}
               onClick={() => handleSelect(option.value)}
             >
@@ -97,16 +99,19 @@ const CreateOpportunityModal = ({
     return { minDate: min, maxDate: max };
   }, []);
 
-  // Prepare department options
+  // Prepare department options with placeholder
   const departmentOptions = useMemo(() => {
-    return departments.map((dept) => ({
+    const placeholder = { label: "Select Department", value: "" };
+    const deptOptions = departments.map((dept) => ({
       label: dept.departmentName,
       value: dept.departmentId.toString(),
     }));
+    return [placeholder, ...deptOptions];
   }, [departments]);
 
-  // Status options
+  // Status options with placeholder
   const statusOptions = [
+    { label: "Select Status", value: "" },
     { label: "Active", value: "Active" },
     { label: "Pending", value: "Pending" },
     { label: "Closed", value: "Closed" },
@@ -271,7 +276,7 @@ const CreateOpportunityModal = ({
                   onChange={handleChange}
                   maxLength={200}
                   className={`com-form-input ${
-                    errors.opportunityName ? "error" : ""
+                    errors.opportunityName ? "com-input-error" : ""
                   }`}
                 />
                 {errors.opportunityName && (
@@ -313,7 +318,7 @@ const CreateOpportunityModal = ({
                     min={minDate}
                     max={maxDate}
                     className={`com-form-input ${
-                      errors.deadline ? "error" : ""
+                      errors.deadline ? "com-input-error" : ""
                     }`}
                   />
                   {errors.deadline && (
@@ -340,7 +345,7 @@ const CreateOpportunityModal = ({
                   rows={4}
                   maxLength={1000}
                   className={`com-form-textarea ${
-                    errors.description ? "error" : ""
+                    errors.description ? "com-input-error" : ""
                   }`}
                 />
                 {errors.description && (
@@ -361,7 +366,7 @@ const CreateOpportunityModal = ({
                   rows={3}
                   maxLength={500}
                   className={`com-form-textarea ${
-                    errors.requirements ? "error" : ""
+                    errors.requirements ? "com-input-error" : ""
                   }`}
                 />
                 {errors.requirements && (

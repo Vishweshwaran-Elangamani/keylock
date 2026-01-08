@@ -4,8 +4,14 @@ import { toast } from "sonner";
 import internalOpportunityService from "../../../services/internal/internalOpportunityService";
 import "../../../styles/internal/EditOpportunityModal.css";
 
-
-const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) => {
+const CustomDropdown = ({
+  value,
+  onChange,
+  options,
+  placeholder,
+  name,
+  error,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -35,27 +41,24 @@ const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) 
   return (
     <div
       ref={dropdownRef}
-      className={`eom-custom-dropdown ${error ? "error" : ""}`}
+      className={`eom-custom-dropdown ${error ? "eom-error" : ""}`}
+      tabIndex={0}
+      onBlur={() => setTimeout(() => setIsOpen(false), 200)}
     >
-      <div
-        className="eom-custom-dropdown-selected"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <span className="eom-custom-dropdown-text">
+      <div className="eom-custom-selected" onClick={() => setIsOpen(!isOpen)}>
+        <span className={!selectedOption ? "eom-placeholder-text" : ""}>
           {selectedOption ? selectedOption.label : placeholder}
         </span>
-        <span className={`eom-custom-dropdown-arrow ${isOpen ? "open" : ""}`}>
-          <i className="bi bi-chevron-down"></i>
-        </span>
+        <span className="eom-custom-arrow"></span>
       </div>
 
       {isOpen && (
-        <div className="eom-custom-dropdown-menu">
+        <div className="eom-custom-menu">
           {options.map((option) => (
             <div
               key={option.value}
-              className={`eom-custom-dropdown-option ${
-                value === option.value ? "selected" : ""
+              className={`eom-custom-option ${
+                value === option.value ? "eom-custom-option-active" : ""
               }`}
               onClick={() => handleSelect(option.value)}
             >
@@ -103,7 +106,7 @@ const EditOpportunityModal = ({
     }
   }, [opportunity]);
 
-  
+  // Department options WITHOUT placeholder (for Edit mode)
   const departmentOptions = useMemo(() => {
     return departments.map((dept) => ({
       label: dept.departmentName,
@@ -111,7 +114,7 @@ const EditOpportunityModal = ({
     }));
   }, [departments]);
 
-  
+  // Status options WITHOUT placeholder (for Edit mode)
   const statusOptions = [
     { label: "Active", value: "Active" },
     { label: "Pending", value: "Pending" },
@@ -245,7 +248,7 @@ const EditOpportunityModal = ({
                   onChange={handleChange}
                   maxLength={200}
                   className={`eom-form-input ${
-                    errors.opportunityName ? "error" : ""
+                    errors.opportunityName ? "eom-input-error" : ""
                   }`}
                 />
                 {errors.opportunityName && (
@@ -284,7 +287,7 @@ const EditOpportunityModal = ({
                     value={formData.deadline}
                     onChange={handleChange}
                     className={`eom-form-input ${
-                      errors.deadline ? "error" : ""
+                      errors.deadline ? "eom-input-error" : ""
                     }`}
                   />
                   {errors.deadline && (
@@ -306,7 +309,7 @@ const EditOpportunityModal = ({
                   rows={4}
                   maxLength={1000}
                   className={`eom-form-textarea ${
-                    errors.description ? "error" : ""
+                    errors.description ? "eom-input-error" : ""
                   }`}
                 />
                 {errors.description && (
@@ -327,7 +330,7 @@ const EditOpportunityModal = ({
                   rows={3}
                   maxLength={1000}
                   className={`eom-form-textarea ${
-                    errors.requirements ? "error" : ""
+                    errors.requirements ? "eom-input-error" : ""
                   }`}
                 />
                 {errors.requirements && (
@@ -376,6 +379,7 @@ const EditOpportunityModal = ({
                 <i className="bi bi-x-circle"></i>
                 Cancel
               </button>
+
               <button
                 type="submit"
                 disabled={loading}

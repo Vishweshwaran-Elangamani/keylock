@@ -127,6 +127,7 @@
   font-size: 13px;
   background: #fff;
   color: #334155;
+  min-height: 44px;
 }
 
 .eum-form-input::placeholder {
@@ -144,7 +145,7 @@
   cursor: not-allowed;
 }
 
-.eum-form-input.error {
+.eum-form-input.eum-input-error {
   border: 1px solid #dc3545;
 }
 
@@ -162,18 +163,21 @@
   display: block;
 }
 
-/* ==================== CUSTOM DROPDOWN - CLEAN, NO LINES ==================== */
+/* ============================================
+   CUSTOM DROPDOWN - NATIONALITY STYLE
+   ============================================ */
+
 .eum-custom-dropdown {
   position: relative;
-  padding: 8px 2rem 8px 9px;
+  padding: 0.75rem 1rem 0.75rem 1rem;
   border: 1px solid #cbd5e1;
   border-radius: 6px;
-  font-size: 13px;
+  font-size: 0.9375rem;
   background: #ffffff;
-  color: #334155;
+  color: #212529;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 37px;
+  min-height: 44px;
   display: flex;
   align-items: center;
   user-select: none;
@@ -190,22 +194,22 @@
   border-color: #27235c;
 }
 
-.eum-custom-dropdown.disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  background: #f1f5f9;
-}
-
-.eum-custom-dropdown.error {
+.eum-custom-dropdown.eum-error {
   border-color: #dc3545;
   background: rgba(220, 53, 69, 0.02);
 }
 
-.eum-custom-dropdown.error:focus {
+.eum-custom-dropdown.eum-error:focus {
   box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
 }
 
-.eum-custom-dropdown-selected {
+.eum-custom-dropdown.eum-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #f8f9fa;
+}
+
+.eum-custom-selected {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -213,67 +217,63 @@
   position: relative;
   cursor: pointer;
   user-select: none;
+  padding-right: 1.5rem;
 }
 
-.eum-custom-dropdown-text {
+.eum-custom-selected span:first-child {
   flex: 1;
-  color: #334155;
   text-align: left;
-  font-weight: 400;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.eum-custom-dropdown-text.placeholder {
-  color: #9ca3af;
-  font-weight: 400;
+.eum-placeholder-text {
+  color: #adb5bd;
+  opacity: 0.8;
 }
 
 /* Arrow positioned close to edge */
-.eum-custom-dropdown-arrow {
+.eum-custom-arrow {
   position: absolute;
-  right: 0.5rem;
+  right: 0.75rem;
   top: 50%;
   transform: translateY(-50%) rotate(45deg);
-  width: 7px;
-  height: 7px;
-  border-right: 2px solid #64748b;
-  border-bottom: 2px solid #64748b;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #6c757d;
+  border-bottom: 2px solid #6c757d;
   pointer-events: none;
   transition: transform 0.2s ease;
 }
 
 /* Arrow rotation when open */
-.eum-custom-dropdown:focus-within .eum-custom-dropdown-arrow {
+.eum-custom-dropdown:focus-within .eum-custom-arrow {
   transform: translateY(-50%) rotate(225deg);
 }
 
 /* Dropdown menu */
-.eum-custom-dropdown-menu {
+.eum-custom-menu {
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
   right: 0;
   background: #ffffff;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   z-index: 9999;
   max-height: 200px;
   overflow-y: auto;
-  animation: eum-dropdown-fade-in 0.15s ease-out;
+  animation: eumDropdownFadeIn 0.15s ease-out;
   min-width: 100%;
 }
 
 /* OPEN UPWARD */
-.eum-custom-dropdown-menu.open-upward {
+.eum-custom-menu.eum-menu-upward {
   top: auto;
   bottom: calc(100% + 4px);
-  animation: eum-dropdown-fade-in-upward 0.15s ease-out;
+  animation: eumDropdownFadeInUpward 0.15s ease-out;
 }
 
-@keyframes eum-dropdown-fade-in {
+@keyframes eumDropdownFadeIn {
   from {
     opacity: 0;
     transform: translateY(-8px);
@@ -284,7 +284,7 @@
   }
 }
 
-@keyframes eum-dropdown-fade-in-upward {
+@keyframes eumDropdownFadeInUpward {
   from {
     opacity: 0;
     transform: translateY(8px);
@@ -295,72 +295,60 @@
   }
 }
 
-/* Dropdown options - NO LINES, CLEAN DESIGN */
-.eum-custom-dropdown-option {
-  padding: 9px 12px;
-  font-size: 13px;
-  color: #334155;
+.eum-custom-option {
+  padding: 0.75rem 1rem;
   cursor: pointer;
-  transition: all 0.12s ease;
-  text-align: left;
-  background-color: #ffffff;
   display: block;
-  border: none;
+  text-align: left;
+  transition: all 0.12s ease;
+  font-size: 0.9375rem;
+  color: #111827;
 }
 
-.eum-custom-dropdown-option:hover {
+.eum-custom-option:hover {
   background-color: #27235c;
   color: #ffffff;
 }
 
-.eum-custom-dropdown-option:first-child {
-  border-radius: 6px 6px 0 0;
-  background-color: #f3f4f6;
-  color: #334155;
-  font-weight: 600;
+.eum-custom-option:first-child {
+  border-radius: 10px 10px 0 0;
 }
 
-.eum-custom-dropdown-option:first-child:hover {
-  background-color: #27235c;
-  color: #ffffff;
+.eum-custom-option:last-child {
+  border-radius: 0 0 10px 10px;
 }
 
-.eum-custom-dropdown-option:last-child {
-  border-radius: 0 0 6px 6px;
-}
-
-.eum-custom-dropdown-option-active {
+.eum-custom-option-active {
   background-color: #f3f4f6;
   font-weight: 600;
-  color: #334155;
 }
 
-.eum-custom-dropdown-option-active:hover {
+.eum-custom-option-active:hover {
   background-color: #27235c;
   color: #ffffff;
 }
 
-/* Scrollbar styling - PURPLE THEME */
-.eum-custom-dropdown-menu::-webkit-scrollbar {
+/* Scrollbar styling - EXACT MATCH TO NATIONALITY DROPDOWN */
+.eum-custom-menu::-webkit-scrollbar {
   width: 6px;
 }
 
-.eum-custom-dropdown-menu::-webkit-scrollbar-track {
+.eum-custom-menu::-webkit-scrollbar-track {
   background: #f1f1f1;
-  border-radius: 6px;
+  border-radius: 10px;
 }
 
-.eum-custom-dropdown-menu::-webkit-scrollbar-thumb {
+.eum-custom-menu::-webkit-scrollbar-thumb {
   background: #27235c;
-  border-radius: 6px;
+  border-radius: 10px;
 }
 
-.eum-custom-dropdown-menu::-webkit-scrollbar-thumb:hover {
+.eum-custom-menu::-webkit-scrollbar-thumb:hover {
   background: #1f1c4b;
 }
 
 /* Firefox scrollbar */
-.eum-custom-dropdown-menu {
+.eum-custom-menu {
   scrollbar-width: thin;
   scrollbar-color: #27235c #f1f1f1;
 }

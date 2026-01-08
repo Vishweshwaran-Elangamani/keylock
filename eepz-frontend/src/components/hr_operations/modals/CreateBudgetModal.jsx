@@ -1,8 +1,86 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import budgetAllocationService from "../../../services/hr_operations/hr/budgetAllocationService";
 import { formatCurrency } from "../../../utils/auth/currencyFormatter";
 import { toast } from "sonner";
 import "../../../styles/hr_operations/hr/CreateBudgetModal.css";
+
+const CustomDropdown = ({
+  value,
+  onChange,
+  options,
+  placeholder,
+  name,
+  error,
+  disabled,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const selectedOption = options.find((opt) => opt.value === value);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+
+  const handleSelect = (optionValue) => {
+    if (!disabled) {
+      onChange({ target: { name, value: optionValue } });
+      setIsOpen(false);
+    }
+  };
+
+  const toggleDropdown = () => {
+    if (!disabled) {
+      setIsOpen(!isOpen);
+    }
+  };
+
+  return (
+    <div
+      ref={dropdownRef}
+      className={`cbm-custom-dropdown ${error ? "cbm-error" : ""} ${
+        disabled ? "cbm-disabled" : ""
+      } ${isOpen ? "cbm-dropdown-open" : ""}`}
+      tabIndex={disabled ? -1 : 0}
+      onBlur={() => setTimeout(() => setIsOpen(false), 200)}
+    >
+      <div className="cbm-custom-selected" onClick={toggleDropdown}>
+        <span className={!selectedOption ? "cbm-placeholder-text" : ""}>
+          {selectedOption ? selectedOption.label : placeholder}
+        </span>
+        <span className="cbm-custom-arrow"></span>
+      </div>
+
+      {isOpen && (
+        <div className="cbm-custom-menu">
+          {options.map((option) => (
+            <div
+              key={option.value}
+              className={`cbm-custom-option ${
+                value === option.value ? "cbm-custom-option-active" : ""
+              }`}
+              onClick={() => handleSelect(option.value)}
+            >
+              {option.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
   const [formData, setFormData] = useState({
@@ -97,6 +175,7 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
         allocatedAmount: allocatedAmount,
       });
 
+      toast.success("Budget created successfully!");
       onBudgetCreated();
       handleClose();
     } catch (err) {
@@ -123,11 +202,25 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
 
   if (!show) return null;
 
+  // Dropdown options
+  const departmentOptions = [
+    { value: "", label: "Select Department" },
+    ...departments.map((dept) => ({
+      value: dept.departmentId,
+      label: dept.departmentName,
+    })),
+  ];
+
+  const fiscalYearOptions = years.map((year) => ({
+    value: year,
+    label: year.toString(),
+  }));
+
   return (
     <>
       <div className="cbm-backdrop" onClick={handleClose} />
 
-      <div className="cbm-modal-container">
+      <div className="cbm-modal-wrapper">
         <div className="cbm-modal-dialog">
           {/* HEADER */}
           <div className="cbm-modal-header">
@@ -155,21 +248,15 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
                   <label className="cbm-form-label">
                     Department <span className="cbm-required-asterisk">*</span>
                   </label>
-                  <select
+                  <CustomDropdown
                     name="departmentId"
                     value={formData.departmentId}
                     onChange={handleChange}
-                    className={`cbm-form-input ${
-                      errors.departmentId ? "error" : ""
-                    }`}
-                  >
-                    <option value="">Select Department</option>
-                    {departments.map((dept) => (
-                      <option key={dept.departmentId} value={dept.departmentId}>
-                        {dept.departmentName}
-                      </option>
-                    ))}
-                  </select>
+                    options={departmentOptions}
+                    placeholder="Select Department"
+                    error={errors.departmentId}
+                    disabled={loading}
+                  />
                   {errors.departmentId && (
                     <div className="cbm-form-error">{errors.departmentId}</div>
                   )}
@@ -180,20 +267,15 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
                   <label className="cbm-form-label">
                     Fiscal Year <span className="cbm-required-asterisk">*</span>
                   </label>
-                  <select
+                  <CustomDropdown
                     name="fiscalYear"
                     value={formData.fiscalYear}
                     onChange={handleChange}
-                    className={`cbm-form-input ${
-                      errors.fiscalYear ? "error" : ""
-                    }`}
-                  >
-                    {years.map((year) => (
-                      <option key={year} value={year}>
-                        {year}
-                      </option>
-                    ))}
-                  </select>
+                    options={fiscalYearOptions}
+                    placeholder="Select Fiscal Year"
+                    error={errors.fiscalYear}
+                    disabled={loading}
+                  />
                   {errors.fiscalYear && (
                     <div className="cbm-form-error">{errors.fiscalYear}</div>
                   )}
@@ -214,7 +296,7 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
                     step="0.01"
                     min="0"
                     className={`cbm-form-input ${
-                      errors.totalBudget ? "error" : ""
+                      errors.totalBudget ? "cbm-input-error" : ""
                     }`}
                   />
                   {errors.totalBudget && (
@@ -237,7 +319,7 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
                     step="0.01"
                     min="0"
                     className={`cbm-form-input ${
-                      errors.allocatedAmount ? "error" : ""
+                      errors.allocatedAmount ? "cbm-input-error" : ""
                     }`}
                   />
                   {errors.allocatedAmount && (
