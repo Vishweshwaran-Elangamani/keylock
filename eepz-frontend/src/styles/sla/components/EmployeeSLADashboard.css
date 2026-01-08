@@ -140,6 +140,7 @@
   background-color: #ffffff;
   box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04);
   transition: all 0.2s ease;
+  min-height: 100px;
 }
 
 .emp-sla-metric-card:hover {
@@ -200,6 +201,7 @@
   font-weight: 700;
   color: #101827;
   line-height: 1.1;
+  margin-left: 35px;
 }
 
 .emp-sla-metric-label {
@@ -208,6 +210,8 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #6b7280;
+  margin-left: 35px;
+
 }
 
 .emp-sla-header-row {

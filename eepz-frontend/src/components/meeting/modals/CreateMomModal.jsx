@@ -42,15 +42,14 @@ const CreateMomModal = ({ meetingData, onClose }) => {
   });
 
   const [errors, setErrors] = useState({});
-
   const [calendarState, setCalendarState] = useState({
     openIndex: null,
     month: null,
     year: null,
   });
-
   const [assignOpenIndex, setAssignOpenIndex] = useState(null);
   const [statusOpenIndex, setStatusOpenIndex] = useState(null);
+
   const assignRefs = useRef({});
   const statusRefs = useRef({});
   const calendarRefs = useRef({});
@@ -67,7 +66,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
           setEmployees(filteredEmployees);
         }
       } catch (error) {
-        console.error("Failed to fetch employees:", error);
+        console.error("Failed to fetch employees", error);
         toastr.error("Failed to load employee list");
       } finally {
         setLoadingEmployees(false);
@@ -88,6 +87,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
       const clickedCal = Object.values(calendarRefs.current).some((ref) =>
         ref ? path.includes(ref) : false
       );
+
       if (!clickedAssign) setAssignOpenIndex(null);
       if (!clickedStatus) setStatusOpenIndex(null);
       if (!clickedCal)
@@ -135,7 +135,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
     updated[index][field] = value;
     setFormData((prev) => ({ ...prev, actionItems: updated }));
 
-    const errorKey = `actionItem_${index}_${field}`;
+    const errorKey = `actionItem[${index}].${field}`;
     if (errors[errorKey]) {
       setErrors((prev) => ({ ...prev, [errorKey]: null }));
     }
@@ -160,6 +160,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
   const removeActionItem = (index) => {
     const updated = formData.actionItems.filter((_, i) => i !== index);
     setFormData((prev) => ({ ...prev, actionItems: updated }));
+
     if (calendarState.openIndex === index) {
       setCalendarState({ openIndex: null, month: null, year: null });
     }
@@ -172,11 +173,11 @@ const CreateMomModal = ({ meetingData, onClose }) => {
     formData.actionItems.forEach((item, index) => {
       if (item.taskDescription.trim()) {
         if (!item.assignedToEmployeeId) {
-          newErrors[`actionItem_${index}_assignedToEmployeeId`] =
+          newErrors[`actionItem[${index}].assignedToEmployeeId`] =
             "Please assign this task";
         }
         if (!item.dueDate) {
-          newErrors[`actionItem_${index}_dueDate`] = "Please set a due date";
+          newErrors[`actionItem[${index}].dueDate`] = "Please set a due date";
         }
       }
     });
@@ -243,6 +244,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
     const today = new Date();
     const month = calendarState.month ?? today.getMonth();
     const year = calendarState.year ?? today.getFullYear();
+
     const firstDay = new Date(year, month, 1);
     const startDay = firstDay.getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -289,11 +291,13 @@ const CreateMomModal = ({ meetingData, onClose }) => {
 
   const handleSelectCalendarDay = (index, day, current) => {
     if (!current) return;
+
     const { month, year } = calendarState;
     const selected = new Date(year, month, day);
     const yyyy = selected.getFullYear();
     const mm = String(selected.getMonth() + 1).padStart(2, "0");
     const dd = String(selected.getDate()).padStart(2, "0");
+
     handleActionItemChange(index, "dueDate", `${yyyy}-${mm}-${dd}`);
     setCalendarState({ openIndex: null, month: null, year: null });
   };
@@ -303,6 +307,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
     const yyyy = now.getFullYear();
     const mm = String(now.getMonth() + 1).padStart(2, "0");
     const dd = String(now.getDate()).padStart(2, "0");
+
     handleActionItemChange(index, "dueDate", `${yyyy}-${mm}-${dd}`);
     setCalendarState({
       openIndex: index,
@@ -329,8 +334,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
       <div className="cmm-card-body">
         <div className="cmm-header">
           <h6 className="cmm-title">
-            <i className="bi bi-file-text"></i>
-            Create Meeting Minutes
+            <i className="bi bi-file-text"></i> Create Meeting Minutes
           </h6>
           <button
             type="button"
@@ -364,8 +368,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                 </div>
                 <div className="cmm-col-12">
                   <label className="cmm-label cmm-flex-gap">
-                    <i className="bi bi-people"></i>
-                    Attendees
+                    <i className="bi bi-people"></i> Attendees
                   </label>
                   <textarea
                     className="cmm-textarea cmm-textarea-compact cmm-input-sm"
@@ -374,7 +377,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                     value={formData.attendees}
                     onChange={handleInputChange}
                     placeholder="Enter attendees (comma separated)..."
-                  />
+                  ></textarea>
                   <small className="cmm-help-text">
                     List all meeting participants
                   </small>
@@ -385,8 +388,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
 
           <div className="cmm-section">
             <label className="cmm-label cmm-flex-gap">
-              <i className="bi bi-chat-left-text"></i>
-              Comments & Observations
+              <i className="bi bi-chat-left-text"></i> Comments & Observations
             </label>
             <textarea
               className="cmm-textarea cmm-textarea-compact"
@@ -395,22 +397,20 @@ const CreateMomModal = ({ meetingData, onClose }) => {
               value={formData.commentsObservations}
               onChange={handleInputChange}
               placeholder="Add any observations or notes about the meeting..."
-            />
+            ></textarea>
           </div>
 
           <div className="cmm-section">
             <div className="cmm-section-header">
               <label className="cmm-section-label cmm-flex-gap">
-                <i className="bi bi-chat-dots"></i>
-                Discussion Points
+                <i className="bi bi-chat-dots"></i> Discussion Points
               </label>
               <button
                 type="button"
                 className="cmm-btn cmm-btn-sm cmm-btn-outline-primary cmm-flex-gap"
                 onClick={addDiscussionPoint}
               >
-                <i className="bi bi-plus-circle"></i>
-                Add Point
+                <i className="bi bi-plus-circle"></i> Add Point
               </button>
             </div>
 
@@ -457,16 +457,14 @@ const CreateMomModal = ({ meetingData, onClose }) => {
           <div className="cmm-section">
             <div className="cmm-section-header">
               <label className="cmm-section-label cmm-flex-gap">
-                <i className="bi bi-check2-square"></i>
-                Action Items
+                <i className="bi bi-check2-square"></i> Action Items
               </label>
               <button
                 type="button"
                 className="cmm-btn cmm-btn-sm cmm-btn-outline-success cmm-flex-gap"
                 onClick={addActionItem}
               >
-                <i className="bi bi-plus-circle"></i>
-                Add Action
+                <i className="bi bi-plus-circle"></i> Add Action
               </button>
             </div>
 
@@ -493,9 +491,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                     <div key={index} className="cmm-action-item">
                       <div className="cmm-action-body">
                         <div className="cmm-mb-3">
-                          <label className="cmm-label">
-                            Task Description *
-                          </label>
+                          <label className="cmm-label">Task Description</label>
                           <input
                             type="text"
                             className="cmm-input"
@@ -514,8 +510,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                         <div className="cmm-row cmm-row-equal">
                           <div className="cmm-col-md-4">
                             <label className="cmm-label cmm-flex-gap">
-                              <i className="bi bi-person-circle"></i>
-                              Assign To *
+                              <i className="bi bi-person-circle"></i> Assign To
                             </label>
                             <div
                               ref={(el) => (assignRefs.current[index] = el)}
@@ -536,19 +531,13 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                               >
                                 <span className="cmm-dropdown-text">
                                   {item.assignedToEmployeeId
-                                    ? getEmployeeName(
-                                        item.assignedToEmployeeId
-                                      ) || "Select employee..."
+                                    ? getEmployeeName(item.assignedToEmployeeId)
                                     : loadingEmployees
                                     ? "Loading..."
                                     : "Select employee..."}
                                 </span>
                                 <span className="cmm-dropdown-arrow">
-                                  <svg
-                                    width="18"
-                                    height="18"
-                                    viewBox="0 0 24 24"
-                                  >
+                                  <svg width="18" height="18" viewBox="0 0 24 24">
                                     <polyline
                                       points="6 9 12 15 18 9"
                                       fill="none"
@@ -560,10 +549,15 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                                   </svg>
                                 </span>
                               </button>
+
                               {assignOpenIndex === index && (
                                 <div className="cmm-dropdown-list">
-                                  {(loadingEmployees ? [] : employees).map(
-                                    (emp) => {
+                                  {loadingEmployees ? (
+                                    <div className="cmm-no-employees">
+                                      Loading...
+                                    </div>
+                                  ) : employees.length > 0 ? (
+                                    employees.map((emp) => {
                                       const active =
                                         String(item.assignedToEmployeeId) ===
                                         String(emp.employeeMasterId);
@@ -586,45 +580,34 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                                           {emp.roleName}
                                         </div>
                                       );
-                                    }
+                                    })
+                                  ) : (
+                                    <div className="cmm-no-employees">
+                                      No employees
+                                    </div>
                                   )}
-                                  {!loadingEmployees &&
-                                    employees.length === 0 && (
-                                      <div className="cmm-no-employees">
-                                        No employees
-                                      </div>
-                                    )}
                                 </div>
                               )}
                             </div>
-                            {errors[
-                              `actionItem_${index}_assignedToEmployeeId`
-                            ] && (
+                            {errors[`actionItem[${index}].assignedToEmployeeId`] && (
                               <div className="cmm-error">
                                 <i className="bi bi-exclamation-circle me-1"></i>
-                                {
-                                  errors[
-                                    `actionItem_${index}_assignedToEmployeeId`
-                                  ]
-                                }
+                                {errors[`actionItem[${index}].assignedToEmployeeId`]}
                               </div>
                             )}
-                            {item.assignedToEmployeeId &&
-                              getEmployeeName(item.assignedToEmployeeId) && (
-                                <small className="cmm-success-text">
-                                  <i className="bi bi-check-circle"></i>
-                                  Assigned to:{" "}
-                                  <strong>
-                                    {getEmployeeName(item.assignedToEmployeeId)}
-                                  </strong>
-                                </small>
-                              )}
+                            {item.assignedToEmployeeId && (
+                              <small className="cmm-success-text">
+                                <i className="bi bi-check-circle"></i> Assigned to{" "}
+                                <strong>
+                                  {getEmployeeName(item.assignedToEmployeeId)}
+                                </strong>
+                              </small>
+                            )}
                           </div>
 
                           <div className="cmm-col-md-4">
                             <label className="cmm-label cmm-flex-gap">
-                              <i className="bi bi-calendar-event"></i>
-                              Due Date *
+                              <i className="bi bi-calendar-event"></i> Due Date
                             </label>
                             <div
                               ref={(el) => (calendarRefs.current[index] = el)}
@@ -636,7 +619,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                                 value={formatDisplayDate(item.dueDate)}
                                 placeholder="Select date"
                                 className={`cmm-input cmm-input-sm ${
-                                  errors[`actionItem_${index}_dueDate`]
+                                  errors[`actionItem[${index}].dueDate`]
                                     ? "cmm-is-invalid"
                                     : ""
                                 }`}
@@ -648,45 +631,47 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                                 onClick={() => ensureCalendarMonthYear(index)}
                               >
                                 <svg
-                                  width="16"
-                                  height="16"
-                                  viewBox="0 0 18 18"
+                                  width="18"
+                                  height="18"
+                                  viewBox="0 0 24 24"
                                   xmlns="http://www.w3.org/2000/svg"
                                 >
                                   <rect
-                                    x="1.25"
-                                    y="2.25"
-                                    width="15.5"
-                                    height="14.5"
-                                    rx="3"
-                                    ry="3"
+                                    x="4"
+                                    y="5"
+                                    width="16"
+                                    height="15"
+                                    rx="2"
+                                    ry="2"
+                                    stroke={PRIMARY}
+                                    strokeWidth="1.8"
                                     fill="none"
+                                  />
+                                  <line
+                                    x1="4"
+                                    y1="9"
+                                    x2="20"
+                                    y2="9"
                                     stroke={PRIMARY}
                                     strokeWidth="1.8"
                                   />
-                                  <rect
-                                    x="3.5"
-                                    y="4.25"
-                                    width="11"
-                                    height="2.6"
-                                    rx="1.3"
-                                    fill={PRIMARY}
+                                  <line
+                                    x1="9"
+                                    y1="3"
+                                    x2="9"
+                                    y2="7"
+                                    stroke={PRIMARY}
+                                    strokeWidth="1.8"
+                                    strokeLinecap="round"
                                   />
-                                  <rect
-                                    x="6"
-                                    y="2"
-                                    width="1.8"
-                                    height="3"
-                                    rx="0.9"
-                                    fill={PRIMARY}
-                                  />
-                                  <rect
-                                    x="10.5"
-                                    y="2"
-                                    width="1.8"
-                                    height="3"
-                                    rx="0.9"
-                                    fill={PRIMARY}
+                                  <line
+                                    x1="15"
+                                    y1="3"
+                                    x2="15"
+                                    y2="7"
+                                    stroke={PRIMARY}
+                                    strokeWidth="1.8"
+                                    strokeLinecap="round"
                                   />
                                 </svg>
                               </button>
@@ -723,17 +708,11 @@ const CreateMomModal = ({ meetingData, onClose }) => {
 
                                   <div className="cmm-calendar-days">
                                     {cells.map((c, idx) => {
-                                      const cellDate = new Date(
-                                        year,
-                                        month,
-                                        c.day
-                                      );
+                                      const cellDate = new Date(year, month, c.day);
                                       const isToday =
                                         c.current &&
-                                        cellDate.getDate() ===
-                                          today.getDate() &&
-                                        cellDate.getMonth() ===
-                                          today.getMonth() &&
+                                        cellDate.getDate() === today.getDate() &&
+                                        cellDate.getMonth() === today.getMonth() &&
                                         cellDate.getFullYear() ===
                                           today.getFullYear();
                                       const isSelected =
@@ -780,10 +759,10 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                                 </div>
                               )}
                             </div>
-                            {errors[`actionItem_${index}_dueDate`] && (
+                            {errors[`actionItem[${index}].dueDate`] && (
                               <div className="cmm-error">
                                 <i className="bi bi-exclamation-circle me-1"></i>
-                                {errors[`actionItem_${index}_dueDate`]}
+                                {errors[`actionItem[${index}].dueDate`]}
                               </div>
                             )}
                           </div>
@@ -811,11 +790,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                                   {item.status}
                                 </span>
                                 <span className="cmm-dropdown-arrow">
-                                  <svg
-                                    width="18"
-                                    height="18"
-                                    viewBox="0 0 24 24"
-                                  >
+                                  <svg width="18" height="18" viewBox="0 0 24 24">
                                     <polyline
                                       points="6 9 12 15 18 9"
                                       fill="none"
@@ -827,6 +802,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                                   </svg>
                                 </span>
                               </button>
+
                               {statusOpenIndex === index && (
                                 <div className="cmm-dropdown-list">
                                   {["Pending", "Completed"].map((st) => {
@@ -855,17 +831,16 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                             </div>
                           </div>
                         </div>
+                      </div>
 
-                        <div className="cmm-action-footer">
-                          <button
-                            type="button"
-                            className="cmm-btn cmm-btn-sm cmm-btn-outline-danger cmm-flex-gap"
-                            onClick={() => removeActionItem(index)}
-                          >
-                            <i className="bi bi-trash"></i>
-                            Remove Action Item
-                          </button>
-                        </div>
+                      <div className="cmm-action-footer">
+                        <button
+                          type="button"
+                          className="cmm-btn cmm-btn-sm cmm-btn-outline-danger cmm-flex-gap"
+                          onClick={() => removeActionItem(index)}
+                        >
+                          <i className="bi bi-trash"></i> Remove Action Item
+                        </button>
                       </div>
                     </div>
                   );
@@ -906,17 +881,17 @@ const CreateMomModal = ({ meetingData, onClose }) => {
               Cancel
             </button>
           </div>
-        </form>
 
-        {formData.actionItems.length > 0 && (
-          <div className="cmm-note">
-            <i className="bi bi-info-circle cmm-note-icon"></i>
-            <div>
-              <strong>Note:</strong> All assigned employees will be notified via
-              email about their action items.
+          {formData.actionItems.length > 0 && (
+            <div className="cmm-note">
+              <i className="bi bi-info-circle cmm-note-icon"></i>
+              <div>
+                <strong>Note:</strong> All assigned employees will be notified
+                via email about their action items.
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </form>
       </div>
     </div>
   );
