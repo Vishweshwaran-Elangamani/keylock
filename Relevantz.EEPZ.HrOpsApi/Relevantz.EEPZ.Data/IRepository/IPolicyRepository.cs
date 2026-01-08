@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Relevantz.EEPZ.Common.Entities;
-
 namespace Relevantz.EEPZ.Data.IRepository
 {
     public interface IPolicyRepository

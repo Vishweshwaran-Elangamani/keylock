@@ -1,6 +1,5 @@
 // File: Data/IRepository/ISlaEscalationRepository.cs
 using Relevantz.EEPZ.Common.Entities;
-
 namespace Relevantz.EEPZ.Data.IRepository
 {
     public interface ISlaEscalationRepository

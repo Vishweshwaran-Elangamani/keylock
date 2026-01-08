@@ -1,5 +1,4 @@
 using Relevantz.EEPZ.Common.Entities;
- 
 namespace Relevantz.EEPZ.Data.IRepository
 {
     public interface IPayrollManagementRepository
@@ -13,5 +12,3 @@ namespace Relevantz.EEPZ.Data.IRepository
         Task<bool> HasPendingPayrollAsync(int EmployeeUserId);
     }
 }
- 
- 

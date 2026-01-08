@@ -1,5 +1,4 @@
 using Relevantz.EEPZ.Common.Entities;
- 
 namespace Relevantz.EEPZ.Data.IRepository
 {
     public interface IDepartmentRepository
@@ -13,5 +12,3 @@ namespace Relevantz.EEPZ.Data.IRepository
         Task<bool> DepartmentNameExistsAsync(string departmentName);
     }
 }
- 
- 

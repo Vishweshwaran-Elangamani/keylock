@@ -1,5 +1,4 @@
 using Relevantz.EEPZ.Common.Entities;
- 
 namespace Relevantz.EEPZ.Data.IRepository
 {
     public interface INominationManagementRepository
@@ -14,5 +13,3 @@ namespace Relevantz.EEPZ.Data.IRepository
         Task<bool> CheckDuplicateNominationAsync(int opportunityId, int nomineeUserId);
     }
 }
- 
- 

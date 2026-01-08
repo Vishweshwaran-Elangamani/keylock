@@ -1,5 +1,4 @@
 using Relevantz.EEPZ.Common.Entities;
- 
 namespace Relevantz.EEPZ.Data.IRepository
 {
     public interface IResponsibilityDistributionRepository
@@ -13,5 +12,4 @@ namespace Relevantz.EEPZ.Data.IRepository
         Task<bool> DeleteAsync(int workloadId);
     }
 }
- 
  ;
