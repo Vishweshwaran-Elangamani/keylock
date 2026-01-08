@@ -407,11 +407,6 @@ export default function FeedbackEmployeeDashboard() {
                 <span className="fm-empdb-action-card__label">
                   SME Dashboard
                 </span>
-                {mentorFeedbackCount > 0 && (
-                  <span className="fm-empdb-action-card__badge">
-                    {mentorFeedbackCount}
-                  </span>
-                )}
               </Link>
             </div>
           )}

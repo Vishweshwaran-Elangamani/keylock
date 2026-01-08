@@ -29,7 +29,7 @@ const HRMomDashboard = () => {
     startDate: "",
     endDate: "",
     pageNumber: 1,
-    pageSize: 10,
+    pageSize: 5,
   });
   const [loading, setLoading] = useState(false);
   const [totalMoms, setTotalMoms] = useState(0);
@@ -233,7 +233,7 @@ const HRMomDashboard = () => {
           </div>
         </div>
 
-        <div className="card hrmom-table-card">
+        
           <div className="card-body hrmom-table-card-body">
             <div className="hrmom-table-wrapper">
               <table className="table hrmom-table mb-0">
@@ -491,7 +491,6 @@ const HRMomDashboard = () => {
                 </div>
               )}
           </div>
-        </div>
       </div>
     </div>
   );

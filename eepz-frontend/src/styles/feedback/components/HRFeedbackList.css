@@ -49,35 +49,39 @@
 .hrfeedback-toggle-wrapper {
   display: flex;
   justify-content: center;
-  margin-bottom: 2rem;
+  margin-bottom: 30px;
+  justify-content: left;
+  margin-top: 25px;
 }
 
 .hrfeedback-toggle-container {
-  background-color: #27235c;
-  border-radius: 55px;
-  padding: 7px;
-  display: inline-flex;
-  gap: 2px;
-  box-shadow: 0 5px 15px rgba(39, 35, 92, 0.22);
-  min-height: 54px;
+  display: flex;
+  gap: 0;
+  margin-bottom: 1.5rem;
+  background: #2c2762;
+  padding: 0.6rem;
+  border-radius: 50px;
+  width: fit-content;
+  box-shadow: 0 4px 12px rgba(44, 39, 98, 0.3);
 }
 
 .hrfeedback-toggle-btn {
-  background: transparent;
-  color: #ffffff;
+  flex: 1;
+  padding: 0.85rem 3rem;
   border: none;
-  border-radius: 55px;
-  padding: 12px 30px;
-  font-size: 0.875rem;
+  border-radius: 40px !important;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
   font-weight: 600;
+  font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  white-space: nowrap;
-  min-height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 0.6rem;
+  white-space: nowrap;
+  min-width: 220px;
 }
 
 .hrfeedback-toggle-btn:hover {
@@ -85,24 +89,25 @@
 }
 
 .hrfeedback-toggle-btn-active {
-  background: #ffffff;
-  color: #27235c;
+  background: #ffffff !important;
+  color: #2c2762 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+  font-weight: 700 !important;
+  border-radius: 40px !important;
 }
 
 .hrfeedback-toggle-badge {
-  background-color: rgba(255, 255, 255, 0.3);
-  color: #ffffff;
-  padding: 2px 8px;
-  border-radius: 12px;
   font-size: 0.75rem;
-  font-weight: 700;
-  min-width: 24px;
-  text-align: center;
+  padding: 0.2rem 0.5rem;
+  background-color: #ffffff;
+  color: #27235c;
+  border-radius: 20px;
 }
 
 .hrfeedback-toggle-btn-active .hrfeedback-toggle-badge {
   background-color: #27235c;
   color: #ffffff;
+  border-radius: 20px
 }
 
 .hrfeedback-loading-container {
@@ -171,7 +176,7 @@
 
 .hrfeedback-card {
   background: white;
-  border: 1px solid #e5e7eb;
+  border: 1px solid black;
   border-radius: 10px;
   padding: 1.25rem;
   height: 100%;

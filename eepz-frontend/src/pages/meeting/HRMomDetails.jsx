@@ -316,11 +316,6 @@ const HRMomDetails = () => {
         <div className="hrmom-card">
           <div className="hrmom-card-body">
             <div className="hrmom-meeting-header">
-              <div className="hrmom-meeting-icon-wrapper">
-                <div className="hrmom-meeting-icon">
-                  <FileText size={35} />
-                </div>
-              </div>
               <div className="hrmom-meeting-info">
                 <h3 className="hrmom-meeting-title">{mom.meetingTitle}</h3>
                 <div className="hrmom-meeting-badges">
@@ -337,7 +332,6 @@ const HRMomDetails = () => {
 
             <div className="hrmom-meeting-details">
               <div className="hrmom-detail-item">
-                <Calendar size={20} className="hrmom-detail-icon" />
                 <div className="hrmom-detail-content">
                   <div className="hrmom-detail-label">
                     Meeting Date &amp; Time
@@ -350,7 +344,6 @@ const HRMomDetails = () => {
 
               {mom.meetingLink && (
                 <div className="hrmom-detail-item">
-                  <LinkIcon size={20} className="hrmom-detail-icon" />
                   <div className="hrmom-detail-content">
                     <div className="hrmom-detail-label">Meeting Link</div>
                     <a
@@ -366,7 +359,6 @@ const HRMomDetails = () => {
               )}
 
               <div className="hrmom-detail-item">
-                <User size={20} className="hrmom-detail-icon" />
                 <div className="hrmom-detail-content">
                   <div className="hrmom-detail-label">Submitted By</div>
                   <div className="hrmom-detail-value">
@@ -381,7 +373,6 @@ const HRMomDetails = () => {
               </div>
 
               <div className="hrmom-detail-item">
-                <Clock size={20} className="hrmom-detail-icon" />
                 <div className="hrmom-detail-content">
                   <div className="hrmom-detail-label">Tracking</div>
                   <div className="hrmom-detail-value hrmom-detail-value-sm">

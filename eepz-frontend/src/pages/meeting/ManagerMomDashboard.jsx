@@ -130,7 +130,7 @@ const ManagerMomDashboard = () => {
   const [selectedMeeting, setSelectedMeeting] = useState(null);
   const [actionItemFilter, setActionItemFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
   useEffect(() => {
     loadDashboardData();

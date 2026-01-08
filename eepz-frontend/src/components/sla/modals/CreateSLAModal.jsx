@@ -365,11 +365,51 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                       }}
                       disabled={loading}
                     >
-                      <div className="csla-calendar-icon">
-                        <div className="csla-calendar-icon__top" />
-                        <div className="csla-calendar-icon__peg csla-calendar-icon__peg--left" />
-                        <div className="csla-calendar-icon__peg csla-calendar-icon__peg--right" />
-                      </div>
+                      <svg
+                        className="csla-calendar-svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <rect
+                          x="4"
+                          y="5"
+                          width="16"
+                          height="15"
+                          rx="2"
+                          ry="2"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          fill="none"
+                        />
+                        <line
+                          x1="4"
+                          y1="9"
+                          x2="20"
+                          y2="9"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                        />
+                        <line
+                          x1="9"
+                          y1="3"
+                          x2="9"
+                          y2="7"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                        />
+                        <line
+                          x1="15"
+                          y1="3"
+                          x2="15"
+                          y2="7"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                        />
+                      </svg>
                     </button>
 
                     {calendarOpen && (

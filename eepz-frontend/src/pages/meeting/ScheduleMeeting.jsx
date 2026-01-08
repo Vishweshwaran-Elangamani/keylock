@@ -268,7 +268,20 @@ const ScheduleMeeting = () => {
     ? new Date(formData.meetingDate)
     : null;
 
-  const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December",];
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
   const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
   const handleSelectCalendarDay = (day, current) => {
@@ -323,47 +336,48 @@ const ScheduleMeeting = () => {
         <div className="col-lg-10 col-xl-9">
           <nav aria-label="breadcrumb" className="sched-breadcrumb-nav">
             <ol className="breadcrumb mb-0 d-flex align-items-center sched-breadcrumb">
-            
-<li className="breadcrumb-item d-flex align-items-center">
-  <button
-    onClick={() => navigate("/manager/dashboard/")}
-    className="sched-breadcrumb-link"
-    style={{ display: "flex", alignItems: "center", padding: 0 }}
-  >
-    <Home size={18} />
-  </button>
-</li>
+              <li className="breadcrumb-item d-flex align-items-center">
+                <button
+                  onClick={() => navigate("/manager/dashboard/")}
+                  className="sched-breadcrumb-link"
+                  style={{ display: "flex", alignItems: "center", padding: 0 }}
+                >
+                  <Home size={18} />
+                </button>
+              </li>
 
-<li
-  className="sched-breadcrumb-separator"
-  style={{ margin: "0 4px" }} 
->
-  /
-</li>
+              <li
+                className="sched-breadcrumb-separator"
+                style={{ margin: "0 4px" }}
+              >
+                /
+              </li>
 
-<li className="breadcrumb-item d-flex align-items-center">
-  <button
-    onClick={() => navigate("/manager/dashboard/meetmom")}
-    className="sched-breadcrumb-link"
-    style={{ padding: 0, marginLeft: "2px" }} 
-  >
-    Meeting and MoM
-  </button>
-</li>
+              <li className="breadcrumb-item d-flex align-items-center">
+                <button
+                  onClick={() => navigate("/manager/dashboard/meetmom")}
+                  className="sched-breadcrumb-link"
+                  style={{ padding: 0, marginLeft: "2px" }}
+                >
+                  Meeting and MoM
+                </button>
+              </li>
 
-<li
-  className="sched-breadcrumb-separator"
-  style={{ margin: "0 4px" }} 
->
-  /
-</li>
+              <li
+                className="sched-breadcrumb-separator"
+                style={{ margin: "0 4px" }}
+              >
+                /
+              </li>
 
-<li className="breadcrumb-item active d-flex align-items-center">
-  <span className="sched-breadcrumb-current" style={{ marginLeft: "2px" }}>
-    Schedule Meeting
-  </span>
-</li>
-
+              <li className="breadcrumb-item active d-flex align-items-center">
+                <span
+                  className="sched-breadcrumb-current"
+                  style={{ marginLeft: "2px" }}
+                >
+                  Schedule Meeting
+                </span>
+              </li>
             </ol>
           </nav>
 
@@ -379,9 +393,7 @@ const ScheduleMeeting = () => {
                       <button
                         type="button"
                         className="sched-dropdown-btn"
-                        onClick={() =>
-                          setMeetingTypeOpen((prev) => !prev)
-                        }
+                        onClick={() => setMeetingTypeOpen((prev) => !prev)}
                       >
                         <span className="sched-dropdown-label">
                           {formData.meetingType}
@@ -460,21 +472,16 @@ const ScheduleMeeting = () => {
                         <button
                           type="button"
                           className="sched-dropdown-btn"
-                          onClick={() =>
-                            setOneOnOneOpen((prev) => !prev)
-                          }
+                          onClick={() => setOneOnOneOpen((prev) => !prev)}
                         >
                           <span className="sched-dropdown-label">
                             {(() => {
-                              const id =
-                                formData.participantEmployeeIds[0];
+                              const id = formData.participantEmployeeIds[0];
                               const emp = employeeOptions.find(
                                 (e) => e.employeeId === id
                               );
                               if (!emp) return "Select employee";
-                              return `${emp.firstName} ${
-                                emp.lastName || ""
-                              }${
+                              return `${emp.firstName} ${emp.lastName || ""}${
                                 emp.departmentName
                                   ? ` - ${emp.departmentName}`
                                   : ""
@@ -507,9 +514,7 @@ const ScheduleMeeting = () => {
                                         : ""
                                     }`}
                                     onClick={() => {
-                                      handleOneOnOneChange(
-                                        emp.employeeId
-                                      );
+                                      handleOneOnOneChange(emp.employeeId);
                                       setOneOnOneOpen(false);
                                     }}
                                   >
@@ -532,12 +537,8 @@ const ScheduleMeeting = () => {
                                 <th className="text-start sched-th-select">
                                   Select
                                 </th>
-                                <th className="text-start sched-th">
-                                  Name
-                                </th>
-                                <th className="text-start sched-th">
-                                  Role
-                                </th>
+                                <th className="text-start sched-th">Name</th>
+                                <th className="text-start sched-th">Role</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -555,9 +556,7 @@ const ScheduleMeeting = () => {
                                   <tr
                                     key={emp.employeeId}
                                     onClick={() =>
-                                      handleCheckboxChange(
-                                        emp.employeeId
-                                      )
+                                      handleCheckboxChange(emp.employeeId)
                                     }
                                     className="sched-row-click"
                                   >
@@ -570,13 +569,9 @@ const ScheduleMeeting = () => {
                                             emp.employeeId
                                           )}
                                           onChange={() =>
-                                            handleCheckboxChange(
-                                              emp.employeeId
-                                            )
+                                            handleCheckboxChange(emp.employeeId)
                                           }
-                                          onClick={(e) =>
-                                            e.stopPropagation()
-                                          }
+                                          onClick={(e) => e.stopPropagation()}
                                         />
                                       </div>
                                     </td>
@@ -620,16 +615,11 @@ const ScheduleMeeting = () => {
                           <CalendarIcon size={20} /> Meeting Date{" "}
                           <span className="text-danger">*</span>
                         </label>
-                        <div
-                          ref={calendarRef}
-                          className="sched-date-wrap"
-                        >
+                        <div ref={calendarRef} className="sched-date-wrap">
                           <input
                             type="text"
                             readOnly
-                            value={formatDisplayDate(
-                              formData.meetingDate
-                            )}
+                            value={formatDisplayDate(formData.meetingDate)}
                             onClick={() => {
                               ensureCalendarMonthYear();
                               setCalendarOpen((o) => !o);
@@ -650,45 +640,48 @@ const ScheduleMeeting = () => {
                             className="sched-date-icon-btn"
                           >
                             <svg
+                              className="sched-calendar-svg"
                               width="18"
                               height="18"
-                              viewBox="0 0 18 18"
-                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              fill="none"
                             >
                               <rect
-                                x="1.25"
-                                y="2.25"
-                                width="15.5"
-                                height="14.5"
-                                rx="3"
-                                ry="3"
+                                x="4"
+                                y="5"
+                                width="16"
+                                height="15"
+                                rx="2"
+                                ry="2"
+                                stroke="currentColor"
+                                strokeWidth="1.8"
                                 fill="none"
-                                stroke={PRIMARY}
+                              />
+                              <line
+                                x1="4"
+                                y1="9"
+                                x2="20"
+                                y2="9"
+                                stroke="currentColor"
                                 strokeWidth="1.8"
                               />
-                              <rect
-                                x="3.5"
-                                y="4.25"
-                                width="11"
-                                height="2.6"
-                                rx="1.3"
-                                fill={PRIMARY}
+                              <line
+                                x1="9"
+                                y1="3"
+                                x2="9"
+                                y2="7"
+                                stroke="currentColor"
+                                strokeWidth="1.8"
+                                strokeLinecap="round"
                               />
-                              <rect
-                                x="6"
-                                y="2"
-                                width="1.8"
-                                height="3"
-                                rx="0.9"
-                                fill={PRIMARY}
-                              />
-                              <rect
-                                x="10.5"
-                                y="2"
-                                width="1.8"
-                                height="3"
-                                rx="0.9"
-                                fill={PRIMARY}
+                              <line
+                                x1="15"
+                                y1="3"
+                                x2="15"
+                                y2="7"
+                                stroke="currentColor"
+                                strokeWidth="1.8"
+                                strokeLinecap="round"
                               />
                             </svg>
                           </button>
@@ -727,17 +720,11 @@ const ScheduleMeeting = () => {
                               </div>
                               <div className="sched-calendar-grid">
                                 {cells.map((c, idx) => {
-                                  const cellDate = new Date(
-                                    year,
-                                    month,
-                                    c.day
-                                  );
+                                  const cellDate = new Date(year, month, c.day);
                                   const isToday =
                                     c.current &&
-                                    cellDate.getDate() ===
-                                      today.getDate() &&
-                                    cellDate.getMonth() ===
-                                      today.getMonth() &&
+                                    cellDate.getDate() === today.getDate() &&
+                                    cellDate.getMonth() === today.getMonth() &&
                                     cellDate.getFullYear() ===
                                       today.getFullYear();
 
@@ -755,8 +742,7 @@ const ScheduleMeeting = () => {
                                     "sched-calendar-cell",
                                     !c.current && "sched-calendar-cell-out",
                                     isToday && "sched-calendar-cell-today",
-                                    isSelected &&
-                                      "sched-calendar-cell-selected",
+                                    isSelected && "sched-calendar-cell-selected",
                                   ]
                                     .filter(Boolean)
                                     .join(" ");
@@ -766,10 +752,7 @@ const ScheduleMeeting = () => {
                                       key={idx}
                                       className={classes}
                                       onClick={() =>
-                                        handleSelectCalendarDay(
-                                          c.day,
-                                          c.current
-                                        )
+                                        handleSelectCalendarDay(c.day, c.current)
                                       }
                                     >
                                       {c.day}
@@ -815,9 +798,7 @@ const ScheduleMeeting = () => {
                         <button
                           type="button"
                           className="sched-dropdown-btn"
-                          onClick={() =>
-                            setDurationOpen((prev) => !prev)
-                          }
+                          onClick={() => setDurationOpen((prev) => !prev)}
                         >
                           <span className="sched-dropdown-label">
                             {
@@ -835,15 +816,12 @@ const ScheduleMeeting = () => {
                         {durationOpen && (
                           <div className="sched-dropdown-menu">
                             {durationOptions.map((opt) => {
-                              const active =
-                                opt.value === formData.duration;
+                              const active = opt.value === formData.duration;
                               return (
                                 <div
                                   key={opt.value}
                                   className={`sched-dropdown-item${
-                                    active
-                                      ? " sched-dropdown-item-active"
-                                      : ""
+                                    active ? " sched-dropdown-item-active" : ""
                                   }`}
                                   onClick={() => {
                                     setFormData((prev) => ({
@@ -903,39 +881,36 @@ const ScheduleMeeting = () => {
               </div>
             </div>
 
-              
-                <div className="d-flex gap-3 justify-content-end mt-4">
-                  <button
-                    type="button"
-                    className="btn btn-secondary px-4 d-flex align-items-center gap-2 sched-cancel-btn"
-                    onClick={() => navigate(-1)}
-                  >
-                    <X size={20} /> Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="btn px-4 d-flex align-items-center gap-2 sched-submit-btn"
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <>
-                        <span
-                          className="spinner-border spinner-border-sm"
-                          role="status"
-                          aria-hidden="true"
-                        ></span>
-                        Scheduling...
-                      </>
-                    ) : (
-                      <>
-                        <CalendarIcon size={20} />
-                        Schedule Meeting
-                      </>
-                    )}
-                  </button>
-                </div>
-              
-            
+            <div className="d-flex gap-3 justify-content-end mt-4">
+              <button
+                type="button"
+                className="btn btn-secondary px-4 d-flex align-items-center gap-2 sched-cancel-btn"
+                onClick={() => navigate(-1)}
+              >
+                <X size={20} /> Cancel
+              </button>
+              <button
+                type="submit"
+                className="btn px-4 d-flex align-items-center gap-2 sched-submit-btn"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <span
+                      className="spinner-border spinner-border-sm"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
+                    Scheduling...
+                  </>
+                ) : (
+                  <>
+                    <CalendarIcon size={20} />
+                    Schedule Meeting
+                  </>
+                )}
+              </button>
+            </div>
           </form>
         </div>
       </div>

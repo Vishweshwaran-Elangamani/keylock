@@ -122,6 +122,7 @@
 }
 
 .fm-empdb-stat-card:hover {
+  border-color: #0f62fe;
   box-shadow: 0 4px 12px rgba(39, 35, 92, 0.1);
   transform: translateY(-2px);
 }
@@ -326,32 +327,30 @@
   text-align: center;
 }
 
+/* Updated Hover States - Keep White Background and Original Border Color */
 .fm-empdb-action-card:hover {
   transform: translateY(-2px);
-}
-
-.fm-empdb-action-card:not(.fm-empdb-action-card--peer):not(.fm-empdb-action-card--submissions):not(.fm-empdb-action-card--sme):hover {
-  background-color: #f8fafc;
-  border-color: #0f62fe;
-  box-shadow: 0 4px 12px rgba(15, 98, 254, 0.15);
+  background-color: #ffffff;
+  border-color: #27235c;
+  box-shadow: 0 4px 12px rgba(39, 35, 92, 0.15);
 }
 
 .fm-empdb-action-card--peer:hover {
-  background-color: #f8f0ff;
-  border-color: #9d4edd;
-  box-shadow: 0 4px 12px rgba(157, 78, 221, 0.15);
+  background-color: #ffffff;
+  border-color: #27235c;
+  box-shadow: 0 4px 12px rgba(39, 35, 92, 0.15);
 }
 
 .fm-empdb-action-card--submissions:hover {
-  background-color: #f8fafc;
-  border-color: #64748b;
-  box-shadow: 0 4px 12px rgba(100, 116, 139, 0.15);
+  background-color: #ffffff;
+  border-color: #27235c;
+  box-shadow: 0 4px 12px rgba(39, 35, 92, 0.15);
 }
 
 .fm-empdb-action-card--sme:hover {
-  background-color: #fef3c7;
-  border-color: #f59e0b;
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+  background-color: #ffffff;
+  border-color: #27235c;
+  box-shadow: 0 4px 12px rgba(39, 35, 92, 0.15);
 }
 
 .fm-empdb-action-card__badge {

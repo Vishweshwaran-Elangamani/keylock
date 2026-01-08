@@ -5,8 +5,8 @@ import {
   MessageSquare,
   Calendar,
   Eye,
-  ThumbsUp,
   Home,
+  ChevronDown,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { mentorFeedbackApi } from "../../../services/feedbackmanagement/feedbackApi";
@@ -45,9 +45,12 @@ export default function MentorFeedbackDashboard() {
   const [feedbacks, setFeedbacks] = useState([]);
   const [filteredFeedbacks, setFilteredFeedbacks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [selectedFeedback, setSelectedFeedback] = useState(null);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [entriesPerPage, setEntriesPerPage] = useState(5);
+  const [entriesDropdownOpen, setEntriesDropdownOpen] = useState(false);
 
   const [filters, setFilters] = useState({
     status: "all",
@@ -108,6 +111,7 @@ export default function MentorFeedbackDashboard() {
         const enriched = await Promise.all(enrichedPromises);
         setFeedbacks(enriched);
         setFilteredFeedbacks(enriched);
+        setCurrentPage(1);
       } else {
         setFeedbacks([]);
         setFilteredFeedbacks([]);
@@ -125,12 +129,6 @@ export default function MentorFeedbackDashboard() {
     fetchAllData();
   }, [fetchAllData]);
 
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    await fetchAllData();
-    setRefreshing(false);
-  };
-
   useEffect(() => {
     let filtered = [...feedbacks];
 
@@ -142,22 +140,25 @@ export default function MentorFeedbackDashboard() {
       filtered = filtered.filter((f) => f.skillName === filters.skill);
 
     setFilteredFeedbacks(filtered);
+    setCurrentPage(1);
   }, [filters, feedbacks]);
 
-  const handleAcknowledge = async (trackingId) => {
-    try {
-      const response = await mentorFeedbackApi.acknowledge(trackingId);
-      if (response.data?.success) {
-        setFeedbacks((prev) =>
-          prev.map((f) =>
-            f.trackingId === trackingId ? { ...f, status: "Acknowledged" } : f
-          )
-        );
-        alert("✓ Feedback acknowledged successfully!");
-      }
-    } catch {
-      alert("Failed to acknowledge feedback");
-    }
+  const indexOfLastEntry = currentPage * entriesPerPage;
+  const indexOfFirstEntry = indexOfLastEntry - entriesPerPage;
+  const currentEntries = filteredFeedbacks.slice(
+    indexOfFirstEntry,
+    indexOfLastEntry
+  );
+  const totalPages = Math.ceil(filteredFeedbacks.length / entriesPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const handleEntriesChange = (newEntries) => {
+    setEntriesPerPage(newEntries);
+    setCurrentPage(1);
+    setEntriesDropdownOpen(false);
   };
 
   const stats = useMemo(() => {
@@ -166,11 +167,7 @@ export default function MentorFeedbackDashboard() {
       total > 0
         ? (feedbacks.reduce((sum, f) => sum + f.rating, 0) / total).toFixed(1)
         : 0;
-    const pending = feedbacks.filter((f) => f.status === "Submitted").length;
-    const acknowledged = feedbacks.filter(
-      (f) => f.status === "Acknowledged"
-    ).length;
-    return { total, avgRating, pending, acknowledged };
+    return { total, avgRating };
   }, [feedbacks]);
 
   const uniqueSkills = useMemo(() => {
@@ -236,22 +233,13 @@ export default function MentorFeedbackDashboard() {
           }
         >
           <span className="mfd-dropdown-placeholder">{selectedLabel}</span>
-          <span
+          <ChevronDown
             className={`mfd-dropdown-arrow ${
               isOpen ? "mfd-dropdown-arrow-open" : ""
             }`}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24">
-              <polyline
-                points="6 9 12 15 18 9"
-                fill="none"
-                stroke="#27235C"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </span>
+            size={20}
+            strokeWidth={2}
+          />
         </button>
 
         {isOpen && (
@@ -276,6 +264,34 @@ export default function MentorFeedbackDashboard() {
         )}
       </div>
     );
+  };
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) pages.push(i);
+        pages.push("...");
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1);
+        pages.push("...");
+        for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
+      } else {
+        pages.push(1);
+        pages.push("...");
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) pages.push(i);
+        pages.push("...");
+        pages.push(totalPages);
+      }
+    }
+    return pages;
   };
 
   if (loading) {
@@ -385,90 +401,165 @@ export default function MentorFeedbackDashboard() {
           </div>
         </div>
       ) : (
-        <div className="mfd-table-wrapper">
-          <div className="mfd-table-responsive">
-            <table className="mfd-table">
-              <thead className="mfd-table-header">
-                <tr>
-                  <th>EMPLOYEE</th>
-                  <th>SKILL</th>
-                  <th>RATING</th>
-                  <th>SUBMITTED</th>
-                  <th>ACTIONS</th>
-                </tr>
-              </thead>
-              <tbody className="mfd-table-body">
-                {filteredFeedbacks.map((feedback) => (
-                  <tr
-                    key={feedback.trackingId}
-                    className="mfd-table-row"
-                    onClick={() => setSelectedFeedback(feedback)}
-                  >
-                    <td>
-                      <div className="mfd-employee-cell">
-                        <User size={16} className="mfd-employee-icon" />
-                        <div className="mfd-employee-info">
-                          <div className="mfd-employee-name">
-                            {feedback.isAnonymous
-                              ? "Anonymous"
-                              : feedback.menteeName}
+        <>
+          <div className="mfd-table-wrapper">
+            <div className="mfd-table-responsive">
+              <table className="mfd-table">
+                <thead className="mfd-table-header">
+                  <tr>
+                    <th>EMPLOYEE</th>
+                    <th>SKILL</th>
+                    <th>RATING</th>
+                    <th>SUBMITTED</th>
+                    <th>ACTIONS</th>
+                  </tr>
+                </thead>
+                <tbody className="mfd-table-body">
+                  {currentEntries.map((feedback) => (
+                    <tr
+                      key={feedback.trackingId}
+                      className="mfd-table-row"
+                      onClick={() => setSelectedFeedback(feedback)}
+                    >
+                      <td>
+                        <div className="mfd-employee-cell">
+                          <User size={16} className="mfd-employee-icon" />
+                          <div className="mfd-employee-info">
+                            <div className="mfd-employee-name">
+                              {feedback.isAnonymous
+                                ? "Anonymous"
+                                : feedback.menteeName}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </td>
-                    <td>
-                      <span className="mfd-badge-skill">
-                        {feedback.skillName}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="mfd-rating-cell">
-                        <Star size={16} className="mfd-rating-star" />
-                        <span className="mfd-rating-text">
-                          {feedback.rating}/5
+                      </td>
+                      <td>
+                        <span className="mfd-badge-skill">
+                          {feedback.skillName}
                         </span>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="mfd-date-cell">
-                        <Calendar size={14} className="mfd-date-icon" />
-                        {feedback.createdAtFormatted}
-                      </div>
-                    </td>
-                    <td>
-                      <div className="mfd-actions">
-                        <button
-                          className="mfd-action-btn mfd-action-view"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedFeedback(feedback);
-                          }}
-                          title="View details"
-                          type="button"
-                        >
-                          <Eye size={14} />
-                        </button>
-                        {feedback.status === "Submitted" && (
+                      </td>
+                      <td>
+                        <div className="mfd-rating-cell">
+                          <Star size={16} className="mfd-rating-star" />
+                          <span className="mfd-rating-text">
+                            {feedback.rating}/5
+                          </span>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="mfd-date-cell">
+                          <Calendar size={14} className="mfd-date-icon" />
+                          {feedback.createdAtFormatted}
+                        </div>
+                      </td>
+                      <td>
+                        <div className="mfd-actions">
                           <button
-                            className="mfd-action-btn mfd-action-acknowledge"
+                            className="mfd-action-btn mfd-action-view"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleAcknowledge(feedback.trackingId);
+                              setSelectedFeedback(feedback);
                             }}
-                            title="Acknowledge"
+                            title="View details"
                             type="button"
                           >
-                            <ThumbsUp size={14} />
+                            <Eye size={14} />
                           </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            
+<div className="mfd-pagination-footer">
+  <div className="mfd-pagination-left">
+    <span className="mfd-pagination-text">Show</span>
+    <div className={`mfd-entries-dropdown ${entriesDropdownOpen ? 'open' : ''}`}>
+      <button
+        className="mfd-entries-selected"
+        onClick={() => setEntriesDropdownOpen(!entriesDropdownOpen)}
+        type="button"
+      >
+        <span className="mfd-entries-value">{entriesPerPage}</span>
+        <span className="mfd-entries-arrow"></span>
+      </button>
+      <div className="mfd-entries-options">
+        {[5, 10, 25, 50].map((num) => (
+          <button
+            key={num}
+            className={`mfd-entries-option ${
+              num === entriesPerPage ? "selected" : ""
+            }`}
+            onClick={() => handleEntriesChange(num)}
+            type="button"
+          >
+            {num}
+          </button>
+        ))}
+      </div>
+    </div>
+    <span className="mfd-pagination-text">entries</span>
+  </div>
+
+  <div className="mfd-pagination-center">
+    <span className="mfd-pagination-status">
+      Showing {indexOfFirstEntry + 1} to{" "}
+      {Math.min(indexOfLastEntry, filteredFeedbacks.length)} of{" "}
+      {filteredFeedbacks.length} entries
+    </span>
+  </div>
+
+  <div className="mfd-pagination-right">
+    <ul className="mfd-pagination-list">
+      <li className={`mfd-page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+        <button
+          className="mfd-page-link"
+          onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          type="button"
+          aria-label="Previous page"
+        >
+          ‹
+        </button>
+      </li>
+      {getPageNumbers().map((page, index) => (
+        <li key={index} className={`mfd-page-item ${currentPage === page ? 'active' : ''}`}>
+          {page === "..." ? (
+            <span className="mfd-page-ellipsis">
+              <span className="mfd-page-dots">...</span>
+            </span>
+          ) : (
+            <button
+              className="mfd-page-link"
+              onClick={() => handlePageChange(page)}
+              type="button"
+            >
+              {page}
+            </button>
+          )}
+        </li>
+      ))}
+      <li className={`mfd-page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+        <button
+          className="mfd-page-link"
+          onClick={() =>
+            currentPage < totalPages && handlePageChange(currentPage + 1)
+          }
+          disabled={currentPage === totalPages}
+          type="button"
+          aria-label="Next page"
+        >
+          ›
+        </button>
+      </li>
+    </ul>
+  </div>
+</div>
+
           </div>
-        </div>
+        </>
       )}
 
       {selectedFeedback && (
@@ -538,19 +629,6 @@ export default function MentorFeedbackDashboard() {
                   </div>
                 </div>
                 <div className="mfd-modal-footer">
-                  {selectedFeedback.status === "Submitted" && (
-                    <button
-                      className="mfd-modal-btn mfd-modal-btn-acknowledge"
-                      onClick={() => {
-                        handleAcknowledge(selectedFeedback.trackingId);
-                        setSelectedFeedback(null);
-                      }}
-                      type="button"
-                    >
-                      <ThumbsUp size={16} />
-                      Acknowledge
-                    </button>
-                  )}
                   <button
                     className="mfd-modal-btn mfd-modal-btn-close"
                     onClick={() => setSelectedFeedback(null)}

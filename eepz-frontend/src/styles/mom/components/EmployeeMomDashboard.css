@@ -29,82 +29,71 @@
   margin: 0 auto 12px;
 }
 
-.emp-momupdate-toggle-wrapper {
-  margin: 1rem 0 2rem;
+.emp-momupdate-buttons-wrapper {
+  margin: 1.5rem 0 2rem;
   display: flex;
-  align-items: center;
+  justify-content: center;
 }
 
-.emp-momupdate-toggle {
+.emp-momupdate-buttons-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(160px, 1fr));
-  gap: 12px;
-  background: #262459;
-  border-radius: 9999px;
-  padding: 10px 14px;
-  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.16);
+  grid-template-columns: repeat(4, minmax(200px, 240px));
+  gap: 16px;
   width: 100%;
-  max-width: 980px;
-  margin-left: 60px;
+  max-width: 1000px;
 }
 
-.emp-momupdate-item {
-  position: relative;
-  display: inline-flex;
+.emp-momupdate-btn {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 12px 18px;
-  min-height: 44px;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 16px 24px;
+  height: 56px;
   border: none;
-  border-radius: 9999px;
-  background: transparent;
-  color: #e9ecf6;
-  font-weight: 700;
-  font-size: 0.95rem;
-  letter-spacing: 0.1px;
+  border-radius: 12px;
+  background: #3a4275;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1rem;
   cursor: pointer;
-  transition: background-color 160ms ease, color 160ms ease, box-shadow 160ms ease, transform 100ms ease;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 8px rgba(45, 53, 97, 0.25);
 }
 
-.emp-momupdate-icon {
+.emp-momupdate-btn-icon {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
-.emp-momupdate-item .emp-momupdate-icon .bi {
-  font-size: 1.1rem;
-  color: #e9ecf6;
-  transition: color 160ms ease, filter 160ms ease;
+.emp-momupdate-btn-icon .bi {
+  font-size: 1.4rem;
+  color: #ffffff;
 }
 
-.emp-momupdate-item.active {
-  background: #ffffff;
-  color: #121424;
-  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.16), inset 0 -1px 0 rgba(16, 24, 40, 0.06);
+.emp-momupdate-btn-label {
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
 }
 
-.emp-momupdate-item.active .emp-momupdate-icon .bi {
-  color: #121424;
-  filter: drop-shadow(1px 0px rgba(255, 72, 72, 0.85)) drop-shadow(-1px 0px rgba(72, 134, 255, 0.85));
+.emp-momupdate-btn:hover {
+  background: #3a4275;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(45, 53, 97, 0.35);
 }
 
-.emp-momupdate-item:not(.active):hover {
-  background: rgba(255, 255, 255, 0.08);
+
+
+.emp-momupdate-btn:active {
+  transform: translateY(0);
 }
 
-.emp-momupdate-item:active {
-  transform: scale(0.98);
-}
-
-.emp-momupdate-item:focus-visible {
-  outline: 2px solid #7ea2ff;
+.emp-momupdate-btn:focus-visible {
+  outline: 3px solid #93c5fd;
   outline-offset: 2px;
-}
-
-.emp-momupdate-item.active .emp-momupdate-label {
-  font-weight: 800;
 }
 
 @keyframes emd-spin {
@@ -572,8 +561,9 @@
 }
 
 @media (max-width: 1200px) {
-  .emp-momupdate-toggle {
-    margin-left: 0;
+  .emp-momupdate-buttons-grid {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 600px;
   }
 }
 
@@ -586,15 +576,19 @@
     margin-bottom: 6px;
   }
 
-  .emp-momupdate-toggle {
+  .emp-momupdate-buttons-grid {
     grid-template-columns: repeat(2, 1fr);
-    max-width: 100%;
-    margin-left: 0;
+    gap: 12px;
   }
 
-  .emp-momupdate-item {
-    padding: 10px 14px;
-    font-size: 0.875rem;
+  .emp-momupdate-btn {
+    padding: 14px 20px;
+    height: 52px;
+    font-size: 0.95rem;
+  }
+
+  .emp-momupdate-btn-icon .bi {
+    font-size: 1.3rem;
   }
 }
 
@@ -616,19 +610,18 @@
     gap: 4px;
   }
 
-  .emp-momupdate-toggle {
-    padding: 8px 10px;
-    gap: 8px;
+  .emp-momupdate-buttons-grid {
+    gap: 10px;
   }
 
-  .emp-momupdate-item {
-    padding: 8px 12px;
-    font-size: 0.8rem;
-    min-height: 38px;
+  .emp-momupdate-btn {
+    padding: 12px 16px;
+    height: 50px;
+    font-size: 0.9rem;
   }
 
-  .emp-momupdate-item .emp-momupdate-icon .bi {
-    font-size: 1rem;
+  .emp-momupdate-btn-icon .bi {
+    font-size: 1.25rem;
   }
 }
 
@@ -663,13 +656,19 @@
     font-size: 0.7rem;
   }
 
-  .emp-momupdate-toggle {
-    grid-template-columns: 1fr;
-    border-radius: 16px;
-    padding: 8px;
+  .emp-momupdate-buttons-wrapper {
+    margin: 1rem 0 1.5rem;
   }
 
-  .emp-momupdate-item {
-    border-radius: 12px;
+  .emp-momupdate-buttons-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    max-width: 100%;
+  }
+
+  .emp-momupdate-btn {
+    justify-content: flex-start;
+    padding: 14px 20px;
+    height: 54px;
   }
 }

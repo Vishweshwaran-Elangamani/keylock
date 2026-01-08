@@ -135,6 +135,7 @@
   width: 100%;
   max-width: 100%;
   margin-top: -10px;
+  min-height: 100px;
 }
 
 .hr-sla-stat-card:hover {
@@ -177,6 +178,7 @@
   color: #111827;
   margin: 0 0 0.45rem 0;
   line-height: 1;
+  margin-left: 40px;
 }
 
 .hr-sla-stat-label {
@@ -186,6 +188,8 @@
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 0.03em;
+  margin-left: 40px;
+
 }
 
 .hr-sla-filters-card {

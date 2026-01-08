@@ -214,91 +214,74 @@ const EmployeeMomDashboard = () => {
           />
         </div>
 
-        <div className="emp-momupdate-toggle-wrapper">
-          <div
-            className="emp-momupdate-toggle"
-            role="tablist"
-            aria-label="MOM actions"
-          >
+        <div className="emp-momupdate-buttons-wrapper">
+          <div className="emp-momupdate-buttons-grid">
             <button
               type="button"
-              role="tab"
-              className={`emp-momupdate-item ${
+              className={`emp-momupdate-btn ${
                 empMomActive === "myMoms" ? "active" : ""
               }`}
-              aria-pressed={empMomActive === "myMoms"}
-              aria-selected={empMomActive === "myMoms"}
               onClick={() => {
                 setEmpMomActive("myMoms");
                 navigate("/employee/dashboard/meetmom/my-moms");
               }}
               title="My MOMs"
             >
-              <span className="emp-momupdate-icon" aria-hidden="true">
+              <span className="emp-momupdate-btn-icon">
                 <i className="bi bi-person"></i>
               </span>
-              <span className="emp-momupdate-label">My MOMs</span>
+              <span className="emp-momupdate-btn-label">My MOMs</span>
             </button>
 
             <button
               type="button"
-              role="tab"
-              className={`emp-momupdate-item ${
+              className={`emp-momupdate-btn ${
                 empMomActive === "sharedMoms" ? "active" : ""
               }`}
-              aria-pressed={empMomActive === "sharedMoms"}
-              aria-selected={empMomActive === "sharedMoms"}
               onClick={() => {
                 setEmpMomActive("sharedMoms");
                 openSharedModal();
               }}
               title="Shared MOMs"
             >
-              <span className="emp-momupdate-icon" aria-hidden="true">
+              <span className="emp-momupdate-btn-icon">
                 <i className="bi bi-people"></i>
               </span>
-              <span className="emp-momupdate-label">Shared MOMs</span>
+              <span className="emp-momupdate-btn-label">Shared MOMs</span>
             </button>
 
             <button
               type="button"
-              role="tab"
-              className={`emp-momupdate-item ${
+              className={`emp-momupdate-btn ${
                 empMomActive === "actionItems" ? "active" : ""
               }`}
-              aria-pressed={empMomActive === "actionItems"}
-              aria-selected={empMomActive === "actionItems"}
               onClick={() => {
                 setEmpMomActive("actionItems");
                 navigate("/employee/dashboard/meetmom/action-items");
               }}
               title="Action Items"
             >
-              <span className="emp-momupdate-icon" aria-hidden="true">
+              <span className="emp-momupdate-btn-icon">
                 <i className="bi bi-list-check"></i>
               </span>
-
-              <span className="emp-momupdate-label">Action Items</span>
+              <span className="emp-momupdate-btn-label">Action Items</span>
             </button>
 
             <button
               type="button"
-              role="tab"
-              className={`emp-momupdate-item ${
+              className={`emp-momupdate-btn ${
                 empMomActive === "invitations" ? "active" : ""
               }`}
-              aria-pressed={empMomActive === "invitations"}
-              aria-selected={empMomActive === "invitations"}
               onClick={() => {
                 setEmpMomActive("invitations");
                 navigate("/employee/dashboard/meetmom/invitations");
               }}
               title="Invitations"
             >
-              <span className="emp-momupdate-icon" aria-hidden="true">
+              <span className="emp-momupdate-btn-icon">
                 <i className="bi bi-envelope"></i>
               </span>
-              <span className="emp-momupdate-label">Invitations</span>
+              <span className="emp-momupdate-btn-label">Invitations</span>
             </button>
           </div>
         </div>

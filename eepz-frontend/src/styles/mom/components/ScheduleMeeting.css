@@ -29,8 +29,6 @@
   font-weight: 500;
   text-decoration: none;
   transition: color 0.2s ease;
-
-
 }
 
 .sched-breadcrumb-link:hover {
@@ -238,10 +236,16 @@
   background: transparent;
   cursor: pointer;
   padding: 0;
+  color: #27235C;
 }
 
 .sched-date-icon-btn:disabled {
   cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.sched-calendar-svg {
+  display: block;
 }
 
 .sched-calendar {
@@ -262,7 +266,8 @@
   justify-content: space-between;
   padding: 0.5rem 0.9rem;
   border-bottom: 1px solid #e5e7eb;
-  background-color: #ffffff;
+  background-color: #f9fafb;
+  border-radius: 12px 12px 0 0;
 }
 
 .sched-calendar-nav {
@@ -281,8 +286,8 @@
 .sched-calendar-weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  padding: 0.35rem 0.9rem 0.2rem;
-  gap: 4px;
+  padding: 0.25rem 0.5rem;
+  gap: 2px;
   font-size: 0.75rem;
   color: #6b7280;
 }
@@ -295,13 +300,13 @@
 .sched-calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  padding: 0.15rem 0.9rem 0.6rem;
-  gap: 4px;
+  padding: 0.25rem 0.5rem 0.5rem;
+  gap: 2px;
 }
 
 .sched-calendar-cell {
   text-align: center;
-  padding: 0.4rem 0;
+  padding: 0.35rem 0;
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.8rem;
@@ -314,6 +319,10 @@
   color: #d1d5db;
 }
 
+.sched-calendar-cell:not(.sched-calendar-cell-out):hover {
+  background-color: rgba(39, 35, 92, 0.06);
+}
+
 .sched-calendar-cell-today {
   background-color: rgba(39, 35, 92, 0.08);
 }
@@ -324,9 +333,10 @@
 }
 
 .sched-calendar-footer {
-  padding: 0.45rem 0.9rem 0.7rem;
+  padding: 0.4rem 0.75rem 0.6rem;
   border-top: 1px solid #e5e7eb;
   text-align: right;
+  border-radius: 0 0 12px 12px;
 }
 
 .sched-calendar-today {
@@ -392,5 +402,12 @@
 
   .sched-header-title {
     font-size: 1.3rem;
+  }
+
+  .sched-calendar {
+    width: 100%;
+    max-width: 300px;
+    left: 0;
+    right: 0;
   }
 }
