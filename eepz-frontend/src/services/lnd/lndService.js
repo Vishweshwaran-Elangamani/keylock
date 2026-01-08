@@ -280,25 +280,33 @@ getSubordinateEmployees: async (params = {}) => {
     }
   },
 
-  /**
-   * Get available SMEs for a skill
-   * @param {number} skillId - Skill ID (required)
-   * @param {number} pageNumber - Page number
-   * @param {string} searchTerm - Search term (optional)
-   * @returns {Promise} API response
-   */
-  getAvailableSmes: async (skillId, pageNumber = 1, searchTerm = "") => {
-    try {
-      const query = buildQueryString({ skillId, pageNumber, searchTerm });
-      const response = await axios.get(
-        `${API_BASE_URL}/lnd-sme/available${query}`,
-        { headers: getHeaders() }
-      );
-      return response;
-    } catch (error) {
-      return handleError(error);
-    }
-  },
+ /**
+ * Get available SMEs for a skill
+ * UPDATED: Now uses request model instead of individual parameters
+ * @param {object} params - { skillId, searchTerm, pageNumber, pageSize }
+ * @returns {Promise} API response
+ */
+getAvailableSmes: async (params = {}) => {
+  try {
+    const defaultParams = {
+      skillId: null,
+      searchTerm: "",
+      pageNumber: 1,
+      pageSize: 10,
+    };
+
+    const finalParams = { ...defaultParams, ...params };
+    const query = buildQueryString(finalParams);
+
+    const response = await axios.get(
+      `${API_BASE_URL}/lnd-sme/available${query}`,
+      { headers: getHeaders() }
+    );
+    return response;
+  } catch (error) {
+    return handleError(error);
+  }
+},
 
   // ASSIGNMENTS (LnDAssignmentsController)
 

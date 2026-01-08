@@ -18,7 +18,14 @@ const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
   const fetchAvailableSmes = async () => {
     try {
       setFetchingSmes(true);
-      const response = await lndService.getAvailableSmes(skillId, 1);
+      
+  
+      const response = await lndService.getAvailableSmes({
+        skillId: skillId,
+        pageNumber: 1,
+        searchTerm: "",
+        pageSize: 10,
+      });
 
       if (response.data.success) {
         setAvailableSmes(response.data.data.items);
