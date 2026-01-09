@@ -16,11 +16,6 @@ import {
 } from "../../../utils/auth/employeeprofile/profileHelpers";
 import "../../../styles/auth/common/EmployeeProfile.css";
 
-/**
- * EmployeeProfile Component
- * Displays and manages employee profile information with modern UI
- * Supports profile editing and change requests for restricted fields
- */
 const EmployeeProfile = () => {
   const { user } = useAuth();
 
@@ -61,7 +56,6 @@ const EmployeeProfile = () => {
     validateField,
   } = useEmployeeProfile();
 
-  // Loading state
   if (loading) {
     return (
       <div className="epda-loading-wrapper">
@@ -73,7 +67,6 @@ const EmployeeProfile = () => {
     );
   }
 
-  // No data state
   if (!profileData) {
     return (
       <div className="epda-error-wrapper">
@@ -92,7 +85,6 @@ const EmployeeProfile = () => {
 
   return (
     <div className="epda-profile-container">
-      {/* Modern Profile Header */}
       <div className="epda-profile-header">
         <div className="epda-header-background"></div>
         <div className="epda-header-content">
@@ -197,12 +189,9 @@ const EmployeeProfile = () => {
         </div>
       </div>
 
-      {/* Main Content Grid */}
       <div className="epda-profile-content">
         <div className="epda-content-grid">
-          {/* Left Sidebar */}
           <div className="epda-sidebar">
-            {/* Personal Details Card */}
             <div className="epda-info-card">
               <div className="epda-card-header">
                 <i className="bi bi-person-circle"></i>
@@ -243,7 +232,6 @@ const EmployeeProfile = () => {
               </div>
             </div>
 
-            {/* Employment Details Card */}
             <div className="epda-info-card">
               <div className="epda-card-header">
                 <i className="bi bi-briefcase"></i>
@@ -279,7 +267,6 @@ const EmployeeProfile = () => {
               </div>
             </div>
 
-            {/* Address Card - Hide in Edit Mode */}
             {!isEditing && (
               <div className="epda-info-card">
                 <div className="epda-card-header">
@@ -322,9 +309,7 @@ const EmployeeProfile = () => {
             )}
           </div>
 
-          {/* Main Section */}
           <div className="epda-main-section">
-            {/* Personal Information Form */}
             <div className="epda-form-card">
               <div className="epda-card-header">
                 <i className="bi bi-person-lines-fill"></i>
@@ -333,7 +318,6 @@ const EmployeeProfile = () => {
               <div className="epda-card-content">
                 <form>
                   <div className="epda-form-grid">
-                    {/* First Name */}
                     <div className="epda-form-field">
                       <label>
                         First Name <span className="epda-required">*</span>
@@ -356,7 +340,6 @@ const EmployeeProfile = () => {
                       )}
                     </div>
 
-                    {/* Middle Name */}
                     <div className="epda-form-field">
                       <label>Middle Name</label>
                       <input
@@ -377,7 +360,6 @@ const EmployeeProfile = () => {
                       )}
                     </div>
 
-                    {/* Last Name */}
                     <div className="epda-form-field">
                       <label>
                         Last Name <span className="epda-required">*</span>
@@ -400,7 +382,6 @@ const EmployeeProfile = () => {
                       )}
                     </div>
 
-                    {/* Calling Name */}
                     <div className="epda-form-field">
                       <label>
                         Calling Name <span className="epda-required">*</span>
@@ -423,7 +404,6 @@ const EmployeeProfile = () => {
                       )}
                     </div>
 
-                    {/* Gender */}
                     <div className="epda-form-field">
                       <label>
                         Gender <span className="epda-required">*</span>
@@ -446,7 +426,6 @@ const EmployeeProfile = () => {
                       )}
                     </div>
 
-                    {/* Date of Birth */}
                     <div className="epda-form-field">
                       <label>
                         Date of Birth <span className="epda-required">*</span>
@@ -469,7 +448,6 @@ const EmployeeProfile = () => {
                       )}
                     </div>
 
-                    {/* Marital Status */}
                     <div className="epda-form-field">
                       <label>
                         Marital Status <span className="epda-required">*</span>
@@ -501,7 +479,6 @@ const EmployeeProfile = () => {
                       )}
                     </div>
 
-                    {/* Nationality */}
                     <div className="epda-form-field">
                       <label>
                         Nationality <span className="epda-required">*</span>
@@ -513,7 +490,10 @@ const EmployeeProfile = () => {
                             ...prev,
                             nationality: val,
                           }));
-                          setTouched((prev) => ({ ...prev, nationality: true }));
+                          setTouched((prev) => ({
+                            ...prev,
+                            nationality: true,
+                          }));
                           const error = validateField("nationality", val);
                           setErrors((prev) => ({
                             ...prev,
@@ -535,7 +515,6 @@ const EmployeeProfile = () => {
               </div>
             </div>
 
-            {/* Contact Information */}
             <div className="epda-form-card">
               <div className="epda-card-header">
                 <i className="bi bi-telephone"></i>
@@ -544,7 +523,6 @@ const EmployeeProfile = () => {
               <div className="epda-card-content">
                 <form>
                   <div className="epda-form-grid">
-                    {/* Mobile Number */}
                     <div className="epda-form-field">
                       <label>
                         Mobile Number <span className="epda-required">*</span>
@@ -568,10 +546,10 @@ const EmployeeProfile = () => {
                       )}
                     </div>
 
-                    {/* Alternate Number */}
                     <div className="epda-form-field">
                       <label>
-                        Alternate Number <span className="epda-required">*</span>
+                        Alternate Number{" "}
+                        <span className="epda-required">*</span>
                       </label>
                       <input
                         type="tel"
@@ -592,7 +570,6 @@ const EmployeeProfile = () => {
                       )}
                     </div>
 
-                    {/* Personal Email */}
                     <div className="epda-form-field">
                       <label>
                         Personal Email <span className="epda-required">*</span>
@@ -620,7 +597,6 @@ const EmployeeProfile = () => {
               </div>
             </div>
 
-            {/* Address Information - Edit Mode */}
             {isEditing && (
               <div className="epda-form-card">
                 <div className="epda-card-header">
@@ -628,14 +604,12 @@ const EmployeeProfile = () => {
                   <h3>Address Information</h3>
                 </div>
                 <div className="epda-card-content">
-                  {/* Current Address Section */}
                   <div className="epda-address-section">
                     <h4 className="epda-section-title">
                       <i className="bi bi-house-door"></i>
                       Current Address
                     </h4>
                     <div className="epda-form-grid epda-address-grid">
-                      {/* Door Number */}
                       <div className="epda-form-field">
                         <label>
                           Door Number <span className="epda-required">*</span>
@@ -664,7 +638,6 @@ const EmployeeProfile = () => {
                         )}
                       </div>
 
-                      {/* Street */}
                       <div className="epda-form-field">
                         <label>
                           Street <span className="epda-required">*</span>
@@ -693,7 +666,6 @@ const EmployeeProfile = () => {
                         )}
                       </div>
 
-                      {/* Landmark */}
                       <div className="epda-form-field">
                         <label>
                           Landmark <span className="epda-required">*</span>
@@ -722,7 +694,6 @@ const EmployeeProfile = () => {
                         )}
                       </div>
 
-                      {/* Area */}
                       <div className="epda-form-field">
                         <label>
                           Area <span className="epda-required">*</span>
@@ -749,7 +720,6 @@ const EmployeeProfile = () => {
                         )}
                       </div>
 
-                      {/* City */}
                       <div className="epda-form-field">
                         <label>
                           City <span className="epda-required">*</span>
@@ -776,7 +746,6 @@ const EmployeeProfile = () => {
                         )}
                       </div>
 
-                      {/* State */}
                       <div className="epda-form-field">
                         <label>
                           State <span className="epda-required">*</span>
@@ -797,7 +766,6 @@ const EmployeeProfile = () => {
                         )}
                       </div>
 
-                      {/* Country */}
                       <div className="epda-form-field">
                         <label>
                           Country <span className="epda-required">*</span>
@@ -826,7 +794,6 @@ const EmployeeProfile = () => {
                         )}
                       </div>
 
-                      {/* PIN Code */}
                       <div className="epda-form-field">
                         <label>
                           PIN Code <span className="epda-required">*</span>
@@ -858,7 +825,6 @@ const EmployeeProfile = () => {
                     </div>
                   </div>
 
-                  {/* Same as Current Address Checkbox */}
                   <div className="epda-address-checkbox">
                     <label className="epda-checkbox-label">
                       <input
@@ -871,7 +837,6 @@ const EmployeeProfile = () => {
                     </label>
                   </div>
 
-                  {/* Permanent Address Section */}
                   <div className="epda-address-section">
                     <h4 className="epda-section-title">
                       <i className="bi bi-house"></i>
@@ -887,7 +852,6 @@ const EmployeeProfile = () => {
                       </div>
                     )}
                     <div className="epda-form-grid epda-address-grid">
-                      {/* Door Number */}
                       <div className="epda-form-field">
                         <label>
                           Door Number <span className="epda-required">*</span>
@@ -917,7 +881,6 @@ const EmployeeProfile = () => {
                         )}
                       </div>
 
-                      {/* Street */}
                       <div className="epda-form-field">
                         <label>
                           Street <span className="epda-required">*</span>
@@ -947,7 +910,6 @@ const EmployeeProfile = () => {
                         )}
                       </div>
 
-                      {/* Landmark */}
                       <div className="epda-form-field">
                         <label>
                           Landmark <span className="epda-required">*</span>
@@ -977,7 +939,6 @@ const EmployeeProfile = () => {
                         )}
                       </div>
 
-                      {/* Area */}
                       <div className="epda-form-field">
                         <label>
                           Area <span className="epda-required">*</span>
@@ -1007,7 +968,6 @@ const EmployeeProfile = () => {
                         )}
                       </div>
 
-                      {/* City */}
                       <div className="epda-form-field">
                         <label>
                           City <span className="epda-required">*</span>
@@ -1037,7 +997,6 @@ const EmployeeProfile = () => {
                         )}
                       </div>
 
-                      {/* State */}
                       <div className="epda-form-field">
                         <label>
                           State <span className="epda-required">*</span>
@@ -1045,7 +1004,11 @@ const EmployeeProfile = () => {
                         <StateDropdown
                           value={formData.permanentAddress?.state || ""}
                           onChange={(val) =>
-                            handleAddressChange("permanentAddress", "state", val)
+                            handleAddressChange(
+                              "permanentAddress",
+                              "state",
+                              val
+                            )
                           }
                           disabled={sameAsCurrentAddress}
                           showError={showError("permanentAddress.state")}
@@ -1058,7 +1021,6 @@ const EmployeeProfile = () => {
                         )}
                       </div>
 
-                      {/* Country */}
                       <div className="epda-form-field">
                         <label>
                           Country <span className="epda-required">*</span>
@@ -1088,7 +1050,6 @@ const EmployeeProfile = () => {
                         )}
                       </div>
 
-                      {/* PIN Code */}
                       <div className="epda-form-field">
                         <label>
                           PIN Code <span className="epda-required">*</span>
@@ -1127,7 +1088,6 @@ const EmployeeProfile = () => {
         </div>
       </div>
 
-      {/* Modals */}
       {showChangeRequestModal && (
         <ChangeRequestModal
           show={showChangeRequestModal}
