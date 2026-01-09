@@ -72,7 +72,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         /// <summary>Creates an SME assignment request for a team member requiring skill development.</summary>
         public async Task<ApiResponse<int>> RequestSmeAssignment(
             int managerId,
-            SmeRequestDto request
+            SmeRequestModel request
         )
         {
             Log.Information(
@@ -176,7 +176,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         /// <summary>Uploads completion proof document and creates approval request for SME acknowledgement.</summary>
         public async Task<ApiResponse<bool>> UploadCompletionProof(
             int employeeId,
-            UploadCompletionProofRequest request
+            UploadCompletionProofRequestModel request
         )
         {
             Log.Information(
@@ -293,7 +293,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         /// <summary>Completes assignment with rating update and marks associated approval as approved.</summary>
         public async Task<ApiResponse<bool>> CompleteAssignment(
             int managerId,
-            CompleteAssignmentRequest request
+            CompleteAssignmentRequestModel request
         )
         {
             Log.Information(
@@ -421,7 +421,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         #region Assignment Retrieval
 
         /// <summary>Gets paginated assignments for the employee as mentee with overdue calculation.</summary>
-        public async Task<ApiResponse<PaginatedResponse<AssignmentDto>>> GetMyAssignments(
+        public async Task<ApiResponse<PaginatedResponse<AssignmentResponseModel>>> GetMyAssignments(
             int employeeId,
             string? statusFilter,
             string? searchTerm,
@@ -450,7 +450,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 var today = DateTime.Now.Date;
 
-                var assignmentDtos = items
+                var AssignmentResponseModels = items
                     .Select(a =>
                     {
                         var isOverdue =
@@ -463,7 +463,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                                 ? (int)(today - a.Deadline.Value.Date).TotalDays
                                 : (int?)null;
 
-                        return new AssignmentDto
+                        return new AssignmentResponseModel
                         {
                             AssignmentId = a.AssignmentId,
                             MenteeEmployeeId = a.MenteeEmployeeId,
@@ -490,15 +490,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 Log.Information(
                     "GetMyAssignments succeeded. EmployeeId={EmployeeId}, ReturnedCount={Count}, TotalCount={TotalCount}",
-                    employeeId, assignmentDtos.Count, totalCount
+                    employeeId, AssignmentResponseModels.Count, totalCount
                 );
 
-                return new ApiResponse<PaginatedResponse<AssignmentDto>>
+                return new ApiResponse<PaginatedResponse<AssignmentResponseModel>>
                 {
                     Success = true,
-                    Data = new PaginatedResponse<AssignmentDto>
+                    Data = new PaginatedResponse<AssignmentResponseModel>
                     {
-                        Items = assignmentDtos,
+                        Items = AssignmentResponseModels,
                         TotalCount = totalCount,
                         PageNumber = pageNumber,
                         PageSize = pageSize,
@@ -513,7 +513,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     employeeId, ex.Message
                 );
 
-                return new ApiResponse<PaginatedResponse<AssignmentDto>>
+                return new ApiResponse<PaginatedResponse<AssignmentResponseModel>>
                 {
                     Success = false,
                     Message = "An error occurred while retrieving assignments",
@@ -523,7 +523,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         /// <summary>Gets paginated assignments for manager's team members with overdue calculation.</summary>
-        public async Task<ApiResponse<PaginatedResponse<AssignmentDto>>> GetTeamAssignments(
+        public async Task<ApiResponse<PaginatedResponse<AssignmentResponseModel>>> GetTeamAssignments(
             int managerId,
             string? statusFilter,
             string? searchTerm,
@@ -552,7 +552,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 var today = DateTime.Now.Date;
 
-                var assignmentDtos = items
+                var AssignmentResponseModels = items
                     .Select(a =>
                     {
                         var isOverdue =
@@ -565,7 +565,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                                 ? (int)(today - a.Deadline.Value.Date).TotalDays
                                 : (int?)null;
 
-                        return new AssignmentDto
+                        return new AssignmentResponseModel
                         {
                             AssignmentId = a.AssignmentId,
                             MenteeEmployeeId = a.MenteeEmployeeId,
@@ -592,15 +592,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 Log.Information(
                     "GetTeamAssignments succeeded. ManagerId={ManagerId}, ReturnedCount={Count}, TotalCount={TotalCount}",
-                    managerId, assignmentDtos.Count, totalCount
+                    managerId, AssignmentResponseModels.Count, totalCount
                 );
 
-                return new ApiResponse<PaginatedResponse<AssignmentDto>>
+                return new ApiResponse<PaginatedResponse<AssignmentResponseModel>>
                 {
                     Success = true,
-                    Data = new PaginatedResponse<AssignmentDto>
+                    Data = new PaginatedResponse<AssignmentResponseModel>
                     {
-                        Items = assignmentDtos,
+                        Items = AssignmentResponseModels,
                         TotalCount = totalCount,
                         PageNumber = pageNumber,
                         PageSize = pageSize,
@@ -615,7 +615,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     managerId, ex.Message
                 );
 
-                return new ApiResponse<PaginatedResponse<AssignmentDto>>
+                return new ApiResponse<PaginatedResponse<AssignmentResponseModel>>
                 {
                     Success = false,
                     Message = "An error occurred while retrieving team assignments",
@@ -625,7 +625,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         /// <summary>Gets paginated assignments where the employee is the assigned SME.</summary>
-        public async Task<ApiResponse<PaginatedResponse<AssignmentDto>>> GetSmeAssignments(
+        public async Task<ApiResponse<PaginatedResponse<AssignmentResponseModel>>> GetSmeAssignments(
       int smeEmployeeId,
       string? statusFilter,
       string? searchTerm,
@@ -660,7 +660,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var today = DateTime.Now.Date;
                 Log.Debug("GetSmeAssignments: Current date for overdue calculation: {Today}", today);
 
-                var assignmentDtos = items
+                var AssignmentResponseModels = items
                     .Select(a =>
                     {
                         var deadlineDate = a.Deadline?.Date;
@@ -683,7 +683,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                             );
                         }
 
-                        return new AssignmentDto
+                        return new AssignmentResponseModel
                         {
                             AssignmentId = a.AssignmentId,
                             MenteeEmployeeId = a.MenteeEmployeeId,
@@ -709,17 +709,17 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 Log.Information(
                     "GetSmeAssignments succeeded. SmeEmployeeId={SmeEmployeeId}, ReturnedCount={Count}, TotalCount={TotalCount}, OverdueCount={OverdueCount}",
                     smeEmployeeId,
-                    assignmentDtos.Count,
+                    AssignmentResponseModels.Count,
                     totalCount,
-                    assignmentDtos.Count(a => a.IsOverdue)
+                    AssignmentResponseModels.Count(a => a.IsOverdue)
                 );
 
-                return new ApiResponse<PaginatedResponse<AssignmentDto>>
+                return new ApiResponse<PaginatedResponse<AssignmentResponseModel>>
                 {
                     Success = true,
-                    Data = new PaginatedResponse<AssignmentDto>
+                    Data = new PaginatedResponse<AssignmentResponseModel>
                     {
-                        Items = assignmentDtos,
+                        Items = AssignmentResponseModels,
                         TotalCount = totalCount,
                         PageNumber = pageNumber,
                         PageSize = pageSize,
@@ -734,7 +734,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     smeEmployeeId, statusFilter, ex.Message
                 );
 
-                return new ApiResponse<PaginatedResponse<AssignmentDto>>
+                return new ApiResponse<PaginatedResponse<AssignmentResponseModel>>
                 {
                     Success = false,
                     Message = "An error occurred while retrieving SME assignments",

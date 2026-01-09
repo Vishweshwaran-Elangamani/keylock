@@ -4,7 +4,7 @@ using Relevantz.EEPZ.Common.Constants;
 namespace Relevantz.EEPZ.Common.DTOs
 {
     // Approval requests
-    public class ApprovalDecisionRequest
+    public class ApprovalDecisionRequestModel
     {
         public int ApprovalId { get; set; }
         public bool IsApproved { get; set; }
@@ -12,14 +12,14 @@ namespace Relevantz.EEPZ.Common.DTOs
     }
 
     // Assignment requests
-    public class UploadCompletionProofRequest
+    public class UploadCompletionProofRequestModel
     {
         public int AssignmentId { get; set; }
         public IFormFile ProofDocument { get; set; }
         public string? CompletionNotes { get; set; }
     }
 
-    public class CompleteAssignmentRequest
+    public class CompleteAssignmentRequestModel
     {
         public int AssignmentId { get; set; }
         public int NewRating { get; set; }
@@ -27,14 +27,14 @@ namespace Relevantz.EEPZ.Common.DTOs
     }
 
     // Employee skill requests
-    public class RecordSkillRequest
+    public class RecordSkillRequestModel
     {
         public int EmployeeId { get; set; }
         public int SkillId { get; set; }
         public int Rating { get; set; }
     }
 
-    public class BulkRecordSkillRequest
+    public class BulkRecordSkillRequestModel
     {
         public int EmployeeId { get; set; }
         public List<SkillRating> Skills { get; set; }
@@ -46,28 +46,28 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int Rating { get; set; }
     }
 
-    public class UpdateSkillRatingRequest
+    public class UpdateSkillRatingRequestModel
     {
         public int MapperId { get; set; }
         public int Rating { get; set; }
-    }
+    }  
 
     // SME requests
-    public class BecomeSmeRequest
+    public class BecomeSmeRequestModel 
     {
         public int SkillId { get; set; }
         public IFormFile ProofDocument { get; set; }
     }
 
-    public class SmeRequestDto
+    public class SmeRequestModel
     {
         public int SkillId { get; set; }
         public int MentorEmployeeId { get; set; }
         public int MenteeEmployeeId { get; set; }
         public DateTime? Deadline { get; set; }
-    }
+    } 
 
-    public class MyApprovalsRequestModel
+    public class MyApprovalsRequestModel 
     {
         public string? ApprovalType { get; set; }
         public string? Status { get; set; }

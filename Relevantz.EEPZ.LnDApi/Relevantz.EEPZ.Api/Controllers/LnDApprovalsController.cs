@@ -73,8 +73,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Processes an approval decision (approve or reject).
         /// Triggers business workflows for SME registration, assignments, and acknowledgements.  
         /// </summary>
-        [HttpPost("api/lnd-approvals/process")]
-        public async Task<IActionResult> ProcessApproval([FromBody] ApprovalDecisionRequest request)
+        [HttpPost("api/lnd-approvals/process")] 
+        public async Task<IActionResult> ProcessApproval([FromBody] ApprovalDecisionRequestModel request)
         {
             var approverId = GetCurrentEmployeeId();
 
@@ -111,10 +111,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Gets complete approval history for the logged-in user as requester or approver.
         /// Supports filtering by role, type, status, and search term with pagination.
         /// </summary>
-        /// <summary>
-        /// Gets complete approval history for the logged-in user as requester or approver.
-        /// Supports filtering by role, type, status, and search term with pagination.
-        /// </summary>
+       
         [HttpGet("api/lnd-approvals/history")]
         public async Task<IActionResult> GetApprovalHistory([FromQuery] ApprovalHistoryRequestModel request)
         {

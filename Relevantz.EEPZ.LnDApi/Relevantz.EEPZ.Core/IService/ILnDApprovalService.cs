@@ -4,7 +4,7 @@ namespace Relevantz.EEPZ.Core.Services.Interface
 {
     public interface ILnDApprovalService
     {
-        Task<ApiResponse<PaginatedResponse<ApprovalDto>>> GetMyApprovals(
+        Task<ApiResponse<PaginatedResponse<ApprovalResponseModel>>> GetMyApprovals(
             int employeeId,
             string? approvalType,
             string? status,
@@ -14,8 +14,8 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             int pageSize,
             string? searchTerm
         );
-        Task<ApiResponse<bool>> ProcessApproval(int approverId, ApprovalDecisionRequest request);
-        Task<ApiResponse<PaginatedResponse<ApprovalDto>>> GetApprovalHistory(
+        Task<ApiResponse<bool>> ProcessApproval(int approverId, ApprovalDecisionRequestModel request);
+        Task<ApiResponse<PaginatedResponse<ApprovalResponseModel>>> GetApprovalHistory(
             int employeeId,
             string? approvalType,
             string? status,
@@ -26,13 +26,13 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             int pageNumber,
             int pageSize
         );
-        Task<ApiResponse<ApprovalDetailsDto>> GetApprovalDetails(int employeeId, int approvalId);
-        Task<ApiResponse<FileDownloadDto>> GetApprovalAttachment(int employeeId, int approvalId);
-        Task<ApiResponse<FileDownloadDto>> GetAssignmentProof(int employeeId, int assignmentId);
-        Task<ApiResponse<FileDownloadDto>> PreviewApprovalAttachment(
+        Task<ApiResponse<ApprovalDetailsResponseModel>> GetApprovalDetails(int employeeId, int approvalId);
+        Task<ApiResponse<FileDownloadResponseModel>> GetApprovalAttachment(int employeeId, int approvalId);
+        Task<ApiResponse<FileDownloadResponseModel>> GetAssignmentProof(int employeeId, int assignmentId);
+        Task<ApiResponse<FileDownloadResponseModel>> PreviewApprovalAttachment(
             int employeeId,
             int approvalId
         );
-        Task<ApiResponse<FileDownloadDto>> PreviewAssignmentProof(int employeeId, int assignmentId);
+        Task<ApiResponse<FileDownloadResponseModel>> PreviewAssignmentProof(int employeeId, int assignmentId);
     }
 }

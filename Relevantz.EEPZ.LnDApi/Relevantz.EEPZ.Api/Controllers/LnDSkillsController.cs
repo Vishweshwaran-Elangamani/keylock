@@ -168,7 +168,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
  
         /// <summary>Records a single skill rating for an employee.</summary>
         [HttpPost("api/lnd-skills/record")]
-        public async Task<IActionResult> RecordEmployeeSkill([FromBody] RecordSkillRequest request)
+        public async Task<IActionResult> RecordEmployeeSkill([FromBody] RecordSkillRequestModel request)
         {
             var managerId = GetCurrentEmployeeId();
  
@@ -199,7 +199,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
  
         /// <summary>Records multiple skill ratings for an employee in a single transaction.</summary>
         [HttpPost("api/lnd-skills/record-bulk")]
-        public async Task<IActionResult> BulkRecordEmployeeSkills([FromBody] BulkRecordSkillRequest request)
+        public async Task<IActionResult> BulkRecordEmployeeSkills([FromBody] BulkRecordSkillRequestModel request)
         {
             var managerId = GetCurrentEmployeeId();
  
@@ -230,7 +230,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
  
         /// <summary>Updates an existing employee skill rating.</summary>
         [HttpPut("api/lnd-skills/rating")]
-        public async Task<IActionResult> UpdateEmployeeSkillRating([FromBody] UpdateSkillRatingRequest request)
+        public async Task<IActionResult> UpdateEmployeeSkillRating([FromBody] UpdateSkillRatingRequestModel request)
         {
             var managerId = GetCurrentEmployeeId();
  

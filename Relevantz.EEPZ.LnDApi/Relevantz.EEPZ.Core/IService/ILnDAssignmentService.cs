@@ -5,8 +5,8 @@ namespace Relevantz.EEPZ.Core.Services.Interface
     public interface ILnDAssignmentService
     {
         Task<ApiResponse<int>> CheckAndMarkOverdueAssignments();
-        Task<ApiResponse<int>> RequestSmeAssignment(int managerId, SmeRequestDto request);
-        Task<ApiResponse<PaginatedResponse<AssignmentDto>>> GetMyAssignments(
+        Task<ApiResponse<int>> RequestSmeAssignment(int managerId, SmeRequestModel request);
+        Task<ApiResponse<PaginatedResponse<AssignmentResponseModel>>> GetMyAssignments(
             int employeeId,
             string? statusFilter,
             string? searchTerm,
@@ -15,7 +15,7 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             int pageNumber,
             int pageSize
         );
-        Task<ApiResponse<PaginatedResponse<AssignmentDto>>> GetTeamAssignments(
+        Task<ApiResponse<PaginatedResponse<AssignmentResponseModel>>> GetTeamAssignments(
             int managerId,
             string? statusFilter,
             string? searchTerm,
@@ -24,7 +24,7 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             int pageNumber,
             int pageSize
         );
-        Task<ApiResponse<PaginatedResponse<AssignmentDto>>> GetSmeAssignments(
+        Task<ApiResponse<PaginatedResponse<AssignmentResponseModel>>> GetSmeAssignments(
             int smeEmployeeId,
             string? statusFilter,
             string? searchTerm,
@@ -35,11 +35,11 @@ namespace Relevantz.EEPZ.Core.Services.Interface
         );
         Task<ApiResponse<bool>> UploadCompletionProof(
             int employeeId,
-            UploadCompletionProofRequest request
+            UploadCompletionProofRequestModel request
         );
         Task<ApiResponse<bool>> CompleteAssignment(
             int managerId,
-            CompleteAssignmentRequest request
+            CompleteAssignmentRequestModel request
         );
         Task<ApiResponse<byte[]>> ExportTeamAssignmentsToExcel(
             int managerId,

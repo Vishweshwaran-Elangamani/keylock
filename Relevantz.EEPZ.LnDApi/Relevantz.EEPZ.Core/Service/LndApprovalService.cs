@@ -40,7 +40,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         /// <summary>
         /// Gets approvals assigned to the specified employee as approver, with filtering, sorting and pagination.
         /// </summary>
-        public async Task<ApiResponse<PaginatedResponse<ApprovalDto>>> GetMyApprovals(
+        public async Task<ApiResponse<PaginatedResponse<ApprovalResponseModel>>> GetMyApprovals(
             int employeeId,
             string? approvalType,
             string? status,
@@ -54,7 +54,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             Log.Information(
                 "GetMyApprovals started. EmployeeId={EmployeeId}, ApprovalType={ApprovalType}, Status={Status}, Page={PageNumber}, PageSize={PageSize}, SearchTerm={SearchTerm}",
                 employeeId, approvalType, status, pageNumber, pageSize, searchTerm
-            );
+            ); 
 
             try
             {
@@ -71,8 +71,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 Log.Debug("GetMyApprovals fetched {ItemCount} items, TotalCount={TotalCount}", items.Count, totalCount);
 
-                var approvalDtos = items
-                    .Select(a => new ApprovalDto
+                var ApprovalResponseModels = items
+                    .Select(a => new ApprovalResponseModel
                     {
                         ApprovalId = a.ApprovalId,
                         ApprovalType = a.ApprovalType,
@@ -96,14 +96,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     .ToList();
 
                 Log.Information("GetMyApprovals succeeded for EmployeeId={EmployeeId}. Returned={Returned}, Total={Total}",
-                    employeeId, approvalDtos.Count, totalCount);
+                    employeeId, ApprovalResponseModels.Count, totalCount);
 
-                return new ApiResponse<PaginatedResponse<ApprovalDto>>
+                return new ApiResponse<PaginatedResponse<ApprovalResponseModel>>
                 {
                     Success = true,
-                    Data = new PaginatedResponse<ApprovalDto>
+                    Data = new PaginatedResponse<ApprovalResponseModel>
                     {
-                        Items = approvalDtos,
+                        Items = ApprovalResponseModels,
                         TotalCount = totalCount,
                         PageNumber = pageNumber,
                         PageSize = pageSize,
@@ -114,7 +114,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 Log.Error(ex, "GetMyApprovals failed for EmployeeId={EmployeeId}", employeeId);
 
-                return new ApiResponse<PaginatedResponse<ApprovalDto>>
+                return new ApiResponse<PaginatedResponse<ApprovalResponseModel>>
                 {
                     Success = false,
                     Message = "An error occurred",
@@ -128,13 +128,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         /// </summary>
         public async Task<ApiResponse<bool>> ProcessApproval(
             int approverId,
-            ApprovalDecisionRequest request
+            ApprovalDecisionRequestModel request
         )
         {
             Log.Information(
                 "ProcessApproval started. ApprovalId={ApprovalId}, ApproverId={ApproverId}, IsApproved={IsApproved}",
                 request.ApprovalId, approverId, request.IsApproved
-            );
+            );  
 
             try
             {
@@ -342,8 +342,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                             await _assignmentRepository.UpdateAssignmentAsync(assignment);
                         }
-                    }
-                }
+                    }  
+                }   
 
                 await _approvalRepository.UpdateApprovalAsync(approval);
                 await _baseRepository.SaveChangesAsync();
@@ -377,13 +377,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     Message = "An error occurred",
                     Errors = new List<string> { ex.Message },
                 };
-            }
-        }
-
+            } 
+        } 
         /// <summary>
         /// Gets complete approval history for the specified employee, with optional role, type, status and search filters.
         /// </summary>
-        public async Task<ApiResponse<PaginatedResponse<ApprovalDto>>> GetApprovalHistory(
+        public async Task<ApiResponse<PaginatedResponse<ApprovalResponseModel>>> GetApprovalHistory(
             int employeeId,
             string? approvalType,
             string? status,
@@ -425,8 +424,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     totalCount
                 );
 
-                var approvalDtos = items
-                    .Select(a => new ApprovalDto
+                var ApprovalResponseModels = items
+                    .Select(a => new ApprovalResponseModel
                     {
                         ApprovalId = a.ApprovalId,
                         ApprovalType = a.ApprovalType,
@@ -452,16 +451,16 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 Log.Information(
                     "GetApprovalHistory succeeded for EmployeeId={EmployeeId}. Returned={Returned}, Total={Total}",
                     employeeId,
-                    approvalDtos.Count,
+                    ApprovalResponseModels.Count,
                     totalCount
                 );
 
-                return new ApiResponse<PaginatedResponse<ApprovalDto>>
+                return new ApiResponse<PaginatedResponse<ApprovalResponseModel>>
                 {
                     Success = true,
-                    Data = new PaginatedResponse<ApprovalDto>
+                    Data = new PaginatedResponse<ApprovalResponseModel>
                     {
-                        Items = approvalDtos,
+                        Items = ApprovalResponseModels,
                         TotalCount = totalCount,
                         PageNumber = pageNumber,
                         PageSize = pageSize,
@@ -476,7 +475,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     employeeId
                 );
 
-                return new ApiResponse<PaginatedResponse<ApprovalDto>>
+                return new ApiResponse<PaginatedResponse<ApprovalResponseModel>>
                 {
                     Success = false,
                     Message = "An error occurred while retrieving approval history",
@@ -488,7 +487,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         /// <summary>
         /// Gets detailed information about a specific approval, including assignment and attachment details, enforcing access control.
         /// </summary>
-        public async Task<ApiResponse<ApprovalDetailsDto>> GetApprovalDetails(
+        public async Task<ApiResponse<ApprovalDetailsResponseModel>> GetApprovalDetails(
             int employeeId,
             int approvalId
         )
@@ -506,7 +505,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 {
                     Log.Warning("GetApprovalDetails: Approval not found. ApprovalId={ApprovalId}", approvalId);
 
-                    return new ApiResponse<ApprovalDetailsDto>
+                    return new ApiResponse<ApprovalDetailsResponseModel>
                     {
                         Success = false,
                         Message = "Approval not found",
@@ -524,14 +523,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         employeeId
                     );
 
-                    return new ApiResponse<ApprovalDetailsDto>
+                    return new ApiResponse<ApprovalDetailsResponseModel>
                     {
                         Success = false,
                         Message = "You do not have access to this approval",
                     };
                 }
 
-                var details = new ApprovalDetailsDto
+                var details = new ApprovalDetailsResponseModel
                 {
                     ApprovalId = approval.ApprovalId,
                     ApprovalType = approval.ApprovalType,
@@ -569,7 +568,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 if (approval.AssignmentId.HasValue && approval.Assignment != null)
                 {
-                    details.Assignment = new AssignmentDetailsDto
+                    details.Assignment = new AssignmentDetailsResponseModel
                     {
                         AssignmentId = approval.Assignment.AssignmentId,
                         MenteeName =
@@ -591,7 +590,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     approvalId, employeeId
                 );
 
-                return new ApiResponse<ApprovalDetailsDto> { Success = true, Data = details };
+                return new ApiResponse<ApprovalDetailsResponseModel> { Success = true, Data = details };
             }
             catch (Exception ex)
             {
@@ -602,7 +601,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     employeeId
                 );
 
-                return new ApiResponse<ApprovalDetailsDto>
+                return new ApiResponse<ApprovalDetailsResponseModel>
                 {
                     Success = false,
                     Message = "An error occurred while retrieving approval details",
@@ -614,7 +613,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         /// <summary>
         /// Downloads the attachment associated with an approval, after validating access for the employee.
         /// </summary>
-        public async Task<ApiResponse<FileDownloadDto>> GetApprovalAttachment(
+        public async Task<ApiResponse<FileDownloadResponseModel>> GetApprovalAttachment(
             int employeeId,
             int approvalId
         )
@@ -642,7 +641,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         employeeId
                     );
 
-                    return new ApiResponse<FileDownloadDto>
+                    return new ApiResponse<FileDownloadResponseModel>
                     {
                         Success = false,
                         Message = "Approval not found or access denied",
@@ -656,7 +655,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         approvalId
                     );
 
-                    return new ApiResponse<FileDownloadDto>
+                    return new ApiResponse<FileDownloadResponseModel>
                     {
                         Success = false,
                         Message = "No attachment found for this approval",
@@ -673,10 +672,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     fileBytes.Length
                 );
 
-                return new ApiResponse<FileDownloadDto>
+                return new ApiResponse<FileDownloadResponseModel>
                 {
                     Success = true,
-                    Data = new FileDownloadDto
+                    Data = new FileDownloadResponseModel
                     {
                         FileBytes = fileBytes,
                         FileName = approval.Attachment.FileName,
@@ -694,7 +693,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     employeeId
                 );
 
-                return new ApiResponse<FileDownloadDto>
+                return new ApiResponse<FileDownloadResponseModel>
                 {
                     Success = false,
                     Message = "An error occurred",
@@ -706,7 +705,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         /// <summary>
         /// Downloads the proof document of an assignment, enforcing mentee, SME, or manager access control.
         /// </summary>
-        public async Task<ApiResponse<FileDownloadDto>> GetAssignmentProof(
+        public async Task<ApiResponse<FileDownloadResponseModel>> GetAssignmentProof(
             int employeeId,
             int assignmentId
         )
@@ -735,7 +734,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         employeeId
                     );
 
-                    return new ApiResponse<FileDownloadDto>
+                    return new ApiResponse<FileDownloadResponseModel>
                     {
                         Success = false,
                         Message = "Assignment not found or access denied",
@@ -749,7 +748,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         assignmentId
                     );
 
-                    return new ApiResponse<FileDownloadDto>
+                    return new ApiResponse<FileDownloadResponseModel>
                     {
                         Success = false,
                         Message = "No proof document found for this assignment",
@@ -766,10 +765,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     fileBytes.Length
                 );
 
-                return new ApiResponse<FileDownloadDto>
+                return new ApiResponse<FileDownloadResponseModel>
                 {
                     Success = true,
-                    Data = new FileDownloadDto
+                    Data = new FileDownloadResponseModel
                     {
                         FileBytes = fileBytes,
                         FileName = fileName,
@@ -787,7 +786,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     employeeId
                 );
 
-                return new ApiResponse<FileDownloadDto>
+                return new ApiResponse<FileDownloadResponseModel>
                 {
                     Success = false,
                     Message = "An error occurred",
@@ -799,7 +798,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         /// <summary>
         /// Returns a preview of an approval attachment for inline viewing, with access checks.
         /// </summary>
-        public async Task<ApiResponse<FileDownloadDto>> PreviewApprovalAttachment(
+        public async Task<ApiResponse<FileDownloadResponseModel>> PreviewApprovalAttachment(
             int employeeId,
             int approvalId
         )
@@ -828,7 +827,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         employeeId
                     );
 
-                    return new ApiResponse<FileDownloadDto>
+                    return new ApiResponse<FileDownloadResponseModel>
                     {
                         Success = false,
                         Message = "Approval not found or access denied",
@@ -842,7 +841,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         approvalId
                     );
 
-                    return new ApiResponse<FileDownloadDto>
+                    return new ApiResponse<FileDownloadResponseModel>
                     {
                         Success = false,
                         Message = "No attachment found",
@@ -859,10 +858,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     fileName
                 );
 
-                return new ApiResponse<FileDownloadDto>
+                return new ApiResponse<FileDownloadResponseModel>
                 {
                     Success = true,
-                    Data = new FileDownloadDto
+                    Data = new FileDownloadResponseModel
                     {
                         FileBytes = fileBytes,
                         FileName = fileName,
@@ -880,7 +879,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     employeeId
                 );
 
-                return new ApiResponse<FileDownloadDto>
+                return new ApiResponse<FileDownloadResponseModel>
                 {
                     Success = false,
                     Message = "An error occurred",
@@ -892,16 +891,16 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         /// <summary>
         /// Returns a preview of an assignment proof document for inline viewing, with access checks.
         /// </summary>
-        public async Task<ApiResponse<FileDownloadDto>> PreviewAssignmentProof(
+        public async Task<ApiResponse<FileDownloadResponseModel>> PreviewAssignmentProof(
             int employeeId,
             int assignmentId
-        )
+        ) 
         {
             Log.Debug(
                 "PreviewAssignmentProof started. AssignmentId={AssignmentId}, EmployeeId={EmployeeId}",
                 assignmentId,
                 employeeId
-            );
+            );      
 
             try
             {
@@ -922,7 +921,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         employeeId
                     );
 
-                    return new ApiResponse<FileDownloadDto>
+                    return new ApiResponse<FileDownloadResponseModel>
                     {
                         Success = false,
                         Message = "Assignment not found or access denied",
@@ -936,7 +935,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         assignmentId
                     );
 
-                    return new ApiResponse<FileDownloadDto>
+                    return new ApiResponse<FileDownloadResponseModel>
                     {
                         Success = false,
                         Message = "No proof document found",
@@ -953,10 +952,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     fileName
                 );
 
-                return new ApiResponse<FileDownloadDto>
+                return new ApiResponse<FileDownloadResponseModel>
                 {
                     Success = true,
-                    Data = new FileDownloadDto
+                    Data = new FileDownloadResponseModel
                     {
                         FileBytes = fileBytes,
                         FileName = fileName,
@@ -972,9 +971,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     "PreviewAssignmentProof failed. AssignmentId={AssignmentId}, EmployeeId={EmployeeId}",
                     assignmentId,
                     employeeId
-                );
+                ); 
 
-                return new ApiResponse<FileDownloadDto>
+                return new ApiResponse<FileDownloadResponseModel>
                 {
                     Success = false,
                     Message = "An error occurred",

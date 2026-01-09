@@ -48,7 +48,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
         /// <summary>Requests SME assignment for a team member (manager initiates request).</summary>
         [HttpPost("api/lnd-assignments/request-sme")]
-        public async Task<IActionResult> RequestSmeAssignment([FromBody] SmeRequestDto request)
+        public async Task<IActionResult> RequestSmeAssignment([FromBody] SmeRequestModel request)
         {
             var managerId = GetCurrentEmployeeId();
 
@@ -80,7 +80,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// <summary>Uploads completion proof document for an assignment (mentee uploads proof).</summary>
         [HttpPost("api/lnd-assignments/upload-proof")]
         public async Task<IActionResult> UploadCompletionProof(
-            [FromForm] UploadCompletionProofRequest request
+            [FromForm] UploadCompletionProofRequestModel request
         )
         {
             var employeeId = GetCurrentEmployeeId();
@@ -113,7 +113,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// <summary>Completes an assignment with rating and acknowledgment (manager approves completion).</summary>
         [HttpPost("api/lnd-assignments/complete")]
         public async Task<IActionResult> CompleteAssignment(
-            [FromBody] CompleteAssignmentRequest request
+            [FromBody] CompleteAssignmentRequestModel request
         )
         {
             var managerId = GetCurrentEmployeeId();

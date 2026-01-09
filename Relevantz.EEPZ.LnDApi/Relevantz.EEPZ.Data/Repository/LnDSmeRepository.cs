@@ -50,7 +50,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             var sme = await _context.Lndsmes.FirstOrDefaultAsync(s =>
                 s.EmployeeId == employeeId && s.SkillId == skillId && s.IsActive == true
-            );
+            );  
 
             if (sme == null)
             {

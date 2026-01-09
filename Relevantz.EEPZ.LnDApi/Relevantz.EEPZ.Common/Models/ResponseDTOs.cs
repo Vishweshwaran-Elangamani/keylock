@@ -21,7 +21,7 @@ namespace Relevantz.EEPZ.Common.DTOs
     }
 
     // Approval responses
-    public class ApprovalDetailsDto
+    public class ApprovalDetailsResponseModel
     {
         public int ApprovalId { get; set; }
         public string ApprovalType { get; set; }
@@ -43,12 +43,12 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string AttachmentFilePath { get; set; }
         public long? AttachmentFileSize { get; set; }
         public string AttachmentType { get; set; }
-        public AssignmentDetailsDto Assignment { get; set; }
+        public AssignmentDetailsResponseModel Assignment { get; set; }
         public string UserRole { get; set; }
         public bool CanDownloadAttachment { get; set; }
     }
 
-    public class ApprovalDto
+    public class ApprovalResponseModel
     {
         public int ApprovalId { get; set; }
         public string ApprovalType { get; set; }
@@ -68,7 +68,7 @@ namespace Relevantz.EEPZ.Common.DTOs
     }
 
     // Assignment responses
-    public class AssignmentDetailsDto
+    public class AssignmentDetailsResponseModel
     {
         public int AssignmentId { get; set; }
         public string MenteeName { get; set; }
@@ -81,7 +81,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int? CompletionRating { get; set; }
     }
 
-    public class AssignmentDto
+    public class AssignmentResponseModel
     {
         public int AssignmentId { get; set; }
         public int MenteeEmployeeId { get; set; }
@@ -103,7 +103,7 @@ namespace Relevantz.EEPZ.Common.DTOs
     }
 
     // Employee skill responses
-    public class EmployeeSkillDto
+    public class EmployeeSkillResponseModel
     {
         public int MapperId { get; set; }
         public int EmployeeId { get; set; }
@@ -117,7 +117,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public bool IsSme { get; set; }
     }
 
-    public class SubordinateEmployeeDto
+    public class SubordinateEmployeeResponseModel
     {
         public int EmployeeId { get; set; }
         public string EmployeeName { get; set; }
@@ -125,14 +125,14 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string DepartmentName { get; set; }
     }
 
-    public class SkillDto
+    public class SkillResponseModel
     {
         public int SkillId { get; set; }
         public string SkillName { get; set; }
     }
 
     // SME responses
-    public class SmeDto
+    public class SmeResponseModel
     {
         public int SmeId { get; set; }
         public int EmployeeId { get; set; }
@@ -147,7 +147,7 @@ namespace Relevantz.EEPZ.Common.DTOs
     }
 
     // File responses
-    public class FileDownloadDto
+    public class FileDownloadResponseModel
     {
         public byte[] FileBytes { get; set; }
         public string FileName { get; set; }

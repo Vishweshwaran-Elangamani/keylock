@@ -4,12 +4,12 @@ namespace Relevantz.EEPZ.Core.Services.Interface
 {
     public interface ILnDHRService
     {
-        Task<ApiResponse<PaginatedResponse<SubordinateEmployeeDto>>> GetAllOrganizationEmployees(
+        Task<ApiResponse<PaginatedResponse<SubordinateEmployeeResponseModel>>> GetAllOrganizationEmployees(
             string? searchTerm,
             int pageNumber,
             int pageSize
         );
-        Task<ApiResponse<PaginatedResponse<AssignmentDto>>> GetAllOrganizationAssignments(
+        Task<ApiResponse<PaginatedResponse<AssignmentResponseModel>>> GetAllOrganizationAssignments(
             string? statusFilter,
             string? searchTerm,
             string? sortField,
@@ -23,7 +23,7 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             string? sortField,
             string? sortOrder
         );
-        Task<ApiResponse<PaginatedResponse<EmployeeSkillDto>>> GetEmployeeSkillsById(
+        Task<ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>> GetEmployeeSkillsById(
             int employeeId,
             int pageNumber,
             string? searchTerm,

@@ -26,7 +26,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         /// <summary>Gets paginated list of all organization employees with department information.</summary>
         public async Task<
-            ApiResponse<PaginatedResponse<SubordinateEmployeeDto>>
+            ApiResponse<PaginatedResponse<SubordinateEmployeeResponseModel>>
         > GetAllOrganizationEmployees(string? searchTerm, int pageNumber, int pageSize)
         {
             Log.Information(
@@ -48,7 +48,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
 
                 var employeeDtos = items
-                    .Select(e => new SubordinateEmployeeDto
+                    .Select(e => new SubordinateEmployeeResponseModel
                     {
                         EmployeeId = e.EmployeeId,
                         EmployeeName = $"{e.Userprofile?.FirstName} {e.Userprofile?.LastName}",
@@ -59,7 +59,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     })
                     .ToList();
 
-                var paginatedResponse = new PaginatedResponse<SubordinateEmployeeDto>
+                var paginatedResponse = new PaginatedResponse<SubordinateEmployeeResponseModel>
                 {
                     Items = employeeDtos,
                     TotalCount = totalCount,
@@ -72,7 +72,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     employeeDtos.Count, totalCount
                 );
 
-                return new ApiResponse<PaginatedResponse<SubordinateEmployeeDto>>
+                return new ApiResponse<PaginatedResponse<SubordinateEmployeeResponseModel>>
                 {
                     Success = true,
                     Message = $"Found {totalCount} employee(s)",
@@ -87,7 +87,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     searchTerm, ex.Message
                 );
 
-                return new ApiResponse<PaginatedResponse<SubordinateEmployeeDto>>
+                return new ApiResponse<PaginatedResponse<SubordinateEmployeeResponseModel>>
                 {
                     Success = false,
                     Message = $"Error retrieving employees: {ex.Message}",
@@ -96,7 +96,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         /// <summary>Gets paginated skills for a specific employee with SME eligibility calculation.</summary>
-        public async Task<ApiResponse<PaginatedResponse<EmployeeSkillDto>>> GetEmployeeSkillsById(
+        public async Task<ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>> GetEmployeeSkillsById(
             int employeeId,
             int pageNumber,
             string? searchTerm,
@@ -126,7 +126,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
 
                 var skillDtos = items
-                    .Select(m => new EmployeeSkillDto
+                    .Select(m => new EmployeeSkillResponseModel
                     {
                         MapperId = m.MapperId,
                         EmployeeId = m.EmployeeId,
@@ -149,10 +149,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     employeeId, skillDtos.Count, totalCount
                 );
 
-                return new ApiResponse<PaginatedResponse<EmployeeSkillDto>>
+                return new ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>
                 {
                     Success = true,
-                    Data = new PaginatedResponse<EmployeeSkillDto>
+                    Data = new PaginatedResponse<EmployeeSkillResponseModel>
                     {
                         Items = skillDtos,
                         TotalCount = totalCount,
@@ -169,7 +169,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     employeeId, ex.Message
                 );
 
-                return new ApiResponse<PaginatedResponse<EmployeeSkillDto>>
+                return new ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>
                 {
                     Success = false,
                     Message = "An error occurred",
@@ -184,7 +184,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         /// <summary>Gets paginated organization-wide assignments with filtering and search.</summary>
         public async Task<
-     ApiResponse<PaginatedResponse<AssignmentDto>>
+     ApiResponse<PaginatedResponse<AssignmentResponseModel>>
  > GetAllOrganizationAssignments(
      string? statusFilter,
      string? searchTerm,
@@ -218,7 +218,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 var today = DateTime.Now.Date;
 
-                var assignmentDtos = items
+                var AssignmentResponseModels = items
                     .Select(a =>
                     {
 
@@ -233,7 +233,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                             ? (int)(today - deadlineDate.Value).TotalDays
                             : (int?)null;
 
-                        return new AssignmentDto
+                        return new AssignmentResponseModel
                         {
                             AssignmentId = a.AssignmentId,
                             SkillName = a.Skill?.SkillName,
@@ -253,9 +253,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     })
                     .ToList();
 
-                var paginatedResponse = new PaginatedResponse<AssignmentDto>
+                var paginatedResponse = new PaginatedResponse<AssignmentResponseModel>
                 {
-                    Items = assignmentDtos,
+                    Items = AssignmentResponseModels,
                     TotalCount = totalCount,
                     PageNumber = pageNumber,
                     PageSize = pageSize,
@@ -263,10 +263,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 Log.Information(
                     "GetAllOrganizationAssignments succeeded. ReturnedCount={Count}, TotalCount={TotalCount}",
-                    assignmentDtos.Count, totalCount
+                    AssignmentResponseModels.Count, totalCount
                 );
 
-                return new ApiResponse<PaginatedResponse<AssignmentDto>>
+                return new ApiResponse<PaginatedResponse<AssignmentResponseModel>>
                 {
                     Success = true,
                     Message = $"Found {totalCount} assignment(s)",
@@ -281,7 +281,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     statusFilter, ex.Message
                 );
 
-                return new ApiResponse<PaginatedResponse<AssignmentDto>>
+                return new ApiResponse<PaginatedResponse<AssignmentResponseModel>>
                 {
                     Success = false,
                     Message = $"Error retrieving assignments: {ex.Message}",

@@ -4,8 +4,6 @@ using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repositories.Interface;
 using Serilog;
-
-
 using Microsoft.EntityFrameworkCore;
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -37,7 +35,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         /// <summary>Gets paginated list of subordinate employees with department information.</summary>
         public async Task<
-            ApiResponse<PaginatedResponse<SubordinateEmployeeDto>>
+            ApiResponse<PaginatedResponse<SubordinateEmployeeResponseModel>>
         > GetSubordinateEmployees(int managerId, string? searchTerm, int pageNumber, int pageSize)
         {
             Log.Information(
@@ -53,7 +51,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 {
                     Log.Warning("GetSubordinateEmployees: Manager not found. ManagerId={ManagerId}", managerId);
 
-                    return new ApiResponse<PaginatedResponse<SubordinateEmployeeDto>>
+                    return new ApiResponse<PaginatedResponse<SubordinateEmployeeResponseModel>>
                     {
                         Success = false,
                         Message = "Manager not found",
@@ -73,7 +71,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
 
                 var employeeDtos = items
-                    .Select(e => new SubordinateEmployeeDto
+                    .Select(e => new SubordinateEmployeeResponseModel
                     {
                         EmployeeId = e.EmployeeId,
                         EmployeeName = $"{e.Userprofile?.FirstName} {e.Userprofile?.LastName}",
@@ -84,7 +82,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     })
                     .ToList();
 
-                var paginatedResponse = new PaginatedResponse<SubordinateEmployeeDto>
+                var paginatedResponse = new PaginatedResponse<SubordinateEmployeeResponseModel>
                 {
                     Items = employeeDtos,
                     TotalCount = totalCount,
@@ -97,7 +95,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     managerId, employeeDtos.Count, totalCount
                 );
 
-                return new ApiResponse<PaginatedResponse<SubordinateEmployeeDto>>
+                return new ApiResponse<PaginatedResponse<SubordinateEmployeeResponseModel>>
                 {
                     Success = true,
                     Message = $"Found {totalCount} subordinate(s)",
@@ -112,7 +110,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     managerId, ex.Message
                 );
 
-                return new ApiResponse<PaginatedResponse<SubordinateEmployeeDto>>
+                return new ApiResponse<PaginatedResponse<SubordinateEmployeeResponseModel>>
                 {
                     Success = false,
                     Message = $"Error retrieving subordinates: {ex.Message}",
@@ -125,7 +123,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         #region Skill Queries
 
         /// <summary>Gets all available skills for dropdown selection.</summary>
-        public async Task<ApiResponse<List<SkillDto>>> GetAllSkills()
+        public async Task<ApiResponse<List<SkillResponseModel>>> GetAllSkills()
         {
             Log.Information("GetAllSkills started");
 
@@ -133,24 +131,24 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 var skills = await _repository.GetAllSkillsAsync();
 
-                var skillDtos = skills
-                    .Select(s => new SkillDto { SkillId = s.SkillId, SkillName = s.SkillName })
+                var SkillResponseModels = skills
+                    .Select(s => new SkillResponseModel { SkillId = s.SkillId, SkillName = s.SkillName })
                     .ToList();
 
-                Log.Information("GetAllSkills succeeded. SkillCount={Count}", skillDtos.Count);
+                Log.Information("GetAllSkills succeeded. SkillCount={Count}", SkillResponseModels.Count);
 
-                return new ApiResponse<List<SkillDto>>
+                return new ApiResponse<List<SkillResponseModel>>
                 {
                     Success = true,
-                    Message = $"Found {skillDtos.Count} skill(s)",
-                    Data = skillDtos,
+                    Message = $"Found {SkillResponseModels.Count} skill(s)",
+                    Data = SkillResponseModels,
                 };
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "GetAllSkills failed. Error={ErrorMessage}", ex.Message);
 
-                return new ApiResponse<List<SkillDto>>
+                return new ApiResponse<List<SkillResponseModel>>
                 {
                     Success = false,
                     Message = $"Error retrieving skills: {ex.Message}",
@@ -159,7 +157,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         /// <summary>Gets paginated skills for subordinate employees with optional employee filter.</summary>
-        public async Task<ApiResponse<PaginatedResponse<EmployeeSkillDto>>> GetSubordinateSkills(
+        public async Task<ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>> GetSubordinateSkills(
             int managerId,
             int? employeeId,
             string? searchTerm,
@@ -181,7 +179,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 {
                     Log.Warning("GetSubordinateSkills: Manager not found. ManagerId={ManagerId}", managerId);
 
-                    return new ApiResponse<PaginatedResponse<EmployeeSkillDto>>
+                    return new ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>
                     {
                         Success = false,
                         Message = "Manager not found",
@@ -202,8 +200,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     items.Count, totalCount
                 );
 
-                var skillDtos = items
-                    .Select(m => new EmployeeSkillDto
+                var SkillResponseModels = items
+                    .Select(m => new EmployeeSkillResponseModel
                     {
                         MapperId = m.MapperId,
                         EmployeeId = m.EmployeeId,
@@ -223,15 +221,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 Log.Information(
                     "GetSubordinateSkills succeeded. ManagerId={ManagerId}, ReturnedCount={Count}, TotalCount={TotalCount}",
-                    managerId, skillDtos.Count, totalCount
+                    managerId, SkillResponseModels.Count, totalCount
                 );
 
-                return new ApiResponse<PaginatedResponse<EmployeeSkillDto>>
+                return new ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>
                 {
                     Success = true,
-                    Data = new PaginatedResponse<EmployeeSkillDto>
+                    Data = new PaginatedResponse<EmployeeSkillResponseModel>
                     {
-                        Items = skillDtos,
+                        Items = SkillResponseModels,
                         TotalCount = totalCount,
                         PageNumber = pageNumber,
                         PageSize = pageSize,
@@ -246,7 +244,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     managerId, ex.Message
                 );
 
-                return new ApiResponse<PaginatedResponse<EmployeeSkillDto>>
+                return new ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>
                 {
                     Success = false,
                     Message = "An error occurred",
@@ -256,7 +254,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         /// <summary>Gets paginated skills for the logged-in employee.</summary>
-        public async Task<ApiResponse<PaginatedResponse<EmployeeSkillDto>>> GetMySkills(
+        public async Task<ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>> GetMySkills(
             int employeeId,
             string searchTerm,
             int pageNumber,
@@ -279,8 +277,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 Log.Debug("GetMySkills: Retrieved {ItemCount} skills. TotalCount={TotalCount}", items.Count, totalCount);
 
-                var skillDtos = items
-                    .Select(m => new EmployeeSkillDto
+                var SkillResponseModels = items
+                    .Select(m => new EmployeeSkillResponseModel
                     {
                         MapperId = m.MapperId,
                         EmployeeId = m.EmployeeId,
@@ -300,15 +298,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 Log.Information(
                     "GetMySkills succeeded. EmployeeId={EmployeeId}, ReturnedCount={Count}, TotalCount={TotalCount}",
-                    employeeId, skillDtos.Count, totalCount
+                    employeeId, SkillResponseModels.Count, totalCount
                 );
 
-                return new ApiResponse<PaginatedResponse<EmployeeSkillDto>>
+                return new ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>
                 {
                     Success = true,
-                    Data = new PaginatedResponse<EmployeeSkillDto>
+                    Data = new PaginatedResponse<EmployeeSkillResponseModel>
                     {
-                        Items = skillDtos,
+                        Items = SkillResponseModels,
                         TotalCount = totalCount,
                         PageNumber = pageNumber,
                         PageSize = pageSize,
@@ -323,7 +321,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     employeeId, ex.Message
                 );
 
-                return new ApiResponse<PaginatedResponse<EmployeeSkillDto>>
+                return new ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>
                 {
                     Success = false,
                     Message = "An error occurred",
@@ -337,9 +335,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         #region Skill Operations
 
         /// <summary>Records a single skill rating for an employee.</summary>
-        public async Task<ApiResponse<EmployeeSkillDto>> RecordEmployeeSkill(
+        public async Task<ApiResponse<EmployeeSkillResponseModel>> RecordEmployeeSkill(
             int managerId,
-            RecordSkillRequest request
+            RecordSkillRequestModel request
         )
         {
             Log.Information(
@@ -358,7 +356,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         request.EmployeeId, managerId
                     );
 
-                    return new ApiResponse<EmployeeSkillDto>
+                    return new ApiResponse<EmployeeSkillResponseModel>
                     {
                         Success = false,
                         Message = "Employee not found or not your subordinate",
@@ -371,7 +369,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 {
                     Log.Warning("RecordEmployeeSkill: Skill not found. SkillId={SkillId}", request.SkillId);
 
-                    return new ApiResponse<EmployeeSkillDto>
+                    return new ApiResponse<EmployeeSkillResponseModel>
                     {
                         Success = false,
                         Message = "Skill not found",
@@ -390,7 +388,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         request.EmployeeId, request.SkillId
                     );
 
-                    return new ApiResponse<EmployeeSkillDto>
+                    return new ApiResponse<EmployeeSkillResponseModel>
                     {
                         Success = false,
                         Message = "Skill already recorded for this employee",
@@ -416,11 +414,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     savedMapper.MapperId, request.EmployeeId, request.SkillId, request.Rating
                 );
 
-                return new ApiResponse<EmployeeSkillDto>
+                return new ApiResponse<EmployeeSkillResponseModel>
                 {
                     Success = true,
                     Message = "Skill recorded successfully",
-                    Data = new EmployeeSkillDto
+                    Data = new EmployeeSkillResponseModel
                     {
                         MapperId = savedMapper.MapperId,
                         EmployeeId = savedMapper.EmployeeId,
@@ -444,7 +442,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     managerId, request.EmployeeId, request.SkillId, ex.Message
                 );
 
-                return new ApiResponse<EmployeeSkillDto>
+                return new ApiResponse<EmployeeSkillResponseModel>
                 {
                     Success = false,
                     Message = "An error occurred",
@@ -454,9 +452,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         /// <summary>Records multiple skill ratings for an employee in a single transaction.</summary>
-        public async Task<ApiResponse<List<EmployeeSkillDto>>> BulkRecordEmployeeSkills(
+        public async Task<ApiResponse<List<EmployeeSkillResponseModel>>> BulkRecordEmployeeSkills(
             int managerId,
-            BulkRecordSkillRequest request
+            BulkRecordSkillRequestModel request
         )
         {
             Log.Information(
@@ -475,7 +473,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         request.EmployeeId, managerId
                     );
 
-                    return new ApiResponse<List<EmployeeSkillDto>>
+                    return new ApiResponse<List<EmployeeSkillResponseModel>>
                     {
                         Success = false,
                         Message = "Employee not found or not your subordinate",
@@ -497,7 +495,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
 
                 var newMappings = new List<Lndemployeeskillmapper>();
-                var results = new List<EmployeeSkillDto>();
+                var results = new List<EmployeeSkillResponseModel>();
 
                 foreach (var skillRating in request.Skills)
                 {
@@ -530,7 +528,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     await _baseRepository.SaveChangesAsync();
 
                     results = newMappings
-                        .Select(m => new EmployeeSkillDto
+                        .Select(m => new EmployeeSkillResponseModel
                         {
                             MapperId = m.MapperId,
                             EmployeeId = m.EmployeeId,
@@ -552,7 +550,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     managerId, request.EmployeeId, results.Count
                 );
 
-                return new ApiResponse<List<EmployeeSkillDto>>
+                return new ApiResponse<List<EmployeeSkillResponseModel>>
                 {
                     Success = true,
                     Message = $"{results.Count} skills recorded successfully",
@@ -567,7 +565,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     managerId, request.EmployeeId, ex.Message
                 );
 
-                return new ApiResponse<List<EmployeeSkillDto>>
+                return new ApiResponse<List<EmployeeSkillResponseModel>>
                 {
                     Success = false,
                     Message = "An error occurred",
@@ -577,9 +575,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         /// <summary>Updates an existing employee skill rating and deactivates SME status if rating drops below threshold.</summary>
-        public async Task<ApiResponse<EmployeeSkillDto>> UpdateEmployeeSkillRating(
+        public async Task<ApiResponse<EmployeeSkillResponseModel>> UpdateEmployeeSkillRating(
             int managerId,
-            UpdateSkillRatingRequest request
+            UpdateSkillRatingRequestModel request
         )
         {
             Log.Information(
@@ -598,7 +596,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         request.MapperId, managerId
                     );
 
-                    return new ApiResponse<EmployeeSkillDto>
+                    return new ApiResponse<EmployeeSkillResponseModel>
                     {
                         Success = false,
                         Message = "Skill mapping not found or employee not your subordinate",
@@ -634,11 +632,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     request.MapperId, mapper.EmployeeId, mapper.SkillId, oldRating, request.Rating
                 );
 
-                return new ApiResponse<EmployeeSkillDto>
+                return new ApiResponse<EmployeeSkillResponseModel>
                 {
                     Success = true,
                     Message = "Skill rating updated successfully",
-                    Data = new EmployeeSkillDto
+                    Data = new EmployeeSkillResponseModel
                     {
                         MapperId = mapper.MapperId,
                         EmployeeId = mapper.EmployeeId,
@@ -662,7 +660,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     managerId, request.MapperId, ex.Message
                 );
 
-                return new ApiResponse<EmployeeSkillDto>
+                return new ApiResponse<EmployeeSkillResponseModel>
                 {
                     Success = false,
                     Message = "An error occurred",

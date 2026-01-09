@@ -77,7 +77,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         /// <summary>Submits an SME registration application with proof document for manager approval.</summary>
         public async Task<ApiResponse<int>> ApplyToBecomeSme(
             int employeeId,
-            BecomeSmeRequest request
+            BecomeSmeRequestModel request
         )
         {
             Log.Information(
@@ -213,7 +213,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         #region SME Queries
 
         /// <summary>Gets paginated available SMEs for a skill with in-progress assignment counts.</summary>
-        public async Task<ApiResponse<PaginatedResponse<SmeDto>>> GetAvailableSmes(
+        public async Task<ApiResponse<PaginatedResponse<SmeResponseModel>>> GetAvailableSmes(
             int skillId,
             string searchTerm,
             int pageNumber,
@@ -241,15 +241,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     items.Count, totalCount
                 );
 
-                var smeDtos = new List<SmeDto>();
+                var SmeResponseModels = new List<SmeResponseModel>();
                 foreach (var sme in items)
                 {
                     var inProgressCount = await _smeRepository.GetSmeInProgressAssignmentCountAsync(
                         sme.SmeId
                     );
 
-                    smeDtos.Add(
-                        new SmeDto
+                    SmeResponseModels.Add(
+                        new SmeResponseModel
                         {
                             SmeId = sme.SmeId,
                             EmployeeId = sme.EmployeeId,
@@ -266,15 +266,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 Log.Information(
                     "GetAvailableSmes succeeded. SkillId={SkillId}, ReturnedCount={Count}, TotalCount={TotalCount}",
-                    skillId, smeDtos.Count, totalCount
+                    skillId, SmeResponseModels.Count, totalCount
                 );
 
-                return new ApiResponse<PaginatedResponse<SmeDto>>
+                return new ApiResponse<PaginatedResponse<SmeResponseModel>>
                 {
                     Success = true,
-                    Data = new PaginatedResponse<SmeDto>
+                    Data = new PaginatedResponse<SmeResponseModel>
                     {
-                        Items = smeDtos,
+                        Items = SmeResponseModels,
                         TotalCount = totalCount,
                         PageNumber = pageNumber,
                         PageSize = pageSize,
@@ -289,7 +289,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     skillId, ex.Message
                 );
 
-                return new ApiResponse<PaginatedResponse<SmeDto>>
+                return new ApiResponse<PaginatedResponse<SmeResponseModel>>
                 {
                     Success = false,
                     Message = "An error occurred",
@@ -299,7 +299,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         /// <summary>Gets paginated list of all active SMEs with department information.</summary>
-        public async Task<ApiResponse<PaginatedResponse<SmeDto>>> GetAllActiveSmes(
+        public async Task<ApiResponse<PaginatedResponse<SmeResponseModel>>> GetAllActiveSmes(
             string? searchTerm,
             int pageNumber,
             int pageSize
@@ -323,8 +323,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     items.Count, totalCount
                 );
 
-                var smeDtos = items
-                    .Select(s => new SmeDto
+                var SmeResponseModels = items
+                    .Select(s => new SmeResponseModel
                     {
                         SmeId = s.SmeId,
                         EmployeeId = s.EmployeeId,
@@ -342,16 +342,16 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 Log.Information(
                     "GetAllActiveSmes succeeded. ReturnedCount={Count}, TotalCount={TotalCount}",
-                    smeDtos.Count, totalCount
+                    SmeResponseModels.Count, totalCount
                 );
 
-                return new ApiResponse<PaginatedResponse<SmeDto>>
+                return new ApiResponse<PaginatedResponse<SmeResponseModel>>
                 {
                     Success = true,
                     Message = $"Found {totalCount} active SME(s)",
-                    Data = new PaginatedResponse<SmeDto>
+                    Data = new PaginatedResponse<SmeResponseModel>
                     {
-                        Items = smeDtos,
+                        Items = SmeResponseModels,
                         TotalCount = totalCount,
                         PageNumber = pageNumber,
                         PageSize = pageSize,
@@ -366,7 +366,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     searchTerm, ex.Message
                 );
 
-                return new ApiResponse<PaginatedResponse<SmeDto>>
+                return new ApiResponse<PaginatedResponse<SmeResponseModel>>
                 {
                     Success = false,
                     Message = $"Error retrieving SMEs: {ex.Message}",

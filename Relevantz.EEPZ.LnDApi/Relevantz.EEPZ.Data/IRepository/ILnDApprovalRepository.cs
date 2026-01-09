@@ -16,7 +16,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
             string? sortOrder,
             int pageNumber,
             int pageSize,
-            string? searchTerm
+            string? searchTerm 
         );
         Task<(List<Lndapproval> Items, int TotalCount)> GetApprovalHistoryAsync(
             int employeeId,

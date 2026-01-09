@@ -99,7 +99,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
         [HttpPost("api/lnd-sme/apply")]
 
-        public async Task<IActionResult> ApplyToBecomeSme([FromForm] BecomeSmeRequest request)
+        public async Task<IActionResult> ApplyToBecomeSme([FromForm] BecomeSmeRequestModel request)
 
         {
 

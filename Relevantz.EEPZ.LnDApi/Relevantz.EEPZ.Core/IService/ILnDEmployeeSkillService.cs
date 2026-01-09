@@ -5,35 +5,35 @@ namespace Relevantz.EEPZ.Core.Services.Interface
 {
     public interface ILnDEmployeeSkillService
     {
-        Task<ApiResponse<PaginatedResponse<SubordinateEmployeeDto>>> GetSubordinateEmployees(
+        Task<ApiResponse<PaginatedResponse<SubordinateEmployeeResponseModel>>> GetSubordinateEmployees(
             int managerId,
             string? searchTerm,
             int pageNumber,
             int pageSize
-        );
-        Task<ApiResponse<List<SkillDto>>> GetAllSkills();
-        Task<ApiResponse<PaginatedResponse<EmployeeSkillDto>>> GetSubordinateSkills(
+        ); 
+        Task<ApiResponse<List<SkillResponseModel>>> GetAllSkills();
+        Task<ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>> GetSubordinateSkills(
             int managerId,
             int? employeeId,
             string? searchTerm,
             string? sortBy,
             int pageNumber,
             int pageSize
-        );
-        Task<ApiResponse<EmployeeSkillDto>> RecordEmployeeSkill(
+        );   
+        Task<ApiResponse<EmployeeSkillResponseModel>> RecordEmployeeSkill(
             int managerId,
-            RecordSkillRequest request
+            RecordSkillRequestModel request
         );
-        Task<ApiResponse<List<EmployeeSkillDto>>> BulkRecordEmployeeSkills(
+        Task<ApiResponse<List<EmployeeSkillResponseModel>>> BulkRecordEmployeeSkills(
             int managerId,
-            BulkRecordSkillRequest request
+            BulkRecordSkillRequestModel request
         );
-        Task<ApiResponse<EmployeeSkillDto>> UpdateEmployeeSkillRating(
+        Task<ApiResponse<EmployeeSkillResponseModel>> UpdateEmployeeSkillRating(
             int managerId,
-            UpdateSkillRatingRequest request
+            UpdateSkillRatingRequestModel request
         );
         Task<ApiResponse<bool>> DeleteEmployeeSkill(int managerId, int mapperId);
-        Task<ApiResponse<PaginatedResponse<EmployeeSkillDto>>> GetMySkills(
+        Task<ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>> GetMySkills(
             int employeeId,
             string searchTerm,
             int pageNumber,
