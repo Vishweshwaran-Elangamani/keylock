@@ -27,7 +27,7 @@ import { employeeApi } from "../../services/feedbackmanagement/feedbackApi";
 import projectService from "../../services/project_management/projectService";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
-import "../../styles/auth/AdminDashboard.css";
+import "../../styles/auth/LeadershipDashboard.css";
 
 const formatStatusLabel = (raw) => {
   if (!raw) return "";
@@ -278,74 +278,81 @@ const LeadershipDashboard = () => {
   const goalStatusDistribution = getGoalStatusDistribution();
 
   const GOAL_CHART_COLORS = [
-    "#84cc16",
-    "#65a30d",
-    "#a3e635",
-    "#bef264",
-    "#d9f99d",
-    "#ecfccb",
+    "#005461",
+    "#018790",
+    "#00B7B5",
+    "#4dd4d2",
+    "#80e0de",
+    "#b3eceb",
   ];
 
+  const StatCard = ({ bg, border, value, label, color }) => (
+    <div className="leadership-stat-card" style={{ background: bg, border: `2px solid ${border}` }}>
+      <div className="leadership-stat-value" style={{ color }}>{value}</div>
+      <div className="leadership-stat-label" style={{ color }}>{label}</div>
+    </div>
+  );
+
   return (
-    <div className="hr-dashboard-container">
+    <div className="leadership-dashboard-container">
       <Breadcrumb items={[{ label: "Leadership Dashboard" }]} />
 
-      <div className="admin-kpi-grid" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
-        <div className="admin-kpi-card">
-          <div className="admin-kpi-icon admin-pink">
+      <div className="leadership-kpi-grid">
+        <div className="leadership-kpi-card">
+          <div className="leadership-kpi-icon leadership-teal">
             <DollarSign size={28} />
           </div>
-          <div className="admin-kpi-content">
+          <div className="leadership-kpi-content">
             <h2>
               ₹<CountUp end={kpiStats.totalBudget} duration={2} separator="," />
             </h2>
             <p>Total Budget</p>
-            <span className="admin-kpi-subtitle">
+            <span className="leadership-kpi-subtitle">
               <TrendingUp size={12} /> {kpiStats.avgUtilization}% utilized
             </span>
           </div>
         </div>
 
-        <div className="admin-kpi-card">
-          <div className="admin-kpi-icon admin-yellow">
+        <div className="leadership-kpi-card">
+          <div className="leadership-kpi-icon leadership-cyan">
             <Target size={28} />
           </div>
-          <div className="admin-kpi-content">
+          <div className="leadership-kpi-content">
             <h2>
               <CountUp end={kpiStats.totalActiveGoals} duration={2} />
             </h2>
             <p>Active Goals</p>
-            <span className="admin-kpi-subtitle">
+            <span className="leadership-kpi-subtitle">
               <Target size={12} /> {kpiStats.completionRate}% completion rate
             </span>
           </div>
         </div>
 
-        <div className="admin-kpi-card">
-          <div className="admin-kpi-icon admin-blue">
+        <div className="leadership-kpi-card">
+          <div className="leadership-kpi-icon leadership-aqua">
             <Briefcase size={28} />
           </div>
-          <div className="admin-kpi-content">
+          <div className="leadership-kpi-content">
             <h2>
               <CountUp end={kpiStats.activeProjects} duration={2} />
             </h2>
             <p>Active Projects</p>
-            <span className="admin-kpi-subtitle">
+            <span className="leadership-kpi-subtitle">
               {kpiStats.totalProjects} total projects
             </span>
           </div>
         </div>
 
-        <div className="admin-kpi-card">
-          <div className="admin-kpi-icon admin-green">
+        <div className="leadership-kpi-card">
+          <div className="leadership-kpi-icon leadership-turquoise">
             <Users size={28} />
           </div>
-          <div className="admin-kpi-content">
+          <div className="leadership-kpi-content">
             <h2>
               <CountUp end={kpiStats.totalDepartments} duration={2} />
             </h2>
             <p>Departments</p>
-            <span className="admin-kpi-subtitle">
+            <span className="leadership-kpi-subtitle">
               {kpiStats.totalEmployees} employees
             </span>
           </div>
@@ -375,82 +382,38 @@ const LeadershipDashboard = () => {
                     className="status-segment"
                     style={{
                       width: `${employeeStatus.fulltimePercent}%`,
-                      backgroundColor: "#f59e0b",
+                      backgroundColor: "#005461",
                     }}
                   ></div>
                   <div
                     className="status-segment"
                     style={{
                       width: `${employeeStatus.contractPercent}%`,
-                      backgroundColor: "#374151",
+                      backgroundColor: "#018790",
                     }}
                   ></div>
                   <div
                     className="status-segment"
                     style={{
                       width: `${employeeStatus.probationPercent}%`,
-                      backgroundColor: "#ef4444",
+                      backgroundColor: "#00B7B5",
                     }}
                   ></div>
                   <div
                     className="status-segment"
                     style={{
                       width: `${employeeStatus.parttimePercent}%`,
-                      backgroundColor: "#ec4899",
+                      backgroundColor: "#4dd4d2",
                     }}
                   ></div>
                 </div>
               </div>
 
               <div className="status-grid">
-                <div className="status-card">
-                  <div className="status-legend">
-                    <span
-                      className="legend-dot"
-                      style={{ backgroundColor: "#f59e0b" }}
-                    ></span>
-                    <span>
-                      Fulltime ({employeeStatus.fulltimePercent}%)
-                    </span>
-                  </div>
-                  <h3>{employeeStatus.fulltime}</h3>
-                </div>
-                <div className="status-card">
-                  <div className="status-legend">
-                    <span
-                      className="legend-dot"
-                      style={{ backgroundColor: "#374151" }}
-                    ></span>
-                    <span>
-                      Contract ({employeeStatus.contractPercent}%)
-                    </span>
-                  </div>
-                  <h3>{employeeStatus.contract}</h3>
-                </div>
-                <div className="status-card">
-                  <div className="status-legend">
-                    <span
-                      className="legend-dot"
-                      style={{ backgroundColor: "#ef4444" }}
-                    ></span>
-                    <span>
-                      Probation ({employeeStatus.probationPercent}%)
-                    </span>
-                  </div>
-                  <h3>{employeeStatus.probation}</h3>
-                </div>
-                <div className="status-card">
-                  <div className="status-legend">
-                    <span
-                      className="legend-dot"
-                      style={{ backgroundColor: "#ec4899" }}
-                    ></span>
-                    <span>
-                      Part-time ({employeeStatus.parttimePercent}%)
-                    </span>
-                  </div>
-                  <h3>{employeeStatus.parttime}</h3>
-                </div>
+                <StatCard bg="#e6f4f5" border="#005461" value={employeeStatus.fulltime} label={`Fulltime (${employeeStatus.fulltimePercent}%)`} color="#005461" />
+                <StatCard bg="#e6f7f8" border="#018790" value={employeeStatus.contract} label={`Contract (${employeeStatus.contractPercent}%)`} color="#018790" />
+                <StatCard bg="#e6fbfb" border="#00B7B5" value={employeeStatus.probation} label={`Probation (${employeeStatus.probationPercent}%)`} color="#00B7B5" />
+                <StatCard bg="#f0fffe" border="#4dd4d2" value={employeeStatus.parttime} label={`Part-time (${employeeStatus.parttimePercent}%)`} color="#018790" />
               </div>
             </div>
           </div>
@@ -483,11 +446,11 @@ const LeadershipDashboard = () => {
                   <BarChart data={budgetByDept}>
                     <CartesianGrid
                       strokeDasharray="3 3"
-                      stroke="#f3f4f6"
+                      stroke="#e6f4f5"
                       vertical={false}
                     />
-                    <XAxis dataKey="name" stroke="#9ca3af" fontSize={11} />
-                    <YAxis stroke="#9ca3af" fontSize={11} />
+                    <XAxis dataKey="name" stroke="#6b7280" fontSize={11} />
+                    <YAxis stroke="#6b7280" fontSize={11} />
                     <Tooltip
                       contentStyle={{
                         backgroundColor: "#fff",
@@ -502,17 +465,17 @@ const LeadershipDashboard = () => {
                     <Legend wrapperStyle={{ fontSize: "12px" }} />
                     <Bar
                       dataKey="Total"
-                      fill="#27235c"
+                      fill="#005461"
                       radius={[6, 6, 0, 0]}
                     />
                     <Bar
                       dataKey="Allocated"
-                      fill="#0F62FE"
+                      fill="#018790"
                       radius={[6, 6, 0, 0]}
                     />
                     <Bar
                       dataKey="Utilized"
-                      fill="#10b981"
+                      fill="#00B7B5"
                       radius={[6, 6, 0, 0]}
                     />
                   </BarChart>
