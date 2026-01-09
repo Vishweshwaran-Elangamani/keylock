@@ -1,122 +1,45 @@
-import api_meet from "./index_meet";
+import axios from "axios";
+const PROJECT_API_URL = import.meta.env.VITE_PROJECT_API_URL;
 
 const employeeService = {
-  //EMPLOYEE OPERATIONS
+  getAllEmployees: () => axios.get(`${PROJECT_API_URL}/api/employeemanagement/all`),
 
-  /**
-   * Get all active employees
-   * Endpoint: GET /api/EmployeeManagement/all
-   */
-  getAllEmployees: async () => {
-    try {
-      const response = await api_meet.get("/EmployeeManagement/all");
-      return response.data;
-    } catch (error) {
-      console.error("Get all employees error:", error);
-      throw error.response?.data || error;
-    }
-  },
+  getById: (employeeId) =>
+    axios.get(`${PROJECT_API_URL}/api/employeemanagement/${employeeId}`),
+ 
+  getByDepartment: (departmentId) =>
+    axios.get(
+      `${PROJECT_API_URL}/api/employeemanagement/department/${departmentId}`
+    ),
 
-  /**
-   * Get employee by EmployeeMasterId
-   * Endpoint: GET /api/EmployeeManagement/{employeeMasterId}
-   */
-  getEmployeeById: async (employeeMasterId) => {
+  getByRole: (roleId) =>
+    axios.get(`${PROJECT_API_URL}/api/employeemanagement/role/${roleId}`),
+ 
+  search: (query) =>
+    axios.get(`${PROJECT_API_URL}/api/employeemanagement/search`, {
+      params: { q: query },
+    }),
+ 
+  getSubordinates: async () => {
     try {
-      const response = await api_meet.get(
-        `/EmployeeManagement/${employeeMasterId}`
+      // Get access token from storage (adjust as needed)
+      const accessToken = localStorage.getItem("accessToken");
+      const response = await axios.get(
+        `${LND_API_URL}/api/lnd-skills/employees/subordinates`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
       );
       return response.data;
     } catch (error) {
-      console.error(`Get employee ${employeeMasterId} error:`, error);
-      throw error.response?.data || error;
-    }
-  },
-
-  /** Get only managers */
-  getManagers: async () => {
-    try {
-      const response = await api_meet.get("/EmployeeManagement/managers");
-      return response.data;
-    } catch (error) {
-      console.error("Get managers error:", error);
-      throw error.response?.data || error;
-    }
-  },
-
-  /** Search employees */
-  searchEmployees: async (query) => {
-    try {
-      const response = await api_meet.get("/EmployeeManagement/search", {
-        params: { query },
-      });
-      return response.data;
-    } catch (error) {
-      console.error("Search employees error:", error);
-      throw error.response?.data || error;
-    }
-  },
-
-  /** Get employees by department */
-  getEmployeesByDepartment: async (departmentId) => {
-    try {
-      const response = await api_meet.get(
-        `/EmployeeManagement/department/${departmentId}`
-      );
-      return response.data;
-    } catch (error) {
-      console.error(
-        `Get employees by department ${departmentId} error:`,
-        error
-      );
-      throw error.response?.data || error;
-    }
-  },
-
-  /** Get employees by role */
-  getEmployeesByRole: async (roleId) => {
-    try {
-      const response = await api_meet.get(`/EmployeeManagement/role/${roleId}`);
-      return response.data;
-    } catch (error) {
-      console.error(`Get employees by role ${roleId} error:`, error);
-      throw error.response?.data || error;
-    }
-  },
-
-  //DEPARTMENT OPERATIONS
-
-  getAllDepartments: async () => {
-    try {
-      const response = await api_meet.get("/EmployeeManagement/departments");
-      return response.data;
-    } catch (error) {
-      console.error("Get all departments error:", error);
-      throw error.response?.data || error;
-    }
-  },
-
-  getDepartmentById: async (departmentId) => {
-    try {
-      const response = await api_meet.get(
-        `/EmployeeManagement/departments/${departmentId}`
-      );
-      return response.data;
-    } catch (error) {
-      console.error(`Get department ${departmentId} error:`, error);
-      throw error.response?.data || error;
-    }
-  },
-
-  getAllBusinessUnits: async () => {
-    try {
-      const response = await api_meet.get("/EmployeeManagement/business-units");
-      return response.data;
-    } catch (error) {
-      console.error("Get all business units error:", error);
+      console.error("Get subordinates error:", error);
       throw error.response?.data || error;
     }
   },
 };
 
-export default employeeService;
+export default employeeService
+
+
