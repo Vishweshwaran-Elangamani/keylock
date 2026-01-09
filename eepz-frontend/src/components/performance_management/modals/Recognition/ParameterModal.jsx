@@ -15,14 +15,6 @@ const ParameterModal = ({
       <div className="parameter-modal" onClick={(e) => e.stopPropagation()}>
         <div className="parameter-modal-header">
           <span className="parameter-modal-header-title">Add Parameter</span>
-          <button
-            type="button"
-            className="parameter-modal-close-btn"
-            onClick={onClose}
-            aria-label="Close"
-          >
-            ×
-          </button>
         </div>
         <div className="parameter-modal-body">
           <form onSubmit={onSubmit} autoComplete="off">
