@@ -26,7 +26,6 @@ const RoleTypeDropdown = ({ value, onChange }) => {
       className="rlm-type-select custom-status-dropdown"
       tabIndex={0}
       onBlur={() => setTimeout(() => setOpen(false), 200)}
-      style={{ position: "relative" }}
     >
       <div
         className="custom-status-selected"

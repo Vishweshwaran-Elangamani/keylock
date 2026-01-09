@@ -87,7 +87,9 @@ const DepartmentDropdown = ({ value, onChange, options }) => {
               key={opt.value || "all-dept"}
               className={
                 "custom-ba-department-option" +
-                (opt.value === value ? " custom-ba-department-option-active" : "")
+                (opt.value === value
+                  ? " custom-ba-department-option-active"
+                  : "")
               }
               onClick={() => handleSelect(opt.value)}
             >
@@ -394,14 +396,12 @@ const BudgetAllocation = () => {
           },
         ]}
       />
-
       {error && (
         <div className="alert alert-danger ba-alert" role="alert">
           <i className="bi bi-exclamation-triangle-fill me-2"></i>
           {error}
         </div>
       )}
-
       {filteredBudgets.length > 0 && (
         <div className="stats-cards-ba">
           <div className="stat-card-ba stat-total-ba">
@@ -441,7 +441,6 @@ const BudgetAllocation = () => {
           </div>
         </div>
       )}
-
       <div className="ba-controls">
         <div className="ba-search-input">
           <div className="ba-search-inner">
@@ -496,7 +495,6 @@ const BudgetAllocation = () => {
           </button>
         )}
       </div>
-
       {filteredBudgets.length === 0 ? (
         <div className="ba-empty-state">
           <div className="ba-empty-icon">
@@ -588,7 +586,9 @@ const BudgetAllocation = () => {
                   >
                     <span>{itemsPerPage}</span>
                     <i
-                      className={`bi bi-chevron-${showRowsDropdown ? "up" : "down"} ba-rows-chevron`}
+                      className={`bi bi-chevron-${
+                        showRowsDropdown ? "up" : "down"
+                      } ba-rows-chevron`}
                     ></i>
                   </button>
 
@@ -732,7 +732,10 @@ const BudgetAllocation = () => {
               <div className="ba-pagination-container">
                 <div className="ba-pagination-info">
                   <span className="ba-pagination-label">Show</span>
-                  <div ref={rowsDropdownRef} className="ba-rows-dropdown-wrapper">
+                  <div
+                    ref={rowsDropdownRef}
+                    className="ba-rows-dropdown-wrapper"
+                  >
                     <button
                       type="button"
                       onClick={() => setShowRowsDropdown(!showRowsDropdown)}
@@ -740,7 +743,9 @@ const BudgetAllocation = () => {
                     >
                       <span>{itemsPerPage}</span>
                       <i
-                        className={`bi bi-chevron-${showRowsDropdown ? "up" : "down"} ba-rows-chevron`}
+                        className={`bi bi-chevron-${
+                          showRowsDropdown ? "up" : "down"
+                        } ba-rows-chevron`}
                       ></i>
                     </button>
 
@@ -824,7 +829,6 @@ const BudgetAllocation = () => {
           </div>
         </>
       )}
-
       {showCreateModal && (
         <CreateBudgetModal
           show={showCreateModal}
@@ -832,7 +836,6 @@ const BudgetAllocation = () => {
           onBudgetCreated={handleBudgetCreated}
         />
       )}
-
       {showEditModal && selectedBudget && (
         <EditBudgetModal
           show={showEditModal}
@@ -844,7 +847,6 @@ const BudgetAllocation = () => {
           onBudgetUpdated={handleBudgetUpdated}
         />
       )}
-
       {showDetailsModal && selectedBudget && (
         <ViewBudgetDetailsModal
           show={showDetailsModal}
@@ -855,7 +857,6 @@ const BudgetAllocation = () => {
           }}
         />
       )}
-
       {showDeleteModal && selectedBudget && (
         <DeleteBudgetModal
           show={showDeleteModal}
@@ -867,18 +868,15 @@ const BudgetAllocation = () => {
           onBudgetDeleted={handleBudgetDeleted}
         />
       )}
-
       <div
-        className="ba-blur-backdrop"
-        style={{
-          display:
-            showCreateModal ||
-            showEditModal ||
-            showDetailsModal ||
-            showDeleteModal
-              ? "block"
-              : "none",
-        }}
+        className={`ba-blur-backdrop ${
+          showCreateModal ||
+          showEditModal ||
+          showDetailsModal ||
+          showDeleteModal
+            ? "ba-blur-active"
+            : ""
+        }`}
       ></div>
     </div>
   );
