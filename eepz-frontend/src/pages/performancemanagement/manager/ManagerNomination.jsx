@@ -29,6 +29,40 @@ const usePagination = (items = [], pageSize = 5) => {
   return { page, setPage, totalPages, paged, pageSize };
 };
 
+const PaginationDropdown = ({ value, onChange, options = [5, 10, 15, 20] }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="custom-mn-pagination-dropdown">
+      <div
+        className="custom-mn-selected"
+        onClick={() => setIsOpen(!isOpen)}
+        tabIndex={0}
+        onBlur={() => setTimeout(() => setIsOpen(false), 200)}
+      >
+        {value}
+        <span className="custom-mn-arrow"></span>
+      </div>
+      {isOpen && (
+        <div className="custom-mn-menu">
+          {options.map((opt) => (
+            <div
+              key={opt}
+              className={`custom-mn-option ${opt === value ? "custom-mn-option-active" : ""}`}
+              onClick={() => {
+                onChange(opt);
+                setIsOpen(false);
+              }}
+            >
+              {opt}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function ManagerNomination() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const empId = user?.empId ?? null;
@@ -42,6 +76,11 @@ export default function ManagerNomination() {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [activeTab, setActiveTab] = useState("pending");
   const [loading, setLoading] = useState(false);
+
+  const [teamPageSize, setTeamPageSize] = useState(5);
+  const [pendingPageSize, setPendingPageSize] = useState(5);
+  const [approvedPageSize, setApprovedPageSize] = useState(5);
+  const [rejectedPageSize, setRejectedPageSize] = useState(5);
 
   useEffect(() => {
     fetchRewardTypes();
@@ -88,20 +127,14 @@ export default function ManagerNomination() {
     }
   };
 
-  const pendingNominations = myNominations.filter(
-    (n) => n?.status === "Pending"
-  );
-  const approvedNominations = myNominations.filter(
-    (n) => n?.status === "Approved"
-  );
-  const rejectedNominations = myNominations.filter(
-    (n) => n?.status === "Rejected"
-  );
+  const pendingNominations = myNominations.filter((n) => n?.status === "Pending");
+  const approvedNominations = myNominations.filter((n) => n?.status === "Approved");
+  const rejectedNominations = myNominations.filter((n) => n?.status === "Rejected");
 
-  const pendingPager = usePagination(pendingNominations, 5);
-  const approvedPager = usePagination(approvedNominations, 5);
-  const rejectedPager = usePagination(rejectedNominations, 5);
-  const teamMembersPager = usePagination(teamMembers, 5);
+  const pendingPager = usePagination(pendingNominations, pendingPageSize);
+  const approvedPager = usePagination(approvedNominations, approvedPageSize);
+  const rejectedPager = usePagination(rejectedNominations, rejectedPageSize);
+  const teamMembersPager = usePagination(teamMembers, teamPageSize);
 
   const handleOpenNominate = (member) => {
     setSelectedEmployee(member);
@@ -112,49 +145,87 @@ export default function ManagerNomination() {
     fetchMyNominations();
     fetchTeamMembers();
     setShowNominationModal(false);
-    toast.success("Nomination submitted");
+    toast.success("Nomination submitted successfully");
   };
 
-  const Pagination = ({ pager }) => {
-    const { page, setPage, totalPages } = pager;
-    if (totalPages <= 1) return null;
+  const Pagination = ({ pager, pageSize, setPageSize }) => {
+    const { page, setPage, totalPages, paged } = pager;
+    const totalItems = pager.pageSize ? Math.ceil(paged.length / pager.pageSize) * pager.pageSize + (page - 1) * pager.pageSize : 0;
+    const startItem = totalPages > 0 ? (page - 1) * pager.pageSize + 1 : 0;
+    const endItem = Math.min(page * pager.pageSize, totalItems);
+
+    if (totalPages <= 0) return null;
+
     const pages = [];
     for (let i = 1; i <= totalPages; i++) pages.push(i);
+
     return (
-      <div className="managernomination-pagination" aria-label="Pagination">
-        <button
-          className="managernomination-pg-btn"
-          onClick={() => setPage(Math.max(1, page - 1))}
-          disabled={page === 1}
-        >
-          Prev
-        </button>
+      <div className="mn-pagination-container">
+        <div className="mn-pagination-info">
+          <span className="mn-pagination-label">Rows per page:</span>
+          <PaginationDropdown value={pageSize} onChange={setPageSize} />
+        </div>
 
-        {pages.map((p) => (
-          <button
-            key={p}
-            className={`managernomination-pg-btn ${p === page ? "active" : ""}`}
-            onClick={() => setPage(p)}
-            aria-current={p === page ? "page" : undefined}
-          >
-            {p}
-          </button>
-        ))}
+        <div className="mn-pagination-status">
+          {startItem}-{endItem} of {totalItems}
+        </div>
 
-        <button
-          className="managernomination-pg-btn"
-          onClick={() => setPage(Math.min(totalPages, page + 1))}
-          disabled={page === totalPages}
-        >
-          Next
-        </button>
+        <div className="mn-pagination-nav">
+          <ul className="mn-pagination">
+            <li className={`mn-page-item ${page === 1 ? "disabled" : ""}`}>
+              <button
+                className="mn-page-link"
+                onClick={() => setPage(Math.max(1, page - 1))}
+                disabled={page === 1}
+                aria-label="Previous page"
+              >
+                <i className="bi bi-chevron-left"></i>
+              </button>
+            </li>
+
+            {pages.map((p) => (
+              <li key={p} className={`mn-page-item ${p === page ? "active" : ""}`}>
+                <button
+                  className="mn-page-link"
+                  onClick={() => setPage(p)}
+                  aria-current={p === page ? "page" : undefined}
+                >
+                  {p}
+                </button>
+              </li>
+            ))}
+
+            <li className={`mn-page-item ${page === totalPages ? "disabled" : ""}`}>
+              <button
+                className="mn-page-link"
+                onClick={() => setPage(Math.min(totalPages, page + 1))}
+                disabled={page === totalPages}
+                aria-label="Next page"
+              >
+                <i className="bi bi-chevron-right"></i>
+              </button>
+            </li>
+          </ul>
+        </div>
       </div>
     );
   };
 
+  const StatCard = ({ icon, label, count, colorClass }) => (
+    <div className={`mn-stat-card ${colorClass}`}>
+      <div className="mn-stat-icon">
+        <i className={`bi bi-${icon}`}></i>
+      </div>
+      <div className="mn-stat-content">
+        <div className="mn-stat-value">{count}</div>
+        <div className="mn-stat-label">{label}</div>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="managernomination-container">
-      <Toaster position="top-right" />
+    <div className="mn-page">
+      <Toaster position="top-right" richColors closeButton />
 
       <Breadcrumb
         items={[
@@ -163,46 +234,59 @@ export default function ManagerNomination() {
         ]}
       />
 
-      <div className="managernomination-card managernomination-available-section managernomination-team-section">
-        <div className="managernomination-section-header">
-          <div className="managernomination-section-header-left">
-            <div className="managernomination-section-icon">
+      <div className="mn-stats-grid">
+        <StatCard icon="people-fill" label="Team Members" count={teamMembers.length} colorClass="mn-stat-total" />
+        <StatCard icon="clock-history" label="Pending" count={pendingNominations.length} colorClass="mn-stat-pending" />
+        <StatCard icon="check-circle-fill" label="Approved" count={approvedNominations.length} colorClass="mn-stat-submitted" />
+        <StatCard icon="x-circle-fill" label="Rejected" count={rejectedNominations.length} colorClass="mn-stat-rejected" />
+      </div>
+
+      <div className="mn-content">
+        <div className="mn-section-header">
+          <div className="mn-section-header-left">
+            <div className="mn-section-icon">
               <i className="bi bi-people-fill"></i>
             </div>
-            <h3 className="managernomination-section-title">Team Members</h3>
+            <div>
+              <h3 className="mn-section-title">Team Members</h3>
+              <p className="mn-section-subtitle">Nominate your team members for rewards and recognition</p>
+            </div>
           </div>
           <button
             onClick={() => {
               setShowNominationsView(!showNominationsView);
               if (!showNominationsView) {
                 setTimeout(() => {
-                  document
-                    .getElementById("nominations-section")
-                    ?.scrollIntoView({
-                      behavior: "smooth",
-                      block: "start",
-                    });
+                  document.getElementById("nominations-section")?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                  });
                 }, 100);
               }
             }}
-            className="managernomination-view-nominations-btn"
+            className="mn-view-btn"
           >
+            <i className={`bi bi-${showNominationsView ? "eye-slash" : "list-check"}`}></i>
             {showNominationsView ? "Hide Nominations" : "View Nominations"}
           </button>
         </div>
 
-        <div className="managernomination-table-wrapper managernomination-table-wrapper-transparent">
-          <table
-            className="managernomination-table"
-            role="table"
-            aria-label="Team members"
-          >
+        <div className="mn-table-wrapper">
+          <table className="mn-employee-table" role="table" aria-label="Team members">
             <thead>
               <tr>
-                <th className="col-index">SNO</th>
-                <th className="col-name">Name</th>
-                <th className="col-dept">Department</th>
-                <th className="col-action">Action</th>
+                <th className="col-index">
+                  <i className="bi bi-hash"></i> SNO
+                </th>
+                <th className="col-name">
+                  <i className="bi bi-person"></i> Name
+                </th>
+                <th className="col-dept">
+                  <i className="bi bi-building"></i> Department
+                </th>
+                <th className="col-action">
+                  <i className="bi bi-lightning"></i> Action
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -219,15 +303,20 @@ export default function ManagerNomination() {
                 return (
                   <tr key={member?.employeeId || i}>
                     <td className="col-index">
-                      {(teamMembersPager.page - 1) * teamMembersPager.pageSize +
-                        i +
-                        1}
+                      {(teamMembersPager.page - 1) * teamMembersPager.pageSize + i + 1}
                     </td>
-                    <td className="col-name">{name}</td>
+                    <td className="col-name">
+                      <div className="mn-employee-cell">
+                        <div className="mn-employee-avatar">
+                          {name.charAt(0).toUpperCase()}
+                        </div>
+                        <span className="mn-employee-name">{name}</span>
+                      </div>
+                    </td>
                     <td className="col-dept">{dept}</td>
                     <td className="col-action">
                       <button
-                        className="managernomination-nominate-button"
+                        className="mn-bulk-btn"
                         onClick={() => handleOpenNominate(member)}
                         title="Nominate this employee"
                       >
@@ -239,94 +328,95 @@ export default function ManagerNomination() {
               })}
               {teamMembers.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="managernomination-empty-row">
-                    {loading
-                      ? "Loading team members..."
-                      : "No team members found"}
+                  <td colSpan={4} className="mn-empty-row">
+                    <div className="mn-empty">
+                      <div className="mn-empty-icon">
+                        <i className="bi bi-inbox"></i>
+                      </div>
+                      <div className="mn-empty-title">
+                        {loading ? "Loading team members..." : "No team members found"}
+                      </div>
+                    </div>
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
-        <div className="managernomination-pagination-wrapper">
-          <Pagination pager={teamMembersPager} />
-        </div>
+
+        {teamMembers.length > 0 && (
+          <Pagination pager={teamMembersPager} pageSize={teamPageSize} setPageSize={setTeamPageSize} />
+        )}
       </div>
 
       {showNominationsView && (
-        <div
-          id="nominations-section"
-          className="managernomination-card managernomination-nominations-section"
-        >
-          <div className="managernomination-section-header">
-            <div className="managernomination-section-header-left">
-              <div className="managernomination-section-icon">
+        <div id="nominations-section" className="mn-content mn-nominations-section">
+          <div className="mn-section-header">
+            <div className="mn-section-header-left">
+              <div className="mn-section-icon">
                 <i className="bi bi-list-check"></i>
               </div>
-              <h3 className="managernomination-section-title">
-                My Nominations
-              </h3>
+              <div>
+                <h3 className="mn-section-title">My Nominations</h3>
+                <p className="mn-section-subtitle">Track and manage all your nomination submissions</p>
+              </div>
             </div>
-            <button
-              onClick={() => setShowNominationsView(false)}
-              className="managernomination-close-btn"
-            >
-              Close
+            <button onClick={() => setShowNominationsView(false)} className="mn-close-btn">
+              <i className="bi bi-x-lg"></i> Close
             </button>
           </div>
 
-          <div
-            className="managernomination-tab-container"
-            role="tablist"
-            aria-label="Nomination tabs"
-          >
+          <div className="mn-tabs-bar" role="tablist" aria-label="Nomination tabs">
             <button
-              className={`managernomination-tab ${
-                activeTab === "pending" ? "managernomination-tab-active" : ""
-              }`}
+              className={`mn-tab ${activeTab === "pending" ? "active" : ""}`}
               onClick={() => setActiveTab("pending")}
               role="tab"
               aria-selected={activeTab === "pending"}
             >
-              Pending ({pendingNominations.length})
+              <i className="bi bi-clock-history"></i>
+              Pending
+              <span className="mn-count">{pendingNominations.length}</span>
             </button>
 
             <button
-              className={`managernomination-tab ${
-                activeTab === "approved" ? "managernomination-tab-active" : ""
-              }`}
+              className={`mn-tab ${activeTab === "approved" ? "active" : ""}`}
               onClick={() => setActiveTab("approved")}
               role="tab"
               aria-selected={activeTab === "approved"}
             >
-              Approved ({approvedNominations.length})
+              <i className="bi bi-check-circle-fill"></i>
+              Approved
+              <span className="mn-count">{approvedNominations.length}</span>
             </button>
 
             <button
-              className={`managernomination-tab ${
-                activeTab === "rejected" ? "managernomination-tab-active" : ""
-              }`}
+              className={`mn-tab ${activeTab === "rejected" ? "active" : ""}`}
               onClick={() => setActiveTab("rejected")}
               role="tab"
               aria-selected={activeTab === "rejected"}
             >
-              Rejected ({rejectedNominations.length})
+              <i className="bi bi-x-circle-fill"></i>
+              Rejected
+              <span className="mn-count">{rejectedNominations.length}</span>
             </button>
           </div>
 
-          <div className="managernomination-table-wrapper managernomination-table-wrapper-transparent">
-            <table
-              className="managernomination-table"
-              role="table"
-              aria-label="Nominations table"
-            >
+          <div className="mn-table-wrapper">
+            <table className="mn-employee-table" role="table" aria-label="Nominations table">
               <thead>
                 <tr>
-                  <th className="col-index">SNO</th>
-                  <th className="col-name">Name</th>
-                  <th className="col-dept">Department</th>
-                  <th className="col-reward">Reward Type</th>
+                  <th className="col-index">
+                    <i className="bi bi-hash"></i> SNO
+                  </th>
+                  <th className="col-name">
+                    <i className="bi bi-person"></i> Name
+                  </th>
+                  <th className="col-dept">
+                    <i className="bi bi-building"></i> Department
+                  </th>
+                  <th className="col-reward">
+                    <i className="bi bi-gift"></i> Reward Type
+                  </th>
                 </tr>
               </thead>
 
@@ -334,9 +424,7 @@ export default function ManagerNomination() {
                 {activeTab === "pending" &&
                   pendingPager.paged.map((nom, i) => {
                     const name = safeText(
-                      `${nom?.nominee?.firstName || ""} ${
-                        nom?.nominee?.lastName || ""
-                      }`.trim(),
+                      `${nom?.nominee?.firstName || ""} ${nom?.nominee?.lastName || ""}`.trim(),
                       nom?.nominee?.name
                     );
                     const dept = safeText(
@@ -346,22 +434,26 @@ export default function ManagerNomination() {
                     );
                     let reward = "-";
                     if (nom?.rewardTypeId && Array.isArray(rewardTypes)) {
-                      const foundType = rewardTypes.find(
-                        (rt) => rt.rewardTypeId === nom.rewardTypeId
-                      );
-                      if (foundType && foundType.rewardName)
-                        reward = foundType.rewardName;
+                      const foundType = rewardTypes.find((rt) => rt.rewardTypeId === nom.rewardTypeId);
+                      if (foundType && foundType.rewardName) reward = foundType.rewardName;
                     }
                     return (
                       <tr key={nom?.nominationId || i}>
                         <td className="col-index">
-                          {(pendingPager.page - 1) * pendingPager.pageSize +
-                            i +
-                            1}
+                          {(pendingPager.page - 1) * pendingPager.pageSize + i + 1}
                         </td>
-                        <td className="col-name">{name}</td>
+                        <td className="col-name">
+                          <div className="mn-employee-cell">
+                            <div className="mn-employee-avatar">{name.charAt(0).toUpperCase()}</div>
+                            <span className="mn-employee-name">{name}</span>
+                          </div>
+                        </td>
                         <td className="col-dept">{dept}</td>
-                        <td className="col-reward">{reward}</td>
+                        <td className="col-reward">
+                          <span className="mn-days-badge badge-info">
+                            <i className="bi bi-gift"></i> {reward}
+                          </span>
+                        </td>
                       </tr>
                     );
                   })}
@@ -369,9 +461,7 @@ export default function ManagerNomination() {
                 {activeTab === "approved" &&
                   approvedPager.paged.map((nom, i) => {
                     const name = safeText(
-                      `${nom?.nominee?.firstName || ""} ${
-                        nom?.nominee?.lastName || ""
-                      }`.trim(),
+                      `${nom?.nominee?.firstName || ""} ${nom?.nominee?.lastName || ""}`.trim(),
                       nom?.nominee?.name
                     );
                     const dept = safeText(
@@ -381,22 +471,26 @@ export default function ManagerNomination() {
                     );
                     let reward = "-";
                     if (nom?.rewardTypeId && Array.isArray(rewardTypes)) {
-                      const foundType = rewardTypes.find(
-                        (rt) => rt.rewardTypeId === nom.rewardTypeId
-                      );
-                      if (foundType && foundType.rewardName)
-                        reward = foundType.rewardName;
+                      const foundType = rewardTypes.find((rt) => rt.rewardTypeId === nom.rewardTypeId);
+                      if (foundType && foundType.rewardName) reward = foundType.rewardName;
                     }
                     return (
                       <tr key={nom?.nominationId || i}>
                         <td className="col-index">
-                          {(approvedPager.page - 1) * approvedPager.pageSize +
-                            i +
-                            1}
+                          {(approvedPager.page - 1) * approvedPager.pageSize + i + 1}
                         </td>
-                        <td className="col-name">{name}</td>
+                        <td className="col-name">
+                          <div className="mn-employee-cell">
+                            <div className="mn-employee-avatar">{name.charAt(0).toUpperCase()}</div>
+                            <span className="mn-employee-name">{name}</span>
+                          </div>
+                        </td>
                         <td className="col-dept">{dept}</td>
-                        <td className="col-reward">{reward}</td>
+                        <td className="col-reward">
+                          <span className="mn-days-badge badge-success">
+                            <i className="bi bi-gift"></i> {reward}
+                          </span>
+                        </td>
                       </tr>
                     );
                   })}
@@ -404,9 +498,7 @@ export default function ManagerNomination() {
                 {activeTab === "rejected" &&
                   rejectedPager.paged.map((nom, i) => {
                     const name = safeText(
-                      `${nom?.nominee?.firstName || ""} ${
-                        nom?.nominee?.lastName || ""
-                      }`.trim(),
+                      `${nom?.nominee?.firstName || ""} ${nom?.nominee?.lastName || ""}`.trim(),
                       nom?.nominee?.name
                     );
                     const dept = safeText(
@@ -416,35 +508,41 @@ export default function ManagerNomination() {
                     );
                     let reward = "-";
                     if (nom?.rewardTypeId && Array.isArray(rewardTypes)) {
-                      const foundType = rewardTypes.find(
-                        (rt) => rt.rewardTypeId === nom.rewardTypeId
-                      );
-                      if (foundType && foundType.rewardName)
-                        reward = foundType.rewardName;
+                      const foundType = rewardTypes.find((rt) => rt.rewardTypeId === nom.rewardTypeId);
+                      if (foundType && foundType.rewardName) reward = foundType.rewardName;
                     }
                     return (
                       <tr key={nom?.nominationId || i}>
                         <td className="col-index">
-                          {(rejectedPager.page - 1) * rejectedPager.pageSize +
-                            i +
-                            1}
+                          {(rejectedPager.page - 1) * rejectedPager.pageSize + i + 1}
                         </td>
-                        <td className="col-name">{name}</td>
+                        <td className="col-name">
+                          <div className="mn-employee-cell">
+                            <div className="mn-employee-avatar">{name.charAt(0).toUpperCase()}</div>
+                            <span className="mn-employee-name">{name}</span>
+                          </div>
+                        </td>
                         <td className="col-dept">{dept}</td>
-                        <td className="col-reward">{reward}</td>
+                        <td className="col-reward">
+                          <span className="mn-days-badge badge-danger">
+                            <i className="bi bi-gift"></i> {reward}
+                          </span>
+                        </td>
                       </tr>
                     );
                   })}
 
-                {((activeTab === "pending" &&
-                  pendingNominations.length === 0) ||
-                  (activeTab === "approved" &&
-                    approvedNominations.length === 0) ||
-                  (activeTab === "rejected" &&
-                    rejectedNominations.length === 0)) && (
+                {((activeTab === "pending" && pendingNominations.length === 0) ||
+                  (activeTab === "approved" && approvedNominations.length === 0) ||
+                  (activeTab === "rejected" && rejectedNominations.length === 0)) && (
                   <tr>
-                    <td colSpan={4} className="managernomination-empty-row">
-                      No {activeTab} nominations found
+                    <td colSpan={4} className="mn-empty-row">
+                      <div className="mn-empty">
+                        <div className="mn-empty-icon">
+                          <i className="bi bi-inbox"></i>
+                        </div>
+                        <div className="mn-empty-title">No {activeTab} nominations found</div>
+                      </div>
                     </td>
                   </tr>
                 )}
@@ -452,11 +550,15 @@ export default function ManagerNomination() {
             </table>
           </div>
 
-          <div className="managernomination-pagination-wrapper">
-            {activeTab === "pending" && <Pagination pager={pendingPager} />}
-            {activeTab === "approved" && <Pagination pager={approvedPager} />}
-            {activeTab === "rejected" && <Pagination pager={rejectedPager} />}
-          </div>
+          {activeTab === "pending" && pendingNominations.length > 0 && (
+            <Pagination pager={pendingPager} pageSize={pendingPageSize} setPageSize={setPendingPageSize} />
+          )}
+          {activeTab === "approved" && approvedNominations.length > 0 && (
+            <Pagination pager={approvedPager} pageSize={approvedPageSize} setPageSize={setApprovedPageSize} />
+          )}
+          {activeTab === "rejected" && rejectedNominations.length > 0 && (
+            <Pagination pager={rejectedPager} pageSize={rejectedPageSize} setPageSize={setRejectedPageSize} />
+          )}
         </div>
       )}
 
