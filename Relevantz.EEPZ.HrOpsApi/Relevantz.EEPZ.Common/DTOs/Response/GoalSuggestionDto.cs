@@ -1,4 +1,6 @@
-namespace Relevantz.EEPZ.Common.DTOs.Response
+using System.Collections.Generic;
+
+namespace Relevantz.EEPZ.Common.DTOs
 {
     public class GoalSuggestionDto
     {

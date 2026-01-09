@@ -159,6 +159,7 @@ builder.Services.AddScoped<ICareerProgressionRepository, CareerProgressionReposi
 builder.Services.AddScoped<IBudgetPeriodAllocationRepository, BudgetPeriodAllocationRepository>();
 builder.Services.AddScoped<IFundAllocationRepository, FundAllocationRepository>();
 builder.Services.AddScoped<ISlaEscalationRepository, SlaEscalationRepository>();
+builder.Services.AddScoped<IEmployeeDataRepository, EmployeeDataRepository>();
 Log.Information("Repositories registered successfully");
 // Register Services
 builder.Services.AddScoped<IPolicyService, PolicyService>();
@@ -173,6 +174,7 @@ builder.Services.AddScoped<IPeriodAllocationService, PeriodAllocationService>();
 builder.Services.AddScoped<ICareerProgressionService, CareerProgressionService>();
 builder.Services.AddScoped<IFundAllocationService, FundAllocationService>();
 builder.Services.AddScoped<ISlaEscalationService, SlaEscalationService>();
+builder.Services.AddScoped<IEmployeeDataService, EmployeeDataService>();
 builder.Services.AddScoped<IMongoDbService, MongoDbService>();
 Log.Information("Services registered successfully");
 // Configure CORS with environment-specific policies
