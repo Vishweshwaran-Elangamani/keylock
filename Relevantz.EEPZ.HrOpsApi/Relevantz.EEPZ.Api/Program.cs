@@ -172,6 +172,7 @@ builder.Services.AddScoped<IPayrollManagementService, PayrollManagementService>(
 builder.Services.AddScoped<IPeriodAllocationService, PeriodAllocationService>();
 builder.Services.AddScoped<ICareerProgressionService, CareerProgressionService>();
 builder.Services.AddScoped<IFundAllocationService, FundAllocationService>();
+builder.Services.AddScoped<ISlaEscalationService, SlaEscalationService>();
 builder.Services.AddScoped<IMongoDbService, MongoDbService>();
 Log.Information("Services registered successfully");
 // Configure CORS with environment-specific policies

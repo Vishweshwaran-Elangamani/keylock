@@ -1,9 +1,7 @@
-using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Core.IService;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Relevantz.EEPZ.Common.Entities;
+
 namespace Relevantz.EEPZ.Api.Controllers
 {
     [Route("api/[controller]")]
@@ -11,25 +9,36 @@ namespace Relevantz.EEPZ.Api.Controllers
     public class FundAllocationController : ControllerBase
     {
         private readonly IFundAllocationService _fundAllocationService;
-        private readonly EEPZDbContext _context;
+        private readonly IDepartmentBudgetService _departmentBudgetService;
+        private readonly ILogger<FundAllocationController> _logger;
+
         public FundAllocationController(
             IFundAllocationService fundAllocationService,
-            EEPZDbContext context)
+            IDepartmentBudgetService departmentBudgetService,
+            ILogger<FundAllocationController> logger)
         {
             _fundAllocationService = fundAllocationService;
-            _context = context;
+            _departmentBudgetService = departmentBudgetService;
+            _logger = logger;
         }
+
+        #region Fund Allocation Endpoints
+
         [HttpPost("create")]
         public async Task<IActionResult> CreateFundAllocation([FromBody] CreateFundAllocationRequestDto request)
         {
             try
             {
                 var result = await _fundAllocationService.CreateFundAllocationAsync(request);
+                
+                if (!result.Success)
+                    return BadRequest(result);
+                
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in CreateFundAllocation: {ex.Message}");
+                _logger.LogError($"Error creating fund allocation: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,
@@ -38,17 +47,22 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
+
         [HttpPut("update")]
         public async Task<IActionResult> UpdateFundAllocation([FromBody] UpdateFundAllocationRequestDto request)
         {
             try
             {
                 var result = await _fundAllocationService.UpdateFundAllocationAsync(request);
+                
+                if (!result.Success)
+                    return BadRequest(result);
+                
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in UpdateFundAllocation: {ex.Message}");
+                _logger.LogError($"Error updating fund allocation: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,
@@ -57,17 +71,22 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
+
         [HttpDelete("{allocationId}")]
         public async Task<IActionResult> DeleteFundAllocation(int allocationId)
         {
             try
             {
                 var result = await _fundAllocationService.DeleteFundAllocationAsync(allocationId);
+                
+                if (!result.Success)
+                    return BadRequest(result);
+                
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in DeleteFundAllocation: {ex.Message}");
+                _logger.LogError($"Error deleting fund allocation: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,
@@ -76,6 +95,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
+
         [HttpGet("all")]
         public async Task<IActionResult> GetAllFundAllocations()
         {
@@ -86,7 +106,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in GetAllFundAllocations: {ex.Message}");
+                _logger.LogError($"Error fetching fund allocations: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,
@@ -95,17 +115,22 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
+
         [HttpGet("{allocationId}")]
         public async Task<IActionResult> GetFundAllocationById(int allocationId)
         {
             try
             {
                 var result = await _fundAllocationService.GetFundAllocationByIdAsync(allocationId);
+                
+                if (!result.Success)
+                    return NotFound(result);
+                
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in GetFundAllocationById: {ex.Message}");
+                _logger.LogError($"Error fetching fund allocation: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,
@@ -114,6 +139,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
+
         [HttpGet("by-department/{departmentId}")]
         public async Task<IActionResult> GetFundAllocationsByDepartment(int departmentId)
         {
@@ -124,7 +150,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in GetFundAllocationsByDepartment: {ex.Message}");
+                _logger.LogError($"Error fetching fund allocations by department: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,
@@ -133,6 +159,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
+
         [HttpGet("by-type/{allocationType}")]
         public async Task<IActionResult> GetFundAllocationsByType(string allocationType)
         {
@@ -143,7 +170,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in GetFundAllocationsByType: {ex.Message}");
+                _logger.LogError($"Error fetching fund allocations by type: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,
@@ -152,138 +179,50 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
+
+        #endregion
+
+        #region Department Budget Endpoints
+
         [HttpGet("department-budgets/all")]
         public async Task<IActionResult> GetAllDepartmentBudgets()
         {
             try
             {
-                Console.WriteLine(" Controller: GetAllDepartmentBudgets called");
-                var budgets = await _context.Departmentbudgets
-                    .AsNoTracking()
-                    .OrderBy(b => b.DepartmentId)
-                    .ToListAsync();
-                Console.WriteLine($" Controller: Found {budgets.Count} department budgets");
-                var response = new List<object>();
-                foreach (var budget in budgets)
-                {
-                    string departmentName = "Unknown";
-                    try
-                    {
-                        var dept = await _context.Departments
-                            .AsNoTracking()
-                            .FirstOrDefaultAsync(d => d.DepartmentId == budget.DepartmentId);
-                        if (dept != null && !string.IsNullOrEmpty(dept.DepartmentName))
-                        {
-                            departmentName = dept.DepartmentName;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($" Error fetching department name: {ex.Message}");
-                    }
-                    response.Add(new
-                    {
-                        budget.BudgetId,
-                        budget.DepartmentId,
-                        DepartmentName = departmentName,
-                        budget.FiscalYear,
-                        budget.TotalBudget,
-                        budget.AllocatedAmount,
-                        budget.UtilizedAmount,
-                        budget.UtilizationPercentage,
-                        budget.Headcount,
-                        budget.AvgCostPerEmployee,
-                        budget.CreatedAt,
-                        budget.UpdatedAt
-                    });
-                }
-                Console.WriteLine($" Controller: Returning {response.Count} department budgets");
-                return Ok(new
-                {
-                    success = true,
-                    message = $"Retrieved {response.Count} department budgets",
-                    data = response
-                });
+                var result = await _departmentBudgetService.GetAllDepartmentBudgetsAsync();
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($" Controller Error in GetAllDepartmentBudgets: {ex.Message}");
-                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                _logger.LogError($"Error fetching department budgets: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,
-                    message = $"An error occurred while fetching department budgets: {ex.Message}",
+                    message = "An error occurred while fetching department budgets",
                     data = (object)null
                 });
             }
         }
+
         [HttpGet("department-budgets/department/{departmentId}")]
         public async Task<IActionResult> GetDepartmentBudget(int departmentId)
         {
             try
             {
-                Console.WriteLine($" Controller: GetDepartmentBudget called for department {departmentId}");
-                if (departmentId <= 0)
+                var result = await _departmentBudgetService.GetDepartmentBudgetAsync(departmentId);
+                
+                if (!result.Success)
                 {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = "Invalid department ID",
-                        data = (object)null
-                    });
+                    if (result.Message.Contains("not found"))
+                        return NotFound(result);
+                    return BadRequest(result);
                 }
-                var budget = await _context.Departmentbudgets
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(b => b.DepartmentId == departmentId);
-                if (budget == null)
-                {
-                    return NotFound(new
-                    {
-                        success = false,
-                        message = "Department budget not found",
-                        data = (object)null
-                    });
-                }
-                string departmentName = "Unknown";
-                try
-                {
-                    var dept = await _context.Departments
-                        .AsNoTracking()
-                        .FirstOrDefaultAsync(d => d.DepartmentId == budget.DepartmentId);
-                    if (dept != null && !string.IsNullOrEmpty(dept.DepartmentName))
-                    {
-                        departmentName = dept.DepartmentName;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($" Error fetching department name: {ex.Message}");
-                }
-                var response = new
-                {
-                    budget.BudgetId,
-                    budget.DepartmentId,
-                    DepartmentName = departmentName,
-                    budget.FiscalYear,
-                    budget.TotalBudget,
-                    budget.AllocatedAmount,
-                    budget.UtilizedAmount,
-                    budget.UtilizationPercentage,
-                    budget.Headcount,
-                    budget.AvgCostPerEmployee,
-                    budget.CreatedAt,
-                    budget.UpdatedAt
-                };
-                return Ok(new
-                {
-                    success = true,
-                    message = "Department budget retrieved successfully",
-                    data = response
-                });
+                
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($" Error in GetDepartmentBudget: {ex.Message}");
+                _logger.LogError($"Error fetching department budget: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,
@@ -292,70 +231,22 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
+
         [HttpGet("department-budgets/year/{fiscalYear}")]
         public async Task<IActionResult> GetDepartmentBudgetsByYear(int fiscalYear)
         {
             try
             {
-                Console.WriteLine($" Controller: GetDepartmentBudgetsByYear called for year {fiscalYear}");
-                if (fiscalYear <= 0)
-                {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = "Fiscal year must be greater than zero",
-                        data = (object)null
-                    });
-                }
-                var budgets = await _context.Departmentbudgets
-                    .AsNoTracking()
-                    .Where(b => b.FiscalYear == fiscalYear)
-                    .OrderBy(b => b.DepartmentId)
-                    .ToListAsync();
-                var response = new List<object>();
-                foreach (var budget in budgets)
-                {
-                    string departmentName = "Unknown";
-                    try
-                    {
-                        var dept = await _context.Departments
-                            .AsNoTracking()
-                            .FirstOrDefaultAsync(d => d.DepartmentId == budget.DepartmentId);
-                        if (dept != null && !string.IsNullOrEmpty(dept.DepartmentName))
-                        {
-                            departmentName = dept.DepartmentName;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($" Error fetching department name: {ex.Message}");
-                    }
-                    response.Add(new
-                    {
-                        budget.BudgetId,
-                        budget.DepartmentId,
-                        DepartmentName = departmentName,
-                        budget.FiscalYear,
-                        budget.TotalBudget,
-                        budget.AllocatedAmount,
-                        budget.UtilizedAmount,
-                        budget.UtilizationPercentage,
-                        budget.Headcount,
-                        budget.AvgCostPerEmployee,
-                        budget.CreatedAt,
-                        budget.UpdatedAt
-                    });
-                }
-                return Ok(new
-                {
-                    success = true,
-                    message = $"Retrieved {response.Count} department budgets for fiscal year {fiscalYear}",
-                    data = response
-                });
+                var result = await _departmentBudgetService.GetDepartmentBudgetsByYearAsync(fiscalYear);
+                
+                if (!result.Success)
+                    return BadRequest(result);
+                
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($" Error in GetDepartmentBudgetsByYear: {ex.Message}");
+                _logger.LogError($"Error fetching department budgets by year: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,
@@ -364,97 +255,26 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
+
         [HttpPost("department-budgets/create")]
         public async Task<IActionResult> CreateDepartmentBudget([FromBody] CreateDepartmentBudgetDto request)
         {
             try
             {
-                Console.WriteLine($" Controller: CreateDepartmentBudget called");
-                Console.WriteLine($"Request: Department={request.DepartmentId}, Year={request.FiscalYear}, Total={request.TotalBudget}");
-                if (request.DepartmentId <= 0)
+                var result = await _departmentBudgetService.CreateDepartmentBudgetAsync(request);
+                
+                if (!result.Success)
                 {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = "Invalid department ID",
-                        data = (object)null
-                    });
+                    if (result.Message.Contains("not found"))
+                        return NotFound(result);
+                    return BadRequest(result);
                 }
-                if (request.FiscalYear <= 0)
-                {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = "Invalid fiscal year",
-                        data = (object)null
-                    });
-                }
-                if (request.TotalBudget <= 0)
-                {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = "Total budget must be greater than zero",
-                        data = (object)null
-                    });
-                }
-                var departmentExists = await _context.Departments
-                    .AnyAsync(d => d.DepartmentId == request.DepartmentId);
-                if (!departmentExists)
-                {
-                    return NotFound(new
-                    {
-                        success = false,
-                        message = "Department not found",
-                        data = (object)null
-                    });
-                }
-                var existingBudget = await _context.Departmentbudgets
-                    .FirstOrDefaultAsync(b => b.DepartmentId == request.DepartmentId && b.FiscalYear == request.FiscalYear);
-                if (existingBudget != null)
-                {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = "Budget already exists for this department and fiscal year",
-                        data = (object)null
-                    });
-                }
-                var newBudget = new Departmentbudget
-                {
-                    DepartmentId = request.DepartmentId,
-                    FiscalYear = request.FiscalYear,
-                    TotalBudget = request.TotalBudget,
-                    AllocatedAmount = request.AllocatedAmount ?? request.TotalBudget,
-                    UtilizedAmount = 0,
-                    UtilizationPercentage = 0,
-                    Headcount = 0,
-                    AvgCostPerEmployee = 0,
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now
-                };
-                _context.Departmentbudgets.Add(newBudget);
-                await _context.SaveChangesAsync();
-                Console.WriteLine($" Budget created with ID: {newBudget.BudgetId}");
-                return Ok(new
-                {
-                    success = true,
-                    message = "Department budget created successfully",
-                    data = new
-                    {
-                        newBudget.BudgetId,
-                        newBudget.DepartmentId,
-                        newBudget.FiscalYear,
-                        newBudget.TotalBudget,
-                        newBudget.AllocatedAmount,
-                        newBudget.CreatedAt
-                    }
-                });
+                
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($" Error in CreateDepartmentBudget: {ex.Message}");
-                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                _logger.LogError($"Error creating department budget: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,
@@ -463,72 +283,26 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
+
         [HttpPut("department-budgets/update")]
         public async Task<IActionResult> UpdateDepartmentBudget([FromBody] UpdateDepartmentBudgetDto request)
         {
             try
             {
-                Console.WriteLine($" Controller: UpdateDepartmentBudget called");
-                if (request.BudgetId <= 0)
+                var result = await _departmentBudgetService.UpdateDepartmentBudgetAsync(request);
+                
+                if (!result.Success)
                 {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = "Invalid budget ID",
-                        data = (object)null
-                    });
+                    if (result.Message.Contains("not found"))
+                        return NotFound(result);
+                    return BadRequest(result);
                 }
-                var budget = await _context.Departmentbudgets
-                    .FirstOrDefaultAsync(b => b.BudgetId == request.BudgetId);
-                if (budget == null)
-                {
-                    return NotFound(new
-                    {
-                        success = false,
-                        message = "Department budget not found",
-                        data = (object)null
-                    });
-                }
-                if (request.TotalBudget <= 0)
-                {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = "Total budget must be greater than zero",
-                        data = (object)null
-                    });
-                }
-                if (request.AllocatedAmount > request.TotalBudget)
-                {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = "Allocated amount cannot exceed total budget",
-                        data = (object)null
-                    });
-                }
-                budget.TotalBudget = request.TotalBudget;
-                budget.AllocatedAmount = request.AllocatedAmount;
-                budget.UpdatedAt = DateTime.Now;
-                _context.Departmentbudgets.Update(budget);
-                await _context.SaveChangesAsync();
-                Console.WriteLine($" Budget updated successfully");
-                return Ok(new
-                {
-                    success = true,
-                    message = "Department budget updated successfully",
-                    data = new
-                    {
-                        budget.BudgetId,
-                        budget.TotalBudget,
-                        budget.AllocatedAmount,
-                        budget.UpdatedAt
-                    }
-                });
+                
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($" Error in UpdateDepartmentBudget: {ex.Message}");
+                _logger.LogError($"Error updating department budget: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,
@@ -537,56 +311,26 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
+
         [HttpDelete("department-budgets/{budgetId}")]
         public async Task<IActionResult> DeleteDepartmentBudget(int budgetId)
         {
             try
             {
-                Console.WriteLine($" Controller: DeleteDepartmentBudget called for budget {budgetId}");
-                if (budgetId <= 0)
+                var result = await _departmentBudgetService.DeleteDepartmentBudgetAsync(budgetId);
+                
+                if (!result.Success)
                 {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = "Invalid budget ID",
-                        data = (object)null
-                    });
+                    if (result.Message.Contains("not found"))
+                        return NotFound(result);
+                    return BadRequest(result);
                 }
-                var budget = await _context.Departmentbudgets
-                    .FirstOrDefaultAsync(b => b.BudgetId == budgetId);
-                if (budget == null)
-                {
-                    return NotFound(new
-                    {
-                        success = false,
-                        message = "Department budget not found",
-                        data = (object)null
-                    });
-                }
-                var allocations = await _context.Budgetallocations
-                    .Where(a => a.DepartmentId == budget.DepartmentId)
-                    .ToListAsync();
-                if (allocations.Count > 0)
-                {
-                    _context.Budgetallocations.RemoveRange(allocations);
-                    Console.WriteLine($" Deleted {allocations.Count} associated allocations");
-                }
-                _context.Departmentbudgets.Remove(budget);
-                await _context.SaveChangesAsync();
-                Console.WriteLine($" Budget deleted successfully");
-                return Ok(new
-                {
-                    success = true,
-                    message = "Department budget deleted successfully",
-                    data = new
-                    {
-                        budget.BudgetId
-                    }
-                });
+                
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($" Error in DeleteDepartmentBudget: {ex.Message}");
+                _logger.LogError($"Error deleting department budget: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,
@@ -595,78 +339,26 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
+
         [HttpPut("department-budgets/update-utilized")]
         public async Task<IActionResult> UpdateUtilizedAmount([FromBody] UpdateUtilizedAmountDto request)
         {
             try
             {
-                Console.WriteLine($" Controller: UpdateUtilizedAmount called");
-                if (request.BudgetId <= 0)
+                var result = await _departmentBudgetService.UpdateUtilizedAmountAsync(request);
+                
+                if (!result.Success)
                 {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = "Invalid budget ID",
-                        data = (object)null
-                    });
+                    if (result.Message.Contains("not found"))
+                        return NotFound(result);
+                    return BadRequest(result);
                 }
-                var budget = await _context.Departmentbudgets
-                    .FirstOrDefaultAsync(b => b.BudgetId == request.BudgetId);
-                if (budget == null)
-                {
-                    return NotFound(new
-                    {
-                        success = false,
-                        message = "Department budget not found",
-                        data = (object)null
-                    });
-                }
-                if (request.UtilizedAmount < 0)
-                {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = "Utilized amount cannot be negative",
-                        data = (object)null
-                    });
-                }
-                if (request.UtilizedAmount > (budget.AllocatedAmount ?? 0))
-                {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = $"Utilized amount cannot exceed allocated budget (₹{budget.AllocatedAmount})",
-                        data = (object)null
-                    });
-                }
-                decimal utilizationPercentage = 0;
-                if (budget.AllocatedAmount > 0)
-                {
-                    utilizationPercentage = (request.UtilizedAmount / budget.AllocatedAmount.Value) * 100;
-                }
-                budget.UtilizedAmount = request.UtilizedAmount;
-                budget.UtilizationPercentage = utilizationPercentage;
-                budget.UpdatedAt = DateTime.Now;
-                _context.Departmentbudgets.Update(budget);
-                await _context.SaveChangesAsync();
-                Console.WriteLine($" Utilized amount updated successfully");
-                return Ok(new
-                {
-                    success = true,
-                    message = "Utilized amount updated successfully",
-                    data = new
-                    {
-                        budget.BudgetId,
-                        budget.AllocatedAmount,
-                        budget.UtilizedAmount,
-                        budget.UtilizationPercentage,
-                        budget.UpdatedAt
-                    }
-                });
+                
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($" Error in UpdateUtilizedAmount: {ex.Message}");
+                _logger.LogError($"Error updating utilized amount: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,
@@ -675,85 +367,26 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
+
         [HttpPut("update-utilization")]
         public async Task<IActionResult> UpdateUtilization([FromBody] UpdateUtilizationDto request)
         {
             try
             {
-                Console.WriteLine($"Controller: UpdateUtilization called for allocation {request.AllocationId}");
-                if (request.AllocationId <= 0)
+                var result = await _departmentBudgetService.UpdateUtilizationAsync(request);
+                
+                if (!result.Success)
                 {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = "Invalid allocation ID",
-                        data = (object)null
-                    });
+                    if (result.Message.Contains("not found"))
+                        return NotFound(result);
+                    return BadRequest(result);
                 }
-                // Get the allocation first
-                var allocation = await _context.Budgetallocations
-                    .FirstOrDefaultAsync(a => a.AllocationId == request.AllocationId);
-                if (allocation == null)
-                {
-                    Console.WriteLine($"Allocation not found: {request.AllocationId}");
-                    // DEBUG: Check what allocations exist
-                    var existingAllocations = await _context.Budgetallocations
-                        .Select(a => a.AllocationId)
-                        .ToListAsync();
-                    Console.WriteLine($"Existing AllocationIds: {string.Join(", ", existingAllocations)}");
-                    return NotFound(new
-                    {
-                        success = false,
-                        message = $"Budget allocation with ID {request.AllocationId} not found",
-                        data = (object)null
-                    });
-                }
-                if (request.UtilizedAmount < 0)
-                {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = "Utilized amount cannot be negative",
-                        data = (object)null
-                    });
-                }
-                if (request.UtilizedAmount > allocation.Amount)
-                {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = $"Utilized amount (₹{request.UtilizedAmount}) cannot exceed allocated amount (₹{allocation.Amount})",
-                        data = (object)null
-                    });
-                }
-                // Update allocation
-                allocation.UtilizedAmount = request.UtilizedAmount;
-                allocation.UtilizationPercentage = request.UtilizationPercentage;
-                if (!string.IsNullOrEmpty(request.Notes))
-                    allocation.Notes = request.Notes;
-                allocation.UpdatedAt = DateTime.UtcNow;
-                _context.Budgetallocations.Update(allocation);
-                await _context.SaveChangesAsync();
-                Console.WriteLine($"Allocation {allocation.AllocationId} utilization updated successfully");
-                await UpdateDepartmentBudgetTotals(allocation.DepartmentId);
-                return Ok(new
-                {
-                    success = true,
-                    message = "Utilization updated successfully",
-                    data = new
-                    {
-                        allocation.AllocationId,
-                        allocation.Amount,
-                        allocation.UtilizedAmount,
-                        allocation.UtilizationPercentage,
-                        allocation.UpdatedAt
-                    }
-                });
+                
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($" Controller Error: {ex.Message}");
-                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                _logger.LogError($"Error updating utilization: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,
@@ -762,74 +395,18 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-        private async Task UpdateDepartmentBudgetTotals(int departmentId)
-        {
-            try
-            {
-                var budget = await _context.Departmentbudgets
-                    .FirstOrDefaultAsync(b => b.DepartmentId == departmentId);
-                if (budget != null)
-                {
-                    var totalUtilized = await _context.Budgetallocations
-                        .Where(a => a.DepartmentId == departmentId)
-                        .SumAsync(a => a.UtilizedAmount ?? 0);
-                    budget.UtilizedAmount = totalUtilized;
-                    budget.UtilizationPercentage = budget.AllocatedAmount > 0
-                        ? (totalUtilized / budget.AllocatedAmount.Value) * 100
-                        : 0;
-                    budget.UpdatedAt = DateTime.UtcNow;
-                    _context.Departmentbudgets.Update(budget);
-                    await _context.SaveChangesAsync();
-                    Console.WriteLine($" Department budget totals updated");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($" Error updating department budget totals: {ex.Message}");
-            }
-        }
+
         [HttpGet("by-budget/{budgetId}")]
         public async Task<IActionResult> GetAllocationsByBudget(int budgetId)
         {
             try
             {
-                Console.WriteLine($" Getting allocations for budget: {budgetId}");
-                var allocations = await _context.Budgetallocations
-                    .AsNoTracking()
-                    .Where(a => a.BudgetId == budgetId)
-                    .Select(a => new
-                    {
-                        a.AllocationId,
-                        a.BudgetId,
-                        a.DepartmentId,
-                        DepartmentName = a.Department != null ? a.Department.DepartmentName : "Unknown",
-                        a.EmployeeUserId,
-                        EmployeeEmail = a.EmployeeUser != null ? a.EmployeeUser.Email : null,
-                        a.AllocationType,
-                        a.Amount,
-                        a.GoalStatus,
-                        a.Notes,
-                        a.AllocatedByUserId,
-                        AllocatedByEmail = a.AllocatedByUser != null ? a.AllocatedByUser.Email : "Unknown",
-                        a.AllocatedAt,
-                        a.UtilizedAmount,
-                        a.UtilizationPercentage,
-                        a.UpdatedAt,
-                        a.Period,
-                        a.PeriodYear
-                    })
-                    .ToListAsync();
-                Console.WriteLine($"Found {allocations.Count} allocations for budget {budgetId}");
-                return Ok(new
-                {
-                    success = true,
-                    message = $"Retrieved {allocations.Count} allocations",
-                    data = allocations
-                });
+                var result = await _departmentBudgetService.GetAllocationsByBudgetAsync(budgetId);
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error getting allocations: {ex.Message}");
+                _logger.LogError($"Error getting allocations: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,
@@ -838,5 +415,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
+
+        #endregion
     }
 }

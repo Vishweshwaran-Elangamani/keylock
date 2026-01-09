@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Core.IService;
+
 namespace Relevantz.EEPZ.Api.Controllers
 {
     [Route("api/[controller]")]
@@ -8,10 +9,16 @@ namespace Relevantz.EEPZ.Api.Controllers
     public class PeriodAllocationController : ControllerBase
     {
         private readonly IPeriodAllocationService _periodAllocationService;
-        public PeriodAllocationController(IPeriodAllocationService periodAllocationService)
+        private readonly ILogger<PeriodAllocationController> _logger; 
+
+        public PeriodAllocationController(
+            IPeriodAllocationService periodAllocationService,
+            ILogger<PeriodAllocationController> logger) 
         {
             _periodAllocationService = periodAllocationService;
+            _logger = logger; 
         }
+
         /// <summary>
         /// Leadership: Create period-based budget allocation
         /// </summary>
@@ -27,7 +34,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Controller Error: {ex.Message}");
+                _logger.LogError($"Error creating period allocation: {ex.Message}"); 
                 return StatusCode(500, new
                 {
                     success = false,
@@ -36,6 +43,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
+
         /// <summary>
         /// Leadership: Update period allocation amount
         /// </summary>
@@ -51,7 +59,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Controller Error: {ex.Message}");
+                _logger.LogError($"Error updating period allocation: {ex.Message}"); 
                 return StatusCode(500, new
                 {
                     success = false,
@@ -60,6 +68,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
+
         /// <summary>
         /// Leadership: Delete period allocation (only if no sub-allocations exist)
         /// </summary>
@@ -75,7 +84,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Controller Error: {ex.Message}");
+                _logger.LogError($"Error deleting period allocation {periodAllocationId}: {ex.Message}"); 
                 return StatusCode(500, new
                 {
                     success = false,
@@ -84,6 +93,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
+
         /// <summary>
         /// Get period allocation by ID
         /// </summary>
@@ -99,7 +109,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Controller Error: {ex.Message}");
+                _logger.LogError($"Error fetching period allocation {periodAllocationId}: {ex.Message}"); 
                 return StatusCode(500, new
                 {
                     success = false,
@@ -108,6 +118,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
+
         /// <summary>
         /// Get all period allocations
         /// </summary>
@@ -121,7 +132,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Controller Error: {ex.Message}");
+                _logger.LogError($"Error fetching all period allocations: {ex.Message}"); 
                 return StatusCode(500, new
                 {
                     success = false,
@@ -130,6 +141,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
+
         /// <summary>
         /// Get all period allocations for a specific budget
         /// </summary>
@@ -143,7 +155,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Controller Error: {ex.Message}");
+                _logger.LogError($"Error fetching period allocations by budget {budgetId}: {ex.Message}"); 
                 return StatusCode(500, new
                 {
                     success = false,
