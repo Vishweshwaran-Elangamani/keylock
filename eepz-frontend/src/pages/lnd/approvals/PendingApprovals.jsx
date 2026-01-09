@@ -105,13 +105,6 @@ const PendingApprovals = () => {
       });
   
       if (response.data.success) {
-        console.log("📊 Debug Info:", {
-          totalItems: response.data.data.totalCount,
-          itemsReceived: response.data.data.items.length,
-          currentPage,
-          itemsPerPage
-        });
-  
         setApprovals(response.data.data.items);
         setTotalItems(response.data.data.totalCount);
         setTotalPages(response.data.data.totalPages);
