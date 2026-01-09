@@ -1,6 +1,5 @@
 import React from "react";
 import "../../../styles/hr_operations/hr/UnpublishPolicyModal.css";
-
 const UnpublishPolicyModal = ({
   show,
   policy,
@@ -9,11 +8,9 @@ const UnpublishPolicyModal = ({
   unpublishing,
 }) => {
   if (!show || !policy) return null;
-
   return (
     <>
       <div className="upm-backdrop" onClick={onHide} />
-
       <div className="upm-modal-container">
         <div className="upm-modal-dialog">
           {/* HEADER */}
@@ -32,14 +29,12 @@ const UnpublishPolicyModal = ({
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* BODY */}
           <div className="upm-modal-body">
             {/* Main Message */}
             <p className="upm-main-message">
               You are about to unpublish the following policy:
             </p>
-
             {/* Policy Info Box */}
             <div className="upm-policy-info-box">
               <div className="upm-policy-content">
@@ -60,13 +55,11 @@ const UnpublishPolicyModal = ({
                 )}
               </div>
             </div>
-
             {/* Info Message */}
             <p className="upm-info-message">
               This policy will be hidden from employees and moved to draft
               status.
             </p>
-
             {/* Warning Info */}
             <div className="upm-warning-info">
               <i className="bi bi-exclamation-triangle-fill upm-warning-icon"></i>
@@ -77,7 +70,6 @@ const UnpublishPolicyModal = ({
               </div>
             </div>
           </div>
-
           {/* FOOTER */}
           <div className="upm-modal-footer">
             <button
@@ -88,7 +80,6 @@ const UnpublishPolicyModal = ({
             >
               Cancel
             </button>
-
             <button
               type="button"
               onClick={onUnpublish}
@@ -113,5 +104,4 @@ const UnpublishPolicyModal = ({
     </>
   );
 };
-
 export default UnpublishPolicyModal;

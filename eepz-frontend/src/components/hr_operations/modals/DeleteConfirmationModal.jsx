@@ -1,6 +1,5 @@
 import React from "react";
 import "../../../styles/hr_operations/hr/DeleteConfirmationModal.css";
-
 const DeleteConfirmationModal = ({
   isOpen,
   onClose,
@@ -11,22 +10,18 @@ const DeleteConfirmationModal = ({
   isDeleting = false,
 }) => {
   if (!isOpen) return null;
-
   const handleConfirm = () => {
     onConfirm();
   };
-
   const handleCancel = () => {
     if (!isDeleting) {
       onClose();
     }
   };
-
   return (
     <>
       {/* Custom Backdrop with Blur Effect */}
       <div className="dcm-backdrop" onClick={handleCancel} />
-
       {/* Modal Container (Compact) */}
       <div className="dcm-modal-container">
         {/* Modal Header */}
@@ -43,17 +38,14 @@ const DeleteConfirmationModal = ({
             <i className="bi bi-x-lg"></i>
           </button>
         </div>
-
         {/* Modal Body */}
         <div className="dcm-modal-body">
           <p className="dcm-message">{message}</p>
-
           {itemName && (
             <div className="dcm-item-box">
               <strong className="dcm-item-name">{itemName}</strong>
             </div>
           )}
-
           {/* Warning Box */}
           <div className="dcm-warning-box">
             <div className="dcm-warning-header">
@@ -63,7 +55,6 @@ const DeleteConfirmationModal = ({
             <p className="dcm-warning-text">This action cannot be undone.</p>
           </div>
         </div>
-
         {/* Modal Footer */}
         <div className="dcm-modal-footer">
           {/* Cancel Button */}
@@ -75,7 +66,6 @@ const DeleteConfirmationModal = ({
           >
             Cancel
           </button>
-
           {/* Delete Button */}
           <button
             type="button"
@@ -100,5 +90,4 @@ const DeleteConfirmationModal = ({
     </>
   );
 };
-
 export default DeleteConfirmationModal;

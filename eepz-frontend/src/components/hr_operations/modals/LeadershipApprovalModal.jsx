@@ -2,23 +2,18 @@ import React, { useState, useEffect } from "react";
 import careerProgressionService from "../../services/hr_operations/hr/careerProgressionService";
 import { Spinner, Alert } from "react-bootstrap";
 import "../../../styles/hr_operations/hr/LeadershipApproval.css";
-
 const LeadershipApproval = () => {
   const [promotions, setPromotions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [viewType, setViewType] = useState("card"); 
-
   useEffect(() => {
     fetchSubmittedPromotions();
   }, []);
-
   const fetchSubmittedPromotions = async () => {
     try {
       setLoading(true);
-
       const response =
         await careerProgressionService.getSubmittedToLeadership();
-
       setPromotions(Array.isArray(response) ? response : []);
     } catch (error) {
       console.error("Error:", error);
@@ -27,7 +22,6 @@ const LeadershipApproval = () => {
       setLoading(false);
     }
   };
-
   const formatCurrency = (amount) => {
     if (!amount || amount === 0) return "Not Set";
     return new Intl.NumberFormat("en-IN", {
@@ -36,7 +30,6 @@ const LeadershipApproval = () => {
       minimumFractionDigits: 0,
     }).format(amount);
   };
-
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-IN", {
@@ -45,7 +38,6 @@ const LeadershipApproval = () => {
       day: "numeric",
     });
   };
-
   const getInitials = (name) => {
     if (!name) return "??";
     return name
@@ -55,7 +47,6 @@ const LeadershipApproval = () => {
       .toUpperCase()
       .slice(0, 2);
   };
-
   return (
     <div className="leadership-approval-root">
       <div className="leadership-header">
@@ -85,7 +76,6 @@ const LeadershipApproval = () => {
           </button>
         </div>
       </div>
-
       {loading ? (
         <div className="leadership-loading-container">
           <Spinner animation="border" variant="primary" role="status">
@@ -115,7 +105,6 @@ const LeadershipApproval = () => {
                   <p className="card-email">{p.employeeEmail || "N/A"}</p>
                 </div>
               </div>
-
               <div className="card-body">
                 <div className="card-row">
                   <span className="card-label">Department:</span>
@@ -123,33 +112,28 @@ const LeadershipApproval = () => {
                     {p.departmentName || "N/A"}
                   </span>
                 </div>
-
                 <div className="card-row">
                   <span className="card-label">Current Role:</span>
                   <span className="card-value">{p.oldRole || "N/A"}</span>
                 </div>
-
                 <div className="card-row">
                   <span className="card-label">Promoted To:</span>
                   <span className="card-value promo-new-role">
                     {p.newRole || "N/A"}
                   </span>
                 </div>
-
                 <div className="card-row">
                   <span className="card-label">Current Salary:</span>
                   <span className="card-value">
                     {formatCurrency(p.oldSalary)}
                   </span>
                 </div>
-
                 <div className="card-row">
                   <span className="card-label">New Salary:</span>
                   <span className="card-value promo-new-salary">
                     {formatCurrency(p.newSalary)}
                   </span>
                 </div>
-
                 <div className="card-row">
                   <span className="card-label">Increment:</span>
                   <span className="card-value increment-badge">
@@ -158,14 +142,12 @@ const LeadershipApproval = () => {
                       : "N/A"}
                   </span>
                 </div>
-
                 <div className="card-row">
                   <span className="card-label">Effective Date:</span>
                   <span className="card-value">
                     {formatDate(p.promotionDate)}
                   </span>
                 </div>
-
                 <div className="card-row">
                   <span className="card-label">Status:</span>
                   <span className="leadership-status-badge leadership-status-approved">
@@ -209,25 +191,19 @@ const LeadershipApproval = () => {
                       </div>
                     </div>
                   </td>
-
                   <td>{p.departmentName || "N/A"}</td>
-
                   <td>{p.oldRole || "N/A"}</td>
-
                   <td>
                     <strong className="leadership-new-role">
                       {p.newRole || "N/A"}
                     </strong>
                   </td>
-
                   <td>{formatCurrency(p.oldSalary)}</td>
-
                   <td>
                     <strong className="leadership-new-salary">
                       {formatCurrency(p.newSalary)}
                     </strong>
                   </td>
-
                   <td className="leadership-text-center">
                     {p.incrementPercentage ? (
                       <span className="leadership-increment-badge">
@@ -237,9 +213,7 @@ const LeadershipApproval = () => {
                       "N/A"
                     )}
                   </td>
-
                   <td>{formatDate(p.promotionDate)}</td>
-
                   <td className="leadership-text-center">
                     <span className="leadership-status-badge leadership-status-approved">
                       {p.status || "Approved"}
@@ -254,5 +228,4 @@ const LeadershipApproval = () => {
     </div>
   );
 };
-
 export default LeadershipApproval;

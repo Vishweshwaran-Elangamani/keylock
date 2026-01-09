@@ -15,7 +15,6 @@ import {
 import nominationService from "../../../services/internal/nominationService";
 import { toast } from "sonner";
 import "../../../styles/internal/NominationGraphModal.css";
-
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -27,30 +26,25 @@ ChartJS.register(
   Legend,
   ArcElement
 );
-
 const SOLID_COLORS = [
   "#27235C", // Total Nominations - Dark Blue
   "#10b981", // Approved - Green
   "#f59e0b", // Pending - Orange
   "#ef4444", // Rejected - Red
 ];
-
 const NominationGraphModal = ({ show, onHide }) => {
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [chartType, setChartType] = useState("bar");
   const [chartKey, setChartKey] = useState(0);
-
   useEffect(() => {
     if (show) {
       fetchAnalytics();
     }
   }, [show]);
-
   const fetchAnalytics = async () => {
     setLoading(true);
     const response = await nominationService.getMyNominationAnalytics();
-
     if (response.success) {
       setAnalytics(response.data);
       setChartKey((prev) => prev + 1);
@@ -59,17 +53,14 @@ const NominationGraphModal = ({ show, onHide }) => {
     }
     setLoading(false);
   };
-
   const getChartData = () => {
     if (!analytics) return null;
-
     const values = [
       analytics.totalNominations,
       analytics.approved,
       analytics.pending,
       analytics.rejected,
     ];
-
     if (chartType === "line") {
       return {
         labels: ["Total Nominations", "Approved", "Pending", "Rejected"],
@@ -90,7 +81,6 @@ const NominationGraphModal = ({ show, onHide }) => {
         ],
       };
     }
-
     return {
       labels: ["Total Nominations", "Approved", "Pending", "Rejected"],
       datasets: [
@@ -106,7 +96,6 @@ const NominationGraphModal = ({ show, onHide }) => {
       ],
     };
   };
-
   const commonOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -127,7 +116,6 @@ const NominationGraphModal = ({ show, onHide }) => {
       },
     },
   };
-
   const barOptions = {
     ...commonOptions,
     plugins: { ...commonOptions.plugins, legend: { display: false } },
@@ -143,7 +131,6 @@ const NominationGraphModal = ({ show, onHide }) => {
       },
     },
   };
-
   const pieOptions = {
     ...commonOptions,
     plugins: {
@@ -159,7 +146,6 @@ const NominationGraphModal = ({ show, onHide }) => {
       },
     },
   };
-
   const lineOptions = {
     ...commonOptions,
     plugins: {
@@ -180,13 +166,10 @@ const NominationGraphModal = ({ show, onHide }) => {
       },
     },
   };
-
   if (!show) return null;
-
   return (
     <>
       <div className="ngm-backdrop" onClick={onHide} />
-
       <div className="ngm-modal-wrapper">
         <div className="ngm-modal-dialog">
           {/* Modal Header */}
@@ -203,7 +186,6 @@ const NominationGraphModal = ({ show, onHide }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* Modal Body */}
           <div className="ngm-modal-body">
             {loading && !analytics ? (
@@ -224,7 +206,6 @@ const NominationGraphModal = ({ show, onHide }) => {
                     <i className="bi bi-bar-chart-fill"></i>
                     Bar Chart
                   </button>
-
                   <button
                     onClick={() => setChartType("pie")}
                     className={`ngm-chart-btn ${
@@ -234,7 +215,6 @@ const NominationGraphModal = ({ show, onHide }) => {
                     <i className="bi bi-pie-chart-fill"></i>
                     Pie Chart
                   </button>
-
                   <button
                     onClick={() => setChartType("line")}
                     className={`ngm-chart-btn ${
@@ -245,7 +225,6 @@ const NominationGraphModal = ({ show, onHide }) => {
                     Line Graph
                   </button>
                 </div>
-
                 {/* Chart Container */}
                 <div className="ngm-chart-container">
                   {chartType === "bar" && (
@@ -278,7 +257,6 @@ const NominationGraphModal = ({ show, onHide }) => {
               </div>
             )}
           </div>
-
           {/* Modal Footer */}
           <div className="ngm-modal-footer">
             <button type="button" onClick={onHide} className="ngm-btn-close">
@@ -291,5 +269,4 @@ const NominationGraphModal = ({ show, onHide }) => {
     </>
   );
 };
-
 export default NominationGraphModal;

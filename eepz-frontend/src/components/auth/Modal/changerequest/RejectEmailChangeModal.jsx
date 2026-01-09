@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import "../../../../styles/auth/changerequest/RejectEmailChangeModal.css";
-
 const RejectEmailChangeModal = ({
   show,
   request,
@@ -10,26 +9,21 @@ const RejectEmailChangeModal = ({
   processing,
 }) => {
   const [adminRemarks, setAdminRemarks] = useState("");
-
   const handleSubmit = () => {
     if (!adminRemarks.trim()) {
       toast.error("Please provide remarks for rejection");
       return;
     }
-
     if (adminRemarks.trim().length < 5) {
       toast.error("Remarks must be at least 5 characters");
       return;
     }
-
     onReject(adminRemarks);
   };
-
   const handleClose = () => {
     setAdminRemarks("");
     onHide();
   };
-
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -40,13 +34,10 @@ const RejectEmailChangeModal = ({
       minute: "2-digit",
     });
   };
-
   if (!show || !request) return null;
-
   return (
     <>
       <div className="recm-backdrop" onClick={handleClose} />
-
       <div className="recm-modal-container">
         <div className="recm-modal-dialog">
           {/* HEADER */}
@@ -65,7 +56,6 @@ const RejectEmailChangeModal = ({
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* BODY */}
           <div className="recm-modal-body">
             {/* Request Details Box */}
@@ -74,7 +64,6 @@ const RejectEmailChangeModal = ({
                 <i className="bi bi-info-circle"></i>
                 Request Details
               </h6>
-
               <div className="recm-details-content">
                 <div className="recm-detail-row">
                   <span className="recm-detail-label">Employee:</span>
@@ -82,26 +71,22 @@ const RejectEmailChangeModal = ({
                     <strong>{request.employeeName}</strong>
                   </div>
                 </div>
-
                 <div className="recm-detail-row">
                   <span className="recm-detail-label">Current Email:</span>
                   <code className="recm-email-current">
                     {request.currentValue || "Not set"}
                   </code>
                 </div>
-
                 <div className="recm-detail-row">
                   <span className="recm-detail-label">New Email:</span>
                   <code className="recm-email-new">{request.newValue}</code>
                 </div>
-
                 <div className="recm-detail-row">
                   <span className="recm-detail-label">Requested At:</span>
                   <span className="recm-date-value">
                     {formatDate(request.requestedAt)}
                   </span>
                 </div>
-
                 {request.reason && (
                   <div className="recm-reason-section">
                     <span className="recm-reason-label">Employee Reason:</span>
@@ -110,7 +95,6 @@ const RejectEmailChangeModal = ({
                 )}
               </div>
             </div>
-
             {/* Admin Remarks - REQUIRED */}
             <div className="recm-remarks-section">
               <label className="recm-remarks-label">
@@ -129,7 +113,6 @@ const RejectEmailChangeModal = ({
                 {adminRemarks.length}/500 characters
               </small>
             </div>
-
             {/* Warning Alert */}
             <div className="recm-warning-alert">
               <i className="bi bi-exclamation-triangle-fill recm-warning-icon"></i>
@@ -140,7 +123,6 @@ const RejectEmailChangeModal = ({
               </div>
             </div>
           </div>
-
           {/* FOOTER */}
           <div className="recm-modal-footer">
             <button
@@ -151,7 +133,6 @@ const RejectEmailChangeModal = ({
             >
               <i className="bi bi-x-circle"></i> Cancel
             </button>
-
             <button
               type="button"
               onClick={handleSubmit}
@@ -175,5 +156,4 @@ const RejectEmailChangeModal = ({
     </>
   );
 };
-
 export default RejectEmailChangeModal;

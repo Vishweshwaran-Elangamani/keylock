@@ -2,15 +2,12 @@ import { useState } from "react";
 import userService from "../../../../services/auth/userService";
 import { toast } from "sonner";
 import "../../../../styles/auth/user/DeactivateUserModal.css";
-
 const DeactivateUserModal = ({ show, onHide, onUserDeactivated, user }) => {
   const [loading, setLoading] = useState(false);
-
   const handleDeactivate = async () => {
     try {
       setLoading(true);
       const response = await userService.deactivateUser(user.userId);
-
       if (response.success) {
         toast.success("User deactivated permanently!");
         onUserDeactivated();
@@ -26,13 +23,10 @@ const DeactivateUserModal = ({ show, onHide, onUserDeactivated, user }) => {
       setLoading(false);
     }
   };
-
   if (!show) return null;
-
   return (
     <>
       <div className="dum-backdrop" onClick={onHide} />
-
       <div className="dum-modal-container">
         <div className="dum-modal-dialog">
           {/* MODAL HEADER */}
@@ -51,7 +45,6 @@ const DeactivateUserModal = ({ show, onHide, onUserDeactivated, user }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* MODAL BODY */}
           <div className="dum-modal-body">
             {/* Confirmation Question */}
@@ -62,7 +55,6 @@ const DeactivateUserModal = ({ show, onHide, onUserDeactivated, user }) => {
               </strong>
               ?
             </p>
-
             {/* Critical Warning Box */}
             <div className="dum-warning-box">
               {/* Warning Header with Icon */}
@@ -70,7 +62,6 @@ const DeactivateUserModal = ({ show, onHide, onUserDeactivated, user }) => {
                 <i className="bi bi-exclamation-triangle-fill dum-warning-icon"></i>
                 <span>Critical Warning</span>
               </div>
-
               {/* Warning Text */}
               <p className="dum-warning-text">
                 <strong>
@@ -78,7 +69,6 @@ const DeactivateUserModal = ({ show, onHide, onUserDeactivated, user }) => {
                 </strong>
                 <br />
               </p>
-
               {/* Warning List */}
               <ul className="dum-warning-list">
                 <strong>Once deactivated, this user will:</strong>
@@ -87,7 +77,6 @@ const DeactivateUserModal = ({ show, onHide, onUserDeactivated, user }) => {
                 <li>Not be able to be reactivated</li>
               </ul>
             </div>
-
             {/* Info Alert */}
             <div className="dum-info-alert">
               <i className="bi bi-info-circle"></i>
@@ -97,7 +86,6 @@ const DeactivateUserModal = ({ show, onHide, onUserDeactivated, user }) => {
               </small>
             </div>
           </div>
-
           {/* MODAL FOOTER - ACTION BUTTONS */}
           <div className="dum-modal-footer">
             {/* Cancel Button */}
@@ -109,7 +97,6 @@ const DeactivateUserModal = ({ show, onHide, onUserDeactivated, user }) => {
             >
               <i className="bi bi-arrow-left"></i> Cancel
             </button>
-
             {/* Deactivate Button */}
             <button
               type="button"
@@ -135,5 +122,4 @@ const DeactivateUserModal = ({ show, onHide, onUserDeactivated, user }) => {
     </>
   );
 };
-
 export default DeactivateUserModal;

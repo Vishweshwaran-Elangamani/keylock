@@ -2,35 +2,27 @@ import { useState, useEffect, useRef } from "react";
 import nominationService from "../../../services/internal/nominationService";
 import { toast } from "sonner";
 import "../../../styles/internal/NominationReviewModal.css";
-
-
 const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-
   const selectedOption = options.find((opt) => opt.value === value);
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     };
-
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen]);
-
   const handleSelect = (optionValue) => {
     onChange({ target: { name, value: optionValue } });
     setIsOpen(false);
   };
-
   return (
     <div
       ref={dropdownRef}
@@ -47,7 +39,6 @@ const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) 
           <i className="bi bi-chevron-down"></i>
         </span>
       </div>
-
       {isOpen && (
         <div className="nrm-custom-dropdown-menu">
           {options.map((option) => (
@@ -66,7 +57,6 @@ const CustomDropdown = ({ value, onChange, options, placeholder, name, error }) 
     </div>
   );
 };
-
 const NominationReviewModal = ({
   show,
   onHide,
@@ -85,23 +75,17 @@ const NominationReviewModal = ({
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-
   const isDepartmentHead = userRole === "Department Head";
-
-  
   const decisionOptions = [
     { label: "-- Select Action --", value: "" },
     { label: "Approve", value: "Approved" },
     { label: "Reject", value: "Rejected" },
   ];
-
-  
   const conflictOptions = [
     { label: "-- Select --", value: "" },
     { label: "No", value: "false" },
     { label: "Yes", value: "true" },
   ];
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -115,14 +99,11 @@ const NominationReviewModal = ({
       }));
     }
   };
-
   const validateForm = () => {
     const newErrors = {};
-
     if (!formData.action) {
       newErrors.action = "Please select an action";
     }
-
     if (isDepartmentHead && formData.action === "Approved") {
       if (!formData.meritScore) {
         newErrors.meritScore = "Merit score is required for approval";
@@ -133,7 +114,6 @@ const NominationReviewModal = ({
       ) {
         newErrors.meritScore = "Merit score must be between 0 and 100";
       }
-
       if (!formData.diversityScore) {
         newErrors.diversityScore = "Diversity score is required for approval";
       } else if (
@@ -143,29 +123,22 @@ const NominationReviewModal = ({
       ) {
         newErrors.diversityScore = "Diversity score must be between 0 and 100";
       }
-
       if (!formData.conflictOfInterest) {
         newErrors.conflictOfInterest = "Please specify conflict of interest";
       }
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) {
       toast.error("Please fix the errors");
       return;
     }
-
     try {
       setLoading(true);
-
       let payload;
-
       if (isDepartmentHead) {
         payload = {
           action: formData.action,
@@ -183,13 +156,11 @@ const NominationReviewModal = ({
           remarks: formData.remarks.trim(),
         };
       }
-
       const response = await nominationService.reviewNomination(
         nomination.nominationId,
         payload,
         userRole
       );
-
       if (response.success) {
         toast.success(
           `Nomination ${formData.action.toLowerCase()} successfully!`
@@ -206,13 +177,10 @@ const NominationReviewModal = ({
       setLoading(false);
     }
   };
-
   if (!show) return null;
-
   return (
     <>
       <div className="nrm-backdrop" onClick={onHide} />
-
       <div className="nrm-modal-wrapper">
         <div className="nrm-modal-dialog">
           {/* HEADER - Fixed */}
@@ -232,7 +200,6 @@ const NominationReviewModal = ({
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* BODY - Scrollable */}
           <form onSubmit={handleSubmit} className="nrm-form">
             <div className="nrm-modal-body">
@@ -252,7 +219,6 @@ const NominationReviewModal = ({
                         {nomination.opportunityName}
                       </p>
                     </div>
-
                     {/* Nominated By */}
                     <div className="nrm-info-item">
                       <label className="nrm-info-label">Nominated By:</label>
@@ -261,7 +227,6 @@ const NominationReviewModal = ({
                       </p>
                     </div>
                   </div>
-
                   {/* RIGHT COLUMN */}
                   <div className="nrm-info-column">
                     {/* Nominee */}
@@ -269,7 +234,6 @@ const NominationReviewModal = ({
                       <label className="nrm-info-label">Nominee:</label>
                       <p className="nrm-info-value">{nomination.nomineeName}</p>
                     </div>
-
                     {/* Type */}
                     <div className="nrm-info-item">
                       <label className="nrm-info-label">Type:</label>
@@ -279,7 +243,6 @@ const NominationReviewModal = ({
                     </div>
                   </div>
                 </div>
-
                 {/* Justification - Full Width */}
                 {nomination.justification && (
                   <div className="nrm-justification">
@@ -290,7 +253,6 @@ const NominationReviewModal = ({
                   </div>
                 )}
               </div>
-
               {/* Decision Field - Custom Dropdown */}
               <div className="nrm-form-group">
                 <label className="nrm-form-label">
@@ -308,7 +270,6 @@ const NominationReviewModal = ({
                   <div className="nrm-form-error">{errors.action}</div>
                 )}
               </div>
-
               {/* Department Head Approval Fields */}
               {isDepartmentHead && formData.action === "Approved" && (
                 <>
@@ -339,7 +300,6 @@ const NominationReviewModal = ({
                         </div>
                       )}
                     </div>
-
                     {/* Diversity Score */}
                     <div className="nrm-form-group">
                       <label className="nrm-form-label">
@@ -366,7 +326,6 @@ const NominationReviewModal = ({
                       )}
                     </div>
                   </div>
-
                   {/* Conflict of Interest - Custom Dropdown */}
                   <div className="nrm-form-group">
                     <label className="nrm-form-label">
@@ -387,7 +346,6 @@ const NominationReviewModal = ({
                       </div>
                     )}
                   </div>
-
                   {/* Review Notes */}
                   <div className="nrm-form-group">
                     <label className="nrm-form-label block">Review Notes</label>
@@ -402,7 +360,6 @@ const NominationReviewModal = ({
                   </div>
                 </>
               )}
-
               {/* Remarks */}
               <div className="nrm-form-group">
                 <label className="nrm-form-label block">
@@ -418,7 +375,6 @@ const NominationReviewModal = ({
                 />
               </div>
             </div>
-
             {/* FOOTER - Fixed */}
             <div className="nrm-modal-footer">
               <button
@@ -430,7 +386,6 @@ const NominationReviewModal = ({
                 <i className="bi bi-x-circle"></i>
                 Cancel
               </button>
-
               <button
                 type="submit"
                 disabled={loading}
@@ -455,5 +410,4 @@ const NominationReviewModal = ({
     </>
   );
 };
-
 export default NominationReviewModal;

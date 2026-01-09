@@ -3,7 +3,6 @@ import { CloseButton } from "react-bootstrap";
 import internalOpportunityService from "../../../services/internal/internalOpportunityService";
 import { toast } from "sonner";
 import "../../../styles/internal/DeleteOpportunityModal.css";
-
 const DeleteOpportunityModal = ({
   show,
   onHide,
@@ -11,15 +10,12 @@ const DeleteOpportunityModal = ({
   opportunity,
 }) => {
   const [loading, setLoading] = useState(false);
-
   const handleDelete = async () => {
     try {
       setLoading(true);
-
       const response = await internalOpportunityService.deleteOpportunity(
         opportunity.opportunityId
       );
-
       if (response.success) {
         toast.success("Opportunity deleted successfully!");
         onOpportunityDeleted();
@@ -34,13 +30,10 @@ const DeleteOpportunityModal = ({
       setLoading(false);
     }
   };
-
   if (!show) return null;
-
   return (
     <>
       <div className="dom-backdrop" onClick={onHide} />
-
       <div className="dom-modal-wrapper">
         <div className="dom-modal-dialog">
           {/* Modal Header */}
@@ -56,7 +49,6 @@ const DeleteOpportunityModal = ({
               className="dom-close-button"
             />
           </div>
-
           {/* Modal Body */}
           <div className="dom-modal-body">
             <div>
@@ -67,7 +59,6 @@ const DeleteOpportunityModal = ({
                 </strong>
                 ?
               </p>
-
               {/* Warning Box */}
               <div className="dom-warning-box">
                 <i className="bi bi-exclamation-circle dom-warning-box-icon"></i>
@@ -78,7 +69,6 @@ const DeleteOpportunityModal = ({
               </div>
             </div>
           </div>
-
           {/* Modal Footer */}
           <div className="dom-modal-footer">
             <button
@@ -114,5 +104,4 @@ const DeleteOpportunityModal = ({
     </>
   );
 };
-
 export default DeleteOpportunityModal;

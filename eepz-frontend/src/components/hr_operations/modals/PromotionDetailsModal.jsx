@@ -1,7 +1,6 @@
 import React from "react";
 import { Modal } from "react-bootstrap";
 import "../../../styles/hr_operations/hr/PromotionDetailsModal.css";
-
 const PromotionDetailsModal = ({ show, promotion, onHide }) => {
   const formatCurrency = (amount) => {
     if (!amount || amount === 0) return "Not Set";
@@ -11,7 +10,6 @@ const PromotionDetailsModal = ({ show, promotion, onHide }) => {
       minimumFractionDigits: 0,
     }).format(amount);
   };
-
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-IN", {
@@ -20,7 +18,6 @@ const PromotionDetailsModal = ({ show, promotion, onHide }) => {
       day: "numeric",
     });
   };
-
   const getStatusBadgeClass = (status) => {
     switch (status?.toLowerCase()) {
       case "approved":
@@ -33,7 +30,6 @@ const PromotionDetailsModal = ({ show, promotion, onHide }) => {
         return "promo-status-pending";
     }
   };
-
   return (
     <Modal show={show} onHide={onHide} size="lg" className="promo-modal">
       <Modal.Header closeButton className="promo-modal-header">
@@ -42,7 +38,6 @@ const PromotionDetailsModal = ({ show, promotion, onHide }) => {
           Promotion Details
         </Modal.Title>
       </Modal.Header>
-
       <Modal.Body className="promo-modal-body">
         <div className="promo-details-container">
           <div className="promo-details-section">
@@ -65,7 +60,6 @@ const PromotionDetailsModal = ({ show, promotion, onHide }) => {
               </div>
             </div>
           </div>
-
           <div className="promo-details-section">
             <h6 className="promo-details-heading">
               <i className="bi bi-briefcase"></i>
@@ -84,7 +78,6 @@ const PromotionDetailsModal = ({ show, promotion, onHide }) => {
               </div>
             </div>
           </div>
-
           <div className="promo-details-section">
             <h6 className="promo-details-heading">
               <i className="bi bi-cash-coin"></i>
@@ -112,7 +105,6 @@ const PromotionDetailsModal = ({ show, promotion, onHide }) => {
                 )}
             </div>
           </div>
-
           <div className="promo-details-section">
             <h6 className="promo-details-heading">
               <i className="bi bi-calendar"></i>
@@ -145,7 +137,6 @@ const PromotionDetailsModal = ({ show, promotion, onHide }) => {
               )}
             </div>
           </div>
-
           <div className="promo-details-section">
             <h6 className="promo-details-heading">
               <i className="bi bi-file-text"></i>
@@ -155,7 +146,6 @@ const PromotionDetailsModal = ({ show, promotion, onHide }) => {
               <p>{promotion?.justification || "No justification provided"}</p>
             </div>
           </div>
-
           {promotion?.approvedByEmail && (
             <div className="promo-details-section">
               <h6 className="promo-details-heading">
@@ -172,7 +162,6 @@ const PromotionDetailsModal = ({ show, promotion, onHide }) => {
           )}
         </div>
       </Modal.Body>
-
       <Modal.Footer className="promo-modal-footer">
         <button type="button" className="btn btn-secondary" onClick={onHide}>
           Close
@@ -181,5 +170,4 @@ const PromotionDetailsModal = ({ show, promotion, onHide }) => {
     </Modal>
   );
 };
-
 export default PromotionDetailsModal;

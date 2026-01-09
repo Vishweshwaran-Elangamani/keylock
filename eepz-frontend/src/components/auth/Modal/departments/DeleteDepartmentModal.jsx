@@ -1,27 +1,21 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import "../../../../styles/auth/department/DeleteDepartmentModal.css";
-
 const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
   const [loading, setLoading] = useState(false);
-
   const handleDelete = async () => {
-    // Frontend validation - Check if HOD is assigned
     if (department?.hodEmployeeId) {
       toast.error(
         "Cannot delete department with assigned HOD. Please remove HOD first from Edit Department."
       );
       return;
     }
-
-    // Frontend validation - Check if has children
     if (department?.hasChildren && department?.childDepartmentCount > 0) {
       toast.error(
         `Cannot delete department with ${department.childDepartmentCount} child department(s). Delete or reassign them first.`
       );
       return;
     }
-
     try {
       setLoading(true);
       toast.loading("Deleting department...");
@@ -36,18 +30,14 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
       setLoading(false);
     }
   };
-
   if (!show) return null;
-
   // Check if deletion is blocked
   const isDeleteBlocked =
     department?.hodEmployeeId ||
     (department?.hasChildren && department?.childDepartmentCount > 0);
-
   return (
     <>
       <div className="ddm-backdrop" onClick={onClose} />
-
       <div className="ddm-modal-container">
         <div className="ddm-modal-dialog">
           {/* HEADER */}
@@ -66,7 +56,6 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* BODY */}
           <div className="ddm-modal-body">
             {/* Department Info Card */}
@@ -77,7 +66,6 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
                   {department?.departmentName}
                 </span>
               </div>
-
               <div className="ddm-info-details">
                 <div className="ddm-info-row">
                   <strong>Code:</strong>{" "}
@@ -85,27 +73,23 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
                     {department?.departmentCode}
                   </span>
                 </div>
-
                 {department?.parentDepartmentName && (
                   <div className="ddm-info-row">
                     <strong>Parent:</strong> {department.parentDepartmentName}
                   </div>
                 )}
-
                 {department?.hodEmployeeName && (
                   <div className="ddm-info-row ddm-info-warning">
                     <strong> HOD Assigned:</strong>{" "}
                     {department.hodEmployeeName}
                   </div>
                 )}
-
                 {department?.hasChildren && (
                   <div className="ddm-info-row ddm-info-warning">
                     <strong> Child Departments:</strong>{" "}
                     {department.childDepartmentCount}
                   </div>
                 )}
-
                 {department?.description && (
                   <div className="ddm-info-description">
                     {department.description}
@@ -113,7 +97,6 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
                 )}
               </div>
             </div>
-
             {/* Blocking Warning */}
             {isDeleteBlocked && (
               <div className="ddm-blocking-alert">
@@ -138,7 +121,6 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
                 </ul>
               </div>
             )}
-
             {/* Normal Warning */}
             {!isDeleteBlocked && (
               <>
@@ -146,7 +128,6 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
                   Are you absolutely sure you want to permanently delete this
                   department?
                 </p>
-
                 <div className="ddm-critical-alert">
                   <div className="ddm-critical-title">
                     <i className="bi bi-exclamation-triangle-fill"></i>
@@ -171,7 +152,6 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
                 </div>
               </>
             )}
-
             {/* Info Note */}
             <div className="ddm-info-note">
               <i className="bi bi-info-circle"></i>
@@ -183,7 +163,6 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
               </small>
             </div>
           </div>
-
           {/* FOOTER */}
           <div className="ddm-modal-footer">
             {/* Cancel Button */}
@@ -196,7 +175,6 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
               <i className="bi bi-x-circle"></i>
               Cancel
             </button>
-
             {/* Delete Button */}
             <button
               type="button"
@@ -224,5 +202,4 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
     </>
   );
 };
-
 export default DeleteDepartmentModal;

@@ -3,7 +3,6 @@ import { toast } from "sonner";
 import periodAllocationService from "../../../services/hr_operations/hr/periodAllocationService";
 import { formatCurrency } from "../../../utils/auth/currencyFormatter";
 import "../../../styles/hr_operations/hr/UpdatePeriodAllocationModal.css";
-
 const UpdatePeriodAllocationModal = ({
   period,
   budget,
@@ -16,32 +15,25 @@ const UpdatePeriodAllocationModal = ({
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-
   const otherPeriodsTotal = budget.allocatedAmount - period.allocatedAmount;
   const availableBudget = budget.totalBudget - otherPeriodsTotal;
-
   const validateForm = () => {
     const newErrors = {};
-
     if (
       !formData.allocatedAmount ||
       parseFloat(formData.allocatedAmount) <= 0
     ) {
       newErrors.allocatedAmount = "Please enter a valid amount";
     }
-
     if (parseFloat(formData.allocatedAmount) > availableBudget) {
       newErrors.allocatedAmount = `Amount exceeds available budget`;
     }
-
     if (parseFloat(formData.allocatedAmount) < period.utilizedAmount) {
       newErrors.allocatedAmount = `Cannot reduce below utilized amount`;
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -49,27 +41,21 @@ const UpdatePeriodAllocationModal = ({
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) {
       return;
     }
-
     setLoading(true);
-
     try {
       const payload = {
         periodAllocationId: period.periodAllocationId,
         allocatedAmount: parseFloat(formData.allocatedAmount),
         notes: formData.notes,
       };
-
       const response = await periodAllocationService.updatePeriodAllocation(
         payload
       );
-
       if (response.success) {
         toast.success("Period allocation updated successfully!");
         onSuccess();
@@ -84,14 +70,11 @@ const UpdatePeriodAllocationModal = ({
       setLoading(false);
     }
   };
-
   const amountChange =
     parseFloat(formData.allocatedAmount) - period.allocatedAmount;
-
   return (
     <>
       <div className="upam-backdrop" onClick={onClose} />
-
       <div className="upam-modal-container">
         <div className="upam-modal-dialog">
           {/* HEADER - Fixed */}
@@ -110,7 +93,6 @@ const UpdatePeriodAllocationModal = ({
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* BODY - Scrollable */}
           <form onSubmit={handleSubmit} className="upam-form">
             <div className="upam-modal-body">
@@ -136,7 +118,6 @@ const UpdatePeriodAllocationModal = ({
                   </div>
                 </div>
               </div>
-
               {/* Warning Box */}
               {period.subAllocationCount > 0 && (
                 <div className="upam-warning-box">
@@ -151,7 +132,6 @@ const UpdatePeriodAllocationModal = ({
                   </div>
                 </div>
               )}
-
               {/* New Allocated Amount */}
               <div className="upam-form-group">
                 <label className="upam-form-label">
@@ -195,7 +175,6 @@ const UpdatePeriodAllocationModal = ({
                   </div>
                 )}
               </div>
-
               {/* Notes */}
               <div className="upam-form-group">
                 <label className="upam-form-label-block">Notes</label>
@@ -209,7 +188,6 @@ const UpdatePeriodAllocationModal = ({
                 />
               </div>
             </div>
-
             {/* FOOTER - Fixed */}
             <div className="upam-modal-footer">
               <button
@@ -220,7 +198,6 @@ const UpdatePeriodAllocationModal = ({
               >
                 Cancel
               </button>
-
               <button
                 type="submit"
                 disabled={loading}
@@ -245,5 +222,4 @@ const UpdatePeriodAllocationModal = ({
     </>
   );
 };
-
 export default UpdatePeriodAllocationModal;

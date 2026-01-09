@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import userService from "../../../../services/auth/userService";
 import { toast } from "sonner";
 import "../../../../styles/auth/user/EditUserModal.css";
-
 const EditUserModal = ({
   show,
   onHide,
@@ -11,9 +10,6 @@ const EditUserModal = ({
   roles,
   departments,
 }) => {
-  // ========================
-  // STATE MANAGEMENT
-  // ========================
   const [formData, setFormData] = useState({
     userId: "",
     employmentType: "",
@@ -26,13 +22,8 @@ const EditUserModal = ({
     noticePeriodDays: "",
     status: "",
   });
-
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-
-  // ========================
-  // EFFECTS
-  // ========================
   useEffect(() => {
     if (user) {
       setFormData({
@@ -51,10 +42,6 @@ const EditUserModal = ({
       });
     }
   }, [user]);
-
-  // ========================
-  // EVENT HANDLERS
-  // ========================
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -68,10 +55,6 @@ const EditUserModal = ({
       }));
     }
   };
-
-  // ========================
-  // CUSTOM DROPDOWN COMPONENT - NATIONALITY STYLE
-  // ========================
   const CustomDropdown = ({
     options,
     value,
@@ -85,30 +68,25 @@ const EditUserModal = ({
     const [isOpen, setIsOpen] = useState(false);
     const [openUpward, setOpenUpward] = useState(forceUpward);
     const dropdownRef = useRef(null);
-
     const toggleDropdown = () => {
       if (!disabled) {
         setIsOpen(!isOpen);
       }
     };
-
     const handleSelect = (selectedValue) => {
       onChange({ target: { name, value: selectedValue } });
       setIsOpen(false);
     };
-
     useEffect(() => {
       if (forceUpward) {
         setOpenUpward(true);
         return;
       }
-
       if (isOpen && dropdownRef.current) {
         const rect = dropdownRef.current.getBoundingClientRect();
         const spaceBelow = window.innerHeight - rect.bottom;
         const spaceAbove = rect.top;
         const dropdownHeight = 250;
-
         if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
           setOpenUpward(true);
         } else {
@@ -116,7 +94,6 @@ const EditUserModal = ({
         }
       }
     }, [isOpen, forceUpward]);
-
     useEffect(() => {
       const handleClickOutside = (event) => {
         if (
@@ -129,9 +106,7 @@ const EditUserModal = ({
       document.addEventListener("mousedown", handleClickOutside);
       return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
-
     const selectedOption = options.find((opt) => opt.value === value);
-
     return (
       <div
         ref={dropdownRef}
@@ -147,7 +122,6 @@ const EditUserModal = ({
           </span>
           <span className="eum-custom-arrow"></span>
         </div>
-
         {isOpen && (
           <div
             className={`eum-custom-menu ${
@@ -170,10 +144,6 @@ const EditUserModal = ({
       </div>
     );
   };
-
-  // ========================
-  // DROPDOWN OPTIONS
-  // ========================
   const employmentTypeOptions = [
     { value: "Permanent", label: "Permanent" },
     { value: "Contract", label: "Contract" },
@@ -181,27 +151,19 @@ const EditUserModal = ({
     { value: "Intern", label: "Intern" },
     { value: "Probation", label: "Probation" },
   ];
-
   const employeeTypeOptions = [
     { value: "FullTime", label: "Full Time" },
     { value: "PartTime", label: "Part Time" },
     { value: "Consultant", label: "Consultant" },
   ];
-
-  // ========================
-  // FORM VALIDATION
-  // ========================
   const validateForm = () => {
     const newErrors = {};
-
     if (!formData.employmentType) {
       newErrors.employmentType = "Employment type is required";
     }
-
     if (!formData.employmentStatus) {
       newErrors.employmentStatus = "Employment status is required";
     }
-
     if (formData.confirmationDate) {
       const confirmDate = new Date(formData.confirmationDate);
       const today = new Date();
@@ -217,7 +179,6 @@ const EditUserModal = ({
         }
       }
     }
-
     if (formData.exitDate) {
       const exitDate = new Date(formData.exitDate);
       if (user?.joiningDate) {
@@ -233,17 +194,14 @@ const EditUserModal = ({
         }
       }
     }
-
     if (formData.workLocation.trim()) {
       if (formData.workLocation.trim().length < 2) {
         newErrors.workLocation = "Work location must be at least 2 characters";
       }
     }
-
     if (!formData.employeeType) {
       newErrors.employeeType = "Employee type is required";
     }
-
     if (formData.noticePeriodDays) {
       const noticePeriod = parseInt(formData.noticePeriodDays);
       if (isNaN(noticePeriod) || noticePeriod < 0) {
@@ -252,7 +210,6 @@ const EditUserModal = ({
         newErrors.noticePeriodDays = "Notice period cannot exceed 365 days";
       }
     }
-
     if (formData.reportingManagerEmployeeId) {
       const managerId = parseInt(formData.reportingManagerEmployeeId);
       if (isNaN(managerId) || managerId < 1) {
@@ -260,26 +217,18 @@ const EditUserModal = ({
           "Manager ID must be a valid positive number";
       }
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
-  // ========================
-  // FORM SUBMISSION
-  // ========================
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) {
       toast.error("Enter Valid Details!");
       return;
     }
-
     try {
       setLoading(true);
       toast.info("Updating user. Please wait...");
-
       const payload = {
         userId: formData.userId,
         employmentType: formData.employmentType || null,
@@ -300,9 +249,7 @@ const EditUserModal = ({
           : null,
         status: formData.status || null,
       };
-
       const response = await userService.updateUser(payload);
-
       if (response.success) {
         toast.success("User updated successfully!");
         onUserUpdated();
@@ -315,16 +262,10 @@ const EditUserModal = ({
       setLoading(false);
     }
   };
-
-  // ========================
-  // RENDER LOGIC
-  // ========================
   if (!show) return null;
-
   return (
     <>
       <div className="eum-backdrop" onClick={onHide} />
-
       <div className="eum-modal-container">
         <div className="eum-modal-dialog">
           {/* MODAL HEADER */}
@@ -343,12 +284,10 @@ const EditUserModal = ({
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* MODAL BODY - FORM */}
           <form onSubmit={handleSubmit} className="eum-form">
             <div className="eum-modal-body">
               <div className="eum-form-grid">
-                {/* Employment Type Field (Required) - CUSTOM DROPDOWN */}
                 <div className="eum-form-group">
                   <label className="eum-form-label">
                     Employment Type{" "}
@@ -370,7 +309,6 @@ const EditUserModal = ({
                     </div>
                   )}
                 </div>
-
                 {/* Exit Date Field (Optional) */}
                 <div className="eum-form-group">
                   <label className="eum-form-label">Exit Date</label>
@@ -391,7 +329,6 @@ const EditUserModal = ({
                     Must be after joining/confirmation date
                   </small>
                 </div>
-
                 {/* Work Location Field (Optional) */}
                 <div className="eum-form-group">
                   <label className="eum-form-label">Work Location</label>
@@ -412,7 +349,6 @@ const EditUserModal = ({
                   )}
                   <small className="eum-form-hint">Minimum 2 characters</small>
                 </div>
-
                 {/* Employee Type Field (Required) - CUSTOM DROPDOWN */}
                 <div className="eum-form-group">
                   <label className="eum-form-label">
@@ -433,7 +369,6 @@ const EditUserModal = ({
                     <div className="eum-form-error">{errors.employeeType}</div>
                   )}
                 </div>
-
                 {/* Notice Period Field (Optional) */}
                 <div className="eum-form-group">
                   <label className="eum-form-label">
@@ -460,7 +395,6 @@ const EditUserModal = ({
                   <small className="eum-form-hint">Maximum 365 days</small>
                 </div>
               </div>
-
               {/* Info Alert */}
               <div className="eum-info-alert">
                 <i className="bi bi-info-circle"></i>
@@ -470,7 +404,6 @@ const EditUserModal = ({
                 </small>
               </div>
             </div>
-
             {/* MODAL FOOTER - ACTION BUTTONS */}
             <div className="eum-modal-footer">
               <button
@@ -506,5 +439,4 @@ const EditUserModal = ({
     </>
   );
 };
-
 export default EditUserModal;

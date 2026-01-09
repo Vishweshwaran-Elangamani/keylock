@@ -3,7 +3,6 @@ import { toast } from "sonner";
 import budgetAllocationService from "../../../services/hr_operations/hr/budgetAllocationService";
 import { formatCurrency } from "../../../utils/auth/currencyFormatter";
 import "../../../styles/hr_operations/hr/AllocateFromPeriodModal.css";
-
 /* Custom Dropdown Component */
 const CustomDropdown = ({
   value,
@@ -16,38 +15,31 @@ const CustomDropdown = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-
   const selectedOption = options.find((opt) => opt.value === value);
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     };
-
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen]);
-
   const handleSelect = (optionValue) => {
     if (!disabled) {
       onChange({ target: { name, value: optionValue } });
       setIsOpen(false);
     }
   };
-
   const toggleDropdown = () => {
     if (!disabled) {
       setIsOpen(!isOpen);
     }
   };
-
   return (
     <div
       ref={dropdownRef}
@@ -63,7 +55,6 @@ const CustomDropdown = ({
         </span>
         <span className="afpm-custom-arrow"></span>
       </div>
-
       {isOpen && (
         <div className="afpm-custom-menu">
           {options.map((option) => (
@@ -82,7 +73,6 @@ const CustomDropdown = ({
     </div>
   );
 };
-
 const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
     allocationType: "Training",
@@ -91,33 +81,26 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-
   const allocationTypeOptions = [
     { value: "Training", label: "Training" },
     { value: "Promotion", label: "Promotion" },
     { value: "Bonus", label: "Bonus" },
     { value: "Other", label: "Other" },
   ];
-
   const validateForm = () => {
     const newErrors = {};
-
     if (!formData.amount || parseFloat(formData.amount) <= 0) {
       newErrors.amount = "Please enter a valid amount";
     }
-
     if (parseFloat(formData.amount) > period.remainingAmount) {
       newErrors.amount = `Amount exceeds remaining period allocation`;
     }
-
     if (!formData.notes || !formData.notes.trim()) {
       newErrors.notes = "Allocation name is required";
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -125,19 +108,14 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) {
       return;
     }
-
     setLoading(true);
-
     try {
       const userId = localStorage.getItem("userId");
-
       const payload = {
         budgetId: budget.budgetId,
         departmentId: budget.departmentId,
@@ -148,10 +126,8 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
         period: period.period,
         periodYear: period.periodYear,
       };
-
       const response =
         await budgetAllocationService.createFundAllocationFromPeriod(payload);
-
       if (response.success) {
         toast.success("Sub-allocation created successfully!");
         onSuccess();
@@ -166,11 +142,9 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
       setLoading(false);
     }
   };
-
   return (
     <>
       <div className="afpm-backdrop" onClick={onClose} />
-
       <div className="afpm-modal-wrapper">
         <div className="afpm-modal-dialog">
           {/* HEADER - Fixed */}
@@ -189,7 +163,6 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* BODY - Scrollable */}
           <form onSubmit={handleSubmit} className="afpm-form">
             <div className="afpm-modal-body">
@@ -234,7 +207,6 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
                     </span>
                   </div>
                 </div>
-
                 {/* Progress Section */}
                 <div className="afpm-progress-section">
                   <div className="afpm-progress-header">
@@ -259,7 +231,6 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
                   </div>
                 </div>
               </div>
-
               {/* Allocation Type */}
               <div className="afpm-form-group">
                 <label className="afpm-form-label">
@@ -278,7 +249,6 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
                   Select the purpose of this allocation
                 </small>
               </div>
-
               {/* Amount */}
               <div className="afpm-form-group">
                 <label className="afpm-form-label">
@@ -310,7 +280,6 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
                   </small>
                 )}
               </div>
-
               {/* Notes */}
               <div className="afpm-form-group">
                 <label className="afpm-form-label">
@@ -332,7 +301,6 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
                   <div className="afpm-form-error">{errors.notes}</div>
                 )}
               </div>
-
               {/* Info Alert */}
               <div className="afpm-info-alert">
                 <i className="bi bi-info-circle-fill afpm-info-icon"></i>
@@ -351,7 +319,6 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
                 </div>
               </div>
             </div>
-
             {/* FOOTER - Fixed */}
             <div className="afpm-modal-footer">
               <button
@@ -363,7 +330,6 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
                 <i className="bi bi-x-circle"></i>
                 Cancel
               </button>
-
               <button
                 type="submit"
                 disabled={loading}
@@ -388,5 +354,4 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
     </>
   );
 };
-
 export default AllocateFromPeriodModal;

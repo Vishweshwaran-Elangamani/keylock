@@ -4,14 +4,12 @@ import { toast } from "sonner";
 import budgetAllocationService from "../../../../services/hr_operations/hr/budgetAllocationService";
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
 import "../../../../styles/hr_operations/hr/AllocateByCategoryModal.css";
-
 const AllocateByCategoryModal = ({
   show,
   budget,
   onHide,
   onAllocationCreated,
 }) => {
-  // Form state with initial values
   const [formData, setFormData] = useState({
     allocationType: "Promotion",
     allocationName: "",
@@ -19,15 +17,11 @@ const AllocateByCategoryModal = ({
     goalStatus: "Approved",
     notes: "",
   });
-
   const [loading, setLoading] = useState(false); 
   const [error, setError] = useState(null); 
-
   // Current logged-in user ID from localStorage
   const currentUserId = parseInt(localStorage.getItem("userId"));
-
   const ALLOCATION_TYPES = ["Promotion", "Training", "Bonus", "Other"];
-
   // Handle input change, updating form state
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -36,13 +30,11 @@ const AllocateByCategoryModal = ({
       [name]: value,
     }));
   };
-
   // Form submission handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
     try {
       // Validate allocation type selection
       if (!formData.allocationType) {
@@ -50,21 +42,17 @@ const AllocateByCategoryModal = ({
         setLoading(false);
         return;
       }
-
       // Validate amount must be > 0
       if (!formData.amount || parseFloat(formData.amount) <= 0) {
         toast.error("Amount must be greater than zero");
         setLoading(false);
         return;
       }
-
       const allocationAmount = parseFloat(formData.amount);
-
       // Calculate remaining budget
       const totalAlreadyAllocated = budget.totalAlreadyAllocated || 0;
       const remainingBudget =
         (budget.allocatedAmount || 0) - totalAlreadyAllocated;
-
       // Reject if allocation exceeds remaining budget
       if (allocationAmount > remainingBudget) {
         toast.error(
@@ -81,14 +69,12 @@ const AllocateByCategoryModal = ({
         setLoading(false);
         return;
       }
-
       // Use provided allocationName or generate a default descriptive name
       const allocationName = formData.allocationName.trim()
         ? formData.allocationName
         : `${
             formData.allocationType
           } Allocation - ${new Date().toLocaleDateString()}`;
-
       // Prepare data payload for backend API
       const allocationData = {
         budgetId: budget.budgetId, // From props, must be valid positive ID
@@ -100,18 +86,15 @@ const AllocateByCategoryModal = ({
         notes: formData.notes,
         allocatedByUserId: currentUserId, // Logged-in user ID
       };
-
       // Call backend API to create the allocation
       const response = await budgetAllocationService.createBudgetAllocation(
         allocationData
       );
-
       if (!response.success) {
         toast.error(response.message || "Failed to create allocation");
         setLoading(false);
         return;
       }
-
       // Construct allocation object with data, fallback ID with timestamp
       const newAllocation = {
         allocationId:
@@ -129,11 +112,9 @@ const AllocateByCategoryModal = ({
         utilizedAmount: 0,
         allocatedAt: new Date().toISOString(),
       };
-
       // Notify parent component so it can update UI accordingly
       onAllocationCreated(newAllocation);
       handleClose();
-
       // Success toast
       toast.success("Budget allocation created successfully");
     } catch (err) {
@@ -148,7 +129,6 @@ const AllocateByCategoryModal = ({
       setLoading(false);
     }
   };
-
   // Reset form and close modal
   const handleClose = () => {
     setFormData({
@@ -161,11 +141,9 @@ const AllocateByCategoryModal = ({
     setError(null);
     onHide();
   };
-
   // Calculate remaining budget for display
   const totalAlreadyAllocated = budget.totalAlreadyAllocated || 0;
   const remainingBudget = (budget.allocatedAmount || 0) - totalAlreadyAllocated;
-
   return (
     <Modal show={show} onHide={handleClose} size="lg" className="abcm-modal">
       <Modal.Header closeButton>
@@ -174,7 +152,6 @@ const AllocateByCategoryModal = ({
           Allocate Budget by Category
         </Modal.Title>
       </Modal.Header>
-
       <form onSubmit={handleSubmit}>
         <Modal.Body>
           {/* Show old-style error alert for form validation fallback */}
@@ -184,7 +161,6 @@ const AllocateByCategoryModal = ({
               {error}
             </div>
           )}
-
           {/* Budget info display */}
           <div className="abcm-approval-info">
             <div className="abcm-info-card">
@@ -206,7 +182,6 @@ const AllocateByCategoryModal = ({
               </span>
             </div>
           </div>
-
           {/* Form inputs grid */}
           <div className="abcm-form-grid">
             <div className="abcm-form-column">
@@ -234,7 +209,6 @@ const AllocateByCategoryModal = ({
                 </select>
               </div>
             </div>
-
             <div className="abcm-form-column">
               <div className="mb-3">
                 <label htmlFor="amount" className="form-label abcm-form-label">
@@ -263,7 +237,6 @@ const AllocateByCategoryModal = ({
               </div>
             </div>
           </div>
-
           {/* Allocation name input with placeholder */}
           <div className="mb-3">
             <label
@@ -282,7 +255,6 @@ const AllocateByCategoryModal = ({
               placeholder="Enter allocation name or leave blank for default"
             />
           </div>
-
           {/* Notes textarea */}
           <div className="mb-3">
             <label htmlFor="notes" className="form-label abcm-form-label">
@@ -298,7 +270,6 @@ const AllocateByCategoryModal = ({
               rows="3"
             />
           </div>
-
           {/* Budget Summary display */}
           <div className="abcm-details-section">
             <h6 className="abcm-details-heading">Budget Summary</h6>
@@ -335,7 +306,6 @@ const AllocateByCategoryModal = ({
               </div>
             </div>
           </div>
-
           {/* Warning if amount exceeds remaining budget */}
           {parseFloat(formData.amount) > remainingBudget && (
             <div className="abcm-alert-danger" role="alert">
@@ -351,7 +321,6 @@ const AllocateByCategoryModal = ({
             </div>
           )}
         </Modal.Body>
-
         <Modal.Footer>
           <button
             type="button"
@@ -385,5 +354,4 @@ const AllocateByCategoryModal = ({
     </Modal>
   );
 };
-
 export default AllocateByCategoryModal;

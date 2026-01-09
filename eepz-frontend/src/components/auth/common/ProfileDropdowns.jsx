@@ -1,5 +1,4 @@
 import { useState } from "react";
-
 export const GenderDropdown = ({ value, onChange, disabled, showError }) => {
   const [open, setOpen] = useState(false);
   const options = [
@@ -10,12 +9,10 @@ export const GenderDropdown = ({ value, onChange, disabled, showError }) => {
     { label: "Prefer not to say", value: "Prefer not to say" },
   ];
   const selected = options.find((o) => o.value === value) || options[0];
-
   const handleSelect = (val) => {
     onChange(val);
     setOpen(false);
   };
-
   if (disabled) {
     return (
       <div className={`epda-form-control ${showError ? "epda-error" : ""}`}>
@@ -23,7 +20,6 @@ export const GenderDropdown = ({ value, onChange, disabled, showError }) => {
       </div>
     );
   }
-
   return (
     <div
       className={`epda-custom-dropdown ${showError ? "epda-error" : ""}`}
@@ -56,7 +52,6 @@ export const GenderDropdown = ({ value, onChange, disabled, showError }) => {
     </div>
   );
 };
-
 export const NationalityDropdown = ({
   value,
   onChange,
@@ -70,12 +65,10 @@ export const NationalityDropdown = ({
     ...options.map((nat) => ({ label: nat, value: nat })),
   ];
   const selected = allOptions.find((o) => o.value === value) || allOptions[0];
-
   const handleSelect = (val) => {
     onChange(val);
     setOpen(false);
   };
-
   if (disabled) {
     return (
       <div className={`epda-form-control ${showError ? "epda-error" : ""}`}>
@@ -83,7 +76,6 @@ export const NationalityDropdown = ({
       </div>
     );
   }
-
   return (
     <div
       className={`epda-custom-dropdown ${showError ? "epda-error" : ""}`}
@@ -116,7 +108,6 @@ export const NationalityDropdown = ({
     </div>
   );
 };
-
 export const MaritalStatusDropdown = ({ value, onChange, disabled, showError }) => {
   const [open, setOpen] = useState(false);
   const options = [
@@ -126,12 +117,10 @@ export const MaritalStatusDropdown = ({ value, onChange, disabled, showError }) 
     { label: "Prefer not to say", value: "Prefer not to say" },
   ];
   const selected = options.find((o) => o.value === value) || options[0];
-
   const handleSelect = (val) => {
     onChange(val);
     setOpen(false);
   };
-
   if (disabled) {
     return (
       <div className={`epda-form-control ${showError ? "epda-error" : ""}`}>
@@ -139,7 +128,6 @@ export const MaritalStatusDropdown = ({ value, onChange, disabled, showError }) 
       </div>
     );
   }
-
   return (
     <div
       className={`epda-custom-dropdown ${showError ? "epda-error" : ""}`}
@@ -172,7 +160,6 @@ export const MaritalStatusDropdown = ({ value, onChange, disabled, showError }) 
     </div>
   );
 };
-
 export const StateDropdown = ({ value, onChange, disabled, showError, options }) => {
   const [open, setOpen] = useState(false);
   const allOptions = [
@@ -180,12 +167,10 @@ export const StateDropdown = ({ value, onChange, disabled, showError, options })
     ...options.map((state) => ({ label: state, value: state })),
   ];
   const selected = allOptions.find((o) => o.value === value) || allOptions[0];
-
   const handleSelect = (val) => {
     onChange(val);
     setOpen(false);
   };
-
   if (disabled) {
     return (
       <div className={`epda-form-control ${showError ? "epda-error" : ""}`}>
@@ -193,7 +178,6 @@ export const StateDropdown = ({ value, onChange, disabled, showError, options })
       </div>
     );
   }
-
   return (
     <div
       className={`epda-custom-dropdown ${showError ? "epda-error" : ""}`}

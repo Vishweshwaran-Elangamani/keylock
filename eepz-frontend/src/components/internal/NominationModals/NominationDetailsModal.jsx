@@ -1,9 +1,7 @@
 import React from "react";
 import "../../../styles/internal/NominationDetailsModal.css";
-
 const NominationDetailsModal = ({ show, onHide, nomination }) => {
   if (!show || !nomination) return null;
-
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -12,7 +10,6 @@ const NominationDetailsModal = ({ show, onHide, nomination }) => {
       day: "numeric",
     });
   };
-
   const getStatusBadgeClass = (status) => {
     switch (status?.toLowerCase()) {
       case "approved":
@@ -27,11 +24,9 @@ const NominationDetailsModal = ({ show, onHide, nomination }) => {
         return "status-inactive";
     }
   };
-
   return (
     <>
       <div className="ndm-backdrop" onClick={onHide} />
-
       <div className="ndm-modal-container">
         <div className="ndm-modal-dialog">
           {/* HEADER - Fixed */}
@@ -49,7 +44,6 @@ const NominationDetailsModal = ({ show, onHide, nomination }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* BODY - Scrollable */}
           <div className="ndm-modal-body">
             {/* Top Section - Opportunity & Nominee Information in 2 Columns */}
@@ -67,7 +61,6 @@ const NominationDetailsModal = ({ show, onHide, nomination }) => {
                   </p>
                 </div>
               </div>
-
               {/* RIGHT COLUMN - Nominee Information */}
               <div className="ndm-info-card nominee">
                 <h6 className="ndm-card-heading nominee">
@@ -82,7 +75,6 @@ const NominationDetailsModal = ({ show, onHide, nomination }) => {
                 </div>
               </div>
             </div>
-
             {/* Nomination Details */}
             <div className="ndm-details-section">
               <h6 className="ndm-details-heading">
@@ -130,7 +122,6 @@ const NominationDetailsModal = ({ show, onHide, nomination }) => {
                 </div>
               )}
             </div>
-
             {/* Review Information (if available) */}
             {(nomination.reviewRemarks || nomination.reviewedByName) && (
               <div className="ndm-review-section">
@@ -165,7 +156,6 @@ const NominationDetailsModal = ({ show, onHide, nomination }) => {
               </div>
             )}
           </div>
-
           {/* FOOTER - Fixed */}
           <div className="ndm-modal-footer">
             <button type="button" onClick={onHide} className="ndm-btn-close">
@@ -177,5 +167,4 @@ const NominationDetailsModal = ({ show, onHide, nomination }) => {
     </>
   );
 };
-
 export default NominationDetailsModal;

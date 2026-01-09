@@ -4,7 +4,6 @@ import departmentService from "../../../../services/auth/departmentService";
 import userService from "../../../../services/auth/userService";
 import { toast } from "sonner";
 import "../../../../styles/auth/department/AddDepartmentModal.css";
-
 const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
     departmentName: "",
@@ -14,28 +13,23 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
     parentDepartmentId: null,
     hodEmployeeId: null,
   });
-
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [departments, setDepartments] = useState([]);
   const [departmentHeads, setDepartmentHeads] = useState([]);
   const [loadingDropdowns, setLoadingDropdowns] = useState(true);
-
   useEffect(() => {
     if (show) {
       fetchDropdownData();
     }
   }, [show]);
-
   const fetchDropdownData = async () => {
     try {
       setLoadingDropdowns(true);
-
       const deptResponse = await departmentService.getActiveDepartments();
       if (deptResponse.success) {
         setDepartments(deptResponse.data || []);
       }
-
       const usersResponse = await userService.getAllUsers();
       if (usersResponse.success) {
         const filteredHeads = (usersResponse.data || []).filter(
@@ -51,7 +45,6 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
       setLoadingDropdowns(false);
     }
   };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -60,10 +53,6 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
     }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
-
-  // ========================
-  // MEMOIZED OPTIONS
-  // ========================
   const statusOptions = useMemo(
     () => [
       { value: "Active", label: "Active" },
@@ -71,7 +60,6 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
     ],
     []
   );
-
   const parentDepartmentOptions = useMemo(
     () => [
       { value: "", label: "-- None (Root Department) --" },
@@ -82,7 +70,6 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
     ],
     [departments]
   );
-
   const hodOptions = useMemo(
     () => [
       { value: "", label: "-- Select HOD --" },
@@ -93,10 +80,6 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
     ],
     [departmentHeads]
   );
-
-  // ========================
-  // CUSTOM DROPDOWN COMPONENT - NATIONALITY STYLE
-  // ========================
   const CustomDropdown = ({
     options,
     value,
@@ -110,30 +93,25 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [openUpward, setOpenUpward] = useState(forceUpward);
     const dropdownRef = useRef(null);
-
     const toggleDropdown = () => {
       if (!disabled) {
         setIsOpen(!isOpen);
       }
     };
-
     const handleSelect = (selectedValue) => {
       onChange({ target: { name, value: selectedValue } });
       setIsOpen(false);
     };
-
     useEffect(() => {
       if (forceUpward) {
         setOpenUpward(true);
         return;
       }
-
       if (isOpen && dropdownRef.current) {
         const rect = dropdownRef.current.getBoundingClientRect();
         const spaceBelow = window.innerHeight - rect.bottom;
         const spaceAbove = rect.top;
         const dropdownHeight = 250;
-
         if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
           setOpenUpward(true);
         } else {
@@ -141,7 +119,6 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
         }
       }
     }, [isOpen, forceUpward]);
-
     useEffect(() => {
       const handleClickOutside = (event) => {
         if (
@@ -154,9 +131,7 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
       document.addEventListener("mousedown", handleClickOutside);
       return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
-
     const selectedOption = options.find((opt) => opt.value === value);
-
     return (
       <div
         ref={dropdownRef}
@@ -172,7 +147,6 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
           </span>
           <span className="adm-custom-arrow"></span>
         </div>
-
         {isOpen && (
           <div
             className={`adm-custom-menu ${
@@ -195,17 +169,14 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
       </div>
     );
   };
-
   const validateForm = () => {
     const newErrors = {};
-
     if (!formData.departmentName.trim()) {
       newErrors.departmentName = "Department name is required";
     } else if (formData.departmentName.trim().length < 3) {
       newErrors.departmentName =
         "Department name must be at least 3 characters";
     }
-
     if (!formData.departmentCode.trim()) {
       newErrors.departmentCode = "Department code is required";
     } else if (formData.departmentCode.trim().length < 2) {
@@ -215,23 +186,18 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
       newErrors.departmentCode =
         "Department code can only contain letters, numbers, hyphens and underscores";
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) {
       toast.error("Please fix the validation errors");
       return;
     }
-
     try {
       setLoading(true);
       toast.loading("Creating department...");
-
       const payload = {
         departmentName: formData.departmentName.trim(),
         departmentCode: formData.departmentCode.trim().toUpperCase(),
@@ -244,9 +210,7 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
           ? parseInt(formData.hodEmployeeId)
           : null,
       };
-
       const response = await departmentService.createDepartment(payload);
-
       if (response.success) {
         toast.dismiss();
         toast.success("Department created successfully");
@@ -262,13 +226,10 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
       setLoading(false);
     }
   };
-
   if (!show) return null;
-
   return (
     <>
       <div className="adm-backdrop" onClick={onClose} />
-
       <div className="adm-modal-container">
         <div className="adm-modal-dialog">
           {/* Header */}
@@ -284,7 +245,6 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
               disabled={loading}
             />
           </div>
-
           {/* Body */}
           <form onSubmit={handleSubmit} autoComplete="off" className="adm-form">
             <div className="adm-modal-body">
@@ -321,7 +281,6 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
                         </div>
                       )}
                     </div>
-
                     <div className="adm-form-group">
                       <label className="adm-form-label">
                         Department Code{" "}
@@ -346,7 +305,6 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
                       )}
                     </div>
                   </div>
-
                   {/* Row 2: Description */}
                   <div className="adm-form-row-full">
                     <label className="adm-form-label">Description</label>
@@ -361,7 +319,6 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
                       className="adm-form-input adm-form-textarea"
                     />
                   </div>
-
                   {/* Row 3: Status & Parent Department */}
                   <div className="adm-form-row">
                     {/* Status */}
@@ -380,7 +337,6 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
                         forceUpward={false}
                       />
                     </div>
-
                     {/* Parent Department */}
                     <div className="adm-form-group">
                       <label className="adm-form-label">
@@ -398,7 +354,6 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
                       />
                     </div>
                   </div>
-
                   {/* Row 4: HOD */}
                   <div className="adm-form-row-full">
                     <label className="adm-form-label">
@@ -424,7 +379,6 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
                 </div>
               )}
             </div>
-
             {/* Footer */}
             <div className="adm-modal-footer">
               <button
@@ -460,5 +414,4 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
     </>
   );
 };
-
 export default AddDepartmentModal;

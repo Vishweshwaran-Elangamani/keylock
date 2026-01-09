@@ -7,7 +7,6 @@ const ExportTab = ({ handleExport, exportingUsers, exportingAll }) => {
           Download data in Excel format for backup or analysis
         </p>
       </div>
-
       <div className="bom-export-cards-grid">
         <div className="bom-export-card">
           <div className="bom-export-card-icon">
@@ -30,7 +29,6 @@ const ExportTab = ({ handleExport, exportingUsers, exportingAll }) => {
             Export Users
           </button>
         </div>
-
         <div className="bom-export-card">
           <div className="bom-export-card-icon">
             <i className="bi bi-database bom-export-card-icon-image"></i>
@@ -56,5 +54,4 @@ const ExportTab = ({ handleExport, exportingUsers, exportingAll }) => {
     </div>
   );
 };
-
 export default ExportTab;

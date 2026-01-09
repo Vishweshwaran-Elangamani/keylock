@@ -2,18 +2,15 @@ import React, { useState, useEffect } from "react";
 import budgetAllocationService from "../../../services/hr_operations/hr/budgetAllocationService";
 import { formatCurrency } from "../../../utils/auth/currencyFormatter";
 import "../../../styles/hr_operations/hr/ViewBudgetDetailsModal.css";
-
 const ViewBudgetDetailsModal = ({ show, budget, onHide }) => {
   const [allocations, setAllocations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   useEffect(() => {
     if (show && budget) {
       fetchAllocations();
     }
   }, [show, budget]);
-
   const fetchAllocations = async () => {
     setLoading(true);
     setError(null);
@@ -30,7 +27,6 @@ const ViewBudgetDetailsModal = ({ show, budget, onHide }) => {
       setLoading(false);
     }
   };
-
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-IN", {
@@ -39,7 +35,6 @@ const ViewBudgetDetailsModal = ({ show, budget, onHide }) => {
       day: "numeric",
     });
   };
-
   const getAllocationsByType = () => {
     const types = {};
     allocations.forEach((alloc) => {
@@ -50,32 +45,26 @@ const ViewBudgetDetailsModal = ({ show, budget, onHide }) => {
     });
     return types;
   };
-
   const getTotalByType = (type) => {
     return allocations
       .filter((a) => a.allocationType === type)
       .reduce((sum, a) => sum + (parseFloat(a.amount) || 0), 0);
   };
-
   const allocationsByType = getAllocationsByType();
   const allocationTypes = Object.keys(allocationsByType).sort();
   const totalAllocated = allocations.reduce(
     (sum, a) => sum + (parseFloat(a.amount) || 0),
     0
   );
-
   const remainingBudget = (budget?.allocatedAmount || 0) - totalAllocated;
   const isPositive = remainingBudget >= 0;
   const usagePercentage = (
     (totalAllocated / (budget?.allocatedAmount || 1)) * 100 || 0
   ).toFixed(2);
-
   if (!show) return null;
-
   return (
     <>
       <div className="vbdm-backdrop" onClick={onHide} />
-
       <div className="vbdm-modal-container">
         <div className="vbdm-modal-dialog">
           {/* HEADER - Fixed */}
@@ -93,7 +82,6 @@ const ViewBudgetDetailsModal = ({ show, budget, onHide }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* BODY - Scrollable */}
           <div className="vbdm-modal-body">
             {error && (
@@ -102,7 +90,6 @@ const ViewBudgetDetailsModal = ({ show, budget, onHide }) => {
                 {error}
               </div>
             )}
-
             {/* BUDGET INFO */}
             <div className="vbdm-budget-info">
               <div className="vbdm-info-card">
@@ -111,13 +98,11 @@ const ViewBudgetDetailsModal = ({ show, budget, onHide }) => {
                   {budget?.departmentName || "Unknown"}
                 </span>
               </div>
-
               <div className="vbdm-info-card">
                 <label className="vbdm-info-label">Fiscal Year:</label>
                 <span className="vbdm-info-value">{budget?.fiscalYear}</span>
               </div>
             </div>
-
             {/* BUDGET SUMMARY */}
             <div className="vbdm-budget-summary">
               <h6 className="vbdm-summary-heading">
@@ -129,19 +114,16 @@ const ViewBudgetDetailsModal = ({ show, budget, onHide }) => {
                   <label>Total Budget:</label>
                   <span>{formatCurrency(budget?.totalBudget)}</span>
                 </div>
-
                 <div className="vbdm-summary-item">
                   <label>Allocated Amount:</label>
                   <span>{formatCurrency(budget?.allocatedAmount)}</span>
                 </div>
-
                 <div className="vbdm-summary-item">
                   <label>Utilized Amount:</label>
                   <span className="utilized">
                     {formatCurrency(budget?.utilizedAmount)}
                   </span>
                 </div>
-
                 <div className="vbdm-summary-item">
                   <label>Utilization %:</label>
                   <span
@@ -156,14 +138,12 @@ const ViewBudgetDetailsModal = ({ show, budget, onHide }) => {
                 </div>
               </div>
             </div>
-
             {/* ALLOCATION BY TYPE BREAKDOWN */}
             <div className="vbdm-allocation-section">
               <h6 className="vbdm-allocation-heading">
                 <i className="bi bi-diagram-3"></i>
                 Allocation by Type
               </h6>
-
               {loading ? (
                 <div className="vbdm-loading">
                   <div
@@ -182,7 +162,6 @@ const ViewBudgetDetailsModal = ({ show, budget, onHide }) => {
                   {allocationTypes.map((type) => (
                     <div key={type} className="vbdm-type-section">
                       <h6 className="vbdm-type-heading">{type}</h6>
-
                       <div className="vbdm-table-container">
                         <table className="vbdm-table">
                           <thead>
@@ -221,7 +200,6 @@ const ViewBudgetDetailsModal = ({ show, budget, onHide }) => {
                           </tbody>
                         </table>
                       </div>
-
                       {/* Subtotal for type */}
                       <div className="vbdm-subtotal-bar">
                         <strong>{type} Subtotal:</strong>{" "}
@@ -229,7 +207,6 @@ const ViewBudgetDetailsModal = ({ show, budget, onHide }) => {
                       </div>
                     </div>
                   ))}
-
                   {/* TOTAL ALLOCATIONS */}
                   <div className="vbdm-total-bar">
                     <strong className="vbdm-total-label">
@@ -242,7 +219,6 @@ const ViewBudgetDetailsModal = ({ show, budget, onHide }) => {
                 </>
               )}
             </div>
-
             {/* REMAINING BUDGET */}
             <div
               className={`vbdm-budget-status ${
@@ -266,7 +242,6 @@ const ViewBudgetDetailsModal = ({ show, budget, onHide }) => {
                   <label>Total Allocated (Leadership):</label>
                   <span>{formatCurrency(budget?.allocatedAmount)}</span>
                 </div>
-
                 <div
                   className={`vbdm-status-item ${
                     isPositive ? "positive" : "negative"
@@ -275,7 +250,6 @@ const ViewBudgetDetailsModal = ({ show, budget, onHide }) => {
                   <label>Total Used (HR/DeptHead):</label>
                   <span>{formatCurrency(totalAllocated)}</span>
                 </div>
-
                 <div
                   className={`vbdm-status-item ${
                     isPositive ? "positive" : "negative"
@@ -284,7 +258,6 @@ const ViewBudgetDetailsModal = ({ show, budget, onHide }) => {
                   <label>Remaining:</label>
                   <span>{formatCurrency(remainingBudget)}</span>
                 </div>
-
                 <div
                   className={`vbdm-status-item ${
                     isPositive ? "positive" : "negative"
@@ -302,7 +275,6 @@ const ViewBudgetDetailsModal = ({ show, budget, onHide }) => {
               </div>
             </div>
           </div>
-
           {/* FOOTER - Fixed */}
           <div className="vbdm-modal-footer">
             <button type="button" onClick={onHide} className="vbdm-btn-close">
@@ -314,5 +286,4 @@ const ViewBudgetDetailsModal = ({ show, budget, onHide }) => {
     </>
   );
 };
-
 export default ViewBudgetDetailsModal;

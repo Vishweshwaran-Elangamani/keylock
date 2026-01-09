@@ -3,7 +3,6 @@ import { CloseButton } from "react-bootstrap";
 import { toast } from "sonner";
 import internalOpportunityService from "../../../services/internal/internalOpportunityService";
 import "../../../styles/internal/EditOpportunityModal.css";
-
 const CustomDropdown = ({
   value,
   onChange,
@@ -14,30 +13,24 @@ const CustomDropdown = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-
   const selectedOption = options.find((opt) => opt.value === value);
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     };
-
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen]);
-
   const handleSelect = (optionValue) => {
     onChange({ target: { name, value: optionValue } });
     setIsOpen(false);
   };
-
   return (
     <div
       ref={dropdownRef}
@@ -51,7 +44,6 @@ const CustomDropdown = ({
         </span>
         <span className="eom-custom-arrow"></span>
       </div>
-
       {isOpen && (
         <div className="eom-custom-menu">
           {options.map((option) => (
@@ -70,7 +62,6 @@ const CustomDropdown = ({
     </div>
   );
 };
-
 const EditOpportunityModal = ({
   show,
   onHide,
@@ -89,7 +80,6 @@ const EditOpportunityModal = ({
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-
   useEffect(() => {
     if (opportunity) {
       setFormData({
@@ -105,7 +95,6 @@ const EditOpportunityModal = ({
       });
     }
   }, [opportunity]);
-
   // Department options WITHOUT placeholder (for Edit mode)
   const departmentOptions = useMemo(() => {
     return departments.map((dept) => ({
@@ -113,14 +102,12 @@ const EditOpportunityModal = ({
       value: dept.departmentId.toString(),
     }));
   }, [departments]);
-
   // Status options WITHOUT placeholder (for Edit mode)
   const statusOptions = [
     { label: "Active", value: "Active" },
     { label: "Pending", value: "Pending" },
     { label: "Closed", value: "Closed" },
   ];
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -134,45 +121,34 @@ const EditOpportunityModal = ({
       }));
     }
   };
-
   const validateForm = () => {
     const newErrors = {};
-
     if (!formData.opportunityName.trim()) {
       newErrors.opportunityName = "Opportunity name is required";
     }
-
     if (!formData.departmentId) {
       newErrors.departmentId = "Department is required";
     }
-
     if (!formData.description.trim()) {
       newErrors.description = "Description is required";
     }
-
     if (!formData.requirements.trim()) {
       newErrors.requirements = "Requirements are required";
     }
-
     if (!formData.deadline) {
       newErrors.deadline = "Deadline is required";
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) {
       toast.error("Please enter valid details");
       return;
     }
-
     try {
       setLoading(true);
-
       const payload = {
         opportunityName: formData.opportunityName.trim(),
         departmentId: parseInt(formData.departmentId),
@@ -182,12 +158,10 @@ const EditOpportunityModal = ({
         deadline: formData.deadline,
         status: formData.status,
       };
-
       const response = await internalOpportunityService.updateOpportunity(
         opportunity.opportunityId,
         payload
       );
-
       if (response.success) {
         toast.success("Opportunity updated successfully!");
         onOpportunityUpdated();
@@ -202,18 +176,14 @@ const EditOpportunityModal = ({
       setLoading(false);
     }
   };
-
   const handleClose = () => {
     setErrors({});
     onHide();
   };
-
   if (!show) return null;
-
   return (
     <>
       <div className="eom-backdrop" onClick={handleClose} />
-
       <div className="eom-modal-wrapper">
         <div className="eom-modal-dialog">
           {/* Modal Header */}
@@ -229,7 +199,6 @@ const EditOpportunityModal = ({
               className="eom-close-button"
             />
           </div>
-
           {/* Form */}
           <form onSubmit={handleSubmit} className="eom-form">
             {/* Modal Body */}
@@ -255,7 +224,6 @@ const EditOpportunityModal = ({
                   <div className="eom-form-error">{errors.opportunityName}</div>
                 )}
               </div>
-
               {/* Department and Deadline Row */}
               <div className="eom-two-column-grid">
                 {/* Department - Custom Dropdown */}
@@ -275,7 +243,6 @@ const EditOpportunityModal = ({
                     <div className="eom-form-error">{errors.departmentId}</div>
                   )}
                 </div>
-
                 {/* Deadline */}
                 <div className="eom-form-group">
                   <label className="eom-form-label">
@@ -295,7 +262,6 @@ const EditOpportunityModal = ({
                   )}
                 </div>
               </div>
-
               {/* Description - Full Width */}
               <div className="eom-form-group">
                 <label className="eom-form-label">
@@ -316,7 +282,6 @@ const EditOpportunityModal = ({
                   <div className="eom-form-error">{errors.description}</div>
                 )}
               </div>
-
               {/* Requirements - Full Width */}
               <div className="eom-form-group">
                 <label className="eom-form-label">
@@ -337,7 +302,6 @@ const EditOpportunityModal = ({
                   <div className="eom-form-error">{errors.requirements}</div>
                 )}
               </div>
-
               {/* Eligibility Criteria - Full Width */}
               <div className="eom-form-group">
                 <label className="eom-form-label">Eligibility Criteria</label>
@@ -351,7 +315,6 @@ const EditOpportunityModal = ({
                   className="eom-form-textarea"
                 />
               </div>
-
               {/* Status - Narrow Width with Custom Dropdown */}
               <div className="eom-form-group narrow">
                 <label className="eom-form-label">
@@ -367,7 +330,6 @@ const EditOpportunityModal = ({
                 />
               </div>
             </div>
-
             {/* Modal Footer */}
             <div className="eom-modal-footer">
               <button
@@ -379,7 +341,6 @@ const EditOpportunityModal = ({
                 <i className="bi bi-x-circle"></i>
                 Cancel
               </button>
-
               <button
                 type="submit"
                 disabled={loading}
@@ -404,5 +365,4 @@ const EditOpportunityModal = ({
     </>
   );
 };
-
 export default EditOpportunityModal;

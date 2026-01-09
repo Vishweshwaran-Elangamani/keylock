@@ -2,19 +2,15 @@ import { useState } from "react";
 import { toast } from "sonner";
 import budgetAllocationService from "../../../services/hr_operations/hr/budgetAllocationService";
 import "../../../styles/hr_operations/hr/DeleteBudgetModal.css";
-
 const DeleteBudgetModal = ({ show, onHide, onBudgetDeleted, budget }) => {
   const [loading, setLoading] = useState(false);
   const [confirmText, setConfirmText] = useState("");
-
   const isConfirmValid = confirmText.toLowerCase() === "confirm";
-
   const handleDelete = async () => {
     if (!isConfirmValid) {
       toast.error("Please type 'confirm' to proceed with deletion");
       return;
     }
-
     try {
       setLoading(true);
       await budgetAllocationService.deleteDepartmentBudget(budget.budgetId);
@@ -29,9 +25,7 @@ const DeleteBudgetModal = ({ show, onHide, onBudgetDeleted, budget }) => {
       setLoading(false);
     }
   };
-
   if (!show) return null;
-
   return (
     <>
       {/* Blurred Backdrop */}
@@ -39,7 +33,6 @@ const DeleteBudgetModal = ({ show, onHide, onBudgetDeleted, budget }) => {
         className="delete-budget-backdrop"
         onClick={onHide}
       />
-
       {/* Modal Container */}
       <div className="delete-budget-modal-wrapper">
         <div className="delete-budget-modal-container">
@@ -59,7 +52,6 @@ const DeleteBudgetModal = ({ show, onHide, onBudgetDeleted, budget }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* MODAL BODY */}
           <div className="delete-budget-modal-body">
             {/* Confirmation Question */}
@@ -70,7 +62,6 @@ const DeleteBudgetModal = ({ show, onHide, onBudgetDeleted, budget }) => {
               </strong>{" "}
               (Fiscal Year: <strong>{budget?.fiscalYear}</strong>)?
             </p>
-
             {/* Critical Warning Box */}
             <div className="delete-budget-warning-box">
               {/* Warning Header with Icon */}
@@ -78,13 +69,11 @@ const DeleteBudgetModal = ({ show, onHide, onBudgetDeleted, budget }) => {
                 <i className="bi bi-exclamation-triangle-fill"></i>
                 <span>Critical Warning</span>
               </div>
-
               {/* Warning Text */}
               <p className="delete-budget-warning-text">
                 <strong>This action is PERMANENT and CANNOT be reversed!</strong>
                 <br />
               </p>
-
               {/* Warning List */}
               <ul className="delete-budget-warning-list">
                 <strong>Once deleted, this budget will:</strong>
@@ -93,7 +82,6 @@ const DeleteBudgetModal = ({ show, onHide, onBudgetDeleted, budget }) => {
                 <li>Cannot be recovered or restored</li>
               </ul>
             </div>
-
             {/* Confirmation Input */}
             <div className="delete-budget-input-section">
               <label className="delete-budget-input-label">
@@ -108,7 +96,6 @@ const DeleteBudgetModal = ({ show, onHide, onBudgetDeleted, budget }) => {
                 className="delete-budget-input"
               />
             </div>
-
             {/* Info Alert */}
             <div className="delete-budget-info-alert">
               <i className="bi bi-info-circle"></i>
@@ -118,7 +105,6 @@ const DeleteBudgetModal = ({ show, onHide, onBudgetDeleted, budget }) => {
               </small>
             </div>
           </div>
-
           {/* MODAL FOOTER - ACTION BUTTONS */}
           <div className="delete-budget-modal-footer">
             {/* Cancel Button */}
@@ -130,7 +116,6 @@ const DeleteBudgetModal = ({ show, onHide, onBudgetDeleted, budget }) => {
             >
               <i className="bi bi-arrow-left"></i> Cancel
             </button>
-
             {/* Delete Button */}
             <button
               type="button"
@@ -156,5 +141,4 @@ const DeleteBudgetModal = ({ show, onHide, onBudgetDeleted, budget }) => {
     </>
   );
 };
-
 export default DeleteBudgetModal;

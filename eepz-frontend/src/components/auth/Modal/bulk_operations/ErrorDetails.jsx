@@ -1,5 +1,4 @@
 import ErrorCategory from "./ErrorCategory";
-
 const ErrorDetails = ({ uploadResult }) => {
   return (
     <div className="error-details-bulk">
@@ -10,7 +9,6 @@ const ErrorDetails = ({ uploadResult }) => {
             Detailed Error Information
           </span>
         </div>
-
         <div className="bom-error-summary">
           <strong className="bom-error-summary-title">
             {uploadResult.failureCount} record
@@ -21,7 +19,6 @@ const ErrorDetails = ({ uploadResult }) => {
             description
           </p>
         </div>
-
         {uploadResult.categorizedErrors ? (
           <div>
             {uploadResult.categorizedErrors.duplicateEmails.length > 0 && (
@@ -32,7 +29,6 @@ const ErrorDetails = ({ uploadResult }) => {
                 errors={uploadResult.categorizedErrors.duplicateEmails}
               />
             )}
-
             {uploadResult.categorizedErrors.validationErrors.length > 0 && (
               <ErrorCategory
                 type="validation"
@@ -41,7 +37,6 @@ const ErrorDetails = ({ uploadResult }) => {
                 errors={uploadResult.categorizedErrors.validationErrors}
               />
             )}
-
             {uploadResult.categorizedErrors.otherErrors.length > 0 && (
               <ErrorCategory
                 type="other"
@@ -68,5 +63,4 @@ const ErrorDetails = ({ uploadResult }) => {
     </div>
   );
 };
-
 export default ErrorDetails;

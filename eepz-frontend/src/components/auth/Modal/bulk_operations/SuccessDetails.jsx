@@ -47,5 +47,4 @@ const SuccessDetails = ({ uploadResult }) => {
     </div>
   );
 };
-
 export default SuccessDetails;

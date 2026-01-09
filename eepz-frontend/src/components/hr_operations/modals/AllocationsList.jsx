@@ -4,18 +4,14 @@ import UpdateUtilizationModal from "./UpdateUtilizationModal";
 import { FaSearch } from "react-icons/fa";
 import { Form } from "react-bootstrap";
 import "../../../styles/hr_operations/hr/AllocationsList.css";
-
-
 const TypeDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
   const allOptions = [{ label: "All Types", value: "all" }, ...options];
   const selected = allOptions.find((o) => o.value === value) || allOptions[0];
-
   const handleSelect = (val) => {
     onChange({ target: { name: "type", value: val } });
     setOpen(false);
   };
-
   return (
     <div
       className="allocations-filter-select allocations-custom-dropdown"
@@ -48,18 +44,14 @@ const TypeDropdown = ({ value, onChange, options }) => {
     </div>
   );
 };
-
-
 const AllocationNameDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
   const allOptions = [{ label: "All Allocations", value: "" }, ...options];
   const selected = allOptions.find((o) => o.value === value) || allOptions[0];
-
   const handleSelect = (val) => {
     onChange({ target: { name: "allocationName", value: val } });
     setOpen(false);
   };
-
   return (
     <div
       className="allocations-filter-select allocations-custom-dropdown"
@@ -92,8 +84,6 @@ const AllocationNameDropdown = ({ value, onChange, options }) => {
     </div>
   );
 };
-
-
 const AllocationsList = ({
   budget,
   allocations = [],
@@ -106,38 +96,30 @@ const AllocationsList = ({
   const [viewType, setViewType] = useState("table");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
-
   const [filters, setFilters] = useState({
     type: "all",
     allocationName: "",
   });
-
   const [filterOptions, setFilterOptions] = useState({
     types: [],
     allocationNames: [],
   });
-
   const userRole = localStorage.getItem("userRole");
   const isDeptHead = userRole === "Department Head";
-
   useEffect(() => {
     generateFilterOptions(allocations);
     setFilteredAllocations(allocations);
   }, [allocations]);
-
   useEffect(() => {
     applyFilters();
     setCurrentPage(1);
   }, [allocations, activeSearchTerm, filters]);
-
   const generateFilterOptions = (data) => {
     const types = [
       ...new Set(data.map((a) => a.allocationType).filter(Boolean)),
     ].sort();
-
     const allocationNames = [
       ...new Set(
         data
@@ -145,7 +127,6 @@ const AllocationsList = ({
           .filter(Boolean)
       ),
     ].sort();
-
     setFilterOptions({
       types: types.map((type) => ({ label: type, value: type })),
       allocationNames: allocationNames.map((name) => ({
@@ -154,10 +135,8 @@ const AllocationsList = ({
       })),
     });
   };
-
   const applyFilters = () => {
     let filtered = allocations;
-
     if (activeSearchTerm.trim()) {
       const query = activeSearchTerm.toLowerCase();
       filtered = filtered.filter((a) => {
@@ -170,21 +149,17 @@ const AllocationsList = ({
         return name.includes(query) || type.includes(query);
       });
     }
-
     if (filters.type !== "all") {
       filtered = filtered.filter((a) => a.allocationType === filters.type);
     }
-
     if (filters.allocationName) {
       filtered = filtered.filter((a) => {
         const name = a.notes || a.allocationType || "Unnamed Allocation";
         return name === filters.allocationName;
       });
     }
-
     setFilteredAllocations(filtered);
   };
-
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({
@@ -192,11 +167,9 @@ const AllocationsList = ({
       [name]: value,
     }));
   };
-
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
   };
-
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
@@ -205,23 +178,19 @@ const AllocationsList = ({
       allocationName: "",
     });
   };
-
   const handleItemsPerPageChange = (e) => {
     setItemsPerPage(parseInt(e.target.value));
     setCurrentPage(1);
   };
-
   const goToPage = (page) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
   };
-
   const totalPages = Math.ceil(filteredAllocations.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentPageData = filteredAllocations.slice(startIndex, endIndex);
-
   const getTypeColor = (type) => {
     const colors = {
       Promotion: { bg: "#fce7f3", color: "#be185d" },
@@ -231,20 +200,16 @@ const AllocationsList = ({
     };
     return colors[type] || colors.Other;
   };
-
   const handleUtilizationUpdate = (updatedAllocation) => {
     const updatedAllocations = allocations.map((a) =>
       a.allocationId === updatedAllocation.allocationId ? updatedAllocation : a
     );
-
     if (onUtilizationUpdated) {
       onUtilizationUpdated(updatedAllocations);
     }
-
     setShowUpdateModal(false);
     setSelectedAllocation(null);
   };
-
   const summaryStats = {
     totalAllocated: filteredAllocations.reduce(
       (sum, a) => sum + (a.amount || 0),
@@ -264,11 +229,9 @@ const AllocationsList = ({
           ).toFixed(2)
         : 0,
   };
-
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
-
     if (totalPages <= maxPagesToShow) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -292,7 +255,6 @@ const AllocationsList = ({
     }
     return pages;
   };
-
   return (
     <div className="allocations-root">
       {/* BREADCRUMB */}
@@ -307,7 +269,6 @@ const AllocationsList = ({
           </h5>
         </div>
       </div>
-
       {/* STATISTICS CARDS */}
       {filteredAllocations.length > 0 && (
         <div className="allocations-stats-grid">
@@ -322,7 +283,6 @@ const AllocationsList = ({
               <p className="allocations-stat-label">Total Allocated</p>
             </div>
           </div>
-
           <div className="allocations-stat-card">
             <div className="allocations-stat-icon allocations-stat-icon-success">
               <i className="bi bi-graph-up-arrow"></i>
@@ -334,7 +294,6 @@ const AllocationsList = ({
               <p className="allocations-stat-label">Total Utilized</p>
             </div>
           </div>
-
           <div className="allocations-stat-card">
             <div className="allocations-stat-icon allocations-stat-icon-warning">
               <i className="bi bi-percent"></i>
@@ -350,7 +309,6 @@ const AllocationsList = ({
           </div>
         </div>
       )}
-
       {/* FILTERS CARD */}
       <div className="allocations-filters-card">
         <div className="allocations-filters-content">
@@ -380,30 +338,25 @@ const AllocationsList = ({
               </button>
             </div>
           </div>
-
           <TypeDropdown
             value={filters.type}
             onChange={handleFilterChange}
             options={filterOptions.types}
           />
-
           <AllocationNameDropdown
             value={filters.allocationName}
             onChange={handleFilterChange}
             options={filterOptions.allocationNames}
           />
-
           <button className="allocations-clear-btn" onClick={clearFilters}>
             Clear Filters
           </button>
-
           <div className="allocations-results-count">
             Showing {currentPageData.length} of {filteredAllocations.length}{" "}
             allocations
           </div>
         </div>
       </div>
-
       {filteredAllocations.length === 0 ? (
         <div className="allocations-empty-card">
           <div className="allocations-empty-state">
@@ -439,7 +392,6 @@ const AllocationsList = ({
                   {currentPageData.map((alloc) => {
                     const typeColor = getTypeColor(alloc.allocationType);
                     const utilizedAmount = alloc.utilizedAmount || 0;
-
                     return (
                       <tr key={alloc.allocationId}>
                         <td>
@@ -516,7 +468,6 @@ const AllocationsList = ({
                 </tbody>
               </table>
             </div>
-
             {totalPages > 1 && (
               <div className="allocations-pagination-container">
                 <div className="allocations-pagination-info">
@@ -533,14 +484,12 @@ const AllocationsList = ({
                   </select>
                   <span className="allocations-pagination-label">entries</span>
                 </div>
-
                 <div className="allocations-pagination-status">
                   Showing{" "}
                   {Math.min(startIndex + 1, filteredAllocations.length)}-
                   {Math.min(endIndex, filteredAllocations.length)} of{" "}
                   {filteredAllocations.length} entries
                 </div>
-
                 <nav className="allocations-pagination-nav">
                   <ul className="allocations-pagination">
                     <li
@@ -556,7 +505,6 @@ const AllocationsList = ({
                         <i className="bi bi-chevron-left"></i>
                       </button>
                     </li>
-
                     {getPageNumbers().map((page, index) => (
                       <li
                         key={index}
@@ -575,7 +523,6 @@ const AllocationsList = ({
                         </button>
                       </li>
                     ))}
-
                     <li
                       className={`allocations-page-item ${
                         currentPage === totalPages ? "disabled" : ""
@@ -596,7 +543,6 @@ const AllocationsList = ({
           </div>
         </>
       )}
-
       {showUpdateModal && selectedAllocation && (
         <UpdateUtilizationModal
           show={showUpdateModal}
@@ -611,6 +557,4 @@ const AllocationsList = ({
     </div>
   );
 };
-
-
 export default AllocationsList;

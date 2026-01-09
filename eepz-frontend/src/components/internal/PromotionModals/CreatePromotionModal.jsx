@@ -3,7 +3,6 @@ import promotionService from "../../../services/internal/promotionService";
 import internalOpportunityService from "../../../services/internal/internalOpportunityService";
 import { toast } from "sonner";
 import "../../../styles/internal/CreatePromotionModal.css";
-
 const CreatePromotionModal = ({
   show,
   onHide,
@@ -22,11 +21,9 @@ const CreatePromotionModal = ({
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-
   useEffect(() => {
     fetchDepartments();
   }, []);
-
   const fetchDepartments = async () => {
     try {
       const response = await internalOpportunityService.getAllOpportunities();
@@ -50,21 +47,17 @@ const CreatePromotionModal = ({
       console.error("Error fetching departments:", error);
     }
   };
-
   const handleNominationChange = (e) => {
     const nominationId = e.target.value;
     setFormData((prev) => ({
       ...prev,
       nominationId,
     }));
-
     if (nominationId) {
       const nomination = approvedNominations.find(
         (n) => n.nominationId === parseInt(nominationId)
       );
-
       setSelectedNomination(nomination);
-
       if (nomination) {
         setFormData((prev) => ({
           ...prev,
@@ -75,7 +68,6 @@ const CreatePromotionModal = ({
     } else {
       setSelectedNomination(null);
     }
-
     if (errors.nominationId) {
       setErrors((prev) => ({
         ...prev,
@@ -83,7 +75,6 @@ const CreatePromotionModal = ({
       }));
     }
   };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -97,49 +88,37 @@ const CreatePromotionModal = ({
       }));
     }
   };
-
   const validateForm = () => {
     const newErrors = {};
-
     if (!formData.nominationId) {
       newErrors.nominationId = "Please select a nomination";
     }
-
     if (!formData.departmentId) {
       newErrors.departmentId = "Please select a department";
     }
-
     if (!formData.oldRole.trim()) {
       newErrors.oldRole = "Old role is required";
     }
-
     if (!formData.newRole.trim()) {
       newErrors.newRole = "New role is required";
     }
-
     if (!formData.promotionDate) {
       newErrors.promotionDate = "Promotion date is required";
     }
-
     if (!formData.justification.trim()) {
       newErrors.justification = "Justification is required";
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) {
       toast.error("Please fix the errors");
       return;
     }
-
     try {
       setLoading(true);
-
       const payload = {
         nominationId: parseInt(formData.nominationId),
         employeeUserId: selectedNomination?.nomineeUserId,
@@ -152,9 +131,7 @@ const CreatePromotionModal = ({
         promotionDate: formData.promotionDate,
         justification: formData.justification.trim(),
       };
-
       const response = await promotionService.createPromotion(payload);
-
       if (response.success) {
         toast.success("Promotion created successfully!");
         onPromotionCreated();
@@ -169,13 +146,10 @@ const CreatePromotionModal = ({
       setLoading(false);
     }
   };
-
   if (!show) return null;
-
   return (
     <>
       <div className="cpm-backdrop" onClick={onHide} />
-
       <div className="cpm-modal-wrapper">
         <div className="cpm-modal-dialog">
           {/* Modal Header */}
@@ -193,7 +167,6 @@ const CreatePromotionModal = ({
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* Form */}
           <form onSubmit={handleSubmit} className="cpm-form">
             {/* Modal Body */}
@@ -224,7 +197,6 @@ const CreatePromotionModal = ({
                     <div className="cpm-form-error">{errors.nominationId}</div>
                   )}
                 </div>
-
                 {/* Info Section - Conditional */}
                 {selectedNomination && (
                   <div className="cpm-info-section">
@@ -237,7 +209,6 @@ const CreatePromotionModal = ({
                     </p>
                   </div>
                 )}
-
                 {/* Department - Full Width */}
                 <div className="cpm-form-group full-width">
                   <label className="cpm-form-label">
@@ -262,7 +233,6 @@ const CreatePromotionModal = ({
                     <div className="cpm-form-error">{errors.departmentId}</div>
                   )}
                 </div>
-
                 {/* Current Role */}
                 <div className="cpm-form-group">
                   <label className="cpm-form-label">
@@ -283,7 +253,6 @@ const CreatePromotionModal = ({
                     <div className="cpm-form-error">{errors.oldRole}</div>
                   )}
                 </div>
-
                 {/* New Role */}
                 <div className="cpm-form-group">
                   <label className="cpm-form-label">
@@ -303,7 +272,6 @@ const CreatePromotionModal = ({
                     <div className="cpm-form-error">{errors.newRole}</div>
                   )}
                 </div>
-
                 {/* Promotion Date - Full Width */}
                 <div className="cpm-form-group full-width">
                   <label className="cpm-form-label">
@@ -323,7 +291,6 @@ const CreatePromotionModal = ({
                     <div className="cpm-form-error">{errors.promotionDate}</div>
                   )}
                 </div>
-
                 {/* Justification - Full Width */}
                 <div className="cpm-form-group full-width">
                   <label className="cpm-form-label">
@@ -347,7 +314,6 @@ const CreatePromotionModal = ({
                 </div>
               </div>
             </div>
-
             {/* Modal Footer */}
             <div className="cpm-modal-footer">
               <button
@@ -383,5 +349,4 @@ const CreatePromotionModal = ({
     </>
   );
 };
-
 export default CreatePromotionModal;

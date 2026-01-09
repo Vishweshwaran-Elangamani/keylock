@@ -1,6 +1,5 @@
 import React from "react";
 import "../../../styles/hr_operations/hr/EscalationDetailModal.css";
-
 const EscalationDetailModal = ({
   show,
   onHide,
@@ -9,18 +8,14 @@ const EscalationDetailModal = ({
   getStatusBadge,
 }) => {
   if (!show || !escalation) return null;
-
   // Custom Badge Component
   const CustomBadge = ({ variant, children }) => {
     const variantClass = `edm-badge edm-badge-${variant || "secondary"}`;
-
     return <span className={variantClass}>{children}</span>;
   };
-
   return (
     <>
       <div className="edm-backdrop" onClick={onHide} />
-
       <div className="esdm-modal-container">
         <div className="edm-modal-dialog">
           {/* HEADER  */}
@@ -38,7 +33,6 @@ const EscalationDetailModal = ({
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* BODY  */}
           <div className="edm-modal-body">
             {/* Detail Grid */}
@@ -50,7 +44,6 @@ const EscalationDetailModal = ({
                   {escalation.employeeName || "N/A"}
                 </span>
               </div>
-
               {/* Employee ID */}
               <div className="edm-detail-item">
                 <label className="edm-detail-label">Employee ID:</label>
@@ -58,7 +51,6 @@ const EscalationDetailModal = ({
                   {escalation.employeeCompanyId}
                 </span>
               </div>
-
               {/* Email */}
               <div className="edm-detail-item">
                 <label className="edm-detail-label">Email:</label>
@@ -66,7 +58,6 @@ const EscalationDetailModal = ({
                   {escalation.employeeEmail || "N/A"}
                 </span>
               </div>
-
               {/* SLA Type */}
               <div className="edm-detail-item">
                 <label className="edm-detail-label">SLA Type:</label>
@@ -74,7 +65,6 @@ const EscalationDetailModal = ({
                   {escalation.slaType || "N/A"}
                 </span>
               </div>
-
               {/* Escalation Level */}
               <div className="edm-detail-item">
                 <label className="edm-detail-label">Escalation Level:</label>
@@ -82,7 +72,6 @@ const EscalationDetailModal = ({
                   {escalation.escalationLevel}
                 </span>
               </div>
-
               {/* Severity */}
               <div className="edm-detail-item">
                 <label className="edm-detail-label">Severity:</label>
@@ -92,7 +81,6 @@ const EscalationDetailModal = ({
                   </CustomBadge>
                 </div>
               </div>
-
               {/* Status */}
               <div className="edm-detail-item">
                 <label className="edm-detail-label">Status:</label>
@@ -104,7 +92,6 @@ const EscalationDetailModal = ({
                   </CustomBadge>
                 </div>
               </div>
-
               {/* Days Overdue */}
               <div className="edm-detail-item">
                 <label className="edm-detail-label">Days Overdue:</label>
@@ -112,7 +99,6 @@ const EscalationDetailModal = ({
                   {escalation.daysOverdue} days
                 </span>
               </div>
-
               {/* SLA Deadline */}
               <div className="edm-detail-item">
                 <label className="edm-detail-label">SLA Deadline:</label>
@@ -120,7 +106,6 @@ const EscalationDetailModal = ({
                   {new Date(escalation.slaDeadline).toLocaleDateString()}
                 </span>
               </div>
-
               {/* Escalated To */}
               <div className="edm-detail-item">
                 <label className="edm-detail-label">Escalated To:</label>
@@ -128,7 +113,6 @@ const EscalationDetailModal = ({
                   {escalation.escalatedToName || "N/A"}
                 </span>
               </div>
-
               {/* Escalated At */}
               <div className="edm-detail-item">
                 <label className="edm-detail-label">Escalated At:</label>
@@ -136,7 +120,6 @@ const EscalationDetailModal = ({
                   {new Date(escalation.submittedAt).toLocaleString()}
                 </span>
               </div>
-
               {/* Submitted By */}
               <div className="edm-detail-item">
                 <label className="edm-detail-label">Submitted By:</label>
@@ -144,13 +127,11 @@ const EscalationDetailModal = ({
                   {escalation.submittedByName || "N/A"}
                 </span>
               </div>
-
               {/* Reason - Full Width */}
               <div className="edm-text-box-section">
                 <label className="edm-detail-label">Reason:</label>
                 <p className="edm-text-box">{escalation.reason}</p>
               </div>
-
               {/* Description - Full Width (Conditional) */}
               {escalation.description && (
                 <div className="edm-text-box-section">
@@ -158,7 +139,6 @@ const EscalationDetailModal = ({
                   <p className="edm-text-box">{escalation.description}</p>
                 </div>
               )}
-
               {/* Resolution Details (Conditional) */}
               {escalation.resolvedAt && (
                 <>
@@ -169,7 +149,6 @@ const EscalationDetailModal = ({
                       {new Date(escalation.resolvedAt).toLocaleString()}
                     </span>
                   </div>
-
                   {/* Resolved By */}
                   <div className="edm-detail-item">
                     <label className="edm-detail-label">Resolved By:</label>
@@ -177,7 +156,6 @@ const EscalationDetailModal = ({
                       {escalation.resolvedByName || "N/A"}
                     </span>
                   </div>
-
                   {/* Resolution Comments (Conditional) */}
                   {escalation.resolutionComments && (
                     <div className="edm-text-box-section">
@@ -193,7 +171,6 @@ const EscalationDetailModal = ({
               )}
             </div>
           </div>
-
           {/* FOOTER - Fixed */}
           <div className="edm-modal-footer">
             <button type="button" onClick={onHide} className="edm-btn-close">
@@ -205,5 +182,4 @@ const EscalationDetailModal = ({
     </>
   );
 };
-
 export default EscalationDetailModal;
