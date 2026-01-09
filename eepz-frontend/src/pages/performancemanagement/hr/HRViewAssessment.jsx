@@ -6,6 +6,7 @@ import AppraisalDetailsModal from "../../../components/performance_management/mo
 import Breadcrumb from "../../../components/common/Breadcrumb";
 import styles from "../../../styles/performancemanagement/hr/HRViewAssessment.module.css";
 
+
 const CustomDropdown = ({
   value,
   onChange,
@@ -72,6 +73,7 @@ const CustomDropdown = ({
   );
 };
 
+
 const PaginationDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -120,6 +122,7 @@ const PaginationDropdown = ({ value, onChange, options }) => {
   );
 };
 
+
 function exportToCsv(filename, rows) {
   if (!rows || !rows.length) return;
   const separator = ",";
@@ -150,16 +153,32 @@ function exportToCsv(filename, rows) {
   document.body.removeChild(link);
 }
 
+
 function average(values) {
   const arr = values.filter((v) => typeof v === "number");
   if (!arr.length) return "N/A";
   return (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(2);
 }
 
+
+function normalizeStatus(status) {
+  if (!status || typeof status !== "string") return "completed";
+  const normalized = status.toLowerCase().trim();
+  
+  if (normalized === "completed" || normalized === "complete") {
+    return "completed";
+  }
+  if (normalized.startsWith("pending") || normalized.includes("pending")) {
+    return "pending";
+  }
+  return "completed";
+}
+
+
 function statusBadge(status) {
-  if (typeof status !== "string") return "";
-  const s = status.toLowerCase();
-  if (s === "completed")
+  const normalized = normalizeStatus(status);
+  
+  if (normalized === "completed") {
     return (
       <span
         className={`${styles.hrViewAssessmentBadge} ${styles.hrViewAssessmentBadgeCompleted}`}
@@ -168,7 +187,8 @@ function statusBadge(status) {
         Completed
       </span>
     );
-  if (s.startsWith("pending"))
+  }
+  if (normalized === "pending") {
     return (
       <span
         className={`${styles.hrViewAssessmentBadge} ${styles.hrViewAssessmentBadgePending}`}
@@ -176,14 +196,16 @@ function statusBadge(status) {
         Pending
       </span>
     );
+  }
   return (
     <span
       className={`${styles.hrViewAssessmentBadge} ${styles.hrViewAssessmentBadgeDefault}`}
     >
-      Completed
+      {status}
     </span>
   );
 }
+
 
 function HRViewAppraisals() {
   const [loading, setLoading] = useState(true);
@@ -248,8 +270,14 @@ function HRViewAppraisals() {
       const l2Ratings = a.competencies
         .map((c) => c.l2Rating)
         .filter((r) => typeof r === "number");
-      let status = a.competencies[0]?.status ?? "N/A";
-      if (a.competencies.some((c) => c.status !== status)) status = "Mixed";
+      
+      let rawStatus = a.competencies[0]?.status ?? "N/A";
+      if (a.competencies.some((c) => c.status !== rawStatus)) {
+        rawStatus = "Mixed";
+      }
+      
+      const normalizedStatus = normalizeStatus(rawStatus);
+      
       return {
         key: `${a.employeeId}-${a.projectName}-${idx}`,
         employeeId: a.employeeId,
@@ -260,7 +288,8 @@ function HRViewAppraisals() {
         l1Avg: average(l1Ratings),
         l2ReviewerName: l2Name,
         l2Avg: average(l2Ratings),
-        status,
+        status: normalizedStatus,
+        rawStatus: rawStatus,
         competencies: a.competencies,
         attachments: a.attachments || [],
       };
@@ -289,12 +318,7 @@ function HRViewAppraisals() {
     let filtered = [...allSummaryRows];
 
     if (filterStatus !== "all") {
-      filtered = filtered.filter((row) => {
-        const status = (row.status || "").toLowerCase();
-        if (filterStatus === "completed") return status === "completed";
-        if (filterStatus === "pending") return status.startsWith("pending");
-        return false;
-      });
+      filtered = filtered.filter((row) => row.status === filterStatus);
     }
 
     if (filterProject !== "all") {
@@ -352,7 +376,7 @@ function HRViewAppraisals() {
       "L1 Average": r.l1Avg,
       "L2 Reviewer Name": r.l2ReviewerName,
       "L2 Average": r.l2Avg,
-      Status: r.status,
+      Status: r.rawStatus,
     }));
   }, [summaryRows]);
 
@@ -519,7 +543,7 @@ function HRViewAppraisals() {
                       <td>{row.l1Avg}</td>
                       <td>{row.l2ReviewerName}</td>
                       <td>{row.l2Avg}</td>
-                      <td>{statusBadge(row.status)}</td>
+                      <td>{statusBadge(row.rawStatus)}</td>
                       <td>
                         <div className={styles.hrViewAssessmentActionButtons}>
                           <button
@@ -643,5 +667,6 @@ function HRViewAppraisals() {
     </div>
   );
 }
+
 
 export default HRViewAppraisals;
