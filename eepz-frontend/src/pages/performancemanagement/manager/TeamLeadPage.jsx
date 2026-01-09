@@ -17,38 +17,29 @@ import {
   submitReviewerDecision,
   downloadReviewerAttachment,
 } from "../../../services/performancemanagement/api/rolesapi";
-
 import { Toaster, toast } from "sonner";
 import "../../../styles/performancemanagement/manager/TeamLeadPage.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import ReviewModal from "../../../components/performance_management/modals/TeamLeadPage/ReviewModal";
 import Breadcrumb from "../../../components/common/Breadcrumb";
-
+ 
 const calculateAverageRating = (items) => {
   if (!items || items.length === 0) return 0;
-  const validRatings = items
-    .filter((item) => item.employeeRating && item.employeeRating > 0)
-    .map((item) => item.employeeRating);
+  const validRatings = items.filter((item) => item.employeeRating && item.employeeRating > 0).map((item) => item.employeeRating);
   if (validRatings.length === 0) return 0;
-  return (
-    validRatings.reduce((a, b) => a + b, 0) / validRatings.length
-  ).toFixed(2);
+  return (validRatings.reduce((a, b) => a + b, 0) / validRatings.length).toFixed(2);
 };
-
+ 
 const getExtensionFromContentType = (contentType) => {
   if (!contentType) return null;
-
   const mimeToExt = {
     "application/pdf": ".pdf",
     "application/msword": ".doc",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-      ".docx",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": ".docx",
     "application/vnd.ms-excel": ".xls",
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-      ".xlsx",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": ".xlsx",
     "application/vnd.ms-powerpoint": ".ppt",
-    "application/vnd.openxmlformats-officedocument.presentationml.presentation":
-      ".pptx",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation": ".pptx",
     "text/plain": ".txt",
     "text/csv": ".csv",
     "image/jpeg": ".jpg",
@@ -57,23 +48,15 @@ const getExtensionFromContentType = (contentType) => {
     "application/zip": ".zip",
     "application/x-zip-compressed": ".zip",
   };
-
   return mimeToExt[contentType.toLowerCase()] || null;
 };
-
+ 
 const isL1Complete = (assess) => {
-  return (assess.items || []).every(
-    (item) =>
-      item.approverRating &&
-      item.approverComments &&
-      item.approverRating >= 1 &&
-      item.approverRating <= 5
-  );
+  return (assess.items || []).every((item) => item.approverRating && item.approverComments && item.approverRating >= 1 && item.approverRating <= 5);
 };
-
+ 
 const getL1Categories = (allSubs) => {
-  if (!Array.isArray(allSubs))
-    return { pending: [], submitted: [], rejected: [] };
+  if (!Array.isArray(allSubs)) return { pending: [], submitted: [], rejected: [] };
   const rejected = [];
   const pending = [];
   const submitted = [];
@@ -90,59 +73,37 @@ const getL1Categories = (allSubs) => {
   });
   return { pending, submitted, rejected };
 };
-
-// Custom Pagination Dropdown Component
+ 
 const CustomPaginationDropdown = ({ value, onChange, options }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     };
-
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
-
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isOpen]);
-
   const handleSelect = (val) => {
     onChange(val);
     setIsOpen(false);
   };
-
   return (
-    <div 
-      className="custom-tl-pagination-dropdown" 
-      ref={dropdownRef}
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          setIsOpen(!isOpen);
-        }
-      }}
-    >
-      <div 
-        className="custom-tl-selected"
-        onClick={() => setIsOpen(!isOpen)}
-      >
+    <div className="custom-tl-pagination-dropdown" ref={dropdownRef} tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { setIsOpen(!isOpen); } }}>
+      <div className="custom-tl-selected" onClick={() => setIsOpen(!isOpen)}>
         {value}
         <span className="custom-tl-arrow"></span>
       </div>
       {isOpen && (
         <div className="custom-tl-menu">
           {options.map((option) => (
-            <div
-              key={option}
-              className={`custom-tl-option ${value === option ? 'custom-tl-option-active' : ''}`}
-              onClick={() => handleSelect(option)}
-            >
+            <div key={option} className={`custom-tl-option ${value === option ? 'custom-tl-option-active' : ''}`} onClick={() => handleSelect(option)}>
               {option}
             </div>
           ))}
@@ -151,7 +112,7 @@ const CustomPaginationDropdown = ({ value, onChange, options }) => {
     </div>
   );
 };
-
+ 
 function TeamLeadPage() {
   const user = JSON.parse(localStorage.getItem("user"));
   const empId = user ? user.empId : null;
@@ -172,19 +133,17 @@ function TeamLeadPage() {
   const [rejectionReason, setRejectionReason] = useState("");
   const [l2ActionLoading, setL2ActionLoading] = useState(false);
   const [isReadOnly, setIsReadOnly] = useState(false);
-
-  // Pagination states
   const [l1CurrentPage, setL1CurrentPage] = useState(1);
   const [l1ItemsPerPage, setL1ItemsPerPage] = useState(10);
   const [l2CurrentPage, setL2CurrentPage] = useState(1);
   const [l2ItemsPerPage, setL2ItemsPerPage] = useState(10);
-
+ 
   useEffect(() => {
     if (userId) {
       fetchData();
     }
   }, [userId, active]);
-
+ 
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -192,132 +151,67 @@ function TeamLeadPage() {
         const [pendingResp, reworkResp, submittedResp] = await Promise.all([
           getApproverAssessments(userId, 1, 25),
           getApproverReworkForms(userId, 1, 25).catch(() => ({ data: [] })),
-          getApproverSubmittedL1Ratings(userId, 1, 25).catch(() => ({
-            data: [],
-          })),
+          getApproverSubmittedL1Ratings(userId, 1, 25).catch(() => ({ data: [] })),
         ]);
-
         const extractAssessments = (resp) => {
           const respData = resp?.data;
-          return Array.isArray(respData)
-            ? respData
-            : Array.isArray(respData?.data)
-            ? respData.data
-            : Array.isArray(respData?.data?.assessments)
-            ? respData.data.assessments
-            : Array.isArray(respData?.assessments)
-            ? respData.assessments
-            : [];
+          return Array.isArray(respData) ? respData : Array.isArray(respData?.data) ? respData.data : Array.isArray(respData?.data?.assessments) ? respData.data.assessments : Array.isArray(respData?.assessments) ? respData.assessments : [];
         };
-
         const pendingAssessments = extractAssessments(pendingResp);
         const reworkAssessmentsList = extractAssessments(reworkResp);
         const submittedAssessmentsBasic = extractAssessments(submittedResp);
-
-        const allAssessmentIds = [
-          ...pendingAssessments.map((a) => a.assessmentId),
-          ...reworkAssessmentsList.map((a) => a.assessmentId),
-        ];
-
+        const allAssessmentIds = [...pendingAssessments.map((a) => a.assessmentId), ...reworkAssessmentsList.map((a) => a.assessmentId)];
         const allWithDetails = await Promise.all(
           allAssessmentIds.map(async (assessmentId) => {
             try {
-              const detailResp = await getApproverAssessmentDetail(
-                userId,
-                assessmentId
-              );
+              const detailResp = await getApproverAssessmentDetail(userId, assessmentId);
               return detailResp.data;
             } catch (err) {
-              return (
-                pendingAssessments.find(
-                  (a) => a.assessmentId === assessmentId
-                ) ||
-                reworkAssessmentsList.find(
-                  (a) => a.assessmentId === assessmentId
-                )
-              );
+              return pendingAssessments.find((a) => a.assessmentId === assessmentId) || reworkAssessmentsList.find((a) => a.assessmentId === assessmentId);
             }
           })
         );
-
         const withNotes = await Promise.all(
           allWithDetails.map(async (a) => {
             try {
-              const decisionResp = await getApproverAssessmentDecision(
-                userId,
-                a.assessmentId
-              );
-              return {
-                ...a,
-                l2DecisionNote: decisionResp.data?.note || "",
-                l2Decision: decisionResp.data?.decision || "",
-              };
+              const decisionResp = await getApproverAssessmentDecision(userId, a.assessmentId);
+              return { ...a, l2DecisionNote: decisionResp.data?.note || "", l2Decision: decisionResp.data?.decision || "" };
             } catch {
-              return {
-                ...a,
-                l2DecisionNote: "",
-                l2Decision: "",
-              };
+              return { ...a, l2DecisionNote: "", l2Decision: "" };
             }
           })
         );
-
         const submittedWithDetails = await Promise.all(
           submittedAssessmentsBasic.map(async (basic) => {
             try {
-              const detailResp = await getApproverAssessmentDetail(
-                userId,
-                basic.assessmentId
-              );
+              const detailResp = await getApproverAssessmentDetail(userId, basic.assessmentId);
               return detailResp.data;
             } catch (err) {
               return basic;
             }
           })
         );
-
         setAllL1(withNotes);
         setSubmittedL1(submittedWithDetails);
       } else {
         const [pendingResp, submittedResp] = await Promise.all([
           getReviewerAssessments(userId, 1, 25),
-          getReviewerSubmittedRatings(userId, 1, 25).catch(() => ({
-            data: [],
-          })),
+          getReviewerSubmittedRatings(userId, 1, 25).catch(() => ({ data: [] })),
         ]);
-
         const respData = pendingResp?.data;
-        const assessments = Array.isArray(respData)
-          ? respData
-          : Array.isArray(respData?.data)
-          ? respData.data
-          : Array.isArray(respData?.data?.assessments)
-          ? respData.data.assessments
-          : Array.isArray(respData?.assessments)
-          ? respData.assessments
-          : [];
-
+        const assessments = Array.isArray(respData) ? respData : Array.isArray(respData?.data) ? respData.data : Array.isArray(respData?.data?.assessments) ? respData.data.assessments : Array.isArray(respData?.assessments) ? respData.assessments : [];
         const submittedData = submittedResp?.data;
-        const submittedAssessmentsBasic = Array.isArray(submittedData)
-          ? submittedData
-          : Array.isArray(submittedData?.data)
-          ? submittedData.data
-          : [];
-
+        const submittedAssessmentsBasic = Array.isArray(submittedData) ? submittedData : Array.isArray(submittedData?.data) ? submittedData.data : [];
         const submittedWithDetails = await Promise.all(
           submittedAssessmentsBasic.map(async (basic) => {
             try {
-              const detailResp = await getReviewerAssessmentDetail(
-                userId,
-                basic.assessmentId
-              );
+              const detailResp = await getReviewerAssessmentDetail(userId, basic.assessmentId);
               return detailResp.data;
             } catch (err) {
               return basic;
             }
           })
         );
-
         setL2Subs(assessments);
         setSubmittedL2(submittedWithDetails);
       }
@@ -328,51 +222,32 @@ function TeamLeadPage() {
       setLoading(false);
     }
   };
-
+ 
   const openModal = async (assess, readOnly = false) => {
     setIsReadOnly(readOnly);
     setModalData(assess);
     const ratings = {};
     (assess.items || []).forEach((item) => {
       if (active === "l1") {
-        ratings[item.detailId] = {
-          rating: item.approverRating ?? "",
-          comment: item.approverComments ?? "",
-        };
+        ratings[item.detailId] = { rating: item.approverRating ?? "", comment: item.approverComments ?? "" };
       } else {
-        ratings[item.detailId] = {
-          rating: item.reviewerRating ?? "",
-          comment: item.reviewerComments ?? "",
-        };
+        ratings[item.detailId] = { rating: item.reviewerRating ?? "", comment: item.reviewerComments ?? "" };
       }
     });
     setModalRatings(ratings);
     setShowRejectReason(false);
     setRejectionReason("");
-
     try {
-      const attachmentsResp =
-        active === "l1"
-          ? await getApproverAssessmentAttachments(userId, assess.assessmentId)
-          : await getReviewerAssessmentAttachments(userId, assess.assessmentId);
-      const attachments =
-        attachmentsResp.data?.data || attachmentsResp.data || [];
-
-      setModalData((prev) => ({
-        ...assess,
-        attachments: attachments,
-      }));
+      const attachmentsResp = active === "l1" ? await getApproverAssessmentAttachments(userId, assess.assessmentId) : await getReviewerAssessmentAttachments(userId, assess.assessmentId);
+      const attachments = attachmentsResp.data?.data || attachmentsResp.data || [];
+      setModalData((prev) => ({ ...assess, attachments: attachments }));
     } catch (error) {
       console.error("Error fetching attachments:", error);
-      setModalData((prev) => ({
-        ...assess,
-        attachments: [],
-      }));
+      setModalData((prev) => ({ ...assess, attachments: [] }));
     }
-
     setShowModal(true);
   };
-
+ 
   const closeModal = () => {
     setShowModal(false);
     setModalData(null);
@@ -381,36 +256,17 @@ function TeamLeadPage() {
     setRejectionReason("");
     setIsReadOnly(false);
   };
-
+ 
   const handleL1Submit = async () => {
     setSubmitting(true);
     try {
-      const items = (modalData.items || []).map((item) => ({
-        detailId: item.detailId,
-        rating: Number(modalRatings[item.detailId]?.rating),
-        comments: modalRatings[item.detailId]?.comment,
-      }));
-
-      if (
-        !items.every(
-          (it) =>
-            it.rating &&
-            !isNaN(it.rating) &&
-            it.rating >= 1 &&
-            it.rating <= 5 &&
-            it.comments &&
-            it.comments.trim().length > 0
-        )
-      ) {
+      const items = (modalData.items || []).map((item) => ({ detailId: item.detailId, rating: Number(modalRatings[item.detailId]?.rating), comments: modalRatings[item.detailId]?.comment }));
+      if (!items.every((it) => it.rating && !isNaN(it.rating) && it.rating >= 1 && it.rating <= 5 && it.comments && it.comments.trim().length > 0)) {
         toast.error("Please fill all ratings and comments.");
         setSubmitting(false);
         return;
       }
-
-      await submitApproverReviews(userId, {
-        assessmentId: modalData.assessmentId,
-        items,
-      });
+      await submitApproverReviews(userId, { assessmentId: modalData.assessmentId, items });
       toast.success("Assessment submitted successfully!");
       closeModal();
       await fetchData();
@@ -421,61 +277,28 @@ function TeamLeadPage() {
       setSubmitting(false);
     }
   };
-
+ 
   const handleL2Approve = async () => {
     setL2ActionLoading(true);
     try {
-      const items = (modalData.items || [])
-        .map((item) => {
-          const fieldData = modalRatings[item.detailId];
-          if (
-            fieldData &&
-            fieldData.rating &&
-            fieldData.comment &&
-            fieldData.comment.trim().length > 0
-          ) {
-            return {
-              detailId: item.detailId,
-              rating: Number(fieldData.rating),
-              comments: fieldData.comment,
-            };
-          }
-          if (
-            item.reviewerRating &&
-            item.reviewerRating > 0 &&
-            item.reviewerComments
-          ) {
-            return {
-              detailId: item.detailId,
-              rating: item.reviewerRating,
-              comments: item.reviewerComments,
-            };
-          }
-          return null;
-        })
-        .filter((item) => item !== null);
-
+      const items = (modalData.items || []).map((item) => {
+        const fieldData = modalRatings[item.detailId];
+        if (fieldData && fieldData.rating && fieldData.comment && fieldData.comment.trim().length > 0) {
+          return { detailId: item.detailId, rating: Number(fieldData.rating), comments: fieldData.comment };
+        }
+        if (item.reviewerRating && item.reviewerRating > 0 && item.reviewerComments) {
+          return { detailId: item.detailId, rating: item.reviewerRating, comments: item.reviewerComments };
+        }
+        return null;
+      }).filter((item) => item !== null);
       if (items.length !== (modalData.items || []).length) {
         toast.error("Please complete all items.");
         setL2ActionLoading(false);
         return;
       }
-
-      await submitReviewerReviews(userId, {
-        assessmentId: modalData.assessmentId,
-        items,
-      });
-      await submitReviewerDecision(
-        userId,
-        modalData.assessmentId,
-        "approved",
-        ""
-      );
-
-      setL2Subs((prevSubs) =>
-        prevSubs.filter((sub) => sub.assessmentId !== modalData.assessmentId)
-      );
-
+      await submitReviewerReviews(userId, { assessmentId: modalData.assessmentId, items });
+      await submitReviewerDecision(userId, modalData.assessmentId, "approved", "");
+      setL2Subs((prevSubs) => prevSubs.filter((sub) => sub.assessmentId !== modalData.assessmentId));
       toast.success("Review approved successfully!");
       closeModal();
       await fetchData();
@@ -487,7 +310,7 @@ function TeamLeadPage() {
       setL2ActionLoading(false);
     }
   };
-
+ 
   const handleL2Reject = async () => {
     if (!rejectionReason.trim()) {
       toast.error("Please provide a rejection reason.");
@@ -495,17 +318,8 @@ function TeamLeadPage() {
     }
     setL2ActionLoading(true);
     try {
-      await submitReviewerDecision(
-        userId,
-        modalData.assessmentId,
-        "rejected",
-        rejectionReason
-      );
-
-      setL2Subs((prevSubs) =>
-        prevSubs.filter((sub) => sub.assessmentId !== modalData.assessmentId)
-      );
-
+      await submitReviewerDecision(userId, modalData.assessmentId, "rejected", rejectionReason);
+      setL2Subs((prevSubs) => prevSubs.filter((sub) => sub.assessmentId !== modalData.assessmentId));
       toast.success("Review rejected and returned to L1.");
       closeModal();
       await fetchData();
@@ -517,71 +331,54 @@ function TeamLeadPage() {
       setL2ActionLoading(false);
     }
   };
-
+ 
   const handleDownloadAttachment = async (attachmentId) => {
     try {
-      const response =
-        active === "l1"
-          ? await downloadApproverAttachment(userId, attachmentId)
-          : await downloadReviewerAttachment(userId, attachmentId);
-
+      const response = active === "l1" ? await downloadApproverAttachment(userId, attachmentId) : await downloadReviewerAttachment(userId, attachmentId);
       let filename = "attachment";
-
       const contentDisposition = response.headers["content-disposition"];
-
       if (contentDisposition) {
-        const matches = contentDisposition.match(
-          /filename\s*=\s*(?:"([^"]*)"|([^;,\n]*))/
-        );
+        const matches = contentDisposition.match(/filename\s*=\s*(?:"([^"]*)"|([^;,\n]*))/);
         if (matches && (matches[1] || matches[2])) {
           filename = matches[1] || matches[2];
           filename = filename.trim();
         }
       }
-
       const contentType = response.headers["content-type"];
-
       if (!filename.includes(".") && contentType) {
         const extension = getExtensionFromContentType(contentType);
         if (extension) {
           filename = `${filename}${extension}`;
         }
       }
-
-      const blob = new Blob([response.data], {
-        type: contentType || "application/octet-stream",
-      });
+      const blob = new Blob([response.data], { type: contentType || "application/octet-stream" });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
       link.setAttribute("download", filename);
-
       document.body.appendChild(link);
       link.click();
-
       setTimeout(() => {
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
       }, 100);
-
       toast.success(`Downloaded: ${filename}`);
     } catch (error) {
       console.error("Error downloading attachment:", error);
       toast.error("Failed to download attachment.");
     }
   };
-
-  // Pagination helper functions
+ 
   const getPaginatedData = (data, currentPage, itemsPerPage) => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     return data.slice(startIndex, endIndex);
   };
-
+ 
   const getTotalPages = (totalItems, itemsPerPage) => {
     return Math.ceil(totalItems / itemsPerPage);
   };
-
+ 
   const handlePageChange = (newPage, isL1) => {
     if (isL1) {
       setL1CurrentPage(newPage);
@@ -589,7 +386,7 @@ function TeamLeadPage() {
       setL2CurrentPage(newPage);
     }
   };
-
+ 
   const handleItemsPerPageChange = (newItemsPerPage, isL1) => {
     if (isL1) {
       setL1ItemsPerPage(Number(newItemsPerPage));
@@ -599,67 +396,44 @@ function TeamLeadPage() {
       setL2CurrentPage(1);
     }
   };
-
-  // Calculate statistics
+ 
   const getStatistics = () => {
     if (active === "l1") {
       const categories = getL1Categories(allL1);
-      return {
-        pending: categories.pending.length,
-        rejected: categories.rejected.length,
-        submitted: submittedL1.length,
-        total: allL1.length + submittedL1.length,
-      };
+      return { pending: categories.pending.length, rejected: categories.rejected.length, submitted: submittedL1.length, total: allL1.length + submittedL1.length };
     } else {
-      return {
-        pending: l2Subs.length,
-        submitted: submittedL2.length,
-        total: l2Subs.length + submittedL2.length,
-      };
+      return { pending: l2Subs.length, submitted: submittedL2.length, total: l2Subs.length + submittedL2.length };
     }
   };
-
-  // Statistics Cards Component
+ 
   const StatisticsCards = () => {
     const stats = getStatistics();
-
     if (active === "l1") {
       return (
         <div className="tl-stats-grid">
           <div className="tl-stat-card tl-stat-pending">
-            <div className="tl-stat-icon">
-              <i className="bi bi-clock-history"></i>
-            </div>
+            <div className="tl-stat-icon"><i className="bi bi-clock-history"></i></div>
             <div className="tl-stat-content">
               <div className="tl-stat-value">{stats.pending}</div>
               <div className="tl-stat-label">Pending Review</div>
             </div>
           </div>
-
           <div className="tl-stat-card tl-stat-rejected">
-            <div className="tl-stat-icon">
-              <i className="bi bi-arrow-counterclockwise"></i>
-            </div>
+            <div className="tl-stat-icon"><i className="bi bi-arrow-counterclockwise"></i></div>
             <div className="tl-stat-content">
               <div className="tl-stat-value">{stats.rejected}</div>
               <div className="tl-stat-label">Rework Required</div>
             </div>
           </div>
-
           <div className="tl-stat-card tl-stat-submitted">
-            <div className="tl-stat-icon">
-              <i className="bi bi-check-circle"></i>
-            </div>
+            <div className="tl-stat-icon"><i className="bi bi-check-circle"></i></div>
             <div className="tl-stat-content">
               <div className="tl-stat-value">{stats.submitted}</div>
               <div className="tl-stat-label">Submitted</div>
             </div>
           </div>
-
           <div className="tl-stat-card tl-stat-total">
-            <div className="tl-stat-icon">
-              <i className="bi bi-file-earmark-text"></i>
-            </div>
+            <div className="tl-stat-icon"><i className="bi bi-file-earmark-text"></i></div>
             <div className="tl-stat-content">
               <div className="tl-stat-value">{stats.total}</div>
               <div className="tl-stat-label">Total Assessments</div>
@@ -671,29 +445,21 @@ function TeamLeadPage() {
       return (
         <div className="tl-stats-grid tl-stats-grid-l2">
           <div className="tl-stat-card tl-stat-pending">
-            <div className="tl-stat-icon">
-              <i className="bi bi-hourglass-split"></i>
-            </div>
+            <div className="tl-stat-icon"><i className="bi bi-hourglass-split"></i></div>
             <div className="tl-stat-content">
               <div className="tl-stat-value">{stats.pending}</div>
               <div className="tl-stat-label">Awaiting Review</div>
             </div>
           </div>
-
           <div className="tl-stat-card tl-stat-submitted">
-            <div className="tl-stat-icon">
-              <i className="bi bi-check-circle"></i>
-            </div>
+            <div className="tl-stat-icon"><i className="bi bi-check-circle"></i></div>
             <div className="tl-stat-content">
               <div className="tl-stat-value">{stats.submitted}</div>
               <div className="tl-stat-label">Completed</div>
             </div>
           </div>
-
           <div className="tl-stat-card tl-stat-total">
-            <div className="tl-stat-icon">
-              <i className="bi bi-file-earmark-check"></i>
-            </div>
+            <div className="tl-stat-icon"><i className="bi bi-file-earmark-check"></i></div>
             <div className="tl-stat-content">
               <div className="tl-stat-value">{stats.total}</div>
               <div className="tl-stat-label">Total Reviews</div>
@@ -703,75 +469,36 @@ function TeamLeadPage() {
       );
     }
   };
-
-  // Pagination component with custom dropdown
-  const PaginationControls = ({
-    currentPage,
-    totalItems,
-    itemsPerPage,
-    onPageChange,
-    onItemsPerPageChange,
-    isL1,
-  }) => {
+ 
+  const PaginationControls = ({ currentPage, totalItems, itemsPerPage, onPageChange, onItemsPerPageChange, isL1 }) => {
     const totalPages = getTotalPages(totalItems, itemsPerPage);
     const startItem = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
     const endItem = Math.min(currentPage * itemsPerPage, totalItems);
     const options = [5, 10, 25, 50];
-
     return (
       <div className="pagination-container">
         <div className="pagination-info">
           <span className="pagination-label">Show</span>
-          <CustomPaginationDropdown
-            value={itemsPerPage}
-            onChange={(val) => onItemsPerPageChange(val, isL1)}
-            options={options}
-          />
+          <CustomPaginationDropdown value={itemsPerPage} onChange={(val) => onItemsPerPageChange(val, isL1)} options={options} />
           <span className="pagination-label">entries</span>
         </div>
-
-        <div className="pagination-status">
-          Showing {startItem} to {endItem} of {totalItems} entries
-        </div>
-
+        <div className="pagination-status">Showing {startItem} to {endItem} of {totalItems} entries</div>
         <nav className="pagination-nav">
           <ul className="pagination">
             <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-              <button
-                className="page-link"
-                onClick={() => onPageChange(currentPage - 1, isL1)}
-                disabled={currentPage === 1}
-              >
+              <button className="page-link" onClick={() => onPageChange(currentPage - 1, isL1)} disabled={currentPage === 1}>
                 <i className="bi bi-chevron-left"></i>
               </button>
             </li>
-
             {[...Array(totalPages)].map((_, index) => {
               const pageNum = index + 1;
-              if (
-                pageNum === 1 ||
-                pageNum === totalPages ||
-                (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
-              ) {
+              if (pageNum === 1 || pageNum === totalPages || (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)) {
                 return (
-                  <li
-                    key={pageNum}
-                    className={`page-item ${
-                      currentPage === pageNum ? "active" : ""
-                    }`}
-                  >
-                    <button
-                      className="page-link"
-                      onClick={() => onPageChange(pageNum, isL1)}
-                    >
-                      {pageNum}
-                    </button>
+                  <li key={pageNum} className={`page-item ${currentPage === pageNum ? "active" : ""}`}>
+                    <button className="page-link" onClick={() => onPageChange(pageNum, isL1)}>{pageNum}</button>
                   </li>
                 );
-              } else if (
-                pageNum === currentPage - 2 ||
-                pageNum === currentPage + 2
-              ) {
+              } else if (pageNum === currentPage - 2 || pageNum === currentPage + 2) {
                 return (
                   <li key={pageNum} className="page-item disabled">
                     <span className="page-link">...</span>
@@ -780,17 +507,8 @@ function TeamLeadPage() {
               }
               return null;
             })}
-
-            <li
-              className={`page-item ${
-                currentPage === totalPages || totalPages === 0 ? "disabled" : ""
-              }`}
-            >
-              <button
-                className="page-link"
-                onClick={() => onPageChange(currentPage + 1, isL1)}
-                disabled={currentPage === totalPages || totalPages === 0}
-              >
+            <li className={`page-item ${currentPage === totalPages || totalPages === 0 ? "disabled" : ""}`}>
+              <button className="page-link" onClick={() => onPageChange(currentPage + 1, isL1)} disabled={currentPage === totalPages || totalPages === 0}>
                 <i className="bi bi-chevron-right"></i>
               </button>
             </li>
@@ -799,52 +517,30 @@ function TeamLeadPage() {
       </div>
     );
   };
-
+ 
   function renderL1Table() {
     const categories = getL1Categories(allL1);
     const tabs = [
       { key: "Pending", label: "Pending L1 Review", subs: categories.pending, icon: "clock-history" },
-      {
-        key: "Rejected",
-        label: "Rejected (Rework)",
-        subs: categories.rejected,
-        icon: "arrow-counterclockwise"
-      },
+      { key: "Rejected", label: "Rejected (Rework)", subs: categories.rejected, icon: "arrow-counterclockwise" },
       { key: "Submitted", label: "Submitted L1 Ratings", subs: submittedL1, icon: "check-circle" },
     ];
     const currentSubs = tabs.find((t) => t.key === activeL1Tab)?.subs || [];
-
-    // Apply pagination
-    const paginatedSubs = getPaginatedData(
-      currentSubs,
-      l1CurrentPage,
-      l1ItemsPerPage
-    );
-
+    const paginatedSubs = getPaginatedData(currentSubs, l1CurrentPage, l1ItemsPerPage);
     return (
       <>
         <div className="tl-tabs-bar">
           {tabs.map((tab) => (
-            <button
-              key={tab.key}
-              className={`tl-tab ${activeL1Tab === tab.key ? "active" : ""}`}
-              onClick={() => {
-                setActiveL1Tab(tab.key);
-                setL1CurrentPage(1);
-              }}
-            >
+            <button key={tab.key} className={`tl-tab ${activeL1Tab === tab.key ? "active" : ""}`} onClick={() => { setActiveL1Tab(tab.key); setL1CurrentPage(1); }}>
               <i className={`bi bi-${tab.icon}`}></i>
               {tab.label}
               <span className="tl-count">{tab.subs.length}</span>
             </button>
           ))}
         </div>
-
         {currentSubs.length === 0 ? (
           <div className="tl-empty">
-            <div className="tl-empty-icon">
-              <i className="bi bi-inbox"></i>
-            </div>
+            <div className="tl-empty-icon"><i className="bi bi-inbox"></i></div>
             <h3 className="tl-empty-title">No Submissions Found</h3>
             <p className="tl-empty-text">There are no assessments in this category at the moment.</p>
           </div>
@@ -867,69 +563,33 @@ function TeamLeadPage() {
                     const avgRating = calculateAverageRating(assess.items);
                     const l1Complete = isL1Complete(assess);
                     const isSubmittedTab = activeL1Tab === "Submitted";
-                    const showReviewBtn =
-                      !isSubmittedTab &&
-                      (!l1Complete || assess.l2Decision === "Rejected");
-
+                    const showReviewBtn = !isSubmittedTab && (!l1Complete || assess.l2Decision === "Rejected");
                     return (
                       <tr key={assess.assessmentId}>
                         <td>
                           <div className="tl-employee-cell">
-                            <div className="tl-employee-avatar">
-                              {assess.employeeName?.charAt(0) || "U"}
-                            </div>
+                            <div className="tl-employee-avatar">{assess.employeeName?.charAt(0) || "U"}</div>
                             <span className="tl-employee-name">{assess.employeeName}</span>
                           </div>
                         </td>
                         <td>{assess.formName}</td>
                         <td>
-                          <span className="cg-days-badge badge-info">
-                            <i className="bi bi-star-fill"></i>
-                            {avgRating}/5
-                          </span>
+                          <span className="cg-days-badge badge-info"><i className="bi bi-star-fill"></i>{avgRating}/5</span>
                         </td>
                         <td>
-                          <span
-                            className={`cg-days-badge ${
-                              isSubmittedTab
-                                ? "badge-success"
-                                : assess.l2Decision === "Rejected"
-                                ? "badge-danger"
-                                : l1Complete
-                                ? "badge-warning"
-                                : "badge-info"
-                            }`}
-                          >
-                            {isSubmittedTab
-                              ? "Submitted"
-                              : assess.l2Decision === "Rejected"
-                              ? "Rejected"
-                              : l1Complete
-                              ? "Submitted"
-                              : "Pending"}
+                          <span className={`cg-days-badge ${isSubmittedTab ? "badge-success" : assess.l2Decision === "Rejected" ? "badge-danger" : l1Complete ? "badge-warning" : "badge-info"}`}>
+                            {isSubmittedTab ? "Submitted" : assess.l2Decision === "Rejected" ? "Rejected" : l1Complete ? "Submitted" : "Pending"}
                           </span>
                         </td>
-                        <td>
-                          {new Date(assess.submittedAt).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric'
-                          })}
-                        </td>
+                        <td>{new Date(assess.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
                         <td>
                           {showReviewBtn && (
-                            <button
-                              className="cg-bulk-btn"
-                              onClick={() => openModal(assess, false)}
-                            >
+                            <button className="cg-bulk-btn" onClick={() => openModal(assess, false)}>
                               <i className="bi bi-pencil-square"></i> Review
                             </button>
                           )}
                           {isSubmittedTab && (
-                            <button
-                              className="cg-bulk-btn cg-bulk-btn-view"
-                              onClick={() => openModal(assess, true)}
-                            >
+                            <button className="cg-bulk-btn cg-bulk-btn-view" onClick={() => openModal(assess, true)}>
                               <i className="bi bi-eye"></i> View
                             </button>
                           )}
@@ -940,21 +600,13 @@ function TeamLeadPage() {
                 </tbody>
               </table>
             </div>
-
-            <PaginationControls
-              currentPage={l1CurrentPage}
-              totalItems={currentSubs.length}
-              itemsPerPage={l1ItemsPerPage}
-              onPageChange={handlePageChange}
-              onItemsPerPageChange={handleItemsPerPageChange}
-              isL1={true}
-            />
+            <PaginationControls currentPage={l1CurrentPage} totalItems={currentSubs.length} itemsPerPage={l1ItemsPerPage} onPageChange={handlePageChange} onItemsPerPageChange={handleItemsPerPageChange} isL1={true} />
           </>
         )}
       </>
     );
   }
-
+ 
   function renderL2Table() {
     const tabs = [
       { key: "Pending", label: "Pending L2 Review", subs: l2Subs, icon: "hourglass-split" },
@@ -962,38 +614,21 @@ function TeamLeadPage() {
     ];
     const currentSubs = tabs.find((t) => t.key === activeL2Tab)?.subs || [];
     const isSubmittedTab = activeL2Tab === "Submitted";
-
-    // Apply pagination
-    const paginatedSubs = getPaginatedData(
-      currentSubs,
-      l2CurrentPage,
-      l2ItemsPerPage
-    );
-
+    const paginatedSubs = getPaginatedData(currentSubs, l2CurrentPage, l2ItemsPerPage);
     return (
       <>
         <div className="tl-tabs-bar">
           {tabs.map((tab) => (
-            <button
-              key={tab.key}
-              className={`tl-tab ${activeL2Tab === tab.key ? "active" : ""}`}
-              onClick={() => {
-                setActiveL2Tab(tab.key);
-                setL2CurrentPage(1);
-              }}
-            >
+            <button key={tab.key} className={`tl-tab ${activeL2Tab === tab.key ? "active" : ""}`} onClick={() => { setActiveL2Tab(tab.key); setL2CurrentPage(1); }}>
               <i className={`bi bi-${tab.icon}`}></i>
               {tab.label}
               <span className="tl-count">{tab.subs.length}</span>
             </button>
           ))}
         </div>
-
         {currentSubs.length === 0 ? (
           <div className="tl-empty">
-            <div className="tl-empty-icon">
-              <i className="bi bi-inbox"></i>
-            </div>
+            <div className="tl-empty-icon"><i className="bi bi-inbox"></i></div>
             <h3 className="tl-empty-title">No Reviews Found</h3>
             <p className="tl-empty-text">There are no reviews in this category at the moment.</p>
           </div>
@@ -1015,71 +650,37 @@ function TeamLeadPage() {
                 <tbody>
                   {paginatedSubs.map((assess) => {
                     const empAvg = calculateAverageRating(assess.items);
-                    const l1Ratings = (assess.items || []).filter(
-                      (i) => i.approverRating && i.approverRating > 0
-                    );
-                    const l1Avg =
-                      l1Ratings.length > 0
-                        ? (
-                            l1Ratings.reduce(
-                              (sum, i) => sum + i.approverRating,
-                              0
-                            ) / l1Ratings.length
-                          ).toFixed(2)
-                        : 0;
+                    const l1Ratings = (assess.items || []).filter((i) => i.approverRating && i.approverRating > 0);
+                    const l1Avg = l1Ratings.length > 0 ? (l1Ratings.reduce((sum, i) => sum + i.approverRating, 0) / l1Ratings.length).toFixed(2) : 0;
                     return (
                       <tr key={assess.assessmentId}>
                         <td>
                           <div className="tl-employee-cell">
-                            <div className="tl-employee-avatar">
-                              {assess.employeeName?.charAt(0) || "U"}
-                            </div>
+                            <div className="tl-employee-avatar">{assess.employeeName?.charAt(0) || "U"}</div>
                             <span className="tl-employee-name">{assess.employeeName}</span>
                           </div>
                         </td>
                         <td>{assess.formName}</td>
                         <td>
-                          <span className="cg-days-badge badge-info">
-                            <i className="bi bi-star-fill"></i>
-                            {empAvg}/5
-                          </span>
+                          <span className="cg-days-badge badge-info"><i className="bi bi-star-fill"></i>{empAvg}/5</span>
                         </td>
                         <td>
-                          <span className="cg-days-badge badge-warning">
-                            <i className="bi bi-star-fill"></i>
-                            {l1Avg}/5
-                          </span>
+                          <span className="cg-days-badge badge-warning"><i className="bi bi-star-fill"></i>{l1Avg}/5</span>
                         </td>
                         <td>
-                          <span
-                            className={`cg-days-badge ${
-                              isSubmittedTab ? "badge-success" : "badge-info"
-                            }`}
-                          >
+                          <span className={`cg-days-badge ${isSubmittedTab ? "badge-success" : "badge-info"}`}>
                             {isSubmittedTab ? "Submitted" : "Awaiting"}
                           </span>
                         </td>
-                        <td>
-                          {new Date(assess.submittedAt).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric'
-                          })}
-                        </td>
+                        <td>{new Date(assess.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
                         <td>
                           {!isSubmittedTab && (
-                            <button
-                              className="cg-bulk-btn"
-                              onClick={() => openModal(assess, false)}
-                            >
+                            <button className="cg-bulk-btn" onClick={() => openModal(assess, false)}>
                               <i className="bi bi-pencil-square"></i> Review
                             </button>
                           )}
                           {isSubmittedTab && (
-                            <button
-                              className="cg-bulk-btn cg-bulk-btn-view"
-                              onClick={() => openModal(assess, true)}
-                            >
+                            <button className="cg-bulk-btn cg-bulk-btn-view" onClick={() => openModal(assess, true)}>
                               <i className="bi bi-eye"></i> View
                             </button>
                           )}
@@ -1090,61 +691,29 @@ function TeamLeadPage() {
                 </tbody>
               </table>
             </div>
-
-            <PaginationControls
-              currentPage={l2CurrentPage}
-              totalItems={currentSubs.length}
-              itemsPerPage={l2ItemsPerPage}
-              onPageChange={handlePageChange}
-              onItemsPerPageChange={handleItemsPerPageChange}
-              isL1={false}
-            />
+            <PaginationControls currentPage={l2CurrentPage} totalItems={currentSubs.length} itemsPerPage={l2ItemsPerPage}
+            onPageChange={handlePageChange} onItemsPerPageChange={handleItemsPerPageChange} isL1={false} />
           </>
         )}
       </>
     );
   }
-
+ 
   return (
     <div className="tl-page">
       <Toaster position="top-right" />
-
       <div className="hrfcper-top-bar compact">
-        <Breadcrumb
-          items={[
-            { label: "Performance", path: "/manager/dashboard/performance" },
-            { label: "Performance Review", path: null },
-          ]}
-        />
-
+        <Breadcrumb items={[{ label: "Performance", path: "/manager/dashboard/performance" }, { label: "Performance Review", path: null }]} />
         <div className="tl-toggle compact">
-          <button
-            className={`tl-toggle-btn ${active === "l1" ? "active" : ""}`}
-            onClick={() => {
-              setActive("l1");
-              setActiveL1Tab("Pending");
-            }}
-            aria-pressed={active === "l1"}
-          >
-            <i className="bi bi-person-check"></i>
-            L1 Approver
+          <button className={`tl-toggle-btn ${active === "l1" ? "active" : ""}`} onClick={() => { setActive("l1"); setActiveL1Tab("Pending"); }} aria-pressed={active === "l1"}>
+            <i className="bi bi-person-check"></i>L1 Approver
           </button>
-          <button
-            className={`tl-toggle-btn ${active === "l2" ? "active" : ""}`}
-            onClick={() => {
-              setActive("l2");
-              setActiveL2Tab("Pending");
-            }}
-            aria-pressed={active === "l2"}
-          >
-            <i className="bi bi-person-check-fill"></i>
-            L2 Approver
+          <button className={`tl-toggle-btn ${active === "l2" ? "active" : ""}`} onClick={() => { setActive("l2"); setActiveL2Tab("Pending"); }} aria-pressed={active === "l2"}>
+            <i className="bi bi-person-check-fill"></i>L2 Approver
           </button>
         </div>
       </div>
-
       {!loading && <StatisticsCards />}
-
       <div className="tl-content">
         {loading ? (
           <div className="tl-loading">
@@ -1158,30 +727,16 @@ function TeamLeadPage() {
           </>
         )}
       </div>
-
       {showModal && modalData && (
-        <ReviewModal
-          showModal={showModal}
-          closeModal={closeModal}
-          modalData={modalData}
-          modalRatings={modalRatings}
-          setModalRatings={setModalRatings}
-          handleL1Submit={handleL1Submit}
-          handleL2Approve={handleL2Approve}
-          handleL2Reject={handleL2Reject}
-          setRejectionReason={setRejectionReason}
-          rejectionReason={rejectionReason}
-          showRejectReason={showRejectReason}
-          setShowRejectReason={setShowRejectReason}
-          submitting={submitting}
-          l2ActionLoading={l2ActionLoading}
-          active={active}
-          handleDownloadAttachment={handleDownloadAttachment}
-          isReadOnly={isReadOnly}
-        />
+        <ReviewModal showModal={showModal} closeModal={closeModal}
+        modalData={modalData} modalRatings={modalRatings} setModalRatings={setModalRatings}
+        handleL1Submit={handleL1Submit} handleL2Approve={handleL2Approve} handleL2Reject={handleL2Reject}
+        setRejectionReason={setRejectionReason} rejectionReason={rejectionReason} showRejectReason={showRejectReason}
+        setShowRejectReason={setShowRejectReason} submitting={submitting} l2ActionLoading={l2ActionLoading} active={active}
+        handleDownloadAttachment={handleDownloadAttachment} isReadOnly={isReadOnly} />
       )}
     </div>
   );
 }
-
 export default TeamLeadPage;
+ 
