@@ -7,30 +7,25 @@ import EmployeeSkillsModal from "../../../components/lnd/modals/EmployeeSkillsMo
 import { lndService } from "../../../services/lnd/lndService";
 import { toast } from "sonner";
 import styles from "../../../styles/lnd/pages/skills/TeamSkills.module.css";
-
 const TeamSkills = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [showSkillsModal, setShowSkillsModal] = useState(false);
   const [rolePrefix, setRolePrefix] = useState("");
-
   // Search
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(12);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const roleName = user?.role || "";
     setRolePrefix(getRolePrefix(roleName));
   }, []);
-
   const getRolePrefix = (role) => {
     const prefixMap = {
       Manager: "/manager",
@@ -42,23 +37,19 @@ const TeamSkills = () => {
     };
     return prefixMap[role] || "/employee";
   };
-
   // Fetch employees when page, search, or itemsPerPage changes
   useEffect(() => {
     fetchEmployees();
   }, [currentPage, searchTerm, itemsPerPage]);
-
   const fetchEmployees = async () => {
     try {
       setLoading(true);
-      
       // UPDATED: Pass params as a single object
       const response = await lndService.getSubordinateEmployees({
         PageNumber: currentPage,
         SearchTerm: searchTerm,
         PageSize: itemsPerPage,
       });
-
       if (response.data.success) {
         setEmployees(response.data.data.items);
         setTotalItems(response.data.data.totalCount);
@@ -71,50 +62,41 @@ const TeamSkills = () => {
       setLoading(false);
     }
   };
-
   const handleSearchChange = (e) => {
     setSearchInput(e.target.value);
   };
-
   const handleSearchSubmit = (e) => {
     if (e.key === "Enter") {
       setSearchTerm(searchInput);
       setCurrentPage(1);
     }
   };
-
   const handleSearch = () => {
     setSearchTerm(searchInput);
     setCurrentPage(1);
   };
-
   const handleCancelSearch = () => {
     setSearchInput("");
     setSearchTerm("");
     setCurrentPage(1);
   };
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
   const handleItemsPerPageChange = (newSize) => {
     setItemsPerPage(newSize);
     setCurrentPage(1);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
   const handleEmployeeClick = (employee) => {
     setSelectedEmployee(employee);
     setShowSkillsModal(true);
   };
-
   const handleCloseModal = () => {
     setShowSkillsModal(false);
     setSelectedEmployee(null);
   };
-
   // Get employee initials for avatar
   const getEmployeeInitials = (name) => {
     return name
@@ -124,7 +106,6 @@ const TeamSkills = () => {
       .substring(0, 2)
       .toUpperCase();
   };
-
   // Show initial loading spinner only when no data
   if (loading && employees.length === 0) {
     return (
@@ -135,7 +116,6 @@ const TeamSkills = () => {
       </div>
     );
   }
-
   return (
     <div>
       <Breadcrumb
@@ -144,7 +124,6 @@ const TeamSkills = () => {
           { label: "Team Skills" },
         ]}
       />
-
       {/* Search Bar */}
       <div className={styles.searchSection}>
         <div className={styles.searchWrapper}>
@@ -174,7 +153,6 @@ const TeamSkills = () => {
           </div>
         </div>
       </div>
-
       {/* Employee List */}
       {employees.length === 0 && !loading ? (
         <EmptyState
@@ -223,8 +201,7 @@ const TeamSkills = () => {
               ))}
             </div>
           </div>
-
-          {/* Updated Pagination with new props */}
+          {/* Pagination with new props */}
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -237,7 +214,6 @@ const TeamSkills = () => {
           />
         </>
       )}
-
       {/* Employee Skills Modal */}
       {showSkillsModal && selectedEmployee && (
         <EmployeeSkillsModal
@@ -248,6 +224,4 @@ const TeamSkills = () => {
     </div>
   );
 };
-
 export default TeamSkills;
- 

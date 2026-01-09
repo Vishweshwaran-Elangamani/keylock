@@ -15,7 +15,6 @@ import { lndService, downloadFile } from "../../../services/lnd/lndService";
 import { ASSIGNMENT_STATUS } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
 import styles from "../../../styles/lnd/pages/assignments/SmeAssignments.module.css";
-
 const SmeAssignments = () => {
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -79,11 +78,9 @@ const SmeAssignments = () => {
   const fetchSmeAssignments = async () => {
     try {
       setLoading(true);
-
       // Pass empty string to backend when overdue is selected
       const backendStatusFilter =
         statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter;
-
      //  NEW - Params object
 const response = await lndService.getSmeAssignments({
   pageNumber: currentPage,
@@ -95,12 +92,10 @@ const response = await lndService.getSmeAssignments({
 });
       if (response.data.success) {
         let items = response.data.data.items;
-
         // Client-side filtering for overdue
         if (statusFilter === ASSIGNMENT_STATUS.OVERDUE) {
           items = items.filter((a) => a.isOverdue === true);
         }
-
         setAssignments(items);
         setTotalItems(response.data.data.totalCount);
         setTotalPages(response.data.data.totalPages);
@@ -134,7 +129,6 @@ const response = await lndService.getSmeAssignments({
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
   const handleItemsPerPageChange = (newSize) => {
     setItemsPerPage(newSize);
     setCurrentPage(1);
@@ -153,7 +147,6 @@ const response = await lndService.getSmeAssignments({
       toast.error("Failed to download proof");
     }
   };
-
   const onSortClick = (field) => {
     if (sortField === field) {
       setSortOrderAsc(!sortOrderAsc);
@@ -168,7 +161,6 @@ const response = await lndService.getSmeAssignments({
     const iconClass = isActive
       ? styles.sortIconActive
       : styles.sortIconInactive;
-
     if (!isActive) {
       return (
         <ChevronUp size={14} className={`${styles.sortIcon} ${iconClass}`} />
@@ -200,7 +192,6 @@ const response = await lndService.getSmeAssignments({
     { value: ASSIGNMENT_STATUS.COMPLETED, label: "Completed" },
     { value: ASSIGNMENT_STATUS.OVERDUE, label: "Overdue" },
   ];
-
   const getHeaderCellClass = (field, align) => {
     const baseClass = styles.tableHeaderCell;
     const alignClass =
@@ -216,7 +207,6 @@ const response = await lndService.getSmeAssignments({
       currentValue === optionValue ? styles.dropdownItemActive : ""
     }`.trim();
   };
-
   if (loading && assignments.length === 0) {
     return (
       <div className={styles.loadingContainer}>
@@ -234,7 +224,6 @@ const response = await lndService.getSmeAssignments({
           { label: "SME Assignments" },
         ]}
       />
-
       <div className={styles.filterContainer}>
         <form onSubmit={handleSearchSubmit} className={styles.searchForm}>
           <div className="input-group">
@@ -263,7 +252,6 @@ const response = await lndService.getSmeAssignments({
             )}
           </div>
         </form>
-
         {/* CUSTOM DROPDOWN */}
         <div ref={dropdownRef} className={styles.dropdownWrapper}>
           <button
@@ -358,7 +346,6 @@ const response = await lndService.getSmeAssignments({
                     >
                       {assignment.menteeName}
                     </div>
-
                     {/* Skill Name */}
                     <div
                       className={styles.cellSkillName}
@@ -366,12 +353,10 @@ const response = await lndService.getSmeAssignments({
                     >
                       {assignment.skillName}
                     </div>
-
                     {/* Assignment Status */}
                     <div className={styles.cellStatus}>
                       <StatusBadge status={assignment.status} />
                     </div>
-
                     {/* Start Date */}
                     <div className={styles.cellDate}>
                       {assignment.createdOn ? (
@@ -380,7 +365,6 @@ const response = await lndService.getSmeAssignments({
                         <span className={styles.cellNone}>None</span>
                       )}
                     </div>
-
                     {/* Due Date - Overdue logic applied */}
                     <div
                       className={
@@ -403,7 +387,6 @@ const response = await lndService.getSmeAssignments({
                         <span className={styles.cellNone}>None</span>
                       )}
                     </div>
-
                     {/* Score */}
                     <div className={styles.cellScore}>
                       {assignment.completionRating ? (
@@ -412,7 +395,6 @@ const response = await lndService.getSmeAssignments({
                         <span className={styles.cellNone}>None</span>
                       )}
                     </div>
-
                     {/* Proof */}
                     <div className={styles.cellCenter}>
                       {assignment.proofFilePath ? (
@@ -427,7 +409,6 @@ const response = await lndService.getSmeAssignments({
                         <span className={styles.cellNone}>None</span>
                       )}
                     </div>
-
                     {/* Comments */}
                     <div className={styles.cellCenter}>
                       {assignment.completionNotes ? (
@@ -459,7 +440,6 @@ const response = await lndService.getSmeAssignments({
                       )}
                     </div>
                   </div>
-
                   {/* Expanded Notes */}
                   {expandedNotes?.[assignment.assignmentId] &&
                     assignment.completionNotes && (
@@ -495,5 +475,4 @@ const response = await lndService.getSmeAssignments({
     </div>
   );
 };
-
 export default SmeAssignments;

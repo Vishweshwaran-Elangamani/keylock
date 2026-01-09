@@ -16,7 +16,6 @@ import Breadcrumb from "../../../components/common/Breadcrumb";
 import { lndService } from "../../../services/lnd/lndService";
 import { toast } from "sonner";
 import styles from "../../../styles/lnd/pages/dashboard/LnDDashboard.module.css";
-
 const LnDDashboard = () => {
   const navigate = useNavigate();
   const [stats, setStats] = useState({
@@ -28,18 +27,14 @@ const LnDDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState("");
   const [rolePrefix, setRolePrefix] = useState("");
-
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const roleName = user?.role || "";
     setUserRole(roleName);
-
     const prefix = getRolePrefix(roleName);
     setRolePrefix(prefix);
-
     fetchDashboardData();
   }, []);
-
   const getRolePrefix = (role) => {
     const prefixMap = {
       Manager: "/manager",
@@ -51,7 +46,6 @@ const LnDDashboard = () => {
     };
     return prefixMap[role] || "/employee";
   };
-
   const fetchDashboardData = async () => {
     try {
       const [skillsRes, assignmentsRes, approvalsRes, smeRes] =
@@ -59,7 +53,6 @@ const LnDDashboard = () => {
           lndService
             .getMySkills(1)  //  Keep as-is (single parameter)
             .catch(() => ({ data: { data: { totalCount: 0 } } })),
-          
           lndService
             .getMyAssignments({  //  Object parameter with PascalCase
               PageNumber: 1,
@@ -70,7 +63,6 @@ const LnDDashboard = () => {
               PageSize: 10
             })
             .catch(() => ({ data: { data: { totalCount: 0 } } })),
-          
           lndService
             .getMyApprovals({  //  Object parameter with PascalCase
               PageNumber: 1,
@@ -82,10 +74,8 @@ const LnDDashboard = () => {
               SearchTerm: ""
             })
             .catch(() => ({ data: { data: { totalCount: 0 } } })),
-          
           lndService.checkIfSme().catch(() => ({ data: { data: false } })),
         ]);
-  
       setStats({
         mySkills: skillsRes.data.data.totalCount,
         activeAssignments: assignmentsRes.data.data.totalCount,
@@ -99,13 +89,10 @@ const LnDDashboard = () => {
       setLoading(false);
     }
   };
-  
-
   const isManager = ["Manager", "Department Head", "Leadership"].includes(
     userRole
   );
   const isHR = userRole === "HR";
-
   const navigationCards = [
     {
       title: "My Skills",
@@ -195,11 +182,9 @@ const LnDDashboard = () => {
       show: isHR,
     },
   ];
-
   const getBadgeClass = (isSme) => {
     return isSme ? styles.badgeActive : styles.badgeInactive;
   };
-
   if (loading) {
     return (
       <div className={styles.loadingContainer}>
@@ -209,12 +194,10 @@ const LnDDashboard = () => {
       </div>
     );
   }
-
   return (
     <div>
       {/* Breadcrumb */}
       <Breadcrumb items={[{ label: "LnD Dashboard" }]} />
-
       {/* Header Section */}
       <div className={styles.headerSection}>
         <h2 className={styles.headerTitle}>Learning & Development</h2>
@@ -224,7 +207,6 @@ const LnDDashboard = () => {
             : "Track skills, manage assignments, and grow your expertise"}
         </p>
       </div>
-
       {/* Navigation Cards */}
       <div className={styles.cardsGrid}>
         {navigationCards
@@ -257,7 +239,6 @@ const LnDDashboard = () => {
                     >
                       <Icon size={24} color={card.backgroundColor} />
                     </div>
-
                     {/* Title & Description */}
                     <div className={styles.textContainer}>
                       <h5 className={styles.cardTitle}>{card.title}</h5>
@@ -266,7 +247,6 @@ const LnDDashboard = () => {
                       </p>
                     </div>
                   </div>
-
                   {/* Right Section: Count or Badge */}
                   <div className={styles.rightSection}>
                     {card.count !== undefined ? (
@@ -289,5 +269,4 @@ const LnDDashboard = () => {
     </div>
   );
 };
-
 export default LnDDashboard;

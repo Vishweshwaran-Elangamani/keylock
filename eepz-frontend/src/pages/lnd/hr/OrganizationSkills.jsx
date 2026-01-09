@@ -7,27 +7,22 @@ import EmployeeSkillsModal from "../../../components/lnd/modals/EmployeeSkillsMo
 import { lndService } from "../../../services/lnd/lndService";
 import { toast } from "sonner";
 import styles from "../../../styles/lnd/pages/hr/OrganizationSkills.module.css";
-
 const OrganizationSkills = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [showSkillsModal, setShowSkillsModal] = useState(false);
-
   // Search
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(12);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-
   useEffect(() => {
     fetchEmployees();
   }, [currentPage, itemsPerPage, searchTerm]);
-
   const fetchEmployees = async () => {
     try {
       setLoading(true);
@@ -36,16 +31,13 @@ const OrganizationSkills = () => {
         searchTerm,
         itemsPerPage
       );
-
       if (response.data.success) {
         let employeesData = response.data.data.items;
-
         if (!searchTerm) {
           employeesData = employeesData.filter(
             (emp) => emp.departmentName !== "Administration"
           );
         }
-
         setEmployees(employeesData);
         setTotalItems(response.data.data.totalCount);
         setTotalPages(response.data.data.totalPages);
@@ -57,50 +49,41 @@ const OrganizationSkills = () => {
       setLoading(false);
     }
   };
-
   const handleSearchChange = (e) => {
     setSearchInput(e.target.value);
   };
-
   const handleSearchSubmit = (e) => {
     if (e) e.preventDefault();
     setSearchTerm(searchInput);
     setCurrentPage(1);
   };
-
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleSearchSubmit();
     }
   };
-
   const handleCancelSearch = () => {
     setSearchInput("");
     setSearchTerm("");
     setCurrentPage(1);
   };
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
   const handleItemsPerPageChange = (newSize) => {
     setItemsPerPage(newSize);
     setCurrentPage(1);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
   const handleEmployeeClick = (employee) => {
     setSelectedEmployee(employee);
     setShowSkillsModal(true);
   };
-
   const handleCloseModal = () => {
     setShowSkillsModal(false);
     setSelectedEmployee(null);
   };
-
   // Helper to generate initials
   const getInitials = (name) => {
     return name
@@ -110,7 +93,6 @@ const OrganizationSkills = () => {
       .substring(0, 2)
       .toUpperCase();
   };
-
   if (loading && employees.length === 0) {
     return (
       <div className={styles.loadingContainer}>
@@ -120,7 +102,6 @@ const OrganizationSkills = () => {
       </div>
     );
   }
-
   return (
     <div>
       <Breadcrumb
@@ -129,7 +110,6 @@ const OrganizationSkills = () => {
           { label: "Organizational Skills" },
         ]}
       />
-
       {/* Search Bar */}
       <div className={styles.searchSection}>
         <div className={styles.searchWrapper}>
@@ -164,7 +144,6 @@ const OrganizationSkills = () => {
           </div>
         </div>
       </div>
-
       {/* Employee List */}
       {employees.length === 0 && !loading ? (
         <EmptyState
@@ -213,7 +192,6 @@ const OrganizationSkills = () => {
               ))}
             </div>
           </div>
-
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -226,7 +204,6 @@ const OrganizationSkills = () => {
           />
         </>
       )}
-
       {/* Employee Skills Modal */}
       {showSkillsModal && selectedEmployee && (
         <EmployeeSkillsModal
@@ -238,5 +215,4 @@ const OrganizationSkills = () => {
     </div>
   );
 };
-
 export default OrganizationSkills;

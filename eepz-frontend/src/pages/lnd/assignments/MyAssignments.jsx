@@ -17,7 +17,6 @@ import { lndService, downloadFile } from "../../../services/lnd/lndService";
 import { ASSIGNMENT_STATUS } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
 import styles from "../../../styles/lnd/pages/assignments/MyAssignments.module.css";
-
 const MyAssignments = () => {
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -57,7 +56,7 @@ const MyAssignments = () => {
     };
     return prefixMap[role] || "/employee";
   };
-  // Close dropdown when clicking outside
+ 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -82,8 +81,6 @@ const MyAssignments = () => {
   const fetchAssignments = async () => {
     try {
       setLoading(true);
-      
-      // ✅ FIXED: Use object parameters with PascalCase
       const response = await lndService.getMyAssignments({
         PageNumber: currentPage,
         StatusFilter: statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter,
@@ -94,7 +91,6 @@ const MyAssignments = () => {
       });
       if (response.data.success) {
         let items = response.data.data.items;
-        // Client-side filter for overdue (if needed)
         if (statusFilter === ASSIGNMENT_STATUS.OVERDUE) {
           items = items.filter((a) => a.isOverdue === true);
         }
@@ -167,13 +163,11 @@ const MyAssignments = () => {
     }
     setCurrentPage(1);
   };
-
   const renderSortIcon = (field) => {
     const isActive = sortField === field;
     const iconClass = isActive
       ? styles.sortIconActive
       : styles.sortIconInactive;
-
     if (!isActive) {
       return (
         <ChevronUp size={14} className={`${styles.sortIcon} ${iconClass}`} />
@@ -185,7 +179,6 @@ const MyAssignments = () => {
       <ChevronDown size={14} className={`${styles.sortIcon} ${iconClass}`} />
     );
   };
-
   const getStatusLabel = (value) => {
     const statusMap = {
       "": "All Statuses",
@@ -198,7 +191,6 @@ const MyAssignments = () => {
     };
     return statusMap[value] || "All Statuses";
   };
-
   const statusOptions = [
     { value: "", label: "All Statuses" },
     {
@@ -213,7 +205,6 @@ const MyAssignments = () => {
     { value: ASSIGNMENT_STATUS.COMPLETED, label: "Completed" },
     { value: ASSIGNMENT_STATUS.OVERDUE, label: "Overdue" },
   ];
-
   const getHeaderCellClass = (field, align) => {
     const baseClass = styles.tableHeaderCell;
     const alignClass =
@@ -224,13 +215,11 @@ const MyAssignments = () => {
     const activeClass = sortField === field ? styles.tableHeaderCellActive : "";
     return `${baseClass} ${alignClass} ${sortableClass} ${activeClass}`.trim();
   };
-
   const getDropdownItemClass = (currentValue, optionValue) => {
     return `${styles.dropdownItem} ${
       currentValue === optionValue ? styles.dropdownItemActive : ""
     }`.trim();
   };
-
   if (loading && assignments.length === 0) {
     return (
       <div className={styles.loadingContainer}>
@@ -240,7 +229,6 @@ const MyAssignments = () => {
       </div>
     );
   }
-
   return (
     <div>
       <Breadcrumb
@@ -249,7 +237,6 @@ const MyAssignments = () => {
           { label: "My Assignments" },
         ]}
       />
-
       <div className={styles.filterContainer}>
         <form onSubmit={handleSearch} className={styles.searchForm}>
           <div className="input-group">
@@ -278,7 +265,6 @@ const MyAssignments = () => {
             )}
           </div>
         </form>
-
         {/* CUSTOM DROPDOWN */}
         <div ref={dropdownRef} className={styles.dropdownWrapper}>
           <button
@@ -293,7 +279,6 @@ const MyAssignments = () => {
               }`}
             ></i>
           </button>
-
           {showStatusDropdown && (
             <div className={styles.dropdownMenu}>
               {statusOptions.map((option) => (
@@ -313,7 +298,6 @@ const MyAssignments = () => {
           )}
         </div>
       </div>
-
       {assignments.length === 0 && !loading ? (
         <EmptyState
           icon={Filter}
@@ -357,7 +341,6 @@ const MyAssignments = () => {
                   </div>
                 ))}
               </div>
-
               {assignments.map((assignment, idx) => (
                 <div
                   key={assignment.assignmentId}
@@ -372,7 +355,6 @@ const MyAssignments = () => {
                   >
                     {assignment.skillName}
                   </div>
-
                   {/* SME Assigned */}
                   <div
                     className={styles.cellSmeName}
@@ -380,12 +362,10 @@ const MyAssignments = () => {
                   >
                     {assignment.smeName}
                   </div>
-
                   {/* Assignment Status */}
                   <div className={styles.cellStatus}>
                     <StatusBadge status={assignment.status} />
                   </div>
-
                   {/* Start Date */}
                   <div className={styles.cellDate}>
                     {assignment.createdOn ? (
@@ -394,7 +374,6 @@ const MyAssignments = () => {
                       <span className={styles.cellNone}>None</span>
                     )}
                   </div>
-
                   {/* Due Date */}
                   <div
                     className={
@@ -417,7 +396,6 @@ const MyAssignments = () => {
                       <span className={styles.cellNone}>None</span>
                     )}
                   </div>
-
                   {/* Score */}
                   <div className={styles.cellScore}>
                     {assignment.completionRating ? (
@@ -426,7 +404,6 @@ const MyAssignments = () => {
                       <span className={styles.cellNone}>None</span>
                     )}
                   </div>
-
                   {/* Proof */}
                   <div className={styles.cellCenter}>
                     {assignment.proofFilePath ? (
@@ -441,7 +418,6 @@ const MyAssignments = () => {
                       <span className={styles.cellNone}>None</span>
                     )}
                   </div>
-
                   {/* Request Acknowledgement / Upload Proof */}
                   <div className={styles.cellCenter}>
                     {assignment.status === ASSIGNMENT_STATUS.IN_PROGRESS ? (
@@ -459,7 +435,6 @@ const MyAssignments = () => {
               ))}
             </div>
           </div>
-
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -472,7 +447,6 @@ const MyAssignments = () => {
           />
         </>
       )}
-
       {showUploadModal && (
         <UploadProofModal
           assignment={selectedAssignment}
@@ -483,5 +457,4 @@ const MyAssignments = () => {
     </div>
   );
 };
-
 export default MyAssignments;

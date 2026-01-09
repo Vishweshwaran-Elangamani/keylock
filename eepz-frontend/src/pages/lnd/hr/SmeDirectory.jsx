@@ -13,26 +13,21 @@ import EmptyState from "../../../components/lnd/common/EmptyState";
 import { lndService, downloadFile } from "../../../services/lnd/lndService";
 import { toast } from "sonner";
 import styles from "../../../styles/lnd/pages/hr/SmeDirectory.module.css";
-
 const SmeDirectory = () => {
   const [smes, setSmes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
-
   // Search
   const [searchTerm, setSearchTerm] = useState("");
   const [searchInput, setSearchInput] = useState("");
-
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-
   useEffect(() => {
     fetchSmes();
   }, [currentPage, itemsPerPage, searchTerm]);
-
   const fetchSmes = async () => {
     try {
       setLoading(true);
@@ -41,7 +36,6 @@ const SmeDirectory = () => {
         searchTerm,
         itemsPerPage
       );
-
       if (response.data.success) {
         setSmes(response.data.data.items);
         setTotalItems(response.data.data.totalCount);
@@ -54,22 +48,17 @@ const SmeDirectory = () => {
       setLoading(false);
     }
   };
-
   const handleExportToExcel = async () => {
     try {
       setExporting(true);
       toast.loading("Preparing Excel export...");
-
       const response = await lndService.exportAllActiveSmes(searchTerm);
-
       const timestamp = new Date()
         .toISOString()
         .replace(/[:.]/g, "-")
         .slice(0, -5);
       const filename = `SMEDirectory_${timestamp}.xlsx`;
-
       downloadFile(response.data, filename);
-
       toast.dismiss();
       toast.success("Excel file downloaded successfully!");
     } catch (error) {
@@ -80,40 +69,33 @@ const SmeDirectory = () => {
       setExporting(false);
     }
   };
-
   const handleSearchInputChange = (e) => {
     setSearchInput(e.target.value);
   };
-
   const handleSearchSubmit = (e) => {
     if (e) e.preventDefault();
     setSearchTerm(searchInput);
     setCurrentPage(1);
   };
-
   const handleCancelSearch = () => {
     setSearchInput("");
     setSearchTerm("");
     setCurrentPage(1);
   };
-
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleSearchSubmit(e);
     }
   };
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
   const handleItemsPerPageChange = (newSize) => {
     setItemsPerPage(newSize);
     setCurrentPage(1);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
   if (loading && smes.length === 0) {
     return (
       <div className={styles.loadingContainer}>
@@ -123,7 +105,6 @@ const SmeDirectory = () => {
       </div>
     );
   }
-
   return (
     <div>
       <Breadcrumb
@@ -132,7 +113,6 @@ const SmeDirectory = () => {
           { label: "SME Directory" },
         ]}
       />
-
       <div className={styles.actionBar}>
         <div className={styles.searchWrapper}>
           <div className="input-group">
@@ -165,7 +145,6 @@ const SmeDirectory = () => {
             )}
           </div>
         </div>
-
         <button
           onClick={handleExportToExcel}
           disabled={exporting || smes.length === 0}
@@ -188,7 +167,6 @@ const SmeDirectory = () => {
           )}
         </button>
       </div>
-
       {smes.length === 0 && !loading ? (
         <EmptyState
           icon={Award}
@@ -213,7 +191,6 @@ const SmeDirectory = () => {
                 <div className={styles.cellLeft}>Department</div>
                 <div className={styles.cellLeft}>Approved Date</div>
               </div>
-
               {smes.map((sme, idx) => (
                 <div
                   key={sme.smeId}
@@ -244,7 +221,6 @@ const SmeDirectory = () => {
               ))}
             </div>
           </div>
-
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -260,5 +236,4 @@ const SmeDirectory = () => {
     </div>
   );
 };
-
 export default SmeDirectory;

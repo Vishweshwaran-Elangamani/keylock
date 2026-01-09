@@ -71,7 +71,7 @@ export const lndService = {
    * @param {string} sortOrder - Sort order: 'asc' or 'desc' (optional)
    * @param {number} pageSize - Items per page (default: 10)
    * @returns {Promise} API response
-   */// ✅ CORRECT - Use params object
+   */// Used params object
 getMySkills: async (params = {}) => {
   try {
     const defaultParams = {
@@ -161,7 +161,6 @@ getMySkills: async (params = {}) => {
   },
 
   /**
-   * Update employee skill rating (Manager only)
    * @param {object} data - { mapperId, rating }
    * @returns {Promise} API response
    */
@@ -204,7 +203,6 @@ getMySkills: async (params = {}) => {
    */
   /**
  * Get subordinate employees for manager with pagination and search
- * UPDATED: Now uses request model instead of individual parameters
  * @param {object} params - { pageNumber, searchTerm, pageSize }
  * @returns {Promise} API response with paginated employees
  */
@@ -282,7 +280,6 @@ getSubordinateEmployees: async (params = {}) => {
 
  /**
  * Get available SMEs for a skill
- * UPDATED: Now uses request model instead of individual parameters
  * @param {object} params - { skillId, searchTerm, pageNumber, pageSize }
  * @returns {Promise} API response
  */
@@ -312,7 +309,6 @@ getAvailableSmes: async (params = {}) => {
 
   /**
    * Get current user's assignments (as mentee)
-   * UPDATED: Now uses request model instead of individual parameters
    * @param {object} params - { pageNumber, statusFilter, searchTerm, sortField, sortOrder, pageSize }
    * @returns {Promise} API response
    */
@@ -342,7 +338,6 @@ getAvailableSmes: async (params = {}) => {
 
   /**
    * Get team assignments (Manager only)
-   * UPDATED: Now uses request model instead of individual parameters
    * @param {object} params - { pageNumber, statusFilter, searchTerm, sortField, sortOrder, pageSize }
    * @returns {Promise} API response
    */
