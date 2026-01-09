@@ -200,9 +200,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             );
 
             var result = await _smeService.GetAllActiveSmes(
-                request.SearchTerm,
-                request.PageNumber,
-                request.PageSize
+                request
             );
 
             if (result.Success)
@@ -234,7 +232,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 request.SearchTerm ?? "none"
             );
 
-            var result = await _smeService.ExportAllActiveSmesToExcel(request.SearchTerm);
+            var result = await _smeService.ExportAllActiveSmesToExcel(request);
 
             if (!result.Success)
             {

@@ -11,6 +11,7 @@ using Relevantz.EEPZ.Data;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repositories.Implementations;
 using Relevantz.EEPZ.Data.Repositories.Interface;
+using Relevantz.EEPZ.Api.Middleware;
 using Serilog;
 
 
@@ -438,7 +439,7 @@ app.UseSerilogRequestLogging(options =>
 app.UseHttpsRedirection();
 
 
-
+app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 // No longer using wwwroot for file storage
 
 // Enable Session

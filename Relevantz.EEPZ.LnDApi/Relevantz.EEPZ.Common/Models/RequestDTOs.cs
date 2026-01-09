@@ -213,22 +213,20 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 12;
     }
-    
-      public class AvailableSmesRequestModel
+
+    public class AvailableSmesRequestModel
 
     {
 
-        public  int SkillId{ get; set; }
+        public int SkillId { get; set; }
 
-        public string? SearchTerm{ get; set; }
+        public string? SearchTerm { get; set; }
 
         public int PageNumber { get; set; } = 1;
 
         public int PageSize { get; set; } = 10;
- 
-    }
 
- 
+    }
  
 }
  

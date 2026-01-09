@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Common.Constants;
+using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repositories.Interface;
@@ -50,7 +51,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             var sme = await _context.Lndsmes.FirstOrDefaultAsync(s =>
                 s.EmployeeId == employeeId && s.SkillId == skillId && s.IsActive == true
-            );  
+            );
 
             if (sme == null)
             {
@@ -92,7 +93,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         #endregion
 
-        #region SME Assignment Queries   
+        #region SME Assignment Queries
 
         /// <summary>Gets in-progress assignment count for a specific SME.</summary>
         public async Task<int> GetSmeInProgressAssignmentCountAsync(int smeId)
@@ -120,23 +121,20 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             List<Lndsme> Items,
             int TotalCount
         )> GetAvailableSmesWithAssignmentCountsAsync(
-            int skillId,
-            string? searchTerm,
-            int pageNumber,
-            int pageSize,
+            AvailableSmesRequestModel request,
             int maxAssignments
         )
         {
             Log.Information(
                 "GetAvailableSmesWithAssignmentCountsAsync called. SkillId={SkillId}, SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}, MaxAssignments={MaxAssignments}",
-                skillId, searchTerm ?? "none", pageNumber, pageSize, maxAssignments
+                request.SkillId, request.SearchTerm ?? "none", request.PageNumber, request.PageSize, maxAssignments
             );
 
             var query = _context
                 .Lndsmes.Include(s => s.Employee)
                 .ThenInclude(e => e.Userprofile)
                 .Include(s => s.Skill)
-                .Where(s => s.SkillId == skillId && s.IsActive == true);
+                .Where(s => s.SkillId == request.SkillId && s.IsActive == true);
 
             var smesWithCounts = await query
                 .Select(s => new
@@ -162,32 +160,32 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 availableSmesWithCounts.Count
             );
 
-            if (!string.IsNullOrEmpty(searchTerm))
+            if (!string.IsNullOrEmpty(request.SearchTerm))
             {
                 availableSmesWithCounts = availableSmesWithCounts
                     .Where(sc =>
                         sc.Sme.Employee.Userprofile.FirstName.Contains(
-                            searchTerm,
+                            request.SearchTerm,
                             StringComparison.OrdinalIgnoreCase
                         )
                         || sc.Sme.Employee.Userprofile.LastName.Contains(
-                            searchTerm,
+                            request.SearchTerm,
                             StringComparison.OrdinalIgnoreCase
                         )
                     )
-                    .ToList();
+                    .ToList();  
             }
 
             var totalCount = availableSmesWithCounts.Count;
             var items = availableSmesWithCounts
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
                 .Select(sc => sc.Sme)
                 .ToList();
 
             Log.Information(
                 "GetAvailableSmesWithAssignmentCountsAsync completed. SkillId={SkillId}, ReturnedCount={Count}, TotalCount={TotalCount}",
-                skillId, items.Count, totalCount
+                request.SkillId, items.Count, totalCount
             );
 
             return (items, totalCount);
@@ -195,14 +193,12 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         /// <summary>Gets paginated all active SMEs with employee and department details.</summary>
         public async Task<(List<Lndsme> Items, int TotalCount)> GetAllActiveSmesAsync(
-            string? searchTerm,
-            int pageNumber,
-            int pageSize
+            ActiveSmesRequestModel request
         )
         {
             Log.Information(
                 "GetAllActiveSmesAsync called. SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
-                searchTerm ?? "none", pageNumber, pageSize
+                request.SearchTerm ?? "none", request.PageNumber, request.PageSize
             );
 
             var query = _context
@@ -215,9 +211,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .Include(s => s.Skill)
                 .AsQueryable();
 
-            if (!string.IsNullOrEmpty(searchTerm))
+            if (!string.IsNullOrEmpty(request.SearchTerm))
             {
-                var lowerSearchTerm = searchTerm.ToLower();
+                var lowerSearchTerm = request.SearchTerm.ToLower();
 
                 query = query.Where(s =>
                     (s.Employee.Userprofile.FirstName + " " + s.Employee.Userprofile.LastName)
@@ -235,8 +231,8 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             var items = await query
                 .OrderBy(s => s.Employee.Userprofile.FirstName)
                 .ThenBy(s => s.Employee.Userprofile.LastName)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
                 .ToListAsync();
 
             Log.Information(
@@ -248,11 +244,13 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>Gets all active SMEs for Excel export without pagination.</summary>
-        public async Task<List<Lndsme>> GetAllActiveSmesForExportAsync(string? searchTerm)
+        public async Task<List<Lndsme>> GetAllActiveSmesForExportAsync(
+            ExportActiveSmesRequestModel request
+        )
         {
             Log.Information(
                 "GetAllActiveSmesForExportAsync called. SearchTerm={SearchTerm}",
-                searchTerm ?? "none"
+                request.SearchTerm ?? "none"
             );
 
             var query = _context
@@ -265,9 +263,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .Include(s => s.Skill)
                 .AsQueryable();
 
-            if (!string.IsNullOrEmpty(searchTerm))
+            if (!string.IsNullOrEmpty(request.SearchTerm))
             {
-                var lowerSearchTerm = searchTerm.ToLower();
+                var lowerSearchTerm = request.SearchTerm.ToLower();
 
                 query = query.Where(s =>
                     (s.Employee.Userprofile.FirstName + " " + s.Employee.Userprofile.LastName)
