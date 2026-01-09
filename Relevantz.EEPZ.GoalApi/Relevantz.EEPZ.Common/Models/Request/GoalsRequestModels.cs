@@ -2,18 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Relevantz.EEPZ.Common.DTOs
+namespace Relevantz.EEPZ.Common.Models
 {
-    // ==================== QUERY/FILTER DTOs ====================
+    // ==================== QUERY/FILTER Models ====================
 
-    public class PagedQueryDto
+    public class PagedQueryModel
     {
         public int Page { get; set; } = 1;
         public int PageSize { get; set; } = 20;
         public string? Search { get; set; }
     }
 
-    public class GoalQueryDto : PagedQueryDto
+    public class GoalQueryModel : PagedQueryModel
     {
         public int? CurrentUserEmpMasterID { get; set; }
         public string? Type { get; set; }
@@ -28,7 +28,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string? CurrentUserRole { get; set; }
     }
 
-    public class ApprovalQueryDto : PagedQueryDto
+    public class ApprovalQueryModel : PagedQueryModel
     {
         public string? Status { get; set; } = "all";
         public string? Type { get; set; } = "all";
@@ -38,9 +38,9 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int? GoalId { get; set; }
     }
 
-    // ==================== CREATION & UPDATE DTOs ====================
+    // ==================== CREATION & UPDATE Models ====================
 
-    public class ChecklistItemDto
+    public class ChecklistItemModel
     {
         public string Title { get; set; } = default!;
         public string? Description { get; set; }
@@ -48,40 +48,40 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int? AddedForEmployeeMasterId { get; set; }
     }
 
-    public class CreateGoalDto
+    public class CreateGoalModel
     {
         public string GoalType { get; set; } = default!;
         public int? ProjectId { get; set; }
         public List<int> AssignedToEmployeeMasterIds { get; set; } = new();
         public string Title { get; set; } = default!;
         public string? Description { get; set; }
-        public List<ChecklistItemDto> Checklist { get; set; } = new();
+        public List<ChecklistItemModel> Checklist { get; set; } = new();
         public DateTime Deadline { get; set; }
     }
 
-    public class UpdateGoalDto
+    public class UpdateGoalModel
     {
         public string? Title { get; set; }
         public string? Description { get; set; }
         public DateTime? Deadline { get; set; }
-        public List<ChecklistItemDto>? Checklist { get; set; }
+        public List<ChecklistItemModel>? Checklist { get; set; }
     }
 
-    // ==================== ASSIGNMENT DTOs ====================
+    // ==================== ASSIGNMENT Models ====================
 
-    public class AssignGoalDto
+    public class AssignGoalModel
     {
         [Required]
         public List<int> AssignedToEmployeeMasterIds { get; set; } = new();
 
         [Required]
         [MinLength(1, ErrorMessage = "At least one checklist item must be provided")]
-        public List<ChecklistItemDto> AdditionalChecklist { get; set; } = new();
+        public List<ChecklistItemModel> AdditionalChecklist { get; set; } = new();
     }
 
-    // ==================== APPROVAL DTOs ====================
+    // ==================== APPROVAL Models ====================
 
-    public class CreateApprovalRequestDto
+    public class CreateApprovalRequestModel
     {
         [Required]
         public string ApprovalType { get; set; } = default!;
@@ -89,29 +89,29 @@ namespace Relevantz.EEPZ.Common.DTOs
         public List<int>? ProofAttachmentIds { get; set; }
     }
 
-    public class DecideApprovalDto
+    public class DecideApprovalModel
     {
         public string Decision { get; set; } = default!;
         public DateTime? NewDeadline { get; set; }
     }
 
-    // ==================== PROGRESS DTOs ====================
+    // ==================== PROGRESS Models ====================
 
-    public class ToggleChecklistDto
+    public class ToggleChecklistModel
     {
         public int ChecklistId { get; set; }
         public bool IsCompleted { get; set; }
     }
 
-    public class ManualProgressUpdateDto
+    public class ManualProgressUpdateModel
     {
         public int ProgressPercent { get; set; }
         public string Source { get; set; } = "manual";
     }
 
-    // ==================== COMMENT DTOs ====================
+    // ==================== COMMENT Models ====================
 
-    public class CreateCommentDto
+    public class CreateCommentModel
     {
         public string Comment { get; set; } = default!;
     }

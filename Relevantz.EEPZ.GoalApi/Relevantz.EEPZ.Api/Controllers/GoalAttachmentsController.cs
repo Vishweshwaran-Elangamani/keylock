@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Models;
+using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Core.Services.Interface;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
-using Relevantz.EEPZ.Core.IService;
+
 namespace Relevantz.EEPZ.Api.Controllers.Goals
 {
-    [Route("api/goal-attachments")]  
     public class GoalAttachmentsController : BaseGoalController
     {
         protected readonly IGoalAttachmentService _service;
@@ -27,7 +27,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Upload a file attachment to a goal
         /// </summary>
-        [HttpPost("{goalId:int}/upload")]
+        [HttpPost("api/goal-attachments/{goalId:int}/upload")]
         public async Task<IActionResult> UploadFile(
             int goalId,
             IFormFile file,
@@ -55,7 +55,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                     result.AttachmentId
                 );
 
-                var response = ApiResponseDto<FileUploadResponseDto>.SuccessResponse(
+                var response = ApiResponseModel<FileUploadResponseModel>.SuccessResponse(
                     ResponseMessages.Codes.FILE_UPLOADED_SUCCESS,
                     result,
                     new { GoalId = goalId, UploadedBy = userId }
@@ -66,21 +66,21 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             catch (KeyNotFoundException)
             {
                 _logger.LogWarning("Goal {GoalId} not found during file upload", goalId);
-                var response = ApiResponseDto<FileUploadResponseDto>.ErrorResponse(
+                var response = ApiResponseModel<FileUploadResponseModel>.ErrorResponse(
                     ResponseMessages.Codes.GOAL_NOT_FOUND
                 );
                 return NotFound(response);
             }
             catch (UnauthorizedAccessException)
             {
-                var response = ApiResponseDto<FileUploadResponseDto>.ErrorResponse(
+                var response = ApiResponseModel<FileUploadResponseModel>.ErrorResponse(
                     ResponseMessages.Codes.FILE_ACCESS_DENIED
                 );
                 return Forbid(response.Message);
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("size"))
             {
-                var response = ApiResponseDto<FileUploadResponseDto>.ErrorResponse(
+                var response = ApiResponseModel<FileUploadResponseModel>.ErrorResponse(
                     ResponseMessages.Codes.FILE_SIZE_EXCEEDED,
                     ex.Message
                 );
@@ -88,7 +88,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("type"))
             {
-                var response = ApiResponseDto<FileUploadResponseDto>.ErrorResponse(
+                var response = ApiResponseModel<FileUploadResponseModel>.ErrorResponse(
                     ResponseMessages.Codes.FILE_TYPE_INVALID,
                     ex.Message
                 );
@@ -102,7 +102,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                     goalId,
                     userId
                 );
-                var response = ApiResponseDto<FileUploadResponseDto>.ErrorResponse(
+                var response = ApiResponseModel<FileUploadResponseModel>.ErrorResponse(
                     ResponseMessages.Codes.FILE_UPLOAD_FAILED
                 );
                 return StatusCode(500, response);
@@ -112,14 +112,14 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// List all attachments for a goal
         /// </summary>
-        [HttpGet("{goalId:int}")]  
+        [HttpGet("api/goal-attachments/{goalId:int}")]
         public async Task<IActionResult> ListAttachments(int goalId)
         {
             try
             {
                 var items = await _service.ListAttachmentsAsync(goalId);
 
-                var response = ApiResponseDto<List<GoalAttachment>>.SuccessResponse(
+                var response = ApiResponseModel<List<GoalAttachment>>.SuccessResponse(
                     ResponseMessages.Codes.FILE_DOWNLOADED_SUCCESS,
                     items,
                     new { GoalId = goalId, AttachmentCount = items.Count }
@@ -129,14 +129,14 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
             catch (KeyNotFoundException)
             {
-                var response = ApiResponseDto<List<GoalAttachment>>.ErrorResponse(
+                var response = ApiResponseModel<List<GoalAttachment>>.ErrorResponse(
                     ResponseMessages.Codes.GOAL_NOT_FOUND
                 );
                 return NotFound(response);
             }
             catch (Exception ex)
             {
-                var response = ApiResponseDto<List<GoalAttachment>>.ErrorResponse(
+                var response = ApiResponseModel<List<GoalAttachment>>.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
                 return StatusCode(500, response);
@@ -146,7 +146,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Download an attachment by ID (enhanced with security)
         /// </summary>
-        [HttpGet("{attachmentId:int}/download")]
+        [HttpGet("api/goal-attachments/{attachmentId:int}/download")]
         public async Task<IActionResult> DownloadAttachment(int attachmentId)
         {
             try
@@ -168,25 +168,29 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
             catch (KeyNotFoundException)
             {
-                var response = ApiResponseDto.ErrorResponse(ResponseMessages.Codes.FILE_NOT_FOUND);
+                var response = ApiResponseModel.ErrorResponse(
+                    ResponseMessages.Codes.FILE_NOT_FOUND
+                );
                 return NotFound(response);
             }
             catch (UnauthorizedAccessException)
             {
-                var response = ApiResponseDto.ErrorResponse(
+                var response = ApiResponseModel.ErrorResponse(
                     ResponseMessages.Codes.FILE_ACCESS_DENIED
                 );
                 return Forbid(response.Message);
             }
             catch (FileNotFoundException)
             {
-                var response = ApiResponseDto.ErrorResponse(ResponseMessages.Codes.FILE_NOT_FOUND);
+                var response = ApiResponseModel.ErrorResponse(
+                    ResponseMessages.Codes.FILE_NOT_FOUND
+                );
                 return NotFound(response);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error downloading attachment {AttachmentId}", attachmentId);
-                var response = ApiResponseDto.ErrorResponse(
+                var response = ApiResponseModel.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
                 return StatusCode(500, response);
@@ -196,7 +200,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Preview attachment without downloading (inline display)
         /// </summary>
-        [HttpGet("{attachmentId:int}/preview")]
+        [HttpGet("api/goal-attachments/{attachmentId:int}/preview")]
         public async Task<IActionResult> PreviewAttachment(int attachmentId)
         {
             try
@@ -206,7 +210,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
 
                 if (result == null)
                 {
-                    var response = ApiResponseDto<object>.ErrorResponse(
+                    var response = ApiResponseModel<object>.ErrorResponse(
                         ResponseMessages.Codes.FILE_NOT_FOUND,
                         "Attachment not found or access denied"
                     );
@@ -227,21 +231,21 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
             catch (UnauthorizedAccessException)
             {
-                var response = ApiResponseDto<object>.ErrorResponse(
+                var response = ApiResponseModel<object>.ErrorResponse(
                     ResponseMessages.Codes.FILE_ACCESS_DENIED
                 );
                 return Forbid(response.Message);
             }
             catch (FileNotFoundException)
             {
-                var response = ApiResponseDto<object>.ErrorResponse(
+                var response = ApiResponseModel<object>.ErrorResponse(
                     ResponseMessages.Codes.FILE_NOT_FOUND
                 );
                 return NotFound(response);
             }
             catch (Exception)
             {
-                var response = ApiResponseDto<object>.ErrorResponse(
+                var response = ApiResponseModel<object>.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
                 return StatusCode(500, response);
@@ -251,7 +255,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Delete an attachment
         /// </summary>
-        [HttpDelete("{attachmentId:int}")]
+        [HttpDelete("api/goal-attachments/{attachmentId:int}")]
         public async Task<IActionResult> DeleteAttachment(int attachmentId)
         {
             try
@@ -262,7 +266,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
 
                 if (success)
                 {
-                    var response = ApiResponseDto.SuccessResponse(
+                    var response = ApiResponseModel.SuccessResponse(
                         ResponseMessages.Codes.FILE_DELETED_SUCCESS,
                         new { AttachmentId = attachmentId, DeletedBy = userId }
                     );
@@ -270,7 +274,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                 }
                 else
                 {
-                    var response = ApiResponseDto.ErrorResponse(
+                    var response = ApiResponseModel.ErrorResponse(
                         ResponseMessages.Codes.FILE_UPLOAD_FAILED
                     );
                     return BadRequest(response);
@@ -278,12 +282,14 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
             catch (KeyNotFoundException)
             {
-                var response = ApiResponseDto.ErrorResponse(ResponseMessages.Codes.FILE_NOT_FOUND);
+                var response = ApiResponseModel.ErrorResponse(
+                    ResponseMessages.Codes.FILE_NOT_FOUND
+                );
                 return NotFound(response);
             }
             catch (UnauthorizedAccessException)
             {
-                var response = ApiResponseDto.ErrorResponse(
+                var response = ApiResponseModel.ErrorResponse(
                     ResponseMessages.Codes.FILE_ACCESS_DENIED
                 );
                 return Forbid(response.Message);
@@ -291,7 +297,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting attachment {AttachmentId}", attachmentId);
-                var response = ApiResponseDto.ErrorResponse(
+                var response = ApiResponseModel.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
                 return StatusCode(500, response);

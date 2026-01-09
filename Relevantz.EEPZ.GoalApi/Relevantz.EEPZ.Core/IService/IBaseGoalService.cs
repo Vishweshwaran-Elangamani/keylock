@@ -1,4 +1,4 @@
-using Relevantz.EEPZ.Common.DTOs;
+using Relevantz.EEPZ.Common.Models;
 
 namespace Relevantz.EEPZ.Core.Services.Interface
 {
@@ -18,7 +18,7 @@ namespace Relevantz.EEPZ.Core.Services.Interface
         );
         Task<bool> CanUserCommentOnGoalAsync(int goalId, int employeeMasterId, string role);
         Task<bool> IsGoalCommentableAsync(int goalId);
-        Task<GoalDetailDto> GetGoalAsync(
+        Task<GoalDetailModel> GetGoalAsync(
             int goalId,
             int currentUserEmployeeMasterId,
             string currentUserRole

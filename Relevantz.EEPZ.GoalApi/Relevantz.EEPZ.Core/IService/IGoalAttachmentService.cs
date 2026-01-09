@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Http;
-using Relevantz.EEPZ.Common.DTOs;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
 
 namespace Relevantz.EEPZ.Core.IService
@@ -20,7 +20,7 @@ namespace Relevantz.EEPZ.Core.IService
         /// <param name="title">Title/description for the attachment</param>
         /// <param name="currentUserEmployeeMasterId">Current user's employee master ID</param>
         /// <returns>File upload response with MongoDB ObjectId</returns>
-        Task<FileUploadResponseDto> UploadFileAsync(
+        Task<FileUploadResponseModel> UploadFileAsync(
             int goalId,
             IFormFile file,
             string title,

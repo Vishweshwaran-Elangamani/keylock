@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.DTOs;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Enums;
 using Relevantz.EEPZ.Core.Services.Interface;
@@ -33,9 +33,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _environment = environment;
         }
 
-        public async Task<ApiResponseDto> ToggleChecklistAsync(
+        public async Task<ApiResponseModel> ToggleChecklistAsync(
             int goalId,
-            ToggleChecklistDto dto,
+            ToggleChecklistModel dto,
             int currentUserEmployeeMasterId
         )
         {
@@ -44,7 +44,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var goal = await _baseRepo.GetGoalByIdAsync(goalId);
                 if (goal == null)
                 {
-                    return ApiResponseDto.ErrorResponse(ResponseMessages.Codes.GOAL_NOT_FOUND);
+                    return ApiResponseModel.ErrorResponse(ResponseMessages.Codes.GOAL_NOT_FOUND);
                 }
 
                 // Check if user is acknowledged and block toggling
@@ -54,7 +54,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
                 if (assignment?.IsAcknowledged == true)
                 {
-                    return ApiResponseDto.ErrorResponse(
+                    return ApiResponseModel.ErrorResponse(
                         ResponseMessages.Codes.CHECKLIST_LOCKED,
                         "Your tasks have been acknowledged. You cannot modify the checklist.",
                         new { IsAcknowledged = true, AcknowledgedOn = assignment.AcknowledgedOn }
@@ -64,7 +64,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var checklistItem = await _repo.GetChecklistItemAsync(dto.ChecklistId);
                 if (checklistItem == null || checklistItem.GoalId != goalId)
                 {
-                    return ApiResponseDto.ErrorResponse(ResponseMessages.Codes.CHECKLIST_NOT_FOUND);
+                    return ApiResponseModel.ErrorResponse(ResponseMessages.Codes.CHECKLIST_NOT_FOUND);
                 }
 
                 // Set progress
@@ -163,7 +163,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     StatusChanged = goal.Goalstatus == GOAL_STATUS.IN_PROGRESS && dto.IsCompleted,
                 };
 
-                return ApiResponseDto.SuccessResponse(
+                return ApiResponseModel.SuccessResponse(
                     ResponseMessages.Codes.CHECKLIST_TOGGLED_SUCCESS,
                     metadata
                 );
@@ -175,13 +175,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     "[ToggleChecklist] Error toggling checklist for goal {GoalId}",
                     goalId
                 );
-                return ApiResponseDto.ErrorResponse(ResponseMessages.Codes.INTERNAL_SERVER_ERROR);
+                return ApiResponseModel.ErrorResponse(ResponseMessages.Codes.INTERNAL_SERVER_ERROR);
             }
         }
 
-        public async Task<ApiResponseDto> ManualUpdateProgressAsync(
+        public async Task<ApiResponseModel> ManualUpdateProgressAsync(
             int goalId,
-            ManualProgressUpdateDto dto,
+            ManualProgressUpdateModel dto,
             int currentUserEmployeeMasterId
         )
         {
@@ -190,7 +190,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var goal = await _baseRepo.GetGoalByIdAsync(goalId);
                 if (goal == null)
                 {
-                    return ApiResponseDto.ErrorResponse(ResponseMessages.Codes.GOAL_NOT_FOUND);
+                    return ApiResponseModel.ErrorResponse(ResponseMessages.Codes.GOAL_NOT_FOUND);
                 }
 
                 var role = await _baseRepo.GetUserRoleAsync(currentUserEmployeeMasterId);
@@ -202,7 +202,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     )
                 )
                 {
-                    return ApiResponseDto.ErrorResponse(
+                    return ApiResponseModel.ErrorResponse(
                         ResponseMessages.Codes.PROGRESS_UPDATE_DENIED,
                         "Only managers and above can manually update progress."
                     );
@@ -229,7 +229,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     UpdatedBy = currentUserEmployeeMasterId,
                 };
 
-                return ApiResponseDto.SuccessResponse(
+                return ApiResponseModel.SuccessResponse(
                     ResponseMessages.Codes.GOAL_PROGRESS_UPDATED,
                     metadata
                 );
@@ -237,7 +237,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             catch (Exception ex)
             {
                 Console.WriteLine($"Error manually updating progress for goal {goalId}: {ex}");
-                return ApiResponseDto.ErrorResponse(ResponseMessages.Codes.INTERNAL_SERVER_ERROR);
+                return ApiResponseModel.ErrorResponse(ResponseMessages.Codes.INTERNAL_SERVER_ERROR);
             }
         }
 
@@ -331,7 +331,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return cascadingProgress;
         }
 
-        public async Task<GoalProgressHierarchyDto> GetProgressHierarchyAsync(
+        public async Task<GoalProgressHierarchyModel> GetProgressHierarchyAsync(
             int goalId,
             int userId
         )
@@ -349,7 +349,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var ownItemsCompleted = await _repo.CountUserOwnCompletedItemsAsync(goalId, userId);
 
             var subordinateIds = await _repo.GetSubordinatesAssignedToGoalAsync(goalId, userId);
-            var subordinateDetails = new List<SubordinateProgressDto>();
+            var subordinateDetails = new List<SubordinateProgressModel>();
             int? teamProgress = null;
 
             if (subordinateIds.Any())
@@ -372,7 +372,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         );
 
                         subordinateDetails.Add(
-                            new SubordinateProgressDto
+                            new SubordinateProgressModel
                             {
                                 UserId = subId,
                                 UserName =
@@ -407,7 +407,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 teamWeight = 0;
             }
 
-            return new GoalProgressHierarchyDto
+            return new GoalProgressHierarchyModel
             {
                 GoalId = goalId,
                 UserId = userId,

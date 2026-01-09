@@ -1,15 +1,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Enums;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Relevantz.EEPZ.Api.Controllers.Goals
 {
-    [Route("api/goal-approvals")]
     public class GoalApprovalsController : BaseGoalController
     {
         protected new readonly IGoalApprovalsService _service;
@@ -29,10 +28,10 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Request approval (creation, completion, reopening, delegation)
         /// </summary>
-        [HttpPost("{goalId:int}")]
+        [HttpPost("api/goal-approvals/{goalId:int}")]
         public async Task<IActionResult> RequestApproval(
             int goalId,
-            [FromBody] CreateApprovalRequestDto dto
+            [FromBody] CreateApprovalRequestModel dto
         )
         {
             try
@@ -67,7 +66,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                     goalId,
                     GetEmpMasterId()
                 );
-                var response = ApiResponseDto<int>.ErrorResponse(
+                var response = ApiResponseModel<int>.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
                 return StatusCode(500, response);
@@ -77,13 +76,13 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Approve or reject an approval request
         /// </summary>
-        [HttpPut("{approvalId:int}")]  
+        [HttpPut("api/goal-approvals/{approvalId:int}")]
         [Authorize(
             Roles = $"{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD},{USER_ROLE.LEADERSHIP}"
         )]
         public async Task<IActionResult> DecideApproval(
             int approvalId,
-            [FromBody] DecideApprovalDto dto
+            [FromBody] DecideApprovalModel dto
         )
         {
             try
@@ -108,7 +107,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
             catch (Exception ex)
             {
-                var response = ApiResponseDto.ErrorResponse(
+                var response = ApiResponseModel.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
                 return StatusCode(500, response);
@@ -118,7 +117,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Get pending approvals for current user (manager/Department Head/Leadership)
         /// </summary>
-        [HttpGet("pending")]
+        [HttpGet("api/goal-approvals/pending")]
         [Authorize(
             Roles = $"{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD},{USER_ROLE.LEADERSHIP}"
         )]
@@ -130,7 +129,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
 
                 var approvals = await _service.GetPendingApprovalsAsync(userId);
 
-                var response = ApiResponseDto<List<GoalApprovalDto>>.SuccessResponse(
+                var response = ApiResponseModel<List<GoalApprovalModel>>.SuccessResponse(
                     ResponseMessages.Codes.APPROVAL_RETRIEVED_SUCCESS,
                     approvals,
                     new { PendingCount = approvals.Count, ApproverId = userId }
@@ -140,7 +139,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
             catch (Exception ex)
             {
-                var response = ApiResponseDto<List<GoalApprovalDto>>.ErrorResponse(
+                var response = ApiResponseModel<List<GoalApprovalModel>>.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
                 return StatusCode(500, response);
@@ -150,17 +149,17 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Get all approvals that the current user is involved in (requested, approving, or goal participant)
         /// </summary>
-        [HttpGet("my")]
-        public async Task<IActionResult> GetMyApprovals([FromQuery] ApprovalQueryDto query)
+        [HttpGet("api/goal-approvals/my")]
+        public async Task<IActionResult> GetMyApprovals([FromQuery] ApprovalQueryModel query)
         {
             try
             {
-                var userId = GetEmpMasterId();                  
+                var userId = GetEmpMasterId();
                 var role = GetUserRole();
 
                 var approvals = await _service.GetUserApprovalsAsync(query, userId, role);
 
-                var response = ApiResponseDto<PagedApprovalsDto>.SuccessResponse(
+                var response = ApiResponseModel<PagedApprovalsModel>.SuccessResponse(
                     ResponseMessages.Codes.APPROVAL_RETRIEVED_SUCCESS,
                     approvals,
                     new { UserId = userId, Role = role }
@@ -170,7 +169,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
             catch (Exception ex)
             {
-                var response = ApiResponseDto<PagedApprovalsDto>.ErrorResponse(
+                var response = ApiResponseModel<PagedApprovalsModel>.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
                 return StatusCode(500, response);

@@ -1,26 +1,26 @@
 using Microsoft.AspNetCore.Http;
-using Relevantz.EEPZ.Common.DTOs;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
 
 namespace Relevantz.EEPZ.Core.Services.Interface
 {
     public interface IGoalApprovalsService
     {
-        Task<ApiResponseDto<int>> RequestApprovalAsync(
+        Task<ApiResponseModel<int>> RequestApprovalAsync(
             int goalId,
-            CreateApprovalRequestDto dto,
+            CreateApprovalRequestModel dto,
             int requesterEmployeeMasterId,
             string requesterRole
         );
-        Task<ApiResponseDto> DecideApprovalAsync(
+        Task<ApiResponseModel> DecideApprovalAsync(
             int approvalId,
-            DecideApprovalDto dto,
+            DecideApprovalModel dto,
             int approverEmployeeMasterId,
             string approverRole
         );
-        Task<List<GoalApprovalDto>> GetPendingApprovalsAsync(int approverEmployeeMasterId);
-        Task<PagedApprovalsDto> GetUserApprovalsAsync(
-            ApprovalQueryDto query,
+        Task<List<GoalApprovalModel>> GetPendingApprovalsAsync(int approverEmployeeMasterId);
+        Task<PagedApprovalsModel> GetUserApprovalsAsync(
+            ApprovalQueryModel query,
             int userId,
             string userRole
         );

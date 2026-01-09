@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.DTOs;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Enums;
 using Relevantz.EEPZ.Data.DBContexts;
@@ -92,7 +92,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
         }
 
-        public async Task<List<ProjectEmployeeDto>> GetProjectSubordinatesAsync(
+        public async Task<List<ProjectEmployeeModel>> GetProjectSubordinatesAsync(
             int projectId,
             int managerEmployeeMasterId
         )
@@ -115,7 +115,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                         "[GetProjectSubordinatesAsync] No subordinates found for manager {ManagerID}",
                         managerEmployeeMasterId
                     );
-                    return new List<ProjectEmployeeDto>();
+                    return new List<ProjectEmployeeModel>();
                 }
 
                 var projectEmployees = await GetProjectEmployeesAsync(projectId);
@@ -136,7 +136,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
         }
 
-        public async Task<List<ProjectEmployeeDto>> GetProjectEmployeesAsync(int projectId)
+        public async Task<List<ProjectEmployeeModel>> GetProjectEmployeesAsync(int projectId)
         {
             try
             {
@@ -164,7 +164,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 // Convert to DTO with proper null coalescing
                 var result = employees
-                    .Select(edm => new ProjectEmployeeDto
+                    .Select(edm => new ProjectEmployeeModel
                     {
                         EmpMasterId = edm.EmployeeMasterId,
                         FirstName = edm.Employee?.Userprofile?.FirstName ?? "Unknown",
@@ -173,7 +173,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     .ToList();
 
                 Log.Information(
-                    "[GetProjectEmployeesAsync] Converted {Count} employees to DTOs",
+                    "[GetProjectEmployeesAsync] Converted {Count} employees to Models",
                     result.Count
                 );
                 return result;

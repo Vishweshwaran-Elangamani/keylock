@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.DTOs;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Data.Repository.Interface;
@@ -102,7 +102,7 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
 
-        public async Task<FileUploadResponseDto> UploadFileAsync(
+        public async Task<FileUploadResponseModel> UploadFileAsync(
             int goalId,
             IFormFile file,
             string title,
@@ -190,7 +190,7 @@ namespace Relevantz.EEPZ.Core.Service
                     goalId, 
                     currentUserEmployeeMasterId);
 
-                return new FileUploadResponseDto
+                return new FileUploadResponseModel
                 {
                     AttachmentId = attachment.Goalattachmentsid,
                     AttachmentTitle = attachment.AttachmentTitle ?? "",

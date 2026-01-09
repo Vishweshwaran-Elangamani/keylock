@@ -1,36 +1,36 @@
 using Microsoft.AspNetCore.Http;
-using Relevantz.EEPZ.Common.DTOs;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
 
 namespace Relevantz.EEPZ.Core.Services.Interface
 {
     public interface IGoalService
     {
-        Task<ApiResponseDto<int>> CreateGoalAsync(
-            CreateGoalDto dto,
+        Task<ApiResponseModel<int>> CreateGoalAsync(
+            CreateGoalModel dto,
             int currentUserEmployeeMasterId,
             string currentUserRole
         );
-        Task<List<GoalSummaryDto>> QueryGoalsAsync(
-            GoalQueryDto query,
+        Task<List<GoalSummaryModel>> QueryGoalsAsync(
+            GoalQueryModel query,
             int currentUserEmployeeMasterId,
             string currentUserRole
         );
-        Task<ApiResponseDto> UpdateGoalAsync(
+        Task<ApiResponseModel> UpdateGoalAsync(
             int goalId,
-            UpdateGoalDto dto,
+            UpdateGoalModel dto,
             int currentUserEmployeeMasterId,
             string currentUserRole
         );
-        Task<List<AssigneeDto>> GetAssigneesAsync(int goalId);
-        Task<ApiResponseDto> AssignAsync(
+        Task<List<AssigneeModel>> GetAssigneesAsync(int goalId);
+        Task<ApiResponseModel> AssignAsync(
             int goalId,
-            AssignGoalDto dto,
+            AssignGoalModel dto,
             int currentUserEmployeeMasterId,
             string currentUserRole
         );
-        Task<List<ProjectDto>> GetUserProjectsAsync(int employeeMasterId);
-        Task<List<ProjectDto>> GetAllProjectsAsync();
-        Task<ProjectDto> GetProjectAsync(int projectId);
+        Task<List<ProjectModel>> GetUserProjectsAsync(int employeeMasterId);
+        Task<List<ProjectModel>> GetAllProjectsAsync();
+        Task<ProjectModel> GetProjectAsync(int projectId);
     }
 }

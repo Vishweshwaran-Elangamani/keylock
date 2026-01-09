@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.DTOs;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Enums;
 using Relevantz.EEPZ.Core.Services.Interface;
@@ -39,8 +39,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _environment = environment;
         }
 
-        public async Task<ApiResponseDto<int>> CreateGoalAsync(
-            CreateGoalDto dto,
+        public async Task<ApiResponseModel<int>> CreateGoalAsync(
+            CreateGoalModel dto,
             int currentUserEmployeeMasterId,
             string currentUserRole
         )
@@ -63,7 +63,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         currentUserRole,
                         dto.GoalType
                     );
-                    return ApiResponseDto<int>.ErrorResponse(
+                    return ApiResponseModel<int>.ErrorResponse(
                         ResponseMessages.Codes.ROLE_INSUFFICIENT,
                         $"Role '{currentUserRole}' not permitted to create '{dto.GoalType}' goals."
                     );
@@ -76,7 +76,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         "[CreateGoal] ERROR: Insufficient checklist items - Count: {Count}",
                         dto.Checklist?.Count ?? 0
                     );
-                    return ApiResponseDto<int>.ErrorResponse(
+                    return ApiResponseModel<int>.ErrorResponse(
                         ResponseMessages.Codes.GOAL_CHECKLIST_INSUFFICIENT,
                         "Goal must have at least 3 checklist items."
                     );
@@ -92,7 +92,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         "[CreateGoal] ERROR: Insufficient valid checklist items - Count: {Count}",
                         validChecklistItems.Count
                     );
-                    return ApiResponseDto<int>.ErrorResponse(
+                    return ApiResponseModel<int>.ErrorResponse(
                         ResponseMessages.Codes.GOAL_CHECKLIST_INSUFFICIENT,
                         "Goal must have at least 3 valid checklist items with titles."
                     );
@@ -121,7 +121,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         "[CreateGoal] ERROR: Unassigned checklist items - Count: {Count}",
                         unassignedItems.Count
                     );
-                    return ApiResponseDto<int>.ErrorResponse(
+                    return ApiResponseModel<int>.ErrorResponse(
                         ResponseMessages.Codes.GOAL_CHECKLIST_UNASSIGNED,
                         $"Found {unassignedItems.Count} unassigned checklist item(s). Please assign each item to a team member."
                     );
@@ -134,7 +134,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         "[CreateGoal] ERROR: Past deadline - Deadline: {Deadline}",
                         dto.Deadline
                     );
-                    return ApiResponseDto<int>.ErrorResponse(
+                    return ApiResponseModel<int>.ErrorResponse(
                         ResponseMessages.Codes.GOAL_DEADLINE_PAST,
                         "Deadline must be in the future."
                     );
@@ -158,7 +158,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                             "[CreateGoal] ERROR: Invalid team assignees - Invalid: {Invalid}",
                             string.Join(", ", invalidAssignees)
                         );
-                        return ApiResponseDto<int>.ErrorResponse(
+                        return ApiResponseModel<int>.ErrorResponse(
                             ResponseMessages.Codes.GOAL_CHECKLIST_UNASSIGNED,
                             $"Invalid assignees found: {string.Join(", ", invalidAssignees)}. Valid assignees: {string.Join(", ", dto.AssignedToEmployeeMasterIds)}"
                         );
@@ -176,7 +176,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                                 "[CreateGoal] ERROR: Assignee has no items - AssigneeId: {AssigneeId}",
                                 assigneeId
                             );
-                            return ApiResponseDto<int>.ErrorResponse(
+                            return ApiResponseModel<int>.ErrorResponse(
                                 ResponseMessages.Codes.GOAL_CHECKLIST_UNASSIGNED,
                                 $"Assignee {assigneeId} has no checklist items assigned."
                             );
@@ -211,7 +211,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                             dto.ProjectId.Value
                         );
 
-                        return ApiResponseDto<int>.ErrorResponse(
+                        return ApiResponseModel<int>.ErrorResponse(
                             ResponseMessages.Codes.PROJECT_NOT_MEMBER,
                             "You are not a member of the selected project."
                         );
@@ -252,7 +252,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                             "[CreateGoal] ERROR: Invalid team assignments - Invalid: {Invalid}",
                             string.Join(", ", invalidAssignments)
                         );
-                        return ApiResponseDto<int>.ErrorResponse(
+                        return ApiResponseModel<int>.ErrorResponse(
                             ResponseMessages.Codes.GOAL_ASSIGNEE_INVALID,
                             $"Invalid assignees: {string.Join(", ", invalidAssignments)}. You can only assign goals to your direct subordinates."
                         );
@@ -282,7 +282,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     ChecklistItemCount = validChecklistItems.Count,
                 };
 
-                return ApiResponseDto<int>.SuccessResponse(
+                return ApiResponseModel<int>.SuccessResponse(
                     ResponseMessages.Codes.GOAL_CREATED_SUCCESS,
                     goalId,
                     metadata
@@ -295,7 +295,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     "[CreateGoal] ERROR: Error creating goal - EmpMasterId: {EmpMasterId}",
                     currentUserEmployeeMasterId
                 );
-                return ApiResponseDto<int>.ErrorResponse(
+                return ApiResponseModel<int>.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR,
                     "Failed to create goal due to an internal error."
                 );
@@ -303,10 +303,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         private async Task<int> CreateGoalInternalAsync(
-            CreateGoalDto dto,
+            CreateGoalModel dto,
             int currentUserEmployeeMasterId,
             string currentUserRole,
-            List<ChecklistItemDto> validChecklistItems
+            List<ChecklistItemModel> validChecklistItems
         )
         {
             // Determine initial status
@@ -408,8 +408,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return goal.GoalId;
         }
 
-        public async Task<List<GoalSummaryDto>> QueryGoalsAsync(
-            GoalQueryDto query,
+        public async Task<List<GoalSummaryModel>> QueryGoalsAsync(
+            GoalQueryModel query,
             int currentUserEmployeeMasterId,
             string currentUserRole
         )
@@ -424,7 +424,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
 
                 var goals = await _repo.QueryGoalsAsync(
-                    new GoalQueryDto
+                    new GoalQueryModel
                     {
                         CurrentUserEmpMasterID = currentUserEmployeeMasterId,
                         Type = query.Type,
@@ -448,7 +448,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     goals.Count
                 );
 
-                var result = new List<GoalSummaryDto>();
+                var result = new List<GoalSummaryModel>();
 
                 foreach (var g in goals)
                 {
@@ -537,14 +537,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         .Any(a => a.IsAcknowledged == true);
 
                     // Get assignees with acknowledgment status
-                    var assignees = new List<AssigneeDto>();
+                    var assignees = new List<AssigneeModel>();
                     if (g.GoalType == GOAL_TYPE.TEAM)
                     {
                         assignees = await GetAssigneesWithDetailsAsync(g.GoalId);
                     }
 
                     result.Add(
-                        new GoalSummaryDto
+                        new GoalSummaryModel
                         {
                             GoalId = g.GoalId,
                             Title = g.GoalTitle ?? "",
@@ -574,7 +574,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     );
                 }
 
-                Log.Information("[QueryGoalsAsync] Service - Returning {Count} DTOs", result.Count);
+                Log.Information("[QueryGoalsAsync] Service - Returning {Count} Models", result.Count);
                 return result;
             }
             catch (Exception ex)
@@ -612,9 +612,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return (int)Math.Round((double)completedCount / userItems.Count * 100);
         }
 
-        public async Task<ApiResponseDto> UpdateGoalAsync(
+        public async Task<ApiResponseModel> UpdateGoalAsync(
             int goalId,
-            UpdateGoalDto dto,
+            UpdateGoalModel dto,
             int currentUserEmployeeMasterId,
             string currentUserRole
         )
@@ -624,13 +624,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var goal = await _baseRepo.GetGoalByIdAsync(goalId);
                 if (goal == null)
                 {
-                    return ApiResponseDto.ErrorResponse(ResponseMessages.Codes.GOAL_NOT_FOUND);
+                    return ApiResponseModel.ErrorResponse(ResponseMessages.Codes.GOAL_NOT_FOUND);
                 }
 
                 // Access control
                 if (goal.GoalType == GOAL_TYPE.ORG && currentUserRole != USER_ROLE.LEADERSHIP)
                 {
-                    return ApiResponseDto.ErrorResponse(
+                    return ApiResponseModel.ErrorResponse(
                         ResponseMessages.Codes.GOAL_ACCESS_DENIED,
                         "Only Leadership can update organization goals."
                     );
@@ -638,7 +638,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 if (goal.GoalType != GOAL_TYPE.ORG && goal.CreatedBy != currentUserEmployeeMasterId)
                 {
-                    return ApiResponseDto.ErrorResponse(
+                    return ApiResponseModel.ErrorResponse(
                         ResponseMessages.Codes.GOAL_ACCESS_DENIED,
                         "Only the goal creator can update this goal."
                     );
@@ -647,7 +647,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 // Validate deadline if provided
                 if (dto.Deadline.HasValue && dto.Deadline.Value <= DateTime.UtcNow)
                 {
-                    return ApiResponseDto.ErrorResponse(
+                    return ApiResponseModel.ErrorResponse(
                         ResponseMessages.Codes.GOAL_DEADLINE_PAST,
                         "Deadline must be in the future."
                     );
@@ -719,7 +719,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 var metadata = new { GoalId = goalId, UpdatedBy = currentUserEmployeeMasterId };
 
-                return ApiResponseDto.SuccessResponse(
+                return ApiResponseModel.SuccessResponse(
                     ResponseMessages.Codes.GOAL_UPDATED_SUCCESS,
                     metadata
                 );
@@ -727,7 +727,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             catch (Exception ex)
             {
                 Console.WriteLine($"Error updating goal {goalId}: {ex}");
-                return ApiResponseDto.ErrorResponse(ResponseMessages.Codes.INTERNAL_SERVER_ERROR);
+                return ApiResponseModel.ErrorResponse(ResponseMessages.Codes.INTERNAL_SERVER_ERROR);
             }
         }
 
@@ -777,15 +777,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-        public async Task<List<AssigneeDto>> GetAssigneesAsync(int goalId)
+        public async Task<List<AssigneeModel>> GetAssigneesAsync(int goalId)
         {
             return await GetAssigneesWithDetailsAsync(goalId);
         }
 
-        private async Task<List<AssigneeDto>> GetAssigneesWithDetailsAsync(int goalId)
+        private async Task<List<AssigneeModel>> GetAssigneesWithDetailsAsync(int goalId)
         {
             var assignments = await _baseRepo.GetAssigneesAsync(goalId);
-            var result = new List<AssigneeDto>();
+            var result = new List<AssigneeModel>();
 
             foreach (var assignment in assignments)
             {
@@ -801,7 +801,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var profile = edm.Employee.Userprofile;
 
                 result.Add(
-                    new AssigneeDto
+                    new AssigneeModel
                     {
                         EmployeeMasterId = assignment.AssignedTo.Value,
                         Name = $"{profile.FirstName} {profile.LastName}".Trim(),
@@ -815,9 +815,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return result;
         }
 
-        public async Task<ApiResponseDto> AssignAsync(
+        public async Task<ApiResponseModel> AssignAsync(
             int goalId,
-            AssignGoalDto dto,
+            AssignGoalModel dto,
             int currentUserEmployeeMasterId,
             string currentUserRole
         )
@@ -827,12 +827,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var goal = await _baseRepo.GetGoalByIdAsync(goalId);
                 if (goal == null)
                 {
-                    return ApiResponseDto.ErrorResponse(ResponseMessages.Codes.GOAL_NOT_FOUND);
+                    return ApiResponseModel.ErrorResponse(ResponseMessages.Codes.GOAL_NOT_FOUND);
                 }
 
                 if (goal.GoalType != GOAL_TYPE.TEAM)
                 {
-                    return ApiResponseDto.ErrorResponse(
+                    return ApiResponseModel.ErrorResponse(
                         ResponseMessages.Codes.ASSIGNMENT_ACCESS_DENIED,
                         "Only team goals support delegation."
                     );
@@ -840,7 +840,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 if (!USER_ROLE.CanAssignGoals(currentUserRole))
                 {
-                    return ApiResponseDto.ErrorResponse(
+                    return ApiResponseModel.ErrorResponse(
                         ResponseMessages.Codes.ASSIGNMENT_ACCESS_DENIED,
                         "Only managers/dept heads can assign goals."
                     );
@@ -859,7 +859,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 if (!isCreator && !isAssignee)
                 {
-                    return ApiResponseDto.ErrorResponse(
+                    return ApiResponseModel.ErrorResponse(
                         ResponseMessages.Codes.ASSIGNMENT_ACCESS_DENIED,
                         "Only the goal creator or assigned participants can delegate this goal."
                     );
@@ -874,7 +874,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     .ToList();
                 if (invalidAssignments.Any())
                 {
-                    return ApiResponseDto.ErrorResponse(
+                    return ApiResponseModel.ErrorResponse(
                         ResponseMessages.Codes.ASSIGNMENT_INVALID_SUBORDINATE,
                         $"Invalid assignees: {string.Join(", ", invalidAssignments)}. You can only assign goals to your direct subordinates."
                     );
@@ -887,7 +887,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 if (duplicateAssignees.Any())
                 {
-                    return ApiResponseDto.ErrorResponse(
+                    return ApiResponseModel.ErrorResponse(
                         ResponseMessages.Codes.ASSIGNMENT_DUPLICATE,
                         $"The following users are already assigned to this goal: {string.Join(", ", duplicateAssignees)}"
                     );
@@ -896,7 +896,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 // Validate checklist
                 if (dto.AdditionalChecklist == null || dto.AdditionalChecklist.Count == 0)
                 {
-                    return ApiResponseDto.ErrorResponse(
+                    return ApiResponseModel.ErrorResponse(
                         ResponseMessages.Codes.ASSIGNMENT_CHECKLIST_REQUIRED,
                         "You must provide at least one checklist item for each newly assigned user."
                     );
@@ -908,7 +908,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 if (sharedItems.Any())
                 {
-                    return ApiResponseDto.ErrorResponse(
+                    return ApiResponseModel.ErrorResponse(
                         ResponseMessages.Codes.ASSIGNMENT_CHECKLIST_REQUIRED,
                         "Shared checklist items are not allowed. All items must be assigned to a specific user."
                     );
@@ -965,7 +965,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     ChecklistItemsAdded = items.Count,
                 };
 
-                return ApiResponseDto.SuccessResponse(
+                return ApiResponseModel.SuccessResponse(
                     ResponseMessages.Codes.ASSIGNMENT_SUCCESS,
                     metadata
                 );
@@ -973,11 +973,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             catch (Exception ex)
             {
                 Console.WriteLine($"Error assigning goal {goalId}: {ex}");
-                return ApiResponseDto.ErrorResponse(ResponseMessages.Codes.INTERNAL_SERVER_ERROR);
+                return ApiResponseModel.ErrorResponse(ResponseMessages.Codes.INTERNAL_SERVER_ERROR);
             }
         }
 
-        public async Task<List<ProjectDto>> GetUserProjectsAsync(int employeeMasterId)
+        public async Task<List<ProjectModel>> GetUserProjectsAsync(int employeeMasterId)
         {
             try
             {
@@ -989,7 +989,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     // Leaders see all active projects
                     var allProjects = await _repo.GetAllProjectsAsync();
                     return allProjects
-                        .Select(p => new ProjectDto
+                        .Select(p => new ProjectModel
                         {
                             ProjectId = p.ProjectId,
                             ProjectName = p.ProjectName ?? "",
@@ -1007,7 +1007,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
                 if (employeeDetails == null)
                 {
-                    return new List<ProjectDto>();
+                    return new List<ProjectModel>();
                 }
 
                 var employeeId = employeeDetails.EmployeeId;
@@ -1016,7 +1016,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var userProjects = await _repo.GetUserProjectsByEmployeeIdAsync(employeeId);
 
                 return userProjects
-                    .Select(p => new ProjectDto
+                    .Select(p => new ProjectModel
                     {
                         ProjectId = p.ProjectId,
                         ProjectName = p.ProjectName ?? "",
@@ -1030,17 +1030,17 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             catch (Exception ex)
             {
                 Console.WriteLine($"Error getting user projects: {ex.Message}");
-                return new List<ProjectDto>();
+                return new List<ProjectModel>();
             }
         }
 
-        public async Task<List<ProjectDto>> GetAllProjectsAsync()
+        public async Task<List<ProjectModel>> GetAllProjectsAsync()
         {
             try
             {
                 var allProjects = await _repo.GetAllProjectsAsync();
                 return allProjects
-                    .Select(p => new ProjectDto
+                    .Select(p => new ProjectModel
                     {
                         ProjectId = p.ProjectId,
                         ProjectName = p.ProjectName ?? "",
@@ -1054,11 +1054,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             catch (Exception ex)
             {
                 Console.WriteLine($"Error getting all projects: {ex.Message}");
-                return new List<ProjectDto>();
+                return new List<ProjectModel>();
             }
         }
 
-        public async Task<ProjectDto> GetProjectAsync(int projectId)
+        public async Task<ProjectModel> GetProjectAsync(int projectId)
         {
             var project = await _repo.GetProjectAsync(projectId);
             if (project == null)
@@ -1066,7 +1066,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             var employees = await _interactionRepo.GetProjectEmployeesAsync(projectId);
 
-            return new ProjectDto
+            return new ProjectModel
             {
                 ProjectId = project.ProjectId,
                 ProjectName = project.ProjectName ?? "",

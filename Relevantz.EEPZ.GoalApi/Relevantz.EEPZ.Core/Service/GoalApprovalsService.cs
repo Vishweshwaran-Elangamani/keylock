@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.DTOs;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Enums;
 using Relevantz.EEPZ.Core.Services.Interface;
@@ -36,9 +36,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _environment = environment;
         }
 
-        public async Task<ApiResponseDto<int>> RequestApprovalAsync(
+        public async Task<ApiResponseModel<int>> RequestApprovalAsync(
             int goalId,
-            CreateApprovalRequestDto dto,
+            CreateApprovalRequestModel dto,
             int requesterEmployeeMasterId,
             string requesterRole
         )
@@ -48,7 +48,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var goal = await _baseRepo.GetGoalByIdAsync(goalId);
                 if (goal == null)
                 {
-                    return ApiResponseDto<int>.ErrorResponse(ResponseMessages.Codes.GOAL_NOT_FOUND);
+                    return ApiResponseModel<int>.ErrorResponse(ResponseMessages.Codes.GOAL_NOT_FOUND);
                 }
 
                 if (dto.ApprovalType == APPROVAL_TYPE.COMPLETION)
@@ -73,7 +73,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         goal.Goalstatus = GOAL_STATUS.COMPLETED;
                         await _baseRepo.SaveChangesAsync();
 
-                        return ApiResponseDto<int>.SuccessResponse(
+                        return ApiResponseModel<int>.SuccessResponse(
                             ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
                             autoApproval.ApprovalId
                         );
@@ -99,7 +99,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         goal.Goalstatus = GOAL_STATUS.COMPLETED;
                         await _baseRepo.SaveChangesAsync();
 
-                        return ApiResponseDto<int>.SuccessResponse(
+                        return ApiResponseModel<int>.SuccessResponse(
                             ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
                             autoApproval.ApprovalId
                         );
@@ -110,7 +110,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     );
                     if (!managerId.HasValue)
                     {
-                        return ApiResponseDto<int>.ErrorResponse(
+                        return ApiResponseModel<int>.ErrorResponse(
                             ResponseMessages.Codes.APPROVAL_NO_MANAGER,
                             "Cannot submit approval: No reporting manager found"
                         );
@@ -130,7 +130,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     await _repo.AddApprovalAsync(approval);
                     await _baseRepo.SaveChangesAsync();
 
-                    return ApiResponseDto<int>.SuccessResponse(
+                    return ApiResponseModel<int>.SuccessResponse(
                         ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
                         approval.ApprovalId
                     );
@@ -140,7 +140,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 {
                     if (goal.CreatedBy != requesterEmployeeMasterId)
                     {
-                        return ApiResponseDto<int>.ErrorResponse(
+                        return ApiResponseModel<int>.ErrorResponse(
                             ResponseMessages.Codes.GOAL_ACCESS_DENIED,
                             "Only goal creator can request closure"
                         );
@@ -155,7 +155,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         }.Contains(goal.Goalstatus?.ToLower() ?? "")
                     )
                     {
-                        return ApiResponseDto<int>.ErrorResponse(
+                        return ApiResponseModel<int>.ErrorResponse(
                             ResponseMessages.Codes.GOAL_INVALID_STATUS,
                             "Goal is already completed or closed"
                         );
@@ -182,7 +182,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                         await _baseRepo.SaveChangesAsync();
 
-                        return ApiResponseDto<int>.SuccessResponse(
+                        return ApiResponseModel<int>.SuccessResponse(
                             ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
                             autoApproval.ApprovalId
                         );
@@ -193,7 +193,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     );
                     if (!managerId.HasValue)
                     {
-                        return ApiResponseDto<int>.ErrorResponse(
+                        return ApiResponseModel<int>.ErrorResponse(
                             ResponseMessages.Codes.APPROVAL_NO_MANAGER,
                             "No manager found to approve closure"
                         );
@@ -212,7 +212,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     await _repo.AddApprovalAsync(approval);
                     await _baseRepo.SaveChangesAsync();
 
-                    return ApiResponseDto<int>.SuccessResponse(
+                    return ApiResponseModel<int>.SuccessResponse(
                         ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
                         approval.ApprovalId
                     );
@@ -222,7 +222,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 {
                     if (!goal.Goalendat.HasValue || goal.Goalendat.Value >= DateTime.UtcNow)
                     {
-                        return ApiResponseDto<int>.ErrorResponse(
+                        return ApiResponseModel<int>.ErrorResponse(
                             ResponseMessages.Codes.GOAL_INVALID_STATUS,
                             "Goal is not overdue"
                         );
@@ -236,7 +236,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         )
                     )
                     {
-                        return ApiResponseDto<int>.ErrorResponse(
+                        return ApiResponseModel<int>.ErrorResponse(
                             ResponseMessages.Codes.GOAL_ACCESS_DENIED,
                             "Only goal creator or assignees can request reopening"
                         );
@@ -247,7 +247,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     );
                     if (!managerId.HasValue)
                     {
-                        return ApiResponseDto<int>.ErrorResponse(
+                        return ApiResponseModel<int>.ErrorResponse(
                             ResponseMessages.Codes.APPROVAL_NO_MANAGER,
                             "No manager found to approve reopening"
                         );
@@ -266,7 +266,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     await _repo.AddApprovalAsync(approval);
                     await _baseRepo.SaveChangesAsync();
 
-                    return ApiResponseDto<int>.SuccessResponse(
+                    return ApiResponseModel<int>.SuccessResponse(
                         ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
                         approval.ApprovalId
                     );
@@ -276,7 +276,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 {
                     if (goal.CreatedBy != requesterEmployeeMasterId)
                     {
-                        return ApiResponseDto<int>.ErrorResponse(
+                        return ApiResponseModel<int>.ErrorResponse(
                             ResponseMessages.Codes.GOAL_ACCESS_DENIED,
                             "Only goal creator can request reactivation"
                         );
@@ -288,7 +288,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         )
                     )
                     {
-                        return ApiResponseDto<int>.ErrorResponse(
+                        return ApiResponseModel<int>.ErrorResponse(
                             ResponseMessages.Codes.GOAL_INVALID_STATUS,
                             "Only closed or completed goals can be reactivated"
                         );
@@ -315,7 +315,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         goal.Goalstatus = GOAL_STATUS.REOPENED;
                         await _baseRepo.SaveChangesAsync();
 
-                        return ApiResponseDto<int>.SuccessResponse(
+                        return ApiResponseModel<int>.SuccessResponse(
                             ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
                             autoApproval.ApprovalId
                         );
@@ -326,7 +326,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     );
                     if (!managerId.HasValue)
                     {
-                        return ApiResponseDto<int>.ErrorResponse(
+                        return ApiResponseModel<int>.ErrorResponse(
                             ResponseMessages.Codes.APPROVAL_NO_MANAGER,
                             "No manager found to approve reactivation"
                         );
@@ -345,7 +345,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     await _repo.AddApprovalAsync(approval);
                     await _baseRepo.SaveChangesAsync();
 
-                    return ApiResponseDto<int>.SuccessResponse(
+                    return ApiResponseModel<int>.SuccessResponse(
                         ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
                         approval.ApprovalId
                     );
@@ -364,7 +364,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 if (!approverId.HasValue)
                 {
-                    return ApiResponseDto<int>.ErrorResponse(
+                    return ApiResponseModel<int>.ErrorResponse(
                         ResponseMessages.Codes.APPROVAL_NO_MANAGER,
                         "Cannot submit approval: No reporting manager found"
                     );
@@ -383,22 +383,22 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 await _repo.AddApprovalAsync(standardApproval);
                 await _baseRepo.SaveChangesAsync();
 
-                return ApiResponseDto<int>.SuccessResponse(
+                return ApiResponseModel<int>.SuccessResponse(
                     ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
                     standardApproval.ApprovalId
                 );
             }
             catch (Exception ex)
             {
-                return ApiResponseDto<int>.ErrorResponse(
+                return ApiResponseModel<int>.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
             }
         }
 
-        public async Task<ApiResponseDto> DecideApprovalAsync(
+        public async Task<ApiResponseModel> DecideApprovalAsync(
             int approvalId,
-            DecideApprovalDto dto,
+            DecideApprovalModel dto,
             int approverEmployeeMasterId,
             string approverRole
         )
@@ -408,14 +408,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var approval = await _repo.GetApprovalByIdAsync(approvalId);
                 if (approval == null)
                 {
-                    return ApiResponseDto.ErrorResponse(ResponseMessages.Codes.APPROVAL_NOT_FOUND);
+                    return ApiResponseModel.ErrorResponse(ResponseMessages.Codes.APPROVAL_NOT_FOUND);
                 }
 
                 var goal = approval.Goal;
 
                 if (!approval.ApprovedBy.HasValue)
                 {
-                    return ApiResponseDto.ErrorResponse(
+                    return ApiResponseModel.ErrorResponse(
                         ResponseMessages.Codes.APPROVAL_NOT_FOUND,
                         "This approval request is malformed (no approver assigned)."
                     );
@@ -423,7 +423,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 if (approval.ApprovedBy.Value != approverEmployeeMasterId)
                 {
-                    return ApiResponseDto.ErrorResponse(
+                    return ApiResponseModel.ErrorResponse(
                         ResponseMessages.Codes.APPROVAL_ACCESS_DENIED,
                         $"You are not authorized to approve this request. This approval is assigned to employee ID {approval.ApprovedBy.Value}."
                     );
@@ -431,7 +431,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 if (approval.ApprovalStatus != APPROVAL_STATUS.PENDING)
                 {
-                    return ApiResponseDto.ErrorResponse(
+                    return ApiResponseModel.ErrorResponse(
                         ResponseMessages.Codes.APPROVAL_ALREADY_DECIDED,
                         $"This approval has already been {approval.ApprovalStatus}. Decision was made on {approval.ApprovedOn:yyyy-MM-dd HH:mm}."
                     );
@@ -442,7 +442,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     && dto.Decision != APPROVAL_STATUS.REJECTED
                 )
                 {
-                    return ApiResponseDto.ErrorResponse(
+                    return ApiResponseModel.ErrorResponse(
                         ResponseMessages.Codes.APPROVAL_INVALID_DECISION,
                         $"Invalid decision: '{dto.Decision}'. Must be 'approved' or 'rejected'."
                     );
@@ -557,7 +557,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                             if (!dto.NewDeadline.HasValue)
                             {
-                                return ApiResponseDto.ErrorResponse(
+                                return ApiResponseModel.ErrorResponse(
                                     ResponseMessages.Codes.INVALID_REQUEST,
                                     "New deadline is required to approve reopening request",
                                     new[] { "Please enter a deadline date" }
@@ -566,7 +566,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                             if (dto.NewDeadline.Value <= DateTime.UtcNow)
                             {
-                                return ApiResponseDto.ErrorResponse(
+                                return ApiResponseModel.ErrorResponse(
                                     ResponseMessages.Codes.INVALID_REQUEST,
                                     "New deadline must be in the future",
                                     new[]
@@ -599,7 +599,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                             break;
 
                         default:
-                            return ApiResponseDto.ErrorResponse(
+                            return ApiResponseModel.ErrorResponse(
                                 ResponseMessages.Codes.INTERNAL_SERVER_ERROR,
                                 $"Unknown approval type: {approval.ApprovalType}"
                             );
@@ -661,7 +661,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     ApprovedOn = approval.ApprovedOn,
                 };
 
-                return ApiResponseDto.SuccessResponse(
+                return ApiResponseModel.SuccessResponse(
                     ResponseMessages.Codes.APPROVAL_DECIDED_SUCCESS,
                     metadata
                 );
@@ -669,25 +669,25 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             catch (Exception ex)
             {
                 Log.Error(ex, "[DecideApproval] Error deciding approval {ApprovalId}", approvalId);
-                return ApiResponseDto.ErrorResponse(ResponseMessages.Codes.INTERNAL_SERVER_ERROR);
+                return ApiResponseModel.ErrorResponse(ResponseMessages.Codes.INTERNAL_SERVER_ERROR);
             }
         }
 
-        public async Task<List<GoalApprovalDto>> GetPendingApprovalsAsync(
+        public async Task<List<GoalApprovalModel>> GetPendingApprovalsAsync(
             int approverEmployeeMasterId
         )
         {
             var approvals = await _repo.GetPendingApprovalsForApproverAsync(
                 approverEmployeeMasterId
             );
-            var result = new List<GoalApprovalDto>();
+            var result = new List<GoalApprovalModel>();
 
             foreach (var a in approvals)
             {
                 var requesterName = await _baseService.GetEmployeeNameAsync(a.RequestedBy);
 
                 var allAttachments = a
-                    .Goal?.GoalAttachments.Select(att => new GoalAttachmentDto
+                    .Goal?.GoalAttachments.Select(att => new GoalAttachmentModel
                     {
                         GoalAttachmentId = att.Goalattachmentsid,
                         GoalId = att.GoalId,
@@ -700,7 +700,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     })
                     .ToList();
 
-                List<GoalAttachmentDto>? proofAttachments = null;
+                List<GoalAttachmentModel>? proofAttachments = null;
                 if (
                     a.ApprovalType == APPROVAL_TYPE.COMPLETION
                     || a.ApprovalType == APPROVAL_TYPE.TASK_ACKNOWLEDGMENT
@@ -714,7 +714,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
 
                 result.Add(
-                    new GoalApprovalDto
+                    new GoalApprovalModel
                     {
                         ApprovalId = a.ApprovalId,
                         GoalId = a.GoalId,
@@ -733,8 +733,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return result;
         }
 
-        public async Task<PagedApprovalsDto> GetUserApprovalsAsync(
-            ApprovalQueryDto query,
+        public async Task<PagedApprovalsModel> GetUserApprovalsAsync(
+            ApprovalQueryModel query,
             int userId,
             string userRole
         )
@@ -809,12 +809,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 query.PageSize
             );
 
-            // Map to DTOs
-            var approvalDtos = new List<UserGoalApprovalDto>();
+            // Map to Models
+            var approvalModels = new List<UserGoalApprovalModel>();
             foreach (var ga in approvals)
             {
-                var dto = await MapToUserGoalApprovalDto(ga, userId, userRole);
-                approvalDtos.Add(dto);
+                var dto = await MapToUserGoalApprovalModel(ga, userId, userRole);
+                approvalModels.Add(dto);
             }
 
             // Calculate summary counts
@@ -823,9 +823,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             // Calculate pagination info
             var totalPages = (int)Math.Ceiling((double)totalCount / query.PageSize);
 
-            return new PagedApprovalsDto
+            return new PagedApprovalsModel
             {
-                Items = approvalDtos,
+                Items = approvalModels,
                 TotalCount = totalCount,
                 Page = query.Page,
                 PageSize = query.PageSize,
@@ -836,7 +836,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
-        private async Task<ApprovalSummaryDto> CalculateApprovalSummaryOptimized(
+        private async Task<ApprovalSummaryModel> CalculateApprovalSummaryOptimized(
             int userId,
             string userRole
         )
@@ -874,7 +874,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             var total = await _repo.CountAsync(baseQuery);
 
-            return new ApprovalSummaryDto
+            return new ApprovalSummaryModel
             {
                 MyPending = myPending,
                 ToReview = toReview,
@@ -941,7 +941,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 && approval.RequestedBy != userId;
         }
 
-        private async Task<UserGoalApprovalDto> MapToUserGoalApprovalDto(
+        private async Task<UserGoalApprovalModel> MapToUserGoalApprovalModel(
             GoalApproval approval,
             int userId,
             string userRole
@@ -952,7 +952,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var goalCreatorName = await _baseService.GetEmployeeNameAsync(approval.Goal?.CreatedBy);
 
             // Get goal assignees
-            var goalAssignees = new List<AssigneeDto>();
+            var goalAssignees = new List<AssigneeModel>();
             if (approval.Goal?.GoalAssignments != null)
             {
                 foreach (var assignment in approval.Goal.GoalAssignments)
@@ -967,7 +967,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                             : null;
 
                         goalAssignees.Add(
-                            new AssigneeDto
+                            new AssigneeModel
                             {
                                 EmployeeMasterId = assignment.AssignedTo.Value,
                                 Name = assigneeName,
@@ -979,8 +979,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
 
             // Get attachments
-            var allAttachments = new List<GoalAttachmentDto>();
-            var proofAttachments = new List<GoalAttachmentDto>();
+            var allAttachments = new List<GoalAttachmentModel>();
+            var proofAttachments = new List<GoalAttachmentModel>();
 
             if (approval.Goal?.GoalAttachments != null)
             {
@@ -988,7 +988,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 {
                     var attacherName = await _baseService.GetEmployeeNameAsync(att.AttachedBy);
 
-                    var attachmentDto = new GoalAttachmentDto
+                    var attachmentModel = new GoalAttachmentModel
                     {
                         GoalAttachmentId = att.Goalattachmentsid,
                         GoalId = att.GoalId,
@@ -1001,19 +1001,19 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         LinkedApprovalId = att.LinkedApprovalId,
                     };
 
-                    allAttachments.Add(attachmentDto);
+                    allAttachments.Add(attachmentModel);
 
                     if (
                         att.IsProofOfCompletion
                         ?? true && att.LinkedApprovalId == approval.ApprovalId
                     )
                     {
-                        proofAttachments.Add(attachmentDto);
+                        proofAttachments.Add(attachmentModel);
                     }
                 }
             }
 
-            var dto = new UserGoalApprovalDto
+            var dto = new UserGoalApprovalModel
             {
                 ApprovalId = approval.ApprovalId,
                 GoalId = approval.GoalId,

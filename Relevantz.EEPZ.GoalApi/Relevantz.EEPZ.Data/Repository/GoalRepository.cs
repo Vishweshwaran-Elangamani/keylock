@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.DTOs;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Enums;
 using Relevantz.EEPZ.Data.DBContexts;
@@ -28,7 +28,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             environment = _environment;
         }
 
-        public async Task<List<Goal>> QueryGoalsAsync(GoalQueryDto request)
+        public async Task<List<Goal>> QueryGoalsAsync(GoalQueryModel request)
         {
             try
             {
@@ -357,7 +357,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
         }
 
-        public async Task<List<AssigneeDto>> GetAssigneesWithDetailsAsync(int goalId)
+        public async Task<List<AssigneeModel>> GetAssigneesWithDetailsAsync(int goalId)
         {
             try
             {
@@ -370,7 +370,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     .GoalAssignments.Where(a => a.GoalId == goalId)
                     .ToListAsync();
 
-                var result = new List<AssigneeDto>();
+                var result = new List<AssigneeModel>();
 
                 foreach (var assignment in assignments)
                 {
@@ -401,7 +401,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     );
 
                     result.Add(
-                        new AssigneeDto
+                        new AssigneeModel
                         {
                             EmployeeMasterId = assignment.AssignedTo.Value,
                             Name = $"{profile.FirstName} {profile.LastName}".Trim(),

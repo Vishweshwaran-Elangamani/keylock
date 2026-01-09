@@ -4,7 +4,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using Relevantz.EEPZ.Common.Configuration;
-using Relevantz.EEPZ.Common.DTOs;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.IService;
 
 namespace Relevantz.EEPZ.Core.Service

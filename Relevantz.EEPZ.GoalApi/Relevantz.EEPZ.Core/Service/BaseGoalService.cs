@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.DTOs;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Enums;
 using Relevantz.EEPZ.Core.Services.Interface;
@@ -270,7 +270,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-        public async Task<GoalDetailDto> GetGoalAsync(
+        public async Task<GoalDetailModel> GetGoalAsync(
             int goalId,
             int currentUserEmployeeMasterId,
             string currentUserRole
@@ -361,7 +361,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 currentUserEmployeeMasterId
             );
 
-            return new GoalDetailDto
+            return new GoalDetailModel
             {
                 GoalId = goal.GoalId,
                 GoalType = goal.GoalType ?? GOAL_TYPE.SELF,
@@ -377,7 +377,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 ProgressPercent = progressPercent,
                 HasPendingApproval = hasPendingApproval,
                 Checklist = goal
-                    .GoalChecklists.Select(c => new GoalChecklistItemDto
+                    .GoalChecklists.Select(c => new GoalChecklistItemModel
                     {
                         ChecklistId = c.ChecklistId,
                         Title = c.ItemTitle ?? "",
@@ -401,10 +401,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
-        private async Task<List<AssigneeDto>> GetAssigneesWithDetailsAsync(int goalId)
+        private async Task<List<AssigneeModel>> GetAssigneesWithDetailsAsync(int goalId)
         {
             var assignments = await _repo.GetAssigneesAsync(goalId);
-            var result = new List<AssigneeDto>();
+            var result = new List<AssigneeModel>();
 
             foreach (var assignment in assignments)
             {
@@ -420,7 +420,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var profile = edm.Employee.Userprofile;
 
                 result.Add(
-                    new AssigneeDto
+                    new AssigneeModel
                     {
                         EmployeeMasterId = assignment.AssignedTo.Value,
                         Name = $"{profile.FirstName} {profile.LastName}".Trim(),

@@ -1,4 +1,4 @@
-using Relevantz.EEPZ.Common.DTOs;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
 
 namespace Relevantz.EEPZ.Data.Repository.Interface

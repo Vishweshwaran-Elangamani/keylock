@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 
-namespace Relevantz.EEPZ.Common.DTOs
+namespace Relevantz.EEPZ.Common.Models
 {
-    // ==================== PROJECT DTOs ====================
+    // ==================== PROJECT Models ====================
 
-    public class ProjectDto
+    public class ProjectModel
     {
         public int ProjectId { get; set; }
         public string ProjectName { get; set; } = string.Empty;
@@ -13,19 +13,19 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string Status { get; set; } = string.Empty;
         public DateOnly? StartDate { get; set; }
         public DateOnly? EndDate { get; set; }
-        public List<ProjectEmployeeDto>? Employees { get; set; }
+        public List<ProjectEmployeeModel>? Employees { get; set; }
     }
 
-    public class ProjectEmployeeDto
+    public class ProjectEmployeeModel
     {
         public int EmpMasterId { get; set; }
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
     }
 
-    // ==================== GOAL DTOs ====================
+    // ==================== GOAL Models ====================
 
-    public class AssigneeDto
+    public class AssigneeModel
     {
         public int EmployeeMasterId { get; set; }
         public string Name { get; set; }
@@ -34,7 +34,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public DateTime? AcknowledgedOn { get; set; }
     }
 
-    public class GoalChecklistItemDto
+    public class GoalChecklistItemModel
     {
         public int ChecklistId { get; set; }
         public string Title { get; set; } = default!;
@@ -44,7 +44,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public bool IsCompletedForCurrentUser { get; set; }
     }
 
-    public class GoalSummaryDto
+    public class GoalSummaryModel
     {
         public int GoalId { get; set; }
         public string Title { get; set; } = default!;
@@ -63,10 +63,10 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int? MyProgress { get; set; }
         public bool HasPendingApproval { get; set; }
         public bool IsAcknowledged { get; set; }
-        public List<AssigneeDto>? Assignees { get; set; }
+        public List<AssigneeModel>? Assignees { get; set; }
     }
 
-    public class GoalDetailDto
+    public class GoalDetailModel
     {
         public int GoalId { get; set; }
         public string GoalType { get; set; } = default!;
@@ -80,8 +80,8 @@ namespace Relevantz.EEPZ.Common.DTOs
         public DateTime? EndAt { get; set; }
         public string Status { get; set; } = default!;
         public int ProgressPercent { get; set; }
-        public List<GoalChecklistItemDto> Checklist { get; set; } = new();
-        public List<AssigneeDto> Assignees { get; set; } = new();
+        public List<GoalChecklistItemModel> Checklist { get; set; } = new();
+        public List<AssigneeModel> Assignees { get; set; } = new();
         public bool CanEdit { get; set; }
         public bool CanComment { get; set; }
         public bool CanMarkComplete { get; set; }
@@ -90,7 +90,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public bool HasPendingApproval { get; set; }
     }
 
-    public class GoalDashboardSummaryDto
+    public class GoalDashboardSummaryModel
     {
         public int Completed { get; set; }
         public int Ongoing { get; set; }
@@ -99,9 +99,9 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int PendingApprovals { get; set; }
     }
 
-    // ==================== APPROVAL DTOs ====================
+    // ==================== APPROVAL Models ====================
 
-    public class GoalApprovalDto
+    public class GoalApprovalModel
     {
         public int ApprovalId { get; set; }
         public int GoalId { get; set; }
@@ -111,12 +111,12 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string? RequestedByName { get; set; }
         public DateTime? RequestedOn { get; set; }
         public string ApprovalStatus { get; set; } = default!;
-        public List<GoalAttachmentDto>? AllAttachments { get; set; }
-        public List<GoalAttachmentDto>? ProofAttachments { get; set; }
+        public List<GoalAttachmentModel>? AllAttachments { get; set; }
+        public List<GoalAttachmentModel>? ProofAttachments { get; set; }
         public DateTime? ReopenUntil { get; set; }
     }
 
-    public class UserGoalApprovalDto : GoalApprovalDto
+    public class UserGoalApprovalModel : GoalApprovalModel
     {
         public string UserRole { get; set; } = default!;
         public bool CanMakeDecision { get; set; }
@@ -126,24 +126,24 @@ namespace Relevantz.EEPZ.Common.DTOs
         public DateTime? ApprovedOn { get; set; }
         public int? GoalCreatedByEmployeeMasterId { get; set; }
         public string? GoalCreatedByName { get; set; }
-        public List<AssigneeDto>? GoalAssignees { get; set; }
+        public List<AssigneeModel>? GoalAssignees { get; set; }
         public string? UserContext { get; set; }
     }
 
     // Paged response for approvals
-    public class PagedApprovalsDto
+    public class PagedApprovalsModel
     {
-        public List<UserGoalApprovalDto> Items { get; set; } = new();
+        public List<UserGoalApprovalModel> Items { get; set; } = new();
         public int TotalCount { get; set; }
         public int Page { get; set; }
         public int PageSize { get; set; }
         public int TotalPages { get; set; }
         public bool HasNextPage { get; set; }
         public bool HasPreviousPage { get; set; }
-        public ApprovalSummaryDto Summary { get; set; } = new();
+        public ApprovalSummaryModel Summary { get; set; } = new();
     }
 
-    public class ApprovalSummaryDto
+    public class ApprovalSummaryModel
     {
         public int MyPending { get; set; }
         public int ToReview { get; set; }
@@ -152,9 +152,9 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int Total { get; set; }
     }
 
-    // ==================== ATTACHMENT DTOs ====================
+    // ==================== ATTACHMENT Models ====================
 
-    public class FileUploadResponseDto 
+    public class FileUploadResponseModel 
     {
         public int AttachmentId { get; set; }
         public string AttachmentTitle { get; set; } = default!;
@@ -165,7 +165,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public DateTime UploadedOn { get; set; }
     }
 
-    public class GoalAttachmentDto
+    public class GoalAttachmentModel
     {
         public int GoalAttachmentId { get; set; }
         public int GoalId { get; set; }
@@ -178,9 +178,9 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int? LinkedApprovalId { get; set; }
     }     
 
-    // ==================== COMMENT DTOs ====================
+    // ==================== COMMENT Models ====================
 
-    public class GoalCommentDto
+    public class GoalCommentModel
     {
         public int GoalCommentId { get; set; }
         public int GoalId { get; set; }
@@ -191,9 +191,9 @@ namespace Relevantz.EEPZ.Common.DTOs
         public DateTime? CommentedOn { get; set; }
     }
 
-    // ==================== TIMELINE DTOs ====================
+    // ==================== TIMELINE Models ====================
 
-    public class TimelineEventDto
+    public class TimelineEventModel
     {
         public string Type { get; set; } = default!;
         public DateTime Timestamp { get; set; }
@@ -204,19 +204,19 @@ namespace Relevantz.EEPZ.Common.DTOs
         public object? Metadata { get; set; }
     }
 
-    // ==================== COMPLETION STATUS DTOs ====================
+    // ==================== COMPLETION STATUS Models ====================
 
-    public class CanMarkCompleteDto
+    public class CanMarkCompleteModel
     {
         public bool CanComplete { get; set; }
         public string? Reason { get; set; } // Combined reason text
         public List<string>? Reasons { get; set; }
         public bool IsOverdue { get; set; }
         public bool ShouldRequestReopen { get; set; }
-        public CanMarkCompleteDetailsDto? Details { get; set; }
+        public CanMarkCompleteDetailsModel? Details { get; set; }
     }
 
-    public class CanMarkCompleteDetailsDto
+    public class CanMarkCompleteDetailsModel
     {
         public bool HasRequiredProgress { get; set; }
         public int CurrentProgress { get; set; }
@@ -226,9 +226,9 @@ namespace Relevantz.EEPZ.Common.DTOs
         public bool IsParticipant { get; set; }
     }
 
-    // ==================== USER ASSIGNMENT DTOs ====================
+    // ==================== USER ASSIGNMENT Models ====================
 
-    public class AssignableUserDto
+    public class AssignableUserModel
     {
         public int EmployeeMasterId { get; set; }
         public string Name { get; set; } = default!;
@@ -237,12 +237,12 @@ namespace Relevantz.EEPZ.Common.DTOs
         public bool IsAlreadyAssigned { get; set; }
     }
 
-    // ==================== CASCADING PROGRESS DTOs ====================
+    // ==================== CASCADING PROGRESS Models ====================
 
     /// <summary>
     /// Hierarchical progress breakdown showing cascade
     /// </summary>
-    public class GoalProgressHierarchyDto
+    public class GoalProgressHierarchyModel
     {
         public int GoalId { get; set; }
         public int UserId { get; set; }
@@ -255,13 +255,13 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int TeamWeight { get; set; }
         public int OwnItemCount { get; set; }
         public int OwnItemsCompleted { get; set; }
-        public List<SubordinateProgressDto> Subordinates { get; set; } = new();
+        public List<SubordinateProgressModel> Subordinates { get; set; } = new();
     }
 
     /// <summary>
     /// Progress details for a subordinate
     /// </summary>
-    public class SubordinateProgressDto
+    public class SubordinateProgressModel
     {
         public int UserId { get; set; }
         public string UserName { get; set; } = default!;

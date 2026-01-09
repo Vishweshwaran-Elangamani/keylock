@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.DTOs;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Enums;
 using Relevantz.EEPZ.Core.Services.Interface;
@@ -36,9 +36,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _environment = environment;
         }
 
-        public async Task<ApiResponseDto> AddCommentAsync(
+        public async Task<ApiResponseModel> AddCommentAsync(
             int goalId,
-            CreateCommentDto dto,
+            CreateCommentModel dto,
             int currentUserEmployeeMasterId,
             string currentUserRole
         )
@@ -48,7 +48,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var goal = await _baseRepo.GetGoalByIdAsync(goalId);
                 if (goal == null)
                 {
-                    return ApiResponseDto.ErrorResponse(ResponseMessages.Codes.GOAL_NOT_FOUND);
+                    return ApiResponseModel.ErrorResponse(ResponseMessages.Codes.GOAL_NOT_FOUND);
                 }
 
                 // NEW CODE:
@@ -60,7 +60,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
                 if (!canComment)
                 {
-                    return ApiResponseDto.ErrorResponse(
+                    return ApiResponseModel.ErrorResponse(
                         ResponseMessages.Codes.COMMENT_ACCESS_DENIED,
                         "You do not have permission to comment on this goal"
                     );
@@ -72,7 +72,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 if (!isCommentable)
                 {
                     Log.Warning("[AddCommentAsync] Goal {GoalId} is not commentable", goalId);
-                    return ApiResponseDto.ErrorResponse(
+                    return ApiResponseModel.ErrorResponse(
                         ResponseMessages.Codes.GOAL_COMMENT_BLOCKED,
                         "Cannot comment on completed or closed goals"
                     );
@@ -95,7 +95,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     CommentedBy = currentUserEmployeeMasterId,
                 };
 
-                return ApiResponseDto.SuccessResponse(
+                return ApiResponseModel.SuccessResponse(
                     ResponseMessages.Codes.COMMENT_ADDED_SUCCESS,
                     metadata
                 );
@@ -103,14 +103,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             catch (Exception ex)
             {
                 Console.WriteLine($"Error adding comment to goal {goalId}: {ex}");
-                return ApiResponseDto.ErrorResponse(ResponseMessages.Codes.INTERNAL_SERVER_ERROR);
+                return ApiResponseModel.ErrorResponse(ResponseMessages.Codes.INTERNAL_SERVER_ERROR);
             }
         }
 
-        public async Task<List<GoalCommentDto>> ListCommentsAsync(int goalId)
+        public async Task<List<GoalCommentModel>> ListCommentsAsync(int goalId)
         {
             var comments = await _repo.GetCommentsByGoalAsync(goalId);
-            var result = new List<GoalCommentDto>();
+            var result = new List<GoalCommentModel>();
 
             foreach (var c in comments)
             {
@@ -120,7 +120,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     : null;
 
                 result.Add(
-                    new GoalCommentDto
+                    new GoalCommentModel
                     {
                         GoalCommentId = c.Goalcommentid,
                         GoalId = c.GoalId,
@@ -136,7 +136,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return result;
         }
 
-        public async Task<GoalDashboardSummaryDto> GetDashboardSummaryAsync(
+        public async Task<GoalDashboardSummaryModel> GetDashboardSummaryAsync(
             int currentUserEmployeeMasterId
         )
         {
@@ -152,7 +152,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 Log.Information("GetDashboardSummaryAsync - User role: {Role}", userRole);
 
                 var allGoals = await _goalRepo.QueryGoalsAsync(
-                    new GoalQueryDto
+                    new GoalQueryModel
                     {
                         CurrentUserEmpMasterID = currentUserEmployeeMasterId,
                         CurrentUserRole = userRole,
@@ -204,7 +204,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     pendingApprovals
                 );
 
-                return new GoalDashboardSummaryDto
+                return new GoalDashboardSummaryModel
                 {
                     Completed = completed.Count,
                     Ongoing = ongoing.Count,
@@ -221,7 +221,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     currentUserEmployeeMasterId
                 );
 
-                return new GoalDashboardSummaryDto
+                return new GoalDashboardSummaryModel
                 {
                     Completed = 0,
                     Ongoing = 0,
@@ -232,13 +232,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-        public async Task<List<GoalSummaryDto>> GetOngoingAsync(
+        public async Task<List<GoalSummaryModel>> GetOngoingAsync(
             string type,
             int currentUserEmployeeMasterId
         )
         {
             var goals = await _goalRepo.QueryGoalsAsync(
-                new GoalQueryDto { Page = 1, PageSize = 1_000_000 }
+                new GoalQueryModel { Page = 1, PageSize = 1_000_000 }
             );
 
             var ongoing = goals
@@ -249,7 +249,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 )
                 .ToList();
 
-            var result = new List<GoalSummaryDto>();
+            var result = new List<GoalSummaryModel>();
             foreach (var g in ongoing)
             {
                 var latestProgress = g
@@ -270,7 +270,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var creatorName = await _baseService.GetEmployeeNameAsync(g.CreatedBy);
 
                 result.Add(
-                    new GoalSummaryDto
+                    new GoalSummaryModel
                     {
                         GoalId = g.GoalId,
                         Title = g.GoalTitle ?? "",
@@ -298,7 +298,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return result;
         }
 
-        public async Task<List<TimelineEventDto>> GetGoalTimelineAsync(
+        public async Task<List<TimelineEventModel>> GetGoalTimelineAsync(
             int goalId,
             int currentUserEmployeeMasterId
         )
@@ -311,11 +311,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (!canView)
                 throw new UnauthorizedAccessException("You cannot view this goal's timeline.");
 
-            var events = new List<TimelineEventDto>();
+            var events = new List<TimelineEventModel>();
 
             // Goal creation
             events.Add(
-                new TimelineEventDto
+                new TimelineEventModel
                 {
                     Type = TIMELINE_EVENT_TYPE.GOAL_CREATED,
                     Timestamp = goal.Goalcreatedat ?? DateTime.UtcNow,
@@ -333,7 +333,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             foreach (var p in progressLogs)
             {
                 events.Add(
-                    new TimelineEventDto
+                    new TimelineEventModel
                     {
                         Type = TIMELINE_EVENT_TYPE.PROGRESS,
                         Timestamp = p.UpdatedOn ?? DateTime.UtcNow,
@@ -365,7 +365,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
 
                 events.Add(
-                    new TimelineEventDto
+                    new TimelineEventModel
                     {
                         Type = TIMELINE_EVENT_TYPE.APPROVAL,
                         Timestamp = a.RequestedOn ?? DateTime.UtcNow,
@@ -397,7 +397,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     };
 
                     events.Add(
-                        new TimelineEventDto
+                        new TimelineEventModel
                         {
                             Type = TIMELINE_EVENT_TYPE.APPROVAL,
                             Timestamp = a.ApprovedOn.Value,
@@ -421,7 +421,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             foreach (var c in goal.GoalComments)
             {
                 events.Add(
-                    new TimelineEventDto
+                    new TimelineEventModel
                     {
                         Type = TIMELINE_EVENT_TYPE.COMMENT,
                         Timestamp = c.CommentedOn ?? DateTime.UtcNow,
@@ -440,7 +440,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             foreach (var a in goal.GoalAssignments)
             {
                 events.Add(
-                    new TimelineEventDto
+                    new TimelineEventModel
                     {
                         Type = TIMELINE_EVENT_TYPE.ASSIGNMENT,
                         Timestamp = a.AssignedOn ?? DateTime.UtcNow,
@@ -459,7 +459,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             foreach (var att in goal.GoalAttachments)
             {
                 events.Add(
-                    new TimelineEventDto
+                    new TimelineEventModel
                     {
                         Type = TIMELINE_EVENT_TYPE.ATTACHMENT,
                         Timestamp = att.AttachedOn ?? DateTime.UtcNow,
@@ -476,7 +476,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return events.OrderByDescending(e => e.Timestamp).ToList();
         }
 
-        public async Task<List<ProjectEmployeeDto>> GetProjectSubordinatesAsync(
+        public async Task<List<ProjectEmployeeModel>> GetProjectSubordinatesAsync(
             int projectId,
             int managerEmployeeMasterId
         )

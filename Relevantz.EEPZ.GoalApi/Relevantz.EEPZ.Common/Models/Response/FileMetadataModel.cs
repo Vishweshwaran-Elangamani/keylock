@@ -1,4 +1,4 @@
-namespace Relevantz.EEPZ.Common.DTOs
+namespace Relevantz.EEPZ.Common.Models
 {
     public class FileMetadata
     {

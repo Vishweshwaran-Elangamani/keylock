@@ -1,13 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Common.Enums;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Relevantz.EEPZ.Api.Controllers.Goals
 {
-    [Route("api/goals")]
     public class GoalInteractionsController : BaseGoalController
     {
         protected new readonly IGoalInteractionService _service;
@@ -27,8 +26,8 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Add a comment to a goal
         /// </summary>
-        [HttpPost("{id:int}/comments")]
-        public async Task<IActionResult> AddComment(int id, [FromBody] CreateCommentDto dto)
+        [HttpPost("api/goal-interaction/{id:int}/comments")]
+        public async Task<IActionResult> AddComment(int id, [FromBody] CreateCommentModel dto)
         {
             try
             {
@@ -51,7 +50,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
             catch (Exception ex)
             {
-                var response = ApiResponseDto.ErrorResponse(
+                var response = ApiResponseModel.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
                 return StatusCode(500, response);
@@ -61,14 +60,14 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// List all comments for a goal
         /// </summary>
-        [HttpGet("{id:int}/comments")]
+        [HttpGet("api/goal-interaction/{id:int}/comments")]
         public async Task<IActionResult> ListComments(int id)
         {
             try
             {
                 var items = await _service.ListCommentsAsync(id);
 
-                var response = ApiResponseDto<List<GoalCommentDto>>.SuccessResponse(
+                var response = ApiResponseModel<List<GoalCommentModel>>.SuccessResponse(
                     ResponseMessages.Codes.COMMENTS_RETRIEVED_SUCCESS,
                     items,
                     new { GoalId = id, CommentCount = items.Count }
@@ -78,14 +77,14 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
             catch (KeyNotFoundException)
             {
-                var response = ApiResponseDto<List<GoalCommentDto>>.ErrorResponse(
+                var response = ApiResponseModel<List<GoalCommentModel>>.ErrorResponse(
                     ResponseMessages.Codes.GOAL_NOT_FOUND
                 );
                 return NotFound(response);
             }
             catch (Exception ex)
             {
-                var response = ApiResponseDto<List<GoalCommentDto>>.ErrorResponse(
+                var response = ApiResponseModel<List<GoalCommentModel>>.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
                 return StatusCode(500, response);
@@ -97,7 +96,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Get timeline of all events for a goal (progress, approvals, comments, etc.)
         /// </summary>
-        [HttpGet("{id:int}/timeline")]
+        [HttpGet("api/goal-interaction/{id:int}/timeline")]
         public async Task<IActionResult> GetTimeline(int id)
         {
             try
@@ -106,7 +105,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
 
                 var timeline = await _service.GetGoalTimelineAsync(id, userId);
 
-                var response = ApiResponseDto<List<TimelineEventDto>>.SuccessResponse(
+                var response = ApiResponseModel<List<TimelineEventModel>>.SuccessResponse(
                     ResponseMessages.Codes.TIMELINE_RETRIEVED_SUCCESS,
                     timeline,
                     new { GoalId = id, EventCount = timeline.Count }
@@ -116,33 +115,33 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
             catch (KeyNotFoundException)
             {
-                var response = ApiResponseDto<List<TimelineEventDto>>.ErrorResponse(
+                var response = ApiResponseModel<List<TimelineEventModel>>.ErrorResponse(
                     ResponseMessages.Codes.GOAL_NOT_FOUND
                 );
                 return NotFound(response);
             }
             catch (UnauthorizedAccessException)
             {
-                var response = ApiResponseDto<List<TimelineEventDto>>.ErrorResponse(
+                var response = ApiResponseModel<List<TimelineEventModel>>.ErrorResponse(
                     ResponseMessages.Codes.GOAL_ACCESS_DENIED
                 );
                 return Forbid(response.Message);
             }
             catch (Exception ex)
             {
-                var response = ApiResponseDto<List<TimelineEventDto>>.ErrorResponse(
+                var response = ApiResponseModel<List<TimelineEventModel>>.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
                 return StatusCode(500, response);
             }
         }
 
-        // DASHBOARD 
+        // DASHBOARD
 
         /// <summary>
         /// Get dashboard summary (completed, ongoing, pending counts)
         /// </summary>
-        [HttpGet("dashboard/summary")]
+        [HttpGet("api/goal-interaction/dashboard/summary")]
         public async Task<IActionResult> DashboardSummary()
         {
             try
@@ -151,7 +150,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
 
                 var summary = await _service.GetDashboardSummaryAsync(userId);
 
-                var response = ApiResponseDto<GoalDashboardSummaryDto>.SuccessResponse(
+                var response = ApiResponseModel<GoalDashboardSummaryModel>.SuccessResponse(
                     ResponseMessages.Codes.DASHBOARD_RETRIEVED_SUCCESS,
                     summary,
                     new { UserId = userId }
@@ -161,53 +160,19 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
             catch (Exception ex)
             {
-                var response = ApiResponseDto<GoalDashboardSummaryDto>.ErrorResponse(
+                var response = ApiResponseModel<GoalDashboardSummaryModel>.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
                 return StatusCode(500, response);
             }
         }
 
-        /// <summary>
-        /// Get ongoing goals filtered by type (self, team, org)
-        /// </summary>
-        [HttpGet("dashboard/ongoing")]
-        public async Task<IActionResult> DashboardOngoing([FromQuery] string type)
-        {
-            try
-            {
-                var userId = GetEmpMasterId();
-
-                var list = await _service.GetOngoingAsync(type, userId);
-
-                var response = ApiResponseDto<List<GoalSummaryDto>>.SuccessResponse(
-                    ResponseMessages.Codes.GOAL_RETRIEVED_SUCCESS,
-                    list,
-                    new
-                    {
-                        UserId = userId,
-                        Type = type,
-                        GoalCount = list.Count,
-                    }
-                );
-
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                var response = ApiResponseDto<List<GoalSummaryDto>>.ErrorResponse(
-                    ResponseMessages.Codes.INTERNAL_SERVER_ERROR
-                );
-                return StatusCode(500, response);
-            }
-        }
-
-        //  PERMISSIONS VALIDATION 
+        //  PERMISSIONS VALIDATION
 
         /// <summary>
         /// Check if user can mark goal as complete
         /// </summary>
-        [HttpGet("{id:int}/can-complete")]
+        [HttpGet("api/goal-interaction/{id:int}/can-complete")]
         public async Task<IActionResult> CanMarkComplete(int id)
         {
             try
@@ -242,14 +207,14 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
 
                 var shouldRequestReopen = isOverdue && goal.Status != GOAL_STATUS.REOPENED;
 
-                var result = new CanMarkCompleteDto
+                var result = new CanMarkCompleteModel
                 {
                     CanComplete = canComplete,
                     Reason = reasons.Any() ? string.Join(", ", reasons) : null,
                     Reasons = reasons.Any() ? reasons : null,
                     IsOverdue = isOverdue,
                     ShouldRequestReopen = shouldRequestReopen,
-                    Details = new CanMarkCompleteDetailsDto
+                    Details = new CanMarkCompleteDetailsModel
                     {
                         HasRequiredProgress = hasRequiredProgress,
                         CurrentProgress = goal.ProgressPercent,
@@ -260,7 +225,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                     },
                 };
 
-                var response = ApiResponseDto<CanMarkCompleteDto>.SuccessResponse(
+                var response = ApiResponseModel<CanMarkCompleteModel>.SuccessResponse(
                     ResponseMessages.Codes.GOAL_RETRIEVED_SUCCESS,
                     result,
                     new { GoalId = id, UserId = userId }
@@ -270,85 +235,26 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
             catch (KeyNotFoundException)
             {
-                var response = ApiResponseDto<CanMarkCompleteDto>.ErrorResponse(
+                var response = ApiResponseModel<CanMarkCompleteModel>.ErrorResponse(
                     ResponseMessages.Codes.GOAL_NOT_FOUND
                 );
                 return NotFound(response);
             }
             catch (Exception ex)
             {
-                var response = ApiResponseDto<CanMarkCompleteDto>.ErrorResponse(
+                var response = ApiResponseModel<CanMarkCompleteModel>.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
                 return StatusCode(500, response);
             }
         }
 
-        /// <summary>
-        /// Check if user can view a goal
-        /// </summary>
-        [HttpGet("{id:int}/can-view")]
-        public async Task<IActionResult> CanViewGoal(int id)
-        {
-            try
-            {
-                var userId = GetEmpMasterId();
-
-                var canView = await _baseService.CanViewGoalAsync(id, userId);
-
-                var response = ApiResponseDto<object>.SuccessResponse(
-                    ResponseMessages.Codes.GOAL_RETRIEVED_SUCCESS,
-                    new { canView },
-                    new { GoalId = id, UserId = userId }
-                );
-
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                var response = ApiResponseDto<object>.ErrorResponse(
-                    ResponseMessages.Codes.INTERNAL_SERVER_ERROR
-                );
-                return StatusCode(500, response);
-            }
-        }
-
-        /// <summary>
-        /// Check if user can comment on a goal
-        /// </summary>
-        [HttpGet("{id:int}/can-comment")]
-        public async Task<IActionResult> CanComment(int id)
-        {
-            try
-            {
-                var userId = GetEmpMasterId();
-                var role = GetUserRole();
-
-                var canComment = await _baseService.CanCommentOnGoalAsync(id, userId, role);
-
-                var response = ApiResponseDto<object>.SuccessResponse(
-                    ResponseMessages.Codes.GOAL_RETRIEVED_SUCCESS,
-                    new { canComment },
-                    new { GoalId = id, UserId = userId }
-                );
-
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                var response = ApiResponseDto<object>.ErrorResponse(
-                    ResponseMessages.Codes.INTERNAL_SERVER_ERROR
-                );
-                return StatusCode(500, response);
-            }
-        }
-
-        //  PROJECTS 
+        //  PROJECTS
 
         /// <summary>
         /// Get project subordinates for assignment
         /// </summary>
-        [HttpGet("projects/{projectId:int}/subordinates")]
+        [HttpGet("api/goal-interaction/projects/{projectId:int}/subordinates")]
         public async Task<IActionResult> GetProjectSubordinates(int projectId)
         {
             try
@@ -360,7 +266,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                 );
 
                 return Ok(
-                    new ApiResponseDto<List<ProjectEmployeeDto>>
+                    new ApiResponseModel<List<ProjectEmployeeModel>>
                     {
                         Success = true,
                         Data = subordinates,
@@ -373,7 +279,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                 _logger.LogError(ex, "Error retrieving project subordinates");
                 return StatusCode(
                     500,
-                    new ApiResponseDto<object>
+                    new ApiResponseModel<object>
                     {
                         Success = false,
                         Message = "Failed to retrieve project subordinates",

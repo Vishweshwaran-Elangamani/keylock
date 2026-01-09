@@ -1,14 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Common.Enums;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Relevantz.EEPZ.Api.Controllers.Goals
 {
-    [Route("api/goal-progress")]
     public class GoalProgressController : BaseGoalController
     {
         protected new readonly IGoalProgressService _service;
@@ -28,10 +27,10 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Toggle checklist item completion status
         /// </summary>
-        [HttpPut("{goalId:int}/checklist/toggle")]
+        [HttpPut("api/goal-progress/{goalId:int}/checklist/toggle")]
         public async Task<IActionResult> ToggleChecklist(
             int goalId,
-            [FromBody] ToggleChecklistDto dto
+            [FromBody] ToggleChecklistModel dto
         )
         {
             try
@@ -54,7 +53,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
             catch (Exception ex)
             {
-                var response = ApiResponseDto.ErrorResponse(
+                var response = ApiResponseModel.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
                 return StatusCode(500, response);
@@ -64,13 +63,13 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Manually update progress (managers/Department Heads/leaders only)
         /// </summary>
-        [HttpPut("{goalId:int}/manual")]
+        [HttpPut("api/goal-progress/{goalId:int}/manual")]
         [Authorize(
             Roles = $"{USER_ROLE.EMPLOYEE},{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD},{USER_ROLE.LEADERSHIP}"
         )]
         public async Task<IActionResult> ManualProgress(
             int goalId,
-            [FromBody] ManualProgressUpdateDto dto
+            [FromBody] ManualProgressUpdateModel dto
         )
         {
             try
@@ -93,7 +92,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
             catch (Exception ex)
             {
-                var response = ApiResponseDto.ErrorResponse(
+                var response = ApiResponseModel.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
                 return StatusCode(500, response);
@@ -103,7 +102,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Get current progress percentage for a goal
         /// </summary>
-        [HttpGet("{goalId:int}")]
+        [HttpGet("api/goal-progress/{goalId:int}")]
         public async Task<IActionResult> GetProgress(int goalId)
         {
             try
@@ -112,7 +111,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
 
                 var percent = await _service.GetGoalProgressPercentAsync(goalId, userId);
 
-                var response = ApiResponseDto<object>.SuccessResponse(
+                var response = ApiResponseModel<object>.SuccessResponse(
                     ResponseMessages.Codes.PROGRESS_CALCULATED_SUCCESS,
                     new { progress = percent },
                     new { GoalId = goalId, UserId = userId }
@@ -122,14 +121,14 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
             catch (KeyNotFoundException)
             {
-                var response = ApiResponseDto<object>.ErrorResponse(
+                var response = ApiResponseModel<object>.ErrorResponse(
                     ResponseMessages.Codes.GOAL_NOT_FOUND
                 );
                 return NotFound(response);
             }
             catch (Exception ex)
             {
-                var response = ApiResponseDto<object>.ErrorResponse(
+                var response = ApiResponseModel<object>.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
                 return StatusCode(500, response);
@@ -139,7 +138,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Get team goal progress for manager (aggregated from subordinates)
         /// </summary>
-        [HttpGet("{goalId:int}/team")]
+        [HttpGet("api/goal-progress/{goalId:int}/team")]
         [Authorize(
             Roles = $"{USER_ROLE.EMPLOYEE},{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD},{USER_ROLE.LEADERSHIP}"
         )]
@@ -151,7 +150,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
 
                 var percent = await _service.GetTeamGoalProgressForManagerAsync(goalId, userId);
 
-                var response = ApiResponseDto<object>.SuccessResponse(
+                var response = ApiResponseModel<object>.SuccessResponse(
                     ResponseMessages.Codes.PROGRESS_CALCULATED_SUCCESS,
                     new { teamProgress = percent },
                     new { GoalId = goalId, ManagerId = userId }
@@ -161,24 +160,24 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
             catch (KeyNotFoundException)
             {
-                var response = ApiResponseDto<object>.ErrorResponse(
+                var response = ApiResponseModel<object>.ErrorResponse(
                     ResponseMessages.Codes.GOAL_NOT_FOUND
                 );
                 return NotFound(response);
             }
             catch (Exception ex)
             {
-                var response = ApiResponseDto<object>.ErrorResponse(
+                var response = ApiResponseModel<object>.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
                 return StatusCode(500, response);
             }
-        }  
+        }
 
         /// <summary>
         /// Get cascading progress for a user (includes subordinate progress)
         /// </summary>
-        [HttpGet("{goalId:int}/cascading")]
+        [HttpGet("api/goal-progress/{goalId:int}/cascading")]
         public async Task<IActionResult> GetCascadingProgress(int goalId)
         {
             try
@@ -187,7 +186,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
 
                 var progress = await _service.GetCascadingProgressAsync(goalId, userId);
 
-                var response = ApiResponseDto<object>.SuccessResponse(
+                var response = ApiResponseModel<object>.SuccessResponse(
                     ResponseMessages.Codes.PROGRESS_CALCULATED_SUCCESS,
                     new { cascadingProgress = progress },
                     new { GoalId = goalId, UserId = userId }
@@ -197,14 +196,14 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
             catch (KeyNotFoundException)
             {
-                var response = ApiResponseDto<object>.ErrorResponse(
+                var response = ApiResponseModel<object>.ErrorResponse(
                     ResponseMessages.Codes.GOAL_NOT_FOUND
                 );
                 return NotFound(response);
             }
             catch (Exception ex)
             {
-                var response = ApiResponseDto<object>.ErrorResponse(
+                var response = ApiResponseModel<object>.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
                 return StatusCode(500, response);
@@ -214,7 +213,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Get detailed hierarchical progress breakdown
         /// </summary>
-        [HttpGet("{goalId:int}/hierarchy")]
+        [HttpGet("api/goal-progress/{goalId:int}/hierarchy")]
         public async Task<IActionResult> GetProgressHierarchy(int goalId)
         {
             try
@@ -223,7 +222,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
 
                 var hierarchy = await _service.GetProgressHierarchyAsync(goalId, userId);
 
-                var response = ApiResponseDto<GoalProgressHierarchyDto>.SuccessResponse(
+                var response = ApiResponseModel<GoalProgressHierarchyModel>.SuccessResponse(
                     ResponseMessages.Codes.PROGRESS_CALCULATED_SUCCESS,
                     hierarchy,
                     new { GoalId = goalId, UserId = userId }
@@ -233,14 +232,14 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
             catch (KeyNotFoundException)
             {
-                var response = ApiResponseDto<GoalProgressHierarchyDto>.ErrorResponse(
+                var response = ApiResponseModel<GoalProgressHierarchyModel>.ErrorResponse(
                     ResponseMessages.Codes.GOAL_NOT_FOUND
                 );
                 return NotFound(response);
             }
             catch (Exception ex)
             {
-                var response = ApiResponseDto<GoalProgressHierarchyDto>.ErrorResponse(
+                var response = ApiResponseModel<GoalProgressHierarchyModel>.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
                 return StatusCode(500, response);

@@ -1,25 +1,25 @@
 using Microsoft.AspNetCore.Http;
-using Relevantz.EEPZ.Common.DTOs;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Common.Entities;
 
 namespace Relevantz.EEPZ.Core.Services.Interface
 {
     public interface IGoalInteractionService
     {
-        Task<ApiResponseDto> AddCommentAsync(
+        Task<ApiResponseModel> AddCommentAsync(
             int goalId,
-            CreateCommentDto dto,
+            CreateCommentModel dto,
             int currentUserEmployeeMasterId,
             string currentUserRole
         );
-        Task<List<GoalCommentDto>> ListCommentsAsync(int goalId);
-        Task<GoalDashboardSummaryDto> GetDashboardSummaryAsync(int currentUserEmployeeMasterId);
-        Task<List<GoalSummaryDto>> GetOngoingAsync(string type, int currentUserEmployeeMasterId);
-        Task<List<TimelineEventDto>> GetGoalTimelineAsync(
+        Task<List<GoalCommentModel>> ListCommentsAsync(int goalId);
+        Task<GoalDashboardSummaryModel> GetDashboardSummaryAsync(int currentUserEmployeeMasterId);
+        Task<List<GoalSummaryModel>> GetOngoingAsync(string type, int currentUserEmployeeMasterId);
+        Task<List<TimelineEventModel>> GetGoalTimelineAsync(
             int goalId,
             int currentUserEmployeeMasterId
         );
-        Task<List<ProjectEmployeeDto>> GetProjectSubordinatesAsync(
+        Task<List<ProjectEmployeeModel>> GetProjectSubordinatesAsync(
             int projectId,
             int managerEmployeeMasterId
         );

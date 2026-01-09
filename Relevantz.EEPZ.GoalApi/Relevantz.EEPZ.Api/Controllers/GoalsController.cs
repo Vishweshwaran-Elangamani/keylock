@@ -1,14 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Common.Enums;
+using Relevantz.EEPZ.Common.Models;
 using Relevantz.EEPZ.Core.Services.Interface;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Relevantz.EEPZ.Api.Controllers.Goals
 {
-    [Route("api/[controller]")]
     public class GoalsController : BaseGoalController
     {
         protected new readonly IGoalService _service;
@@ -28,11 +27,11 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Create a new goal (self, team, or org based on role)
         /// </summary>
-        [HttpPost]
+        [HttpPost("/api/goals/create")]
         [Authorize(
             Roles = $"{USER_ROLE.EMPLOYEE},{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD},{USER_ROLE.LEADERSHIP}"
         )]
-        public async Task<IActionResult> Create([FromBody] CreateGoalDto dto)
+        public async Task<IActionResult> Create([FromBody] CreateGoalModel dto)
         {
             var userId = 0;
             try
@@ -74,7 +73,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating goal for User {UserId}", userId);
-                var response = ApiResponseDto<int>.ErrorResponse(
+                var response = ApiResponseModel<int>.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
                 return StatusCode(500, response);
@@ -84,7 +83,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Get goal details by ID
         /// </summary>
-        [HttpGet("{id:int}")]
+        [HttpGet("/api/goals/{id:int}")]
         public async Task<IActionResult> GetGoalDetailsById(int id)
         {
             var userId = 0;
@@ -97,7 +96,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
 
                 var goal = await _baseService.GetGoalAsync(id, userId, role);
 
-                var response = ApiResponseDto<GoalDetailDto>.SuccessResponse(
+                var response = ApiResponseModel<GoalDetailModel>.SuccessResponse(
                     ResponseMessages.Codes.GOAL_RETRIEVED_SUCCESS,
                     goal,
                     new { GoalId = id, RequestedBy = userId }
@@ -112,7 +111,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                     id,
                     userId
                 );
-                var response = ApiResponseDto<GoalDetailDto>.ErrorResponse(
+                var response = ApiResponseModel<GoalDetailModel>.ErrorResponse(
                     ResponseMessages.Codes.GOAL_NOT_FOUND
                 );
                 return NotFound(response);
@@ -120,7 +119,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             catch (UnauthorizedAccessException)
             {
                 _logger.LogWarning("User {UserId} denied access to Goal {GoalId}", userId, id);
-                var response = ApiResponseDto<GoalDetailDto>.ErrorResponse(
+                var response = ApiResponseModel<GoalDetailModel>.ErrorResponse(
                     ResponseMessages.Codes.GOAL_ACCESS_DENIED
                 );
                 return Forbid(response.Message);
@@ -133,7 +132,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                     id,
                     userId
                 );
-                var response = ApiResponseDto<GoalDetailDto>.ErrorResponse(
+                var response = ApiResponseModel<GoalDetailModel>.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
                 return StatusCode(500, response);
@@ -143,8 +142,8 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Query goals based on filters
         /// </summary>
-        [HttpGet("query")]
-        public async Task<IActionResult> QueryGoals([FromQuery] GoalQueryDto query)
+        [HttpGet("/api/goals/query")]
+        public async Task<IActionResult> QueryGoals([FromQuery] GoalQueryModel query)
         {
             try
             {
@@ -160,7 +159,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
 
                 var goals = await _service.QueryGoalsAsync(query, userId, role);
 
-                var response = ApiResponseDto<List<GoalSummaryDto>>.SuccessResponse(
+                var response = ApiResponseModel<List<GoalSummaryModel>>.SuccessResponse(
                     ResponseMessages.Codes.GOAL_RETRIEVED_SUCCESS,
                     goals,
                     new
@@ -179,7 +178,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                 _logger.LogError(ex, "[GoalsController.Query] Error");
                 return StatusCode(
                     500,
-                    ApiResponseDto<List<GoalSummaryDto>>.ErrorResponse(
+                    ApiResponseModel<List<GoalSummaryModel>>.ErrorResponse(
                         ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                     )
                 );
@@ -189,8 +188,8 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Update goal (title, description, deadline)
         /// </summary>
-        [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateGoal(int id, [FromBody] UpdateGoalDto dto)
+        [HttpPut("/api/goals/{id:int}")]
+        public async Task<IActionResult> UpdateGoal(int id, [FromBody] UpdateGoalModel dto)
         {
             var userId = 0;
             try
@@ -224,7 +223,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error updating goal {GoalId} by User {UserId}", id, userId);
-                var response = ApiResponseDto.ErrorResponse(
+                var response = ApiResponseModel.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
                 return StatusCode(500, response);
@@ -234,14 +233,14 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Get list of assignees for a goal
         /// </summary>
-        [HttpGet("{id:int}/assignees")]
+        [HttpGet("/api/goals/{id:int}/assignees")]
         public async Task<IActionResult> GetAssignees(int id)
         {
             try
             {
                 var assignees = await _service.GetAssigneesAsync(id);
 
-                var response = ApiResponseDto<List<AssigneeDto>>.SuccessResponse(
+                var response = ApiResponseModel<List<AssigneeModel>>.SuccessResponse(
                     ResponseMessages.Codes.ASSIGNMENT_RETRIEVED_SUCCESS,
                     assignees,
                     new { GoalId = id, AssigneeCount = assignees.Count }
@@ -251,14 +250,14 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
             catch (KeyNotFoundException)
             {
-                var response = ApiResponseDto<List<AssigneeDto>>.ErrorResponse(
+                var response = ApiResponseModel<List<AssigneeModel>>.ErrorResponse(
                     ResponseMessages.Codes.GOAL_NOT_FOUND
                 );
                 return NotFound(response);
             }
             catch (Exception ex)
             {
-                var response = ApiResponseDto<List<AssigneeDto>>.ErrorResponse(
+                var response = ApiResponseModel<List<AssigneeModel>>.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
                 return StatusCode(500, response);
@@ -268,9 +267,9 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Assign a team goal to subordinates (managers/Department Heads only)
         /// </summary>
-        [HttpPost("{id:int}/assign")]
+        [HttpPost("/api/goals/{id:int}/assign")]
         [Authorize(Roles = $"{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD}")]
-        public async Task<IActionResult> Assign(int id, [FromBody] AssignGoalDto dto)
+        public async Task<IActionResult> Assign(int id, [FromBody] AssignGoalModel dto)
         {
             try
             {
@@ -295,7 +294,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
             catch (Exception ex)
             {
-                var response = ApiResponseDto.ErrorResponse(
+                var response = ApiResponseModel.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
                 return StatusCode(500, response);
@@ -305,7 +304,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Get projects for the current authenticated user
         /// </summary>
-        [HttpGet("projects/user")]
+        [HttpGet("/api/goals/projects/user")]
         public async Task<IActionResult> GetUserProjects()
         {
             try
@@ -314,7 +313,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
 
                 var userProjects = await _service.GetUserProjectsAsync(userId);
 
-                var response = ApiResponseDto<List<ProjectDto>>.SuccessResponse(
+                var response = ApiResponseModel<List<ProjectModel>>.SuccessResponse(
                     ResponseMessages.Codes.PROJECTS_RETRIEVED_SUCCESS,
                     userProjects,
                     new { UserId = userId, ProjectCount = userProjects.Count }
@@ -324,7 +323,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
             catch (Exception ex)
             {
-                var response = ApiResponseDto<List<ProjectDto>>.ErrorResponse(
+                var response = ApiResponseModel<List<ProjectModel>>.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
                 return StatusCode(500, response);
@@ -334,7 +333,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Get all projects (for reference)
         /// </summary>
-        [HttpGet("projects")]
+        [HttpGet("/api/goals/projects")]
         [Authorize(
             Roles = $"{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD},{USER_ROLE.LEADERSHIP}"
         )]
@@ -344,7 +343,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             {
                 var allProjects = await _service.GetAllProjectsAsync();
 
-                var response = ApiResponseDto<List<ProjectDto>>.SuccessResponse(
+                var response = ApiResponseModel<List<ProjectModel>>.SuccessResponse(
                     ResponseMessages.Codes.PROJECTS_RETRIEVED_SUCCESS,
                     allProjects,
                     new { ProjectCount = allProjects.Count }
@@ -354,7 +353,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
             catch (Exception ex)
             {
-                var response = ApiResponseDto<List<ProjectDto>>.ErrorResponse(
+                var response = ApiResponseModel<List<ProjectModel>>.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
                 return StatusCode(500, response);
@@ -364,14 +363,14 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         /// <summary>
         /// Get project by ID
         /// </summary>
-        [HttpGet("projects/{projectId:int}")]
+        [HttpGet("/api/goals/projects/{projectId:int}")]
         public async Task<IActionResult> GetProject(int projectId)
         {
             try
             {
                 var project = await _service.GetProjectAsync(projectId);
 
-                var response = ApiResponseDto<ProjectDto>.SuccessResponse(
+                var response = ApiResponseModel<ProjectModel>.SuccessResponse(
                     ResponseMessages.Codes.PROJECT_RETRIEVED_SUCCESS,
                     project,
                     new { ProjectId = projectId }
@@ -381,14 +380,14 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             }
             catch (KeyNotFoundException)
             {
-                var response = ApiResponseDto<ProjectDto>.ErrorResponse(
+                var response = ApiResponseModel<ProjectModel>.ErrorResponse(
                     ResponseMessages.Codes.PROJECT_NOT_FOUND
                 );
                 return NotFound(response);
             }
             catch (Exception ex)
             {
-                var response = ApiResponseDto<ProjectDto>.ErrorResponse(
+                var response = ApiResponseModel<ProjectModel>.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
                 return StatusCode(500, response);
@@ -396,4 +395,3 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         }
     }
 }
-     

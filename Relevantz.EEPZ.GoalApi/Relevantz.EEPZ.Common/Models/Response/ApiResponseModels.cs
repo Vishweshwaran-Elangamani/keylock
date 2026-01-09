@@ -1,10 +1,10 @@
-// DTOs/ApiResponseDto.cs
+// Models/ApiResponseModel.cs
 using System.Collections.Generic;
 using Relevantz.EEPZ.Common.Constants;
 
-namespace Relevantz.EEPZ.Common.DTOs
+namespace Relevantz.EEPZ.Common.Models
 {
-    public class ApiResponseDto<T>
+    public class ApiResponseModel<T>
     {
         public bool Success { get; set; }
         public string Code { get; set; } = default!;
@@ -16,14 +16,14 @@ namespace Relevantz.EEPZ.Common.DTOs
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
 
         // Success response
-        public static ApiResponseDto<T> SuccessResponse(
+        public static ApiResponseModel<T> SuccessResponse(
             string code,
             T? data = default,
             object? metadata = null
         )
         {
             var message = ResponseMessages.GetMessage(code);
-            return new ApiResponseDto<T>
+            return new ApiResponseModel<T>
             {
                 Success = true,
                 Code = code,
@@ -35,14 +35,14 @@ namespace Relevantz.EEPZ.Common.DTOs
         }
 
         // Error response
-        public static ApiResponseDto<T> ErrorResponse(
+        public static ApiResponseModel<T> ErrorResponse(
             string code,
             List<string>? errors = null,
             object? metadata = null
         )
         {
             var message = ResponseMessages.GetMessage(code);
-            return new ApiResponseDto<T>
+            return new ApiResponseModel<T>
             {
                 Success = false,
                 Code = code,
@@ -54,7 +54,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         }
 
         // Error response with single error
-        public static ApiResponseDto<T> ErrorResponse(
+        public static ApiResponseModel<T> ErrorResponse(
             string code,
             string error,
             object? metadata = null
@@ -65,13 +65,13 @@ namespace Relevantz.EEPZ.Common.DTOs
     }
 
     // Non-generic version for responses without data
-    public class ApiResponseDto : ApiResponseDto<object>
+    public class ApiResponseModel : ApiResponseModel<object>
     {
         // Fixed: Remove generic type arguments and use base class methods
-        public static ApiResponseDto SuccessResponse(string code, object? metadata = null)
+        public static ApiResponseModel SuccessResponse(string code, object? metadata = null)
         {
             var message = ResponseMessages.GetMessage(code);
-            return new ApiResponseDto
+            return new ApiResponseModel
             {
                 Success = true,
                 Code = code,
@@ -82,14 +82,14 @@ namespace Relevantz.EEPZ.Common.DTOs
             };
         }
 
-        public static ApiResponseDto ErrorResponse(
+        public static ApiResponseModel ErrorResponse(
             string code,
             List<string>? errors = null,
             object? metadata = null
         )
         {
             var message = ResponseMessages.GetMessage(code);
-            return new ApiResponseDto
+            return new ApiResponseModel
             {
                 Success = false,
                 Code = code,
@@ -100,7 +100,7 @@ namespace Relevantz.EEPZ.Common.DTOs
             };
         }
 
-        public static ApiResponseDto ErrorResponse(
+        public static ApiResponseModel ErrorResponse(
             string code,
             string error,
             object? metadata = null
