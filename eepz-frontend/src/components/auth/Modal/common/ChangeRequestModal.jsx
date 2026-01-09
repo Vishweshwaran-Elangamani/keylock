@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import ChangeRequestService from "../../../../services/auth/changeRequestService";
 import "../../../../styles/auth/common/ChangeRequestModal.css";
-
 const ChangeRequestModal = ({
   show,
   onClose,
@@ -16,11 +15,9 @@ const ChangeRequestModal = ({
     reason: "",
     currentPassword: "",
   });
-
   const [currentEmail, setCurrentEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
   useEffect(() => {
     if (show) {
       fetchCurrentEmail();
@@ -28,13 +25,11 @@ const ChangeRequestModal = ({
       resetForm();
     }
   }, [show]);
-
   const resetForm = () => {
     setFormData({ newEmail: "", reason: "", currentPassword: "" });
     setCurrentEmail("");
     setShowPassword(false);
   };
-
   const fetchCurrentEmail = () => {
     try {
       if (profileData?.companyEmail) {
@@ -76,27 +71,22 @@ const ChangeRequestModal = ({
       setCurrentEmail("Error loading email");
     }
   };
-
   const validateEmailDomain = (email) => {
     const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
     const eepzRegex = /^[a-zA-Z0-9._%+-]+@eepz\.com$/i;
     const relevantzRegex = /^[a-zA-Z0-9._%+-]+@relevantz\.com$/i;
     return gmailRegex.test(email) || eepzRegex.test(email) || relevantzRegex.test(email);
   };
-
   const handleSubmit = (e) => {
     e.preventDefault();
-
     if (!formData.newEmail?.trim()) {
       toast.error("Please enter new email address");
       return;
     }
-
     if (!validateEmailDomain(formData.newEmail.trim())) {
       toast.error("Only Gmail (@gmail.com), Eepz (@eepz.com), or Relevantz (@relevantz.com) addresses are allowed");
       return;
     }
-
     if (
       currentEmail &&
       formData.newEmail.trim().toLowerCase() === currentEmail.toLowerCase()
@@ -120,7 +110,6 @@ const ChangeRequestModal = ({
       toast.error("Reason must be at least 10 characters");
       return;
     }
-
     const requestPayload = {
       ChangeType: "Email",
       NewEmail: formData.newEmail.trim(),
@@ -129,14 +118,12 @@ const ChangeRequestModal = ({
     };
     onSubmit(requestPayload);
   };
-
   const handleClose = () => {
     if (!isLoading) {
       resetForm();
       onClose();
     }
   };
-
   const handleCancelRequest = async () => {
     setIsLoading(true);
     try {
@@ -155,14 +142,11 @@ const ChangeRequestModal = ({
       setIsLoading(false);
     }
   };
-
   if (!show) return null;
-
   if (hasPendingRequest) {
     return (
       <>
         <div className="crm-backdrop" onClick={handleClose} />
-
         <div className="crm-modal-container crm-modal-container-pending">
           <div className="crm-modal-dialog">
             <div className="crm-modal-header">
@@ -180,7 +164,6 @@ const ChangeRequestModal = ({
                 <i className="bi bi-x-lg"></i>
               </button>
             </div>
-
             <div className="crm-modal-body">
               <div className="crm-alert-danger">
                 <i className="bi bi-exclamation-triangle-fill crm-alert-icon"></i>
@@ -194,7 +177,6 @@ const ChangeRequestModal = ({
                   </div>
                 </div>
               </div>
-
               <div className="crm-info-section">
                 <div className="crm-info-title">
                   <i className="bi bi-info-circle"></i>
@@ -213,7 +195,6 @@ const ChangeRequestModal = ({
                 </ul>
               </div>
             </div>
-
             <div className="crm-modal-footer">
               <button
                 type="button"
@@ -222,7 +203,6 @@ const ChangeRequestModal = ({
               >
                 <i className="bi bi-check2"></i> Close
               </button>
-
               <button
                 type="button"
                 onClick={handleCancelRequest}
@@ -249,7 +229,6 @@ const ChangeRequestModal = ({
   return (
     <>
       <div className="crm-backdrop" onClick={handleClose} />
-
       <div className="crm-modal-container">
         <div className="crm-modal-dialog">
           <div className="crm-modal-header">
@@ -266,7 +245,6 @@ const ChangeRequestModal = ({
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           <form onSubmit={handleSubmit} className="crm-form">
             <div className="crm-modal-body">
               <div className="crm-alert-info">
@@ -279,7 +257,6 @@ const ChangeRequestModal = ({
                   one pending request at a time.
                 </div>
               </div>
-
               <div className="crm-form-group">
                 <label className="crm-form-label">Current Email Address</label>
                 <input
@@ -310,7 +287,6 @@ const ChangeRequestModal = ({
                   Only Gmail (@gmail.com), Eepz (@eepz.com), or Relevantz (@relevantz.com) addresses are allowed
                 </small>
               </div>
-
               <div className="crm-form-group">
                 <label className="crm-form-label">
                   Current Password{" "}
@@ -355,7 +331,6 @@ const ChangeRequestModal = ({
                   security purposes
                 </small>
               </div>
-
               <div className="crm-form-group">
                 <label className="crm-form-label">
                   Reason for Change{" "}
@@ -384,7 +359,6 @@ const ChangeRequestModal = ({
                 </small>
               </div>
             </div>
-
             <div className="crm-modal-footer">
               <button
                 type="button"
@@ -393,7 +367,6 @@ const ChangeRequestModal = ({
               >
                 <i className="bi bi-x-circle"></i> Cancel
               </button>
-
               <button
                 type="submit"
                 disabled={
@@ -413,5 +386,4 @@ const ChangeRequestModal = ({
     </>
   );
 };
-
 export default ChangeRequestModal;

@@ -1,17 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { Form } from "react-bootstrap";
 import { FaSearch } from "react-icons/fa";
-
 const StatusDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
   const allOptions = [{ label: "All Status", value: "" }, ...options];
   const selected = allOptions.find((o) => o.value === value) || allOptions[0];
-
   const handleSelect = (val) => {
     onChange(val);
     setOpen(false);
   };
-
   return (
     <div
       className="crm-status-select custom-crm-dropdown"
@@ -38,7 +35,6 @@ const StatusDropdown = ({ value, onChange, options }) => {
     </div>
   );
 };
-
 const getStatusBadge = (status) => {
   const statusClasses = {
     Pending: "crm-status-pending",
@@ -48,7 +44,6 @@ const getStatusBadge = (status) => {
   };
   return `crm-status-badge ${statusClasses[status] || "crm-status-badge-default"}`;
 };
-
 const formatDate = (dateString) => {
   if (!dateString) return "N/A";
   return new Date(dateString).toLocaleDateString("en-US", {
@@ -59,7 +54,6 @@ const formatDate = (dateString) => {
     minute: "2-digit",
   });
 };
-
 const getInitials = (name) => {
   if (!name) return "NA";
   const parts = name.split(" ");
@@ -68,7 +62,6 @@ const getInitials = (name) => {
   }
   return name.substring(0, 2).toUpperCase();
 };
-
 export const PendingRequests = ({ requests, handleProcessClick }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
@@ -77,14 +70,11 @@ export const PendingRequests = ({ requests, handleProcessClick }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredRequests, setFilteredRequests] = useState([]);
   const searchInputRef = useRef(null);
-
   useEffect(() => {
     applyFilters();
   }, [requests, activeSearchTerm, filterDate]);
-
   const applyFilters = () => {
     let filtered = requests.filter((req) => req.status === "Pending");
-
     if (activeSearchTerm.trim()) {
       const search = activeSearchTerm.toLowerCase();
       filtered = filtered.filter(
@@ -95,7 +85,6 @@ export const PendingRequests = ({ requests, handleProcessClick }) => {
           req.newValue?.toLowerCase().includes(search)
       );
     }
-
     if (filterDate) {
       filtered = filtered.filter((req) => {
         const requestDate = new Date(req.requestedAt);
@@ -103,36 +92,29 @@ export const PendingRequests = ({ requests, handleProcessClick }) => {
         return requestDate.toDateString() === filterDateObj.toDateString();
       });
     }
-
     setFilteredRequests(filtered);
     setCurrentPage(1);
   };
-
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
   };
-
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
     setFilterDate("");
   };
-
   const handleSearchKeyDown = (e) => {
     if (e.key === "Enter") {
       handleSearch();
       if (searchInputRef.current) searchInputRef.current.blur();
     }
   };
-
   const totalPages = Math.ceil(filteredRequests.length / rowsPerPage) || 1;
-
   const getPaginatedRequests = () => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
     return filteredRequests.slice(startIndex, endIndex);
   };
-
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
@@ -151,7 +133,6 @@ export const PendingRequests = ({ requests, handleProcessClick }) => {
     }
     return pages;
   };
-
   return (
     <>
       <div className="crm-filters-card">
@@ -189,7 +170,6 @@ export const PendingRequests = ({ requests, handleProcessClick }) => {
           </div>
         </div>
       </div>
-
       <div className="crm-table-card">
         <div className="crm-table-wrapper">
           <table className="crm-request-table">
@@ -263,7 +243,6 @@ export const PendingRequests = ({ requests, handleProcessClick }) => {
             </tbody>
           </table>
         </div>
-
         {filteredRequests.length > 0 && totalPages > 1 && (
           <div className="crm-pagination">
             <div className="crm-pagination-info">
@@ -328,7 +307,6 @@ export const PendingRequests = ({ requests, handleProcessClick }) => {
     </>
   );
 };
-
 export const AllRequests = ({ requests, handleProcessClick }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
@@ -338,14 +316,11 @@ export const AllRequests = ({ requests, handleProcessClick }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredRequests, setFilteredRequests] = useState([]);
   const searchInputRef = useRef(null);
-
   useEffect(() => {
     applyFilters();
   }, [requests, activeSearchTerm, filterStatus, filterDate]);
-
   const applyFilters = () => {
     let filtered = [...requests];
-
     if (activeSearchTerm.trim()) {
       const search = activeSearchTerm.toLowerCase();
       filtered = filtered.filter(
@@ -356,11 +331,9 @@ export const AllRequests = ({ requests, handleProcessClick }) => {
           req.newValue?.toLowerCase().includes(search)
       );
     }
-
     if (filterStatus) {
       filtered = filtered.filter((req) => req.status === filterStatus);
     }
-
     if (filterDate) {
       filtered = filtered.filter((req) => {
         const requestDate = new Date(req.requestedAt);
@@ -368,44 +341,36 @@ export const AllRequests = ({ requests, handleProcessClick }) => {
         return requestDate.toDateString() === filterDateObj.toDateString();
       });
     }
-
     setFilteredRequests(filtered);
     setCurrentPage(1);
   };
-
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
   };
-
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
     setFilterStatus("");
     setFilterDate("");
   };
-
   const handleSearchKeyDown = (e) => {
     if (e.key === "Enter") {
       handleSearch();
       if (searchInputRef.current) searchInputRef.current.blur();
     }
   };
-
   const statusOptions = [
     { label: "Pending", value: "Pending" },
     { label: "Approved", value: "Approved" },
     { label: "Rejected", value: "Rejected" },
     { label: "Cancelled", value: "Cancelled" },
   ];
-
   const totalPages = Math.ceil(filteredRequests.length / rowsPerPage) || 1;
-
   const getPaginatedRequests = () => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
     return filteredRequests.slice(startIndex, endIndex);
   };
-
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
@@ -424,7 +389,6 @@ export const AllRequests = ({ requests, handleProcessClick }) => {
     }
     return pages;
   };
-
   return (
     <>
       <div className="crm-filters-card">
@@ -467,7 +431,6 @@ export const AllRequests = ({ requests, handleProcessClick }) => {
           </div>
         </div>
       </div>
-
       <div className="crm-table-card">
         <div className="crm-table-wrapper">
           <table className="crm-request-table">
@@ -557,7 +520,6 @@ export const AllRequests = ({ requests, handleProcessClick }) => {
             </tbody>
           </table>
         </div>
-
         {filteredRequests.length > 0 && totalPages > 1 && (
           <div className="crm-pagination">
             <div className="crm-pagination-info">

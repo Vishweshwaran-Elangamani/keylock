@@ -3,7 +3,6 @@ import { toast } from "sonner";
 import periodAllocationService from "../../../services/hr_operations/hr/periodAllocationService";
 import { formatCurrency } from "../../../utils/auth/currencyFormatter";
 import "../../../styles/hr_operations/hr/CreatePeriodAllocationModal.css";
-
 /* Custom Dropdown Component */
 const CustomDropdown = ({
   value,
@@ -16,38 +15,31 @@ const CustomDropdown = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-
   const selectedOption = options.find((opt) => opt.value === value);
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     };
-
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen]);
-
   const handleSelect = (optionValue) => {
     if (!disabled) {
       onChange({ target: { name, value: optionValue } });
       setIsOpen(false);
     }
   };
-
   const toggleDropdown = () => {
     if (!disabled) {
       setIsOpen(!isOpen);
     }
   };
-
   return (
     <div
       ref={dropdownRef}
@@ -63,7 +55,6 @@ const CustomDropdown = ({
         </span>
         <span className="cpam-custom-arrow"></span>
       </div>
-
       {isOpen && (
         <div className="cpam-custom-menu">
           {options.map((option) => (
@@ -82,7 +73,6 @@ const CustomDropdown = ({
     </div>
   );
 };
-
 const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
     period: "Q1",
@@ -92,10 +82,8 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-
   // Calculate available budget
   const availableBudget = budget.totalBudget - (budget.allocatedAmount || 0);
-
   const periods = [
     { value: "Q1", label: "Q1 - Quarter 1" },
     { value: "Q2", label: "Q2 - Quarter 2" },
@@ -104,7 +92,6 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
     { value: "H1", label: "H1 - Half Year 1" },
     { value: "H2", label: "H2 - Half Year 2" },
   ];
-
   const currentYear = new Date().getFullYear();
   const yearOptions = [
     { value: currentYear, label: currentYear.toString() },
@@ -112,25 +99,20 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
     { value: currentYear + 2, label: (currentYear + 2).toString() },
     { value: currentYear + 3, label: (currentYear + 3).toString() },
   ];
-
   const validateForm = () => {
     const newErrors = {};
-
     if (
       !formData.allocatedAmount ||
       parseFloat(formData.allocatedAmount) <= 0
     ) {
       newErrors.allocatedAmount = "Please enter a valid amount";
     }
-
     if (parseFloat(formData.allocatedAmount) > availableBudget) {
       newErrors.allocatedAmount = `Amount exceeds available budget`;
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -138,19 +120,14 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) {
       return;
     }
-
     setLoading(true);
-
     try {
       const userId = localStorage.getItem("userId");
-
       const payload = {
         budgetId: budget.budgetId,
         period: formData.period,
@@ -159,11 +136,9 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
         allocatedByUserId: parseInt(userId),
         notes: formData.notes,
       };
-
       const response = await periodAllocationService.createPeriodAllocation(
         payload
       );
-
       if (response.success) {
         toast.success("Period allocation created successfully!");
         onSuccess();
@@ -178,11 +153,9 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
       setLoading(false);
     }
   };
-
   return (
     <>
       <div className="cpam-backdrop" onClick={onClose} />
-
       <div className="cpam-modal-wrapper">
         <div className="cpam-modal-dialog">
           {/* HEADER - Fixed */}
@@ -201,7 +174,6 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* BODY - Scrollable */}
           <form onSubmit={handleSubmit} className="cpam-form">
             <div className="cpam-modal-body">
@@ -237,7 +209,6 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
                   </div>
                 </div>
               </div>
-
               {/* Period and Year Row */}
               <div className="cpam-form-row">
                 {/* Period */}
@@ -254,7 +225,6 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
                     disabled={loading}
                   />
                 </div>
-
                 {/* Year */}
                 <div className="cpam-form-group-inline">
                   <label className="cpam-form-label">
@@ -270,7 +240,6 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
                   />
                 </div>
               </div>
-
               {/* Allocated Amount */}
               <div className="cpam-form-group">
                 <label className="cpam-form-label">
@@ -302,7 +271,6 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
                   </small>
                 )}
               </div>
-
               {/* Notes */}
               <div className="cpam-form-group">
                 <label className="cpam-form-label">Notes</label>
@@ -316,7 +284,6 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
                 />
               </div>
             </div>
-
             {/* FOOTER - Fixed */}
             <div className="cpam-modal-footer">
               <button
@@ -328,7 +295,6 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
                 <i className="bi bi-x-circle"></i>
                 Cancel
               </button>
-
               <button
                 type="submit"
                 disabled={loading}
@@ -353,5 +319,4 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
     </>
   );
 };
-
 export default CreatePeriodAllocationModal;

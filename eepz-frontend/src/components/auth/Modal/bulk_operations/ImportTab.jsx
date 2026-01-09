@@ -1,5 +1,4 @@
 import UploadResults from "./UploadResults";
-
 const ImportTab = ({
   handleDownloadTemplate,
   isDownloadingTemplate,
@@ -37,7 +36,6 @@ const ImportTab = ({
           Download the template, fill in user details, and upload it below
         </small>
       </div>
-
       <div className="bom-info-alert">
         <i className="bi bi-info-circle-fill bom-info-alert-icon"></i>
         <div className="bom-info-alert-content">
@@ -63,7 +61,6 @@ const ImportTab = ({
           </ul>
         </div>
       </div>
-
       <div className="bom-file-upload-section">
         <input
           ref={fileInputRef}
@@ -85,7 +82,6 @@ const ImportTab = ({
           </small>
         </button>
       </div>
-
       {selectedFile && (
         <div className="bom-selected-file-wrapper">
           <div className="bom-selected-file-container">
@@ -111,7 +107,6 @@ const ImportTab = ({
           </div>
         </div>
       )}
-
       {selectedFile && (
         <div className="bom-import-button-wrapper">
           <button
@@ -133,10 +128,8 @@ const ImportTab = ({
           </button>
         </div>
       )}
-
       {uploadResult && <UploadResults uploadResult={uploadResult} />}
     </div>
   );
 };
-
 export default ImportTab;

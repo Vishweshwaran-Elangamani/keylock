@@ -2,7 +2,6 @@ import { useState } from "react";
 import roleService from "../../../../services/auth/roleService";
 import { toast } from "sonner";
 import "../../../../styles/auth/roles/AddRoleModal.css";
-
 const AddRoleModal = ({ show, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
     roleName: "",
@@ -11,7 +10,6 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -25,7 +23,6 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
       }));
     }
   };
-
   const validateForm = () => {
     const newErrors = {};
     if (!formData.roleName.trim()) {
@@ -48,7 +45,6 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) {
@@ -82,13 +78,10 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
       setLoading(false);
     }
   };
-
   if (!show) return null;
-
   return (
     <>
       <div className="arm-backdrop" onClick={onClose} />
-
       <div className="arm-modal-container">
         <div className="arm-modal-dialog">
           {/* HEADER */}
@@ -107,7 +100,6 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* BODY/FORM */}
           <form onSubmit={handleSubmit} className="arm-form">
             <div className="arm-modal-body">
@@ -133,7 +125,6 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
                     <div className="arm-form-error">{errors.roleName}</div>
                   )}
                 </div>
-
                 {/* Role Code */}
                 <div className="arm-form-group">
                   <label className="arm-form-label">
@@ -155,7 +146,6 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
                     <div className="arm-form-error">{errors.roleCode}</div>
                   )}
                 </div>
-
                 {/* Description */}
                 <div className="arm-form-group">
                   <label className="arm-form-label">
@@ -181,7 +171,6 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
                   </small>
                 </div>
               </div>
-
               {/* Info Alert */}
               <div className="arm-info-alert">
                 <i className="bi bi-info-circle"></i>
@@ -191,7 +180,6 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
                 </small>
               </div>
             </div>
-
             {/* FOOTER */}
             <div className="arm-modal-footer">
               <button
@@ -203,7 +191,6 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
                 <i className="bi bi-x-circle"></i>
                 Cancel
               </button>
-
               <button
                 type="submit"
                 disabled={loading}
@@ -228,5 +215,4 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
     </>
   );
 };
-
 export default AddRoleModal;

@@ -13,24 +13,19 @@ import Breadcrumb from "../../components/common/Breadcrumb";
 import { FaSearch } from "react-icons/fa";
 import { toast } from "sonner";
 import "../../styles/internal/NominationManagement.css";
-
 const NominationStatusDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
-
   const options = [
     { label: "All Status", value: "" },
     { label: "Pending", value: "Pending" },
     { label: "Approved", value: "Approved" },
     { label: "Rejected", value: "Rejected" },
   ];
-
   const selected = options.find((o) => o.value === value) || options[0];
-
   const handleSelect = (val) => {
     onChange(val);
     setOpen(false);
   };
-
   return (
     <div
       className="nm-status-select custom-status-dropdown"
@@ -45,7 +40,6 @@ const NominationStatusDropdown = ({ value, onChange }) => {
         {selected.label}
         <span className="custom-status-arrow" />
       </div>
-
       {open && (
         <div className="custom-status-menu">
           {options.map((opt) => (
@@ -65,7 +59,6 @@ const NominationStatusDropdown = ({ value, onChange }) => {
     </div>
   );
 };
-
 const NominationManagement = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -87,21 +80,17 @@ const NominationManagement = () => {
   const [showGraphModal, setShowGraphModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedNomination, setSelectedNomination] = useState(null);
-
   const getRolePrefix = () => {
     const role = user?.role?.toLowerCase();
     return `/${role}`;
   };
   const rolePrefix = getRolePrefix();
-
   useEffect(() => {
     fetchData();
   }, []);
-
   useEffect(() => {
     applyFilters();
   }, [nominations, selectedStatus, activeSearchTerm]);
-
   // Click outside handler for rows dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -112,37 +101,31 @@ const NominationManagement = () => {
         setShowRowsDropdown(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
     setCurrentPage(1);
     if (searchInputRef.current) searchInputRef.current.blur();
   };
-
   const handleSearchKeyDown = (e) => {
     if (e.key === "Enter") {
       handleSearch();
     }
   };
-
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
     setSelectedStatus("");
     setCurrentPage(1);
   };
-
   const fetchData = async () => {
     try {
       setLoading(true);
       let nominationsResponse;
-
       if (user?.role === "Manager") {
         nominationsResponse = await nominationService.getPendingManagerReview();
       } else if (user?.role === "Department Head") {
@@ -152,9 +135,7 @@ const NominationManagement = () => {
       } else {
         nominationsResponse = await nominationService.getMyNominations();
       }
-
       const opportunitiesResponse = await internalOpportunityService.getAllOpportunities();
-
       if (nominationsResponse.success) {
         const data = Array.isArray(nominationsResponse.data)
           ? nominationsResponse.data
@@ -164,7 +145,6 @@ const NominationManagement = () => {
         toast.error(nominationsResponse.message || "Failed to load nominations");
         setNominations([]);
       }
-
       if (opportunitiesResponse.success) {
         setOpportunities(
           Array.isArray(opportunitiesResponse.data) ? opportunitiesResponse.data : []
@@ -178,10 +158,8 @@ const NominationManagement = () => {
       setLoading(false);
     }
   };
-
   const applyFilters = () => {
     let filtered = Array.isArray(nominations) ? [...nominations] : [];
-
     if (activeSearchTerm) {
       const term = activeSearchTerm.toLowerCase();
       filtered = filtered.filter(
@@ -190,12 +168,10 @@ const NominationManagement = () => {
           nom.nomineeName?.toLowerCase().includes(term)
       );
     }
-
     if (selectedStatus) {
       filtered = filtered.filter((nom) => {
         const status = nom.status?.toLowerCase() || "";
         const filterStatus = selectedStatus.toLowerCase();
-
         if (filterStatus === "pending") {
           return status.includes("pending");
         } else if (filterStatus === "approved") {
@@ -206,11 +182,9 @@ const NominationManagement = () => {
         return status === filterStatus;
       });
     }
-
     setFilteredNominations(filtered);
     setCurrentPage(1);
   };
-
   const handleSelfNominate = () => {
     if (!opportunities || opportunities.length === 0) {
       toast.error("No opportunities available");
@@ -218,43 +192,34 @@ const NominationManagement = () => {
     }
     setShowSelfNominateModal(true);
   };
-
   const handleManagerNominate = () => setShowManagerNominateModal(true);
-
   const handleReviewNomination = (nomination) => {
     setSelectedNomination(nomination);
     setShowReviewModal(true);
   };
-
   const handleViewDetails = (nomination) => {
     setSelectedNomination(nomination);
     setShowDetailsModal(true);
   };
-
   const handleNominationSubmitted = () => {
     setShowSelfNominateModal(false);
     setShowManagerNominateModal(false);
     fetchData();
   };
-
   const handleReviewSubmitted = () => {
     setShowReviewModal(false);
     fetchData();
   };
-
   const handleViewHistory = () => {
     navigate("/internal/nomination-history");
   };
-
   const indexOfLastItem = currentPage * rowsPerPage;
   const indexOfFirstItem = indexOfLastItem - rowsPerPage;
   const currentItems = filteredNominations.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredNominations.length / rowsPerPage) || 1;
-
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
-
     if (totalPages <= maxPagesToShow) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -268,15 +233,11 @@ const NominationManagement = () => {
         pages.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages);
       }
     }
-
     return pages;
   };
-
   const getStatusBadgeClass = (status) => {
     if (!status) return "nm-badge-inactive";
-
     const statusLower = status.toLowerCase();
-
     if (statusLower.includes("approved")) {
       return "nm-badge-approved";
     }
@@ -286,20 +247,16 @@ const NominationManagement = () => {
     if (statusLower.includes("pending")) {
       return "nm-badge-pending";
     }
-
     return "nm-badge-inactive";
   };
-
   const formatStatus = (status) => {
     if (!status) return "N/A";
-
     return status
       .replace(/_/g, " ")
       .split(" ")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(" ");
   };
-
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -308,7 +265,6 @@ const NominationManagement = () => {
       day: "numeric",
     });
   };
-
   const getStatistics = () => {
     const total = nominations.length;
     const approved = nominations.filter((n) =>
@@ -320,12 +276,9 @@ const NominationManagement = () => {
     const rejected = nominations.filter((n) =>
       n.status?.toLowerCase().includes("rejected")
     ).length;
-
     return { total, approved, pending, rejected };
   };
-
   const stats = getStatistics();
-
   if (loading) {
     return (
       <div className="nm-loading-container">
@@ -335,7 +288,6 @@ const NominationManagement = () => {
       </div>
     );
   }
-
   return (
     <div className="nm-page">
       <Breadcrumb
@@ -345,7 +297,6 @@ const NominationManagement = () => {
           },
         ]}
       />
-
       {/* Statistics Cards */}
       <div className="stats-cards-nm">
         <div className="stat-card-nm stat-total-nm">
@@ -357,7 +308,6 @@ const NominationManagement = () => {
             <div className="stat-label-nm">Total Nominations</div>
           </div>
         </div>
-
         <div className="stat-card-nm stat-approved-nm">
           <div className="stat-icon-nm">
             <i className="bi bi-check-circle-fill"></i>
@@ -367,7 +317,6 @@ const NominationManagement = () => {
             <div className="stat-label-nm">Approved</div>
           </div>
         </div>
-
         <div className="stat-card-nm stat-pending-nm">
           <div className="stat-icon-nm">
             <i className="bi bi-clock-fill"></i>
@@ -377,7 +326,6 @@ const NominationManagement = () => {
             <div className="stat-label-nm">Pending</div>
           </div>
         </div>
-
         <div className="stat-card-nm stat-rejected-nm">
           <div className="stat-icon-nm">
             <i className="bi bi-x-circle-fill"></i>
@@ -388,7 +336,6 @@ const NominationManagement = () => {
           </div>
         </div>
       </div>
-
       {/* Controls */}
       <div className="nm-controls">
         <div className="nm-search-input">
@@ -410,7 +357,6 @@ const NominationManagement = () => {
             </button>
           </div>
         </div>
-
         <div className="nm-status-filter">
           <NominationStatusDropdown
             value={selectedStatus}
@@ -420,11 +366,9 @@ const NominationManagement = () => {
             }}
           />
         </div>
-
         <button className="nm-btn-clear" onClick={clearFilters}>
           Clear Filters
         </button>
-
         {!["HR", "Department Head"].includes(user?.role) && (
           <button
             className="nm-btn-graph"
@@ -435,7 +379,6 @@ const NominationManagement = () => {
             View Graph
           </button>
         )}
-
         {user?.role === "Manager" && (
           <button
             className="nm-btn-history"
@@ -446,13 +389,11 @@ const NominationManagement = () => {
             History
           </button>
         )}
-
         <div className="nm-results-count">
           Showing {filteredNominations.length}{" "}
           {filteredNominations.length === 1 ? "nomination" : "nominations"}
         </div>
       </div>
-
       {/* Table */}
       <div className="nm-table-card">
         <div className="nm-table-wrapper">
@@ -520,7 +461,6 @@ const NominationManagement = () => {
                               <i className="bi bi-pencil"></i>
                             </button>
                           )}
-
                         <button
                           className="nm-action-view"
                           onClick={() => handleViewDetails(nomination)}
@@ -536,7 +476,6 @@ const NominationManagement = () => {
             </tbody>
           </table>
         </div>
-
         {/* Pagination */}
         {filteredNominations.length > 0 && (
           <div className="nm-pagination-container">
@@ -553,7 +492,6 @@ const NominationManagement = () => {
                     className={`bi bi-chevron-${showRowsDropdown ? "up" : "down"} nm-rows-chevron`}
                   ></i>
                 </button>
-
                 {showRowsDropdown && (
                   <div className="nm-rows-dropdown">
                     {[10, 25, 50].map((size) => (
@@ -576,13 +514,11 @@ const NominationManagement = () => {
               </div>
               <span className="nm-pagination-label">entries</span>
             </div>
-
             <div className="nm-pagination-status">
               Showing {indexOfFirstItem + 1} to{" "}
               {Math.min(indexOfLastItem, filteredNominations.length)} of{" "}
               {filteredNominations.length} entries
             </div>
-
             <nav className="nm-pagination-nav">
               <ul className="nm-pagination">
                 <li className={`nm-page-item ${currentPage === 1 ? "disabled" : ""}`}>
@@ -594,7 +530,6 @@ const NominationManagement = () => {
                     <i className="bi bi-chevron-left"></i>
                   </button>
                 </li>
-
                 {getPageNumbers().map((page, index) => (
                   <li
                     key={index}
@@ -611,7 +546,6 @@ const NominationManagement = () => {
                     </button>
                   </li>
                 ))}
-
                 <li
                   className={`nm-page-item ${
                     currentPage === totalPages ? "disabled" : ""
@@ -632,7 +566,6 @@ const NominationManagement = () => {
           </div>
         )}
       </div>
-
       {showSelfNominateModal && (
         <SelfNominateModal
           show={showSelfNominateModal}
@@ -641,7 +574,6 @@ const NominationManagement = () => {
           onNominationSubmitted={handleNominationSubmitted}
         />
       )}
-
       {showManagerNominateModal && (
         <ManagerNominateModal
           show={showManagerNominateModal}
@@ -650,7 +582,6 @@ const NominationManagement = () => {
           onNominationSubmitted={handleNominationSubmitted}
         />
       )}
-
       {showReviewModal && selectedNomination && (
         <NominationReviewModal
           show={showReviewModal}
@@ -660,14 +591,12 @@ const NominationManagement = () => {
           onReviewSubmitted={handleReviewSubmitted}
         />
       )}
-
       {showGraphModal && (
         <NominationGraphModal
           show={showGraphModal}
           onHide={() => setShowGraphModal(false)}
         />
       )}
-
       {showDetailsModal && selectedNomination && (
         <NominationDetailsModal
           show={showDetailsModal}
@@ -678,5 +607,4 @@ const NominationManagement = () => {
     </div>
   );
 };
-
 export default NominationManagement;

@@ -14,24 +14,19 @@ import { toast } from "sonner";
 import { FaSearch } from "react-icons/fa";
 import { Form } from "react-bootstrap";
 import "../../styles/internal/InternalOpportunityManagement.css";
-
 const StatusDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
-
   const options = [
     { label: "All Status", value: "" },
     { label: "Active", value: "Active" },
     { label: "Closed", value: "Closed" },
     { label: "Pending", value: "Pending" },
   ];
-
   const selected = options.find((o) => o.value === value) || options[0];
-
   const handleSelect = (val) => {
     onChange(val);
     setOpen(false);
   };
-
   return (
     <div
       className="ioma-status-select custom-status-dropdown"
@@ -46,7 +41,6 @@ const StatusDropdown = ({ value, onChange }) => {
         {selected.label}
         <span className="custom-status-arrow" />
       </div>
-
       {open && (
         <div className="custom-status-menu">
           {options.map((opt) => (
@@ -66,7 +60,6 @@ const StatusDropdown = ({ value, onChange }) => {
     </div>
   );
 };
-
 const InternalOpportunityManagement = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -74,19 +67,16 @@ const InternalOpportunityManagement = () => {
   const [filteredOpportunities, setFilteredOpportunities] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
-
   // Filter states
   const [searchTerm, setSearchTerm] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
-
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [showItemsDropdown, setShowItemsDropdown] = useState(false);
   const itemsDropdownRef = useRef(null);
-
   // Modal states
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -95,31 +85,25 @@ const InternalOpportunityManagement = () => {
   const [showSelfNominateModal, setShowSelfNominateModal] = useState(false);
   const [showManagerNominateModal, setShowManagerNominateModal] = useState(false);
   const [selectedOpportunity, setSelectedOpportunity] = useState(null);
-
   toast.options = {
     closeButton: true,
     progressBar: true,
     positionClass: "toast-top-right",
     timeOut: 3000,
   };
-
   // Get role prefix for routing
   const getRolePrefix = () => {
     const role = user?.role?.toLowerCase();
     return `/${role}`;
   };
-
   const rolePrefix = getRolePrefix();
-
   useEffect(() => {
     fetchData();
   }, []);
-
   // Auto-filter when dependencies change
   useEffect(() => {
     filterOpportunities();
   }, [opportunities, selectedDepartment, selectedStatus, activeSearchTerm]);
-
   // Click outside handler for items dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -130,13 +114,11 @@ const InternalOpportunityManagement = () => {
         setShowItemsDropdown(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -144,7 +126,6 @@ const InternalOpportunityManagement = () => {
         internalOpportunityService.getAllOpportunities(),
         departmentService.getAllDepartments(),
       ]);
-
       if (opportunitiesResponse.success) {
         const oppArray = Array.isArray(opportunitiesResponse.data)
           ? opportunitiesResponse.data
@@ -156,7 +137,6 @@ const InternalOpportunityManagement = () => {
         toast.dismiss();
         toast.error("Failed to load opportunities");
       }
-
       if (departmentsResponse.success) {
         setDepartments(departmentsResponse.data || []);
       }
@@ -169,10 +149,8 @@ const InternalOpportunityManagement = () => {
       setLoading(false);
     }
   };
-
   const filterOpportunities = useCallback(() => {
     let filtered = Array.isArray(opportunities) ? [...opportunities] : [];
-
     if (activeSearchTerm) {
       const term = activeSearchTerm.toLowerCase();
       filtered = filtered.filter(
@@ -182,26 +160,21 @@ const InternalOpportunityManagement = () => {
           opp.requirements?.toLowerCase().includes(term)
       );
     }
-
     if (selectedDepartment) {
       filtered = filtered.filter(
         (opp) => opp.departmentId === parseInt(selectedDepartment)
       );
     }
-
     if (selectedStatus) {
       filtered = filtered.filter((opp) => opp.status === selectedStatus);
     }
-
     setFilteredOpportunities(filtered);
     setCurrentPage(1);
   }, [opportunities, activeSearchTerm, selectedDepartment, selectedStatus]);
-
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
     setCurrentPage(1);
   };
-
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
@@ -209,58 +182,47 @@ const InternalOpportunityManagement = () => {
     setSelectedStatus("");
     setCurrentPage(1);
   };
-
   const handleCreateOpportunity = () => {
     setShowCreateModal(true);
   };
-
   const handleEditOpportunity = (opportunity) => {
     setSelectedOpportunity(opportunity);
     setShowEditModal(true);
   };
-
   const handleDeleteOpportunity = (opportunity) => {
     setSelectedOpportunity(opportunity);
     setShowDeleteModal(true);
   };
-
   const handleViewOpportunity = (opportunity) => {
     setSelectedOpportunity(opportunity);
     setShowViewModal(true);
   };
-
   const handleSelfNominate = (opportunity) => {
     setSelectedOpportunity(opportunity);
     setShowSelfNominateModal(true);
   };
-
   const handleManagerNominate = (opportunity) => {
     setSelectedOpportunity(opportunity);
     setShowManagerNominateModal(true);
   };
-
   const handleOpportunityCreated = () => {
     setShowCreateModal(false);
     fetchData();
   };
-
   const handleOpportunityUpdated = () => {
     setShowEditModal(false);
     fetchData();
   };
-
   const handleOpportunityDeleted = () => {
     setShowDeleteModal(false);
     fetchData();
   };
-
   const handleNominationSubmitted = () => {
     setShowSelfNominateModal(false);
     setShowManagerNominateModal(false);
     toast.success("Nomination submitted successfully!");
     fetchData();
   };
-
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredOpportunities.slice(
@@ -268,11 +230,9 @@ const InternalOpportunityManagement = () => {
     indexOfLastItem
   );
   const totalPages = Math.ceil(filteredOpportunities.length / itemsPerPage) || 1;
-
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
-
     if (totalPages <= maxPagesToShow) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -294,10 +254,8 @@ const InternalOpportunityManagement = () => {
         );
       }
     }
-
     return pages;
   };
-
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -306,7 +264,6 @@ const InternalOpportunityManagement = () => {
       year: "numeric",
     });
   };
-
   const getStatusBadgeClass = (status) => {
     switch (status?.toLowerCase()) {
       case "active":
@@ -319,18 +276,15 @@ const InternalOpportunityManagement = () => {
         return "ioma-badge-inactive";
     }
   };
-
   // ROLE-BASED UI RENDERING
   const isHR = user?.role === "HR";
   const isEmployee = user?.role === "Employee";
   const isManager = user?.role === "Manager";
-
   const getOppStats = () => {
     const total = opportunities.length;
     const active = opportunities.filter((o) => o.status === "Active").length;
     const closed = opportunities.filter((o) => o.status === "Closed").length;
     const pending = opportunities.filter((o) => o.status === "Pending").length;
-
     return {
       totalOpportunities: total,
       activeOpportunities: active,
@@ -338,9 +292,7 @@ const InternalOpportunityManagement = () => {
       pendingOpportunities: pending,
     };
   };
-
   const stats = getOppStats();
-
   if (loading) {
     return (
       <div className="ioma-loading-container">
@@ -350,7 +302,6 @@ const InternalOpportunityManagement = () => {
       </div>
     );
   }
-
   return (
     <div className="ioma-page">
       <Breadcrumb
@@ -362,7 +313,6 @@ const InternalOpportunityManagement = () => {
           },
         ]}
       />
-
       {/* KPI CARDS */}
       <div className="stats-cards-ioma">
         <div className="stat-card-ioma stat-total-ioma">
@@ -374,7 +324,6 @@ const InternalOpportunityManagement = () => {
             <div className="stat-label-ioma">Total Opportunities</div>
           </div>
         </div>
-
         <div className="stat-card-ioma stat-active-ioma">
           <div className="stat-icon-ioma">
             <i className="bi bi-check2-circle"></i>
@@ -384,7 +333,6 @@ const InternalOpportunityManagement = () => {
             <div className="stat-label-ioma">Active</div>
           </div>
         </div>
-
         <div className="stat-card-ioma stat-closed-ioma">
           <div className="stat-icon-ioma">
             <i className="bi bi-x-circle"></i>
@@ -394,7 +342,6 @@ const InternalOpportunityManagement = () => {
             <div className="stat-label-ioma">Closed</div>
           </div>
         </div>
-
         <div className="stat-card-ioma stat-pending-ioma">
           <div className="stat-icon-ioma">
             <i className="bi bi-clock"></i>
@@ -405,7 +352,6 @@ const InternalOpportunityManagement = () => {
           </div>
         </div>
       </div>
-
       {/* CONTROLS BAR */}
       <div className="ioma-controls">
         <div className="ioma-search-input">
@@ -434,7 +380,6 @@ const InternalOpportunityManagement = () => {
             </button>
           </div>
         </div>
-
         <div className="ioma-status-filter">
           <StatusDropdown
             value={selectedStatus}
@@ -444,16 +389,13 @@ const InternalOpportunityManagement = () => {
             }}
           />
         </div>
-
         <button className="ioma-btn-clear" onClick={clearFilters}>
           Clear Filters
         </button>
-
         <div className="ioma-results-count">
           Showing {filteredOpportunities.length}{" "}
           {filteredOpportunities.length === 1 ? "opportunity" : "opportunities"}
         </div>
-
         {/* ONLY HR CAN CREATE */}
         {isHR && (
           <button className="ioma-btn-create" onClick={handleCreateOpportunity}>
@@ -462,7 +404,6 @@ const InternalOpportunityManagement = () => {
           </button>
         )}
       </div>
-
       {/* TABLE */}
       <div className="ioma-table-card">
         <div className="ioma-table-wrapper">
@@ -535,7 +476,6 @@ const InternalOpportunityManagement = () => {
                             </button>
                           </>
                         )}
-
                         {/* EMPLOYEE: Self Nominate */}
                         {isEmployee && (
                           <button
@@ -546,7 +486,6 @@ const InternalOpportunityManagement = () => {
                             <i className="bi bi-hand-thumbs-up"></i>
                           </button>
                         )}
-
                         {/* MANAGER: Self Nominate & Nominate Team Members */}
                         {isManager && (
                           <>
@@ -566,7 +505,6 @@ const InternalOpportunityManagement = () => {
                             </button>
                           </>
                         )}
-
                         {/* View Details for all */}
                         <button
                           className="ioma-action-view"
@@ -583,7 +521,6 @@ const InternalOpportunityManagement = () => {
             </tbody>
           </table>
         </div>
-
         {/* Pagination */}
         {filteredOpportunities.length > 0 && (
           <div className="ioma-pagination-container">
@@ -600,7 +537,6 @@ const InternalOpportunityManagement = () => {
                     className={`bi bi-chevron-${showItemsDropdown ? "up" : "down"} ioma-items-chevron`}
                   ></i>
                 </button>
-
                 {showItemsDropdown && (
                   <div className="ioma-items-dropdown">
                     {[10, 25, 50].map((size) => (
@@ -623,13 +559,11 @@ const InternalOpportunityManagement = () => {
               </div>
               <span className="ioma-pagination-label">entries</span>
             </div>
-
             <div className="ioma-pagination-status">
               Showing {indexOfFirstItem + 1} to{" "}
               {Math.min(indexOfLastItem, filteredOpportunities.length)} of{" "}
               {filteredOpportunities.length} entries
             </div>
-
             <nav className="ioma-pagination-nav">
               <ul className="ioma-pagination">
                 <li
@@ -647,7 +581,6 @@ const InternalOpportunityManagement = () => {
                     <i className="bi bi-chevron-left"></i>
                   </button>
                 </li>
-
                 {getPageNumbers().map((page, index) => (
                   <li
                     key={index}
@@ -666,7 +599,6 @@ const InternalOpportunityManagement = () => {
                     </button>
                   </li>
                 ))}
-
                 <li
                   className={`ioma-page-item ${
                     currentPage === totalPages ? "disabled" : ""
@@ -687,7 +619,6 @@ const InternalOpportunityManagement = () => {
           </div>
         )}
       </div>
-
       {/* MODALS */}
       {isHR && showCreateModal && (
         <CreateOpportunityModal
@@ -697,7 +628,6 @@ const InternalOpportunityManagement = () => {
           departments={departments}
         />
       )}
-
       {isHR && showEditModal && selectedOpportunity && (
         <EditOpportunityModal
           show={showEditModal}
@@ -707,7 +637,6 @@ const InternalOpportunityManagement = () => {
           departments={departments}
         />
       )}
-
       {isHR && showDeleteModal && selectedOpportunity && (
         <DeleteOpportunityModal
           show={showDeleteModal}
@@ -716,7 +645,6 @@ const InternalOpportunityManagement = () => {
           opportunity={selectedOpportunity}
         />
       )}
-
       {showViewModal && selectedOpportunity && (
         <ViewOpportunityModal
           show={showViewModal}
@@ -727,7 +655,6 @@ const InternalOpportunityManagement = () => {
           }}
         />
       )}
-
       {(isEmployee || isManager) &&
         showSelfNominateModal &&
         selectedOpportunity && (
@@ -738,7 +665,6 @@ const InternalOpportunityManagement = () => {
             onNominationSubmitted={handleNominationSubmitted}
           />
         )}
-
       {isManager && showManagerNominateModal && selectedOpportunity && (
         <ManagerNominateModal
           show={showManagerNominateModal}
@@ -750,5 +676,4 @@ const InternalOpportunityManagement = () => {
     </div>
   );
 };
-
 export default InternalOpportunityManagement;

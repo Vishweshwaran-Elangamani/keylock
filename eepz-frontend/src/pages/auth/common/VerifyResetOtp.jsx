@@ -4,30 +4,14 @@ import authService from "../../../services/auth/authService";
 import { toast } from "sonner";
 import "../../../styles/auth/common/VerifyResetOtp.css";
 const VerifyResetOtp = () => {
-  // ========================
-  // HOOKS & NAVIGATION
-  // ========================
   const navigate = useNavigate();
   const location = useLocation();
   const email = location.state?.email;
-  // ========================
-  // STATE MANAGEMENT
-  // ========================
   const [otpCode, setOtpCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  // ========================
-  // EMAIL DOMAIN VALIDATION
-  // ========================
-  /**
-   * Validates that email belongs to Gmail domain
-   * Only accepts @gmail.com addresses
-   *
-   * @param {string} email - Email address to validate
-   * @returns {boolean} True if valid Gmail address
-   */
   const isValidGmailDomain = (email) => {
     if (!email) return false;
     const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
@@ -39,9 +23,6 @@ const VerifyResetOtp = () => {
       relevantzRegex.test(email)
     );
   };
-  // ========================
-  // PASSWORD VALIDATION
-  // ========================
   const validatePassword = (password) => {
     const minLength = 8;
     const hasUpperCase = /[A-Z]/.test(password);
@@ -65,9 +46,6 @@ const VerifyResetOtp = () => {
     }
     return null;
   };
-  // ========================
-  // FORM SUBMISSION
-  // ========================
   const handleResetPassword = async (e) => {
     e.preventDefault();
     // -------- Validate Email Exists --------
@@ -131,9 +109,6 @@ const VerifyResetOtp = () => {
       setLoading(false);
     }
   };
-  // ========================
-  // RESEND OTP
-  // ========================
   const handleResendOtp = async () => {
     try {
       await authService.forgotPassword(email);
@@ -142,16 +117,10 @@ const VerifyResetOtp = () => {
       toast.error("Failed to resend OTP. Please try again.");
     }
   };
-  // ========================
-  // GUARD CLAUSE - SILENT REDIRECT
-  // ========================
   if (!email) {
     navigate("/reset-password");
     return null;
   }
-  // ========================
-  // RENDER LOGIC
-  // ========================
   return (
     <div className="verify-reset-otp-container">
       <div className="verify-reset-otp-card">

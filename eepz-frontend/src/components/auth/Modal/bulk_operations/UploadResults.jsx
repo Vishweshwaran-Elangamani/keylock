@@ -1,6 +1,5 @@
 import SuccessDetails from "./SuccessDetails";
 import ErrorDetails from "./ErrorDetails";
-
 const UploadResults = ({ uploadResult }) => {
   return (
     <div className="bom-upload-results-container">
@@ -8,7 +7,6 @@ const UploadResults = ({ uploadResult }) => {
         <i className="bi bi-bar-chart-fill"></i>
         Import Results
       </h6>
-
       <div className="bom-stats-grid">
         <div className="bom-stat-card bom-stat-card-total">
           <i className="bi bi-file-earmark-text bom-stat-icon bom-stat-icon-total"></i>
@@ -36,16 +34,13 @@ const UploadResults = ({ uploadResult }) => {
           <div className="bom-stat-label bom-stat-label-failed">Failed</div>
         </div>
       </div>
-
       {uploadResult.successCount > 0 && (
         <SuccessDetails uploadResult={uploadResult} />
       )}
-
       {uploadResult.errors && uploadResult.errors.length > 0 && (
         <ErrorDetails uploadResult={uploadResult} />
       )}
     </div>
   );
 };
-
 export default UploadResults;

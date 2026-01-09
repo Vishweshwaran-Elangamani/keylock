@@ -5,24 +5,19 @@ import { FaSearch } from "react-icons/fa";
 import violationService from "../../../../services/hr_operations/hr/violationService";
 import EscalationDetailModal from "../../../../components/hr_operations/modals/EscalationDetailModal";
 import "../../../../styles/hr_operations/hr/ComplianceIssues.css";
-
 const StatusDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
-
   const options = [
     { label: "All Status", value: "" },
     { label: "Open", value: "Open" },
     { label: "Pending", value: "Pending" },
     { label: "Resolved", value: "Resolved" },
   ];
-
   const selected = options.find((o) => o.value === value) || options[0];
-
   const handleSelect = (val) => {
     onChange(val);
     setOpen(false);
   };
-
   return (
     <div
       className="ci-status-select custom-status-dropdown"
@@ -37,7 +32,6 @@ const StatusDropdown = ({ value, onChange }) => {
         {selected.label}
         <span className="custom-status-arrow" />
       </div>
-
       {open && (
         <div className="custom-status-menu">
           {options.map((opt) => (
@@ -57,23 +51,18 @@ const StatusDropdown = ({ value, onChange }) => {
     </div>
   );
 };
-
 const LevelDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
-
   const options = [
     { label: "All Levels", value: "" },
     { label: "L1", value: "L1" },
     { label: "L2", value: "L2" },
   ];
-
   const selected = options.find((o) => o.value === value) || options[0];
-
   const handleSelect = (val) => {
     onChange(val);
     setOpen(false);
   };
-
   return (
     <div
       className="ci-level-select custom-status-dropdown"
@@ -88,7 +77,6 @@ const LevelDropdown = ({ value, onChange }) => {
         {selected.label}
         <span className="custom-status-arrow" />
       </div>
-
       {open && (
         <div className="custom-status-menu">
           {options.map((opt) => (
@@ -108,33 +96,26 @@ const LevelDropdown = ({ value, onChange }) => {
     </div>
   );
 };
-
 const ComplianceIssues = () => {
   const [slaEscalations, setSlaEscalations] = useState([]);
   const [filteredEscalations, setFilteredEscalations] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [showEscalationDetailModal, setShowEscalationDetailModal] = useState(false);
   const [selectedEscalation, setSelectedEscalation] = useState(null);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
   const [selectedLevel, setSelectedLevel] = useState("");
-
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [showRowsDropdown, setShowRowsDropdown] = useState(false);
   const rowsDropdownRef = useRef(null);
-
   useEffect(() => {
     fetchSlaEscalations();
   }, []);
-
   useEffect(() => {
     applyFilters();
   }, [slaEscalations, selectedStatus, selectedLevel, activeSearchTerm]);
-
   // Click outside handler for rows dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -145,13 +126,11 @@ const ComplianceIssues = () => {
         setShowRowsDropdown(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
   const fetchSlaEscalations = async () => {
     try {
       setLoading(true);
@@ -166,15 +145,12 @@ const ComplianceIssues = () => {
       setLoading(false);
     }
   };
-
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
     setCurrentPage(1);
   };
-
   const applyFilters = () => {
     let filtered = [...slaEscalations];
-
     if (activeSearchTerm) {
       filtered = filtered.filter(
         (e) =>
@@ -184,19 +160,15 @@ const ComplianceIssues = () => {
           e.reason?.toLowerCase().includes(activeSearchTerm.toLowerCase())
       );
     }
-
     if (selectedStatus) {
       filtered = filtered.filter((e) => e.escalationStatus === selectedStatus);
     }
-
     if (selectedLevel) {
       filtered = filtered.filter((e) => e.escalationLevel === selectedLevel);
     }
-
     setFilteredEscalations(filtered);
     setCurrentPage(1);
   };
-
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
@@ -204,16 +176,13 @@ const ComplianceIssues = () => {
     setSelectedLevel("");
     setCurrentPage(1);
   };
-
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredEscalations.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredEscalations.length / itemsPerPage) || 1;
-
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
-
     if (totalPages <= maxPagesToShow) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -227,15 +196,12 @@ const ComplianceIssues = () => {
         pages.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages);
       }
     }
-
     return pages;
   };
-
   const handleViewEscalationDetails = (escalation) => {
     setSelectedEscalation(escalation);
     setShowEscalationDetailModal(true);
   };
-
   const getSeverityBadge = (severity) => {
     const badges = {
       Low: "success",
@@ -245,7 +211,6 @@ const ComplianceIssues = () => {
     };
     return badges[severity] || "secondary";
   };
-
   const getStatusBadge = (status) => {
     const badges = {
       Open: "primary",
@@ -254,13 +219,11 @@ const ComplianceIssues = () => {
     };
     return badges[status] || "secondary";
   };
-
   const getEscalationStats = () => {
     const total = filteredEscalations.length;
     const open = filteredEscalations.filter((e) => e.escalationStatus === "Open").length;
     const pending = filteredEscalations.filter((e) => e.escalationStatus === "Pending").length;
     const resolved = filteredEscalations.filter((e) => e.escalationStatus === "Resolved").length;
-
     return {
       totalEscalations: total,
       openEscalations: open,
@@ -268,9 +231,7 @@ const ComplianceIssues = () => {
       resolvedEscalations: resolved,
     };
   };
-
   const stats = getEscalationStats();
-
   if (loading) {
     return (
       <div className="ci-loading-container">
@@ -280,7 +241,6 @@ const ComplianceIssues = () => {
       </div>
     );
   }
-
   return (
     <div className="ci-page">
       <div className="stats-cards-ci">
@@ -293,7 +253,6 @@ const ComplianceIssues = () => {
             <div className="stat-label-ci">Total Escalations</div>
           </div>
         </div>
-
         <div className="stat-card-ci stat-open-ci">
           <div className="stat-icon-ci">
             <i className="bi bi-clock-history"></i>
@@ -303,7 +262,6 @@ const ComplianceIssues = () => {
             <div className="stat-label-ci">Open</div>
           </div>
         </div>
-
         <div className="stat-card-ci stat-pending-ci">
           <div className="stat-icon-ci">
             <i className="bi bi-hourglass-split"></i>
@@ -313,7 +271,6 @@ const ComplianceIssues = () => {
             <div className="stat-label-ci">Pending</div>
           </div>
         </div>
-
         <div className="stat-card-ci stat-resolved-ci">
           <div className="stat-icon-ci">
             <i className="bi bi-check-circle"></i>
@@ -324,7 +281,6 @@ const ComplianceIssues = () => {
           </div>
         </div>
       </div>
-
       <div className="ci-controls">
         <div className="ci-search-input">
           <div className="ci-search-inner">
@@ -352,7 +308,6 @@ const ComplianceIssues = () => {
             </button>
           </div>
         </div>
-
         <div className="ci-status-filter">
           <StatusDropdown
             value={selectedStatus}
@@ -362,7 +317,6 @@ const ComplianceIssues = () => {
             }}
           />
         </div>
-
         <div className="ci-level-filter">
           <LevelDropdown
             value={selectedLevel}
@@ -372,16 +326,13 @@ const ComplianceIssues = () => {
             }}
           />
         </div>
-
         <button className="ci-btn-clear" onClick={clearFilters}>
           Clear Filters
         </button>
-
         <div className="ci-results-count">
           Showing {currentItems.length} of {filteredEscalations.length} escalations
         </div>
       </div>
-
       <div className="ci-table-card">
         <div className="ci-table-wrapper">
           <table className="ci-table">
@@ -475,7 +426,6 @@ const ComplianceIssues = () => {
             </tbody>
           </table>
         </div>
-
         {totalPages > 1 && filteredEscalations.length > 0 && (
           <div className="ci-pagination">
             <div className="ci-pagination-info">
@@ -491,7 +441,6 @@ const ComplianceIssues = () => {
                     className={`bi bi-chevron-${showRowsDropdown ? "up" : "down"} ci-rows-chevron`}
                   ></i>
                 </button>
-
                 {showRowsDropdown && (
                   <div className="ci-rows-dropdown">
                     {[5, 10, 25, 50].map((size) => (
@@ -514,11 +463,9 @@ const ComplianceIssues = () => {
               </div>
               <span>entries</span>
             </div>
-
             <div className="ci-pagination-status">
               Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredEscalations.length)} of {filteredEscalations.length} entries
             </div>
-
             <nav className="ci-pagination-nav">
               <ul className="ci-pagination-list">
                 <li className={`ci-page-item ${currentPage === 1 ? "disabled" : ""}`}>
@@ -557,7 +504,6 @@ const ComplianceIssues = () => {
           </div>
         )}
       </div>
-
       {showEscalationDetailModal && selectedEscalation && (
         <EscalationDetailModal
           show={showEscalationDetailModal}
@@ -573,5 +519,4 @@ const ComplianceIssues = () => {
     </div>
   );
 };
-
 export default ComplianceIssues;

@@ -5,18 +5,14 @@ import { toast } from "sonner";
 import { FaSearch } from "react-icons/fa";
 import { Form } from "react-bootstrap";
 import "../../styles/internal/NominationHistory.css";
-
 const StatusDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
-
   const allOptions = [{ label: "All Status", value: "" }, ...options];
   const selected = allOptions.find((o) => o.value === value) || allOptions[0];
-
   const handleSelect = (val) => {
     onChange(val);
     setOpen(false);
   };
-
   return (
     <div
       className="nhad-status-select custom-nhad-dropdown"
@@ -49,7 +45,6 @@ const StatusDropdown = ({ value, onChange, options }) => {
     </div>
   );
 };
-
 const SelfNominations = ({
   nominations,
   searchTerm,
@@ -69,14 +64,11 @@ const SelfNominations = ({
 }) => {
   const [filteredNominations, setFilteredNominations] = useState([]);
   const searchInputRef = useRef(null);
-
   useEffect(() => {
     applyFilters();
   }, [nominations, activeSearchTerm, filterStatus]);
-
   const applyFilters = () => {
     let filtered = [...nominations];
-
     if (activeSearchTerm.trim()) {
       const search = activeSearchTerm.toLowerCase();
       filtered = filtered.filter(
@@ -87,27 +79,21 @@ const SelfNominations = ({
           nom.opportunityType?.toLowerCase().includes(search)
       );
     }
-
     if (filterStatus) {
       filtered = filtered.filter((nom) => nom.currentStatus === filterStatus);
     }
-
     setFilteredNominations(filtered);
     setCurrentPage(1);
   };
-
   const totalPages = Math.ceil(filteredNominations.length / rowsPerPage) || 1;
-
   const getPaginatedNominations = () => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
     return filteredNominations.slice(startIndex, endIndex);
   };
-
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
-
     if (totalPages <= maxPagesToShow) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -131,20 +117,17 @@ const SelfNominations = ({
     }
     return pages;
   };
-
   const handleSearchKeyDown = (e) => {
     if (e.key === "Enter") {
       handleSearch();
       if (searchInputRef.current) searchInputRef.current.blur();
     }
   };
-
   const statusOptions = [
     { label: "Approved", value: "Approved" },
     { label: "Rejected", value: "Rejected" },
     { label: "Withdrawn", value: "Withdrawn" },
   ];
-
   return (
     <>
       <div className="nhad-filters-card">
@@ -172,24 +155,20 @@ const SelfNominations = ({
               </button>
             </div>
           </div>
-
           <StatusDropdown
             value={filterStatus}
             onChange={(val) => setFilterStatus(val)}
             options={statusOptions}
           />
-
           <button className="nhad-btn-clear" onClick={clearFilters}>
             Clear Filters
           </button>
-
           <div className="nhad-results-count">
             Showing {getPaginatedNominations().length} of{" "}
             {filteredNominations.length} nominations
           </div>
         </div>
       </div>
-
       <div className="nhad-table-card">
         <div className="nhad-table-wrapper">
           <table className="nhad-nomination-table">
@@ -226,7 +205,6 @@ const SelfNominations = ({
                         #{nom.nominationId}
                       </span>
                     </td>
-
                     <td>
                       <div className="nhad-opportunity-cell">
                         <strong className="nhad-opportunity-title">
@@ -237,7 +215,6 @@ const SelfNominations = ({
                         </span>
                       </div>
                     </td>
-
                     <td>
                       <div className="nhad-user-info">
                         <div className="nhad-user-avatar">
@@ -253,21 +230,17 @@ const SelfNominations = ({
                         </div>
                       </div>
                     </td>
-
                     <td>
                       <span className="nhad-type-badge">
                         {nom.nominationType}
                       </span>
                     </td>
-
                     <td>
                       <span className={getStatusBadge(nom.currentStatus)}>
                         {nom.currentStatus}
                       </span>
                     </td>
-
                     <td className="text-muted">{formatDate(nom.nominatedDate)}</td>
-
                     <td>
                       {nom.currentStatus === "Approved" && (
                         <div className="nhad-action-cell nhad-action-approved">
@@ -304,7 +277,6 @@ const SelfNominations = ({
                         </div>
                       )}
                     </td>
-
                     <td>
                       <div className="nhad-action-buttons">
                         <button
@@ -324,7 +296,6 @@ const SelfNominations = ({
             </tbody>
           </table>
         </div>
-
         {filteredNominations.length > 0 && totalPages > 1 && (
           <div className="nhad-pagination">
             <div className="nhad-pagination-info">
@@ -343,13 +314,11 @@ const SelfNominations = ({
               </select>
               <span>entries</span>
             </div>
-
             <div className="nhad-pagination-status">
               Showing {(currentPage - 1) * rowsPerPage + 1} to{" "}
               {Math.min(currentPage * rowsPerPage, filteredNominations.length)}{" "}
               of {filteredNominations.length} entries
             </div>
-
             <nav className="nhad-pagination-nav">
               <ul className="nhad-pagination-list">
                 <li
@@ -366,7 +335,6 @@ const SelfNominations = ({
                     <i className="bi bi-chevron-left"></i>
                   </button>
                 </li>
-
                 {getPageNumbers().map((page, index) => (
                   <li
                     key={index}
@@ -384,7 +352,6 @@ const SelfNominations = ({
                     </button>
                   </li>
                 ))}
-
                 <li
                   className={`nhad-page-item ${
                     currentPage === totalPages ? "disabled" : ""
@@ -409,7 +376,6 @@ const SelfNominations = ({
     </>
   );
 };
-
 const TeamNominations = ({
   nominations,
   searchTerm,
@@ -429,14 +395,11 @@ const TeamNominations = ({
 }) => {
   const [filteredNominations, setFilteredNominations] = useState([]);
   const searchInputRef = useRef(null);
-
   useEffect(() => {
     applyFilters();
   }, [nominations, activeSearchTerm, filterStatus]);
-
   const applyFilters = () => {
     let filtered = [...nominations];
-
     if (activeSearchTerm.trim()) {
       const search = activeSearchTerm.toLowerCase();
       filtered = filtered.filter(
@@ -447,27 +410,21 @@ const TeamNominations = ({
           nom.opportunityType?.toLowerCase().includes(search)
       );
     }
-
     if (filterStatus) {
       filtered = filtered.filter((nom) => nom.currentStatus === filterStatus);
     }
-
     setFilteredNominations(filtered);
     setCurrentPage(1);
   };
-
   const totalPages = Math.ceil(filteredNominations.length / rowsPerPage) || 1;
-
   const getPaginatedNominations = () => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
     return filteredNominations.slice(startIndex, endIndex);
   };
-
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
-
     if (totalPages <= maxPagesToShow) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -491,20 +448,17 @@ const TeamNominations = ({
     }
     return pages;
   };
-
   const handleSearchKeyDown = (e) => {
     if (e.key === "Enter") {
       handleSearch();
       if (searchInputRef.current) searchInputRef.current.blur();
     }
   };
-
   const statusOptions = [
     { label: "Approved", value: "Approved" },
     { label: "Rejected", value: "Rejected" },
     { label: "Withdrawn", value: "Withdrawn" },
   ];
-
   return (
     <>
       <div className="nhad-filters-card">
@@ -532,24 +486,20 @@ const TeamNominations = ({
               </button>
             </div>
           </div>
-
           <StatusDropdown
             value={filterStatus}
             onChange={(val) => setFilterStatus(val)}
             options={statusOptions}
           />
-
           <button className="nhad-btn-clear" onClick={clearFilters}>
             Clear Filters
           </button>
-
           <div className="nhad-results-count">
             Showing {getPaginatedNominations().length} of{" "}
             {filteredNominations.length} nominations
           </div>
         </div>
       </div>
-
       <div className="nhad-table-card">
         <div className="nhad-table-wrapper">
           <table className="nhad-nomination-table">
@@ -586,7 +536,6 @@ const TeamNominations = ({
                         #{nom.nominationId}
                       </span>
                     </td>
-
                     <td>
                       <div className="nhad-opportunity-cell">
                         <strong className="nhad-opportunity-title">
@@ -597,7 +546,6 @@ const TeamNominations = ({
                         </span>
                       </div>
                     </td>
-
                     <td>
                       <div className="nhad-user-info">
                         <div className="nhad-user-avatar">
@@ -613,21 +561,17 @@ const TeamNominations = ({
                         </div>
                       </div>
                     </td>
-
                     <td>
                       <span className="nhad-type-badge">
                         {nom.nominationType}
                       </span>
                     </td>
-
                     <td>
                       <span className={getStatusBadge(nom.currentStatus)}>
                         {nom.currentStatus}
                       </span>
                     </td>
-
                     <td className="text-muted">{formatDate(nom.nominatedDate)}</td>
-
                     <td>
                       {nom.currentStatus === "Approved" && (
                         <div className="nhad-action-cell nhad-action-approved">
@@ -664,7 +608,6 @@ const TeamNominations = ({
                         </div>
                       )}
                     </td>
-
                     <td>
                       <div className="nhad-action-buttons">
                         <button
@@ -684,7 +627,6 @@ const TeamNominations = ({
             </tbody>
           </table>
         </div>
-
         {filteredNominations.length > 0 && totalPages > 1 && (
           <div className="nhad-pagination">
             <div className="nhad-pagination-info">
@@ -703,13 +645,11 @@ const TeamNominations = ({
               </select>
               <span>entries</span>
             </div>
-
             <div className="nhad-pagination-status">
               Showing {(currentPage - 1) * rowsPerPage + 1} to{" "}
               {Math.min(currentPage * rowsPerPage, filteredNominations.length)}{" "}
               of {filteredNominations.length} entries
             </div>
-
             <nav className="nhad-pagination-nav">
               <ul className="nhad-pagination-list">
                 <li
@@ -726,7 +666,6 @@ const TeamNominations = ({
                     <i className="bi bi-chevron-left"></i>
                   </button>
                 </li>
-
                 {getPageNumbers().map((page, index) => (
                   <li
                     key={index}
@@ -744,7 +683,6 @@ const TeamNominations = ({
                     </button>
                   </li>
                 ))}
-
                 <li
                   className={`nhad-page-item ${
                     currentPage === totalPages ? "disabled" : ""
@@ -769,28 +707,22 @@ const TeamNominations = ({
     </>
   );
 };
-
 const NominationHistory = () => {
   const [historyData, setHistoryData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("self");
-
   const [searchTerm, setSearchTerm] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
-
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
-
   useEffect(() => {
     fetchHistory();
   }, []);
-
   const fetchHistory = async () => {
     try {
       setLoading(true);
       const response = await nominationService.getMyNominationHistory(null);
-
       if (response.success) {
         setHistoryData(response.data);
       } else {
@@ -803,23 +735,19 @@ const NominationHistory = () => {
       setLoading(false);
     }
   };
-
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
   };
-
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
     setFilterStatus("");
   };
-
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     clearFilters();
     setCurrentPage(1);
   };
-
   const getStatusBadge = (status) => {
     const statusClasses = {
       Approved: "nhad-status-approved",
@@ -828,7 +756,6 @@ const NominationHistory = () => {
     };
     return `nhad-status-badge ${statusClasses[status] || "nhad-status-pending"}`;
   };
-
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -837,7 +764,6 @@ const NominationHistory = () => {
       year: "numeric",
     });
   };
-
   const getInitials = (name) => {
     if (!name) return "NA";
     const parts = name.split(" ");
@@ -848,7 +774,6 @@ const NominationHistory = () => {
     }
     return name.substring(0, 2).toUpperCase();
   };
-
   if (loading) {
     return (
       <div className="nhad-loading-container">
@@ -858,7 +783,6 @@ const NominationHistory = () => {
       </div>
     );
   }
-
   return (
     <div className="nhad-page">
       <Breadcrumb
@@ -872,7 +796,6 @@ const NominationHistory = () => {
           },
         ]}
       />
-
       <div className="stats-cards-nhad">
         <div className="stat-card-nhad stat-total-nhad">
           <div className="stat-icon-nhad">
@@ -885,7 +808,6 @@ const NominationHistory = () => {
             <div className="stat-label-nhad">Self Nominations</div>
           </div>
         </div>
-
         <div className="stat-card-nhad stat-pending-nhad">
           <div className="stat-icon-nhad">
             <i className="bi bi-people-fill"></i>
@@ -897,7 +819,6 @@ const NominationHistory = () => {
             <div className="stat-label-nhad">Team Nominations</div>
           </div>
         </div>
-
         <div className="stat-card-nhad stat-approved-nhad">
           <div className="stat-icon-nhad">
             <i className="bi bi-check-circle-fill"></i>
@@ -909,7 +830,6 @@ const NominationHistory = () => {
             <div className="stat-label-nhad">Approved</div>
           </div>
         </div>
-
         <div className="stat-card-nhad stat-rejected-nhad">
           <div className="stat-icon-nhad">
             <i className="bi bi-x-circle-fill"></i>
@@ -922,7 +842,6 @@ const NominationHistory = () => {
           </div>
         </div>
       </div>
-
       <div className="nhad-nomination-tabs">
         <button
           className={`nhad-tab-btn ${activeTab === "self" ? "active" : ""}`}
@@ -949,7 +868,6 @@ const NominationHistory = () => {
           )}
         </button>
       </div>
-
       <div className="tab-content-nhad">
         {activeTab === "self" ? (
           <SelfNominations
@@ -992,5 +910,4 @@ const NominationHistory = () => {
     </div>
   );
 };
-
 export default NominationHistory;

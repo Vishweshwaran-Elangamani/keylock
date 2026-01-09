@@ -1,5 +1,4 @@
 import "../../../styles/hr_operations/employee/BulkReminderModal.css";
-
 const BulkReminderModal = ({
   show,
   onHide,
@@ -8,11 +7,9 @@ const BulkReminderModal = ({
   onSendBulkReminders,
 }) => {
   if (!show) return null;
-
   return (
     <>
       <div className="brm-backdrop" onClick={onHide} />
-
       <div className="brm-modal-container">
         <div className="brm-modal-dialog">
           {/* HEADER */}
@@ -31,7 +28,6 @@ const BulkReminderModal = ({
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* BODY */}
           <div className="brm-modal-body">
             {/* Main Message */}
@@ -42,13 +38,11 @@ const BulkReminderModal = ({
               </span>{" "}
               selected employee(s).
             </p>
-
             {/* Info Message */}
             <p className="brm-info-message">
               Each employee will receive an email reminder to set their career
               goals.
             </p>
-
             {/* Warning */}
             <div className="brm-warning-box">
               <p className="brm-warning-text">
@@ -57,7 +51,6 @@ const BulkReminderModal = ({
               </p>
             </div>
           </div>
-
           {/* FOOTER */}
           <div className="brm-modal-footer">
             <button
@@ -68,7 +61,6 @@ const BulkReminderModal = ({
             >
               Cancel
             </button>
-
             <button
               type="button"
               onClick={onSendBulkReminders}
@@ -93,5 +85,4 @@ const BulkReminderModal = ({
     </>
   );
 };
-
 export default BulkReminderModal;

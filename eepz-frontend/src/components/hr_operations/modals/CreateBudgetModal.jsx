@@ -3,7 +3,6 @@ import budgetAllocationService from "../../../services/hr_operations/hr/budgetAl
 import { formatCurrency } from "../../../utils/auth/currencyFormatter";
 import { toast } from "sonner";
 import "../../../styles/hr_operations/hr/CreateBudgetModal.css";
-
 const CustomDropdown = ({
   value,
   onChange,
@@ -15,38 +14,31 @@ const CustomDropdown = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-
   const selectedOption = options.find((opt) => opt.value === value);
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     };
-
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen]);
-
   const handleSelect = (optionValue) => {
     if (!disabled) {
       onChange({ target: { name, value: optionValue } });
       setIsOpen(false);
     }
   };
-
   const toggleDropdown = () => {
     if (!disabled) {
       setIsOpen(!isOpen);
     }
   };
-
   return (
     <div
       ref={dropdownRef}
@@ -62,7 +54,6 @@ const CustomDropdown = ({
         </span>
         <span className="cbm-custom-arrow"></span>
       </div>
-
       {isOpen && (
         <div className="cbm-custom-menu">
           {options.map((option) => (
@@ -81,7 +72,6 @@ const CustomDropdown = ({
     </div>
   );
 };
-
 const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
   const [formData, setFormData] = useState({
     departmentId: "",
@@ -89,17 +79,14 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
     totalBudget: "",
     allocatedAmount: "",
   });
-
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-
   useEffect(() => {
     if (show) {
       fetchDepartments();
     }
   }, [show]);
-
   const fetchDepartments = async () => {
     try {
       const response = await budgetAllocationService.getAllDepartments();
@@ -109,7 +96,6 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
       toast.error("Failed to load departments");
     }
   };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -119,62 +105,48 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
           ? parseInt(value)
           : value,
     }));
-
     // Clear error for this field
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
-
   const validateForm = () => {
     const newErrors = {};
-
     if (!formData.departmentId) {
       newErrors.departmentId = "Please select a department";
     }
-
     if (!formData.fiscalYear) {
       newErrors.fiscalYear = "Please select a fiscal year";
     }
-
     if (!formData.totalBudget || parseFloat(formData.totalBudget) <= 0) {
       newErrors.totalBudget = "Total budget must be greater than zero";
     }
-
     const allocatedAmount = formData.allocatedAmount
       ? parseFloat(formData.allocatedAmount)
       : parseFloat(formData.totalBudget);
-
     if (allocatedAmount > parseFloat(formData.totalBudget)) {
       newErrors.allocatedAmount = "Allocated amount cannot exceed total budget";
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) {
       toast.error("Please fix the errors in the form");
       return;
     }
-
     setLoading(true);
-
     try {
       const allocatedAmount = formData.allocatedAmount
         ? parseFloat(formData.allocatedAmount)
         : parseFloat(formData.totalBudget);
-
       await budgetAllocationService.createDepartmentBudget({
         departmentId: formData.departmentId,
         fiscalYear: formData.fiscalYear,
         totalBudget: parseFloat(formData.totalBudget),
         allocatedAmount: allocatedAmount,
       });
-
       toast.success("Budget created successfully!");
       onBudgetCreated();
       handleClose();
@@ -185,7 +157,6 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
       setLoading(false);
     }
   };
-
   const handleClose = () => {
     setFormData({
       departmentId: "",
@@ -196,12 +167,9 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
     setErrors({});
     onHide();
   };
-
   const currentYear = new Date().getFullYear();
   const years = [currentYear, currentYear + 1, currentYear + 2];
-
   if (!show) return null;
-
   // Dropdown options
   const departmentOptions = [
     { value: "", label: "Select Department" },
@@ -210,16 +178,13 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
       label: dept.departmentName,
     })),
   ];
-
   const fiscalYearOptions = years.map((year) => ({
     value: year,
     label: year.toString(),
   }));
-
   return (
     <>
       <div className="cbm-backdrop" onClick={handleClose} />
-
       <div className="cbm-modal-wrapper">
         <div className="cbm-modal-dialog">
           {/* HEADER */}
@@ -238,7 +203,6 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* BODY/FORM */}
           <form onSubmit={handleSubmit} className="cbm-form">
             <div className="cbm-modal-body">
@@ -261,7 +225,6 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
                     <div className="cbm-form-error">{errors.departmentId}</div>
                   )}
                 </div>
-
                 {/* Fiscal Year */}
                 <div className="cbm-form-group">
                   <label className="cbm-form-label">
@@ -280,7 +243,6 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
                     <div className="cbm-form-error">{errors.fiscalYear}</div>
                   )}
                 </div>
-
                 {/* Total Budget */}
                 <div className="cbm-form-group">
                   <label className="cbm-form-label">
@@ -306,7 +268,6 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
                     Total budget allocated to this department
                   </small>
                 </div>
-
                 {/* Allocated Amount */}
                 <div className="cbm-form-group">
                   <label className="cbm-form-label">Allocated Amount (₹)</label>
@@ -332,7 +293,6 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
                   </small>
                 </div>
               </div>
-
               {/* Budget Summary */}
               {formData.totalBudget && (
                 <div className="cbm-budget-summary">
@@ -340,7 +300,6 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
                     <i className="bi bi-cash-stack cbm-summary-icon"></i>
                     <span>Budget Summary</span>
                   </div>
-
                   <div className="cbm-summary-grid">
                     <div className="cbm-summary-item">
                       <label className="cbm-summary-label">Total Budget:</label>
@@ -348,7 +307,6 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
                         {formatCurrency(formData.totalBudget)}
                       </span>
                     </div>
-
                     <div className="cbm-summary-item">
                       <label className="cbm-summary-label">
                         Allocated Amount:
@@ -359,7 +317,6 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
                         )}
                       </span>
                     </div>
-
                     <div className="cbm-summary-item">
                       <label className="cbm-summary-label">Remaining:</label>
                       <span className="cbm-summary-value">
@@ -375,7 +332,6 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
                 </div>
               )}
             </div>
-
             {/* FOOTER */}
             <div className="cbm-modal-footer">
               <button
@@ -386,7 +342,6 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
               >
                 <i className="bi bi-x-circle"></i> Cancel
               </button>
-
               <button
                 type="submit"
                 disabled={loading}
@@ -410,5 +365,4 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
     </>
   );
 };
-
 export default CreateBudgetModal;

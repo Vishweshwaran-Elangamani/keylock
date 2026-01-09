@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import policyService from "../../../services/hr_operations/hr/policyService";
 import "../../../styles/hr_operations/hr/EditPolicyModal.css";
-
 const CustomDropdown = ({
   value,
   onChange,
@@ -13,38 +12,31 @@ const CustomDropdown = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-
   const selectedOption = options.find((opt) => opt.value === value);
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     };
-
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen]);
-
   const handleSelect = (optionValue) => {
     if (!disabled) {
       onChange({ target: { name, value: optionValue } });
       setIsOpen(false);
     }
   };
-
   const toggleDropdown = () => {
     if (!disabled) {
       setIsOpen(!isOpen);
     }
   };
-
   return (
     <div
       ref={dropdownRef}
@@ -60,7 +52,6 @@ const CustomDropdown = ({
         </span>
         <span className="epm-custom-arrow"></span>
       </div>
-
       {isOpen && (
         <div className="epm-custom-menu">
           {options.map((option) => (
@@ -79,7 +70,6 @@ const CustomDropdown = ({
     </div>
   );
 };
-
 const EditPolicyModal = ({
   show,
   policy,
@@ -95,18 +85,15 @@ const EditPolicyModal = ({
     complianceGuidance: "",
     status: "Active",
   });
-
   const [documentType, setDocumentType] = useState("none");
   const [selectedFile, setSelectedFile] = useState(null);
   const [documentLink, setDocumentLink] = useState("");
   const [documentName, setDocumentName] = useState("");
   const [uploadingDoc, setUploadingDoc] = useState(false);
   const [existingDocument, setExistingDocument] = useState(null);
-
   const [loading, setLoading] = useState(false);
   const [unpublishing, setUnpublishing] = useState(false);
   const [errors, setErrors] = useState({});
-
   const categories = [
     "Attendance",
     "Leave",
@@ -119,26 +106,20 @@ const EditPolicyModal = ({
     "IT Policy",
     "Other",
   ];
-
   const statuses = ["Active", "Inactive", "Draft"];
-
   const getFullDocumentUrl = (url) => {
     if (!url) {
       console.warn("Empty document URL provided");
       return "";
     }
-
     if (url.startsWith("http://") || url.startsWith("https://")) {
       return url;
     }
-
     const fileName = url.split("/").pop();
     const hrBaseUrl = import.meta.env.VITE_HR_API_URL;
     const fullUrl = `${hrBaseUrl}/api/policy/document/${fileName}`;
-
     return fullUrl;
   };
-
   useEffect(() => {
     if (policy) {
       setFormData({
@@ -148,7 +129,6 @@ const EditPolicyModal = ({
         complianceGuidance: policy.complianceGuidance || "",
         status: policy.status || "Active",
       });
-
       if (policy.documentUrl) {
         setExistingDocument({
           url: policy.documentUrl,
@@ -159,20 +139,17 @@ const EditPolicyModal = ({
       } else {
         setExistingDocument(null);
       }
-
       setDocumentType("none");
       setSelectedFile(null);
       setDocumentLink("");
       setDocumentName("");
     }
   }, [policy]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
-
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -186,17 +163,14 @@ const EditPolicyModal = ({
           onToast("warning", "Only PDF, DOC, DOCX files allowed");
         return;
       }
-
       if (file.size > 5 * 1024 * 1024) {
         if (typeof onToast === "function")
           onToast("warning", "File size must be less than 5MB");
         return;
       }
-
       setSelectedFile(file);
     }
   };
-
   const validate = () => {
     const newErrors = {};
     if (!formData.policyName.trim())
@@ -204,27 +178,21 @@ const EditPolicyModal = ({
     if (!formData.category.trim()) newErrors.category = "Category is required";
     if (!formData.description.trim())
       newErrors.description = "Description is required";
-
     if (documentType === "link") {
       if (!documentLink.trim())
         newErrors.documentLink = "Document URL is required";
       if (!documentName.trim())
         newErrors.documentName = "Document name is required";
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
-
     try {
       setLoading(true);
-
       let documentData = {};
-
       if (documentType === "upload" && selectedFile) {
         setUploadingDoc(true);
         const uploadResult = await policyService.uploadDocument(selectedFile);
@@ -246,7 +214,6 @@ const EditPolicyModal = ({
           documentType: linkResult.documentType,
         };
       }
-
       const policyDataWithDoc = { ...formData, ...documentData };
       await policyService.updatePolicy(policy.policyId, policyDataWithDoc);
       onSuccess();
@@ -262,7 +229,6 @@ const EditPolicyModal = ({
       setUploadingDoc(false);
     }
   };
-
   const handleUnpublish = async () => {
     try {
       setUnpublishing(true);
@@ -279,11 +245,8 @@ const EditPolicyModal = ({
       setUnpublishing(false);
     }
   };
-
   const isAnyActionLoading = loading || uploadingDoc || unpublishing;
-
   if (!show) return null;
-
   // Dropdown options with placeholder
   const categoryOptions = [
     { value: "", label: "Select Category" },
@@ -292,16 +255,13 @@ const EditPolicyModal = ({
       label: cat,
     })),
   ];
-
   const statusOptions = statuses.map((st) => ({
     value: st,
     label: st,
   }));
-
   return (
     <>
       <div className="epm-backdrop" onClick={onClose} />
-
       <div className="epm-modal-wrapper">
         <div className="epm-modal-dialog">
           {/* Header */}
@@ -325,7 +285,6 @@ const EditPolicyModal = ({
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           <form onSubmit={handleSubmit} className="epm-form">
             {/* Body */}
             <div className="epm-modal-body">
@@ -335,7 +294,6 @@ const EditPolicyModal = ({
                   {errors.submit}
                 </div>
               )}
-
               <div className="epm-form-columns">
                 {/* Left Column */}
                 <div className="epm-form-column">
@@ -359,7 +317,6 @@ const EditPolicyModal = ({
                       <div className="epm-form-error">{errors.policyName}</div>
                     )}
                   </div>
-
                   {/* Category - CUSTOM DROPDOWN */}
                   <div className="epm-form-group">
                     <label className="epm-form-label">
@@ -378,7 +335,6 @@ const EditPolicyModal = ({
                       <div className="epm-form-error">{errors.category}</div>
                     )}
                   </div>
-
                   {/* Status - CUSTOM DROPDOWN */}
                   <div className="epm-form-group">
                     <label className="epm-form-label">Status</label>
@@ -392,7 +348,6 @@ const EditPolicyModal = ({
                     />
                   </div>
                 </div>
-
                 {/* Right Column */}
                 <div className="epm-form-column">
                   {/* Description */}
@@ -415,7 +370,6 @@ const EditPolicyModal = ({
                       <div className="epm-form-error">{errors.description}</div>
                     )}
                   </div>
-
                   {/* Compliance Guidance */}
                   <div className="epm-form-group">
                     <label className="epm-form-label">
@@ -432,14 +386,12 @@ const EditPolicyModal = ({
                   </div>
                 </div>
               </div>
-
               {/* Document Section */}
               <div className="epm-document-section">
                 <label className="epm-document-label">
                   <i className="bi bi-file-earmark-text epm-document-icon"></i>
                   Policy Document
                 </label>
-
                 {/* Existing Document Display */}
                 {existingDocument && (
                   <div className="epm-existing-document">
@@ -470,7 +422,6 @@ const EditPolicyModal = ({
                     </div>
                   </div>
                 )}
-
                 {/* Document Type Selector */}
                 <div className="epm-document-type-selector">
                   <button
@@ -516,7 +467,6 @@ const EditPolicyModal = ({
                     Add New Link
                   </button>
                 </div>
-
                 {/* Upload File UI */}
                 {documentType === "upload" && (
                   <div className="epm-upload-container">
@@ -537,7 +487,6 @@ const EditPolicyModal = ({
                     <small className="epm-upload-hint">
                       Supported: PDF, DOC, DOCX (Max 5MB)
                     </small>
-
                     {/* Selected File Display */}
                     {selectedFile && (
                       <div className="epm-selected-file">
@@ -564,7 +513,6 @@ const EditPolicyModal = ({
                     )}
                   </div>
                 )}
-
                 {/* Link UI */}
                 {documentType === "link" && (
                   <div className="epm-link-container">
@@ -612,7 +560,6 @@ const EditPolicyModal = ({
                 )}
               </div>
             </div>
-
             {/* Footer */}
             <div className="epm-modal-footer">
               {policy?.isPublished && (
@@ -634,7 +581,6 @@ const EditPolicyModal = ({
                   )}
                 </button>
               )}
-
               <button
                 type="button"
                 onClick={onClose}
@@ -644,7 +590,6 @@ const EditPolicyModal = ({
                 <i className="bi bi-x-circle"></i>
                 Cancel
               </button>
-
               <button
                 type="submit"
                 disabled={isAnyActionLoading}
@@ -668,5 +613,4 @@ const EditPolicyModal = ({
     </>
   );
 };
-
 export default EditPolicyModal;

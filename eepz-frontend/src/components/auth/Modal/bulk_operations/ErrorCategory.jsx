@@ -31,5 +31,4 @@ const ErrorCategory = ({ type, title, icon, errors }) => {
     </details>
   );
 };
-
 export default ErrorCategory;

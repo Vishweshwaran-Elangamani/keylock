@@ -26,7 +26,6 @@ import GoalSuggestionsModal from "../../../../components/hr_operations/modals/Go
 import ReminderEmailModal from "../../../../components/hr_operations/modals/ReminderEmailModal";
 import BulkReminderModal from "../../../../components/hr_operations/modals/BulkReminderModal";
 import "../../../../styles/hr_operations/hr/CareerGoals.css";
-
 const COLORS = [
   "#97247E",
   "#8B5CF6",
@@ -35,10 +34,8 @@ const COLORS = [
   "#C026D3",
   "#9333EA",
 ];
-
 const DepartmentDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
-
   const list = [
     { label: "All Departments", value: "" },
     ...options.map((o) => ({
@@ -46,14 +43,11 @@ const DepartmentDropdown = ({ value, onChange, options }) => {
       value: o,
     })),
   ];
-
   const selected = list.find((o) => o.value === value) || list[0];
-
   const handleSelect = (val) => {
     onChange(val);
     setOpen(false);
   };
-
   return (
     <div
       className="cg-filter-select custom-status-dropdown"
@@ -86,24 +80,19 @@ const DepartmentDropdown = ({ value, onChange, options }) => {
     </div>
   );
 };
-
 const DaysDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
-
   const options = [
     { label: "All Days", value: "" },
     { label: "0-7 days", value: "0-7" },
     { label: "8-30 days", value: "8-30" },
     { label: "30+ days", value: "30+" },
   ];
-
   const selected = options.find((o) => o.value === value) || options[0];
-
   const handleSelect = (val) => {
     onChange(val);
     setOpen(false);
   };
-
   return (
     <div
       className="cg-days-select custom-status-dropdown"
@@ -136,7 +125,6 @@ const DaysDropdown = ({ value, onChange }) => {
     </div>
   );
 };
-
 const CareerGoals = () => {
   const [withoutGoals, setWithoutGoals] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -151,39 +139,31 @@ const CareerGoals = () => {
   const [reminderTargetUser, setReminderTargetUser] = useState(null);
   const [sendingReminder, setSendingReminder] = useState(false);
   const [reminderResult, setReminderResult] = useState(null);
-
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [bulkReminderModal, setBulkReminderModal] = useState(false);
   const [sendingBulkReminder, setSendingBulkReminder] = useState(false);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("");
   const [daysFilter, setDaysFilter] = useState("");
-
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [showRowsDropdown, setShowRowsDropdown] = useState(false);
   const rowsDropdownRef = useRef(null);
-
   const [showVisualization, setShowVisualization] = useState(false);
-
   useEffect(() => {
     fetchWithoutGoals();
     fetchAdoptionStats();
     fetchGoalStats();
   }, []);
-
   useEffect(() => {
     applyFilters();
   }, [withoutGoals, departmentFilter, daysFilter, activeSearchTerm]);
-
   useEffect(() => {
     setSelectedEmployees([]);
     setSelectAll(false);
   }, [filteredData]);
-
   // Click outside handler for rows dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -194,13 +174,11 @@ const CareerGoals = () => {
         setShowRowsDropdown(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
   const fetchWithoutGoals = () => {
     setLoadingWithoutGoals(true);
     careerGoalsService
@@ -212,7 +190,6 @@ const CareerGoals = () => {
       .catch(() => setWithoutGoals([]))
       .finally(() => setLoadingWithoutGoals(false));
   };
-
   const fetchAdoptionStats = () => {
     setLoadingAdoption(true);
     careerGoalsService
@@ -224,7 +201,6 @@ const CareerGoals = () => {
       .catch(() => setAdoptionStats(null))
       .finally(() => setLoadingAdoption(false));
   };
-
   const fetchGoalStats = () => {
     setLoadingGoalStats(true);
     careerGoalsService
@@ -233,7 +209,6 @@ const CareerGoals = () => {
       .catch(() => setGoalStats(null))
       .finally(() => setLoadingGoalStats(false));
   };
-
   const fetchSuggestions = (userId) => {
     setLoadingSuggestions(true);
     careerGoalsService
@@ -242,15 +217,12 @@ const CareerGoals = () => {
       .catch(() => setGoalSuggestions(null))
       .finally(() => setLoadingSuggestions(false));
   };
-
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
     setCurrentPage(1);
   };
-
   const applyFilters = () => {
     let filtered = [...withoutGoals];
-
     if (activeSearchTerm) {
       filtered = filtered.filter(
         (emp) =>
@@ -265,14 +237,12 @@ const CareerGoals = () => {
           )
       );
     }
-
     if (departmentFilter) {
       filtered = filtered.filter(
         (emp) =>
           emp.departmentName?.toLowerCase() === departmentFilter.toLowerCase()
       );
     }
-
     if (daysFilter) {
       filtered = filtered.filter((emp) => {
         const days = emp.daysWithoutGoals ?? 0;
@@ -282,11 +252,9 @@ const CareerGoals = () => {
         return true;
       });
     }
-
     setFilteredData(filtered);
     setCurrentPage(1);
   };
-
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
@@ -294,16 +262,13 @@ const CareerGoals = () => {
     setDaysFilter("");
     setCurrentPage(1);
   };
-
   const uniqueDepartments = [
     ...new Set(withoutGoals.map((emp) => emp.departmentName).filter(Boolean)),
   ];
-
   const indexOfLastItem = currentPage * rowsPerPage;
   const indexOfFirstItem = indexOfLastItem - rowsPerPage;
   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredData.length / rowsPerPage) || 1;
-
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
@@ -330,7 +295,6 @@ const CareerGoals = () => {
     }
     return pages;
   };
-
   const handleSelectAll = (e) => {
     if (e.target.checked) {
       const allIds = currentItems.map((emp) => emp.userId ?? emp.UserId);
@@ -341,7 +305,6 @@ const CareerGoals = () => {
       setSelectAll(false);
     }
   };
-
   const handleSelectEmployee = (userId) => {
     if (selectedEmployees.includes(userId)) {
       setSelectedEmployees(selectedEmployees.filter((id) => id !== userId));
@@ -350,7 +313,6 @@ const CareerGoals = () => {
       setSelectedEmployees([...selectedEmployees, userId]);
     }
   };
-
   const openBulkReminderModal = () => {
     if (selectedEmployees.length === 0) {
       toast("Please select at least one employee!");
@@ -358,7 +320,6 @@ const CareerGoals = () => {
     }
     setBulkReminderModal(true);
   };
-
   const sendBulkReminders = () => {
     setSendingBulkReminder(true);
     careerGoalsService
@@ -380,13 +341,11 @@ const CareerGoals = () => {
       })
       .finally(() => setSendingBulkReminder(false));
   };
-
   const openSendReminder = (user) => {
     setReminderTargetUser(user);
     setReminderResult(null);
     setReminderEmailModal(true);
   };
-
   const sendReminder = () => {
     setSendingReminder(true);
     careerGoalsService
@@ -408,12 +367,10 @@ const CareerGoals = () => {
       })
       .finally(() => setSendingReminder(false));
   };
-
   const handleCloseReminderModal = () => {
     setReminderEmailModal(false);
     setReminderResult(null);
   };
-
   const getDaysDistributionData = () => {
     const distribution = {
       "0-7 days": 0,
@@ -421,7 +378,6 @@ const CareerGoals = () => {
       "31-60 days": 0,
       "60+ days": 0,
     };
-
     filteredData.forEach((emp) => {
       const days = emp.daysWithoutGoals ?? emp.DaysWithoutGoals ?? 0;
       if (days <= 7) distribution["0-7 days"]++;
@@ -429,25 +385,21 @@ const CareerGoals = () => {
       else if (days <= 60) distribution["31-60 days"]++;
       else distribution["60+ days"]++;
     });
-
     return Object.entries(distribution).map(([range, count]) => ({
       range,
       count,
     }));
   };
-
   const getDepartmentData = () => {
     const deptCounts = {};
     filteredData.forEach((emp) => {
       const dept = emp.departmentName ?? emp.DepartmentName ?? "Unknown";
       deptCounts[dept] = (deptCounts[dept] || 0) + 1;
     });
-
     return Object.entries(deptCounts)
       .map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value);
   };
-
   if (loadingAdoption) {
     return (
       <div className="cg-loading-container">
@@ -457,11 +409,9 @@ const CareerGoals = () => {
       </div>
     );
   }
-
   return (
     <div className="cg-page">
       <Toaster position="top-right" closeButton expand={false} />
-
       {adoptionStats && (
         <div className="stats-cards-cg">
           <div className="stat-card-cg stat-total-cg">
@@ -475,7 +425,6 @@ const CareerGoals = () => {
               <div className="stat-label-cg">Total Employees</div>
             </div>
           </div>
-
           <div className="stat-card-cg stat-with-goals-cg">
             <div className="stat-icon-cg">
               <i className="bi bi-check-circle-fill"></i>
@@ -489,7 +438,6 @@ const CareerGoals = () => {
               </div>
             </div>
           </div>
-
           <div className="stat-card-cg stat-without-goals-cg">
             <div className="stat-icon-cg">
               <i className="bi bi-exclamation-triangle-fill"></i>
@@ -503,7 +451,6 @@ const CareerGoals = () => {
           </div>
         </div>
       )}
-
       <div className="cg-controls">
         <div className="cg-search-input">
           <div className="cg-search-inner">
@@ -531,7 +478,6 @@ const CareerGoals = () => {
             </button>
           </div>
         </div>
-
         <div className="cg-department-filter">
           <DepartmentDropdown
             value={departmentFilter}
@@ -539,20 +485,16 @@ const CareerGoals = () => {
             options={uniqueDepartments}
           />
         </div>
-
         <div className="cg-days-filter">
           <DaysDropdown value={daysFilter} onChange={setDaysFilter} />
         </div>
-
         <button className="cg-btn-clear" onClick={clearFilters}>
           Clear Filters
         </button>
-
         <div className="cg-results-count">
           Showing {filteredData.length}{" "}
           {filteredData.length === 1 ? "employee" : "employees"}
         </div>
-
         <button
           className="cg-btn-analytics"
           onClick={() => setShowVisualization(!showVisualization)}
@@ -560,7 +502,6 @@ const CareerGoals = () => {
           <FaChartBar />
           {showVisualization ? "Hide" : "Show"} Analytics
         </button>
-
         {selectedEmployees.length > 0 && (
           <button className="cg-btn-bulk" onClick={openBulkReminderModal}>
             <i className="bi bi-send"></i>
@@ -568,7 +509,6 @@ const CareerGoals = () => {
           </button>
         )}
       </div>
-
       <Collapse in={showVisualization}>
         <div className="cg-analytics-section">
           <div className="cg-charts-grid">
@@ -606,7 +546,6 @@ const CareerGoals = () => {
                 </ResponsiveContainer>
               </div>
             </div>
-
             <div className="cg-chart-card">
               <div className="cg-chart-header">
                 <i className="bi bi-pie-chart"></i>
@@ -660,7 +599,6 @@ const CareerGoals = () => {
           </div>
         </div>
       </Collapse>
-
       <div className="cg-table-card">
         <div className="cg-table-wrapper">
           <table className="cg-table">
@@ -759,7 +697,6 @@ const CareerGoals = () => {
                               <i className="bi bi-send"></i>
                             </button>
                           </OverlayTrigger>
-
                           <OverlayTrigger
                             placement="top"
                             overlay={
@@ -784,7 +721,6 @@ const CareerGoals = () => {
             </tbody>
           </table>
         </div>
-
         {totalPages > 1 && filteredData.length > 0 && (
           <div className="cg-pagination">
             <div className="cg-pagination-info">
@@ -800,7 +736,6 @@ const CareerGoals = () => {
                     className={`bi bi-chevron-${showRowsDropdown ? "up" : "down"} cg-rows-chevron`}
                   ></i>
                 </button>
-
                 {showRowsDropdown && (
                   <div className="cg-rows-dropdown">
                     {[5, 10, 25, 50].map((size) => (
@@ -823,13 +758,11 @@ const CareerGoals = () => {
               </div>
               <span>entries</span>
             </div>
-
             <div className="cg-pagination-status">
               Showing {(currentPage - 1) * rowsPerPage + 1} to{" "}
               {Math.min(currentPage * rowsPerPage, filteredData.length)} of{" "}
               {filteredData.length} entries
             </div>
-
             <nav className="cg-pagination-nav">
               <ul className="cg-pagination-list">
                 <li
@@ -882,14 +815,12 @@ const CareerGoals = () => {
           </div>
         )}
       </div>
-
       <GoalSuggestionsModal
         show={!!goalSuggestions}
         onHide={() => setGoalSuggestions(null)}
         goalSuggestions={goalSuggestions}
         loadingSuggestions={loadingSuggestions}
       />
-
       <ReminderEmailModal
         show={reminderEmailModal}
         onHide={handleCloseReminderModal}
@@ -898,7 +829,6 @@ const CareerGoals = () => {
         sendingReminder={sendingReminder}
         onSendReminder={sendReminder}
       />
-
       <BulkReminderModal
         show={bulkReminderModal}
         onHide={() => setBulkReminderModal(false)}
@@ -909,5 +839,4 @@ const CareerGoals = () => {
     </div>
   );
 };
-
 export default CareerGoals;

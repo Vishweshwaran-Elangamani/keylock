@@ -1,8 +1,6 @@
 import "../../../styles/internal/ViewOpportunityModal.css";
-
 const ViewOpportunityModal = ({ show, opportunity, onClose }) => {
   if (!show || !opportunity) return null;
-
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -11,7 +9,6 @@ const ViewOpportunityModal = ({ show, opportunity, onClose }) => {
       year: "numeric",
     });
   };
-
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
       case "active":
@@ -24,13 +21,10 @@ const ViewOpportunityModal = ({ show, opportunity, onClose }) => {
         return { bg: "#f3f4f6", text: "#374151", border: "#d1d5db" };
     }
   };
-
   const statusColors = getStatusColor(opportunity.status);
-
   return (
     <>
       <div className="vom-backdrop" onClick={onClose} />
-
       <div className="vom-modal-wrapper">
         <div className="vom-modal-dialog">
           {/* HEADER - Fixed */}
@@ -48,7 +42,6 @@ const ViewOpportunityModal = ({ show, opportunity, onClose }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* BODY - Scrollable */}
           <div className="vom-modal-body">
             {/* Opportunity Name & Status */}
@@ -71,7 +64,6 @@ const ViewOpportunityModal = ({ show, opportunity, onClose }) => {
                 {opportunity.status || "Pending"}
               </span>
             </div>
-
             {/* Key Info Grid */}
             <div className="vom-info-box">
               <div className="vom-info-grid">
@@ -82,7 +74,6 @@ const ViewOpportunityModal = ({ show, opportunity, onClose }) => {
                     {opportunity.postedByName || "N/A"}
                   </div>
                 </div>
-
                 <div>
                   <span className="vom-info-item-label">Deadline</span>
                   <div className="vom-info-item-value">
@@ -90,7 +81,6 @@ const ViewOpportunityModal = ({ show, opportunity, onClose }) => {
                     {formatDate(opportunity.deadline)}
                   </div>
                 </div>
-
                 <div>
                   <span className="vom-info-item-label">Created Date</span>
                   <div className="vom-info-item-value">
@@ -98,7 +88,6 @@ const ViewOpportunityModal = ({ show, opportunity, onClose }) => {
                     {formatDate(opportunity.createdAt)}
                   </div>
                 </div>
-
                 {opportunity.updatedAt && (
                   <div>
                     <span className="vom-info-item-label">Last Updated</span>
@@ -110,7 +99,6 @@ const ViewOpportunityModal = ({ show, opportunity, onClose }) => {
                 )}
               </div>
             </div>
-
             {/* Description */}
             <div className="vom-section">
               <h6 className="vom-section-title">
@@ -121,7 +109,6 @@ const ViewOpportunityModal = ({ show, opportunity, onClose }) => {
                 {opportunity.description || "No description provided."}
               </div>
             </div>
-
             {/* Requirements */}
             <div className="vom-section">
               <h6 className="vom-section-title">
@@ -132,7 +119,6 @@ const ViewOpportunityModal = ({ show, opportunity, onClose }) => {
                 {opportunity.requirements || "No specific requirements listed."}
               </div>
             </div>
-
             {/* Info Box */}
             <div className="vom-info-alert">
               <i className="bi bi-info-circle-fill vom-info-alert-icon"></i>
@@ -146,7 +132,6 @@ const ViewOpportunityModal = ({ show, opportunity, onClose }) => {
               </div>
             </div>
           </div>
-
           {/* FOOTER - Fixed */}
           <div className="vom-modal-footer">
             <button type="button" onClick={onClose} className="vom-btn-close">
@@ -158,5 +143,4 @@ const ViewOpportunityModal = ({ show, opportunity, onClose }) => {
     </>
   );
 };
-
 export default ViewOpportunityModal;

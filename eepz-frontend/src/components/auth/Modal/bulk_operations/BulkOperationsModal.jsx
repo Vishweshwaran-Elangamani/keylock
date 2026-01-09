@@ -4,10 +4,8 @@ import ImportTab from "./ImportTab";
 import ExportTab from "./ExportTab";
 import useBulkOperations from "../../../../hooks/auth/bulk_operations/useBulkOperations";
 import "../../../../styles/auth/bulk_operations/BulkOperationsModal.css";
-
 const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
   const [activeTab, setActiveTab] = useState("import");
-  
   const {
     selectedFile,
     setSelectedFile,
@@ -24,9 +22,7 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
     handleFileUploadClick,
     handleBulkImport,
   } = useBulkOperations();
-
   if (!show) return null;
-
   const handleClose = () => {
     toast.dismiss();
     if (uploadResult && uploadResult.successCount > 0) {
@@ -37,17 +33,14 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
     setActiveTab("import");
     onClose();
   };
-
   const handleBackdropClick = (e) => {
     if (e.target.classList.contains("bom-backdrop")) {
       handleClose();
     }
   };
-
   return (
     <>
       <div className="bom-backdrop" onClick={handleBackdropClick} />
-
       <div className="bom-modal-wrapper">
         <div className="bom-modal-dialog">
           <div className="bom-modal-header">
@@ -59,7 +52,6 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           <div className="bom-tabs-container">
             <button
               onClick={() => setActiveTab("import")}
@@ -80,7 +72,6 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
               Export Data
             </button>
           </div>
-
           <div className="bom-modal-body">
             {activeTab === "export" && (
               <ExportTab
@@ -89,7 +80,6 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                 exportingAll={exportingAll}
               />
             )}
-
             {activeTab === "import" && (
               <ImportTab
                 handleDownloadTemplate={handleDownloadTemplate}
@@ -106,7 +96,6 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
               />
             )}
           </div>
-
           <div className="bom-modal-footer">
             <button onClick={handleClose} className="bom-footer-close-button">
               <i className="bi bi-x-circle"></i>
@@ -118,5 +107,4 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
     </>
   );
 };
-
 export default BulkOperationsModal;

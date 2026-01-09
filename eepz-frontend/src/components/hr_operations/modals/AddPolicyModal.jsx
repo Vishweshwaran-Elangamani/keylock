@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import policyService from "../../../services/hr_operations/hr/policyService";
 import "../../../styles/hr_operations/hr/AddPolicyModal.css";
-
 const CustomDropdown = ({
   value,
   onChange,
@@ -13,38 +12,31 @@ const CustomDropdown = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-
   const selectedOption = options.find((opt) => opt.value === value);
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     };
-
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen]);
-
   const handleSelect = (optionValue) => {
     if (!disabled) {
       onChange({ target: { name, value: optionValue } });
       setIsOpen(false);
     }
   };
-
   const toggleDropdown = () => {
     if (!disabled) {
       setIsOpen(!isOpen);
     }
   };
-
   return (
     <div
       ref={dropdownRef}
@@ -60,7 +52,6 @@ const CustomDropdown = ({
         </span>
         <span className="apm-custom-arrow"></span>
       </div>
-
       {isOpen && (
         <div className="apm-custom-menu">
           {options.map((option) => (
@@ -79,7 +70,6 @@ const CustomDropdown = ({
     </div>
   );
 };
-
 const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
   const [formData, setFormData] = useState({
     policyName: "",
@@ -95,7 +85,6 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
   const [uploadingDoc, setUploadingDoc] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-
   const categories = [
     "Attendance",
     "Leave",
@@ -108,15 +97,12 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
     "IT Policy",
     "Other",
   ];
-
   const statuses = ["Active", "Inactive", "Draft"];
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
-
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -138,7 +124,6 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
       setSelectedFile(file);
     }
   };
-
   const validate = () => {
     const newErrors = {};
     if (!formData.policyName.trim())
@@ -155,15 +140,12 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
-
     try {
       setLoading(true);
       let documentData = {};
-
       if (documentType === "upload" && selectedFile) {
         setUploadingDoc(true);
         const uploadResult = await policyService.uploadDocument(selectedFile);
@@ -185,10 +167,8 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
           documentType: linkResult.documentType,
         };
       }
-
       const policyDataWithDoc = { ...formData, ...documentData };
       await policyService.createPolicy(policyDataWithDoc);
-
       if (typeof onToast === "function")
         onToast("success", "Policy created successfully!");
       onSuccess();
@@ -202,21 +182,16 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
       setUploadingDoc(false);
     }
   };
-
   if (!show) return null;
-
   // Dropdown options with placeholder
   const categoryOptions = [
     { value: "", label: "Select Category" },
     ...categories.map((cat) => ({ value: cat, label: cat })),
   ];
-
   const statusOptions = statuses.map((st) => ({ value: st, label: st }));
-
   return (
     <>
       <div className="apm-backdrop" onClick={onClose} />
-
       <div className="apm-modal-wrapper">
         <div className="apm-modal-dialog">
           {/* Modal Header */}
@@ -235,7 +210,6 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* Form */}
           <form onSubmit={handleSubmit} className="apm-form">
             {/* Modal Body */}
@@ -246,7 +220,6 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                   {errors.submit}
                 </div>
               )}
-
               {/* Two Column Grid */}
               <div className="apm-two-column-grid">
                 {/* LEFT COLUMN */}
@@ -271,7 +244,6 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                       <div className="apm-form-error">{errors.policyName}</div>
                     )}
                   </div>
-
                   {/* Category - CUSTOM DROPDOWN */}
                   <div className="apm-form-group">
                     <label className="apm-form-label">
@@ -290,7 +262,6 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                       <div className="apm-form-error">{errors.category}</div>
                     )}
                   </div>
-
                   {/* Status - CUSTOM DROPDOWN */}
                   <div className="apm-form-group">
                     <label className="apm-form-label">Status</label>
@@ -307,7 +278,6 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                     </small>
                   </div>
                 </div>
-
                 {/* RIGHT COLUMN */}
                 <div className="apm-column-right">
                   {/* Description */}
@@ -330,7 +300,6 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                       <div className="apm-form-error">{errors.description}</div>
                     )}
                   </div>
-
                   {/* Compliance Guidance */}
                   <div className="apm-form-group">
                     <label className="apm-form-label">
@@ -347,14 +316,12 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                   </div>
                 </div>
               </div>
-
               {/* DOCUMENT SECTION */}
               <div className="apm-document-section">
                 <label className="apm-document-label">
                   <i className="bi bi-file-earmark-text apm-document-label-icon"></i>
                   Attach Policy Document (Optional)
                 </label>
-
                 {/* Three Button Group */}
                 <div className="apm-button-group">
                   <button
@@ -400,7 +367,6 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                     Add Link
                   </button>
                 </div>
-
                 {/* Upload File Section */}
                 {documentType === "upload" && (
                   <div className="apm-upload-container">
@@ -418,7 +384,6 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                     <small className="apm-upload-hint">
                       Supported: PDF, DOC, DOCX (Max 5MB)
                     </small>
-
                     {/* Selected File Display */}
                     {selectedFile && (
                       <div className="apm-selected-file">
@@ -445,7 +410,6 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                     )}
                   </div>
                 )}
-
                 {/* Link Section */}
                 {documentType === "link" && (
                   <div className="apm-link-container">
@@ -493,7 +457,6 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                 )}
               </div>
             </div>
-
             {/* Modal Footer */}
             <div className="apm-modal-footer">
               <button
@@ -505,7 +468,6 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                 <i className="bi bi-x-circle"></i>
                 Cancel
               </button>
-
               <button
                 type="submit"
                 disabled={loading || uploadingDoc}
@@ -535,5 +497,4 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
     </>
   );
 };
-
 export default AddPolicyModal;

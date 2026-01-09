@@ -1,6 +1,5 @@
 import React from "react";
 import "../../../styles/hr_operations/hr/ReminderEmailModal.css";
-
 const ReminderEmailModal = ({
   show,
   onHide,
@@ -10,11 +9,9 @@ const ReminderEmailModal = ({
   onSendReminder,
 }) => {
   if (!show) return null;
-
   return (
     <>
       <div className="rem-backdrop" onClick={onHide} />
-
       <div className="rem-modal-container">
         <div className="rem-modal-dialog">
           {/* HEADER */}
@@ -33,14 +30,12 @@ const ReminderEmailModal = ({
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* BODY */}
           <div className="rem-modal-body">
             <p className="rem-label">Send goal-setting reminder to:</p>
             <div className="rem-email-box">
               {reminderTargetUser?.email ?? reminderTargetUser?.Email}
             </div>
-
             {/* Reminder Result */}
             {reminderResult && (
               <div
@@ -62,7 +57,6 @@ const ReminderEmailModal = ({
               </div>
             )}
           </div>
-
           {/* FOOTER */}
           <div className="rem-modal-footer">
             <button
@@ -73,7 +67,6 @@ const ReminderEmailModal = ({
             >
               Close
             </button>
-
             <button
               type="button"
               onClick={onSendReminder}
@@ -97,5 +90,4 @@ const ReminderEmailModal = ({
     </>
   );
 };
-
 export default ReminderEmailModal;

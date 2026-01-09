@@ -1,6 +1,5 @@
 import { useState } from "react";
 import "../../../../styles/auth/changerequest/ApproveEmailChangeModal.css";
-
 const ApproveEmailChangeModal = ({
   show,
   request,
@@ -9,16 +8,13 @@ const ApproveEmailChangeModal = ({
   processing,
 }) => {
   const [adminRemarks, setAdminRemarks] = useState("");
-
   const handleSubmit = () => {
     onApprove(adminRemarks);
   };
-
   const handleClose = () => {
     setAdminRemarks("");
     onHide();
   };
-
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -29,13 +25,10 @@ const ApproveEmailChangeModal = ({
       minute: "2-digit",
     });
   };
-
   if (!show || !request) return null;
-
   return (
     <>
       <div className="aecm-backdrop" onClick={handleClose} />
-
       <div className="aecm-modal-container">
         <div className="aecm-modal-dialog">
           {/* HEADER */}
@@ -54,7 +47,6 @@ const ApproveEmailChangeModal = ({
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* BODY */}
           <div className="aecm-modal-body">
             {/* Request Details Box */}
@@ -63,7 +55,6 @@ const ApproveEmailChangeModal = ({
                 <i className="bi bi-info-circle"></i>
                 Request Details
               </h6>
-
               <div className="aecm-details-content">
                 <div className="aecm-detail-row">
                   <span className="aecm-detail-label">Employee:</span>
@@ -72,26 +63,22 @@ const ApproveEmailChangeModal = ({
                     <small></small>
                   </div>
                 </div>
-
                 <div className="aecm-detail-row">
                   <span className="aecm-detail-label">Current Email:</span>
                   <code className="aecm-email-current">
                     {request.currentValue || "Not set"}
                   </code>
                 </div>
-
                 <div className="aecm-detail-row">
                   <span className="aecm-detail-label">New Email:</span>
                   <code className="aecm-email-new">{request.newValue}</code>
                 </div>
-
                 <div className="aecm-detail-row">
                   <span className="aecm-detail-label">Requested At:</span>
                   <span className="aecm-date-value">
                     {formatDate(request.requestedAt)}
                   </span>
                 </div>
-
                 {request.reason && (
                   <div className="aecm-reason-section">
                     <span className="aecm-reason-label">Employee Reason:</span>
@@ -100,7 +87,6 @@ const ApproveEmailChangeModal = ({
                 )}
               </div>
             </div>
-
             {/* Admin Remarks */}
             <div className="aecm-remarks-section">
               <label className="aecm-remarks-label">
@@ -119,7 +105,6 @@ const ApproveEmailChangeModal = ({
                 {adminRemarks.length}/500 characters
               </small>
             </div>
-
             {/* Info Alert */}
             <div className="aecm-info-alert">
               <i className="bi bi-info-circle aecm-info-icon"></i>
@@ -130,7 +115,6 @@ const ApproveEmailChangeModal = ({
               </div>
             </div>
           </div>
-
           {/* FOOTER */}
           <div className="aecm-modal-footer">
             <button
@@ -141,7 +125,6 @@ const ApproveEmailChangeModal = ({
             >
               <i className="bi bi-x-circle"></i> Cancel
             </button>
-
             <button
               type="button"
               onClick={handleSubmit}
@@ -165,5 +148,4 @@ const ApproveEmailChangeModal = ({
     </>
   );
 };
-
 export default ApproveEmailChangeModal;

@@ -3,15 +3,12 @@ import { toast } from "sonner";
 import budgetAllocationService from "../../../services/hr_operations/hr/budgetAllocationService";
 import { formatCurrency } from "../../../utils/auth/currencyFormatter";
 import "../../../styles/hr_operations/hr/ViewPeriodDetailsModal.css";
-
 const ViewPeriodDetailsModal = ({ period, onClose }) => {
   const [subAllocations, setSubAllocations] = useState([]);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     fetchSubAllocations();
   }, []);
-
   const fetchSubAllocations = async () => {
     try {
       setLoading(true);
@@ -19,7 +16,6 @@ const ViewPeriodDetailsModal = ({ period, onClose }) => {
         await budgetAllocationService.getFundAllocationsByDepartment(
           period.departmentId
         );
-
       if (response.success) {
         const periodAllocations = response.data.filter(
           (alloc) =>
@@ -35,25 +31,21 @@ const ViewPeriodDetailsModal = ({ period, onClose }) => {
       setLoading(false);
     }
   };
-
   const getStatusClass = (utilizationPercentage) => {
     if (utilizationPercentage >= 90) return "critical";
     if (utilizationPercentage >= 75) return "high";
     if (utilizationPercentage >= 50) return "medium";
     return "low";
   };
-
   const getStatusText = (utilizationPercentage) => {
     if (utilizationPercentage >= 90) return "Critical";
     if (utilizationPercentage >= 75) return "High";
     if (utilizationPercentage >= 50) return "Medium";
     return "Low";
   };
-
   return (
     <>
       <div className="vpdm-backdrop" onClick={onClose} />
-
       <div className="vpdm-modal-container">
         <div className="vpdm-modal-dialog">
           {/* HEADER  */}
@@ -71,7 +63,6 @@ const ViewPeriodDetailsModal = ({ period, onClose }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* BODY  */}
           <div className="vpdm-modal-body">
             {/* Period Summary */}
@@ -97,20 +88,17 @@ const ViewPeriodDetailsModal = ({ period, onClose }) => {
                   <span>{formatCurrency(period.remainingAmount || 0)}</span>
                 </div>
               </div>
-
               {period.notes && (
                 <div className="vpdm-period-notes">
                   <strong>Notes:</strong> {period.notes}
                 </div>
               )}
             </div>
-
             {/* Sub-Allocations */}
             <h6 className="vpdm-suballoc-heading">
               <i className="bi bi-list-task vpdm-suballoc-icon"></i>
               Sub-Allocations ({subAllocations.length})
             </h6>
-
             {loading ? (
               <div className="vpdm-loading">
                 <span className="vpdm-spinner" />
@@ -144,7 +132,6 @@ const ViewPeriodDetailsModal = ({ period, onClose }) => {
                       const utilization = alloc.utilizationPercentage || 0;
                       const statusClass = getStatusClass(utilization);
                       const statusText = getStatusText(utilization);
-
                       return (
                         <tr key={alloc.allocationId}>
                           <td>
@@ -220,7 +207,6 @@ const ViewPeriodDetailsModal = ({ period, onClose }) => {
               </div>
             )}
           </div>
-
           {/* FOOTER - Fixed */}
           <div className="vpdm-modal-footer">
             <button type="button" onClick={onClose} className="vpdm-btn-close">
@@ -232,5 +218,4 @@ const ViewPeriodDetailsModal = ({ period, onClose }) => {
     </>
   );
 };
-
 export default ViewPeriodDetailsModal;

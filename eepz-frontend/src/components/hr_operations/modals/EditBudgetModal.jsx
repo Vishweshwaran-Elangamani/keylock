@@ -3,7 +3,6 @@ import budgetAllocationService from "../../../services/hr_operations/hr/budgetAl
 import { formatCurrency } from "../../../utils/auth/currencyFormatter";
 import { toast } from "sonner";
 import "../../../styles/hr_operations/hr/EditBudgetModal.css";
-
 const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
   const [formData, setFormData] = useState({
     budgetId: "",
@@ -12,10 +11,8 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
     totalBudget: "",
     allocatedAmount: "",
   });
-
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-
   useEffect(() => {
     if (show && budget) {
       setFormData({
@@ -28,7 +25,6 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
       setErrors({});
     }
   }, [show, budget]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -38,47 +34,35 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
           ? parseInt(value)
           : value,
     }));
-
-   
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
-
   const validateForm = () => {
     const newErrors = {};
-
     if (!formData.totalBudget || parseFloat(formData.totalBudget) <= 0) {
       newErrors.totalBudget = "Total budget must be greater than zero";
     }
-
     const allocatedAmount = formData.allocatedAmount
       ? parseFloat(formData.allocatedAmount)
       : parseFloat(formData.totalBudget);
-
     if (allocatedAmount > parseFloat(formData.totalBudget)) {
       newErrors.allocatedAmount = "Allocated amount cannot exceed total budget";
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) {
       toast.error("Please fix the errors in the form");
       return;
     }
-
     setLoading(true);
-
     try {
       const allocatedAmount = formData.allocatedAmount
         ? parseFloat(formData.allocatedAmount)
         : parseFloat(formData.totalBudget);
-
       await budgetAllocationService.updateDepartmentBudget({
         budgetId: formData.budgetId,
         departmentId: formData.departmentId,
@@ -96,18 +80,14 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
       setLoading(false);
     }
   };
-
   const handleClose = () => {
     setErrors({});
     onHide();
   };
-
   if (!show) return null;
-
   return (
     <>
       <div className="ebm-backdrop" onClick={handleClose} />
-
       <div className="ebm-modal-container">
         <div className="ebm-modal-dialog">
           {/* HEADER */}
@@ -126,7 +106,6 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* BODY/FORM */}
           <form onSubmit={handleSubmit} className="ebm-form">
             <div className="ebm-modal-body">
@@ -138,12 +117,10 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
                     {budget?.departmentName || "Unknown"}
                   </span>
                 </div>
-
                 <div className="ebm-info-card">
                   <label className="ebm-info-label">Fiscal Year:</label>
                   <span className="ebm-info-value">{budget?.fiscalYear}</span>
                 </div>
-
                 <div className="ebm-info-card">
                   <label className="ebm-info-label">Created On:</label>
                   <span className="ebm-info-value">
@@ -153,7 +130,6 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
                   </span>
                 </div>
               </div>
-
               <div className="ebm-form-grid">
                 {/* Total Budget */}
                 <div className="ebm-form-group">
@@ -180,7 +156,6 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
                     Total budget for this department and fiscal year
                   </small>
                 </div>
-
                 {/* Allocated Amount */}
                 <div className="ebm-form-group">
                   <label className="ebm-form-label">Allocated Amount (₹)</label>
@@ -206,14 +181,12 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
                   </small>
                 </div>
               </div>
-
               {/* BUDGET COMPARISON */}
               <div className="ebm-budget-comparison">
                 <div className="ebm-comparison-header">
                   <i className="bi bi-arrow-left-right ebm-comparison-icon"></i>
                   <span>Budget Comparison</span>
                 </div>
-
                 <div className="ebm-comparison-grid">
                   {/* Current */}
                   <div>
@@ -229,7 +202,6 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
                       </p>
                     </div>
                   </div>
-
                   {/* New */}
                   <div>
                     <h6 className="ebm-comparison-section-title">NEW</h6>
@@ -248,7 +220,6 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
                   </div>
                 </div>
               </div>
-
               {/* CURRENT UTILIZATION */}
               {budget?.utilizedAmount > 0 && (
                 <div className="ebm-utilization-info">
@@ -273,7 +244,6 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
                 </div>
               )}
             </div>
-
             {/* FOOTER */}
             <div className="ebm-modal-footer">
               <button
@@ -284,7 +254,6 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
               >
                 <i className="bi bi-x-circle"></i> Cancel
               </button>
-
               <button
                 type="submit"
                 disabled={loading}
@@ -308,5 +277,4 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
     </>
   );
 };
-
 export default EditBudgetModal;

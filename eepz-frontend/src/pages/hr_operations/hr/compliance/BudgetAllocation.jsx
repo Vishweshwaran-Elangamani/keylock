@@ -10,17 +10,14 @@ import { FaSearch } from "react-icons/fa";
 import { Form } from "react-bootstrap";
 import "../../../../styles/hr_operations/hr/BudgetAllocation.css";
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
-
 const YearDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
   const allOptions = [{ label: "All Years", value: "all" }, ...options];
   const selected = allOptions.find((o) => o.value === value) || allOptions[0];
-
   const handleSelect = (val) => {
     onChange({ target: { name: "year", value: val } });
     setOpen(false);
   };
-
   return (
     <div
       className="ba-filter-select custom-ba-year-dropdown"
@@ -53,7 +50,6 @@ const YearDropdown = ({ value, onChange, options }) => {
     </div>
   );
 };
-
 const DepartmentDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
   const allOptions = [
@@ -61,12 +57,10 @@ const DepartmentDropdown = ({ value, onChange, options }) => {
     ...options.map((dept) => ({ label: dept, value: dept })),
   ];
   const selected = allOptions.find((o) => o.value === value) || allOptions[0];
-
   const handleSelect = (val) => {
     onChange({ target: { name: "department", value: val } });
     setOpen(false);
   };
-
   return (
     <div
       className="ba-filter-select custom-ba-department-dropdown"
@@ -101,54 +95,43 @@ const DepartmentDropdown = ({ value, onChange, options }) => {
     </div>
   );
 };
-
 const BudgetAllocation = () => {
   const [budgets, setBudgets] = useState([]);
   const [filteredBudgets, setFilteredBudgets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedBudget, setSelectedBudget] = useState(null);
-
   const [viewType, setViewType] = useState("table");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [showRowsDropdown, setShowRowsDropdown] = useState(false);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
   const searchInputRef = useRef(null);
   const rowsDropdownRef = useRef(null);
-
   const [filters, setFilters] = useState({
     year: "all",
     department: "",
   });
-
   const [filterOptions, setFilterOptions] = useState({
     years: [],
     departments: [],
   });
-
   const currentUserId = parseInt(localStorage.getItem("userId"));
   const userRole = localStorage.getItem("userRole");
   const isLeadership = userRole === "Leadership";
-
   useEffect(() => {}, [userRole]);
-
   useEffect(() => {
     fetchBudgets();
   }, []);
-
   useEffect(() => {
     applyFilters();
     setCurrentPage(1);
   }, [budgets, activeSearchTerm, filters]);
-
   // Click outside handler for rows dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -159,13 +142,11 @@ const BudgetAllocation = () => {
         setShowRowsDropdown(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
   const fetchBudgets = async () => {
     setLoading(true);
     setError(null);
@@ -183,7 +164,6 @@ const BudgetAllocation = () => {
       setLoading(false);
     }
   };
-
   const generateFilterOptions = (data) => {
     const years = [...new Set(data.map((b) => b.fiscalYear))].sort(
       (a, b) => b - a
@@ -191,13 +171,10 @@ const BudgetAllocation = () => {
     const departments = [
       ...new Set(data.map((b) => b.departmentName).filter(Boolean)),
     ].sort();
-
     setFilterOptions({ years, departments });
   };
-
   const applyFilters = () => {
     let filtered = budgets;
-
     if (activeSearchTerm.trim()) {
       const query = activeSearchTerm.toLowerCase();
       filtered = filtered.filter((b) => {
@@ -205,22 +182,18 @@ const BudgetAllocation = () => {
         return dept.includes(query) || b.fiscalYear.toString().includes(query);
       });
     }
-
     if (filters.year !== "all") {
       filtered = filtered.filter(
         (b) => b.fiscalYear === parseInt(filters.year)
       );
     }
-
     if (filters.department) {
       filtered = filtered.filter(
         (b) => b.departmentName === filters.department
       );
     }
-
     setFilteredBudgets(filtered);
   };
-
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({
@@ -228,18 +201,15 @@ const BudgetAllocation = () => {
       [name]: value,
     }));
   };
-
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
     if (searchInputRef.current) searchInputRef.current.blur();
   };
-
   const handleSearchKeyDown = (e) => {
     if (e.key === "Enter") {
       handleSearch();
     }
   };
-
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
@@ -248,62 +218,51 @@ const BudgetAllocation = () => {
       department: "",
     });
   };
-
   const handleItemsPerPageChange = (newSize) => {
     setItemsPerPage(newSize);
     setCurrentPage(1);
     setShowRowsDropdown(false);
   };
-
   const goToPage = (page) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
   };
-
   const totalPages = Math.ceil(filteredBudgets.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentPageData = filteredBudgets.slice(startIndex, endIndex);
-
   const handleCreateBudget = () => {
     setShowCreateModal(true);
   };
-
   const handleBudgetCreated = () => {
     setShowCreateModal(false);
     fetchBudgets();
     showToast("Success", "Department budget created successfully", "success");
   };
-
   const handleEditClick = (budget) => {
     setSelectedBudget(budget);
     setShowEditModal(true);
   };
-
   const handleBudgetUpdated = () => {
     setShowEditModal(false);
     setSelectedBudget(null);
     fetchBudgets();
     showToast("Success", "Department budget updated successfully", "success");
   };
-
   const handleDeleteClick = (budget) => {
     setSelectedBudget(budget);
     setShowDeleteModal(true);
   };
-
   const handleBudgetDeleted = () => {
     setShowDeleteModal(false);
     setSelectedBudget(null);
     fetchBudgets();
   };
-
   const handleViewDetails = (budget) => {
     setSelectedBudget(budget);
     setShowDetailsModal(true);
   };
-
   const showToast = (title, message, type) => {
     const fullMessage = `${title}: ${message}`;
     switch (type) {
@@ -324,7 +283,6 @@ const BudgetAllocation = () => {
         toast(fullMessage);
     }
   };
-
   const getUtilizationColor = (percentage) => {
     if (!percentage) return "#cbd5e1";
     if (percentage >= 90) return "#ef4444";
@@ -332,7 +290,6 @@ const BudgetAllocation = () => {
     if (percentage >= 50) return "#10b981";
     return "#3b82f6";
   };
-
   const summaryStats = {
     totalBudget: filteredBudgets.reduce(
       (sum, b) => sum + (b.totalBudget || 0),
@@ -347,11 +304,9 @@ const BudgetAllocation = () => {
       0
     ),
   };
-
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
-
     if (totalPages <= maxPagesToShow) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -375,7 +330,6 @@ const BudgetAllocation = () => {
     }
     return pages;
   };
-
   if (loading) {
     return (
       <div className="ba-loading-container">
@@ -386,7 +340,6 @@ const BudgetAllocation = () => {
       </div>
     );
   }
-
   return (
     <div className="ba-page">
       <Breadcrumb
@@ -415,7 +368,6 @@ const BudgetAllocation = () => {
               <div className="stat-label-ba">Total Budget</div>
             </div>
           </div>
-
           <div className="stat-card-ba stat-allocated-ba">
             <div className="stat-icon-ba">
               <i className="bi bi-cash-stack"></i>
@@ -427,7 +379,6 @@ const BudgetAllocation = () => {
               <div className="stat-label-ba">Total Allocated</div>
             </div>
           </div>
-
           <div className="stat-card-ba stat-utilized-ba">
             <div className="stat-icon-ba">
               <i className="bi bi-graph-up-arrow"></i>
@@ -465,7 +416,6 @@ const BudgetAllocation = () => {
             </button>
           </div>
         </div>
-
         <YearDropdown
           value={filters.year}
           onChange={handleFilterChange}
@@ -474,21 +424,17 @@ const BudgetAllocation = () => {
             value: year.toString(),
           }))}
         />
-
         <DepartmentDropdown
           value={filters.department}
           onChange={handleFilterChange}
           options={filterOptions.departments}
         />
-
         <button className="ba-btn-clear" onClick={clearFilters}>
           Clear Filters
         </button>
-
         <div className="ba-results-count">
           Showing {currentPageData.length} of {filteredBudgets.length} budgets
         </div>
-
         {isLeadership && (
           <button className="ba-btn-create" onClick={handleCreateBudget}>
             <i className="bi bi-plus-circle"></i> Add Budget
@@ -517,7 +463,6 @@ const BudgetAllocation = () => {
                     <p className="ba-card-year">{budget.fiscalYear}</p>
                   </div>
                 </div>
-
                 <div className="ba-card-body">
                   <div className="ba-card-row">
                     <span className="ba-card-label">Total Budget</span>
@@ -544,7 +489,6 @@ const BudgetAllocation = () => {
                     </span>
                   </div>
                 </div>
-
                 {isLeadership && (
                   <div className="ba-card-actions">
                     <button
@@ -573,7 +517,6 @@ const BudgetAllocation = () => {
               </div>
             ))}
           </div>
-
           {totalPages > 1 && (
             <div className="ba-pagination-container">
               <div className="ba-pagination-info">
@@ -591,7 +534,6 @@ const BudgetAllocation = () => {
                       } ba-rows-chevron`}
                     ></i>
                   </button>
-
                   {showRowsDropdown && (
                     <div className="ba-rows-dropdown">
                       {[5, 10, 25, 50].map((size) => (
@@ -610,13 +552,11 @@ const BudgetAllocation = () => {
                 </div>
                 <span className="ba-pagination-label">entries</span>
               </div>
-
               <div className="ba-pagination-status">
                 Showing {Math.min(startIndex + 1, filteredBudgets.length)}-
                 {Math.min(endIndex, filteredBudgets.length)} of{" "}
                 {filteredBudgets.length} entries
               </div>
-
               <nav className="ba-pagination-nav">
                 <ul className="ba-pagination">
                   <li
@@ -632,7 +572,6 @@ const BudgetAllocation = () => {
                       <i className="bi bi-chevron-left"></i>
                     </button>
                   </li>
-
                   {getPageNumbers().map((page, index) => (
                     <li
                       key={index}
@@ -651,7 +590,6 @@ const BudgetAllocation = () => {
                       </button>
                     </li>
                   ))}
-
                   <li
                     className={`ba-page-item ${
                       currentPage === totalPages ? "disabled" : ""
@@ -727,7 +665,6 @@ const BudgetAllocation = () => {
                 </tbody>
               </table>
             </div>
-
             {totalPages > 1 && (
               <div className="ba-pagination-container">
                 <div className="ba-pagination-info">
@@ -748,7 +685,6 @@ const BudgetAllocation = () => {
                         } ba-rows-chevron`}
                       ></i>
                     </button>
-
                     {showRowsDropdown && (
                       <div className="ba-rows-dropdown">
                         {[5, 10, 25, 50].map((size) => (
@@ -767,13 +703,11 @@ const BudgetAllocation = () => {
                   </div>
                   <span className="ba-pagination-label">entries</span>
                 </div>
-
                 <div className="ba-pagination-status">
                   Showing {Math.min(startIndex + 1, filteredBudgets.length)}-
                   {Math.min(endIndex, filteredBudgets.length)} of{" "}
                   {filteredBudgets.length} entries
                 </div>
-
                 <nav className="ba-pagination-nav">
                   <ul className="ba-pagination">
                     <li
@@ -789,7 +723,6 @@ const BudgetAllocation = () => {
                         <i className="bi bi-chevron-left"></i>
                       </button>
                     </li>
-
                     {getPageNumbers().map((page, index) => (
                       <li
                         key={index}
@@ -808,7 +741,6 @@ const BudgetAllocation = () => {
                         </button>
                       </li>
                     ))}
-
                     <li
                       className={`ba-page-item ${
                         currentPage === totalPages ? "disabled" : ""
@@ -881,5 +813,4 @@ const BudgetAllocation = () => {
     </div>
   );
 };
-
 export default BudgetAllocation;

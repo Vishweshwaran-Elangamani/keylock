@@ -11,22 +11,16 @@ import DeleteConfirmationModal from "../../../../components/hr_operations/modals
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
 import { FaSearch } from "react-icons/fa";
 import "../../../../styles/hr_operations/hr/PeriodAllocation.css";
-
-
-
 const DepartmentDropdown = ({ budgets, selectedBudget, onChange }) => {
   const [open, setOpen] = useState(false);
-
   const handleSelect = (budget) => {
     onChange(budget);
     setOpen(false);
   };
-
   const handleSelectPlaceholder = () => {
     onChange(null);
     setOpen(false);
   };
-
   if (budgets.length === 0) {
     return (
       <div className="pa-filter-select custom-status-dropdown">
@@ -37,7 +31,6 @@ const DepartmentDropdown = ({ budgets, selectedBudget, onChange }) => {
       </div>
     );
   }
-
   return (
     <div
       className="pa-filter-select custom-status-dropdown"
@@ -54,7 +47,6 @@ const DepartmentDropdown = ({ budgets, selectedBudget, onChange }) => {
           : "Select Department"}
         <span className="custom-status-arrow" />
       </div>
-
       {open && (
         <div className="custom-status-menu">
           <div
@@ -63,7 +55,6 @@ const DepartmentDropdown = ({ budgets, selectedBudget, onChange }) => {
           >
             Select Department
           </div>
-
           {budgets.map((budget) => (
             <div
               key={budget.budgetId}
@@ -89,24 +80,17 @@ const DepartmentDropdown = ({ budgets, selectedBudget, onChange }) => {
     </div>
   );
 };
-
-
-
 const YearDropdown = ({ value, onChange, years }) => {
   const [open, setOpen] = useState(false);
-
   const allOptions = [
     { label: "All Years", value: "all" },
     ...years.map((year) => ({ label: year.toString(), value: year.toString() })),
   ];
-
   const selected = allOptions.find((o) => o.value === value) || allOptions[0];
-
   const handleSelect = (val) => {
     onChange(val);
     setOpen(false);
   };
-
   return (
     <div
       className="pa-year-select custom-status-dropdown"
@@ -121,7 +105,6 @@ const YearDropdown = ({ value, onChange, years }) => {
         {selected.label}
         <span className="custom-status-arrow" />
       </div>
-
       {open && (
         <div className="custom-status-menu">
           {allOptions.map((opt) => (
@@ -140,8 +123,6 @@ const YearDropdown = ({ value, onChange, years }) => {
     </div>
   );
 };
-
-
 const PeriodAllocationManagement = () => {
   const [budgets, setBudgets] = useState([]);
   const [selectedBudget, setSelectedBudget] = useState(null);
@@ -149,40 +130,31 @@ const PeriodAllocationManagement = () => {
   const [filteredPeriods, setFilteredPeriods] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   const [showCreatePeriodModal, setShowCreatePeriodModal] = useState(false);
   const [showUpdatePeriodModal, setShowUpdatePeriodModal] = useState(false);
   const [showAllocateModal, setShowAllocateModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState(null);
-
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [periodToDelete, setPeriodToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
-
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-
   const [sortConfig, setSortConfig] = useState({
     key: null,
     direction: "asc",
   });
-
   const [filters, setFilters] = useState({
     year: "all",
   });
-
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-
   const [filterOptions, setFilterOptions] = useState({
     years: [],
   });
-
   useEffect(() => {
     fetchBudgets();
   }, []);
-
   useEffect(() => {
     if (selectedBudget) {
       fetchPeriodAllocations(selectedBudget.budgetId);
@@ -191,17 +163,14 @@ const PeriodAllocationManagement = () => {
       setFilteredPeriods([]);
     }
   }, [selectedBudget]);
-
   useEffect(() => {
     applyFilters();
     setCurrentPage(1);
   }, [periodAllocations, filters, sortConfig, searchTerm]);
-
   const fetchBudgets = async () => {
     try {
       setLoading(true);
       const response = await budgetAllocationService.getAllDepartmentBudgets();
-
       if (response.success) {
         const yearFiltered = response.data || [];
         setBudgets(yearFiltered);
@@ -214,12 +183,10 @@ const PeriodAllocationManagement = () => {
       setLoading(false);
     }
   };
-
   const fetchPeriodAllocations = async (budgetId) => {
     try {
       const response =
         await periodAllocationService.getPeriodAllocationsByBudget(budgetId);
-
       if (response.success) {
         const data = response.data || [];
         setPeriodAllocations(data);
@@ -231,20 +198,16 @@ const PeriodAllocationManagement = () => {
       toast.error("Failed to load period allocations");
     }
   };
-
   const generateFilterOptions = (data) => {
     const years = [...new Set(data.map((p) => p.periodYear))].sort(
       (a, b) => b - a
     );
-
     setFilterOptions({
       years,
     });
   };
-
   const applyFilters = () => {
     let filtered = periodAllocations;
-
     if (searchTerm.trim()) {
       const query = searchTerm.toLowerCase();
       filtered = filtered.filter((p) => {
@@ -254,26 +217,21 @@ const PeriodAllocationManagement = () => {
         );
       });
     }
-
     if (filters.year !== "all") {
       filtered = filtered.filter(
         (p) => p.periodYear === parseInt(filters.year)
       );
     }
-
     if (sortConfig.key) {
       filtered.sort((a, b) => {
         let aValue = a[sortConfig.key];
         let bValue = b[sortConfig.key];
-
         if (aValue === null || aValue === undefined) aValue = 0;
         if (bValue === null || bValue === undefined) bValue = 0;
-
         if (typeof aValue === "string") {
           aValue = aValue.toLowerCase();
           bValue = bValue.toLowerCase();
         }
-
         if (aValue < bValue) {
           return sortConfig.direction === "asc" ? -1 : 1;
         }
@@ -283,10 +241,8 @@ const PeriodAllocationManagement = () => {
         return 0;
       });
     }
-
     setFilteredPeriods(filtered);
   };
-
   const handleSort = (key) => {
     let direction = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
@@ -294,7 +250,6 @@ const PeriodAllocationManagement = () => {
     }
     setSortConfig({ key, direction });
   };
-
   const getSortIcon = (columnKey) => {
     if (sortConfig.key !== columnKey) {
       return <i className="bi bi-arrow-down-up pa-sort-icon"></i>;
@@ -305,15 +260,12 @@ const PeriodAllocationManagement = () => {
       <i className="bi bi-arrow-down pa-sort-icon active"></i>
     );
   };
-
   const handleSearchInputChange = (e) => {
     setSearchInput(e.target.value);
   };
-
   const handleSearchClick = () => {
     setSearchTerm(searchInput.trim());
   };
-
   const clearFilters = () => {
     setFilters({
       year: "all",
@@ -322,24 +274,20 @@ const PeriodAllocationManagement = () => {
     setSearchTerm("");
     setSortConfig({ key: null, direction: "asc" });
   };
-
   const handleItemsPerPageChange = (e) => {
     setItemsPerPage(parseInt(e.target.value));
     setCurrentPage(1);
   };
-
   const goToPage = (page) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
   };
-
   const exportToCSV = () => {
     if (filteredPeriods.length === 0) {
       toast.warning("No data to export");
       return;
     }
-
     const headers = [
       "Period",
       "Period Year",
@@ -347,7 +295,6 @@ const PeriodAllocationManagement = () => {
       "Allocated Amount",
       "Sub-Allocations",
     ];
-
     const csvData = filteredPeriods.map((period) => [
       period.period || "",
       period.periodYear || "",
@@ -355,12 +302,10 @@ const PeriodAllocationManagement = () => {
       period.allocatedAmount || 0,
       period.subAllocationCount || 0,
     ]);
-
     const csvContent = [
       headers.join(","),
       ...csvData.map((row) => row.join(",")),
     ].join("\n");
-
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
@@ -373,15 +318,12 @@ const PeriodAllocationManagement = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-
     toast.success("Period allocations exported successfully");
   };
-
   const totalPages = Math.ceil(filteredPeriods.length / itemsPerPage) || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentPageData = filteredPeriods.slice(startIndex, endIndex);
-
   const handleCreatePeriod = () => {
     if (!selectedBudget) {
       toast.error("Please select a budget first");
@@ -389,36 +331,29 @@ const PeriodAllocationManagement = () => {
     }
     setShowCreatePeriodModal(true);
   };
-
   const handleUpdatePeriod = (period) => {
     setSelectedPeriod(period);
     setShowUpdatePeriodModal(true);
   };
-
   const handleAllocateFromPeriod = (period) => {
     setSelectedPeriod(period);
     setShowAllocateModal(true);
   };
-
   const handleViewDetails = (period) => {
     setSelectedPeriod(period);
     setShowDetailsModal(true);
   };
-
   const handleDeletePeriod = (period) => {
     setPeriodToDelete(period);
     setShowDeleteModal(true);
   };
-
   const confirmDelete = async () => {
     if (!periodToDelete) return;
-
     setIsDeleting(true);
     try {
       const response = await periodAllocationService.deletePeriodAllocation(
         periodToDelete.periodAllocationId
       );
-
       if (response.success) {
         toast.success("Period allocation deleted successfully");
         fetchPeriodAllocations(selectedBudget.budgetId);
@@ -435,19 +370,16 @@ const PeriodAllocationManagement = () => {
       setIsDeleting(false);
     }
   };
-
   const cancelDelete = () => {
     setShowDeleteModal(false);
     setPeriodToDelete(null);
   };
-
   const handleSuccess = () => {
     if (selectedBudget) {
       fetchPeriodAllocations(selectedBudget.budgetId);
       fetchBudgets();
     }
   };
-
   const summaryStats = {
     totalAllocated: filteredPeriods.reduce(
       (sum, p) => sum + (p.allocatedAmount || 0),
@@ -459,11 +391,9 @@ const PeriodAllocationManagement = () => {
       0
     ),
   };
-
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
-
     if (totalPages <= maxPagesToShow) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -487,7 +417,6 @@ const PeriodAllocationManagement = () => {
     }
     return pages;
   };
-
   if (loading) {
     return (
       <div className="pa-loading-container">
@@ -497,7 +426,6 @@ const PeriodAllocationManagement = () => {
       </div>
     );
   }
-
   return (
     <div className="pa-page">
       {selectedBudget && filteredPeriods.length > 0 && (
@@ -513,7 +441,6 @@ const PeriodAllocationManagement = () => {
               <div className="stat-label-pa">Total Allocated</div>
             </div>
           </div>
-
           <div className="stat-card-pa stat-periods-pa">
             <div className="stat-icon-pa">
               <i className="bi bi-calendar-check"></i>
@@ -523,7 +450,6 @@ const PeriodAllocationManagement = () => {
               <div className="stat-label-pa">Active Periods</div>
             </div>
           </div>
-
           <div className="stat-card-pa stat-sub-pa">
             <div className="stat-icon-pa">
               <i className="bi bi-diagram-3"></i>
@@ -535,7 +461,6 @@ const PeriodAllocationManagement = () => {
               <div className="stat-label-pa">Sub-Allocations</div>
             </div>
           </div>
-
           <div className="stat-card-pa stat-budget-pa">
             <div className="stat-icon-pa">
               <i className="bi bi-building"></i>
@@ -549,7 +474,6 @@ const PeriodAllocationManagement = () => {
           </div>
         </div>
       )}
-
       <div className="pa-controls">
         <div className="pa-search-input">
           <div className="pa-search-inner">
@@ -577,7 +501,6 @@ const PeriodAllocationManagement = () => {
             </button>
           </div>
         </div>
-
         <div className="pa-department-filter">
           <DepartmentDropdown
             budgets={budgets}
@@ -585,7 +508,6 @@ const PeriodAllocationManagement = () => {
             onChange={setSelectedBudget}
           />
         </div>
-
         <div className="pa-year-filter">
           <YearDropdown
             value={filters.year}
@@ -593,20 +515,16 @@ const PeriodAllocationManagement = () => {
             years={filterOptions.years}
           />
         </div>
-
         <button className="pa-btn-clear" onClick={clearFilters}>
           Clear Filters
         </button>
-
         <button className="pa-btn-export" onClick={exportToCSV}>
           <i className="bi bi-download"></i>
           Export
         </button>
-
         <div className="pa-results-count">
           Showing {filteredPeriods.length} {filteredPeriods.length === 1 ? "period" : "periods"}
         </div>
-
         <button
           className="pa-btn-create"
           onClick={handleCreatePeriod}
@@ -616,7 +534,6 @@ const PeriodAllocationManagement = () => {
           Add Period
         </button>
       </div>
-
       {totalPages > 1 && filteredPeriods.length > 0 && (
         <div className="pa-pagination-wrapper">
           <nav className="pa-pagination">
@@ -656,7 +573,6 @@ const PeriodAllocationManagement = () => {
           </nav>
         </div>
       )}
-
       <div className={`pa-table-card ${totalPages > 1 ? "pa-table-with-pagination" : ""}`}>
         {!selectedBudget ? (
           <div className="pa-empty-state">
@@ -774,7 +690,6 @@ const PeriodAllocationManagement = () => {
           </div>
         )}
       </div>
-
       {showCreatePeriodModal && (
         <CreatePeriodAllocationModal
           budget={selectedBudget}
@@ -782,7 +697,6 @@ const PeriodAllocationManagement = () => {
           onSuccess={handleSuccess}
         />
       )}
-
       {showUpdatePeriodModal && selectedPeriod && (
         <UpdatePeriodAllocationModal
           period={selectedPeriod}
@@ -791,7 +705,6 @@ const PeriodAllocationManagement = () => {
           onSuccess={handleSuccess}
         />
       )}
-
       {showAllocateModal && selectedPeriod && (
         <AllocateFromPeriodModal
           period={selectedPeriod}
@@ -800,14 +713,12 @@ const PeriodAllocationManagement = () => {
           onSuccess={handleSuccess}
         />
       )}
-
       {showDetailsModal && selectedPeriod && (
         <ViewPeriodDetailsModal
           period={selectedPeriod}
           onClose={() => setShowDetailsModal(false)}
         />
       )}
-
       <DeleteConfirmationModal
         isOpen={showDeleteModal}
         onClose={cancelDelete}
@@ -824,5 +735,4 @@ const PeriodAllocationManagement = () => {
     </div>
   );
 };
-
 export default PeriodAllocationManagement;

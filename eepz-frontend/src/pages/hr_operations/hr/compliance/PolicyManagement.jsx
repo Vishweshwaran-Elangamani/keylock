@@ -8,23 +8,18 @@ import EditPolicyModal from "../../../../components/hr_operations/modals/EditPol
 import PublishPolicyModal from "../../../../components/hr_operations/modals/PublishPolicyModal";
 import UnpublishPolicyModal from "../../../../components/hr_operations/modals/UnpublishPolicyModal";
 import "../../../../styles/hr_operations/hr/PolicyManagement.css";
-
 const PolicyStatusDropdown = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
-
   const options = [
     { label: "All Status", value: "" },
     { label: "Published", value: "Published" },
     { label: "Draft", value: "Draft" },
   ];
-
   const selected = options.find((o) => o.value === value) || options[0];
-
   const handleSelect = (val) => {
     onChange(val);
     setOpen(false);
   };
-
   return (
     <div
       className="pma-status-select custom-status-dropdown"
@@ -39,7 +34,6 @@ const PolicyStatusDropdown = ({ value, onChange }) => {
         {selected.label}
         <span className="custom-status-arrow" />
       </div>
-
       {open && (
         <div className="custom-status-menu">
           {options.map((opt) => (
@@ -59,22 +53,17 @@ const PolicyStatusDropdown = ({ value, onChange }) => {
     </div>
   );
 };
-
 const PolicyCategoryDropdown = ({ value, onChange, categories }) => {
   const [open, setOpen] = useState(false);
-
   const allOptions = [
     { label: "All Categories", value: "" },
     ...categories.map((cat) => ({ label: cat, value: cat })),
   ];
-
   const selected = allOptions.find((o) => o.value === value) || allOptions[0];
-
   const handleSelect = (val) => {
     onChange(val);
     setOpen(false);
   };
-
   return (
     <div
       className="pma-category-select custom-status-dropdown"
@@ -89,7 +78,6 @@ const PolicyCategoryDropdown = ({ value, onChange, categories }) => {
         {selected.label}
         <span className="custom-status-arrow" />
       </div>
-
       {open && (
         <div className="custom-status-menu">
           {allOptions.map((opt) => (
@@ -109,12 +97,10 @@ const PolicyCategoryDropdown = ({ value, onChange, categories }) => {
     </div>
   );
 };
-
 const PolicyManagement = () => {
   const [policies, setPolicies] = useState([]);
   const [filteredPolicies, setFilteredPolicies] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showPublishModal, setShowPublishModal] = useState(false);
@@ -122,19 +108,15 @@ const PolicyManagement = () => {
   const [selectedPolicy, setSelectedPolicy] = useState(null);
   const [publishing, setPublishing] = useState(false);
   const [unpublishing, setUnpublishing] = useState(false);
-
   const [alert, setAlert] = useState(null);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [showRowsDropdown, setShowRowsDropdown] = useState(false);
   const rowsDropdownRef = useRef(null);
-
   const enqueueToast = (variant, message) => {
     switch (variant) {
       case "success":
@@ -154,15 +136,12 @@ const PolicyManagement = () => {
         toast(message);
     }
   };
-
   useEffect(() => {
     fetchPolicies();
   }, []);
-
   useEffect(() => {
     applyFilters();
   }, [policies, categoryFilter, statusFilter, activeSearchTerm]);
-
   // Click outside handler for rows dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -173,18 +152,15 @@ const PolicyManagement = () => {
         setShowRowsDropdown(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
   const showAlert = (type, message) => {
     setAlert({ type, message });
     setTimeout(() => setAlert(null), 3000);
   };
-
   const fetchPolicies = async () => {
     try {
       setLoading(true);
@@ -197,15 +173,12 @@ const PolicyManagement = () => {
       setLoading(false);
     }
   };
-
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
     setCurrentPage(1);
   };
-
   const applyFilters = () => {
     let filtered = [...policies];
-
     if (activeSearchTerm) {
       filtered = filtered.filter(
         (policy) =>
@@ -213,22 +186,18 @@ const PolicyManagement = () => {
           policy.description?.toLowerCase().includes(activeSearchTerm.toLowerCase())
       );
     }
-
     if (categoryFilter) {
       filtered = filtered.filter(
         (policy) => policy.category?.toLowerCase() === categoryFilter.toLowerCase()
       );
     }
-
     if (statusFilter) {
       const isPublished = statusFilter === "Published";
       filtered = filtered.filter((policy) => policy.isPublished === isPublished);
     }
-
     setFilteredPolicies(filtered);
     setCurrentPage(1);
   };
-
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
@@ -236,20 +205,16 @@ const PolicyManagement = () => {
     setStatusFilter("");
     setCurrentPage(1);
   };
-
   const uniqueCategories = [
     ...new Set(policies.map((policy) => policy.category).filter(Boolean)),
   ];
-
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredPolicies.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredPolicies.length / itemsPerPage) || 1;
-
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
-
     if (totalPages <= maxPagesToShow) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -263,26 +228,21 @@ const PolicyManagement = () => {
         pages.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages);
       }
     }
-
     return pages;
   };
-
   const handleAddSuccess = () => {
     setShowAddModal(false);
     fetchPolicies();
   };
-
   const handleEditSuccess = () => {
     setShowEditModal(false);
     setSelectedPolicy(null);
     fetchPolicies();
   };
-
   const handleView = (policy) => {
     setSelectedPolicy(policy);
     setShowEditModal(true);
   };
-
   const handleDelete = async (policyId) => {
     try {
       await policyService.deletePolicy(policyId);
@@ -292,15 +252,12 @@ const PolicyManagement = () => {
       enqueueToast("danger", "Failed to delete policy");
     }
   };
-
   const handlePublishClick = (policy) => {
     setSelectedPolicy(policy);
     setShowPublishModal(true);
   };
-
   const handlePublishConfirm = async () => {
     if (!selectedPolicy) return;
-
     try {
       setPublishing(true);
       await policyService.publishPolicy(selectedPolicy.policyId);
@@ -314,15 +271,12 @@ const PolicyManagement = () => {
       setPublishing(false);
     }
   };
-
   const handleUnpublishClick = (policy) => {
     setSelectedPolicy(policy);
     setShowUnpublishModal(true);
   };
-
   const handleUnpublishConfirm = async () => {
     if (!selectedPolicy) return;
-
     try {
       setUnpublishing(true);
       await policyService.unpublishPolicy(selectedPolicy.policyId);
@@ -336,13 +290,11 @@ const PolicyManagement = () => {
       setUnpublishing(false);
     }
   };
-
   const getPolicyStats = () => {
     const total = filteredPolicies.length;
     const published = filteredPolicies.filter((p) => p.isPublished).length;
     const draft = filteredPolicies.filter((p) => !p.isPublished).length;
     const categories = [...new Set(filteredPolicies.map((p) => p.category).filter(Boolean))].length;
-
     return {
       totalPolicies: total,
       publishedPolicies: published,
@@ -350,9 +302,7 @@ const PolicyManagement = () => {
       totalCategories: categories,
     };
   };
-
   const stats = getPolicyStats();
-
   if (loading) {
     return (
       <div className="pma-loading-container">
@@ -362,7 +312,6 @@ const PolicyManagement = () => {
       </div>
     );
   }
-
   return (
     <div className="pma-page">
       {alert && (
@@ -375,7 +324,6 @@ const PolicyManagement = () => {
           {alert.message}
         </Alert>
       )}
-
       <div className="stats-cards-pma">
         <div className="stat-card-pma stat-total-pma">
           <div className="stat-icon-pma">
@@ -386,7 +334,6 @@ const PolicyManagement = () => {
             <div className="stat-label-pma">Total Policies</div>
           </div>
         </div>
-
         <div className="stat-card-pma stat-published-pma">
           <div className="stat-icon-pma">
             <i className="bi bi-check2-circle"></i>
@@ -396,7 +343,6 @@ const PolicyManagement = () => {
             <div className="stat-label-pma">Published</div>
           </div>
         </div>
-
         <div className="stat-card-pma stat-draft-pma">
           <div className="stat-icon-pma">
             <i className="bi bi-pencil-square"></i>
@@ -406,7 +352,6 @@ const PolicyManagement = () => {
             <div className="stat-label-pma">Draft</div>
           </div>
         </div>
-
         <div className="stat-card-pma stat-categories-pma">
           <div className="stat-icon-pma">
             <i className="bi bi-grid-3x3-gap"></i>
@@ -417,7 +362,6 @@ const PolicyManagement = () => {
           </div>
         </div>
       </div>
-
       <div className="pma-controls">
         <div className="pma-search-input">
           <div className="pma-search-inner">
@@ -445,7 +389,6 @@ const PolicyManagement = () => {
             </button>
           </div>
         </div>
-
         <div className="pma-category-filter">
           <PolicyCategoryDropdown
             value={categoryFilter}
@@ -456,7 +399,6 @@ const PolicyManagement = () => {
             categories={uniqueCategories}
           />
         </div>
-
         <div className="pma-status-filter">
           <PolicyStatusDropdown
             value={statusFilter}
@@ -466,21 +408,17 @@ const PolicyManagement = () => {
             }}
           />
         </div>
-
         <button className="pma-btn-clear" onClick={clearFilters}>
           Clear Filters
         </button>
-
         <div className="pma-results-count">
           Showing {currentItems.length} of {filteredPolicies.length} policies
         </div>
-
         <button className="pma-btn-create" onClick={() => setShowAddModal(true)}>
           <i className="bi bi-plus-circle"></i>
           Add Policy
         </button>
       </div>
-
       <div className="pma-table-card">
         <div className="pma-table-wrapper">
           <table className="pma-table">
@@ -563,7 +501,6 @@ const PolicyManagement = () => {
             </tbody>
           </table>
         </div>
-
         {totalPages > 1 && filteredPolicies.length > 0 && (
           <div className="pma-pagination">
             <div className="pma-pagination-info">
@@ -579,7 +516,6 @@ const PolicyManagement = () => {
                     className={`bi bi-chevron-${showRowsDropdown ? "up" : "down"} pma-rows-chevron`}
                   ></i>
                 </button>
-
                 {showRowsDropdown && (
                   <div className="pma-rows-dropdown">
                     {[5, 10, 25, 50].map((size) => (
@@ -602,11 +538,9 @@ const PolicyManagement = () => {
               </div>
               <span>entries</span>
             </div>
-
             <div className="pma-pagination-status">
               Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredPolicies.length)} of {filteredPolicies.length} entries
             </div>
-
             <nav className="pma-pagination-nav">
               <ul className="pma-pagination-list">
                 <li className={`pma-page-item ${currentPage === 1 ? "disabled" : ""}`}>
@@ -645,7 +579,6 @@ const PolicyManagement = () => {
           </div>
         )}
       </div>
-
       {showAddModal && (
         <AddPolicyModal
           show={showAddModal}
@@ -654,7 +587,6 @@ const PolicyManagement = () => {
           onToast={enqueueToast}
         />
       )}
-
       {showEditModal && selectedPolicy && (
         <EditPolicyModal
           show={showEditModal}
@@ -668,7 +600,6 @@ const PolicyManagement = () => {
           onToast={enqueueToast}
         />
       )}
-
       {showPublishModal && selectedPolicy && (
         <PublishPolicyModal
           show={showPublishModal}
@@ -681,7 +612,6 @@ const PolicyManagement = () => {
           publishing={publishing}
         />
       )}
-
       {showUnpublishModal && selectedPolicy && (
         <UnpublishPolicyModal
           show={showUnpublishModal}
@@ -697,5 +627,4 @@ const PolicyManagement = () => {
     </div>
   );
 };
-
 export default PolicyManagement;

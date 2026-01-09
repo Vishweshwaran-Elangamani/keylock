@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import budgetAllocationService from "../../../services/hr_operations/hr/budgetAllocationService";
 import { formatCurrency } from "../../../utils/auth/currencyFormatter";
 import "../../../styles/hr_operations/hr/UpdateUtilizationModal.css";
-
 const UpdateUtilizationModal = ({
   show,
   allocation,
@@ -13,12 +12,9 @@ const UpdateUtilizationModal = ({
     utilizedAmount: allocation?.utilizedAmount || 0,
     notes: "",
   });
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
   const currentUserId = parseInt(localStorage.getItem("userId"));
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -26,21 +22,17 @@ const UpdateUtilizationModal = ({
       [name]: value,
     }));
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
     try {
       const utilizedAmount = parseFloat(formData.utilizedAmount);
-
       if (isNaN(utilizedAmount) || utilizedAmount < 0) {
         setError("Utilized amount must be zero or greater");
         setLoading(false);
         return;
       }
-
       if (utilizedAmount > (allocation.amount || 0)) {
         setError(
           `Utilized amount (Rs.${utilizedAmount.toLocaleString(
@@ -52,11 +44,9 @@ const UpdateUtilizationModal = ({
         setLoading(false);
         return;
       }
-
       const utilizationPercentage = Math.round(
         (utilizedAmount / (allocation.amount || 1)) * 100
       );
-
       await budgetAllocationService.updateUtilization({
         allocationId: allocation.allocationId,
         utilizedAmount: utilizedAmount,
@@ -77,7 +67,6 @@ const UpdateUtilizationModal = ({
       setLoading(false);
     }
   };
-
   const handleClose = () => {
     setFormData({
       utilizedAmount: allocation?.utilizedAmount || 0,
@@ -86,28 +75,22 @@ const UpdateUtilizationModal = ({
     setError(null);
     onHide();
   };
-
   const currentUtilizedAmount = parseFloat(formData.utilizedAmount) || 0;
   const currentUtilizationPercentage = Math.round(
     (currentUtilizedAmount / (allocation?.amount || 1)) * 100
   );
   const remainingAmount = (allocation?.amount || 0) - currentUtilizedAmount;
-
   const getUtilizationClass = (percentage) => {
     if (percentage >= 100) return "critical";
     if (percentage >= 75) return "warning";
     if (percentage >= 50) return "good";
     return "normal";
   };
-
   const utilizationClass = getUtilizationClass(currentUtilizationPercentage);
-
   if (!show) return null;
-
   return (
     <>
       <div className="uum-backdrop" onClick={handleClose} />
-
       <div className="uum-modal-container">
         <div className="uum-modal-dialog">
           {/* HEADER - Fixed */}
@@ -126,7 +109,6 @@ const UpdateUtilizationModal = ({
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* BODY - Scrollable */}
           <form onSubmit={handleSubmit} className="uum-form">
             <div className="uum-modal-body">
@@ -136,7 +118,6 @@ const UpdateUtilizationModal = ({
                   {error}
                 </div>
               )}
-
               {/* Allocation Info Grid */}
               <div className="uum-allocation-info">
                 <div className="uum-info-item">
@@ -165,7 +146,6 @@ const UpdateUtilizationModal = ({
                   </span>
                 </div>
               </div>
-
               {/* Utilized Amount Input */}
               <div className="uum-form-group">
                 <label htmlFor="utilizedAmount" className="uum-form-label">
@@ -189,7 +169,6 @@ const UpdateUtilizationModal = ({
                   Maximum: {formatCurrency(allocation?.amount)} (100%)
                 </small>
               </div>
-
               {/* Notes Textarea */}
               <div className="uum-form-group notes">
                 <label htmlFor="notes" className="uum-form-label-block">
@@ -205,11 +184,9 @@ const UpdateUtilizationModal = ({
                   className="uum-form-input uum-form-textarea"
                 />
               </div>
-
               {/* Utilization Summary Section */}
               <div className={`uum-summary-section ${utilizationClass}`}>
                 <h6 className="uum-summary-heading">Utilization Summary</h6>
-
                 {/* Summary Grid */}
                 <div className="uum-summary-grid">
                   <div className="uum-summary-item">
@@ -247,7 +224,6 @@ const UpdateUtilizationModal = ({
                     </span>
                   </div>
                 </div>
-
                 {/* Progress Bar */}
                 <div className="uum-progress-container">
                   <div className="uum-progress-bar">
@@ -266,7 +242,6 @@ const UpdateUtilizationModal = ({
                   </div>
                 </div>
               </div>
-
               {/* Exceeded Warning */}
               {currentUtilizedAmount > (allocation?.amount || 0) && (
                 <div className="uum-exceeded-warning">
@@ -283,7 +258,6 @@ const UpdateUtilizationModal = ({
                 </div>
               )}
             </div>
-
             {/* FOOTER - Fixed */}
             <div className="uum-modal-footer">
               <button
@@ -294,7 +268,6 @@ const UpdateUtilizationModal = ({
               >
                 Cancel
               </button>
-
               <button
                 type="submit"
                 disabled={
@@ -321,5 +294,4 @@ const UpdateUtilizationModal = ({
     </>
   );
 };
-
 export default UpdateUtilizationModal;

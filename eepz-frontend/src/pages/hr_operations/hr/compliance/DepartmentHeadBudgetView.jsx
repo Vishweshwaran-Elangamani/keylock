@@ -7,17 +7,14 @@ import { FaSearch } from "react-icons/fa";
 import { Form } from "react-bootstrap";
 import "../../../../styles/hr_operations/hr/DeptHeadReviewModal.css";
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
-
 const YearDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
   const allOptions = [{ label: "All Years", value: "all" }, ...options];
   const selected = allOptions.find((o) => o.value === value) || allOptions[0];
-
   const handleSelect = (val) => {
     onChange({ target: { name: "year", value: val } });
     setOpen(false);
   };
-
   return (
     <div
       className="budget-filter-select custom-status-dropdown"
@@ -51,7 +48,6 @@ const YearDropdown = ({ value, onChange, options }) => {
     </div>
   );
 };
-
 const DepartmentDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
   const allOptions = [
@@ -59,12 +55,10 @@ const DepartmentDropdown = ({ value, onChange, options }) => {
     ...options.map((dept) => ({ label: dept, value: dept })),
   ];
   const selected = allOptions.find((o) => o.value === value) || allOptions[0];
-
   const handleSelect = (val) => {
     onChange({ target: { name: "department", value: val } });
     setOpen(false);
   };
-
   return (
     <div
       className="budget-filter-select custom-status-dropdown"
@@ -98,67 +92,53 @@ const DepartmentDropdown = ({ value, onChange, options }) => {
     </div>
   );
 };
-
 const DepartmentHeadBudgetView = () => {
   const [budgets, setBudgets] = useState([]);
   const [filteredBudgets, setFilteredBudgets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedBudgetForAllocations, setSelectedBudgetForAllocations] = useState(null);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
-
   const [filters, setFilters] = useState({
     year: "all",
     department: "",
   });
-
   const [filterOptions, setFilterOptions] = useState({
     years: [],
     departments: [],
   });
-
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const userDepartmentName = user.departmentName || "";
   const userName = ((user.firstName || "") + " " + (user.lastName || "")).trim();
-
   useEffect(() => {
     if (!userDepartmentName) {
       setError("Department information not found. Please log in again.");
       setLoading(false);
       return;
     }
-
     fetchBudgets();
   }, []);
-
   useEffect(() => {
     applyFilters();
   }, [budgets, activeSearchTerm, filters]);
-
   const fetchBudgets = async () => {
     setLoading(true);
     setError(null);
-
     try {
       const response = await budgetAllocationService.getAllDepartmentBudgets();
-
       if (!response.success || !response.data) {
         throw new Error(response.message || "Failed to fetch budgets");
       }
-
       const departmentBudgets = response.data.filter((budget) => {
         return (
           budget.departmentName?.trim().toLowerCase() ===
           userDepartmentName?.trim().toLowerCase()
         );
       });
-
       setBudgets(departmentBudgets);
       setFilteredBudgets(departmentBudgets);
       generateFilterOptions(departmentBudgets);
-
       if (departmentBudgets.length === 0) {
         console.warn(`No budget found for department "${userDepartmentName}"`);
         setError(
@@ -173,7 +153,6 @@ const DepartmentHeadBudgetView = () => {
       setLoading(false);
     }
   };
-
   const generateFilterOptions = (data) => {
     const years = [...new Set(data.map((b) => b.fiscalYear))].sort(
       (a, b) => b - a
@@ -181,13 +160,10 @@ const DepartmentHeadBudgetView = () => {
     const departments = [
       ...new Set(data.map((b) => b.departmentName).filter(Boolean)),
     ].sort();
-
     setFilterOptions({ years, departments });
   };
-
   const applyFilters = () => {
     let filtered = budgets;
-
     if (activeSearchTerm.trim()) {
       const query = activeSearchTerm.toLowerCase();
       filtered = filtered.filter((b) => {
@@ -195,22 +171,18 @@ const DepartmentHeadBudgetView = () => {
         return dept.includes(query) || b.fiscalYear.toString().includes(query);
       });
     }
-
     if (filters.year !== "all") {
       filtered = filtered.filter(
         (b) => b.fiscalYear === parseInt(filters.year)
       );
     }
-
     if (filters.department) {
       filtered = filtered.filter(
         (b) => b.departmentName === filters.department
       );
     }
-
     setFilteredBudgets(filtered);
   };
-
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({
@@ -218,11 +190,9 @@ const DepartmentHeadBudgetView = () => {
       [name]: value,
     }));
   };
-
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
   };
-
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
@@ -231,14 +201,12 @@ const DepartmentHeadBudgetView = () => {
       department: "",
     });
   };
-
   const handleShowAllocations = async (budget) => {
     try {
       setLoading(true);
       const response = await budgetAllocationService.getBudgetAllocationsByBudget(
         budget.budgetId
       );
-
       let budgetAllocations = [];
       if (response && response.success) {
         budgetAllocations = response.data || [];
@@ -249,12 +217,10 @@ const DepartmentHeadBudgetView = () => {
           ? response.data.data
           : [];
       }
-
       setSelectedBudgetForAllocations({
         ...budget,
         allocations: budgetAllocations,
       });
-
       setLoading(false);
     } catch (err) {
       console.error("Error fetching allocations:", err);
@@ -262,12 +228,10 @@ const DepartmentHeadBudgetView = () => {
       setLoading(false);
     }
   };
-
   const handleBackToList = () => {
     setSelectedBudgetForAllocations(null);
     fetchBudgets();
   };
-
   const getUtilizationColor = (percentage) => {
     if (!percentage) return "#cbd5e1";
     if (percentage >= 90) return "#ef4444";
@@ -275,7 +239,6 @@ const DepartmentHeadBudgetView = () => {
     if (percentage >= 50) return "#10b981";
     return "#3b82f6";
   };
-
   const getUtilizationStatus = (percentage) => {
     if (!percentage) return { text: "No Usage", color: "#94a3b8" };
     if (percentage >= 90) return { text: "Critical", color: "#ef4444" };
@@ -283,7 +246,6 @@ const DepartmentHeadBudgetView = () => {
     if (percentage >= 50) return { text: "Medium", color: "#10b981" };
     return { text: "Low", color: "#3b82f6" };
   };
-
   const summaryStats = filteredBudgets.length > 0 ? {
     totalBudget: filteredBudgets.reduce((sum, b) => sum + (b.totalBudget || 0), 0),
     totalAllocated: filteredBudgets.reduce((sum, b) => sum + (b.allocatedAmount || 0), 0),
@@ -293,7 +255,6 @@ const DepartmentHeadBudgetView = () => {
     totalAllocated: 0,
     totalUtilized: 0,
   };
-
   if (loading) {
     return (
       <div className="budget-loading-container">
@@ -303,7 +264,6 @@ const DepartmentHeadBudgetView = () => {
       </div>
     );
   }
-
   return (
     <div className="budget-page">
       {!selectedBudgetForAllocations ? (
@@ -315,7 +275,6 @@ const DepartmentHeadBudgetView = () => {
               },
             ]}
           />
-
           {filteredBudgets.length > 0 && (
             <div className="stats-cards-budget">
               <div className="stat-card-budget stat-total-budget">
@@ -327,7 +286,6 @@ const DepartmentHeadBudgetView = () => {
                   <div className="stat-label-budget">Total Budget</div>
                 </div>
               </div>
-
               <div className="stat-card-budget stat-allocated-budget">
                 <div className="stat-icon-budget">
                   <i className="bi bi-cash-stack"></i>
@@ -337,7 +295,6 @@ const DepartmentHeadBudgetView = () => {
                   <div className="stat-label-budget">Total Allocated</div>
                 </div>
               </div>
-
               <div className="stat-card-budget stat-utilized-budget">
                 <div className="stat-icon-budget">
                   <i className="bi bi-graph-up-arrow"></i>
@@ -349,7 +306,6 @@ const DepartmentHeadBudgetView = () => {
               </div>
             </div>
           )}
-
           {/* CONTROLS */}
           <div className="budget-controls">
             <div className="budget-search-input">
@@ -378,7 +334,6 @@ const DepartmentHeadBudgetView = () => {
                 </button>
               </div>
             </div>
-
             <div className="budget-year-filter">
               <YearDropdown
                 value={filters.year}
@@ -389,7 +344,6 @@ const DepartmentHeadBudgetView = () => {
                 }))}
               />
             </div>
-
             <div className="budget-department-filter">
               <DepartmentDropdown
                 value={filters.department}
@@ -397,17 +351,14 @@ const DepartmentHeadBudgetView = () => {
                 options={filterOptions.departments}
               />
             </div>
-
             <button className="budget-btn-clear" onClick={clearFilters}>
               Clear Filters
             </button>
-
             <div className="budget-results-count">
               Showing {filteredBudgets.length}{" "}
               {filteredBudgets.length === 1 ? "budget" : "budgets"}
             </div>
           </div>
-
           {filteredBudgets.length === 0 ? (
             <div className="budget-table-card">
               <div className="budget-empty-state">
@@ -452,7 +403,6 @@ const DepartmentHeadBudgetView = () => {
                       const status = getUtilizationStatus(
                         budget.utilizationPercentage
                       );
-
                       return (
                         <tr key={budget.budgetId}>
                           <td>
@@ -530,5 +480,4 @@ const DepartmentHeadBudgetView = () => {
     </div>
   );
 };
-
 export default DepartmentHeadBudgetView;

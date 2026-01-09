@@ -8,7 +8,6 @@ import PromotionDetailsModal from "../../components/internal/PromotionModals/Pro
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
 import "../../styles/internal/PromotionManagement.css";
-
 const PromotionManagement = () => {
   const { user } = useAuth();
   const [promotions, setPromotions] = useState([]);
@@ -23,34 +22,27 @@ const PromotionManagement = () => {
   const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedPromotion, setSelectedPromotion] = useState(null);
-
   // Get role prefix for routing
   const getRolePrefix = () => {
     const role = user?.role?.toLowerCase().replace(/\s+/g, "-");
     return `/${role}`;
   };
-
   const rolePrefix = getRolePrefix();
-
   toast.options = {
     closeButton: true,
     progressBar: true,
     positionClass: "toast-top-right",
     timeOut: 3000,
   };
-
   useEffect(() => {
     fetchData();
   }, []);
-
   useEffect(() => {
     filterPromotions();
   }, [promotions, searchTerm, selectedStatus]);
-
   const fetchData = async () => {
     try {
       setLoading(true);
-
       let promotionsResponse;
       if (user?.role === "HR") {
         promotionsResponse = await promotionService.getPendingHRApproval();
@@ -60,14 +52,12 @@ const PromotionManagement = () => {
       } else {
         promotionsResponse = await promotionService.getAllPromotions();
       }
-
       if (promotionsResponse.success) {
         const promotionData = Array.isArray(promotionsResponse.data)
           ? promotionsResponse.data
           : promotionsResponse.data?.promotions || [];
         setPromotions(promotionData);
       }
-
       const nomResponse = await nominationService.getAllNominations();
       if (nomResponse.success) {
         const nominations = Array.isArray(nomResponse.data)
@@ -85,10 +75,8 @@ const PromotionManagement = () => {
       setLoading(false);
     }
   };
-
   const filterPromotions = () => {
     let filtered = Array.isArray(promotions) ? [...promotions] : [];
-
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(
@@ -98,25 +86,20 @@ const PromotionManagement = () => {
           promo.positionName?.toLowerCase().includes(term)
       );
     }
-
     if (selectedStatus) {
       filtered = filtered.filter(
         (promo) => promo.status?.toLowerCase() === selectedStatus.toLowerCase()
       );
     }
-
     setFilteredPromotions(filtered);
     setCurrentPage(1);
   };
-
   const getPaginatedPromotions = () => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
     return filteredPromotions.slice(startIndex, endIndex);
   };
-
   const totalPages = Math.ceil(filteredPromotions.length / rowsPerPage);
-
   const getStatusBadgeClass = (status) => {
     switch (status?.toLowerCase()) {
       case "approved":
@@ -133,12 +116,10 @@ const PromotionManagement = () => {
         return "status-inactive";
     }
   };
-
   const handleViewDetails = (promotion) => {
     setSelectedPromotion(promotion);
     setShowDetailsModal(true);
   };
-
   if (loading) {
     return (
       <div className="loading-container">
@@ -148,7 +129,6 @@ const PromotionManagement = () => {
       </div>
     );
   }
-
   return (
     <div className="user-list-page">
       <Breadcrumb
@@ -158,7 +138,6 @@ const PromotionManagement = () => {
           },
         ]}
       />
-
       <div className="filters-card">
         <div className="filters-content">
           <div className="filters-left">
@@ -172,7 +151,6 @@ const PromotionManagement = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-
             <select
               className="filter-select"
               value={selectedStatus}
@@ -187,7 +165,6 @@ const PromotionManagement = () => {
               <option value="rejected">Rejected</option>
             </select>
           </div>
-
           <div className="filters-actions">
             {user?.role === "HR" && (
               <button
@@ -201,7 +178,6 @@ const PromotionManagement = () => {
           </div>
         </div>
       </div>
-
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-icon stat-icon-primary">
@@ -212,7 +188,6 @@ const PromotionManagement = () => {
             <p className="stat-label">Total Promotions</p>
           </div>
         </div>
-
         <div className="stat-card">
           <div className="stat-icon stat-icon-success">
             <i className="bi bi-check-circle-fill"></i>
@@ -227,7 +202,6 @@ const PromotionManagement = () => {
             <p className="stat-label">Approved</p>
           </div>
         </div>
-
         <div className="stat-card">
           <div className="stat-icon stat-icon-warning">
             <i className="bi bi-hourglass-split"></i>
@@ -243,7 +217,6 @@ const PromotionManagement = () => {
             <p className="stat-label">Pending</p>
           </div>
         </div>
-
         <div className="stat-card">
           <div className="stat-icon stat-icon-danger">
             <i className="bi bi-x-circle-fill"></i>
@@ -259,7 +232,6 @@ const PromotionManagement = () => {
           </div>
         </div>
       </div>
-
       <div className="table-card">
         <div className="table-wrapper">
           <table className="user-table">
@@ -338,7 +310,6 @@ const PromotionManagement = () => {
             </tbody>
           </table>
         </div>
-
         {filteredPromotions.length > 0 && (
           <div className="pagination-container">
             <div className="pagination-info">
@@ -360,7 +331,6 @@ const PromotionManagement = () => {
           </div>
         )}
       </div>
-
       {showCreateModal && (
         <CreatePromotionModal
           show={showCreateModal}
@@ -372,7 +342,6 @@ const PromotionManagement = () => {
           }}
         />
       )}
-
       {showApprovalModal && selectedPromotion && (
         <PromotionApprovalModal
           show={showApprovalModal}
@@ -385,7 +354,6 @@ const PromotionManagement = () => {
           }}
         />
       )}
-
       {showDetailsModal && selectedPromotion && (
         <PromotionDetailsModal
           show={showDetailsModal}
@@ -396,5 +364,4 @@ const PromotionManagement = () => {
     </div>
   );
 };
-
 export default PromotionManagement;

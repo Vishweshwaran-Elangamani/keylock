@@ -1,12 +1,9 @@
 import "../../../styles/internal/PromotionDetailsModal.css";
-
 const PromotionDetailsModal = ({ show, onHide, promotion }) => {
   if (!show) return null;
-
   return (
     <>
       <div className="pdm-backdrop" onClick={onHide} />
-
       <div className="pdm-modal-wrapper">
         <div className="pdm-modal-dialog">
           {/* Modal Header */}
@@ -19,7 +16,6 @@ const PromotionDetailsModal = ({ show, onHide, promotion }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* Modal Body */}
           <div className="pdm-modal-body">
             {/* Employee Information */}
@@ -40,7 +36,6 @@ const PromotionDetailsModal = ({ show, onHide, promotion }) => {
                 </div>
               </div>
             </div>
-
             {/* Role Change Details */}
             <div className="pdm-details-section">
               <h6 className="pdm-section-title">Role Change Details</h6>
@@ -80,7 +75,6 @@ const PromotionDetailsModal = ({ show, onHide, promotion }) => {
                 </div>
               </div>
             </div>
-
             {/* Justification - Conditional */}
             {promotion.justification && (
               <div className="pdm-details-section">
@@ -88,7 +82,6 @@ const PromotionDetailsModal = ({ show, onHide, promotion }) => {
                 <p className="pdm-remarks-text">{promotion.justification}</p>
               </div>
             )}
-
             {/* HR Remarks - Conditional */}
             {promotion.remarks && (
               <div className="pdm-details-section">
@@ -96,7 +89,6 @@ const PromotionDetailsModal = ({ show, onHide, promotion }) => {
                 <p className="pdm-remarks-text">{promotion.remarks}</p>
               </div>
             )}
-
             {/* Approval Remarks - Conditional */}
             {promotion.approvalRemarks && (
               <div className="pdm-details-section">
@@ -104,7 +96,6 @@ const PromotionDetailsModal = ({ show, onHide, promotion }) => {
                 <p className="pdm-remarks-text">{promotion.approvalRemarks}</p>
               </div>
             )}
-
             {/* Timeline */}
             <div className="pdm-details-section">
               <h6 className="pdm-section-title">Timeline</h6>
@@ -128,7 +119,6 @@ const PromotionDetailsModal = ({ show, onHide, promotion }) => {
               </div>
             </div>
           </div>
-
           {/* Modal Footer */}
           <div className="pdm-modal-footer">
             <button type="button" className="pdm-btn-close" onClick={onHide}>
@@ -141,7 +131,6 @@ const PromotionDetailsModal = ({ show, onHide, promotion }) => {
     </>
   );
 };
-
 const getStatusBadgeClass = (status) => {
   switch (status?.toLowerCase()) {
     case "approved":
@@ -158,5 +147,4 @@ const getStatusBadgeClass = (status) => {
       return "rejected";
   }
 };
-
 export default PromotionDetailsModal;

@@ -3,7 +3,6 @@ import { Modal } from "react-bootstrap";
 import budgetAllocationService from "../../../services/hr_operations/hr/budgetAllocationService";
 import { formatCurrency } from "../../../utils/auth/currencyFormatter";
 import "../../../styles/hr_operations/hr/UpdateUtilizedAmountModal.css";
-
 const UpdateUtilizedAmountModal = ({
   show,
   budget,
@@ -14,11 +13,9 @@ const UpdateUtilizedAmountModal = ({
     budgetId: "",
     utilizedAmount: "",
   });
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [allocations, setAllocations] = useState([]);
-
   useEffect(() => {
     if (show && budget) {
       setFormData({
@@ -29,7 +26,6 @@ const UpdateUtilizedAmountModal = ({
       setError(null);
     }
   }, [show, budget]);
-
   const fetchAllocations = async () => {
     try {
       const response =
@@ -41,7 +37,6 @@ const UpdateUtilizedAmountModal = ({
       console.error("Error fetching allocations:", err);
     }
   };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -49,12 +44,10 @@ const UpdateUtilizedAmountModal = ({
       [name]: value,
     }));
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
     try {
       // VALIDATIONS
       if (!formData.utilizedAmount || parseFloat(formData.utilizedAmount) < 0) {
@@ -62,11 +55,8 @@ const UpdateUtilizedAmountModal = ({
         setLoading(false);
         return;
       }
-
       const utilizedAmount = parseFloat(formData.utilizedAmount);
       const allocatedAmount = budget.allocatedAmount || 0;
-
-      
       if (utilizedAmount > allocatedAmount) {
         setError(
           `Utilized amount (₹${utilizedAmount.toLocaleString(
@@ -78,7 +68,6 @@ const UpdateUtilizedAmountModal = ({
         setLoading(false);
         return;
       }
-
       await budgetAllocationService.updateUtilizedAmount({
         budgetId: formData.budgetId,
         utilizedAmount: utilizedAmount,
@@ -92,16 +81,13 @@ const UpdateUtilizedAmountModal = ({
       setLoading(false);
     }
   };
-
   const handleClose = () => {
     setError(null);
     onHide();
   };
-
   const getTotalAllocations = () => {
     return allocations.reduce((sum, a) => sum + (parseFloat(a.amount) || 0), 0);
   };
-
   const utilizationPercentage =
     budget.allocatedAmount > 0
       ? (
@@ -109,19 +95,15 @@ const UpdateUtilizedAmountModal = ({
           100
         ).toFixed(2)
       : 0;
-
   const remainingBudget =
     (budget.allocatedAmount || 0) - (parseFloat(formData.utilizedAmount) || 0);
-
   const getProgressColor = (percentage) => {
     if (percentage >= 90) return "critical";
     if (percentage >= 75) return "warning";
     if (percentage >= 50) return "good";
     return "normal";
   };
-
   const progressColorClass = getProgressColor(utilizationPercentage);
-
   return (
     <Modal show={show} onHide={handleClose} size="lg" className="uuam-modal">
       <Modal.Header closeButton>
@@ -130,7 +112,6 @@ const UpdateUtilizedAmountModal = ({
           Update Utilized Amount
         </Modal.Title>
       </Modal.Header>
-
       <form onSubmit={handleSubmit}>
         <Modal.Body>
           {error && (
@@ -139,7 +120,6 @@ const UpdateUtilizedAmountModal = ({
               {error}
             </div>
           )}
-
           {/* BUDGET INFO */}
           <div className="uuam-budget-info">
             <div className="uuam-info-card">
@@ -159,7 +139,6 @@ const UpdateUtilizedAmountModal = ({
               <span>{formatCurrency(budget?.allocatedAmount)}</span>
             </div>
           </div>
-
           {/* CURRENT vs NEW */}
           <div className="uuam-form-grid">
             <div>
@@ -172,7 +151,6 @@ const UpdateUtilizedAmountModal = ({
                 </div>
               </div>
             </div>
-
             <div>
               <div className="mb-3">
                 <label htmlFor="utilizedAmount" className="form-label">
@@ -197,7 +175,6 @@ const UpdateUtilizedAmountModal = ({
               </div>
             </div>
           </div>
-
           {/* ALLOCATIONS BREAKDOWN */}
           {allocations.length > 0 && (
             <div className="uuam-details-section">
@@ -249,7 +226,6 @@ const UpdateUtilizedAmountModal = ({
               </div>
             </div>
           )}
-
           {/* UTILIZATION SUMMARY */}
           <div className="uuam-details-section summary">
             <h6 className="uuam-details-heading">
@@ -298,7 +274,6 @@ const UpdateUtilizedAmountModal = ({
                 </span>
               </div>
             </div>
-
             {/* Progress bar */}
             <div className="uuam-progress-container">
               <div className="uuam-progress-bar">
@@ -313,7 +288,6 @@ const UpdateUtilizedAmountModal = ({
               </div>
             </div>
           </div>
-
           {/* VALIDATION WARNING */}
           {parseFloat(formData.utilizedAmount) >
             (budget?.allocatedAmount || 0) && (
@@ -332,7 +306,6 @@ const UpdateUtilizedAmountModal = ({
             </div>
           )}
         </Modal.Body>
-
         <Modal.Footer>
           <button
             type="button"
@@ -370,5 +343,4 @@ const UpdateUtilizedAmountModal = ({
     </Modal>
   );
 };
-
 export default UpdateUtilizedAmountModal;

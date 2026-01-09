@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import roleService from "../../../../services/auth/roleService";
 import { toast } from "sonner";
 import "../../../../styles/auth/roles/EditRoleModal.css";
-
 const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
     roleId: "",
@@ -12,7 +11,6 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-
   useEffect(() => {
     if (role) {
       setFormData({
@@ -24,7 +22,6 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
       setErrors({});
     }
   }, [role]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -38,7 +35,6 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
       }));
     }
   };
-
   const validateForm = () => {
     const newErrors = {};
     if (!formData.roleName.trim()) {
@@ -61,7 +57,6 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) {
@@ -96,13 +91,10 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
       setLoading(false);
     }
   };
-
   if (!show) return null;
-
   return (
     <>
       <div className="erm-backdrop" onClick={onClose} />
-
       <div className="erm-modal-container">
         <div className="erm-modal-dialog">
           {/* HEADER */}
@@ -121,7 +113,6 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* BODY/FORM */}
           <form onSubmit={handleSubmit} className="erm-form">
             <div className="erm-modal-body">
@@ -134,7 +125,6 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
                   </div>
                 </div>
               )}
-
               {/* 2 column layout */}
               <div className="erm-two-column">
                 {/* LEFT COLUMN */}
@@ -159,7 +149,6 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
                       <div className="erm-form-error">{errors.roleName}</div>
                     )}
                   </div>
-
                   <div className="erm-form-group erm-form-group-spaced">
                     <label className="erm-form-label">
                       Role Code <span className="erm-required-asterisk">*</span>
@@ -181,7 +170,6 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
                     )}
                   </div>
                 </div>
-
                 {/* RIGHT COLUMN */}
                 <div className="erm-column-right">
                   <div className="erm-form-group-full-height">
@@ -212,14 +200,12 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
                   </div>
                 </div>
               </div>
-
               {/* Info Alert */}
               <div className="erm-info-alert">
                 <i className="bi bi-info-circle"></i>
                 <small>All fields are required for updating the role</small>
               </div>
             </div>
-
             {/* FOOTER */}
             <div className="erm-modal-footer">
               {/* Cancel Button */}
@@ -232,7 +218,6 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
                 <i className="bi bi-x-circle"></i>
                 Cancel
               </button>
-
               {/* Update Button */}
               <button
                 type="submit"
@@ -258,5 +243,4 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
     </>
   );
 };
-
 export default EditRoleModal;

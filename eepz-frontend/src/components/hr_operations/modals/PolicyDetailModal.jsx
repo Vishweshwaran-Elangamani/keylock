@@ -1,19 +1,15 @@
 import React from "react";
 import employeePolicyService from "../../../services/hr_operations/employee/employeePolicyService";
 import "../../../styles/hr_operations/employee/PolicyDetailModal.css";
-
 const PolicyDetailModal = ({ show, policy, onClose }) => {
   if (!show || !policy) return null;
-
   const handleViewDocument = (documentUrl) => {
     const fullUrl = employeePolicyService.getFullDocumentUrl(documentUrl);
     window.open(fullUrl, "_blank");
   };
-
   return (
     <>
       <div className="pdm-backdrop" onClick={onClose} />
-
       <div className="pdm-modal-container">
         <div className="pdm-modal-dialog">
           {/* HEADER - Fixed */}
@@ -31,7 +27,6 @@ const PolicyDetailModal = ({ show, policy, onClose }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* BODY - Scrollable */}
           <div className="pdm-modal-body">
             {/* Category and Status Badges */}
@@ -45,7 +40,6 @@ const PolicyDetailModal = ({ show, policy, onClose }) => {
                 Published
               </span>
             </div>
-
             {/* Description Section */}
             <div className="pdm-section">
               <h6 className="pdm-section-heading">
@@ -54,7 +48,6 @@ const PolicyDetailModal = ({ show, policy, onClose }) => {
               </h6>
               <p className="pdm-description-text">{policy.description}</p>
             </div>
-
             {/* Compliance Guidance Section */}
             {policy.complianceGuidance && (
               <div className="pdm-section">
@@ -67,7 +60,6 @@ const PolicyDetailModal = ({ show, policy, onClose }) => {
                 </p>
               </div>
             )}
-
             {/* Attached Document Section */}
             {policy.documentUrl && (
               <div className="pdm-document-section">
@@ -100,7 +92,6 @@ const PolicyDetailModal = ({ show, policy, onClose }) => {
                 </div>
               </div>
             )}
-
             {/* Published Date Info */}
             <div className="pdm-published-info">
               <i className="bi bi-calendar-event pdm-calendar-icon"></i>
@@ -117,7 +108,6 @@ const PolicyDetailModal = ({ show, policy, onClose }) => {
               </div>
             </div>
           </div>
-
           {/* FOOTER - Fixed */}
           <div className="pdm-modal-footer">
             <button type="button" onClick={onClose} className="pdm-btn-close">
@@ -130,5 +120,4 @@ const PolicyDetailModal = ({ show, policy, onClose }) => {
     </>
   );
 };
-
 export default PolicyDetailModal;

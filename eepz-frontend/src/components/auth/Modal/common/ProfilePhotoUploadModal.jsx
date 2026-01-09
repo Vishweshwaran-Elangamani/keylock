@@ -2,20 +2,16 @@ import React, { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import EmployeeProfileService from "../../../../services/auth/EmployeeProfileService";
 import "../../../../styles/common/ProfilePhotoUploadModal.css";
-
 function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
-
   // Image positioning states
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-
   const imageRef = useRef(null);
-
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
   const ALLOWED_FILE_TYPES = [
     "image/jpeg",
@@ -24,7 +20,6 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
     "image/gif",
     "image/webp",
   ];
-
   const validateFile = (file) => {
     if (!file) return { valid: false, error: "No file selected" };
     if (!ALLOWED_FILE_TYPES.includes(file.type)) {
@@ -35,38 +30,31 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
     }
     return { valid: true };
   };
-
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     processFile(file);
   };
-
   const processFile = (file) => {
     if (!file) return;
-
     const validation = validateFile(file);
     if (!validation.valid) {
       toast.error(validation.error);
       return;
     }
-
     setSelectedFile(file);
     setPreview(URL.createObjectURL(file));
     setPosition({ x: 0, y: 0 }); // Reset position
   };
-
   const handleDragOver = (e) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(true);
   };
-
   const handleDragLeave = (e) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
   };
-
   const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -74,7 +62,6 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
     const file = e.dataTransfer.files[0];
     processFile(file);
   };
-
   // ========================
   // IMAGE REPOSITIONING
   // ========================
@@ -86,20 +73,15 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
       y: e.clientY - position.y,
     });
   };
-
   const handleMouseMove = (e) => {
     if (!dragging) return;
-
     const newX = e.clientX - dragStart.x;
     const newY = e.clientY - dragStart.y;
-
     setPosition({ x: newX, y: newY });
   };
-
   const handleMouseUp = () => {
     setDragging(false);
   };
-
   const handleTouchStart = (e) => {
     if (!preview) return;
     const touch = e.touches[0];
@@ -109,59 +91,39 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
       y: touch.clientY - position.y,
     });
   };
-
   const handleTouchMove = (e) => {
     if (!dragging) return;
     const touch = e.touches[0];
-
     const newX = touch.clientX - dragStart.x;
     const newY = touch.clientY - dragStart.y;
-
     setPosition({ x: newX, y: newY });
   };
-
   const handleTouchEnd = () => {
     setDragging(false);
   };
-
-  // ========================
-  // CROP AND UPLOAD
-  // ========================
   const getCroppedImage = async () => {
     return new Promise((resolve) => {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
-
       const size = 300; // Output size
       canvas.width = size;
       canvas.height = size;
-
       const img = new Image();
       img.onload = () => {
-        const containerSize = 160; // Preview container size
-
-        // Draw circular clipped image
+        const containerSize = 160; 
         ctx.beginPath();
         ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
         ctx.closePath();
         ctx.clip();
-
-        
         const scale = Math.max(
           containerSize / img.width,
           containerSize / img.height
         );
-
         const scaledWidth = img.width * scale;
         const scaledHeight = img.height * scale;
-
-        // Calculate centered position with offset
         const offsetX = (containerSize - scaledWidth) / 2 + position.x;
         const offsetY = (containerSize - scaledHeight) / 2 + position.y;
-
-        // Scale up for output
         const outputScale = size / containerSize;
-
         ctx.drawImage(
           img,
           offsetX * outputScale,
@@ -169,7 +131,6 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
           scaledWidth * outputScale,
           scaledHeight * outputScale
         );
-
         canvas.toBlob(
           (blob) => {
             resolve(blob);
@@ -181,41 +142,31 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
       img.src = preview;
     });
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!selectedFile) {
       toast.error("Please select an image");
       return;
     }
-
     setUploading(true);
-
     try {
       const croppedBlob = await getCroppedImage();
       const croppedFile = new File([croppedBlob], selectedFile.name, {
         type: "image/jpeg",
       });
-
       const formData = new FormData();
       formData.append("ProfilePhoto", croppedFile);
-
       toast.loading("Uploading photo...");
       const response = await EmployeeProfileService.updateProfilePhoto(
         formData
       );
-
       toast.dismiss();
-
       if (response.success) {
         toast.success("Profile photo updated successfully!");
-
         if (response.data?.profilePhotoBase64) {
           const imageUrl = `data:image/jpeg;base64,${response.data.profilePhotoBase64}`;
           onPhotoUpdate(imageUrl);
         }
-
         setTimeout(() => onClose(), 500);
       } else {
         toast.error(response.message || "Failed to upload photo");
@@ -228,17 +179,14 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
       setUploading(false);
     }
   };
-
   useEffect(() => {
     return () => {
       if (preview) URL.revokeObjectURL(preview);
     };
   }, [preview]);
-
   return (
     <>
       <div className="ppum-backdrop" onClick={onClose} />
-
       <div className="ppum-modal-container">
         <div className="ppum-modal-dialog">
           {/* HEADER */}
@@ -256,7 +204,6 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* BODY */}
           <form onSubmit={handleSubmit}>
             <div className="ppum-modal-body">
@@ -287,12 +234,10 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
                       }}
                     />
                   </div>
-
                   {/* Drag Instruction */}
                   <p className="ppum-drag-instruction">
                     <i className="bi bi-hand-index"></i> Drag to reposition
                   </p>
-
                   {/* File Info */}
                   <p className="ppum-file-name">{selectedFile?.name}</p>
                   <p className="ppum-file-size">
@@ -333,7 +278,6 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
                   />
                 </div>
               )}
-
               {/* Info */}
               <div className="ppum-info-box">
                 <i className="bi bi-info-circle"></i>
@@ -342,7 +286,6 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
                 </small>
               </div>
             </div>
-
             {/* FOOTER */}
             <div className="ppum-modal-footer">
               <button
@@ -353,7 +296,6 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
               >
                 <i className="bi bi-x-circle"></i> Cancel
               </button>
-
               <button
                 type="submit"
                 disabled={!selectedFile || uploading}
@@ -377,5 +319,4 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
     </>
   );
 }
-
 export default ProfilePhotoUploadModal;

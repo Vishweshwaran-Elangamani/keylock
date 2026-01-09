@@ -1,17 +1,3 @@
-/**
- * VerifyCode Component
- *
- * OTP verification component for user login.
- * Features:
- * - 6-digit OTP input with auto-focus
- * - Show/hide OTP toggle
- * - Failed attempt tracking and lockout (3 minutes after 3 failed attempts)
- * - Paste support for OTP codes
- * - Toast notifications using Sonner for user feedback
- * - Role-based dashboard routing
- *
- * @component
- */
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts/auth/AuthContext";
@@ -20,63 +6,18 @@ import { toast } from "sonner";
 import "../../../styles/auth/common/VerifyCode.css";
 import logo from "../../../assets/logodarkbarred.png";
 const VerifyCode = () => {
-  // ========================
-  // STATE MANAGEMENT
-  // ========================
-  /**
-   * OTP code state - stores 6 digits entered by user
-   */
   const [code, setCode] = useState(["", "", "", "", "", ""]);
-  /**
-   * Error state - stores error messages
-   */
   const [error, setError] = useState("");
-  /**
-   * Loading state - tracks form submission status
-   */
   const [loading, setLoading] = useState(false);
-  /**
-   * User info state - stores temporary user data from login
-   */
   const [userInfo, setUserInfo] = useState(null);
-  /**
-   * Show OTP state - controls OTP visibility
-   */
   const [showOtp, setShowOtp] = useState(false);
-  /**
-   * Failed attempts state - tracks number of failed OTP attempts
-   */
   const [failedAttempts, setFailedAttempts] = useState(0);
-  /**
-   * Locked state - tracks if user is locked out
-   */
   const [isLocked, setIsLocked] = useState(false);
-  /**
-   * Lockout end time state - stores when lockout expires
-   */
   const [lockoutEndTime, setLockoutEndTime] = useState(null);
-  /**
-   * Remaining time state - for countdown display
-   */
   const [remainingTime, setRemainingTime] = useState(0);
-  // ========================
-  // REFS
-  // ========================
   const inputRefs = useRef([]);
-  // ========================
-  // HOOKS
-  // ========================
   const navigate = useNavigate();
   const { login } = useAuth();
-  // ========================
-  // EFFECTS
-  // ========================
-  /**
-   * Effect: Initialize component on mount
-   * - Checks for temporary user data from login
-   * - Checks for existing lockout
-   * - Focuses first input
-   */
   useEffect(() => {
     const tempUserStr = localStorage.getItem("tempUser");
     if (!tempUserStr) {
@@ -101,11 +42,6 @@ const VerifyCode = () => {
     }
     inputRefs.current[0]?.focus();
   }, [navigate]);
-  /**
-   * Effect: Countdown timer for lockout
-   * Updates remaining time every second
-   * Unlocks user when time expires
-   */
   useEffect(() => {
     if (!isLocked || !lockoutEndTime) return;
     const interval = setInterval(() => {
@@ -123,17 +59,6 @@ const VerifyCode = () => {
     }, 1000);
     return () => clearInterval(interval);
   }, [isLocked, lockoutEndTime]);
-  // ========================
-  // INPUT HANDLERS
-  // ========================
-  /**
-   * Handles OTP digit input change
-   * Only allows numeric characters (0-9)
-   * Auto-focuses next input when digit entered
-   *
-   * @param {number} index - Input field index
-   * @param {string} value - Input value
-   */
   const handleChange = (index, value) => {
     // Only allow single digit numbers
     if (!/^[0-9]?$/.test(value)) {
@@ -148,25 +73,11 @@ const VerifyCode = () => {
       inputRefs.current[index + 1]?.focus();
     }
   };
-  /**
-   * Handles backspace key in OTP inputs
-   * Moves focus to previous input when backspace pressed on empty field
-   *
-   * @param {number} index - Input field index
-   * @param {Event} e - Keyboard event
-   */
   const handleKeyDown = (index, e) => {
     if (e.key === "Backspace" && !code[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
   };
-  /**
-   * Handles paste event for OTP input
-   * Only allows numeric characters
-   * Auto-fills up to 6 digits
-   *
-   * @param {Event} e - Paste event
-   */
   const handlePaste = (e) => {
     e.preventDefault();
     const pastedData = e.clipboardData.getData("text").trim();
@@ -184,34 +95,15 @@ const VerifyCode = () => {
       inputRefs.current[5]?.focus();
     }
   };
-  // ========================
-  // UTILITY FUNCTIONS
-  // ========================
-  /**
-   * Formats milliseconds to MM:SS format for lockout display
-   *
-   * @param {number} milliseconds - Time in milliseconds
-   * @returns {string} Formatted time string
-   */
   const formatRemainingTime = (milliseconds) => {
     const totalSeconds = Math.ceil(milliseconds / 1000);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
-  /**
-   * Toggles OTP visibility
-   */
   const toggleOtpVisibility = () => {
     setShowOtp(!showOtp);
   };
-  /**
-   * Returns dashboard route based on user role
-   * Maps role names to their respective dashboard paths
-   *
-   * @param {string} roleName - User role name
-   * @returns {string} Dashboard route path
-   */
   const getDashboardRoute = (roleName) => {
     const normalizedRole = roleName?.toUpperCase().replace(/\s+/g, "");
     const routes = {
@@ -230,15 +122,7 @@ const VerifyCode = () => {
     };
     return routes[normalizedRole] || "/employee/dashboard";
   };
-  // ========================
-  // FORM SUBMISSION
-  // ========================
   /**
-   * Handles OTP verification form submission
-   * Validates OTP and makes API call
-   * Handles lockout on failed attempts
-   * Shows Sonner toast notifications
-   *
    * @param {Event} e - Form submit event
    */
   const handleSubmit = async (e) => {
@@ -375,16 +259,7 @@ const VerifyCode = () => {
       setLoading(false);
     }
   };
-  // ========================
-  // COMPUTED VALUES
-  // ========================
-  /**
-   * Checks if all 6 OTP digits are entered
-   */
   const isCodeComplete = code.every((digit) => digit !== "");
-  // ========================
-  // RENDER LOGIC
-  // ========================
   return (
     <div className="verify-code-container">
       <div className="verify-code-card">

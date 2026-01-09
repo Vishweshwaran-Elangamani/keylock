@@ -25,7 +25,7 @@ const StatusDropdown = ({ value, onChange }) => {
     <div
       className="dlm-status-select custom-status-dropdown"
       tabIndex={0}
-      onBlur={() => setTimeout(() => setOpen(false), 200)}
+      onBlur={() => setTimeout(() => setOpen(false), 200)} 
     >
       <div
         className="custom-status-selected"
@@ -687,7 +687,7 @@ const DepartmentList = () => {
           )}
         </>
       )}
-      {/* MODALS */}
+    
       {showAddModal && (
         <AddDepartmentModal
           show={showAddModal}

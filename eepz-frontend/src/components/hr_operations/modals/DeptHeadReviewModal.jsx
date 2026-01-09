@@ -3,7 +3,6 @@ import { Modal } from "react-bootstrap";
 import { toast } from "sonner";
 import carearProgressionService from "../../../services/hr_operations/hr/careerProgressionService";
 import "../../../styles/hr_operations/hr/DeptHeadReviewModal.css";
-
 const DeptHeadReviewModal = ({
   show,
   nomination,
@@ -16,12 +15,10 @@ const DeptHeadReviewModal = ({
   const [loading, setLoading] = useState(false);
   const [decision, setDecision] = useState(""); 
   const [error, setError] = useState(null);
-
   const handleApprove = async () => {
     setDecision("approve");
     setLoading(true);
     setError(null);
-
     try {
       await carearProgressionService.approveNomination(
         nomination.promotionId,
@@ -38,17 +35,14 @@ const DeptHeadReviewModal = ({
       setLoading(false);
     }
   };
-
   const handleReject = async () => {
     if (!rejectionReason.trim()) {
       setError("Please provide rejection reason");
       return;
     }
-
     setDecision("reject");
     setLoading(true);
     setError(null);
-
     try {
       await carearProgressionService.rejectNomination(
         nomination.promotionId,
@@ -65,7 +59,6 @@ const DeptHeadReviewModal = ({
       setLoading(false);
     }
   };
-
   const handleClose = () => {
     setApprovalComments("");
     setRejectionReason("");
@@ -73,10 +66,8 @@ const DeptHeadReviewModal = ({
     setError(null);
     onHide();
   };
-
   const showToast = (title, message, type) => {
     const fullMessage = `${title}: ${message}`;
-
     switch (type) {
       case "success":
         toast.success(fullMessage);
@@ -95,7 +86,6 @@ const DeptHeadReviewModal = ({
         toast(fullMessage);
     }
   };
-
   const formatCurrency = (amount) => {
     if (!amount || amount === 0) return "₹0";
     return new Intl.NumberFormat("en-IN", {
@@ -104,27 +94,22 @@ const DeptHeadReviewModal = ({
       minimumFractionDigits: 0,
     }).format(amount);
   };
-
   // FAVORITISM LOGIC
   const getFavoritismRiskLevel = () => {
     if (!favoritism) return { level: "UNKNOWN", className: "" };
-
     const riskScore = favoritism.riskScore || 0;
-
     if (riskScore >= 75) return { level: "HIGH RISK", className: "high-risk" };
     if (riskScore >= 50)
       return { level: "MEDIUM RISK", className: "medium-risk" };
     if (riskScore >= 25) return { level: "LOW RISK", className: "low-risk" };
     return { level: "NO RISK", className: "no-risk" };
   };
-
   const riskLevel = getFavoritismRiskLevel();
   const increment = (nomination.newSalary || 0) - (nomination.oldSalary || 0);
   const incrementPercent =
     nomination.oldSalary > 0
       ? ((increment / nomination.oldSalary) * 100).toFixed(2)
       : 0;
-
   return (
     <Modal show={show} onHide={handleClose} size="lg" className="dhrm-modal">
       <Modal.Header closeButton>
@@ -133,7 +118,6 @@ const DeptHeadReviewModal = ({
           Department Head Review - Promotion Request
         </Modal.Title>
       </Modal.Header>
-
       <Modal.Body>
         {error && (
           <div className="dhrm-alert-danger" role="alert">
@@ -141,7 +125,6 @@ const DeptHeadReviewModal = ({
             {error}
           </div>
         )}
-
         {/* NOMINATION DETAILS */}
         <div className="dhrm-approval-info">
           <div className="dhrm-info-card">
@@ -161,7 +144,6 @@ const DeptHeadReviewModal = ({
             <span>{formatCurrency(nomination.oldSalary)}</span>
           </div>
         </div>
-
         {/* FAVORITISM CHECK - CRITICAL */}
         <div className={`dhrm-favoritism-alert ${riskLevel.className}`}>
           <div className="dhrm-favoritism-content">
@@ -192,7 +174,6 @@ const DeptHeadReviewModal = ({
             </div>
           </div>
         </div>
-
         {/* PROMOTION DETAILS */}
         <div className="dhrm-details-section">
           <h6 className="dhrm-details-heading">Promotion Details</h6>
@@ -221,7 +202,6 @@ const DeptHeadReviewModal = ({
             </div>
           </div>
         </div>
-
         {/* APPROVAL COMMENTS */}
         {!decision && (
           <div className="dhrm-form-group">
@@ -238,7 +218,6 @@ const DeptHeadReviewModal = ({
             />
           </div>
         )}
-
         {/* REJECTION REASON */}
         {decision === "reject" && (
           <div className="dhrm-form-group">
@@ -256,7 +235,6 @@ const DeptHeadReviewModal = ({
             />
           </div>
         )}
-
         {/* INFO ALERT */}
         <div className="dhrm-info-alert" role="alert">
           <i className="bi bi-info-circle dhrm-info-icon"></i>
@@ -268,7 +246,6 @@ const DeptHeadReviewModal = ({
           </p>
         </div>
       </Modal.Body>
-
       <Modal.Footer>
         <button
           type="button"
@@ -277,7 +254,6 @@ const DeptHeadReviewModal = ({
         >
           Cancel
         </button>
-
         {!decision && (
           <>
             <button
@@ -299,7 +275,6 @@ const DeptHeadReviewModal = ({
             </button>
           </>
         )}
-
         {decision === "reject" && (
           <>
             <button
@@ -336,5 +311,4 @@ const DeptHeadReviewModal = ({
     </Modal>
   );
 };
-
 export default DeptHeadReviewModal;

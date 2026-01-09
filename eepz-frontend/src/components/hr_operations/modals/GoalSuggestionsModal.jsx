@@ -1,6 +1,5 @@
 import React from "react";
 import "../../../styles/hr_operations/hr/GoalSuggestionsModal.css";
-
 const GoalSuggestionsModal = ({
   show,
   onHide,
@@ -8,17 +7,14 @@ const GoalSuggestionsModal = ({
   loadingSuggestions,
 }) => {
   if (!show) return null;
-
   const getPriorityClass = (priority) => {
     if (priority === "High") return "high";
     if (priority === "Medium") return "medium";
     return "low";
   };
-
   return (
     <>
       <div className="gsm-backdrop" onClick={onHide} />
-
       <div className="gsm-modal-container">
         <div className="gsm-modal-dialog">
           {/* HEADER - Fixed */}
@@ -41,7 +37,6 @@ const GoalSuggestionsModal = ({
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* BODY - Scrollable */}
           <div className="gsm-modal-body">
             {loadingSuggestions ? (
@@ -61,12 +56,10 @@ const GoalSuggestionsModal = ({
                           {g.goalType}
                         </span>
                       </div>
-
                       {/* Description */}
                       <div className="gsm-goal-description">
                         {g.goalDescription}
                       </div>
-
                       {/* Meta Information */}
                       <div className="gsm-goal-meta">
                         <span className="gsm-meta-item">
@@ -91,7 +84,6 @@ const GoalSuggestionsModal = ({
               </ul>
             )}
           </div>
-
           {/* FOOTER - Fixed */}
           <div className="gsm-modal-footer">
             <button type="button" onClick={onHide} className="gsm-btn-close">
@@ -103,5 +95,4 @@ const GoalSuggestionsModal = ({
     </>
   );
 };
-
 export default GoalSuggestionsModal;

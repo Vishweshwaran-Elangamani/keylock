@@ -2,7 +2,6 @@ import { useState } from "react";
 import nominationService from "../../../services/internal/nominationService";
 import { toast } from "sonner";
 import "../../../styles/internal/SelfNominateModal.css";
-
 const SelfNominateModal = ({
   show,
   onHide,
@@ -14,7 +13,6 @@ const SelfNominateModal = ({
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -28,39 +26,30 @@ const SelfNominateModal = ({
       }));
     }
   };
-
   const validateForm = () => {
     const newErrors = {};
-
     if (!formData.justification.trim()) {
       newErrors.justification = "Justification is required";
     } else if (formData.justification.trim().length < 50) {
       newErrors.justification = "Justification must be at least 50 characters";
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) {
       toast.error("Please fix the errors");
       return;
     }
-
     try {
       setLoading(true);
-
       const payload = {
         opportunityId: opportunity.opportunityId,
         justification: formData.justification.trim(),
         nominationType: "Self",
       };
-
       const response = await nominationService.selfNominate(payload);
-
       if (response.success) {
         toast.success("Self-nomination submitted successfully!");
         onNominationSubmitted();
@@ -75,13 +64,10 @@ const SelfNominateModal = ({
       setLoading(false);
     }
   };
-
   if (!show) return null;
-
   return (
     <>
       <div className="snm-backdrop" onClick={onHide} />
-
       <div className="snm-modal-wrapper">
         <div className="snm-modal-dialog">
           {/* Modal Header */}
@@ -99,7 +85,6 @@ const SelfNominateModal = ({
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* Form */}
           <form onSubmit={handleSubmit} className="snm-form">
             {/* Modal Body */}
@@ -119,7 +104,6 @@ const SelfNominateModal = ({
                   {new Date(opportunity.deadline).toLocaleDateString()}
                 </p>
               </div>
-
               {/* Justification Field */}
               <div className="snm-form-group">
                 <label className="snm-form-label">
@@ -151,7 +135,6 @@ const SelfNominateModal = ({
                 </small>
               </div>
             </div>
-
             {/* Modal Footer */}
             <div className="snm-modal-footer">
               <button
@@ -163,7 +146,6 @@ const SelfNominateModal = ({
                 <i className="bi bi-x-circle"></i>
                 Cancel
               </button>
-
               <button
                 type="submit"
                 disabled={loading}
@@ -188,5 +170,4 @@ const SelfNominateModal = ({
     </>
   );
 };
-
 export default SelfNominateModal;

@@ -6,14 +6,10 @@ import ComplianceIssues from "./compliance/ComplianceIssues";
 import PeriodAllocationManagement from "./compliance/PeriodAllocationManagement";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 import "../../../styles/hr_operations/hr/HROperations.css";
-
 const HROperations = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
-  
   const [activeSection, setActiveSection] = useState("hr-operations");
-
   const getActiveTab = () => {
     const path = location.pathname;
     if (path.includes("/policies")) return "policies";
@@ -22,13 +18,10 @@ const HROperations = () => {
     if (path.includes("/period-allocations")) return "period-allocations";
     return "policies";
   };
-
   const [activeTab, setActiveTab] = useState(getActiveTab());
-
   useEffect(() => {
     setActiveTab(getActiveTab());
   }, [location.pathname]);
-
   const tabs = [
     { key: "policies", label: "Policies", path: "/hr/operations/policies" },
     {
@@ -47,21 +40,17 @@ const HROperations = () => {
       path: "/hr/operations/period-allocations",
     },
   ];
-
   const handleTabChange = (tab) => {
     setActiveTab(tab.key);
     navigate(tab.path);
   };
-
   const handleSectionChange = (section) => {
     setActiveSection(section);
   };
-
   const getCurrentTabLabel = () => {
     const currentTab = tabs.find((tab) => tab.key === activeTab);
     return currentTab ? currentTab.label : "Policies";
   };
-
   return (
     <div className="hr-operations-container">
       <Breadcrumb
@@ -75,7 +64,6 @@ const HROperations = () => {
           },
         ]}
       />
-
       {activeSection === "internal-opportunities" ? (
         <div className="coming-soon-container">
           <div className="coming-soon-icon">
@@ -104,7 +92,6 @@ const HROperations = () => {
               </button>
             ))}
           </div>
-
           <div className="tab-content-hr">
             <Routes>
               <Route path="policies" element={<PolicyManagement />} />
@@ -122,5 +109,4 @@ const HROperations = () => {
     </div>
   );
 };
-
 export default HROperations;

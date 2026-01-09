@@ -72,7 +72,6 @@ const RoleList = () => {
   useEffect(() => {
     fetchRoles();
   }, []);
-  // Click outside handler for rows dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (

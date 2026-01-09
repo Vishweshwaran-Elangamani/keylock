@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import policyService from "../../../services/hr_operations/hr/policyService";
 import "../../../styles/hr_operations/hr/PublishPolicyModal.css";
-
 const PublishPolicyModal = ({
   show,
   policy,
@@ -10,11 +9,9 @@ const PublishPolicyModal = ({
   publishing,
 }) => {
   if (!show || !policy) return null;
-
   return (
     <>
       <div className="ppm-backdrop" onClick={onHide} />
-
       <div className="ppm-modal-container">
         <div className="ppm-modal-dialog">
           {/* HEADER */}
@@ -33,14 +30,12 @@ const PublishPolicyModal = ({
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* BODY */}
           <div className="ppm-modal-body">
             {/* Main Message */}
             <p className="ppm-main-message">
               You are about to publish the following policy:
             </p>
-
             {/* Policy Info Box */}
             <div className="ppm-policy-info-box">
               <div className="ppm-policy-content">
@@ -61,12 +56,10 @@ const PublishPolicyModal = ({
                 )}
               </div>
             </div>
-
             {/* Info Message */}
             <p className="ppm-info-message">
               Once published, this policy will be visible to all employees.
             </p>
-
             {/* Success Info */}
             <div className="ppm-success-info">
               <i className="bi bi-info-circle ppm-success-icon"></i>
@@ -77,7 +70,6 @@ const PublishPolicyModal = ({
               </div>
             </div>
           </div>
-
           {/* FOOTER */}
           <div className="ppm-modal-footer">
             <button
@@ -88,7 +80,6 @@ const PublishPolicyModal = ({
             >
               Cancel
             </button>
-
             <button
               type="button"
               onClick={onPublish}
@@ -113,5 +104,4 @@ const PublishPolicyModal = ({
     </>
   );
 };
-
 export default PublishPolicyModal;

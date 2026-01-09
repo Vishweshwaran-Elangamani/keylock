@@ -4,17 +4,13 @@ import PolicyDetailModal from "../../../components/hr_operations/modals/PolicyDe
 import Breadcrumb from "../../../components/common/Breadcrumb";
 import { toast } from "sonner";
 import "../../../styles/hr_operations/employee/EmployeePolicy.css";
-
 const CategoryDropdown = ({ value, onChange, categories }) => {
   const [open, setOpen] = useState(false);
-
   const selected = categories.find((cat) => cat === value) || categories[0];
-
   const handleSelect = (val) => {
     onChange(val);
     setOpen(false);
   };
-
   return (
     <div
       className="filter-select-epd custom-category-dropdown-epd"
@@ -28,7 +24,6 @@ const CategoryDropdown = ({ value, onChange, categories }) => {
         {selected}
         <span className="custom-category-arrow-epd" />
       </div>
-
       {open && (
         <div className="custom-category-menu-epd">
           {categories.map((cat) => (
@@ -48,19 +43,15 @@ const CategoryDropdown = ({ value, onChange, categories }) => {
     </div>
   );
 };
-
 /* Custom Date Filter Dropdown Component */
 const DateFilterDropdown = ({ value, onChange, dateFilters }) => {
   const [open, setOpen] = useState(false);
-
   const selected =
     dateFilters.find((filter) => filter.value === value) || dateFilters[0];
-
   const handleSelect = (val) => {
     onChange(val);
     setOpen(false);
   };
-
   return (
     <div
       className="filter-select-epd custom-date-dropdown-epd"
@@ -74,7 +65,6 @@ const DateFilterDropdown = ({ value, onChange, dateFilters }) => {
         {selected.label}
         <span className="custom-date-arrow-epd" />
       </div>
-
       {open && (
         <div className="custom-date-menu-epd">
           {dateFilters.map((filter) => (
@@ -94,7 +84,6 @@ const DateFilterDropdown = ({ value, onChange, dateFilters }) => {
     </div>
   );
 };
-
 const EmployeePolicyView = () => {
   const [policies, setPolicies] = useState([]);
   const [filteredPolicies, setFilteredPolicies] = useState([]);
@@ -109,7 +98,6 @@ const EmployeePolicyView = () => {
   const [showRowsDropdown, setShowRowsDropdown] = useState(false);
   const searchInputRef = useRef(null);
   const rowsDropdownRef = useRef(null);
-
   const categories = [
     "All",
     "Security",
@@ -124,7 +112,6 @@ const EmployeePolicyView = () => {
     "Data Protection",
     "Compliance",
   ];
-
   const dateFilters = [
     { value: "All", label: "All Dates" },
     { value: "Today", label: "Today" },
@@ -134,16 +121,13 @@ const EmployeePolicyView = () => {
     { value: "Last6Months", label: "Last 6 Months" },
     { value: "LastYear", label: "Last Year" },
   ];
-
   useEffect(() => {
     fetchPublishedPolicies();
   }, []);
-
   useEffect(() => {
     applyFilters();
     // eslint-disable-next-line
   }, [policies, selectedCategory, selectedDateFilter]);
-
   // Click outside handler for rows dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -154,13 +138,11 @@ const EmployeePolicyView = () => {
         setShowRowsDropdown(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
   const fetchPublishedPolicies = async () => {
     try {
       setLoading(true);
@@ -173,15 +155,12 @@ const EmployeePolicyView = () => {
       setLoading(false);
     }
   };
-
   const isWithinDateRange = (publishedDate) => {
     if (selectedDateFilter === "All") return true;
-
     const published = new Date(publishedDate);
     const now = new Date();
     const diffTime = Math.abs(now - published);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
     switch (selectedDateFilter) {
       case "Today":
         return diffDays === 0;
@@ -199,10 +178,8 @@ const EmployeePolicyView = () => {
         return true;
     }
   };
-
   const applyFilters = () => {
     let filtered = policies;
-
     if (searchTerm.trim()) {
       filtered = filtered.filter(
         (p) =>
@@ -211,39 +188,31 @@ const EmployeePolicyView = () => {
           p.description?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-
     if (selectedCategory !== "All") {
       filtered = filtered.filter((p) => p.category === selectedCategory);
     }
-
     filtered = filtered.filter((p) => isWithinDateRange(p.publishedAt));
-
     setFilteredPolicies(filtered);
     setCurrentPage(1);
   };
-
   const handleSearchInput = (e) => {
     setSearchTerm(e.target.value);
   };
-
   const handleSearchKeyDown = (e) => {
     if (e.key === "Enter") {
       applyFilters();
       if (searchInputRef.current) searchInputRef.current.blur();
     }
   };
-
   const handleSearchButton = () => {
     applyFilters();
     if (searchInputRef.current) searchInputRef.current.blur();
   };
-
   const handleClearSearch = () => {
     setSearchTerm("");
     setTimeout(() => applyFilters(), 0);
     if (searchInputRef.current) searchInputRef.current.focus();
   };
-
   const clearFilters = () => {
     setSelectedCategory("All");
     setSelectedDateFilter("All");
@@ -255,12 +224,10 @@ const EmployeePolicyView = () => {
     toast.info("Filters cleared");
     if (searchInputRef.current) searchInputRef.current.value = "";
   };
-
   useEffect(() => {
     if (searchTerm === "") applyFilters();
     // eslint-disable-next-line
   }, [searchTerm]);
-
   const formatDate = (date) => {
     return date
       ? new Date(date).toLocaleDateString("en-US", {
@@ -270,28 +237,22 @@ const EmployeePolicyView = () => {
         })
       : "N/A";
   };
-
   const getCategoryStats = () => {
     const totalPolicies = filteredPolicies.length;
     const uniqueCategories = [
       ...new Set(filteredPolicies.map((p) => p.category)),
     ].length;
     const withDocuments = filteredPolicies.filter((p) => p.documentUrl).length;
-
     return { totalPolicies, uniqueCategories, withDocuments };
   };
-
   const stats = getCategoryStats();
-
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredPolicies.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredPolicies.length / itemsPerPage);
-
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
-
     if (totalPages <= maxPagesToShow) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -315,12 +276,10 @@ const EmployeePolicyView = () => {
     }
     return pages;
   };
-
   const handleViewDetails = (policy) => {
     setSelectedPolicy(policy);
     setShowDetailModal(true);
   };
-
   if (loading) {
     return (
       <div className="loading-container-epd">
@@ -330,7 +289,6 @@ const EmployeePolicyView = () => {
       </div>
     );
   }
-
   return (
     <div className="employee-policy-page-epd">
       <Breadcrumb
@@ -340,7 +298,6 @@ const EmployeePolicyView = () => {
           },
         ]}
       />
-
       {/* STATISTICS CARDS */}
       <div className="stats-cards-epd">
         <div className="stat-card-epd stat-total-epd">
@@ -352,7 +309,6 @@ const EmployeePolicyView = () => {
             <div className="stat-label-epd">Total Policies</div>
           </div>
         </div>
-
         <div className="stat-card-epd stat-categories-epd">
           <div className="stat-icon-epd">
             <i className="bi bi-folder-fill"></i>
@@ -362,7 +318,6 @@ const EmployeePolicyView = () => {
             <div className="stat-label-epd">Categories</div>
           </div>
         </div>
-
         <div className="stat-card-epd stat-documents-epd">
           <div className="stat-icon-epd">
             <i className="bi bi-file-earmark-pdf-fill"></i>
@@ -373,7 +328,6 @@ const EmployeePolicyView = () => {
           </div>
         </div>
       </div>
-
       {/* CONTROLS BAR */}
       <div className="controls-bar-epd">
         <div className="search-section-epd policy-search-revamp-epd">
@@ -411,30 +365,25 @@ const EmployeePolicyView = () => {
             </div>
           </div>
         </div>
-
         {/* Custom Category Dropdown */}
         <CategoryDropdown
           value={selectedCategory}
           onChange={(val) => setSelectedCategory(val)}
           categories={categories}
         />
-
         {/* Custom Date Filter Dropdown */}
         <DateFilterDropdown
           value={selectedDateFilter}
           onChange={(val) => setSelectedDateFilter(val)}
           dateFilters={dateFilters}
         />
-
         <button className="btn-clear-epd" onClick={clearFilters}>
           Clear Filters
         </button>
-
         <div className="results-count-inline-epd">
           Showing {currentItems.length} of {filteredPolicies.length} policies
         </div>
       </div>
-
       {/* EMPTY STATE */}
       {filteredPolicies.length === 0 ? (
         <div className="empty-state-epd">
@@ -500,7 +449,6 @@ const EmployeePolicyView = () => {
               </tbody>
             </table>
           </div>
-
           {/* PAGINATION */}
           {filteredPolicies.length > 0 && totalPages > 1 && (
             <div className="pagination-container-epd">
@@ -517,7 +465,6 @@ const EmployeePolicyView = () => {
                       className={`bi bi-chevron-${showRowsDropdown ? "up" : "down"} rows-chevron-epd`}
                     ></i>
                   </button>
-
                   {showRowsDropdown && (
                     <div className="rows-dropdown-epd">
                       {[5, 10, 25, 50].map((size) => (
@@ -540,13 +487,11 @@ const EmployeePolicyView = () => {
                 </div>
                 <span className="pagination-label-epd">entries</span>
               </div>
-
               <div className="pagination-status-epd">
                 Showing {indexOfFirstItem + 1} to{" "}
                 {Math.min(indexOfLastItem, filteredPolicies.length)} of{" "}
                 {filteredPolicies.length} entries
               </div>
-
               <nav className="pagination-nav-epd">
                 <ul className="pagination-epd">
                   <li
@@ -564,7 +509,6 @@ const EmployeePolicyView = () => {
                       <i className="bi bi-chevron-left"></i>
                     </button>
                   </li>
-
                   {getPageNumbers().map((page, index) => (
                     <li
                       key={index}
@@ -583,7 +527,6 @@ const EmployeePolicyView = () => {
                       </button>
                     </li>
                   ))}
-
                   <li
                     className={`page-item-epd ${
                       currentPage === totalPages ? "disabled" : ""
@@ -607,7 +550,6 @@ const EmployeePolicyView = () => {
           )}
         </div>
       )}
-
       {/* POLICY DETAIL MODAL */}
       {showDetailModal && selectedPolicy && (
         <PolicyDetailModal
@@ -622,5 +564,4 @@ const EmployeePolicyView = () => {
     </div>
   );
 };
-
 export default EmployeePolicyView;

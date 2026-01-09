@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import "../../../../styles/auth/roles/DeleteRoleModal.css";
-
 const DeleteRoleModal = ({ show, role, onClose, onConfirm }) => {
   const [loading, setLoading] = useState(false);
-
   const handleDelete = async () => {
     try {
       setLoading(true);
@@ -18,13 +16,10 @@ const DeleteRoleModal = ({ show, role, onClose, onConfirm }) => {
       setLoading(false);
     }
   };
-
   if (!show) return null;
-
   return (
     <>
       <div className="drm-backdrop" onClick={onClose} />
-
       <div className="drm-modal-container">
         <div className="drm-modal-dialog">
           {/* HEADER */}
@@ -43,7 +38,6 @@ const DeleteRoleModal = ({ show, role, onClose, onConfirm }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           {/* BODY */}
           <div className="drm-modal-body">
             {/* Confirmation */}
@@ -51,7 +45,6 @@ const DeleteRoleModal = ({ show, role, onClose, onConfirm }) => {
               Are you sure you want to permanently delete the role{" "}
               <strong className="drm-role-name">{role?.roleName}</strong>?
             </p>
-
             {/* WARNING BOX */}
             <div className="drm-warning-box">
               <div className="drm-warning-title">
@@ -74,7 +67,6 @@ const DeleteRoleModal = ({ show, role, onClose, onConfirm }) => {
                 <li>Cannot be recovered or restored</li>
               </ul>
             </div>
-
             {/* Info Alert */}
             <div className="drm-info-alert">
               <i className="bi bi-info-circle"></i>
@@ -85,7 +77,6 @@ const DeleteRoleModal = ({ show, role, onClose, onConfirm }) => {
               </small>
             </div>
           </div>
-
           {/* FOOTER */}
           <div className="drm-modal-footer">
             {/* CANCEL */}
@@ -97,7 +88,6 @@ const DeleteRoleModal = ({ show, role, onClose, onConfirm }) => {
             >
               Cancel
             </button>
-
             {/* DELETE */}
             <button
               type="button"
@@ -123,5 +113,4 @@ const DeleteRoleModal = ({ show, role, onClose, onConfirm }) => {
     </>
   );
 };
-
 export default DeleteRoleModal;

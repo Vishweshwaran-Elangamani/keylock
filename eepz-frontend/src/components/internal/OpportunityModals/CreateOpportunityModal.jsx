@@ -3,7 +3,6 @@ import { CloseButton } from "react-bootstrap";
 import internalOpportunityService from "../../../services/internal/internalOpportunityService";
 import { toast } from "sonner";
 import "../../../styles/internal/CreateOpportunityModal.css";
-
 const CustomDropdown = ({
   value,
   onChange,
@@ -14,30 +13,24 @@ const CustomDropdown = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-
   const selectedOption = options.find((opt) => opt.value === value);
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     };
-
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen]);
-
   const handleSelect = (optionValue) => {
     onChange({ target: { name, value: optionValue } });
     setIsOpen(false);
   };
-
   return (
     <div
       ref={dropdownRef}
@@ -51,7 +44,6 @@ const CustomDropdown = ({
         </span>
         <span className="com-custom-arrow"></span>
       </div>
-
       {isOpen && (
         <div className="com-custom-menu">
           {options.map((option) => (
@@ -70,7 +62,6 @@ const CustomDropdown = ({
     </div>
   );
 };
-
 const CreateOpportunityModal = ({
   show,
   onHide,
@@ -88,7 +79,6 @@ const CreateOpportunityModal = ({
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-
   const { minDate, maxDate } = useMemo(() => {
     const today = new Date();
     const currentYear = today.getFullYear();
@@ -98,7 +88,6 @@ const CreateOpportunityModal = ({
     const max = `${aprilDeadlineYear}-04-30`;
     return { minDate: min, maxDate: max };
   }, []);
-
   // Prepare department options with placeholder
   const departmentOptions = useMemo(() => {
     const placeholder = { label: "Select Department", value: "" };
@@ -108,7 +97,6 @@ const CreateOpportunityModal = ({
     }));
     return [placeholder, ...deptOptions];
   }, [departments]);
-
   // Status options with placeholder
   const statusOptions = [
     { label: "Select Status", value: "" },
@@ -116,7 +104,6 @@ const CreateOpportunityModal = ({
     { label: "Pending", value: "Pending" },
     { label: "Closed", value: "Closed" },
   ];
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -124,61 +111,48 @@ const CreateOpportunityModal = ({
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
-
   const validateForm = () => {
     const newErrors = {};
-
     if (!formData.opportunityName.trim()) {
       newErrors.opportunityName = "Opportunity name is required";
     } else if (formData.opportunityName.trim().length < 5) {
       newErrors.opportunityName =
         "Opportunity name must be at least 5 characters";
     }
-
     if (!formData.departmentId) {
       newErrors.departmentId = "Department is required";
     }
-
     if (!formData.description.trim()) {
       newErrors.description = "Description is required";
     }
-
     if (!formData.requirements.trim()) {
       newErrors.requirements = "Requirements are required";
     }
-
     if (!formData.deadline) {
       newErrors.deadline = "Deadline is required";
     } else {
       const deadlineDate = new Date(formData.deadline);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-
       if (deadlineDate < today) {
         newErrors.deadline = "Deadline cannot be in the past";
       }
-
       const maxDeadline = new Date(maxDate);
       if (deadlineDate > maxDeadline) {
         newErrors.deadline = `Deadline cannot be after April 30th, ${maxDeadline.getFullYear()}`;
       }
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) {
       toast.error("Please enter valid details");
       return;
     }
-
     try {
       setLoading(true);
-
       const payload = {
         opportunityName: formData.opportunityName.trim(),
         departmentId: parseInt(formData.departmentId),
@@ -188,11 +162,9 @@ const CreateOpportunityModal = ({
         deadline: formData.deadline,
         status: formData.status,
       };
-
       const response = await internalOpportunityService.createOpportunity(
         payload
       );
-
       if (response.success || response.data) {
         toast.success("Opportunity created successfully!");
         setFormData({
@@ -222,7 +194,6 @@ const CreateOpportunityModal = ({
       setLoading(false);
     }
   };
-
   const handleClose = () => {
     setFormData({
       opportunityName: "",
@@ -236,13 +207,10 @@ const CreateOpportunityModal = ({
     setErrors({});
     onHide();
   };
-
   if (!show) return null;
-
   return (
     <>
       <div className="com-backdrop" onClick={handleClose} />
-
       <div className="com-modal-wrapper">
         <div className="com-modal-dialog">
           {/* Modal Header */}
@@ -257,7 +225,6 @@ const CreateOpportunityModal = ({
               className="com-close-button"
             />
           </div>
-
           {/* Form */}
           <form onSubmit={handleSubmit} className="com-form">
             {/* Modal Body */}
@@ -283,7 +250,6 @@ const CreateOpportunityModal = ({
                   <div className="com-form-error">{errors.opportunityName}</div>
                 )}
               </div>
-
               {/* Department and Deadline Row */}
               <div className="com-two-column-grid">
                 {/* Department - Custom Dropdown */}
@@ -303,7 +269,6 @@ const CreateOpportunityModal = ({
                     <div className="com-form-error">{errors.departmentId}</div>
                   )}
                 </div>
-
                 {/* Deadline */}
                 <div className="com-form-group">
                   <label className="com-form-label">
@@ -331,7 +296,6 @@ const CreateOpportunityModal = ({
                   </small>
                 </div>
               </div>
-
               {/* Description - Full Width */}
               <div className="com-form-group">
                 <label className="com-form-label">
@@ -352,7 +316,6 @@ const CreateOpportunityModal = ({
                   <div className="com-form-error">{errors.description}</div>
                 )}
               </div>
-
               {/* Requirements - Full Width */}
               <div className="com-form-group">
                 <label className="com-form-label">
@@ -373,7 +336,6 @@ const CreateOpportunityModal = ({
                   <div className="com-form-error">{errors.requirements}</div>
                 )}
               </div>
-
               {/* Eligibility Criteria - Full Width */}
               <div className="com-form-group">
                 <label className="com-form-label">Eligibility Criteria</label>
@@ -387,7 +349,6 @@ const CreateOpportunityModal = ({
                   className="com-form-textarea"
                 />
               </div>
-
               {/* Status and Info Row */}
               <div className="com-status-row">
                 {/* Status - Custom Dropdown */}
@@ -404,7 +365,6 @@ const CreateOpportunityModal = ({
                     error={errors.status}
                   />
                 </div>
-
                 {/* Info Alert - Right Side */}
                 <div className="com-info-alert">
                   <i className="bi bi-info-circle-fill com-info-icon"></i>
@@ -415,7 +375,6 @@ const CreateOpportunityModal = ({
                 </div>
               </div>
             </div>
-
             {/* Modal Footer */}
             <div className="com-modal-footer">
               <button
@@ -426,7 +385,6 @@ const CreateOpportunityModal = ({
               >
                 Cancel
               </button>
-
               <button
                 type="submit"
                 disabled={loading}
@@ -451,5 +409,4 @@ const CreateOpportunityModal = ({
     </>
   );
 };
-
 export default CreateOpportunityModal;

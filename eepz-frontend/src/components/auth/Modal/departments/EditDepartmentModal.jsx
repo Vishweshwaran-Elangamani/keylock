@@ -4,7 +4,6 @@ import departmentService from "../../../../services/auth/departmentService";
 import userService from "../../../../services/auth/userService";
 import { toast } from "sonner";
 import "../../../../styles/auth/department/EditDepartmentModal.css";
-
 const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
     departmentId: "",
@@ -15,13 +14,11 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
     parentDepartmentId: "",
     hodEmployeeId: "",
   });
-
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [departments, setDepartments] = useState([]);
   const [departmentHeads, setDepartmentHeads] = useState([]);
   const [loadingDropdowns, setLoadingDropdowns] = useState(true);
-
   useEffect(() => {
     if (department && show) {
       setFormData({
@@ -37,12 +34,9 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
       fetchDropdownData();
     }
   }, [department, show]);
-
   const fetchDropdownData = async () => {
     try {
       setLoadingDropdowns(true);
-
-      // Fetch active departments (exclude current department)
       const deptResponse = await departmentService.getActiveDepartments();
       if (deptResponse.success) {
         const filteredDepts = (deptResponse.data || []).filter(
@@ -50,11 +44,8 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
         );
         setDepartments(filteredDepts);
       }
-
-      // Fetch ALL users and filter for Department Head role on frontend
       const usersResponse = await userService.getAllUsers();
       if (usersResponse.success) {
-        // Filter only users with Department Head role
         const filteredHeads = (usersResponse.data || []).filter(
           (user) =>
             user.roleName === "Department Head" && user.status === "Active"
@@ -68,7 +59,6 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
       setLoadingDropdowns(false);
     }
   };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -79,11 +69,6 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
-
-  // ========================
-  // CUSTOM DROPDOWN COMPONENT - NATIONALITY STYLE
-  // ========================
-
   const CustomDropdown = ({
     options,
     value,
@@ -95,18 +80,15 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
   }) => {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
-
     const toggleDropdown = () => {
       if (!disabled) {
         setIsOpen(!isOpen);
       }
     };
-
     const handleSelect = (selectedValue) => {
       onChange({ target: { name, value: selectedValue } });
       setIsOpen(false);
     };
-
     useEffect(() => {
       const handleClickOutside = (event) => {
         if (
@@ -119,9 +101,7 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
       document.addEventListener("mousedown", handleClickOutside);
       return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
-
     const selectedOption = options.find((opt) => opt.value === value);
-
     return (
       <div
         ref={dropdownRef}
@@ -137,7 +117,6 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
           </span>
           <span className="edm-custom-arrow"></span>
         </div>
-
         {isOpen && (
           <div className="edm-custom-menu">
             {options.map((option) => (
@@ -156,16 +135,10 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
       </div>
     );
   };
-
-  // ========================
-  // DROPDOWN OPTIONS
-  // ========================
-
   const statusOptions = [
     { value: "Active", label: "Active" },
     { value: "Inactive", label: "Inactive" },
   ];
-
   const parentDepartmentOptions = [
     { value: "", label: "-- None (Root Department) --" },
     ...departments.map((dept) => ({
@@ -173,7 +146,6 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
       label: `${dept.departmentName} (${dept.departmentCode})`,
     })),
   ];
-
   const hodOptions = [
     { value: "", label: "-- None (No HOD Assigned) --" },
     ...departmentHeads.map((emp) => ({
@@ -181,14 +153,11 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
       label: `${emp.firstName} ${emp.lastName} (${emp.employeeCompanyId})`,
     })),
   ];
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       setLoading(true);
       toast.loading("Updating department...");
-
       const payload = {
         departmentId: formData.departmentId,
         description: formData.description.trim() || null,
@@ -203,9 +172,7 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
             ? null
             : parseInt(formData.hodEmployeeId),
       };
-
       const response = await departmentService.updateDepartment(payload);
-
       if (response.success) {
         toast.dismiss();
         toast.success("Department updated successfully");
@@ -225,13 +192,10 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
       setLoading(false);
     }
   };
-
   if (!show) return null;
-
   return (
     <>
       <div className="edm-backdrop" onClick={onClose} />
-
       <div className="edm-modal-container">
         <div className="edm-modal-dialog">
           {/* Header */}
@@ -247,7 +211,6 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
               disabled={loading}
             />
           </div>
-
           {/* Body */}
           <form onSubmit={handleSubmit} autoComplete="off" className="edm-form">
             <div className="edm-modal-body">
@@ -272,7 +235,6 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
                         <i className="bi bi-lock-fill"></i> Cannot be edited
                       </div>
                     </div>
-
                     <div className="edm-form-group">
                       <label className="edm-form-label">Department Code</label>
                       <input
@@ -286,7 +248,6 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
                       </div>
                     </div>
                   </div>
-
                   {/* Row 2: Description (EDITABLE) */}
                   <div className="edm-form-row-full">
                     <label className="edm-form-label">Description</label>
@@ -301,7 +262,6 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
                       className="edm-form-input edm-form-textarea"
                     />
                   </div>
-
                   {/* Row 3: Status & Parent Department (CUSTOM DROPDOWNS) */}
                   <div className="edm-form-row">
                     {/* Status - CUSTOM DROPDOWN */}
@@ -316,7 +276,6 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
                         disabled={loading}
                       />
                     </div>
-
                     {/* Parent Department - CUSTOM DROPDOWN */}
                     <div className="edm-form-group">
                       <label className="edm-form-label">
@@ -336,7 +295,6 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
                       </div>
                     </div>
                   </div>
-
                   {/* Row 4: HOD (CUSTOM DROPDOWN) */}
                   <div className="edm-form-row-full">
                     <label className="edm-form-label">
@@ -364,7 +322,6 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
                 </div>
               )}
             </div>
-
             {/* Footer */}
             <div className="edm-modal-footer">
               <button
@@ -400,5 +357,4 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
     </>
   );
 };
-
 export default EditDepartmentModal;

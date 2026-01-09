@@ -7,7 +7,6 @@ import RejectEmailChangeModal from "../../../components/auth/Modal/changerequest
 import { PendingRequests, AllRequests } from "../../../components/auth/Modal/changerequest/RequestsTabContent";
 import useChangeRequestsManagement from "../../../hooks/auth/changerequest/useChangeRequestsManagement";
 import "../../../styles/auth/admin/ChangeRequestManagement.css";
-
 const ChangeRequestManagement = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -15,7 +14,6 @@ const ChangeRequestManagement = () => {
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [processing, setProcessing] = useState(false);
-
   const {
     requests,
     loading,
@@ -23,20 +21,16 @@ const ChangeRequestManagement = () => {
     handleApproveRequest,
     handleRejectRequest,
   } = useChangeRequestsManagement();
-
   const getActiveTab = () => {
     const path = location.pathname;
     if (path.includes("/pending")) return "pending";
     if (path.includes("/all")) return "all";
     return "pending";
   };
-
   const [activeTab, setActiveTab] = useState(getActiveTab());
-
   useEffect(() => {
     setActiveTab(getActiveTab());
   }, [location.pathname]);
-
   const tabs = [
     {
       key: "pending",
@@ -51,12 +45,10 @@ const ChangeRequestManagement = () => {
       icon: "bi-list-ul",
     },
   ];
-
   const handleTabChange = (tab) => {
     setActiveTab(tab.key);
     navigate(tab.path);
   };
-
   const handleProcessClick = (request, action) => {
     setSelectedRequest(request);
     if (action === "Approved") {
@@ -66,36 +58,30 @@ const ChangeRequestManagement = () => {
     }
     toast.info(`Processing email change request #${request.requestId}`);
   };
-
   const handleApprove = async (adminRemarks) => {
     setProcessing(true);
     const success = await handleApproveRequest(selectedRequest.requestId, adminRemarks);
     setProcessing(false);
-    
     if (success) {
       setShowApproveModal(false);
       setSelectedRequest(null);
       fetchRequests(true);
     }
   };
-
   const handleReject = async (adminRemarks) => {
     setProcessing(true);
     const success = await handleRejectRequest(selectedRequest.requestId, adminRemarks);
     setProcessing(false);
-    
     if (success) {
       setShowRejectModal(false);
       setSelectedRequest(null);
       fetchRequests(true);
     }
   };
-
   const getCurrentTabLabel = () => {
     const currentTab = tabs.find((tab) => tab.key === activeTab);
     return currentTab ? currentTab.label : "Pending Requests";
   };
-
   if (loading) {
     return (
       <div className="crm-loading-container">
@@ -105,7 +91,6 @@ const ChangeRequestManagement = () => {
       </div>
     );
   }
-
   return (
     <div className="crm-page">
       <Breadcrumb
@@ -114,7 +99,6 @@ const ChangeRequestManagement = () => {
           { label: getCurrentTabLabel() },
         ]}
       />
-
       <div className="stats-cards-crm">
         <div className="stat-card-crm stat-total-crm">
           <div className="stat-icon-crm">
@@ -159,7 +143,6 @@ const ChangeRequestManagement = () => {
           </div>
         </div>
       </div>
-
       <div className="crm-request-tabs">
         {tabs.map((tab) => (
           <button
@@ -177,7 +160,6 @@ const ChangeRequestManagement = () => {
           </button>
         ))}
       </div>
-
       <div className="tab-content-crm">
         <Routes>
           <Route
@@ -209,7 +191,6 @@ const ChangeRequestManagement = () => {
           />
         </Routes>
       </div>
-
       <ApproveEmailChangeModal
         show={showApproveModal}
         request={selectedRequest}
@@ -227,5 +208,4 @@ const ChangeRequestManagement = () => {
     </div>
   );
 };
-
 export default ChangeRequestManagement;
