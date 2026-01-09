@@ -16,23 +16,19 @@ const CustomDropdown = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
   const selectedOption = options.find((opt) => opt.value === value);
   const displayText = selectedOption ? selectedOption.label : placeholder;
-
   return (
     <div ref={dropdownRef} className={styles.customDropdownContainer}>
       <button
@@ -49,7 +45,6 @@ const CustomDropdown = ({
           style={{ fontSize: "0.7rem", marginLeft: "0.5rem", flexShrink: 0 }}
         ></i>
       </button>
-
       {isOpen && !disabled && (
         <div
           className={styles.customDropdownMenu}
@@ -82,29 +77,23 @@ const CustomDropdown = ({
     </div>
   );
 };
-
 const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
   const [employees, setEmployees] = useState([]);
   const [allSkills, setAllSkills] = useState([]);
   const [availableSkills, setAvailableSkills] = useState([]);
-
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(
     skill?.employeeId || ""
   );
   const [selectedSkillId, setSelectedSkillId] = useState(skill?.skillId || "");
   const [rating, setRating] = useState(skill?.rating || 5);
-
   const [loading, setLoading] = useState(false);
   const [fetchingEmployees, setFetchingEmployees] = useState(true);
   const [fetchingSkills, setFetchingSkills] = useState(false);
   const [allSkillsLoaded, setAllSkillsLoaded] = useState(false);
-
   // Confirmation modal state
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [pendingSubmit, setPendingSubmit] = useState(null);
-
   const isEditMode = !!skill?.mapperId;
-
   // Load employees and all skills on mount
   useEffect(() => {
     fetchEmployees();
@@ -112,20 +101,17 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
       fetchAllSkills();
     }
   }, []);
-
   useEffect(() => {
     if (selectedEmployeeId && !isEditMode && allSkillsLoaded) {
       fetchEmployeeSkills();
     }
   }, [allSkillsLoaded]);
-
   // Load available skills when employee is selected AND all skills are loaded
   useEffect(() => {
     if (selectedEmployeeId && !isEditMode && allSkillsLoaded) {
       fetchEmployeeSkills();
     }
   }, [selectedEmployeeId]);
-
   const fetchEmployees = async () => {
     try {
       setFetchingEmployees(true);
@@ -143,7 +129,6 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
       setFetchingEmployees(false);
     }
   };
-
   const fetchAllSkills = async () => {
     try {
       const response = await lndService.getAllSkills();
@@ -157,12 +142,10 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
       toast.error("Failed to load skills");
     }
   };
-
   const fetchEmployeeSkills = async () => {
     if (!allSkillsLoaded || allSkills.length === 0) {
       return;
     }
-
     try {
       setFetchingSkills(true);
       setSelectedSkillId("");
@@ -173,7 +156,6 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
         "",
         "skillname"
       );
-
       if (response.data.success) {
         const existingSkillIds = response.data.data.items.map(
           (item) => item.skillId
@@ -195,21 +177,17 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
       setFetchingSkills(false);
     }
   };
-
   const handleEmployeeChange = (e) => {
     setSelectedEmployeeId(e.target.value);
     setSelectedSkillId("");
     setAvailableSkills([]);
   };
-
   const handleSubmit = (e) => {
     e.preventDefault();
-
     if (!selectedEmployeeId || !selectedSkillId) {
       toast.error("Please select both employee and skill");
       return;
     }
-
     if (isEditMode) {
       setPendingSubmit({ selectedEmployeeId, selectedSkillId, rating });
       setShowConfirmModal(true);
@@ -217,7 +195,6 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
       submitSkill();
     }
   };
-
   const submitSkill = async () => {
     try {
       setLoading(true);
@@ -259,19 +236,16 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
       setPendingSubmit(null);
     }
   };
-
   const getRatingLabel = (rating) => {
     if (rating < RATING.MIN_REQUEST_SME) return "Needs Improvement";
     if (rating < RATING.MIN_SME) return "Competent";
     return "Expert (SME Eligible)";
   };
-
   const getRatingColor = (rating) => {
     if (rating < RATING.MIN_REQUEST_SME) return "#dc3545";
     if (rating < RATING.MIN_SME) return "#0d6efd";
     return "#198754";
   };
-
   // Prepare dropdown options
   const employeeOptions = [
     {
@@ -285,7 +259,6 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
       }`,
     })),
   ];
-
   const skillOptions = [
     {
       value: "",
@@ -304,7 +277,6 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
       label: skill.skillName,
     })),
   ];
-
   return (
     <>
       <div className={styles.backdrop} onClick={onClose}>
@@ -332,7 +304,6 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
-
           <div className={styles.body}>
             <form onSubmit={handleSubmit}>
               <div className={styles.formContent}>
@@ -386,7 +357,6 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
                     </div>
                   </>
                 )}
-
                 <div
                   className={`${styles.ratingContainer} ${
                     !isEditMode && !selectedSkillId
@@ -404,7 +374,6 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
                     </span>
                     <span className={styles.ratingScaleLabel}>/10</span>
                   </label>
-
                   <div className={styles.ratingButtons}>
                     {[...Array(10)].map((_, index) => {
                       const value = index + 1;
@@ -434,7 +403,6 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
                       );
                     })}
                   </div>
-
                   <div className={styles.ratingScale}>
                     <div className={styles.ratingScaleMin}>
                       <span className={styles.ratingScaleLabel}>Min</span>
@@ -506,7 +474,6 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
           </div>
         </div>
       </div>
-
       <ConfirmationModal
         isOpen={showConfirmModal}
         onClose={() => {

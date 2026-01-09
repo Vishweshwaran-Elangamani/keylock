@@ -22,33 +22,27 @@ const SmeAssignments = () => {
   const [userRole, setUserRole] = useState("");
   const [rolePrefix, setRolePrefix] = useState("");
   const [expandedNotes, setExpandedNotes] = useState({});
-
   // Search
   const [searchTerm, setSearchTerm] = useState("");
   const [searchInput, setSearchInput] = useState("");
-
   // Filter
   const [statusFilter, setStatusFilter] = useState("");
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const dropdownRef = useRef(null);
-
   // Sorting
   const [sortField, setSortField] = useState("");          
   const [sortOrderAsc, setSortOrderAsc] = useState(true);                 
-
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const roleName = user?.role || "";
     setUserRole(roleName);
     setRolePrefix(getRolePrefix(roleName)); 
   }, []);
-
   const getRolePrefix = (role) => {
     const prefixMap = {
       Manager: "/manager",
@@ -60,7 +54,6 @@ const SmeAssignments = () => {
     };
     return prefixMap[role] || "/employee";
   };
-
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -68,13 +61,11 @@ const SmeAssignments = () => {
         setShowStatusDropdown(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
   useEffect(() => {
     fetchSmeAssignments();
   }, [
@@ -85,7 +76,6 @@ const SmeAssignments = () => {
     sortField,
     sortOrderAsc,
   ]);
-
   const fetchSmeAssignments = async () => {
     try {
       setLoading(true);
@@ -103,8 +93,6 @@ const response = await lndService.getSmeAssignments({
   sortOrder: sortOrderAsc ? "asc" : "desc",
   pageSize: itemsPerPage,
 });
-
-
       if (response.data.success) {
         let items = response.data.data.items;
 
@@ -124,29 +112,24 @@ const response = await lndService.getSmeAssignments({
       setLoading(false);
     }
   };
-
   const handleSearchInputChange = (e) => {
     setSearchInput(e.target.value);
   };
-
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     setSearchTerm(searchInput);
     setCurrentPage(1);
   };
-
   const handleCancelSearch = () => {
     setSearchInput("");
     setSearchTerm("");
     setCurrentPage(1);
   };
-
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleSearchSubmit(e);
     }
   };
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -157,7 +140,6 @@ const response = await lndService.getSmeAssignments({
     setCurrentPage(1);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
   const handleDownloadProof = async (assignment) => {
     try {
       const response = await lndService.downloadAssignmentProof(
@@ -181,7 +163,6 @@ const response = await lndService.getSmeAssignments({
     }
     setCurrentPage(1);
   };
-
   const renderSortIcon = (field) => {
     const isActive = sortField === field;
     const iconClass = isActive
@@ -199,7 +180,6 @@ const response = await lndService.getSmeAssignments({
       <ChevronDown size={14} className={`${styles.sortIcon} ${iconClass}`} />
     );
   };
-
   const getStatusLabel = (value) => {
     const statusMap = {
       "": "All Statuses",
@@ -210,7 +190,6 @@ const response = await lndService.getSmeAssignments({
     };
     return statusMap[value] || "All Statuses";
   };
-
   const statusOptions = [
     { value: "", label: "All Statuses" },
     { value: ASSIGNMENT_STATUS.IN_PROGRESS, label: "In Progress" },
@@ -232,7 +211,6 @@ const response = await lndService.getSmeAssignments({
     const activeClass = sortField === field ? styles.tableHeaderCellActive : "";
     return `${baseClass} ${alignClass} ${sortableClass} ${activeClass}`.trim();
   };
-
   const getDropdownItemClass = (currentValue, optionValue) => {
     return `${styles.dropdownItem} ${
       currentValue === optionValue ? styles.dropdownItemActive : ""
@@ -248,7 +226,6 @@ const response = await lndService.getSmeAssignments({
       </div>
     );
   }
-
   return (
     <div>
       <Breadcrumb
@@ -301,7 +278,6 @@ const response = await lndService.getSmeAssignments({
               }`}
             ></i>
           </button>
-
           {showStatusDropdown && (
             <div className={styles.dropdownMenu}>
               {statusOptions.map((option) => (
@@ -321,7 +297,6 @@ const response = await lndService.getSmeAssignments({
           )}
         </div>
       </div>
-
       {assignments.length === 0 && !loading ? (
         <EmptyState
           icon={Filter}
@@ -369,7 +344,6 @@ const response = await lndService.getSmeAssignments({
                   </div>
                 ))}
               </div>
-
               {assignments.map((assignment, idx) => (
                 <div key={assignment.assignmentId}>
                   <div
@@ -506,7 +480,6 @@ const response = await lndService.getSmeAssignments({
               ))}
             </div>
           </div>
-
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}

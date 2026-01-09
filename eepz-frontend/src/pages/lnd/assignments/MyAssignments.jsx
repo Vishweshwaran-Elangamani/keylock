@@ -25,33 +25,27 @@ const MyAssignments = () => {
   const [selectedAssignment, setSelectedAssignment] = useState(null);
   const [userRole, setUserRole] = useState("");
   const [rolePrefix, setRolePrefix] = useState("");
-
   // Search
   const [searchTerm, setSearchTerm] = useState("");
   const [searchInput, setSearchInput] = useState("");
-
   // Filter
   const [statusFilter, setStatusFilter] = useState("");
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const dropdownRef = useRef(null);
-
   // Sorting
   const [sortField, setSortField] = useState("");
   const [sortOrderAsc, setSortOrderAsc] = useState(true);
-
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const roleName = user?.role || "";
     setUserRole(roleName);
     setRolePrefix(getRolePrefix(roleName));
   }, []);
-
   const getRolePrefix = (role) => {
     const prefixMap = {
       Manager: "/manager",
@@ -63,7 +57,6 @@ const MyAssignments = () => {
     };
     return prefixMap[role] || "/employee";
   };
-
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -71,13 +64,11 @@ const MyAssignments = () => {
         setShowStatusDropdown(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
   useEffect(() => {
     fetchAssignments();
   }, [
@@ -88,7 +79,6 @@ const MyAssignments = () => {
     sortField,
     sortOrderAsc,
   ]);
-
   const fetchAssignments = async () => {
     try {
       setLoading(true);
@@ -102,15 +92,12 @@ const MyAssignments = () => {
         SortOrder: sortOrderAsc ? "asc" : "desc",
         PageSize: itemsPerPage
       });
-  
       if (response.data.success) {
         let items = response.data.data.items;
-  
         // Client-side filter for overdue (if needed)
         if (statusFilter === ASSIGNMENT_STATUS.OVERDUE) {
           items = items.filter((a) => a.isOverdue === true);
         }
-  
         setAssignments(items);
         setTotalItems(response.data.data.totalCount);
         setTotalPages(response.data.data.totalPages);
@@ -122,51 +109,42 @@ const MyAssignments = () => {
       setLoading(false);
     }
   };
-  
   const handleSearchInputChange = (e) => {
     setSearchInput(e.target.value);
   };
-
   const handleSearch = (e) => {
     e.preventDefault();
     setSearchTerm(searchInput);
     setCurrentPage(1);
   };
-
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleSearch(e);
     }
   };
-
   const handleCancelSearch = () => {
     setSearchInput("");
     setSearchTerm("");
     setCurrentPage(1);
   };
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
   const handleItemsPerPageChange = (newSize) => {
     setItemsPerPage(newSize);
     setCurrentPage(1);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
   const handleUploadProof = (assignment) => {
     setSelectedAssignment(assignment);
     setShowUploadModal(true);
   };
-
   const handleUploadSuccess = () => {
     setShowUploadModal(false);
     toast.success("Proof uploaded successfully!");
     fetchAssignments();
   };
-
   const handleDownloadProof = async (assignment) => {
     try {
       const response = await lndService.downloadAssignmentProof(
@@ -180,7 +158,6 @@ const MyAssignments = () => {
       toast.error("Failed to download proof");
     }
   };
-
   const onSortClick = (field) => {
     if (sortField === field) {
       setSortOrderAsc(!sortOrderAsc);

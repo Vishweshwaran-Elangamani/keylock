@@ -20,20 +20,16 @@ const OrganizationAssignments = () => {
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
-
   // Search
   const [searchTerm, setSearchTerm] = useState("");
   const [searchInput, setSearchInput] = useState("");
-
   // Filter
   const [statusFilter, setStatusFilter] = useState("");
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const statusDropdownRef = useRef(null);
-
   // Sorting
   const [sortField, setSortField] = useState("");
   const [sortOrderAsc, setSortOrderAsc] = useState(true);
-
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -169,7 +165,6 @@ const OrganizationAssignments = () => {
     setCurrentPage(1);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
   const getStatusLabel = (value) => {
     const statusMap = {
       "": "All Statuses",
@@ -181,7 +176,6 @@ const OrganizationAssignments = () => {
     };
     return statusMap[value] || "All Statuses";
   };
-
   const statusOptions = [
     { value: "", label: "All Statuses" },
     { value: ASSIGNMENT_STATUS.IN_PROGRESS, label: "In Progress" },
@@ -251,7 +245,6 @@ const OrganizationAssignments = () => {
       </div>
     );
   }
-
   return (
     <div>
       <Breadcrumb
@@ -481,7 +474,6 @@ const OrganizationAssignments = () => {
               ))}
             </div>
           </div>
-
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
