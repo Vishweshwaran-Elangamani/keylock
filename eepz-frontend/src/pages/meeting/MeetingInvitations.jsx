@@ -393,11 +393,7 @@ const MeetingInvitations = () => {
                         Respond to meeting invitation
                       </p>
                     </div>
-                    <button
-                      type="button"
-                      className="btn-close btn-close-white"
-                      onClick={closeRsvpModal}
-                    ></button>
+                    <button type="button" className="btn-close btn-close-white" onClick={closeRsvpModal}></button>
                   </div>
 
                   <div className="modal-body mi-modal-body">
@@ -407,11 +403,7 @@ const MeetingInvitations = () => {
                         <div className="mi-error-text">
                           <strong>Error:</strong> {errorMessage}
                         </div>
-                        <button
-                          type="button"
-                          className="btn-close btn-sm mi-error-close"
-                          onClick={() => setErrorMessage("")}
-                        ></button>
+                        <button type="button" className="btn-close btn-sm mi-error-close"onClick={() => setErrorMessage("")}></button>
                       </div>
                     )}
 
@@ -471,29 +463,22 @@ const MeetingInvitations = () => {
                       "RSVPStatus"
                     ) !== RSVP_STATUS.PENDING && (
                       <div className="alert alert-info mi-current-status-alert">
-                        <AlertCircle
-                          size={18}
-                          className="mi-current-status-icon"
-                        />
+                        <AlertCircle size={18}className="mi-current-status-icon"/>
                         <div className="mi-current-status-text">
                           <strong>Current Response:</strong>{" "}
                           {getField(
                             selectedInvitation,
-                            "rsvpStatus",
-                            "RSVPStatus"
+                            "rsvpStatus", "RSVPStatus"
                           )}
                           {getField(
                             selectedInvitation,
-                            "rsvpResponseDate",
-                            "RSVPResponseDate"
+                            "rsvpResponseDate", "RSVPResponseDate"
                           ) && (
                             <div className="mi-current-status-meta">
                               Responded on{" "}
                               {formatDate(
                                 getField(
-                                  selectedInvitation,
-                                  "rsvpResponseDate",
-                                  "RSVPResponseDate"
+                                  selectedInvitation, "rsvpResponseDate", "RSVPResponseDate"
                                 )
                               )}
                             </div>
@@ -509,59 +494,32 @@ const MeetingInvitations = () => {
                       </label>
 
                       <div className="btn-group w-100" role="group">
-                        <input
-                          type="radio"
-                          className="btn-check"
-                          name="rsvpStatus"
-                          id="rsvp-accepted"
-                          value={RSVP_STATUS.ACCEPTED.value}
-                          checked={rsvpStatus === RSVP_STATUS.ACCEPTED.value}
-                          onChange={(e) =>
-                            setRsvpStatus(Number(e.target.value))
-                          }
-                        />
-                        <label
-                          className="btn btn-outline-success mi-rsvp-option"
-                          htmlFor="rsvp-accepted"
-                        >
+                        <input type="radio"className="btn-check" name="rsvpStatus" id="rsvp-accepted"
+                          value={RSVP_STATUS.ACCEPTED.value} checked={rsvpStatus === RSVP_STATUS.ACCEPTED.value}
+                          onChange={(e) =>setRsvpStatus(Number(e.target.value))
+                          }/>
+                        
+                        <label className="btn btn-outline-success mi-rsvp-option"htmlFor="rsvp-accepted">
                           <CheckCircle size={16} className="me-1" />
                           Accept
                         </label>
 
-                        <input
-                          type="radio"
-                          className="btn-check"
-                          name="rsvpStatus"
-                          id="rsvp-tentative"
+                        <input type="radio" className="btn-check" name="rsvpStatus" id="rsvp-tentative"
                           value={RSVP_STATUS.TENTATIVE.value}
                           checked={rsvpStatus === RSVP_STATUS.TENTATIVE.value}
-                          onChange={(e) =>
-                            setRsvpStatus(Number(e.target.value))
-                          }
-                        />
-                        <label
-                          className="btn btn-outline-info mi-rsvp-option"
-                          htmlFor="rsvp-tentative"
-                        >
+                          onChange={(e) => setRsvpStatus(Number(e.target.value)) }/>
+                       
+                        <label className="btn btn-outline-info mi-rsvp-option" htmlFor="rsvp-tentative">
                           <AlertCircle size={16} className="me-1" />
                           Tentative
                         </label>
 
-                        <input
-                          type="radio"
-                          className="btn-check"
-                          name="rsvpStatus"
-                          id="rsvp-declined"
-                          value={RSVP_STATUS.DECLINED.value}
+                        <input type="radio"className="btn-check" name="rsvpStatus"
+                          id="rsvp-declined"  value={RSVP_STATUS.DECLINED.value}
                           checked={rsvpStatus === RSVP_STATUS.DECLINED.value}
-                          onChange={(e) =>
-                            setRsvpStatus(Number(e.target.value))
-                          }
-                        />
-                        <label
-                          className="btn btn-outline-danger mi-rsvp-option"
-                          htmlFor="rsvp-declined"
-                        >
+                          onChange={(e) =>setRsvpStatus(Number(e.target.value))
+                          }/>
+                        <label className="btn btn-outline-danger mi-rsvp-option" htmlFor="rsvp-declined">
                           <XCircle size={16} className="me-1" />
                           Decline
                         </label>
@@ -573,12 +531,10 @@ const MeetingInvitations = () => {
                         <span>Add Comment (Optional)</span>
                       </label>
                       <textarea
-                        className="form-control"
-                        rows="3"
-                        value={rsvpComment}
-                        onChange={(e) => setRsvpComment(e.target.value)}
-                        placeholder="Add any comments or notes..."
-                      />
+                        className="form-control"rows="3"
+                        value={rsvpComment} onChange={(e) => setRsvpComment(e.target.value)}
+                        placeholder="Add any comments or notes..."/>
+
                       {getField(
                         selectedInvitation,
                         "rsvpComments",
@@ -598,26 +554,14 @@ const MeetingInvitations = () => {
                   </div>
 
                   <div className="modal-footer mi-modal-footer">
-                    <button
-                      className="btn btn-light mi-cancel-button"
-                      onClick={closeRsvpModal}
-                      type="button"
-                    >
+                    <button className="btn btn-light mi-cancel-button"onClick={closeRsvpModal} type="button">
                       Cancel
                     </button>
-                    <button
-                      className="btn mi-gradient-button mi-submit-button"
-                      onClick={handleRsvpSubmit}
-                      disabled={submitting}
-                      type="button"
-                    >
+                    <button className="btn mi-gradient-button mi-submit-button" onClick={handleRsvpSubmit}
+                      disabled={submitting} type="button">
                       {submitting ? (
                         <>
-                          <span
-                            className="spinner-border spinner-border-sm"
-                            role="status"
-                            aria-hidden="true"
-                          ></span>
+                          <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                           Submitting...
                         </>
                       ) : (

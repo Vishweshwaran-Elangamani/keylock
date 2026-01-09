@@ -192,12 +192,8 @@ export default function SubmitOrgGoalFeedback() {
                   Select Organization Objective{" "}
                   <span className="sogf-required">*</span>
                 </label>
-                <select
-                  className="sogf-select"
-                  value={form.objectiveId || ""}
-                  onChange={handleObjectiveChange}
-                  required
-                >
+                <select className="sogf-select" value={form.objectiveId || ""}
+                  onChange={handleObjectiveChange} required>
                   <option value="">-- Choose an objective --</option>
                   {objectives.map((objective) => (
                     <option
@@ -227,16 +223,10 @@ export default function SubmitOrgGoalFeedback() {
                     Rating <span className="sogf-required">*</span>
                   </label>
                   <div className="sogf-rating-wrapper">
-                    <input
-                      type="range"
-                      min="1"
-                      max="5"
-                      className="sogf-range"
-                      value={form.rating}
-                      onChange={(e) =>
-                        setForm({ ...form, rating: Number(e.target.value) })
-                      }
-                    />
+                    <input type="range" min="1" max="5"
+                      className="sogf-range" value={form.rating}
+                      onChange={(e) =>setForm({ ...form, rating: Number(e.target.value) })
+                      } />
                     <span className="sogf-rating-badge">{form.rating} ⭐</span>
                   </div>
                 </div>
@@ -244,21 +234,10 @@ export default function SubmitOrgGoalFeedback() {
                 <div className="sogf-form-col">
                   <label className="sogf-label sogf-label-spacer">&nbsp;</label>
                   <div className="sogf-checkbox-wrapper">
-                    <input
-                      className="sogf-checkbox-input"
-                      type="checkbox"
-                      id="anonymousCheckbox"
-                      checked={form.isAnonymous}
-                      onChange={(e) =>
-                        setForm({ ...form, isAnonymous: e.target.checked })
-                      }
-                    />
-                    <label
-                      className="sogf-checkbox-label"
-                      htmlFor="anonymousCheckbox"
-                    >
-                      Submit anonymously
-                    </label>
+                    <input className="sogf-checkbox-input"
+                      type="checkbox"  id="anonymousCheckbox" checked={form.isAnonymous}
+                      onChange={(e) => setForm({ ...form, isAnonymous: e.target.checked })  } />
+                <label className="sogf-checkbox-label" htmlFor="anonymousCheckbox" > Submit anonymously </label>
                   </div>
                 </div>
               </div>
@@ -267,40 +246,20 @@ export default function SubmitOrgGoalFeedback() {
                 <label className="sogf-label">
                   Your Feedback <span className="sogf-required">*</span>
                 </label>
-                <textarea
-                  className="sogf-textarea"
-                  rows={5}
-                  value={form.feedbackComments}
-                  onChange={(e) =>
-                    setForm({ ...form, feedbackComments: e.target.value })
-                  }
+                <textarea className="sogf-textarea"  rows={5}  value={form.feedbackComments} onChange={(e) =>
+                setForm({ ...form, feedbackComments: e.target.value })}
                   placeholder="Share your detailed feedback on this organization objective. What's working well? What could be improved?"
-                  required
-                  disabled={!form.objectiveId}
-                  maxLength={1000}
-                />
-                <small className="sogf-char-count">
-                  {form.feedbackComments.length} / 1000 characters
-                </small>
+                  required disabled={!form.objectiveId}maxLength={1000}/>
+                <small className="sogf-char-count"> {form.feedbackComments.length} / 1000 characters </small>
               </div>
 
               <div className="sogf-form-group">
-                <button
-                  className="sogf-submit-button"
-                  disabled={
-                    loading ||
-                    !form.objectiveId ||
-                    !form.feedbackComments.trim()
-                  }
-                  type="submit"
-                >
+                <button className="sogf-submit-button"
+                  disabled={  loading ||  !form.objectiveId ||  !form.feedbackComments.trim() }
+                  type="submit">
                   {loading ? (
                     <>
-                      <span
-                        className="sogf-button-spinner"
-                        role="status"
-                        aria-hidden="true"
-                      ></span>
+                      <span className="sogf-button-spinner"role="status"aria-hidden="true"></span>
                       Submitting...
                     </>
                   ) : (

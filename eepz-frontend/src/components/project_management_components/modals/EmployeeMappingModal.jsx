@@ -174,7 +174,6 @@ const EmployeeMappingModal = ({
   const modalContent = (
     <>
       <div className="emm-overlay" onClick={onClose} />
-
       <div className="emm-modal-shell">
         <div className="emm-modal-card">
           <div className="emm-modal-header">
@@ -194,7 +193,6 @@ const EmployeeMappingModal = ({
               <X size={22} />
             </button>
           </div>
-
           <div className="emm-body">
             {message && (
               <div
@@ -212,7 +210,6 @@ const EmployeeMappingModal = ({
                 <span>{message.text}</span>
               </div>
             )}
-
             {getProjectManagerIds().length > 0 && (
               <div className="emm-info-banner">
                 <Info size={18} className="emm-info-icon" />
@@ -245,7 +242,6 @@ const EmployeeMappingModal = ({
                 </div>
               </div>
             )}
-
             {isLoadingData ? (
               <div className="emm-loading">
                 <div
@@ -316,7 +312,6 @@ const EmployeeMappingModal = ({
                     />
                   </div>
                 </div>
-
                 <div className="emm-selection-summary">
                   <div className="emm-summary-badges">
                     <span className="emm-badge emm-badge--info">
@@ -342,7 +337,6 @@ const EmployeeMappingModal = ({
                     Select/Deselect All
                   </button>
                 </div>
-
                 <div className="emm-warning-banner">
                   <Info size={16} className="emm-info-icon" />
                   <div className="emm-warning-text">
@@ -351,7 +345,6 @@ const EmployeeMappingModal = ({
                     Employees must be selected first before marking as primary.
                   </div>
                 </div>
-
                 <div className="table-responsive emm-table-wrapper">
                   <table className="table table-hover mb-0 emm-table">
                     <thead className="table-light emm-thead">
@@ -389,7 +382,6 @@ const EmployeeMappingModal = ({
                           const isPrimary = primaryEmployeeIds.includes(
                             emp.employeeMasterId
                           );
-
                           return (
                             <tr
                               key={emp.employeeMasterId}
@@ -462,21 +454,11 @@ const EmployeeMappingModal = ({
               </>
             )}
           </div>
-
           <div className="emm-footer">
-            <button
-              type="button"
-              onClick={onClose}
-              className="emm-btn emm-btn--secondary"
-            >
+            <button type="button" onClick={onClose} className="emm-btn emm-btn--secondary">
               Close
             </button>
-            <button
-              type="button"
-              onClick={onMap}
-              disabled={!hasSelectedUnmapped || isSubmitting}
-              className="emm-btn emm-btn--map"
-            >
+            <button type="button" onClick={onMap} disabled={!hasSelectedUnmapped || isSubmitting} className="emm-btn emm-btn--map">
               {isSubmitting ? (
                 <>
                   <span className="spinner-border spinner-border-sm emm-btn-spinner" />
@@ -489,12 +471,7 @@ const EmployeeMappingModal = ({
                 </>
               )}
             </button>
-            <button
-              type="button"
-              onClick={onUnmap}
-              disabled={!hasSelectedMapped || isSubmitting}
-              className="emm-btn emm-btn--unmap"
-            >
+            <button type="button" onClick={onUnmap} disabled={!hasSelectedMapped || isSubmitting} className="emm-btn emm-btn--unmap" >
               {isSubmitting ? (
                 <>
                   <span className="spinner-border spinner-border-sm emm-btn-spinner" />
@@ -512,8 +489,6 @@ const EmployeeMappingModal = ({
       </div>
     </>
   );
-
   return ReactDOM.createPortal(modalContent, document.body);
 };
-
 export default EmployeeMappingModal;

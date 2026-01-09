@@ -180,19 +180,7 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
   const selectedDate = deadline ? new Date(deadline) : null;
 
   const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+    "January","February","March","April","May","June","July","August","September","October","November","December", ];
   const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
   return (
@@ -200,23 +188,15 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
       <div className="esla-modal" onClick={(e) => e.stopPropagation()}>
         <div className="esla-header">
           <h5 className="esla-title">Edit SLA - {sla?.employeeName}</h5>
-          <button
-            type="button"
-            className={`esla-close-btn ${
-              updating ? "esla-close-btn--disabled" : ""
-            }`}
-            onClick={onClose}
-            disabled={updating}
-          >
-            <X size={24} />
+          <button  type="button"  className={`esla-close-btn ${  updating ? "esla-close-btn--disabled" : ""}`}
+            onClick={onClose} disabled={updating}>  <X size={24} />
           </button>
         </div>
 
         <div className="esla-body">
           {error && (
             <div className="esla-error-alert">
-              <AlertCircle className="esla-error-icon" size={20} />
-              <p className="esla-error-text">{error}</p>
+              <AlertCircle className="esla-error-icon" size={20} /> <p className="esla-error-text">{error}</p>
             </div>
           )}
 
@@ -235,67 +215,34 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
               </label>
 
               <div ref={calendarRef} className="esla-calendar-container">
-                <input
-                  type="text"
-                  readOnly
-                  value={formatDisplayDate(deadline)}
-                  onClick={() => setCalendarOpen((o) => !o)}
-                  disabled={updating}
-                  placeholder="Select date"
-                  className={`esla-input esla-deadline-input ${
-                    updating ? "esla-input--disabled" : ""
-                  }`}
-                />
-                <button
-                  type="button"
-                  className={`esla-calendar-trigger ${
-                    updating ? "esla-calendar-trigger--disabled" : ""
-                  }`}
-                  onClick={() => setCalendarOpen((o) => !o)}
-                  disabled={updating}
-                >
-                  <svg
-                    className="esla-calendar-svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                  >
-                    <rect
-                      x="4"
-                      y="5"
-                      width="16"
-                      height="15"
-                      rx="2"
-                      ry="2"
+                <input  type="text"  readOnly  value={formatDisplayDate(deadline)}
+                  onClick={() => setCalendarOpen((o) => !o)}  disabled={updating}  placeholder="Select date"  
+                  className={`esla-input esla-deadline-input ${ updating ? "esla-input--disabled" : ""}`} />
+                <button type="button"  className={`esla-calendar-trigger ${ updating ? "esla-calendar-trigger--disabled" : ""}`}
+                  onClick={() => setCalendarOpen((o) => !o)} disabled={updating} >
+                  
+                  <svg className="esla-calendar-svg"
+                    width="18" height="18"
+                    viewBox="0 0 24 24" fill="none">
+                    
+                  <rect  x="4"  y="5"
+                    width="16"  height="15" rx="2" ry="2"
                       stroke="currentColor"
                       strokeWidth="1.8"
-                      fill="none"
-                    />
-                    <line
-                      x1="4"
-                      y1="9"
-                      x2="20"
-                      y2="9"
+                      fill="none"/>
+
+                    <line x1="4" y1="9" x2="20" y2="9"
                       stroke="currentColor"
-                      strokeWidth="1.8"
-                    />
-                    <line
-                      x1="9"
-                      y1="3"
-                      x2="9"
-                      y2="7"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
+                      strokeWidth="1.8"/>
+                    
+                    <line  x1="9" y1="3" x2="9" y2="7"
+                      stroke="currentColor" strokeWidth="1.8"
                       strokeLinecap="round"
                     />
+
                     <line
-                      x1="15"
-                      y1="3"
-                      x2="15"
-                      y2="7"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
+                      x1="15"  y1="3"  x2="15" y2="7"
+                      stroke="currentColor"   strokeWidth="1.8"
                       strokeLinecap="round"
                     />
                   </svg>
@@ -304,21 +251,13 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
                 {calendarOpen && (
                   <div className="esla-calendar-dropdown">
                     <div className="esla-calendar-header">
-                      <button
-                        type="button"
-                        className="esla-calendar-nav-btn"
-                        onClick={goPrevMonth}
-                      >
+                      <button type="button" className="esla-calendar-nav-btn"onClick={goPrevMonth}>
                         <ChevronLeft size={16} />
                       </button>
                       <span className="esla-calendar-title">
                         {monthNames[month]} {year}
                       </span>
-                      <button
-                        type="button"
-                        className="esla-calendar-nav-btn"
-                        onClick={goNextMonth}
-                      >
+                      <button type="button" className="esla-calendar-nav-btn"onClick={goNextMonth}>
                         <ChevronRight size={16} />
                       </button>
                     </div>
@@ -367,13 +306,7 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
                     </div>
 
                     <div className="esla-calendar-footer">
-                      <button
-                        type="button"
-                        className="esla-today-btn"
-                        onClick={goToday}
-                      >
-                        Today
-                      </button>
+                      <button type="button" className="esla-today-btn" onClick={goToday}> Today</button>
                     </div>
                   </div>
                 )}
@@ -387,26 +320,15 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
 
               <div ref={statusRef} className="esla-status-container">
                 <button
-                  type="button"
-                  className={`esla-status-trigger ${
-                    updating ? "esla-status-trigger--disabled" : ""
-                  }`}
+                  type="button" className={`esla-status-trigger ${
+                    updating ? "esla-status-trigger--disabled" : ""}`}
                   onClick={() => setStatusOpen((o) => !o)}
-                  disabled={updating}
-                >
-                  <span
-                    className={`esla-status-value ${
-                      status ? "" : "esla-status-value--placeholder"
-                    }`}
-                  >
+                  disabled={updating}>
+                  <span className={`esla-status-value ${ status ? "" : "esla-status-value--placeholder" }`}>
                     {status || "Select Status"}
                   </span>
-                  <ChevronDown
-                    className={`esla-chevron ${
-                      statusOpen ? "esla-chevron--open" : ""
-                    }`}
-                    size={18}
-                  />
+                  <ChevronDown className={`esla-chevron ${ statusOpen ? "esla-chevron--open" : ""}`}
+                    size={18}/>
                 </button>
 
                 {statusOpen && (
@@ -414,17 +336,9 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
                     {["Open", "Closed"].map((opt) => {
                       const selected = status === opt;
                       return (
-                        <button
-                          key={opt}
-                          type="button"
-                          className={`esla-status-option ${
+                        <button key={opt} type="button" className={`esla-status-option ${
                             selected ? "esla-status-option--selected" : ""
-                          }`}
-                          onClick={() => {
-                            setStatus(opt);
-                            setStatusOpen(false);
-                          }}
-                        >
+                        }`} onClick={() => { setStatus(opt); setStatusOpen(false); }}>
                           {opt}
                         </button>
                       );
@@ -438,17 +352,11 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
               <label className="esla-label">
                 Update Reason <span className="esla-required">*</span>
               </label>
-              <textarea
-                rows={3}
-                placeholder="Why are you updating this SLA?"
-                value={updateReason}
-                onChange={(e) => setUpdateReason(e.target.value)}
-                maxLength={250}
-                disabled={updating}
-                className={`esla-textarea ${
-                  updating ? "esla-textarea--disabled" : ""
-                }`}
-              />
+              <textarea  rows={3}  placeholder="Why are you updating this SLA?"
+                value={updateReason} onChange={(e) => setUpdateReason(e.target.value)}
+                maxLength={250} disabled={updating} className={`esla-textarea ${
+                  updating ? "esla-textarea--disabled" : ""}`}/>
+
               <small className="esla-char-count">
                 {updateReason.length}/250 characters
               </small>
@@ -457,27 +365,14 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
         </div>
 
         <div className="esla-footer">
-          <button
-            type="button"
-            className={`esla-btn esla-btn--cancel ${
-              updating ? "esla-btn--disabled" : ""
-            }`}
-            onClick={onClose}
-            disabled={updating}
-          >
-            Cancel
+          <button  type="button"className={`esla-btn esla-btn--cancel ${updating ? "esla-btn--disabled" : ""}`}
+            onClick={onClose} disabled={updating}> Cancel
           </button>
 
-          <button
-            type="submit"
-            className={`esla-btn esla-btn--update ${
-              updating || !deadline || !updateReason.trim()
-                ? "esla-btn--disabled"
-                : ""
-            }`}
-            onClick={handleSubmit}
-            disabled={updating || !deadline || !updateReason.trim()}
-          >
+          <button type="submit"
+            className={`esla-btn esla-btn--update ${ updating || !deadline || !updateReason.trim()
+           ? "esla-btn--disabled": "" }`}
+            onClick={handleSubmit} disabled={updating || !deadline || !updateReason.trim()}>
             {updating ? (
               <>
                 <span className="esla-btn-spinner" />

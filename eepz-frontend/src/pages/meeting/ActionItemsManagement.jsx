@@ -121,48 +121,29 @@ const ActionItemsManagement = () => {
       </div>
     );
   }
-
   return (
     <div className="aim-page">
       <div className="aim-container container-fluid px-4 py-4">
-        <nav
-          aria-label="breadcrumb"
-          className="aim-breadcrumb"
-          style={{ "--bs-breadcrumb-divider": "''" }}
-        >
+        <nav  aria-label="breadcrumb"  className="aim-breadcrumb"
+          style={{ "--bs-breadcrumb-divider": "''" }}>
           <ol className="breadcrumb mb-0 d-flex align-items-center aim-breadcrumb-list">
             <li className="breadcrumb-item aim-breadcrumb-item">
-              <button
-                onClick={() => navigate("/employee/dashboard/")}
+              <button onClick={() => navigate("/employee/dashboard/")}
                 className="aim-breadcrumb-link aim-breadcrumb-home"
-                type="button"
-                aria-label="Dashboard"
-              >
+                type="button" aria-label="Dashboard">
                 <Home size={18} className="aim-home-icon" />
               </button>
             </li>
-
             <li className="aim-breadcrumb-separator">/</li>
             <li className="breadcrumb-item aim-breadcrumb-item">
-              <button
-                onClick={() =>
-                  navigate("/employee/dashboard/meetmom", {
-                    state: { fromPage: "actionItems" },
-                  })
-                }
-                className="aim-breadcrumb-link"
-                type="button"
-              >
+              <button onClick={() => navigate("/employee/dashboard/meetmom", {
+                  state: { fromPage: "actionItems" },})}
+                className="aim-breadcrumb-link"type="button">
                 Meetings and MoM
               </button>
             </li>
-
             <li className="aim-breadcrumb-separator">/</li>
-
-            <li
-              className="breadcrumb-item active aim-breadcrumb-item"
-              aria-current="page"
-            >
+            <li className="breadcrumb-item active aim-breadcrumb-item"aria-current="page">
               <span className="aim-breadcrumb-current">Action Items</span>
             </li>
           </ol>
@@ -170,10 +151,7 @@ const ActionItemsManagement = () => {
 
         <div className="row g-3 mb-4">
           <div className="col-lg-3 col-md-6">
-            <div
-              className="card aim-stat-card"
-              onClick={() => setFilter("all")}
-            >
+            <div className="card aim-stat-card"  onClick={() => setFilter("all")}>
               <div className="card-body aim-stat-card-body">
                 <div className="aim-stat-icon aim-stat-icon-total">
                   <i className="bi bi-card-checklist"></i>
@@ -187,10 +165,7 @@ const ActionItemsManagement = () => {
           </div>
 
           <div className="col-lg-3 col-md-6">
-            <div
-              className="card aim-stat-card"
-              onClick={() => setFilter("overdue")}
-            >
+            <div className="card aim-stat-card" onClick={() => setFilter("overdue")} >
               <div className="card-body aim-stat-card-body">
                 <div className="aim-stat-icon aim-stat-icon-overdue">
                   <i className="bi bi-exclamation-triangle"></i>
@@ -212,40 +187,24 @@ const ActionItemsManagement = () => {
                   <span className="aim-search-icon">
                     <i className="bi bi-search" />
                   </span>
-
-                  <input
-                    type="text"
-                    className="form-control aim-search-input"
-                    placeholder="Search action items..."
-                    value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
-                    onKeyDown={(e) => {
+                  <input type="text"
+                    className="form-control aim-search-input" placeholder="Search action items..."
+                    value={searchInput} onChange={(e) => setSearchInput(e.target.value)}onKeyDown={(e) => {
                       if (e.key === "Enter") handleSearchClick();
-                    }}
-                  />
-
+                    }} />
                   {isSearching ? (
-                    <button
-                      type="button"
-                      onClick={handleCancelClick}
-                      className="aim-search-btn aim-search-btn-cancel"
-                    >
+                    <button type="button" onClick={handleCancelClick} className="aim-search-btn aim-search-btn-cancel">
                       <i className="bi bi-x" />
                       Cancel
                     </button>
                   ) : (
-                    <button
-                      type="button"
-                      onClick={handleSearchClick}
-                      className="aim-search-btn aim-search-btn-primary"
-                    >
+                    <button type="button" onClick={handleSearchClick} className="aim-search-btn aim-search-btn-primary">
                       <i className="bi bi-search" />
                       Search
                     </button>
                   )}
                 </div>
               </div>
-
               <div className="col-lg-3 text-lg-end">
                 <span className="aim-count-badge">
                   Showing {filteredItems.length} of {actionItems.length} tasks
@@ -266,8 +225,7 @@ const ActionItemsManagement = () => {
                   <h5 className="aim-empty-title">No action items found</h5>
                   <p className="aim-empty-text">
                     {searchTerm
-                      ? "Try adjusting your search criteria"
-                      : "You have no action items assigned"}
+                      ? "Try adjusting your search criteria": "You have no action items assigned"}
                   </p>
                 </div>
               </div>
@@ -276,7 +234,6 @@ const ActionItemsManagement = () => {
                 {filteredItems.map((item) => {
                   const overdueStatus = isOverdue(item);
                   const meetingTitle = getMeetingTitle(item);
-
                   return (
                     <div key={item.actionItemId} className="col-lg-6 col-xl-4">
                       <div className="card aim-item-card h-100">
@@ -295,22 +252,15 @@ const ActionItemsManagement = () => {
                           <div className="aim-item-meta">
                             <div className="aim-item-meta-row">
                               <strong>Due Date:</strong>
-                              <span
-                                className={
-                                  overdueStatus ? "aim-item-due-overdue" : ""
-                                }
-                              >
+                              <span className={ overdueStatus ? "aim-item-due-overdue" : ""}>
                                 {new Date(item.dueDate).toLocaleDateString(
                                   "en-US",
                                   {
-                                    year: "numeric",
-                                    month: "short",
-                                    day: "numeric",
+                                    year: "numeric",month: "short",day: "numeric",
                                   }
                                 )}
                               </span>
                             </div>
-
                             {item.assignedByEmployeeName && (
                               <div className="aim-item-meta-row">
                                 <strong>Assigned by:</strong>

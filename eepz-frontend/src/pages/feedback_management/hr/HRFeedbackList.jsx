@@ -1,20 +1,9 @@
 import React, { useEffect, useState } from "react";
 import {
-  AlertTriangle,
-  Eye,
-  Users,
-  Send,
-  Clock,
-  Lock,
-  User,
-  X,
-  ChartLine,
+  AlertTriangle,Eye, Users, Send, Clock, Lock, User, X, ChartLine,
 } from "lucide-react";
 import {
-  mentorFeedbackApi,
-  peerQueueApi,
-  employeeApi,
-  feedbackAnalysisApi,
+  mentorFeedbackApi, peerQueueApi, employeeApi, feedbackAnalysisApi,
 } from "../../../services/feedbackmanagement/feedbackApi";
 import ResponseViewModal from "../../../components/feedback_management/modals/ResponseViewModal";
 import FeedbackAnalysisModal from "../../../components/feedback_management/modals/FeedbackAnalysisModal";
@@ -60,8 +49,7 @@ export default function HRFeedbackList() {
     try {
       const employeeResponse = await employeeApi.getAll();
       const employees = Array.isArray(employeeResponse?.data)
-        ? employeeResponse.data
-        : employeeResponse?.data?.data || [];
+        ? employeeResponse.data: employeeResponse?.data?.data || [];
 
       const employeeMap = {};
       employees.forEach((emp) => {
@@ -93,36 +81,27 @@ export default function HRFeedbackList() {
           null;
 
         const submitterId =
-          m.menteeEmployeeId ||
-          m.employeeId ||
-          m.submittedByEmployeeId ||
-          m.submitterEmployeeId ||
-          m.createdByEmployeeId;
+          m.menteeEmployeeId ||m.employeeId ||
+          m.submittedByEmployeeId ||m.submitterEmployeeId || m.createdByEmployeeId;
 
         let submitterName = null;
         if (m.menteeName && isNaN(m.menteeName)) {
           submitterName = m.menteeName;
         } else if (submitterId) {
           submitterName =
-            employeeMap[submitterId] ||
-            employeeMap[String(submitterId)] ||
-            employeeMap[Number(submitterId)] ||
-            null;
+            employeeMap[submitterId] || employeeMap[String(submitterId)] ||employeeMap[Number(submitterId)] || null;
         }
 
         return {
           ...m,
-          mentorNameFull:
-            mentorName || `Employee ${m.mentorEmployeeId || "Unknown"}`,
+          mentorNameFull: mentorName || `Employee ${m.mentorEmployeeId || "Unknown"}`,
           submitterNameFull: submitterName || "Anonymous Feedback",
         };
       });
 
       setMentor(enrichedMentorData);
-
       const peerData = Array.isArray(peerResponse?.data)
-        ? peerResponse.data
-        : peerResponse?.data?.data || [];
+        ? peerResponse.data: peerResponse?.data?.data || [];
 
       const enrichedPeerData = peerData.map((p) => {
         let recipientName = null;
@@ -130,27 +109,20 @@ export default function HRFeedbackList() {
           recipientName = p.recipientName;
         } else if (p.recipientEmployeeId) {
           recipientName =
-            employeeMap[p.recipientEmployeeId] ||
-            employeeMap[String(p.recipientEmployeeId)] ||
-            employeeMap[Number(p.recipientEmployeeId)] ||
-            null;
+            employeeMap[p.recipientEmployeeId] || employeeMap[String(p.recipientEmployeeId)] ||
+            employeeMap[Number(p.recipientEmployeeId)] ||null;
         }
-
         let submitterName = null;
         if (p.submitterName && isNaN(p.submitterName)) {
           submitterName = p.submitterName;
         } else if (p.submittedByEmployeeId) {
           submitterName =
-            employeeMap[p.submittedByEmployeeId] ||
-            employeeMap[String(p.submittedByEmployeeId)] ||
-            employeeMap[Number(p.submittedByEmployeeId)] ||
-            null;
+            employeeMap[p.submittedByEmployeeId] ||   employeeMap[String(p.submittedByEmployeeId)] ||
+            employeeMap[Number(p.submittedByEmployeeId)] || null;
         }
-
         return {
           ...p,
-          recipientNameFull:
-            recipientName || `Employee ${p.recipientEmployeeId || "Unknown"}`,
+          recipientNameFull: recipientName || `Employee ${p.recipientEmployeeId || "Unknown"}`,
           submitterNameFull: submitterName || "Anonymous Feedback",
         };
       });
@@ -172,10 +144,8 @@ export default function HRFeedbackList() {
     if (type === "Mentor") {
       const normalized = {
         ...data,
-        submittedByName: data.submitterNameFull || "Anonymous",
-        submittedAt: data.createdAt || data.submittedAt,
-        comments: data.feedbackComments || data.comments || "",
-        rating: data.rating,
+        submittedByName: data.submitterNameFull || "Anonymous",submittedAt: data.createdAt || data.submittedAt,
+        comments: data.feedbackComments || data.comments || "", rating: data.rating,
       };
       setSelectedResponse(normalized);
       setSelectedType(type);
@@ -186,8 +156,7 @@ export default function HRFeedbackList() {
     if (type === "Peer") {
       const normalized = {
         ...data,
-        submittedByName: data.submitterNameFull || "Anonymous",
-        submittedAt: data.createdAt || data.submittedAt,
+        submittedByName: data.submitterNameFull || "Anonymous", submittedAt: data.createdAt || data.submittedAt,
         comments: data.feedbackContent || data.comments || "",
       };
       setSelectedResponse(normalized);
@@ -320,8 +289,7 @@ export default function HRFeedbackList() {
           items={[
             { label: "Feedback Management", path: "/hr/dashboard/feedback" },
             { label: "Feedback Forms List" },
-          ]}
-        />
+          ]}/>
 
         {error && (
           <div className="hrfeedback-alert-error">
@@ -330,25 +298,14 @@ export default function HRFeedbackList() {
               <strong>Error</strong>
               <p className="hrfeedback-alert-text">{error}</p>
             </div>
-            <button
-              type="button"
-              className="hrfeedback-alert-close"
-              onClick={() => setError("")}
-            >
-              ×
-            </button>
+            <button type="button" className="hrfeedback-alert-close" onClick={() => setError("")}> × </button>
           </div>
         )}
 
         <div className="hrfeedback-toggle-wrapper">
           <div className="hrfeedback-toggle-container">
-            <button
-              type="button"
-              onClick={() => setTab("Mentor")}
-              className={`hrfeedback-toggle-btn ${
-                tab === "Mentor" ? "hrfeedback-toggle-btn-active" : ""
-              }`}
-            >
+            <button type="button" onClick={() => setTab("Mentor")} className={`hrfeedback-toggle-btn ${
+                tab === "Mentor" ? "hrfeedback-toggle-btn-active" : ""  }`} >
               <Send size={15} />
               Mentor
               {mentor.length > 0 && (
@@ -356,13 +313,8 @@ export default function HRFeedbackList() {
               )}
             </button>
 
-            <button
-              type="button"
-              onClick={() => setTab("Peer")}
-              className={`hrfeedback-toggle-btn ${
-                tab === "Peer" ? "hrfeedback-toggle-btn-active" : ""
-              }`}
-            >
+            <button type="button" onClick={() => setTab("Peer")}
+              className={`hrfeedback-toggle-btn ${   tab === "Peer" ? "hrfeedback-toggle-btn-active" : "" }`} >
               <Users size={15} />
               Peer
               {peer.length > 0 && (
@@ -371,7 +323,6 @@ export default function HRFeedbackList() {
             </button>
           </div>
         </div>
-
         {loading ? (
           <div className="hrfeedback-loading-container">
             <div className="hrfeedback-spinner" role="status">
@@ -385,32 +336,20 @@ export default function HRFeedbackList() {
               (mentor.length === 0 ? (
                 <div className="hrfeedback-empty-state">
                   <AlertTriangle size={48} className="hrfeedback-empty-icon" />
-                  <h5 className="hrfeedback-empty-title">
-                    No Mentor Feedback Yet
-                  </h5>
-                  <p className="hrfeedback-empty-text">
-                    There are no mentor feedback submissions.
-                  </p>
+                  <h5 className="hrfeedback-empty-title"> No Mentor Feedback Yet</h5>
+                  <p className="hrfeedback-empty-text"> There are no mentor feedback submissions.</p>
                 </div>
               ) : (
                 <div className="row g-3">
                   {mentor.map((m) => (
-                    <div
-                      className="col-md-6 col-lg-4"
-                      key={m.trackingId || m.id}
-                    >
+                    <div className="col-md-6 col-lg-4"key={m.trackingId || m.id}>
                       <div className="hrfeedback-card">
                         <div className="hrfeedback-card-header">
                           <div className="fm-hrlist-card__header-wrapper">
                             <div className="hrfeedback-card-label">Mentor</div>
                             <div className="hrfeedback-card-name-row">
-                              <User
-                                size={14}
-                                className="hrfeedback-card-user-icon"
-                              />
-                              <h6 className="hrfeedback-card-name">
-                                {m.mentorNameFull}
-                              </h6>
+                              <User  size={14}  className="hrfeedback-card-user-icon"/>
+                              <h6 className="hrfeedback-card-name">{m.mentorNameFull}</h6>
                             </div>
                           </div>
                           <Badge text={`${m.rating || 0}/5`} color="#27235C" />
@@ -418,35 +357,22 @@ export default function HRFeedbackList() {
 
                         <div className="hrfeedback-card-date">
                           <Clock size={14} />
-                          <span>
-                            {m.createdAt
-                              ? new Date(m.createdAt).toLocaleDateString()
-                              : "—"}
-                          </span>
+                          <span> {m.createdAt   ? new Date(m.createdAt).toLocaleDateString()   : "—"} </span>
                         </div>
 
                         <div className="hrfeedback-card-content">
                           <p className="hrfeedback-card-text">
-                            {m.feedbackComments
-                              ? m.feedbackComments.substring(0, 80) + "..."
-                              : "No comments"}
+                            {m.feedbackComments? m.feedbackComments.substring(0, 80) + "..." : "No comments"}
                           </p>
                         </div>
 
                         <div className="hrfeedback-card-actions">
-                          <button
-                            className="hrfeedback-btn-view"
-                            onClick={() => handleViewResponse(m, "Mentor")}
-                          >
-                            <Eye size={16} />
-                            View
+                          <button className="hrfeedback-btn-view" onClick={() => handleViewResponse(m, "Mentor")}>
+                            <Eye size={16} />  View
                           </button>
                         </div>
 
-                        <button
-                          className="hrfeedback-btn-analyze"
-                          onClick={() => handleAnalyzeFeedback(m, "Mentor")}
-                        >
+                        <button className="hrfeedback-btn-analyze" onClick={() => handleAnalyzeFeedback(m, "Mentor")}>
                           <ChartLine size={16} />
                           Analyze Feedback
                         </button>
@@ -455,14 +381,11 @@ export default function HRFeedbackList() {
                   ))}
                 </div>
               ))}
-
             {tab === "Peer" &&
               (peer.length === 0 ? (
                 <div className="hrfeedback-empty-state">
                   <AlertTriangle size={48} className="hrfeedback-empty-icon" />
-                  <h5 className="hrfeedback-empty-title">
-                    No Peer Feedback Yet
-                  </h5>
+                  <h5 className="hrfeedback-empty-title">  No Peer Feedback Yet</h5>
                   <p className="hrfeedback-empty-text">
                     There are no peer feedback submissions.
                   </p>
@@ -476,65 +399,40 @@ export default function HRFeedbackList() {
                           <div className="fm-hrlist-card__header-wrapper">
                             <div className="hrfeedback-card-label">From</div>
                             <div className="hrfeedback-card-name-row hrfeedback-mb-2">
-                              <User
-                                size={14}
-                                className="fm-hrlist-card__user-icon--muted"
-                              />
-                              <h6 className="hrfeedback-card-name-small">
-                                {p.submitterNameFull}
-                              </h6>
+                              <User  size={14}  className="fm-hrlist-card__user-icon--muted"/>
+                              <h6 className="hrfeedback-card-name-small">{p.submitterNameFull} </h6>
                             </div>
                             <div className="hrfeedback-card-label">To</div>
                             <div className="hrfeedback-card-name-row">
-                              <User
-                                size={14}
-                                className="hrfeedback-card-user-icon"
-                              />
-                              <h6 className="hrfeedback-card-name">
-                                {p.recipientNameFull}
-                              </h6>
+                              <User  size={14} className="hrfeedback-card-user-icon"/>
+                              <h6 className="hrfeedback-card-name"> {p.recipientNameFull} </h6>
                             </div>
                           </div>
                         </div>
 
                         <div className="hrfeedback-card-date">
                           <Clock size={14} />
-                          <span>
-                            {p.createdAt
-                              ? new Date(p.createdAt).toLocaleDateString()
-                              : "—"}
-                          </span>
+                          <span> {p.createdAt ? new Date(p.createdAt).toLocaleDateString()   : "—"}</span>
                         </div>
 
                         {p.isAnonymous && (
                           <div className="hrfeedback-card-anonymous">
-                            <Lock size={12} />
-                            <span>Anonymous submission</span>
+                            <Lock size={12} /> <span>Anonymous submission</span>
                           </div>
                         )}
 
                         <div className="hrfeedback-card-content">
                           <p className="hrfeedback-card-text">
-                            {p.feedbackContent
-                              ? p.feedbackContent.substring(0, 80) + "..."
-                              : "No content"}
+                            {p.feedbackContent? p.feedbackContent.substring(0, 80) + "..." : "No content"}
                           </p>
                         </div>
-
                         <div className="hrfeedback-card-actions">
-                          <button
-                            className="hrfeedback-btn-view"
-                            onClick={() => handleViewResponse(p, "Peer")}
-                          >
-                            <Eye size={16} />
-                            View
+                          <button className="hrfeedback-btn-view" onClick={() => handleViewResponse(p, "Peer")} >
+                            <Eye size={16} /> View
                           </button>
                         </div>
 
-                        <button
-                          className="hrfeedback-btn-analyze"
-                          onClick={() => handleAnalyzeFeedback(p, "Peer")}
-                        >
+                        <button className="hrfeedback-btn-analyze" onClick={() => handleAnalyzeFeedback(p, "Peer")}>
                           <ChartLine size={16} />
                           Analyze Feedback
                         </button>
@@ -543,8 +441,7 @@ export default function HRFeedbackList() {
                   ))}
                 </div>
               ))}
-          </>
-        )}
+          </> )}
       </div>
 
       <ResponseViewModal
@@ -552,8 +449,7 @@ export default function HRFeedbackList() {
         response={selectedResponse}
         onClose={handleCloseModal}
         type={selectedType}
-      />
-
+/>
       <FeedbackAnalysisModal
         show={showAnalysisModal}
         onClose={handleCloseAnalysisModal}
@@ -561,22 +457,12 @@ export default function HRFeedbackList() {
         loading={analysisLoading}
         error={analysisError}
       />
-
       {showDeleteModal && (
-        <div
-          className="hrfeedback-modal-overlay"
-          onClick={handleCloseDeleteModal}
-        >
-          <div
-            className="hrfeedback-delete-modal"
-            onClick={(e) => e.stopPropagation()}
-          >
+        <div className="hrfeedback-modal-overlay" onClick={handleCloseDeleteModal}>
+          <div  className="hrfeedback-delete-modal"  onClick={(e) => e.stopPropagation()}>
             <div className="hrfeedback-delete-header">
               <h5 className="hrfeedback-delete-title">{getDeleteTitle()}</h5>
-              <button
-                className="hrfeedback-delete-close"
-                onClick={handleCloseDeleteModal}
-              >
+              <button className="hrfeedback-delete-close" onClick={handleCloseDeleteModal}>
                 <X size={24} />
               </button>
             </div>
@@ -588,18 +474,10 @@ export default function HRFeedbackList() {
               </div>
             </div>
             <div className="hrfeedback-delete-footer">
-              <button
-                className="hrfeedback-btn-cancel"
-                onClick={handleCloseDeleteModal}
-                disabled={isDeleting}
-              >
+              <button className="hrfeedback-btn-cancel"onClick={handleCloseDeleteModal} disabled={isDeleting}>
                 Cancel
               </button>
-              <button
-                className="hrfeedback-btn-delete-confirm"
-                onClick={handleConfirmDelete}
-                disabled={isDeleting}
-              >
+              <button  className="hrfeedback-btn-delete-confirm"  onClick={handleConfirmDelete}  disabled={isDeleting}>
                 {isDeleting ? "Deleting..." : "Delete"}
               </button>
             </div>

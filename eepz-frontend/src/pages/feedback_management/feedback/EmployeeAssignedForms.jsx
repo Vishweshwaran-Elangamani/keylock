@@ -150,13 +150,8 @@ export default function EmployeeAssignedForms() {
           <div className="employee-forms-alert-content">
             <strong>Error:</strong> {error}
           </div>
-          <button
-            className="employee-forms-alert-close"
-            onClick={() => setError("")}
-            title="Close"
-            type="button"
-          >
-            ×
+          <button className="employee-forms-alert-close" onClick={() => setError("")}
+            title="Close" type="button"> ×
           </button>
         </div>
       )}
@@ -164,9 +159,7 @@ export default function EmployeeAssignedForms() {
       <div className="employee-forms-stats-grid">
         <div className="employee-forms-stat-card">
           <div
-            className="employee-forms-stat-icon"
-            style={{ backgroundColor: "#EEF2FF" }}
-          >
+            className="employee-forms-stat-icon"style={{ backgroundColor: "#EEF2FF" }}>
             <FileText size={22} color="#3B82F6" />
           </div>
           <h3 className="employee-forms-stat-value">{stats.total}</h3>
@@ -209,9 +202,7 @@ export default function EmployeeAssignedForms() {
             </p>
             <button
               className="employee-forms-btn employee-forms-btn-primary"
-              onClick={handleRefresh}
-              type="button"
-            >
+              onClick={handleRefresh}type="button">
               <RefreshCw size={16} />
               Refresh
             </button>
@@ -286,11 +277,7 @@ export default function EmployeeAssignedForms() {
                     {isSubmitted ? (
                       <button
                         className="employee-forms-card-btn employee-forms-card-btn-disabled"
-                        disabled
-                        title="Already Submitted"
-                        tabIndex={-1}
-                        type="button"
-                      >
+                        disabledtitle="Already Submitted"tabIndex={-1}type="button">
                         <Lock size={16} />
                         Already Submitted
                       </button>

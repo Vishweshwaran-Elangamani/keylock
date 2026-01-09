@@ -171,11 +171,7 @@ export default function HRFeedbackReport() {
           </div>
           <p className="hfr-subtitle">View all forms and submitted responses</p>
         </div>
-        <button
-          className="hfr-refresh-btn"
-          onClick={fetchData}
-          disabled={refreshing || loading}
-        >
+        <button className="hfr-refresh-btn" onClick={fetchData} disabled={refreshing || loading} >
           <RefreshCw size={18} className={refreshing ? "hfr-icon-spin" : ""} />
           Refresh
         </button>
@@ -190,9 +186,7 @@ export default function HRFeedbackReport() {
               <p className="hfr-alert-text">{error}</p>
             </div>
           </div>
-          <button className="hfr-alert-close" onClick={() => setError("")}>
-            ×
-          </button>
+          <button className="hfr-alert-close" onClick={() => setError("")}>×</button>
         </div>
       )}
 
@@ -207,9 +201,7 @@ export default function HRFeedbackReport() {
         </div>
         <div className="hfr-stat-card">
           <div className="hfr-stat-body">
-            <h4 className="hfr-stat-number hfr-stat-number-success">
-              {responses.length}
-            </h4>
+            <h4 className="hfr-stat-number hfr-stat-number-success"> {responses.length}</h4>
             <small className="hfr-stat-label">Submitted</small>
           </div>
         </div>
@@ -253,10 +245,7 @@ export default function HRFeedbackReport() {
                         <div className="hfr-form-card-body">
                           <div className="hfr-form-header">
                             <h6 className="hfr-form-name">{form.formName}</h6>
-                            <Badge
-                              text={`${formResponses.length}`}
-                              color="#0F62FE"
-                            />
+                            <Badge text={`${formResponses.length}`}color="#0F62FE"/>
                           </div>
                           <p className="hfr-form-description">
                             {form.formDescription || "No description"}
@@ -345,19 +334,11 @@ export default function HRFeedbackReport() {
                           )}
 
                           <div className="hfr-response-actions">
-                            <button
-                              className="hfr-btn hfr-btn-outline hfr-btn-full"
-                              onClick={() => handleViewResponse(response)}
-                            >
+                            <button className="hfr-btn hfr-btn-outline hfr-btn-full"onClick={() => handleViewResponse(response)}>
                               <Eye size={14} className="hfr-inline-icon" />
                               View
                             </button>
-                            <button
-                              className="hfr-btn hfr-btn-outline-danger"
-                              onClick={() =>
-                                deleteResponse(response.responseId)
-                              }
-                            >
+                            <button className="hfr-btn hfr-btn-outline-danger"  onClick={() => deleteResponse(response.responseId) }>
                               <Trash2 size={14} />
                             </button>
                           </div>

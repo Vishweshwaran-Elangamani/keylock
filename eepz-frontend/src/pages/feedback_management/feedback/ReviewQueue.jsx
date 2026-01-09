@@ -1,10 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  RefreshCw,
-  AlertTriangle,
-  ThumbsUp,
-  ThumbsDown,
-  CheckCircle,
+  RefreshCw,AlertTriangle,
+  ThumbsUp,ThumbsDown,CheckCircle,
 } from "lucide-react";
 import { peerQueueApi } from "../../../services/feedbackmanagement/feedbackApi";
 import "../../../styles/feedback/components/ReviewQueue.css";
@@ -103,16 +100,11 @@ export default function ReviewQueue() {
           <h2 className="rq-title">Review Queue (HR)</h2>
           <p className="rq-subtitle">Approve or reject pending peer feedback</p>
         </div>
-        <button
-          className="rq-refresh-btn"
-          onClick={fetchPending}
-          disabled={refreshing}
-        >
+        <button className="rq-refresh-btn"onClick={fetchPending} disabled={refreshing}>
           <RefreshCw size={18} className={refreshing ? "rq-spin" : ""} />
           Refresh
         </button>
       </div>
-
       {error && (
         <div className="rq-alert rq-alert-error">
           <AlertTriangle size={18} className="rq-alert-icon" />
@@ -176,17 +168,11 @@ export default function ReviewQueue() {
                           : "—"}
                       </small>
                       <div className="rq-card-actions">
-                        <button
-                          className="rq-btn rq-btn-approve"
-                          onClick={() => approve(item)}
-                        >
+                        <button  className="rq-btn rq-btn-approve" onClick={() => approve(item)}>
                           <ThumbsUp size={14} />
                           Approve
                         </button>
-                        <button
-                          className="rq-btn rq-btn-reject"
-                          onClick={() => reject(item)}
-                        >
+                        <button className="rq-btn rq-btn-reject" onClick={() => reject(item)}>
                           <ThumbsDown size={14} />
                           Reject
                         </button>

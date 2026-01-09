@@ -44,11 +44,7 @@ const ResolveEscalationModal = ({ escalation, onClose, onResolve }) => {
         <div className="resolve-modal-container">
           <div className="resolve-modal-header">
             <h3 className="resolve-modal-title">Resolve Escalation</h3>
-            <button
-              className="resolve-modal-close-btn"
-              onClick={onClose}
-              disabled={loading}
-            >
+            <button className="resolve-modal-close-btn" onClick={onClose} disabled={loading}>
               <X size={20} />
             </button>
           </div>
@@ -60,10 +56,7 @@ const ResolveEscalationModal = ({ escalation, onClose, onResolve }) => {
                 <div>
                   <p>{error}</p>
                 </div>
-                <button
-                  onClick={() => setError(null)}
-                  className="resolve-error-close"
-                >
+                <button onClick={() => setError(null)} className="resolve-error-close">
                   <X size={16} />
                 </button>
               </div>
@@ -72,10 +65,9 @@ const ResolveEscalationModal = ({ escalation, onClose, onResolve }) => {
             <div className="resolve-info-box">
               <div className="resolve-info-row">
                 <span className="resolve-info-label">Employee:</span>
-                <span className="resolve-info-value">
-                  {escalation.employeeName}
-                </span>
+                <span className="resolve-info-value">{escalation.employeeName}</span>
               </div>
+
               <div className="resolve-info-row">
                 <span className="resolve-info-label">Reason:</span>
                 <span className="resolve-info-value">{escalation.reason}</span>
@@ -83,19 +75,12 @@ const ResolveEscalationModal = ({ escalation, onClose, onResolve }) => {
             </div>
 
             <div className="resolve-form-group">
-              <label className="resolve-form-label">
-                Resolution Comments
+              <label className="resolve-form-label"> Resolution Comments
                 <span className="resolve-required">*</span>
               </label>
-              <textarea
-                className="resolve-textarea"
-                rows="3"
-                value={resolutionComments}
-                onChange={(e) => setResolutionComments(e.target.value)}
-                placeholder="Provide resolution details..."
-                disabled={loading}
-                maxLength={500}
-              />
+              <textarea className="resolve-textarea"
+                rows="3" value={resolutionComments} onChange={(e) => setResolutionComments(e.target.value)}
+                placeholder="Provide resolution details..." disabled={loading} maxLength={500}/>
               <small className="resolve-char-count">
                 {resolutionComments.length}/500
               </small>
@@ -103,18 +88,11 @@ const ResolveEscalationModal = ({ escalation, onClose, onResolve }) => {
           </div>
 
           <div className="resolve-modal-footer">
-            <button
-              className="resolve-btn resolve-btn-secondary"
-              onClick={onClose}
-              disabled={loading}
-            >
-              Cancel
-            </button>
-            <button
-              className="resolve-btn resolve-btn-primary"
-              onClick={handleResolve}
-              disabled={loading || !resolutionComments.trim()}
-            >
+            <button className="resolve-btn resolve-btn-secondary"
+              onClick={onClose} disabled={loading}> Cancel </button>
+           
+            <button className="resolve-btn resolve-btn-primary"
+              onClick={handleResolve} disabled={loading || !resolutionComments.trim()}>
               {loading ? (
                 <>
                   <span className="resolve-spinner" />

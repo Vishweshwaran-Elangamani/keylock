@@ -16,7 +16,6 @@ import axios from "axios";
 import "../../../styles/feedback/components/ManagerGoalFeedbackView.css";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
-
 const RATING_LABELS = {
   1: "Poor",
   2: "Fair",
@@ -193,16 +192,12 @@ export default function ManagerGoalFeedbackView() {
               {showSubmitter && (
                 <div className="mgfv-submitter-row">
                   <User size={14} className="mgfv-submitter-icon" />
-                  <small className="mgfv-submitter-text">
-                    {feedback.submitterName}
-                  </small>
+                  <small className="mgfv-submitter-text">{feedback.submitterName}</small>
                 </div>
               )}
               <div className="mgfv-date-row">
                 <Calendar size={14} className="mgfv-date-icon" />
-                <small className="mgfv-date-text">
-                  {feedback.formattedDate}
-                </small>
+                <small className="mgfv-date-text">{feedback.formattedDate}</small>
               </div>
             </div>
             <div className="mgfv-header-right">
@@ -217,8 +212,7 @@ export default function ManagerGoalFeedbackView() {
           </div>
 
           <div className="mgfv-meta-row">
-            <span
-              className={`mgfv-feedback-type-badge ${
+            <span className={`mgfv-feedback-type-badge ${
                 feedback.feedbackFrom === "Manager"
                   ? "mgfv-feedback-type-manager"
                   : "mgfv-feedback-type-employee"
@@ -264,10 +258,7 @@ export default function ManagerGoalFeedbackView() {
     <div className="mgfv-page">
       <div className="mgfv-container">
         <div className="mgfv-header">
-          <button
-            className="mgfv-btn mgfv-btn-outline mgfv-back-btn"
-            onClick={() => navigate(-1)}
-          >
+          <button className="mgfv-btn mgfv-btn-outline mgfv-back-btn"onClick={() => navigate(-1)}>
             <ArrowLeft size={16} />
           </button>
           <div className="mgfv-header-main">
@@ -302,19 +293,13 @@ export default function ManagerGoalFeedbackView() {
             <span className="mgfv-alert-text">
               <strong>Error:</strong> {error}
             </span>
-            <button
-              type="button"
-              className="mgfv-alert-close"
-              onClick={() => setError("")}
-            />
+            <button type="button" className="mgfv-alert-close" onClick={() => setError("")}/>
           </div>
         )}
 
         <div className="mgfv-tabs-card">
           <div className="mgfv-tabs-body">
-            <button
-              type="button"
-              className={`mgfv-tab-btn ${
+            <button type="button" className={`mgfv-tab-btn ${
                 activeTab === "myFeedback" ? "mgfv-tab-btn-active" : ""
               }`}
               onClick={() => setActiveTab("myFeedback")}
@@ -323,9 +308,7 @@ export default function ManagerGoalFeedbackView() {
               My Feedback ({myGoalFeedback.length})
             </button>
             {isManager && (
-              <button
-                type="button"
-                className={`mgfv-tab-btn ${
+              <button type="button" className={`mgfv-tab-btn ${
                   activeTab === "teamFeedback" ? "mgfv-tab-btn-active" : ""
                 }`}
                 onClick={() => setActiveTab("teamFeedback")}

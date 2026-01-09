@@ -47,13 +47,9 @@ export default function EmployeeFillForm() {
   const QUESTION_TEMPLATES = {
     PerformanceReview: {
       label: "Performance Appraisal Process",
-      description:
-        "Evaluate the effectiveness of our performance appraisal and review process",
-      questions: [
-        {
-          id: 1,
-          text: "How clear and well-communicated are the appraisal criteria?",
-          category: "Clarity",
+      description:"Evaluate the effectiveness of our performance appraisal and review process",
+      questions: [{
+          id: 1,text: "How clear and well-communicated are the appraisal criteria?", category: "Clarity",
           helpText: "Rate how well evaluation standards are explained",
         },
         {
@@ -346,12 +342,7 @@ export default function EmployeeFillForm() {
   };
 
   const RATING_LABELS = {
-    1: "Poor",
-    2: "Fair",
-    3: "Good",
-    4: "Very Good",
-    5: "Excellent",
-  };
+    1: "Poor", 2: "Fair", 3: "Good", 4: "Very Good", 5: "Excellent",};
 
   const parseDate = useCallback((dateValue) => {
     if (!dateValue) return null;
@@ -514,24 +505,15 @@ export default function EmployeeFillForm() {
         <nav aria-label="breadcrumb" className="eaf-breadcrumb-wrapper">
           <ol className="eaf-breadcrumb">
             <li className="eaf-breadcrumb-item">
-              <Link
-                to={feedbackDashboardPath.replace("/feedback", "")}
-                className="eaf-breadcrumb-link"
-              >
-                <Home size={16} className="eaf-breadcrumb-icon" />
-                Dashboard
-              </Link>
+              <Link to={feedbackDashboardPath.replace("/feedback", "")}className="eaf-breadcrumb-link">
+                <Home size={16} className="eaf-breadcrumb-icon" />Dashboard </Link>
             </li>
             <li className="eaf-breadcrumb-separator">/</li>
             <li className="eaf-breadcrumb-item">
-              <Link to={feedbackDashboardPath} className="eaf-breadcrumb-link">
-                Feedback Management
-              </Link>
+              <Link to={feedbackDashboardPath} className="eaf-breadcrumb-link"> Feedback Management</Link>
             </li>
             <li className="eaf-breadcrumb-separator">/</li>
-            <li className="eaf-breadcrumb-item eaf-breadcrumb-active">
-              Assigned Forms
-            </li>
+            <li className="eaf-breadcrumb-item eaf-breadcrumb-active">Assigned Forms </li>
           </ol>
         </nav>
 
@@ -539,17 +521,10 @@ export default function EmployeeFillForm() {
           <AlertTriangle size={20} />
           <div>
             <strong>Error</strong>
-            <p className="eaf-alert-message">
-              Form not found or failed to load
-            </p>
+            <p className="eaf-alert-message">  Form not found or failed to load </p>
           </div>
         </div>
-        <button
-          className="eaf-btn eaf-btn-primary"
-          onClick={() => navigate(-1)}
-        >
-          Back to Assigned Forms
-        </button>
+        <button className="eaf-btn eaf-btn-primary"onClick={() => navigate(-1)}> Back to Assigned Forms</button>
       </div>
     );
   }
@@ -561,13 +536,8 @@ export default function EmployeeFillForm() {
           <nav aria-label="breadcrumb" className="eaf-breadcrumb-wrapper">
             <ol className="eaf-breadcrumb">
               <li className="eaf-breadcrumb-item">
-                <Link
-                  to={feedbackDashboardPath.replace("/feedback", "")}
-                  className="eaf-breadcrumb-link"
-                >
-                  <Home size={16} className="eaf-breadcrumb-icon" />
-                  Dashboard
-                </Link>
+                <Link to={feedbackDashboardPath.replace("/feedback", "")} className="eaf-breadcrumb-link">
+                  <Home size={16} className="eaf-breadcrumb-icon" /> Dashboard</Link>
               </li>
               <li className="eaf-breadcrumb-separator">/</li>
               <li className="eaf-breadcrumb-item">

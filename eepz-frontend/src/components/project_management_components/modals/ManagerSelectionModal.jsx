@@ -180,13 +180,7 @@ const ManagerSelectionModal = ({
                 {project?.projectName && ` - ${project.projectName}`}
               </span>
             </h5>
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={isSubmitting}
-              aria-label="Close"
-              className="msm-modal-close"
-            >
+            <button type="button" onClick={onClose} disabled={isSubmitting} aria-label="Close" className="msm-modal-close">
               <X size={22} />
             </button>
           </div>
@@ -287,28 +281,15 @@ const ManagerSelectionModal = ({
                 <div className="msm-search-wrapper">
                   <Search size={16} className="msm-search-icon" />
                   <input
-                    type="text"
-                    className="form-control text-start msm-search-input"
-                    placeholder="Search by name..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    onKeyPress={handleSearchKeyPress}
-                  />
+                    type="text" className="form-control text-start msm-search-input" placeholder="Search by name..."
+                    value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} onKeyPress={handleSearchKeyPress}/>
                   {activeSearchTerm ? (
-                    <button
-                      type="button"
-                      onClick={handleCancelSearch}
-                      className="msm-search-btn msm-search-btn--cancel"
-                    >
+                    <button  type="button"onClick={handleCancelSearch} className="msm-search-btn msm-search-btn--cancel" >
                       <X size={14} />
                       <span>Cancel</span>
                     </button>
                   ) : (
-                    <button
-                      type="button"
-                      onClick={handleSearch}
-                      className="msm-search-btn"
-                    >
+                    <button type="button" onClick={handleSearch} className="msm-search-btn">
                       <Search size={14} />
                       <span>Search</span>
                     </button>
@@ -371,10 +352,7 @@ const ManagerSelectionModal = ({
                             className="msm-td msm-td--select"
                           >
                             <input
-                              type="radio"
-                              className="msm-radio"
-                              name={`manager-${activeTab}`}
-                              checked={selected}
+                              type="radio" className="msm-radio" name={`manager-${activeTab}`} checked={selected}
                               onChange={() => onManagerSelect(emp)}
                             />
                           </td>
@@ -478,19 +456,10 @@ const ManagerSelectionModal = ({
           </div>
 
           <div className="msm-footer">
-            <button
-              type="button"
-              onClick={onClose}
-              className="msm-btn msm-btn--secondary"
-            >
+            <button type="button" onClick={onClose} className="msm-btn msm-btn--secondary">
               Cancel
             </button>
-            <button
-              type="button"
-              onClick={onUpdate}
-              disabled={isSubmitting}
-              className="msm-btn msm-btn--primary"
-            >
+            <button type="button" onClick={onUpdate} disabled={isSubmitting} className="msm-btn msm-btn--primary">
               {isSubmitting ? (
                 <>
                   <span className="spinner-border spinner-border-sm msm-btn-spinner" />

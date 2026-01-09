@@ -60,19 +60,13 @@ export default function CreateFeedbackForm() {
   }, []);
 
   const CustomSelect = ({
-    value,
-    onChange,
-    options,
-    placeholder,
-    disabled,
+    value,onChange,options,placeholder,disabled,
   }) => {
     const selectRef = useRef(null);
     const dropdownRef = useRef(null);
     const selectedOption = options.find((opt) => opt.value === value);
     const [dropdownPosition, setDropdownPosition] = useState({
-      top: 0,
-      left: 0,
-      width: 0,
+      top: 0, left: 0, width: 0,
     });
     const [isHovered, setIsHovered] = useState(false);
     const [hoveredOption, setHoveredOption] = useState(null);
@@ -90,38 +84,22 @@ export default function CreateFeedbackForm() {
 
     return (
       <div className="cff-custom-select" ref={selectRef}>
-        <button
-          type="button"
-          className={`cff-select-trigger ${
+        <button  type="button"  className={`cff-select-trigger ${
             disabled ? "cff-select-disabled" : ""
           } ${isHovered && !disabled ? "cff-select-hovered" : ""} ${
             openDropdown ? "cff-select-open" : ""
           }`}
-          onClick={() => !disabled && setOpenDropdown(!openDropdown)}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          disabled={disabled}
-        >
-          <span
-            className={`cff-select-value ${
-              !value ? "cff-select-placeholder" : ""
-            }`}
-          >
+          onClick={() => !disabled && setOpenDropdown(!openDropdown)}  onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)} disabled={disabled}>
+          <span className={`cff-select-value ${ !value ? "cff-select-placeholder" : "" }`}>
             {selectedOption?.label || placeholder}
           </span>
           <ChevronDown size={18} className="cff-select-icon" strokeWidth={2} />
         </button>
-
         {openDropdown && !disabled && (
-          <div
-            ref={dropdownRef}
-            className="cff-select-dropdown"
-            style={{
-              top: `${dropdownPosition.top}px`,
-              left: `${dropdownPosition.left}px`,
-              width: `${dropdownPosition.width}px`,
-            }}
-          >
+          <div  ref={dropdownRef}  className="cff-select-dropdown"
+            style={{ top: `${dropdownPosition.top}px`, left: `${dropdownPosition.left}px`, width: `${dropdownPosition.width}px`,
+            }}>
             {options.map((option, index) => (
               <div
                 key={option.value}
@@ -214,20 +192,7 @@ export default function CreateFeedbackForm() {
   const today = new Date();
   const selectedDate = form.deadline ? new Date(form.deadline) : null;
 
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December",];
   const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
   const handleSelectCalendarDay = (day, current) => {
@@ -361,12 +326,7 @@ export default function CreateFeedbackForm() {
             <div className="cff-alert-content">
               <strong>Error:</strong> {error}
             </div>
-            <button
-              type="button"
-              className="cff-alert-close"
-              onClick={() => setError("")}
-              aria-label="Close"
-            >
+            <button type="button" className="cff-alert-close"onClick={() => setError("")}aria-label="Close">
               ×
             </button>
           </div>
@@ -390,41 +350,22 @@ export default function CreateFeedbackForm() {
               <label htmlFor="formName" className="cff-label">
                 Form Name <span className="cff-required">*</span>
               </label>
-              <input
-                id="formName"
-                type="text"
-                className="cff-input"
-                value={form.formName}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, formName: e.target.value }))
-                }
-                placeholder="e.g., Q4 Performance Review"
-                disabled={loading}
-              />
-              <small className="cff-hint">
-                Give your form a clear, descriptive name
-              </small>
+              <input  id="formName"  type="text"  className="cff-input"
+                value={form.formName}  onChange={(e) => setForm((prev) => ({ ...prev, formName: e.target.value }))}
+                placeholder="e.g., Q4 Performance Review"disabled={loading}/>
+              <small className="cff-hint"> Give your form a clear, descriptive name</small>
             </div>
 
             <div className="cff-form-group">
               <label htmlFor="formDescription" className="cff-label">
                 Description <span className="cff-required">*</span>
               </label>
-              <textarea
-                id="formDescription"
-                className="cff-textarea"
-                rows={4}
-                value={form.formDescription}
-                onChange={(e) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    formDescription: e.target.value,
-                  }))
-                }
+              <textarea id="formDescription" className="cff-textarea"
+                rows={4}  value={form.formDescription} onChange={(e) =>
+                  setForm((prev) => ({  ...prev,
+                    formDescription: e.target.value, })) }
                 placeholder="Describe the purpose and goals of this form..."
-                disabled={loading}
-                maxLength={500}
-              />
+                disabled={loading}  maxLength={500}/>
               <small className="cff-hint">
                 Employees will see this description (
                 {form.formDescription.length}/500 characters)
@@ -432,74 +373,41 @@ export default function CreateFeedbackForm() {
             </div>
 
             <div className="cff-form-group">
-              <label htmlFor="formType" className="cff-label">
-                Form Type <span className="cff-required">*</span>
-              </label>
-              <CustomSelect
-                value={form.formType}
-                onChange={(value) =>
-                  setForm((prev) => ({ ...prev, formType: value }))
-                }
-                options={FORM_TYPES}
-                placeholder="-- Select Form Type --"
-                disabled={loading}
-              />
-              <small className="cff-hint">
-                Choose what type of feedback this form collects
-              </small>
+              <label htmlFor="formType" className="cff-label">  Form Type <span className="cff-required">*</span> </label>
+              <CustomSelect  value={form.formType}  onChange={(value) =>    setForm((prev) => ({ ...prev, formType: value }))  }
+                options={FORM_TYPES} placeholder="-- Select Form Type --"disabled={loading}/>
+              <small className="cff-hint">  Choose what type of feedback this form collects</small>
             </div>
 
             <div className="cff-form-group">
-              <label htmlFor="deadline" className="cff-label">
-                Response Deadline <span className="cff-required">*</span>
-              </label>
+              <label htmlFor="deadline" className="cff-label">  Response Deadline <span className="cff-required">*</span></label>
 
               <div ref={calendarRef} className="cff-date-wrapper">
-                <input
-                  type="text"
-                  readOnly
-                  id="deadline"
-                  value={formatDisplayDate(form.deadline)}
-                  onClick={() => {
+                <input type="text" readOnly id="deadline" value={formatDisplayDate(form.deadline)}
+                  onClick={() => {  if (!loading) {
+                      ensureCalendarMonthYear();
+                      setCalendarOpen(true);
+                    }
+                  }}
+                  placeholder="Select deadline date"className="cff-input cff-date-input"/>
+                <button  type="button"  onClick={() => {
                     if (!loading) {
                       ensureCalendarMonthYear();
                       setCalendarOpen(true);
                     }
                   }}
-                  placeholder="Select deadline date"
-                  className="cff-input cff-date-input"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!loading) {
-                      ensureCalendarMonthYear();
-                      setCalendarOpen(true);
-                    }
-                  }}
-                  className="cff-calendar-icon-btn"
-                >
+                  className="cff-calendar-icon-btn" >
                   <CalendarIcon size={18} />
                 </button>
 
                 {calendarOpen && (
                   <div className="cff-calendar">
                     <div className="cff-calendar-header">
-                      <button
-                        type="button"
-                        onClick={goPrevMonth}
-                        className="cff-calendar-nav"
-                      >
+                      <button type="button" onClick={goPrevMonth} className="cff-calendar-nav">
                         <ChevronLeftIcon size={16} />
                       </button>
-                      <span className="cff-calendar-title">
-                        {monthNames[month]} {year}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={goNextMonth}
-                        className="cff-calendar-nav"
-                      >
+                      <span className="cff-calendar-title">{monthNames[month]} {year}</span>
+                      <button  type="button"  onClick={goNextMonth}  className="cff-calendar-nav">
                         <ChevronRight size={16} />
                       </button>
                     </div>
@@ -531,13 +439,8 @@ export default function CreateFeedbackForm() {
                         const isDisabled = !c.current;
 
                         return (
-                          <button
-                            key={idx}
-                            type="button"
-                            onClick={() =>
-                              !isDisabled &&
-                              handleSelectCalendarDay(c.day, c.current)
-                            }
+                          <button key={idx}
+                            type="button"onClick={() =>  !isDisabled &&  handleSelectCalendarDay(c.day, c.current) }
                             disabled={isDisabled}
                             className={`cff-calendar-day ${
                               isSelected ? "cff-calendar-day-selected" : ""
@@ -552,18 +455,10 @@ export default function CreateFeedbackForm() {
                     </div>
 
                     <div className="cff-calendar-footer">
-                      <button
-                        type="button"
-                        onClick={goToday}
-                        className="cff-calendar-footer-btn cff-calendar-today-btn"
-                      >
+                      <button type="button"onClick={goToday} className="cff-calendar-footer-btn cff-calendar-today-btn">
                         Today
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => setCalendarOpen(false)}
-                        className="cff-calendar-footer-btn cff-calendar-close-btn"
-                      >
+                      <button type="button"   onClick={() => setCalendarOpen(false)}   className="cff-calendar-footer-btn cff-calendar-close-btn" >
                         Close
                       </button>
                     </div>
@@ -577,11 +472,7 @@ export default function CreateFeedbackForm() {
             </div>
 
             <div className="cff-submit-wrapper">
-              <button
-                type="submit"
-                className="cff-submit-btn"
-                disabled={loading}
-              >
+              <button  type="submit" className="cff-submit-btn" disabled={loading}>
                 {loading ? (
                   <>
                     <Loader size={18} className="cff-submit-icon cff-spinner" />

@@ -17,12 +17,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
   const [error, setError] = useState(null);
   const [employeeCount, setEmployeeCount] = useState(0);
 
-  const [formData, setFormData] = useState({
-    reviewType: "",
-    deadline: "",
-    reason: "",
-  });
-
+  const [formData, setFormData] = useState({ reviewType: "",deadline: "",reason: "",});
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [calendarMonth, setCalendarMonth] = useState(null);
   const [calendarYear, setCalendarYear] = useState(null);
@@ -138,15 +133,9 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
       });
 
       const bulkRequests = Array.from(uniqueEmployees.values()).map((emp) => ({
-        slatype: formData.reviewType,
-        employeeId: emp.employeeId,
-        assignedToEmployeeId: null,
-        departmentId: emp.departmentId,
-        deadline: deadlineIso,
-        relatedEntityType: null,
-        relatedEntityId: null,
-        createdByEmployeeId: user?.empId || 1,
-        creationReason: formData.reason || `${formData.reviewType} assigned`,
+        slatype: formData.reviewType,employeeId: emp.employeeId,assignedToEmployeeId: null,
+        departmentId: emp.departmentId,deadline: deadlineIso,relatedEntityType: null,relatedEntityId: null,
+        createdByEmployeeId: user?.empId || 1,creationReason: formData.reason || `${formData.reviewType} assigned`,
       }));
 
       const response = await slaService.createBulkSLA(bulkRequests);
@@ -154,7 +143,6 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
 
       if (response?.success) {
         const resultData = response.data;
-
         toast.success("SLA Created Successfully", { duration: 3000 });
 
         setTimeout(() => {
@@ -199,12 +187,10 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
     const today = new Date();
     const month = calendarMonth ?? today.getMonth();
     const year = calendarYear ?? today.getFullYear();
-
     const firstDay = new Date(year, month, 1);
     const startDay = firstDay.getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const prevMonthDays = new Date(year, month, 0).getDate();
-
     const cells = [];
     for (let i = startDay - 1; i >= 0; i--) {
       cells.push({ day: prevMonthDays - i, current: false });
@@ -221,21 +207,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
   const { cells, month, year } = getCalendarMatrix();
   const today = new Date();
   const selectedDate = formData.deadline ? new Date(formData.deadline) : null;
-
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December",];
   const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
   const handleSelectCalendarDay = (day, current) => {
@@ -266,7 +238,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
     let m = calendarMonth + 1;
     let y = calendarYear;
     if (m > 11) {
-      m = 0;
+      m = 0; 
       y += 1;
     }
     setCalendarMonth(m);
@@ -290,13 +262,8 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
         <div className="csla-modal" onClick={(e) => e.stopPropagation()}>
           <div className="csla-header">
             <h5 className="csla-title">Create SLA</h5>
-            <button
-              className={`csla-close-btn ${
-                loading ? "csla-close-btn--disabled" : ""
-              }`}
-              onClick={onClose}
-              disabled={loading}
-            >
+            <button className={`csla-close-btn ${ loading ? "csla-close-btn--disabled" : ""}`}
+              onClick={onClose} disabled={loading}>
               <X size={24} />
             </button>
           </div>
@@ -311,8 +278,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
               <form className="csla-form" onSubmit={handleSubmit}>
                 {error && (
                   <div className="csla-error-alert">
-                    <AlertCircle className="csla-error-icon" size={20} />
-                    <p className="csla-error-text">{error}</p>
+                    <AlertCircle className="csla-error-icon" size={20} /> <p className="csla-error-text">{error}</p>
                   </div>
                 )}
 
@@ -320,91 +286,44 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                   <label className="csla-label">
                     Review Type <span className="csla-required">*</span>
                   </label>
-                  <input
-                    type="text"
-                    name="reviewType"
-                    value={formData.reviewType}
-                    onChange={handleChange}
-                    placeholder="E.g., Performance Form, Quarterly Review"
-                    required
-                    disabled={loading}
-                    className={`csla-input ${
-                      loading ? "csla-input--disabled" : ""
-                    }`}
-                  />
+
+                <input type="text"
+                  name="reviewType" value={formData.reviewType} onChange={handleChange}
+                  placeholder="E.g., Performance Form, Quarterly Review" required disabled={loading}
+                className={`csla-input ${  loading ? "csla-input--disabled" : "" }`} />
                 </div>
 
                 <div className="csla-field">
-                  <label className="csla-label">
-                    Deadline <span className="csla-required">*</span>
-                  </label>
+                  <label className="csla-label"> Deadline <span className="csla-required">*</span></label>
 
                   <div ref={calendarRef} className="csla-calendar-container">
-                    <input
-                      type="text"
-                      readOnly
-                      value={formatDisplayDate(formData.deadline)}
-                      onClick={() => {
-                        ensureCalendarMonthYear();
-                        setCalendarOpen((o) => !o);
-                      }}
-                      disabled={loading}
-                      placeholder="Select date"
-                      className={`csla-input csla-deadline-input ${
-                        loading ? "csla-input--disabled" : ""
-                      }`}
-                    />
-                    <button
-                      type="button"
-                      className={`csla-calendar-trigger ${
-                        loading ? "csla-calendar-trigger--disabled" : ""
-                      }`}
-                      onClick={() => {
-                        ensureCalendarMonthYear();
-                        setCalendarOpen((o) => !o);
-                      }}
-                      disabled={loading}
-                    >
-                      <svg
-                        className="csla-calendar-svg"
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                      >
-                        <rect
-                          x="4"
-                          y="5"
-                          width="16"
-                          height="15"
-                          rx="2"
-                          ry="2"
-                          stroke="currentColor"
-                          strokeWidth="1.8"
-                          fill="none"
-                        />
-                        <line
-                          x1="4"
-                          y1="9"
-                          x2="20"
-                          y2="9"
-                          stroke="currentColor"
-                          strokeWidth="1.8"
-                        />
-                        <line
-                          x1="9"
-                          y1="3"
-                          x2="9"
-                          y2="7"
-                          stroke="currentColor"
-                          strokeWidth="1.8"
-                          strokeLinecap="round"
-                        />
-                        <line
-                          x1="15"
-                          y1="3"
-                          x2="15"
-                          y2="7"
+                    <input type="text" readOnly value={formatDisplayDate(formData.deadline)}
+                      onClick={() => {  ensureCalendarMonthYear();
+                        setCalendarOpen((o) => !o);}}
+                      disabled={loading} placeholder="Select date" 
+                      className={`csla-input csla-deadline-input ${ loading ? "csla-input--disabled" : "" }`}/>
+                    <button type="button"
+                      className={`csla-calendar-trigger ${ loading ? "csla-calendar-trigger--disabled" : ""}`}
+                      onClick={() => { ensureCalendarMonthYear(); setCalendarOpen((o) => !o); }}
+                      disabled={loading}>
+                      
+                      <svg  className="csla-calendar-svg"
+                        width="18" height="18" viewBox="0 0 24 24"fill="none">
+                        
+                      <rect x="4" y="5"
+                          width="16" height="15" rx="2" ry="2" stroke="currentColor"
+                          strokeWidth="1.8" fill="none" />
+                        
+                      <line x1="4"  y1="9" x2="20" y2="9"
+                        stroke="currentColor" strokeWidth="1.8" />
+                    
+                      <line
+                          x1="9" y1="3" x2="9"y2="7"
+                          stroke="currentColor" strokeWidth="1.8"
+                          strokeLinecap="round" />
+                        
+                      <line
+                          x1="15" y1="3"x2="15"y2="7"
                           stroke="currentColor"
                           strokeWidth="1.8"
                           strokeLinecap="round"
@@ -415,21 +334,14 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                     {calendarOpen && (
                       <div className="csla-calendar-dropdown">
                         <div className="csla-calendar-header">
-                          <button
-                            type="button"
-                            className="csla-calendar-nav-btn"
-                            onClick={goPrevMonth}
-                          >
+                          <button type="button"
+                            className="csla-calendar-nav-btn"onClick={goPrevMonth}>
                             <ChevronLeft size={16} />
                           </button>
                           <span className="csla-calendar-title">
                             {monthNames[month]} {year}
                           </span>
-                          <button
-                            type="button"
-                            className="csla-calendar-nav-btn"
-                            onClick={goNextMonth}
-                          >
+                          <button type="button"  className="csla-calendar-nav-btn" onClick={goNextMonth}>
                             <ChevronRight size={16} />
                           </button>
                         </div>
@@ -450,7 +362,6 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                               cellDate.getDate() === today.getDate() &&
                               cellDate.getMonth() === today.getMonth() &&
                               cellDate.getFullYear() === today.getFullYear();
-
                             const isSelected =
                               selectedDate &&
                               c.current &&
@@ -460,37 +371,19 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                                 selectedDate.getFullYear();
 
                             return (
-                              <div
-                                key={idx}
-                                className={`csla-calendar-day 
+                              <div key={idx} className={`csla-calendar-day    ${
+                                c.current  ? "csla-calendar-day--current" : ""} 
+                                ${isToday ? "csla-calendar-day--today" : ""} 
                                   ${
-                                    c.current
-                                      ? "csla-calendar-day--current"
-                                      : ""
-                                  } 
-                                  ${isToday ? "csla-calendar-day--today" : ""} 
-                                  ${
-                                    isSelected
-                                      ? "csla-calendar-day--selected"
-                                      : ""
-                                  }`}
-                                onClick={() =>
-                                  handleSelectCalendarDay(c.day, c.current)
-                                }
-                              >
-                                {c.day}
+                                    isSelected ? "csla-calendar-day--selected" : "" }`}
+                                onClick={() => handleSelectCalendarDay(c.day, c.current) }> {c.day}
                               </div>
                             );
                           })}
                         </div>
 
                         <div className="csla-calendar-footer">
-                          <button
-                            type="button"
-                            className="csla-today-btn"
-                            onClick={goToday}
-                          >
-                            Today
+                          <button type="button" className="csla-today-btn"  onClick={goToday} >  Today
                           </button>
                         </div>
                       </div>
@@ -501,16 +394,11 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                 <div className="csla-field">
                   <label className="csla-label">Reason (Optional)</label>
                   <input
-                    type="text"
-                    name="reason"
-                    value={formData.reason}
-                    onChange={handleChange}
-                    placeholder="Why assign this SLA?"
-                    disabled={loading}
-                    className={`csla-input ${
+                    type="text" name="reason" value={formData.reason}
+                    onChange={handleChange} placeholder="Why assign this SLA?"
+                    disabled={loading} className={`csla-input ${
                       loading ? "csla-input--disabled" : ""
-                    }`}
-                  />
+                    }`}/>
                 </div>
 
                 <div className="csla-employee-info">
@@ -526,25 +414,16 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
           </div>
 
           <div className="csla-footer">
-            <button
-              className={`csla-btn csla-btn--cancel ${
-                loading ? "csla-btn--disabled" : ""
-              }`}
-              onClick={onClose}
-              disabled={loading}
-            >
+            <button className={`csla-btn csla-btn--cancel ${
+                loading ? "csla-btn--disabled" : ""}`} onClick={onClose}  disabled={loading}>
               Cancel
             </button>
 
             <button
               className={`csla-btn csla-btn--create ${
                 loading || fetchLoading || employeeCount === 0
-                  ? "csla-btn--disabled"
-                  : ""
-              }`}
-              onClick={handleSubmit}
-              disabled={loading || fetchLoading || employeeCount === 0}
-            >
+                  ? "csla-btn--disabled": ""}`}
+              onClick={handleSubmit} disabled={loading || fetchLoading || employeeCount === 0}>
               {loading ? (
                 <>
                   <span className="csla-btn-spinner" />

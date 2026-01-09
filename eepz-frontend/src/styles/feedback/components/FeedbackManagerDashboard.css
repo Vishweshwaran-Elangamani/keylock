@@ -82,6 +82,7 @@
   margin-top: 40px;
 }
 
+
 .fm-mgrdash-stat-card {
   background: white;
   border: 1.5px solid #27235c;
@@ -94,6 +95,8 @@
   align-items: center;
   gap: 1rem;
   margin-top: -20px;
+  min-height: 125px;
+  margin-bottom: 50px;
 }
 
 .fm-mgrdash-stat-card:hover {

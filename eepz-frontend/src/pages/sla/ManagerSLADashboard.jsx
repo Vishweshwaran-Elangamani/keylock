@@ -1,18 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import {
-  Search,
-  Filter,
-  FileText,
-  Send,
-  Eye,
-  Users,
-  Clock,
-  CheckCircle,
-  Home,
-  Zap,
-  X,
+import { Search,Filter,FileText,Send, Eye, Users, Clock, CheckCircle, Home, Zap, X,
 } from "lucide-react";
 import slaService, { dateHelpers } from "../../services/sla/slaService";
 import ManagerEscalationModal from "../../components/sla/modals/ManagerEscalationModal";
@@ -26,27 +15,11 @@ const MgrSelect = ({ value, onChange, options }) => {
 
   return (
     <div className="mgr-select">
-      <button
-        type="button"
-        className={`mgr-select-control ${open ? "open" : ""}`}
-        onClick={() => setOpen((p) => !p)}
-      >
+      <button type="button" className={`mgr-select-control ${open ? "open" : ""}`} onClick={() => setOpen((p) => !p)}>
         <span className="mgr-select-value">{selected.label}</span>
         <span className={`mgr-select-icon ${open ? "open" : ""}`}>
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <polyline
-              points="6 9 12 15 18 9"
-              stroke="#9CA3AF"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polyline points="6 9 12 15 18 9" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </span>
       </button>
@@ -54,16 +27,12 @@ const MgrSelect = ({ value, onChange, options }) => {
       {open && (
         <div className="mgr-select-menu">
           {options.map((opt) => (
-            <div
-              key={opt.value}
-              className={`mgr-select-option ${
+            <div key={opt.value} className={`mgr-select-option ${
                 opt.value === value ? "selected" : ""
               }`}
-              onClick={() => {
-                onChange(opt.value);
+              onClick={() => { onChange(opt.value);
                 setOpen(false);
-              }}
-            >
+              }} >
               {opt.label}
             </div>
           ))}
@@ -76,52 +45,31 @@ const MgrSelect = ({ value, onChange, options }) => {
 const PaginationDropdown = ({ value, onChange, options }) => {
   const [open, setOpen] = useState(false);
   const selected = options.find((o) => o === value) || options[0];
-
   return (
     <div className="pagination-dropdown">
-      <button
-        type="button"
-        className={`pagination-dropdown-control ${open ? "open" : ""}`}
-        onClick={() => setOpen((p) => !p)}
-      >
+      <button  type="button"  className={`pagination-dropdown-control ${open ? "open" : ""}`}
+        onClick={() => setOpen((p) => !p)}>
         <span className="pagination-dropdown-value">{selected}</span>
         <span className={`pagination-dropdown-icon ${open ? "open" : ""}`}>
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <polyline
-              points="6 9 12 15 18 9"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polyline points="6 9 12 15 18 9" stroke="currentColor"
+              strokeWidth="2"strokeLinecap="round"strokeLinejoin="round" />
           </svg>
         </span>
       </button>
 
       {open && (
         <>
-          <div
-            className="pagination-dropdown-backdrop"
-            onClick={() => setOpen(false)}
-          />
+          <div className="pagination-dropdown-backdrop" onClick={() => setOpen(false)}/>
           <div className="pagination-dropdown-menu">
             {options.map((opt) => (
-              <div
-                key={opt}
+              <div  key={opt}
                 className={`pagination-dropdown-option ${
                   opt === value ? "selected" : ""
                 }`}
-                onClick={() => {
-                  onChange(opt);
+                onClick={() => { onChange(opt);
                   setOpen(false);
-                }}
-              >
+                }}>
                 {opt}
               </div>
             ))}
@@ -155,20 +103,16 @@ const complianceOptions = [
 
 const ManagerSLADashboard = () => {
   const navigate = useNavigate();
-
   const [mySLAs, setMySLAs] = useState([]);
   const [managerEscalations, setManagerEscalations] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [complianceFilter, setComplianceFilter] = useState("All");
   const [activeTab, setActiveTab] = useState("my-escalation");
-
   const [showEscalationModal, setShowEscalationModal] = useState(false);
   const [showResolveModal, setShowResolveModal] = useState(false);
   const [selectedSLAForEscalation, setSelectedSLAForEscalation] =
@@ -231,11 +175,8 @@ const ManagerSLADashboard = () => {
         const term = activeSearchTerm.toLowerCase();
         result = result.filter(
           (sla) =>
-            sla.employeeName?.toLowerCase().includes(term) ||
-            sla.departmentName?.toLowerCase().includes(term) ||
-            sla.slaid?.toString().includes(term) ||
-            sla.slatype?.toLowerCase().includes(term) ||
-            sla.assignedToName?.toLowerCase().includes(term)
+            sla.employeeName?.toLowerCase().includes(term) || sla.departmentName?.toLowerCase().includes(term) ||
+            sla.slaid?.toString().includes(term) || sla.slatype?.toLowerCase().includes(term) || sla.assignedToName?.toLowerCase().includes(term)
         );
       }
 
@@ -265,12 +206,7 @@ const ManagerSLADashboard = () => {
 
     return result;
   }, [
-    mySLAs,
-    managerEscalations,
-    activeSearchTerm,
-    statusFilter,
-    complianceFilter,
-    activeTab,
+    mySLAs,managerEscalations,activeSearchTerm,statusFilter,complianceFilter,activeTab,
   ]);
 
   const handleSearch = () => {
@@ -291,8 +227,7 @@ const ManagerSLADashboard = () => {
   };
 
   const calculateStats = () => ({
-    total: mySLAs.length,
-    open: mySLAs.filter((s) => s.status === "Open").length,
+    total: mySLAs.length,open: mySLAs.filter((s) => s.status === "Open").length,
     inProgress: mySLAs.filter((s) => s.status === "InProgress").length,
     closed: mySLAs.filter((s) => s.status === "Closed").length,
   });
@@ -342,11 +277,9 @@ const ManagerSLADashboard = () => {
       toast.error("Resolution failed");
     }
   };
-
   const handleRowClick = (id) => {
     navigate(`/sla/manager/details/${id}`);
   };
-
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
@@ -354,34 +287,26 @@ const ManagerSLADashboard = () => {
     setComplianceFilter("All");
     toast.info("Filters cleared");
   };
-
   const getStatusBadgeClass = (status) => {
     if (status === "Closed") return "mgr-sla-status-closed";
     if (status === "Open") return "mgr-sla-status-open";
     if (status === "InProgress") return "mgr-sla-status-inprogress";
     return "mgr-sla-status-open";
   };
-
   const stats = calculateStats();
-
   const isTeamTab = activeTab === "team-escalation";
   const pageSize = isTeamTab ? itemsPerPage : 9;
-
   const safeTotal = filteredSlas.length;
   const totalPages = Math.max(1, Math.ceil(safeTotal / pageSize));
-
   const validCurrentPage = Math.min(currentPage, totalPages);
-
   const startIndex = safeTotal === 0 ? 0 : (validCurrentPage - 1) * pageSize;
   const endIndex =
     safeTotal === 0 ? 0 : Math.min(validCurrentPage * pageSize, safeTotal);
   const paginatedData = filteredSlas.slice(startIndex, endIndex);
-
-  const goToPage = (page) => {
+ const goToPage = (page) => {
     const p = Math.max(1, Math.min(page, totalPages));
     setCurrentPage(p);
   };
-
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
@@ -423,21 +348,14 @@ const ManagerSLADashboard = () => {
       <nav aria-label="breadcrumb" className="mgr-sla-breadcrumb-nav">
         <ol className="mgr-sla-breadcrumb-list">
           <li className="mgr-sla-breadcrumb-item">
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate("/manager/dashboard");
-              }}
-              className="mgr-sla-breadcrumb-link"
-            >
+            <a href="#" onClick={(e) => {   e.preventDefault();
+                navigate("/manager/dashboard"); }}
+              className="mgr-sla-breadcrumb-link">
               <Home size={18} />
             </a>
           </li>
 
-          <li className="mgr-sla-breadcrumb-separator" aria-hidden="true">
-            /
-          </li>
+          <li className="mgr-sla-breadcrumb-separator" aria-hidden="true"> /</li>
 
           <li className="mgr-sla-breadcrumb-item">
             <span className="mgr-sla-breadcrumb">SLA Compliance</span>
@@ -479,11 +397,8 @@ const ManagerSLADashboard = () => {
           <div key={label} className="mgr-sla-stat-col">
             <div className="mgr-sla-stat-card">
               <div className={`mgr-sla-stat-icon-wrapper ${bgColor}`}>
-                <Icon
-                  className={`mgr-sla-stat-icon ${iconColor}`}
-                  size={28}
-                  strokeWidth={2.5}
-                />
+                <Icon className={`mgr-sla-stat-icon ${iconColor}`}
+                  size={28} strokeWidth={2.5}/>
               </div>
               <div className="mgr-sla-stat-text">
                 <h3 className="mgr-sla-stat-value">{value}</h3>
@@ -499,33 +414,20 @@ const ManagerSLADashboard = () => {
           <div className="mgr-sla-filter-col-search">
             <div className="mgr-sla-search-wrapper">
               <Search size={16} className="mgr-sla-search-icon" />
-              <input
-                type="text"
-                className="mgr-sla-search-input"
-                placeholder={
-                  activeTab === "team-escalation"
-                    ? "Search by reason or employee..."
-                    : "Search by SLA type, assigned to, or department..."
+              <input type="text"className="mgr-sla-search-input"
+                placeholder={activeTab === "team-escalation" ? "Search by reason or employee..."
+                   : "Search by SLA type, assigned to, or department..."
                 }
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyPress={handleSearchKeyPress}
-              />
+                onKeyPress={handleSearchKeyPress}/>
               {activeSearchTerm ? (
-                <button
-                  type="button"
-                  className="mgr-sla-search-cta mgr-sla-search-cta-cancel"
-                  onClick={handleClearSearch}
-                >
+                <button type="button" className="mgr-sla-search-cta mgr-sla-search-cta-cancel" onClick={handleClearSearch}>
                   <X size={16} />
                   Cancel
                 </button>
               ) : (
-                <button
-                  type="button"
-                  className="mgr-sla-search-cta mgr-sla-search-cta-search"
-                  onClick={handleSearch}
-                >
+                <button type="button" className="mgr-sla-search-cta mgr-sla-search-cta-search"onClick={handleSearch}>
                   <Search size={14} />
                   Search
                 </button>
@@ -538,30 +440,23 @@ const ManagerSLADashboard = () => {
               value={statusFilter}
               onChange={setStatusFilter}
               options={
-                activeTab === "team-escalation"
-                  ? statusOptionsTeam
-                  : statusOptionsMy
+                activeTab === "team-escalation" ? statusOptionsTeam: statusOptionsMy
               }
             />
           </div>
 
           {activeTab === "my-escalation" && (
             <div className="mgr-sla-filter-col-compliance">
-              <MgrSelect
-                value={complianceFilter}
-                onChange={setComplianceFilter}
-                options={complianceOptions}
-              />
+              <MgrSelect value={complianceFilter} onChange={setComplianceFilter}
+                options={complianceOptions}/>
             </div>
           )}
-
           <div
             className={`mgr-sla-filter-col-actions ${
               activeTab === "my-escalation"
                 ? "mgr-sla-filter-col-actions-narrow"
                 : ""
-            }`}
-          >
+            }`} >
             <div className="mgr-sla-filter-actions">
               <button className="mgr-sla-btn-clear" onClick={clearFilters}>
                 <Filter size={16} />
@@ -578,13 +473,8 @@ const ManagerSLADashboard = () => {
             { key: "my-escalation", label: "My Escalation" },
             { key: "team-escalation", label: "Team Escalation" },
           ].map(({ key, label }) => (
-            <button
-              key={key}
-              className={`mgr-sla-tab-pill ${
-                activeTab === key ? "active" : ""
-              }`}
-              onClick={() => setActiveTab(key)}
-            >
+            <button key={key} className={`mgr-sla-tab-pill ${
+                activeTab === key ? "active" : "" }`} onClick={() => setActiveTab(key)}>
               {label}
             </button>
           ))}
@@ -601,10 +491,7 @@ const ManagerSLADashboard = () => {
           {searchTerm ||
           statusFilter !== "All" ||
           complianceFilter !== "All" ? (
-            <button
-              className="mgr-sla-btn-clear-filters-empty"
-              onClick={clearFilters}
-            >
+            <button className="mgr-sla-btn-clear-filters-empty" onClick={clearFilters}>
               Clear Filters
             </button>
           ) : null}
@@ -627,10 +514,7 @@ const ManagerSLADashboard = () => {
                         </h6>
                       </div>
                       <span
-                        className={`mgr-escalation-status-badge ${getStatusBadgeClass(
-                          sla.status
-                        )}`}
-                      >
+                        className={`mgr-escalation-status-badge ${getStatusBadgeClass( sla.status)}`}>
                         {sla.status === "InProgress"
                           ? "INPROGRESS"
                           : sla.status?.toUpperCase()}
@@ -644,7 +528,6 @@ const ManagerSLADashboard = () => {
                           {dateHelpers.formatDeadline(sla.deadline)}
                         </span>
                       </div>
-
                       <div className="mgr-escalation-info-row">
                         <span className="mgr-escalation-label">
                           Days Remaining
@@ -661,7 +544,6 @@ const ManagerSLADashboard = () => {
                           {Math.abs(daysRemaining)} days
                         </span>
                       </div>
-
                       <div className="mgr-escalation-info-row">
                         <span className="mgr-escalation-label">
                           Assigned To
@@ -678,30 +560,21 @@ const ManagerSLADashboard = () => {
                           )}
                         </span>
                       </div>
-
                       {sla.complianceStatus && (
                         <div className="mgr-escalation-info-row">
                           <span className="mgr-escalation-label">
                             Compliance
                           </span>
-                          <span
-                            className={`mgr-compliance-badge ${
-                              sla.complianceStatus === "OnTime"
-                                ? "mgr-compliance-ontime"
-                                : "mgr-compliance-breached"
-                            }`}
-                          >
+                          <span className={`mgr-compliance-badge ${
+                              sla.complianceStatus === "OnTime" ? "mgr-compliance-ontime" : "mgr-compliance-breached"
+                            }`}>
                             {sla.complianceStatus}
                           </span>
                         </div>
                       )}
                     </div>
-
                     <div className="mgr-escalation-card-footer">
-                      <button
-                        className="mgr-escalation-view-btn"
-                        onClick={() => handleRowClick(sla.slaid)}
-                      >
+                      <button className="mgr-escalation-view-btn" onClick={() => handleRowClick(sla.slaid)} >
                         <Eye size={16} />
                         View Details
                       </button>
@@ -730,19 +603,12 @@ const ManagerSLADashboard = () => {
                   </thead>
                   <tbody>
                     {paginatedData.map((esc) => (
-                      <tr
-                        key={esc.escalationId}
-                        className="mgr-sla-clickable-row"
-                      >
+                      <tr key={esc.escalationId} className="mgr-sla-clickable-row" >
                         <td onClick={() => handleRowClick(esc.slaid)}>
                           <div className="mgr-sla-employee-cell">
                             <div className="mgr-sla-employee-info">
-                              <div className="mgr-sla-employee-name">
-                                {esc.employeeName || "—"}
-                              </div>
-                              <div className="mgr-sla-employee-email">
-                                {esc.employeeEmail || "No email"}
-                              </div>
+                              <div className="mgr-sla-employee-name">{esc.employeeName || "—"}</div>
+                              <div className="mgr-sla-employee-email">{esc.employeeEmail || "No email"}</div>
                             </div>
                           </div>
                         </td>
@@ -757,11 +623,8 @@ const ManagerSLADashboard = () => {
                         <td onClick={() => handleRowClick(esc.slaid)}>
                           <span
                             className={`mgr-sla-badge ${
-                              esc.escalationStatus === "Resolved"
-                                ? "mgr-sla-badge-success"
-                                : esc.escalationStatus === "InProgress"
-                                ? "mgr-sla-badge-warning"
-                                : "mgr-sla-badge-primary"
+                              esc.escalationStatus === "Resolved" ? "mgr-sla-badge-success"
+                                : esc.escalationStatus === "InProgress" ? "mgr-sla-badge-warning" : "mgr-sla-badge-primary"
                             }`}
                           >
                             {esc.escalationStatus}
@@ -772,27 +635,18 @@ const ManagerSLADashboard = () => {
                         </td>
                         <td>
                           <div className="mgr-sla-actions">
-                            <button
-                              className="mgr-sla-action-btn mgr-sla-action-view"
-                              onClick={(e) => handleViewClick(e, esc.slaid)}
-                              title="View details"
-                            >
+                            <button className="mgr-sla-action-btn mgr-sla-action-view"
+                              onClick={(e) => handleViewClick(e, esc.slaid)}title="View details">
                               <Eye size={16} />
                             </button>
                             {esc.escalationStatus !== "Resolved" && (
                               <>
-                                <button
-                                  className="mgr-sla-action-btn mgr-sla-action-escalate"
-                                  onClick={(e) => handleEscalateClick(e, esc)}
-                                  title="Escalate to Department Head"
-                                >
+                                <button className="mgr-sla-action-btn mgr-sla-action-escalate"
+                                  onClick={(e) => handleEscalateClick(e, esc)} title="Escalate to Department Head">
                                   <Send size={16} />
                                 </button>
-                                <button
-                                  className="mgr-sla-action-btn mgr-sla-action-resolve"
-                                  onClick={(e) => handleResolveClick(e, esc)}
-                                  title="Resolve escalation"
-                                >
+                                <button className="mgr-sla-action-btn mgr-sla-action-resolve"
+                                  onClick={(e) => handleResolveClick(e, esc)}title="Resolve escalation">
                                   <CheckCircle size={16} />
                                 </button>
                               </>
@@ -804,19 +658,15 @@ const ManagerSLADashboard = () => {
                   </tbody>
                 </table>
               </div>
-
               {safeTotal > 0 && (
                 <div className="mgr-sla-pagination-footer">
                   <div className="mgr-sla-pagination-left">
                     <span className="mgr-sla-pagination-text">Show</span>
-                    <PaginationDropdown
-                      value={itemsPerPage}
-                      onChange={(val) => {
-                        setItemsPerPage(val);
-                        setCurrentPage(1);
+                    <PaginationDropdown value={itemsPerPage}
+                      onChange={(val) => { setItemsPerPage(val);
+                            setCurrentPage(1);
                       }}
-                      options={[5, 10, 25, 50]}
-                    />
+                      options={[5, 10, 25, 50]}/>
                     <span className="mgr-sla-pagination-text">entries</span>
                   </div>
 
@@ -832,13 +682,11 @@ const ManagerSLADashboard = () => {
                       <li
                         className={`mgr-sla-page-item ${
                           validCurrentPage === 1 ? "disabled" : ""
-                        }`}
-                      >
+                        }`}>
                         <button
                           className="mgr-sla-page-link mgr-sla-page-arrow"
                           onClick={() => goToPage(validCurrentPage - 1)}
-                          disabled={validCurrentPage === 1}
-                        >
+                          disabled={validCurrentPage === 1} >
                           <span className="mgr-sla-arrow-icon">‹</span>
                         </button>
                       </li>
@@ -869,13 +717,11 @@ const ManagerSLADashboard = () => {
                       <li
                         className={`mgr-sla-page-item ${
                           validCurrentPage === totalPages ? "disabled" : ""
-                        }`}
-                      >
+                        }`}>
                         <button
                           className="mgr-sla-page-link mgr-sla-page-arrow"
                           onClick={() => goToPage(validCurrentPage + 1)}
-                          disabled={validCurrentPage === totalPages}
-                        >
+                          disabled={validCurrentPage === totalPages}>
                           <span className="mgr-sla-arrow-icon">›</span>
                         </button>
                       </li>

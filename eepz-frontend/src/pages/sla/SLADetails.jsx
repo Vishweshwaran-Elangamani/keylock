@@ -1,15 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-  FileText,
-  Clock,
-  CheckCircle,
-  AlertTriangle,
-  RotateCcw,
-  History,
-  Loader,
-  X,
-  Info,
+  FileText,Clock, CheckCircle, AlertTriangle, RotateCcw,
+  History, Loader, X, Info,
 } from "lucide-react";
 import { toast } from "sonner";
 import SLAHistoryTimeline from "../../components/sla/common/SLAHistoryTimeline";
@@ -64,7 +57,6 @@ const SLADetails = () => {
   const fetchSLADetails = useCallback(async () => {
     setLoading(true);
     setError(null);
-
     try {
       const userData = JSON.parse(localStorage.getItem("user") || "{}");
       const slaResponse = await slaService.getSLAById(parseInt(slaid));
@@ -75,9 +67,7 @@ const SLADetails = () => {
         setLoading(false);
         return;
       }
-
       setSla(slaResponse.data);
-
       try {
         const historyResponse = await slaService.getSLAHistory(parseInt(slaid));
         if (historyResponse?.success && Array.isArray(historyResponse.data)) {
@@ -144,14 +134,12 @@ const SLADetails = () => {
       } else {
         setEscalationBlockReason(null);
       }
-
       setCanReopen(
         userData.roleName === "Manager" && slaData.status === "Closed"
       );
     },
     []
   );
-
   const handleEscalateClick = useCallback(() => {
     if (!canEscalate) {
       console.warn("Escalation blocked:", escalationBlockReason);
@@ -209,7 +197,6 @@ const SLADetails = () => {
       </div>
     );
   }
-
   if (error || !sla) {
     return (
       <div className="sla-details-error-wrapper">
@@ -247,15 +234,13 @@ const SLADetails = () => {
             },
           ]}
         />
-
         <div className="sla-details-actions-wrapper">
           {sla.status !== "Closed" &&
             (user?.roleName === "Employee" || user?.roleName === "Manager") &&
             (canEscalate ? (
               <button
                 onClick={handleEscalateClick}
-                className="sla-details-btn sla-details-btn-warning"
-              >
+                className="sla-details-btn sla-details-btn-warning">
                 <AlertTriangle size={16} />
                 Escalate
               </button>
@@ -263,8 +248,7 @@ const SLADetails = () => {
               <button
                 disabled
                 className="sla-details-btn sla-details-btn-disabled"
-                title={escalationBlockReason || "Cannot escalate"}
-              >
+                title={escalationBlockReason || "Cannot escalate"} >
                 <AlertTriangle size={16} />
                 Escalated
               </button>
@@ -273,8 +257,7 @@ const SLADetails = () => {
           {canReopen && sla.status === "Closed" && (
             <button
               onClick={() => setShowReopenForm(true)}
-              className="sla-details-btn sla-details-btn-reopen"
-            >
+              className="sla-details-btn sla-details-btn-reopen" >
               <RotateCcw size={16} />
               Reopen
             </button>
@@ -284,8 +267,7 @@ const SLADetails = () => {
             <button
               onClick={() => setShowCloseConfirmation(true)}
               disabled={refreshing}
-              className="sla-details-btn sla-details-btn-primary"
-            >
+              className="sla-details-btn sla-details-btn-primary">
               Close SLA
             </button>
           )}
@@ -368,8 +350,7 @@ const SLADetails = () => {
                         daysRemaining < 0
                           ? "sla-details-text-danger"
                           : "sla-details-text-success"
-                      }`}
-                    >
+                      }`}>
                       {Math.abs(daysRemaining)} days
                       <small className="sla-details-subtitle-block">
                         {daysRemaining < 0 ? "OVERDUE" : "remaining"}
@@ -435,10 +416,7 @@ const SLADetails = () => {
             <div className="sla-details-card">
               <div className="sla-details-card-body">
                 <h5 className="sla-details-section-title">
-                  <AlertTriangle
-                    size={20}
-                    className="sla-details-section-icon"
-                  />
+                  <AlertTriangle  size={20}  className="sla-details-section-icon"/>
                   Escalation Chain ({escalations.length})
                 </h5>
 
@@ -481,13 +459,10 @@ const SLADetails = () => {
                         )}
                       </span>
                     </div>
-
                     <div className="sla-details-escalation-content">
                       <div className="sla-details-escalation-row">
                         <div className="sla-details-escalation-col">
-                          <small className="sla-details-label">
-                            Escalated By
-                          </small>
+                          <small className="sla-details-label"> Escalated By </small>
                           <strong className="sla-details-value">
                             {esc.submittedByName ||
                               `User ${esc.submittedByEmployeeId}`}
@@ -567,10 +542,7 @@ const SLADetails = () => {
 
       {showCloseConfirmation && (
         <>
-          <div
-            className="sla-close-modal-backdrop"
-            onClick={() => !refreshing && setShowCloseConfirmation(false)}
-          />
+          <div  className="sla-close-modal-backdrop"  onClick={() => !refreshing && setShowCloseConfirmation(false)}/>
           <div className="sla-close-modal-wrapper">
             <div className="sla-close-modal-container">
               <div className="sla-close-modal-header">
@@ -579,8 +551,7 @@ const SLADetails = () => {
                   type="button"
                   className="sla-close-modal-close-btn"
                   onClick={() => setShowCloseConfirmation(false)}
-                  disabled={refreshing}
-                >
+                  disabled={refreshing}>
                   <X size={20} />
                 </button>
               </div>

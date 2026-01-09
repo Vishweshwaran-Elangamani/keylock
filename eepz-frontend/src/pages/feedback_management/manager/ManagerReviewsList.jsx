@@ -175,19 +175,12 @@ export default function ManagerReviewsList() {
     <>
       {showEditModal && (
         <>
-          <div
-            className="fm-mgrrev-modal-backdrop"
-            onClick={handleCloseEditModal}
-          />
+          <div className="fm-mgrrev-modal-backdrop"onClick={handleCloseEditModal}/>
           <div className="fm-mgrrev-modal-wrapper">
             <div className="fm-mgrrev-modal">
               <div className="fm-mgrrev-modal__header">
                 <h5 className="fm-mgrrev-modal__title">Edit Review</h5>
-                <button
-                  className="fm-mgrrev-modal__close-btn"
-                  onClick={handleCloseEditModal}
-                  aria-label="Close"
-                >
+                <button className="fm-mgrrev-modal__close-btn"onClick={handleCloseEditModal} aria-label="Close">
                   <X size={20} />
                 </button>
               </div>
@@ -197,9 +190,7 @@ export default function ManagerReviewsList() {
                     <label className="fm-mgrrev-form-label">
                       Select Employee <span className="text-danger">*</span>
                     </label>
-                    <select
-                      className="form-select fm-mgrrev-form-control"
-                      value={editForm.targetEmployeeId}
+                    <select className="form-select fm-mgrrev-form-control"value={editForm.targetEmployeeId}
                       onChange={(e) =>
                         setEditForm({
                           ...editForm,
@@ -319,19 +310,11 @@ export default function ManagerReviewsList() {
                 </form>
               </div>
               <div className="fm-mgrrev-modal__footer">
-                <button
-                  type="button"
-                  onClick={handleCloseEditModal}
-                  className="fm-mgrrev-btn fm-mgrrev-btn--secondary"
-                >
+                <button type="button" onClick={handleCloseEditModal} className="fm-mgrrev-btn fm-mgrrev-btn--secondary">
                   Cancel
                 </button>
-                <button
-                  type="button"
-                  onClick={handleSaveEdit}
-                  disabled={editLoading}
-                  className="fm-mgrrev-btn fm-mgrrev-btn--primary"
-                >
+
+                <button type="button" onClick={handleSaveEdit} disabled={editLoading} className="fm-mgrrev-btn fm-mgrrev-btn--primary">
                   {editLoading ? (
                     <>
                       <Loader size={16} className="fm-mgrrev-icon-spin" />
@@ -371,20 +354,14 @@ export default function ManagerReviewsList() {
                 <strong>Error</strong>
                 <p className="mb-0 mt-1">{error}</p>
               </div>
-              <button
-                type="button"
-                className="btn-close"
-                onClick={() => setError("")}
-              />
+              <button type="button"className="btn-close"onClick={() => setError("")}/>
             </div>
           )}
 
           {loading ? (
             <div className="fm-mgrrev-loading">
               <div
-                className="spinner-border fm-mgrrev-loading__spinner"
-                role="status"
-              >
+                className="spinner-border fm-mgrrev-loading__spinner" role="status" >
                 <span className="visually-hidden">Loading...</span>
               </div>
               <p className="fm-mgrrev-loading__text">Loading reviews...</p>
@@ -429,10 +406,7 @@ export default function ManagerReviewsList() {
                       </div>
 
                       <div className="fm-mgrrev-card__date">
-                        <Calendar
-                          size={14}
-                          className="fm-mgrrev-card__calendar-icon"
-                        />
+                        <Calendar size={14} className="fm-mgrrev-card__calendar-icon"/>
                         <span className="fm-mgrrev-card__date-text">
                           {review.createdAt
                             ? new Date(review.createdAt).toLocaleDateString(
@@ -463,11 +437,7 @@ export default function ManagerReviewsList() {
                           />
                         ))}
                       </div>
-                      <button
-                        onClick={() => handleView(review.reviewcommentId)}
-                        className="fm-mgrrev-card__view-btn"
-                        title="View"
-                      >
+                      <button onClick={() => handleView(review.reviewcommentId)} className="fm-mgrrev-card__view-btn" title="View">
                         <Eye size={16} />
                       </button>
                     </div>

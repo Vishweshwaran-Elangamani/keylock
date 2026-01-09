@@ -217,12 +217,8 @@ export default function SubmitPeerFeedback() {
         <div className="spf-alert spf-alert-success">
           <CheckCircle size={20} className="spf-alert-icon" />
           <div className="spf-alert-content">{successMsg}</div>
-          <button
-            type="button"
-            className="spf-alert-close"
-            onClick={() => closeAlert("success")}
-            aria-label="Close"
-          >
+          <button type="button" className="spf-alert-close" onClick={() => closeAlert("success")}
+            aria-label="Close">
             ×
           </button>
         </div>
@@ -248,14 +244,9 @@ export default function SubmitPeerFeedback() {
                   <span className="spf-required">*</span>
                 </label>
                 <div className="spf-select-wrapper">
-                  <select
-                    id="recipientSelect"
-                    className="spf-select"
-                    value={form.recipientEmployeeId}
-                    onChange={handleRecipientChange}
-                    disabled={loadingEmployees || employees.length === 0}
-                    aria-label="Select recipient employee"
-                  >
+                  <select id="recipientSelect" className="spf-select"
+                    value={form.recipientEmployeeId}  onChange={handleRecipientChange}
+                    disabled={loadingEmployees || employees.length === 0} aria-label="Select recipient employee">
                     <option value="">
                       {loadingEmployees
                         ? "Loading employees..."
@@ -318,26 +309,14 @@ export default function SubmitPeerFeedback() {
               <label htmlFor="feedbackContent" className="spf-label">
                 Feedback Content <span className="spf-required">*</span>
               </label>
-              <textarea
-                id="feedbackContent"
-                className="spf-textarea"
+              <textarea id="feedbackContent" className="spf-textarea"
                 rows={5}
                 placeholder="Share specific, constructive feedback. Example: 'Your communication in meetings is clear and inclusive...'"
-                value={form.feedbackContent}
-                onChange={handleFeedbackChange}
-                disabled={loading}
-                maxLength={5000}
-                aria-label="Enter feedback content"
-              />
+                value={form.feedbackContent} onChange={handleFeedbackChange} disabled={loading} maxLength={5000}
+                aria-label="Enter feedback content"/>
               <div className="spf-textarea-footer">
-                <small className="spf-help-text">
-                  Provide specific, actionable, and constructive feedback
-                </small>
-                <small
-                  className={`spf-char-count ${
-                    isNearLimit ? "spf-char-count-warning" : ""
-                  }`}
-                >
+                <small className="spf-help-text">  Provide specific, actionable, and constructive feedback</small>
+                <small className={`spf-char-count ${  isNearLimit ? "spf-char-count-warning" : ""}`}>
                   {charCount} / 5000 characters
                   {isNearLimit && ` (${charRemaining} remaining)`}
                 </small>
@@ -346,14 +325,8 @@ export default function SubmitPeerFeedback() {
 
             <div className="spf-form-group">
               <div className="spf-checkbox-wrapper">
-                <input
-                  id="isAnonymous"
-                  type="checkbox"
-                  className="spf-checkbox-input"
-                  checked={form.isAnonymous}
-                  onChange={handleAnonymousChange}
-                  disabled={loading}
-                />
+                <input id="isAnonymous" type="checkbox" className="spf-checkbox-input"
+                  checked={form.isAnonymous} onChange={handleAnonymousChange} disabled={loading}/>
                 <label htmlFor="isAnonymous" className="spf-checkbox-label">
                   <strong>Submit anonymously</strong>
                   <small className="spf-checkbox-hint">
@@ -364,13 +337,9 @@ export default function SubmitPeerFeedback() {
             </div>
 
             <div className="spf-button-group">
-              <button
-                type="submit"
-                className="spf-submit-button"
-                disabled={
+              <button type="submit" className="spf-submit-button"disabled={
                   loading || loadingEmployees || !form.recipientEmployeeId
-                }
-              >
+                }>
                 {loading ? (
                   <>
                     <Loader size={16} className="spf-button-loader" />
@@ -383,12 +352,7 @@ export default function SubmitPeerFeedback() {
                   </>
                 )}
               </button>
-              <button
-                type="button"
-                className="spf-clear-button"
-                onClick={resetForm}
-                disabled={loading}
-              >
+              <button type="button"className="spf-clear-button"onClick={resetForm}disabled={loading}>
                 Clear Form
               </button>
             </div>

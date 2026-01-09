@@ -152,19 +152,13 @@ export default function CreateManagerReview() {
           <nav aria-label="breadcrumb" className="cmr-breadcrumb-nav">
             <ol className="cmr-breadcrumb-list">
               <li className="cmr-breadcrumb-item">
-                <button
-                  className="cmr-breadcrumb-link"
-                  onClick={() => navigate("/manager/dashboard/")}
-                >
+                <button className="cmr-breadcrumb-link" onClick={() => navigate("/manager/dashboard/")}>
                   <Home size={18} className="cmr-breadcrumb-icon" />
                 </button>
               </li>
               <li className="cmr-breadcrumb-separator">/</li>
               <li className="cmr-breadcrumb-item">
-                <button
-                  className="cmr-breadcrumb-link"
-                  onClick={() => navigate("/manager/dashboard/feedback")}
-                >
+                <button className="cmr-breadcrumb-link"onClick={() => navigate("/manager/dashboard/feedback")}>
                   Feedback Management
                 </button>
               </li>
@@ -191,10 +185,7 @@ export default function CreateManagerReview() {
           <div className="cmr-alert cmr-alert-success">
             <CheckCircle size={18} className="cmr-alert-icon" />
             <div className="cmr-alert-body">{success}</div>
-            <button
-              className="cmr-alert-close"
-              onClick={() => setSuccess("")}
-            />
+            <button className="cmr-alert-close"onClick={() => setSuccess("")}/>
           </div>
         )}
 
@@ -207,9 +198,7 @@ export default function CreateManagerReview() {
                 </label>
 
                 <div className="cmr-dropdown">
-                  <button
-                    type="button"
-                    className={`cmr-dropdown-trigger ${
+                  <button type="button" className={`cmr-dropdown-trigger ${
                       openEmployeeDropdown ? "cmr-dropdown-trigger-open" : ""
                     }`}
                     onClick={() =>
@@ -273,10 +262,7 @@ export default function CreateManagerReview() {
                 </label>
                 <div className="cmr-rating-row">
                   {[1, 2, 3, 4, 5].map((rating) => (
-                    <button
-                      key={rating}
-                      type="button"
-                      className={`cmr-rating-btn ${
+                    <button key={rating} type="button" className={`cmr-rating-btn ${
                         form.rating === rating ? "cmr-rating-btn-active" : ""
                       }`}
                       onClick={() => setForm((prev) => ({ ...prev, rating }))}
@@ -296,14 +282,9 @@ export default function CreateManagerReview() {
                 <label className="cmr-label">
                   Review Comment <span className="cmr-required">*</span>
                 </label>
-                <textarea
-                  className="cmr-textarea"
-                  rows={4}
-                  value={form.reviewComment}
-                  onChange={(e) =>
+                <textarea className="cmr-textarea" rows={4} value={form.reviewComment} onChange={(e) =>
                     setForm((prev) => ({
-                      ...prev,
-                      reviewComment: e.target.value,
+                      ...prev,reviewComment: e.target.value,
                     }))
                   }
                   placeholder="Provide detailed feedback on the employee's performance..."
@@ -319,11 +300,7 @@ export default function CreateManagerReview() {
                   Project Context{" "}
                   <span className="cmr-optional">(Optional)</span>
                 </label>
-                <textarea
-                  className="cmr-textarea"
-                  rows={2}
-                  value={form.projectContext}
-                  onChange={(e) =>
+                <textarea className="cmr-textarea" rows={2} value={form.projectContext} onChange={(e) =>
                     setForm((prev) => ({
                       ...prev,
                       projectContext: e.target.value,
@@ -337,14 +314,9 @@ export default function CreateManagerReview() {
                 <label className="cmr-label">
                   Goal Context <span className="cmr-optional">(Optional)</span>
                 </label>
-                <textarea
-                  className="cmr-textarea"
-                  rows={2}
-                  value={form.goalContext}
-                  onChange={(e) =>
-                    setForm((prev) => ({
-                      ...prev,
-                      goalContext: e.target.value,
+                <textarea className="cmr-textarea" rows={2} value={form.goalContext}
+                  onChange={(e) =>  setForm((prev) => ({
+                    ...prev, goalContext: e.target.value,
                     }))
                   }
                   placeholder="Mention any relevant goals or objectives..."
@@ -352,19 +324,11 @@ export default function CreateManagerReview() {
               </div>
 
               <div className="col-12 cmr-actions-row">
-                <button
-                  type="submit"
-                  className="cmr-btn cmr-btn-primary"
-                  disabled={loading || loadingEmployees}
-                >
+                <button type="submit" className="cmr-btn cmr-btn-primary"disabled={loading || loadingEmployees}>
                   <Send size={16} className="cmr-btn-icon-left" />
                   {loading ? "Submitting Review..." : "Submit Review"}
                 </button>
-                <button
-                  type="button"
-                  className="cmr-btn cmr-btn-outline"
-                  onClick={() => navigate(-1)}
-                >
+                <button type="button" className="cmr-btn cmr-btn-outline"onClick={() => navigate(-1)} >
                   Cancel
                 </button>
               </div>

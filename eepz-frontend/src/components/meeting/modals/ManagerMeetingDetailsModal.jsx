@@ -133,9 +133,7 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
         </div>
 
         <div className="mmdm-footer">
-          <button className="mmdm-close-btn" onClick={onClose}>
-            Close
-          </button>
+          <button className="mmdm-close-btn" onClick={onClose}>Close</button>
         </div>
       </div>
     </div>

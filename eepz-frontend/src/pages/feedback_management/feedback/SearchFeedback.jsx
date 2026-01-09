@@ -131,11 +131,7 @@ export default function SearchFeedback() {
           <h2 className="sf-title">Search Feedback</h2>
           <p className="sf-subtitle">Search across all feedback types</p>
         </div>
-        <button
-          className="sf-refresh-btn"
-          onClick={fetchAll}
-          disabled={loading}
-        >
+        <button className="sf-refresh-btn" onClick={fetchAll} disabled={loading} >
           <RefreshCw size={18} className={loading ? "sf-spin" : ""} />
           Refresh
         </button>
@@ -162,14 +158,8 @@ export default function SearchFeedback() {
             ))}
           </div>
           <div className="sf-search-input-wrapper">
-            <input
-              type="text"
-              className="sf-search-input"
-              placeholder="Search feedback by keyword…"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            />
+            <input type="text" className="sf-search-input" placeholder="Search feedback by keyword…"
+            value={query} onChange={(e) => setQuery(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSearch()}/>
             <button className="sf-search-button" onClick={handleSearch}>
               <Search size={18} />
             </button>
@@ -197,17 +187,10 @@ export default function SearchFeedback() {
                         )}
                       </div>
                       <p className="sf-result-content">
-                        {item.reviewComment ||
-                          item.feedbackComments ||
-                          item.feedbackContent ||
-                          "No content"}
+                        {item.reviewComment || item.feedbackComments || item.feedbackContent || "No content"}
                       </p>
                       <small className="sf-result-meta">
-                        {item.targetEmployeeName ||
-                          item.mentorName ||
-                          item.recipientName ||
-                          item.organizationGoalName ||
-                          "Unknown"}
+                        {item.targetEmployeeName ||item.mentorName ||item.recipientName ||item.organizationGoalName || "Unknown"}
                       </small>
                     </div>
                   </div>

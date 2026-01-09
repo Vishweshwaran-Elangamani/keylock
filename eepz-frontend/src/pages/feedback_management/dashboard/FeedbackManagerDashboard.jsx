@@ -1,17 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import {
-  RefreshCw,
-  AlertTriangle,
-  FileText,
-  Plus,
-  Send,
-  Search,
-  Eye,
-  Star,
-  Users,
-  Target,
-  Briefcase,
-  MessageSquare,
+  RefreshCw, AlertTriangle, FileText, Plus, Send,
+  Search,Eye,Star,Users,Target,Briefcase,MessageSquare,
   Loader,
 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -38,10 +28,7 @@ export default function FeedbackManagerDashboard() {
   const user = useMemo(
     () =>
       JSON.parse(localStorage.getItem("user") || "{}") || {
-        empId: 1002,
-        firstName: "Manager",
-        lastName: "User",
-        roleName: "Manager",
+        empId: 1002, firstName: "Manager", lastName: "User", roleName: "Manager",
       },
     []
   );
@@ -50,7 +37,6 @@ export default function FeedbackManagerDashboard() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [activeTab] = useState("overview");
-
   const [myReviews, setMyReviews] = useState([]);
   const [myPeerFeedback, setMyPeerFeedback] = useState([]);
   const [allForms, setAllForms] = useState([]);
@@ -214,8 +200,7 @@ export default function FeedbackManagerDashboard() {
     ).length;
 
     return {
-      myReviews: myReviews.length,
-      pendingForms: pending,
+      myReviews: myReviews.length,pendingForms: pending,
       peerFeedback: myPeerFeedback.length,
     };
   }, [myReviews, myPeerFeedback, allForms, submittedFormIds]);
@@ -245,17 +230,12 @@ export default function FeedbackManagerDashboard() {
           <div className="fm-mgrdash-error-alert__content">
             <strong>Error:</strong> {error}
           </div>
-          <button
-            className="fm-mgrdash-error-alert__close"
-            onClick={() => setError("")}
-            title="Close"
-            type="button"
-          >
-            ×
+          <button  className="fm-mgrdash-error-alert__close"
+            onClick={() => setError("")} title="Close" type="button" >  ×
           </button>
         </div>
       )}
-
+      
       <div className="fm-mgrdash-stats">
         <div className="fm-mgrdash-stat-card">
           <div className="fm-mgrdash-stat-card__icon fm-mgrdash-stat-card__icon--blue">
@@ -292,6 +272,7 @@ export default function FeedbackManagerDashboard() {
         </div>
       </div>
 
+         
       <div className="fm-mgrdash-content">
         {loading ? (
           <div className="fm-mgrdash-loading">
@@ -299,11 +280,9 @@ export default function FeedbackManagerDashboard() {
             <p className="fm-mgrdash-loading__text">Loading dashboard...</p>
           </div>
         ) : (
+          
           <div className="fm-mgrdash-actions-grid">
-            <Link
-              to="/manager/dashboard/feedback/create-review"
-              className="fm-mgrdash-action-card"
-            >
+            <Link to="/manager/dashboard/feedback/create-review" className="fm-mgrdash-action-card">
               <div className="fm-mgrdash-action-card__icon-wrapper fm-mgrdash-action-card__icon-wrapper--primary">
                 <Plus size={20} />
               </div>
@@ -312,20 +291,14 @@ export default function FeedbackManagerDashboard() {
               </span>
             </Link>
 
-            <Link
-              to="/manager/dashboard/feedback/all-review"
-              className="fm-mgrdash-action-card"
-            >
+            <Link to="/manager/dashboard/feedback/all-review"className="fm-mgrdash-action-card">
               <div className="fm-mgrdash-action-card__icon-wrapper fm-mgrdash-action-card__icon-wrapper--primary">
                 <Eye size={20} />
               </div>
               <span className="fm-mgrdash-action-card__label">All Reviews</span>
             </Link>
 
-            <Link
-              to="/manager/dashboard/feedback/team"
-              className="fm-mgrdash-action-card"
-            >
+            <Link  to="/manager/dashboard/feedback/team"className="fm-mgrdash-action-card">
               <div className="fm-mgrdash-action-card__icon-wrapper fm-mgrdash-action-card__icon-wrapper--primary">
                 <Users size={20} />
               </div>
@@ -334,10 +307,7 @@ export default function FeedbackManagerDashboard() {
               </span>
             </Link>
 
-            <Link
-              to="/manager/dashboard/feedback/submit-mentor"
-              className="fm-mgrdash-action-card"
-            >
+            <Link to="/manager/dashboard/feedback/submit-mentor" className="fm-mgrdash-action-card">
               <div className="fm-mgrdash-action-card__icon-wrapper fm-mgrdash-action-card__icon-wrapper--secondary">
                 <Send size={20} />
               </div>
@@ -346,10 +316,7 @@ export default function FeedbackManagerDashboard() {
               </span>
             </Link>
 
-            <Link
-              to="/manager/dashboard/feedback/contextfeedback"
-              className="fm-mgrdash-action-card"
-            >
+            <Link to="/manager/dashboard/feedback/contextfeedback"  className="fm-mgrdash-action-card">
               <div className="fm-mgrdash-action-card__icon-wrapper fm-mgrdash-action-card__icon-wrapper--secondary">
                 <MessageSquare size={20} />
               </div>
@@ -358,10 +325,7 @@ export default function FeedbackManagerDashboard() {
               </span>
             </Link>
 
-            <Link
-              to="/manager/dashboard/feedback/assignedform"
-              className="fm-mgrdash-action-card"
-            >
+            <Link to="/manager/dashboard/feedback/assignedform"className="fm-mgrdash-action-card">
               <div className="fm-mgrdash-action-card__icon-wrapper fm-mgrdash-action-card__icon-wrapper--secondary">
                 <Target size={20} />
               </div>
@@ -370,10 +334,7 @@ export default function FeedbackManagerDashboard() {
               </span>
             </Link>
 
-            <Link
-              to="/manager/dashboard/feedback/submissions"
-              className="fm-mgrdash-action-card"
-            >
+            <Link to="/manager/dashboard/feedback/submissions" className="fm-mgrdash-action-card">
               <div className="fm-mgrdash-action-card__icon-wrapper fm-mgrdash-action-card__icon-wrapper--secondary">
                 <Search size={20} />
               </div>
