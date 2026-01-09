@@ -1,0 +1,469 @@
+/* HR DASHBOARD - CYAN/BLUE PROFESSIONAL DESIGN */
+
+/* LOADING STATE */
+.hrd-loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+}
+
+/* MAIN DASHBOARD */
+.hrd-dashboard {
+  padding: 0;
+  background: #f8f9fa;
+}
+
+/* STATISTICS CARDS - FIXED TO 5 COLUMNS */
+.hrd-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.hrd-stat-card {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #0891b2;
+  padding: 1.125rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.hrd-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(8, 145, 178, 0.12);
+}
+
+.hrd-stat-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.hrd-stat-icon-primary {
+  background: linear-gradient(135deg, rgba(8, 145, 178, 0.15) 0%, rgba(6, 182, 212, 0.1) 100%);
+  color: #0891b2;
+}
+
+.hrd-stat-icon-success {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.1) 100%);
+  color: #10b981;
+}
+
+.hrd-stat-icon-warning {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.1) 100%);
+  color: #f59e0b;
+}
+
+.hrd-stat-icon-info {
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.15) 0%, rgba(13, 148, 136, 0.1) 100%);
+  color: #14b8a6;
+}
+
+.hrd-stat-icon-cyan {
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.15) 0%, rgba(6, 182, 212, 0.1) 100%);
+  color: #22d3ee;
+}
+
+.hrd-stat-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  text-align: center;
+  align-items: center;
+}
+
+.hrd-stat-content h2 {
+  font-size: 1.625rem;
+  font-weight: 700;
+  color: #0891b2;
+  margin: 0;
+  line-height: 1;
+}
+
+.hrd-stat-content p {
+  font-size: 0.8125rem;
+  color: #6c757d;
+  margin: 0;
+  font-weight: 500;
+}
+
+.hrd-stat-trend {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-top: 0.25rem;
+}
+
+/* DASHBOARD CARDS CONTAINER */
+.hrd-cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.hrd-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.hrd-card {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #0891b2;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+}
+
+.hrd-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(8, 145, 178, 0.12);
+}
+
+.hrd-card-medium {
+  grid-column: span 1;
+}
+
+.hrd-card-small {
+  grid-column: span 1;
+}
+
+/* CARD HEADER - DARK NAVY BLUE (MATCHING ADMIN) */
+.hrd-card-header {
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, #27235c 0%, #3b4d8f 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hrd-card-header-content {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.hrd-card-header-content i {
+  font-size: 1.125rem;
+  color: #ffffff;
+}
+
+.hrd-card-header-content h3 {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.hrd-card-filter-btn,
+.hrd-card-select {
+  padding: 0.375rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.hrd-card-filter-btn:hover,
+.hrd-card-select:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.hrd-card-select {
+  outline: none;
+}
+
+.hrd-card-select option {
+  background: #ffffff;
+  color: #1f2937;
+}
+
+/* CARD BODY */
+.hrd-card-body {
+  padding: 1.25rem;
+}
+
+.hrd-no-data {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #9ca3af;
+  font-size: 0.875rem;
+  min-height: 240px;
+}
+
+/* EMPLOYEE STATUS SECTION */
+.hrd-employee-status-summary {
+  margin-bottom: 1.25rem;
+}
+
+.hrd-status-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.hrd-status-total .hrd-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.hrd-status-total h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0891b2;
+  margin: 0;
+}
+
+.hrd-status-bar {
+  display: flex;
+  height: 12px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f3f4f6;
+}
+
+.hrd-status-segment {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.hrd-status-segment.hrd-fulltime {
+  background-color: #0891b2;
+}
+
+.hrd-status-segment.hrd-contract {
+  background-color: #06b6d4;
+}
+
+.hrd-status-segment.hrd-probation {
+  background-color: #22d3ee;
+}
+
+.hrd-status-segment.hrd-parttime {
+  background-color: #67e8f9;
+}
+
+.hrd-status-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.hrd-status-card {
+  background: #f9fafb;
+  padding: 0.875rem;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.hrd-status-card:hover {
+  background: #ecfeff;
+  border-color: #a5f3fc;
+}
+
+.hrd-status-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.hrd-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.hrd-legend-dot.hrd-fulltime {
+  background-color: #0891b2;
+}
+
+.hrd-legend-dot.hrd-contract {
+  background-color: #06b6d4;
+}
+
+.hrd-legend-dot.hrd-probation {
+  background-color: #22d3ee;
+}
+
+.hrd-legend-dot.hrd-parttime {
+  background-color: #67e8f9;
+}
+
+.hrd-status-legend span {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.hrd-status-card h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0891b2;
+  margin: 0;
+}
+
+/* PERFORMANCE OVERVIEW SECTION */
+.hrd-perf-overview {
+  margin-bottom: 1rem;
+}
+
+.hrd-perf-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.625rem;
+  margin-bottom: 1rem;
+}
+
+.hrd-perf-stat-card {
+  padding: 0.625rem;
+  border-radius: 6px;
+  text-align: center;
+  border: 1px solid;
+}
+
+.hrd-perf-stat-card.hrd-perf-cyan {
+  background: #ecfeff;
+  border-color: #a5f3fc;
+}
+
+.hrd-perf-stat-card.hrd-perf-green {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+
+.hrd-perf-stat-card.hrd-perf-yellow {
+  background: #fef3c7;
+  border-color: #fcd34d;
+}
+
+.hrd-perf-stat-value {
+  font-size: 1.375rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.hrd-perf-stat-card.hrd-perf-cyan .hrd-perf-stat-value {
+  color: #0891b2;
+}
+
+.hrd-perf-stat-card.hrd-perf-green .hrd-perf-stat-value {
+  color: #10b981;
+}
+
+.hrd-perf-stat-card.hrd-perf-yellow .hrd-perf-stat-value {
+  color: #d97706;
+}
+
+.hrd-perf-stat-label {
+  font-size: 0.6875rem;
+  font-weight: 500;
+}
+
+.hrd-perf-stat-card.hrd-perf-cyan .hrd-perf-stat-label {
+  color: #0e7490;
+}
+
+.hrd-perf-stat-card.hrd-perf-green .hrd-perf-stat-label {
+  color: #047857;
+}
+
+.hrd-perf-stat-card.hrd-perf-yellow .hrd-perf-stat-label {
+  color: #b45309;
+}
+
+.hrd-perf-chart-info {
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 1400px) {
+  .hrd-stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .hrd-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .hrd-card-small {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 992px) {
+  .hrd-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .hrd-card-medium,
+  .hrd-card-small {
+    grid-column: span 1;
+  }
+  
+  .hrd-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .hrd-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .hrd-status-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .hrd-perf-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .hrd-card-header {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+  
+  .hrd-card-filter-btn,
+  .hrd-card-select {
+    width: 100%;
+  }
+}
+
+/* SCROLL BEHAVIOR */
+.hrd-dashboard {
+  overflow-x: hidden;
+}

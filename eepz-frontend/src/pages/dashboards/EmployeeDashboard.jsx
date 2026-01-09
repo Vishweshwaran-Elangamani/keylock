@@ -1,96 +1,38 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  AreaChart,
-  Area,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { PieChart, Pie, Cell, AreaChart, Area, CartesianGrid, Tooltip, Legend, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import CountUp from "react-countup";
-import {
-  Target,
-  BookOpen,
-  Calendar,
-  AlertTriangle,
-  TrendingUp,
-  Award,
-  Trophy,
-  Medal,
-} from "lucide-react";
-
+import { Target, BookOpen, Calendar, AlertTriangle, TrendingUp, Trophy, Medal } from "lucide-react";
 import goalService from "../../services/goals/goalService";
 import lndService from "../../services/lnd/lndService";
 import rsvpService from "../../services/meeting/rsvpService";
 import slaService from "../../services/sla/slaService";
 import { getApprovedProfiles, getStatistics } from "../../services/performancemanagement/api/nominationapi";
-
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
-import "../../styles/auth/AdminDashboard.css";
-import "../../styles/common/Dashboard.css";
+import "../../styles/auth/EmployeeDashboard.css";
 
 const EmployeeDashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState({
-    goals: [],
-    lndAssignments: [],
-    lndSkills: [],
-    meetings: [],
-    slas: [],
-    performance: {
-      myRecognitions: [],
-      stats: null,
-    },
+    goals: [], lndAssignments: [], lndSkills: [], meetings: [], slas: [],
+    performance: { myRecognitions: [], stats: null }
   });
 
-  useEffect(() => {
-    fetchAllData();
-  }, []);
+  useEffect(() => { fetchAllData(); }, []);
 
   const getUserData = () => {
-    const raw = localStorage.getItem("user");
-    if (!raw) return null;
-    try {
-      return JSON.parse(raw);
-    } catch {
-      return null;
-    }
+    try { return JSON.parse(localStorage.getItem("user")); }
+    catch { return null; }
   };
 
   const extractData = (response) => {
     if (!response) return [];
     if (Array.isArray(response)) return response;
-
     const data = response.data || response;
-
-    const paths = [
-      data?.data?.items,
-      data?.data?.$values,
-      data?.data?.values,
-      data?.data,
-      data?.items,
-      data?.$values,
-      data?.values,
-      data,
-    ];
-
-    for (let i = 0; i < paths.length; i++) {
-      const path = paths[i];
-      if (Array.isArray(path) && path.length >= 0) {
-        return path;
-      }
-    }
-
-    return [];
+    const paths = [data?.data?.items, data?.data?.$values, data?.data, data?.items, data?.$values, data];
+    return paths.find(p => Array.isArray(p)) || [];
   };
 
   const fetchAllData = async () => {
@@ -104,110 +46,38 @@ const EmployeeDashboard = () => {
       }
 
       const empId = user.empMasterId || user.employeeMasterId || user.id;
-
-      const [
-        selfGoalsRes,
-        orgGoalsRes,
-        teamGoalsRes,
-        myLndAssignmentsRes,
-        myLndSkillsRes,
-        myMeetingsRes,
-        mySlasRes,
-        approvedProfilesRes,
-        statsRes,
-      ] = await Promise.all([
-        goalService
-          .queryGoals({ type: "self", pageSize: 1000 })
-          .catch((err) => {
-            console.error("Self Goals Error:", err);
-            return { data: [] };
-          }),
-        goalService
-          .queryGoals({ type: "org", pageSize: 1000 })
-          .catch((err) => {
-            console.error("Org Goals Error:", err);
-            return { data: [] };
-          }),
-        goalService
-          .queryGoals({ type: "team", pageSize: 1000 })
-          .catch((err) => {
-            console.error("Team Goals Error:", err);
-            return { data: [] };
-          }),
-        lndService
-          .getMyAssignments(1, "", "", "", "", 1000)
-          .catch((err) => {
-            console.error("LND Assignments Error:", err);
-            return { data: [] };
-          }),
-        lndService
-          .getMySkills(1, "", "", "asc", 1000)
-          .catch((err) => {
-            console.error("LND Skills Error:", err);
-            return { data: { items: [] } };
-          }),
-        rsvpService.getMyInvitations().catch((err) => {
-          console.error("Meetings Error:", err);
-          return [];
-        }),
-        slaService.getEmployeeSLAs(empId).catch((err) => {
-          console.error("SLAs Error:", err);
-          return { data: [] };
-        }),
-        getApprovedProfiles().catch((err) => {
-          console.error("Approved Profiles Error:", err);
-          return { data: [] };
-        }),
-        getStatistics().catch((err) => {
-          console.error("Statistics Error:", err);
-          return { data: null };
-        }),
-      ]);
-
-      const selfGoals = extractData(selfGoalsRes);
-      const orgGoals = extractData(orgGoalsRes);
-      const teamGoals = extractData(teamGoalsRes);
-      const lndAssignments = extractData(myLndAssignmentsRes);
-      const lndSkills = extractData(myLndSkillsRes);
-      const meetings = Array.isArray(myMeetingsRes)
-        ? myMeetingsRes
-        : extractData(myMeetingsRes);
-      const slas = extractData(mySlasRes);
+      const [selfGoalsRes, orgGoalsRes, teamGoalsRes, myLndAssignmentsRes, myLndSkillsRes, myMeetingsRes, mySlasRes, approvedProfilesRes, statsRes] = 
+        await Promise.all([
+          goalService.queryGoals({ type: "self", pageSize: 1000 }).catch(() => ({ data: [] })),
+          goalService.queryGoals({ type: "org", pageSize: 1000 }).catch(() => ({ data: [] })),
+          goalService.queryGoals({ type: "team", pageSize: 1000 }).catch(() => ({ data: [] })),
+          lndService.getMyAssignments(1, "", "", "", "", 1000).catch(() => ({ data: [] })),
+          lndService.getMySkills(1, "", "", "asc", 1000).catch(() => ({ data: { items: [] } })),
+          rsvpService.getMyInvitations().catch(() => []),
+          slaService.getEmployeeSLAs(empId).catch(() => ({ data: [] })),
+          getApprovedProfiles().catch(() => ({ data: [] })),
+          getStatistics().catch(() => ({ data: null }))
+        ]);
 
       const allGoals = [
-        ...selfGoals.map((g) => ({ ...g, goalType: "self" })),
-        ...orgGoals.map((g) => ({ ...g, goalType: "org" })),
-        ...teamGoals.map((g) => ({ ...g, goalType: "team" })),
+        ...extractData(selfGoalsRes).map(g => ({ ...g, goalType: "self" })),
+        ...extractData(orgGoalsRes).map(g => ({ ...g, goalType: "org" })),
+        ...extractData(teamGoalsRes).map(g => ({ ...g, goalType: "team" }))
       ];
 
       const allApprovedProfiles = extractData(approvedProfilesRes);
-
-      const myRecognitions = allApprovedProfiles.filter((p) => {
-        const nomineeId =
-          p.nominee?.employeeId ||
-          p.nomineeEmployeeId ||
-          p.employeeId ||
-          p.employeeMasterId;
+      const myRecognitions = allApprovedProfiles.filter(p => {
+        const nomineeId = p.nominee?.employeeId || p.nomineeEmployeeId || p.employeeId || p.employeeMasterId;
         return nomineeId == empId;
       });
 
-      const stats =
-        statsRes?.data?.data ||
-        statsRes?.data ||
-        statsRes?.totalNominations ||
-        statsRes ||
-        null;
-
       setDashboardData({
         goals: allGoals,
-        lndAssignments,
-        lndSkills,
-        meetings,
-        slas,
-        performance: {
-          myRecognitions,
-          stats,
-        },
+        lndAssignments: extractData(myLndAssignmentsRes),
+        lndSkills: extractData(myLndSkillsRes),
+        meetings: Array.isArray(myMeetingsRes) ? myMeetingsRes : extractData(myMeetingsRes),
+        slas: extractData(mySlasRes),
+        performance: { myRecognitions, stats: statsRes?.data?.data || statsRes?.data || null }
       });
     } catch (err) {
       console.error("Error in fetchAllData:", err);
@@ -217,277 +87,123 @@ const EmployeeDashboard = () => {
     }
   };
 
-  const isOverdue = (deadline) => {
-    if (!deadline) return false;
-    if (!slaService || typeof slaService.isOverdue !== "function") return false;
-    return slaService.isOverdue(deadline);
-  };
+  const isOverdue = (deadline) => deadline && slaService?.isOverdue?.(deadline);
 
   const getKPIStats = () => {
     const now = new Date();
-    const totalGoals = dashboardData.goals.length;
-    const totalLndAssignments = dashboardData.lndAssignments.length;
-    const totalMeetings = dashboardData.meetings.length;
-    const totalSlas = dashboardData.slas.length;
-
-    const upcomingMeetings = dashboardData.meetings.filter((m) => {
-      const d = new Date(m.meetingDate || m.date);
-      return d >= now;
-    }).length;
-
-    const overdueSlas = dashboardData.slas.filter((s) =>
-      isOverdue(s.deadline || s.dueDate)
-    ).length;
-
     return {
-      totalGoals,
-      totalLndAssignments,
-      totalMeetings,
-      upcomingMeetings,
-      totalSlas,
-      overdueSlas,
+      totalGoals: dashboardData.goals.length,
+      totalLndAssignments: dashboardData.lndAssignments.length,
+      totalMeetings: dashboardData.meetings.length,
+      upcomingMeetings: dashboardData.meetings.filter(m => new Date(m.meetingDate || m.date) >= now).length,
+      totalSlas: dashboardData.slas.length,
+      overdueSlas: dashboardData.slas.filter(s => isOverdue(s.deadline || s.dueDate)).length
     };
   };
 
   const getPerformanceOverview = () => {
     const { myRecognitions, stats } = dashboardData.performance;
-    const totalRecognitions = myRecognitions.length;
-
     const byRewardType = {};
-    myRecognitions.forEach((r) => {
-      const type =
-        r.opportunity?.rewardType ||
-        r.rewardTypeName ||
-        r.rewardType ||
-        (r.rewardTypeId ? `Type ${r.rewardTypeId}` : "Other");
+    myRecognitions.forEach(r => {
+      const type = r.opportunity?.rewardType || r.rewardTypeName || r.rewardType || "Other";
       byRewardType[type] = (byRewardType[type] || 0) + 1;
     });
 
-    const REWARD_COLORS = [
-      "#2c2c54",
-      "#0F62FE",
-      "#10b981",
-      "#f59e0b",
-      "#E01950",
-      "#8b5cf6",
-    ];
-
-    const chartData = Object.entries(byRewardType).map(
-      ([name, value], index) => ({
-        name,
-        value,
-        fill: REWARD_COLORS[index % REWARD_COLORS.length],
-      })
-    );
-
-    const orgTotalNoms =
-      stats?.data?.totalNominations ||
-      stats?.data?.total ||
-      stats?.data?.count ||
-      stats?.data?.approvedNominations ||
-      stats?.totalNominations ||
-      stats?.total ||
-      stats?.count ||
-      0;
+    const COLORS = ["#F08A5D", "#B83B5E", "#6A2C70", "#FF6B9D", "#C06C84", "#E8777D"];
+    const chartData = Object.entries(byRewardType).map(([name, value], i) => ({ name, value, fill: COLORS[i % COLORS.length] }));
 
     return {
-      totalRecognitions,
+      totalRecognitions: myRecognitions.length,
       chartData,
-      orgTotalNoms,
+      orgTotalNoms: stats?.data?.totalNominations || stats?.totalNominations || 0
     };
   };
 
   const getGoalsOverview = () => {
     const goals = dashboardData.goals;
+    if (!goals?.length) return { total: 0, completed: 0, inProgress: 0, pending: 0, chartData: [] };
 
-    if (!goals || goals.length === 0) {
-      return {
-        total: 0,
-        completed: 0,
-        inProgress: 0,
-        pending: 0,
-        chartData: [],
-      };
-    }
+    const completed = goals.filter(g => (g.status || g.goalStatus || "").toLowerCase() === "completed").length;
+    const inProgress = goals.filter(g => (g.status || g.goalStatus || "").toLowerCase() === "inprogress").length;
+    const pending = goals.filter(g => ["pending", "open", "approved"].includes((g.status || g.goalStatus || "").toLowerCase())).length;
 
-    const completed = goals.filter(
-      (g) =>
-        g.status?.toLowerCase() === "completed" ||
-        g.goalStatus?.toLowerCase() === "completed"
-    ).length;
+    const chartData = [
+      completed > 0 && { name: "Completed", value: completed, fill: "#6A2C70" },
+      inProgress > 0 && { name: "In Progress", value: inProgress, fill: "#F08A5D" },
+      pending > 0 && { name: "Pending", value: pending, fill: "#FF6B9D" }
+    ].filter(Boolean);
 
-    const inProgress = goals.filter(
-      (g) =>
-        g.status?.toLowerCase() === "inprogress" ||
-        g.goalStatus?.toLowerCase() === "inprogress"
-    ).length;
-
-    const pending = goals.filter((g) => {
-      const status = (g.status || g.goalStatus || "").toLowerCase();
-      return status === "pending" || status === "open" || status === "approved";
-    }).length;
-
-    const chartData = [];
-    if (completed > 0)
-      chartData.push({ name: "Completed", value: completed, fill: "#10b981" });
-    if (inProgress > 0)
-      chartData.push({
-        name: "In Progress",
-        value: inProgress,
-        fill: "#0F62FE",
-      });
-    if (pending > 0)
-      chartData.push({ name: "Pending", value: pending, fill: "#f59e0b" });
-
-    return {
-      total: goals.length,
-      completed,
-      inProgress,
-      pending,
-      chartData,
-    };
+    return { total: goals.length, completed, inProgress, pending, chartData };
   };
 
   const getLndOverview = () => {
     const skills = dashboardData.lndSkills;
+    if (!skills?.length) return { total: 0, low: 0, medium: 0, high: 0, chartData: [] };
 
-    if (!skills || !skills.length) {
-      return {
-        total: 0,
-        low: 0,
-        medium: 0,
-        high: 0,
-        chartData: [],
-      };
-    }
-
-    let low = 0;
-    let medium = 0;
-    let high = 0;
-
-    skills.forEach((s) => {
-      const rating =
-        s.rating || s.proficiency || s.proficiencyLevel || s.score || 0;
-      const r = Number(rating);
-
-      if (isNaN(r)) return;
-
-      if (r <= 4) low += 1;
-      else if (r <= 7) medium += 1;
-      else high += 1;
+    let low = 0, medium = 0, high = 0;
+    skills.forEach(s => {
+      const r = Number(s.rating || s.proficiency || s.proficiencyLevel || s.score || 0);
+      if (!isNaN(r)) {
+        if (r <= 4) low++;
+        else if (r <= 7) medium++;
+        else high++;
+      }
     });
 
-    const chartData = [];
-    if (low > 0)
-      chartData.push({ name: "Rating 1-4", value: low, fill: "#f97316" });
-    if (medium > 0)
-      chartData.push({ name: "Rating 5-7", value: medium, fill: "#0F62FE" });
-    if (high > 0)
-      chartData.push({ name: "Rating 8-10", value: high, fill: "#10b981" });
+    const chartData = [
+      low > 0 && { name: "Rating 1-4", value: low, fill: "#FF6B9D" },
+      medium > 0 && { name: "Rating 5-7", value: medium, fill: "#F08A5D" },
+      high > 0 && { name: "Rating 8-10", value: high, fill: "#6A2C70" }
+    ].filter(Boolean);
 
-    return {
-      total: skills.length,
-      low,
-      medium,
-      high,
-      chartData,
-    };
+    return { total: skills.length, low, medium, high, chartData };
   };
 
   const getMeetingsOverview = () => {
     const meetings = dashboardData.meetings;
     const now = new Date();
-
-    const upcoming = meetings.filter((m) => {
-      const d = new Date(m.meetingDate || m.date);
-      return d >= now;
-    }).length;
-
-    const completed = meetings.filter((m) => {
-      const d = new Date(m.meetingDate || m.date);
-      return d < now;
-    }).length;
+    const upcoming = meetings.filter(m => new Date(m.meetingDate || m.date) >= now).length;
+    const completed = meetings.length - upcoming;
 
     const monthlyData = {};
-    meetings.forEach((m) => {
+    meetings.forEach(m => {
       const date = new Date(m.meetingDate || m.date || m.createdDate);
-      if (isNaN(date.getTime())) return;
-
-      const key = `${date.getFullYear()}-${String(
-        date.getMonth() + 1
-      ).padStart(2, "0")}`;
-      monthlyData[key] = (monthlyData[key] || 0) + 1;
+      if (!isNaN(date.getTime())) {
+        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+        monthlyData[key] = (monthlyData[key] || 0) + 1;
+      }
     });
 
-    const chartData = Object.entries(monthlyData)
-      .sort((a, b) => a[0].localeCompare(b[0]))
-      .slice(-6)
-      .map(([month, count]) => ({
-        month: new Date(month + "-01").toLocaleDateString("en-US", {
-          month: "short",
-          year: "numeric",
-        }),
-        count,
-      }));
+    const chartData = Object.entries(monthlyData).sort((a, b) => a[0].localeCompare(b[0])).slice(-6)
+      .map(([month, count]) => ({ month: new Date(month + "-01").toLocaleDateString("en-US", { month: "short", year: "numeric" }), count }));
 
-    return {
-      total: meetings.length,
-      upcoming,
-      completed,
-      chartData,
-    };
+    return { total: meetings.length, upcoming, completed, chartData };
   };
 
   const getSlaOverview = () => {
     const slas = dashboardData.slas;
+    if (!slas?.length) return { total: 0, open: 0, overdue: 0, closed: 0, chartData: [] };
 
-    if (!slas || slas.length === 0) {
-      return {
-        total: 0,
-        open: 0,
-        overdue: 0,
-        closed: 0,
-        chartData: [],
-      };
-    }
-
-    const closed = slas.filter(
-      (s) => (s.status || "").toLowerCase() === "closed"
-    ).length;
+    const closed = slas.filter(s => (s.status || "").toLowerCase() === "closed").length;
     const open = slas.length - closed;
-    const overdue = slas.filter((s) => isOverdue(s.deadline || s.dueDate))
-      .length;
+    const overdue = slas.filter(s => isOverdue(s.deadline || s.dueDate)).length;
 
-    const chartData = [];
-    if (open > 0)
-      chartData.push({
-        name: "Open / In Progress",
-        value: open,
-        fill: "#0F62FE",
-      });
-    if (overdue > 0)
-      chartData.push({ name: "Overdue", value: overdue, fill: "#ef4444" });
-    if (closed > 0)
-      chartData.push({ name: "Closed", value: closed, fill: "#10b981" });
+    const chartData = [
+      open > 0 && { name: "Open / In Progress", value: open, fill: "#F08A5D" },
+      overdue > 0 && { name: "Overdue", value: overdue, fill: "#B83B5E" },
+      closed > 0 && { name: "Closed", value: closed, fill: "#6A2C70" }
+    ].filter(Boolean);
 
-    return {
-      total: slas.length,
-      open,
-      overdue,
-      closed,
-      chartData,
-    };
+    return { total: slas.length, open, overdue, closed, chartData };
   };
 
-  if (loading) {
-    return (
-      <div className="ada-loading-container">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
+  if (loading) return (
+    <div className="ada-loading-container">
+      <div className="spinner-border text-primary" role="status">
+        <span className="visually-hidden">Loading...</span>
       </div>
-    );
-  }
+    </div>
+  );
 
   const kpiStats = getKPIStats();
   const perfOverview = getPerformanceOverview();
@@ -496,86 +212,47 @@ const EmployeeDashboard = () => {
   const meetingsData = getMeetingsOverview();
   const slaData = getSlaOverview();
 
+  const kpiCards = [
+    { icon: "trophy", value: perfOverview.totalRecognitions, label: "My Recognitions", subtitle: `Organization nominations: ${perfOverview.orgTotalNoms}`, iconClass: "admin-purple" },
+    { icon: Target, value: kpiStats.totalGoals, label: "My Goals", subtitle: "Self, Team & Org", iconClass: "admin-blue", showTrend: true },
+    { icon: BookOpen, value: dashboardData.lndSkills.length, label: "My Skills", subtitle: "From L&D module", iconClass: "admin-pink" },
+    { icon: Calendar, value: kpiStats.totalMeetings, label: "Meetings", subtitle: `${kpiStats.upcomingMeetings} upcoming`, iconClass: "admin-green" },
+    { icon: AlertTriangle, value: kpiStats.totalSlas, label: "My SLAs", subtitle: `${kpiStats.overdueSlas} overdue`, iconClass: "admin-cyan" }
+  ];
+
+  const StatCard = ({ bg, border, value, label, color }) => (
+    <div className="emp-stat-card" style={{ background: bg, border: `1px solid ${border}` }}>
+      <div className="emp-stat-value" style={{ color }}>{value}</div>
+      <div className="emp-stat-label" style={{ color }}>{label}</div>
+    </div>
+  );
+
   return (
     <div className="hr-dashboard-container">
       <Breadcrumb items={[{ label: "Employee Dashboard" }]} />
 
       <div className="admin-kpi-grid">
-        <div className="admin-kpi-card">
-          <div className="admin-kpi-icon admin-purple">
-            <i className="bi bi-trophy"></i>
-          </div>
-          <div className="admin-kpi-content">
-            <h2>
-              <CountUp end={perfOverview.totalRecognitions} duration={2} />
-            </h2>
-            <p>My Recognitions</p>
-            <span className="admin-kpi-subtitle">
-              Organization nominations: {perfOverview.orgTotalNoms}
-            </span>
-          </div>
-        </div>
-
-        <div className="admin-kpi-card">
-          <div className="admin-kpi-icon admin-blue">
-            <Target size={28} />
-          </div>
-          <div className="admin-kpi-content">
-            <h2>
-              <CountUp end={kpiStats.totalGoals} duration={2} />
-            </h2>
-            <p>My Goals</p>
-            <span className="admin-kpi-subtitle">
-              <TrendingUp size={12} /> Self, Team & Org
-            </span>
-          </div>
-        </div>
-
-        <div className="admin-kpi-card">
-          <div className="admin-kpi-icon admin-pink">
-            <BookOpen size={28} />
-          </div>
-          <div className="admin-kpi-content">
-            <h2>
-              <CountUp end={dashboardData.lndSkills.length} duration={2} />
-            </h2>
-            <p>My Skills</p>
-            <span className="admin-kpi-subtitle">From L&D module</span>
-          </div>
-        </div>
-
-        <div className="admin-kpi-card">
-          <div className="admin-kpi-icon admin-green">
-            <Calendar size={28} />
-          </div>
-          <div className="admin-kpi-content">
-            <h2>
-              <CountUp end={kpiStats.totalMeetings} duration={2} />
-            </h2>
-            <p>Meetings</p>
-            <span className="admin-kpi-subtitle">
-              {kpiStats.upcomingMeetings} upcoming
-            </span>
-          </div>
-        </div>
-
-        <div className="admin-kpi-card">
-          <div className="admin-kpi-icon admin-cyan">
-            <AlertTriangle size={28} />
-          </div>
-          <div className="admin-kpi-content">
-            <h2>
-              <CountUp end={kpiStats.totalSlas} duration={2} />
-            </h2>
-            <p>My SLAs</p>
-            <span className="admin-kpi-subtitle">
-              {kpiStats.overdueSlas} overdue
-            </span>
-          </div>
-        </div>
+        {kpiCards.map(({ icon, value, label, subtitle, iconClass, showTrend }, i) => {
+          const IconComponent = icon;
+          return (
+            <div key={i} className="admin-kpi-card">
+              <div className={`admin-kpi-icon ${iconClass}`}>
+                {typeof icon === "string" ? <i className={`bi bi-${icon}`}></i> : <IconComponent size={28} />}
+              </div>
+              <div className="admin-kpi-content">
+                <h2><CountUp end={value} duration={2} /></h2>
+                <p>{label}</p>
+                <span className="admin-kpi-subtitle">
+                  {showTrend && <TrendingUp size={12} />} {subtitle}
+                </span>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       <div className="dashboard-cards-container">
+        {/* FIRST ROW - 3 CARDS */}
         <div className="dashboard-row">
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
@@ -587,192 +264,28 @@ const EmployeeDashboard = () => {
             <div className="card-body">
               {perfOverview.totalRecognitions > 0 ? (
                 <>
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr 1fr",
-                      gap: "0.75rem",
-                      marginBottom: "1.5rem",
-                    }}
-                  >
-                    <div
-                      style={{
-                        background: "#f0f9ff",
-                        padding: "0.75rem",
-                        borderRadius: "6px",
-                        textAlign: "center",
-                        border: "1px solid #bfdbfe",
-                      }}
-                    >
-                      <div
-                        style={{
-                          fontSize: "1.5rem",
-                          fontWeight: "bold",
-                          color: "#0F62FE",
-                        }}
-                      >
-                        {perfOverview.totalRecognitions}
-                      </div>
-                      <div style={{ fontSize: "0.7rem", color: "#1e40af" }}>
-                        My Recognitions
-                      </div>
-                    </div>
-                    <div
-                      style={{
-                        background: "#f0fdf4",
-                        padding: "0.75rem",
-                        borderRadius: "6px",
-                        textAlign: "center",
-                        border: "1px solid #86efac",
-                      }}
-                    >
-                      <div
-                        style={{
-                          fontSize: "1.5rem",
-                          fontWeight: "bold",
-                          color: "#10b981",
-                        }}
-                      >
-                        {perfOverview.orgTotalNoms}
-                      </div>
-                      <div style={{ fontSize: "0.7rem", color: "#047857" }}>
-                        Total Organization Nominations
-                      </div>
-                    </div>
+                  <div className="emp-stats-grid emp-stats-2col">
+                    <StatCard bg="#ffe8e1" border="#F08A5D" value={perfOverview.totalRecognitions} label="My Recognitions" color="#F08A5D" />
+                    <StatCard bg="#f3e5f5" border="#6A2C70" value={perfOverview.orgTotalNoms} label="Total Organization Nominations" color="#6A2C70" />
                   </div>
-
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      padding: "1rem 0",
-                    }}
-                  >
-                    <div
-                      style={{
-                        position: "relative",
-                        marginBottom: "1.5rem",
-                      }}
-                    >
-                      <Trophy
-                        size={100}
-                        style={{
-                          color: "#FFD700",
-                          filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.1))",
-                        }}
-                      />
-                      <div
-                        style={{
-                          position: "absolute",
-                          top: "50%",
-                          left: "50%",
-                          transform: "translate(-50%, -50%)",
-                          background: "white",
-                          borderRadius: "50%",
-                          width: "50px",
-                          height: "50px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          border: "3px solid #FFD700",
-                          boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                        }}
-                      >
-                        <span
-                          style={{
-                            fontSize: "1.25rem",
-                            fontWeight: "bold",
-                            color: "#FFD700",
-                          }}
-                        >
-                          {perfOverview.totalRecognitions}
-                        </span>
-                      </div>
+                  <div className="emp-trophy-section">
+                    <div className="emp-trophy-container">
+                      <Trophy size={100} className="emp-trophy-icon" />
+                      <div className="emp-trophy-badge">{perfOverview.totalRecognitions}</div>
                     </div>
-
-                    <h4
-                      style={{
-                        fontSize: "1.1rem",
-                        fontWeight: "600",
-                        color: "#1f2937",
-                        marginBottom: "1rem",
-                      }}
-                    >
-                      My Recognitions
-                    </h4>
-
+                    <h4 className="emp-trophy-title">My Recognitions</h4>
                     {perfOverview.chartData.length > 0 && (
-                      <div
-                        style={{
-                          width: "100%",
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: "0.75rem",
-                        }}
-                      >
-                        {perfOverview.chartData.map((item, index) => (
-                          <div
-                            key={index}
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "0.75rem",
-                              padding: "0.75rem",
-                              background: "#f9fafb",
-                              borderRadius: "8px",
-                              border: "1px solid #e5e7eb",
-                            }}
-                          >
-                            <Medal
-                              size={24}
-                              style={{ color: item.fill, flexShrink: 0 }}
-                            />
-                            <div style={{ flex: 1 }}>
-                              <div
-                                style={{
-                                  fontSize: "0.875rem",
-                                  fontWeight: "500",
-                                  color: "#374151",
-                                  marginBottom: "0.25rem",
-                                }}
-                              >
-                                {item.name}
-                              </div>
-                              <div
-                                style={{
-                                  width: "100%",
-                                  height: "6px",
-                                  background: "#e5e7eb",
-                                  borderRadius: "3px",
-                                  overflow: "hidden",
-                                }}
-                              >
-                                <div
-                                  style={{
-                                    width: `${
-                                      (item.value / perfOverview.totalRecognitions) *
-                                      100
-                                    }%`,
-                                    height: "100%",
-                                    background: item.fill,
-                                    transition: "width 0.3s ease",
-                                  }}
-                                />
+                      <div className="emp-recognition-list">
+                        {perfOverview.chartData.map((item, i) => (
+                          <div key={i} className="emp-recognition-item">
+                            <Medal size={24} style={{ color: item.fill }} />
+                            <div className="emp-recognition-info">
+                              <div className="emp-recognition-name">{item.name}</div>
+                              <div className="emp-recognition-bar">
+                                <div className="emp-recognition-fill" style={{ width: `${(item.value / perfOverview.totalRecognitions) * 100}%`, background: item.fill }} />
                               </div>
                             </div>
-                            <span
-                              style={{
-                                fontSize: "1rem",
-                                fontWeight: "600",
-                                color: item.fill,
-                                minWidth: "30px",
-                                textAlign: "right",
-                              }}
-                            >
-                              {item.value}
-                            </span>
+                            <span className="emp-recognition-count" style={{ color: item.fill }}>{item.value}</span>
                           </div>
                         ))}
                       </div>
@@ -795,279 +308,35 @@ const EmployeeDashboard = () => {
             <div className="card-body">
               {goalsData.total > 0 ? (
                 <>
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr 1fr 1fr",
-                      gap: "0.75rem",
-                      marginBottom: "1rem",
-                    }}
-                  >
-                    <div
-                      style={{
-                        background: "#f0f9ff",
-                        padding: "0.75rem",
-                        borderRadius: "6px",
-                        textAlign: "center",
-                        border: "1px solid #bfdbfe",
-                      }}
-                    >
-                      <div
-                        style={{
-                          fontSize: "1.5rem",
-                          fontWeight: "bold",
-                          color: "#0F62FE",
-                        }}
-                      >
-                        {goalsData.total}
-                      </div>
-                      <div style={{ fontSize: "0.7rem", color: "#1e40af" }}>
-                        Total
-                      </div>
-                    </div>
-                    <div
-                      style={{
-                        background: "#f0fdf4",
-                        padding: "0.75rem",
-                        borderRadius: "6px",
-                        textAlign: "center",
-                        border: "1px solid #86efac",
-                      }}
-                    >
-                      <div
-                        style={{
-                          fontSize: "1.5rem",
-                          fontWeight: "bold",
-                          color: "#10b981",
-                        }}
-                      >
-                        {goalsData.completed}
-                      </div>
-                      <div style={{ fontSize: "0.7rem", color: "#047857" }}>
-                        Completed
-                      </div>
-                    </div>
-                    <div
-                      style={{
-                        background: "#fef3c7",
-                        padding: "0.75rem",
-                        borderRadius: "6px",
-                        textAlign: "center",
-                        border: "1px solid #fcd34d",
-                      }}
-                    >
-                      <div
-                        style={{
-                          fontSize: "1.5rem",
-                          fontWeight: "bold",
-                          color: "#d97706",
-                        }}
-                      >
-                        {goalsData.inProgress}
-                      </div>
-                      <div style={{ fontSize: "0.7rem", color: "#b45309" }}>
-                        In Progress
-                      </div>
-                    </div>
+                  <div className="emp-stats-grid">
+                    <StatCard bg="#f3e5f5" border="#6A2C70" value={goalsData.total} label="Total" color="#6A2C70" />
+                    <StatCard bg="#4a1f54" border="#6A2C70" value={goalsData.completed} label="Completed" color="#ffffff" />
+                    <StatCard bg="#ffe8e1" border="#F08A5D" value={goalsData.inProgress} label="In Progress" color="#F08A5D" />
                   </div>
-
-                  {goalsData.chartData.length > 0 ? (
+                  {goalsData.chartData.length > 0 && (
                     <ResponsiveContainer width="100%" height={240}>
                       <PieChart>
-                        <Pie
-                          data={goalsData.chartData}
-                          cx="50%"
-                          cy="45%"
-                          outerRadius={80}
-                          dataKey="value"
-                          label={false}
-                        >
-                          {goalsData.chartData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.fill} />
-                          ))}
+                        <Pie data={goalsData.chartData} cx="50%" cy="45%" outerRadius={80} dataKey="value" label={false}>
+                          {goalsData.chartData.map((entry, i) => <Cell key={`cell-${i}`} fill={entry.fill} />)}
                         </Pie>
                         <Tooltip />
-                        <Legend
-                          layout="horizontal"
-                          align="center"
-                          verticalAlign="bottom"
-                          wrapperStyle={{
-                            fontSize: "11px",
-                            paddingTop: "10px",
-                          }}
+                        <Legend layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
                           formatter={(value, entry) => {
-                            const item = goalsData.chartData.find(
-                              (d) => d.name === entry.value
-                            );
+                            const item = goalsData.chartData.find(d => d.name === entry.value);
                             return `${item?.name || value}: ${item?.value || 0}`;
                           }}
                         />
                       </PieChart>
                     </ResponsiveContainer>
-                  ) : (
-                    <div className="no-data-message">No chart data available</div>
                   )}
                 </>
               ) : (
-                <div className="no-data-message">No goal data</div>
+                <div className="no-data-message">No goals overview data</div>
               )}
             </div>
           </div>
 
           <div className="dashboard-card card-medium">
-            <div className="card-header-dark">
-              <div className="card-header-content">
-                <i className="bi bi-book"></i>
-                <h3>Learning & Development</h3>
-              </div>
-            </div>
-            <div className="card-body">
-              {lndData.total > 0 ? (
-                <>
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr 1fr 1fr 1fr",
-                      gap: "0.75rem",
-                      marginBottom: "1rem",
-                    }}
-                  >
-                    <div
-                      style={{
-                        background: "#f0f9ff",
-                        padding: "0.75rem",
-                        borderRadius: "6px",
-                        textAlign: "center",
-                        border: "1px solid #bfdbfe",
-                      }}
-                    >
-                      <div
-                        style={{
-                          fontSize: "1.5rem",
-                          fontWeight: "bold",
-                          color: "#0F62FE",
-                        }}
-                      >
-                        {lndData.total}
-                      </div>
-                      <div style={{ fontSize: "0.7rem", color: "#1e40af" }}>
-                        Total Skills
-                      </div>
-                    </div>
-                    <div
-                      style={{
-                        background: "#fee2e2",
-                        padding: "0.75rem",
-                        borderRadius: "6px",
-                        textAlign: "center",
-                        border: "1px solid #fecaca",
-                      }}
-                    >
-                      <div
-                        style={{
-                          fontSize: "1.5rem",
-                          fontWeight: "bold",
-                          color: "#f97316",
-                        }}
-                      >
-                        {lndData.low}
-                      </div>
-                      <div style={{ fontSize: "0.7rem", color: "#c2410c" }}>
-                        Rating 1-4
-                      </div>
-                    </div>
-                    <div
-                      style={{
-                        background: "#dbeafe",
-                        padding: "0.75rem",
-                        borderRadius: "6px",
-                        textAlign: "center",
-                        border: "1px solid #93c5fd",
-                      }}
-                    >
-                      <div
-                        style={{
-                          fontSize: "1.5rem",
-                          fontWeight: "bold",
-                          color: "#0F62FE",
-                        }}
-                      >
-                        {lndData.medium}
-                      </div>
-                      <div style={{ fontSize: "0.7rem", color: "#1d4ed8" }}>
-                        Rating 5-7
-                      </div>
-                    </div>
-                    <div
-                      style={{
-                        background: "#f0fdf4",
-                        padding: "0.75rem",
-                        borderRadius: "6px",
-                        textAlign: "center",
-                        border: "1px solid #86efac",
-                      }}
-                    >
-                      <div
-                        style={{
-                          fontSize: "1.5rem",
-                          fontWeight: "bold",
-                          color: "#10b981",
-                        }}
-                      >
-                        {lndData.high}
-                      </div>
-                      <div style={{ fontSize: "0.7rem", color: "#047857" }}>
-                        Rating 8-10
-                      </div>
-                    </div>
-                  </div>
-
-                  {lndData.chartData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height={240}>
-                      <PieChart>
-                        <Pie
-                          data={lndData.chartData}
-                          cx="50%"
-                          cy="45%"
-                          outerRadius={80}
-                          dataKey="value"
-                          label={false}
-                        >
-                          {lndData.chartData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.fill} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                        <Legend
-                          layout="horizontal"
-                          align="center"
-                          verticalAlign="bottom"
-                          wrapperStyle={{
-                            fontSize: "11px",
-                            paddingTop: "10px",
-                          }}
-                          formatter={(value, entry) => {
-                            const item = lndData.chartData.find(
-                              (d) => d.name === entry.value
-                            );
-                            return `${item?.name || value}: ${item?.value || 0}`;
-                          }}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <div className="no-data-message">No chart data available</div>
-                  )}
-                </>
-              ) : (
-                <div className="no-data-message">No skills recorded in L&D</div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="dashboard-row">
-          <div className="dashboard-card card-large">
             <div className="card-header-dark">
               <div className="card-header-content">
                 <i className="bi bi-calendar-check"></i>
@@ -1077,245 +346,107 @@ const EmployeeDashboard = () => {
             <div className="card-body">
               {meetingsData.total > 0 ? (
                 <>
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr 1fr 1fr",
-                      gap: "0.75rem",
-                      marginBottom: "1rem",
-                    }}
-                  >
-                    <div
-                      style={{
-                        background: "#f0f9ff",
-                        padding: "0.75rem",
-                        borderRadius: "6px",
-                        textAlign: "center",
-                        border: "1px solid #bfdbfe",
-                      }}
-                    >
-                      <div
-                        style={{
-                          fontSize: "1.5rem",
-                          fontWeight: "bold",
-                          color: "#0F62FE",
-                        }}
-                      >
-                        {meetingsData.total}
-                      </div>
-                      <div style={{ fontSize: "0.7rem", color: "#1e40af" }}>
-                        Total
-                      </div>
-                    </div>
-                    <div
-                      style={{
-                        background: "#f0fdf4",
-                        padding: "0.75rem",
-                        borderRadius: "6px",
-                        textAlign: "center",
-                        border: "1px solid #86efac",
-                      }}
-                    >
-                      <div
-                        style={{
-                          fontSize: "1.5rem",
-                          fontWeight: "bold",
-                          color: "#10b981",
-                        }}
-                      >
-                        {meetingsData.upcoming}
-                      </div>
-                      <div style={{ fontSize: "0.7rem", color: "#047857" }}>
-                        Upcoming
-                      </div>
-                    </div>
-                    <div
-                      style={{
-                        background: "#fef3c7",
-                        padding: "0.75rem",
-                        borderRadius: "6px",
-                        textAlign: "center",
-                        border: "1px solid #fcd34d",
-                      }}
-                    >
-                      <div
-                        style={{
-                          fontSize: "1.5rem",
-                          fontWeight: "bold",
-                          color: "#d97706",
-                        }}
-                      >
-                        {meetingsData.completed}
-                      </div>
-                      <div style={{ fontSize: "0.7rem", color: "#b45309" }}>
-                        Completed
-                      </div>
-                    </div>
+                  <div className="emp-stats-grid">
+                    <StatCard bg="#f3e5f5" border="#6A2C70" value={meetingsData.total} label="Total" color="#6A2C70" />
+                    <StatCard bg="#4a1f54" border="#6A2C70" value={meetingsData.upcoming} label="Upcoming" color="#ffffff" />
+                    <StatCard bg="#ffe8e1" border="#F08A5D" value={meetingsData.completed} label="Completed" color="#F08A5D" />
                   </div>
-
-                  {meetingsData.chartData.length > 0 ? (
+                  {meetingsData.chartData.length > 0 && (
                     <ResponsiveContainer width="100%" height={240}>
                       <AreaChart data={meetingsData.chartData}>
                         <defs>
                           <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#2c2c54" stopOpacity={0.8} />
-                            <stop offset="95%" stopColor="#2c2c54" stopOpacity={0.1} />
+                            <stop offset="5%" stopColor="#F08A5D" stopOpacity={0.8} />
+                            <stop offset="95%" stopColor="#F08A5D" stopOpacity={0.1} />
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
                         <XAxis dataKey="month" stroke="#9ca3af" fontSize={10} />
                         <YAxis stroke="#9ca3af" fontSize={11} />
-                        <Tooltip
-                          contentStyle={{
-                            backgroundColor: "#fff",
-                            border: "1px solid #e5e7eb",
-                            borderRadius: "6px",
-                            fontSize: "12px",
-                          }}
-                        />
-                        <Area
-                          type="monotone"
-                          dataKey="count"
-                          stroke="#2c2c54"
-                          strokeWidth={2}
-                          fillOpacity={1}
-                          fill="url(#colorCount)"
-                        />
+                        <Tooltip contentStyle={{ backgroundColor: "#fff", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "12px" }} />
+                        <Area type="monotone" dataKey="count" stroke="#F08A5D" strokeWidth={2} fillOpacity={1} fill="url(#colorCount)" />
                       </AreaChart>
                     </ResponsiveContainer>
-                  ) : (
-                    <div className="no-data-message">No chart data available</div>
                   )}
                 </>
               ) : (
-                <div className="no-data-message">No meeting data</div>
+                <div className="no-data-message">No meetings data</div>
               )}
             </div>
           </div>
+        </div>
 
-          <div className="dashboard-card card-large">
+        {/* SECOND ROW - 2 CARDS AUTO-ADJUST */}
+        <div className="dashboard-row dashboard-row-2">
+          <div className="dashboard-card">
             <div className="card-header-dark">
               <div className="card-header-content">
-                <i className="bi bi-file-earmark-check"></i>
-                <h3>My SLAs</h3>
+                <i className="bi bi-book"></i>
+                <h3>Learning & Development</h3>
               </div>
             </div>
             <div className="card-body">
-              {slaData.total > 0 ? (
+              {lndData.total > 0 ? (
                 <>
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr 1fr 1fr",
-                      gap: "0.75rem",
-                      marginBottom: "1rem",
-                    }}
-                  >
-                    <div
-                      style={{
-                        background: "#f0f9ff",
-                        padding: "0.75rem",
-                        borderRadius: "6px",
-                        textAlign: "center",
-                        border: "1px solid #bfdbfe",
-                      }}
-                    >
-                      <div
-                        style={{
-                          fontSize: "1.5rem",
-                          fontWeight: "bold",
-                          color: "#0F62FE",
-                        }}
-                      >
-                        {slaData.total}
-                      </div>
-                      <div style={{ fontSize: "0.7rem", color: "#1e40af" }}>
-                        Total
-                      </div>
-                    </div>
-                    <div
-                      style={{
-                        background: "#fee2e2",
-                        padding: "0.75rem",
-                        borderRadius: "6px",
-                        textAlign: "center",
-                        border: "1px solid #fca5a5",
-                      }}
-                    >
-                      <div
-                        style={{
-                          fontSize: "1.5rem",
-                          fontWeight: "bold",
-                          color: "#ef4444",
-                        }}
-                      >
-                        {slaData.overdue}
-                      </div>
-                      <div style={{ fontSize: "0.7rem", color: "#dc2626" }}>
-                        Overdue
-                      </div>
-                    </div>
-                    <div
-                      style={{
-                        background: "#f0fdf4",
-                        padding: "0.75rem",
-                        borderRadius: "6px",
-                        textAlign: "center",
-                        border: "1px solid #86efac",
-                      }}
-                    >
-                      <div
-                        style={{
-                          fontSize: "1.5rem",
-                          fontWeight: "bold",
-                          color: "#10b981",
-                        }}
-                      >
-                        {slaData.closed}
-                      </div>
-                      <div style={{ fontSize: "0.7rem", color: "#047857" }}>
-                        Closed
-                      </div>
-                    </div>
+                  <div className="emp-stats-grid emp-stats-4col">
+                    <StatCard bg="#f3e5f5" border="#6A2C70" value={lndData.total} label="Total Skills" color="#6A2C70" />
+                    <StatCard bg="#ffebf0" border="#FF6B9D" value={lndData.low} label="Rating 1-4" color="#FF6B9D" />
+                    <StatCard bg="#ffe8e1" border="#F08A5D" value={lndData.medium} label="Rating 5-7" color="#F08A5D" />
+                    <StatCard bg="#4a1f54" border="#6A2C70" value={lndData.high} label="Rating 8-10" color="#ffffff" />
                   </div>
-
-                  {slaData.chartData.length > 0 ? (
+                  {lndData.chartData.length > 0 && (
                     <ResponsiveContainer width="100%" height={240}>
                       <PieChart>
-                        <Pie
-                          data={slaData.chartData}
-                          cx="50%"
-                          cy="45%"
-                          innerRadius={50}
-                          outerRadius={70}
-                          paddingAngle={3}
-                          dataKey="value"
-                          label={false}
-                        >
-                          {slaData.chartData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.fill} />
-                          ))}
+                        <Pie data={lndData.chartData} cx="50%" cy="45%" outerRadius={80} dataKey="value" label={false}>
+                          {lndData.chartData.map((entry, i) => <Cell key={`cell-${i}`} fill={entry.fill} />)}
                         </Pie>
                         <Tooltip />
-                        <Legend
-                          layout="horizontal"
-                          align="center"
-                          verticalAlign="bottom"
-                          wrapperStyle={{
-                            fontSize: "11px",
-                            paddingTop: "10px",
-                          }}
+                        <Legend layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
                           formatter={(value, entry) => {
-                            const item = slaData.chartData.find(
-                              (d) => d.name === entry.value
-                            );
+                            const item = lndData.chartData.find(d => d.name === entry.value);
                             return `${item?.name || value}: ${item?.value || 0}`;
                           }}
                         />
                       </PieChart>
                     </ResponsiveContainer>
-                  ) : (
-                    <div className="no-data-message">No chart data available</div>
+                  )}
+                </>
+              ) : (
+                <div className="no-data-message">No learning & development data</div>
+              )}
+            </div>
+          </div>
+
+          <div className="dashboard-card">
+            <div className="card-header-dark">
+              <div className="card-header-content">
+                <i className="bi bi-exclamation-triangle"></i>
+                <h3>SLA Overview</h3>
+              </div>
+            </div>
+            <div className="card-body">
+              {slaData.total > 0 ? (
+                <>
+                  <div className="emp-stats-grid">
+                    <StatCard bg="#f3e5f5" border="#6A2C70" value={slaData.total} label="Total" color="#6A2C70" />
+                    <StatCard bg="#ffe8e1" border="#F08A5D" value={slaData.open} label="Open" color="#F08A5D" />
+                    <StatCard bg="#fce4ec" border="#B83B5E" value={slaData.overdue} label="Overdue" color="#B83B5E" />
+                  </div>
+                  {slaData.chartData.length > 0 && (
+                    <ResponsiveContainer width="100%" height={240}>
+                      <PieChart>
+                        <Pie data={slaData.chartData} cx="50%" cy="45%" outerRadius={80} dataKey="value" label={false}>
+                          {slaData.chartData.map((entry, i) => <Cell key={`cell-${i}`} fill={entry.fill} />)}
+                        </Pie>
+                        <Tooltip />
+                        <Legend layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
+                          formatter={(value, entry) => {
+                            const item = slaData.chartData.find(d => d.name === entry.value);
+                            return `${item?.name || value}: ${item?.value || 0}`;
+                          }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
                   )}
                 </>
               ) : (

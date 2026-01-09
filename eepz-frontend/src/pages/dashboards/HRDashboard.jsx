@@ -44,7 +44,7 @@ import { getAllForms } from "../../services/performancemanagement/hr/formsapi";
 import { listSubmitted } from "../../services/performancemanagement/hr/selfassessmentapi";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
-import "../../styles/auth/AdminDashboard.css";
+import "../../styles/auth/HRDashboard.css";
 
 const formatStatusLabel = (raw) => {
   if (!raw) return "";
@@ -55,8 +55,7 @@ const formatStatusLabel = (raw) => {
 const HRDashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [selectedDepartment, setSelectedDepartment] =
-    useState("All Departments");
+  const [selectedDepartment, setSelectedDepartment] = useState("All Departments");
   const [dashboardData, setDashboardData] = useState({
     employees: [],
     budgets: [],
@@ -84,14 +83,12 @@ const HRDashboard = () => {
   const extractData = (response) => {
     if (!response) return [];
     if (Array.isArray(response)) return response;
-
     if (response.success === true || response.success === false) {
       if (response.data) {
         if (Array.isArray(response.data)) return response.data;
         if (response.data.$values) return response.data.$values;
       }
     }
-
     if (response.data) {
       if (Array.isArray(response.data)) return response.data;
       if (response.data.$values) return response.data.$values;
@@ -100,7 +97,6 @@ const HRDashboard = () => {
         if (response.data.data.$values) return response.data.data.$values;
       }
     }
-
     if (response.$values) return response.$values;
     return [];
   };
@@ -108,7 +104,6 @@ const HRDashboard = () => {
   const fetchAllData = async () => {
     try {
       setLoading(true);
-
       const [
         employeesRes,
         allGoalsRes,
@@ -129,22 +124,12 @@ const HRDashboard = () => {
       ] = await Promise.all([
         employeeApi.getAll().catch(() => ({ data: [] })),
         careerGoalsService.getAllGoals().catch(() => ({ data: [] })),
-        budgetAllocationService
-          .getAllDepartmentBudgets()
-          .catch(() => ({ data: [] })),
-        budgetAllocationService
-          .getAllDepartments()
-          .catch(() => ({ data: [] })),
+        budgetAllocationService.getAllDepartmentBudgets().catch(() => ({ data: [] })),
+        budgetAllocationService.getAllDepartments().catch(() => ({ data: [] })),
         violationService.getAllViolations().catch(() => ({ data: [] })),
-        internalOpportunityService
-          .getAllOpportunities()
-          .catch(() => ({ success: false, data: [] })),
-        nominationService
-          .getAllNominations()
-          .catch(() => ({ success: false, data: [] })),
-        lndService
-          .getAllOrganizationAssignments(1, "", "", "", "", 1000)
-          .catch(() => ({ data: { items: [], totalCount: 0 } })),
+        internalOpportunityService.getAllOpportunities().catch(() => ({ success: false, data: [] })),
+        nominationService.getAllNominations().catch(() => ({ success: false, data: [] })),
+        lndService.getAllOrganizationAssignments(1, "", "", "", "", 1000).catch(() => ({ data: { items: [], totalCount: 0 } })),
         projectService.getAllProjects().catch(() => ({ data: [] })),
         getDeptHeadRatings().catch(() => ({ data: [] })),
         getAllManagerNominations().catch(() => ({ data: [] })),
@@ -152,9 +137,7 @@ const HRDashboard = () => {
         getApprovedProfiles().catch(() => ({ data: [] })),
         getStatistics().catch(() => ({ data: null })),
         getAllForms().catch(() => ({ data: [] })),
-        listSubmitted().catch(() => ({
-          data: { data: { assessments: [] } },
-        })),
+        listSubmitted().catch(() => ({ data: { data: { assessments: [] } } })),
       ]);
 
       const extractedEmployees = extractData(employeesRes);
@@ -185,15 +168,13 @@ const HRDashboard = () => {
         if (Array.isArray(selfAssessmentsRes.data.data.assessments)) {
           extractedSelfAssessments = selfAssessmentsRes.data.data.assessments;
         } else if (selfAssessmentsRes.data.data.assessments.$values) {
-          extractedSelfAssessments =
-            selfAssessmentsRes.data.data.assessments.$values;
+          extractedSelfAssessments = selfAssessmentsRes.data.data.assessments.$values;
         }
       } else if (selfAssessmentsRes?.data?.assessments) {
         if (Array.isArray(selfAssessmentsRes.data.assessments)) {
           extractedSelfAssessments = selfAssessmentsRes.data.assessments;
         } else if (selfAssessmentsRes.data.assessments.$values) {
-          extractedSelfAssessments =
-            selfAssessmentsRes.data.assessments.$values;
+          extractedSelfAssessments = selfAssessmentsRes.data.assessments.$values;
         }
       } else {
         extractedSelfAssessments = extractData(selfAssessmentsRes);
@@ -202,16 +183,12 @@ const HRDashboard = () => {
       let allPeriodAllocations = [];
       for (const budget of extractedBudgets) {
         try {
-          const periodRes =
-            await periodAllocationService.getPeriodAllocationsByBudget(
-              budget.budgetId
-            );
+          const periodRes = await periodAllocationService.getPeriodAllocationsByBudget(budget.budgetId);
           if (periodRes.success) {
             const periods = extractData(periodRes);
             allPeriodAllocations = [...allPeriodAllocations, ...periods];
           }
-        } catch {
-        }
+        } catch {}
       }
 
       setDashboardData({
@@ -242,16 +219,10 @@ const HRDashboard = () => {
   };
 
   const getEmployeeStatus = () => {
-    const statusCount = {
-      fulltime: 0,
-      contract: 0,
-      probation: 0,
-      parttime: 0,
-    };
+    const statusCount = { fulltime: 0, contract: 0, probation: 0, parttime: 0 };
     dashboardData.employees.forEach((emp) => {
       const status = (emp.employmentType || emp.status || "").toLowerCase();
-      if (status.includes("full") || status.includes("permanent"))
-        statusCount.fulltime++;
+      if (status.includes("full") || status.includes("permanent")) statusCount.fulltime++;
       else if (status.includes("contract")) statusCount.contract++;
       else if (status.includes("probation")) statusCount.probation++;
       else if (status.includes("part")) statusCount.parttime++;
@@ -273,10 +244,7 @@ const HRDashboard = () => {
   };
 
   const getKPIStats = () => {
-    const totalBudget = dashboardData.budgets.reduce(
-      (sum, b) => sum + (parseFloat(b.totalBudget) || 0),
-      0
-    );
+    const totalBudget = dashboardData.budgets.reduce((sum, b) => sum + (parseFloat(b.totalBudget) || 0), 0);
     const pendingNominations = dashboardData.nominations.filter(
       (n) =>
         n.status?.toLowerCase().includes("pending") ||
@@ -285,23 +253,17 @@ const HRDashboard = () => {
         n.hrApprovalStatus === "Pending"
     ).length;
 
-    const activeEmployees = dashboardData.employees.filter(
-      (e) => e.isActive === true
-    ).length;
+    const activeEmployees = dashboardData.employees.filter((e) => e.isActive === true).length;
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     const newEmployeesThisMonth = dashboardData.employees.filter((e) => {
-      const joinDate = new Date(
-        e.joiningDate || e.createdDate || e.createdAt
-      );
+      const joinDate = new Date(e.joiningDate || e.createdDate || e.createdAt);
       return joinDate > thirtyDaysAgo;
     }).length;
 
     const totalLndAssignments = dashboardData.lndAssignments.length;
     const activeLndAssignments = dashboardData.lndAssignments.filter((a) => {
-      const status = (a.assignmentStatus || a.status || "")
-        .toLowerCase()
-        .replace(/\s/g, "");
+      const status = (a.assignmentStatus || a.status || "").toLowerCase().replace(/\s/g, "");
       return status === "inprogress" || status === "active";
     }).length;
 
@@ -320,12 +282,9 @@ const HRDashboard = () => {
 
   const getBudgetByDepartment = () => {
     let filteredBudgets = dashboardData.budgets;
-
     if (selectedDepartment !== "All Departments") {
       filteredBudgets = dashboardData.budgets.filter((budget) => {
-        const dept = dashboardData.departments.find(
-          (d) => d.departmentId === budget.departmentId
-        );
+        const dept = dashboardData.departments.find((d) => d.departmentId === budget.departmentId);
         const deptName = dept?.departmentName || dept?.name || "";
         return deptName === selectedDepartment;
       });
@@ -333,15 +292,10 @@ const HRDashboard = () => {
 
     return filteredBudgets
       .map((budget) => {
-        const dept = dashboardData.departments.find(
-          (d) => d.departmentId === budget.departmentId
-        );
+        const dept = dashboardData.departments.find((d) => d.departmentId === budget.departmentId);
         const deptName = dept?.departmentName || dept?.name || "Unknown";
         return {
-          name:
-            deptName.length > 10
-              ? deptName.substring(0, 10) + "..."
-              : deptName,
+          name: deptName.length > 10 ? deptName.substring(0, 10) + "..." : deptName,
           Total: parseFloat(budget.totalBudget) || 0,
           Allocated: parseFloat(budget.allocatedAmount) || 0,
           Utilized: parseFloat(budget.utilizedAmount) || 0,
@@ -387,56 +341,6 @@ const HRDashboard = () => {
       .filter((item) => item.value > 0);
   };
 
-  const getLndOverview = () => {
-    if (
-      !dashboardData.lndAssignments ||
-      dashboardData.lndAssignments.length === 0
-    ) {
-      return [];
-    }
-
-    const completed = dashboardData.lndAssignments.filter((a) => {
-      const status = (a.assignmentStatus || a.status || "")
-        .toLowerCase()
-        .replace(/\s/g, "");
-      return status === "completed";
-    }).length;
-
-    const active = dashboardData.lndAssignments.filter((a) => {
-      const status = (a.assignmentStatus || a.status || "")
-        .toLowerCase()
-        .replace(/\s/g, "");
-      return status === "inprogress" || status === "active";
-    }).length;
-
-    const pending = dashboardData.lndAssignments.filter((a) => {
-      const status = (a.assignmentStatus || a.status || "")
-        .toLowerCase()
-        .replace(/\s/g, "");
-      return status === "pending" || status === "requested";
-    }).length;
-
-    const result = [];
-    if (completed > 0)
-      result.push({ name: "Completed", value: completed, color: "#10b981" });
-    if (active > 0)
-      result.push({ name: "In Progress", value: active, color: "#0F62FE" });
-    if (pending > 0)
-      result.push({ name: "Pending", value: pending, color: "#f59e0b" });
-
-    if (result.length === 0 && dashboardData.lndAssignments.length > 0) {
-      return [
-        {
-          name: "Total Assignments",
-          value: dashboardData.lndAssignments.length,
-          color: "#0F62FE",
-        },
-      ];
-    }
-
-    return result;
-  };
-
   const getPerformanceOverview = () => {
     const totalNominations = dashboardData.managerNominations.length;
     const totalForms = dashboardData.appraisalForms.length;
@@ -444,22 +348,12 @@ const HRDashboard = () => {
     const totalRatings = dashboardData.performanceRatings.length;
 
     const pendingNominations = dashboardData.managerNominations.filter((n) => {
-      const status = (
-        n.hrApprovalStatus ||
-        n.approvalStatus ||
-        n.status ||
-        ""
-      ).toLowerCase();
+      const status = (n.hrApprovalStatus || n.approvalStatus || n.status || "").toLowerCase();
       return status === "pending" || status === "submitted";
     }).length;
 
     const approvedNominations = dashboardData.managerNominations.filter((n) => {
-      const status = (
-        n.hrApprovalStatus ||
-        n.approvalStatus ||
-        n.status ||
-        ""
-      ).toLowerCase();
+      const status = (n.hrApprovalStatus || n.approvalStatus || n.status || "").toLowerCase();
       return status === "approved";
     }).length;
 
@@ -487,36 +381,18 @@ const HRDashboard = () => {
 
   const getPerformanceChartData = () => {
     const overview = getPerformanceOverview();
-
     const data = [
-      {
-        name: "Pending Nominations",
-        value: overview.pendingNominations,
-        color: "#f59e0b",
-      },
-      {
-        name: "Approved Nominations",
-        value: overview.approvedNominations,
-        color: "#10b981",
-      },
-      {
-        name: "Pending Assessments",
-        value: overview.pendingAssessments,
-        color: "#ef4444",
-      },
-      {
-        name: "Completed Assessments",
-        value: overview.completedAssessments,
-        color: "#0F62FE",
-      },
+      { name: "Pending Nominations", value: overview.pendingNominations, color: "#f59e0b" },
+      { name: "Approved Nominations", value: overview.approvedNominations, color: "#10b981" },
+      { name: "Pending Assessments", value: overview.pendingAssessments, color: "#22d3ee" },
+      { name: "Completed Assessments", value: overview.completedAssessments, color: "#0891b2" },
     ].filter((item) => item.value > 0);
-
     return data;
   };
 
   if (loading) {
     return (
-      <div className="ada-loading-container">
+      <div className="hrd-loading-container">
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
@@ -530,197 +406,125 @@ const HRDashboard = () => {
   const periodAllocations = getPeriodAllocations();
   const projectStatus = getProjectStatus();
   const nominationStatus = getNominationStatus();
-  const lndOverview = getLndOverview();
   const perfOverview = getPerformanceOverview();
 
-  const CHART_COLORS = [
-    "#97247E",
-    "#0F62FE",
-    "#10b981",
-    "#f59e0b",
-    "#E01950",
-    "#8b5cf6",
-  ];
+  const CHART_COLORS = ["#0891b2", "#06b6d4", "#10b981", "#f59e0b", "#14b8a6", "#22d3ee"];
 
   return (
-    <div className="hr-dashboard-container">
+    <div className="hrd-dashboard">
       <Breadcrumb items={[{ label: "HR Dashboard" }]} />
 
-      <div className="admin-kpi-grid">
-        <div className="admin-kpi-card">
-          <div className="admin-kpi-icon admin-pink">
+      <div className="hrd-stats-grid">
+        <div className="hrd-stat-card">
+          <div className="hrd-stat-icon hrd-stat-icon-primary">
             <Users size={28} />
           </div>
-          <div className="admin-kpi-content">
-            <h2>
-              <CountUp end={kpiStats.totalEmployees} duration={2} />
-            </h2>
+          <div className="hrd-stat-content">
+            <h2><CountUp end={kpiStats.totalEmployees} duration={2} /></h2>
             <p>Total Users</p>
-            <span className="admin-kpi-subtitle">
-              <TrendingUp size={12} />{" "}
-              {kpiStats.newEmployeesThisMonth > 0 ? "100%" : "0%"} vs last month
+            <span className="hrd-stat-trend">
+              <TrendingUp size={12} /> {kpiStats.newEmployeesThisMonth > 0 ? "100%" : "0%"} vs last month
             </span>
           </div>
         </div>
 
-        <div className="admin-kpi-card">
-          <div className="admin-kpi-icon admin-green">
+        <div className="hrd-stat-card">
+          <div className="hrd-stat-icon hrd-stat-icon-success">
             <UserCheck size={28} />
           </div>
-          <div className="admin-kpi-content">
-            <h2>
-              <CountUp end={kpiStats.activeEmployees} duration={2} />
-            </h2>
+          <div className="hrd-stat-content">
+            <h2><CountUp end={kpiStats.activeEmployees} duration={2} /></h2>
             <p>Active Users</p>
-            <span className="admin-kpi-subtitle">100% active rate</span>
+            <span className="hrd-stat-trend">100% active rate</span>
           </div>
         </div>
 
-        {/* FIXED: Changed from perfOverview.pendingNominations to kpiStats.pendingNominations */}
-        <div className="admin-kpi-card">
-          <div className="admin-kpi-icon admin-yellow">
+        <div className="hrd-stat-card">
+          <div className="hrd-stat-icon hrd-stat-icon-warning">
             <Award size={28} />
           </div>
-          <div className="admin-kpi-content">
-            <h2>
-              <CountUp end={kpiStats.pendingNominations} duration={2} />
-            </h2>
+          <div className="hrd-stat-content">
+            <h2><CountUp end={kpiStats.pendingNominations} duration={2} /></h2>
             <p>Pending Nominations</p>
-            <span className="admin-kpi-subtitle">
-              {dashboardData.nominations.length} total
-            </span>
+            <span className="hrd-stat-trend">{dashboardData.nominations.length} total</span>
           </div>
         </div>
 
-        <div className="admin-kpi-card">
-          <div className="admin-kpi-icon admin-blue">
+        <div className="hrd-stat-card">
+          <div className="hrd-stat-icon hrd-stat-icon-info">
             <Briefcase size={28} />
           </div>
-          <div className="admin-kpi-content">
-            <h2>
-              <CountUp end={kpiStats.totalDepartments} duration={2} />
-            </h2>
+          <div className="hrd-stat-content">
+            <h2><CountUp end={kpiStats.totalDepartments} duration={2} /></h2>
             <p>Departments</p>
-            <span className="admin-kpi-subtitle">
-              {kpiStats.activeProjects} projects
-            </span>
+            <span className="hrd-stat-trend">{kpiStats.activeProjects} projects</span>
           </div>
         </div>
 
-        <div className="admin-kpi-card">
-          <div className="admin-kpi-icon admin-purple">
+        <div className="hrd-stat-card">
+          <div className="hrd-stat-icon hrd-stat-icon-cyan">
             <Shield size={28} />
           </div>
-          <div className="admin-kpi-content">
-            <h2>
-              <CountUp end={perfOverview.totalForms} duration={2} />
-            </h2>
+          <div className="hrd-stat-content">
+            <h2><CountUp end={perfOverview.totalForms} duration={2} /></h2>
             <p>Appraisal Forms</p>
-            <span className="admin-kpi-subtitle">Performance tracking</span>
+            <span className="hrd-stat-trend">Performance tracking</span>
           </div>
         </div>
       </div>
 
-      <div className="dashboard-cards-container">
-        <div className="dashboard-row">
-          <div className="dashboard-card card-medium">
-            <div className="card-header-dark">
-              <div className="card-header-content">
+      <div className="hrd-cards-container">
+        <div className="hrd-row">
+          <div className="hrd-card hrd-card-medium">
+            <div className="hrd-card-header">
+              <div className="hrd-card-header-content">
                 <i className="bi bi-person-badge"></i>
                 <h3>Employee Status</h3>
               </div>
-              <button className="card-filter-btn-dark">
+              <button className="hrd-card-filter-btn">
                 <i className="bi bi-calendar3"></i> This Week
               </button>
             </div>
-            <div className="card-body">
-              <div className="employee-status-summary">
-                <div className="status-total">
-                  <span className="label">Total Employee</span>
+            <div className="hrd-card-body">
+              <div className="hrd-employee-status-summary">
+                <div className="hrd-status-total">
+                  <span className="hrd-label">Total Employee</span>
                   <h2>{employeeStatus.total}</h2>
                 </div>
-                <div className="status-bar">
-                  <div
-                    className="status-segment"
-                    style={{
-                      width: `${employeeStatus.fulltimePercent}%`,
-                      backgroundColor: "#f59e0b",
-                    }}
-                  ></div>
-                  <div
-                    className="status-segment"
-                    style={{
-                      width: `${employeeStatus.contractPercent}%`,
-                      backgroundColor: "#374151",
-                    }}
-                  ></div>
-                  <div
-                    className="status-segment"
-                    style={{
-                      width: `${employeeStatus.probationPercent}%`,
-                      backgroundColor: "#ef4444",
-                    }}
-                  ></div>
-                  <div
-                    className="status-segment"
-                    style={{
-                      width: `${employeeStatus.parttimePercent}%`,
-                      backgroundColor: "#ec4899",
-                    }}
-                  ></div>
+                <div className="hrd-status-bar">
+                  <div className="hrd-status-segment hrd-fulltime" style={{ width: `${employeeStatus.fulltimePercent}%` }}></div>
+                  <div className="hrd-status-segment hrd-contract" style={{ width: `${employeeStatus.contractPercent}%` }}></div>
+                  <div className="hrd-status-segment hrd-probation" style={{ width: `${employeeStatus.probationPercent}%` }}></div>
+                  <div className="hrd-status-segment hrd-parttime" style={{ width: `${employeeStatus.parttimePercent}%` }}></div>
                 </div>
               </div>
 
-              <div className="status-grid">
-                <div className="status-card">
-                  <div className="status-legend">
-                    <span
-                      className="legend-dot"
-                      style={{ backgroundColor: "#f59e0b" }}
-                    ></span>
-                    <span>
-                      Fulltime ({employeeStatus.fulltimePercent}
-                      %)
-                    </span>
+              <div className="hrd-status-grid">
+                <div className="hrd-status-card">
+                  <div className="hrd-status-legend">
+                    <span className="hrd-legend-dot hrd-fulltime"></span>
+                    <span>Fulltime ({employeeStatus.fulltimePercent}%)</span>
                   </div>
                   <h3>{employeeStatus.fulltime}</h3>
                 </div>
-                <div className="status-card">
-                  <div className="status-legend">
-                    <span
-                      className="legend-dot"
-                      style={{ backgroundColor: "#374151" }}
-                    ></span>
-                    <span>
-                      Contract ({employeeStatus.contractPercent}
-                      %)
-                    </span>
+                <div className="hrd-status-card">
+                  <div className="hrd-status-legend">
+                    <span className="hrd-legend-dot hrd-contract"></span>
+                    <span>Contract ({employeeStatus.contractPercent}%)</span>
                   </div>
                   <h3>{employeeStatus.contract}</h3>
                 </div>
-                <div className="status-card">
-                  <div className="status-legend">
-                    <span
-                      className="legend-dot"
-                      style={{ backgroundColor: "#ef4444" }}
-                    ></span>
-                    <span>
-                      Probation ({employeeStatus.probationPercent}
-                      %)
-                    </span>
+                <div className="hrd-status-card">
+                  <div className="hrd-status-legend">
+                    <span className="hrd-legend-dot hrd-probation"></span>
+                    <span>Probation ({employeeStatus.probationPercent}%)</span>
                   </div>
                   <h3>{employeeStatus.probation}</h3>
                 </div>
-                <div className="status-card">
-                  <div className="status-legend">
-                    <span
-                      className="legend-dot"
-                      style={{ backgroundColor: "#ec4899" }}
-                    ></span>
-                    <span>
-                      Part-time ({employeeStatus.parttimePercent}
-                      %)
-                    </span>
+                <div className="hrd-status-card">
+                  <div className="hrd-status-legend">
+                    <span className="hrd-legend-dot hrd-parttime"></span>
+                    <span>Part-time ({employeeStatus.parttimePercent}%)</span>
                   </div>
                   <h3>{employeeStatus.parttime}</h3>
                 </div>
@@ -728,167 +532,93 @@ const HRDashboard = () => {
             </div>
           </div>
 
-          <div className="dashboard-card card-medium">
-            <div className="card-header-dark">
-              <div className="card-header-content">
+          <div className="hrd-card hrd-card-medium">
+            <div className="hrd-card-header">
+              <div className="hrd-card-header-content">
                 <i className="bi bi-cash-stack"></i>
                 <h3>Budget Allocation</h3>
               </div>
-              <select
-                className="card-select-dark"
-                value={selectedDepartment}
-                onChange={(e) => setSelectedDepartment(e.target.value)}
-              >
+              <select className="hrd-card-select" value={selectedDepartment} onChange={(e) => setSelectedDepartment(e.target.value)}>
                 <option>All Departments</option>
                 {dashboardData.departments.map((d) => (
-                  <option
-                    key={d.departmentId}
-                    value={d.departmentName || d.name}
-                  >
+                  <option key={d.departmentId} value={d.departmentName || d.name}>
                     {d.departmentName || d.name}
                   </option>
                 ))}
               </select>
             </div>
-            <div className="card-body">
+            <div className="hrd-card-body">
               {budgetByDept.length > 0 ? (
                 <ResponsiveContainer width="100%" height={280}>
                   <BarChart data={budgetByDept}>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke="#f3f4f6"
-                      vertical={false}
-                    />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
                     <XAxis dataKey="name" stroke="#9ca3af" fontSize={11} />
                     <YAxis stroke="#9ca3af" fontSize={11} />
                     <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#fff",
-                        border: "1px solid #e5e7eb",
-                        borderRadius: "6px",
-                        fontSize: "12px",
-                      }}
-                      formatter={(value) =>
-                        `₹${Number(value).toLocaleString()}`
-                      }
+                      contentStyle={{ backgroundColor: "#fff", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "12px" }}
+                      formatter={(value) => `₹${Number(value).toLocaleString()}`}
                     />
                     <Legend wrapperStyle={{ fontSize: "12px" }} />
-                    <Bar
-                      dataKey="Total"
-                      fill="#27235c"
-                      radius={[6, 6, 0, 0]}
-                    />
-                    <Bar
-                      dataKey="Allocated"
-                      fill="#0F62FE"
-                      radius={[6, 6, 0, 0]}
-                    />
-                    <Bar
-                      dataKey="Utilized"
-                      fill="#10b981"
-                      radius={[6, 6, 0, 0]}
-                    />
+                    <Bar dataKey="Total" fill="#0891b2" radius={[6, 6, 0, 0]} />
+                    <Bar dataKey="Allocated" fill="#06b6d4" radius={[6, 6, 0, 0]} />
+                    <Bar dataKey="Utilized" fill="#10b981" radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="no-data-message">No budget data available</div>
+                <div className="hrd-no-data">No budget data available</div>
               )}
             </div>
           </div>
 
-          <div className="dashboard-card card-medium">
-            <div className="card-header-dark">
-              <div className="card-header-content">
+          <div className="hrd-card hrd-card-medium">
+            <div className="hrd-card-header">
+              <div className="hrd-card-header-content">
                 <i className="bi bi-calendar-range"></i>
                 <h3>Period Allocations</h3>
               </div>
             </div>
-            <div className="card-body">
+            <div className="hrd-card-body">
               {periodAllocations.length > 0 ? (
                 <ResponsiveContainer width="100%" height={280}>
                   <AreaChart data={periodAllocations}>
                     <defs>
-                      <linearGradient
-                        id="colorAmount"
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop
-                          offset="5%"
-                          stopColor="#27235c"
-                          stopOpacity={0.3}
-                        />
-                        <stop
-                          offset="95%"
-                          stopColor="#27235c"
-                          stopOpacity={0}
-                        />
+                      <linearGradient id="colorAmountHR" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#0891b2" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#0891b2" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke="#f3f4f6"
-                      vertical={false}
-                    />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
                     <XAxis dataKey="period" stroke="#9ca3af" fontSize={11} />
                     <YAxis stroke="#9ca3af" fontSize={11} />
                     <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#fff",
-                        border: "1px solid #e5e7eb",
-                        borderRadius: "6px",
-                        fontSize: "12px",
-                      }}
-                      formatter={(value) =>
-                        `₹${Number(value).toLocaleString()}`
-                      }
+                      contentStyle={{ backgroundColor: "#fff", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "12px" }}
+                      formatter={(value) => `₹${Number(value).toLocaleString()}`}
                     />
-                    <Area
-                      type="monotone"
-                      dataKey="amount"
-                      stroke="#27235c"
-                      strokeWidth={2}
-                      fillOpacity={1}
-                      fill="url(#colorAmount)"
-                    />
+                    <Area type="monotone" dataKey="amount" stroke="#0891b2" strokeWidth={2} fillOpacity={1} fill="url(#colorAmountHR)" />
                   </AreaChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="no-data-message">
-                  No period allocation data
-                </div>
+                <div className="hrd-no-data">No period allocation data</div>
               )}
             </div>
           </div>
         </div>
 
-        <div className="dashboard-row">
-          <div className="dashboard-card card-small">
-            <div className="card-header-dark">
-              <div className="card-header-content">
+        <div className="hrd-row">
+          <div className="hrd-card hrd-card-small">
+            <div className="hrd-card-header">
+              <div className="hrd-card-header-content">
                 <i className="bi bi-folder"></i>
                 <h3>Project Status</h3>
               </div>
             </div>
-            <div className="card-body">
+            <div className="hrd-card-body">
               {projectStatus.length > 0 ? (
                 <ResponsiveContainer width="100%" height={240}>
                   <PieChart>
-                    <Pie
-                      data={projectStatus}
-                      cx="50%"
-                      cy="45%"
-                      outerRadius={70}
-                      dataKey="value"
-                      label={false}
-                    >
+                    <Pie data={projectStatus} cx="50%" cy="45%" outerRadius={70} dataKey="value" label={false}>
                       {projectStatus.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={CHART_COLORS[index % CHART_COLORS.length]}
-                        />
+                        <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                       ))}
                     </Pie>
                     <Tooltip />
@@ -898,44 +628,32 @@ const HRDashboard = () => {
                       verticalAlign="bottom"
                       wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
                       formatter={(value, entry) => {
-                        const item = projectStatus.find(d => d.name === entry.value);
+                        const item = projectStatus.find((d) => d.name === entry.value);
                         return `${item?.name || value}: ${item?.value || 0}`;
                       }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="no-data-message">No project data</div>
+                <div className="hrd-no-data">No project data</div>
               )}
             </div>
           </div>
 
-          <div className="dashboard-card card-small">
-            <div className="card-header-dark">
-              <div className="card-header-content">
+          <div className="hrd-card hrd-card-small">
+            <div className="hrd-card-header">
+              <div className="hrd-card-header-content">
                 <i className="bi bi-award"></i>
                 <h3>Nominations</h3>
               </div>
             </div>
-            <div className="card-body">
+            <div className="hrd-card-body">
               {nominationStatus.length > 0 ? (
                 <ResponsiveContainer width="100%" height={240}>
                   <PieChart>
-                    <Pie
-                      data={nominationStatus}
-                      cx="50%"
-                      cy="45%"
-                      innerRadius={50}
-                      outerRadius={70}
-                      paddingAngle={3}
-                      dataKey="value"
-                      label={false}
-                    >
+                    <Pie data={nominationStatus} cx="50%" cy="45%" innerRadius={50} outerRadius={70} paddingAngle={3} dataKey="value" label={false}>
                       {nominationStatus.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={CHART_COLORS[index % CHART_COLORS.length]}
-                        />
+                        <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                       ))}
                     </Pie>
                     <Tooltip />
@@ -945,132 +663,49 @@ const HRDashboard = () => {
                       verticalAlign="bottom"
                       wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
                       formatter={(value, entry) => {
-                        const item = nominationStatus.find(d => d.name === entry.value);
+                        const item = nominationStatus.find((d) => d.name === entry.value);
                         return `${item?.name || value}: ${item?.value || 0}`;
                       }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="no-data-message">No nomination data</div>
+                <div className="hrd-no-data">No nomination data</div>
               )}
             </div>
           </div>
 
-          <div className="dashboard-card card-small">
-            <div className="card-header-dark">
-              <div className="card-header-content">
+          <div className="hrd-card hrd-card-small">
+            <div className="hrd-card-header">
+              <div className="hrd-card-header-content">
                 <i className="bi bi-star-fill"></i>
                 <h3>Performance Management</h3>
               </div>
             </div>
-            <div className="card-body">
+            <div className="hrd-card-body">
               {(() => {
                 const chartData = getPerformanceChartData();
-                const totalItems =
-                  perfOverview.totalNominations +
-                  perfOverview.totalAssessments +
-                  perfOverview.totalForms;
+                const totalItems = perfOverview.totalNominations + perfOverview.totalAssessments + perfOverview.totalForms;
 
                 if (totalItems === 0) {
-                  return (
-                    <div className="no-data-message">
-                      No performance data available
-                    </div>
-                  );
+                  return <div className="hrd-no-data">No performance data available</div>;
                 }
 
                 return (
                   <>
-                    <div style={{ marginBottom: "1rem" }}>
-                      <div
-                        style={{
-                          display: "grid",
-                          gridTemplateColumns: "1fr 1fr 1fr",
-                          gap: "0.5rem",
-                          marginBottom: "1rem",
-                        }}
-                      >
-                        <div
-                          style={{
-                            background: "#f0f9ff",
-                            padding: "0.5rem",
-                            borderRadius: "6px",
-                            textAlign: "center",
-                            border: "1px solid #bfdbfe",
-                          }}
-                        >
-                          <div
-                            style={{
-                              fontSize: "1.25rem",
-                              fontWeight: "bold",
-                              color: "#0F62FE",
-                            }}
-                          >
-                            {perfOverview.totalNominations}
-                          </div>
-                          <div
-                            style={{
-                              fontSize: "0.65rem",
-                              color: "#1e40af",
-                            }}
-                          >
-                            Nominations
-                          </div>
+                    <div className="hrd-perf-overview">
+                      <div className="hrd-perf-stats-grid">
+                        <div className="hrd-perf-stat-card hrd-perf-cyan">
+                          <div className="hrd-perf-stat-value">{perfOverview.totalNominations}</div>
+                          <div className="hrd-perf-stat-label">Nominations</div>
                         </div>
-                        <div
-                          style={{
-                            background: "#f0fdf4",
-                            padding: "0.5rem",
-                            borderRadius: "6px",
-                            textAlign: "center",
-                            border: "1px solid #86efac",
-                          }}
-                        >
-                          <div
-                            style={{
-                              fontSize: "1.25rem",
-                              fontWeight: "bold",
-                              color: "#10b981",
-                            }}
-                          >
-                            {perfOverview.totalAssessments}
-                          </div>
-                          <div
-                            style={{
-                              fontSize: "0.65rem",
-                              color: "#047857",
-                            }}
-                          >
-                            Assessments
-                          </div>
+                        <div className="hrd-perf-stat-card hrd-perf-green">
+                          <div className="hrd-perf-stat-value">{perfOverview.totalAssessments}</div>
+                          <div className="hrd-perf-stat-label">Assessments</div>
                         </div>
-                        <div
-                          style={{
-                            background: "#fef3c7",
-                            padding: "0.5rem",
-                            borderRadius: "6px",
-                            textAlign: "center",
-                            border: "1px solid #fcd34d",
-                          }}
-                        >
-                          <div
-                            style={{
-                              fontSize: "1.25rem",
-                              fontWeight: "bold",
-                              color: "#d97706",
-                            }}
-                          >
-                            {perfOverview.totalForms}
-                          </div>
-                          <div
-                            style={{
-                              fontSize: "0.65rem",
-                              color: "#b45309",
-                            }}
-                          >
-                            Forms
-                          </div>
+                        <div className="hrd-perf-stat-card hrd-perf-yellow">
+                          <div className="hrd-perf-stat-value">{perfOverview.totalForms}</div>
+                          <div className="hrd-perf-stat-label">Forms</div>
                         </div>
                       </div>
                     </div>
@@ -1078,130 +713,19 @@ const HRDashboard = () => {
                     {chartData.length > 0 ? (
                       <ResponsiveContainer width="100%" height={160}>
                         <PieChart>
-                          <Pie
-                            data={chartData}
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={30}
-                            outerRadius={50}
-                            paddingAngle={2}
-                            dataKey="value"
-                            label={false}
-                          >
+                          <Pie data={chartData} cx="50%" cy="50%" innerRadius={30} outerRadius={50} paddingAngle={2} dataKey="value" label={false}>
                             {chartData.map((entry, index) => (
-                              <Cell
-                                key={`cell-${index}`}
-                                fill={entry.color}
-                              />
+                              <Cell key={`cell-${index}`} fill={entry.color} />
                             ))}
                           </Pie>
                           <Tooltip />
-                          <Legend
-  layout="horizontal"
-  align="center"
-  verticalAlign="bottom"
-  wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
-  formatter={(value, entry) => {
-    const item = chartData.find(d => d.name === entry.value);
-    return `${item?.name || value}: ${item?.value || 0}`;
-  }}
-/>
-
+                          <Legend layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ fontSize: "10px" }} />
                         </PieChart>
                       </ResponsiveContainer>
                     ) : (
-                      <div
-                        style={{
-                          textAlign: "center",
-                          padding: "1rem",
-                          fontSize: "0.875rem",
-                          color: "#6b7280",
-                        }}
-                      >
-                        {perfOverview.totalForms} form
-                        {perfOverview.totalForms !== 1 ? "s" : ""} available
-                      </div>
+                      <div className="hrd-perf-chart-info">{perfOverview.totalForms} form{perfOverview.totalForms !== 1 ? "s" : ""} available</div>
                     )}
                   </>
-                );
-              })()}
-            </div>
-          </div>
-
-          <div className="dashboard-card card-small">
-            <div className="card-header-dark">
-              <div className="card-header-content">
-                <i className="bi bi-book"></i>
-                <h3>Learning & Development</h3>
-              </div>
-            </div>
-            <div className="card-body">
-              {(() => {
-                const lndData = lndOverview;
-                const totalAssignments =
-                  dashboardData.lndAssignments?.length || 0;
-
-                if (totalAssignments === 0) {
-                  return (
-                    <div className="no-data-message">
-                      No L&D assignments available
-                    </div>
-                  );
-                }
-
-                if (lndData.length === 0) {
-                  return (
-                    <div className="no-data-message">
-                      {totalAssignments} assignment
-                      {totalAssignments !== 1 ? "s" : ""} found
-                      <br />
-                      <small
-                        style={{
-                          fontSize: "0.75rem",
-                          color: "#6b7280",
-                          marginTop: "0.5rem",
-                          display: "block",
-                        }}
-                      >
-                        Status data not available
-                      </small>
-                    </div>
-                  );
-                }
-
-                return (
-                  <ResponsiveContainer width="100%" height={240}>
-                    <PieChart>
-                      <Pie
-                        data={lndData}
-                        cx="50%"
-                        cy="45%"
-                        innerRadius={50}
-                        outerRadius={70}
-                        paddingAngle={3}
-                        dataKey="value"
-                        label={false}
-                      >
-                        {lndData.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={entry.color}
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                      <Legend
-                        layout="horizontal"
-                        align="center"
-                        verticalAlign="bottom"
-                        wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
-                        formatter={(value, entry) => {
-                          const item = lndData.find(d => d.name === entry.value);
-                          return `${item?.name || value}: ${item?.value || 0}`;
-                        }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
                 );
               })()}
             </div>

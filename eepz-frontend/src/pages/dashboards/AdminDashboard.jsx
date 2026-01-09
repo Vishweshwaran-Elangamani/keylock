@@ -1,38 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  AreaChart,
-  Area,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Radar,
-  ComposedChart,
-  Bar,
+  LineChart, Line, PieChart, Pie, AreaChart, Area, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ComposedChart, Bar,
 } from "recharts";
 import CountUp from "react-countup";
-import {
-  Users,
-  UserCheck,
-  Clock,
-  Building2,
-  Shield,
-  UserPlus,
-  TrendingUp,
-  TrendingDown,
-} from "lucide-react";
+import { Users, Clock, Building2, UserPlus, Shield, TrendingUp, TrendingDown } from "lucide-react";
 import userService from "../../services/auth/userService";
 import roleService from "../../services/auth/roleService";
 import departmentService from "../../services/auth/departmentService";
@@ -44,421 +17,205 @@ import "../../styles/auth/AdminDashboard.css";
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [dashboardData, setDashboardData] = useState({
-    users: [],
-    roles: [],
-    departments: [],
-    changeRequests: [],
-  });
+  const [data, setData] = useState({ users: [], roles: [], departments: [], changeRequests: [] });
 
   useEffect(() => {
-    fetchAllData();
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [usersRes, rolesRes, deptsRes, requestsRes] = await Promise.all([
+          userService.getAllUsers(), roleService.getAllRoles(), departmentService.getAllDepartments(), ChangeRequestService.getAllChangeRequests()
+        ]);
+        setData({
+          users: usersRes.success ? usersRes.data || [] : [],
+          roles: rolesRes.success ? rolesRes.data || [] : [],
+          departments: deptsRes.success ? deptsRes.data || [] : [],
+          changeRequests: requestsRes.success ? requestsRes.data || [] : [],
+        });
+      } catch (error) {
+        console.error("Error:", error);
+        toast.error("Failed to load data");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, []);
 
-  const fetchAllData = async () => {
-    try {
-      setLoading(true);
-      const [usersRes, rolesRes, deptsRes, requestsRes] = await Promise.all([
-        userService.getAllUsers(),
-        roleService.getAllRoles(),
-        departmentService.getAllDepartments(),
-        ChangeRequestService.getAllChangeRequests(),
-      ]);
+  const nonAdminUsers = useMemo(() => data.users.filter(u => u.roleName !== "Admin"), [data.users]);
 
-      setDashboardData({
-        users: usersRes.success ? usersRes.data || [] : [],
-        roles: rolesRes.success ? rolesRes.data || [] : [],
-        departments: deptsRes.success ? deptsRes.data || [] : [],
-        changeRequests: requestsRes.success ? requestsRes.data || [] : [],
-      });
-    } catch (error) {
-      console.error("Error fetching dashboard data:", error);
-      toast.error("Failed to load dashboard data");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getNonAdminUsers = () => {
-    return dashboardData.users.filter((user) => user.roleName !== "Admin");
-  };
-
-  const getStats = () => {
-    const nonAdminUsers = getNonAdminUsers();
-    const activeUsers = nonAdminUsers.filter((u) => u.isActive).length;
-    const inactiveUsers = nonAdminUsers.filter((u) => !u.isActive).length;
-
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    const newUsers = nonAdminUsers.filter((u) => {
-      const joinDate = new Date(u.joiningDate);
-      return joinDate > thirtyDaysAgo;
-    }).length;
-
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    const weeklyNewUsers = nonAdminUsers.filter((u) => {
-      const joinDate = new Date(u.joiningDate);
-      return joinDate > sevenDaysAgo;
-    }).length;
-
-    const pendingRequests = dashboardData.changeRequests.filter(
-      (r) => r.status === "Pending"
-    ).length;
-    const approvedRequests = dashboardData.changeRequests.filter(
-      (r) => r.status === "Approved"
-    ).length;
-    const rejectedRequests = dashboardData.changeRequests.filter(
-      (r) => r.status === "Rejected"
-    ).length;
-
-    const systemRoles = dashboardData.roles.filter((r) => r.isSystemRole).length;
-    const customRoles = dashboardData.roles.filter((r) => !r.isSystemRole).length;
-
-    const activeRate =
-      nonAdminUsers.length > 0
-        ? ((activeUsers / nonAdminUsers.length) * 100).toFixed(1)
-        : 0;
-
-    const sixtyDaysAgo = new Date();
-    sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
-    const prevMonthUsers = nonAdminUsers.filter((u) => {
+  const stats = useMemo(() => {
+    const activeUsers = nonAdminUsers.filter(u => u.isActive).length;
+    const inactiveUsers = nonAdminUsers.filter(u => !u.isActive).length;
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const newUsers = nonAdminUsers.filter(u => new Date(u.joiningDate) > thirtyDaysAgo).length;
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const weeklyNewUsers = nonAdminUsers.filter(u => new Date(u.joiningDate) > sevenDaysAgo).length;
+    const pendingRequests = data.changeRequests.filter(r => r.status === "Pending").length;
+    const approvedRequests = data.changeRequests.filter(r => r.status === "Approved").length;
+    const rejectedRequests = data.changeRequests.filter(r => r.status === "Rejected").length;
+    const systemRoles = data.roles.filter(r => r.isSystemRole).length;
+    const customRoles = data.roles.filter(r => !r.isSystemRole).length;
+    const activeRate = nonAdminUsers.length ? ((activeUsers / nonAdminUsers.length) * 100).toFixed(1) : 0;
+    const sixtyDaysAgo = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000);
+    const prevMonthUsers = nonAdminUsers.filter(u => {
       const joinDate = new Date(u.joiningDate);
       return joinDate > sixtyDaysAgo && joinDate <= thirtyDaysAgo;
     }).length;
-
-    const growthRate =
-      prevMonthUsers > 0
-        ? (((newUsers - prevMonthUsers) / prevMonthUsers) * 100).toFixed(1)
-        : newUsers > 0
-        ? 100
-        : 0;
+    const growthRate = prevMonthUsers > 0 ? (((newUsers - prevMonthUsers) / prevMonthUsers) * 100).toFixed(1) : newUsers > 0 ? 100 : 0;
 
     return {
-      totalUsers: nonAdminUsers.length,
-      activeUsers,
-      inactiveUsers,
-      newUsers,
-      weeklyNewUsers,
-      totalRoles: dashboardData.roles.length,
-      systemRoles,
-      customRoles,
-      totalDepartments: dashboardData.departments.length,
-      totalRequests: dashboardData.changeRequests.length,
-      pendingRequests,
-      approvedRequests,
-      rejectedRequests,
-      activeRate: parseFloat(activeRate),
-      growthRate: parseFloat(growthRate),
+      totalUsers: nonAdminUsers.length, activeUsers, inactiveUsers, newUsers, weeklyNewUsers,
+      totalRoles: data.roles.length, systemRoles, customRoles, totalDepartments: data.departments.length,
+      totalRequests: data.changeRequests.length, pendingRequests, approvedRequests, rejectedRequests,
+      activeRate: parseFloat(activeRate), growthRate: parseFloat(growthRate)
     };
-  };
+  }, [nonAdminUsers, data]);
 
-  const getDepartmentDistribution = () => {
-    const nonAdminUsers = getNonAdminUsers();
-    const deptCount = {};
+  const departmentData = useMemo(() => {
+    const deptCount = nonAdminUsers.reduce((acc, u) => {
+      const dept = u.departmentName || "Unassigned";
+      acc[dept] = (acc[dept] || 0) + 1;
+      return acc;
+    }, {});
+    return Object.entries(deptCount).map(([name, value]) => ({ name, fullName: name, value }))
+      .sort((a, b) => b.value - a.value).slice(0, 6);
+  }, [nonAdminUsers]);
 
-    nonAdminUsers.forEach((user) => {
-      const dept = user.departmentName || "Unassigned";
-      deptCount[dept] = (deptCount[dept] || 0) + 1;
-    });
-
-    return Object.entries(deptCount)
-      .map(([name, value]) => ({
-        name: name,
-        fullName: name,
-        value,
-      }))
-      .sort((a, b) => b.value - a.value)
-      .slice(0, 6);
-  };
-
-  const getRoleDistribution = () => {
-    const nonAdminUsers = getNonAdminUsers();
-    const roleCount = {};
-
-    nonAdminUsers.forEach((user) => {
-      const role = user.roleName || "Unassigned";
-      roleCount[role] = (roleCount[role] || 0) + 1;
-    });
-
-    return Object.entries(roleCount)
-      .map(([name, value]) => ({
-        name,
-        value,
-      }))
+  const roleData = useMemo(() => {
+    const roleCount = nonAdminUsers.reduce((acc, u) => {
+      const role = u.roleName || "Unassigned";
+      acc[role] = (acc[role] || 0) + 1;
+      return acc;
+    }, {});
+    return Object.entries(roleCount).map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value);
-  };
+  }, [nonAdminUsers]);
 
-  const getMonthlyTrend = () => {
-    const nonAdminUsers = getNonAdminUsers();
-    const months = [];
+  const monthlyTrend = useMemo(() => {
     const now = new Date();
-
+    const months = [];
     for (let i = 5; i >= 0; i--) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
       const monthName = date.toLocaleDateString("en-US", { month: "short" });
-
       const monthStart = new Date(date.getFullYear(), date.getMonth(), 1);
       const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-
-      const newInMonth = nonAdminUsers.filter((user) => {
-        const joinDate = new Date(user.joiningDate);
+      const newInMonth = nonAdminUsers.filter(u => {
+        const joinDate = new Date(u.joiningDate);
         return joinDate >= monthStart && joinDate <= monthEnd;
       }).length;
-
-      const activeInMonth = nonAdminUsers.filter((user) => {
-        const joinDate = new Date(user.joiningDate);
-        return joinDate <= monthEnd && user.isActive;
+      const activeInMonth = nonAdminUsers.filter(u => {
+        const joinDate = new Date(u.joiningDate);
+        return joinDate <= monthEnd && u.isActive;
       }).length;
-
-      months.push({
-        month: monthName,
-        New: newInMonth,
-        Active: activeInMonth,
-      });
+      months.push({ month: monthName, New: newInMonth, Active: activeInMonth });
     }
-
     return months;
-  };
+  }, [nonAdminUsers]);
 
-  const getRequestStatusData = () => {
-    return [
-      { name: "Approved", value: stats.approvedRequests },
-      { name: "Pending", value: stats.pendingRequests },
-      { name: "Rejected", value: stats.rejectedRequests },
-    ];
-  };
+  const requestStatusData = useMemo(() => [
+    { name: "Approved", value: stats.approvedRequests },
+    { name: "Pending", value: stats.pendingRequests },
+    { name: "Rejected", value: stats.rejectedRequests }
+  ], [stats]);
 
-  const getDepartmentActivityRadar = () => {
-    const nonAdminUsers = getNonAdminUsers();
-    const topDepts = getDepartmentDistribution().slice(0, 5);
-
-    return topDepts.map((dept) => {
-      const deptUsers = nonAdminUsers.filter((u) => {
-        const deptName = u.departmentName || "Unassigned";
-        return deptName === dept.name;
-      });
-      const active = deptUsers.filter((u) => u.isActive).length;
-      const inactive = deptUsers.filter((u) => !u.isActive).length;
-
+  const radarData = useMemo(() => {
+    const topDepts = departmentData.slice(0, 5);
+    return topDepts.map(dept => {
+      const deptUsers = nonAdminUsers.filter(u => (u.departmentName || "Unassigned") === dept.name);
       return {
         department: dept.name,
-        Active: active,
-        Inactive: inactive,
+        Active: deptUsers.filter(u => u.isActive).length,
+        Inactive: deptUsers.filter(u => !u.isActive).length
       };
     });
-  };
+  }, [departmentData, nonAdminUsers]);
 
-  const getRequestTrendData = () => {
-    const months = [];
+  const requestTrendData = useMemo(() => {
     const now = new Date();
-
+    const months = [];
     for (let i = 5; i >= 0; i--) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
       const monthName = date.toLocaleDateString("en-US", { month: "short" });
-
       const monthStart = new Date(date.getFullYear(), date.getMonth(), 1);
       const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-
-      const requestsInMonth = dashboardData.changeRequests.filter((req) => {
+      const requestsInMonth = data.changeRequests.filter(req => {
         const requestDate = new Date(req.requestedAt);
         return requestDate >= monthStart && requestDate <= monthEnd;
       });
-
       months.push({
         month: monthName,
         Total: requestsInMonth.length,
-        Approved: requestsInMonth.filter((r) => r.status === "Approved").length,
-        Pending: requestsInMonth.filter((r) => r.status === "Pending").length,
+        Approved: requestsInMonth.filter(r => r.status === "Approved").length,
+        Pending: requestsInMonth.filter(r => r.status === "Pending").length
       });
     }
-
     return months;
-  };
+  }, [data.changeRequests]);
 
-  if (loading) {
-    return (
-      <div className="ada-loading-container">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
+  const COLORS = ["#1E40AF", "#3B82F6", "#60A5FA", "#93C5FD", "#DBEAFE", "#2563EB"];
+
+  if (loading) return (
+    <div className="ada-loading-container">
+      <div className="spinner-border text-primary" role="status">
+        <span className="visually-hidden">Loading...</span>
       </div>
-    );
-  }
-
-  const stats = getStats();
-  const departmentData = getDepartmentDistribution();
-  const roleData = getRoleDistribution();
-  const monthlyTrend = getMonthlyTrend();
-  const requestStatusData = getRequestStatusData();
-  const radarData = getDepartmentActivityRadar();
-  const requestTrendData = getRequestTrendData();
-
-  const COLORS = [
-    "#1E40AF",
-    "#3B82F6",
-    "#60A5FA",
-    "#93C5FD",
-    "#DBEAFE",
-    "#2563EB",
-  ];
+    </div>
+  );
 
   return (
     <div className="ada-dashboard">
-      <Breadcrumb
-        items={[
-          {
-            label: "Admin Dashboard",
-          },
-        ]}
-      />
-
+      <Breadcrumb items={[{ label: "Admin Dashboard" }]} />
+      
       <div className="ada-stats-grid">
-        <div className="ada-stat-card">
-          <div className="ada-stat-icon ada-stat-icon-primary">
-            <Users size={24} />
-          </div>
-          <div className="ada-stat-content">
-            <h3 className="ada-stat-value">
-              <CountUp end={stats.totalUsers} duration={2} />
-            </h3>
-            <p className="ada-stat-label">Total Users</p>
-            <div className="ada-stat-trend">
-              {stats.growthRate >= 0 ? (
-                <TrendingUp size={14} className="ada-trend-icon-up" />
-              ) : (
-                <TrendingDown size={14} className="ada-trend-icon-down" />
-              )}
-              <span>{Math.abs(stats.growthRate)}% vs last month</span>
+        {[
+          { icon: Users, value: stats.totalUsers, label: "Total Users", trend: `${Math.abs(stats.growthRate)}% vs last month`, up: stats.growthRate >= 0 },
+          { icon: Clock, value: stats.pendingRequests, label: "Pending Requests", trend: "Awaiting review" },
+          { icon: Building2, value: stats.totalDepartments, label: "Departments", trend: `${stats.totalRoles} roles` },
+          { icon: Shield, value: stats.totalRoles, label: "System Roles", trend: `${stats.customRoles} custom` },
+          { icon: UserPlus, value: stats.weeklyNewUsers, label: "New This Week", trend: "Last 7 days" }
+        ].map(({ icon: Icon, value, label, trend, up }, i) => (
+          <div key={i} className="ada-stat-card">
+            <div className={`ada-stat-icon ada-stat-icon-${['primary','warning','info','purple','cyan'][i]}`}>
+              <Icon size={28} />
             </div>
-          </div>
-        </div>
-
-        <div className="ada-stat-card">
-          <div className="ada-stat-icon ada-stat-icon-success">
-            <UserCheck size={24} />
-          </div>
-          <div className="ada-stat-content">
-            <h3 className="ada-stat-value">
-              <CountUp end={stats.activeUsers} duration={2} />
-            </h3>
-            <p className="ada-stat-label">Active Users</p>
-            <div className="ada-stat-trend">
-              <span className="ada-trend-neutral">
-                {stats.activeRate}% active rate
+            <div className="ada-stat-content">
+              <h2><CountUp end={value} duration={2} /></h2>
+              <p>{label}</p>
+              <span className="ada-stat-trend">
+                {up !== undefined && (up ? <TrendingUp size={12} className="ada-trend-icon-up" /> : <TrendingDown size={12} className="ada-trend-icon-down" />)}
+                {trend}
               </span>
             </div>
           </div>
-        </div>
-
-        <div className="ada-stat-card">
-          <div className="ada-stat-icon ada-stat-icon-warning">
-            <Clock size={24} />
-          </div>
-          <div className="ada-stat-content">
-            <h3 className="ada-stat-value">
-              <CountUp end={stats.pendingRequests} duration={2} />
-            </h3>
-            <p className="ada-stat-label">Pending Requests</p>
-            <div className="ada-stat-trend">
-              <span className="ada-trend-neutral">Awaiting review</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="ada-stat-card">
-          <div className="ada-stat-icon ada-stat-icon-info">
-            <Building2 size={24} />
-          </div>
-          <div className="ada-stat-content">
-            <h3 className="ada-stat-value">
-              <CountUp end={stats.totalDepartments} duration={2} />
-            </h3>
-            <p className="ada-stat-label">Departments</p>
-            <div className="ada-stat-trend">
-              <span className="ada-trend-neutral">
-                {stats.totalRoles} roles
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="ada-stat-card">
-          <div className="ada-stat-icon ada-stat-icon-purple">
-            <Shield size={24} />
-          </div>
-          <div className="ada-stat-content">
-            <h3 className="ada-stat-value">
-              <CountUp end={stats.systemRoles} duration={2} />
-            </h3>
-            <p className="ada-stat-label">System Roles</p>
-            <div className="ada-stat-trend">
-              <span className="ada-trend-neutral">
-                {stats.customRoles} custom
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="ada-stat-card">
-          <div className="ada-stat-icon ada-stat-icon-cyan">
-            <UserPlus size={24} />
-          </div>
-          <div className="ada-stat-content">
-            <h3 className="ada-stat-value">
-              <CountUp end={stats.weeklyNewUsers} duration={2} />
-            </h3>
-            <p className="ada-stat-label">New This Week</p>
-            <div className="ada-stat-trend">
-              <span className="ada-trend-neutral">Last 7 days</span>
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
 
       <div className="ada-actions-card">
         <div className="ada-actions-grid">
-          <button
-            className="ada-action-btn"
-            onClick={() => navigate("/admin/users")}
-          >
-            <i className="bi bi-person-plus"></i>
-            <span>Manage Users</span>
-          </button>
-          <button
-            className="ada-action-btn"
-            onClick={() => navigate("/admin/roles")}
-          >
-            <i className="bi bi-shield-check"></i>
-            <span>Configure Roles</span>
-          </button>
-          <button
-            className="ada-action-btn"
-            onClick={() => navigate("/admin/departments")}
-          >
-            <i className="bi bi-building"></i>
-            <span>Departments</span>
-          </button>
-          <button
-            className="ada-action-btn"
-            onClick={() => navigate("/admin/change-requests/pending")}
-          >
-            <i className="bi bi-clipboard-check"></i>
-            <span>Review Requests</span>
-          </button>
+          {[
+            { path: "/admin/users", icon: "bi-person-plus", label: "Manage Users" },
+            { path: "/admin/roles", icon: "bi-shield-check", label: "Configure Roles" },
+            { path: "/admin/departments", icon: "bi-building", label: "Departments" },
+            { path: "/admin/change-requests/pending", icon: "bi-clipboard-check", label: "Review Requests" }
+          ].map(({ path, icon, label }, i) => (
+            <button key={i} className="ada-action-btn" onClick={() => navigate(path)}>
+              <i className={icon}></i>
+              <span>{label}</span>
+            </button>
+          ))}
         </div>
       </div>
 
       <div className="ada-charts-grid">
-        <div className="dashboard-card card-medium">
-          <div className="card-header-dark">
-            <div className="card-header-content">
-              <i className="bi bi-graph-up-arrow" />
-              <h3>User Growth Trend</h3>
+        <div className="ada-chart-card">
+          <div className="ada-card-header">
+            <div className="ada-card-title">
+              <i className="bi bi-graph-up-arrow" />User Growth Trend
             </div>
-            <span className="card-filter-btn-dark">Last 6 Months</span>
+            <span className="ada-card-badge">Last 6 Months</span>
           </div>
-          <div className="card-body">
+          <div className="ada-card-body">
             <ResponsiveContainer width="100%" height={280}>
               <AreaChart data={monthlyTrend}>
                 <defs>
@@ -471,71 +228,33 @@ const AdminDashboard = () => {
                     <stop offset="95%" stopColor="#1E40AF" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#e5e7eb"
-                  vertical={false}
-                />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
                 <XAxis dataKey="month" stroke="#6c757d" fontSize={13} />
                 <YAxis stroke="#6c757d" fontSize={13} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#fff",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: "8px",
-                    fontSize: "13px",
-                  }}
-                />
+                <Tooltip contentStyle={{ backgroundColor: "#fff", border: "1px solid #e5e7eb", borderRadius: "8px", fontSize: "13px" }} />
                 <Legend wrapperStyle={{ fontSize: "13px" }} />
-                <Area
-                  type="monotone"
-                  dataKey="New"
-                  stroke="#60A5FA"
-                  strokeWidth={2}
-                  fillOpacity={1}
-                  fill="url(#colorNew)"
-                />
-                <Area
-                  type="monotone"
-                  dataKey="Active"
-                  stroke="#1E40AF"
-                  strokeWidth={2}
-                  fillOpacity={1}
-                  fill="url(#colorActive)"
-                />
+                <Area type="monotone" dataKey="New" stroke="#60A5FA" strokeWidth={2} fillOpacity={1} fill="url(#colorNew)" />
+                <Area type="monotone" dataKey="Active" stroke="#1E40AF" strokeWidth={2} fillOpacity={1} fill="url(#colorActive)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="dashboard-card card-medium">
-          <div className="card-header-dark">
-            <div className="card-header-content">
-              <i className="bi bi-radar" />
-              <h3>Department Activity Analysis</h3>
+        <div className="ada-chart-card">
+          <div className="ada-card-header">
+            <div className="ada-card-title">
+              <i className="bi bi-radar" />Department Activity
             </div>
-            <span className="card-filter-btn-dark">Top 5 Departments</span>
+            <span className="ada-card-badge">Top 5 Depts</span>
           </div>
-          <div className="card-body">
+          <div className="ada-card-body">
             <ResponsiveContainer width="100%" height={280}>
               <RadarChart data={radarData}>
                 <PolarGrid stroke="#e5e7eb" />
                 <PolarAngleAxis dataKey="department" fontSize={12} />
                 <PolarRadiusAxis fontSize={12} />
-                <Radar
-                  name="Active"
-                  dataKey="Active"
-                  stroke="#1E40AF"
-                  fill="#1E40AF"
-                  fillOpacity={0.6}
-                />
-                <Radar
-                  name="Inactive"
-                  dataKey="Inactive"
-                  stroke="#BFDBFE"
-                  fill="#BFDBFE"
-                  fillOpacity={0.5}
-                />
+                <Radar name="Active" dataKey="Active" stroke="#1E40AF" fill="#1E40AF" fillOpacity={0.6} />
+                <Radar name="Inactive" dataKey="Inactive" stroke="#BFDBFE" fill="#BFDBFE" fillOpacity={0.5} />
                 <Legend wrapperStyle={{ fontSize: "13px" }} />
                 <Tooltip />
               </RadarChart>
@@ -543,190 +262,86 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        <div className="dashboard-card card-medium">
-          <div className="card-header-dark">
-            <div className="card-header-content">
-              <i className="bi bi-pie-chart-fill" />
-              <h3>Department Distribution</h3>
+        <div className="ada-chart-card">
+          <div className="ada-card-header">
+            <div className="ada-card-title">
+              <i className="bi bi-pie-chart-fill" />Department Dist.
             </div>
           </div>
-          <div className="card-body">
+          <div className="ada-card-body">
             <ResponsiveContainer width="100%" height={320}>
               <PieChart>
-                <Pie
-                  data={departmentData}
-                  cx="50%"
-                  cy="45%"
-                  labelLine={false}
-                  label={false}
-                  outerRadius={90}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {departmentData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                    />
-                  ))}
+                <Pie data={departmentData} cx="50%" cy="45%" labelLine={false} label={false} outerRadius={90} dataKey="value">
+                  {departmentData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
                 </Pie>
-                <Tooltip
-                  formatter={(value, name, props) => [
-                    `${value} users (${((value / stats.totalUsers) * 100).toFixed(0)}%)`,
-                    props.payload.fullName || props.payload.name
-                  ]}
-                />
-                <Legend
-                  layout="horizontal"
-                  align="center"
-                  verticalAlign="bottom"
-                  wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }}
-                  formatter={(value, entry) => {
-                    const item = departmentData.find(d => d.name === entry.value);
-                    return `${item?.name || value}: ${item?.value || 0}`;
-                  }}
-                />
+                <Tooltip formatter={(value, name, props) => [`${value} users (${((value / stats.totalUsers) * 100).toFixed(0)}%)`, props.payload.fullName || props.payload.name]} />
+                <Legend layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }}
+                  formatter={(value, entry) => `${departmentData.find(d => d.name === entry.value)?.name || value}: ${departmentData.find(d => d.name === entry.value)?.value || 0}`} />
               </PieChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="dashboard-card card-medium">
-          <div className="card-header-dark">
-            <div className="card-header-content">
-              <i className="bi bi-shield-fill" />
-              <h3>Role Distribution</h3>
+        <div className="ada-chart-card">
+          <div className="ada-card-header">
+            <div className="ada-card-title">
+              <i className="bi bi-shield-fill" />Role Distribution
             </div>
           </div>
-          <div className="card-body">
+          <div className="ada-card-body">
             <ResponsiveContainer width="100%" height={320}>
               <PieChart>
-                <Pie
-                  data={roleData}
-                  cx="50%"
-                  cy="45%"
-                  innerRadius={60}
-                  outerRadius={90}
-                  fill="#8884d8"
-                  paddingAngle={3}
-                  dataKey="value"
-                  label={false}
-                >
-                  {roleData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                    />
-                  ))}
+                <Pie data={roleData} cx="50%" cy="45%" innerRadius={60} outerRadius={90} paddingAngle={3} dataKey="value" label={false}>
+                  {roleData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
                 </Pie>
-                <Tooltip
-                  formatter={(value, name, props) => [
-                    `${value} users (${((value / stats.totalUsers) * 100).toFixed(0)}%)`,
-                    props.payload.name
-                  ]}
-                />
-                <Legend
-                  layout="horizontal"
-                  align="center"
-                  verticalAlign="bottom"
-                  wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }}
-                  formatter={(value, entry) => {
-                    const item = roleData.find(d => d.name === entry.value);
-                    return `${item?.name || value}: ${item?.value || 0}`;
-                  }}
-                />
+                <Tooltip formatter={(value, name, props) => [`${value} users (${((value / stats.totalUsers) * 100).toFixed(0)}%)`, props.payload.name]} />
+                <Legend layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }}
+                  formatter={(value, entry) => `${roleData.find(d => d.name === entry.value)?.name || value}: ${roleData.find(d => d.name === entry.value)?.value || 0}`} />
               </PieChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="dashboard-card card-medium">
-          <div className="card-header-dark">
-            <div className="card-header-content">
-              <i className="bi bi-clipboard-data" />
-              <h3>Request Status</h3>
+        <div className="ada-chart-card">
+          <div className="ada-card-header">
+            <div className="ada-card-title">
+              <i className="bi bi-clipboard-data" />Request Status
             </div>
           </div>
-          <div className="card-body">
+          <div className="ada-card-body">
             <ResponsiveContainer width="100%" height={320}>
               <PieChart>
-                <Pie
-                  data={requestStatusData}
-                  cx="50%"
-                  cy="45%"
-                  labelLine={false}
-                  label={false}
-                  outerRadius={90}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
+                <Pie data={requestStatusData} cx="50%" cy="45%" labelLine={false} label={false} outerRadius={90} dataKey="value">
                   {requestStatusData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={
-                        entry.name === "Approved"
-                          ? "#1E40AF"
-                          : entry.name === "Pending"
-                          ? "#60A5FA"
-                          : "#BFDBFE"
-                      }
-                    />
+                    <Cell key={`cell-${index}`} fill={entry.name === "Approved" ? "#1E40AF" : entry.name === "Pending" ? "#60A5FA" : "#BFDBFE"} />
                   ))}
                 </Pie>
-                <Tooltip
-                  formatter={(value, name) => [`${value} requests`, name]}
-                />
-                <Legend
-                  layout="horizontal"
-                  align="center"
-                  verticalAlign="bottom"
-                  wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }}
-                  formatter={(value, entry) => {
-                    const item = requestStatusData.find(d => d.name === entry.value);
-                    return `${item?.name || value}: ${item?.value || 0}`;
-                  }}
-                />
+                <Tooltip formatter={(value, name) => [`${value} requests`, name]} />
+                <Legend layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }}
+                  formatter={(value, entry) => `${requestStatusData.find(d => d.name === entry.value)?.name || value}: ${requestStatusData.find(d => d.name === entry.value)?.value || 0}`} />
               </PieChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="dashboard-card card-medium">
-          <div className="card-header-dark">
-            <div className="card-header-content">
-              <i className="bi bi-bar-chart-line-fill" />
-              <h3>Request Trend</h3>
+        <div className="ada-chart-card">
+          <div className="ada-card-header">
+            <div className="ada-card-title">
+              <i className="bi bi-bar-chart-line-fill" />Request Trend
             </div>
-            <span className="card-filter-btn-dark">Last 6 Months</span>
+            <span className="ada-card-badge">Last 6 Months</span>
           </div>
-          <div className="card-body">
+          <div className="ada-card-body">
             <ResponsiveContainer width="100%" height={280}>
               <ComposedChart data={requestTrendData}>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#e5e7eb"
-                  vertical={false}
-                />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
                 <XAxis dataKey="month" stroke="#6c757d" fontSize={13} />
                 <YAxis stroke="#6c757d" fontSize={13} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#fff",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: "8px",
-                    fontSize: "13px",
-                  }}
-                />
+                <Tooltip contentStyle={{ backgroundColor: "#fff", border: "1px solid #e5e7eb", borderRadius: "8px", fontSize: "13px" }} />
                 <Legend wrapperStyle={{ fontSize: "13px" }} />
                 <Bar dataKey="Approved" fill="#1E40AF" radius={[8, 8, 0, 0]} />
                 <Bar dataKey="Pending" fill="#60A5FA" radius={[8, 8, 0, 0]} />
-                <Line
-                  type="monotone"
-                  dataKey="Total"
-                  stroke="#2563EB"
-                  strokeWidth={2}
-                  dot={{ r: 4, fill: "#2563EB" }}
-                />
+                <Line type="monotone" dataKey="Total" stroke="#2563EB" strokeWidth={2} dot={{ r: 4, fill: "#2563EB" }} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>

@@ -45,9 +45,8 @@ const CustomDropdown = ({
       onBlur={() => setTimeout(() => setOpen(false), 200)}
     >
       <div
-        className={`${styles.customSelected} ${
-          disabled ? styles.customDisabled : ""
-        }`}
+        className={`${styles.customSelected} ${disabled ? styles.customDisabled : ""
+          }`}
         onClick={() => !disabled && setOpen((prev) => !prev)}
       >
         {selected.label}
@@ -59,9 +58,8 @@ const CustomDropdown = ({
           {options.map((opt) => (
             <div
               key={opt.value}
-              className={`${styles.customOption} ${
-                opt.value === value ? styles.customOptionActive : ""
-              }`}
+              className={`${styles.customOption} ${opt.value === value ? styles.customOptionActive : ""
+                }`}
               onClick={() => handleSelect(opt.value)}
             >
               {opt.label}
@@ -108,9 +106,8 @@ const PaginationDropdown = ({ value, onChange, options }) => {
           {options.map((opt) => (
             <div
               key={opt}
-              className={`${styles.paginationOption} ${
-                opt === value ? styles.paginationOptionActive : ""
-              }`}
+              className={`${styles.paginationOption} ${opt === value ? styles.paginationOptionActive : ""
+                }`}
               onClick={() => handleSelect(opt)}
             >
               {opt}
@@ -164,7 +161,7 @@ function average(values) {
 function normalizeStatus(status) {
   if (!status || typeof status !== "string") return "completed";
   const normalized = status.toLowerCase().trim();
-  
+
   if (normalized === "completed" || normalized === "complete") {
     return "completed";
   }
@@ -177,7 +174,7 @@ function normalizeStatus(status) {
 
 function statusBadge(status) {
   const normalized = normalizeStatus(status);
-  
+
   if (normalized === "completed") {
     return (
       <span
@@ -270,14 +267,14 @@ function HRViewAppraisals() {
       const l2Ratings = a.competencies
         .map((c) => c.l2Rating)
         .filter((r) => typeof r === "number");
-      
+
       let rawStatus = a.competencies[0]?.status ?? "N/A";
       if (a.competencies.some((c) => c.status !== rawStatus)) {
         rawStatus = "Mixed";
       }
-      
+
       const normalizedStatus = normalizeStatus(rawStatus);
-      
+
       return {
         key: `${a.employeeId}-${a.projectName}-${idx}`,
         employeeId: a.employeeId,
@@ -587,11 +584,10 @@ function HRViewAppraisals() {
             <nav className={styles.hrViewAssessmentPaginationNav}>
               <ul className={styles.hrViewAssessmentPagination}>
                 <li
-                  className={`${styles.hrViewAssessmentPageItem}${
-                    currentPage === 1
+                  className={`${styles.hrViewAssessmentPageItem}${currentPage === 1
                       ? ` ${styles.hrViewAssessmentDisabled}`
                       : ""
-                  }`}
+                    }`}
                 >
                   <button
                     className={styles.hrViewAssessmentPageLink}
@@ -606,15 +602,13 @@ function HRViewAppraisals() {
                 {getPageNumbers().map((page, idx) => (
                   <li
                     key={idx}
-                    className={`${styles.hrViewAssessmentPageItem}${
-                      page === currentPage
+                    className={`${styles.hrViewAssessmentPageItem}${page === currentPage
                         ? ` ${styles.hrViewAssessmentActive}`
                         : ""
-                    } ${
-                      typeof page !== "number"
+                      } ${typeof page !== "number"
                         ? ` ${styles.hrViewAssessmentDisabled}`
                         : ""
-                    }`}
+                      }`}
                   >
                     <button
                       className={styles.hrViewAssessmentPageLink}
@@ -628,11 +622,10 @@ function HRViewAppraisals() {
                   </li>
                 ))}
                 <li
-                  className={`${styles.hrViewAssessmentPageItem}${
-                    currentPage === totalPages
+                  className={`${styles.hrViewAssessmentPageItem}${currentPage === totalPages
                       ? ` ${styles.hrViewAssessmentDisabled}`
                       : ""
-                  }`}
+                    }`}
                 >
                   <button
                     className={styles.hrViewAssessmentPageLink}
