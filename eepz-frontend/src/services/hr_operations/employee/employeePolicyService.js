@@ -1,12 +1,7 @@
 import axios from "axios";
 
-
-const API_BASE_URL =
-  import.meta.env.VITE_EMPLOYEE_API_URL || "http://localhost:5104/api";
-
-
 const employeeApi = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: import.meta.env.VITE_HR_API_URL+"/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -62,7 +57,7 @@ const employeePolicyService = {
     }
     
     //  FIXED: Use HR API base URL (port 5104)
-    const hrBaseUrl = import.meta.env.VITE_HR_API_URL || "http://localhost:5104";
+    const hrBaseUrl =import.meta.env.VITE_HR_API_URL;
     
     // Extract filename from paths like "/uploads/policies/abc.pdf"
     const fileName = url.split('/').pop();
