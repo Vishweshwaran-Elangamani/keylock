@@ -106,7 +106,7 @@ const goalService = {
   // ==================== DASHBOARD ====================
   getDashboardSummary: async () => {
     try {
-      const response = await goalApi.get("/goals/dashboard/summary");
+      const response = await goalApi.get("/goal-interaction/dashboard/summary");
       return response.data;
     } catch (error) {
       console.error("Error fetching dashboard summary:", error);
@@ -168,13 +168,13 @@ const goalService = {
   },
 
   getProjectSubordinates: async (projectId) => {
-    return goalApi.get(`/goals/projects/${projectId}/subordinates`);
+    return goalApi.get(`/goal-interaction/projects/${projectId}/subordinates`);
   },
 
   // ==================== GOAL CRUD ====================
   createGoal: async (goalData) => {
     try {
-      const response = await goalApi.post("/goals", goalData);
+      const response = await goalApi.post("/goals/create", goalData);
       return response.data;
     } catch (error) {
       console.error("Error creating goal:", error);
@@ -320,7 +320,7 @@ const goalService = {
   // ==================== COMMENTS ====================
   addComment: async (goalId, comment) => {
     try {
-      const response = await goalApi.post(`/goals/${goalId}/comments`, {
+      const response = await goalApi.post(`/goal-interaction/${goalId}/comments`, {
         comment,
       });
       return response.data;
@@ -332,7 +332,7 @@ const goalService = {
 
   listComments: async (goalId, filters = {}) => {
     try {
-      const response = await goalApi.get(`/goals/${goalId}/comments`, {
+      const response = await goalApi.get(`/goal-interaction/${goalId}/comments`, {
         params: filters,
       });
       return response.data;
@@ -345,7 +345,7 @@ const goalService = {
   // ==================== TIMELINE ====================
   getTimeline: async (goalId) => {
     try {
-      const response = await goalApi.get(`/goals/${goalId}/timeline`);
+      const response = await goalApi.get(`/goal-interaction/${goalId}/timeline`);
       return response.data;
     } catch (error) {
       console.error("Error fetching timeline:", error);
@@ -353,7 +353,7 @@ const goalService = {
     }
   },
 
-  // ==================== ATTACHMENTS (UPDATED - ALL ROUTES CHANGED) ====================
+  // ==================== ATTACHMENTS  ====================
   /**
    *  FIXED: Changed to /goal-attachments/{goalId}/upload
    */
@@ -489,7 +489,7 @@ const goalService = {
    */
   canMarkComplete: async (goalId) => {
     try {
-      const response = await goalApi.get(`/goals/${goalId}/can-complete`);
+      const response = await goalApi.get(`/goal-interaction/${goalId}/can-complete`);
       return response.data;
     } catch (error) {
       console.error("Error checking completion permission:", error);
