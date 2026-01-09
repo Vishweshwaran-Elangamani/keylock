@@ -764,3 +764,61 @@
     transform: rotate(360deg);
   }
 }
+/* ==================== SUCCESS STYLES ==================== */
+.bom-success-category {
+  border-color: #10b981 !important;
+  background: #f0fdf4 !important;
+}
+
+.bom-success-category-summary {
+  background: #dcfce7 !important;
+  color: #065f46 !important;
+}
+
+.bom-success-badge {
+  background: #10b981 !important;
+  color: #ffffff !important;
+}
+
+.bom-success-list-item {
+  border-left: 3px solid #10b981 !important;
+  background: #f0fdf4 !important;
+  color: #065f46 !important;
+}
+
+.bom-success-icon {
+  color: #10b981 !important;
+}
+
+.bom-success-summary {
+  padding: 1rem;
+  text-align: center;
+  color: #065f46;
+}
+
+.bom-success-summary-icon {
+  font-size: 2rem;
+  color: #10b981;
+}
+
+.bom-success-summary-title {
+  margin-top: 0.5rem;
+  font-weight: 600;
+}
+
+.bom-success-summary-text {
+  color: #047857;
+}
+
+/* ==================== ERROR CATEGORY SPECIFIC STYLES ==================== */
+.bom-error-list-item-duplicate {
+  border-left: 3px solid #ef4444;
+}
+
+.bom-error-list-item-validation {
+  border-left: 3px solid #f97316;
+}
+
+.bom-error-list-item-other {
+  border-left: 3px solid #3b82f6;
+}
