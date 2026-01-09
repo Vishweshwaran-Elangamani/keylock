@@ -1,0 +1,289 @@
+/* DEPARTMENT HEAD DASHBOARD - PURPLE-BLUE THEME (#b9b4c7, #7077a1, #590016) */
+
+/* LOADING STATE */
+.ada-loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+}
+
+/* MAIN DASHBOARD CONTAINER */
+.hr-dashboard-container {
+  padding: 0;
+  background: #f8f9fa;
+  overflow-x: hidden;
+}
+
+/* KPI CARDS GRID - FIXED 5 COLUMNS */
+.admin-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.admin-kpi-card {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 2px solid #b9b4c7;
+  padding: 1.125rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.admin-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(112, 119, 161, 0.25);
+  border-color: #7077a1;
+}
+
+.admin-kpi-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1.5rem;
+}
+
+/* PURPLE-BLUE GRADIENT COLORS FOR KPI ICONS */
+.admin-kpi-icon.admin-purple {
+  background: linear-gradient(135deg, rgba(185, 180, 199, 0.2) 0%, rgba(112, 119, 161, 0.15) 100%);
+  color: #7077a1;
+}
+
+.admin-kpi-icon.admin-blue {
+  background: linear-gradient(135deg, rgba(112, 119, 161, 0.2) 0%, rgba(93, 99, 137, 0.15) 100%);
+  color: #7077a1;
+}
+
+.admin-kpi-icon.admin-pink {
+  background: linear-gradient(135deg, rgba(152, 145, 175, 0.2) 0%, rgba(185, 180, 199, 0.15) 100%);
+  color: #9891af;
+}
+
+.admin-kpi-icon.admin-green {
+  background: linear-gradient(135deg, rgba(163, 155, 181, 0.2) 0%, rgba(112, 119, 161, 0.15) 100%);
+  color: #b9b4c7;
+}
+
+.admin-kpi-icon.admin-cyan {
+  background: linear-gradient(135deg, rgba(89, 0, 22, 0.15) 0%, rgba(120, 0, 30, 0.1) 100%);
+  color: #590016;
+}
+
+.admin-kpi-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  text-align: center;
+  align-items: center;
+}
+
+.admin-kpi-content h2 {
+  font-size: 1.625rem;
+  font-weight: 700;
+  color: #7077a1;
+  margin: 0;
+  line-height: 1;
+}
+
+.admin-kpi-content p {
+  font-size: 0.8125rem;
+  color: #000000;
+  margin: 0;
+  font-weight: 600;
+}
+
+.admin-kpi-subtitle {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: #000000;
+  margin-top: 0.25rem;
+  font-weight: 500;
+}
+
+/* DASHBOARD CARDS CONTAINER */
+.dashboard-cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.dashboard-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+/* AUTO-ADJUST FOR 2 CARDS IN SECOND ROW */
+.dashboard-row-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.dashboard-card {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 2px solid #b9b4c7;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(112, 119, 161, 0.25);
+}
+
+.dashboard-card.card-medium {
+  grid-column: span 1;
+}
+
+/* CARD HEADER - DARK NAVY BLUE */
+.card-header-dark {
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, #27235c 0%, #3b4d8f 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header-content {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.card-header-content i {
+  font-size: 1.125rem;
+  color: #ffffff;
+}
+
+.card-header-content h3 {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* CARD BODY */
+.card-body {
+  padding: 1.25rem;
+}
+
+.no-data-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #9ca3af;
+  font-size: 0.875rem;
+  min-height: 240px;
+}
+
+/* STAT CARDS GRID - PURPLE-BLUE THEMED */
+.emp-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.emp-stats-grid.emp-stats-2col {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.emp-stat-card {
+  padding: 0.75rem;
+  border-radius: 6px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.emp-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(112, 119, 161, 0.2);
+}
+
+.emp-stat-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.emp-stat-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 1400px) {
+  .admin-kpi-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .dashboard-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dashboard-row-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 992px) {
+  .dashboard-row,
+  .dashboard-row-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .emp-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .emp-stats-grid.emp-stats-2col {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .emp-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-header-dark {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+
+  .admin-kpi-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .admin-kpi-icon {
+    margin: 0 auto;
+  }
+}

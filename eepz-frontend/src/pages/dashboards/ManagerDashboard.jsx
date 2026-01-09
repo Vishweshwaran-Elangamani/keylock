@@ -1,28 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-} from "recharts";
+import { PieChart, Pie, Cell, LineChart, Line, CartesianGrid, Tooltip, Legend, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import CountUp from "react-countup";
-import {
-  Users,
-  Target,
-  Shield,
-  TrendingUp,
-  Calendar,
-  AlertTriangle,
-} from "lucide-react";
+import { Users, Target, Shield, TrendingUp, Calendar, AlertTriangle } from "lucide-react";
 import goalService from "../../services/goals/goalService";
 import lndService from "../../services/lnd/lndService";
 import { getTeamMembers, getMyNominations } from "../../services/performancemanagement/manager/managernominationapi";
@@ -30,7 +10,7 @@ import meetingService from "../../services/meeting/meetingService";
 import slaService from "../../services/sla/slaService";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
-import "../../styles/auth/AdminDashboard.css";
+import "../../styles/auth/ManagerDashboard.css";
 
 const formatStatusLabel = (raw) => {
   if (!raw) return "";
@@ -53,91 +33,28 @@ const ManagerDashboard = () => {
     subordinateEmployees: [],
     myMeetings: [],
     oneOnOneReports: [],
-    managerEscalations: [],
+    managerEscalations: []
   });
 
-  useEffect(() => {
-    fetchAllData();
-
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        fetchAllData();
-      }
-    };
-
-    const handleFocus = () => {
-      fetchAllData();
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("focus", handleFocus);
-
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("focus", handleFocus);
-    };
-  }, []);
+  useEffect(() => { fetchAllData(); }, []);
 
   const getUserData = () => {
-    const userStr = localStorage.getItem("user");
-    if (!userStr) return null;
-    try {
-      return JSON.parse(userStr);
-    } catch {
-      return null;
-    }
+    try { return JSON.parse(localStorage.getItem("user")); }
+    catch { return null; }
   };
 
   const extractData = (response) => {
     if (!response) return [];
     if (Array.isArray(response)) return response;
-
-    if (response.success === true || response.success === false) {
-      if (response.data) {
-        if (Array.isArray(response.data)) return response.data;
-        if (response.data.$values) return response.data.$values;
-        if (response.data.nominations) {
-          if (Array.isArray(response.data.nominations)) return response.data.nominations;
-          if (response.data.nominations.$values) return response.data.nominations.$values;
-        }
-        if (response.data.items) {
-          if (Array.isArray(response.data.items)) return response.data.items;
-          if (response.data.items.$values) return response.data.items.$values;
-        }
-      }
-    }
-
-    if (response.data) {
-      if (Array.isArray(response.data)) return response.data;
-      if (response.data.$values) return response.data.$values;
-      if (response.data.nominations) {
-        if (Array.isArray(response.data.nominations)) return response.data.nominations;
-        if (response.data.nominations.$values) return response.data.nominations.$values;
-      }
-      if (response.data.data) {
-        if (Array.isArray(response.data.data)) return response.data.data;
-        if (response.data.data.$values) return response.data.data.$values;
-        if (response.data.data.nominations) return response.data.data.nominations;
-        if (response.data.data.items?.$values) return response.data.data.items.$values;
-        if (response.data.data.items) return response.data.data.items;
-      }
-    }
-
-    if (response.$values) return response.$values;
-    if (response.nominations) {
-      if (Array.isArray(response.nominations)) return response.nominations;
-      if (response.nominations.$values) return response.nominations.$values;
-    }
-
-    return [];
+    const data = response.data || response;
+    const paths = [data?.data?.items, data?.data?.$values, data?.data, data?.items, data?.$values, data];
+    return paths.find(p => Array.isArray(p)) || [];
   };
 
   const fetchAllData = async () => {
     try {
       setLoading(true);
-
       const user = getUserData();
-
       if (!user) {
         toast.error("User not found. Please login again.");
         navigate("/login");
@@ -147,35 +64,21 @@ const ManagerDashboard = () => {
       const managerId = user.empMasterId || user.employeeMasterId || user.id;
 
       const [
-        dashboardSummaryRes,
-        allGoalsRes,
-        myProjectsRes,
-        pendingApprovalsRes,
-        managerNominationsRes,
-        teamMembersRes,
-        teamAssignmentsRes,
-        subordinateEmployeesRes,
-        myMeetingsRes,
-        oneOnOneReportsRes,
-        managerEscalationsRes,
+        dashboardSummaryRes, allGoalsRes, myProjectsRes, pendingApprovalsRes,
+        managerNominationsRes, teamMembersRes, teamAssignmentsRes,
+        subordinateEmployeesRes, myMeetingsRes, oneOnOneReportsRes, managerEscalationsRes
       ] = await Promise.all([
         goalService.getDashboardSummary().catch(() => ({ data: null })),
-        goalService
-          .queryGoals({ pageSize: 1000, status: "" })
-          .catch(() => ({ data: [] })),
+        goalService.queryGoals({ pageSize: 1000, status: "" }).catch(() => ({ data: [] })),
         goalService.getUserProjects().catch(() => ({ data: [] })),
         goalService.getPendingApprovals().catch(() => ({ data: [] })),
         getMyNominations(managerId).catch(() => ({ data: [] })),
         getTeamMembers(managerId).catch(() => ({ data: [] })),
-        lndService
-          .getTeamAssignments(1)
-          .catch(() => ({ data: { data: { items: [] } } })),
-        lndService
-          .getSubordinateEmployees(1)
-          .catch(() => ({ data: { data: { items: [] } } })),
+        lndService.getTeamAssignments(1).catch(() => ({ data: { data: { items: [] } } })),
+        lndService.getSubordinateEmployees(1).catch(() => ({ data: { data: { items: [] } } })),
         meetingService.getMyMeetings().catch(() => ({ data: [] })),
         meetingService.getOneOnOneReports().catch(() => ({ data: [] })),
-        slaService.getManagerEscalations(managerId).catch(() => ({ data: [] })),
+        slaService.getManagerEscalations(managerId).catch(() => ({ data: [] }))
       ]);
 
       const allGoalsExtracted = extractData(allGoalsRes);
@@ -189,11 +92,7 @@ const ManagerDashboard = () => {
       const extractedTeamGoals = allGoalsExtracted.filter((g) => {
         const title = (g.title || "").toLowerCase();
         const type = (g.goalType || g.type || "").toLowerCase();
-        return (
-          (title.includes("team") || type === "team") &&
-          !title.includes("self") &&
-          !title.includes("personal")
-        );
+        return (title.includes("team") || type === "team") && !title.includes("self") && !title.includes("personal");
       });
 
       const extractedOrgGoals = allGoalsExtracted.filter((g) => {
@@ -205,19 +104,9 @@ const ManagerDashboard = () => {
       const extractedProjects = extractData(myProjectsRes);
       const extractedPendingApprovals = extractData(pendingApprovalsRes);
       const extractedManagerNominations = extractData(managerNominationsRes);
-
       const extractedTeamMembers = extractData(teamMembersRes);
-
-      const extractedTeamAssignments =
-        teamAssignmentsRes?.data?.data?.items?.$values ||
-        teamAssignmentsRes?.data?.data?.items ||
-        extractData(teamAssignmentsRes);
-
-      const extractedSubordinateEmployees =
-        subordinateEmployeesRes?.data?.data?.items?.$values ||
-        subordinateEmployeesRes?.data?.data?.items ||
-        extractData(subordinateEmployeesRes);
-
+      const extractedTeamAssignments = teamAssignmentsRes?.data?.data?.items?.$values || teamAssignmentsRes?.data?.data?.items || extractData(teamAssignmentsRes);
+      const extractedSubordinateEmployees = subordinateEmployeesRes?.data?.data?.items?.$values || subordinateEmployeesRes?.data?.data?.items || extractData(subordinateEmployeesRes);
       const extractedMeetings = extractData(myMeetingsRes);
       const extractedOneOnOneReports = extractData(oneOnOneReportsRes);
       const extractedManagerEscalations = extractData(managerEscalationsRes);
@@ -225,16 +114,12 @@ const ManagerDashboard = () => {
       const allGoalsCombined = [
         ...extractedSelfGoals.map((g) => ({ ...g, goalType: "self" })),
         ...extractedTeamGoals.map((g) => ({ ...g, goalType: "team" })),
-        ...extractedOrgGoals.map((g) => ({ ...g, goalType: "org" })),
+        ...extractedOrgGoals.map((g) => ({ ...g, goalType: "org" }))
       ];
 
       let summaryData = null;
       if (dashboardSummaryRes) {
-        if (dashboardSummaryRes.data) {
-          summaryData = dashboardSummaryRes.data;
-        } else {
-          summaryData = dashboardSummaryRes;
-        }
+        summaryData = dashboardSummaryRes.data ? dashboardSummaryRes.data : dashboardSummaryRes;
       }
 
       setDashboardData({
@@ -248,10 +133,10 @@ const ManagerDashboard = () => {
         subordinateEmployees: extractedSubordinateEmployees,
         myMeetings: extractedMeetings,
         oneOnOneReports: extractedOneOnOneReports,
-        managerEscalations: extractedManagerEscalations,
+        managerEscalations: extractedManagerEscalations
       });
-    } catch (error) {
-      console.error("Error fetching dashboard data:", error);
+    } catch (err) {
+      console.error("Error in fetchAllData:", err);
       toast.error("Failed to load dashboard data");
     } finally {
       setLoading(false);
@@ -259,180 +144,94 @@ const ManagerDashboard = () => {
   };
 
   const getKPIStats = () => {
-    const totalTeamMembers =
-      dashboardData.subordinateEmployees.length || dashboardData.teamMembers.length;
+    const totalTeamMembers = dashboardData.subordinateEmployees.length || dashboardData.teamMembers.length;
     const pendingApprovals = dashboardData.pendingApprovals.length;
     const totalNominations = dashboardData.managerNominations.length;
-
     const ongoingGoalsCount = dashboardData.allGoals.filter((g) => {
       const status = (g.status || g.goalStatus || "").toLowerCase();
-      return (
-        status === "inprogress" ||
-        status === "pending" ||
-        status === "approved" ||
-        status === "open"
-      );
+      return status === "inprogress" || status === "pending" || status === "approved" || status === "open";
     }).length;
-
     const myProjectsCount = dashboardData.myProjects.length;
     const teamAssignmentsCount = dashboardData.teamAssignments.length;
-    const pendingEscalations = dashboardData.managerEscalations.filter(
-      (e) => e.escalationStatus?.toLowerCase() === "pending"
-    ).length;
+    const pendingEscalations = dashboardData.managerEscalations.filter((e) => e.escalationStatus?.toLowerCase() === "pending").length;
     const upcomingMeetings = dashboardData.myMeetings.filter((m) => {
       const meetingDate = new Date(m.meetingDate || m.date);
-      const now = new Date();
-      return meetingDate > now;
+      return meetingDate > new Date();
     }).length;
 
     return {
-      totalTeamMembers,
-      pendingApprovals,
-      totalNominations,
-      ongoingGoalsCount,
-      myProjectsCount,
-      teamAssignmentsCount,
-      pendingEscalations,
-      upcomingMeetings,
+      totalTeamMembers, pendingApprovals, totalNominations, ongoingGoalsCount,
+      myProjectsCount, teamAssignmentsCount, pendingEscalations, upcomingMeetings,
       totalEscalations: dashboardData.managerEscalations.length,
-      totalMeetings: dashboardData.myMeetings.length,
+      totalMeetings: dashboardData.myMeetings.length
     };
   };
 
   const getGoalsByType = () => {
     const goals = dashboardData.allGoals.filter((g) => {
       const goalTypeLower = (g.goalType || g.type || "").toLowerCase();
-
-      if (goalType === "self") {
-        return goalTypeLower === "self" || goalTypeLower === "personal";
-      }
-      if (goalType === "team") {
-        return goalTypeLower === "team";
-      }
-      if (goalType === "org") {
-        return goalTypeLower === "org" || goalTypeLower === "organization";
-      }
-
+      if (goalType === "self") return goalTypeLower === "self" || goalTypeLower === "personal";
+      if (goalType === "team") return goalTypeLower === "team";
+      if (goalType === "org") return goalTypeLower === "org" || goalTypeLower === "organization";
       return false;
     });
 
     if (!goals || goals.length === 0) {
-      return {
-        total: 0,
-        completed: 0,
-        inProgress: 0,
-        overdue: 0,
-        chartData: [],
-      };
+      return { total: 0, completed: 0, inProgress: 0, overdue: 0, chartData: [] };
     }
 
     const now = new Date();
-    const completed = goals.filter(
-      (g) =>
-        g.status?.toLowerCase() === "completed" ||
-        g.goalStatus?.toLowerCase() === "completed"
-    ).length;
-
-    const inProgress = goals.filter(
-      (g) =>
-        g.status?.toLowerCase() === "inprogress" ||
-        g.goalStatus?.toLowerCase() === "inprogress"
-    ).length;
-
+    const completed = goals.filter((g) => g.status?.toLowerCase() === "completed" || g.goalStatus?.toLowerCase() === "completed").length;
+    const inProgress = goals.filter((g) => g.status?.toLowerCase() === "inprogress" || g.goalStatus?.toLowerCase() === "inprogress").length;
     const pending = goals.filter((g) => {
       const status = (g.status || g.goalStatus || "").toLowerCase();
       return status === "pending" || status === "open" || status === "approved";
     }).length;
 
-    const overdue = goals.filter((g) => {
-      const deadline = new Date(g.deadline || g.endDate);
-      const status = (g.status || g.goalStatus || "").toLowerCase();
-      return deadline < now && status !== "completed";
-    }).length;
+    const chartData = [
+      completed > 0 && { name: "Completed", value: completed, fill: "#7077a1" },
+      inProgress > 0 && { name: "In Progress", value: inProgress, fill: "#b9b4c7" },
+      pending > 0 && { name: "Pending", value: pending, fill: "#9891af" }
+    ].filter(Boolean);
 
-    const total = goals.length;
-
-    const chartData = [];
-    if (completed > 0)
-      chartData.push({ name: "Completed", value: completed, fill: "#10b981" });
-    if (inProgress > 0)
-      chartData.push({ name: "In Progress", value: inProgress, fill: "#0F62FE" });
-    if (pending > 0) chartData.push({ name: "Pending", value: pending, fill: "#f59e0b" });
-    if (overdue > 0) chartData.push({ name: "Overdue", value: overdue, fill: "#ef4444" });
-
-    return {
-      total,
-      completed,
-      inProgress,
-      pending: pending + overdue,
-      chartData:
-        chartData.length > 0
-          ? chartData
-          : [{ name: "No Data", value: 1, fill: "#e5e7eb" }],
-    };
+    return { total: goals.length, completed, inProgress, pending, chartData };
   };
 
   const getTeamAssignmentStatus = () => {
-    const CHART_COLORS_LOCAL = [
-      "#10b981",
-      "#f59e0b",
-      "#0F62FE",
-      "#ef4444",
-      "#8b5cf6",
-      "#2c2c54",
-    ];
-
+    const CHART_COLORS_LOCAL = ["#7077a1", "#b9b4c7", "#9891af", "#5d6389", "#a39bb5"];
     const statusCount = {};
     dashboardData.teamAssignments.forEach((assignment) => {
       const rawStatus = assignment.assignmentStatus || assignment.status || "Unknown";
       const key = formatStatusLabel(rawStatus);
       statusCount[key] = (statusCount[key] || 0) + 1;
     });
-
     return Object.entries(statusCount)
-      .map(([name, value], index) => ({
-        name,
-        value,
-        fill: CHART_COLORS_LOCAL[index % CHART_COLORS_LOCAL.length],
-      }))
+      .map(([name, value], index) => ({ name, value, fill: CHART_COLORS_LOCAL[index % CHART_COLORS_LOCAL.length] }))
       .filter((item) => item.value > 0);
   };
 
   const getEscalationHistory = () => {
     const escalations = dashboardData.managerEscalations;
-
     const ESCALATION_COLORS = {
-      "Pending": "#f59e0b",
-      "Resolved": "#10b981",
-      "Rejected": "#ef4444",
-      "In Progress": "#0F62FE",
+      "Pending": "#f59e0b", "Resolved": "#7077a1",
+      "Rejected": "#662222", "In Progress": "#b9b4c7"
     };
-
     const statusCount = {};
     escalations.forEach((esc) => {
       const rawStatus = esc.escalationStatus || "Unknown";
       const key = formatStatusLabel(rawStatus);
       statusCount[key] = (statusCount[key] || 0) + 1;
     });
-
     const chartData = Object.entries(statusCount).map(([name, value]) => ({
-      name,
-      value,
-      fill: ESCALATION_COLORS[name] || "#6b7280",
+      name, value, fill: ESCALATION_COLORS[name] || "#6b7280"
     }));
 
     return {
       total: escalations.length,
-      pending: escalations.filter(
-        (e) => e.escalationStatus?.toLowerCase() === "pending"
-      ).length,
-      resolved: escalations.filter(
-        (e) => e.escalationStatus?.toLowerCase() === "resolved"
-      ).length,
-      rejected: escalations.filter(
-        (e) => e.escalationStatus?.toLowerCase() === "rejected"
-      ).length,
-      chartData: chartData.filter((item) => item.value > 0),
+      pending: escalations.filter((e) => e.escalationStatus?.toLowerCase() === "pending").length,
+      resolved: escalations.filter((e) => e.escalationStatus?.toLowerCase() === "resolved").length,
+      rejected: escalations.filter((e) => e.escalationStatus?.toLowerCase() === "rejected").length,
+      chartData: chartData.filter((item) => item.value > 0)
     };
   };
 
@@ -441,24 +240,10 @@ const ManagerDashboard = () => {
     const now = new Date();
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth();
-
     const total = nominations.length;
 
     const thisMonth = nominations.filter((nom) => {
-      const dateFields = [
-        nom.createdDate,
-        nom.submittedDate,
-        nom.nominationDate,
-        nom.createdAt,
-        nom.submittedAt,
-        nom.dateCreated,
-        nom.dateSubmitted,
-        nom.created,
-        nom.submitted,
-        nom.createdOn,
-        nom.submittedOn,
-      ];
-
+      const dateFields = [nom.createdDate, nom.submittedDate, nom.nominationDate, nom.createdAt, nom.submittedAt];
       for (const df of dateFields) {
         if (df) {
           const d = new Date(df);
@@ -483,78 +268,45 @@ const ManagerDashboard = () => {
     });
 
     const chartData = Object.entries(statusCount).map(([name, value]) => ({
-      name,
-      value,
-      fill: name.toLowerCase().includes("pending") ? "#f59e0b" : 
-            name.toLowerCase().includes("approved") ? "#10b981" :
-            name.toLowerCase().includes("reject") ? "#ef4444" : "#0F62FE",
+      name, value,
+      fill: name.toLowerCase().includes("pending") ? "#f59e0b" :
+            name.toLowerCase().includes("approved") ? "#7077a1" :
+            name.toLowerCase().includes("reject") ? "#662222" : "#b9b4c7"
     }));
 
-    return {
-      total,
-      thisMonth,
-      pending,
-      chartData: chartData.filter((item) => item.value > 0),
-    };
+    return { total, thisMonth, pending, chartData: chartData.filter((item) => item.value > 0) };
   };
 
   const getMeetingScheduleData = () => {
     const meetings = dashboardData.myMeetings;
-
     const monthlyData = {};
     meetings.forEach((meeting) => {
       const date = new Date(meeting.meetingDate || meeting.date || meeting.createdDate);
-      const monthKey = `${date.getFullYear()}-${String(
-        date.getMonth() + 1
-      ).padStart(2, "0")}`;
-      monthlyData[monthKey] = (monthlyData[monthKey] || 0) + 1;
+      if (!isNaN(date.getTime())) {
+        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+        monthlyData[key] = (monthlyData[key] || 0) + 1;
+      }
     });
-
-    const chartData = Object.entries(monthlyData)
-      .sort((a, b) => a[0].localeCompare(b[0]))
-      .slice(-6)
-      .map(([month, count]) => ({
-        month: new Date(month + "-01").toLocaleDateString("en-US", {
-          month: "short",
-          year: "numeric",
-        }),
-        count,
-      }));
-
-    return {
-      total: meetings.length,
-      thisMonth: Object.values(monthlyData).slice(-1)[0] || 0,
-      chartData,
-    };
+    const chartData = Object.entries(monthlyData).sort((a, b) => a[0].localeCompare(b[0])).slice(-6)
+      .map(([month, count]) => ({ month: new Date(month + "-01").toLocaleDateString("en-US", { month: "short", year: "numeric" }), count }));
+    return { total: meetings.length, thisMonth: Object.values(monthlyData).slice(-1)[0] || 0, chartData };
   };
 
   const getMeetingOverview = () => {
+    const now = new Date();
     const total = dashboardData.myMeetings.length;
-    const upcoming = dashboardData.myMeetings.filter((m) => {
-      const meetingDate = new Date(m.meetingDate || m.date);
-      return meetingDate > new Date();
-    }).length;
-    const completed = dashboardData.myMeetings.filter((m) => {
-      const meetingDate = new Date(m.meetingDate || m.date);
-      return meetingDate <= new Date();
-    }).length;
-
-    return {
-      total,
-      upcoming,
-      completed,
-    };
+    const upcoming = dashboardData.myMeetings.filter((m) => new Date(m.meetingDate || m.date) >= now).length;
+    const completed = total - upcoming;
+    return { total, upcoming, completed };
   };
 
-  if (loading) {
-    return (
-      <div className="ada-loading-container">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
+  if (loading) return (
+    <div className="ada-loading-container">
+      <div className="spinner-border text-primary" role="status">
+        <span className="visually-hidden">Loading...</span>
       </div>
-    );
-  }
+    </div>
+  );
 
   const kpiStats = getKPIStats();
   const goalsData = getGoalsByType();
@@ -564,88 +316,44 @@ const ManagerDashboard = () => {
   const meetingScheduleData = getMeetingScheduleData();
   const meetingOverview = getMeetingOverview();
 
+  const kpiCards = [
+    { icon: Users, value: kpiStats.totalTeamMembers, label: "Team Members", subtitle: "Your team size", iconClass: "admin-purple" },
+    { icon: Target, value: kpiStats.ongoingGoalsCount, label: "Ongoing Goals", subtitle: `${kpiStats.myProjectsCount} projects`, iconClass: "admin-blue", showTrend: true },
+    { icon: Shield, value: kpiStats.totalNominations, label: "My Nominations", subtitle: `${nominationOverview.thisMonth} this month`, iconClass: "admin-pink" },
+    { icon: Calendar, value: kpiStats.totalMeetings, label: "Meetings", subtitle: `${kpiStats.upcomingMeetings} upcoming`, iconClass: "admin-green" },
+    { icon: AlertTriangle, value: kpiStats.totalEscalations, label: "Escalations", subtitle: `${kpiStats.pendingEscalations} pending`, iconClass: "admin-cyan" }
+  ];
+
+  const StatCard = ({ bg, border, value, label, color }) => (
+    <div className="emp-stat-card" style={{ background: bg, border: `2px solid ${border}` }}>
+      <div className="emp-stat-value" style={{ color }}>{value}</div>
+      <div className="emp-stat-label" style={{ color }}>{label}</div>
+    </div>
+  );
+
   return (
     <div className="hr-dashboard-container">
       <Breadcrumb items={[{ label: "Manager Dashboard" }]} />
 
       <div className="admin-kpi-grid">
-        <div className="admin-kpi-card" onClick={() => navigate("")}>
-          <div className="admin-kpi-icon admin-pink">
-            <Users size={28} />
+        {kpiCards.map(({ icon: IconComponent, value, label, subtitle, iconClass, showTrend }, i) => (
+          <div key={i} className="admin-kpi-card">
+            <div className={`admin-kpi-icon ${iconClass}`}>
+              <IconComponent size={28} />
+            </div>
+            <div className="admin-kpi-content">
+              <h2><CountUp end={value} duration={2} /></h2>
+              <p>{label}</p>
+              <span className="admin-kpi-subtitle">
+                {showTrend && <TrendingUp size={12} />} {subtitle}
+              </span>
+            </div>
           </div>
-          <div className="admin-kpi-content">
-            <h2>
-              <CountUp end={kpiStats.totalTeamMembers} duration={2} />
-            </h2>
-            <p>Team Members</p>
-            <span className="admin-kpi-subtitle">
-              <TrendingUp size={12} /> Your team size
-            </span>
-          </div>
-        </div>
-
-        <div className="admin-kpi-card" onClick={() => navigate("")}>
-          <div className="admin-kpi-icon admin-blue">
-            <Target size={28} />
-          </div>
-          <div className="admin-kpi-content">
-            <h2>
-              <CountUp end={kpiStats.ongoingGoalsCount} duration={2} />
-            </h2>
-            <p>Ongoing Goals</p>
-            <span className="admin-kpi-subtitle">
-              {kpiStats.myProjectsCount} projects
-            </span>
-          </div>
-        </div>
-
-        <div className="admin-kpi-card" onClick={() => navigate("")}>
-          <div className="admin-kpi-icon admin-purple">
-            <Shield size={28} />
-          </div>
-          <div className="admin-kpi-content">
-            <h2>
-              <CountUp end={kpiStats.totalNominations} duration={2} />
-            </h2>
-            <p>My Nominations</p>
-            <span className="admin-kpi-subtitle">
-              {nominationOverview.thisMonth} this month
-            </span>
-          </div>
-        </div>
-
-        <div className="admin-kpi-card" onClick={() => navigate("")}>
-          <div className="admin-kpi-icon admin-green">
-            <Calendar size={28} />
-          </div>
-          <div className="admin-kpi-content">
-            <h2>
-              <CountUp end={kpiStats.totalMeetings} duration={2} />
-            </h2>
-            <p>Meetings</p>
-            <span className="admin-kpi-subtitle">
-              {kpiStats.upcomingMeetings} upcoming
-            </span>
-          </div>
-        </div>
-
-        <div className="admin-kpi-card" onClick={() => navigate("")}>
-          <div className="admin-kpi-icon admin-cyan">
-            <AlertTriangle size={28} />
-          </div>
-          <div className="admin-kpi-content">
-            <h2>
-              <CountUp end={kpiStats.totalEscalations} duration={2} />
-            </h2>
-            <p>Escalations</p>
-            <span className="admin-kpi-subtitle">
-              {kpiStats.pendingEscalations} pending
-            </span>
-          </div>
-        </div>
+        ))}
       </div>
 
       <div className="dashboard-cards-container">
+        {/* FIRST ROW - 3 CARDS */}
         <div className="dashboard-row">
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
@@ -653,185 +361,39 @@ const ManagerDashboard = () => {
                 <i className="bi bi-bullseye"></i>
                 <h3>Goals Overview</h3>
               </div>
-              <div style={{ display: "flex", gap: "0.5rem" }}>
-                <button
-                  onClick={() => setGoalType("self")}
-                  style={{
-                    padding: "0.4rem 0.75rem",
-                    fontSize: "0.75rem",
-                    borderRadius: "6px",
-                    border:
-                      goalType === "self"
-                        ? "1px solid #fff"
-                        : "1px solid rgba(255,255,255,0.3)",
-                    background:
-                      goalType === "self"
-                        ? "rgba(255,255,255,0.25)"
-                        : "rgba(255,255,255,0.1)",
-                    color: "#fff",
-                    cursor: "pointer",
-                    fontWeight: goalType === "self" ? "600" : "500",
-                    transition: "all 0.2s",
-                  }}
-                >
-                  Self
-                </button>
-                <button
-                  onClick={() => setGoalType("team")}
-                  style={{
-                    padding: "0.4rem 0.75rem",
-                    fontSize: "0.75rem",
-                    borderRadius: "6px",
-                    border:
-                      goalType === "team"
-                        ? "1px solid #fff"
-                        : "1px solid rgba(255,255,255,0.3)",
-                    background:
-                      goalType === "team"
-                        ? "rgba(255,255,255,0.25)"
-                        : "rgba(255,255,255,0.1)",
-                    color: "#fff",
-                    cursor: "pointer",
-                    fontWeight: goalType === "team" ? "600" : "500",
-                    transition: "all 0.2s",
-                  }}
-                >
-                  Team
-                </button>
-                <button
-                  onClick={() => setGoalType("org")}
-                  style={{
-                    padding: "0.4rem 0.75rem",
-                    fontSize: "0.75rem",
-                    borderRadius: "6px",
-                    border:
-                      goalType === "org"
-                        ? "1px solid #fff"
-                        : "1px solid rgba(255,255,255,0.3)",
-                    background:
-                      goalType === "org"
-                        ? "rgba(255,255,255,0.25)"
-                        : "rgba(255,255,255,0.1)",
-                    color: "#fff",
-                    cursor: "pointer",
-                    fontWeight: goalType === "org" ? "600" : "500",
-                    transition: "all 0.2s",
-                  }}
-                >
-                  Org
-                </button>
+              <div className="mgr-btn-group">
+                <button onClick={() => setGoalType("self")} className={goalType === "self" ? "mgr-active" : ""}>Self</button>
+                <button onClick={() => setGoalType("team")} className={goalType === "team" ? "mgr-active" : ""}>Team</button>
+                <button onClick={() => setGoalType("org")} className={goalType === "org" ? "mgr-active" : ""}>Org</button>
               </div>
             </div>
             <div className="card-body">
               {goalsData.total > 0 ? (
                 <>
-                  <div style={{ marginBottom: "1.5rem" }}>
-                    <div
-                      style={{
-                        display: "grid",
-                        gridTemplateColumns: "1fr 1fr 1fr",
-                        gap: "0.75rem",
-                        marginBottom: "1rem",
-                      }}
-                    >
-                      <div
-                        style={{
-                          background: "#f0f9ff",
-                          padding: "0.75rem",
-                          borderRadius: "6px",
-                          textAlign: "center",
-                          border: "1px solid #bfdbfe",
-                        }}
-                      >
-                        <div
-                          style={{
-                            fontSize: "1.5rem",
-                            fontWeight: "bold",
-                            color: "#0F62FE",
-                          }}
-                        >
-                          {goalsData.total}
-                        </div>
-                        <div style={{ fontSize: "0.7rem", color: "#1e40af" }}>
-                          Total
-                        </div>
-                      </div>
-                      <div
-                        style={{
-                          background: "#f0fdf4",
-                          padding: "0.75rem",
-                          borderRadius: "6px",
-                          textAlign: "center",
-                          border: "1px solid #86efac",
-                        }}
-                      >
-                        <div
-                          style={{
-                            fontSize: "1.5rem",
-                            fontWeight: "bold",
-                            color: "#10b981",
-                          }}
-                        >
-                          {goalsData.completed}
-                        </div>
-                        <div style={{ fontSize: "0.7rem", color: "#047857" }}>
-                          Completed
-                        </div>
-                      </div>
-                      <div
-                        style={{
-                          background: "#fef3c7",
-                          padding: "0.75rem",
-                          borderRadius: "6px",
-                          textAlign: "center",
-                          border: "1px solid #fcd34d",
-                        }}
-                      >
-                        <div
-                          style={{
-                            fontSize: "1.5rem",
-                            fontWeight: "bold",
-                            color: "#d97706",
-                          }}
-                        >
-                          {goalsData.inProgress}
-                        </div>
-                        <div style={{ fontSize: "0.7rem", color: "#b45309" }}>
-                          In Progress
-                        </div>
-                      </div>
-                    </div>
+                  <div className="emp-stats-grid">
+                    <StatCard bg="#f0eff5" border="#b9b4c7" value={goalsData.total} label="Total" color="#7077a1" />
+                    <StatCard bg="#4e5473" border="#7077a1" value={goalsData.completed} label="Completed" color="#ffffff" />
+                    <StatCard bg="#e8e7ef" border="#b9b4c7" value={goalsData.inProgress} label="In Progress" color="#7077a1" />
                   </div>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <PieChart>
-                      <Pie
-                        data={goalsData.chartData}
-                        cx="50%"
-                        cy="45%"
-                        outerRadius={70}
-                        dataKey="value"
-                        label={false}
-                      >
-                        {goalsData.chartData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.fill} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                      <Legend
-                        layout="horizontal"
-                        align="center"
-                        verticalAlign="bottom"
-                        wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
-                        formatter={(value, entry) => {
-                          const item = goalsData.chartData.find(d => d.name === entry.value);
-                          return `${item?.name || value}: ${item?.value || 0}`;
-                        }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
+                  {goalsData.chartData.length > 0 && (
+                    <ResponsiveContainer width="100%" height={240}>
+                      <PieChart>
+                        <Pie data={goalsData.chartData} cx="50%" cy="45%" outerRadius={80} dataKey="value" label={false}>
+                          {goalsData.chartData.map((entry, i) => <Cell key={`cell-${i}`} fill={entry.fill} />)}
+                        </Pie>
+                        <Tooltip />
+                        <Legend layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
+                          formatter={(value, entry) => {
+                            const item = goalsData.chartData.find(d => d.name === entry.value);
+                            return `${item?.name || value}: ${item?.value || 0}`;
+                          }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  )}
                 </>
               ) : (
-                <div className="no-data-message">No goal data</div>
+                <div className="no-data-message">No goals overview data</div>
               )}
             </div>
           </div>
@@ -846,110 +408,27 @@ const ManagerDashboard = () => {
             <div className="card-body">
               {nominationOverview.total > 0 ? (
                 <>
-                  <div style={{ marginBottom: "1.5rem" }}>
-                    <div
-                      style={{
-                        display: "grid",
-                        gridTemplateColumns: "1fr 1fr 1fr",
-                        gap: "0.75rem",
-                        marginBottom: "1rem",
-                      }}
-                    >
-                      <div
-                        style={{
-                          background: "#f0f9ff",
-                          padding: "0.75rem",
-                          borderRadius: "6px",
-                          textAlign: "center",
-                          border: "1px solid #bfdbfe",
-                        }}
-                      >
-                        <div
-                          style={{
-                            fontSize: "1.5rem",
-                            fontWeight: "bold",
-                            color: "#0F62FE",
-                          }}
-                        >
-                          {nominationOverview.total}
-                        </div>
-                        <div style={{ fontSize: "0.7rem", color: "#1e40af" }}>
-                          Total
-                        </div>
-                      </div>
-                      <div
-                        style={{
-                          background: "#dcfce7",
-                          padding: "0.75rem",
-                          borderRadius: "6px",
-                          textAlign: "center",
-                          border: "1px solid #bbf7d0",
-                        }}
-                      >
-                        <div
-                          style={{
-                            fontSize: "1.5rem",
-                            fontWeight: "bold",
-                            color: "#15803d",
-                          }}
-                        >
-                          {nominationOverview.thisMonth}
-                        </div>
-                        <div style={{ fontSize: "0.7rem", color: "#166534" }}>
-                          This Month
-                        </div>
-                      </div>
-                      <div
-                        style={{
-                          background: "#fef3c7",
-                          padding: "0.75rem",
-                          borderRadius: "6px",
-                          textAlign: "center",
-                          border: "1px solid #fde68a",
-                        }}
-                      >
-                        <div
-                          style={{
-                            fontSize: "1.5rem",
-                            fontWeight: "bold",
-                            color: "#b45309",
-                          }}
-                        >
-                          {nominationOverview.pending}
-                        </div>
-                        <div style={{ fontSize: "0.7rem", color: "#92400e" }}>
-                          Pending
-                        </div>
-                      </div>
-                    </div>
+                  <div className="emp-stats-grid">
+                    <StatCard bg="#f0eff5" border="#b9b4c7" value={nominationOverview.total} label="Total" color="#7077a1" />
+                    <StatCard bg="#4e5473" border="#7077a1" value={nominationOverview.thisMonth} label="This Month" color="#ffffff" />
+                    <StatCard bg="#fef3c7" border="#fbbf24" value={nominationOverview.pending} label="Pending" color="#d97706" />
                   </div>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <PieChart>
-                      <Pie
-                        data={nominationOverview.chartData}
-                        cx="50%"
-                        cy="45%"
-                        outerRadius={70}
-                        dataKey="value"
-                        label={false}
-                      >
-                        {nominationOverview.chartData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.fill} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                      <Legend
-                        layout="horizontal"
-                        align="center"
-                        verticalAlign="bottom"
-                        wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
-                        formatter={(value, entry) => {
-                          const item = nominationOverview.chartData.find(d => d.name === entry.value);
-                          return `${item?.name || value}: ${item?.value || 0}`;
-                        }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
+                  {nominationOverview.chartData.length > 0 && (
+                    <ResponsiveContainer width="100%" height={240}>
+                      <PieChart>
+                        <Pie data={nominationOverview.chartData} cx="50%" cy="45%" outerRadius={80} dataKey="value" label={false}>
+                          {nominationOverview.chartData.map((entry, i) => <Cell key={`cell-${i}`} fill={entry.fill} />)}
+                        </Pie>
+                        <Tooltip />
+                        <Legend layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
+                          formatter={(value, entry) => {
+                            const item = nominationOverview.chartData.find(d => d.name === entry.value);
+                            return `${item?.name || value}: ${item?.value || 0}`;
+                          }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  )}
                 </>
               ) : (
                 <div className="no-data-message">No nominations yet</div>
@@ -965,120 +444,35 @@ const ManagerDashboard = () => {
               </div>
             </div>
             <div className="card-body">
-              <div style={{ marginBottom: "1rem" }}>
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr 1fr",
-                    gap: "0.75rem",
-                    marginBottom: "1rem",
-                  }}
-                >
-                  <div
-                    style={{
-                      background: "#f0f9ff",
-                      padding: "0.75rem",
-                      borderRadius: "6px",
-                      textAlign: "center",
-                      border: "1px solid #bfdbfe",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "1.5rem",
-                        fontWeight: "bold",
-                        color: "#0F62FE",
-                      }}
-                    >
-                      {meetingOverview.total}
-                    </div>
-                    <div style={{ fontSize: "0.7rem", color: "#1e40af" }}>
-                      Total
-                    </div>
+              {meetingOverview.total > 0 ? (
+                <>
+                  <div className="emp-stats-grid">
+                    <StatCard bg="#f0eff5" border="#b9b4c7" value={meetingOverview.total} label="Total" color="#7077a1" />
+                    <StatCard bg="#4e5473" border="#7077a1" value={meetingOverview.upcoming} label="Upcoming" color="#ffffff" />
+                    <StatCard bg="#e8e7ef" border="#b9b4c7" value={meetingOverview.completed} label="Completed" color="#7077a1" />
                   </div>
-                  <div
-                    style={{
-                      background: "#f0fdf4",
-                      padding: "0.75rem",
-                      borderRadius: "6px",
-                      textAlign: "center",
-                      border: "1px solid #86efac",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "1.5rem",
-                        fontWeight: "bold",
-                        color: "#10b981",
-                      }}
-                    >
-                      {meetingOverview.upcoming}
-                    </div>
-                    <div style={{ fontSize: "0.7rem", color: "#047857" }}>
-                      Upcoming
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      background: "#fef3c7",
-                      padding: "0.75rem",
-                      borderRadius: "6px",
-                      textAlign: "center",
-                      border: "1px solid #fcd34d",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "1.5rem",
-                        fontWeight: "bold",
-                        color: "#d97706",
-                      }}
-                    >
-                      {meetingOverview.completed}
-                    </div>
-                    <div style={{ fontSize: "0.7rem", color: "#b45309" }}>
-                      Completed
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {meetingScheduleData.chartData.length > 0 ? (
-                <ResponsiveContainer width="100%" height={200}>
-                  <LineChart data={meetingScheduleData.chartData}>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke="#f3f4f6"
-                      vertical={false}
-                    />
-                    <XAxis dataKey="month" stroke="#9ca3af" fontSize={10} />
-                    <YAxis stroke="#9ca3af" fontSize={11} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#fff",
-                        border: "1px solid #e5e7eb",
-                        borderRadius: "6px",
-                        fontSize: "12px",
-                      }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="count"
-                      stroke="#0F62FE"
-                      strokeWidth={2}
-                      dot={{ fill: "#0F62FE", r: 4 }}
-                      activeDot={{ r: 6 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+                  {meetingScheduleData.chartData.length > 0 && (
+                    <ResponsiveContainer width="100%" height={240}>
+                      <LineChart data={meetingScheduleData.chartData}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
+                        <XAxis dataKey="month" stroke="#9ca3af" fontSize={10} />
+                        <YAxis stroke="#9ca3af" fontSize={11} />
+                        <Tooltip contentStyle={{ backgroundColor: "#fff", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "12px" }} />
+                        <Line type="monotone" dataKey="count" stroke="#7077a1" strokeWidth={2} dot={{ fill: "#7077a1", r: 4 }} activeDot={{ r: 6 }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  )}
+                </>
               ) : (
-                <div className="no-data-message">No meeting data</div>
+                <div className="no-data-message">No meetings data</div>
               )}
             </div>
           </div>
         </div>
 
-        <div className="dashboard-row">
-          <div className="dashboard-card card-large">
+        {/* SECOND ROW - 2 CARDS AUTO-ADJUST */}
+        <div className="dashboard-row dashboard-row-2">
+          <div className="dashboard-card">
             <div className="card-header-dark">
               <div className="card-header-content">
                 <i className="bi bi-people-fill"></i>
@@ -1089,26 +483,11 @@ const ManagerDashboard = () => {
               {teamAssignmentStatus.length > 0 ? (
                 <ResponsiveContainer width="100%" height={280}>
                   <PieChart>
-                    <Pie
-                      data={teamAssignmentStatus}
-                      cx="50%"
-                      cy="45%"
-                      innerRadius={60}
-                      outerRadius={90}
-                      paddingAngle={3}
-                      dataKey="value"
-                      label={false}
-                    >
-                      {teamAssignmentStatus.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.fill} />
-                      ))}
+                    <Pie data={teamAssignmentStatus} cx="50%" cy="45%" innerRadius={60} outerRadius={90} paddingAngle={3} dataKey="value" label={false}>
+                      {teamAssignmentStatus.map((entry, i) => <Cell key={`cell-${i}`} fill={entry.fill} />)}
                     </Pie>
                     <Tooltip />
-                    <Legend
-                      layout="horizontal"
-                      align="center"
-                      verticalAlign="bottom"
-                      wrapperStyle={{ fontSize: "12px", paddingTop: "15px" }}
+                    <Legend layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ fontSize: "12px", paddingTop: "15px" }}
                       formatter={(value, entry) => {
                         const item = teamAssignmentStatus.find(d => d.name === entry.value);
                         return `${item?.name || value}: ${item?.value || 0}`;
@@ -1122,7 +501,7 @@ const ManagerDashboard = () => {
             </div>
           </div>
 
-          <div className="dashboard-card card-large">
+          <div className="dashboard-card">
             <div className="card-header-dark">
               <div className="card-header-content">
                 <i className="bi bi-exclamation-triangle-fill"></i>
@@ -1130,113 +509,30 @@ const ManagerDashboard = () => {
               </div>
             </div>
             <div className="card-body">
-              <div style={{ marginBottom: "1rem" }}>
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr 1fr",
-                    gap: "0.75rem",
-                    marginBottom: "1rem",
-                  }}
-                >
-                  <div
-                    style={{
-                      background: "#f0f9ff",
-                      padding: "0.75rem",
-                      borderRadius: "6px",
-                      textAlign: "center",
-                      border: "1px solid #bfdbfe",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "1.5rem",
-                        fontWeight: "bold",
-                        color: "#0F62FE",
-                      }}
-                    >
-                      {escalationHistory.total}
-                    </div>
-                    <div style={{ fontSize: "0.7rem", color: "#1e40af" }}>
-                      Total
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      background: "#fef3c7",
-                      padding: "0.75rem",
-                      borderRadius: "6px",
-                      textAlign: "center",
-                      border: "1px solid #fcd34d",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "1.5rem",
-                        fontWeight: "bold",
-                        color: "#d97706",
-                      }}
-                    >
-                      {escalationHistory.pending}
-                    </div>
-                    <div style={{ fontSize: "0.7rem", color: "#b45309" }}>
-                      Pending
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      background: "#f0fdf4",
-                      padding: "0.75rem",
-                      borderRadius: "6px",
-                      textAlign: "center",
-                      border: "1px solid #86efac",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "1.5rem",
-                        fontWeight: "bold",
-                        color: "#10b981",
-                      }}
-                    >
-                      {escalationHistory.resolved}
-                    </div>
-                    <div style={{ fontSize: "0.7rem", color: "#047857" }}>
-                      Resolved
-                    </div>
-                  </div>
-                </div>
-              </div>
               {escalationHistory.total > 0 ? (
-                <ResponsiveContainer width="100%" height={200}>
-                  <PieChart>
-                    <Pie
-                      data={escalationHistory.chartData}
-                      cx="50%"
-                      cy="45%"
-                      innerRadius={50}
-                      outerRadius={70}
-                      paddingAngle={3}
-                      dataKey="value"
-                      label={false}
-                    >
-                      {escalationHistory.chartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.fill} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend
-                      layout="horizontal"
-                      align="center"
-                      verticalAlign="bottom"
-                      wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
-                      formatter={(value, entry) => {
-                        const item = escalationHistory.chartData.find(d => d.name === entry.value);
-                        return `${item?.name || value}: ${item?.value || 0}`;
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
+                <>
+                  <div className="emp-stats-grid">
+                    <StatCard bg="#f0eff5" border="#b9b4c7" value={escalationHistory.total} label="Total" color="#7077a1" />
+                    <StatCard bg="#fef3c7" border="#fbbf24" value={escalationHistory.pending} label="Pending" color="#d97706" />
+                    <StatCard bg="#4e5473" border="#7077a1" value={escalationHistory.resolved} label="Resolved" color="#ffffff" />
+                  </div>
+                  {escalationHistory.chartData.length > 0 && (
+                    <ResponsiveContainer width="100%" height={240}>
+                      <PieChart>
+                        <Pie data={escalationHistory.chartData} cx="50%" cy="45%" innerRadius={50} outerRadius={70} paddingAngle={3} dataKey="value" label={false}>
+                          {escalationHistory.chartData.map((entry, i) => <Cell key={`cell-${i}`} fill={entry.fill} />)}
+                        </Pie>
+                        <Tooltip />
+                        <Legend layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
+                          formatter={(value, entry) => {
+                            const item = escalationHistory.chartData.find(d => d.name === entry.value);
+                            return `${item?.name || value}: ${item?.value || 0}`;
+                          }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  )}
+                </>
               ) : (
                 <div className="no-data-message">No escalation data</div>
               )}
