@@ -15,7 +15,6 @@ const employeeApi = axios.create({
   timeout: 30000,
 });
 
-//  REQUEST INTERCEPTORS
 [slaApi, employeeApi].forEach((api) => {
   api.interceptors.request.use(
     (config) => {
@@ -27,7 +26,6 @@ const employeeApi = axios.create({
   );
 });
 
-//RESPONSE INTERCEPTORS
 [slaApi, employeeApi].forEach((api) => {
   api.interceptors.response.use(
     (response) => ({
@@ -51,7 +49,6 @@ const employeeApi = axios.create({
   );
 });
 
-// ========== CONSTANTS ==========
 export const ROLE_IDS = {
   EMPLOYEE: 1,
   MANAGER: 2,
@@ -59,7 +56,6 @@ export const ROLE_IDS = {
   HR: 4,
 };
 
-// ========== ESCALATION HELPERS ==========
 export const escalationHelpers = {
   canEscalateToL1: (sla, escalations = []) => {
     if (!sla || sla.status === "Closed") return false;
@@ -125,7 +121,6 @@ export const escalationHelpers = {
   }),
 };
 
-// ========== DATE HELPERS ==========
 export const dateHelpers = {
   daysRemaining: (deadline) => {
     if (!deadline) return 0;
@@ -166,12 +161,7 @@ export const dateHelpers = {
   },
 };
 
-// ========== MAIN SERVICE ==========
 const slaService = {
-  // ============================================
-  // ===== SLA OPERATIONS =====
-  // ============================================
-
   getAllSLAs: async () => {
     try {
       const response = await slaApi.get("/all");
@@ -218,17 +208,8 @@ const slaService = {
     }
   },
 
-  /**
-   * NEW: Bulk create SLAs (10-20x faster)
-   * Endpoint: POST /api/sla/bulk-create
-   * Max: 10,000 records per request
-   *
-   * @param {Array<Object>} slaRequests - Array of SLA creation requests
-   * @returns {Promise<Object>} { success, data: { totalRequested, successfulInserts, failedInserts, failedRecords, message } }
-   */
   createBulkSLA: async (slaRequests) => {
     try {
-      // Validate input
       if (!Array.isArray(slaRequests) || slaRequests.length === 0) {
         throw new Error("SLA requests array is required and cannot be empty");
       }
@@ -237,7 +218,6 @@ const slaService = {
         throw new Error("Maximum 10,000 SLAs allowed per bulk operation");
       }
 
-      // Transform to match backend DTO structure
       const payload = slaRequests.map((sla) => ({
         slatype: sla.slatype,
         employeeId: sla.employeeId,
@@ -252,7 +232,6 @@ const slaService = {
 
       const response = await slaApi.post("/bulk-create", payload);
 
-      // Log failed records if any
       if (response.data?.failedRecords?.length > 0) {
         console.warn("Failed records:", response.data.failedRecords);
       }
@@ -264,13 +243,8 @@ const slaService = {
     }
   },
 
-  /**
-   * Helper: Create SLAs for all employees in a department
-   * Use case: Performance review season, training compliance, etc.
-   */
   createBulkSLAForDepartment: async (departmentId, slaConfig) => {
     try {
-      // Step 1: Get all employees in department
       const employeesResponse = await employeeApi.get(
         `/department/${departmentId}`
       );
@@ -281,7 +255,6 @@ const slaService = {
 
       const employees = employeesResponse.data;
 
-      // Step 2: Create SLA request for each employee
       const slaRequests = employees.map((emp) => ({
         slatype: slaConfig.slatype,
         employeeId: emp.employeeId || emp.employeeMasterId,
@@ -293,7 +266,6 @@ const slaService = {
           slaConfig.creationReason || `Bulk creation for ${slaConfig.slatype}`,
       }));
 
-      // Step 3: Call bulk create
       return await slaService.createBulkSLA(slaRequests);
     } catch (error) {
       console.error("Error creating department bulk SLAs:", error);
@@ -301,13 +273,8 @@ const slaService = {
     }
   },
 
-  /**
-   * Helper: Create SLAs for ALL employees in organization
-   * Use case: Company-wide mandatory training, annual reviews
-   */
   createBulkSLAForAllEmployees: async (slaConfig) => {
     try {
-      // Step 1: Get all employees
       const employeesResponse = await employeeApi.get("/all");
 
       if (!employeesResponse?.success || !employeesResponse?.data?.length) {
@@ -316,7 +283,6 @@ const slaService = {
 
       const employees = employeesResponse.data;
 
-      // Step 2: Create SLA request for each employee
       const slaRequests = employees.map((emp) => ({
         slatype: slaConfig.slatype,
         employeeId: emp.employeeId || emp.employeeMasterId,
@@ -327,8 +293,6 @@ const slaService = {
         creationReason:
           slaConfig.creationReason || `Organization-wide ${slaConfig.slatype}`,
       }));
-
-      // Step 3: Call bulk create
       return await slaService.createBulkSLA(slaRequests);
     } catch (error) {
       console.error("Error creating organization-wide bulk SLAs:", error);
@@ -383,10 +347,6 @@ const slaService = {
       throw error;
     }
   },
-
-  // ============================================
-  // ===== ESCALATION OPERATIONS =====
-  // ============================================
 
   submitEscalation: async (data) => {
     try {
@@ -455,10 +415,6 @@ const slaService = {
     }
   },
 
-  // ============================================
-  // ===== MANAGER OPERATIONS =====
-  // ============================================
-
   getTeamReviews: async (managerId) => {
     try {
       return await slaApi.get(`/manager/${managerId}/team-reviews`);
@@ -476,10 +432,6 @@ const slaService = {
       throw error;
     }
   },
-
-  // ============================================
-  // ===== COMPLIANCE =====
-  // ============================================
 
   getDepartmentCompliance: async (deptId, period = null) => {
     try {
@@ -509,10 +461,6 @@ const slaService = {
       throw error;
     }
   },
-
-  // ============================================
-  // ===== EMPLOYEE MANAGEMENT =====
-  // ============================================
 
   getAllEmployees: async () => {
     try {
@@ -586,10 +534,6 @@ const slaService = {
     }
   },
 
-  /**
-   * Get dept heads by department ID
-   * Endpoint: GET /api/EmployeeManagement/department-heads/{departmentId}
-   */
   getDepartmentHeads: async (deptId) => {
     try {
       if (!deptId) {
@@ -611,10 +555,6 @@ const slaService = {
     }
   },
 
-  /**
-   * Get ALL department heads by ROLE ID = 3
-   * Used for: Getting all dept heads across organization
-   */
   getAllDepartmentHeads: async () => {
     try {
       return await employeeApi.get(`/role/${ROLE_IDS.DEPARTMENT_HEAD}`);
@@ -624,18 +564,8 @@ const slaService = {
     }
   },
 
-  /**
-   * NEW: Get valid dept head for manager escalation
-   *
-   * Logic:
-   * 1. Get manager details -> find who they report to (reportsTo field)
-   * 2. Fetch all dept heads by roleId = 3
-   * 3. Filter to find dept head whose ID matches manager's reportsTo
-   * 4. Return valid escalation target
-   */
   getDepartmentHeadForEscalation: async (managerId) => {
     try {
-      // Step 1: Get manager details
       const managerResponse = await employeeApi.get(`/${managerId}`);
 
       if (!managerResponse?.success || !managerResponse?.data) {
@@ -648,8 +578,6 @@ const slaService = {
       if (!managerReportsTo) {
         throw new Error("Manager has no reporting manager for escalation");
       }
-
-      // Step 2: Fetch all department heads by ROLE ID
       const deptHeadsResponse = await employeeApi.get(
         `/role/${ROLE_IDS.DEPARTMENT_HEAD}`
       );
@@ -660,8 +588,6 @@ const slaService = {
       ) {
         throw new Error("Failed to fetch department heads");
       }
-
-      // Step 3: Find dept head whose ID matches manager's reportsTo
 
       const validDeptHeads = deptHeadsResponse.data.filter((dh) => {
         const dhId = dh.employeeId || dh.employeeMasterId;
@@ -679,7 +605,6 @@ const slaService = {
           `Manager's reporting manager (${managerReportsTo}) is NOT in dept heads`
         );
 
-        // Fallback: Get direct manager
         const directManager = await employeeApi.get(`/${managerReportsTo}`);
         if (directManager?.success && directManager?.data) {
           return {
@@ -705,10 +630,6 @@ const slaService = {
       throw error;
     }
   },
-
-  // ============================================
-  // ===== VALIDATION HELPERS =====
-  // ============================================
 
   canEscalate: (sla) => sla && sla.status !== "Closed",
   canReopen: (sla) => sla && sla.status === "Closed",

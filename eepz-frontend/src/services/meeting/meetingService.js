@@ -35,8 +35,6 @@ const meetingService = {
     }
   },
 
-  //ONE-ON-ONE REPORTS (Manager)
-
   getOneOnOneReports: async (filters = {}) => {
     try {
       const params = new URLSearchParams();
@@ -64,11 +62,8 @@ const meetingService = {
     }
   },
 
-  //NEW: Get Subordinates from LnD API
-
   getSubordinates: async () => {
     try {
-      // Get access token from storage (adjust as needed)
       const accessToken = localStorage.getItem("accessToken");
       const response = await axios.get(
         `${import.meta.env.VITE_LND_API_URL}/api/LnD/employees/subordinates`,

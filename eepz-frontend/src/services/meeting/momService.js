@@ -12,15 +12,12 @@ const apiRequest = async (method, url, data = null, config = {}) => {
 
 const momService = {
   api_mom,
-
-  // MOM OPERATIONS
   createMom: (momData) => apiRequest("post", "/Mom/create", momData),
   updateMom: (momData) => apiRequest("put", "/Mom/update", momData),
   getMyMoms: () => apiRequest("get", "/Mom/my-moms"),
   getMomById: (momId) => apiRequest("get", `/Mom/${momId}`),
   deleteMom: (momId) => apiRequest("delete", `/Mom/${momId}`),
 
-  //SHARING OPERATIONS (US035)
   shareMom: (momId, employeeIds) =>
     apiRequest("post", "/Mom/share", {
       momId,
@@ -30,7 +27,6 @@ const momService = {
   getMomsSharedByMe: () => apiRequest("get", "/Mom/shared-by-me"),
   getMomsSharedWithMe: () => apiRequest("get", "/Mom/shared-with-me"),
 
-  //HR OPERATIONS (US119)
   getAllMomsForHR: (filters = {}) => {
     const params = new URLSearchParams();
     Object.entries(filters).forEach(([key, value]) => {
@@ -41,7 +37,6 @@ const momService = {
     return apiRequest("get", `/Mom/all-moms?${params.toString()}`);
   },
 
-  //ACTION ITEM OPERATIONS
   updateActionItemStatus: (actionItemId, status) =>
     apiRequest(
       "patch",
@@ -55,7 +50,6 @@ const momService = {
     apiRequest("get", "/Mom/action-items/assigned-by-me"),
   getOverdueActionItems: () => apiRequest("get", "/Mom/action-items/overdue"),
 
-  //EMPLOYEE MANAGEMENT
   getAllEmployees: () => apiRequest("get", "/EmployeeManagement/all"),
 };
 

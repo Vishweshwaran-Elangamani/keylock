@@ -1,12 +1,6 @@
 import apiClient from "./api";
 
 const projectService = {
-  // PROJECT CRUD OPERATIONS
-
-  /**
-   * Get all projects
-   * @returns {Promise} Array of all projects
-   */
   getAllProjects: async () => {
     try {
       const response = await apiClient.get("/ProjectManagement");
@@ -20,11 +14,6 @@ const projectService = {
     }
   },
 
-  /**
-   * Get project by ID
-   * @param {number} projectId - Project ID
-   * @returns {Promise} Project details
-   */
   getProjectById: async (projectId) => {
     try {
       const response = await apiClient.get(`/ProjectManagement/${projectId}`);
@@ -34,11 +23,6 @@ const projectService = {
     }
   },
 
-  /**
-   * Create new project
-   * @param {Object} projectData - Project data
-   * @returns {Promise} Created project
-   */
   createProject: async (projectData) => {
     try {
       const response = await apiClient.post("/ProjectManagement", projectData);
@@ -48,12 +32,6 @@ const projectService = {
     }
   },
 
-  /**
-   * Update project
-   * @param {number} projectId - Project ID
-   * @param {Object} projectData - Updated project data
-   * @returns {Promise} Updated project
-   */
   updateProject: async (projectId, projectData) => {
     try {
       const response = await apiClient.put(
@@ -66,11 +44,6 @@ const projectService = {
     }
   },
 
-  /**
-   * Delete project
-   * @param {number} projectId - Project ID
-   * @returns {Promise} Deletion result
-   */
   deleteProject: async (projectId) => {
     try {
       const response = await apiClient.delete(
@@ -82,14 +55,6 @@ const projectService = {
     }
   },
 
-  //  REPORTING MANAGERS
-
-  /**
-   * Update reporting managers of a project
-   * @param {number} projectId - Project ID
-   * @param {Object} managersData - Managers data
-   * @returns {Promise} Update result
-   */
   updateReportingManagers: async (projectId, managersData) => {
     try {
       const response = await apiClient.put(
@@ -106,23 +71,6 @@ const projectService = {
     }
   },
 
-  // EMPLOYEE MAPPING
-
-  /**
-   * Map employees to project with isPrimary support
-   * @param {number} projectId - Project ID
-   * @param {Array} employees - Array of employee objects with employeeId and isPrimary
-   * @returns {Promise} Mapping result
-   *
-   * Expected payload format:
-   * {
-   *   projectId: 1,
-   *   employees: [
-   *     { employeeId: 5, isPrimary: true },
-   *     { employeeId: 6, isPrimary: false }
-   *   ]
-   * }
-   */
   mapEmployees: async (projectId, employees) => {
     try {
       const response = await apiClient.post(
@@ -138,12 +86,6 @@ const projectService = {
     }
   },
 
-  /**
-   * Unmap employees from project
-   * @param {number} projectId - Project ID
-   * @param {Array} employeeIds - Array of employee IDs
-   * @returns {Promise} Unmapping result
-   */
   unmapEmployees: async (projectId, employeeIds) => {
     try {
       const response = await apiClient.post(
@@ -156,10 +98,6 @@ const projectService = {
     }
   },
 
-  /**
-   * Get available employees for mapping
-   * @returns {Promise} Array of available employees
-   */
   getAvailableEmployees: async () => {
     try {
       const response = await apiClient.get(
@@ -175,12 +113,6 @@ const projectService = {
     }
   },
 
-  //  EMPLOYEE DATA FOR DROPDOWNS
-
-  /**
-   * Get all active employees with details (for Resource Owner dropdown)
-   * @returns {Promise} Array of all employees
-   */
   getAllEmployees: async () => {
     try {
       const response = await apiClient.get("/EmployeeManagement/all");
@@ -192,10 +124,6 @@ const projectService = {
     }
   },
 
-  /**
-   * Get managers only (for L1/L2 Approver dropdowns)
-   * @returns {Promise} Array of managers
-   */
   getManagers: async () => {
     try {
       const response = await apiClient.get("/EmployeeManagement/managers");
@@ -205,11 +133,6 @@ const projectService = {
     }
   },
 
-  /**
-   * Get employee by ID
-   * @param {number} employeeMasterId - Employee Master ID
-   * @returns {Promise} Employee details
-   */
   getEmployeeById: async (employeeMasterId) => {
     try {
       const response = await apiClient.get(
@@ -221,11 +144,6 @@ const projectService = {
     }
   },
 
-  /**
-   * Search employees by query
-   * @param {string} query - Search query
-   * @returns {Promise} Array of matching employees
-   */
   searchEmployees: async (query) => {
     try {
       const response = await apiClient.get(
@@ -237,12 +155,6 @@ const projectService = {
     }
   },
 
-  //  DEPARTMENT & BUSINESS UNIT DATA
-
-  /**
-   * Get all departments (for Department dropdown)
-   * @returns {Promise} Array of departments
-   */
   getAllDepartments: async () => {
     try {
       const response = await apiClient.get("/EmployeeManagement/departments");
@@ -252,11 +164,6 @@ const projectService = {
     }
   },
 
-  /**
-   * Get department by ID
-   * @param {number} departmentId - Department ID
-   * @returns {Promise} Department details
-   */
   getDepartmentById: async (departmentId) => {
     try {
       const response = await apiClient.get(
@@ -268,10 +175,6 @@ const projectService = {
     }
   },
 
-  /**
-   * Get all business units (for Business Unit dropdown)
-   * @returns {Promise} Array of business units
-   */
   getAllBusinessUnits: async () => {
     try {
       const response = await apiClient.get(
@@ -285,11 +188,6 @@ const projectService = {
     }
   },
 
-  /**
-   * Get employees by department
-   * @param {number} departmentId - Department ID
-   * @returns {Promise} Array of employees in department
-   */
   getEmployeesByDepartment: async (departmentId) => {
     try {
       const response = await apiClient.get(
@@ -305,11 +203,6 @@ const projectService = {
     }
   },
 
-  /**
-   * Get employees by role
-   * @param {number} roleId - Role ID
-   * @returns {Promise} Array of employees with role
-   */
   getEmployeesByRole: async (roleId) => {
     try {
       const response = await apiClient.get(
@@ -323,16 +216,6 @@ const projectService = {
     }
   },
 
-  //  RESOURCE POOL OPERATIONS (NEW)
-
-  /**
-   * Get employees with null reporting manager (Initial Stage Employees)
-   * @returns {Promise} Array of initial stage employees
-   *
-   * Returns employees who have:
-   * - IsActive = true
-   * - ReportingManagerEmployeeId = null
-   */
   getInitialStageEmployees: async () => {
     try {
       const response = await apiClient.get("/EmployeeManagement/initial-stage");
@@ -362,22 +245,6 @@ const projectService = {
     }
   },
 
-  /**
-   * Map employees to resource pool (org.rz.resourcepool)
-   * @param {Array|Object} input - Array of employee master IDs or { employeeMasterIds: [...] }
-   * @returns {Promise} Mapping result
-   *
-   * This function:
-   * 1. Maps selected employees to the "org.rz.resourcepool" project
-   * 2. Updates their ReportingManagerEmployeeId to the Resource Pool's L2 Approver
-   * 3. Marks them as primary employees for the resource pool
-   * 4. Removes from other projects (single project rule)
-   *
-   * Expected payload format:
-   * {
-   *   employeeMasterIds: [1, 2, 3, 4]
-   * }
-   */
   mapToResourcePool: async (input) => {
     try {
       let employeeMasterIds = [];
@@ -395,7 +262,6 @@ const projectService = {
           "Input cannot be null or undefined. Please provide an array of employeeMasterIds."
         );
       } else {
-        // Try to extract array from unexpected input (e.g., if passed a non-array primitive)
         if (Array.isArray(input.value) || Array.isArray(input.ids)) {
           employeeMasterIds = input.value || input.ids || [];
         } else {
@@ -407,7 +273,6 @@ const projectService = {
         }
       }
 
-      // Handle empty array gracefully (backend should return success with mappedCount: 0)
       if (employeeMasterIds.length === 0) {
         console.warn(
           "No employeeMasterIds provided - returning empty success response"

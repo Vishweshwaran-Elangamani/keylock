@@ -1,7 +1,6 @@
 import apii from "./index_meet";
 
 const rsvpService = {
-  // Get all invitations for current user
   getMyInvitations: async () => {
     try {
       const response = await apii.get("/Rsvp/my-invitations");
@@ -12,7 +11,6 @@ const rsvpService = {
     }
   },
 
-  // Submit RSVP response
   submitRsvp: async (rsvpData) => {
     try {
       const response = await apii.post("/Rsvp/submit", rsvpData);
@@ -23,7 +21,6 @@ const rsvpService = {
     }
   },
 
-  // Update RSVP by meeting ID (could be used for batch updates)
   updateRsvp: async (meetingId, rsvpData) => {
     try {
       const response = await apii.put(`/Rsvp/${meetingId}/update`, rsvpData);
@@ -34,7 +31,6 @@ const rsvpService = {
     }
   },
 
-  // Get count of pending RSVPs for current user
   getPendingRsvpCount: async () => {
     try {
       const response = await apii.get("/Rsvp/pending-count");
@@ -45,7 +41,6 @@ const rsvpService = {
     }
   },
 
-  // Get RSVP summary for a specific meeting
   getMeetingRsvpSummary: async (meetingId) => {
     try {
       const response = await apii.get(`/Rsvp/meeting/${meetingId}/summary`);
@@ -56,7 +51,6 @@ const rsvpService = {
     }
   },
 
-  // Update participant RSVP by participant ID (for individual participant update)
   updateParticipantRsvp: async (participantId, rsvpStatus) => {
     try {
       const response = await apii.patch(
