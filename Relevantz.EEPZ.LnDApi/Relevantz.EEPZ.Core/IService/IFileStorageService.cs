@@ -10,5 +10,8 @@ namespace Relevantz.EEPZ.Core.Services.Interface
         Task<bool> DeleteFileAsync(string fileId);
         Task<(byte[] fileBytes, string contentType, string fileName)> GetFileForPreviewAsync(string fileId);
         Task<FileMetadata?> GetFileMetadataAsync(string fileId);
+
+       string GetContentType(string fileName);
+
     }
 }

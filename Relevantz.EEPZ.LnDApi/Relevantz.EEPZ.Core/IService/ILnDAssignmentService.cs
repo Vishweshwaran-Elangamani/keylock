@@ -8,30 +8,15 @@ namespace Relevantz.EEPZ.Core.Services.Interface
         Task<ApiResponse<int>> RequestSmeAssignment(int managerId, SmeRequestModel request);
         Task<ApiResponse<PaginatedResponse<AssignmentResponseModel>>> GetMyAssignments(
             int employeeId,
-            string? statusFilter,
-            string? searchTerm,
-            string? sortField,
-            string? sortOrder,
-            int pageNumber,
-            int pageSize
+            AssignmentRequestModel request
         );
         Task<ApiResponse<PaginatedResponse<AssignmentResponseModel>>> GetTeamAssignments(
             int managerId,
-            string? statusFilter,
-            string? searchTerm,
-            string? sortField,
-            string? sortOrder,
-            int pageNumber,
-            int pageSize
+            AssignmentRequestModel request
         );
         Task<ApiResponse<PaginatedResponse<AssignmentResponseModel>>> GetSmeAssignments(
             int smeEmployeeId,
-            string? statusFilter,
-            string? searchTerm,
-            string? sortField,
-            string? sortOrder,
-            int pageNumber,
-            int pageSize
+            AssignmentRequestModel request
         );
         Task<ApiResponse<bool>> UploadCompletionProof(
             int employeeId,
@@ -43,10 +28,7 @@ namespace Relevantz.EEPZ.Core.Services.Interface
         );
         Task<ApiResponse<byte[]>> ExportTeamAssignmentsToExcel(
             int managerId,
-            string? statusFilter,
-            string? searchTerm,
-            string? sortField,
-            string? sortOrder
+            ExportAssignmentRequestModel request
         );
     }
 }

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Common.Constants;
+using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repositories.Interface;
@@ -113,18 +114,12 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         /// </summary>
         public async Task<(List<Lndapproval> Items, int TotalCount)> GetMyApprovalsAsync(
             int employeeId,
-            string? approvalType,
-            string? status,
-            string? sortField,
-            string? sortOrder,
-            int pageNumber,
-            int pageSize,
-            string? searchTerm
+            MyApprovalsRequestModel request
         )
         {
             Log.Information(
                 "GetMyApprovalsAsync called. EmployeeId={EmployeeId}, ApprovalType={ApprovalType}, Status={Status}, Page={PageNumber}, PageSize={PageSize}, SearchTerm={SearchTerm}",
-                employeeId, approvalType ?? "all", status ?? "all", pageNumber, pageSize, searchTerm ?? "none"
+                employeeId, request.ApprovalType ?? "all", request.Status ?? "all", request.PageNumber, request.PageSize, request.SearchTerm ?? "none"
             );
 
             var query = _context
@@ -137,9 +132,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .Where(a => a.ApproverEmployeeId == employeeId);
 
             // Search filter
-            if (!string.IsNullOrWhiteSpace(searchTerm))
+            if (!string.IsNullOrWhiteSpace(request.SearchTerm))
             {
-                var searchLower = searchTerm.ToLower().Trim();
+                var searchLower = request.SearchTerm.ToLower().Trim();
                 query = query.Where(a =>
                     a.ApprovalType.ToLower().Contains(searchLower)
                     || (
@@ -163,21 +158,21 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 );
             }
 
-            if (!string.IsNullOrEmpty(approvalType))
+            if (!string.IsNullOrEmpty(request.ApprovalType))
             {
-                query = query.Where(a => a.ApprovalType == approvalType);
+                query = query.Where(a => a.ApprovalType == request.ApprovalType);
             }
 
-            if (!string.IsNullOrEmpty(status))
+            if (!string.IsNullOrEmpty(request.Status))
             {
-                query = query.Where(a => a.Status == status);
+                query = query.Where(a => a.Status == request.Status);
             }
 
-            if (!string.IsNullOrWhiteSpace(sortField))
+            if (!string.IsNullOrWhiteSpace(request.SortField))
             {
-                var isAscending = sortOrder?.ToLower() != LnDConstants.SORT_ORDER.DESC;
+                var isAscending = request.SortOrder?.ToLower() != LnDConstants.SORT_ORDER.DESC;
 
-                query = sortField.ToLower() switch
+                query = request.SortField.ToLower() switch
                 {
                     LnDConstants.SORT_FIELDS.APPROVAL_TYPE => isAscending
                         ? query.OrderBy(a => a.ApprovalType)
@@ -217,7 +212,10 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             var totalCount = await query.CountAsync();
 
-            var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            var items = await query
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToListAsync();
 
             Log.Information(
                 "GetMyApprovalsAsync completed. EmployeeId={EmployeeId}, ReturnedItems={ItemCount}, TotalCount={TotalCount}",
@@ -233,19 +231,12 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         /// </summary>
         public async Task<(List<Lndapproval> Items, int TotalCount)> GetApprovalHistoryAsync(
             int employeeId,
-            string? approvalType,
-            string? status,
-            string? role,
-            string? searchTerm,
-            string? sortField,
-            string? sortOrder,
-            int pageNumber,
-            int pageSize
+            ApprovalHistoryRequestModel request
         )
         {
             Log.Information(
                 "GetApprovalHistoryAsync called. EmployeeId={EmployeeId}, Role={Role}, ApprovalType={ApprovalType}, Status={Status}, Page={PageNumber}",
-                employeeId, role ?? "all", approvalType ?? "all", status ?? "all", pageNumber
+                employeeId, request.Role ?? "all", request.ApprovalType ?? "all", request.Status ?? "all", request.PageNumber
             );
 
             var query = _context
@@ -257,13 +248,13 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .Include(a => a.Attachment)
                 .AsQueryable();
 
-            if (!string.IsNullOrEmpty(role) && role.ToLower() != LnDConstants.ROLE_FILTERS.ALL)
+            if (!string.IsNullOrEmpty(request.Role) && request.Role.ToLower() != LnDConstants.ROLE_FILTERS.ALL)
             {
-                if (role.ToLower() == LnDConstants.ROLE_FILTERS.REQUESTER)
+                if (request.Role.ToLower() == LnDConstants.ROLE_FILTERS.REQUESTER)
                 {
                     query = query.Where(a => a.RequesterEmployeeId == employeeId);
                 }
-                else if (role.ToLower() == LnDConstants.ROLE_FILTERS.APPROVER)
+                else if (request.Role.ToLower() == LnDConstants.ROLE_FILTERS.APPROVER)
                 {
                     query = query.Where(a => a.ApproverEmployeeId == employeeId);
                 }
@@ -275,19 +266,19 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 );
             }
 
-            if (!string.IsNullOrEmpty(approvalType))
+            if (!string.IsNullOrEmpty(request.ApprovalType))
             {
-                query = query.Where(a => a.ApprovalType == approvalType);
+                query = query.Where(a => a.ApprovalType == request.ApprovalType);
             }
 
-            if (!string.IsNullOrEmpty(status))
+            if (!string.IsNullOrEmpty(request.Status))
             {
-                query = query.Where(a => a.Status == status);
+                query = query.Where(a => a.Status == request.Status);
             }
 
-            if (!string.IsNullOrEmpty(searchTerm))
+            if (!string.IsNullOrEmpty(request.SearchTerm))
             {
-                var lowerSearchTerm = searchTerm.ToLower();
+                var lowerSearchTerm = request.SearchTerm.ToLower();
                 query = query.Where(a =>
                     (
                         a.RequesterEmployee.Userprofile.FirstName
@@ -315,9 +306,12 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             var totalCount = await query.CountAsync();
 
-            query = ApplyApprovalSorting(query, sortField, sortOrder);
+            query = ApplyApprovalSorting(query, request.SortField, request.SortOrder);
 
-            var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            var items = await query
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToListAsync();
 
             Log.Information(
                 "GetApprovalHistoryAsync completed. EmployeeId={EmployeeId}, ReturnedItems={ItemCount}, TotalCount={TotalCount}",
@@ -409,7 +403,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         #endregion
 
-        #region Private Helpers  
+        #region Private Helpers
 
         /// <summary>
         /// Applies sorting logic to approval queries based on sort field and order.
@@ -474,6 +468,3 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         #endregion
     }
 }
-
-
-

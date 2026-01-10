@@ -119,8 +119,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             var managerId = GetCurrentEmployeeId();
 
             Log.Information(
-                "CompleteAssignment API called. ManagerId={ManagerId}",
-                managerId
+                "CompleteAssignment API called. ManagerId={ManagerId}, AssignmentId={AssignmentId}",
+                managerId, request.AssignmentId
             );
 
             var result = await _assignmentService.CompleteAssignment(managerId, request);
@@ -158,15 +158,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 employeeId, request.StatusFilter ?? "all", request.PageNumber
             );
 
-            var result = await _assignmentService.GetMyAssignments(
-                employeeId,
-                request.StatusFilter,
-                request.SearchTerm,
-                request.SortField,
-                request.SortOrder,
-                request.PageNumber,
-                request.PageSize
-            );
+            var result = await _assignmentService.GetMyAssignments(employeeId, request);
 
             if (result.Success)
             {
@@ -197,15 +189,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 managerId, request.StatusFilter ?? "all", request.PageNumber
             );
 
-            var result = await _assignmentService.GetTeamAssignments(
-                managerId,
-                request.StatusFilter,
-                request.SearchTerm,
-                request.SortField,
-                request.SortOrder,
-                request.PageNumber,
-                request.PageSize
-            );
+            var result = await _assignmentService.GetTeamAssignments(managerId, request);
 
             if (result.Success)
             {
@@ -236,15 +220,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 smeEmployeeId, request.StatusFilter ?? "all", request.PageNumber
             );
 
-            var result = await _assignmentService.GetSmeAssignments(
-                smeEmployeeId,
-                request.StatusFilter,
-                request.SearchTerm,
-                request.SortField,
-                request.SortOrder,
-                request.PageNumber,
-                request.PageSize
-            );
+            var result = await _assignmentService.GetSmeAssignments(smeEmployeeId, request);
 
             if (result.Success)
             {
@@ -280,13 +256,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 managerId, request.StatusFilter ?? "all"
             );
 
-            var result = await _assignmentService.ExportTeamAssignmentsToExcel(
-                managerId,
-                request.StatusFilter,
-                request.SearchTerm,
-                request.SortField,
-                request.SortOrder
-            );
+            var result = await _assignmentService.ExportTeamAssignmentsToExcel(managerId, request);
 
             if (!result.Success)
             {

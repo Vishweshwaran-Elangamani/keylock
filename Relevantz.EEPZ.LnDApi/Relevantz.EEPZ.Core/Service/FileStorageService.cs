@@ -174,7 +174,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-        private string GetContentType(string fileName)
+        public string GetContentType(string fileName)
         {
             var extension = Path.GetExtension(fileName).ToLowerInvariant();
 

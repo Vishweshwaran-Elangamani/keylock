@@ -102,7 +102,6 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 request.SkillId, request.SearchTerm ?? "none", request.PageNumber, request.PageSize
             );
 
-            // Pass the request model directly to the service
             var result = await _smeService.GetAvailableSmes(request);
 
             if (result.Success)

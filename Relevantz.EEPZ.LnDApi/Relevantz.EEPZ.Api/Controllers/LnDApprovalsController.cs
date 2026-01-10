@@ -40,16 +40,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 employeeId, request.ApprovalType ?? "all", request.Status ?? "all", request.PageNumber, request.PageSize
             );
 
-            var result = await _approvalService.GetMyApprovals(
-                employeeId,
-                request.ApprovalType,
-                request.Status,
-                request.SortField,
-                request.SortOrder,
-                request.PageNumber,
-                request.PageSize,
-                request.SearchTerm
-            );
+            var result = await _approvalService.GetMyApprovals(employeeId, request);
 
             if (result.Success)
             {
@@ -111,7 +102,6 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// Gets complete approval history for the logged-in user as requester or approver.
         /// Supports filtering by role, type, status, and search term with pagination.
         /// </summary>
-       
         [HttpGet("api/lnd-approvals/history")]
         public async Task<IActionResult> GetApprovalHistory([FromQuery] ApprovalHistoryRequestModel request)
         {
@@ -122,17 +112,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 employeeId, request.Role ?? "all", request.ApprovalType ?? "all", request.Status ?? "all"
             );
 
-            var result = await _approvalService.GetApprovalHistory(
-                employeeId,
-                request.ApprovalType,
-                request.Status,
-                request.Role,
-                request.SearchTerm,
-                request.SortField,
-                request.SortOrder,
-                request.PageNumber,
-                request.PageSize
-            );
+            var result = await _approvalService.GetApprovalHistory(employeeId, request);
 
             if (result.Success)
             {
@@ -151,7 +131,6 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 return BadRequest(result);
             }
         }
-
 
         /// <summary>
         /// Gets detailed approval information including all attachments and assignment details.
@@ -223,7 +202,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             );
 
             return File(fileBytes, contentType, fileName);
-        }
+        }                       
 
         /// <summary>
         /// Downloads assignment completion proof document.

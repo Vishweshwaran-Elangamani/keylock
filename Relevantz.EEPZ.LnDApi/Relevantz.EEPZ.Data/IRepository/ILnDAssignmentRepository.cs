@@ -1,3 +1,4 @@
+using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Common.Entities;
 
 namespace Relevantz.EEPZ.Data.Repositories.Interface
@@ -11,38 +12,19 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
         Task UpdateAssignmentAsync(Lndassignment assignment);
         Task<(List<Lndassignment> Items, int TotalCount)> GetMyAssignmentsAsync(
             int employeeId,
-            string? statusFilter,
-            string? searchTerm,
-            string? sortField,
-            string? sortOrder,
-            int pageNumber,
-            int pageSize
+            AssignmentRequestModel request
         );
         Task<(List<Lndassignment> Items, int TotalCount)> GetTeamAssignmentsAsync(
             int managerId,
-            string? statusFilter,
-            string? searchTerm,
-            string? sortField,
-            string? sortOrder,
-            int pageNumber,
-            int pageSize
+            AssignmentRequestModel request
         );
         Task<(List<Lndassignment> Items, int TotalCount)> GetSmeAssignmentsAsync(
             int smeEmployeeId,
-            string? statusFilter,
-            string? searchTerm,
-            string? sortField,
-            string? sortOrder,
-            int pageNumber,
-            int pageSize
-        );      
+            AssignmentRequestModel request
+        );
         Task<List<Lndassignment>> GetAllTeamAssignmentsForExportAsync(
             int managerId,
-            string? statusFilter,
-            string? searchTerm,
-            string? sortField,
-            string? sortOrder
+            ExportAssignmentRequestModel request
         );
-        
     }
 }

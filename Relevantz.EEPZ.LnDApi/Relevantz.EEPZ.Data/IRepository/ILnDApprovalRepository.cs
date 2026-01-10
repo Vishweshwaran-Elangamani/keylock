@@ -1,3 +1,4 @@
+using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Common.Entities;
 
 namespace Relevantz.EEPZ.Data.Repositories.Interface
@@ -10,28 +11,14 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
         Task UpdateApprovalAsync(Lndapproval approval);
         Task<(List<Lndapproval> Items, int TotalCount)> GetMyApprovalsAsync(
             int employeeId,
-            string? approvalType,
-            string? status,
-            string? sortField,
-            string? sortOrder,
-            int pageNumber,
-            int pageSize,
-            string? searchTerm 
+            MyApprovalsRequestModel request
         );
         Task<(List<Lndapproval> Items, int TotalCount)> GetApprovalHistoryAsync(
             int employeeId,
-            string? approvalType,
-            string? status,
-            string? role,
-            string? searchTerm,
-            string? sortField,
-            string? sortOrder,
-            int pageNumber, 
-            int pageSize
-        );            
+            ApprovalHistoryRequestModel request
+        );
         Task<Lndapproval?> GetPendingAssignmentApprovalAsync(int assignmentId, string approvalType);
         Task<Lndattachment> AddAttachmentAsync(Lndattachment attachment);
         Task<Lndattachment?> GetAttachmentByIdAsync(int attachmentId);
-         
-    }   
+    }
 }
