@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.DTOs;
 
 namespace Relevantz.EEPZ.Core.Services.Interface
@@ -7,19 +6,13 @@ namespace Relevantz.EEPZ.Core.Services.Interface
     {
         Task<ApiResponse<PaginatedResponse<SubordinateEmployeeResponseModel>>> GetSubordinateEmployees(
             int managerId,
-            string? searchTerm,
-            int pageNumber,
-            int pageSize
-        ); 
+            SubordinateEmployeesRequestModel request
+        );
         Task<ApiResponse<List<SkillResponseModel>>> GetAllSkills();
         Task<ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>> GetSubordinateSkills(
             int managerId,
-            int? employeeId,
-            string? searchTerm,
-            string? sortBy,
-            int pageNumber,
-            int pageSize
-        );   
+            SubordinateSkillsRequestModel request
+        );
         Task<ApiResponse<EmployeeSkillResponseModel>> RecordEmployeeSkill(
             int managerId,
             RecordSkillRequestModel request
@@ -35,9 +28,7 @@ namespace Relevantz.EEPZ.Core.Services.Interface
         Task<ApiResponse<bool>> DeleteEmployeeSkill(int managerId, int mapperId);
         Task<ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>> GetMySkills(
             int employeeId,
-            string searchTerm,
-            int pageNumber,
-            int pageSize
+            MySkillsRequestModel request
         );
     }
 }

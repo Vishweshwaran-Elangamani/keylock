@@ -1,3 +1,4 @@
+using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Common.Entities;
 
 namespace Relevantz.EEPZ.Data.Repositories.Interface
@@ -7,19 +8,13 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
         Task<Employee?> GetEmployeeByIdAsync(int employeeId);
         Task<(List<Employee> Items, int TotalCount)> GetSubordinateEmployeesAsync(
             int managerId,
-            string? searchTerm,
-            int pageNumber,
-            int pageSize
+            SubordinateEmployeesRequestModel request
         );
         Task<List<MasterSkill>> GetAllSkillsAsync();
         Task<MasterSkill?> GetSkillByIdAsync(int skillId);
         Task<(List<Lndemployeeskillmapper> Items, int TotalCount)> GetSubordinateSkillsAsync(
             int managerId,
-            int? employeeId,
-            string? searchTerm,
-            string? sortBy,
-            int pageNumber,
-            int pageSize
+            SubordinateSkillsRequestModel request
         );
         Task<Lndemployeeskillmapper?> GetEmployeeSkillMappingAsync(int employeeId, int skillId);
         Task<Lndemployeeskillmapper?> GetEmployeeSkillMappingByIdAsync(int mapperId);
@@ -31,18 +26,14 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
         Task DeleteEmployeeSkillAsync(Lndemployeeskillmapper mapper);
         Task<(List<Lndemployeeskillmapper> Items, int TotalCount)> GetMySkillsAsync(
             int employeeId,
-            string? searchTerm,
-            int pageNumber,
-            int pageSize
+            MySkillsRequestModel request
         );
         Task<List<int>> GetExistingSkillMappingsAsync(int employeeId, List<int> skillIds);
-
 
         Task<List<Lndapproval>> GetPendingSkillApprovalsAsync(int employeeId, int skillId);
         Task<List<Lndassignment>> GetActiveAssignmentsForSkillAsync(int employeeId, int skillId);
         Task<List<Lndapproval>> GetPendingAssignmentApprovalsAsync(List<int> assignmentIds);
         Task DeleteApprovalsAsync(List<Lndapproval> approvals);
         Task DeleteAssignmentsAsync(List<Lndassignment> assignments);
-
     }
 }

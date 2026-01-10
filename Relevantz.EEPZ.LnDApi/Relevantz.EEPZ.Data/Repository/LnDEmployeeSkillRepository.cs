@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Common.Constants;
+using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repositories.Interface;
@@ -45,14 +46,12 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         /// <summary>Gets paginated subordinate employees with search across name, email, and department.</summary>
         public async Task<(List<Employee> Items, int TotalCount)> GetSubordinateEmployeesAsync(
             int managerId,
-            string? searchTerm,
-            int pageNumber,
-            int pageSize
+            SubordinateEmployeesRequestModel request
         )
         {
             Log.Information(
                 "GetSubordinateEmployeesAsync called. ManagerId={ManagerId}, SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
-                managerId, searchTerm ?? "none", pageNumber, pageSize
+                managerId, request.SearchTerm ?? "none", request.PageNumber, request.PageSize
             );
 
             IQueryable<Employee> query = _context
@@ -65,9 +64,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                     && e.EmploymentStatus == LnDConstants.EMPLOYMENT_STATUS.ACTIVE
                 );
 
-            if (!string.IsNullOrEmpty(searchTerm))
+            if (!string.IsNullOrEmpty(request.SearchTerm))
             {
-                var lowerSearchTerm = searchTerm.ToLower();
+                var lowerSearchTerm = request.SearchTerm.ToLower();
 
                 query = query.Where(e =>
                     e.Userprofile.FirstName.ToLower().Contains(lowerSearchTerm)
@@ -90,8 +89,8 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             var items = await query
                 .OrderBy(e => e.Userprofile.FirstName)
                 .ThenBy(e => e.Userprofile.LastName)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
                 .ToListAsync();
 
             Log.Information(
@@ -143,16 +142,12 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             int TotalCount
         )> GetSubordinateSkillsAsync(
             int managerId,
-            int? employeeId,
-            string? searchTerm,
-            string? sortBy,
-            int pageNumber,
-            int pageSize
+            SubordinateSkillsRequestModel request
         )
         {
             Log.Information(
                 "GetSubordinateSkillsAsync called. ManagerId={ManagerId}, EmployeeId={EmployeeId}, SearchTerm={SearchTerm}, SortBy={SortBy}, Page={PageNumber}",
-                managerId, employeeId?.ToString() ?? "all", searchTerm ?? "none", sortBy ?? "default", pageNumber
+                managerId, request.EmployeeId?.ToString() ?? "all", request.SearchTerm ?? "none", request.SortBy ?? "default", request.PageNumber
             );
 
             var query = _context
@@ -162,19 +157,19 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .ThenInclude(s => s.Lndsmes)
                 .Where(m => m.Employee.ReportingManagerEmployeeId == managerId);
 
-            if (employeeId.HasValue)
-                query = query.Where(m => m.EmployeeId == employeeId.Value);
+            if (request.EmployeeId.HasValue)
+                query = query.Where(m => m.EmployeeId == request.EmployeeId.Value);
 
-            if (!string.IsNullOrEmpty(searchTerm))
+            if (!string.IsNullOrEmpty(request.SearchTerm))
             {
                 query = query.Where(m =>
-                    m.Skill.SkillName.Contains(searchTerm)
-                    || m.Employee.Userprofile.FirstName.Contains(searchTerm)
-                    || m.Employee.Userprofile.LastName.Contains(searchTerm)
+                    m.Skill.SkillName.Contains(request.SearchTerm)
+                    || m.Employee.Userprofile.FirstName.Contains(request.SearchTerm)
+                    || m.Employee.Userprofile.LastName.Contains(request.SearchTerm)
                 );
             }
 
-            query = sortBy?.ToLower() switch
+            query = request.SortBy?.ToLower() switch
             {
                 LnDConstants.SORT_FIELDS.SKILL_NAME => query.OrderBy(m => m.Skill.SkillName),
                 LnDConstants.SORT_FIELDS.RATING => query.OrderByDescending(m => m.Rating),
@@ -183,7 +178,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             };
 
             var totalCount = await query.CountAsync();
-            var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            var items = await query.Skip((request.PageNumber - 1) * 1_000_000).Take(1_000_000).ToListAsync();
 
             Log.Information(
                 "GetSubordinateSkillsAsync completed. ManagerId={ManagerId}, ReturnedCount={Count}, TotalCount={TotalCount}",
@@ -196,14 +191,12 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         /// <summary>Gets paginated skill mappings for a specific employee.</summary>
         public async Task<(List<Lndemployeeskillmapper> Items, int TotalCount)> GetMySkillsAsync(
             int employeeId,
-            string? searchTerm,
-            int pageNumber,
-            int pageSize
+            MySkillsRequestModel request
         )
         {
             Log.Information(
                 "GetMySkillsAsync called. EmployeeId={EmployeeId}, SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
-                employeeId, searchTerm ?? "none", pageNumber, pageSize
+                employeeId, request.SearchTerm ?? "none", request.PageNumber, request.PageSize
             );
 
             var query = _context
@@ -213,16 +206,16 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .ThenInclude(s => s.Lndsmes)
                 .Where(m => m.EmployeeId == employeeId);
 
-            if (!string.IsNullOrEmpty(searchTerm))
+            if (!string.IsNullOrEmpty(request.SearchTerm))
             {
-                query = query.Where(m => m.Skill.SkillName.Contains(searchTerm));
+                query = query.Where(m => m.Skill.SkillName.Contains(request.SearchTerm));
             }
 
             var totalCount = await query.CountAsync();
             var items = await query
                 .OrderBy(m => m.Skill.SkillName)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
                 .ToListAsync();
 
             Log.Information(
@@ -378,7 +371,6 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             Log.Debug("DeleteEmployeeSkillAsync: Mapper removed from context. Pending SaveChanges");
         }
 
-
         public async Task<List<Lndapproval>> GetPendingSkillApprovalsAsync(int employeeId, int skillId)
         {
             Log.Debug(
@@ -486,11 +478,6 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             await Task.CompletedTask;
         }
 
-
-
-
         #endregion
     }
 }
-
-
