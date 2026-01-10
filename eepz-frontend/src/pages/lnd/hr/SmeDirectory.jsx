@@ -28,26 +28,46 @@ const SmeDirectory = () => {
   useEffect(() => {
     fetchSmes();
   }, [currentPage, itemsPerPage, searchTerm]);
-  const fetchSmes = async () => {
+  
+  const fetchSmes = async () => { 
     try {
       setLoading(true);
-      const response = await lndService.getAllActiveSmes(
-        currentPage,
-        searchTerm,
-        itemsPerPage
-      );
+  
+      //  Pass parameters as an object
+  
+      const response = await lndService.getAllActiveSmes({
+  
+        pageNumber: currentPage,
+  
+        searchTerm: searchTerm,
+  
+        pageSize: itemsPerPage
+  
+      });
+  
       if (response.data.success) {
+  
         setSmes(response.data.data.items);
+  
         setTotalItems(response.data.data.totalCount);
+  
         setTotalPages(response.data.data.totalPages);
+  
       }
+  
     } catch (error) {
+  
       console.error("Failed to fetch SMEs:", error);
+  
       toast.error("Failed to load SMEs");
+  
     } finally {
+  
       setLoading(false);
+  
     }
-  };
+  
+  };  
   const handleExportToExcel = async () => {
     try {
       setExporting(true);
