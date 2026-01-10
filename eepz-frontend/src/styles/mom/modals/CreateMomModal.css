@@ -200,23 +200,6 @@
   gap: 0.4rem;
 }
 
-.cmm-badge {
-  padding: 0.25rem 0.5rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.cmm-badge-primary {
-  background: #27235c;
-  color: #fff;
-}
-
-.cmm-badge-success {
-  background: #10b981;
-  color: #fff;
-}
-
 .cmm-btn {
   border: none;
   border-radius: 6px;
@@ -330,20 +313,6 @@
   gap: 0.75rem;
 }
 
-.cmm-point-badge {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #27235c;
-  color: #fff;
-  font-weight: 700;
-  font-size: 0.85rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
 .cmm-relative {
   position: relative;
 }
@@ -450,119 +419,6 @@
   background: transparent;
   cursor: pointer;
   padding: 0;
-}
-
-.cmm-calendar {
-  position: absolute;
-  top: calc(100% + 0.5rem);
-  right: -150px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 16px 44px rgba(15, 23, 42, 0.2);
-  border: 1px solid #e5e7eb;
-  z-index: 1001;
-  width: 250px;
-  max-width: calc(100vw - 2rem);
-}
-
-.cmm-calendar-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid #e5e7eb;
-  background: #f9fafb;
-}
-
-.cmm-calendar-nav {
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 4px;
-  transition: background 0.2s ease;
-}
-
-.cmm-calendar-nav:hover {
-  background: rgba(39, 35, 92, 0.1);
-}
-
-.cmm-calendar-title {
-  font-weight: 600;
-  font-size: 0.95rem;
-  color: #111827;
-}
-
-.cmm-calendar-weekdays {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  padding: 0.35rem 0.75rem;
-  gap: 0.25rem;
-  font-size: 0.75rem;
-  color: #6b7280;
-}
-
-.cmm-weekday {
-  text-align: center;
-  padding: 0.25rem 0;
-  font-weight: 500;
-}
-
-.cmm-calendar-days {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  padding: 0.35rem 0.75rem 0.6rem;
-  gap: 0.25rem;
-}
-
-.cmm-calendar-day {
-  text-align: center;
-  padding: 0.35rem 0.15rem;
-  font-size: 0.78rem;
-  border-radius: 6px;
-  cursor: default;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.cmm-calendar-day.cmm-current {
-  color: #111827;
-  cursor: pointer;
-}
-
-.cmm-calendar-day.cmm-current:hover {
-  background: rgba(39, 35, 92, 0.08);
-}
-
-.cmm-calendar-day.cmm-today {
-  background: rgba(39, 35, 92, 0.1);
-}
-
-.cmm-calendar-day.cmm-selected {
-  background: #27235c !important;
-  color: #fff !important;
-}
-
-.cmm-calendar-footer {
-  padding: 0.75rem 1rem 1rem;
-  border-top: 1px solid #e5e7eb;
-  text-align: right;
-}
-
-.cmm-today-btn {
-  border: none;
-  background: transparent;
-  color: #27235c;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-.cmm-today-btn:hover {
-  background: rgba(39, 35, 92, 0.1);
 }
 
 .cmm-error {
@@ -680,11 +536,5 @@
 
   .cmm-actions {
     flex-direction: column;
-  }
-
-  .cmm-calendar {
-    width: calc(500vw - 2rem);
-    left: 0;
-    right: auto;
   }
 }

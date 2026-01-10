@@ -1,45 +1,52 @@
-import React, { useRef, useEffect } from "react";
+import React, { useMemo } from "react";
 import { Search, Filter, Plus, Users, X } from "lucide-react";
+import CustomDropdown from "../../components/project_management_components/common/CustomDropdown";
 import "../../styles/projectmanagement/components/ProjectListFilterBar.css";
 
 const ProjectListFilterBar = ({
-  searchTerm,setSearchTerm,activeSearchTerm,
-  filterStatus,setFilterStatus,onSearch,
-  onCancelSearch,onSearchKeyPress,onNavigateResourcePool,
+  searchTerm,
+  setSearchTerm,
+  activeSearchTerm,
+  filterStatus,
+  setFilterStatus,
+  onSearch,
+  onCancelSearch,
+  onSearchKeyPress,
+  onNavigateResourcePool,
   onNavigateCreateProject,
 }) => {
-  const dropdownRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        dropdownRef.current.classList.remove("prj-list-dropdown-open");
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const toggleDropdown = () => {
-    dropdownRef.current?.classList.toggle("prj-list-dropdown-open");
-  };
-
-  const handleStatusSelect = (status) => {
-    setFilterStatus(status);
-    dropdownRef.current?.classList.remove("prj-list-dropdown-open");
-  };
+  const statusOptions = useMemo(
+    () => [
+      { value: "All", label: "All Status" },
+      { value: "Active", label: "Active" },
+      { value: "On Hold", label: "On Hold" },
+      { value: "Completed", label: "Completed" },
+      { value: "Cancelled", label: "Cancelled" },
+    ],
+    []
+  );
 
   return (
     <div className="prj-list-filter-bar">
       <div className="prj-list-filter-bar-content">
         <div className="prj-list-search-wrapper">
           <Search size={18} className="prj-list-search-icon" />
-          <input type="text" className="prj-list-search-input" placeholder="Search projects..."
-            value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} onKeyPress={onSearchKeyPress}/>
+
+          <input
+            type="text"
+            className="prj-list-search-input"
+            placeholder="Search projects..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyPress={onSearchKeyPress}
+          />
 
           {activeSearchTerm ? (
-            <button className="prj-list-search-btn prj-list-search-btn-cancel" type="button" onClick={onCancelSearch}>
+            <button
+              className="prj-list-search-btn prj-list-search-btn-cancel"
+              type="button"
+              onClick={onCancelSearch}
+            >
               <X size={16} />
               <span>Cancel</span>
             </button>
@@ -53,42 +60,18 @@ const ProjectListFilterBar = ({
 
         <div className="prj-list-status-filter-wrapper">
           <Filter size={18} className="prj-list-filter-icon" />
-          <div className="prj-list-custom-dropdown" ref={dropdownRef}>
-            <div className="prj-list-custom-dropdown-selected" onClick={toggleDropdown}>
-              <span>
-                {filterStatus === "All" ? "All Status" : filterStatus}
-              </span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="12"
-                height="12"
-                viewBox="0 0 16 16"
-                className="prj-list-dropdown-arrow">
-                <path
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M2 5l6 6 6-6"/>
-              </svg>
-            </div>
-            <div className="prj-list-custom-dropdown-options">
-              {["All", "Active", "On Hold", "Completed", "Cancelled"].map(
-                (status) => (
-                  <div
-                    key={status}
-                    className={`prj-list-custom-option ${
-                      filterStatus === status
-                        ? "prj-list-option-selected"
-                        : ""
-                    }`}
-                    onClick={() => handleStatusSelect(status)}>
-                    {status === "All" ? "All Status" : status}
-                  </div>
-                )
-              )}
-            </div>
+
+          <div className="prj-list-status-dropdown">
+            <CustomDropdown
+              name="status"
+              value={filterStatus}
+              options={statusOptions}
+              placeholder="All Status"
+              onChange={(name, val) => setFilterStatus(val)}
+              className="prj-list-status-dropdown-comp"
+              align="left"
+              offset={{ x: 0, y: 6 }}
+            />
           </div>
         </div>
 
@@ -96,11 +79,17 @@ const ProjectListFilterBar = ({
           <button
             className="prj-list-btn prj-list-btn-resource"
             type="button"
-            onClick={onNavigateResourcePool} >
+            onClick={onNavigateResourcePool}
+          >
             <Users size={20} />
             <span>Resource Pool</span>
           </button>
-          <button className="prj-list-btn prj-list-btn-create" type="button" onClick={onNavigateCreateProject} >
+
+          <button
+            className="prj-list-btn prj-list-btn-create"
+            type="button"
+            onClick={onNavigateCreateProject}
+          >
             <Plus size={20} />
             <span>Create Project</span>
           </button>

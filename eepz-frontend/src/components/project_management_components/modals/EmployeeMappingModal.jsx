@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import {
   Users,
@@ -8,78 +8,9 @@ import {
   Search,
   Check,
   X,
-  ChevronDown,
 } from "lucide-react";
+import CustomDropdown from "../../../components/project_management_components/common/CustomDropdown";
 import "../../../styles/projectmanagement/modals/EmployeeMappingModal.css";
-
-const CustomDropdown = ({ value, onChange, options, placeholder }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const handleSelect = (optionValue) => {
-    onChange(optionValue);
-    setIsOpen(false);
-  };
-
-  const getDisplayValue = () => {
-    if (!value || value === "All") return placeholder || "Select";
-    return value;
-  };
-
-  return (
-    <div className="emm-dd-wrapper" ref={dropdownRef}>
-      <div
-        className={`emm-dd-button ${isOpen ? "emm-dd-button--open" : ""}`}
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <span
-          className={`emm-dd-value ${
-            value && value !== "All"
-              ? "emm-dd-value--filled"
-              : "emm-dd-value--placeholder"
-          }`}
-        >
-          {getDisplayValue()}
-        </span>
-        <ChevronDown
-          size={16}
-          className={`emm-dd-chevron ${isOpen ? "emm-dd-chevron--open" : ""}`}
-        />
-      </div>
-      {isOpen && (
-        <ul className="emm-dd-menu">
-          {options.map((opt, idx) => {
-            const optValue = opt.value || opt;
-            const optLabel = opt.label || opt;
-            const selected = value === optValue;
-            return (
-              <li
-                key={idx}
-                className={`emm-dd-item ${
-                  selected ? "emm-dd-item--selected" : ""
-                }`}
-                onClick={() => handleSelect(optValue)}
-              >
-                {optLabel}
-              </li>
-            );
-          })}
-        </ul>
-      )}
-    </div>
-  );
-};
 
 const EmployeeMappingModal = ({
   show,
@@ -115,11 +46,8 @@ const EmployeeMappingModal = ({
   hasSelectedUnmapped,
 }) => {
   useEffect(() => {
-    if (show) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
+    if (show) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "unset";
     return () => {
       document.body.style.overflow = "unset";
     };
@@ -147,33 +75,42 @@ const EmployeeMappingModal = ({
   const getProjectManagerIds = () => {
     if (!project) return [];
     const managerIds = [];
-    if (project.resourceOwner?.employeeMasterId) {
+    if (project.resourceOwner?.employeeMasterId)
       managerIds.push(project.resourceOwner.employeeMasterId);
-    }
-    if (project.l1Approver?.employeeMasterId) {
+    if (project.l1Approver?.employeeMasterId)
       managerIds.push(project.l1Approver.employeeMasterId);
-    }
-    if (project.l2Approver?.employeeMasterId) {
+    if (project.l2Approver?.employeeMasterId)
       managerIds.push(project.l2Approver.employeeMasterId);
-    }
     return managerIds;
   };
 
-  const displayEmployees = filteredEmployees.filter(
+  const displayEmployees = (filteredEmployees || []).filter(
     (emp) => emp.roleName && emp.roleName.toLowerCase() !== "admin"
   );
 
-  const displayUniqueRoles = uniqueRoles.filter(
+  const displayUniqueRoles = (uniqueRoles || []).filter(
     (role) => role && role.toLowerCase() !== "admin"
   );
 
-  const roleOptions = ["All", ...displayUniqueRoles];
-  const departmentOptions = ["All", ...uniqueDepartments];
-  const statusOptions = ["All", "Mapped", "Unmapped"];
+  const roleOptions = ["All", ...displayUniqueRoles].map((r) => ({
+    value: r,
+    label: r === "All" ? "All Roles" : r,
+  }));
+
+  const departmentOptions = ["All", ...(uniqueDepartments || [])].map((d) => ({
+    value: d,
+    label: d === "All" ? "All Departments" : d,
+  }));
+
+  const statusOptions = ["All", "Mapped", "Unmapped"].map((s) => ({
+    value: s,
+    label: s === "All" ? "All Status" : s,
+  }));
 
   const modalContent = (
     <>
       <div className="emm-overlay" onClick={onClose} />
+
       <div className="emm-modal-shell">
         <div className="emm-modal-card">
           <div className="emm-modal-header">
@@ -184,15 +121,18 @@ const EmployeeMappingModal = ({
                 {project?.projectName && ` - ${project.projectName}`}
               </span>
             </h5>
+
             <button
               type="button"
               onClick={onClose}
               aria-label="Close"
               className="emm-modal-close"
+              disabled={isSubmitting}
             >
               <X size={22} />
             </button>
           </div>
+
           <div className="emm-body">
             {message && (
               <div
@@ -210,6 +150,7 @@ const EmployeeMappingModal = ({
                 <span>{message.text}</span>
               </div>
             )}
+
             {getProjectManagerIds().length > 0 && (
               <div className="emm-info-banner">
                 <Info size={18} className="emm-info-icon" />
@@ -227,27 +168,23 @@ const EmployeeMappingModal = ({
                     {project.l1Approver && (
                       <li>
                         <strong>L1 Approver:</strong>{" "}
-                        {project.l1Approver.firstName}{" "}
-                        {project.l1Approver.lastName}
+                        {project.l1Approver.firstName} {project.l1Approver.lastName}
                       </li>
                     )}
                     {project.l2Approver && (
                       <li>
                         <strong>L2 Approver:</strong>{" "}
-                        {project.l2Approver.firstName}{" "}
-                        {project.l2Approver.lastName}
+                        {project.l2Approver.firstName} {project.l2Approver.lastName}
                       </li>
                     )}
                   </ul>
                 </div>
               </div>
             )}
+
             {isLoadingData ? (
               <div className="emm-loading">
-                <div
-                  className="emm-loading-spinner spinner-border"
-                  role="status"
-                >
+                <div className="emm-loading-spinner spinner-border" role="status">
                   <span className="visually-hidden">Loading...</span>
                 </div>
                 <p className="emm-loading-text">Loading employees...</p>
@@ -266,6 +203,7 @@ const EmployeeMappingModal = ({
                         onChange={(e) => setSearchTerm(e.target.value)}
                         onKeyPress={handleSearchKeyPress}
                       />
+
                       {activeSearchTerm ? (
                         <button
                           type="button"
@@ -287,31 +225,47 @@ const EmployeeMappingModal = ({
                       )}
                     </div>
                   </div>
+
                   <div className="col-md-2">
                     <CustomDropdown
+                      name="role"
                       value={filterRole}
-                      onChange={setFilterRole}
+                      onChange={(_, v) => setFilterRole(v)}
                       options={roleOptions}
                       placeholder="All Roles"
+                      className="emm-filter-dd"
+                      align="left"
+                      offset={{ x: 0, y: 6 }}
                     />
                   </div>
+
                   <div className="col-md-2">
                     <CustomDropdown
+                      name="department"
                       value={filterDepartment}
-                      onChange={setFilterDepartment}
+                      onChange={(_, v) => setFilterDepartment(v)}
                       options={departmentOptions}
                       placeholder="All Departments"
+                      className="emm-filter-dd"
+                      align="left"
+                      offset={{ x: 0, y: 6 }}
                     />
                   </div>
+
                   <div className="col-md-2">
                     <CustomDropdown
+                      name="status"
                       value={filterStatus}
-                      onChange={setFilterStatus}
+                      onChange={(_, v) => setFilterStatus(v)}
                       options={statusOptions}
                       placeholder="All Status"
+                      className="emm-filter-dd"
+                      align="left"
+                      offset={{ x: 0, y: 6 }}
                     />
                   </div>
                 </div>
+
                 <div className="emm-selection-summary">
                   <div className="emm-summary-badges">
                     <span className="emm-badge emm-badge--info">
@@ -329,6 +283,7 @@ const EmployeeMappingModal = ({
                       </span>
                     )}
                   </div>
+
                   <button
                     type="button"
                     className="emm-btn-outline"
@@ -337,6 +292,7 @@ const EmployeeMappingModal = ({
                     Select/Deselect All
                   </button>
                 </div>
+
                 <div className="emm-warning-banner">
                   <Info size={16} className="emm-info-icon" />
                   <div className="emm-warning-text">
@@ -345,6 +301,7 @@ const EmployeeMappingModal = ({
                     Employees must be selected first before marking as primary.
                   </div>
                 </div>
+
                 <div className="table-responsive emm-table-wrapper">
                   <table className="table table-hover mb-0 emm-table">
                     <thead className="table-light emm-thead">
@@ -354,11 +311,10 @@ const EmployeeMappingModal = ({
                         <th className="emm-th">Role</th>
                         <th className="emm-th">Department</th>
                         <th className="emm-th emm-th--status">Status</th>
-                        <th className="emm-th emm-th--primary">
-                          Primary Project
-                        </th>
+                        <th className="emm-th emm-th--primary">Primary Project</th>
                       </tr>
                     </thead>
+
                     <tbody>
                       {displayEmployees.length === 0 ? (
                         <tr>
@@ -382,6 +338,7 @@ const EmployeeMappingModal = ({
                           const isPrimary = primaryEmployeeIds.includes(
                             emp.employeeMasterId
                           );
+
                           return (
                             <tr
                               key={emp.employeeMasterId}
@@ -397,22 +354,22 @@ const EmployeeMappingModal = ({
                                   type="checkbox"
                                   className="emm-checkbox"
                                   checked={isSelected}
-                                  onChange={() =>
-                                    onEmployeeSelect(emp.employeeMasterId)
-                                  }
+                                  onChange={() => onEmployeeSelect(emp.employeeMasterId)}
                                 />
                               </td>
+
                               <td className="emm-td emm-td--name">
                                 <span className="emm-name">
                                   {emp.firstName} {emp.lastName}
                                 </span>
                               </td>
-                              <td className="emm-td emm-td--muted">
-                                {emp.roleName}
-                              </td>
+
+                              <td className="emm-td emm-td--muted">{emp.roleName}</td>
+
                               <td className="emm-td emm-td--muted">
                                 {emp.departmentName}
                               </td>
+
                               <td className="emm-td">
                                 {isMapped ? (
                                   <span className="emm-status emm-status--mapped">
@@ -425,6 +382,7 @@ const EmployeeMappingModal = ({
                                   </span>
                                 )}
                               </td>
+
                               <td
                                 onClick={(e) => e.stopPropagation()}
                                 className="emm-td emm-td--primary"
@@ -434,9 +392,7 @@ const EmployeeMappingModal = ({
                                   className="emm-checkbox"
                                   checked={isPrimary}
                                   disabled={!isSelected}
-                                  onChange={() =>
-                                    onPrimaryToggle(emp.employeeMasterId)
-                                  }
+                                  onChange={() => onPrimaryToggle(emp.employeeMasterId)}
                                   title={
                                     !isSelected
                                       ? "Select employee first"
@@ -454,11 +410,23 @@ const EmployeeMappingModal = ({
               </>
             )}
           </div>
+
           <div className="emm-footer">
-            <button type="button" onClick={onClose} className="emm-btn emm-btn--secondary">
+            <button
+              type="button"
+              onClick={onClose}
+              className="emm-btn emm-btn--secondary"
+              disabled={isSubmitting}
+            >
               Close
             </button>
-            <button type="button" onClick={onMap} disabled={!hasSelectedUnmapped || isSubmitting} className="emm-btn emm-btn--map">
+
+            <button
+              type="button"
+              onClick={onMap}
+              disabled={!hasSelectedUnmapped || isSubmitting}
+              className="emm-btn emm-btn--map"
+            >
               {isSubmitting ? (
                 <>
                   <span className="spinner-border spinner-border-sm emm-btn-spinner" />
@@ -471,7 +439,13 @@ const EmployeeMappingModal = ({
                 </>
               )}
             </button>
-            <button type="button" onClick={onUnmap} disabled={!hasSelectedMapped || isSubmitting} className="emm-btn emm-btn--unmap" >
+
+            <button
+              type="button"
+              onClick={onUnmap}
+              disabled={!hasSelectedMapped || isSubmitting}
+              className="emm-btn emm-btn--unmap"
+            >
               {isSubmitting ? (
                 <>
                   <span className="spinner-border spinner-border-sm emm-btn-spinner" />
@@ -489,6 +463,8 @@ const EmployeeMappingModal = ({
       </div>
     </>
   );
+
   return ReactDOM.createPortal(modalContent, document.body);
 };
+
 export default EmployeeMappingModal;

@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
 
 .cff-page {
   max-width: 900px;
   margin: 0 auto;
   padding: 2rem 1.5rem;
-  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   margin-top: -25px;
 }
 
@@ -240,7 +240,6 @@
     opacity: 0;
     transform: translateY(-4px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -278,10 +277,8 @@
 }
 
 .cff-select-option-hovered {
-
   background: #27235c;
   color: #ffffff;
-
 }
 
 .cff-select-option-selected {
@@ -313,126 +310,9 @@
   color: #27235c;
 }
 
-.cff-calendar {
-  position: absolute;
-  bottom: 100%;
-  right: 0;
-  margin-bottom: 4px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  border: 1px solid #e5e7eb;
-  z-index: 9999;
-  width: 260px;
-}
-
-.cff-calendar-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid #e5e7eb;
-  background-color: #f9fafb;
-}
-
-.cff-calendar-nav {
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  color: #374151;
-}
-
-.cff-calendar-nav:hover {
-  color: #27235c;
-}
-
-.cff-calendar-title {
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: #111827;
-}
-
-.cff-calendar-weekdays {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  padding: 0.25rem 0.5rem;
-  gap: 2px;
-  font-size: 0.75rem;
-  color: #6b7280;
-}
-
-.cff-calendar-weekday {
-  text-align: center;
-  padding: 0.25rem 0;
-}
-
-.cff-calendar-days {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  padding: 0.25rem 0.5rem 0.5rem;
-  gap: 2px;
-}
-
-.cff-calendar-day {
-  border: none;
-  background-color: transparent;
-  color: #111827;
-  border-radius: 6px;
-  padding: 0.35rem 0;
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.cff-calendar-day:hover:not(.cff-calendar-day-disabled) {
-  background-color: #f3f4f6;
-}
-
-.cff-calendar-day-today {
-  background-color: #e5e7eb;
-}
-
-.cff-calendar-day-selected {
-  background-color: #27235c;
-  color: #ffffff;
-}
-
-.cff-calendar-day-disabled {
-  color: #d1d5db;
-  cursor: default;
-}
-
-.cff-calendar-footer {
-  border-top: 1px solid #e5e7eb;
-  padding: 0.4rem 0.6rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #f9fafb;
-}
-
-.cff-calendar-footer-btn {
-  border: none;
-  background: transparent;
-  font-size: 0.75rem;
-  cursor: pointer;
-  padding: 0.25rem 0.5rem;
-}
-
-.cff-calendar-today-btn {
-  color: #27235c;
-  font-weight: 600;
-}
-
-.cff-calendar-close-btn {
-  color: #6b7280;
-}
-
-.cff-calendar-footer-btn:hover {
-  opacity: 0.7;
+.cff-calendar-icon-btn--disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
 }
 
 .cff-submit-wrapper {
@@ -480,7 +360,6 @@
   from {
     transform: rotate(0deg);
   }
-
   to {
     transform: rotate(360deg);
   }
@@ -497,12 +376,6 @@
 
   .cff-form-group {
     margin-bottom: 1.25rem;
-  }
-
-  .cff-calendar {
-    right: 50%;
-    transform: translateX(50%);
-    width: 280px;
   }
 }
 
@@ -528,11 +401,6 @@
 
   .cff-select-trigger {
     padding-right: 2.5rem;
-  }
-
-  .cff-calendar {
-    width: 100%;
-    max-width: 300px;
   }
 
   .cff-submit-btn {

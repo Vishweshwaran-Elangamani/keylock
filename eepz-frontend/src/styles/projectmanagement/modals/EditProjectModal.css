@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
 .epm-overlay {
   position: fixed;
   inset: 0;
@@ -14,7 +16,12 @@
   width: 980px;
   max-width: 92vw;
   max-height: 92vh;
-  font-family: Poppins, sans-serif;
+  font-family: "Poppins", sans-serif;
+}
+
+.epm-modal-shell,
+.epm-modal-shell * {
+  font-family: "Poppins", sans-serif !important;
 }
 
 .epm-modal-card {
@@ -26,7 +33,7 @@
   display: flex;
   flex-direction: column;
   background-color: #ffffff;
-  font-family: Poppins, sans-serif;
+  margin-top: -40px;
 }
 
 .epm-modal-header {
@@ -36,7 +43,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-family: Poppins, sans-serif;
 }
 
 .epm-modal-title {
@@ -47,7 +53,6 @@
   font-size: 1.1rem;
   font-weight: 600;
   color: #ffffff;
-  font-family: Poppins, sans-serif;
 }
 
 .epm-modal-title svg {
@@ -58,7 +63,6 @@
   background: transparent;
   border: none;
   color: #ffffff;
-  font-size: 1.5rem;
   cursor: pointer;
   padding: 0.25rem;
   line-height: 1;
@@ -66,7 +70,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: Poppins, sans-serif;
+  transition: opacity 0.2s ease;
+}
+
+.epm-modal-close:hover {
+  opacity: 1;
 }
 
 .epm-form {
@@ -74,7 +82,6 @@
   flex-direction: column;
   flex: 1;
   overflow: hidden;
-  font-family: Poppins, sans-serif;
 }
 
 .epm-body {
@@ -82,7 +89,6 @@
   background-color: #f8f9fa;
   overflow-y: auto;
   flex: 1;
-  font-family: Poppins, sans-serif;
 }
 
 .epm-alert {
@@ -94,7 +100,6 @@
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 1.5rem;
-  font-family: Poppins, sans-serif;
 }
 
 .epm-alert--success {
@@ -114,32 +119,27 @@
   margin-bottom: 1.75rem;
   border: 1px solid #e5e7eb;
   text-align: left;
-  font-family: Poppins, sans-serif;
 }
 
 .epm-summary-text {
   font-size: 0.875rem;
   color: #6b7280;
   font-weight: 500;
-  font-family: Poppins, sans-serif;
 }
 
 .epm-summary-name {
   color: #374151;
   font-weight: 600;
-  font-family: Poppins, sans-serif;
 }
 
 .epm-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1.5rem 1.5rem;
-  font-family: Poppins, sans-serif;
 }
 
 .epm-col {
   width: 100%;
-  font-family: Poppins, sans-serif;
 }
 
 .epm-label {
@@ -149,13 +149,11 @@
   font-weight: 600;
   text-align: left;
   display: block;
-  font-family: Poppins, sans-serif;
 }
 
 .epm-label-required {
   color: #e01950;
   margin-left: 0.15rem;
-  font-family: Poppins, sans-serif;
 }
 
 .epm-input {
@@ -165,31 +163,51 @@
   border: 1px solid #d1d5db;
   padding: 0.625rem 0.75rem;
   background-color: #ffffff;
-  font-family: Poppins, sans-serif;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.epm-input:focus {
+  outline: none;
+  border-color: #27235c;
+  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
 }
 
 .epm-input::placeholder {
-  font-family: Poppins, sans-serif;
+  color: #9ca3af;
 }
 
+/* ✅ Description textarea now same height as inputs */
 .epm-textarea {
   width: 100%;
+  height: 42px;
+  min-height: 42px;
+  max-height: 42px;
   font-size: 0.875rem;
-  line-height: 1.5;
+  line-height: 42px;
   border-radius: 8px;
   border: 1px solid #d1d5db;
-  padding: 0.625rem 0.75rem;
+  padding: 0 0.75rem;
   background-color: #ffffff;
-  resize: vertical;
-  font-family: Poppins, sans-serif;
+  resize: none;
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.epm-textarea:focus {
+  outline: none;
+  border-color: #27235c;
+  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
 }
 
 .epm-textarea::placeholder {
-  font-family: Poppins, sans-serif;
+  color: #9ca3af;
 }
 
+/* not needed anymore but kept safe */
 .epm-textarea--half {
-  min-height: 90px;
+  height: 42px;
+  min-height: 42px;
+  max-height: 42px;
 }
 
 .epm-footer {
@@ -199,7 +217,6 @@
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
-  font-family: Poppins, sans-serif;
 }
 
 .epm-btn {
@@ -213,12 +230,15 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  font-family: Poppins, sans-serif;
 }
 
 .epm-btn--secondary {
   background-color: #6b7280;
   color: #ffffff;
+}
+
+.epm-btn--secondary:hover:not(:disabled) {
+  background-color: #4b5563;
 }
 
 .epm-btn--secondary:disabled {
@@ -232,9 +252,15 @@
   box-shadow: 0 4px 12px rgba(192, 38, 211, 0.3);
 }
 
+.epm-btn--primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(192, 38, 211, 0.4);
+}
+
 .epm-btn--primary:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+  transform: none;
 }
 
 .epm-inline-spinner {
@@ -252,246 +278,23 @@
   }
 }
 
-.epm-dd-wrapper {
-  margin-bottom: 0;
-  font-family: Poppins, sans-serif;
-}
-
-.epm-dd-inner {
-  position: relative;
-  font-family: Poppins, sans-serif;
-}
-
-.epm-dd-button {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.epm-dd-slot {
   width: 100%;
-  padding: 0.625rem 0.75rem;
-  font-size: 0.875rem;
-  background: #ffffff;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  outline: none;
-  user-select: none;
-  font-family: Poppins, sans-serif;
 }
 
-.epm-dd-button--open {
-  border-color: #27235c;
-  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+.epm-dd-slot .cdrop-wrap {
+  margin-bottom: 0 !important;
 }
 
-.epm-dd-value {
-  flex: 1;
-  text-align: left;
-  font-family: Poppins, sans-serif;
-}
-
-.epm-dd-value--placeholder {
-  color: #8d8d8d;
-  font-weight: 400;
-}
-
-.epm-dd-value--filled {
-  color: #393939;
-}
-
-.epm-dd-chevron {
-  color: #6c757d;
-  transition: all 0.2s ease;
-  margin-left: 0.5rem;
-  flex-shrink: 0;
-}
-
-.epm-dd-chevron--open {
-  transform: rotate(180deg);
-  color: #27235c;
-}
-
-.epm-dd-menu {
-  position: fixed;
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-  max-height: 220px;
-  overflow-y: auto;
-  z-index: 99999;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  animation: epm-dropdown-fade 0.2s ease;
-  font-size: 0.875rem;
-  font-family: Poppins, sans-serif;
-}
-
-.epm-dd-item {
-  padding: 0.65rem 0.875rem;
-  color: #393939;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  border-bottom: 1px solid #f0f0f0;
-  font-family: Poppins, sans-serif;
-}
-
-.epm-dd-item:last-child {
-  border-bottom: none;
-}
-
-.epm-dd-item--selected {
-  background: #efefef;
-  color: #000;
-  font-weight: 600;
-}
-
-.epm-dd-item:hover {
-  background: #27235c;
-  color: #ffffff;
-}
-
-@keyframes epm-dropdown-fade {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.epm-cal-root {
-  background: #ffffff;
-  border: 1px solid #e9e9ef;
-  border-radius: 6px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-  padding: 0.4rem;
-  width: 180px;
-  font-family: Poppins, sans-serif;
-  animation: epm-calendar-fade 0.2s ease;
-}
-
-.epm-cal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.25rem;
-  font-family: Poppins, sans-serif;
-}
-
-.epm-cal-nav-btn {
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  padding: 2px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.epm-cal-month {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #111827;
-  font-family: Poppins, sans-serif;
-}
-
-.epm-cal-weekdays {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 1px;
-  margin-bottom: 0.2rem;
-}
-
-.epm-cal-weekday {
-  text-align: center;
-  font-size: 0.625rem;
-  color: #6b7280;
-  padding: 0.15rem 0;
-  font-family: Poppins, sans-serif;
-}
-
-.epm-cal-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
-}
-
-.epm-cal-day {
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.625rem;
-  color: #393939;
-  cursor: pointer;
-  border-radius: 3px;
-  padding: 0.1rem;
-  transition: all 0.2s ease;
-  font-weight: 500;
-  font-family: Poppins, sans-serif;
-}
-
-.epm-cal-day--outside {
-  color: #d1d5db;
-  cursor: default;
-}
-
-.epm-cal-day--today {
-  background: rgba(39, 35, 92, 0.1);
-  color: #27235c;
-}
-
-.epm-cal-day--selected {
-  background: #27235c;
-  color: #ffffff;
-  font-weight: 600;
-}
-
-.epm-cal-day--disabled {
-  color: #d1d5db;
-  cursor: not-allowed;
-  text-decoration: line-through;
-}
-
-.epm-cal-today-btn {
-  width: 100%;
-  margin-top: 0.3rem;
-  border: none;
-  background: transparent;
-  color: #27235c;
-  font-size: 0.7rem;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0.2rem 0;
-  font-family: Poppins, sans-serif;
-}
-
-@keyframes epm-calendar-fade {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
+/* Date Input Styles */
 .epm-date-wrapper {
   margin-bottom: 0;
-  font-family: Poppins, sans-serif;
 }
 
 .epm-date-input-wrapper {
   position: relative;
   display: flex;
   align-items: center;
-  font-family: Poppins, sans-serif;
 }
 
 .epm-date-input {
@@ -502,11 +305,17 @@
   border: 1px solid #d1d5db;
   background-color: #ffffff;
   cursor: pointer;
-  font-family: Poppins, sans-serif;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.epm-date-input:focus {
+  outline: none;
+  border-color: #27235c;
+  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
 }
 
 .epm-date-input::placeholder {
-  font-family: Poppins, sans-serif;
+  color: #9ca3af;
 }
 
 .epm-date-icon-btn {
@@ -522,7 +331,6 @@
   justify-content: center;
   border-radius: 4px;
   transition: all 0.2s ease;
-  font-family: Poppins, sans-serif;
 }
 
 .epm-date-icon-btn:hover {
@@ -530,120 +338,10 @@
   transform: scale(1.05);
 }
 
-.epm-date-popup {
-  position: fixed;
-  z-index: 99999;
-  font-family: Poppins, sans-serif;
-}
-
-.epm-date-popup-inner {
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  border: 1px solid #e5e7eb;
-  width: 260px;
-  overflow: hidden;
-  font-family: Poppins, sans-serif;
-}
-
-.epm-date-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid #e5e7eb;
-  background-color: #f9fafb;
-  font-family: Poppins, sans-serif;
-}
-
-.epm-date-nav-btn {
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  padding: 4px;
-}
-
-.epm-date-month {
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: #111827;
-  font-family: Poppins, sans-serif;
-}
-
-.epm-date-weekdays {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  padding: 0.25rem 0.5rem;
-  gap: 2px;
-  font-size: 0.75rem;
-  color: #6b7280;
-  font-family: Poppins, sans-serif;
-}
-
-.epm-date-weekday {
-  text-align: center;
-  padding: 0.25rem 0;
-  font-family: Poppins, sans-serif;
-}
-
-.epm-date-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  padding: 0.25rem 0.5rem 0.5rem;
-  gap: 2px;
-}
-
-.epm-date-cell {
-  text-align: center;
-  padding: 0.35rem 0;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.8rem;
-  background-color: transparent;
-  color: #111827;
-  font-family: Poppins, sans-serif;
-}
-
-.epm-date-cell--outside {
-  cursor: default;
-  color: #d1d5db;
-}
-
-.epm-date-cell--today {
-  background-color: rgba(39, 35, 92, 0.08);
-}
-
-.epm-date-cell--selected {
-  background-color: #27235c;
-  color: #ffffff;
-}
-
-.epm-date-cell--disabled {
-  color: #d1d5db;
-}
-
-.epm-date-footer {
-  padding: 0.4rem 0.75rem 0.6rem;
-  border-top: 1px solid #e5e7eb;
-  text-align: right;
-  font-family: Poppins, sans-serif;
-}
-
-.epm-date-today-btn {
-  border: none;
-  background: transparent;
-  color: #27235c;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: Poppins, sans-serif;
-}
-
 .epm-field-error {
   margin-top: 0.25rem;
   color: #e01950;
   font-size: 0.75rem;
-  font-family: Poppins, sans-serif;
 }
 
 @media (max-width: 992px) {

@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { UserCog, X, CheckCircle, Search } from "lucide-react";
-import "../../../styles/projectmanagement/modals/EmployeeSelectionModal.css";
-
-const PRIMARY = "#27235C";
+import CustomDropdown from "../../../components/project_management_components/common/CustomDropdown";
+import "../../../styles/projectmanagement/components/EmployeeSelectionModal.css";
 
 const EmployeeSelectionModal = ({
   show,
@@ -21,7 +20,19 @@ const EmployeeSelectionModal = ({
   const [filterRole, setFilterRole] = useState("All");
   const [filterDepartment, setFilterDepartment] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
+
   const itemsPerPage = 10;
+
+  const roleDropdownRef = useRef(null);
+  const deptDropdownRef = useRef(null);
+
+  useEffect(() => {
+    if (!show) return;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [show]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -46,32 +57,32 @@ const EmployeeSelectionModal = ({
     }
   };
 
-  const getFilteredManagers = () => {
-    return employees.filter((emp) => {
+  const uniqueRoles = useMemo(() => {
+    const roles = [...new Set((employees || []).map((emp) => emp.roleName).filter(Boolean))];
+    return roles.sort((a, b) => a.localeCompare(b));
+  }, [employees]);
+
+  const uniqueDepartments = useMemo(() => {
+    const depts = [...new Set((employees || []).map((emp) => emp.departmentName).filter(Boolean))];
+    return depts.sort((a, b) => a.localeCompare(b));
+  }, [employees]);
+
+  const filteredManagers = useMemo(() => {
+    return (employees || []).filter((emp) => {
       const searchMatch =
         !searchTerm ||
         `${emp.firstName} ${emp.lastName} ${emp.roleName} ${emp.departmentName}`
           .toLowerCase()
           .includes(searchTerm.toLowerCase());
+
       const roleMatch = filterRole === "All" || emp.roleName === filterRole;
-      const deptMatch =
-        filterDepartment === "All" || emp.departmentName === filterDepartment;
+      const deptMatch = filterDepartment === "All" || emp.departmentName === filterDepartment;
+
       return searchMatch && roleMatch && deptMatch;
     });
-  };
+  }, [employees, searchTerm, filterRole, filterDepartment]);
 
-  const getUniqueRoles = () => {
-    const roles = [...new Set(employees.map((emp) => emp.roleName))];
-    return roles.sort((a, b) => a.localeCompare(b));
-  };
-
-  const getUniqueDepartments = () => {
-    const depts = [...new Set(employees.map((emp) => emp.departmentName))];
-    return depts.sort((a, b) => a.localeCompare(b));
-  };
-
-  const filteredManagers = getFilteredManagers();
-  const totalPages = Math.ceil(filteredManagers.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredManagers.length / itemsPerPage) || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedManagers = filteredManagers.slice(startIndex, endIndex);
@@ -104,76 +115,6 @@ const EmployeeSelectionModal = ({
     return pages;
   };
 
-  const CustomFilterDropdown = ({ value, onChange, options, placeholder }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const dropdownRef = useRef(null);
-
-    useEffect(() => {
-      const handleClickOutside = (event) => {
-        if (
-          dropdownRef.current &&
-          !dropdownRef.current.contains(event.target)
-        ) {
-          setIsOpen(false);
-        }
-      };
-      document.addEventListener("mousedown", handleClickOutside);
-      return () =>
-        document.removeEventListener("mousedown", handleClickOutside);
-    });
-
-    const handleSelect = (optionValue) => {
-      onChange(optionValue);
-      setIsOpen(false);
-    };
-
-    return (
-      <div className="prj-custom-filter-dropdown" ref={dropdownRef}>
-        <button
-          type="button"
-          className={`prj-custom-filter-select ${isOpen ? "open" : ""}`}
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          <span className="prj-custom-filter-value">
-            {value || placeholder}
-          </span>
-          <span className="prj-custom-filter-arrow">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              className={isOpen ? "prj-custom-filter-arrow-svg-open" : ""}
-            >
-              <polyline
-                points="6 9 12 15 18 9"
-                fill="none"
-                stroke={PRIMARY}
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </span>
-        </button>
-        {isOpen && (
-          <ul className="prj-custom-filter-list">
-            {options.map((opt, idx) => (
-              <li
-                key={idx}
-                className={`prj-custom-filter-option ${
-                  value === opt ? "selected" : ""
-                } prj-custom-filter-option-left`}
-                onClick={() => handleSelect(opt)}
-              >
-                {opt}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    );
-  };
-
   if (!show) return null;
 
   const getCurrentSelection = () => {
@@ -188,18 +129,15 @@ const EmployeeSelectionModal = ({
   return (
     <>
       <div className="prj-modal-backdrop" onClick={onClose} />
-      <div className="prj-modal-overlay">
+      <div className="prj-modal-overlay" role="dialog" aria-modal="true">
         <div className="prj-modal-container">
           <div className="prj-modal-header">
             <div className="prj-modal-header-content">
               <UserCog size={24} />
               <h3 className="prj-modal-title">Select Manager</h3>
             </div>
-            <button
-              type="button"
-              className="prj-modal-close"
-              onClick={onClose}
-            >
+
+            <button type="button" className="prj-modal-close" onClick={onClose}>
               <X size={20} />
             </button>
           </div>
@@ -207,9 +145,7 @@ const EmployeeSelectionModal = ({
           <div className="prj-modal-tabs">
             <button
               type="button"
-              className={`prj-modal-tab ${
-                activeTab === "resource" ? "active" : ""
-              }`}
+              className={`prj-modal-tab ${activeTab === "resource" ? "active" : ""}`}
               onClick={() => setActiveTab("resource")}
             >
               <span>Resource Owner</span>
@@ -217,6 +153,7 @@ const EmployeeSelectionModal = ({
                 <CheckCircle size={16} className="prj-tab-icon" />
               )}
             </button>
+
             <button
               type="button"
               className={`prj-modal-tab ${activeTab === "l1" ? "active" : ""}`}
@@ -227,6 +164,7 @@ const EmployeeSelectionModal = ({
                 <CheckCircle size={16} className="prj-tab-icon" />
               )}
             </button>
+
             <button
               type="button"
               className={`prj-modal-tab ${activeTab === "l2" ? "active" : ""}`}
@@ -254,14 +192,16 @@ const EmployeeSelectionModal = ({
           <div className="prj-modal-filters">
             <div className="prj-filter-search-container">
               <Search size={18} className="prj-search-icon-left" />
+
               <input
                 type="text"
                 className="prj-search-input-with-btn"
                 placeholder="Search by name, role, or department..."
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                onKeyPress={handleSearchKeyPress}
+                onKeyDown={handleSearchKeyPress}
               />
+
               {searchInput && (
                 <button
                   type="button"
@@ -271,6 +211,7 @@ const EmployeeSelectionModal = ({
                   <X size={16} />
                 </button>
               )}
+
               {searchTerm ? (
                 <button
                   type="button"
@@ -281,36 +222,36 @@ const EmployeeSelectionModal = ({
                   <span>Cancel</span>
                 </button>
               ) : (
-                <button
-                  type="button"
-                  onClick={handleSearch}
-                  className="prj-search-btn-inside"
-                >
+                <button type="button" onClick={handleSearch} className="prj-search-btn-inside">
                   <Search size={16} />
                   <span>Search</span>
                 </button>
               )}
             </div>
 
-            <CustomFilterDropdown
-              value={filterRole === "All" ? "All Roles" : filterRole}
-              onChange={(v) => setFilterRole(v === "All Roles" ? "All" : v)}
-              options={["All Roles", ...getUniqueRoles()]}
-              placeholder="All Roles"
-            />
+            <div ref={roleDropdownRef} className="prj-filter-dd">
+              <CustomDropdown
+                label=""
+                name="filterRole"
+                value={filterRole}
+                placeholder="All Roles"
+                options={["All", ...uniqueRoles]}
+                anchorRef={roleDropdownRef}
+                onChange={(_, v) => setFilterRole(v)}
+              />
+            </div>
 
-            <CustomFilterDropdown
-              value={
-                filterDepartment === "All"
-                  ? "All Departments"
-                  : filterDepartment
-              }
-              onChange={(v) =>
-                setFilterDepartment(v === "All Departments" ? "All" : v)
-              }
-              options={["All Departments", ...getUniqueDepartments()]}
-              placeholder="All Departments"
-            />
+            <div ref={deptDropdownRef} className="prj-filter-dd">
+              <CustomDropdown
+                label=""
+                name="filterDepartment"
+                value={filterDepartment}
+                placeholder="All Departments"
+                options={["All", ...uniqueDepartments]}
+                anchorRef={deptDropdownRef}
+                onChange={(_, v) => setFilterDepartment(v)}
+              />
+            </div>
           </div>
 
           <div className="prj-modal-body">
@@ -324,6 +265,7 @@ const EmployeeSelectionModal = ({
                     <th className="prj-col-dept">Department</th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {paginatedManagers.length === 0 ? (
                     <tr>
@@ -335,21 +277,16 @@ const EmployeeSelectionModal = ({
                     paginatedManagers.map((emp) => {
                       const isSelected =
                         (activeTab === "resource" &&
-                          selectedResourceOwner?.employeeMasterId ===
-                            emp.employeeMasterId) ||
+                          selectedResourceOwner?.employeeMasterId === emp.employeeMasterId) ||
                         (activeTab === "l1" &&
-                          selectedL1Approver?.employeeMasterId ===
-                            emp.employeeMasterId) ||
+                          selectedL1Approver?.employeeMasterId === emp.employeeMasterId) ||
                         (activeTab === "l2" &&
-                          selectedL2Approver?.employeeMasterId ===
-                            emp.employeeMasterId);
+                          selectedL2Approver?.employeeMasterId === emp.employeeMasterId);
 
                       return (
                         <tr
                           key={emp.employeeMasterId}
-                          className={
-                            isSelected ? "prj-table-row-selected" : ""
-                          }
+                          className={isSelected ? "prj-table-row-selected" : ""}
                           onClick={() => onSelectManager(emp)}
                         >
                           <td className="prj-table-select-col">
@@ -376,12 +313,14 @@ const EmployeeSelectionModal = ({
             {totalPages > 1 && (
               <div className="prj-pagination">
                 <button
+                  type="button"
                   className="prj-page-btn"
                   onClick={() => goToPage(currentPage - 1)}
                   disabled={currentPage === 1}
                 >
                   ‹
                 </button>
+
                 {getPageNumbers().map((page, idx) =>
                   page === "..." ? (
                     <span key={`dots-${idx}`} className="prj-page-dots">
@@ -390,16 +329,17 @@ const EmployeeSelectionModal = ({
                   ) : (
                     <button
                       key={page}
-                      className={`prj-page-btn ${
-                        currentPage === page ? "active" : ""
-                      }`}
+                      type="button"
+                      className={`prj-page-btn ${currentPage === page ? "active" : ""}`}
                       onClick={() => goToPage(page)}
                     >
                       {page}
                     </button>
                   )
                 )}
+
                 <button
+                  type="button"
                   className="prj-page-btn"
                   onClick={() => goToPage(currentPage + 1)}
                   disabled={currentPage === totalPages}
@@ -411,18 +351,11 @@ const EmployeeSelectionModal = ({
           </div>
 
           <div className="prj-modal-footer">
-            <button
-              type="button"
-              onClick={onClose}
-              className="prj-btn prj-btn-secondary"
-            >
+            <button type="button" onClick={onClose} className="prj-btn prj-btn-secondary">
               <span>Cancel</span>
             </button>
-            <button
-              type="button"
-              onClick={onConfirm}
-              className="prj-btn prj-btn-primary"
-            >
+
+            <button type="button" onClick={onConfirm} className="prj-btn prj-btn-primary">
               <CheckCircle size={18} />
               <span>Confirm Selection</span>
             </button>

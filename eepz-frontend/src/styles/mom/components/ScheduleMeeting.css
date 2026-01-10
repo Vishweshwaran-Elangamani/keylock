@@ -50,36 +50,8 @@
   font-weight: 600;
 }
 
-.breadcrumb-item+.breadcrumb-item::before {
+.breadcrumb-item + .breadcrumb-item::before {
   display: none;
-}
-
-.sched-header-card {
-  background: linear-gradient(135deg, #27235c 0%, #4338ca 100%);
-  border-radius: 0.75rem;
-  color: #ffffff;
-}
-
-.sched-header-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 999px;
-  background-color: rgba(255, 255, 255, 0.08);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.sched-header-title {
-  margin: 0 0 0.15rem 0;
-  font-size: 1.6rem;
-  font-weight: 700;
-}
-
-.sched-header-subtitle {
-  margin: 0;
-  font-size: 0.95rem;
-  color: #e5e7eb;
 }
 
 .sched-input {
@@ -248,106 +220,6 @@
   display: block;
 }
 
-.sched-calendar {
-  position: absolute;
-  right: -250px;
-  top: calc(100% + 4px);
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 14px 40px rgba(15, 23, 42, 0.18);
-  border: 1px solid #e5e7eb;
-  z-index: 9999;
-  width: 280px;
-}
-
-.sched-calendar-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 0.9rem;
-  border-bottom: 1px solid #e5e7eb;
-  background-color: #f9fafb;
-  border-radius: 12px 12px 0 0;
-}
-
-.sched-calendar-nav {
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  padding: 4px;
-}
-
-.sched-calendar-title {
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: #111827;
-}
-
-.sched-calendar-weekdays {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  padding: 0.25rem 0.5rem;
-  gap: 2px;
-  font-size: 0.75rem;
-  color: #6b7280;
-}
-
-.sched-calendar-weekday {
-  text-align: center;
-  padding: 0.25rem 0;
-}
-
-.sched-calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  padding: 0.25rem 0.5rem 0.5rem;
-  gap: 2px;
-}
-
-.sched-calendar-cell {
-  text-align: center;
-  padding: 0.35rem 0;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.8rem;
-  background-color: transparent;
-  color: #111827;
-}
-
-.sched-calendar-cell-out {
-  cursor: default;
-  color: #d1d5db;
-}
-
-.sched-calendar-cell:not(.sched-calendar-cell-out):hover {
-  background-color: rgba(39, 35, 92, 0.06);
-}
-
-.sched-calendar-cell-today {
-  background-color: rgba(39, 35, 92, 0.08);
-}
-
-.sched-calendar-cell-selected {
-  background-color: #27235c;
-  color: #ffffff;
-}
-
-.sched-calendar-footer {
-  padding: 0.4rem 0.75rem 0.6rem;
-  border-top: 1px solid #e5e7eb;
-  text-align: right;
-  border-radius: 0 0 12px 12px;
-}
-
-.sched-calendar-today {
-  border: none;
-  background: transparent;
-  color: #27235c;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
 .sched-generate-btn {
   font-size: 1rem;
 }
@@ -385,29 +257,10 @@
   .sched-page {
     padding: 1.25rem 1rem;
   }
-
-  .sched-header-title {
-    font-size: 1.4rem;
-  }
-
-  .sched-calendar {
-    right: 0;
-  }
 }
 
 @media (max-width: 576px) {
   .sched-page {
     padding: 1rem 0.75rem;
-  }
-
-  .sched-header-title {
-    font-size: 1.3rem;
-  }
-
-  .sched-calendar {
-    width: 100%;
-    max-width: 300px;
-    left: 0;
-    right: 0;
   }
 }

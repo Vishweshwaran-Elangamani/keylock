@@ -1,14 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  Plus,
-  Loader,
-  AlertCircle,
-  X,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { Plus, Loader, AlertCircle, X } from "lucide-react";
 import { toast } from "sonner";
 import slaService from "../../../services/sla/slaService";
+import CustomCalendar from "../../../components/project_management_components/common/CustomCalendar";
 import "../../../styles/sla/modals/CreateSLAModal.css";
 
 const CreateSLAModal = ({ onClose, onSuccess }) => {
@@ -17,11 +11,14 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
   const [error, setError] = useState(null);
   const [employeeCount, setEmployeeCount] = useState(0);
 
-  const [formData, setFormData] = useState({ reviewType: "",deadline: "",reason: "",});
+  const [formData, setFormData] = useState({
+    reviewType: "",
+    deadline: "",
+    reason: "",
+  });
+
   const [calendarOpen, setCalendarOpen] = useState(false);
-  const [calendarMonth, setCalendarMonth] = useState(null);
-  const [calendarYear, setCalendarYear] = useState(null);
-  const calendarRef = useRef(null);
+  const calendarAnchorRef = useRef(null);
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
@@ -34,9 +31,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
         if (res?.success && Array.isArray(res.data)) {
           const uniqueEmployees = new Set();
           res.data.forEach((item) => {
-            if (item.employeeId) {
-              uniqueEmployees.add(item.employeeId);
-            }
+            if (item.employeeId) uniqueEmployees.add(item.employeeId);
           });
           setEmployeeCount(uniqueEmployees.size);
         } else {
@@ -55,20 +50,6 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
     fetchCount();
   }, []);
 
-  useEffect(() => {
-    const handler = (e) => {
-      if (
-        calendarOpen &&
-        calendarRef.current &&
-        !calendarRef.current.contains(e.target)
-      ) {
-        setCalendarOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [calendarOpen]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -76,6 +57,21 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
       [name]: value,
     }));
     setError(null);
+  };
+
+  const formatDisplayDate = (iso) => {
+    if (!iso) return "";
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return "";
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    const yyyy = d.getFullYear();
+    return `${mm}/${dd}/${yyyy}`;
+  };
+
+  const handleDateChange = (value) => {
+    setFormData((prev) => ({ ...prev, deadline: value }));
+    setCalendarOpen(false);
   };
 
   const handleSubmit = async (e) => {
@@ -87,6 +83,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
       setError("Please enter a review type");
       return;
     }
+
     if (!formData.deadline) {
       toast.error("Please select a deadline");
       setError("Please select a deadline");
@@ -96,6 +93,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
     const deadlineDate = new Date(formData.deadline);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+
     if (deadlineDate < today) {
       toast.error("Deadline must be in the future");
       setError("Deadline must be in the future");
@@ -133,9 +131,15 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
       });
 
       const bulkRequests = Array.from(uniqueEmployees.values()).map((emp) => ({
-        slatype: formData.reviewType,employeeId: emp.employeeId,assignedToEmployeeId: null,
-        departmentId: emp.departmentId,deadline: deadlineIso,relatedEntityType: null,relatedEntityId: null,
-        createdByEmployeeId: user?.empId || 1,creationReason: formData.reason || `${formData.reviewType} assigned`,
+        slatype: formData.reviewType,
+        employeeId: emp.employeeId,
+        assignedToEmployeeId: null,
+        departmentId: emp.departmentId,
+        deadline: deadlineIso,
+        relatedEntityType: null,
+        relatedEntityId: null,
+        createdByEmployeeId: user?.empId || 1,
+        creationReason: formData.reason || `${formData.reviewType} assigned`,
       }));
 
       const response = await slaService.createBulkSLA(bulkRequests);
@@ -165,105 +169,19 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
     }
   };
 
-  const formatDisplayDate = (iso) => {
-    if (!iso) return "";
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return "";
-    const mm = String(d.getMonth() + 1).padStart(2, "0");
-    const dd = String(d.getDate()).padStart(2, "0");
-    const yyyy = d.getFullYear();
-    return `${mm}/${dd}/${yyyy}`;
-  };
-
-  const ensureCalendarMonthYear = () => {
-    if (calendarMonth === null || calendarYear === null) {
-      const base = formData.deadline ? new Date(formData.deadline) : new Date();
-      setCalendarMonth(base.getMonth());
-      setCalendarYear(base.getFullYear());
-    }
-  };
-
-  const getCalendarMatrix = () => {
-    const today = new Date();
-    const month = calendarMonth ?? today.getMonth();
-    const year = calendarYear ?? today.getFullYear();
-    const firstDay = new Date(year, month, 1);
-    const startDay = firstDay.getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const prevMonthDays = new Date(year, month, 0).getDate();
-    const cells = [];
-    for (let i = startDay - 1; i >= 0; i--) {
-      cells.push({ day: prevMonthDays - i, current: false });
-    }
-    for (let d = 1; d <= daysInMonth; d++) {
-      cells.push({ day: d, current: true });
-    }
-    while (cells.length % 7 !== 0) {
-      cells.push({ day: cells.length, current: false });
-    }
-    return { cells, month, year };
-  };
-
-  const { cells, month, year } = getCalendarMatrix();
-  const today = new Date();
-  const selectedDate = formData.deadline ? new Date(formData.deadline) : null;
-  const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December",];
-  const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
-
-  const handleSelectCalendarDay = (day, current) => {
-    if (!current) return;
-    const selected = new Date(year, month, day);
-    const yyyy = selected.getFullYear();
-    const mm = String(selected.getMonth() + 1).padStart(2, "0");
-    const dd = String(selected.getDate()).padStart(2, "0");
-    const value = `${yyyy}-${mm}-${dd}`;
-    setFormData((prev) => ({ ...prev, deadline: value }));
-    setCalendarOpen(false);
-  };
-
-  const goPrevMonth = () => {
-    if (calendarMonth === null || calendarYear === null) return;
-    let m = calendarMonth - 1;
-    let y = calendarYear;
-    if (m < 0) {
-      m = 11;
-      y -= 1;
-    }
-    setCalendarMonth(m);
-    setCalendarYear(y);
-  };
-
-  const goNextMonth = () => {
-    if (calendarMonth === null || calendarYear === null) return;
-    let m = calendarMonth + 1;
-    let y = calendarYear;
-    if (m > 11) {
-      m = 0; 
-      y += 1;
-    }
-    setCalendarMonth(m);
-    setCalendarYear(y);
-  };
-
-  const goToday = () => {
-    const now = new Date();
-    const yyyy = now.getFullYear();
-    const mm = String(now.getMonth() + 1).padStart(2, "0");
-    const dd = String(now.getDate()).padStart(2, "0");
-    setFormData((prev) => ({ ...prev, deadline: `${yyyy}-${mm}-${dd}` }));
-    setCalendarMonth(now.getMonth());
-    setCalendarYear(now.getFullYear());
-    setCalendarOpen(false);
-  };
-
   return (
     <>
       <div className="csla-overlay" onClick={onClose}>
         <div className="csla-modal" onClick={(e) => e.stopPropagation()}>
           <div className="csla-header">
             <h5 className="csla-title">Create SLA</h5>
-            <button className={`csla-close-btn ${ loading ? "csla-close-btn--disabled" : ""}`}
-              onClick={onClose} disabled={loading}>
+            <button
+              className={`csla-close-btn ${
+                loading ? "csla-close-btn--disabled" : ""
+              }`}
+              onClick={onClose}
+              disabled={loading}
+            >
               <X size={24} />
             </button>
           </div>
@@ -278,7 +196,8 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
               <form className="csla-form" onSubmit={handleSubmit}>
                 {error && (
                   <div className="csla-error-alert">
-                    <AlertCircle className="csla-error-icon" size={20} /> <p className="csla-error-text">{error}</p>
+                    <AlertCircle className="csla-error-icon" size={20} />
+                    <p className="csla-error-text">{error}</p>
                   </div>
                 )}
 
@@ -287,124 +206,126 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                     Review Type <span className="csla-required">*</span>
                   </label>
 
-                <input type="text"
-                  name="reviewType" value={formData.reviewType} onChange={handleChange}
-                  placeholder="E.g., Performance Form, Quarterly Review" required disabled={loading}
-                className={`csla-input ${  loading ? "csla-input--disabled" : "" }`} />
+                  <input
+                    type="text"
+                    name="reviewType"
+                    value={formData.reviewType}
+                    onChange={handleChange}
+                    placeholder="E.g., Performance Form, Quarterly Review"
+                    required
+                    disabled={loading}
+                    className={`csla-input ${
+                      loading ? "csla-input--disabled" : ""
+                    }`}
+                  />
                 </div>
 
+                {/* ✅ Deadline field using external CustomCalendar */}
                 <div className="csla-field">
-                  <label className="csla-label"> Deadline <span className="csla-required">*</span></label>
+                  <label className="csla-label">
+                    Deadline <span className="csla-required">*</span>
+                  </label>
 
-                  <div ref={calendarRef} className="csla-calendar-container">
-                    <input type="text" readOnly value={formatDisplayDate(formData.deadline)}
-                      onClick={() => {  ensureCalendarMonthYear();
-                        setCalendarOpen((o) => !o);}}
-                      disabled={loading} placeholder="Select date" 
-                      className={`csla-input csla-deadline-input ${ loading ? "csla-input--disabled" : "" }`}/>
-                    <button type="button"
-                      className={`csla-calendar-trigger ${ loading ? "csla-calendar-trigger--disabled" : ""}`}
-                      onClick={() => { ensureCalendarMonthYear(); setCalendarOpen((o) => !o); }}
-                      disabled={loading}>
-                      
-                      <svg  className="csla-calendar-svg"
-                        width="18" height="18" viewBox="0 0 24 24"fill="none">
-                        
-                      <rect x="4" y="5"
-                          width="16" height="15" rx="2" ry="2" stroke="currentColor"
-                          strokeWidth="1.8" fill="none" />
-                        
-                      <line x1="4"  y1="9" x2="20" y2="9"
-                        stroke="currentColor" strokeWidth="1.8" />
-                    
-                      <line
-                          x1="9" y1="3" x2="9"y2="7"
-                          stroke="currentColor" strokeWidth="1.8"
-                          strokeLinecap="round" />
-                        
-                      <line
-                          x1="15" y1="3"x2="15"y2="7"
+                  <div ref={calendarAnchorRef} className="csla-calendar-container">
+                    <input
+                      type="text"
+                      readOnly
+                      value={formatDisplayDate(formData.deadline)}
+                      onClick={() => setCalendarOpen((o) => !o)}
+                      disabled={loading}
+                      placeholder="Select date"
+                      className={`csla-input csla-deadline-input ${
+                        loading ? "csla-input--disabled" : ""
+                      }`}
+                    />
+
+                    <button
+                      type="button"
+                      className={`csla-calendar-trigger ${
+                        loading ? "csla-calendar-trigger--disabled" : ""
+                      }`}
+                      onClick={() => setCalendarOpen((o) => !o)}
+                      disabled={loading}
+                    >
+                      <svg
+                        className="csla-calendar-svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <rect
+                          x="4"
+                          y="5"
+                          width="16"
+                          height="15"
+                          rx="2"
+                          ry="2"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          fill="none"
+                        />
+                        <line
+                          x1="4"
+                          y1="9"
+                          x2="20"
+                          y2="9"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                        />
+                        <line
+                          x1="9"
+                          y1="3"
+                          x2="9"
+                          y2="7"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                        />
+                        <line
+                          x1="15"
+                          y1="3"
+                          x2="15"
+                          y2="7"
                           stroke="currentColor"
                           strokeWidth="1.8"
                           strokeLinecap="round"
                         />
                       </svg>
                     </button>
-
-                    {calendarOpen && (
-                      <div className="csla-calendar-dropdown">
-                        <div className="csla-calendar-header">
-                          <button type="button"
-                            className="csla-calendar-nav-btn"onClick={goPrevMonth}>
-                            <ChevronLeft size={16} />
-                          </button>
-                          <span className="csla-calendar-title">
-                            {monthNames[month]} {year}
-                          </span>
-                          <button type="button"  className="csla-calendar-nav-btn" onClick={goNextMonth}>
-                            <ChevronRight size={16} />
-                          </button>
-                        </div>
-
-                        <div className="csla-calendar-weekdays">
-                          {weekdays.map((w) => (
-                            <div key={w} className="csla-weekday">
-                              {w}
-                            </div>
-                          ))}
-                        </div>
-
-                        <div className="csla-calendar-grid">
-                          {cells.map((c, idx) => {
-                            const cellDate = new Date(year, month, c.day);
-                            const isToday =
-                              c.current &&
-                              cellDate.getDate() === today.getDate() &&
-                              cellDate.getMonth() === today.getMonth() &&
-                              cellDate.getFullYear() === today.getFullYear();
-                            const isSelected =
-                              selectedDate &&
-                              c.current &&
-                              cellDate.getDate() === selectedDate.getDate() &&
-                              cellDate.getMonth() === selectedDate.getMonth() &&
-                              cellDate.getFullYear() ===
-                                selectedDate.getFullYear();
-
-                            return (
-                              <div key={idx} className={`csla-calendar-day    ${
-                                c.current  ? "csla-calendar-day--current" : ""} 
-                                ${isToday ? "csla-calendar-day--today" : ""} 
-                                  ${
-                                    isSelected ? "csla-calendar-day--selected" : "" }`}
-                                onClick={() => handleSelectCalendarDay(c.day, c.current) }> {c.day}
-                              </div>
-                            );
-                          })}
-                        </div>
-
-                        <div className="csla-calendar-footer">
-                          <button type="button" className="csla-today-btn"  onClick={goToday} >  Today
-                          </button>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
+
+               <CustomCalendar
+                isOpen={calendarOpen}
+               onClose={() => setCalendarOpen(false)}
+               value={formData.deadline}
+               onChange={handleDateChange}
+               anchorRef={calendarAnchorRef}
+               position="below-icon"    
+               align="right"            
+               offset={{ x: 0, y: 0 }}   
+               minDate={new Date().toISOString().slice(0, 10)}
+              />
+
 
                 <div className="csla-field">
                   <label className="csla-label">Reason (Optional)</label>
                   <input
-                    type="text" name="reason" value={formData.reason}
-                    onChange={handleChange} placeholder="Why assign this SLA?"
-                    disabled={loading} className={`csla-input ${
+                    type="text"
+                    name="reason"
+                    value={formData.reason}
+                    onChange={handleChange}
+                    placeholder="Why assign this SLA?"
+                    disabled={loading}
+                    className={`csla-input ${
                       loading ? "csla-input--disabled" : ""
-                    }`}/>
+                    }`}
+                  />
                 </div>
 
                 <div className="csla-employee-info">
-                  <p className="csla-employee-count">
-                    {employeeCount} Employees
-                  </p>
+                  <p className="csla-employee-count">{employeeCount} Employees</p>
                   <small className="csla-employee-note">
                     SLA will be displayed to all employees
                   </small>
@@ -414,16 +335,25 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
           </div>
 
           <div className="csla-footer">
-            <button className={`csla-btn csla-btn--cancel ${
-                loading ? "csla-btn--disabled" : ""}`} onClick={onClose}  disabled={loading}>
+            <button
+              className={`csla-btn csla-btn--cancel ${
+                loading ? "csla-btn--disabled" : ""
+              }`}
+              onClick={onClose}
+              disabled={loading}
+            >
               Cancel
             </button>
 
             <button
               className={`csla-btn csla-btn--create ${
                 loading || fetchLoading || employeeCount === 0
-                  ? "csla-btn--disabled": ""}`}
-              onClick={handleSubmit} disabled={loading || fetchLoading || employeeCount === 0}>
+                  ? "csla-btn--disabled"
+                  : ""
+              }`}
+              onClick={handleSubmit}
+              disabled={loading || fetchLoading || employeeCount === 0}
+            >
               {loading ? (
                 <>
                   <span className="csla-btn-spinner" />

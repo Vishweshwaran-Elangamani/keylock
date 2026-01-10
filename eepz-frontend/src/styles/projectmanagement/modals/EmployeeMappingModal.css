@@ -144,10 +144,15 @@
   font-family: Poppins, sans-serif;
 }
 
+/* ===========================
+   Search (MATCH DROPDOWN HEIGHT)
+   =========================== */
+
 .emm-search-wrapper {
   position: relative;
   display: flex;
   align-items: center;
+  height: 42px;
 }
 
 .emm-search-icon {
@@ -156,16 +161,24 @@
   color: #6b7280;
   pointer-events: none;
   z-index: 2;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .emm-search-input {
-  font-size: 0.875rem;
-  border: 1px solid #d1d5db;
-  padding: 0.5rem 0.75rem 0.5rem 2.5rem;
-  border-radius: 8px;
   width: 100%;
-  padding-right: 7.5rem;
+  height: 42px !important;
+  box-sizing: border-box !important;
+
+  font-size: 0.875rem;
+  border: 1px solid #d1d5db !important;
+  border-radius: 8px !important;
+
+  padding: 0 0.75rem 0 2.5rem !important;
+  padding-right: 7.5rem !important;
+
   font-family: Poppins, sans-serif;
+  line-height: 42px !important;
 }
 
 .emm-search-input::placeholder {
@@ -177,17 +190,24 @@
   right: 3px;
   top: 3px;
   bottom: 3px;
+
+  height: 36px !important;
   background: #252267;
   border: none;
   color: #ffffff;
+
   border-radius: 0 8px 8px 0;
   padding: 0 1rem;
+
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
-  display: flex;
+
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.4rem;
+
   z-index: 1;
   transition: all 0.2s ease;
   white-space: nowrap;
@@ -213,6 +233,9 @@
   border-color: #4b5563;
 }
 
+/* ===========================
+   Dropdown (Employee Modal)
+   =========================== */
 
 .emm-dd-wrapper {
   position: relative;
@@ -220,15 +243,20 @@
 }
 
 .emm-dd-button {
+  height: 42px;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 0.5rem 0.75rem;
+
+  padding: 0 0.75rem;
   font-size: 0.875rem;
   background: #ffffff;
+
   border: 1px solid #d1d5db;
   border-radius: 8px;
+
   cursor: pointer;
   transition: all 0.2s ease;
   outline: none;
@@ -245,6 +273,9 @@
   flex: 1;
   text-align: left;
   font-family: Poppins, sans-serif;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .emm-dd-value--placeholder {
@@ -273,16 +304,20 @@
   top: 100%;
   left: 0;
   right: 0;
+
   background: #ffffff;
   border-top: none;
   border-radius: 0 0 8px 8px;
+
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
   max-height: 220px;
   overflow-y: auto;
+
   z-index: 10000;
   list-style: none;
   margin: 0;
   padding: 0;
+
   animation: emm-dropdown-fade 0.2s ease;
   font-family: Poppins, sans-serif;
 }
@@ -316,13 +351,15 @@
     opacity: 0;
     transform: translateY(-8px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
+/* ===========================
+   Selection Summary
+   =========================== */
 
 .emm-selection-summary {
   margin-bottom: 0.5rem;
@@ -378,7 +415,6 @@
 .emm-btn-outline:hover {
   background: #f3f4f6;
 }
-
 
 .emm-warning-banner {
   border-radius: 8px;
@@ -540,7 +576,6 @@
   color: #ffffff;
 }
 
-
 .emm-footer {
   padding: 1rem 1.5rem;
   border-top: 1px solid #e5e7eb;
@@ -606,7 +641,6 @@
   height: 14px;
 }
 
-
 @media (max-width: 992px) {
   .emm-modal-shell {
     width: 96vw;
@@ -639,7 +673,7 @@
   }
 
   .emm-search-input {
-    padding-right: 7rem;
+    padding-right: 7rem !important;
   }
 
   .emm-search-btn,

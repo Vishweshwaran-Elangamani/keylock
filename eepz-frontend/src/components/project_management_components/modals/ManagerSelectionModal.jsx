@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import {
   X,
@@ -9,78 +9,9 @@ import {
   CheckCircle,
   UserCog,
   Info,
-  ChevronDown,
 } from "lucide-react";
+import CustomDropdown from "../../../components/project_management_components/common/CustomDropdown";
 import "../../../styles/projectmanagement/modals/ManagerSelectionModal.css";
-
-const CustomDropdown = ({ value, onChange, options, placeholder }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const handleSelect = (optionValue) => {
-    onChange(optionValue);
-    setIsOpen(false);
-  };
-
-  const getDisplayValue = () => {
-    if (!value || value === "All") return placeholder || "Select";
-    return value;
-  };
-
-  return (
-    <div className="msm-dd-wrapper" ref={dropdownRef}>
-      <div
-        className={`msm-dd-button ${isOpen ? "msm-dd-button--open" : ""}`}
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <span
-          className={`msm-dd-value ${
-            value && value !== "All"
-              ? "msm-dd-value--filled"
-              : "msm-dd-value--placeholder"
-          }`}
-        >
-          {getDisplayValue()}
-        </span>
-        <ChevronDown
-          size={16}
-          className={`msm-dd-chevron ${isOpen ? "msm-dd-chevron--open" : ""}`}
-        />
-      </div>
-      {isOpen && (
-        <ul className="msm-dd-menu">
-          {options.map((opt, idx) => {
-            const optValue = opt.value || opt;
-            const optLabel = opt.label || opt;
-            const selected = value === optValue;
-            return (
-              <li
-                key={idx}
-                className={`msm-dd-item ${
-                  selected ? "msm-dd-item--selected" : ""
-                }`}
-                onClick={() => handleSelect(optValue)}
-              >
-                {optLabel}
-              </li>
-            );
-          })}
-        </ul>
-      )}
-    </div>
-  );
-};
 
 const ManagerSelectionModal = ({
   show,
@@ -115,11 +46,8 @@ const ManagerSelectionModal = ({
   totalItems,
 }) => {
   useEffect(() => {
-    if (show) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
+    if (show) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "unset";
     return () => {
       document.body.style.overflow = "unset";
     };
@@ -156,8 +84,15 @@ const ManagerSelectionModal = ({
     return selected?.employeeMasterId === emp.employeeMasterId;
   };
 
-  const roleOptions = ["All", ...uniqueRoles];
-  const departmentOptions = ["All", ...uniqueDepartments];
+  const roleOptions = ["All", ...(uniqueRoles || [])].map((r) => ({
+    value: r,
+    label: r === "All" ? "All Roles" : r,
+  }));
+
+  const departmentOptions = ["All", ...(uniqueDepartments || [])].map((d) => ({
+    value: d,
+    label: d === "All" ? "All Departments" : d,
+  }));
 
   const safeTotal =
     typeof totalItems === "number" ? totalItems : paginatedManagers.length;
@@ -180,7 +115,14 @@ const ManagerSelectionModal = ({
                 {project?.projectName && ` - ${project.projectName}`}
               </span>
             </h5>
-            <button type="button" onClick={onClose} disabled={isSubmitting} aria-label="Close" className="msm-modal-close">
+
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={isSubmitting}
+              aria-label="Close"
+              className="msm-modal-close"
+            >
               <X size={22} />
             </button>
           </div>
@@ -220,6 +162,7 @@ const ManagerSelectionModal = ({
                   )}
                 </button>
               </li>
+
               <li className="nav-item">
                 <button
                   type="button"
@@ -236,6 +179,7 @@ const ManagerSelectionModal = ({
                   )}
                 </button>
               </li>
+
               <li className="nav-item">
                 <button
                   type="button"
@@ -257,9 +201,7 @@ const ManagerSelectionModal = ({
             <div className="alert alert-info d-flex align-items-start gap-2 mb-3 msm-current-banner">
               <Info size={18} className="msm-info-icon" />
               <div className="msm-current-content">
-                <strong className="msm-current-label">
-                  Current Selection:
-                </strong>
+                <strong className="msm-current-label">Current Selection:</strong>
                 <div className="mt-1">
                   {getSelectedManager() ? (
                     <span className="badge msm-current-badge">
@@ -281,35 +223,59 @@ const ManagerSelectionModal = ({
                 <div className="msm-search-wrapper">
                   <Search size={16} className="msm-search-icon" />
                   <input
-                    type="text" className="form-control text-start msm-search-input" placeholder="Search by name..."
-                    value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} onKeyPress={handleSearchKeyPress}/>
+                    type="text"
+                    className="form-control text-start msm-search-input"
+                    placeholder="Search by name..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyPress={handleSearchKeyPress}
+                  />
+
                   {activeSearchTerm ? (
-                    <button  type="button"onClick={handleCancelSearch} className="msm-search-btn msm-search-btn--cancel" >
+                    <button
+                      type="button"
+                      onClick={handleCancelSearch}
+                      className="msm-search-btn msm-search-btn--cancel"
+                    >
                       <X size={14} />
                       <span>Cancel</span>
                     </button>
                   ) : (
-                    <button type="button" onClick={handleSearch} className="msm-search-btn">
+                    <button
+                      type="button"
+                      onClick={handleSearch}
+                      className="msm-search-btn"
+                    >
                       <Search size={14} />
                       <span>Search</span>
                     </button>
                   )}
                 </div>
               </div>
+
               <div className="col-md-3">
                 <CustomDropdown
+                  name="role"
                   value={filterRole}
-                  onChange={setFilterRole}
+                  onChange={(_, v) => setFilterRole(v)}
                   options={roleOptions}
                   placeholder="All Roles"
+                  className="msm-filter-dd"
+                  align="left"
+                  offset={{ x: 0, y: 6 }}
                 />
               </div>
+
               <div className="col-md-3">
                 <CustomDropdown
+                  name="department"
                   value={filterDepartment}
-                  onChange={setFilterDepartment}
+                  onChange={(_, v) => setFilterDepartment(v)}
                   options={departmentOptions}
                   placeholder="All Departments"
+                  className="msm-filter-dd"
+                  align="left"
+                  offset={{ x: 0, y: 6 }}
                 />
               </div>
             </div>
@@ -324,6 +290,7 @@ const ManagerSelectionModal = ({
                     <th className="msm-th">Department</th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {paginatedManagers.length === 0 ? (
                     <tr>
@@ -339,6 +306,7 @@ const ManagerSelectionModal = ({
                   ) : (
                     paginatedManagers.map((emp) => {
                       const selected = isManagerSelected(emp);
+
                       return (
                         <tr
                           key={emp.employeeMasterId}
@@ -352,18 +320,24 @@ const ManagerSelectionModal = ({
                             className="msm-td msm-td--select"
                           >
                             <input
-                              type="radio" className="msm-radio" name={`manager-${activeTab}`} checked={selected}
+                              type="radio"
+                              className="msm-radio"
+                              name={`manager-${activeTab}`}
+                              checked={selected}
                               onChange={() => onManagerSelect(emp)}
                             />
                           </td>
+
                           <td className="msm-td msm-td--name">
                             <span className="msm-name">
                               {emp.firstName} {emp.lastName}
                             </span>
                           </td>
+
                           <td className="msm-td msm-td--muted">
                             {emp.roleName}
                           </td>
+
                           <td className="msm-td msm-td--muted">
                             {emp.departmentName}
                           </td>
@@ -408,10 +382,12 @@ const ManagerSelectionModal = ({
                         className="msm-page-link msm-page-arrow"
                         onClick={() => goToPage(currentPage - 1)}
                         disabled={currentPage === 1}
+                        type="button"
                       >
                         <ChevronLeft size={16} />
                       </button>
                     </li>
+
                     {getPageNumbers().map((page, index) =>
                       page === "..." ? (
                         <li
@@ -430,12 +406,14 @@ const ManagerSelectionModal = ({
                           <button
                             className="msm-page-link"
                             onClick={() => goToPage(page)}
+                            type="button"
                           >
                             {page}
                           </button>
                         </li>
                       )
                     )}
+
                     <li
                       className={`msm-page-item ${
                         currentPage === totalPages ? "disabled" : ""
@@ -445,6 +423,7 @@ const ManagerSelectionModal = ({
                         className="msm-page-link msm-page-arrow"
                         onClick={() => goToPage(currentPage + 1)}
                         disabled={currentPage === totalPages}
+                        type="button"
                       >
                         <ChevronRight size={16} />
                       </button>
@@ -456,10 +435,21 @@ const ManagerSelectionModal = ({
           </div>
 
           <div className="msm-footer">
-            <button type="button" onClick={onClose} className="msm-btn msm-btn--secondary">
+            <button
+              type="button"
+              onClick={onClose}
+              className="msm-btn msm-btn--secondary"
+              disabled={isSubmitting}
+            >
               Cancel
             </button>
-            <button type="button" onClick={onUpdate} disabled={isSubmitting} className="msm-btn msm-btn--primary">
+
+            <button
+              type="button"
+              onClick={onUpdate}
+              disabled={isSubmitting}
+              className="msm-btn msm-btn--primary"
+            >
               {isSubmitting ? (
                 <>
                   <span className="spinner-border spinner-border-sm msm-btn-spinner" />
