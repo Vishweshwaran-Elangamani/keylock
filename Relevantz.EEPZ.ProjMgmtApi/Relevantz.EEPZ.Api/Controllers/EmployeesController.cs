@@ -3,21 +3,21 @@ using Microsoft.Extensions.Logging;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.Services.Interfaces;
-using Microsoft.AspNetCore.Authorization;
+using Relevantz.EEPZ.Common.Constants;
 
 namespace eepzbackend.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/employees")]
     [ApiController]
     // [Authorize(Roles = "HR")]
-    public class EmployeeManagementController : ControllerBase
+   public class EmployeesController : ControllerBase
     {
         private readonly IEmployeeService _employeeService;
-        private readonly ILogger<EmployeeManagementController> _logger;
+        private readonly ILogger<EmployeesController> _logger;
 
-        public EmployeeManagementController(
+        public EmployeesController(
             IEmployeeService employeeService,
-            ILogger<EmployeeManagementController> logger)
+            ILogger<EmployeesController> logger)
         {
             _employeeService = employeeService;
             _logger = logger;
@@ -26,42 +26,43 @@ namespace eepzbackend.Controllers
         /// <summary>
         /// Get all active employees with their details. Used for Resource Owner dropdown
         /// </summary>
-        [HttpGet("all")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpGet("allEmployees")]
         public async Task<IActionResult> GetAllEmployees()
         {
             _logger.LogInformation("HR requested all active employees");
             var result = await _employeeService.GetAllEmployeesAsync();
+
+            if (!result.Success && result.Code == EmployeeResponseMessages.Codes.EMPLOYEE_NOT_FOUND)
+                return NotFound(result);
+
             return Ok(result);
         }
 
         /// <summary>
-        /// Get only managers/senior roles for approver dropdowns. Used for L1 and L2 Approver dropdowns
+        /// Get all managers/senior roles for approver dropdowns
         /// </summary>
         [HttpGet("managers")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetManagers()
+        public async Task<IActionResult> GetAllManagers()
         {
-            _logger.LogInformation("HR requested manager employees for approver dropdowns");
+            _logger.LogInformation("HR requested all managers for approver dropdowns");
             var result = await _employeeService.GetManagersAsync();
+
+            if (!result.Success && result.Code == EmployeeResponseMessages.Codes.EMPLOYEE_NOT_FOUND)
+                return NotFound(result);
+
             return Ok(result);
         }
 
         /// <summary>
         /// Get employee by ID with full details
         /// </summary>
-        [HttpGet("{employeeMasterId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetEmployeeById(int employeeMasterId)
+        [HttpGet("employeeId/{employeeId}")]
+        public async Task<IActionResult> GetEmployeeById(int employeeId)
         {
-            _logger.LogInformation("HR requested employee details for ID: {EmployeeMasterId}", employeeMasterId);
-            var result = await _employeeService.GetEmployeeByIdAsync(employeeMasterId);
+            _logger.LogInformation("HR requested employee details for ID: {EmployeeId}", employeeId);
+            var result = await _employeeService.GetEmployeeByIdAsync(employeeId);
 
-            if (!result.Success && result.Data == null)
+            if (!result.Success && result.Code == EmployeeResponseMessages.Codes.EMPLOYEE_NOT_FOUND)
                 return NotFound(result);
 
             return Ok(result);
@@ -71,16 +72,16 @@ namespace eepzbackend.Controllers
         /// Search employees by name or employee company ID
         /// </summary>
         [HttpGet("search")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> SearchEmployees([FromQuery] string query)
+        public async Task<IActionResult> SearchEmployees([FromQuery] string searchTerm)
         {
-            _logger.LogInformation("HR requested employee search with query: {SearchQuery}", query);
-            var result = await _employeeService.SearchEmployeesAsync(query);
+            _logger.LogInformation("HR requested employee search with term: {SearchTerm}", searchTerm);
+            var result = await _employeeService.SearchEmployeesAsync(searchTerm);
 
-            if (!result.Success && result.Message == "Search query is required")
+            if (!result.Success && result.Code == EmployeeResponseMessages.Codes.EMPLOYEE_SEARCH_QUERY_REQUIRED)
                 return BadRequest(result);
+
+            if (!result.Success && result.Code == EmployeeResponseMessages.Codes.EMPLOYEE_NOT_FOUND)
+                return NotFound(result);
 
             return Ok(result);
         }
@@ -89,12 +90,14 @@ namespace eepzbackend.Controllers
         /// Get employees by department
         /// </summary>
         [HttpGet("department/{departmentId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetEmployeesByDepartment(int departmentId)
         {
             _logger.LogInformation("HR requested employees for department ID: {DepartmentId}", departmentId);
             var result = await _employeeService.GetEmployeesByDepartmentAsync(departmentId);
+
+            if (!result.Success && result.Code == EmployeeResponseMessages.Codes.DEPARTMENT_NOT_FOUND)
+                return NotFound(result);
+
             return Ok(result);
         }
 
@@ -102,12 +105,14 @@ namespace eepzbackend.Controllers
         /// Get employees by role
         /// </summary>
         [HttpGet("role/{roleId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetEmployeesByRole(int roleId)
         {
             _logger.LogInformation("HR requested employees for role ID: {RoleId}", roleId);
             var result = await _employeeService.GetEmployeesByRoleAsync(roleId);
+
+            if (!result.Success && result.Code == EmployeeResponseMessages.Codes.EMPLOYEE_NOT_FOUND)
+                return NotFound(result);
+
             return Ok(result);
         }
 
@@ -115,53 +120,59 @@ namespace eepzbackend.Controllers
         /// Get all departments. Used for Department dropdown in project forms
         /// </summary>
         [HttpGet("departments")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllDepartments()
         {
             _logger.LogInformation("HR requested all departments");
             var result = await _employeeService.GetAllDepartmentsAsync();
+
+            if (!result.Success && result.Code == EmployeeResponseMessages.Codes.DEPARTMENT_NOT_FOUND)
+                return NotFound(result);
+
             return Ok(result);
         }
 
         /// <summary>
-        /// Get all business units (distinct from existing projects). Used for Business Unit dropdown in project forms
+        /// Get all business units. Used for Business Unit dropdown in project forms
         /// </summary>
         [HttpGet("business-units")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllBusinessUnits()
         {
             _logger.LogInformation("HR requested all business units");
             var result = await _employeeService.GetAllBusinessUnitsAsync();
+
+            if (!result.Success && result.Code == EmployeeResponseMessages.Codes.INVALID_REQUEST)
+                return NotFound(result);
+
             return Ok(result);
         }
 
         /// <summary>
-        /// Get employees with null reporting manager (Initial Stage Employees). Excludes employees already mapped to resource pool
+        /// Get employees with null reporting manager (Initial Stage Employees)
         /// </summary>
         [HttpGet("initial-stage")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetInitialStageEmployees()
         {
             _logger.LogInformation("HR requested initial stage employees");
             var result = await _employeeService.GetInitialStageEmployeesAsync();
+
+            if (!result.Success && result.Code == EmployeeResponseMessages.Codes.EMPLOYEE_NOT_FOUND)
+                return NotFound(result);
+
             return Ok(result);
         }
 
         /// <summary>
-        /// Map initial stage employees to resource pool (org.rz.resourcepool)
+        /// Map initial stage employees to resource pool
         /// </summary>
         [HttpPost("map-to-resource-pool")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> MapToResourcePool([FromBody] MapToResourcePoolRequest request)
         {
             _logger.LogInformation("HR requested mapping {EmployeeCount} employees to resource pool", request.EmployeeMasterIds?.Count ?? 0);
             var result = await _employeeService.MapEmployeesToResourcePoolAsync(request.EmployeeMasterIds ?? new List<int>());
+
+            if (!result.Success && result.Code == EmployeeResponseMessages.Codes.INVALID_REQUEST)
+                return BadRequest(result);
+
             return Ok(result);
         }
 
@@ -169,15 +180,12 @@ namespace eepzbackend.Controllers
         /// Get department by ID with details
         /// </summary>
         [HttpGet("departments/{departmentId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetDepartmentById(int departmentId)
         {
             _logger.LogInformation("HR requested department details for ID: {DepartmentId}", departmentId);
             var result = await _employeeService.GetDepartmentByIdAsync(departmentId);
 
-            if (!result.Success && result.Data == null)
+            if (!result.Success && result.Code == EmployeeResponseMessages.Codes.DEPARTMENT_NOT_FOUND)
                 return NotFound(result);
 
             return Ok(result);

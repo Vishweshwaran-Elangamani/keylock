@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
+using Relevantz.EEPZ.Common.Constants;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -18,187 +19,187 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _logger = logger;
         }
 
-        public async Task<ApiResponse<List<EmployeeDto>>> GetAllEmployeesAsync()
+        public async Task<EmployeeApiResponse<List<EmployeeDto>>> GetAllEmployeesAsync()
         {
             _logger.LogInformation("Fetching all active employees");
 
             var employees = await _employeeRepository.GetAllEmployeesAsync();
 
-            _logger.LogInformation(
-                "Successfully retrieved {EmployeeCount} active employees",
-                employees.Count);
+            if (employees == null || !employees.Any())
+            {
+                var code = EmployeeResponseMessages.Codes.EMPLOYEE_NOT_FOUND;
+                var msg = EmployeeResponseMessages.GetMessage(code).Message;
+                return EmployeeApiResponse<List<EmployeeDto>>.ErrorResponse(code, msg);
+            }
 
-            return ApiResponse<List<EmployeeDto>>.SuccessResponse(
-                employees,
-                "Employees retrieved successfully");
+            var successCode = EmployeeResponseMessages.Codes.EMPLOYEES_RETRIEVED_SUCCESS;
+            var successMsg = EmployeeResponseMessages.GetMessage(successCode).Message;
+            return EmployeeApiResponse<List<EmployeeDto>>.SuccessResponse(employees, successCode, successMsg);
         }
 
-        public async Task<ApiResponse<List<EmployeeDto>>> GetManagersAsync()
+        public async Task<EmployeeApiResponse<List<EmployeeDto>>> GetManagersAsync()
         {
             _logger.LogInformation("Fetching manager employees for approver dropdowns");
 
             var managers = await _employeeRepository.GetManagersAsync();
 
-            _logger.LogInformation(
-                "Successfully retrieved {ManagerCount} managers",
-                managers.Count);
+            if (managers == null || !managers.Any())
+            {
+                var code = EmployeeResponseMessages.Codes.EMPLOYEE_NOT_FOUND;
+                var msg = EmployeeResponseMessages.GetMessage(code).Message;
+                return EmployeeApiResponse<List<EmployeeDto>>.ErrorResponse(code, msg);
+            }
 
-            return ApiResponse<List<EmployeeDto>>.SuccessResponse(
-                managers,
-                "Managers retrieved successfully");
+            var successCode = EmployeeResponseMessages.Codes.MANAGERS_RETRIEVED_SUCCESS;
+            var successMsg = EmployeeResponseMessages.GetMessage(successCode).Message;
+            return EmployeeApiResponse<List<EmployeeDto>>.SuccessResponse(managers, successCode, successMsg);
         }
 
-        public async Task<ApiResponse<EmployeeDto>> GetEmployeeByIdAsync(int employeeMasterId)
+        public async Task<EmployeeApiResponse<EmployeeDto>> GetEmployeeByIdAsync(int employeeMasterId)
         {
-            _logger.LogInformation(
-                "Fetching employee by ID: {EmployeeMasterId}",
-                employeeMasterId);
+            _logger.LogInformation("Fetching employee by ID: {EmployeeMasterId}", employeeMasterId);
 
             var employee = await _employeeRepository.GetEmployeeByIdAsync(employeeMasterId);
 
             if (employee == null)
             {
-                _logger.LogWarning(
-                    "Employee not found with ID: {EmployeeMasterId}",
-                    employeeMasterId);
-
-                return ApiResponse<EmployeeDto>.ErrorResponse("Employee not found");
+                var code = EmployeeResponseMessages.Codes.EMPLOYEE_NOT_FOUND;
+                var msg = EmployeeResponseMessages.GetMessage(code).Message;
+                return EmployeeApiResponse<EmployeeDto>.ErrorResponse(code, msg);
             }
 
-            _logger.LogInformation(
-                "Successfully retrieved employee: {EmployeeCompanyId}",
-                employee.EmployeeCompanyId);
-
-            return ApiResponse<EmployeeDto>.SuccessResponse(
-                employee,
-                "Employee retrieved successfully");
+            var successCode = EmployeeResponseMessages.Codes.EMPLOYEE_RETRIEVED_SUCCESS;
+            var successMsg = EmployeeResponseMessages.GetMessage(successCode).Message;
+            return EmployeeApiResponse<EmployeeDto>.SuccessResponse(employee, successCode, successMsg);
         }
 
-        public async Task<ApiResponse<List<EmployeeDto>>> SearchEmployeesAsync(string query)
+        public async Task<EmployeeApiResponse<List<EmployeeDto>>> SearchEmployeesAsync(string searchTerm)
         {
-            if (string.IsNullOrWhiteSpace(query))
+            if (string.IsNullOrWhiteSpace(searchTerm))
             {
-                _logger.LogWarning("Empty search query provided");
-                return ApiResponse<List<EmployeeDto>>.ErrorResponse("Search query is required");
+                var code = EmployeeResponseMessages.Codes.EMPLOYEE_SEARCH_QUERY_REQUIRED;
+                var msg = EmployeeResponseMessages.GetMessage(code).Message;
+                return EmployeeApiResponse<List<EmployeeDto>>.ErrorResponse(code, msg);
             }
 
-            _logger.LogInformation(
-                "Searching employees with query: {SearchQuery}",
-                query);
+            _logger.LogInformation("Searching employees with query: {SearchQuery}", searchTerm);
 
-            var employees = await _employeeRepository.SearchEmployeesAsync(query);
+            var employees = await _employeeRepository.SearchEmployeesAsync(searchTerm);
 
-            _logger.LogInformation(
-                "Search returned {EmployeeCount} results for query: {SearchQuery}",
-                employees.Count,
-                query);
+            if (employees == null || !employees.Any())
+            {
+                var code = EmployeeResponseMessages.Codes.EMPLOYEE_NOT_FOUND;
+                var msg = EmployeeResponseMessages.GetMessage(code).Message;
+                return EmployeeApiResponse<List<EmployeeDto>>.ErrorResponse(code, msg);
+            }
 
-            return ApiResponse<List<EmployeeDto>>.SuccessResponse(
-                employees,
-                $"Employees search completed ({employees.Count} results)");
+            var successCode = EmployeeResponseMessages.Codes.EMPLOYEES_RETRIEVED_SUCCESS;
+            var successMsg = EmployeeResponseMessages.GetMessage(successCode).Message;
+            return EmployeeApiResponse<List<EmployeeDto>>.SuccessResponse(employees, successCode, successMsg);
         }
 
-        public async Task<ApiResponse<List<EmployeeDto>>> GetEmployeesByDepartmentAsync(int departmentId)
+        public async Task<EmployeeApiResponse<List<EmployeeDto>>> GetEmployeesByDepartmentAsync(int departmentId)
         {
-            _logger.LogInformation(
-                "Fetching employees for department ID: {DepartmentId}",
-                departmentId);
+            _logger.LogInformation("Fetching employees for department ID: {DepartmentId}", departmentId);
 
             var employees = await _employeeRepository.GetEmployeesByDepartmentAsync(departmentId);
 
-            _logger.LogInformation(
-                "Retrieved {EmployeeCount} employees for department {DepartmentId}",
-                employees.Count,
-                departmentId);
+            if (employees == null || !employees.Any())
+            {
+                var code = EmployeeResponseMessages.Codes.DEPARTMENT_NOT_FOUND;
+                var msg = EmployeeResponseMessages.GetMessage(code).Message;
+                return EmployeeApiResponse<List<EmployeeDto>>.ErrorResponse(code, msg);
+            }
 
-            return ApiResponse<List<EmployeeDto>>.SuccessResponse(
-                employees,
-                $"Department employees retrieved successfully ({employees.Count} results)");
+            var successCode = EmployeeResponseMessages.Codes.DEPARTMENTS_RETRIEVED_SUCCESS;
+            var successMsg = EmployeeResponseMessages.GetMessage(successCode).Message;
+            return EmployeeApiResponse<List<EmployeeDto>>.SuccessResponse(employees, successCode, successMsg);
         }
 
-        public async Task<ApiResponse<List<EmployeeDto>>> GetEmployeesByRoleAsync(int roleId)
+        public async Task<EmployeeApiResponse<List<EmployeeDto>>> GetEmployeesByRoleAsync(int roleId)
         {
-            _logger.LogInformation(
-                "Fetching employees for role ID: {RoleId}",
-                roleId);
+            _logger.LogInformation("Fetching employees for role ID: {RoleId}", roleId);
 
             var employees = await _employeeRepository.GetEmployeesByRoleAsync(roleId);
 
-            _logger.LogInformation(
-                "Retrieved {EmployeeCount} employees for role {RoleId}",
-                employees.Count,
-                roleId);
+            if (employees == null || !employees.Any())
+            {
+                var code = EmployeeResponseMessages.Codes.EMPLOYEE_NOT_FOUND;
+                var msg = EmployeeResponseMessages.GetMessage(code).Message;
+                return EmployeeApiResponse<List<EmployeeDto>>.ErrorResponse(code, msg);
+            }
 
-            return ApiResponse<List<EmployeeDto>>.SuccessResponse(
-                employees,
-                $"Role employees retrieved successfully ({employees.Count} results)");
+            var successCode = EmployeeResponseMessages.Codes.EMPLOYEES_RETRIEVED_SUCCESS;
+            var successMsg = EmployeeResponseMessages.GetMessage(successCode).Message;
+            return EmployeeApiResponse<List<EmployeeDto>>.SuccessResponse(employees, successCode, successMsg);
         }
 
-        public async Task<ApiResponse<List<DepartmentDto>>> GetAllDepartmentsAsync()
+        public async Task<EmployeeApiResponse<List<DepartmentDto>>> GetAllDepartmentsAsync()
         {
             _logger.LogInformation("Fetching all departments");
 
             var departments = await _employeeRepository.GetAllDepartmentsAsync();
 
-            _logger.LogInformation(
-                "Successfully retrieved {DepartmentCount} departments",
-                departments.Count);
+            if (departments == null || !departments.Any())
+            {
+                var code = EmployeeResponseMessages.Codes.DEPARTMENT_NOT_FOUND;
+                var msg = EmployeeResponseMessages.GetMessage(code).Message;
+                return EmployeeApiResponse<List<DepartmentDto>>.ErrorResponse(code, msg);
+            }
 
-            return ApiResponse<List<DepartmentDto>>.SuccessResponse(
-                departments,
-                "Departments retrieved successfully");
+            var successCode = EmployeeResponseMessages.Codes.DEPARTMENTS_RETRIEVED_SUCCESS;
+            var successMsg = EmployeeResponseMessages.GetMessage(successCode).Message;
+            return EmployeeApiResponse<List<DepartmentDto>>.SuccessResponse(departments, successCode, successMsg);
         }
 
-        public async Task<ApiResponse<List<string>>> GetAllBusinessUnitsAsync()
+        public async Task<EmployeeApiResponse<List<string>>> GetAllBusinessUnitsAsync()
         {
             _logger.LogInformation("Fetching all business units");
 
             var businessUnits = await _employeeRepository.GetAllBusinessUnitsAsync();
 
-            _logger.LogInformation(
-                "Successfully retrieved {BusinessUnitCount} business units",
-                businessUnits.Count);
+            if (businessUnits == null || !businessUnits.Any())
+            {
+                var code = EmployeeResponseMessages.Codes.INVALID_REQUEST;
+                var msg = EmployeeResponseMessages.GetMessage(code).Message;
+                return EmployeeApiResponse<List<string>>.ErrorResponse(code, msg);
+            }
 
-            return ApiResponse<List<string>>.SuccessResponse(
-                businessUnits,
-                "Business units retrieved successfully");
+            var successCode = EmployeeResponseMessages.Codes.BUSINESS_UNITS_RETRIEVED_SUCCESS;
+            var successMsg = EmployeeResponseMessages.GetMessage(successCode).Message;
+            return EmployeeApiResponse<List<string>>.SuccessResponse(businessUnits, successCode, successMsg);
         }
 
-        public async Task<ApiResponse<List<EmployeeDto>>> GetInitialStageEmployeesAsync()
+        public async Task<EmployeeApiResponse<List<EmployeeDto>>> GetInitialStageEmployeesAsync()
         {
-            _logger.LogInformation(
-                "Fetching initial stage employees (no reporting manager, not in resource pool)");
+            _logger.LogInformation("Fetching initial stage employees (no reporting manager, not in resource pool)");
 
             var employees = await _employeeRepository.GetInitialStageEmployeesAsync();
 
-            _logger.LogInformation(
-                "Retrieved {EmployeeCount} initial stage employees",
-                employees.Count);
+            if (employees == null || !employees.Any())
+            {
+                var code = EmployeeResponseMessages.Codes.EMPLOYEE_NOT_FOUND;
+                var msg = EmployeeResponseMessages.GetMessage(code).Message;
+                return EmployeeApiResponse<List<EmployeeDto>>.ErrorResponse(code, msg);
+            }
 
-            return ApiResponse<List<EmployeeDto>>.SuccessResponse(
-                employees,
-                $"Initial stage employees retrieved successfully ({employees.Count} results)");
+            var successCode = EmployeeResponseMessages.Codes.EMPLOYEES_RETRIEVED_SUCCESS;
+            var successMsg = EmployeeResponseMessages.GetMessage(successCode).Message;
+            return EmployeeApiResponse<List<EmployeeDto>>.SuccessResponse(employees, successCode, successMsg);
         }
 
-        public async Task<ApiResponse<object>> MapEmployeesToResourcePoolAsync(List<int> employeeMasterIds)
+        public async Task<EmployeeApiResponse<object>> MapEmployeesToResourcePoolAsync(List<int> employeeMasterIds)
         {
             if (employeeMasterIds == null || !employeeMasterIds.Any())
             {
-                _logger.LogWarning("No employees provided to map to resource pool");
-                return ApiResponse<object>.ErrorResponse("No employees provided to map");
+                var code = EmployeeResponseMessages.Codes.INVALID_REQUEST;
+                var msg = EmployeeResponseMessages.GetMessage(code).Message;
+                return EmployeeApiResponse<object>.ErrorResponse(code, msg);
             }
 
-            _logger.LogInformation(
-                "Mapping {EmployeeCount} employees to resource pool",
-                employeeMasterIds.Count);
+            _logger.LogInformation("Mapping {EmployeeCount} employees to resource pool", employeeMasterIds.Count);
 
-            var (mappedCount, errors) =
-                await _employeeRepository.MapEmployeesToResourcePoolAsync(employeeMasterIds);
-
-            _logger.LogInformation(
-                "Successfully mapped {MappedCount} employees to resource pool. Errors: {ErrorCount}",
-                mappedCount,
-                errors.Count);
+            var (mappedCount, errors) = await _employeeRepository.MapEmployeesToResourcePoolAsync(employeeMasterIds);
 
             var responseData = new
             {
@@ -207,35 +208,27 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 errors
             };
 
-            return ApiResponse<object>.SuccessResponse(
-                responseData,
-                $"Successfully mapped {mappedCount} employees to resource pool");
+            var successCode = EmployeeResponseMessages.Codes.RESOURCE_POOL_MAPPING_SUCCESS;
+            var successMsg = EmployeeResponseMessages.GetMessage(successCode).Message;
+            return EmployeeApiResponse<object>.SuccessResponse(responseData, successCode, successMsg);
         }
 
-        public async Task<ApiResponse<DepartmentDetailDto>> GetDepartmentByIdAsync(int departmentId)
+        public async Task<EmployeeApiResponse<DepartmentDetailDto>> GetDepartmentByIdAsync(int departmentId)
         {
-            _logger.LogInformation(
-                "Fetching department by ID: {DepartmentId}",
-                departmentId);
+            _logger.LogInformation("Fetching department by ID: {DepartmentId}", departmentId);
 
             var department = await _employeeRepository.GetDepartmentByIdAsync(departmentId);
 
             if (department == null)
             {
-                _logger.LogWarning(
-                    "Department not found with ID: {DepartmentId}",
-                    departmentId);
-
-                return ApiResponse<DepartmentDetailDto>.ErrorResponse("Department not found");
+                var code = EmployeeResponseMessages.Codes.DEPARTMENT_NOT_FOUND;
+                var msg = EmployeeResponseMessages.GetMessage(code).Message;
+                return EmployeeApiResponse<DepartmentDetailDto>.ErrorResponse(code, msg);
             }
 
-            _logger.LogInformation(
-                "Successfully retrieved department: {DepartmentName}",
-                department.DepartmentName);
-
-            return ApiResponse<DepartmentDetailDto>.SuccessResponse(
-                department,
-                "Department retrieved successfully");
+            var successCode = EmployeeResponseMessages.Codes.DEPARTMENTS_RETRIEVED_SUCCESS;
+            var successMsg = EmployeeResponseMessages.GetMessage(successCode).Message;
+            return EmployeeApiResponse<DepartmentDetailDto>.SuccessResponse(department, successCode, successMsg);
         }
     }
 }
