@@ -192,5 +192,74 @@ namespace Relevantz.EEPZ.Data.Repository
                 DepartmentName = department.DepartmentName
             };
         }
+
+        public async Task<UserForGoalDto?> GetUserWithEmployeeAsync(int userId)
+        {
+            return await _context.Userauthentications
+                .Where(u => u.UserId == userId)
+                .Select(u => new UserForGoalDto
+                {
+                    UserId = u.UserId,
+                    EmployeeId = u.EmployeeId,
+                    Email = u.Email,
+                    CreatedAt = u.CreatedAt
+                })
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<List<string>> GetExistingGoalTypesForEmployeeAsync(int employeeId)
+        {
+            return await _context.Goals
+                .Where(g => g.CreatedBy == employeeId)
+                .Select(g => g.GoalType)
+                .Distinct()
+                .ToListAsync();
+        }
+        public async Task<List<UserForGoalDto>> GetUsersByIdsAsync(List<int> userIds)
+        {
+            return await _context.Userauthentications
+                .Where(u => userIds.Contains(u.UserId))
+                .Select(u => new UserForGoalDto
+                {
+                    UserId = u.UserId,
+                    EmployeeId = u.EmployeeId,
+                    Email = u.Email,
+                    CreatedAt = u.CreatedAt
+                })
+                .ToListAsync();
+        }
+
+        public async Task<List<UserForGoalDto>> GetUsersWithoutGoalsAsync(int? filterByDays = null)
+        {
+            var allUsers = await _context.Userauthentications
+                .Where(u => u.Status == "Active")
+                .Select(u => new UserForGoalDto
+                {
+                    UserId = u.UserId,
+                    EmployeeId = u.EmployeeId,
+                    Email = u.Email,
+                    CreatedAt = u.CreatedAt
+                })
+                .ToListAsync();
+
+            var employeesWithGoals = await _context.Goals
+                .Where(g => g.CreatedBy != null)
+                .Select(g => g.CreatedBy)
+                .Distinct()
+                .ToListAsync();
+
+            var usersWithoutGoals = allUsers
+                .Where(u => u.EmployeeId.HasValue && !employeesWithGoals.Contains(u.EmployeeId.Value))
+                .ToList();
+
+            if (filterByDays.HasValue)
+            {
+                usersWithoutGoals = usersWithoutGoals
+                    .Where(u => (DateTime.Now - u.CreatedAt).Days >= filterByDays.Value)
+                    .ToList();
+            }
+
+            return usersWithoutGoals;
+        }
     }
 }

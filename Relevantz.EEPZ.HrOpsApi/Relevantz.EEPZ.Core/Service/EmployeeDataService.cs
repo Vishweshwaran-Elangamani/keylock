@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Relevantz.EEPZ.Common.DTOs.Request;
@@ -19,29 +18,25 @@ namespace Relevantz.EEPZ.Core.Service
         private readonly IPolicyService _policyService;
         private readonly IEmailService _emailService;
         private readonly IEmployeeDataRepository _employeeDataRepository;
-        private readonly EEPZDbContext _context;
         private readonly ILogger<EmployeeDataService> _logger;
-        private readonly IConfiguration _configuration; 
-
+        private readonly IConfiguration _configuration;
+        
         public EmployeeDataService(
             IComplianceService complianceService,
             IPolicyService policyService,
             IEmailService emailService,
             IEmployeeDataRepository employeeDataRepository,
-            EEPZDbContext context,
             ILogger<EmployeeDataService> logger,
-            IConfiguration configuration)  
+            IConfiguration configuration)
         {
             _complianceService = complianceService;
             _policyService = policyService;
             _emailService = emailService;
             _employeeDataRepository = employeeDataRepository;
-            _context = context;
             _logger = logger;
-            _configuration = configuration;  
+            _configuration = configuration;
         }
 
-        // FIXED: Handle ApiResponseDto wrapper from compliance service
         public async Task<ComplianceOverviewDto> GetComplianceOverviewAsync()
         {
             var complianceResponse = await _complianceService.GetComplianceOverviewAsync();
@@ -63,37 +58,32 @@ namespace Relevantz.EEPZ.Core.Service
             );
 
             var message = $"Found {usersWithoutGoals.Count} employees without goals";
-
             return (usersWithoutGoals, message);
         }
 
-        
         public async Task<GoalSuggestionsResponseDto> SuggestGoalsAsync(int userId)
         {
-            var user = await _context.Userauthentications
-                .Include(u => u.Employee)
-                .FirstOrDefaultAsync(u => u.UserId == userId);
-
+            var user = await _employeeDataRepository.GetUserWithEmployeeAsync(userId);
             if (user == null)
             {
                 throw new ArgumentException("User not found");
             }
 
-            
             var allSuggestions = _configuration
                 .GetSection("GoalSuggestions:Suggestions")
                 .Get<List<GoalSuggestionDto>>() ?? new List<GoalSuggestionDto>();
 
-            _logger.LogInformation("Loaded {Count} total goal suggestions from config for user {UserId}", 
+            _logger.LogInformation("Loaded {Count} total goal suggestions from config for user {UserId}",
                 allSuggestions.Count, userId);
 
-            var existingGoalTypes = await _context.Goals
-                .Where(g => g.CreatedBy == user.EmployeeId)
-                .Select(g => g.GoalType)
-                .Distinct()
-                .ToListAsync();
+            if (!user.EmployeeId.HasValue)
+            {
+                throw new ArgumentException("User not found");
+            }
+            var existingGoalTypes = await _employeeDataRepository
+                .GetExistingGoalTypesForEmployeeAsync(user.EmployeeId.Value);
 
-            
+
             var relevantSuggestions = allSuggestions
                 .Where(s => !existingGoalTypes.Contains(s.GoalType))
                 .OrderBy(s => s.Priority switch
@@ -102,12 +92,11 @@ namespace Relevantz.EEPZ.Core.Service
                     "Medium" => 1,
                     _ => 2
                 })
-                .Take(5) 
+                .Take(5)
                 .ToList();
 
-            
-            var suggestions = relevantSuggestions.Any() 
-                ? relevantSuggestions 
+            var suggestions = relevantSuggestions.Any()
+                ? relevantSuggestions
                 : allSuggestions.OrderBy(s => s.Priority switch
                 {
                     "High" => 0,
@@ -115,7 +104,7 @@ namespace Relevantz.EEPZ.Core.Service
                     _ => 2
                 }).Take(3).ToList();
 
-            _logger.LogInformation("Generated {Count} personalized suggestions for user {UserId}", 
+            _logger.LogInformation("Generated {Count} personalized suggestions for user {UserId}",
                 suggestions.Count, userId);
 
             return new GoalSuggestionsResponseDto
@@ -134,13 +123,10 @@ namespace Relevantz.EEPZ.Core.Service
 
             if (request.SendType == "single" && request.UserId.HasValue)
             {
-                var user = await _context.Userauthentications
-                    .FirstOrDefaultAsync(u => u.UserId == request.UserId.Value);
-
+                var user = await _employeeDataRepository.GetUserWithEmployeeAsync(request.UserId.Value);
                 if (user == null)
                     throw new ArgumentException("User not found");
 
-                
                 var suggestionsResponse = await SuggestGoalsAsync(user.UserId);
                 var suggestionTitles = suggestionsResponse.Suggestions
                     .Take(3)
@@ -148,7 +134,6 @@ namespace Relevantz.EEPZ.Core.Service
                     .ToList();
 
                 var userName = user.Email?.Split('@')[0] ?? "User";
-
                 var emailSent = await _emailService.SendGoalReminderEmailAsync(
                     user.Email ?? string.Empty,
                     userName,
@@ -164,7 +149,6 @@ namespace Relevantz.EEPZ.Core.Service
                         status = "sent",
                         sentAt = DateTime.Now
                     });
-
                     _logger.LogInformation("Reminder email sent to {Email}", user.Email);
                 }
                 else
@@ -175,19 +159,15 @@ namespace Relevantz.EEPZ.Core.Service
                         email = user.Email,
                         error = "Email delivery failed"
                     });
-
                     _logger.LogWarning("Failed to send reminder email to {Email}", user.Email);
                 }
             }
             else if (request.SendType == "multiple" && request.UserIds != null && request.UserIds.Any())
             {
-                var users = await _context.Userauthentications
-                    .Where(u => request.UserIds.Contains(u.UserId))
-                    .ToListAsync();
+                var users = await _employeeDataRepository.GetUsersByIdsAsync(request.UserIds);
 
                 foreach (var user in users)
                 {
-                    
                     var suggestionsResponse = await SuggestGoalsAsync(user.UserId);
                     var suggestionTitles = suggestionsResponse.Suggestions
                         .Take(3)
@@ -195,7 +175,6 @@ namespace Relevantz.EEPZ.Core.Service
                         .ToList();
 
                     var userName = user.Email?.Split('@')[0] ?? "User";
-
                     var emailSent = await _emailService.SendGoalReminderEmailAsync(
                         user.Email ?? string.Empty,
                         userName,
@@ -221,39 +200,16 @@ namespace Relevantz.EEPZ.Core.Service
                             error = "Email delivery failed"
                         });
                     }
-
                     await Task.Delay(100);
                 }
-
-                _logger.LogInformation("Bulk reminders sent: {Success} successful, {Failed} failed",
-                    sentTo.Count, failedSends.Count);
             }
             else if (request.SendType == "all")
             {
-                var allUsers = await _context.Userauthentications
-                    .Where(u => u.Status == "Active")
-                    .ToListAsync();
-
-                var employeesWithGoals = await _context.Goals
-                    .Where(g => g.CreatedBy != null)
-                    .Select(g => g.CreatedBy)
-                    .Distinct()
-                    .ToListAsync();
-
-                var usersWithoutGoals = allUsers
-                    .Where(u => !employeesWithGoals.Contains(u.EmployeeId))
-                    .ToList();
-
-                if (request.FilterByDays.HasValue)
-                {
-                    usersWithoutGoals = usersWithoutGoals
-                        .Where(u => (DateTime.Now - u.CreatedAt).Days >= request.FilterByDays.Value)
-                        .ToList();
-                }
+                var usersWithoutGoals = await _employeeDataRepository
+                    .GetUsersWithoutGoalsAsync(request.FilterByDays);
 
                 foreach (var user in usersWithoutGoals)
                 {
-                    
                     var suggestionsResponse = await SuggestGoalsAsync(user.UserId);
                     var suggestionTitles = suggestionsResponse.Suggestions
                         .Take(3)
@@ -261,7 +217,6 @@ namespace Relevantz.EEPZ.Core.Service
                         .ToList();
 
                     var userName = user.Email?.Split('@')[0] ?? "User";
-
                     var emailSent = await _emailService.SendGoalReminderEmailAsync(
                         user.Email ?? string.Empty,
                         userName,
@@ -287,17 +242,13 @@ namespace Relevantz.EEPZ.Core.Service
                             error = "Email delivery failed"
                         });
                     }
-
                     await Task.Delay(100);
                 }
-
-                _logger.LogInformation("Mass reminders sent: {Success} successful, {Failed} failed",
-                    sentTo.Count, failedSends.Count);
             }
 
             return new GoalRemindersResponseDto
             {
-                TotalSent = sentTo.Count + failedSends.Count,  
+                TotalSent = sentTo.Count + failedSends.Count,
                 Successful = sentTo.Count,
                 Failed = failedSends.Count,
                 SentTo = sentTo,
@@ -306,8 +257,7 @@ namespace Relevantz.EEPZ.Core.Service
             };
         }
 
-        
-
+        // Existing repository methods (unchanged)
         public Task<GoalAdoptionRateDto> GetGoalAdoptionRateAsync()
         {
             return _employeeDataRepository.GetGoalAdoptionRateAsync();
@@ -333,13 +283,10 @@ namespace Relevantz.EEPZ.Core.Service
         public async Task<List<PolicyResponseDto>> GetPublishedPoliciesAsync(int userId, string userRole)
         {
             _logger.LogInformation("User {UserId} (Role: {Role}) fetching published policies", userId, userRole);
-
             var response = await _policyService.GetPublishedPoliciesAsync();
-
             _logger.LogInformation("Returned {Count} published policies to user {UserId}",
                 response.Data?.Count ?? 0,
                 userId);
-
             return response.Data ?? new List<PolicyResponseDto>();
         }
 
@@ -360,7 +307,6 @@ namespace Relevantz.EEPZ.Core.Service
             {
                 _logger.LogWarning("Policy {PolicyId} is not published. Access denied for user {UserId}",
                     policyId, userId);
-
                 throw new ArgumentException("Policy not found or not published");
             }
 
