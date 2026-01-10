@@ -17,6 +17,7 @@ import { lndService, downloadFile } from "../../../services/lnd/lndService";
 import { ASSIGNMENT_STATUS } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
 import styles from "../../../styles/lnd/pages/assignments/TeamAssignments.module.css";
+import { LND_TOASTS } from "../../../constants/lnd/lndToasts";
 const TeamAssignments = () => {
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -84,9 +85,8 @@ const TeamAssignments = () => {
     try {
       setLoading(true);
       // Pass empty string to backend when overdue is selected
-      const backendStatusFilter = statusFilter === ASSIGNMENT_STATUS.OVERDUE 
-        ? "" 
-        : statusFilter;
+      const backendStatusFilter =
+        statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter;
       // UPDATED: Pass parameters as an object
       const response = await lndService.getTeamAssignments({
         pageNumber: currentPage,
@@ -94,7 +94,7 @@ const TeamAssignments = () => {
         searchTerm: searchTerm,
         sortField: sortField,
         sortOrder: sortOrderAsc ? "asc" : "desc",
-        pageSize: itemsPerPage
+        pageSize: itemsPerPage,
       });
       if (response.data.success) {
         let items = response.data.data.items;
@@ -116,13 +116,12 @@ const TeamAssignments = () => {
   const handleExportToExcel = async () => {
     try {
       setExporting(true);
-      toast.loading("Preparing Excel export...");
-      // UPDATED: Pass parameters as an object
       const response = await lndService.exportTeamAssignments({
-        statusFilter: statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter,
+        statusFilter:
+          statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter,
         searchTerm: searchTerm,
         sortField: sortField,
-        sortOrder: sortOrderAsc ? "asc" : "desc"
+        sortOrder: sortOrderAsc ? "asc" : "desc",
       });
       const timestamp = new Date()
         .toISOString()
@@ -131,11 +130,10 @@ const TeamAssignments = () => {
       const filename = `TeamAssignments_${timestamp}.xlsx`;
       downloadFile(response.data, filename);
       toast.dismiss();
-      toast.success("Excel file downloaded successfully!");
+      toast.success(LND_TOASTS.EXCEL_EXPORTED_MESSAGE);
     } catch (error) {
-      console.error("Failed to export:", error);
       toast.dismiss();
-      toast.error("Failed to export team assignments to Excel");
+      toast.error(LND_TOASTS.FAILED_TO_EXPORT);
     } finally {
       setExporting(false);
     }
@@ -173,7 +171,7 @@ const TeamAssignments = () => {
   };
   const handleCompleteSuccess = () => {
     setShowCompleteModal(false);
-    toast.success("Assignment completed successfully!");
+    toast.success(LND_TOASTS.ASSIGNMENT_COMPLETED_MESSAGE);
     fetchTeamAssignments();
   };
   const handleDownloadProof = async (assignment) => {
@@ -183,10 +181,9 @@ const TeamAssignments = () => {
       );
       const filename = `${assignment.menteeName}_${assignment.skillName}_proof.pdf`;
       downloadFile(response.data, filename);
-      toast.success("File downloaded successfully");
+      toast.success(LND_TOASTS.DOWNLOAD_SUCCESS);
     } catch (error) {
-      console.error("Failed to download:", error);
-      toast.error("Failed to download proof");
+      toast.error(LND_TOASTS.DOWNLOAD_FAILED);
     }
   };
   const onSortClick = (field) => {
@@ -200,7 +197,9 @@ const TeamAssignments = () => {
   };
   const renderSortIcon = (field) => {
     const isActive = sortField === field;
-    const iconClass = isActive ? styles.sortIconActive : styles.sortIconInactive;
+    const iconClass = isActive
+      ? styles.sortIconActive
+      : styles.sortIconInactive;
     if (!isActive) {
       return (
         <ChevronUp size={14} className={`${styles.sortIcon} ${iconClass}`} />
@@ -418,7 +417,10 @@ const TeamAssignments = () => {
                     >
                       {assignment.menteeName}
                     </div>
-                    <div className={styles.cellText} title={assignment.skillName}>
+                    <div
+                      className={styles.cellText}
+                      title={assignment.skillName}
+                    >
                       {assignment.skillName}
                     </div>
                     <div

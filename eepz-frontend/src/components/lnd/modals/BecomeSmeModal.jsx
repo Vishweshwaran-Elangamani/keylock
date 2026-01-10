@@ -4,6 +4,7 @@ import { lndService } from "../../../services/lnd/lndService";
 import { FILE_UPLOAD } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
 import styles from "../../../styles/lnd/components/BecomeSmeModal.module.css";
+import { LND_TOASTS } from "../../../constants/lnd/lndToasts";
 
 const BecomeSmeModal = ({ skill, onClose, onSuccess }) => {
   const [file, setFile] = useState(null);
@@ -33,13 +34,13 @@ const BecomeSmeModal = ({ skill, onClose, onSuccess }) => {
   const handleFileChange = (selectedFile) => {
     // Validate file size
     if (selectedFile.size > FILE_UPLOAD.MAX_SIZE) {
-      toast.error("File size must be less than 10MB");
+      toast.error(LND_TOASTS.FILE_SIZE_MESSAGE);
       return;
     }
 
     // Validate file type
     if (!FILE_UPLOAD.ALLOWED_TYPES.includes(selectedFile.type)) {
-      toast.error("Invalid file type. Allowed: PDF, DOC, DOCX, Images, ZIP");
+      toast.error(LND_TOASTS.FILE_TYPE_MESSAGE);
       return;
     }
 
@@ -50,7 +51,7 @@ const BecomeSmeModal = ({ skill, onClose, onSuccess }) => {
     e.preventDefault();
 
     if (!file) {
-      toast.error("Please upload a proof document");
+      toast.error(LND_TOASTS.UPLOAD_MESSAGE);
       return;
     }
 
@@ -66,13 +67,11 @@ const BecomeSmeModal = ({ skill, onClose, onSuccess }) => {
       if (response.data.success) {
         onSuccess();
       } else {
-        toast.error(response.data.message || "Failed to submit application");
+        toast.error(response.data.message || LND_TOASTS.FAILED_TO_SUBMIT);
       }
     } catch (error) {
       console.error("Failed to apply:", error);
-      toast.error(
-        error.response?.data?.message || "Failed to submit SME application"
-      );
+      toast.error(error.response?.data?.message || LND_TOASTS.FAILED_TO_SUBMIT);
     } finally {
       setUploading(false);
     }

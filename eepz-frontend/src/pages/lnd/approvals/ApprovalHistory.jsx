@@ -11,6 +11,7 @@ import {
 } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
 import styles from "../../../styles/lnd/pages/approvals/ApprovalHistory.module.css";
+import { LND_TOASTS } from "../../../constants/lnd/lndToasts";
 
 const ApprovalHistory = () => {
   const [approvals, setApprovals] = useState([]);
@@ -112,7 +113,7 @@ const ApprovalHistory = () => {
   const fetchApprovalHistory = async () => {
     try {
       setLoading(true);
-      
+
       // UPDATED: Pass parameters as an object
       const response = await lndService.getApprovalHistory({
         pageNumber: currentPage,
@@ -122,7 +123,7 @@ const ApprovalHistory = () => {
         searchTerm: searchTerm,
         sortField: sortField,
         sortOrder: sortOrderAsc ? "asc" : "desc",
-        pageSize: itemsPerPage
+        pageSize: itemsPerPage,
       });
 
       if (response.data.success) {
@@ -131,8 +132,7 @@ const ApprovalHistory = () => {
         setTotalPages(response.data.data.totalPages);
       }
     } catch (error) {
-      console.error("Failed to fetch approval history:", error);
-      toast.error("Failed to load approval history");
+      toast.error(LND_TOASTS.FAILED_TO_LOAD_APPROVAL_HISTORY);
     } finally {
       setLoading(false);
     }
@@ -178,10 +178,9 @@ const ApprovalHistory = () => {
       );
       const filename = `approval_${approval.approvalId}_attachment`;
       downloadFile(response.data, filename);
-      toast.success("File downloaded successfully");
+      toast.success(LND_TOASTS.DOWNLOAD_SUCCESS);
     } catch (error) {
-      console.error("Failed to download:", error);
-      toast.error("Failed to download file");
+      toast.error(LND_TOASTS.DOWNLOAD_FAILED);
     }
   };
 
@@ -446,7 +445,7 @@ const ApprovalHistory = () => {
         </div>
       </div>
 
-      {/* Approval History Table */}  
+      {/* Approval History Table */}
       {approvals.length === 0 && !loading ? (
         <EmptyState
           icon={Filter}

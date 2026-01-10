@@ -17,6 +17,7 @@ import { lndService, downloadFile } from "../../../services/lnd/lndService";
 import { ASSIGNMENT_STATUS } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
 import styles from "../../../styles/lnd/pages/assignments/MyAssignments.module.css";
+import { LND_TOASTS } from "../../../constants/lnd/lndToasts";
 const MyAssignments = () => {
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -56,7 +57,7 @@ const MyAssignments = () => {
     };
     return prefixMap[role] || "/employee";
   };
- 
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -83,11 +84,12 @@ const MyAssignments = () => {
       setLoading(true);
       const response = await lndService.getMyAssignments({
         PageNumber: currentPage,
-        StatusFilter: statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter,
+        StatusFilter:
+          statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter,
         SearchTerm: searchTerm,
         SortField: sortField,
         SortOrder: sortOrderAsc ? "asc" : "desc",
-        PageSize: itemsPerPage
+        PageSize: itemsPerPage,
       });
       if (response.data.success) {
         let items = response.data.data.items;
@@ -99,8 +101,7 @@ const MyAssignments = () => {
         setTotalPages(response.data.data.totalPages);
       }
     } catch (error) {
-      console.error("Failed to load assignments:", error);
-      toast.error("Failed to load assignments");
+      toast.error(LND_TOASTS.FAILED_TO_LOAD_ASSIGNMENTS);
     } finally {
       setLoading(false);
     }
@@ -148,10 +149,9 @@ const MyAssignments = () => {
       );
       const filename = `${assignment.skillName}_proof.pdf`;
       downloadFile(response.data, filename);
-      toast.success("File downloaded successfully");
+      toast.success(LND_TOASTS.DOWNLOAD_SUCCESS);
     } catch (error) {
-      console.error("Failed to download proof:", error);
-      toast.error("Failed to download proof");
+      toast.error(LND_TOASTS.DOWNLOAD_FAILED);
     }
   };
   const onSortClick = (field) => {

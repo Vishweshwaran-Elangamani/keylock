@@ -15,6 +15,7 @@ import { lndService, downloadFile } from "../../../services/lnd/lndService";
 import { ASSIGNMENT_STATUS } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
 import styles from "../../../styles/lnd/pages/hr/OrganizationAssignments.module.css";
+import { LND_TOASTS } from "../../../constants/lnd/lndToasts";
 const OrganizationAssignments = () => {
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -61,9 +62,8 @@ const OrganizationAssignments = () => {
   const fetchAssignments = async () => {
     try {
       setLoading(true);
-      const backendStatusFilter = statusFilter === ASSIGNMENT_STATUS.OVERDUE 
-        ? "" 
-        : statusFilter;
+      const backendStatusFilter =
+        statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter;
       // FIXED: Use object parameters with PascalCase
       const response = await lndService.getAllOrganizationAssignments({
         PageNumber: currentPage,
@@ -71,8 +71,8 @@ const OrganizationAssignments = () => {
         SearchTerm: searchTerm,
         SortField: sortField,
         SortOrder: sortOrderAsc ? "asc" : "desc",
-        PageSize: itemsPerPage
-      });  
+        PageSize: itemsPerPage,
+      });
       if (response.data.success) {
         let items = response.data.data.items;
         // Client-side filtering for overdue
@@ -93,13 +93,12 @@ const OrganizationAssignments = () => {
   const handleExportToExcel = async () => {
     try {
       setExporting(true);
-      toast.loading("Preparing Excel export...");
-      //  FIXED: Use object parameters with PascalCase
       const response = await lndService.exportOrganizationAssignments({
-        StatusFilter: statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter,
+        StatusFilter:
+          statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter,
         SearchTerm: searchTerm,
         SortField: sortField,
-        SortOrder: sortOrderAsc ? "asc" : "desc"
+        SortOrder: sortOrderAsc ? "asc" : "desc",
       });
       const timestamp = new Date()
         .toISOString()
@@ -108,11 +107,10 @@ const OrganizationAssignments = () => {
       const filename = `OrganizationalAssignments_${timestamp}.xlsx`;
       downloadFile(response.data, filename);
       toast.dismiss();
-      toast.success("Excel file downloaded successfully!");
+      toast.success(LND_TOASTS.EXCEL_EXPORTED_MESSAGE);
     } catch (error) {
-      console.error("Failed to export:", error);
       toast.dismiss();
-      toast.error("Failed to export assignments to Excel");
+      toast.error(LND_TOASTS.FAILED_TO_EXPORT);
     } finally {
       setExporting(false);
     }

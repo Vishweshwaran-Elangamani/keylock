@@ -11,6 +11,7 @@ import {
   APPROVAL_STATUS,
 } from "../../../constants/lnd/lndConstants";
 import styles from "../../../styles/lnd/pages/skills/MySkills.module.css";
+import { LND_TOASTS } from "../../../constants/lnd/lndToasts";
 const MySkills = () => {
   const [skills, setSkills] = useState([]);
   const [approvals, setApprovals] = useState([]);
@@ -61,7 +62,6 @@ const MySkills = () => {
   const fetchSkills = async () => {
     try {
       setLoading(true);
-      // UPDATED: Include sortField and sortOrder
       const response = await lndService.getMySkills({
         searchTerm: searchTerm,
         pageNumber: currentPage,
@@ -73,15 +73,13 @@ const MySkills = () => {
         setTotalPages(response.data.data.totalPages);
       }
     } catch (error) {
-      console.error("Failed to fetch skills:", error);
-      toast.error("Failed to load skills");
+      toast.error(LND_TOASTS.FAILED_TO_LOAD_SKILLS);
     } finally {
       setLoading(false);
     }
   };
   const fetchApprovalHistory = async () => {
     try {
-      // UPDATED: Use params object instead of individual parameters
       const response = await lndService.getApprovalHistory({
         pageNumber: 1,
         role: "",
@@ -95,7 +93,7 @@ const MySkills = () => {
         setApprovals(response.data.data.items);
       }
     } catch (error) {
-      console.error("Failed to fetch approval history:", error);
+      toast.error(LND_TOASTS.FAILED_TO_LOAD_APPROVAL_HISTORY);
     }
   };
   const hasPendingSmeRequest = (skillId) => {
@@ -136,7 +134,7 @@ const MySkills = () => {
   };
   const handleSmeSuccess = () => {
     setShowSmeModal(false);
-    toast.success("SME application submitted successfully!");
+    toast.success(LND_TOASTS.SME_REQUEST_SUBMITTED);
     fetchSkills();
   };
   const getRatingColor = (rating) => {

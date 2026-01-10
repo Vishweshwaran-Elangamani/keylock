@@ -12,6 +12,7 @@ import {
   ASSIGNMENT_STATUS,
 } from "../../../constants/lnd/lndConstants";
 import styles from "../../../styles/lnd/components/EmployeeSkillsModal.module.css";
+import { LND_TOASTS } from "../../../constants/lnd/lndToasts";
 
 const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
   const [skills, setSkills] = useState([]);
@@ -56,8 +57,7 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
         setSkills(response.data.data.items);
       }
     } catch (error) {
-      console.error("Failed to fetch employee skills:", error);
-      toast.error("Failed to load employee skills");
+      toast.error(LND_TOASTS.FAILED_TO_LOAD_SKILLS);
     } finally {
       setLoading(false);
     }
@@ -87,8 +87,7 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
         });
       }
     } catch (error) {
-      console.error("Failed to fetch team assignments:", error);
-      toast.error("Failed to load team assignments");
+      toast.error(LND_TOASTS.FAILED_TO_LOAD_TEAM_ASSIGNMENTS);
     } finally {
       setLoading(false);
     }
@@ -118,8 +117,7 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
         });
       }
     } catch (error) {
-      console.error("Failed to fetch approval history:", error);
-      toast.error("Failed to load approval history");
+      toast.error(LND_TOASTS.FAILED_TO_LOAD_APPROVAL_HISTORY);
     } finally {
       setLoading(false);
     }
@@ -136,15 +134,12 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
           const notes = JSON.parse(approval.notes || "{}");
           return notes.MenteeEmployeeId === employee.employeeId;
         } catch (error) {
-          // If notes is not valid JSON, skip this approval
-          console.warn("Invalid JSON in approval notes:", approval.notes);
           return false;
         }
       }
       return false;
     });
   };
-  
 
   const hasOngoingAssignments = (skillId) => {
     const ACTIVE_STATUSES = [
@@ -184,16 +179,17 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
       const response = await lndService.deleteSkill(skillToDelete.mapperId);
 
       if (response.data.success) {
-        toast.success("Skill deleted successfully");
+        toast.success(LND_TOASTS.SKILL_DELETED);
         setShowConfirmModal(false);
         setSkillToDelete(null);
         fetchEmployeeSkills();
       } else {
-        toast.error(response.data.message || "Failed to delete skill");
+        toast.error(response.data.message || LND_TOASTS.FAILED_TO_DELETE_SKILL);
       }
     } catch (error) {
-      console.error("Failed to delete skill:", error);
-      toast.error(error.response?.data?.message || "Failed to delete skill");
+      toast.error(
+        error.response?.data?.message || LND_TOASTS.FAILED_TO_DELETE_SKILL
+      );
     } finally {
       setDeleting(false);
     }
@@ -212,7 +208,7 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
 
   const handleRequestSmeSuccess = () => {
     setShowRequestSmeModal(false);
-    toast.success("SME request submitted successfully!");
+    toast.success(LND_TOASTS.SME_REQUEST_SUBMITTED);
   };
 
   return (

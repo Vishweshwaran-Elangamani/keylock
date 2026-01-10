@@ -7,6 +7,7 @@ import lndService, {
 import { APPROVAL_TYPE } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
 import styles from "../../../styles/lnd/components/ApprovalDecisionModal.module.css";
+import { LND_TOASTS } from "../../../constants/lnd/lndToasts";
 
 const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
   const [decision, setDecision] = useState(null);
@@ -76,13 +77,13 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
   }
   const handlePreview = async () => {
     if (!canPreview) {
-      toast.warning(
-        "Preview not supported for this file type. Please download to view."
+      toast.warning( LND_TOASTS.PREVIEW_NOT_SUPPORTED
+        
       );
       return;
     }
     try {
-      toast.info("Loading preview...");
+      toast.info(LND_TOASTS.LOADING);
 
       const response = await lndService.previewApprovalAttachment(
         approval.approvalId
@@ -112,26 +113,26 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
 
         if (blockedContentTypes.includes(contentType)) {
           toast.warning(
-            "This file type cannot be previewed in browser. Please use the download button."
+            LND_TOASTS.PREVIEW_NOT_SUPPORTED
           );
           return;
         }
 
         if (!previewableContentTypes.includes(contentType)) {
           toast.warning(
-            "This file type cannot be previewed. Please download to view."
+            LND_TOASTS.PREVIEW_NOT_SUPPORTED
           );
           return;
         }
 
         previewFile(response.data, contentType);
-        toast.success("Opening preview...");
+        toast.success(LND_TOASTS.LOADING);
       }
     } catch (error) {
       const errorMessage =
         error.response?.data?.message ||
         error.response?.data?.errors?.[0] ||
-        "Failed to preview document";
+        LND_TOASTS.PREVIEW_FAILED;
       toast.error(errorMessage);
     }
   };
@@ -157,12 +158,12 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
       }
 
       downloadFile(response.data, filename);
-      toast.success("File downloaded successfully");
+      toast.success(LND_TOASTS.DOWNLOAD_SUCCESS);
     } catch (error) {
       const errorMessage =
         error.response?.data?.message ||
         error.response?.data?.errors?.[0] ||
-        "Failed to download file";
+        LND_TOASTS.DOWNLOAD_FAILED;
       toast.error(errorMessage);
     }
   };
@@ -171,7 +172,7 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
     e.preventDefault();
 
     if (!decision) {
-      toast.error("Please select approve or reject");
+      toast.error(LND_TOASTS.SELECT_DECISION_MESSAGE);
       return;
     }
 
@@ -185,7 +186,7 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
         Number(newRating) < 1 ||
         Number(newRating) > 10
       ) {
-        toast.error("Please provide a rating between 1 and 10");
+        toast.error(LND_TOASTS.PROVIDE_RATING_MESSAGE);
         return;
       }
 
@@ -201,14 +202,14 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
         const response = await lndService.completeAssignment(data);
 
         if (response.data.success) {
-          toast.success("Assignment completed and rating updated!");
+          toast.success(LND_TOASTS.ASSIGNMENT_COMPLETED_MESSAGE);
           onSuccess();
         } else {
-          toast.error(response.data.message || "Failed to complete assignment");
+          toast.error(response.data.message || LND_TOASTS.ASSIGNMENT_FAILED_TO_COMPLETE);
         }
       } catch (error) {
         toast.error(
-          error.response?.data?.message || "Failed to complete assignment"
+          error.response?.data?.message || LND_TOASTS.ASSIGNMENT_FAILED_TO_COMPLETE
         );
       } finally {
         setProcessing(false);
@@ -220,7 +221,7 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
     const notesToSend = isSmeRequest ? approval.notes || "" : notes.trim();
 
     if (!isSmeRequest && !notesToSend) {
-      toast.error("Please provide notes for your decision");
+      toast.error(LND_TOASTS.PROVIDE_NOTES_MESSAGE);
       return;
     }
 
@@ -237,17 +238,15 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
 
       if (response.data.success) {
         toast.success(
-          `Approval ${
-            decision === "approve" ? "approved" : "rejected"
-          } successfully!`
+          LND_TOASTS.APPROVAL_PROCESSED_MESSAGE
         );
         onSuccess();
       } else {
-        toast.error(response.data.message || "Failed to process approval");
+        toast.error(response.data.message || LND_TOASTS.APPROVAL_NOT_PROCESSED_MESSAGE);
       }
     } catch (error) {
       toast.error(
-        error.response?.data?.message || "Failed to process approval"
+        error.response?.data?.message || LND_TOASTS.APPROVAL_NOT_PROCESSED_MESSAGE
       );
     } finally {
       setProcessing(false);

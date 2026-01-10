@@ -13,6 +13,7 @@ import EmptyState from "../../../components/lnd/common/EmptyState";
 import { lndService, downloadFile } from "../../../services/lnd/lndService";
 import { toast } from "sonner";
 import styles from "../../../styles/lnd/pages/hr/SmeDirectory.module.css";
+import { LND_TOASTS } from "../../../constants/lnd/lndToasts";
 const SmeDirectory = () => {
   const [smes, setSmes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,46 +29,34 @@ const SmeDirectory = () => {
   useEffect(() => {
     fetchSmes();
   }, [currentPage, itemsPerPage, searchTerm]);
-  
-  const fetchSmes = async () => { 
+
+  const fetchSmes = async () => {
     try {
       setLoading(true);
-  
+
       //  Pass parameters as an object
-  
+
       const response = await lndService.getAllActiveSmes({
-  
         pageNumber: currentPage,
-  
+
         searchTerm: searchTerm,
-  
-        pageSize: itemsPerPage
-  
+
+        pageSize: itemsPerPage,
       });
-  
+
       if (response.data.success) {
-  
         setSmes(response.data.data.items);
-  
+
         setTotalItems(response.data.data.totalCount);
-  
+
         setTotalPages(response.data.data.totalPages);
-  
       }
-  
     } catch (error) {
-  
-      console.error("Failed to fetch SMEs:", error);
-  
-      toast.error("Failed to load SMEs");
-  
+      toast.error(LND_TOASTS.FAILED_TO_LOAD_SMES);
     } finally {
-  
       setLoading(false);
-  
     }
-  
-  };  
+  };
   const handleExportToExcel = async () => {
     try {
       setExporting(true);
@@ -80,11 +69,10 @@ const SmeDirectory = () => {
       const filename = `SMEDirectory_${timestamp}.xlsx`;
       downloadFile(response.data, filename);
       toast.dismiss();
-      toast.success("Excel file downloaded successfully!");
+      toast.success(LND_TOASTS.EXCEL_EXPORTED_MESSAGE);
     } catch (error) {
-      console.error("Failed to export:", error);
       toast.dismiss();
-      toast.error("Failed to export SME directory to Excel");
+      toast.error(LND_TOASTS.FAILED_TO_EXPORT);
     } finally {
       setExporting(false);
     }

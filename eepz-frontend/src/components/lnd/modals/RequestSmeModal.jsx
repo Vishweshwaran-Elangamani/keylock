@@ -3,6 +3,7 @@ import { X, Users, AlertCircle, Calendar } from "lucide-react";
 import { lndService } from "../../../services/lnd/lndService";
 import { toast } from "sonner";
 import styles from "../../../styles/lnd/components/RequestSmeModal.module.css";
+import { LND_TOASTS } from "../../../constants/lnd/lndToasts";
 
 const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
   const [availableSmes, setAvailableSmes] = useState([]);
@@ -18,8 +19,7 @@ const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
   const fetchAvailableSmes = async () => {
     try {
       setFetchingSmes(true);
-      
-  
+
       const response = await lndService.getAvailableSmes({
         skillId: skillId,
         pageNumber: 1,
@@ -31,8 +31,7 @@ const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
         setAvailableSmes(response.data.data.items);
       }
     } catch (error) {
-      console.error("Failed to fetch SMEs:", error);
-      toast.error("Failed to load available SMEs");
+      toast.error(LND_TOASTS.FAILED_TO_LOAD_SMES);
     } finally {
       setFetchingSmes(false);
     }
@@ -42,7 +41,7 @@ const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
     e.preventDefault();
 
     if (!selectedSmeId) {
-      toast.error("Please select an SME");
+      toast.error(LND_TOASTS.SELECT_SME_MESSAGE);
       return;
     }
 
@@ -61,14 +60,11 @@ const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
       if (response.data.success) {
         onSuccess();
       } else {
-        toast.error(
-          response.data.message || "Failed to request SME assignment"
-        );
+        toast.error(response.data.message || LND_TOASTS.FAILED_TO_REQUEST_SME);
       }
     } catch (error) {
-      console.error("Failed to request SME:", error);
       toast.error(
-        error.response?.data?.message || "Failed to request SME assignment"
+        error.response?.data?.message || LND_TOASTS.FAILED_TO_REQUEST_SME
       );
     } finally {
       setLoading(false);

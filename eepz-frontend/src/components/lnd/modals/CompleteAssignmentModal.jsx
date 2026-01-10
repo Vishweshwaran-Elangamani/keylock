@@ -4,6 +4,7 @@ import { RATING } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
 import { useState } from "react";
 import styles from "../../../styles/lnd/components/CompleteAssignmentModal.module.css";
+import { LND_TOASTS } from "../../../constants/lnd/lndToasts";
 
 const CompleteAssignmentModal = ({ assignment, onClose, onSuccess }) => {
   const [rating, setRating] = useState(5);
@@ -13,7 +14,7 @@ const CompleteAssignmentModal = ({ assignment, onClose, onSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!notes.trim()) {
-      toast.error("Please provide completion notes");
+      toast.error(LND_TOASTS.PROVIDE_NOTES_MESSAGE);
       return;
     }
     try {
@@ -27,12 +28,11 @@ const CompleteAssignmentModal = ({ assignment, onClose, onSuccess }) => {
       if (response.data.success) {
         onSuccess();
       } else {
-        toast.error(response.data.message || "Failed to complete assignment");
+        toast.error(response.data.message || LND_TOASTS.FAILED_TO_COMPLETE);
       }
     } catch (error) {
-      console.error("Failed to complete assignment:", error);
       toast.error(
-        error.response?.data?.message || "Failed to complete assignment"
+        error.response?.data?.message || LND_TOASTS.FAILED_TO_COMPLETE
       );
     } finally {
       setLoading(false);

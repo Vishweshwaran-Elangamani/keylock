@@ -15,6 +15,7 @@ import { lndService, downloadFile } from "../../../services/lnd/lndService";
 import { ASSIGNMENT_STATUS } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
 import styles from "../../../styles/lnd/pages/assignments/SmeAssignments.module.css";
+import { LND_TOASTS } from "../../../constants/lnd/lndToasts";
 const SmeAssignments = () => {
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,8 +30,8 @@ const SmeAssignments = () => {
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const dropdownRef = useRef(null);
   // Sorting
-  const [sortField, setSortField] = useState("");          
-  const [sortOrderAsc, setSortOrderAsc] = useState(true);                 
+  const [sortField, setSortField] = useState("");
+  const [sortOrderAsc, setSortOrderAsc] = useState(true);
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -40,7 +41,7 @@ const SmeAssignments = () => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const roleName = user?.role || "";
     setUserRole(roleName);
-    setRolePrefix(getRolePrefix(roleName)); 
+    setRolePrefix(getRolePrefix(roleName));
   }, []);
   const getRolePrefix = (role) => {
     const prefixMap = {
@@ -81,15 +82,15 @@ const SmeAssignments = () => {
       // Pass empty string to backend when overdue is selected
       const backendStatusFilter =
         statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter;
-     //  NEW - Params object
-const response = await lndService.getSmeAssignments({
-  pageNumber: currentPage,
-  statusFilter: backendStatusFilter,
-  searchTerm: searchTerm,
-  sortField: sortField,
-  sortOrder: sortOrderAsc ? "asc" : "desc",
-  pageSize: itemsPerPage,
-});
+      //  NEW - Params object
+      const response = await lndService.getSmeAssignments({
+        pageNumber: currentPage,
+        statusFilter: backendStatusFilter,
+        searchTerm: searchTerm,
+        sortField: sortField,
+        sortOrder: sortOrderAsc ? "asc" : "desc",
+        pageSize: itemsPerPage,
+      });
       if (response.data.success) {
         let items = response.data.data.items;
         // Client-side filtering for overdue
@@ -101,8 +102,7 @@ const response = await lndService.getSmeAssignments({
         setTotalPages(response.data.data.totalPages);
       }
     } catch (error) {
-      console.error("Failed to fetch SME assignments:", error);
-      toast.error("Failed to load SME assignments");
+      toast.error(LND_TOASTS.FAILED_TO_LOAD_SME_ASSIGNMENTS);
     } finally {
       setLoading(false);
     }
@@ -141,10 +141,9 @@ const response = await lndService.getSmeAssignments({
       );
       const filename = `${assignment.menteeName}_${assignment.skillName}_proof.pdf`;
       downloadFile(response.data, filename);
-      toast.success("File downloaded successfully");
+      toast.success(LND_TOASTS.DOWNLOAD_SUCCESS);
     } catch (error) {
-      console.error("Failed to download:", error);
-      toast.error("Failed to download proof");
+      toast.error(LND_TOASTS.DOWNLOAD_FAILED);
     }
   };
   const onSortClick = (field) => {

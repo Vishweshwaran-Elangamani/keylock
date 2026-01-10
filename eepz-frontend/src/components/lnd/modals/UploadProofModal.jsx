@@ -4,6 +4,7 @@ import { lndService } from "../../../services/lnd/lndService";
 import { FILE_UPLOAD } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
 import styles from "../../../styles/lnd/components/UploadProofModal.module.css";
+import { LND_TOASTS } from "../../../constants/lnd/lndToasts";
 
 const UploadProofModal = ({ assignment, onClose, onSuccess }) => {
   const [file, setFile] = useState(null);
@@ -33,12 +34,12 @@ const UploadProofModal = ({ assignment, onClose, onSuccess }) => {
 
   const handleFileChange = (selectedFile) => {
     if (selectedFile.size > FILE_UPLOAD.MAX_SIZE) {
-      toast.error("File size must be less than 10MB");
+      toast.error(LND_TOASTS.FILE_SIZE_MESSAGE);
       return;
     }
 
     if (!FILE_UPLOAD.ALLOWED_TYPES.includes(selectedFile.type)) {
-      toast.error("Invalid file type. Allowed: PDF, DOC, DOCX, Images, ZIP");
+      toast.error(LND_TOASTS.FILE_TYPE_MESSAGE);
       return;
     }
 
@@ -49,7 +50,7 @@ const UploadProofModal = ({ assignment, onClose, onSuccess }) => {
     e.preventDefault();
 
     if (!file) {
-      toast.error("Please upload a completion proof document");
+      toast.error(LND_TOASTS.UPLOAD_MESSAGE);
       return;
     }
 
@@ -66,13 +67,10 @@ const UploadProofModal = ({ assignment, onClose, onSuccess }) => {
       if (response.data.success) {
         onSuccess();
       } else {
-        toast.error(response.data.message || "Failed to upload proof");
+        toast.error(response.data.message || LND_TOASTS.FAILED_TO_SUBMIT);
       }
     } catch (error) {
-      console.error("Failed to upload:", error);
-      toast.error(
-        error.response?.data?.message || "Failed to upload completion proof"
-      );
+      toast.error(error.response?.data?.message || LND_TOASTS.FAILED_TO_SUBMIT);
     } finally {
       setUploading(false);
     }

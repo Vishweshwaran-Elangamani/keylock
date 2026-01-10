@@ -7,6 +7,7 @@ import EmployeeSkillsModal from "../../../components/lnd/modals/EmployeeSkillsMo
 import { lndService } from "../../../services/lnd/lndService";
 import { toast } from "sonner";
 import styles from "../../../styles/lnd/pages/hr/OrganizationSkills.module.css";
+import { LND_TOASTS } from "../../../constants/lnd/lndToasts";
 const OrganizationSkills = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,30 +30,29 @@ const OrganizationSkills = () => {
       const response = await lndService.getAllOrganizationEmployees({
         pageNumber: currentPage,
         searchTerm: searchTerm,
-        pageSize: itemsPerPage
+        pageSize: itemsPerPage,
       });
-     
+
       if (response.data.success) {
         let employeesData = response.data.data.items;
-       
+
         if (!searchTerm) {
           employeesData = employeesData.filter(
             (emp) => emp.departmentName !== "Administration"
           );
         }
-       
+
         setEmployees(employeesData);
         setTotalItems(response.data.data.totalCount);
         setTotalPages(response.data.data.totalPages);
       }
     } catch (error) {
-      console.error("Failed to fetch employees:", error);
-      toast.error("Failed to load employees");
+      toast.error(LND_TOASTS.FAILED_TO_LOAD_EMPLOYEES);
     } finally {
       setLoading(false);
     }
   };
- 
+
   const handleSearchChange = (e) => {
     setSearchInput(e.target.value);
   };

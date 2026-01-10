@@ -5,6 +5,7 @@ import { RATING } from "../../../constants/lnd/lndConstants";
 import ConfirmationModal from "./ConfirmationModal";
 import { toast } from "sonner";
 import styles from "../../../styles/lnd/components/RecordSkillModal.module.css";
+import { LND_TOASTS } from "../../../constants/lnd/lndToasts";
 
 // Custom Dropdown Component
 const CustomDropdown = ({
@@ -120,11 +121,10 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
       if (response.data.success) {
         setEmployees(response.data.data.items);
       } else {
-        toast.error("Failed to load employees");
+        toast.error(LND_TOASTS.FAILED_TO_LOAD_EMPLOYEES);
       }
     } catch (error) {
-      console.error("Failed to fetch employees:", error);
-      toast.error("Failed to load employees");
+      toast.error(LND_TOASTS.FAILED_TO_LOAD_EMPLOYEES);
     } finally {
       setFetchingEmployees(false);
     }
@@ -138,8 +138,7 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
         setAllSkillsLoaded(true);
       }
     } catch (error) {
-      console.error("Failed to fetch skills:", error);
-      toast.error("Failed to load skills");
+      toast.error(LND_TOASTS.FAILED_TO_LOAD_SKILLS);
     }
   };
   const fetchEmployeeSkills = async () => {
@@ -167,12 +166,11 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
         setAvailableSkills(available);
 
         if (available.length === 0 && allSkills.length > 0) {
-          toast.info("This employee already has all available skills");
+          toast.info(LND_TOASTS.ALREADY_HAS_ALL_SKILLS_MESSAGE);
         }
       }
     } catch (error) {
-      console.error("Failed to fetch employee skills:", error);
-      toast.error("Failed to load employee skills");
+      toast.error(LND_TOASTS.FAILED_TO_LOAD_SKILLS);
     } finally {
       setFetchingSkills(false);
     }
@@ -184,10 +182,6 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
   };
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!selectedEmployeeId || !selectedSkillId) {
-      toast.error("Please select both employee and skill");
-      return;
-    }
     if (isEditMode) {
       setPendingSubmit({ selectedEmployeeId, selectedSkillId, rating });
       setShowConfirmModal(true);
@@ -207,10 +201,12 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
         const response = await lndService.updateSkillRating(data);
 
         if (response.data.success) {
-          toast.success("Skill rating updated successfully!");
+          toast.success(LND_TOASTS.SKILL_RATING_UPDATED);
           onSuccess();
         } else {
-          toast.error(response.data.message || "Failed to update skill rating");
+          toast.error(
+            response.data.message || LND_TOASTS.FAILED_TO_UPDTE_RATING
+          );
         }
       } else {
         const data = {
@@ -221,15 +217,18 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
         const response = await lndService.recordSkill(data);
 
         if (response.data.success) {
-          toast.success("Skill recorded successfully!");
+          toast.success(LND_TOASTS.SKILL_RECORDED);
           onSuccess();
         } else {
-          toast.error(response.data.message || "Failed to record skill");
+          toast.error(
+            response.data.message || LND_TOASTS.FAILED_TO_RECORD_SKILL
+          );
         }
       }
     } catch (error) {
-      console.error("Failed to save skill:", error);
-      toast.error(error.response?.data?.message || "Failed to save skill");
+      toast.error(
+        error.response?.data?.message || LND_TOASTS.FAILED_TO_RECORD_SKILL
+      );
     } finally {
       setLoading(false);
       setShowConfirmModal(false);
