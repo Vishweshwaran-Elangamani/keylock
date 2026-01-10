@@ -5,29 +5,17 @@ namespace Relevantz.EEPZ.Core.Services.Interface
     public interface ILnDHRService
     {
         Task<ApiResponse<PaginatedResponse<SubordinateEmployeeResponseModel>>> GetAllOrganizationEmployees(
-            string? searchTerm,
-            int pageNumber,
-            int pageSize
+            OrganizationEmployeesRequestModel request
         );
         Task<ApiResponse<PaginatedResponse<AssignmentResponseModel>>> GetAllOrganizationAssignments(
-            string? statusFilter,
-            string? searchTerm,
-            string? sortField,
-            string? sortOrder,
-            int pageNumber,
-            int pageSize
+            OrganizationAssignmentsRequestModel request
         );
         Task<ApiResponse<byte[]>> ExportOrganizationAssignmentsToExcel(
-            string? statusFilter,
-            string? searchTerm,
-            string? sortField,
-            string? sortOrder
+            ExportOrganizationAssignmentsRequestModel request
         );
         Task<ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>> GetEmployeeSkillsById(
             int employeeId,
-            int pageNumber,
-            string? searchTerm,
-            string? sortBy
+            EmployeeSkillsByIdRequestModel request
         );
     }
 }

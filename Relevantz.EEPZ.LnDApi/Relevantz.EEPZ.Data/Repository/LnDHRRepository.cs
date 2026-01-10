@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Common.Constants;
+using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repositories.Interface;
@@ -24,21 +25,19 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         /// <summary>Gets paginated active employees with search across name, email, and department.</summary>
         public async Task<(List<Employee> Items, int TotalCount)> GetAllOrganizationEmployeesAsync(
-            string? searchTerm,
-            int pageNumber,
-            int pageSize
+            OrganizationEmployeesRequestModel request
         )
         {
             Log.Information(
                 "GetAllOrganizationEmployeesAsync called. SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
-                searchTerm ?? "none", pageNumber, pageSize
+                request.SearchTerm ?? "none", request.PageNumber, request.PageSize
             );
 
             var baseQuery = _context.Employees.Where(e => e.EmploymentStatus == "Active");
 
-            if (!string.IsNullOrEmpty(searchTerm))
+            if (!string.IsNullOrEmpty(request.SearchTerm))
             {
-                var lowerSearchTerm = searchTerm.ToLower();
+                var lowerSearchTerm = request.SearchTerm.ToLower();
 
                 baseQuery = baseQuery.Where(e =>
                     (e.Userprofile.FirstName + " " + e.Userprofile.LastName)
@@ -60,8 +59,8 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .ThenInclude(ed => ed.Department)
                 .OrderBy(e => e.Userprofile.FirstName)
                 .ThenBy(e => e.Userprofile.LastName)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
                 .ToListAsync();
 
             Log.Information(
@@ -78,15 +77,12 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             int TotalCount
         )> GetEmployeeSkillsByIdAsync(
             int employeeId,
-            string? searchTerm,
-            string? sortBy,
-            int pageNumber,
-            int pageSize
+            EmployeeSkillsByIdRequestModel request
         )
         {
             Log.Information(
                 "GetEmployeeSkillsByIdAsync called. EmployeeId={EmployeeId}, SearchTerm={SearchTerm}, SortBy={SortBy}, Page={PageNumber}",
-                employeeId, searchTerm ?? "none", sortBy ?? "default", pageNumber
+                employeeId, request.SearchTerm ?? "none", request.SortBy ?? "default", request.PageNumber
             );
 
             var query = _context
@@ -96,12 +92,12 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .ThenInclude(s => s.Lndsmes)
                 .Where(m => m.EmployeeId == employeeId);
 
-            if (!string.IsNullOrEmpty(searchTerm))
+            if (!string.IsNullOrEmpty(request.SearchTerm))
             {
-                query = query.Where(m => m.Skill.SkillName.Contains(searchTerm));
+                query = query.Where(m => m.Skill.SkillName.Contains(request.SearchTerm));
             }
 
-            query = sortBy?.ToLower() switch
+            query = request.SortBy?.ToLower() switch
             {
                 LnDConstants.SORT_FIELDS.SKILL_NAME => query.OrderBy(m => m.Skill.SkillName),
                 LnDConstants.SORT_FIELDS.RATING => query.OrderByDescending(m => m.Rating),
@@ -109,8 +105,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 _ => query.OrderBy(m => m.Skill.SkillName),
             };
 
+            var pageSize = 10;
             var totalCount = await query.CountAsync();
-            var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            var items = await query.Skip((request.PageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 
             Log.Information(
                 "GetEmployeeSkillsByIdAsync completed. EmployeeId={EmployeeId}, ReturnedCount={Count}, TotalCount={TotalCount}",
@@ -128,18 +125,11 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         public async Task<(
             List<Lndassignment> Items,
             int TotalCount
-        )> GetAllOrganizationAssignmentsAsync(
-            string? statusFilter,
-            string? searchTerm,
-            string? sortField,
-            string? sortOrder,
-            int pageNumber,
-            int pageSize
-        )
+        )> GetAllOrganizationAssignmentsAsync(OrganizationAssignmentsRequestModel request)
         {
             Log.Information(
                 "GetAllOrganizationAssignmentsAsync called. StatusFilter={StatusFilter}, SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
-                statusFilter ?? "all", searchTerm ?? "none", pageNumber, pageSize
+                request.StatusFilter ?? "all", request.SearchTerm ?? "none", request.PageNumber, request.PageSize
             );
 
             var query = _context
@@ -154,14 +144,14 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .ThenInclude(e => e.Userprofile)
                 .AsQueryable();
 
-            if (!string.IsNullOrEmpty(statusFilter))
+            if (!string.IsNullOrEmpty(request.StatusFilter))
             {
-                query = query.Where(a => a.Status == statusFilter);
+                query = query.Where(a => a.Status == request.StatusFilter);
             }
 
-            if (!string.IsNullOrEmpty(searchTerm))
+            if (!string.IsNullOrEmpty(request.SearchTerm))
             {
-                var lowerSearchTerm = searchTerm.ToLower();
+                var lowerSearchTerm = request.SearchTerm.ToLower();
 
                 query = query.Where(a =>
                     (a.MenteeEmployee.Userprofile.FirstName ?? "")
@@ -196,9 +186,12 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             var totalCount = await query.CountAsync();
 
-            query = ApplyAssignmentSorting(query, sortField, sortOrder);
+            query = ApplyAssignmentSorting(query, request.SortField, request.SortOrder);
 
-            var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            var items = await query
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToListAsync();
 
             Log.Information(
                 "GetAllOrganizationAssignmentsAsync completed. ReturnedCount={Count}, TotalCount={TotalCount}",
@@ -210,15 +203,12 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         /// <summary>Gets all organization assignments for Excel export without pagination.</summary>
         public async Task<List<Lndassignment>> GetAllOrganizationAssignmentsForExportAsync(
-            string? statusFilter,
-            string? searchTerm,
-            string? sortField,
-            string? sortOrder
+            ExportOrganizationAssignmentsRequestModel request
         )
         {
             Log.Information(
                 "GetAllOrganizationAssignmentsForExportAsync called. StatusFilter={StatusFilter}, SearchTerm={SearchTerm}",
-                statusFilter ?? "all", searchTerm ?? "none"
+                request.StatusFilter ?? "all", request.SearchTerm ?? "none"
             );
 
             var query = _context
@@ -233,14 +223,14 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .ThenInclude(e => e.Userprofile)
                 .AsQueryable();
 
-            if (!string.IsNullOrEmpty(statusFilter))
+            if (!string.IsNullOrEmpty(request.StatusFilter))
             {
-                query = query.Where(a => a.Status == statusFilter);
+                query = query.Where(a => a.Status == request.StatusFilter);
             }
 
-            if (!string.IsNullOrEmpty(searchTerm))
+            if (!string.IsNullOrEmpty(request.SearchTerm))
             {
-                var lowerSearchTerm = searchTerm.ToLower();
+                var lowerSearchTerm = request.SearchTerm.ToLower();
 
                 query = query.Where(a =>
                     (a.MenteeEmployee.Userprofile.FirstName ?? "")
@@ -273,7 +263,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 );
             }
 
-            query = ApplyAssignmentSorting(query, sortField, sortOrder);
+            query = ApplyAssignmentSorting(query, request.SortField, request.SortOrder);
 
             var items = await query.ToListAsync();
 

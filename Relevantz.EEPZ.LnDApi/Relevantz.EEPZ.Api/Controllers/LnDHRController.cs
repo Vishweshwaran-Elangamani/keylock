@@ -14,7 +14,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
     [Authorize(Roles = LnDConstants.USER_ROLES.HR)]
     public class LnDHRController : BaseLnDController
     {
-        #region Dependencies  
+        #region Dependencies
 
         private readonly ILnDHRService _hrService;
         private readonly ILnDSmeService _smeService;
@@ -40,14 +40,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 request.StatusFilter ?? "all", request.PageNumber, request.PageSize
             );
 
-            var result = await _hrService.GetAllOrganizationAssignments(
-                request.StatusFilter,
-                request.SearchTerm,
-                request.SortField,
-                request.SortOrder,
-                request.PageNumber,
-                request.PageSize
-            );
+            var result = await _hrService.GetAllOrganizationAssignments(request);
 
             if (result.Success)
             {
@@ -78,12 +71,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 request.StatusFilter ?? "all"
             );
 
-            var result = await _hrService.ExportOrganizationAssignmentsToExcel(
-                request.StatusFilter,
-                request.SearchTerm,
-                request.SortField,
-                request.SortOrder
-            );
+            var result = await _hrService.ExportOrganizationAssignmentsToExcel(request);
 
             if (!result.Success)
             {
@@ -123,11 +111,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 request.SearchTerm ?? "none", request.PageNumber, request.PageSize
             );
 
-            var result = await _hrService.GetAllOrganizationEmployees(
-                request.SearchTerm,
-                request.PageNumber,
-                request.PageSize
-            );
+            var result = await _hrService.GetAllOrganizationEmployees(request);
 
             if (result.Success)
             {
@@ -159,12 +143,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 employeeId, request.PageNumber, request.SearchTerm ?? "none"
             );
 
-            var result = await _hrService.GetEmployeeSkillsById(
-                employeeId,
-                request.PageNumber,
-                request.SearchTerm,
-                request.SortBy ?? LnDConstants.DEFAULTS.SORT_BY_SKILL_NAME
-            );
+            var result = await _hrService.GetEmployeeSkillsById(employeeId, request);
 
             if (result.Success)
             {
@@ -199,9 +178,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 request.SearchTerm ?? "none", request.PageNumber, request.PageSize
             );
 
-            var result = await _smeService.GetAllActiveSmes(
-                request
-            );
+            var result = await _smeService.GetAllActiveSmes(request);
 
             if (result.Success)
             {
@@ -260,4 +237,3 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         #endregion
     }
 }
-
