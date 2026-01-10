@@ -7,6 +7,7 @@ import {
   APPROVAL_TYPE_LABELS,
 } from "../../../constants/goals/goalConstants";
 import styles from "../../../styles/goals/components/RequestApprovalModal.module.css";
+import { GOAL_TOASTS } from "../../../constants/goals/goalToasts";
 
 const RequestApprovalModal = ({
   isOpen,
@@ -101,15 +102,14 @@ const RequestApprovalModal = ({
     const file = e.target.files[0];
     if (file) {
       if (file.size > 10 * 1024 * 1024) {
-        toast.error("File Too Large", {
-          description: "File size must be less than 10MB",
+        toast.error(GOAL_TOASTS.FILE_TOO_LARGE, {
+          description: GOAL_TOASTS.FILE_TOO_LARGE_DESC,
           duration: 4000,
         });
         return;
       }
       setProofFile(file);
-      toast.success("File Selected", {
-        description: `${file.name} (${(file.size / 1024).toFixed(2)} KB)`,
+      toast.success(GOAL_TOASTS.FILE_SELECTED, {
         duration: 2000,
       });
     }
@@ -117,8 +117,7 @@ const RequestApprovalModal = ({
 
   const removeFile = () => {
     if (proofFile) {
-      toast.info("File Removed", {
-        description: `${proofFile.name} has been removed`,
+      toast.info(GOAL_TOASTS.FILE_REMOVED, {
         duration: 2000,
       });
     }
@@ -143,14 +142,13 @@ const RequestApprovalModal = ({
     const file = e.dataTransfer.files[0];
     if (file) {
       if (file.size > 10 * 1024 * 1024) {
-        toast.error("File Too Large", {
-          description: "File size must be less than 10MB",
+        toast.error(GOAL_TOASTS.FILE_TOO_LARGE, {
+          description: GOAL_TOASTS.FILE_TOO_LARGE_DESC,
           duration: 4000,
         });
       } else {
         setProofFile(file);
-        toast.success("File Added", {
-          description: `${file.name} (${(file.size / 1024).toFixed(2)} KB)`,
+        toast.success(GOAL_TOASTS.FILE_SELECTED, {
           duration: 2000,
         });
       }
@@ -161,11 +159,11 @@ const RequestApprovalModal = ({
     e.preventDefault();
 
     if (requiresProof && !isLeadershipOrgCompletion && !proofFile) {
-      toast.error("Proof Required", {
+      toast.error(GOAL_TOASTS.PROOF_REQUIRED, {
         description:
           approvalType === APPROVAL_TYPES.COMPLETION
-            ? "Please upload proof of completion"
-            : "Please upload proof of task completion",
+            ? GOAL_TOASTS.COMPLETION_PROOF_NEEDED
+            : GOAL_TOASTS.TASK_COMPLETION_PROOF_NEEDED,
         duration: 4000,
       });
       return;
@@ -307,7 +305,7 @@ const RequestApprovalModal = ({
 
                   {!proofFile ? (
                     <div
-                      className={`${styles.dragDropArea} ${    
+                      className={`${styles.dragDropArea} ${
                         isDragActive ? styles.dragDropAreaActive : ""
                       }`}
                       style={{
@@ -373,7 +371,7 @@ const RequestApprovalModal = ({
                         onChange={handleFileChange}
                         disabled={loading}
                         className={styles.fileInput}
-                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif" 
+                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif"
                       />
                     </div>
                   ) : (

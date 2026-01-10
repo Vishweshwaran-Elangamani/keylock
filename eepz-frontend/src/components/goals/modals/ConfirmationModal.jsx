@@ -1,4 +1,5 @@
 import { toast } from "sonner";
+import { GOAL_TOASTS } from "../../../constants/goals/goalToasts";
 
 const ConfirmationModal = ({
   isOpen,
@@ -18,11 +19,10 @@ const ConfirmationModal = ({
   const handleConfirm = async () => {
     try {
       await onConfirm();
-      
+
       if (showToast) {
-        // Fixed: Better message generation without "ed" suffix
         const message = toastMessage || `${confirmText} successful!`;
-        
+
         switch (toastType) {
           case "success":
             toast.success(message, { duration: 3000 });
@@ -40,11 +40,11 @@ const ConfirmationModal = ({
             toast.success(message, { duration: 3000 });
         }
       }
-      
+
       onClose();
     } catch (error) {
-      toast.error("Action Failed", {
-        description: error.message || "An error occurred",
+      toast.error(GOAL_TOASTS.ACTION_FAILED, {
+        description: error.message || GOAL_TOASTS.ERROR_OCCURED_WHILE_EXECUTION,
         duration: 4000,
       });
     }

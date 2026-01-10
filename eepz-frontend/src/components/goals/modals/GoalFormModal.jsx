@@ -7,6 +7,7 @@ import {
   GOAL_TYPE_LABELS,
 } from "../../../constants/goals/goalConstants";
 import styles from "../../../styles/goals/components/GoalFormModal.module.css";
+import { GOAL_TOASTS } from "../../../constants/goals/goalToasts";
 
 const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
   const { user } = useAuth();
@@ -154,12 +155,9 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
         setCompletedChecklistIds(completedIds);
 
         if (completedIds.size > 0) {
-          toast.warning(
-            `${completedIds.size} checklist item(s) are completed and locked. You must uncomplete them before editing.`,
-            {
-              duration: 5000,
-            }
-          );
+          toast.warning(GOAL_TOASTS.LOCKED_CHECKLIST_MESSAGE, {
+            duration: 5000,
+          });
         }
 
         setFormData({
@@ -198,9 +196,9 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
         });
       }
     } catch (error) {
-      console.error("Failed to load form data:", error);
-      toast.error("Failed to load form data", {
-        description: error.message || "An error occurred while loading data",
+      toast.error(GOAL_TOASTS.FAILED_TO_LOAD_DATA, {
+        description:
+          error.message || GOAL_TOASTS.ERROR_OCCURED_WHILE_LOADING_DATA,
       });
     } finally {
       setLoadingData(false);
@@ -213,8 +211,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
       const projectsData = response.data || [];
       setProjects(projectsData);
     } catch (error) {
-      console.error("Failed to load projects:", error);
-      toast.error("Failed to load projects");
+      toast.error(GOAL_TOASTS.FAILED_TO_LOAD_PROJECTS);
     }
   };
 
@@ -242,9 +239,8 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
 
       setAvailableEmployees(formattedEmployees);
     } catch (error) {
-      console.error("Failed to load subordinates:", error);
-      toast.error("Failed to load team members", {
-        description: "Please try selecting the project again",
+      toast.error(GOAL_TOASTS.FAILED_TO_LOAD_TEAM_MEMBERS, {
+        description: GOAL_TOASTS.PLEASE_TRY_AGAIN,
       });
       setAvailableEmployees([]);
     } finally {
@@ -407,7 +403,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
           (e) => e.empMasterId === empMasterId
         );
         if (emp) {
-          toast.success(`${emp.fullName} added as an assignee.`, {
+          toast.success(GOAL_TOASTS.ASSIGNEE_ADDED, {
             duration: 2000,
           });
         }
@@ -417,7 +413,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
           (e) => e.empMasterId === empMasterId
         );
         if (emp) {
-          toast.info(`${emp.fullName} removed from assignees.`, {
+          toast.info(GOAL_TOASTS.ASSIGNEE_REMOVED, {
             duration: 2000,
           });
         }
@@ -443,7 +439,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
         ],
       },
     }));
-    toast.success("Checklist item added.", { duration: 2000 });
+    toast.success(GOAL_TOASTS.CHECKLIST_ADDED, { duration: 2000 });
   };
 
   const removeChecklistItem = (assigneeId, index) => {
@@ -456,7 +452,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
         ),
       },
     }));
-    toast.info("Checklist item removed", { duration: 2000 });
+    toast.info(GOAL_TOASTS.CHECKLIST_REMOVED, { duration: 2000 });
   };
 
   const updateChecklistItem = (assigneeId, index, field, value) => {
@@ -528,8 +524,8 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
     });
 
     if (!validateForm()) {
-      toast.error("Validation Error", {
-        description: "Please fix the errors before submitting",
+      toast.error(GOAL_TOASTS.VALIDATION_ERROR, {
+        description: GOAL_TOASTS.PLEASE_TRY_AGAIN,
         duration: 4000,
       });
       modalBodyRef.current?.scrollTo({ top: 0, behavior: "smooth" });
@@ -543,12 +539,12 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
 
       if (isEdit) {
         await goalService.updateGoal(goalData.goalId, payload);
-        toast.success("Goal Updated Successfully!", {
+        toast.success(GOAL_TOASTS.GOAL_UPDATED, {
           duration: 3000,
         });
       } else {
         await goalService.createGoal(payload);
-        toast.success("Goal Saved Successfully!", {
+        toast.success(GOAL_TOASTS.GOAL_SAVED, {
           duration: 3000,
         });
       }
@@ -562,12 +558,18 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
         error.response?.data?.message ||
         error.response?.data?.errors?.[0] ||
         error.response?.data?.title ||
-        (isEdit ? "Failed to update goal" : "Failed to create goal");
+        (isEdit
+          ? GOAL_TOASTS.FAILED_TO_UPDATE_GOAL
+          : GOAL_TOASTS.FAILED_TO_SAVE_GOAL);
 
-      toast.error(isEdit ? "Update Failed" : "Creation Failed", {
-        description: errorMessage,
-        duration: 5000,
-      });
+      toast.error(
+        isEdit
+          ? GOAL_TOASTS.FAILED_TO_UPDATE_GOAL
+          : GOAL_TOASTS.FAILED_TO_SAVE_GOAL,
+        {
+          duration: 5000,
+        }
+      );
       modalBodyRef.current?.scrollTo({ top: 0, behavior: "smooth" });
     } finally {
       setLoading(false);
@@ -578,7 +580,6 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
     emp.fullName?.toLowerCase().includes(assigneeSearchTerm.toLowerCase())
   );
 
-  // Get display text for selected values
   const getSelectedTypeLabel = () => {
     return GOAL_TYPE_LABELS[formData.type] || "Select Goal Type";
   };

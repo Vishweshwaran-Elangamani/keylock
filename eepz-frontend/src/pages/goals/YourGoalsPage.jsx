@@ -12,15 +12,17 @@ import { GOAL_TYPES } from "../../constants/goals/goalConstants";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
 import styles from "../../styles/goals/pages/YourGoalsPage.module.css";
+import { GOAL_TOASTS } from "../../constants/goals/goalToasts";
 
 const YourGoalsPage = () => {
   const { user } = useAuth();
-  const getRolePrefix = (role) => ({
-    Manager: "/manager",
-    "Department Head": "/department-head",
-    Leadership: "/leadership",
-    Employee: "/employee",
-  }[role] || "/employee");
+  const getRolePrefix = (role) =>
+    ({
+      Manager: "/manager",
+      "Department Head": "/department-head",
+      Leadership: "/leadership",
+      Employee: "/employee",
+    }[role] || "/employee");
 
   const rolePrefix = getRolePrefix(user.role);
 
@@ -79,8 +81,7 @@ const YourGoalsPage = () => {
       }));
       setProjects(formattedProjects);
     } catch (error) {
-      console.error("Failed to load projects:", error);
-      toast.error("Failed to load projects");
+      toast.error(GOAL_TOASTS.FAILED_TO_LOAD_PROJECTS);
     }
   };
 
@@ -188,8 +189,7 @@ const YourGoalsPage = () => {
         }
       }
     } catch (error) {
-      console.error("Failed to load goals:", error);
-      toast.error(error.response?.data?.message || "Failed to load goals");
+      toast.error(GOAL_TOASTS.FAILED_TO_LOAD_GOALS);
       setGoals([]);
       setTotalCount(0);
       setTotalPages(0);
@@ -219,7 +219,7 @@ const YourGoalsPage = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Updated search handlers 
+  // Updated search handlers
   const handleSearchInputChange = (e) => {
     setSearchInput(e.target.value);
   };
@@ -229,7 +229,7 @@ const YourGoalsPage = () => {
     setSearchTerm(searchInput);
     setCurrentPage(1);
     if (searchInput.trim()) {
-      toast.success("Search applied");
+      toast.success(GOAL_TOASTS.SEARCH_APPLIED);
     }
   };
 
@@ -237,7 +237,7 @@ const YourGoalsPage = () => {
     setSearchInput("");
     setSearchTerm("");
     setCurrentPage(1);
-    toast.info("Search cleared");
+    toast.info(GOAL_TOASTS.SEARCH_REMOVED);
   };
 
   const handleKeyPress = (e) => {
@@ -255,7 +255,7 @@ const YourGoalsPage = () => {
     setFilters(newFilters);
     setCurrentPage(1);
     setShowFiltersModal(false);
-    toast.success("Filters applied");
+    toast.success(GOAL_TOASTS.FILTERS_APPLIED);
   };
 
   const handleClearFilters = () => {
@@ -269,7 +269,7 @@ const YourGoalsPage = () => {
     setSearchInput("");
     setSearchTerm("");
     setCurrentPage(1);
-    toast.info("All filters cleared");
+    toast.info(GOAL_TOASTS.FILTERS_REMOVED);
   };
 
   const activeFilterCount =
@@ -281,7 +281,6 @@ const YourGoalsPage = () => {
       {/* Breadcrumb */}
       <Breadcrumb
         items={[
-          
           { label: "Goals Dashboard", path: `${rolePrefix}/dashboard/goals` },
           { label: "Your Goals", path: null, icon: "" },
         ]}
@@ -424,17 +423,17 @@ const YourGoalsPage = () => {
               </div>
             </div>
           </div>
-          
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-              loading={loading}
-              totalItems={totalCount}
-              itemsPerPage={itemsPerPage}
-              onItemsPerPageChange={handleItemsPerPageChange}
-              pageSizeOptions={[8, 12, 24, 48]}
-            />
+
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            loading={loading}
+            totalItems={totalCount}
+            itemsPerPage={itemsPerPage}
+            onItemsPerPageChange={handleItemsPerPageChange}
+            pageSizeOptions={[8, 12, 24, 48]}
+          />
         </>
       )}
 
