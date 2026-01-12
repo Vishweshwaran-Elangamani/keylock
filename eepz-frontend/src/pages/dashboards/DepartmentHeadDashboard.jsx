@@ -239,10 +239,11 @@ const DepartmentHeadDashboard = () => {
     { icon: AlertTriangle, value: kpiStats.totalDepartmentSLAs, label: "Department SLAs", subtitle: `${kpiStats.overdueSLAs} overdue`, iconClass: "admin-cyan" }
   ];
 
-  const StatCard = ({ bg, border, value, label, color }) => (
-    <div className="emp-stat-card" style={{ background: bg, border: `2px solid ${border}` }}>
-      <div className="emp-stat-value" style={{ color }}>{value}</div>
-      <div className="emp-stat-label" style={{ color }}>{label}</div>
+  
+  const StatCard = ({ type, value, label }) => (
+    <div className={`emp-stat-card emp-stat-${type}`}>
+      <div className="emp-stat-value">{value}</div>
+      <div className="emp-stat-label">{label}</div>
     </div>
   );
 
@@ -280,9 +281,9 @@ const DepartmentHeadDashboard = () => {
               {goalsData.total > 0 ? (
                 <>
                   <div className="emp-stats-grid">
-                    <StatCard bg="#f0eff5" border="#b9b4c7" value={goalsData.total} label="Total" color="#7077a1" />
-                    <StatCard bg="#4e5473" border="#7077a1" value={goalsData.completed} label="Completed" color="#ffffff" />
-                    <StatCard bg="#e8e7ef" border="#b9b4c7" value={goalsData.inProgress} label="In Progress" color="#7077a1" />
+                    <StatCard type="total" value={goalsData.total} label="Total" />
+                    <StatCard type="completed" value={goalsData.completed} label="Completed" />
+                    <StatCard type="inprogress" value={goalsData.inProgress} label="In Progress" />
                   </div>
                   {goalsData.chartData.length > 0 && (
                     <ResponsiveContainer width="100%" height={240}>
@@ -318,8 +319,8 @@ const DepartmentHeadDashboard = () => {
               {performanceData.total > 0 ? (
                 <>
                   <div className="emp-stats-grid emp-stats-2col">
-                    <StatCard bg="#e8e7ef" border="#b9b4c7" value={performanceData.pending} label="Pending" color="#7077a1" />
-                    <StatCard bg="#4e5473" border="#7077a1" value={performanceData.approved} label="Approved" color="#ffffff" />
+                    <StatCard type="pending" value={performanceData.pending} label="Pending" />
+                    <StatCard type="approved" value={performanceData.approved} label="Approved" />
                   </div>
                   <ResponsiveContainer width="100%" height={240}>
                     <BarChart data={[{ name: "Pending", value: performanceData.pending }, { name: "Approved", value: performanceData.approved }]} margin={{ top: 10, right: 10, bottom: 30, left: 0 }}>
@@ -351,9 +352,9 @@ const DepartmentHeadDashboard = () => {
               {nominationsData.total > 0 ? (
                 <>
                   <div className="emp-stats-grid">
-                    <StatCard bg="#e8e7ef" border="#b9b4c7" value={nominationsData.pending} label="Pending" color="#7077a1" />
-                    <StatCard bg="#4e5473" border="#7077a1" value={nominationsData.approved} label="Approved" color="#ffffff" />
-                    <StatCard bg="#3d0010" border="#590016" value={nominationsData.rejected} label="Rejected" color="#ffffff" />
+                    <StatCard type="pending" value={nominationsData.pending} label="Pending" />
+                    <StatCard type="approved" value={nominationsData.approved} label="Approved" />
+                    <StatCard type="rejected" value={nominationsData.rejected} label="Rejected" />
                   </div>
                   {nominationsData.chartData.length > 0 && (
                     <ResponsiveContainer width="100%" height={240}>
@@ -391,9 +392,9 @@ const DepartmentHeadDashboard = () => {
               {slaData.total > 0 ? (
                 <>
                   <div className="emp-stats-grid">
-                    <StatCard bg="#f0eff5" border="#b9b4c7" value={slaData.total} label="Total" color="#7077a1" />
-                    <StatCard bg="#3d0010" border="#590016" value={slaData.overdue} label="Overdue" color="#ffffff" />
-                    <StatCard bg="#4e5473" border="#7077a1" value={slaData.closed} label="Closed" color="#ffffff" />
+                    <StatCard type="total" value={slaData.total} label="Total" />
+                    <StatCard type="overdue" value={slaData.overdue} label="Overdue" />
+                    <StatCard type="closed" value={slaData.closed} label="Closed" />
                   </div>
                   {slaData.chartData.length > 0 && (
                     <ResponsiveContainer width="100%" height={240}>
@@ -429,9 +430,9 @@ const DepartmentHeadDashboard = () => {
               {hasCompliancePoints ? (
                 <>
                   <div className="emp-stats-grid">
-                    <StatCard bg="#4e5473" border="#7077a1" value={`${complianceTrend[0].compliance}%`} label="Current Compliance Rate" color="#ffffff" />
-                    <StatCard bg="#e8e7ef" border="#b9b4c7" value={complianceTrend[0].onTimeSLAs} label="On-time" color="#7077a1" />
-                    <StatCard bg="#3d0010" border="#590016" value={complianceTrend[0].breachedSLAs} label="Breached" color="#ffffff" />
+                    <StatCard type="compliance" value={`${complianceTrend[0].compliance}%`} label="Compliance Rate" />
+                    <StatCard type="ontime" value={complianceTrend[0].onTimeSLAs} label="On-time" />
+                    <StatCard type="breached" value={complianceTrend[0].breachedSLAs} label="Breached" />
                   </div>
                   <ResponsiveContainer width="100%" height={200}>
                     <LineChart data={complianceTrend}>

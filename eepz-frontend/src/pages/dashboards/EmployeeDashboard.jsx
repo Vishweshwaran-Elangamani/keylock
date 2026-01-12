@@ -197,6 +197,14 @@ const EmployeeDashboard = () => {
     return { total: slas.length, open, overdue, closed, chartData };
   };
 
+ 
+  const StatCard = ({ type, value, label }) => (
+    <div className={`emp-stat-card emp-stat-${type}`}>
+      <div className="emp-stat-value">{value}</div>
+      <div className="emp-stat-label">{label}</div>
+    </div>
+  );
+
   if (loading) return (
     <div className="ada-loading-container">
       <div className="spinner-border text-primary" role="status">
@@ -219,13 +227,6 @@ const EmployeeDashboard = () => {
     { icon: Calendar, value: kpiStats.totalMeetings, label: "Meetings", subtitle: `${kpiStats.upcomingMeetings} upcoming`, iconClass: "admin-green" },
     { icon: AlertTriangle, value: kpiStats.totalSlas, label: "My SLAs", subtitle: `${kpiStats.overdueSlas} overdue`, iconClass: "admin-cyan" }
   ];
-
-  const StatCard = ({ bg, border, value, label, color }) => (
-    <div className="emp-stat-card" style={{ background: bg, border: `1px solid ${border}` }}>
-      <div className="emp-stat-value" style={{ color }}>{value}</div>
-      <div className="emp-stat-label" style={{ color }}>{label}</div>
-    </div>
-  );
 
   return (
     <div className="hr-dashboard-container">
@@ -265,8 +266,8 @@ const EmployeeDashboard = () => {
               {perfOverview.totalRecognitions > 0 ? (
                 <>
                   <div className="emp-stats-grid emp-stats-2col">
-                    <StatCard bg="#ffe8e1" border="#F08A5D" value={perfOverview.totalRecognitions} label="My Recognitions" color="#F08A5D" />
-                    <StatCard bg="#f3e5f5" border="#6A2C70" value={perfOverview.orgTotalNoms} label="Total Organization Nominations" color="#6A2C70" />
+                    <StatCard type="recognition" value={perfOverview.totalRecognitions} label="My Recognitions" />
+                    <StatCard type="org-noms" value={perfOverview.orgTotalNoms} label="Total Organization Nominations" />
                   </div>
                   <div className="emp-trophy-section">
                     <div className="emp-trophy-container">
@@ -278,14 +279,20 @@ const EmployeeDashboard = () => {
                       <div className="emp-recognition-list">
                         {perfOverview.chartData.map((item, i) => (
                           <div key={i} className="emp-recognition-item">
-                            <Medal size={24} style={{ color: item.fill }} />
+                            <Medal size={24} className="emp-recognition-medal" style={{ '--medal-color': item.fill }} />
                             <div className="emp-recognition-info">
                               <div className="emp-recognition-name">{item.name}</div>
                               <div className="emp-recognition-bar">
-                                <div className="emp-recognition-fill" style={{ width: `${(item.value / perfOverview.totalRecognitions) * 100}%`, background: item.fill }} />
+                                <div 
+                                  className="emp-recognition-fill" 
+                                  style={{ 
+                                    '--fill-width': `${(item.value / perfOverview.totalRecognitions) * 100}%`,
+                                    '--fill-color': item.fill 
+                                  }} 
+                                />
                               </div>
                             </div>
-                            <span className="emp-recognition-count" style={{ color: item.fill }}>{item.value}</span>
+                            <span className="emp-recognition-count" style={{ '--count-color': item.fill }}>{item.value}</span>
                           </div>
                         ))}
                       </div>
@@ -309,9 +316,9 @@ const EmployeeDashboard = () => {
               {goalsData.total > 0 ? (
                 <>
                   <div className="emp-stats-grid">
-                    <StatCard bg="#f3e5f5" border="#6A2C70" value={goalsData.total} label="Total" color="#6A2C70" />
-                    <StatCard bg="#4a1f54" border="#6A2C70" value={goalsData.completed} label="Completed" color="#ffffff" />
-                    <StatCard bg="#ffe8e1" border="#F08A5D" value={goalsData.inProgress} label="In Progress" color="#F08A5D" />
+                    <StatCard type="total-purple" value={goalsData.total} label="Total" />
+                    <StatCard type="completed-purple" value={goalsData.completed} label="Completed" />
+                    <StatCard type="inprogress-coral" value={goalsData.inProgress} label="In Progress" />
                   </div>
                   {goalsData.chartData.length > 0 && (
                     <ResponsiveContainer width="100%" height={240}>
@@ -347,9 +354,9 @@ const EmployeeDashboard = () => {
               {meetingsData.total > 0 ? (
                 <>
                   <div className="emp-stats-grid">
-                    <StatCard bg="#f3e5f5" border="#6A2C70" value={meetingsData.total} label="Total" color="#6A2C70" />
-                    <StatCard bg="#4a1f54" border="#6A2C70" value={meetingsData.upcoming} label="Upcoming" color="#ffffff" />
-                    <StatCard bg="#ffe8e1" border="#F08A5D" value={meetingsData.completed} label="Completed" color="#F08A5D" />
+                    <StatCard type="total-purple" value={meetingsData.total} label="Total" />
+                    <StatCard type="completed-purple" value={meetingsData.upcoming} label="Upcoming" />
+                    <StatCard type="inprogress-coral" value={meetingsData.completed} label="Completed" />
                   </div>
                   {meetingsData.chartData.length > 0 && (
                     <ResponsiveContainer width="100%" height={240}>
@@ -389,10 +396,10 @@ const EmployeeDashboard = () => {
               {lndData.total > 0 ? (
                 <>
                   <div className="emp-stats-grid emp-stats-4col">
-                    <StatCard bg="#f3e5f5" border="#6A2C70" value={lndData.total} label="Total Skills" color="#6A2C70" />
-                    <StatCard bg="#ffebf0" border="#FF6B9D" value={lndData.low} label="Rating 1-4" color="#FF6B9D" />
-                    <StatCard bg="#ffe8e1" border="#F08A5D" value={lndData.medium} label="Rating 5-7" color="#F08A5D" />
-                    <StatCard bg="#4a1f54" border="#6A2C70" value={lndData.high} label="Rating 8-10" color="#ffffff" />
+                    <StatCard type="total-purple" value={lndData.total} label="Total Skills" />
+                    <StatCard type="low-rating" value={lndData.low} label="Rating 1-4" />
+                    <StatCard type="medium-rating" value={lndData.medium} label="Rating 5-7" />
+                    <StatCard type="high-rating" value={lndData.high} label="Rating 8-10" />
                   </div>
                   {lndData.chartData.length > 0 && (
                     <ResponsiveContainer width="100%" height={240}>
@@ -428,9 +435,9 @@ const EmployeeDashboard = () => {
               {slaData.total > 0 ? (
                 <>
                   <div className="emp-stats-grid">
-                    <StatCard bg="#f3e5f5" border="#6A2C70" value={slaData.total} label="Total" color="#6A2C70" />
-                    <StatCard bg="#ffe8e1" border="#F08A5D" value={slaData.open} label="Open" color="#F08A5D" />
-                    <StatCard bg="#fce4ec" border="#B83B5E" value={slaData.overdue} label="Overdue" color="#B83B5E" />
+                    <StatCard type="total-purple" value={slaData.total} label="Total" />
+                    <StatCard type="open" value={slaData.open} label="Open" />
+                    <StatCard type="overdue" value={slaData.overdue} label="Overdue" />
                   </div>
                   {slaData.chartData.length > 0 && (
                     <ResponsiveContainer width="100%" height={240}>

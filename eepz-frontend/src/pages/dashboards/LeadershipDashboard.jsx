@@ -286,13 +286,6 @@ const LeadershipDashboard = () => {
     "#b3eceb",
   ];
 
-  const StatCard = ({ bg, border, value, label, color }) => (
-    <div className="leadership-stat-card" style={{ background: bg, border: `2px solid ${border}` }}>
-      <div className="leadership-stat-value" style={{ color }}>{value}</div>
-      <div className="leadership-stat-label" style={{ color }}>{label}</div>
-    </div>
-  );
-
   return (
     <div className="leadership-dashboard-container">
       <Breadcrumb items={[{ label: "Leadership Dashboard" }]} />
@@ -378,42 +371,50 @@ const LeadershipDashboard = () => {
                   <h2>{employeeStatus.total}</h2>
                 </div>
                 <div className="status-bar">
-                  <div
-                    className="status-segment"
-                    style={{
-                      width: `${employeeStatus.fulltimePercent}%`,
-                      backgroundColor: "#005461",
-                    }}
-                  ></div>
-                  <div
-                    className="status-segment"
-                    style={{
-                      width: `${employeeStatus.contractPercent}%`,
-                      backgroundColor: "#018790",
-                    }}
-                  ></div>
-                  <div
-                    className="status-segment"
-                    style={{
-                      width: `${employeeStatus.probationPercent}%`,
-                      backgroundColor: "#00B7B5",
-                    }}
-                  ></div>
-                  <div
-                    className="status-segment"
-                    style={{
-                      width: `${employeeStatus.parttimePercent}%`,
-                      backgroundColor: "#4dd4d2",
-                    }}
-                  ></div>
+                  <div 
+                    className="status-segment segment-fulltime" 
+                    data-width={employeeStatus.fulltimePercent}
+                  />
+                  <div 
+                    className="status-segment segment-contract" 
+                    data-width={employeeStatus.contractPercent}
+                  />
+                  <div 
+                    className="status-segment segment-probation" 
+                    data-width={employeeStatus.probationPercent}
+                  />
+                  <div 
+                    className="status-segment segment-parttime" 
+                    data-width={employeeStatus.parttimePercent}
+                  />
                 </div>
               </div>
 
               <div className="status-grid">
-                <StatCard bg="#e6f4f5" border="#005461" value={employeeStatus.fulltime} label={`Fulltime (${employeeStatus.fulltimePercent}%)`} color="#005461" />
-                <StatCard bg="#e6f7f8" border="#018790" value={employeeStatus.contract} label={`Contract (${employeeStatus.contractPercent}%)`} color="#018790" />
-                <StatCard bg="#e6fbfb" border="#00B7B5" value={employeeStatus.probation} label={`Probation (${employeeStatus.probationPercent}%)`} color="#00B7B5" />
-                <StatCard bg="#f0fffe" border="#4dd4d2" value={employeeStatus.parttime} label={`Part-time (${employeeStatus.parttimePercent}%)`} color="#018790" />
+                <div className="leadership-stat-card stat-card-fulltime">
+                  <div className="leadership-stat-value">{employeeStatus.fulltime}</div>
+                  <div className="leadership-stat-label">
+                    Fulltime ({employeeStatus.fulltimePercent}%)
+                  </div>
+                </div>
+                <div className="leadership-stat-card stat-card-contract">
+                  <div className="leadership-stat-value">{employeeStatus.contract}</div>
+                  <div className="leadership-stat-label">
+                    Contract ({employeeStatus.contractPercent}%)
+                  </div>
+                </div>
+                <div className="leadership-stat-card stat-card-probation">
+                  <div className="leadership-stat-value">{employeeStatus.probation}</div>
+                  <div className="leadership-stat-label">
+                    Probation ({employeeStatus.probationPercent}%)
+                  </div>
+                </div>
+                <div className="leadership-stat-card stat-card-parttime">
+                  <div className="leadership-stat-value">{employeeStatus.parttime}</div>
+                  <div className="leadership-stat-label">
+                    Part-time ({employeeStatus.parttimePercent}%)
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -451,18 +452,8 @@ const LeadershipDashboard = () => {
                     />
                     <XAxis dataKey="name" stroke="#6b7280" fontSize={11} />
                     <YAxis stroke="#6b7280" fontSize={11} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#fff",
-                        border: "1px solid #e5e7eb",
-                        borderRadius: "6px",
-                        fontSize: "12px",
-                      }}
-                      formatter={(value) =>
-                        `₹${Number(value).toLocaleString()}`
-                      }
-                    />
-                    <Legend wrapperStyle={{ fontSize: "12px" }} />
+                    <Tooltip />
+                    <Legend />
                     <Bar
                       dataKey="Total"
                       fill="#005461"
@@ -513,18 +504,7 @@ const LeadershipDashboard = () => {
                       ))}
                     </Pie>
                     <Tooltip />
-                    <Legend
-                      layout="horizontal"
-                      align="center"
-                      verticalAlign="bottom"
-                      wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
-                      formatter={(value, entry) => {
-                        const item = goalStatusDistribution.find(
-                          (d) => d.name === entry.value
-                        );
-                        return `${item?.name || value}: ${item?.value || 0}`;
-                      }}
-                    />
+                    <Legend />
                   </PieChart>
                 </ResponsiveContainer>
               ) : (

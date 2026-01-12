@@ -1,4 +1,4 @@
-/* EMPLOYEE DASHBOARD - CORAL-PINK-PURPLE THEME */
+/* EMPLOYEE DASHBOARD - CORAL-PINK-PURPLE THEME (#F08A5D, #B83B5E, #6A2C70) */
 
 /* LOADING STATE */
 .ada-loading-container {
@@ -124,7 +124,6 @@
   gap: 1.25rem;
 }
 
-/* AUTO-ADJUST FOR 2 CARDS IN SECOND ROW */
 .dashboard-row-2 {
   grid-template-columns: repeat(2, 1fr);
 }
@@ -147,7 +146,7 @@
   grid-column: span 1;
 }
 
-/* CARD HEADER - DARK NAVY BLUE (CONSISTENT WITH ADMIN/HR) */
+/* CARD HEADER - DARK NAVY BLUE */
 .card-header-dark {
   padding: 1rem 1.25rem;
   background: linear-gradient(135deg, #27235c 0%, #3b4d8f 100%);
@@ -191,7 +190,7 @@
   min-height: 240px;
 }
 
-/* STAT CARDS GRID - CORAL-PINK-PURPLE THEMED */
+/* STAT CARDS GRID */
 .emp-stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -203,7 +202,6 @@
   grid-template-columns: repeat(2, 1fr);
 }
 
-/* 4 COLUMN GRID FOR L&D */
 .emp-stats-grid.emp-stats-4col {
   grid-template-columns: repeat(4, 1fr);
 }
@@ -229,6 +227,97 @@
 .emp-stat-label {
   font-size: 0.7rem;
   font-weight: 500;
+}
+
+/* STAT CARDS - PREDEFINED THEME VARIANTS (NO INLINE CSS) */
+.emp-stat-recognition { 
+  background: #ffe8e1 !important; 
+  border: 1px solid #F08A5D !important; 
+}
+.emp-stat-recognition .emp-stat-value,
+.emp-stat-recognition .emp-stat-label { 
+  color: #F08A5D !important; 
+}
+
+.emp-stat-org-noms { 
+  background: #f3e5f5 !important; 
+  border: 1px solid #6A2C70 !important; 
+}
+.emp-stat-org-noms .emp-stat-value,
+.emp-stat-org-noms .emp-stat-label { 
+  color: #6A2C70 !important; 
+}
+
+.emp-stat-total-purple { 
+  background: #f3e5f5 !important; 
+  border: 1px solid #6A2C70 !important; 
+}
+.emp-stat-total-purple .emp-stat-value,
+.emp-stat-total-purple .emp-stat-label { 
+  color: #6A2C70 !important; 
+}
+
+.emp-stat-completed-purple { 
+  background: #4a1f54 !important; 
+  border: 1px solid #6A2C70 !important; 
+}
+.emp-stat-completed-purple .emp-stat-value,
+.emp-stat-completed-purple .emp-stat-label { 
+  color: #ffffff !important; 
+}
+
+.emp-stat-inprogress-coral { 
+  background: #ffe8e1 !important; 
+  border: 1px solid #F08A5D !important; 
+}
+.emp-stat-inprogress-coral .emp-stat-value,
+.emp-stat-inprogress-coral .emp-stat-label { 
+  color: #F08A5D !important; 
+}
+
+.emp-stat-low-rating { 
+  background: #ffebf0 !important; 
+  border: 1px solid #FF6B9D !important; 
+}
+.emp-stat-low-rating .emp-stat-value,
+.emp-stat-low-rating .emp-stat-label { 
+  color: #FF6B9D !important; 
+}
+
+.emp-stat-medium-rating { 
+  background: #ffe8e1 !important; 
+  border: 1px solid #F08A5D !important; 
+}
+.emp-stat-medium-rating .emp-stat-value,
+.emp-stat-medium-rating .emp-stat-label { 
+  color: #F08A5D !important; 
+}
+
+.emp-stat-high-rating { 
+  background: #4a1f54 !important; 
+  border: 1px solid #6A2C70 !important; 
+}
+.emp-stat-high-rating .emp-stat-value,
+.emp-stat-high-rating .emp-stat-label { 
+  color: #ffffff !important; 
+}
+
+.emp-stat-open { 
+  background: #ffe8e1 !important; 
+  border: 1px solid #F08A5D !important; 
+}
+.emp-stat-open .emp-stat-value,
+.emp-stat-open .emp-stat-label { 
+  color: #F08A5D !important; 
+}
+
+.emp-stat-overdue { 
+  background: #fce4ec !important; 
+  border: 1px solid #B83B5E !important; 
+}
+.emp-stat-overdue .emp-stat-value,
+.emp-stat-overdue .emp-stat-label { 
+  color: #B83B5E !important; 
 }
 
 /* TROPHY SECTION - DARK PURPLE */

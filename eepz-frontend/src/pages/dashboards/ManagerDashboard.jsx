@@ -402,7 +402,7 @@ const ManagerDashboard = () => {
             <div className="card-header-dark">
               <div className="card-header-content">
                 <i className="bi bi-award"></i>
-                <h3>My Nominations</h3>
+                <h3> Nominations</h3>
               </div>
             </div>
             <div className="card-body">

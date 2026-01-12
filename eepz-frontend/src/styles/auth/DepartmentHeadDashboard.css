@@ -227,6 +227,106 @@
   font-weight: 500;
 }
 
+/* STAT CARDS - PREDEFINED THEME VARIANTS (NO INLINE CSS) */
+.emp-stat-total { 
+  background: #f0eff5; 
+  border: 2px solid #b9b4c7; 
+}
+.emp-stat-total .emp-stat-value,
+.emp-stat-total .emp-stat-label { 
+  color: #7077a1; 
+}
+
+.emp-stat-completed { 
+  background: #4e5473; 
+  border: 2px solid #7077a1; 
+}
+.emp-stat-completed .emp-stat-value,
+.emp-stat-completed .emp-stat-label { 
+  color: #ffffff; 
+}
+
+.emp-stat-inprogress { 
+  background: #e8e7ef; 
+  border: 2px solid #b9b4c7; 
+}
+.emp-stat-inprogress .emp-stat-value,
+.emp-stat-inprogress .emp-stat-label { 
+  color: #7077a1; 
+}
+
+.emp-stat-pending { 
+  background: #e8e7ef; 
+  border: 2px solid #b9b4c7; 
+}
+.emp-stat-pending .emp-stat-value,
+.emp-stat-pending .emp-stat-label { 
+  color: #7077a1; 
+}
+
+.emp-stat-approved { 
+  background: #4e5473; 
+  border: 2px solid #7077a1; 
+}
+.emp-stat-approved .emp-stat-value,
+.emp-stat-approved .emp-stat-label { 
+  color: #ffffff; 
+}
+
+.emp-stat-rejected { 
+  background: #3d0010; 
+  border: 2px solid #590016; 
+}
+.emp-stat-rejected .emp-stat-value,
+.emp-stat-rejected .emp-stat-label { 
+  color: #ffffff; 
+}
+
+.emp-stat-overdue { 
+  background: #3d0010; 
+  border: 2px solid #590016; 
+}
+.emp-stat-overdue .emp-stat-value,
+.emp-stat-overdue .emp-stat-label { 
+  color: #ffffff; 
+}
+
+.emp-stat-closed { 
+  background: #4e5473; 
+  border: 2px solid #7077a1; 
+}
+.emp-stat-closed .emp-stat-value,
+.emp-stat-closed .emp-stat-label { 
+  color: #ffffff; 
+}
+
+.emp-stat-compliance { 
+  background: #4e5473; 
+  border: 2px solid #7077a1; 
+}
+.emp-stat-compliance .emp-stat-value,
+.emp-stat-compliance .emp-stat-label { 
+  color: #ffffff; 
+}
+
+.emp-stat-ontime { 
+  background: #e8e7ef; 
+  border: 2px solid #b9b4c7; 
+}
+.emp-stat-ontime .emp-stat-value,
+.emp-stat-ontime .emp-stat-label { 
+  color: #7077a1; 
+}
+
+.emp-stat-breached { 
+  background: #3d0010; 
+  border: 2px solid #590016; 
+}
+.emp-stat-breached .emp-stat-value,
+.emp-stat-breached .emp-stat-label { 
+  color: #ffffff; 
+}
+
 /* RESPONSIVE DESIGN */
 @media (max-width: 1400px) {
   .admin-kpi-grid {
