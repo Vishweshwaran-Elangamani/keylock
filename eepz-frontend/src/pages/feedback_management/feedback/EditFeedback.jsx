@@ -126,7 +126,13 @@ export default function EditFeedback() {
             <strong>Error</strong>
             <p>{error}</p>
           </div>
-          <button className="fm-editfb-alert-close"onClick={() => setError("")}> ×</button>
+          <button
+            className="fm-editfb-alert-close"
+            onClick={() => setError("")}
+          >
+            {" "}
+            ×
+          </button>
         </div>
       )}
 
@@ -144,17 +150,30 @@ export default function EditFeedback() {
               <>
                 <div className="fm-editfb-form-group fm-editfb-form-group--half">
                   <label className="fm-editfb-label">Rating (1-5) *</label>
-                  <input type="range" min="1" max="5" className="fm-editfb-range"
-                    value={form.rating} onChange={(e) => setForm({ ...form, rating: e.target.value })
-                    }/>
+                  <input
+                    type="range"
+                    min="1"
+                    max="5"
+                    className="fm-editfb-range"
+                    value={form.rating}
+                    onChange={(e) =>
+                      setForm({ ...form, rating: e.target.value })
+                    }
+                  />
                   <div className="fm-editfb-rating-display">
                     Selected: {form.rating} ⭐
                   </div>
                 </div>
                 <div className="fm-editfb-form-group fm-editfb-form-group--full">
                   <label className="fm-editfb-label">Feedback Comments *</label>
-                  <textarea className="fm-editfb-textarea" rows={4} value={form.feedbackComments}
-                    onChange={(e) => setForm({ ...form, feedbackComments: e.target.value })}placeholder="Update your feedback…"
+                  <textarea
+                    className="fm-editfb-textarea"
+                    rows={4}
+                    value={form.feedbackComments}
+                    onChange={(e) =>
+                      setForm({ ...form, feedbackComments: e.target.value })
+                    }
+                    placeholder="Update your feedback…"
                   />
                 </div>
               </>
@@ -162,9 +181,16 @@ export default function EditFeedback() {
             {type === "peer" && (
               <div className="fm-editfb-form-group fm-editfb-form-group--full">
                 <label className="fm-editfb-label">Feedback Content *</label>
-                <textarea className="fm-editfb-textarea"  rows={4}
-                  value={form.feedbackContent} onChange={(e) =>   setForm({ ...form, feedbackContent: e.target.value }) }
-                  placeholder="Update your feedback…"disabled/>
+                <textarea
+                  className="fm-editfb-textarea"
+                  rows={4}
+                  value={form.feedbackContent}
+                  onChange={(e) =>
+                    setForm({ ...form, feedbackContent: e.target.value })
+                  }
+                  placeholder="Update your feedback…"
+                  disabled
+                />
                 <small className="fm-editfb-help-text">
                   Peer feedback cannot be edited after submission (API
                   limitation).
@@ -172,7 +198,10 @@ export default function EditFeedback() {
               </div>
             )}
             <div className="fm-editfb-form-actions">
-              <button className="fm-editfb-submit-btn" disabled={loading || type === "peer"}>
+              <button
+                className="fm-editfb-submit-btn"
+                disabled={loading || type === "peer"}
+              >
                 <Save size={16} />
                 <span>Save Changes</span>
               </button>

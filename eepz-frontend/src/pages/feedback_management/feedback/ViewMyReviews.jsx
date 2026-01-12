@@ -117,8 +117,16 @@ export default function ViewMyReviews() {
               Reviews you have received from your managers
             </p>
           </div>
-          <button className="vmr-refresh-button" onClick={fetchReviews} disabled={loading} title="Refresh">
-            <RefreshCw size={18} className={loading ? "vmr-refresh-icon-spin" : ""}/>
+          <button
+            className="vmr-refresh-button"
+            onClick={fetchReviews}
+            disabled={loading}
+            title="Refresh"
+          >
+            <RefreshCw
+              size={18}
+              className={loading ? "vmr-refresh-icon-spin" : ""}
+            />
           </button>
         </div>
 
@@ -224,8 +232,13 @@ export default function ViewMyReviews() {
                       {review.projectContext && (
                         <div className="vmr-context-item">
                           <div className="vmr-context-box">
-                            <h6 className="vmr-context-label">Project Context</h6>
-                            <p className="vmr-context-text"> {review.projectContext}</p>
+                            <h6 className="vmr-context-label">
+                              Project Context
+                            </h6>
+                            <p className="vmr-context-text">
+                              {" "}
+                              {review.projectContext}
+                            </p>
                           </div>
                         </div>
                       )}

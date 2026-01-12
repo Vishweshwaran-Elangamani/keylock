@@ -218,7 +218,14 @@ export default function ManagerPeerFeedback() {
           <div className="mgrpeer-alert-content">
             <strong>Error:</strong> {error}
           </div>
-          <button className="mgrpeer-alert-close" onClick={() => setError("")} type="button" > ×</button>
+          <button
+            className="mgrpeer-alert-close"
+            onClick={() => setError("")}
+            type="button"
+          >
+            {" "}
+            ×
+          </button>
         </div>
       )}
 
@@ -228,7 +235,8 @@ export default function ManagerPeerFeedback() {
             <Users size={64} className="mgrpeer-empty-icon" />
             <h5 className="mgrpeer-empty-title">No Peer Feedback Yet</h5>
             <p className="mgrpeer-empty-text">
-              You haven't received any peer feedback. Check back later for feedback from your colleagues.
+              You haven't received any peer feedback. Check back later for
+              feedback from your colleagues.
             </p>
           </div>
         ) : (

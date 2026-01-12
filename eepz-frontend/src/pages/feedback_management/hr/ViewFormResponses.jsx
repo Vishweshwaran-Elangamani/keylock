@@ -55,7 +55,10 @@ export default function ViewFormResponses() {
   return (
     <div className="hfrp-page">
       <div className="hfrp-container">
-        <button className="hfrp-btn hfrp-btn-outline hfrp-back-btn" onClick={() => navigate(-1)}>
+        <button
+          className="hfrp-btn hfrp-btn-outline hfrp-back-btn"
+          onClick={() => navigate(-1)}
+        >
           <ArrowLeft size={16} className="hfrp-inline-icon-left" />
           Back
         </button>
@@ -75,7 +78,10 @@ export default function ViewFormResponses() {
                   <div className="hfrp-card-header">
                     <h6 className="hfrp-employee-name">{resp.employeeName}</h6>
                     <span className="hfrp-status-badge">
-                      <CheckCircle size={12} className="hfrp-inline-icon-left"/>
+                      <CheckCircle
+                        size={12}
+                        className="hfrp-inline-icon-left"
+                      />
                       Submitted
                     </span>
                   </div>

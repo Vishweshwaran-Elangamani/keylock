@@ -106,7 +106,6 @@ export default function FormsList() {
 
   useEffect(() => {
     fetchForms();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (loading) {

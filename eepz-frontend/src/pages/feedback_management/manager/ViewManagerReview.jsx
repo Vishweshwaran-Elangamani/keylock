@@ -108,13 +108,17 @@ export default function ViewManagerReview() {
   const createdDate =
     review &&
     new Date(review.createdAt).toLocaleDateString("en-US", {
-      year: "numeric", month: "short",day: "numeric",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
 
   const submittedDate =
     review && review.submittedDate
       ? new Date(review.submittedDate).toLocaleDateString("en-US", {
-          year: "numeric", month: "short", day: "numeric",
+          year: "numeric",
+          month: "short",
+          day: "numeric",
         })
       : null;
 
@@ -136,13 +140,20 @@ export default function ViewManagerReview() {
   if (!review) {
     return (
       <div className="vmr-overlay" onClick={handleClose}>
-        <div className="vmr-notfound-modal" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="vmr-notfound-modal"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="vmr-notfound-header">
             <div className="vmr-notfound-title">
               <AlertTriangle size={20} />
               <span>Review not found</span>
             </div>
-            <button type="button" className="vmr-icon-btn" onClick={handleClose}>
+            <button
+              type="button"
+              className="vmr-icon-btn"
+              onClick={handleClose}
+            >
               <X size={18} />
             </button>
           </div>
@@ -171,7 +182,11 @@ export default function ViewManagerReview() {
               {review.targetEmployeeName}
             </div>
           </div>
-          <button type="button" className="vmr-icon-btn vmr-header-close" onClick={handleClose}>
+          <button
+            type="button"
+            className="vmr-icon-btn vmr-header-close"
+            onClick={handleClose}
+          >
             <X size={18} />
           </button>
         </div>
@@ -194,8 +209,12 @@ export default function ViewManagerReview() {
               </div>
               <div className="vmr-summary-stars">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={18}className={
-                      i < review.rating ? "vmr-summary-star vmr-summary-star-active"
+                  <Star
+                    key={i}
+                    size={18}
+                    className={
+                      i < review.rating
+                        ? "vmr-summary-star vmr-summary-star-active"
                         : "vmr-summary-star"
                     }
                   />
@@ -273,7 +292,10 @@ export default function ViewManagerReview() {
         </div>
 
         <div className="vmr-footer">
-          <button className="vmr-secondary-btn" onClick={handleClose}> Close</button>
+          <button className="vmr-secondary-btn" onClick={handleClose}>
+            {" "}
+            Close
+          </button>
         </div>
       </div>
     </div>

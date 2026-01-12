@@ -1,8 +1,17 @@
 import React, { useEffect, useState, useMemo } from "react";
 import {
   RefreshCw,
-  AlertTriangle,CheckCircle,Clock,Send,Search,Eye,Zap,
-  Star, Users, Award, MessageSquare,
+  AlertTriangle,
+  CheckCircle,
+  Clock,
+  Send,
+  Search,
+  Eye,
+  Zap,
+  Star,
+  Users,
+  Award,
+  MessageSquare,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -29,8 +38,15 @@ const getFeedbackDashboardPath = (roleName) => {
 
 const StatCard = ({ label, value, Icon, bgColor, iconColor }) => (
   <div className="fm-empdb-stat-card">
-    <div className="fm-empdb-stat-card__icon-wrapper" data-bg={bgColor.replace("#", "")} >
-      <Icon size={24} data-color={iconColor.replace("#", "")} strokeWidth={2.5}/>
+    <div
+      className="fm-empdb-stat-card__icon-wrapper"
+      data-bg={bgColor.replace("#", "")}
+    >
+      <Icon
+        size={24}
+        data-color={iconColor.replace("#", "")}
+        strokeWidth={2.5}
+      />
     </div>
     <div className="fm-empdb-stat-card__content">
       <h2 className="fm-empdb-stat-card__value">{value}</h2>
@@ -224,18 +240,34 @@ export default function FeedbackEmployeeDashboard() {
 
     return [
       {
-        label: "PENDING FORMS", value: pending, Icon: Clock, bgColor: "#fef3c7", iconColor: "#E2B93B",
+        label: "PENDING FORMS",
+        value: pending,
+        Icon: Clock,
+        bgColor: "#fef3c7",
+        iconColor: "#E2B93B",
       },
-      
+
       {
-        label: "SUBMITTED FORMS",value: submitted,Icon: CheckCircle,bgColor: "#dcfce7",iconColor: "#24A148",
+        label: "SUBMITTED FORMS",
+        value: submitted,
+        Icon: CheckCircle,
+        bgColor: "#dcfce7",
+        iconColor: "#24A148",
       },
-      
+
       {
-        label: "REVIEWS RECEIVED",  value: myReviews.length, Icon: Star, bgColor: "#dbeafe", iconColor: "#0F62FE",
+        label: "REVIEWS RECEIVED",
+        value: myReviews.length,
+        Icon: Star,
+        bgColor: "#dbeafe",
+        iconColor: "#0F62FE",
       },
       {
-        label: "PEER FEEDBACK",value: myPeerFeedback.length,Icon: Users,bgColor: "#f8f0ff",iconColor: "#9D4EDD",
+        label: "PEER FEEDBACK",
+        value: myPeerFeedback.length,
+        Icon: Users,
+        bgColor: "#f8f0ff",
+        iconColor: "#9D4EDD",
       },
     ];
   }, [activeHrForms, submittedForms, myReviews, myPeerFeedback]);
@@ -271,8 +303,12 @@ export default function FeedbackEmployeeDashboard() {
           <div className="fm-empdb-alert__content">
             <p className="fm-empdb-alert__text">{error}</p>
           </div>
-          <button type="button" className="fm-empdb-alert__close"
-            onClick={() => setError("")} aria-label="Close"/>
+          <button
+            type="button"
+            className="fm-empdb-alert__close"
+            onClick={() => setError("")}
+            aria-label="Close"
+          />
         </div>
       )}
 

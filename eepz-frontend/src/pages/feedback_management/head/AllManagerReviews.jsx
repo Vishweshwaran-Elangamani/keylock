@@ -185,7 +185,11 @@ export default function AllManagerReviews() {
               View the feedback submitted by managers to their team members
             </p>
           </div>
-          <button  onClick={fetchPeerFeedbacks} disabled={refreshing} className="amr-refresh-btn">
+          <button
+            onClick={fetchPeerFeedbacks}
+            disabled={refreshing}
+            className="amr-refresh-btn"
+          >
             <RefreshCw size={18} className={refreshing ? "amr-spin" : ""} />
             Refresh
           </button>
@@ -208,22 +212,39 @@ export default function AllManagerReviews() {
           <div className="amr-filter-content">
             <div className="amr-filter-wrapper">
               <div className="amr-dd">
-                <button type="button" className={`amr-dd-trigger ${   isManagerOpen ? "amr-dd-open" : "" }`}
-                  onClick={() => setIsManagerOpen((o) => !o)}>
-                  <span className="amr-dd-trigger-text"> {selectedManagerLabel}</span>
+                <button
+                  type="button"
+                  className={`amr-dd-trigger ${
+                    isManagerOpen ? "amr-dd-open" : ""
+                  }`}
+                  onClick={() => setIsManagerOpen((o) => !o)}
+                >
+                  <span className="amr-dd-trigger-text">
+                    {" "}
+                    {selectedManagerLabel}
+                  </span>
                   <span className="amr-dd-arrow" />
                 </button>
 
                 {isManagerOpen && (
                   <div className="amr-dd-menu">
-                    <button type="button" className="amr-dd-item amr-dd-header" onClick={() => {
-                        setSelectedManager("All");setIsManagerOpen(false);
-                      }}>
+                    <button
+                      type="button"
+                      className="amr-dd-item amr-dd-header"
+                      onClick={() => {
+                        setSelectedManager("All");
+                        setIsManagerOpen(false);
+                      }}
+                    >
                       All Managers
                     </button>
 
                     {managers.map((m) => (
-                      <button key={m.id} type="button" className="amr-dd-item"onClick={() => {
+                      <button
+                        key={m.id}
+                        type="button"
+                        className="amr-dd-item"
+                        onClick={() => {
                           setSelectedManager(String(m.id));
                           setIsManagerOpen(false);
                         }}

@@ -46,10 +46,14 @@ export default function ViewMyPeerFeedback() {
 
   const checkIsAnonymous = (feedback) => {
     return Boolean(
-      feedback.isAnonymous === true || feedback.isAnonymous === 1 ||
-        feedback.anonymous === true || feedback.anonymous === 1 ||
-         feedback.is_anonymous === true || feedback.is_anonymous === 1 ||
-        feedback.IsAnonymous === true || feedback.IsAnonymous === 1
+      feedback.isAnonymous === true ||
+        feedback.isAnonymous === 1 ||
+        feedback.anonymous === true ||
+        feedback.anonymous === 1 ||
+        feedback.is_anonymous === true ||
+        feedback.is_anonymous === 1 ||
+        feedback.IsAnonymous === true ||
+        feedback.IsAnonymous === 1
     );
   };
 
@@ -61,7 +65,9 @@ export default function ViewMyPeerFeedback() {
     }
 
     return (
-      feedback.submittedByName || feedback.submitterName || `Employee ${feedback.submittedByEmployeeId}`
+      feedback.submittedByName ||
+      feedback.submitterName ||
+      `Employee ${feedback.submittedByEmployeeId}`
     );
   };
 
@@ -176,7 +182,8 @@ export default function ViewMyPeerFeedback() {
   return (
     <div className="fm-viewpeer-page-wrapper">
       <div className="fm-viewpeer-container">
-        <FeedbackBreadcrumb items={[
+        <FeedbackBreadcrumb
+          items={[
             {
               label: "Feedback Management",
               path: "/employee/dashboard/feedback",
@@ -192,7 +199,11 @@ export default function ViewMyPeerFeedback() {
               <strong>Error</strong>
               <p className="mb-0 mt-1">{error}</p>
             </div>
-            <button type="button" className="btn-close" onClick={() => setError("")}/>
+            <button
+              type="button"
+              className="btn-close"
+              onClick={() => setError("")}
+            />
           </div>
         )}
 
@@ -230,7 +241,10 @@ export default function ViewMyPeerFeedback() {
               return (
                 <div
                   className="fm-viewpeer-card"
-                  key={feedback.queueId || feedback.QueueId || feedback.peerQueueId }>
+                  key={
+                    feedback.queueId || feedback.QueueId || feedback.peerQueueId
+                  }
+                >
                   <div
                     className={`fm-viewpeer-card__indicator ${
                       isAnon
@@ -242,7 +256,9 @@ export default function ViewMyPeerFeedback() {
                   <div className="fm-viewpeer-card__header">
                     <div className="fm-viewpeer-card__sender">
                       {isAnon ? (
-                        <Lock size={18} className="fm-viewpeer-card__icon fm-viewpeer-card__icon--anonymous"
+                        <Lock
+                          size={18}
+                          className="fm-viewpeer-card__icon fm-viewpeer-card__icon--anonymous"
                         />
                       ) : (
                         <User

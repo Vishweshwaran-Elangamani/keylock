@@ -264,10 +264,7 @@ const SLACompliance = () => {
             title="Table View"
             aria-pressed={viewMode === "table"}
           >
-            <i
-              className="bi bi-table sla-toggle-icon"
-              aria-hidden="true"
-            ></i>
+            <i className="bi bi-table sla-toggle-icon" aria-hidden="true"></i>
             <span className="visually-hidden">Table View</span>
           </button>
 

@@ -1,8 +1,20 @@
 import React, { useEffect, useState, useMemo } from "react";
 import {
-  RefreshCw,AlertTriangle,FileText,Eye,Search,Zap,
-  Plus,Send,Users,CheckCircle,Clock,Star,Briefcase,
-  XCircle,ArrowRight,
+  RefreshCw,
+  AlertTriangle,
+  FileText,
+  Eye,
+  Search,
+  Zap,
+  Plus,
+  Send,
+  Users,
+  CheckCircle,
+  Clock,
+  Star,
+  Briefcase,
+  XCircle,
+  ArrowRight,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -18,7 +30,11 @@ const StatCard = ({ label, value, Icon, color, bgColor }) => (
   <div className="fb-hr-stat-card">
     <div className="fb-hr-stat-card__row">
       <div className="fb-hr-stat-card__icon" data-bg={bgColor.replace("#", "")}>
-        <Icon size={28} className="fb-hr-stat-card__icon-svg" data-color={color.replace("#", "")}/>
+        <Icon
+          size={28}
+          className="fb-hr-stat-card__icon-svg"
+          data-color={color.replace("#", "")}
+        />
       </div>
       <div className="fb-hr-stat-card__info">
         <h2 className="fb-hr-stat-card__value">{value}</h2>
@@ -29,12 +45,24 @@ const StatCard = ({ label, value, Icon, color, bgColor }) => (
 );
 
 const HeroActionCard = ({
-  title,description,icon: Icon,to,iconBg,iconColor,
+  title,
+  description,
+  icon: Icon,
+  to,
+  iconBg,
+  iconColor,
 }) => (
   <Link to={to} className="fb-hr-action-card-link">
     <div className="fb-hr-action-card">
-      <div className="fb-hr-action-card__icon-wrapper"data-bg={iconBg.replace("#", "")}>
-        <Icon size={24} className="fb-hr-action-card__icon-svg" data-color={iconColor.replace("#", "")}/>
+      <div
+        className="fb-hr-action-card__icon-wrapper"
+        data-bg={iconBg.replace("#", "")}
+      >
+        <Icon
+          size={24}
+          className="fb-hr-action-card__icon-svg"
+          data-color={iconColor.replace("#", "")}
+        />
       </div>
       <div className="fb-hr-action-card__content">
         <h5 className="fb-hr-action-card__title">{title}</h5>
@@ -196,17 +224,33 @@ export default function FeedbackHRDashboard() {
 
     return [
       {
-        label: "Total Feedback",value: feedback.length,Icon: Briefcase,color: "#3B82F6",bgColor: "#DBEAFE",
+        label: "Total Feedback",
+        value: feedback.length,
+        Icon: Briefcase,
+        color: "#3B82F6",
+        bgColor: "#DBEAFE",
       },
-      
+
       {
-        label: "Active Forms",  value: activeHrForms.length,  Icon: CheckCircle,color: "#10B981",bgColor: "#D1FAE5",
+        label: "Active Forms",
+        value: activeHrForms.length,
+        Icon: CheckCircle,
+        color: "#10B981",
+        bgColor: "#D1FAE5",
       },
       {
-        label: "Pending Forms",value: pendingForms,Icon: Clock,color: "#F59E0B",bgColor: "#FEF3C7",
+        label: "Pending Forms",
+        value: pendingForms,
+        Icon: Clock,
+        color: "#F59E0B",
+        bgColor: "#FEF3C7",
       },
       {
-        label: "Reviews Received",value: myReviews.length,Icon: Star,color: "#8B5CF6",bgColor: "#EDE9FE",
+        label: "Reviews Received",
+        value: myReviews.length,
+        Icon: Star,
+        color: "#8B5CF6",
+        bgColor: "#EDE9FE",
       },
     ];
   }, [feedback, activeHrForms, submittedForms, myReviews]);
@@ -236,7 +280,11 @@ export default function FeedbackHRDashboard() {
               <p className="fb-hr-alert__error-text">{error}</p>
             </div>
             <button
-              type="button" className="fb-hr-alert__close-btn" onClick={() => setError("")} aria-label="Close">
+              type="button"
+              className="fb-hr-alert__close-btn"
+              onClick={() => setError("")}
+              aria-label="Close"
+            >
               <XCircle size={18} />
             </button>
           </div>
@@ -251,23 +299,32 @@ export default function FeedbackHRDashboard() {
         </div>
 
         <div className="fb-hr-action-cards-row">
-          <HeroActionCard  title="View All Feedback"
+          <HeroActionCard
+            title="View All Feedback"
             description="Browse, search, and manage all feedback submissions from employees."
-            icon={Search}  to="/hr/dashboard/feedback/hrformlist" iconBg="#EDE9FE"
-            iconColor="#8B5CF6"/>
+            icon={Search}
+            to="/hr/dashboard/feedback/hrformlist"
+            iconBg="#EDE9FE"
+            iconColor="#8B5CF6"
+          />
 
           <HeroActionCard
             title="Create New Form"
             description="Design and publish custom feedback forms for performance reviews."
-            icon={Plus}  to="/hr/dashboard/feedback/create-form"
-            iconBg="#FECDD3"iconColor="#E11D48"
+            icon={Plus}
+            to="/hr/dashboard/feedback/create-form"
+            iconBg="#FECDD3"
+            iconColor="#E11D48"
           />
 
           <HeroActionCard
             title="Submit Mentor Feedback"
             description="Provide valuable feedback and guidance to mentees and team members."
-            icon={Send} to="/hr/dashboard/feedback/submit-mentor"
-            iconBg="#DBEAFE"iconColor="#3B82F6"/>
+            icon={Send}
+            to="/hr/dashboard/feedback/submit-mentor"
+            iconBg="#DBEAFE"
+            iconColor="#3B82F6"
+          />
         </div>
 
         {myPeerFeedback.length > 0 && (

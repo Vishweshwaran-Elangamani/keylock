@@ -107,7 +107,10 @@ export default function ViewMyPeerFeedback() {
       <div className="hrq-container">
         <div className="hrq-header">
           <div className="hrq-header-left">
-            <button className="hrq-btn hrq-btn-outline hrq-btn-back"onClick={() => navigate(-1)}>
+            <button
+              className="hrq-btn hrq-btn-outline hrq-btn-back"
+              onClick={() => navigate(-1)}
+            >
               <ArrowLeft size={16} />
             </button>
             <div className="hrq-header-text">
@@ -117,7 +120,12 @@ export default function ViewMyPeerFeedback() {
               </p>
             </div>
           </div>
-          <button className="hrq-btn hrq-btn-outline hrq-btn-refresh" onClick={handleRefresh} disabled={refreshing} title="Refresh">
+          <button
+            className="hrq-btn hrq-btn-outline hrq-btn-refresh"
+            onClick={handleRefresh}
+            disabled={refreshing}
+            title="Refresh"
+          >
             <RefreshCw
               size={18}
               className={refreshing ? "hrq-icon-spin" : ""}
@@ -134,7 +142,10 @@ export default function ViewMyPeerFeedback() {
                 <p className="hrq-alert-text">{error}</p>
               </div>
             </div>
-            <button className="hrq-alert-close" onClick={() => setError("")}> × </button>
+            <button className="hrq-alert-close" onClick={() => setError("")}>
+              {" "}
+              ×{" "}
+            </button>
           </div>
         )}
 
@@ -147,7 +158,10 @@ export default function ViewMyPeerFeedback() {
                 </div>
                 <div>
                   <h5 className="hrq-stat-number">{peerFeedback.length}</h5>
-                  <small className="hrq-stat-label"> Peer Feedback Received</small>
+                  <small className="hrq-stat-label">
+                    {" "}
+                    Peer Feedback Received
+                  </small>
                 </div>
               </div>
             </div>
@@ -192,7 +206,10 @@ export default function ViewMyPeerFeedback() {
                       <div className="hrq-feedback-status-wrap">
                         <span
                           className={`hrq-status-chip ${
-                            feedback.status === "Approved" ? "hrq-status-chip-approved" : "hrq-status-chip-default"}`}
+                            feedback.status === "Approved"
+                              ? "hrq-status-chip-approved"
+                              : "hrq-status-chip-default"
+                          }`}
                         >
                           {feedback.status || "Pending"}
                         </span>

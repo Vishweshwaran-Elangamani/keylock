@@ -164,8 +164,11 @@ const EmployeeMomDashboard = () => {
         <nav aria-label="breadcrumb" className="emd-breadcrumb">
           <ol className="emd-breadcrumb-list">
             <li className="emd-breadcrumb-item">
-              <button onClick={() => navigate("/employee/dashboard")}
-                className="emd-breadcrumb-link emd-breadcrumb-home"type="button">
+              <button
+                onClick={() => navigate("/employee/dashboard")}
+                className="emd-breadcrumb-link emd-breadcrumb-home"
+                type="button"
+              >
                 <Home size={20} />
               </button>
             </li>
@@ -177,38 +180,64 @@ const EmployeeMomDashboard = () => {
         </nav>
 
         <div className="row g-3 emd-stats-row">
-          <StatCard icon="bi-file-text"
-            bgColor="#EDF3FF" iconColor="#246BFF"  count={stats.myMoms} label="MY MOMS"
-            onClick={() => navigate("/employee/dashboard/meetmom/my-moms")}/>
-          
-          <StatCard icon="bi-clock-history"
-            bgColor="#F0EAFF" iconColor="#A855F7" count={stats.pendingActionItems} label="PENDING ACTIONS"
-            onClick={() => navigate("/employee/dashboard/meetmom/action-items")} />
+          <StatCard
+            icon="bi-file-text"
+            bgColor="#EDF3FF"
+            iconColor="#246BFF"
+            count={stats.myMoms}
+            label="MY MOMS"
+            onClick={() => navigate("/employee/dashboard/meetmom/my-moms")}
+          />
 
-          <StatCard icon="bi-envelope-open" 
-            bgColor="#E9FBF4" iconColor="#16A34A"  count={stats.meetingInvitations} label="INVITATIONS"
-            onClick={() => navigate("/employee/dashboard/meetmom/invitations")} />
-         
-          <StatCard icon="bi-share"
-            bgColor="#FFF4DF"iconColor="#F59E0B"count={stats.sharedMoms}label="SHARED MOMS"
-            onClick={openSharedModal} />
+          <StatCard
+            icon="bi-clock-history"
+            bgColor="#F0EAFF"
+            iconColor="#A855F7"
+            count={stats.pendingActionItems}
+            label="PENDING ACTIONS"
+            onClick={() => navigate("/employee/dashboard/meetmom/action-items")}
+          />
+
+          <StatCard
+            icon="bi-envelope-open"
+            bgColor="#E9FBF4"
+            iconColor="#16A34A"
+            count={stats.meetingInvitations}
+            label="INVITATIONS"
+            onClick={() => navigate("/employee/dashboard/meetmom/invitations")}
+          />
+
+          <StatCard
+            icon="bi-share"
+            bgColor="#FFF4DF"
+            iconColor="#F59E0B"
+            count={stats.sharedMoms}
+            label="SHARED MOMS"
+            onClick={openSharedModal}
+          />
         </div>
 
         <div className="emp-momupdate-buttons-wrapper">
           <div className="emp-momupdate-buttons-grid">
-            <button type="button" className={`emp-momupdate-btn ${
-                empMomActive === "myMoms" ? "active" : "" }`}
-              onClick={() => { setEmpMomActive("myMoms");
-                navigate("/employee/dashboard/meetmom/my-moms");}}
-              
-              title="My MOMs">
+            <button
+              type="button"
+              className={`emp-momupdate-btn ${
+                empMomActive === "myMoms" ? "active" : ""
+              }`}
+              onClick={() => {
+                setEmpMomActive("myMoms");
+                navigate("/employee/dashboard/meetmom/my-moms");
+              }}
+              title="My MOMs"
+            >
               <span className="emp-momupdate-btn-icon">
                 <i className="bi bi-person"></i>
               </span>
               <span className="emp-momupdate-btn-label">My MOMs</span>
             </button>
 
-            <button type="button"
+            <button
+              type="button"
               className={`emp-momupdate-btn ${
                 empMomActive === "sharedMoms" ? "active" : ""
               }`}
