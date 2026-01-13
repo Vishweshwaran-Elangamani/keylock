@@ -10,7 +10,7 @@ const slaApi = axios.create({
 });
 
 const employeeApi = axios.create({
-  baseURL: `${API_EMP}/api/EmployeeManagement`,
+  baseURL: `${API_EMP}/api/employees`,
   headers: { "Content-Type": "application/json" },
   timeout: 30000,
 });
@@ -464,7 +464,7 @@ const slaService = {
 
   getAllEmployees: async () => {
     try {
-      return await employeeApi.get("/all");
+      return await employeeApi.get("/allEmployees");
     } catch (error) {
       console.error("Error fetching employees:", error);
       throw error;
@@ -482,7 +482,7 @@ const slaService = {
 
   getEmployeeById: async (id) => {
     try {
-      return await employeeApi.get(`/${id}`);
+      return await employeeApi.get(`employeeId/${id}`);
     } catch (error) {
       console.error("Error fetching employee:", error);
       throw error;
