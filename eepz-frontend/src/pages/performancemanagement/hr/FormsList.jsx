@@ -8,7 +8,6 @@ import { apiPort5113 } from "../../../services/performancemanagement/api/rolesap
 import ViewFormDetailsModal from "../../../components/performance_management/modals/FormsList/ViewFormDetailsModal";
 import DeadlineModal from "../../../components/performance_management/modals/FormsList/DeadlineModal";
 import "../../../styles/performancemanagement/hr/FormList.css";
-import "bootstrap-icons/font/bootstrap-icons.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 
 const CustomDropdown = ({
@@ -67,10 +66,12 @@ function FormsList() {
 
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const [users, setUsers] = useState([]);
   const [selectedFormId, setSelectedFormId] = useState(null);
   const [selectedUserIds, setSelectedUserIds] = useState([]);
   const [assignedUserIds, setAssignedUserIds] = useState([]);
+
   const [sharing, setSharing] = useState(false);
   const [showDeadlineModal, setShowDeadlineModal] = useState(false);
   const [deadlineInDays, setDeadlineInDays] = useState(7);
@@ -142,12 +143,13 @@ function FormsList() {
     );
   }
 
+  // current user
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
         const storedUserId = localStorage.getItem("userId");
         if (storedUserId) {
-          setCurrentUserId(parseInt(storedUserId));
+          setCurrentUserId(parseInt(storedUserId, 10));
           return;
         }
         const res = await api.get("/Auth/current-user");
@@ -167,6 +169,7 @@ function FormsList() {
     fetchCurrentUser();
   }, []);
 
+  // all forms
   useEffect(() => {
     let mounted = true;
     api
@@ -178,7 +181,9 @@ function FormsList() {
       })
       .catch(() => toast.error("Failed to load forms."))
       .finally(() => mounted && setLoading(false));
-    return () => (mounted = false);
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const fetchAssignedUsers = useCallback(async (formId) => {
@@ -195,34 +200,43 @@ function FormsList() {
     }
   }, []);
 
+  // eligible users for selected form
   useEffect(() => {
     if (!selectedFormId) {
       setUsers([]);
       setAssignedUserIds([]);
       return;
     }
+
     const fetchUsersBasedOnFormType = async () => {
       try {
         const selectedForm = rows.find((f) => f.formId === selectedFormId);
         if (!selectedForm) return;
+
         const creatorId = selectedForm?.createdBy;
 
         const assignedIds = await fetchAssignedUsers(selectedFormId);
         setAssignedUserIds(assignedIds);
 
         let filteredUsersData = [];
+
         if (selectedForm.type === "Manager") {
+          // managers
           const managersRes = await apiPort5113.get("/Employees/all-managers");
           filteredUsersData = Array.isArray(managersRes.data?.data)
             ? managersRes.data.data
             : [];
         } else {
-          const usersRes = await api.get("/Assignments/upcoming-eligible");
+          // NOTE: pass formId so backend returns only still-eligible users
+          const usersRes = await api.get(
+            `/Assignments/upcoming-eligible?formId=${selectedFormId}`
+          );
           filteredUsersData = Array.isArray(usersRes.data?.data)
             ? usersRes.data.data
             : [];
         }
 
+        // role filter
         filteredUsersData = filteredUsersData.filter((u) => {
           const role = (
             u.role ||
@@ -237,12 +251,14 @@ function FormsList() {
           return role !== "HR" && role !== "ADMIN";
         });
 
+        // remove creator and already assigned
         filteredUsersData = filteredUsersData.filter(
           (u) =>
             u.userId !== creatorId &&
             !assignedIds.map(String).includes(String(u.userId))
         );
 
+        // search filter
         if (userSearchQuery.trim() !== "") {
           const query = userSearchQuery.toLowerCase();
           filteredUsersData = filteredUsersData.filter(
@@ -258,6 +274,7 @@ function FormsList() {
         toast.error("Failed to load eligible users");
       }
     };
+
     fetchUsersBasedOnFormType();
   }, [
     selectedFormId,
@@ -276,11 +293,15 @@ function FormsList() {
             form.name?.toLowerCase().includes(query) ||
             form.type?.toLowerCase().includes(query)
           )
-        )
+        ) {
           return false;
+        }
       }
-      if (formTypeFilter !== "All" && form.type !== formTypeFilter)
+
+      if (formTypeFilter !== "All" && form.type !== formTypeFilter) {
         return false;
+      }
+
       if (formDeliveryFilter !== "All") {
         if (formDeliveryFilter === "Delivery and Enablement") {
           if (form.deliveryEnablement !== undefined) {
@@ -297,10 +318,11 @@ function FormsList() {
           } else {
             return false;
           }
-        } else {
-          if (form.deliveryEnablement !== formDeliveryFilter) return false;
+        } else if (form.deliveryEnablement !== formDeliveryFilter) {
+          return false;
         }
       }
+
       return true;
     });
   }, [rows, formSearchQuery, formTypeFilter, formDeliveryFilter]);
@@ -357,22 +379,20 @@ function FormsList() {
   };
 
   const handleSelectAll = () => {
-    const eligibleUsers = users.filter(
-      (u) => !assignedUserIds.includes(u.userId)
-    );
-    const allSelected = eligibleUsers.every((u) =>
+    const eligible = users.filter((u) => !assignedUserIds.includes(u.userId));
+    const allSelected = eligible.every((u) =>
       selectedUserIds.includes(u.userId)
     );
+
     if (allSelected) {
       setSelectedUserIds([]);
       toast.success("All users deselected");
     } else {
-      setSelectedUserIds(eligibleUsers.map((u) => u.userId));
-      toast.success(`Selected ${eligibleUsers.length} users`);
+      setSelectedUserIds(eligible.map((u) => u.userId));
+      toast.success(`Selected ${eligible.length} users`);
     }
   };
 
-  // Clear all filters function
   const handleClearFilters = () => {
     setFormSearchQuery("");
     setFormSearchInput("");
@@ -382,7 +402,6 @@ function FormsList() {
     toast.success("Filters cleared");
   };
 
-  // Check if any filters are active
   const hasActiveFilters =
     formSearchQuery !== "" ||
     formTypeFilter !== "All" ||
@@ -419,10 +438,12 @@ function FormsList() {
       );
       return;
     }
+
     setSharing(true);
     const loadingToast = toast.loading(
       actionType === "Send" ? "Sharing form to users..." : "Saving as draft..."
     );
+
     try {
       const payload = {
         formId: selectedFormId,
@@ -437,6 +458,7 @@ function FormsList() {
       if (data?.success) {
         const appraisals = data.data || [];
         const skipped = data.skipped || [];
+
         const successfulUserIds = appraisals
           .map((a) => a.userId || a.UserId || a.employeeId || a.EmployeeId)
           .filter(Boolean);
@@ -473,16 +495,13 @@ function FormsList() {
             { id: loadingToast }
           );
         }
-        if (skipped.length > 0) {
-          const skippedInfo = skipped
-            .map((s) => `User ${s.UserId || s.userId}: ${s.Reason}`)
-            .join(", ");
-        }
+
         if (appraisals.length === 0 && skipped.length > 0) {
           toast.info(`Selected user(s) already have this form assigned.`, {
             id: loadingToast,
           });
         }
+
         if (appraisals.length === 0 && skipped.length === 0) {
           toast.error("No appraisals were assigned.", { id: loadingToast });
         }
@@ -499,7 +518,7 @@ function FormsList() {
           ? "Failed to share form."
           : "Failed to save draft.");
       toast.error(errorMsg, { id: loadingToast });
-      console.error(" Error details:", e.response?.data);
+      console.error("Error details:", e.response?.data);
     } finally {
       setSharing(false);
     }
@@ -528,7 +547,6 @@ function FormsList() {
     };
   }, [rows, assignedUserIds]);
 
-  /* Custom Pagination Dropdown Component */
   const PaginationDropdown = ({ value, onChange, options }) => {
     const [open, setOpen] = useState(false);
 
@@ -872,13 +890,14 @@ function FormsList() {
               </div>
             </div>
           </div>
-          {/* Users Panel */}
 
+          {/* Users Panel */}
           <div className="flp-users-panel">
             <div className="flp-panel-header">
               <h3>
                 <i className="bi bi-people-fill"></i> Select Users
               </h3>
+
               {selectedFormId && (
                 <div className="flp-users-filters">
                   <div
@@ -958,11 +977,13 @@ function FormsList() {
                     <i className="bi bi-check-circle-fill"></i>
                     <strong>{selectedUserIds.length}</strong> user(s) selected
                   </div>
+
                   {pagedUsers.map((user) => {
                     const isAssigned = assignedUserIds
                       .map(String)
                       .includes(String(user.userId));
                     const isSelected = selectedUserIds.includes(user.userId);
+
                     return (
                       <div
                         key={user.userId}
@@ -1061,7 +1082,8 @@ function FormsList() {
                 disabled={
                   !selectedFormId ||
                   selectedUserIds.length === 0 ||
-                  !currentUserId
+                  !currentUserId ||
+                  sharing
                 }
               >
                 <i className="bi bi-send-fill"></i> Share
@@ -1073,4 +1095,5 @@ function FormsList() {
     </div>
   );
 }
+
 export default FormsList;
