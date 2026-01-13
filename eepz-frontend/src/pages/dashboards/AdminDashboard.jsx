@@ -166,7 +166,7 @@ const AdminDashboard = () => {
   return (
     <div className="ada-dashboard">
       <Breadcrumb items={[{ label: "Admin Dashboard" }]} />
-      
+
       <div className="ada-stats-grid">
         {[
           { icon: Users, value: stats.totalUsers, label: "Total Users", trend: `${Math.abs(stats.growthRate)}% vs last month`, up: stats.growthRate >= 0 },
@@ -176,7 +176,7 @@ const AdminDashboard = () => {
           { icon: UserPlus, value: stats.weeklyNewUsers, label: "New This Week", trend: "Last 7 days" }
         ].map(({ icon: Icon, value, label, trend, up }, i) => (
           <div key={i} className="ada-stat-card">
-            <div className={`ada-stat-icon ada-stat-icon-${['primary','warning','info','purple','cyan'][i]}`}>
+            <div className={`ada-stat-icon ada-stat-icon-${['primary', 'warning', 'info', 'purple', 'cyan'][i]}`}>
               <Icon size={28} />
             </div>
             <div className="ada-stat-content">

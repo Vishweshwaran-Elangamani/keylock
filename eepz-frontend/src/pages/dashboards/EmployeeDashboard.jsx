@@ -20,6 +20,9 @@ const EmployeeDashboard = () => {
     performance: { myRecognitions: [], stats: null }
   });
 
+
+  const BLUE_COLORS = ["#1E40AF", "#3B82F6", "#60A5FA", "#93C5FD", "#DBEAFE", "#2563EB"];
+
   useEffect(() => { fetchAllData(); }, []);
 
   const getUserData = () => {
@@ -46,7 +49,7 @@ const EmployeeDashboard = () => {
       }
 
       const empId = user.empMasterId || user.employeeMasterId || user.id;
-      const [selfGoalsRes, orgGoalsRes, teamGoalsRes, myLndAssignmentsRes, myLndSkillsRes, myMeetingsRes, mySlasRes, approvedProfilesRes, statsRes] = 
+      const [selfGoalsRes, orgGoalsRes, teamGoalsRes, myLndAssignmentsRes, myLndSkillsRes, myMeetingsRes, mySlasRes, approvedProfilesRes, statsRes] =
         await Promise.all([
           goalService.queryGoals({ type: "self", pageSize: 1000 }).catch(() => ({ data: [] })),
           goalService.queryGoals({ type: "org", pageSize: 1000 }).catch(() => ({ data: [] })),
@@ -109,8 +112,12 @@ const EmployeeDashboard = () => {
       byRewardType[type] = (byRewardType[type] || 0) + 1;
     });
 
-    const COLORS = ["#F08A5D", "#B83B5E", "#6A2C70", "#FF6B9D", "#C06C84", "#E8777D"];
-    const chartData = Object.entries(byRewardType).map(([name, value], i) => ({ name, value, fill: COLORS[i % COLORS.length] }));
+
+    const chartData = Object.entries(byRewardType).map(([name, value], i) => ({
+      name,
+      value,
+      fill: BLUE_COLORS[i % BLUE_COLORS.length]
+    }));
 
     return {
       totalRecognitions: myRecognitions.length,
@@ -127,10 +134,11 @@ const EmployeeDashboard = () => {
     const inProgress = goals.filter(g => (g.status || g.goalStatus || "").toLowerCase() === "inprogress").length;
     const pending = goals.filter(g => ["pending", "open", "approved"].includes((g.status || g.goalStatus || "").toLowerCase())).length;
 
+
     const chartData = [
-      completed > 0 && { name: "Completed", value: completed, fill: "#6A2C70" },
-      inProgress > 0 && { name: "In Progress", value: inProgress, fill: "#F08A5D" },
-      pending > 0 && { name: "Pending", value: pending, fill: "#FF6B9D" }
+      completed > 0 && { name: "Completed", value: completed, fill: BLUE_COLORS[0] },
+      inProgress > 0 && { name: "In Progress", value: inProgress, fill: BLUE_COLORS[1] },
+      pending > 0 && { name: "Pending", value: pending, fill: BLUE_COLORS[2] }
     ].filter(Boolean);
 
     return { total: goals.length, completed, inProgress, pending, chartData };
@@ -150,10 +158,11 @@ const EmployeeDashboard = () => {
       }
     });
 
+
     const chartData = [
-      low > 0 && { name: "Rating 1-4", value: low, fill: "#FF6B9D" },
-      medium > 0 && { name: "Rating 5-7", value: medium, fill: "#F08A5D" },
-      high > 0 && { name: "Rating 8-10", value: high, fill: "#6A2C70" }
+      low > 0 && { name: "Rating 1-4", value: low, fill: BLUE_COLORS[2] },
+      medium > 0 && { name: "Rating 5-7", value: medium, fill: BLUE_COLORS[1] },
+      high > 0 && { name: "Rating 8-10", value: high, fill: BLUE_COLORS[0] }
     ].filter(Boolean);
 
     return { total: skills.length, low, medium, high, chartData };
@@ -188,16 +197,16 @@ const EmployeeDashboard = () => {
     const open = slas.length - closed;
     const overdue = slas.filter(s => isOverdue(s.deadline || s.dueDate)).length;
 
+
     const chartData = [
-      open > 0 && { name: "Open / In Progress", value: open, fill: "#F08A5D" },
-      overdue > 0 && { name: "Overdue", value: overdue, fill: "#B83B5E" },
-      closed > 0 && { name: "Closed", value: closed, fill: "#6A2C70" }
+      open > 0 && { name: "Open / In Progress", value: open, fill: BLUE_COLORS[1] },
+      overdue > 0 && { name: "Overdue", value: overdue, fill: BLUE_COLORS[3] },
+      closed > 0 && { name: "Closed", value: closed, fill: BLUE_COLORS[0] }
     ].filter(Boolean);
 
     return { total: slas.length, open, overdue, closed, chartData };
   };
 
- 
   const StatCard = ({ type, value, label }) => (
     <div className={`emp-stat-card emp-stat-${type}`}>
       <div className="emp-stat-value">{value}</div>
@@ -283,12 +292,12 @@ const EmployeeDashboard = () => {
                             <div className="emp-recognition-info">
                               <div className="emp-recognition-name">{item.name}</div>
                               <div className="emp-recognition-bar">
-                                <div 
-                                  className="emp-recognition-fill" 
-                                  style={{ 
+                                <div
+                                  className="emp-recognition-fill"
+                                  style={{
                                     '--fill-width': `${(item.value / perfOverview.totalRecognitions) * 100}%`,
-                                    '--fill-color': item.fill 
-                                  }} 
+                                    '--fill-color': item.fill
+                                  }}
                                 />
                               </div>
                             </div>
@@ -363,15 +372,15 @@ const EmployeeDashboard = () => {
                       <AreaChart data={meetingsData.chartData}>
                         <defs>
                           <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#F08A5D" stopOpacity={0.8} />
-                            <stop offset="95%" stopColor="#F08A5D" stopOpacity={0.1} />
+                            <stop offset="5%" stopColor={BLUE_COLORS[2]} stopOpacity={0.8} />
+                            <stop offset="95%" stopColor={BLUE_COLORS[2]} stopOpacity={0.1} />
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
                         <XAxis dataKey="month" stroke="#9ca3af" fontSize={10} />
                         <YAxis stroke="#9ca3af" fontSize={11} />
                         <Tooltip contentStyle={{ backgroundColor: "#fff", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "12px" }} />
-                        <Area type="monotone" dataKey="count" stroke="#F08A5D" strokeWidth={2} fillOpacity={1} fill="url(#colorCount)" />
+                        <Area type="monotone" dataKey="count" stroke={BLUE_COLORS[2]} strokeWidth={2} fillOpacity={1} fill="url(#colorCount)" />
                       </AreaChart>
                     </ResponsiveContainer>
                   )}

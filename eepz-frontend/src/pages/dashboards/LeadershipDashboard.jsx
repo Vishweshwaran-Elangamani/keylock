@@ -47,6 +47,8 @@ const LeadershipDashboard = () => {
     projects: [],
   });
 
+  const BLUE_COLORS = ["#1E40AF", "#3B82F6", "#60A5FA", "#93C5FD", "#DBEAFE", "#2563EB"];
+
   useEffect(() => {
     fetchAllData();
   }, []);
@@ -164,14 +166,14 @@ const LeadershipDashboard = () => {
     const completionRate =
       dashboardData.goals.length > 0
         ? Math.round(
-            (dashboardData.goals.filter(
-              (g) =>
-                g.status?.toLowerCase() === "completed" ||
-                g.goalStatus?.toLowerCase() === "completed"
-            ).length /
-              dashboardData.goals.length) *
-              100
-          )
+          (dashboardData.goals.filter(
+            (g) =>
+              g.status?.toLowerCase() === "completed" ||
+              g.goalStatus?.toLowerCase() === "completed"
+          ).length /
+            dashboardData.goals.length) *
+          100
+        )
         : 0;
 
     return {
@@ -277,14 +279,7 @@ const LeadershipDashboard = () => {
   const budgetByDept = getBudgetByDepartment();
   const goalStatusDistribution = getGoalStatusDistribution();
 
-  const GOAL_CHART_COLORS = [
-    "#005461",
-    "#018790",
-    "#00B7B5",
-    "#4dd4d2",
-    "#80e0de",
-    "#b3eceb",
-  ];
+  const GOAL_CHART_COLORS = BLUE_COLORS;
 
   return (
     <div className="leadership-dashboard-container">
@@ -371,20 +366,20 @@ const LeadershipDashboard = () => {
                   <h2>{employeeStatus.total}</h2>
                 </div>
                 <div className="status-bar">
-                  <div 
-                    className="status-segment segment-fulltime" 
+                  <div
+                    className="status-segment segment-fulltime"
                     data-width={employeeStatus.fulltimePercent}
                   />
-                  <div 
-                    className="status-segment segment-contract" 
+                  <div
+                    className="status-segment segment-contract"
                     data-width={employeeStatus.contractPercent}
                   />
-                  <div 
-                    className="status-segment segment-probation" 
+                  <div
+                    className="status-segment segment-probation"
                     data-width={employeeStatus.probationPercent}
                   />
-                  <div 
-                    className="status-segment segment-parttime" 
+                  <div
+                    className="status-segment segment-parttime"
                     data-width={employeeStatus.parttimePercent}
                   />
                 </div>
@@ -456,17 +451,17 @@ const LeadershipDashboard = () => {
                     <Legend />
                     <Bar
                       dataKey="Total"
-                      fill="#005461"
+                      fill={BLUE_COLORS[0]}
                       radius={[6, 6, 0, 0]}
                     />
                     <Bar
                       dataKey="Allocated"
-                      fill="#018790"
+                      fill={BLUE_COLORS[1]}
                       radius={[6, 6, 0, 0]}
                     />
                     <Bar
                       dataKey="Utilized"
-                      fill="#00B7B5"
+                      fill={BLUE_COLORS[2]}
                       radius={[6, 6, 0, 0]}
                     />
                   </BarChart>

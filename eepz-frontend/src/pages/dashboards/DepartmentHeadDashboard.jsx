@@ -161,10 +161,11 @@ const DepartmentHeadDashboard = () => {
     const inProgress = goals.filter((g) => (g.status || g.goalStatus || "").toLowerCase() === "inprogress").length;
     const pending = goals.filter((g) => ["pending", "open", "approved"].includes((g.status || g.goalStatus || "").toLowerCase())).length;
 
+    // BLUE THEME CHART COLORS
     const chartData = [
-      completed > 0 && { name: "Completed", value: completed, fill: "#7077a1" },
-      inProgress > 0 && { name: "In Progress", value: inProgress, fill: "#b9b4c7" },
-      pending > 0 && { name: "Pending", value: pending, fill: "#590016" }
+      completed > 0 && { name: "Completed", value: completed, fill: "#3B82F6" },
+      inProgress > 0 && { name: "In Progress", value: inProgress, fill: "#60A5FA" },
+      pending > 0 && { name: "Pending", value: pending, fill: "#1E40AF" }
     ].filter(Boolean);
 
     return { total: goals.length, completed, inProgress, pending, chartData };
@@ -173,9 +174,10 @@ const DepartmentHeadDashboard = () => {
   const getPerformanceReviewsOverview = () => {
     const pending = dashboardData.pendingPerformanceReviews.length;
     const approved = dashboardData.approvedPerformanceReviews.length;
+    // BLUE THEME CHART COLORS
     const chartData = [
-      pending > 0 && { name: "Pending Review", value: pending, fill: "#b9b4c7" },
-      approved > 0 && { name: "Approved", value: approved, fill: "#7077a1" }
+      pending > 0 && { name: "Pending Review", value: pending, fill: "#60A5FA" },
+      approved > 0 && { name: "Approved", value: approved, fill: "#3B82F6" }
     ].filter(Boolean);
     return { total: pending + approved, pending, approved, chartData };
   };
@@ -186,10 +188,11 @@ const DepartmentHeadDashboard = () => {
     const approved = nominations.filter((n) => n.status?.toLowerCase() === "approved").length;
     const rejected = nominations.filter((n) => n.status?.toLowerCase().includes("rejected")).length;
 
+    // BLUE THEME CHART COLORS
     const chartData = [
-      pending > 0 && { name: "Pending", value: pending, fill: "#b9b4c7" },
-      approved > 0 && { name: "Approved", value: approved, fill: "#7077a1" },
-      rejected > 0 && { name: "Rejected", value: rejected, fill: "#590016" }
+      pending > 0 && { name: "Pending", value: pending, fill: "#60A5FA" },
+      approved > 0 && { name: "Approved", value: approved, fill: "#3B82F6" },
+      rejected > 0 && { name: "Rejected", value: rejected, fill: "#1E40AF" }
     ].filter(Boolean);
 
     return { total: nominations.length, pending, approved, rejected, chartData };
@@ -206,10 +209,11 @@ const DepartmentHeadDashboard = () => {
       return deadline < new Date() && s.status?.toLowerCase() !== "closed";
     }).length;
 
+    // BLUE THEME CHART COLORS
     const chartData = [
-      overdue > 0 && { name: "Overdue", value: overdue, fill: "#590016" },
-      open > 0 && { name: "Open", value: open, fill: "#b9b4c7" },
-      closed > 0 && { name: "Closed", value: closed, fill: "#7077a1" }
+      overdue > 0 && { name: "Overdue", value: overdue, fill: "#1E40AF" },
+      open > 0 && { name: "Open", value: open, fill: "#60A5FA" },
+      closed > 0 && { name: "Closed", value: closed, fill: "#3B82F6" }
     ].filter(Boolean);
 
     return { total: slas.length, open, overdue, closed, chartData };
@@ -217,7 +221,7 @@ const DepartmentHeadDashboard = () => {
 
   if (loading) return (
     <div className="ada-loading-container">
-      <div className="spinner-border text-primary" role="status">
+      <div className="spinner-border" style={{ width: '3rem', height: '3rem', color: '#3B82F6' }} role="status">
         <span className="visually-hidden">Loading...</span>
       </div>
     </div>
@@ -239,7 +243,6 @@ const DepartmentHeadDashboard = () => {
     { icon: AlertTriangle, value: kpiStats.totalDepartmentSLAs, label: "Department SLAs", subtitle: `${kpiStats.overdueSLAs} overdue`, iconClass: "admin-cyan" }
   ];
 
-  
   const StatCard = ({ type, value, label }) => (
     <div className={`emp-stat-card emp-stat-${type}`}>
       <div className="emp-stat-value">{value}</div>
@@ -329,8 +332,8 @@ const DepartmentHeadDashboard = () => {
                       <YAxis allowDecimals={false} stroke="#6b7280" fontSize={11} />
                       <Tooltip contentStyle={{ backgroundColor: "#fff", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "12px" }} />
                       <Bar dataKey="value" radius={[6, 6, 0, 0]}>
-                        <Cell fill="#b9b4c7" />
-                        <Cell fill="#7077a1" />
+                        <Cell fill="#60A5FA" />
+                        <Cell fill="#3B82F6" />
                       </Bar>
                     </BarChart>
                   </ResponsiveContainer>
@@ -440,7 +443,7 @@ const DepartmentHeadDashboard = () => {
                       <XAxis dataKey="month" stroke="#9ca3af" fontSize={10} />
                       <YAxis stroke="#9ca3af" fontSize={11} domain={[0, 100]} />
                       <Tooltip contentStyle={{ backgroundColor: "#fff", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "12px" }} />
-                      <Line type="monotone" dataKey="compliance" stroke="#7077a1" strokeWidth={2} dot={{ fill: "#7077a1", r: 4 }} activeDot={{ r: 6 }} />
+                      <Line type="monotone" dataKey="compliance" stroke="#3B82F6" strokeWidth={3} dot={{ fill: "#3B82F6", r: 5 }} activeDot={{ r: 7 }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </>

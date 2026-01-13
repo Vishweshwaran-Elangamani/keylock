@@ -188,7 +188,7 @@ const HRDashboard = () => {
             const periods = extractData(periodRes);
             allPeriodAllocations = [...allPeriodAllocations, ...periods];
           }
-        } catch {}
+        } catch { }
       }
 
       setDashboardData({

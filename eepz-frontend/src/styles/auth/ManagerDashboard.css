@@ -1,331 +1,252 @@
-/* MANAGER DASHBOARD - PURPLE-BLUE THEME (#b9b4c7, #7077a1, #662222) */
+.ada-btn-group {
 
-/* LOADING STATE */
-.ada-loading-container {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 50vh;
-}
 
-/* MAIN DASHBOARD CONTAINER */
-.hr-dashboard-container {
-  padding: 0;
-  background: #f8f9fa;
-  overflow-x: hidden;
-}
-
-/* KPI CARDS GRID - FIXED 5 COLUMNS */
-.admin-kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.admin-kpi-card {
-  background: #ffffff;
-  border-radius: 12px;
-  border: 2px solid #b9b4c7;
-  padding: 1.125rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-}
-
-.admin-kpi-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(112, 119, 161, 0.25);
-  border-color: #7077a1;
-}
-
-.admin-kpi-icon {
-  width: 50px;
-  height: 50px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  font-size: 1.5rem;
-}
-
-/* PURPLE-BLUE GRADIENT COLORS FOR KPI ICONS */
-.admin-kpi-icon.admin-purple {
-  background: linear-gradient(135deg, rgba(185, 180, 199, 0.2) 0%, rgba(112, 119, 161, 0.15) 100%);
-  color: #7077a1;
-}
-
-.admin-kpi-icon.admin-blue {
-  background: linear-gradient(135deg, rgba(112, 119, 161, 0.2) 0%, rgba(93, 99, 137, 0.15) 100%);
-  color: #7077a1;
-}
-
-.admin-kpi-icon.admin-pink {
-  background: linear-gradient(135deg, rgba(152, 145, 175, 0.2) 0%, rgba(185, 180, 199, 0.15) 100%);
-  color: #9891af;
-}
-
-.admin-kpi-icon.admin-green {
-  background: linear-gradient(135deg, rgba(163, 155, 181, 0.2) 0%, rgba(112, 119, 161, 0.15) 100%);
-  color: #b9b4c7;
-}
-
-.admin-kpi-icon.admin-cyan {
-  background: linear-gradient(135deg, rgba(102, 34, 34, 0.15) 0%, rgba(152, 51, 51, 0.1) 100%);
-  color: #662222;
-}
-
-.admin-kpi-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
   gap: 0.25rem;
-  text-align: center;
-  align-items: center;
-}
 
-.admin-kpi-content h2 {
-  font-size: 1.625rem;
-  font-weight: 700;
-  color: #7077a1;
-  margin: 0;
-  line-height: 1;
 }
+ 
+.ada-btn-group button {
 
-.admin-kpi-content p {
-  font-size: 0.8125rem;
-  color: #6c757d;
-  margin: 0;
-  font-weight: 500;
-}
+  padding: 0.375rem 0.75rem;
 
-.admin-kpi-subtitle {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.75rem;
-  color: #6c757d;
-  margin-top: 0.25rem;
-}
-
-/* DASHBOARD CARDS CONTAINER */
-.dashboard-cards-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.dashboard-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem;
-}
-
-/* AUTO-ADJUST FOR 2 CARDS IN SECOND ROW */
-.dashboard-row-2 {
-  grid-template-columns: repeat(2, 1fr);
-}
-
-.dashboard-card {
-  background: #ffffff;
-  border-radius: 12px;
-  border: 2px solid #b9b4c7;
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-  transition: all 0.3s ease;
-}
-
-.dashboard-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(112, 119, 161, 0.25);
-}
-
-.dashboard-card.card-medium {
-  grid-column: span 1;
-}
-
-/* CARD HEADER - DARK NAVY BLUE (SAME AS EMPLOYEE) */
-.card-header-dark {
-  padding: 1rem 1.25rem;
-  background: linear-gradient(135deg, #27235c 0%, #3b4d8f 100%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.card-header-content {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-}
-
-.card-header-content i {
-  font-size: 1.125rem;
-  color: #ffffff;
-}
-
-.card-header-content h3 {
-  margin: 0;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: #ffffff;
-}
-
-/* BUTTON GROUP */
-.mgr-btn-group {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.mgr-btn-group button {
-  padding: 0.4rem 0.75rem;
-  font-size: 0.75rem;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-
-.mgr-btn-group button:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.5);
-}
-
-.mgr-btn-group button.mgr-active {
-  border-color: #fff;
-  background: rgba(255, 255, 255, 0.25);
-  font-weight: 600;
-}
-
-/* CARD BODY */
-.card-body {
-  padding: 1.25rem;
-}
-
-.no-data-message {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 3rem 1rem;
-  color: #9ca3af;
-  font-size: 0.875rem;
-  min-height: 240px;
-}
-
-/* STAT CARDS GRID - PURPLE-BLUE THEMED */
-.emp-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-
-.emp-stats-grid.emp-stats-2col {
-  grid-template-columns: repeat(2, 1fr);
-}
-
-/* 4 COLUMN GRID FOR L&D */
-.emp-stats-grid.emp-stats-4col {
-  grid-template-columns: repeat(4, 1fr);
-}
-
-.emp-stat-card {
-  padding: 0.75rem;
   border-radius: 6px;
-  text-align: center;
-  transition: all 0.2s ease;
-}
 
-.emp-stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(112, 119, 161, 0.2);
-}
+  font-size: 0.75rem;
 
-.emp-stat-value {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 0.25rem;
-}
-
-.emp-stat-label {
-  font-size: 0.7rem;
   font-weight: 500;
-}
 
-/* RESPONSIVE DESIGN */
+  background: rgba(255, 255, 255, 0.15);
+
+  color: #ffffff;
+
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+
+}
+ 
+.ada-btn-group button:hover {
+
+  background: rgba(255, 255, 255, 0.25);
+
+}
+ 
+.ada-btn-group button.ada-active {
+
+  background: rgba(96, 165, 250, 0.4);
+
+  border-color: #60A5FA;
+
+  box-shadow: 0 2px 4px rgba(96, 165, 250, 0.3);
+
+}
+ 
+.ada-perf-stats-grid {
+
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 0.75rem;
+
+  margin-bottom: 1rem;
+
+}
+ 
+.ada-perf-stat-card {
+
+  padding: 1rem;
+
+  border-radius: 8px;
+
+  text-align: center;
+
+  background: linear-gradient(135deg, rgba(30, 64, 175, 0.05) 0%, rgba(59, 130, 246, 0.03) 100%);
+
+  border: 1px solid rgba(30, 64, 175, 0.1);
+
+  transition: all 0.3s ease;
+
+}
+ 
+.ada-perf-stat-card:hover {
+
+  transform: translateY(-2px);
+
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.15);
+
+}
+ 
+.ada-perf-stat-card.ada-primary {
+
+  background: #DBEAFE;
+
+  border: 1px solid #60A5FA;
+
+}
+ 
+.ada-perf-stat-card.ada-success {
+
+  background: #27235c;
+
+  border: 1px solid #4F46E5;
+
+}
+ 
+.ada-perf-stat-card.ada-info {
+
+  background: #DBEAFE;
+
+  border: 1px solid #60A5FA;
+
+}
+ 
+.ada-perf-stat-card.ada-warning {
+
+  background: #e0ecff;
+
+  border: 1px solid #1D4ED8;
+
+}
+ 
+.ada-perf-stat-value {
+
+  font-size: 1.25rem;
+
+  font-weight: 700;
+
+  margin-bottom: 0.25rem;
+
+  line-height: 1.2;
+
+  color: #1E40AF;
+
+}
+ 
+.ada-perf-stat-label {
+
+  font-size: 0.75rem;
+
+  font-weight: 600;
+
+  color: #6c757d;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+
+}
+ 
+.ada-perf-stat-card.ada-success .ada-perf-stat-value,
+
+.ada-perf-stat-card.ada-success .ada-perf-stat-label {
+
+  color: #ffffff !important;
+
+}
+ 
+.ada-perf-stat-card.ada-primary .ada-perf-stat-value,
+
+.ada-perf-stat-card.ada-primary .ada-perf-stat-label {
+
+  color: #2563EB !important;
+
+}
+ 
+.ada-perf-stat-card.ada-warning .ada-perf-stat-value,
+
+.ada-perf-stat-card.ada-warning .ada-perf-stat-label {
+
+  color: #1E3A8A !important;
+
+}
+ 
+.ada-perf-stat-card.ada-info .ada-perf-stat-value,
+
+.ada-perf-stat-card.ada-info .ada-perf-stat-label {
+
+  color: #2563EB !important;
+
+}
+ 
+.manager-cards-container {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 1.25rem;
+
+}
+ 
+.manager-row {
+
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 1.25rem;
+
+}
+ 
+.manager-row-2 {
+
+  grid-template-columns: repeat(2, 1fr);
+
+}
+ 
 @media (max-width: 1400px) {
-  .admin-kpi-grid {
-    grid-template-columns: repeat(3, 1fr);
+
+  .manager-row {
+
+    grid-template-columns: repeat(2, 1fr);
+
+  }
+ 
+  .manager-row-2 {
+
+    grid-template-columns: repeat(2, 1fr);
+
   }
 
-  .dashboard-row {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .dashboard-row-2 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .emp-stats-grid.emp-stats-4col {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
-
+ 
 @media (max-width: 992px) {
-  .dashboard-row,
-  .dashboard-row-2 {
+
+  .manager-row,
+
+  .manager-row-2 {
+
     grid-template-columns: 1fr;
-  }
 
-  .admin-kpi-grid {
+  }
+ 
+  .ada-perf-stats-grid {
+
     grid-template-columns: repeat(2, 1fr);
+
   }
 
-  .emp-stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .emp-stats-grid.emp-stats-2col {
-    grid-template-columns: 1fr;
-  }
-
-  .emp-stats-grid.emp-stats-4col {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
-
-@media (max-width: 768px) {
-  .admin-kpi-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .emp-stats-grid,
-  .emp-stats-grid.emp-stats-4col {
-    grid-template-columns: 1fr;
-  }
-}
-
+ 
 @media (max-width: 480px) {
-  .card-header-dark {
-    flex-direction: column;
-    gap: 0.75rem;
-    align-items: stretch;
-  }
 
-  .admin-kpi-card {
+  .ada-perf-stats-grid {
+
+    grid-template-columns: 1fr;
+
+  }
+ 
+  .ada-stat-card {
+
     flex-direction: column;
+
     text-align: center;
+
   }
 
-  .admin-kpi-icon {
-    margin: 0 auto;
-  }
 }
+ 
