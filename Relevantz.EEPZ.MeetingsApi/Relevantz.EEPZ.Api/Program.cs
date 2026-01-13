@@ -32,7 +32,7 @@ builder.Services.AddSwaggerGen(options =>
     {
         Title = "EEPZ API",
         Version = "v1",
-        Description = "MoM API"
+        Description = "Meetings API"
     });
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -104,6 +104,8 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<IMeetingRepository, MeetingRepository>();
 builder.Services.AddScoped<IMeetingService, MeetingService>();
 builder.Services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+builder.Services.AddScoped<IUserAuthenticationRepository, UserAuthenticationRepository>();
+
 
 builder.Services.AddCors(options =>
 {
@@ -139,6 +141,7 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.UseMiddleware<Relevantz.EEPZ.Common.Middleware.GlobalExceptionMiddleware>();
 
 using (var scope = app.Services.CreateScope())
 {
