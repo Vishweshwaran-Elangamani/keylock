@@ -34,8 +34,6 @@ const SmeDirectory = () => {
     try {
       setLoading(true);
 
-      //  Pass parameters as an object
-
       const response = await lndService.getAllActiveSmes({
         pageNumber: currentPage,
 
@@ -52,7 +50,9 @@ const SmeDirectory = () => {
         setTotalPages(response.data.data.totalPages);
       }
     } catch (error) {
-      toast.error(LND_TOASTS.FAILED_TO_LOAD_SMES);
+      console.error("Failed to fetch SMEs:", error);
+
+      toast.error("Failed to load SMEs");
     } finally {
       setLoading(false);
     }

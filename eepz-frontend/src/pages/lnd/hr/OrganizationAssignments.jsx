@@ -93,6 +93,8 @@ const OrganizationAssignments = () => {
   const handleExportToExcel = async () => {
     try {
       setExporting(true);
+      toast.loading("Preparing Excel export...");
+
       const response = await lndService.exportOrganizationAssignments({
         StatusFilter:
           statusFilter === ASSIGNMENT_STATUS.OVERDUE ? "" : statusFilter,

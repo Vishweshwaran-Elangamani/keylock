@@ -856,7 +856,7 @@ export const downloadFile = (blob, filename = "download") => {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-  window.URL.revokeObjectURL(url);
+  window.URL.revokeObjectURL(url);  
 };
 
 /**

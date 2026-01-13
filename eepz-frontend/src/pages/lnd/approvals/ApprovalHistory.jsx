@@ -176,7 +176,8 @@ const ApprovalHistory = () => {
       const response = await lndService.downloadApprovalAttachment(
         approval.approvalId
       );
-      const filename = `approval_${approval.approvalId}_attachment`;
+      const typeLabel = getApprovalTypeLabel(approval.approvalType);
+      const filename = `${approval.requesterName}_${typeLabel}${approval.approvalId}`;
       downloadFile(response.data, filename);
       toast.success(LND_TOASTS.DOWNLOAD_SUCCESS);
     } catch (error) {

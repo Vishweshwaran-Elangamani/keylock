@@ -219,4 +219,4 @@ const OrganizationSkills = () => {
     </div>
   );
 };
-export default OrganizationSkills;
+export default OrganizationSkills;                  

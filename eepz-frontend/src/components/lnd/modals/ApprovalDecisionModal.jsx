@@ -144,7 +144,8 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
       );
 
       const contentDisposition = response.headers["content-disposition"];
-      let filename = `approval_${approval.approvalId}_attachment`;
+const typeLabel = getApprovalTypeLabel(approval.approvalType);
+      const filename = `${approval.requesterName}_${typeLabel}${approval.approvalId}`;
 
       if (contentDisposition) {
         const fileNameMatch = contentDisposition.match(
@@ -319,7 +320,7 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
                       {canPreview
                         ? "Preview Document"
                         : "Preview Not Supported"}
-                    </button>
+                    </button>                     
 
                     {/* Download Button */}
                     <button
