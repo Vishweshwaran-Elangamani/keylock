@@ -144,8 +144,8 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
       );
 
       const contentDisposition = response.headers["content-disposition"];
-const typeLabel = getApprovalTypeLabel(approval.approvalType);
-      const filename = `${approval.requesterName}_${typeLabel}${approval.approvalId}`;
+      const typeLabel = getApprovalTypeLabel(approval.approvalType); 
+      let filename = `${approval.requesterName}_${typeLabel}${approval.approvalId}`; 
 
       if (contentDisposition) {
         const fileNameMatch = contentDisposition.match(
