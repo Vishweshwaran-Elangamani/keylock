@@ -9,5 +9,6 @@ namespace Relevantz.EEPZ.Data.IRepository
         Task<Userprofile> CreateAsync(Userprofile profile);
         Task<Userprofile> UpdateAsync(Userprofile profile);
         Task<bool> DeleteAsync(int profileId);
+        Task<string?> GetFullNameByEmployeeIdAsync(int employeeId);
     }
 }

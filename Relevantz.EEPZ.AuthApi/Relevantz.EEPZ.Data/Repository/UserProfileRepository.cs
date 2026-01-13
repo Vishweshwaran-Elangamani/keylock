@@ -11,6 +11,16 @@ namespace Relevantz.EEPZ.Data.Repository
         {
             _context = context;
         }
+
+        public async Task<string?> GetFullNameByEmployeeIdAsync(int employeeId)
+        {
+            var userProfile = await _context.Userprofiles
+                .FirstOrDefaultAsync(up => up.EmployeeId == employeeId);
+            
+            return userProfile != null 
+                ? $"{userProfile.FirstName} {userProfile.LastName}" 
+                : null;
+        }
         public async Task<Userprofile?> GetByIdAsync(int profileId)
         {
             return await _context.Userprofiles
