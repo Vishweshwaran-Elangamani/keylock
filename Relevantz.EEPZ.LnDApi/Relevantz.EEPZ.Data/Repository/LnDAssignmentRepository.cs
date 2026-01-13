@@ -24,7 +24,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         #region Overdue Management
 
         /// <summary>Gets all assignments that are overdue (past deadline and not completed).</summary>
-        public async Task<List<Lndassignment>> GetOverdueAssignmentsAsync()
+        public async Task<List<Lndassignment>> GetOverdueAssignments()
         {
             var today = DateTime.Now.Date;
 
@@ -48,11 +48,11 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>Marks assignments as overdue and updates status in database.</summary>
-        public async Task<int> MarkAssignmentsAsOverdueAsync()
+        public async Task<int> MarkAssignmentsAsOverdue()
         {
             Log.Information("MarkAssignmentsAsOverdueAsync started");
 
-            var overdueAssignments = await GetOverdueAssignmentsAsync();
+            var overdueAssignments = await GetOverdueAssignments();
 
             if (overdueAssignments.Count == 0)
             {
@@ -79,7 +79,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         #region Assignment Retrieval
 
         /// <summary>Gets a single assignment by ID with all related entities including mentee, SME, and skill.</summary>
-        public async Task<Lndassignment?> GetAssignmentByIdAsync(int assignmentId)
+        public async Task<Lndassignment?> GetAssignmentById(int assignmentId)
         {
             Log.Debug("GetAssignmentByIdAsync called. AssignmentId={AssignmentId}", assignmentId);
 
@@ -106,7 +106,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>Gets paginated assignments for a mentee with filtering and search capabilities.</summary>
-        public async Task<(List<Lndassignment> Items, int TotalCount)> GetMyAssignmentsAsync(
+        public async Task<(List<Lndassignment> Items, int TotalCount)> GetMyAssignments(
             int employeeId,
             AssignmentRequestModel request
         )
@@ -176,7 +176,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>Gets paginated assignments for a manager's team with filtering and search capabilities.</summary>
-        public async Task<(List<Lndassignment> Items, int TotalCount)> GetTeamAssignmentsAsync(
+        public async Task<(List<Lndassignment> Items, int TotalCount)> GetTeamAssignments(
             int managerId,
             AssignmentRequestModel request
         )
@@ -301,7 +301,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>Gets paginated assignments where employee is the assigned SME with filtering and search.</summary>
-        public async Task<(List<Lndassignment> Items, int TotalCount)> GetSmeAssignmentsAsync(
+        public async Task<(List<Lndassignment> Items, int TotalCount)> GetSmeAssignments(
             int smeEmployeeId,
             AssignmentRequestModel request
         )
@@ -392,7 +392,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>Gets all team assignments for Excel export without pagination.</summary>
-        public async Task<List<Lndassignment>> GetAllTeamAssignmentsForExportAsync(
+        public async Task<List<Lndassignment>> GetAllTeamAssignmentsForExport(
             int managerId,
             ExportAssignmentRequestModel request
         )
@@ -453,7 +453,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         #region Assignment Modifications
 
         /// <summary>Adds a new assignment to the database context (requires SaveChanges).</summary>
-        public async Task<Lndassignment> AddAssignmentAsync(Lndassignment assignment)
+        public async Task<Lndassignment> AddAssignment(Lndassignment assignment)
         {
             Log.Information(
                 "AddAssignmentAsync called. MenteeId={MenteeId}, SmeId={SmeId}, SkillId={SkillId}",
@@ -468,7 +468,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>Updates an existing assignment in the database context (requires SaveChanges).</summary>
-        public async Task UpdateAssignmentAsync(Lndassignment assignment)
+        public async Task UpdateAssignment(Lndassignment assignment)
         {
             Log.Information(
                 "UpdateAssignmentAsync called. AssignmentId={AssignmentId}, Status={Status}",

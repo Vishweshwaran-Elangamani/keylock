@@ -25,7 +25,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         #region SME Status Queries
 
         /// <summary>Checks if an employee has any active SME status.</summary>
-        public async Task<bool> IsEmployeeSmeAsync(int employeeId)
+        public async Task<bool> IsEmployeeSme(int employeeId)
         {
             Log.Debug("IsEmployeeSmeAsync called. EmployeeId={EmployeeId}", employeeId);
 
@@ -42,7 +42,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>Gets an active SME record for a specific employee and skill combination.</summary>
-        public async Task<Lndsme?> GetActiveSmeAsync(int employeeId, int skillId)
+        public async Task<Lndsme?> GetActiveSme(int employeeId, int skillId)
         {
             Log.Debug(
                 "GetActiveSmeAsync called. EmployeeId={EmployeeId}, SkillId={SkillId}",
@@ -96,7 +96,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         #region SME Assignment Queries
 
         /// <summary>Gets in-progress assignment count for a specific SME.</summary>
-        public async Task<int> GetSmeInProgressAssignmentCountAsync(int smeId)
+        public async Task<int> GetSmeInProgressAssignmentCount(int smeId)
         {
             Log.Debug("GetSmeInProgressAssignmentCountAsync called. SmeId={SmeId}", smeId);
 
@@ -120,7 +120,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         public async Task<(
             List<Lndsme> Items,
             int TotalCount
-        )> GetAvailableSmesWithAssignmentCountsAsync(
+        )> GetAvailableSmesWithAssignmentCounts(
             AvailableSmesRequestModel request,
             int maxAssignments
         )
@@ -192,7 +192,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>Gets paginated all active SMEs with employee and department details.</summary>
-        public async Task<(List<Lndsme> Items, int TotalCount)> GetAllActiveSmesAsync(
+        public async Task<(List<Lndsme> Items, int TotalCount)> GetAllActiveSmes(
             ActiveSmesRequestModel request
         )
         {
@@ -244,7 +244,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>Gets all active SMEs for Excel export without pagination.</summary>
-        public async Task<List<Lndsme>> GetAllActiveSmesForExportAsync(
+        public async Task<List<Lndsme>> GetAllActiveSmesForExport(
             ExportActiveSmesRequestModel request
         )
         {
@@ -296,7 +296,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         #region SME Modifications
 
         /// <summary>Adds a new SME record to the database context (requires SaveChanges).</summary>
-        public async Task<Lndsme> AddSmeAsync(Lndsme sme)
+        public async Task<Lndsme> AddSme(Lndsme sme)
         {
             Log.Information(
                 "AddSmeAsync called. EmployeeId={EmployeeId}, SkillId={SkillId}",
@@ -311,7 +311,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>Updates an existing SME record in the database context (requires SaveChanges).</summary>
-        public async Task UpdateSmeAsync(Lndsme sme)
+        public async Task UpdateSme(Lndsme sme)
         {
             Log.Information(
                 "UpdateSmeAsync called. SmeId={SmeId}, EmployeeId={EmployeeId}, SkillId={SkillId}, IsActive={IsActive}",

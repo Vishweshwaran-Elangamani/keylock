@@ -8,7 +8,7 @@ using Serilog;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
-    public class LnDApprovalService : ILnDApprovalService
+    public class LnDApprovalService : ILnDApprovalService 
     {
         private readonly ILnDApprovalRepository _approvalRepository;
         private readonly ILnDSmeRepository _smeRepository;
@@ -49,12 +49,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 "GetMyApprovals started. EmployeeId={EmployeeId}, ApprovalType={ApprovalType}, Status={Status}, Page={PageNumber}, PageSize={PageSize}, SearchTerm={SearchTerm}",
                 employeeId, request.ApprovalType ?? "all", request.Status ?? "all", request.PageNumber, request.PageSize, request.SearchTerm
             );
-
-            var (items, totalCount) = await _approvalRepository.GetMyApprovalsAsync(
+            // Getting the approvals with the count for a particular employee
+            var (items, totalCount) = await _approvalRepository.GetMyApprovals(
                 employeeId,
                 request
             );
-
+      
             Log.Debug("GetMyApprovals fetched {ItemCount} items, TotalCount={TotalCount}", items.Count, totalCount);
 
             var approvalResponseModels = items
@@ -80,7 +80,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     AttachmentPath = a.Attachment?.FilePath,
                 })
                 .ToList();
-
+            
             Log.Information("GetMyApprovals succeeded for EmployeeId={EmployeeId}. Returned={Returned}, Total={Total}",
                 employeeId, approvalResponseModels.Count, totalCount);
 
@@ -110,7 +110,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 request.ApprovalId, approverId, request.IsApproved
             );
 
-            var approval = await _approvalRepository.GetApprovalByIdAsync(request.ApprovalId);
+            var approval = await _approvalRepository.GetApprovalById(request.ApprovalId);
 
             if (approval == null || approval.ApproverEmployeeId != approverId)
             {
@@ -148,7 +148,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             Log.Debug(
                 "ProcessApproval: Status updated. ApprovalId={ApprovalId}, NewStatus={NewStatus}",
-                request.ApprovalId, approval.Status
+                request.ApprovalId, approval.Status 
             );
 
             if (request.IsApproved)
@@ -171,7 +171,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         IsActive = true,
                     };
 
-                    await _smeRepository.AddSmeAsync(sme);
+                    await _smeRepository.AddSme(sme);
                 }
                 else if (approval.ApprovalType == LnDConstants.APPROVAL_TYPE.SME_REQUEST)
                 {
@@ -232,7 +232,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         CreatedOn = DateOnly.FromDateTime(DateTime.Now),
                     };
 
-                    await _assignmentRepository.AddAssignmentAsync(assignment);
+                    await _assignmentRepository.AddAssignment(assignment);
                 }
                 else if (
                     approval.ApprovalType
@@ -244,7 +244,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         approval.ApprovalId, approval.AssignmentId
                     );
 
-                    var assignment = await _assignmentRepository.GetAssignmentByIdAsync(
+                    var assignment = await _assignmentRepository.GetAssignmentById(
                         approval.AssignmentId.Value
                     );
 
@@ -268,7 +268,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     assignment.UpdatedByEmployeeId = approverId;
                     assignment.UpdatedOn = DateOnly.FromDateTime(DateTime.Now);
 
-                    await _assignmentRepository.UpdateAssignmentAsync(assignment);
+                    await _assignmentRepository.UpdateAssignment(assignment);
 
                     var managerApproval = new Lndapproval
                     {
@@ -285,7 +285,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         RequestedOn = DateOnly.FromDateTime(DateTime.Now),
                     };
 
-                    await _approvalRepository.AddApprovalAsync(managerApproval);
+                    await _approvalRepository.AddApproval(managerApproval);
                 }
             }
             else
@@ -300,7 +300,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         approval.ApprovalId, approval.AssignmentId
                     );
 
-                    var assignment = await _assignmentRepository.GetAssignmentByIdAsync(
+                    var assignment = await _assignmentRepository.GetAssignmentById(
                         approval.AssignmentId.Value
                     );
 
@@ -312,12 +312,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         assignment.UpdatedByEmployeeId = approverId;
                         assignment.UpdatedOn = DateOnly.FromDateTime(DateTime.Now);
 
-                        await _assignmentRepository.UpdateAssignmentAsync(assignment);
+                        await _assignmentRepository.UpdateAssignment(assignment);
                     }
                 }
             }
 
-            await _approvalRepository.UpdateApprovalAsync(approval);
+            await _approvalRepository.UpdateApproval(approval);
             await _baseRepository.SaveChangesAsync();
 
             Log.Information(
@@ -354,7 +354,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (pageSize > 100)
                 pageSize = 100;
 
-            var (items, totalCount) = await _approvalRepository.GetApprovalHistoryAsync(
+            var (items, totalCount) = await _approvalRepository.GetApprovalHistory(
                 employeeId,
                 request
             );
@@ -421,8 +421,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 "GetApprovalDetails started. ApprovalId={ApprovalId}, EmployeeId={EmployeeId}",
                 approvalId, employeeId
             );
-
-            var approval = await _approvalRepository.GetApprovalByIdAsync(approvalId);
+            // Getting the approvals details by Id
+            var approval = await _approvalRepository.GetApprovalById(approvalId);
 
             if (approval == null)
             {
@@ -434,7 +434,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     Message = "Approval not found",
                 };
             }
-
+            //validating the user role like request and approver
             if (
                 approval.RequesterEmployeeId != employeeId
                 && approval.ApproverEmployeeId != employeeId
@@ -452,7 +452,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     Message = "You do not have access to this approval",
                 };
             }
-
+           // Geeting the approval details as response
             var details = new ApprovalDetailsResponseModel
             {
                 ApprovalId = approval.ApprovalId,
@@ -488,7 +488,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     approval.RequesterEmployeeId == employeeId ? LnDConstants.ROLE_FILTERS.REQUESTER : LnDConstants.ROLE_FILTERS.APPROVER,
                 CanDownloadAttachment = approval.Attachment != null,
             };
-
+             // Mapping the assignment details with approval
             if (approval.AssignmentId.HasValue && approval.Assignment != null)
             {
                 details.Assignment = new AssignmentDetailsResponseModel
@@ -514,7 +514,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
 
             return new ApiResponse<ApprovalDetailsResponseModel> { Success = true, Data = details };
-        }
+        }  
 
         /// <summary>
         /// Downloads the attachment associated with an approval, after validating access for the employee.
@@ -529,7 +529,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 approvalId, employeeId
             );
 
-            var approval = await _approvalRepository.GetApprovalByIdAsync(approvalId);
+            var approval = await _approvalRepository.GetApprovalById(approvalId);
 
             if (
                 approval == null
@@ -602,7 +602,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 assignmentId, employeeId
             );
 
-            var assignment = await _assignmentRepository.GetAssignmentByIdAsync(assignmentId);
+            var assignment = await _assignmentRepository.GetAssignmentById(assignmentId);
 
             if (
                 assignment == null
@@ -677,7 +677,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 employeeId
             );
 
-            var approval = await _approvalRepository.GetApprovalByIdAsync(approvalId);
+            var approval = await _approvalRepository.GetApprovalById(approvalId);
 
             if (
                 approval == null
@@ -691,7 +691,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     "PreviewApprovalAttachment: Approval not found or access denied. ApprovalId={ApprovalId}, EmployeeId={EmployeeId}",
                     approvalId,
                     employeeId
-                );
+                );      
 
                 return new ApiResponse<FileDownloadResponseModel>
                 {
@@ -751,7 +751,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 employeeId
             );
 
-            var assignment = await _assignmentRepository.GetAssignmentByIdAsync(assignmentId);
+            var assignment = await _assignmentRepository.GetAssignmentById(assignmentId);
 
             if (
                 assignment == null
@@ -811,7 +811,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 },
             };
         }
-
+  
         #endregion
     }
 }

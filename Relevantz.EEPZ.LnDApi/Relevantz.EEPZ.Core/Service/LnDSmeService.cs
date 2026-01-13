@@ -42,7 +42,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             Log.Information("CheckIfEmployeeIsSme started. EmployeeId={EmployeeId}", employeeId);
 
-            var isSme = await _smeRepository.IsEmployeeSmeAsync(employeeId);
+            var isSme = await _smeRepository.IsEmployeeSme(employeeId);
 
             Log.Information(
                 "CheckIfEmployeeIsSme succeeded. EmployeeId={EmployeeId}, IsSme={IsSme}",
@@ -67,7 +67,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 employeeId, request.SkillId, request.ProofDocument?.FileName
             );
 
-            var skillMapping = await _skillRepository.GetEmployeeSkillMappingAsync(
+            var skillMapping = await _skillRepository.GetEmployeeSkillMapping(
                 employeeId,
                 request.SkillId
             );
@@ -87,7 +87,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
             }
 
-            var existingSme = await _smeRepository.GetActiveSmeAsync(
+            var existingSme = await _smeRepository.GetActiveSme(
                 employeeId,
                 request.SkillId
             );
@@ -106,7 +106,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
             }
 
-            var pendingApproval = await _approvalRepository.GetPendingSmeRegistrationAsync(
+            var pendingApproval = await _approvalRepository.GetPendingSmeRegistration(
                 employeeId,
                 request.SkillId
             );
@@ -142,7 +142,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 CreatedOn = DateOnly.FromDateTime(DateTime.Now),
             };
 
-            await _approvalRepository.AddAttachmentAsync(attachment);
+            await _approvalRepository.AddAttachment(attachment);
             await _baseRepository.SaveChangesAsync();
 
             var approval = new Lndapproval
@@ -156,7 +156,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 RequestedOn = DateOnly.FromDateTime(DateTime.Now),
             };
 
-            await _approvalRepository.AddApprovalAsync(approval);
+            await _approvalRepository.AddApproval(approval);
             await _baseRepository.SaveChangesAsync();
 
             Log.Information(
@@ -187,7 +187,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
 
             var (items, totalCount) =
-                await _smeRepository.GetAvailableSmesWithAssignmentCountsAsync(
+                await _smeRepository.GetAvailableSmesWithAssignmentCounts(
                     request,
                     LnDConstants.MAX_SME_ASSIGNMENTS
                 );
@@ -200,7 +200,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var smeDtos = new List<SmeResponseModel>();
             foreach (var sme in items)
             {
-                var inProgressCount = await _smeRepository.GetSmeInProgressAssignmentCountAsync(
+                var inProgressCount = await _smeRepository.GetSmeInProgressAssignmentCount(
                     sme.SmeId
                 );
 
@@ -248,7 +248,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 request.SearchTerm ?? "none", request.PageNumber, request.PageSize
             );
 
-            var (items, totalCount) = await _smeRepository.GetAllActiveSmesAsync(request);
+            var (items, totalCount) = await _smeRepository.GetAllActiveSmes(request);
 
             Log.Debug(
                 "GetAllActiveSmes: Retrieved {ItemCount} SMEs. TotalCount={TotalCount}",
@@ -305,7 +305,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 request.SearchTerm ?? "none"
             );
 
-            var allSmes = await _smeRepository.GetAllActiveSmesForExportAsync(request);
+            var allSmes = await _smeRepository.GetAllActiveSmesForExport(request);
 
             Log.Debug(
                 "ExportAllActiveSmesToExcel: Retrieved {Count} SMEs for export",

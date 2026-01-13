@@ -43,7 +43,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             Log.Information("CheckAndMarkOverdueAssignments started");
 
-            var count = await _assignmentRepository.MarkAssignmentsAsOverdueAsync();
+            var count = await _assignmentRepository.MarkAssignmentsAsOverdue();
 
             Log.Information("CheckAndMarkOverdueAssignments completed. OverdueCount={Count}", count);
 
@@ -66,7 +66,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 managerId, request.MenteeEmployeeId, request.SkillId, request.MentorEmployeeId
             );
 
-            var mentee = await _skillRepository.GetEmployeeByIdAsync(request.MenteeEmployeeId);
+            var mentee = await _skillRepository.GetEmployeeById(request.MenteeEmployeeId);
 
             if (mentee == null || mentee.ReportingManagerEmployeeId != managerId)
             {
@@ -82,7 +82,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
             }
 
-            var skillMapping = await _skillRepository.GetEmployeeSkillMappingAsync(
+            var skillMapping = await _skillRepository.GetEmployeeSkillMapping(
                 request.MenteeEmployeeId,
                 request.SkillId
             );
@@ -125,7 +125,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 RequestedOn = DateOnly.FromDateTime(DateTime.Now),
             };
 
-            await _approvalRepository.AddApprovalAsync(approval);
+            await _approvalRepository.AddApproval(approval);
             await _baseRepository.SaveChangesAsync();
 
             Log.Information(
@@ -152,7 +152,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 employeeId, request.AssignmentId, request.ProofDocument?.FileName
             );
 
-            var assignment = await _assignmentRepository.GetAssignmentByIdAsync(
+            var assignment = await _assignmentRepository.GetAssignmentById(
                 request.AssignmentId
             );
 
@@ -201,8 +201,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 CreatedOn = DateOnly.FromDateTime(DateTime.Now),
             };
 
-            await _approvalRepository.AddAttachmentAsync(attachment);
-            await _baseRepository.SaveChangesAsync();
+            await _approvalRepository.AddAttachment(attachment);
+            await _baseRepository.SaveChangesAsync(); 
 
             assignment.ProofFilePath = filePath;
             assignment.CompletionNotes = request.CompletionNotes;
@@ -222,8 +222,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 RequestedOn = DateOnly.FromDateTime(DateTime.Now),
             };
 
-            await _approvalRepository.AddApprovalAsync(approval);
-            await _assignmentRepository.UpdateAssignmentAsync(assignment);
+            await _approvalRepository.AddApproval(approval);
+            await _assignmentRepository.UpdateAssignment(assignment);
             await _baseRepository.SaveChangesAsync();
 
             Log.Information(
@@ -251,7 +251,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 managerId, request.AssignmentId, request.NewRating
             );
 
-            var assignment = await _assignmentRepository.GetAssignmentByIdAsync(
+            var assignment = await _assignmentRepository.GetAssignmentById(
                 request.AssignmentId
             );
 
@@ -289,7 +289,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
             }
 
-            var skillMapping = await _skillRepository.GetEmployeeSkillMappingAsync(
+            var skillMapping = await _skillRepository.GetEmployeeSkillMapping(
                 assignment.MenteeEmployeeId,
                 assignment.SkillId
             );
@@ -304,7 +304,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 skillMapping.Rating = request.NewRating;
                 skillMapping.UpdatedByEmployeeId = managerId;
                 skillMapping.UpdatedOn = DateOnly.FromDateTime(DateTime.Now);
-                await _skillRepository.UpdateEmployeeSkillAsync(skillMapping);
+                await _skillRepository.UpdateEmployeeSkill(skillMapping);
             }
 
             assignment.Status = LnDConstants.ASSIGNMENT_STATUS.COMPLETED;
@@ -313,9 +313,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             assignment.UpdatedByEmployeeId = managerId;
             assignment.UpdatedOn = DateOnly.FromDateTime(DateTime.Now);
 
-            await _assignmentRepository.UpdateAssignmentAsync(assignment);
+            await _assignmentRepository.UpdateAssignment(assignment);
 
-            var pendingApproval = await _approvalRepository.GetPendingAssignmentApprovalAsync(
+            var pendingApproval = await _approvalRepository.GetPendingAssignmentApproval(
                 assignment.AssignmentId,
                 LnDConstants.APPROVAL_TYPE.ASSIGNMENT_COMPLETION
             );
@@ -325,7 +325,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 pendingApproval.Status = LnDConstants.APPROVAL_STATUS.APPROVED;
                 pendingApproval.UpdatedOn = DateOnly.FromDateTime(DateTime.Now);
                 pendingApproval.Notes = request.Notes;
-                await _approvalRepository.UpdateApprovalAsync(pendingApproval);
+                await _approvalRepository.UpdateApproval(pendingApproval);
 
                 Log.Debug(
                     "CompleteAssignment: Approval updated. ApprovalId={ApprovalId}",
@@ -363,7 +363,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 employeeId, request.StatusFilter ?? "all", request.PageNumber
             );
 
-            var (items, totalCount) = await _assignmentRepository.GetMyAssignmentsAsync(
+            var (items, totalCount) = await _assignmentRepository.GetMyAssignments(
                 employeeId,
                 request
             );
@@ -437,7 +437,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 managerId, request.StatusFilter ?? "all", request.PageNumber
             );
 
-            var (items, totalCount) = await _assignmentRepository.GetTeamAssignmentsAsync(
+            var (items, totalCount) = await _assignmentRepository.GetTeamAssignments(
                 managerId,
                 request
             );
@@ -511,7 +511,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 smeEmployeeId, request.StatusFilter ?? "all", request.SearchTerm ?? "none", request.SortField ?? "default", request.SortOrder ?? "default", request.PageNumber, request.PageSize
             );
 
-            var (items, totalCount) = await _assignmentRepository.GetSmeAssignmentsAsync(
+            var (items, totalCount) = await _assignmentRepository.GetSmeAssignments(
                 smeEmployeeId,
                 request
             );
@@ -544,7 +544,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                             "GetSmeAssignments: Overdue assignment detected. AssignmentId={AssignmentId}, Deadline={Deadline}, DaysOverdue={DaysOverdue}, Status={Status}",
                             a.AssignmentId, deadlineDate, daysOverdue, a.Status
                         );
-                    }
+                    }    
 
                     return new AssignmentResponseModel
                     {
@@ -606,10 +606,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
 
             var allAssignments =
-                await _assignmentRepository.GetAllTeamAssignmentsForExportAsync(
+                await _assignmentRepository.GetAllTeamAssignmentsForExport(
                     managerId,
                     request
-                );
+                ); 
 
             Log.Debug(
                 "ExportTeamAssignmentsToExcel: Retrieved {Count} assignments for export",

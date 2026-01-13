@@ -24,7 +24,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         #region Employee Queries
 
         /// <summary>Gets an employee by ID with profile, authentication, and department details.</summary>
-        public async Task<Employee?> GetEmployeeByIdAsync(int employeeId)
+        public async Task<Employee?> GetEmployeeById(int employeeId)
         {
             Log.Debug("GetEmployeeByIdAsync called. EmployeeId={EmployeeId}", employeeId);
 
@@ -44,7 +44,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>Gets paginated subordinate employees with search across name, email, and department.</summary>
-        public async Task<(List<Employee> Items, int TotalCount)> GetSubordinateEmployeesAsync(
+        public async Task<(List<Employee> Items, int TotalCount)> GetSubordinateEmployees(
             int managerId,
             SubordinateEmployeesRequestModel request
         )
@@ -106,7 +106,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         #region Skill Queries
 
         /// <summary>Gets all skills ordered by skill name.</summary>
-        public async Task<List<MasterSkill>> GetAllSkillsAsync()
+        public async Task<List<MasterSkill>> GetAllSkills()
         {
             Log.Debug("GetAllSkillsAsync called");
 
@@ -118,7 +118,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>Gets a single skill by ID.</summary>
-        public async Task<MasterSkill?> GetSkillByIdAsync(int skillId)
+        public async Task<MasterSkill?> GetSkillById(int skillId)
         {
             Log.Debug("GetSkillByIdAsync called. SkillId={SkillId}", skillId);
 
@@ -140,7 +140,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         public async Task<(
             List<Lndemployeeskillmapper> Items,
             int TotalCount
-        )> GetSubordinateSkillsAsync(
+        )> GetSubordinateSkills(
             int managerId,
             SubordinateSkillsRequestModel request
         )
@@ -189,7 +189,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>Gets paginated skill mappings for a specific employee.</summary>
-        public async Task<(List<Lndemployeeskillmapper> Items, int TotalCount)> GetMySkillsAsync(
+        public async Task<(List<Lndemployeeskillmapper> Items, int TotalCount)> GetMySkills(
             int employeeId,
             MySkillsRequestModel request
         )
@@ -227,7 +227,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>Gets a skill mapping by employee ID and skill ID.</summary>
-        public async Task<Lndemployeeskillmapper?> GetEmployeeSkillMappingAsync(
+        public async Task<Lndemployeeskillmapper?> GetEmployeeSkillMapping(
             int employeeId,
             int skillId
         )
@@ -255,7 +255,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>Gets a skill mapping by mapper ID.</summary>
-        public async Task<Lndemployeeskillmapper?> GetEmployeeSkillMappingByIdAsync(int mapperId)
+        public async Task<Lndemployeeskillmapper?> GetEmployeeSkillMappingById(int mapperId)
         {
             Log.Debug("GetEmployeeSkillMappingByIdAsync called. MapperId={MapperId}", mapperId);
 
@@ -274,7 +274,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>Gets existing skill IDs for an employee from a list of skill IDs.</summary>
-        public async Task<List<int>> GetExistingSkillMappingsAsync(
+        public async Task<List<int>> GetExistingSkillMappings(
             int employeeId,
             List<int> skillIds
         )
@@ -304,7 +304,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         #region Skill Mapping Modifications
 
         /// <summary>Adds a single skill mapping and returns the saved entity with generated ID.</summary>
-        public async Task<Lndemployeeskillmapper> AddEmployeeSkillAsync(
+        public async Task<Lndemployeeskillmapper> AddEmployeeSkill(
             Lndemployeeskillmapper mapper
         )
         {
@@ -321,11 +321,11 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 mapper.MapperId, mapper.EmployeeId, mapper.SkillId
             );
 
-            return (await GetEmployeeSkillMappingByIdAsync(mapper.MapperId))!;
+            return (await GetEmployeeSkillMappingById(mapper.MapperId))!;
         }
 
         /// <summary>Adds multiple skill mappings in bulk and returns the saved entities.</summary>
-        public async Task<List<Lndemployeeskillmapper>> AddEmployeeSkillsAsync(
+        public async Task<List<Lndemployeeskillmapper>> AddEmployeeSkills(
             List<Lndemployeeskillmapper> mappers
         )
         {
@@ -346,7 +346,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>Updates an existing skill mapping in the database context (requires SaveChanges).</summary>
-        public async Task UpdateEmployeeSkillAsync(Lndemployeeskillmapper mapper)
+        public async Task UpdateEmployeeSkill(Lndemployeeskillmapper mapper)
         {
             Log.Information(
                 "UpdateEmployeeSkillAsync called. MapperId={MapperId}, EmployeeId={EmployeeId}, SkillId={SkillId}, Rating={Rating}",
@@ -359,7 +359,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>Deletes a skill mapping from the database context (requires SaveChanges).</summary>
-        public async Task DeleteEmployeeSkillAsync(Lndemployeeskillmapper mapper)
+        public async Task DeleteEmployeeSkill(Lndemployeeskillmapper mapper)
         {
             Log.Information(
                 "DeleteEmployeeSkillAsync called. MapperId={MapperId}, EmployeeId={EmployeeId}, SkillId={SkillId}",
@@ -371,7 +371,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             Log.Debug("DeleteEmployeeSkillAsync: Mapper removed from context. Pending SaveChanges");
         }
 
-        public async Task<List<Lndapproval>> GetPendingSkillApprovalsAsync(int employeeId, int skillId)
+        public async Task<List<Lndapproval>> GetPendingSkillApprovals(int employeeId, int skillId)
         {
             Log.Debug(
                 "GetPendingSkillApprovalsAsync called. EmployeeId={EmployeeId}, SkillId={SkillId}",
@@ -394,7 +394,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>Gets active assignments for a specific employee and skill.</summary>
-        public async Task<List<Lndassignment>> GetActiveAssignmentsForSkillAsync(int employeeId, int skillId)
+        public async Task<List<Lndassignment>> GetActiveAssignmentsForSkill(int employeeId, int skillId)
         {
             Log.Debug(
                 "GetActiveAssignmentsForSkillAsync called. EmployeeId={EmployeeId}, SkillId={SkillId}",
@@ -419,7 +419,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>Gets pending approvals for specific assignments.</summary>
-        public async Task<List<Lndapproval>> GetPendingAssignmentApprovalsAsync(List<int> assignmentIds)
+        public async Task<List<Lndapproval>> GetPendingAssignmentApprovals(List<int> assignmentIds)
         {
             Log.Debug(
                 "GetPendingAssignmentApprovalsAsync called. AssignmentCount={Count}",
@@ -445,7 +445,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>Deletes multiple approvals from the database.</summary>
-        public async Task DeleteApprovalsAsync(List<Lndapproval> approvals)
+        public async Task DeleteApprovals(List<Lndapproval> approvals)
         {
             Log.Debug(
                 "DeleteApprovalsAsync called. Count={Count}",
@@ -462,7 +462,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>Deletes multiple assignments from the database.</summary>
-        public async Task DeleteAssignmentsAsync(List<Lndassignment> assignments)
+        public async Task DeleteAssignments(List<Lndassignment> assignments)
         {
             Log.Debug(
                 "DeleteAssignmentsAsync called. Count={Count}",

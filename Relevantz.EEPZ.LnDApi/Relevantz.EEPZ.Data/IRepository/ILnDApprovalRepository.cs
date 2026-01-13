@@ -5,20 +5,20 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
 {
     public interface ILnDApprovalRepository
     {
-        Task<Lndapproval?> GetApprovalByIdAsync(int approvalId);
-        Task<Lndapproval?> GetPendingSmeRegistrationAsync(int employeeId, int skillId);
-        Task<Lndapproval> AddApprovalAsync(Lndapproval approval);
-        Task UpdateApprovalAsync(Lndapproval approval);
-        Task<(List<Lndapproval> Items, int TotalCount)> GetMyApprovalsAsync(
+        Task<Lndapproval?> GetApprovalById(int approvalId);
+        Task<Lndapproval?> GetPendingSmeRegistration(int employeeId, int skillId);
+        Task<Lndapproval> AddApproval(Lndapproval approval);
+        Task UpdateApproval(Lndapproval approval);
+        Task<(List<Lndapproval> Items, int TotalCount)> GetMyApprovals(
             int employeeId,
             MyApprovalsRequestModel request
         );
-        Task<(List<Lndapproval> Items, int TotalCount)> GetApprovalHistoryAsync(
+        Task<(List<Lndapproval> Items, int TotalCount)> GetApprovalHistory(
             int employeeId,
             ApprovalHistoryRequestModel request
         );
-        Task<Lndapproval?> GetPendingAssignmentApprovalAsync(int assignmentId, string approvalType);
-        Task<Lndattachment> AddAttachmentAsync(Lndattachment attachment);
-        Task<Lndattachment?> GetAttachmentByIdAsync(int attachmentId);
+        Task<Lndapproval?> GetPendingAssignmentApproval(int assignmentId, string approvalType);
+        Task<Lndattachment> AddAttachment(Lndattachment attachment);
+        Task<Lndattachment?> GetAttachmentById(int attachmentId);
     }
 }

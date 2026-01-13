@@ -5,16 +5,16 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
 {
     public interface ILnDHRRepository
     {
-        Task<(List<Employee> Items, int TotalCount)> GetAllOrganizationEmployeesAsync(
+        Task<(List<Employee> Items, int TotalCount)> GetAllOrganizationEmployees(
             OrganizationEmployeesRequestModel request
         );
-        Task<(List<Lndassignment> Items, int TotalCount)> GetAllOrganizationAssignmentsAsync(
+        Task<(List<Lndassignment> Items, int TotalCount)> GetAllOrganizationAssignments(
             OrganizationAssignmentsRequestModel request
         );
-        Task<List<Lndassignment>> GetAllOrganizationAssignmentsForExportAsync(
+        Task<List<Lndassignment>> GetAllOrganizationAssignmentsForExport(
             ExportOrganizationAssignmentsRequestModel request
         );
-        Task<(List<Lndemployeeskillmapper> Items, int TotalCount)> GetEmployeeSkillsByIdAsync(
+        Task<(List<Lndemployeeskillmapper> Items, int TotalCount)> GetEmployeeSkillsById(
             int employeeId,
             EmployeeSkillsByIdRequestModel request
         );

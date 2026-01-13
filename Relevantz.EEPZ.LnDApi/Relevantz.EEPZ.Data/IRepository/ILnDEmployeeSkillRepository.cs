@@ -5,35 +5,35 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
 {
     public interface ILnDEmployeeSkillRepository
     {
-        Task<Employee?> GetEmployeeByIdAsync(int employeeId);
-        Task<(List<Employee> Items, int TotalCount)> GetSubordinateEmployeesAsync(
+        Task<Employee?> GetEmployeeById(int employeeId);
+        Task<(List<Employee> Items, int TotalCount)> GetSubordinateEmployees(
             int managerId,
             SubordinateEmployeesRequestModel request
         );
-        Task<List<MasterSkill>> GetAllSkillsAsync();
-        Task<MasterSkill?> GetSkillByIdAsync(int skillId);
-        Task<(List<Lndemployeeskillmapper> Items, int TotalCount)> GetSubordinateSkillsAsync(
+        Task<List<MasterSkill>> GetAllSkills();
+        Task<MasterSkill?> GetSkillById(int skillId);
+        Task<(List<Lndemployeeskillmapper> Items, int TotalCount)> GetSubordinateSkills(
             int managerId,
             SubordinateSkillsRequestModel request
         );
-        Task<Lndemployeeskillmapper?> GetEmployeeSkillMappingAsync(int employeeId, int skillId);
-        Task<Lndemployeeskillmapper?> GetEmployeeSkillMappingByIdAsync(int mapperId);
-        Task<Lndemployeeskillmapper> AddEmployeeSkillAsync(Lndemployeeskillmapper mapper);
-        Task<List<Lndemployeeskillmapper>> AddEmployeeSkillsAsync(
+        Task<Lndemployeeskillmapper?> GetEmployeeSkillMapping(int employeeId, int skillId);
+        Task<Lndemployeeskillmapper?> GetEmployeeSkillMappingById(int mapperId);
+        Task<Lndemployeeskillmapper> AddEmployeeSkill(Lndemployeeskillmapper mapper);
+        Task<List<Lndemployeeskillmapper>> AddEmployeeSkills(
             List<Lndemployeeskillmapper> mappers
         );
-        Task UpdateEmployeeSkillAsync(Lndemployeeskillmapper mapper);
-        Task DeleteEmployeeSkillAsync(Lndemployeeskillmapper mapper);
-        Task<(List<Lndemployeeskillmapper> Items, int TotalCount)> GetMySkillsAsync(
+        Task UpdateEmployeeSkill(Lndemployeeskillmapper mapper);
+        Task DeleteEmployeeSkill(Lndemployeeskillmapper mapper);
+        Task<(List<Lndemployeeskillmapper> Items, int TotalCount)> GetMySkills(
             int employeeId,
             MySkillsRequestModel request
         );
-        Task<List<int>> GetExistingSkillMappingsAsync(int employeeId, List<int> skillIds);
+        Task<List<int>> GetExistingSkillMappings(int employeeId, List<int> skillIds);
 
-        Task<List<Lndapproval>> GetPendingSkillApprovalsAsync(int employeeId, int skillId);
-        Task<List<Lndassignment>> GetActiveAssignmentsForSkillAsync(int employeeId, int skillId);
-        Task<List<Lndapproval>> GetPendingAssignmentApprovalsAsync(List<int> assignmentIds);
-        Task DeleteApprovalsAsync(List<Lndapproval> approvals);
-        Task DeleteAssignmentsAsync(List<Lndassignment> assignments);
+        Task<List<Lndapproval>> GetPendingSkillApprovals(int employeeId, int skillId);
+        Task<List<Lndassignment>> GetActiveAssignmentsForSkill(int employeeId, int skillId);
+        Task<List<Lndapproval>> GetPendingAssignmentApprovals(List<int> assignmentIds);
+        Task DeleteApprovals(List<Lndapproval> approvals);
+        Task DeleteAssignments(List<Lndassignment> assignments);
     }
 }

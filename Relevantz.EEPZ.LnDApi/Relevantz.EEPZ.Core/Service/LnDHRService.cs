@@ -34,7 +34,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 request.SearchTerm ?? "none", request.PageNumber, request.PageSize
             );
 
-            var (items, totalCount) = await _hrRepository.GetAllOrganizationEmployeesAsync(request);
+            var (items, totalCount) = await _hrRepository.GetAllOrganizationEmployees(request);
 
             Log.Debug(
                 "GetAllOrganizationEmployees: Retrieved {ItemCount} employees from database. TotalCount={TotalCount}",
@@ -87,7 +87,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             var pageSize = 10;
 
-            var (items, totalCount) = await _hrRepository.GetEmployeeSkillsByIdAsync(
+            var (items, totalCount) = await _hrRepository.GetEmployeeSkillsById(
                 employeeId,
                 request
             );
@@ -148,7 +148,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 request.StatusFilter ?? "all", request.SearchTerm ?? "none", request.PageNumber, request.PageSize
             );
 
-            var (items, totalCount) = await _hrRepository.GetAllOrganizationAssignmentsAsync(request);
+            var (items, totalCount) = await _hrRepository.GetAllOrganizationAssignments(request);
 
             Log.Debug(
                 "GetAllOrganizationAssignments: Retrieved {ItemCount} assignments. TotalCount={TotalCount}",
@@ -227,7 +227,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
 
             var allAssignments =
-                await _hrRepository.GetAllOrganizationAssignmentsForExportAsync(request);
+                await _hrRepository.GetAllOrganizationAssignmentsForExport(request);
 
             Log.Debug(
                 "ExportOrganizationAssignmentsToExcel: Retrieved {Count} assignments for export",

@@ -5,24 +5,24 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
 {
     public interface ILnDAssignmentRepository
     {
-        Task<List<Lndassignment>> GetOverdueAssignmentsAsync();
-        Task<int> MarkAssignmentsAsOverdueAsync();
-        Task<Lndassignment?> GetAssignmentByIdAsync(int assignmentId);
-        Task<Lndassignment> AddAssignmentAsync(Lndassignment assignment);
-        Task UpdateAssignmentAsync(Lndassignment assignment);
-        Task<(List<Lndassignment> Items, int TotalCount)> GetMyAssignmentsAsync(
+        Task<List<Lndassignment>> GetOverdueAssignments();
+        Task<int> MarkAssignmentsAsOverdue();
+        Task<Lndassignment?> GetAssignmentById(int assignmentId);
+        Task<Lndassignment> AddAssignment(Lndassignment assignment);
+        Task UpdateAssignment(Lndassignment assignment);
+        Task<(List<Lndassignment> Items, int TotalCount)> GetMyAssignments(
             int employeeId,
             AssignmentRequestModel request
         );
-        Task<(List<Lndassignment> Items, int TotalCount)> GetTeamAssignmentsAsync(
+        Task<(List<Lndassignment> Items, int TotalCount)> GetTeamAssignments(
             int managerId,
             AssignmentRequestModel request
         );
-        Task<(List<Lndassignment> Items, int TotalCount)> GetSmeAssignmentsAsync(
+        Task<(List<Lndassignment> Items, int TotalCount)> GetSmeAssignments(
             int smeEmployeeId,
             AssignmentRequestModel request
         );
-        Task<List<Lndassignment>> GetAllTeamAssignmentsForExportAsync(
+        Task<List<Lndassignment>> GetAllTeamAssignmentsForExport(
             int managerId,
             ExportAssignmentRequestModel request
         );

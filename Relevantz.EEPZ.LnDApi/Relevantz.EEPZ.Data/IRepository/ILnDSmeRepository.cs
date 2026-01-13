@@ -5,17 +5,17 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
 {
     public interface ILnDSmeRepository
     {
-        Task<bool> IsEmployeeSmeAsync(int employeeId);
-        Task<Lndsme?> GetActiveSmeAsync(int employeeId, int skillId);
-        Task<Lndsme> AddSmeAsync(Lndsme sme);
-        Task UpdateSmeAsync(Lndsme sme);
-        Task<(List<Lndsme> Items, int TotalCount)> GetAvailableSmesWithAssignmentCountsAsync(
+        Task<bool> IsEmployeeSme(int employeeId);
+        Task<Lndsme?> GetActiveSme(int employeeId, int skillId);
+        Task<Lndsme> AddSme(Lndsme sme);
+        Task UpdateSme(Lndsme sme);
+        Task<(List<Lndsme> Items, int TotalCount)> GetAvailableSmesWithAssignmentCounts(
             AvailableSmesRequestModel request,
             int maxAssignments
         );
-        Task<int> GetSmeInProgressAssignmentCountAsync(int smeId);
-        Task<(List<Lndsme> Items, int TotalCount)> GetAllActiveSmesAsync(ActiveSmesRequestModel request);
-        Task<List<Lndsme>> GetAllActiveSmesForExportAsync(ExportActiveSmesRequestModel request);
+        Task<int> GetSmeInProgressAssignmentCount(int smeId);
+        Task<(List<Lndsme> Items, int TotalCount)> GetAllActiveSmes(ActiveSmesRequestModel request);
+        Task<List<Lndsme>> GetAllActiveSmesForExport(ExportActiveSmesRequestModel request);
         Task<Lndsme?> GetSmeFromEmployeeId(Dictionary<string, object> assignmentDetails);
     }
 }

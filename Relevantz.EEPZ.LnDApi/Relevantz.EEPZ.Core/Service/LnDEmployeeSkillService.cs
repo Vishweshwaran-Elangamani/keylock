@@ -41,7 +41,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 managerId, request.SearchTerm ?? "none", request.PageNumber, request.PageSize
             );
 
-            var manager = await _repository.GetEmployeeByIdAsync(managerId);
+            var manager = await _repository.GetEmployeeById(managerId);
 
             if (manager == null)
             {
@@ -54,7 +54,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
             }
 
-            var (items, totalCount) = await _repository.GetSubordinateEmployeesAsync(
+            var (items, totalCount) = await _repository.GetSubordinateEmployees(
                 managerId,
                 request
             );
@@ -106,7 +106,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             Log.Information("GetAllSkills started");
 
-            var skills = await _repository.GetAllSkillsAsync();
+            var skills = await _repository.GetAllSkills();
 
             var skillResponseModels = skills
                 .Select(s => new SkillResponseModel { SkillId = s.SkillId, SkillName = s.SkillName })
@@ -133,7 +133,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 managerId, request.EmployeeId?.ToString() ?? "all", request.SearchTerm ?? "none", request.SortBy ?? "default", request.PageNumber
             );
 
-            var manager = await _repository.GetEmployeeByIdAsync(managerId);
+            var manager = await _repository.GetEmployeeById(managerId);
 
             if (manager == null)
             {
@@ -146,7 +146,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
             }
 
-            var (items, totalCount) = await _repository.GetSubordinateSkillsAsync(
+            var (items, totalCount) = await _repository.GetSubordinateSkills(
                 managerId,
                 request
             );
@@ -204,7 +204,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 employeeId, request.SearchTerm ?? "none", request.PageNumber, request.PageSize
             );
 
-            var (items, totalCount) = await _repository.GetMySkillsAsync(employeeId, request);
+            var (items, totalCount) = await _repository.GetMySkills(employeeId, request);
 
             Log.Debug("GetMySkills: Retrieved {ItemCount} skills. TotalCount={TotalCount}", items.Count, totalCount);
 
@@ -260,7 +260,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 managerId, request.EmployeeId, request.SkillId, request.Rating
             );
 
-            var employee = await _repository.GetEmployeeByIdAsync(request.EmployeeId);
+            var employee = await _repository.GetEmployeeById(request.EmployeeId);
 
             if (employee == null || employee.ReportingManagerEmployeeId != managerId)
             {
@@ -276,7 +276,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
             }
 
-            var skill = await _repository.GetSkillByIdAsync(request.SkillId);
+            var skill = await _repository.GetSkillById(request.SkillId);
 
             if (skill == null)
             {
@@ -289,7 +289,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
             }
 
-            var existingMapping = await _repository.GetEmployeeSkillMappingAsync(
+            var existingMapping = await _repository.GetEmployeeSkillMapping(
                 request.EmployeeId,
                 request.SkillId
             );
@@ -319,7 +319,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 UpdatedOn = DateOnly.FromDateTime(DateTime.Now),
             };
 
-            var savedMapper = await _repository.AddEmployeeSkillAsync(mapper);
+            var savedMapper = await _repository.AddEmployeeSkill(mapper);
             await _baseRepository.SaveChangesAsync();
 
             Log.Information(
@@ -359,7 +359,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 managerId, request.EmployeeId, request.Skills?.Count ?? 0
             );
 
-            var employee = await _repository.GetEmployeeByIdAsync(request.EmployeeId);
+            var employee = await _repository.GetEmployeeById(request.EmployeeId);
 
             if (employee == null || employee.ReportingManagerEmployeeId != managerId)
             {
@@ -376,10 +376,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
 
             var skillIds = request.Skills.Select(s => s.SkillId).ToList();
-            var skills = await _repository.GetAllSkillsAsync();
+            var skills = await _repository.GetAllSkills();
             var relevantSkills = skills.Where(s => skillIds.Contains(s.SkillId)).ToList();
 
-            var existingMappings = await _repository.GetExistingSkillMappingsAsync(
+            var existingMappings = await _repository.GetExistingSkillMappings(
                 request.EmployeeId,
                 skillIds
             );
@@ -419,7 +419,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             if (newMappings.Any())
             {
-                await _repository.AddEmployeeSkillsAsync(newMappings);
+                await _repository.AddEmployeeSkills(newMappings);
                 await _baseRepository.SaveChangesAsync();
 
                 results = newMappings
@@ -464,7 +464,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 managerId, request.MapperId, request.Rating
             );
 
-            var mapper = await _repository.GetEmployeeSkillMappingByIdAsync(request.MapperId);
+            var mapper = await _repository.GetEmployeeSkillMappingById(request.MapperId);
 
             if (mapper == null || mapper.Employee.ReportingManagerEmployeeId != managerId)
             {
@@ -485,7 +485,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             mapper.UpdatedByEmployeeId = managerId;
             mapper.UpdatedOn = DateOnly.FromDateTime(DateTime.Now);
 
-            var smeRecord = await _smeRepository.GetActiveSmeAsync(
+            var smeRecord = await _smeRepository.GetActiveSme(
                 mapper.EmployeeId,
                 mapper.SkillId
             );
@@ -498,10 +498,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
 
                 smeRecord.IsActive = false;
-                await _smeRepository.UpdateSmeAsync(smeRecord);
+                await _smeRepository.UpdateSme(smeRecord);
             }
 
-            await _repository.UpdateEmployeeSkillAsync(mapper);
+            await _repository.UpdateEmployeeSkill(mapper);
             await _baseRepository.SaveChangesAsync();
 
             Log.Information(
@@ -538,7 +538,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 managerId, mapperId
             );
 
-            var mapper = await _repository.GetEmployeeSkillMappingByIdAsync(mapperId);
+            var mapper = await _repository.GetEmployeeSkillMappingById(mapperId);
 
             if (mapper == null || mapper.Employee.ReportingManagerEmployeeId != managerId)
             {
@@ -554,7 +554,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
             }
 
-            var pendingSkillApprovals = await _repository.GetPendingSkillApprovalsAsync(
+            var pendingSkillApprovals = await _repository.GetPendingSkillApprovals(
                 mapper.EmployeeId,
                 mapper.SkillId
             );
@@ -565,10 +565,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     "DeleteEmployeeSkill: Deleting {Count} pending skill approvals. EmployeeId={EmployeeId}, SkillId={SkillId}",
                     pendingSkillApprovals.Count, mapper.EmployeeId, mapper.SkillId
                 );
-                await _repository.DeleteApprovalsAsync(pendingSkillApprovals);
+                await _repository.DeleteApprovals(pendingSkillApprovals);
             }
 
-            var relatedAssignments = await _repository.GetActiveAssignmentsForSkillAsync(
+            var relatedAssignments = await _repository.GetActiveAssignmentsForSkill(
                 mapper.EmployeeId,
                 mapper.SkillId
             );
@@ -577,7 +577,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 var assignmentIds = relatedAssignments.Select(a => a.AssignmentId).ToList();
 
-                var assignmentApprovals = await _repository.GetPendingAssignmentApprovalsAsync(assignmentIds);
+                var assignmentApprovals = await _repository.GetPendingAssignmentApprovals(assignmentIds);
 
                 if (assignmentApprovals.Any())
                 {
@@ -585,17 +585,17 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         "DeleteEmployeeSkill: Deleting {Count} pending assignment approvals",
                         assignmentApprovals.Count
                     );
-                    await _repository.DeleteApprovalsAsync(assignmentApprovals);
+                    await _repository.DeleteApprovals(assignmentApprovals);
                 }
 
                 Log.Information(
                     "DeleteEmployeeSkill: Deleting {Count} related assignments. EmployeeId={EmployeeId}, SkillId={SkillId}",
                     relatedAssignments.Count, mapper.EmployeeId, mapper.SkillId
                 );
-                await _repository.DeleteAssignmentsAsync(relatedAssignments);
+                await _repository.DeleteAssignments(relatedAssignments);
             }
 
-            var smeRecord = await _smeRepository.GetActiveSmeAsync(
+            var smeRecord = await _smeRepository.GetActiveSme(
                 mapper.EmployeeId,
                 mapper.SkillId
             );
@@ -608,10 +608,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
 
                 smeRecord.IsActive = false;
-                await _smeRepository.UpdateSmeAsync(smeRecord);
+                await _smeRepository.UpdateSme(smeRecord);
             }
 
-            await _repository.DeleteEmployeeSkillAsync(mapper);
+            await _repository.DeleteEmployeeSkill(mapper);
 
             await _baseRepository.SaveChangesAsync();
 

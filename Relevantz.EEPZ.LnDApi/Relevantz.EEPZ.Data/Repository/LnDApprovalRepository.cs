@@ -27,7 +27,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         /// Gets a single approval by ID with all related entities including employees, skill, attachment, and assignment.
         /// Returns null if approval is not found.
         /// </summary>
-        public async Task<Lndapproval?> GetApprovalByIdAsync(int approvalId)
+        public async Task<Lndapproval?> GetApprovalById(int approvalId)
         {
             Log.Debug("GetApprovalByIdAsync called. ApprovalId={ApprovalId}", approvalId);
 
@@ -60,7 +60,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         /// Checks if a pending SME registration approval exists for the given employee and skill.
         /// Returns null if no pending approval is found.
         /// </summary>
-        public async Task<Lndapproval?> GetPendingSmeRegistrationAsync(int employeeId, int skillId)
+        public async Task<Lndapproval?> GetPendingSmeRegistration(int employeeId, int skillId)
         {
             Log.Debug("GetPendingSmeRegistrationAsync called. EmployeeId={EmployeeId}, SkillId={SkillId}",
                 employeeId, skillId);
@@ -85,7 +85,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         /// Gets pending approval for an assignment by assignment ID and approval type.
         /// Returns null if no pending approval exists.
         /// </summary>
-        public async Task<Lndapproval?> GetPendingAssignmentApprovalAsync(
+        public async Task<Lndapproval?> GetPendingAssignmentApproval(
             int assignmentId,
             string approvalType
         )
@@ -112,7 +112,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         /// Gets paginated approvals assigned to an employee as approver with filtering, sorting, and search.
         /// Returns list of approvals and total count for pagination.
         /// </summary>
-        public async Task<(List<Lndapproval> Items, int TotalCount)> GetMyApprovalsAsync(
+        public async Task<(List<Lndapproval> Items, int TotalCount)> GetMyApprovals(
             int employeeId,
             MyApprovalsRequestModel request
         )
@@ -229,7 +229,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         /// Gets complete approval history for an employee as requester or approver with filtering and pagination.
         /// Supports role-based filtering (requester/approver/all) and full-text search.
         /// </summary>
-        public async Task<(List<Lndapproval> Items, int TotalCount)> GetApprovalHistoryAsync(
+        public async Task<(List<Lndapproval> Items, int TotalCount)> GetApprovalHistory(
             int employeeId,
             ApprovalHistoryRequestModel request
         )
@@ -329,7 +329,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         /// Adds a new approval to the database context.
         /// Requires SaveChanges to be called separately to persist.
         /// </summary>
-        public async Task<Lndapproval> AddApprovalAsync(Lndapproval approval)
+        public async Task<Lndapproval> AddApproval(Lndapproval approval)
         {
             Log.Information(
                 "AddApprovalAsync called. ApprovalType={ApprovalType}, RequesterEmployeeId={RequesterEmployeeId}, ApproverEmployeeId={ApproverEmployeeId}",
@@ -347,7 +347,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         /// Updates an existing approval in the database context.
         /// Requires SaveChanges to be called separately to persist.
         /// </summary>
-        public async Task UpdateApprovalAsync(Lndapproval approval)
+        public async Task UpdateApproval(Lndapproval approval)
         {
             Log.Information(
                 "UpdateApprovalAsync called. ApprovalId={ApprovalId}, Status={Status}",
@@ -367,7 +367,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         /// Adds a new attachment to the database context.
         /// Requires SaveChanges to be called separately to persist.
         /// </summary>
-        public async Task<Lndattachment> AddAttachmentAsync(Lndattachment attachment)
+        public async Task<Lndattachment> AddAttachment(Lndattachment attachment)
         {
             Log.Information(
                 "AddAttachmentAsync called. FileName={FileName}, AttachmentType={AttachmentType}, FileSize={FileSize}",
@@ -385,7 +385,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         /// Gets an attachment by ID.
         /// Returns null if attachment is not found.
         /// </summary>
-        public async Task<Lndattachment?> GetAttachmentByIdAsync(int attachmentId)
+        public async Task<Lndattachment?> GetAttachmentById(int attachmentId)
         {
             Log.Debug("GetAttachmentByIdAsync called. AttachmentId={AttachmentId}", attachmentId);
 
