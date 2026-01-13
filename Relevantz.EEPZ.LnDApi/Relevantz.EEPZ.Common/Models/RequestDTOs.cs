@@ -148,6 +148,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string? SearchTerm { get; set; }
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 9;
+        public string ExcludeDepartment { get; set; }
     }
 
     /// <summary>

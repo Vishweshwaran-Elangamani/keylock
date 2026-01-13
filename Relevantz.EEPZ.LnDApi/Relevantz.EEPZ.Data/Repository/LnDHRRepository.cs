@@ -25,15 +25,24 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         /// <summary>Gets paginated active employees with search across name, email, and department.</summary>
         public async Task<(List<Employee> Items, int TotalCount)> GetAllOrganizationEmployees(
-            OrganizationEmployeesRequestModel request
-        )
+     OrganizationEmployeesRequestModel request
+ )
         {
             Log.Information(
-                "GetAllOrganizationEmployeesAsync called. SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}",
-                request.SearchTerm ?? "none", request.PageNumber, request.PageSize
+                "GetAllOrganizationEmployeesAsync called. SearchTerm={SearchTerm}, Page={PageNumber}, PageSize={PageSize}, ExcludeDepartment={ExcludeDepartment}",
+                request.SearchTerm ?? "none", request.PageNumber, request.PageSize, request.ExcludeDepartment ?? "none"
             );
 
-            var baseQuery = _context.Employees.Where(e => e.EmploymentStatus == "Active");
+            var baseQuery = _context.Employees.Where(e => e.EmploymentStatus == "Active");      
+
+            if (!string.IsNullOrEmpty(request.ExcludeDepartment))
+            {
+                baseQuery = baseQuery.Where(e =>
+                    !e.Employeedetailsmasters.Any(edm =>
+                        edm.Department.DepartmentName == request.ExcludeDepartment
+                    )
+                ); 
+            }
 
             if (!string.IsNullOrEmpty(request.SearchTerm))
             {
@@ -90,7 +99,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .ThenInclude(e => e.Userprofile)
                 .Include(m => m.Skill)
                 .ThenInclude(s => s.Lndsmes)
-                .Where(m => m.EmployeeId == employeeId);
+                .Where(m => m.EmployeeId == employeeId);  
 
             if (!string.IsNullOrEmpty(request.SearchTerm))
             {
@@ -115,7 +124,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             );
 
             return (items, totalCount);
-        }
+        }  
 
         #endregion
 
@@ -142,7 +151,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .Include(a => a.Sme)
                 .ThenInclude(s => s.Employee)
                 .ThenInclude(e => e.Userprofile)
-                .AsQueryable();
+                .AsQueryable();  
 
             if (!string.IsNullOrEmpty(request.StatusFilter))
             {

@@ -7,6 +7,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
     /// <summary>
     /// Base controller for LnD module with shared helper methods
     /// </summary>
+    
     public abstract class BaseLnDController : ControllerBase
     {
         protected int GetCurrentEmployeeId()

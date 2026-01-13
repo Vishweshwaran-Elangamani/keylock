@@ -9,4 +9,8 @@ namespace Relevantz.EEPZ.Common.DTOs
         public DateTime UploadDate { get; set; }
         public string SubFolder { get; set; } = string.Empty;
     }
-}
+}     
+
+
+
+
