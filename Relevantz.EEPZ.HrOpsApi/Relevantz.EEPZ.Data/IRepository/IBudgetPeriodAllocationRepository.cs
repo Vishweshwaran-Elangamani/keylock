@@ -1,4 +1,6 @@
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.DTOs.Response;
+
 namespace Relevantz.EEPZ.Data.IRepository
 {
     public interface IBudgetPeriodAllocationRepository
@@ -10,5 +12,6 @@ namespace Relevantz.EEPZ.Data.IRepository
         Task<List<Budgetperiodallocation>> GetAllAsync();
         Task<List<Budgetperiodallocation>> GetByBudgetIdAsync(int budgetId);
         Task<Budgetperiodallocation?> GetByBudgetPeriodYearAsync(int budgetId, string period, int periodYear);
+        Task<PeriodAllocationResponseDto?> GetPeriodAllocationDetailsAsync(int periodAllocationId);
     }
 }

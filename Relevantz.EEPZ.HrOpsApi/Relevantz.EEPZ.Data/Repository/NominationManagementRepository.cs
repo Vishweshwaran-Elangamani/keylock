@@ -1,27 +1,33 @@
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.IRepository;
 using Microsoft.EntityFrameworkCore;
+
 namespace Relevantz.EEPZ.Data.Repository
 {
     public class NominationManagementRepository : INominationManagementRepository
     {
         private readonly EEPZDbContext _context;
+
         public NominationManagementRepository(EEPZDbContext context)
         {
             _context = context;
         }
+
         public async Task<Nomination?> GetByIdAsync(int nominationId)
         {
             return await _context.Nominations
                 .FirstOrDefaultAsync(n => n.NominationId == nominationId);
         }
+
         public async Task<List<Nomination>> GetAllAsync()
         {
             return await _context.Nominations
                 .OrderByDescending(n => n.SubmittedAt)
                 .ToListAsync();
         }
+
         public async Task<List<Nomination>> GetByStatusAsync(string status)
         {
             return await _context.Nominations
@@ -29,6 +35,7 @@ namespace Relevantz.EEPZ.Data.Repository
                 .OrderByDescending(n => n.SubmittedAt)
                 .ToListAsync();
         }
+
         public async Task<List<Nomination>> GetByOpportunityIdAsync(int opportunityId)
         {
             return await _context.Nominations
@@ -36,6 +43,7 @@ namespace Relevantz.EEPZ.Data.Repository
                 .OrderByDescending(n => n.SubmittedAt)
                 .ToListAsync();
         }
+
         public async Task<List<Nomination>> GetPendingReviewAsync()
         {
             return await _context.Nominations
@@ -43,24 +51,91 @@ namespace Relevantz.EEPZ.Data.Repository
                 .OrderBy(n => n.SubmittedAt)
                 .ToListAsync();
         }
+
         public async Task<Nomination> CreateAsync(Nomination nomination)
         {
             _context.Nominations.Add(nomination);
             await _context.SaveChangesAsync();
             return nomination;
         }
+
         public async Task<Nomination> UpdateAsync(Nomination nomination)
         {
             _context.Nominations.Update(nomination);
             await _context.SaveChangesAsync();
             return nomination;
         }
+
         public async Task<bool> CheckDuplicateNominationAsync(int opportunityId, int nomineeUserId)
         {
             return await _context.Nominations
                 .AnyAsync(n => n.OpportunityId == opportunityId &&
                               n.NomineeUserId == nomineeUserId &&
                               (n.Status == "Pending" || n.Status == "UnderReview" || n.Status == "Approved"));
+        }
+
+        // NEW METHOD - Moved from service layer
+        public async Task<NominationResponseDto?> GetNominationWithDetailsAsync(int nominationId)
+        {
+            var nomination = await _context.Nominations
+                .Where(n => n.NominationId == nominationId)
+                .Select(n => new
+                {
+                    n.NominationId,
+                    n.OpportunityId,
+                    OpportunityTitle = _context.Internalopportunities
+                        .Where(o => o.OpportunityId == n.OpportunityId)
+                        .Select(o => o.OpportunityName)
+                        .FirstOrDefault() ?? "Unknown",
+                    n.NomineeUserId,
+                    NomineeEmail = _context.Userauthentications
+                        .Where(u => u.UserId == n.NomineeUserId)
+                        .Select(u => u.Email)
+                        .FirstOrDefault() ?? "Unknown",
+                    n.NominationType,
+                    n.NominatedByUserId,
+                    NominatedByEmail = _context.Userauthentications
+                        .Where(u => u.UserId == n.NominatedByUserId)
+                        .Select(u => u.Email)
+                        .FirstOrDefault() ?? "Unknown",
+                    n.Justification,
+                    n.Status,
+                    n.ReviewedByUserId,
+                    ReviewedByEmail = n.ReviewedByUserId.HasValue
+                        ? _context.Userauthentications
+                            .Where(u => u.UserId == n.ReviewedByUserId)
+                            .Select(u => u.Email)
+                            .FirstOrDefault()
+                        : null,
+                    n.ReviewRemarks,
+                    n.SubmittedAt,
+                    n.ReviewedAt
+                })
+                .FirstOrDefaultAsync();
+
+            if (nomination == null)
+            {
+                return null;
+            }
+
+            return new NominationResponseDto
+            {
+                NominationId = nomination.NominationId,
+                OpportunityId = nomination.OpportunityId,
+                OpportunityTitle = nomination.OpportunityTitle,
+                NomineeEmail = nomination.NomineeEmail,
+                NomineeUserId = nomination.NomineeUserId,
+                NominationType = nomination.NominationType,
+                NominatedByUserId = nomination.NominatedByUserId,
+                NominatedByEmail = nomination.NominatedByEmail,
+                Justification = nomination.Justification,
+                Status = nomination.Status,
+                ReviewedByUserId = nomination.ReviewedByUserId,
+                ReviewedByEmail = nomination.ReviewedByEmail,
+                ReviewRemarks = nomination.ReviewRemarks,
+                SubmittedAt = nomination.SubmittedAt,
+                ReviewedAt = nomination.ReviewedAt
+            };
         }
     }
 }

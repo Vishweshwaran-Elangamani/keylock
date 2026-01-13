@@ -1,41 +1,34 @@
-using Relevantz.EEPZ.Data.DBContexts;
+using Microsoft.Extensions.Logging;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Common.Entities;
-using Relevantz.EEPZ.Data.IRepository;
 using Relevantz.EEPZ.Core.IService;
-using Microsoft.EntityFrameworkCore;
+using Relevantz.EEPZ.Data.IRepository;
 
 namespace Relevantz.EEPZ.Core.Service
 {
     public class FundAllocationService : IFundAllocationService
     {
         private readonly IFundAllocationRepository _fundAllocationRepository;
-        private readonly EEPZDbContext _context;
+        private readonly ILogger<FundAllocationService> _logger;
 
         public FundAllocationService(
             IFundAllocationRepository fundAllocationRepository,
-            EEPZDbContext context)
+            ILogger<FundAllocationService> logger)
         {
             _fundAllocationRepository = fundAllocationRepository;
-            _context = context;
+            _logger = logger;
         }
 
         public async Task<ApiResponseDto<FundAllocationResponseDto>> CreateFundAllocationAsync(CreateFundAllocationRequestDto request)
         {
             try
             {
-                Console.WriteLine($" Service: Creating fund allocation");
-                Console.WriteLine($"   BudgetId: {request.BudgetId}");
-                Console.WriteLine($"   DepartmentId: {request.DepartmentId}");
-                Console.WriteLine($"   Type: {request.AllocationType}");
-                Console.WriteLine($"   Amount: {request.Amount}");
-                Console.WriteLine($"   Period: {request.Period}");
-                Console.WriteLine($"   PeriodYear: {request.PeriodYear}");
+                _logger.LogInformation(
+                    "Service: Creating fund allocation. BudgetId: {BudgetId}, DepartmentId: {DepartmentId}, Type: {Type}, Amount: {Amount}, Period: {Period}, PeriodYear: {Year}",
+                    request.BudgetId, request.DepartmentId, request.AllocationType, request.Amount, request.Period, request.PeriodYear);
 
-                // Validate budget exists
-                var budgetExists = await _context.Departmentbudgets
-                    .AnyAsync(b => b.BudgetId == request.BudgetId);
+                var budgetExists = await _fundAllocationRepository.BudgetExistsAsync(request.BudgetId);
 
                 if (!budgetExists)
                 {
@@ -43,38 +36,26 @@ namespace Relevantz.EEPZ.Core.Service
                         $"Budget with ID {request.BudgetId} not found");
                 }
 
-                // Validate period allocation if period is specified
                 if (!string.IsNullOrEmpty(request.Period) && request.PeriodYear.HasValue)
                 {
-                    var periodAllocation = await _context.Budgetperiodallocations
-                        .FirstOrDefaultAsync(p => p.BudgetId == request.BudgetId
-                                                && p.Period == request.Period
-                                                && p.PeriodYear == request.PeriodYear.Value);
+                    var (exists, availableInPeriod) = await _fundAllocationRepository
+                        .ValidatePeriodAndGetAvailableAsync(request.BudgetId, request.Period, request.PeriodYear.Value);
 
-                    if (periodAllocation == null)
+                    if (!exists)
                     {
-                        Console.WriteLine($" Period allocation not found for {request.Period} {request.PeriodYear}");
+                        _logger.LogInformation("Period allocation not found for {Period} {Year}", request.Period, request.PeriodYear);
                         return ApiResponseDto<FundAllocationResponseDto>.FailureResponse(
                             $"Period allocation not found for {request.Period} {request.PeriodYear}. Create period allocation first.");
                     }
 
-                    // Check if amount exceeds period allocation
-                    var periodSubAllocationsTotal = await _context.Budgetallocations
-                        .Where(a => a.BudgetId == request.BudgetId
-                                 && a.Period == request.Period
-                                 && a.PeriodYear == request.PeriodYear)
-                        .SumAsync(a => a.Amount);
-
-                    var availableInPeriod = periodAllocation.AllocatedAmount - periodSubAllocationsTotal;
-
                     if (request.Amount > availableInPeriod)
                     {
-                        Console.WriteLine($" Amount exceeds period allocation. Available: {availableInPeriod}");
+                        _logger.LogInformation("Amount exceeds period allocation. Available: {Available}", availableInPeriod);
                         return ApiResponseDto<FundAllocationResponseDto>.FailureResponse(
                             $"Amount ({request.Amount:N2}) exceeds available period allocation ({availableInPeriod:N2})");
                     }
 
-                    Console.WriteLine($" Period validation passed. Available: {availableInPeriod}");
+                    _logger.LogInformation("Period validation passed. Available: {Available}", availableInPeriod);
                 }
 
                 var allocation = new Budgetallocation
@@ -97,18 +78,17 @@ namespace Relevantz.EEPZ.Core.Service
 
                 var createdAllocation = await _fundAllocationRepository.CreateAsync(allocation);
 
-                var response = await BuildFundAllocationResponse(createdAllocation.AllocationId);
+                var response = await _fundAllocationRepository.GetFundAllocationDetailsAsync(createdAllocation.AllocationId);
 
-                Console.WriteLine($" Service: Fund allocation created with AllocationId: {createdAllocation.AllocationId}");
+                _logger.LogInformation("Service: Fund allocation created with AllocationId: {Id}", createdAllocation.AllocationId);
 
                 return ApiResponseDto<FundAllocationResponseDto>.SuccessResponse(
-                    response,
+                    response!,
                     "Fund allocation created successfully");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($" Service Error: {ex.Message}");
-                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                _logger.LogError(ex, "Service Error while creating fund allocation");
                 return ApiResponseDto<FundAllocationResponseDto>.FailureResponse(
                     $"An error occurred while creating fund allocation: {ex.Message}");
             }
@@ -118,12 +98,12 @@ namespace Relevantz.EEPZ.Core.Service
         {
             try
             {
-                Console.WriteLine($"Updating fund allocation with AllocationId: {request.AllocationId}");
+                _logger.LogInformation("Updating fund allocation with AllocationId: {Id}", request.AllocationId);
 
                 var allocation = await _fundAllocationRepository.GetByIdAsync(request.AllocationId);
                 if (allocation == null)
                 {
-                    Console.WriteLine($"Fund allocation not found: {request.AllocationId}");
+                    _logger.LogInformation("Fund allocation not found: {Id}", request.AllocationId);
                     return ApiResponseDto<FundAllocationResponseDto>.FailureResponse("Fund allocation not found");
                 }
 
@@ -140,16 +120,17 @@ namespace Relevantz.EEPZ.Core.Service
 
                 var updatedAllocation = await _fundAllocationRepository.UpdateAsync(allocation);
 
-                var response = await BuildFundAllocationResponse(updatedAllocation.AllocationId);
+                var response = await _fundAllocationRepository.GetFundAllocationDetailsAsync(updatedAllocation.AllocationId);
 
-                Console.WriteLine($"Fund allocation updated successfully: {request.AllocationId}");
+                _logger.LogInformation("Fund allocation updated successfully: {Id}", request.AllocationId);
+
                 return ApiResponseDto<FundAllocationResponseDto>.SuccessResponse(
-                    response,
+                    response!,
                     "Fund allocation updated successfully");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error updating fund allocation: {ex.Message}");
+                _logger.LogError(ex, "Error updating fund allocation");
                 return ApiResponseDto<FundAllocationResponseDto>.FailureResponse(
                     "An error occurred while updating fund allocation");
             }
@@ -159,12 +140,12 @@ namespace Relevantz.EEPZ.Core.Service
         {
             try
             {
-                Console.WriteLine($"Deleting fund allocation with AllocationId: {allocationId}");
+                _logger.LogInformation("Deleting fund allocation with AllocationId: {Id}", allocationId);
 
                 var allocation = await _fundAllocationRepository.GetByIdAsync(allocationId);
                 if (allocation == null)
                 {
-                    Console.WriteLine($"Fund allocation not found: {allocationId}");
+                    _logger.LogInformation("Fund allocation not found: {Id}", allocationId);
                     return ApiResponseDto<bool>.FailureResponse("Fund allocation not found");
                 }
 
@@ -172,7 +153,7 @@ namespace Relevantz.EEPZ.Core.Service
 
                 if (result)
                 {
-                    Console.WriteLine($"Fund allocation deleted successfully: {allocationId}");
+                    _logger.LogInformation("Fund allocation deleted successfully: {Id}", allocationId);
                     return ApiResponseDto<bool>.SuccessResponse(true, "Fund allocation deleted successfully");
                 }
 
@@ -180,7 +161,7 @@ namespace Relevantz.EEPZ.Core.Service
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error deleting fund allocation: {ex.Message}");
+                _logger.LogError(ex, "Error deleting fund allocation");
                 return ApiResponseDto<bool>.FailureResponse(
                     "An error occurred while deleting fund allocation");
             }
@@ -190,23 +171,22 @@ namespace Relevantz.EEPZ.Core.Service
         {
             try
             {
-                Console.WriteLine($"Fetching fund allocation with AllocationId: {allocationId}");
+                _logger.LogInformation("Fetching fund allocation with AllocationId: {Id}", allocationId);
 
-                var allocation = await _fundAllocationRepository.GetByIdAsync(allocationId);
-                if (allocation == null)
+                var response = await _fundAllocationRepository.GetFundAllocationDetailsAsync(allocationId);
+                if (response == null)
                 {
-                    Console.WriteLine($"Fund allocation not found: {allocationId}");
+                    _logger.LogInformation("Fund allocation not found: {Id}", allocationId);
                     return ApiResponseDto<FundAllocationResponseDto>.FailureResponse("Fund allocation not found");
                 }
 
-                var response = await BuildFundAllocationResponse(allocationId);
                 return ApiResponseDto<FundAllocationResponseDto>.SuccessResponse(
                     response,
                     "Fund allocation retrieved successfully");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching fund allocation: {ex.Message}");
+                _logger.LogError(ex, "Error fetching fund allocation");
                 return ApiResponseDto<FundAllocationResponseDto>.FailureResponse(
                     "An error occurred while fetching fund allocation");
             }
@@ -216,14 +196,18 @@ namespace Relevantz.EEPZ.Core.Service
         {
             try
             {
-                Console.WriteLine("Fetching all fund allocations");
+                _logger.LogInformation("Fetching all fund allocations");
 
                 var allocations = await _fundAllocationRepository.GetAllAsync();
                 var response = new List<FundAllocationResponseDto>();
 
                 foreach (var allocation in allocations)
                 {
-                    response.Add(await BuildFundAllocationResponse(allocation.AllocationId));
+                    var dto = await _fundAllocationRepository.GetFundAllocationDetailsAsync(allocation.AllocationId);
+                    if (dto != null)
+                    {
+                        response.Add(dto);
+                    }
                 }
 
                 return ApiResponseDto<List<FundAllocationResponseDto>>.SuccessResponse(
@@ -232,7 +216,7 @@ namespace Relevantz.EEPZ.Core.Service
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching all fund allocations: {ex.Message}");
+                _logger.LogError(ex, "Error fetching all fund allocations");
                 return ApiResponseDto<List<FundAllocationResponseDto>>.FailureResponse(
                     "An error occurred while fetching fund allocations");
             }
@@ -242,14 +226,18 @@ namespace Relevantz.EEPZ.Core.Service
         {
             try
             {
-                Console.WriteLine($"Fetching fund allocations for DepartmentId: {departmentId}");
+                _logger.LogInformation("Fetching fund allocations for DepartmentId: {DepartmentId}", departmentId);
 
                 var allocations = await _fundAllocationRepository.GetByDepartmentIdAsync(departmentId);
                 var response = new List<FundAllocationResponseDto>();
 
                 foreach (var allocation in allocations)
                 {
-                    response.Add(await BuildFundAllocationResponse(allocation.AllocationId));
+                    var dto = await _fundAllocationRepository.GetFundAllocationDetailsAsync(allocation.AllocationId);
+                    if (dto != null)
+                    {
+                        response.Add(dto);
+                    }
                 }
 
                 return ApiResponseDto<List<FundAllocationResponseDto>>.SuccessResponse(
@@ -258,7 +246,7 @@ namespace Relevantz.EEPZ.Core.Service
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching fund allocations by department: {ex.Message}");
+                _logger.LogError(ex, "Error fetching fund allocations by department");
                 return ApiResponseDto<List<FundAllocationResponseDto>>.FailureResponse(
                     "An error occurred while fetching fund allocations");
             }
@@ -268,14 +256,18 @@ namespace Relevantz.EEPZ.Core.Service
         {
             try
             {
-                Console.WriteLine($"Fetching fund allocations for Type: {allocationType}");
+                _logger.LogInformation("Fetching fund allocations for Type: {Type}", allocationType);
 
                 var allocations = await _fundAllocationRepository.GetByAllocationTypeAsync(allocationType);
                 var response = new List<FundAllocationResponseDto>();
 
                 foreach (var allocation in allocations)
                 {
-                    response.Add(await BuildFundAllocationResponse(allocation.AllocationId));
+                    var dto = await _fundAllocationRepository.GetFundAllocationDetailsAsync(allocation.AllocationId);
+                    if (dto != null)
+                    {
+                        response.Add(dto);
+                    }
                 }
 
                 return ApiResponseDto<List<FundAllocationResponseDto>>.SuccessResponse(
@@ -284,77 +276,10 @@ namespace Relevantz.EEPZ.Core.Service
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching fund allocations by type: {ex.Message}");
+                _logger.LogError(ex, "Error fetching fund allocations by type");
                 return ApiResponseDto<List<FundAllocationResponseDto>>.FailureResponse(
                     "An error occurred while fetching fund allocations");
             }
         }
-
-        private async Task<FundAllocationResponseDto> BuildFundAllocationResponse(int allocationId)
-        {
-            var allocation = await _context.Budgetallocations
-                .Where(b => b.AllocationId == allocationId)
-                .Select(b => new
-                {
-                    b.AllocationId,
-                    b.BudgetId,
-                    b.DepartmentId,
-                    DepartmentName = _context.Departments
-                        .Where(d => d.DepartmentId == b.DepartmentId)
-                        .Select(d => d.DepartmentName)
-                        .FirstOrDefault() ?? "Unknown",
-                    b.EmployeeUserId,
-                    EmployeeEmail = b.EmployeeUserId.HasValue
-                        ? _context.Userauthentications
-                            .Where(u => u.UserId == b.EmployeeUserId)
-                            .Select(u => u.Email)
-                            .FirstOrDefault()
-                        : null,
-                    b.AllocationType,
-                    b.Amount,
-                    b.GoalStatus,
-                    b.Notes,
-                    b.AllocatedByUserId,
-                    AllocatedByEmail = _context.Userauthentications
-                        .Where(u => u.UserId == b.AllocatedByUserId)
-                        .Select(u => u.Email)
-                        .FirstOrDefault() ?? "Unknown",
-                    b.AllocatedAt,
-                    b.UtilizedAmount,
-                    b.UtilizationPercentage,
-                    b.UpdatedAt,
-                    b.Period,
-                    b.PeriodYear
-                })
-                .FirstOrDefaultAsync();
-
-            if (allocation == null)
-            {
-                throw new Exception($"Fund allocation with ID {allocationId} not found");
-            }
-
-            return new FundAllocationResponseDto
-            {
-                AllocationId = allocation.AllocationId,
-                BudgetId = allocation.BudgetId ?? 0,
-                DepartmentId = allocation.DepartmentId,
-                DepartmentName = allocation.DepartmentName,
-                EmployeeUserId = allocation.EmployeeUserId,
-                EmployeeEmail = allocation.EmployeeEmail,
-                AllocationType = allocation.AllocationType ?? "Unknown",
-                Amount = allocation.Amount,
-                GoalStatus = allocation.GoalStatus,
-                Notes = allocation.Notes,
-                AllocatedByUserId = allocation.AllocatedByUserId,
-                AllocatedByEmail = allocation.AllocatedByEmail,
-                AllocatedAt = allocation.AllocatedAt,
-                UtilizedAmount = allocation.UtilizedAmount ?? 0,
-                UtilizationPercentage = allocation.UtilizationPercentage ?? 0,
-                UpdatedAt = allocation.UpdatedAt,
-                Period = allocation.Period,
-                PeriodYear = allocation.PeriodYear
-            };
-        }
-
     }
 }
