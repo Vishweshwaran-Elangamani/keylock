@@ -58,12 +58,18 @@ const EmployeeSelectionModal = ({
   };
 
   const uniqueRoles = useMemo(() => {
-    const roles = [...new Set((employees || []).map((emp) => emp.roleName).filter(Boolean))];
+    const roles = [
+      ...new Set((employees || []).map((emp) => emp.roleName).filter(Boolean)),
+    ];
     return roles.sort((a, b) => a.localeCompare(b));
   }, [employees]);
 
   const uniqueDepartments = useMemo(() => {
-    const depts = [...new Set((employees || []).map((emp) => emp.departmentName).filter(Boolean))];
+    const depts = [
+      ...new Set(
+        (employees || []).map((emp) => emp.departmentName).filter(Boolean)
+      ),
+    ];
     return depts.sort((a, b) => a.localeCompare(b));
   }, [employees]);
 
@@ -76,7 +82,8 @@ const EmployeeSelectionModal = ({
           .includes(searchTerm.toLowerCase());
 
       const roleMatch = filterRole === "All" || emp.roleName === filterRole;
-      const deptMatch = filterDepartment === "All" || emp.departmentName === filterDepartment;
+      const deptMatch =
+        filterDepartment === "All" || emp.departmentName === filterDepartment;
 
       return searchMatch && roleMatch && deptMatch;
     });
@@ -145,7 +152,9 @@ const EmployeeSelectionModal = ({
           <div className="prj-modal-tabs">
             <button
               type="button"
-              className={`prj-modal-tab ${activeTab === "resource" ? "active" : ""}`}
+              className={`prj-modal-tab ${
+                activeTab === "resource" ? "active" : ""
+              }`}
               onClick={() => setActiveTab("resource")}
             >
               <span>Resource Owner</span>
@@ -222,7 +231,11 @@ const EmployeeSelectionModal = ({
                   <span>Cancel</span>
                 </button>
               ) : (
-                <button type="button" onClick={handleSearch} className="prj-search-btn-inside">
+                <button
+                  type="button"
+                  onClick={handleSearch}
+                  className="prj-search-btn-inside"
+                >
                   <Search size={16} />
                   <span>Search</span>
                 </button>
@@ -277,11 +290,14 @@ const EmployeeSelectionModal = ({
                     paginatedManagers.map((emp) => {
                       const isSelected =
                         (activeTab === "resource" &&
-                          selectedResourceOwner?.employeeMasterId === emp.employeeMasterId) ||
+                          selectedResourceOwner?.employeeMasterId ===
+                            emp.employeeMasterId) ||
                         (activeTab === "l1" &&
-                          selectedL1Approver?.employeeMasterId === emp.employeeMasterId) ||
+                          selectedL1Approver?.employeeMasterId ===
+                            emp.employeeMasterId) ||
                         (activeTab === "l2" &&
-                          selectedL2Approver?.employeeMasterId === emp.employeeMasterId);
+                          selectedL2Approver?.employeeMasterId ===
+                            emp.employeeMasterId);
 
                       return (
                         <tr
@@ -330,7 +346,9 @@ const EmployeeSelectionModal = ({
                     <button
                       key={page}
                       type="button"
-                      className={`prj-page-btn ${currentPage === page ? "active" : ""}`}
+                      className={`prj-page-btn ${
+                        currentPage === page ? "active" : ""
+                      }`}
                       onClick={() => goToPage(page)}
                     >
                       {page}
@@ -351,11 +369,19 @@ const EmployeeSelectionModal = ({
           </div>
 
           <div className="prj-modal-footer">
-            <button type="button" onClick={onClose} className="prj-btn prj-btn-secondary">
+            <button
+              type="button"
+              onClick={onClose}
+              className="prj-btn prj-btn-secondary"
+            >
               <span>Cancel</span>
             </button>
 
-            <button type="button" onClick={onConfirm} className="prj-btn prj-btn-primary">
+            <button
+              type="button"
+              onClick={onConfirm}
+              className="prj-btn prj-btn-primary"
+            >
               <CheckCircle size={18} />
               <span>Confirm Selection</span>
             </button>

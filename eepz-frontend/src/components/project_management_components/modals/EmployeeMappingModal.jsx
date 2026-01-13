@@ -168,13 +168,15 @@ const EmployeeMappingModal = ({
                     {project.l1Approver && (
                       <li>
                         <strong>L1 Approver:</strong>{" "}
-                        {project.l1Approver.firstName} {project.l1Approver.lastName}
+                        {project.l1Approver.firstName}{" "}
+                        {project.l1Approver.lastName}
                       </li>
                     )}
                     {project.l2Approver && (
                       <li>
                         <strong>L2 Approver:</strong>{" "}
-                        {project.l2Approver.firstName} {project.l2Approver.lastName}
+                        {project.l2Approver.firstName}{" "}
+                        {project.l2Approver.lastName}
                       </li>
                     )}
                   </ul>
@@ -184,7 +186,10 @@ const EmployeeMappingModal = ({
 
             {isLoadingData ? (
               <div className="emm-loading">
-                <div className="emm-loading-spinner spinner-border" role="status">
+                <div
+                  className="emm-loading-spinner spinner-border"
+                  role="status"
+                >
                   <span className="visually-hidden">Loading...</span>
                 </div>
                 <p className="emm-loading-text">Loading employees...</p>
@@ -311,7 +316,9 @@ const EmployeeMappingModal = ({
                         <th className="emm-th">Role</th>
                         <th className="emm-th">Department</th>
                         <th className="emm-th emm-th--status">Status</th>
-                        <th className="emm-th emm-th--primary">Primary Project</th>
+                        <th className="emm-th emm-th--primary">
+                          Primary Project
+                        </th>
                       </tr>
                     </thead>
 
@@ -354,7 +361,9 @@ const EmployeeMappingModal = ({
                                   type="checkbox"
                                   className="emm-checkbox"
                                   checked={isSelected}
-                                  onChange={() => onEmployeeSelect(emp.employeeMasterId)}
+                                  onChange={() =>
+                                    onEmployeeSelect(emp.employeeMasterId)
+                                  }
                                 />
                               </td>
 
@@ -364,7 +373,9 @@ const EmployeeMappingModal = ({
                                 </span>
                               </td>
 
-                              <td className="emm-td emm-td--muted">{emp.roleName}</td>
+                              <td className="emm-td emm-td--muted">
+                                {emp.roleName}
+                              </td>
 
                               <td className="emm-td emm-td--muted">
                                 {emp.departmentName}
@@ -392,7 +403,9 @@ const EmployeeMappingModal = ({
                                   className="emm-checkbox"
                                   checked={isPrimary}
                                   disabled={!isSelected}
-                                  onChange={() => onPrimaryToggle(emp.employeeMasterId)}
+                                  onChange={() =>
+                                    onPrimaryToggle(emp.employeeMasterId)
+                                  }
                                   title={
                                     !isSelected
                                       ? "Select employee first"

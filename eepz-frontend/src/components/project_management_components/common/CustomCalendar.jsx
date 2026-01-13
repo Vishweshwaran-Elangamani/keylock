@@ -1,9 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  useLayoutEffect,
-} from "react";
+import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { createPortal } from "react-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import "../../../styles/projectmanagement/components/CustomCalendar.css";
@@ -28,8 +23,20 @@ const CustomCalendar = ({
     left: 0,
   });
 
-  const monthNames = ["January","February","March","April","May","June","July","August",
-  "September","October","November","December",];
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
 
   const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
@@ -75,10 +82,7 @@ const CustomCalendar = ({
             left = anchorRect.left + ox;
           } else {
             left =
-              anchorRect.left +
-              anchorRect.width / 2 -
-              calendarWidth / 2 +
-              ox;
+              anchorRect.left + anchorRect.width / 2 - calendarWidth / 2 + ox;
           }
           break;
         }
@@ -93,19 +97,12 @@ const CustomCalendar = ({
             left = wrapperRect.left + ox;
           } else {
             left =
-              wrapperRect.left +
-              wrapperRect.width / 2 -
-              calendarWidth / 2 +
-              ox;
+              wrapperRect.left + wrapperRect.width / 2 - calendarWidth / 2 + ox;
           }
           break;
         }
 
         case "above-icon": {
-          /**
-           * ✅ EXACT placement:
-           * calendar bottom touches icon top
-           */
           top = anchorRect.top - calendarHeight + oy;
 
           if (align === "right") {
@@ -114,10 +111,7 @@ const CustomCalendar = ({
             left = anchorRect.left + ox;
           } else {
             left =
-              anchorRect.left +
-              anchorRect.width / 2 -
-              calendarWidth / 2 +
-              ox;
+              anchorRect.left + anchorRect.width / 2 - calendarWidth / 2 + ox;
           }
           break;
         }
@@ -159,10 +153,7 @@ const CustomCalendar = ({
             left = anchorRect.left + ox;
           } else {
             left =
-              anchorRect.left +
-              anchorRect.width / 2 -
-              calendarWidth / 2 +
-              ox;
+              anchorRect.left + anchorRect.width / 2 - calendarWidth / 2 + ox;
           }
 
           break;
@@ -179,7 +170,6 @@ const CustomCalendar = ({
         top = viewportHeight - calendarHeight - 10;
       }
 
-    
       setCalendarPosition({ top, left });
     };
 
@@ -313,8 +303,16 @@ const CustomCalendar = ({
   const minDateObj = minDate ? new Date(minDate) : null;
 
   const calendarContent = (
-    <div className="csla-calendar-dropdown"ref={calendarRef}style={{position: "fixed",top: `${calendarPosition.top}px`,
-        left: `${calendarPosition.left}px`, zIndex: 10002,}}>
+    <div
+      className="csla-calendar-dropdown"
+      ref={calendarRef}
+      style={{
+        position: "fixed",
+        top: `${calendarPosition.top}px`,
+        left: `${calendarPosition.left}px`,
+        zIndex: 10002,
+      }}
+    >
       <div className="csla-calendar-header">
         <button
           type="button"

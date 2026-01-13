@@ -196,10 +196,18 @@ const EditProjectModal = ({
 
                 <div className="epm-col">
                   <div className="epm-dd-slot">
-                    <CustomDropdown label="Status" required name="status"
-                      value={formData.status} onChange={(name, val) =>
-                        setFormData((prev) => ({ ...prev, [name]: val })) }
-                      options={statusOptions} placeholder="Select Status"align="left"/>
+                    <CustomDropdown
+                      label="Status"
+                      required
+                      name="status"
+                      value={formData.status}
+                      onChange={(name, val) =>
+                        setFormData((prev) => ({ ...prev, [name]: val }))
+                      }
+                      options={statusOptions}
+                      placeholder="Select Status"
+                      align="left"
+                    />
                   </div>
                 </div>
 

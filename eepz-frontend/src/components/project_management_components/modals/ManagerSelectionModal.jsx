@@ -201,7 +201,9 @@ const ManagerSelectionModal = ({
             <div className="alert alert-info d-flex align-items-start gap-2 mb-3 msm-current-banner">
               <Info size={18} className="msm-info-icon" />
               <div className="msm-current-content">
-                <strong className="msm-current-label">Current Selection:</strong>
+                <strong className="msm-current-label">
+                  Current Selection:
+                </strong>
                 <div className="mt-1">
                   {getSelectedManager() ? (
                     <span className="badge msm-current-badge">

@@ -227,7 +227,11 @@ const CreateMomModal = ({ meetingData, onClose }) => {
           <h6 className="cmm-title">
             <i className="bi bi-file-text"></i> Create Meeting Minutes
           </h6>
-          <button type="button" className="cmm-close-btn" onClick={onClose}></button>
+          <button
+            type="button"
+            className="cmm-close-btn"
+            onClick={onClose}
+          ></button>
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -265,7 +269,9 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                     onChange={handleInputChange}
                     placeholder="Enter attendees (comma separated)..."
                   ></textarea>
-                  <small className="cmm-help-text">List all meeting participants</small>
+                  <small className="cmm-help-text">
+                    List all meeting participants
+                  </small>
                 </div>
               </div>
             </div>
@@ -359,7 +365,8 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                 <div>
                   <p className="cmm-empty-title">No action items added</p>
                   <small className="cmm-empty-subtitle">
-                    Click "Add Action" to create tasks and assign them to team members
+                    Click "Add Action" to create tasks and assign them to team
+                    members
                   </small>
                 </div>
               </div>
@@ -378,7 +385,11 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                             className="cmm-input"
                             value={item.taskDescription}
                             onChange={(e) =>
-                              handleActionItemChange(index, "taskDescription", e.target.value)
+                              handleActionItemChange(
+                                index,
+                                "taskDescription",
+                                e.target.value
+                              )
                             }
                             placeholder="Describe the action item..."
                           />
@@ -396,10 +407,14 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                               <button
                                 type="button"
                                 className={`cmm-dropdown-trigger ${
-                                  assignOpenIndex === index ? "cmm-dropdown-open" : ""
+                                  assignOpenIndex === index
+                                    ? "cmm-dropdown-open"
+                                    : ""
                                 }`}
                                 onClick={() =>
-                                  setAssignOpenIndex(assignOpenIndex === index ? null : index)
+                                  setAssignOpenIndex(
+                                    assignOpenIndex === index ? null : index
+                                  )
                                 }
                               >
                                 <span className="cmm-dropdown-text">
@@ -410,7 +425,11 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                                     : "Select employee..."}
                                 </span>
                                 <span className="cmm-dropdown-arrow">
-                                  <svg width="18" height="18" viewBox="0 0 24 24">
+                                  <svg
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                  >
                                     <polyline
                                       points="6 9 12 15 18 9"
                                       fill="none"
@@ -426,7 +445,9 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                               {assignOpenIndex === index && (
                                 <div className="cmm-dropdown-list">
                                   {loadingEmployees ? (
-                                    <div className="cmm-no-employees">Loading...</div>
+                                    <div className="cmm-no-employees">
+                                      Loading...
+                                    </div>
                                   ) : employees.length > 0 ? (
                                     employees.map((emp) => {
                                       const active =
@@ -435,7 +456,9 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                                       return (
                                         <div
                                           key={emp.employeeMasterId}
-                                          className={`cmm-dropdown-item ${active ? "cmm-active" : ""}`}
+                                          className={`cmm-dropdown-item ${
+                                            active ? "cmm-active" : ""
+                                          }`}
                                           onClick={() => {
                                             handleActionItemChange(
                                               index,
@@ -445,28 +468,40 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                                             setAssignOpenIndex(null);
                                           }}
                                         >
-                                          {emp.firstName} {emp.lastName} - {emp.roleName}
+                                          {emp.firstName} {emp.lastName} -{" "}
+                                          {emp.roleName}
                                         </div>
                                       );
                                     })
                                   ) : (
-                                    <div className="cmm-no-employees">No employees</div>
+                                    <div className="cmm-no-employees">
+                                      No employees
+                                    </div>
                                   )}
                                 </div>
                               )}
                             </div>
 
-                            {errors[`actionItem[${index}].assignedToEmployeeId`] && (
+                            {errors[
+                              `actionItem[${index}].assignedToEmployeeId`
+                            ] && (
                               <div className="cmm-error">
                                 <i className="bi bi-exclamation-circle me-1"></i>
-                                {errors[`actionItem[${index}].assignedToEmployeeId`]}
+                                {
+                                  errors[
+                                    `actionItem[${index}].assignedToEmployeeId`
+                                  ]
+                                }
                               </div>
                             )}
 
                             {item.assignedToEmployeeId && (
                               <small className="cmm-success-text">
-                                <i className="bi bi-check-circle"></i> Assigned to{" "}
-                                <strong>{getEmployeeName(item.assignedToEmployeeId)}</strong>
+                                <i className="bi bi-check-circle"></i> Assigned
+                                to{" "}
+                                <strong>
+                                  {getEmployeeName(item.assignedToEmployeeId)}
+                                </strong>
                               </small>
                             )}
                           </div>
@@ -486,32 +521,66 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                                 value={formatDisplayDate(item.dueDate)}
                                 placeholder="Select date"
                                 className={`cmm-input cmm-input-sm ${
-                                  errors[`actionItem[${index}].dueDate`] ? "cmm-is-invalid" : ""
+                                  errors[`actionItem[${index}].dueDate`]
+                                    ? "cmm-is-invalid"
+                                    : ""
                                 }`}
                                 onClick={() =>
-                                  setCalendarOpenIndex(calendarOpenIndex === index ? null : index)
+                                  setCalendarOpenIndex(
+                                    calendarOpenIndex === index ? null : index
+                                  )
                                 }
                               />
                               <button
                                 type="button"
                                 className="cmm-calendar-trigger"
                                 onClick={() =>
-                                  setCalendarOpenIndex(calendarOpenIndex === index ? null : index)
+                                  setCalendarOpenIndex(
+                                    calendarOpenIndex === index ? null : index
+                                  )
                                 }
                               >
                                 <svg width="18" height="18" viewBox="0 0 24 24">
+                                  <rect
+                                    x="4"
+                                    y="5"
+                                    width="16"
+                                    height="15"
+                                    rx="2"
+                                    ry="2"
+                                    stroke={PRIMARY}
+                                    strokeWidth="1.8"
+                                    fill="none"
+                                  />
 
-                                  <rect x="4" y="5" width="16" height="15"
-                                    rx="2" ry="2" stroke={PRIMARY} strokeWidth="1.8" fill="none"/>
+                                  <line
+                                    x1="4"
+                                    y1="9"
+                                    x2="20"
+                                    y2="9"
+                                    stroke={PRIMARY}
+                                    strokeWidth="1.8"
+                                  />
 
-                                  <line x1="4" y1="9" x2="20" y2="9"
-                                   stroke={PRIMARY}strokeWidth="1.8"/>
-                                  
-                                  <line x1="9" y1="3" x2="9" y2="7" stroke={PRIMARY}
-                                    strokeWidth="1.8" strokeLinecap="round"/>
-                                  
-                                  <line  x1="15"  y1="3"  x2="15"  y2="7"
-                                    stroke={PRIMARY} strokeWidth="1.8" strokeLinecap="round"/>
+                                  <line
+                                    x1="9"
+                                    y1="3"
+                                    x2="9"
+                                    y2="7"
+                                    stroke={PRIMARY}
+                                    strokeWidth="1.8"
+                                    strokeLinecap="round"
+                                  />
+
+                                  <line
+                                    x1="15"
+                                    y1="3"
+                                    x2="15"
+                                    y2="7"
+                                    stroke={PRIMARY}
+                                    strokeWidth="1.8"
+                                    strokeLinecap="round"
+                                  />
                                 </svg>
                               </button>
                             </div>
@@ -520,8 +589,12 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                               isOpen={isCalendarOpen}
                               onClose={() => setCalendarOpenIndex(null)}
                               value={item.dueDate}
-                              onChange={(value) => handleDueDateChange(index, value)}
-                              anchorRef={{ current: calendarRefs.current[index] }}
+                              onChange={(value) =>
+                                handleDueDateChange(index, value)
+                              }
+                              anchorRef={{
+                                current: calendarRefs.current[index],
+                              }}
                               position="below-icon"
                               align="left"
                               offset={{ x: 0, y: 0 }}
@@ -545,15 +618,25 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                               <button
                                 type="button"
                                 className={`cmm-dropdown-trigger ${
-                                  statusOpenIndex === index ? "cmm-dropdown-open" : ""
+                                  statusOpenIndex === index
+                                    ? "cmm-dropdown-open"
+                                    : ""
                                 }`}
                                 onClick={() =>
-                                  setStatusOpenIndex(statusOpenIndex === index ? null : index)
+                                  setStatusOpenIndex(
+                                    statusOpenIndex === index ? null : index
+                                  )
                                 }
                               >
-                                <span className="cmm-dropdown-text">{item.status}</span>
+                                <span className="cmm-dropdown-text">
+                                  {item.status}
+                                </span>
                                 <span className="cmm-dropdown-arrow">
-                                  <svg width="18" height="18" viewBox="0 0 24 24">
+                                  <svg
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                  >
                                     <polyline
                                       points="6 9 12 15 18 9"
                                       fill="none"
@@ -573,9 +656,15 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                                     return (
                                       <div
                                         key={st}
-                                        className={`cmm-dropdown-item ${active ? "cmm-active" : ""}`}
+                                        className={`cmm-dropdown-item ${
+                                          active ? "cmm-active" : ""
+                                        }`}
                                         onClick={() => {
-                                          handleActionItemChange(index, "status", st);
+                                          handleActionItemChange(
+                                            index,
+                                            "status",
+                                            st
+                                          );
                                           setStatusOpenIndex(null);
                                         }}
                                       >
@@ -643,8 +732,8 @@ const CreateMomModal = ({ meetingData, onClose }) => {
             <div className="cmm-note">
               <i className="bi bi-info-circle cmm-note-icon"></i>
               <div>
-                <strong>Note:</strong> All assigned employees will be notified via email about
-                their action items.
+                <strong>Note:</strong> All assigned employees will be notified
+                via email about their action items.
               </div>
             </div>
           )}

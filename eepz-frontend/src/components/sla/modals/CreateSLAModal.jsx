@@ -220,13 +220,15 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                   />
                 </div>
 
-                {/* ✅ Deadline field using external CustomCalendar */}
                 <div className="csla-field">
                   <label className="csla-label">
                     Deadline <span className="csla-required">*</span>
                   </label>
 
-                  <div ref={calendarAnchorRef} className="csla-calendar-container">
+                  <div
+                    ref={calendarAnchorRef}
+                    className="csla-calendar-container"
+                  >
                     <input
                       type="text"
                       readOnly
@@ -296,18 +298,17 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                   </div>
                 </div>
 
-               <CustomCalendar
-                isOpen={calendarOpen}
-               onClose={() => setCalendarOpen(false)}
-               value={formData.deadline}
-               onChange={handleDateChange}
-               anchorRef={calendarAnchorRef}
-               position="below-icon"    
-               align="right"            
-               offset={{ x: 0, y: 0 }}   
-               minDate={new Date().toISOString().slice(0, 10)}
-              />
-
+                <CustomCalendar
+                  isOpen={calendarOpen}
+                  onClose={() => setCalendarOpen(false)}
+                  value={formData.deadline}
+                  onChange={handleDateChange}
+                  anchorRef={calendarAnchorRef}
+                  position="below-icon"
+                  align="right"
+                  offset={{ x: 0, y: 0 }}
+                  minDate={new Date().toISOString().slice(0, 10)}
+                />
 
                 <div className="csla-field">
                   <label className="csla-label">Reason (Optional)</label>
@@ -325,7 +326,9 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                 </div>
 
                 <div className="csla-employee-info">
-                  <p className="csla-employee-count">{employeeCount} Employees</p>
+                  <p className="csla-employee-count">
+                    {employeeCount} Employees
+                  </p>
                   <small className="csla-employee-note">
                     SLA will be displayed to all employees
                   </small>
