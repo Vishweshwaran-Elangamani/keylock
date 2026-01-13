@@ -1,9 +1,8 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Common.Entities;
-using Relevantz.EEPZ.Data.DBContexts;
+using Relevantz.EEPZ.Data.IRepository;  
 using Relevantz.EEPZ.Core.IService;
 using System;
 using System.Collections.Generic;
@@ -14,14 +13,17 @@ namespace Relevantz.EEPZ.Core.Service
 {
     public class DepartmentBudgetService : IDepartmentBudgetService
     {
-        private readonly EEPZDbContext _context;
+        private readonly IDepartmentBudgetRepository _budgetRepo;
+        private readonly IDepartmentRepository _departmentRepo;
         private readonly ILogger<DepartmentBudgetService> _logger;
 
         public DepartmentBudgetService(
-            EEPZDbContext context,
+            IDepartmentBudgetRepository budgetRepo,       
+            IDepartmentRepository departmentRepo,         
             ILogger<DepartmentBudgetService> logger)
         {
-            _context = context;
+            _budgetRepo = budgetRepo;
+            _departmentRepo = departmentRepo;
             _logger = logger;
         }
 
@@ -31,10 +33,7 @@ namespace Relevantz.EEPZ.Core.Service
             {
                 _logger.LogInformation("Fetching all department budgets");
 
-                var budgets = await _context.Departmentbudgets
-                    .AsNoTracking()
-                    .OrderBy(b => b.DepartmentId)
-                    .ToListAsync();
+                var budgets = await _budgetRepo.GetAllAsync();  
 
                 _logger.LogInformation($"Found {budgets.Count} department budgets");
 
@@ -42,7 +41,6 @@ namespace Relevantz.EEPZ.Core.Service
                 foreach (var budget in budgets)
                 {
                     string departmentName = await GetDepartmentNameAsync(budget.DepartmentId);
-
                     response.Add(new
                     {
                         budget.BudgetId,
@@ -61,8 +59,7 @@ namespace Relevantz.EEPZ.Core.Service
                 }
 
                 return ApiResponseDto<List<object>>.SuccessResponse(
-                    response,
-                    $"Retrieved {response.Count} department budgets");
+                    response, $"Retrieved {response.Count} department budgets");
             }
             catch (Exception ex)
             {
@@ -79,18 +76,12 @@ namespace Relevantz.EEPZ.Core.Service
                 _logger.LogInformation($"Fetching department budget for department {departmentId}");
 
                 if (departmentId <= 0)
-                {
                     return ApiResponseDto<object>.FailureResponse("Invalid department ID");
-                }
 
-                var budget = await _context.Departmentbudgets
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(b => b.DepartmentId == departmentId);
+                var budget = await _budgetRepo.GetByDepartmentIdAsync(departmentId);  
 
                 if (budget == null)
-                {
                     return ApiResponseDto<object>.FailureResponse("Department budget not found");
-                }
 
                 string departmentName = await GetDepartmentNameAsync(budget.DepartmentId);
 
@@ -110,15 +101,12 @@ namespace Relevantz.EEPZ.Core.Service
                     budget.UpdatedAt
                 };
 
-                return ApiResponseDto<object>.SuccessResponse(
-                    response,
-                    "Department budget retrieved successfully");
+                return ApiResponseDto<object>.SuccessResponse(response, "Department budget retrieved successfully");
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error fetching department budget: {ex.Message}");
-                return ApiResponseDto<object>.FailureResponse(
-                    "An error occurred while fetching department budget");
+                return ApiResponseDto<object>.FailureResponse("An error occurred while fetching department budget");
             }
         }
 
@@ -129,22 +117,14 @@ namespace Relevantz.EEPZ.Core.Service
                 _logger.LogInformation($"Fetching department budgets for fiscal year {fiscalYear}");
 
                 if (fiscalYear <= 0)
-                {
-                    return ApiResponseDto<List<object>>.FailureResponse(
-                        "Fiscal year must be greater than zero");
-                }
+                    return ApiResponseDto<List<object>>.FailureResponse("Fiscal year must be greater than zero");
 
-                var budgets = await _context.Departmentbudgets
-                    .AsNoTracking()
-                    .Where(b => b.FiscalYear == fiscalYear)
-                    .OrderBy(b => b.DepartmentId)
-                    .ToListAsync();
+                var budgets = await _budgetRepo.GetByFiscalYearAsync(fiscalYear);  
 
                 var response = new List<object>();
                 foreach (var budget in budgets)
                 {
                     string departmentName = await GetDepartmentNameAsync(budget.DepartmentId);
-
                     response.Add(new
                     {
                         budget.BudgetId,
@@ -163,14 +143,12 @@ namespace Relevantz.EEPZ.Core.Service
                 }
 
                 return ApiResponseDto<List<object>>.SuccessResponse(
-                    response,
-                    $"Retrieved {response.Count} department budgets for fiscal year {fiscalYear}");
+                    response, $"Retrieved {response.Count} department budgets for fiscal year {fiscalYear}");
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error fetching department budgets by year: {ex.Message}");
-                return ApiResponseDto<List<object>>.FailureResponse(
-                    "An error occurred while fetching department budgets by year");
+                return ApiResponseDto<List<object>>.FailureResponse("An error occurred while fetching department budgets by year");
             }
         }
 
@@ -180,42 +158,22 @@ namespace Relevantz.EEPZ.Core.Service
             {
                 _logger.LogInformation($"Creating department budget for department {request.DepartmentId}");
 
-                // Validations
                 if (request.DepartmentId <= 0)
-                {
                     return ApiResponseDto<object>.FailureResponse("Invalid department ID");
-                }
 
                 if (request.FiscalYear <= 0)
-                {
                     return ApiResponseDto<object>.FailureResponse("Invalid fiscal year");
-                }
 
                 if (request.TotalBudget <= 0)
-                {
-                    return ApiResponseDto<object>.FailureResponse(
-                        "Total budget must be greater than zero");
-                }
+                    return ApiResponseDto<object>.FailureResponse("Total budget must be greater than zero");
 
-                // Check if department exists
-                var departmentExists = await _context.Departments
-                    .AnyAsync(d => d.DepartmentId == request.DepartmentId);
-
-                if (!departmentExists)
-                {
+                var department = await _departmentRepo.GetByIdAsync(request.DepartmentId);
+                if (department == null)
                     return ApiResponseDto<object>.FailureResponse("Department not found");
-                }
 
-                // Check for duplicate
-                var existingBudget = await _context.Departmentbudgets
-                    .FirstOrDefaultAsync(b => b.DepartmentId == request.DepartmentId 
-                                           && b.FiscalYear == request.FiscalYear);
-
+                var existingBudget = await _budgetRepo.GetByDepartmentAndFiscalYearAsync(request.DepartmentId, request.FiscalYear);
                 if (existingBudget != null)
-                {
-                    return ApiResponseDto<object>.FailureResponse(
-                        "Budget already exists for this department and fiscal year");
-                }
+                    return ApiResponseDto<object>.FailureResponse("Budget already exists for this department and fiscal year");
 
                 var newBudget = new Departmentbudget
                 {
@@ -231,28 +189,24 @@ namespace Relevantz.EEPZ.Core.Service
                     UpdatedAt = DateTime.Now
                 };
 
-                _context.Departmentbudgets.Add(newBudget);
-                await _context.SaveChangesAsync();
+                var createdBudget = await _budgetRepo.CreateAsync(newBudget);  
 
-                _logger.LogInformation($"Budget created with ID: {newBudget.BudgetId}");
+                _logger.LogInformation($"Budget created with ID: {createdBudget.BudgetId}");
 
-                return ApiResponseDto<object>.SuccessResponse(
-                    new
-                    {
-                        newBudget.BudgetId,
-                        newBudget.DepartmentId,
-                        newBudget.FiscalYear,
-                        newBudget.TotalBudget,
-                        newBudget.AllocatedAmount,
-                        newBudget.CreatedAt
-                    },
-                    "Department budget created successfully");
+                return ApiResponseDto<object>.SuccessResponse(new
+                {
+                    createdBudget.BudgetId,
+                    createdBudget.DepartmentId,
+                    createdBudget.FiscalYear,
+                    createdBudget.TotalBudget,
+                    createdBudget.AllocatedAmount,
+                    createdBudget.CreatedAt
+                }, "Department budget created successfully");
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error creating department budget: {ex.Message}");
-                return ApiResponseDto<object>.FailureResponse(
-                    "An error occurred while creating department budget");
+                return ApiResponseDto<object>.FailureResponse("An error occurred while creating department budget");
             }
         }
 
@@ -263,54 +217,39 @@ namespace Relevantz.EEPZ.Core.Service
                 _logger.LogInformation($"Updating department budget {request.BudgetId}");
 
                 if (request.BudgetId <= 0)
-                {
                     return ApiResponseDto<object>.FailureResponse("Invalid budget ID");
-                }
 
-                var budget = await _context.Departmentbudgets
-                    .FirstOrDefaultAsync(b => b.BudgetId == request.BudgetId);
+                var budget = await _budgetRepo.GetByIdAsync(request.BudgetId);  
 
                 if (budget == null)
-                {
                     return ApiResponseDto<object>.FailureResponse("Department budget not found");
-                }
 
                 if (request.TotalBudget <= 0)
-                {
-                    return ApiResponseDto<object>.FailureResponse(
-                        "Total budget must be greater than zero");
-                }
+                    return ApiResponseDto<object>.FailureResponse("Total budget must be greater than zero");
 
                 if (request.AllocatedAmount > request.TotalBudget)
-                {
-                    return ApiResponseDto<object>.FailureResponse(
-                        "Allocated amount cannot exceed total budget");
-                }
+                    return ApiResponseDto<object>.FailureResponse("Allocated amount cannot exceed total budget");
 
                 budget.TotalBudget = request.TotalBudget;
                 budget.AllocatedAmount = request.AllocatedAmount;
                 budget.UpdatedAt = DateTime.Now;
 
-                _context.Departmentbudgets.Update(budget);
-                await _context.SaveChangesAsync();
+                var updatedBudget = await _budgetRepo.UpdateAsync(budget);  
 
                 _logger.LogInformation("Budget updated successfully");
 
-                return ApiResponseDto<object>.SuccessResponse(
-                    new
-                    {
-                        budget.BudgetId,
-                        budget.TotalBudget,
-                        budget.AllocatedAmount,
-                        budget.UpdatedAt
-                    },
-                    "Department budget updated successfully");
+                return ApiResponseDto<object>.SuccessResponse(new
+                {
+                    updatedBudget.BudgetId,
+                    updatedBudget.TotalBudget,
+                    updatedBudget.AllocatedAmount,
+                    updatedBudget.UpdatedAt
+                }, "Department budget updated successfully");
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error updating department budget: {ex.Message}");
-                return ApiResponseDto<object>.FailureResponse(
-                    "An error occurred while updating department budget");
+                return ApiResponseDto<object>.FailureResponse("An error occurred while updating department budget");
             }
         }
 
@@ -321,43 +260,31 @@ namespace Relevantz.EEPZ.Core.Service
                 _logger.LogInformation($"Deleting department budget {budgetId}");
 
                 if (budgetId <= 0)
-                {
                     return ApiResponseDto<object>.FailureResponse("Invalid budget ID");
-                }
 
-                var budget = await _context.Departmentbudgets
-                    .FirstOrDefaultAsync(b => b.BudgetId == budgetId);
+                var budget = await _budgetRepo.GetByIdAsync(budgetId);  
 
                 if (budget == null)
-                {
                     return ApiResponseDto<object>.FailureResponse("Department budget not found");
-                }
 
-                // Delete associated allocations
-                var allocations = await _context.Budgetallocations
-                    .Where(a => a.DepartmentId == budget.DepartmentId)
-                    .ToListAsync();
+                var allocationsDeleted = await _budgetRepo.DeleteAllocationsByDepartmentIdAsync(budget.DepartmentId);  
 
-                if (allocations.Count > 0)
-                {
-                    _context.Budgetallocations.RemoveRange(allocations);
-                    _logger.LogInformation($"Deleted {allocations.Count} associated allocations");
-                }
+                if (allocationsDeleted > 0)
+                    _logger.LogInformation($"Deleted {allocationsDeleted} associated allocations");
 
-                _context.Departmentbudgets.Remove(budget);
-                await _context.SaveChangesAsync();
+                var result = await _budgetRepo.DeleteAsync(budgetId);  
+
+                if (!result)
+                    return ApiResponseDto<object>.FailureResponse("Failed to delete department budget");
 
                 _logger.LogInformation("Budget deleted successfully");
 
-                return ApiResponseDto<object>.SuccessResponse(
-                    new { budget.BudgetId },
-                    "Department budget deleted successfully");
+                return ApiResponseDto<object>.SuccessResponse(new { BudgetId = budgetId }, "Department budget deleted successfully");
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error deleting department budget: {ex.Message}");
-                return ApiResponseDto<object>.FailureResponse(
-                    "An error occurred while deleting department budget");
+                return ApiResponseDto<object>.FailureResponse("An error occurred while deleting department budget");
             }
         }
 
@@ -368,61 +295,44 @@ namespace Relevantz.EEPZ.Core.Service
                 _logger.LogInformation("Updating utilized amount");
 
                 if (request.BudgetId <= 0)
-                {
                     return ApiResponseDto<object>.FailureResponse("Invalid budget ID");
-                }
 
-                var budget = await _context.Departmentbudgets
-                    .FirstOrDefaultAsync(b => b.BudgetId == request.BudgetId);
+                var budget = await _budgetRepo.GetByIdAsync(request.BudgetId);  
 
                 if (budget == null)
-                {
                     return ApiResponseDto<object>.FailureResponse("Department budget not found");
-                }
 
                 if (request.UtilizedAmount < 0)
-                {
-                    return ApiResponseDto<object>.FailureResponse(
-                        "Utilized amount cannot be negative");
-                }
+                    return ApiResponseDto<object>.FailureResponse("Utilized amount cannot be negative");
 
                 if (request.UtilizedAmount > (budget.AllocatedAmount ?? 0))
-                {
-                    return ApiResponseDto<object>.FailureResponse(
-                        $"Utilized amount cannot exceed allocated budget (₹{budget.AllocatedAmount})");
-                }
+                    return ApiResponseDto<object>.FailureResponse($"Utilized amount cannot exceed allocated budget (₹{budget.AllocatedAmount})");
 
-                decimal utilizationPercentage = 0;
-                if (budget.AllocatedAmount > 0)
-                {
-                    utilizationPercentage = (request.UtilizedAmount / budget.AllocatedAmount.Value) * 100;
-                }
+                decimal utilizationPercentage = budget.AllocatedAmount > 0
+                    ? (request.UtilizedAmount / budget.AllocatedAmount.Value) * 100
+                    : 0;
 
                 budget.UtilizedAmount = request.UtilizedAmount;
                 budget.UtilizationPercentage = utilizationPercentage;
                 budget.UpdatedAt = DateTime.Now;
 
-                _context.Departmentbudgets.Update(budget);
-                await _context.SaveChangesAsync();
+                var updatedBudget = await _budgetRepo.UpdateAsync(budget);  
 
                 _logger.LogInformation("Utilized amount updated successfully");
 
-                return ApiResponseDto<object>.SuccessResponse(
-                    new
-                    {
-                        budget.BudgetId,
-                        budget.AllocatedAmount,
-                        budget.UtilizedAmount,
-                        budget.UtilizationPercentage,
-                        budget.UpdatedAt
-                    },
-                    "Utilized amount updated successfully");
+                return ApiResponseDto<object>.SuccessResponse(new
+                {
+                    updatedBudget.BudgetId,
+                    updatedBudget.AllocatedAmount,
+                    updatedBudget.UtilizedAmount,
+                    updatedBudget.UtilizationPercentage,
+                    updatedBudget.UpdatedAt
+                }, "Utilized amount updated successfully");
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error updating utilized amount: {ex.Message}");
-                return ApiResponseDto<object>.FailureResponse(
-                    "An error occurred while updating utilized amount");
+                return ApiResponseDto<object>.FailureResponse("An error occurred while updating utilized amount");
             }
         }
 
@@ -433,72 +343,47 @@ namespace Relevantz.EEPZ.Core.Service
                 _logger.LogInformation($"Updating utilization for allocation {request.AllocationId}");
 
                 if (request.AllocationId <= 0)
-                {
                     return ApiResponseDto<object>.FailureResponse("Invalid allocation ID");
-                }
 
-                var allocation = await _context.Budgetallocations
-                    .FirstOrDefaultAsync(a => a.AllocationId == request.AllocationId);
+                var allocation = await _budgetRepo.GetAllocationByIdAsync(request.AllocationId);  
 
                 if (allocation == null)
                 {
                     _logger.LogWarning($"Allocation not found: {request.AllocationId}");
-                    
-                    // Debug: Check existing allocations
-                    var existingAllocations = await _context.Budgetallocations
-                        .Select(a => a.AllocationId)
-                        .ToListAsync();
-                    _logger.LogDebug($"Existing AllocationIds: {string.Join(", ", existingAllocations)}");
-
-                    return ApiResponseDto<object>.FailureResponse(
-                        $"Budget allocation with ID {request.AllocationId} not found");
+                    return ApiResponseDto<object>.FailureResponse($"Budget allocation with ID {request.AllocationId} not found");
                 }
 
                 if (request.UtilizedAmount < 0)
-                {
-                    return ApiResponseDto<object>.FailureResponse(
-                        "Utilized amount cannot be negative");
-                }
+                    return ApiResponseDto<object>.FailureResponse("Utilized amount cannot be negative");
 
                 if (request.UtilizedAmount > allocation.Amount)
-                {
-                    return ApiResponseDto<object>.FailureResponse(
-                        $"Utilized amount (₹{request.UtilizedAmount}) cannot exceed allocated amount (₹{allocation.Amount})");
-                }
+                    return ApiResponseDto<object>.FailureResponse($"Utilized amount (₹{request.UtilizedAmount}) cannot exceed allocated amount (₹{allocation.Amount})");
 
-                // Update allocation
                 allocation.UtilizedAmount = request.UtilizedAmount;
                 allocation.UtilizationPercentage = request.UtilizationPercentage;
-                
                 if (!string.IsNullOrEmpty(request.Notes))
                     allocation.Notes = request.Notes;
-                
                 allocation.UpdatedAt = DateTime.UtcNow;
 
-                _context.Budgetallocations.Update(allocation);
-                await _context.SaveChangesAsync();
+                var updatedAllocation = await _budgetRepo.UpdateAllocationAsync(allocation);  
 
                 _logger.LogInformation($"Allocation {allocation.AllocationId} utilization updated successfully");
 
-                // Update department budget totals
-                await UpdateDepartmentBudgetTotalsAsync(allocation.DepartmentId);
+                await UpdateDepartmentBudgetTotalsAsync(allocation.DepartmentId);   
 
-                return ApiResponseDto<object>.SuccessResponse(
-                    new
-                    {
-                        allocation.AllocationId,
-                        allocation.Amount,
-                        allocation.UtilizedAmount,
-                        allocation.UtilizationPercentage,
-                        allocation.UpdatedAt
-                    },
-                    "Utilization updated successfully");
+                return ApiResponseDto<object>.SuccessResponse(new
+                {
+                    updatedAllocation.AllocationId,
+                    updatedAllocation.Amount,
+                    updatedAllocation.UtilizedAmount,
+                    updatedAllocation.UtilizationPercentage,
+                    updatedAllocation.UpdatedAt
+                }, "Utilization updated successfully");
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error updating utilization: {ex.Message}");
-                return ApiResponseDto<object>.FailureResponse(
-                    "An error occurred while updating utilization");
+                return ApiResponseDto<object>.FailureResponse("An error occurred while updating utilization");
             }
         }
 
@@ -508,43 +393,38 @@ namespace Relevantz.EEPZ.Core.Service
             {
                 _logger.LogInformation($"Getting allocations for budget: {budgetId}");
 
-                var allocations = await _context.Budgetallocations
-                    .AsNoTracking()
-                    .Where(a => a.BudgetId == budgetId)
-                    .Select(a => new
-                    {
-                        a.AllocationId,
-                        a.BudgetId,
-                        a.DepartmentId,
-                        DepartmentName = a.Department != null ? a.Department.DepartmentName : "Unknown",
-                        a.EmployeeUserId,
-                        EmployeeEmail = a.EmployeeUser != null ? a.EmployeeUser.Email : null,
-                        a.AllocationType,
-                        a.Amount,
-                        a.GoalStatus,
-                        a.Notes,
-                        a.AllocatedByUserId,
-                        AllocatedByEmail = a.AllocatedByUser != null ? a.AllocatedByUser.Email : "Unknown",
-                        a.AllocatedAt,
-                        a.UtilizedAmount,
-                        a.UtilizationPercentage,
-                        a.UpdatedAt,
-                        a.Period,
-                        a.PeriodYear
-                    })
-                    .ToListAsync();
+                var allocations = await _budgetRepo.GetAllocationsByBudgetIdAsync(budgetId);  
 
-                _logger.LogInformation($"Found {allocations.Count} allocations for budget {budgetId}");
+                var response = allocations.Select(a => new
+                {
+                    a.AllocationId,
+                    a.BudgetId,
+                    a.DepartmentId,
+                    DepartmentName = a.Department != null ? a.Department.DepartmentName : "Unknown",
+                    a.EmployeeUserId,
+                    EmployeeEmail = a.EmployeeUser != null ? a.EmployeeUser.Email : null,
+                    a.AllocationType,
+                    a.Amount,
+                    a.GoalStatus,
+                    a.Notes,
+                    a.AllocatedByUserId,
+                    AllocatedByEmail = a.AllocatedByUser != null ? a.AllocatedByUser.Email : "Unknown",
+                    a.AllocatedAt,
+                    a.UtilizedAmount,
+                    a.UtilizationPercentage,
+                    a.UpdatedAt,
+                    a.Period,
+                    a.PeriodYear
+                }).Cast<object>().ToList();
 
-                return ApiResponseDto<List<object>>.SuccessResponse(
-                    allocations.Cast<object>().ToList(),
-                    $"Retrieved {allocations.Count} allocations");
+                _logger.LogInformation($"Found {response.Count} allocations for budget {budgetId}");
+
+                return ApiResponseDto<List<object>>.SuccessResponse(response, $"Retrieved {response.Count} allocations");
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error getting allocations: {ex.Message}");
-                return ApiResponseDto<List<object>>.FailureResponse(
-                    "An error occurred while fetching allocations");
+                return ApiResponseDto<List<object>>.FailureResponse("An error occurred while fetching allocations");
             }
         }
 
@@ -553,10 +433,7 @@ namespace Relevantz.EEPZ.Core.Service
         {
             try
             {
-                var dept = await _context.Departments
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(d => d.DepartmentId == departmentId);
-
+                var dept = await _departmentRepo.GetByIdAsync(departmentId);  
                 return dept != null && !string.IsNullOrEmpty(dept.DepartmentName)
                     ? dept.DepartmentName
                     : "Unknown";
@@ -572,14 +449,11 @@ namespace Relevantz.EEPZ.Core.Service
         {
             try
             {
-                var budget = await _context.Departmentbudgets
-                    .FirstOrDefaultAsync(b => b.DepartmentId == departmentId);
+                var budget = await _budgetRepo.GetByDepartmentIdAsync(departmentId);  
 
                 if (budget != null)
                 {
-                    var totalUtilized = await _context.Budgetallocations
-                        .Where(a => a.DepartmentId == departmentId)
-                        .SumAsync(a => a.UtilizedAmount ?? 0);
+                    var totalUtilized = await _budgetRepo.GetTotalUtilizedByDepartmentAsync(departmentId);  
 
                     budget.UtilizedAmount = totalUtilized;
                     budget.UtilizationPercentage = budget.AllocatedAmount > 0
@@ -587,8 +461,7 @@ namespace Relevantz.EEPZ.Core.Service
                         : 0;
                     budget.UpdatedAt = DateTime.UtcNow;
 
-                    _context.Departmentbudgets.Update(budget);
-                    await _context.SaveChangesAsync();
+                    await _budgetRepo.UpdateAsync(budget);  
 
                     _logger.LogInformation("Department budget totals updated");
                 }

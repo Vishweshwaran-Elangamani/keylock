@@ -13,5 +13,8 @@ namespace Relevantz.EEPZ.Data.IRepository
         Task<List<Budgetperiodallocation>> GetByBudgetIdAsync(int budgetId);
         Task<Budgetperiodallocation?> GetByBudgetPeriodYearAsync(int budgetId, string period, int periodYear);
         Task<PeriodAllocationResponseDto?> GetPeriodAllocationDetailsAsync(int periodAllocationId);
+        Task<decimal> GetTotalAllocatedByBudgetAsync(int budgetId);
+        Task<decimal> GetTotalAllocatedByBudgetExceptIdAsync(int budgetId, int periodAllocationId);
+        Task<bool> HasSubAllocationsAsync(int budgetId, string period, int periodYear);
     }
 }

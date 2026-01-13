@@ -160,6 +160,7 @@ builder.Services.AddScoped<IBudgetPeriodAllocationRepository, BudgetPeriodAlloca
 builder.Services.AddScoped<IFundAllocationRepository, FundAllocationRepository>();
 builder.Services.AddScoped<ISlaEscalationRepository, SlaEscalationRepository>();
 builder.Services.AddScoped<IEmployeeDataRepository, EmployeeDataRepository>();
+builder.Services.AddScoped<IDepartmentBudgetRepository, DepartmentBudgetRepository>();
 Log.Information("Repositories registered successfully");
 // Register Services
 builder.Services.AddScoped<IPolicyService, PolicyService>();

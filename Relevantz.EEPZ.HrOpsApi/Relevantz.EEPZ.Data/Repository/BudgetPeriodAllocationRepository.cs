@@ -90,9 +90,7 @@ namespace Relevantz.EEPZ.Data.Repository
                 .FirstOrDefaultAsync(p => p.PeriodAllocationId == periodAllocationId);
 
             if (periodAllocation == null)
-            {
                 return null;
-            }
 
             var subAllocationCount = await _context.Budgetallocations
                 .CountAsync(a => a.BudgetId == periodAllocation.BudgetId
@@ -118,6 +116,28 @@ namespace Relevantz.EEPZ.Data.Repository
                 RemainingAmount = periodAllocation.AllocatedAmount - periodAllocation.UtilizedAmount,
                 SubAllocationCount = subAllocationCount
             };
+        }
+
+        public async Task<decimal> GetTotalAllocatedByBudgetAsync(int budgetId)
+        {
+            return await _context.Budgetperiodallocations
+                .Where(p => p.BudgetId == budgetId)
+                .SumAsync(p => p.AllocatedAmount);
+        }
+
+        public async Task<decimal> GetTotalAllocatedByBudgetExceptIdAsync(int budgetId, int periodAllocationId)
+        {
+            return await _context.Budgetperiodallocations
+                .Where(p => p.BudgetId == budgetId && p.PeriodAllocationId != periodAllocationId)
+                .SumAsync(p => p.AllocatedAmount);
+        }
+
+        public async Task<bool> HasSubAllocationsAsync(int budgetId, string period, int periodYear)
+        {
+            return await _context.Budgetallocations
+                .AnyAsync(a => a.BudgetId == budgetId 
+                             && a.Period == period 
+                             && a.PeriodYear == periodYear);
         }
     }
 }

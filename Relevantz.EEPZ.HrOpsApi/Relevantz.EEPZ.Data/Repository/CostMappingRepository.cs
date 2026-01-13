@@ -2,21 +2,25 @@ using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.IRepository;
 using Microsoft.EntityFrameworkCore;
+
 namespace Relevantz.EEPZ.Data.Repository
 {
     public class CostMappingRepository : ICostMappingRepository
     {
         private readonly EEPZDbContext _context;
+
         public CostMappingRepository(EEPZDbContext context)
         {
             _context = context;
         }
+
         public async Task<Departmentbudget?> GetByIdAsync(int budgetId)
         {
             return await _context.Departmentbudgets
                 .Include(db => db.Department)
                 .FirstOrDefaultAsync(db => db.BudgetId == budgetId);
         }
+
         public async Task<List<Departmentbudget>> GetAllAsync()
         {
             return await _context.Departmentbudgets
@@ -24,6 +28,7 @@ namespace Relevantz.EEPZ.Data.Repository
                 .OrderByDescending(db => db.CreatedAt)
                 .ToListAsync();
         }
+
         public async Task<List<Departmentbudget>> GetByDepartmentIdAsync(int departmentId)
         {
             return await _context.Departmentbudgets
@@ -32,6 +37,7 @@ namespace Relevantz.EEPZ.Data.Repository
                 .OrderByDescending(db => db.FiscalYear)
                 .ToListAsync();
         }
+
         public async Task<List<Departmentbudget>> GetByFiscalYearAsync(int fiscalYear)
         {
             return await _context.Departmentbudgets
@@ -40,6 +46,7 @@ namespace Relevantz.EEPZ.Data.Repository
                 .OrderBy(db => db.Department!.DepartmentName)
                 .ToListAsync();
         }
+
         public async Task<Departmentbudget?> GetByDepartmentAndFiscalYearAsync(int departmentId, int fiscalYear)
         {
             return await _context.Departmentbudgets
@@ -47,18 +54,21 @@ namespace Relevantz.EEPZ.Data.Repository
                     db.DepartmentId == departmentId &&
                     db.FiscalYear == fiscalYear);
         }
+
         public async Task<Departmentbudget> CreateAsync(Departmentbudget budget)
         {
             _context.Departmentbudgets.Add(budget);
             await _context.SaveChangesAsync();
             return budget;
         }
+
         public async Task<Departmentbudget> UpdateAsync(Departmentbudget budget)
         {
             _context.Departmentbudgets.Update(budget);
             await _context.SaveChangesAsync();
             return budget;
         }
+
         public async Task<bool> DeleteAsync(int budgetId)
         {
             var budget = await _context.Departmentbudgets.FindAsync(budgetId);
@@ -66,6 +76,15 @@ namespace Relevantz.EEPZ.Data.Repository
             _context.Departmentbudgets.Remove(budget);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<int> GetCurrentHeadcountAsync(int departmentId)
+        {
+            return await _context.Employeedetailsmasters
+                .Where(edm => edm.DepartmentId == departmentId)
+                .Select(edm => edm.EmployeeId)
+                .Distinct()
+                .CountAsync();
         }
     }
 }

@@ -1,11 +1,9 @@
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
-using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.IRepository;
 using Relevantz.EEPZ.Core.IService;
 using Relevantz.EEPZ.Common.Utils;
-using Microsoft.EntityFrameworkCore;
 
 namespace Relevantz.EEPZ.Core.Service
 {
@@ -13,13 +11,11 @@ namespace Relevantz.EEPZ.Core.Service
     {
         private readonly ICostMappingRepository _costMappingRepository;
         private readonly IDepartmentRepository _departmentRepository;
-        private readonly EEPZDbContext _context;
 
-        public CostMappingService(ICostMappingRepository costMappingRepository, IDepartmentRepository departmentRepository, EEPZDbContext context)
+        public CostMappingService(ICostMappingRepository costMappingRepository, IDepartmentRepository departmentRepository)
         {
             _costMappingRepository = costMappingRepository;
             _departmentRepository = departmentRepository;
-            _context = context;
         }
 
         public async Task<ApiResponseDto<HeadcountResponseDto>> GetDepartmentHeadcountAsync(int departmentId)
@@ -33,8 +29,14 @@ namespace Relevantz.EEPZ.Core.Service
                     EEPZBusinessLog.Warning($"Department not found: {departmentId}");
                     return ApiResponseDto<HeadcountResponseDto>.FailureResponse("Department not found");
                 }
-                var headcount = await GetCurrentHeadcountAsync(departmentId);
-                var response = new HeadcountResponseDto { DepartmentId = departmentId, DepartmentName = department.DepartmentName ?? "Unknown", CurrentHeadcount = headcount, Timestamp = DateTime.UtcNow };
+                var headcount = await _costMappingRepository.GetCurrentHeadcountAsync(departmentId);
+                var response = new HeadcountResponseDto 
+                { 
+                    DepartmentId = departmentId, 
+                    DepartmentName = department.DepartmentName ?? "Unknown", 
+                    CurrentHeadcount = headcount, 
+                    Timestamp = DateTime.UtcNow 
+                };
                 EEPZBusinessLog.Information($"Headcount fetched successfully for {department.DepartmentName}: {headcount} employees");
                 return ApiResponseDto<HeadcountResponseDto>.SuccessResponse(response, $"Current headcount for {department.DepartmentName}: {headcount} employees");
             }
@@ -67,7 +69,7 @@ namespace Relevantz.EEPZ.Core.Service
                 {
                     headcount = request.Headcount.Value;
                     EEPZBusinessLog.Information($"Using provided headcount: {headcount}");
-                    var actualHeadcount = await GetCurrentHeadcountAsync(request.DepartmentId);
+                    var actualHeadcount = await _costMappingRepository.GetCurrentHeadcountAsync(request.DepartmentId);
                     if (Math.Abs(headcount - actualHeadcount) > 10)
                     {
                         EEPZBusinessLog.Warning($"Provided headcount ({headcount}) differs significantly from actual ({actualHeadcount})");
@@ -75,7 +77,7 @@ namespace Relevantz.EEPZ.Core.Service
                 }
                 else
                 {
-                    headcount = await GetCurrentHeadcountAsync(request.DepartmentId);
+                    headcount = await _costMappingRepository.GetCurrentHeadcountAsync(request.DepartmentId);
                     EEPZBusinessLog.Information($"Auto-calculated headcount: {headcount}");
                     if (headcount == 0)
                     {
@@ -84,7 +86,18 @@ namespace Relevantz.EEPZ.Core.Service
                     }
                 }
                 decimal avgCostPerEmployee = headcount > 0 ? request.TotalBudget / headcount : 0;
-                var budget = new Departmentbudget { DepartmentId = request.DepartmentId, FiscalYear = request.FiscalYear, TotalBudget = request.TotalBudget, AllocatedAmount = 0, UtilizedAmount = 0, UtilizationPercentage = 0, Headcount = headcount, AvgCostPerEmployee = avgCostPerEmployee, CreatedAt = DateTime.UtcNow };
+                var budget = new Departmentbudget 
+                { 
+                    DepartmentId = request.DepartmentId, 
+                    FiscalYear = request.FiscalYear, 
+                    TotalBudget = request.TotalBudget, 
+                    AllocatedAmount = 0, 
+                    UtilizedAmount = 0, 
+                    UtilizationPercentage = 0, 
+                    Headcount = headcount, 
+                    AvgCostPerEmployee = avgCostPerEmployee, 
+                    CreatedAt = DateTime.UtcNow 
+                };
                 var createdBudget = await _costMappingRepository.CreateAsync(budget);
                 var budgetWithDetails = await _costMappingRepository.GetByIdAsync(createdBudget.BudgetId);
                 var response = MapToCostMappingResponse(budgetWithDetails!);
@@ -226,15 +239,21 @@ namespace Relevantz.EEPZ.Core.Service
 
         private CostMappingResponseDto MapToCostMappingResponse(Departmentbudget budget)
         {
-            return new CostMappingResponseDto { BudgetId = budget.BudgetId, DepartmentId = budget.DepartmentId, DepartmentName = budget.Department?.DepartmentName ?? "Unknown", FiscalYear = budget.FiscalYear, TotalBudget = budget.TotalBudget, AllocatedAmount = budget.AllocatedAmount ?? 0, UtilizedAmount = budget.UtilizedAmount ?? 0, UtilizationPercentage = budget.UtilizationPercentage ?? 0, Headcount = budget.Headcount ?? 0, AvgCostPerEmployee = budget.AvgCostPerEmployee ?? 0, CreatedAt = budget.CreatedAt, UpdatedAt = budget.UpdatedAt };
-        }
-
-        private async Task<int> GetCurrentHeadcountAsync(int departmentId)
-        {
-            return await _context.Employeedetailsmasters.Where(edm => edm.DepartmentId == departmentId).Select(edm => edm.EmployeeId).Distinct().CountAsync();
+            return new CostMappingResponseDto 
+            { 
+                BudgetId = budget.BudgetId, 
+                DepartmentId = budget.DepartmentId, 
+                DepartmentName = budget.Department?.DepartmentName ?? "Unknown", 
+                FiscalYear = budget.FiscalYear, 
+                TotalBudget = budget.TotalBudget, 
+                AllocatedAmount = budget.AllocatedAmount ?? 0, 
+                UtilizedAmount = budget.UtilizedAmount ?? 0, 
+                UtilizationPercentage = budget.UtilizationPercentage ?? 0, 
+                Headcount = budget.Headcount ?? 0, 
+                AvgCostPerEmployee = budget.AvgCostPerEmployee ?? 0, 
+                CreatedAt = budget.CreatedAt, 
+                UpdatedAt = budget.UpdatedAt 
+            };
         }
     }
-
-
 }
-
