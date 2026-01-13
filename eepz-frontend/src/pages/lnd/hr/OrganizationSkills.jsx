@@ -31,27 +31,20 @@ const OrganizationSkills = () => {
         pageNumber: currentPage,
         searchTerm: searchTerm,
         pageSize: itemsPerPage,
+        excludeDepartment: searchTerm ? null : "Administration",
       });
-
-      if (response.data.success) {
-        let employeesData = response.data.data.items;
-
-        if (!searchTerm) {
-          employeesData = employeesData.filter(
-            (emp) => emp.departmentName !== "Administration"
-          );
-        }
-
-        setEmployees(employeesData);
-        setTotalItems(response.data.data.totalCount);
-        setTotalPages(response.data.data.totalPages);
+      if (response.data.success) 
+        {
+        setEmployees(response.data.data.items);
+        setTotalItems(response.data.data.totalCount);  
+        setTotalPages(response.data.data.totalPages); 
       }
     } catch (error) {
       toast.error(LND_TOASTS.FAILED_TO_LOAD_EMPLOYEES);
     } finally {
       setLoading(false);
     }
-  };
+  }; 
 
   const handleSearchChange = (e) => {
     setSearchInput(e.target.value);
@@ -219,4 +212,4 @@ const OrganizationSkills = () => {
     </div>
   );
 };
-export default OrganizationSkills;                  
+export default OrganizationSkills;

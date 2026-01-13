@@ -1073,7 +1073,7 @@ function FormsList() {
                   </ul>
                 </nav>
               </div>
-            )}
+            )}    
 
             <div className="flp-panel-footer">
               <button

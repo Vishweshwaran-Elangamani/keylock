@@ -494,6 +494,7 @@ getAvailableSmes: async (params = {}) => {
         pageNumber: 1,
         searchTerm: "",
         pageSize: 12,
+        excludeDepartment: "Administration"
       };
 
       const finalParams = { ...defaultParams, ...params };

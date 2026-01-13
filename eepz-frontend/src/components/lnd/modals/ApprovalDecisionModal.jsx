@@ -56,7 +56,7 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
     "zip",
     "rar",
     "7z",
-  ];
+  ];  
 
   const hasAttachment = approval.attachmentPath || approval.attachmentFileName;
 
@@ -495,4 +495,4 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
   );
 };
 
-export default ApprovalDecisionModal;
+export default ApprovalDecisionModal;  

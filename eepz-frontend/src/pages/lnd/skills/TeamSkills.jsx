@@ -45,7 +45,6 @@ const TeamSkills = () => {
   const fetchEmployees = async () => {
     try {
       setLoading(true);
-      // UPDATED: Pass params as a single object
       const response = await lndService.getSubordinateEmployees({
         PageNumber: currentPage,
         SearchTerm: searchTerm,
@@ -131,7 +130,7 @@ const TeamSkills = () => {
             <input
               type="text"
               className={`form-control ${styles.searchInput}`}
-              placeholder="Search employees..."
+              placeholder="Search employees..."                                         
               value={searchInput}
               onChange={handleSearchChange}
               onKeyPress={handleSearchSubmit}
@@ -149,7 +148,7 @@ const TeamSkills = () => {
                 <i className="bi bi-search me-1"></i>
                 Search
               </button>
-            )}
+            )}  
           </div>
         </div>
       </div>
