@@ -49,7 +49,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-        
+
         public async Task<Feedback> GetOrgGoalFeedbackByIdAsync(int feedbackId)
         {
             try

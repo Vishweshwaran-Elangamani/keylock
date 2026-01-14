@@ -179,8 +179,8 @@ namespace eepzbackend.Controllers
 
         private string GetRoleFromClaims()
         {
-            var roleClaim = User.FindFirst(AppConstants.ClaimTypes.MsRoleSchema) ?? 
-                            User.FindFirst(ClaimTypes.Role) ?? 
+            var roleClaim = User.FindFirst(AppConstants.ClaimTypes.MsRoleSchema) ??
+                            User.FindFirst(ClaimTypes.Role) ??
                             User.FindFirst(AppConstants.ClaimTypes.Role);
 
             return roleClaim?.Value ?? AppConstants.Roles.Employee;

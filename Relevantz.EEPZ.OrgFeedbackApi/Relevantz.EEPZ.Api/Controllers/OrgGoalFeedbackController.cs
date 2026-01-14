@@ -36,7 +36,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> CreateOrgGoalFeedback([FromBody] CreateOrgGoalFeedbackRequestDto dto)
         {
             var result = await _service.CreateOrgGoalFeedbackAsync(dto);
-            
+
             return Ok(ApiResponseDto<OrgGoalFeedbackResponseDto>.SuccessResponse(
                 result,
                 MessageConstants.OrgGoalFeedbackCreated));

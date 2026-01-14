@@ -22,9 +22,9 @@ namespace Relevantz.EEPZ.Core.Service
             {
                 _logger.LogInformation("Service: Retrieving active SMEs");
                 var smes = await _repository.GetActiveSmesAsync();
-                
+
                 return ApiResponse<List<SmeDto>>.SuccessResponse(
-                    smes, 
+                    smes,
                     $"Retrieved {smes.Count} active SMEs successfully.");
             }
             catch (Exception ex)

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Data.IRepository;
 using Relevantz.EEPZ.Data.DBContexts;
-using Relevantz.EEPZ.Common.Models; 
+using Relevantz.EEPZ.Common.Models;
 
 namespace Relevantz.EEPZ.Data.Repository
 {

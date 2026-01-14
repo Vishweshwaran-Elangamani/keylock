@@ -91,7 +91,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw new Exception($"Error retrieving feedback by employee: {ex.Message}");
             }
         }
-        
+
         public async Task<Projectgoalfeedback> GetFeedbackByIdAsync(int feedbackId)
         {
             try

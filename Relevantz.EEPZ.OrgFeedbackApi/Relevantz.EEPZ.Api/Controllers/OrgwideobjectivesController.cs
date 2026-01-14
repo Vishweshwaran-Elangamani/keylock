@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Core.IService;
-using Relevantz.EEPZ.Common.Models;  
+using Relevantz.EEPZ.Common.Models;
 
 
 namespace Relevantz.EEPZ.Api.Controllers
@@ -13,7 +13,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         private readonly ILogger<OrgwideObjectivesController> _logger;
 
         public OrgwideObjectivesController(
-            IOrgwideObjectivesService service, 
+            IOrgwideObjectivesService service,
             ILogger<OrgwideObjectivesController> logger)
         {
             _service = service;

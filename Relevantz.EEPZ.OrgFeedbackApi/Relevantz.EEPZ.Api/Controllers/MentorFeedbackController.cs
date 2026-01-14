@@ -36,7 +36,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> CreateMentorFeedback([FromBody] CreateMentorFeedbackRequestDto dto)
         {
             var result = await _service.CreateMentorFeedbackAsync(dto);
-            
+
             return Ok(ApiResponseDto<MentorFeedbackResponseDto>.SuccessResponse(
                 result,
                 MessageConstants.MentorFeedbackCreated));

@@ -10,7 +10,7 @@ namespace eepzbackend.Controllers
     [Route("api/employees")]
     [ApiController]
     // [Authorize(Roles = "HR")]
-   public class EmployeesController : ControllerBase
+    public class EmployeesController : ControllerBase
     {
         private readonly IEmployeeService _employeeService;
         private readonly ILogger<EmployeesController> _logger;
