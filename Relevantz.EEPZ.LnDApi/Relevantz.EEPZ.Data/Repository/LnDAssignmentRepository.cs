@@ -106,315 +106,315 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         }
 
         /// <summary>Gets paginated assignments for a mentee with filtering and search capabilities.</summary>
-       public async Task<(List<AssignmentResponseModel> Items, int TotalCount)> GetMyAssignments(
-    int employeeId,
-    AssignmentRequestModel request
-)
-{
-    Log.Information(
-        "GetMyAssignmentsAsync called. EmployeeId={EmployeeId}, StatusFilter={StatusFilter}, Page={PageNumber}",
-        employeeId, request.StatusFilter ?? "all", request.PageNumber
-    );
-
-    var query = _context
-        .Lndassignments.Include(a => a.MenteeEmployee)
-        .ThenInclude(e => e.Userprofile)
-        .Include(a => a.Sme)
-        .ThenInclude(s => s.Employee)
-        .ThenInclude(e => e.Userprofile)
-        .Include(a => a.Skill)
-        .Where(a => a.MenteeEmployeeId == employeeId);
-
-    if (!string.IsNullOrEmpty(request.StatusFilter))
-    {
-        query = query.Where(a => a.Status == request.StatusFilter);
-    }
-
-    if (!string.IsNullOrEmpty(request.SearchTerm))
-    {
-        var lowerSearchTerm = request.SearchTerm.ToLower();
-        query = query.Where(a =>
-            a.Skill.SkillName.ToLower().Contains(lowerSearchTerm)
-            || ((a.Sme.Employee.Userprofile.FirstName ?? "") + " " + (a.Sme.Employee.Userprofile.LastName ?? ""))
-                .ToLower().Contains(lowerSearchTerm)
-            || ((a.MenteeEmployee.Userprofile.FirstName ?? "") + " " + (a.MenteeEmployee.Userprofile.LastName ?? ""))
-                .ToLower().Contains(lowerSearchTerm)
-            || a.Status.ToLower().Contains(lowerSearchTerm)
-            || (a.CompletionNotes != null && a.CompletionNotes.ToLower().Contains(lowerSearchTerm))
-        );
-    }
-
-    var totalCount = await query.CountAsync();
-
-    query = ApplyAssignmentSorting(query, request.SortField, request.SortOrder);
-
-    var items = await query
-        .Skip((request.PageNumber - 1) * request.PageSize)
-        .Take(request.PageSize)
-        .Select(a => new AssignmentResponseModel
+        public async Task<(List<AssignmentResponseModel> Items, int TotalCount)> GetMyAssignments(
+     int employeeId,
+     AssignmentRequestModel request
+ )
         {
-            AssignmentId = a.AssignmentId,
-            MenteeEmployeeId = a.MenteeEmployeeId,
-            MenteeName = a.MenteeEmployee.Userprofile.FirstName + " " + a.MenteeEmployee.Userprofile.LastName,
-            SmeId = a.SmeId,
-            SmeEmployeeId = a.Sme.EmployeeId,
-            SmeName = a.Sme.Employee.Userprofile.FirstName + " " + a.Sme.Employee.Userprofile.LastName,
-            SkillId = a.SkillId,
-            SkillName = a.Skill.SkillName,
-            Deadline = a.Deadline,
-            Status = a.Status,
-            ProofFilePath = a.ProofFilePath,
-            CompletionNotes = a.CompletionNotes,
-            CompletionRating = a.CompletionRating,
-            CreatedOn = a.CreatedOn,
-            UpdatedOn = a.UpdatedOn,
-            IsOverdue = false,  
-            DaysOverdue = null  
-        })
-        .ToListAsync();
+            Log.Information(
+                "GetMyAssignmentsAsync called. EmployeeId={EmployeeId}, StatusFilter={StatusFilter}, Page={PageNumber}",
+                employeeId, request.StatusFilter ?? "all", request.PageNumber
+            );
 
-    Log.Information(
-        "GetMyAssignmentsAsync completed. EmployeeId={EmployeeId}, ReturnedCount={Count}, TotalCount={TotalCount}",
-        employeeId, items.Count, totalCount
-    );
+            var query = _context
+                .Lndassignments.Include(a => a.MenteeEmployee)
+                .ThenInclude(e => e.Userprofile)
+                .Include(a => a.Sme)
+                .ThenInclude(s => s.Employee)
+                .ThenInclude(e => e.Userprofile)
+                .Include(a => a.Skill)
+                .Where(a => a.MenteeEmployeeId == employeeId);
 
-    return (items, totalCount);
-}
+            if (!string.IsNullOrEmpty(request.StatusFilter))
+            {
+                query = query.Where(a => a.Status == request.StatusFilter);
+            }
+
+            if (!string.IsNullOrEmpty(request.SearchTerm))
+            {
+                var lowerSearchTerm = request.SearchTerm.ToLower();
+                query = query.Where(a =>
+                    a.Skill.SkillName.ToLower().Contains(lowerSearchTerm)
+                    || ((a.Sme.Employee.Userprofile.FirstName ?? "") + " " + (a.Sme.Employee.Userprofile.LastName ?? ""))
+                        .ToLower().Contains(lowerSearchTerm)
+                    || ((a.MenteeEmployee.Userprofile.FirstName ?? "") + " " + (a.MenteeEmployee.Userprofile.LastName ?? ""))
+                        .ToLower().Contains(lowerSearchTerm)
+                    || a.Status.ToLower().Contains(lowerSearchTerm)
+                    || (a.CompletionNotes != null && a.CompletionNotes.ToLower().Contains(lowerSearchTerm))
+                );
+            }
+
+            var totalCount = await query.CountAsync();
+
+            query = ApplyAssignmentSorting(query, request.SortField, request.SortOrder);
+
+            var items = await query
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .Select(a => new AssignmentResponseModel
+                {
+                    AssignmentId = a.AssignmentId,
+                    MenteeEmployeeId = a.MenteeEmployeeId,
+                    MenteeName = a.MenteeEmployee.Userprofile.FirstName + " " + a.MenteeEmployee.Userprofile.LastName,
+                    SmeId = a.SmeId,
+                    SmeEmployeeId = a.Sme.EmployeeId,
+                    SmeName = a.Sme.Employee.Userprofile.FirstName + " " + a.Sme.Employee.Userprofile.LastName,
+                    SkillId = a.SkillId,
+                    SkillName = a.Skill.SkillName,
+                    Deadline = a.Deadline,
+                    Status = a.Status,
+                    ProofFilePath = a.ProofFilePath,
+                    CompletionNotes = a.CompletionNotes,
+                    CompletionRating = a.CompletionRating,
+                    CreatedOn = a.CreatedOn,
+                    UpdatedOn = a.UpdatedOn,
+                    IsOverdue = false,
+                    DaysOverdue = null
+                })
+                .ToListAsync();
+
+            Log.Information(
+                "GetMyAssignmentsAsync completed. EmployeeId={EmployeeId}, ReturnedCount={Count}, TotalCount={TotalCount}",
+                employeeId, items.Count, totalCount
+            );
+
+            return (items, totalCount);
+        }
 
         /// <summary>Gets paginated assignments for a manager's team with filtering and search capabilities.</summary>
-       public async Task<(List<AssignmentResponseModel> Items, int TotalCount)> GetTeamAssignments(
-    int managerId,
-    AssignmentRequestModel request
-)
-{
-    Log.Information(
-        "GetTeamAssignmentsAsync called. ManagerId={ManagerId}, StatusFilter={StatusFilter}, Page={PageNumber}",
-        managerId, request.StatusFilter ?? "all", request.PageNumber
-    );
-
-    var query = _context
-        .Lndassignments
-        .Include(a => a.MenteeEmployee)
-        .ThenInclude(e => e.Userprofile)
-        .Include(a => a.Sme)
-        .ThenInclude(s => s.Employee)
-        .ThenInclude(e => e.Userprofile)
-        .Include(a => a.Skill)
-        .Include(a => a.Lndapprovals)
-        .Where(a => a.MenteeEmployee.ReportingManagerEmployeeId == managerId);
-
-    if (!string.IsNullOrEmpty(request.StatusFilter))
-    {
-        query = query.Where(a => a.Status == request.StatusFilter);
-    }
-
-    if (!string.IsNullOrEmpty(request.SearchTerm))
-    {
-        var lowerSearchTerm = request.SearchTerm.ToLower();
-        query = query.Where(a =>
-            a.Skill.SkillName.ToLower().Contains(lowerSearchTerm)
-            || a.MenteeEmployee.Userprofile.FirstName.ToLower().Contains(lowerSearchTerm)
-            || a.MenteeEmployee.Userprofile.LastName.ToLower().Contains(lowerSearchTerm)
-            || ((a.MenteeEmployee.Userprofile.FirstName + " " + a.MenteeEmployee.Userprofile.LastName)
-                .ToLower().Contains(lowerSearchTerm))
-            || a.Sme.Employee.Userprofile.FirstName.ToLower().Contains(lowerSearchTerm)
-            || a.Sme.Employee.Userprofile.LastName.ToLower().Contains(lowerSearchTerm)
-            || ((a.Sme.Employee.Userprofile.FirstName + " " + a.Sme.Employee.Userprofile.LastName)
-                .ToLower().Contains(lowerSearchTerm))
-        );
-    }
-
-    if (!string.IsNullOrWhiteSpace(request.SortField))
-    {
-        var isAscending = request.SortOrder?.ToLower() != LnDConstants.SORT_ORDER.DESC;
-        query = request.SortField.ToLower() switch
+        public async Task<(List<AssignmentResponseModel> Items, int TotalCount)> GetTeamAssignments(
+     int managerId,
+     AssignmentRequestModel request
+ )
         {
-            LnDConstants.SORT_FIELDS.MENTEE_NAME => isAscending
-                ? query.OrderBy(a => a.MenteeEmployee.Userprofile.FirstName)
-                    .ThenBy(a => a.MenteeEmployee.Userprofile.LastName)
-                : query.OrderByDescending(a => a.MenteeEmployee.Userprofile.FirstName)
-                    .ThenByDescending(a => a.MenteeEmployee.Userprofile.LastName),
+            Log.Information(
+                "GetTeamAssignmentsAsync called. ManagerId={ManagerId}, StatusFilter={StatusFilter}, Page={PageNumber}",
+                managerId, request.StatusFilter ?? "all", request.PageNumber
+            );
 
-            LnDConstants.SORT_FIELDS.SKILL_NAME => isAscending
-                ? query.OrderBy(a => a.Skill.SkillName)
-                : query.OrderByDescending(a => a.Skill.SkillName),
+            var query = _context
+                .Lndassignments
+                .Include(a => a.MenteeEmployee)
+                .ThenInclude(e => e.Userprofile)
+                .Include(a => a.Sme)
+                .ThenInclude(s => s.Employee)
+                .ThenInclude(e => e.Userprofile)
+                .Include(a => a.Skill)
+                .Include(a => a.Lndapprovals)
+                .Where(a => a.MenteeEmployee.ReportingManagerEmployeeId == managerId);
 
-            LnDConstants.SORT_FIELDS.SME_NAME => isAscending
-                ? query.OrderBy(a => a.Sme.Employee.Userprofile.FirstName)
-                    .ThenBy(a => a.Sme.Employee.Userprofile.LastName)
-                : query.OrderByDescending(a => a.Sme.Employee.Userprofile.FirstName)
-                    .ThenByDescending(a => a.Sme.Employee.Userprofile.LastName),
+            if (!string.IsNullOrEmpty(request.StatusFilter))
+            {
+                query = query.Where(a => a.Status == request.StatusFilter);
+            }
 
-            LnDConstants.SORT_FIELDS.STATUS => isAscending
-                ? query.OrderBy(a => a.Status)
-                : query.OrderByDescending(a => a.Status),
+            if (!string.IsNullOrEmpty(request.SearchTerm))
+            {
+                var lowerSearchTerm = request.SearchTerm.ToLower();
+                query = query.Where(a =>
+                    a.Skill.SkillName.ToLower().Contains(lowerSearchTerm)
+                    || a.MenteeEmployee.Userprofile.FirstName.ToLower().Contains(lowerSearchTerm)
+                    || a.MenteeEmployee.Userprofile.LastName.ToLower().Contains(lowerSearchTerm)
+                    || ((a.MenteeEmployee.Userprofile.FirstName + " " + a.MenteeEmployee.Userprofile.LastName)
+                        .ToLower().Contains(lowerSearchTerm))
+                    || a.Sme.Employee.Userprofile.FirstName.ToLower().Contains(lowerSearchTerm)
+                    || a.Sme.Employee.Userprofile.LastName.ToLower().Contains(lowerSearchTerm)
+                    || ((a.Sme.Employee.Userprofile.FirstName + " " + a.Sme.Employee.Userprofile.LastName)
+                        .ToLower().Contains(lowerSearchTerm))
+                );
+            }
 
-            LnDConstants.SORT_FIELDS.CREATED_ON => isAscending
-                ? query.OrderBy(a => a.CreatedOn)
-                : query.OrderByDescending(a => a.CreatedOn),
+            if (!string.IsNullOrWhiteSpace(request.SortField))
+            {
+                var isAscending = request.SortOrder?.ToLower() != LnDConstants.SORT_ORDER.DESC;
+                query = request.SortField.ToLower() switch
+                {
+                    LnDConstants.SORT_FIELDS.MENTEE_NAME => isAscending
+                        ? query.OrderBy(a => a.MenteeEmployee.Userprofile.FirstName)
+                            .ThenBy(a => a.MenteeEmployee.Userprofile.LastName)
+                        : query.OrderByDescending(a => a.MenteeEmployee.Userprofile.FirstName)
+                            .ThenByDescending(a => a.MenteeEmployee.Userprofile.LastName),
 
-            LnDConstants.SORT_FIELDS.DEADLINE => isAscending
-                ? query.OrderBy(a => a.Deadline)
-                : query.OrderByDescending(a => a.Deadline),
+                    LnDConstants.SORT_FIELDS.SKILL_NAME => isAscending
+                        ? query.OrderBy(a => a.Skill.SkillName)
+                        : query.OrderByDescending(a => a.Skill.SkillName),
 
-            LnDConstants.SORT_FIELDS.COMPLETION_RATING => isAscending
-                ? query.OrderBy(a => a.CompletionRating ?? 0)
-                : query.OrderByDescending(a => a.CompletionRating ?? 0),
+                    LnDConstants.SORT_FIELDS.SME_NAME => isAscending
+                        ? query.OrderBy(a => a.Sme.Employee.Userprofile.FirstName)
+                            .ThenBy(a => a.Sme.Employee.Userprofile.LastName)
+                        : query.OrderByDescending(a => a.Sme.Employee.Userprofile.FirstName)
+                            .ThenByDescending(a => a.Sme.Employee.Userprofile.LastName),
 
-            _ => query.OrderByDescending(a => a.CreatedOn),
-        };
-    }
-    else
-    {
-        query = query.OrderByDescending(a => a.CreatedOn);
-    }
+                    LnDConstants.SORT_FIELDS.STATUS => isAscending
+                        ? query.OrderBy(a => a.Status)
+                        : query.OrderByDescending(a => a.Status),
 
-    var totalCount = await query.CountAsync();
+                    LnDConstants.SORT_FIELDS.CREATED_ON => isAscending
+                        ? query.OrderBy(a => a.CreatedOn)
+                        : query.OrderByDescending(a => a.CreatedOn),
 
-    var items = await query
-        .Skip((request.PageNumber - 1) * request.PageSize)
-        .Take(request.PageSize)
-        .Select(a => new AssignmentResponseModel
-        {
-            AssignmentId = a.AssignmentId,
-            MenteeEmployeeId = a.MenteeEmployeeId,
-            MenteeName = a.MenteeEmployee.Userprofile.FirstName + " " + a.MenteeEmployee.Userprofile.LastName,
-            SmeId = a.SmeId,
-            SmeEmployeeId = a.Sme.EmployeeId,
-            SmeName = a.Sme.Employee.Userprofile.FirstName + " " + a.Sme.Employee.Userprofile.LastName,
-            SkillId = a.SkillId,
-            SkillName = a.Skill.SkillName,
-            Deadline = a.Deadline,
-            Status = a.Status,
-            ProofFilePath = a.ProofFilePath,
-            CompletionNotes = a.Lndapprovals.OrderByDescending(ap => ap.UpdatedOn).FirstOrDefault(ap => !string.IsNullOrEmpty(ap.Notes)) != null 
-                ? a.Lndapprovals.OrderByDescending(ap => ap.UpdatedOn).FirstOrDefault(ap => !string.IsNullOrEmpty(ap.Notes)).Notes 
-                : null,
-            CompletionRating = a.CompletionRating,
-            CreatedOn = a.CreatedOn,
-            UpdatedOn = a.UpdatedOn,
-            IsOverdue = false,  
-            DaysOverdue = null  
-        })
-        .ToListAsync();
+                    LnDConstants.SORT_FIELDS.DEADLINE => isAscending
+                        ? query.OrderBy(a => a.Deadline)
+                        : query.OrderByDescending(a => a.Deadline),
 
-    Log.Information(
-        "GetTeamAssignmentsAsync completed. ManagerId={ManagerId}, ReturnedCount={Count}, TotalCount={TotalCount}",
-        managerId, items.Count, totalCount
-    );
+                    LnDConstants.SORT_FIELDS.COMPLETION_RATING => isAscending
+                        ? query.OrderBy(a => a.CompletionRating ?? 0)
+                        : query.OrderByDescending(a => a.CompletionRating ?? 0),
 
-    return (items, totalCount);
-}
+                    _ => query.OrderByDescending(a => a.CreatedOn),
+                };
+            }
+            else
+            {
+                query = query.OrderByDescending(a => a.CreatedOn);
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .Select(a => new AssignmentResponseModel
+                {
+                    AssignmentId = a.AssignmentId,
+                    MenteeEmployeeId = a.MenteeEmployeeId,
+                    MenteeName = a.MenteeEmployee.Userprofile.FirstName + " " + a.MenteeEmployee.Userprofile.LastName,
+                    SmeId = a.SmeId,
+                    SmeEmployeeId = a.Sme.EmployeeId,
+                    SmeName = a.Sme.Employee.Userprofile.FirstName + " " + a.Sme.Employee.Userprofile.LastName,
+                    SkillId = a.SkillId,
+                    SkillName = a.Skill.SkillName,
+                    Deadline = a.Deadline,
+                    Status = a.Status,
+                    ProofFilePath = a.ProofFilePath,
+                    CompletionNotes = a.Lndapprovals.OrderByDescending(ap => ap.UpdatedOn).FirstOrDefault(ap => !string.IsNullOrEmpty(ap.Notes)) != null
+                        ? a.Lndapprovals.OrderByDescending(ap => ap.UpdatedOn).FirstOrDefault(ap => !string.IsNullOrEmpty(ap.Notes)).Notes
+                        : null,
+                    CompletionRating = a.CompletionRating,
+                    CreatedOn = a.CreatedOn,
+                    UpdatedOn = a.UpdatedOn,
+                    IsOverdue = false,
+                    DaysOverdue = null
+                })
+                .ToListAsync();
+
+            Log.Information(
+                "GetTeamAssignmentsAsync completed. ManagerId={ManagerId}, ReturnedCount={Count}, TotalCount={TotalCount}",
+                managerId, items.Count, totalCount
+            );
+
+            return (items, totalCount);
+        }
 
         /// <summary>Gets paginated assignments where employee is the assigned SME with filtering and search.</summary>
-       public async Task<(List<AssignmentResponseModel> Items, int TotalCount)> GetSmeAssignments(
-    int smeEmployeeId,
-    AssignmentRequestModel request
-)
-{
-    Log.Information(
-        "GetSmeAssignmentsAsync called. SmeEmployeeId={SmeEmployeeId}, StatusFilter={StatusFilter}, Page={PageNumber}",
-        smeEmployeeId, request.StatusFilter ?? "all", request.PageNumber
-    );
-
-    var query = _context
-        .Lndassignments.Include(a => a.MenteeEmployee)
-        .ThenInclude(e => e.Userprofile)
-        .Include(a => a.Sme)
-        .ThenInclude(s => s.Employee)
-        .ThenInclude(e => e.Userprofile)
-        .Include(a => a.Skill)
-        .Where(a => a.Sme.EmployeeId == smeEmployeeId);
-
-    if (!string.IsNullOrEmpty(request.StatusFilter))
-    {
-        query = query.Where(a => a.Status == request.StatusFilter);
-    }
-
-    if (!string.IsNullOrEmpty(request.SearchTerm))
-    {
-        var lowerSearchTerm = request.SearchTerm.ToLower();
-        query = query.Where(a =>
-            a.Skill.SkillName.ToLower().Contains(lowerSearchTerm)
-            || a.MenteeEmployee.Userprofile.FirstName.ToLower().Contains(lowerSearchTerm)
-            || a.MenteeEmployee.Userprofile.LastName.ToLower().Contains(lowerSearchTerm)
-        );
-    }
-
-    if (!string.IsNullOrWhiteSpace(request.SortField))
-    {
-        var isAscending = request.SortOrder?.ToLower() != LnDConstants.SORT_ORDER.DESC;
-        query = request.SortField.ToLower() switch
+        public async Task<(List<AssignmentResponseModel> Items, int TotalCount)> GetSmeAssignments(
+     int smeEmployeeId,
+     AssignmentRequestModel request
+ )
         {
-            LnDConstants.SORT_FIELDS.MENTEE_NAME => isAscending
-                ? query.OrderBy(a => a.MenteeEmployee.Userprofile.FirstName)
-                    .ThenBy(a => a.MenteeEmployee.Userprofile.LastName)
-                : query.OrderByDescending(a => a.MenteeEmployee.Userprofile.FirstName)
-                    .ThenByDescending(a => a.MenteeEmployee.Userprofile.LastName),
+            Log.Information(
+                "GetSmeAssignmentsAsync called. SmeEmployeeId={SmeEmployeeId}, StatusFilter={StatusFilter}, Page={PageNumber}",
+                smeEmployeeId, request.StatusFilter ?? "all", request.PageNumber
+            );
 
-            LnDConstants.SORT_FIELDS.SKILL_NAME => isAscending
-                ? query.OrderBy(a => a.Skill.SkillName)
-                : query.OrderByDescending(a => a.Skill.SkillName),
+            var query = _context
+                .Lndassignments.Include(a => a.MenteeEmployee)
+                .ThenInclude(e => e.Userprofile)
+                .Include(a => a.Sme)
+                .ThenInclude(s => s.Employee)
+                .ThenInclude(e => e.Userprofile)
+                .Include(a => a.Skill)
+                .Where(a => a.Sme.EmployeeId == smeEmployeeId);
 
-            LnDConstants.SORT_FIELDS.STATUS => isAscending
-                ? query.OrderBy(a => a.Status)
-                : query.OrderByDescending(a => a.Status),
+            if (!string.IsNullOrEmpty(request.StatusFilter))
+            {
+                query = query.Where(a => a.Status == request.StatusFilter);
+            }
 
-            LnDConstants.SORT_FIELDS.CREATED_ON => isAscending
-                ? query.OrderBy(a => a.CreatedOn)
-                : query.OrderByDescending(a => a.CreatedOn),
+            if (!string.IsNullOrEmpty(request.SearchTerm))
+            {
+                var lowerSearchTerm = request.SearchTerm.ToLower();
+                query = query.Where(a =>
+                    a.Skill.SkillName.ToLower().Contains(lowerSearchTerm)
+                    || a.MenteeEmployee.Userprofile.FirstName.ToLower().Contains(lowerSearchTerm)
+                    || a.MenteeEmployee.Userprofile.LastName.ToLower().Contains(lowerSearchTerm)
+                );
+            }
 
-            LnDConstants.SORT_FIELDS.DEADLINE => isAscending
-                ? query.OrderBy(a => a.Deadline)
-                : query.OrderByDescending(a => a.Deadline),
+            if (!string.IsNullOrWhiteSpace(request.SortField))
+            {
+                var isAscending = request.SortOrder?.ToLower() != LnDConstants.SORT_ORDER.DESC;
+                query = request.SortField.ToLower() switch
+                {
+                    LnDConstants.SORT_FIELDS.MENTEE_NAME => isAscending
+                        ? query.OrderBy(a => a.MenteeEmployee.Userprofile.FirstName)
+                            .ThenBy(a => a.MenteeEmployee.Userprofile.LastName)
+                        : query.OrderByDescending(a => a.MenteeEmployee.Userprofile.FirstName)
+                            .ThenByDescending(a => a.MenteeEmployee.Userprofile.LastName),
 
-            LnDConstants.SORT_FIELDS.COMPLETION_RATING => isAscending
-                ? query.OrderBy(a => a.CompletionRating ?? 0)
-                : query.OrderByDescending(a => a.CompletionRating ?? 0),
+                    LnDConstants.SORT_FIELDS.SKILL_NAME => isAscending
+                        ? query.OrderBy(a => a.Skill.SkillName)
+                        : query.OrderByDescending(a => a.Skill.SkillName),
 
-            _ => query.OrderByDescending(a => a.CreatedOn),
-        };
-    }
-    else
-    {
-        query = query.OrderByDescending(a => a.CreatedOn);
-    }
+                    LnDConstants.SORT_FIELDS.STATUS => isAscending
+                        ? query.OrderBy(a => a.Status)
+                        : query.OrderByDescending(a => a.Status),
 
-    var totalCount = await query.CountAsync();
+                    LnDConstants.SORT_FIELDS.CREATED_ON => isAscending
+                        ? query.OrderBy(a => a.CreatedOn)
+                        : query.OrderByDescending(a => a.CreatedOn),
 
-  
-    var items = await query
-        .Skip((request.PageNumber - 1) * request.PageSize)
-        .Take(request.PageSize)
-        .Select(a => new AssignmentResponseModel
-        {
-            AssignmentId = a.AssignmentId,
-            MenteeEmployeeId = a.MenteeEmployeeId,
-            MenteeName = a.MenteeEmployee.Userprofile.FirstName + " " + a.MenteeEmployee.Userprofile.LastName,
-            SmeId = a.SmeId,
-            SmeEmployeeId = a.Sme.EmployeeId,
-            SmeName = a.Sme.Employee.Userprofile.FirstName + " " + a.Sme.Employee.Userprofile.LastName,
-            SkillId = a.SkillId,
-            SkillName = a.Skill.SkillName,
-            Deadline = a.Deadline,
-            Status = a.Status,
-            ProofFilePath = a.ProofFilePath,
-            CompletionNotes = a.CompletionNotes,
-            CompletionRating = a.CompletionRating,
-            CreatedOn = a.CreatedOn,
-            UpdatedOn = a.UpdatedOn,
-            IsOverdue = false,  
-            DaysOverdue = null  
-        })
-        .ToListAsync();
+                    LnDConstants.SORT_FIELDS.DEADLINE => isAscending
+                        ? query.OrderBy(a => a.Deadline)
+                        : query.OrderByDescending(a => a.Deadline),
 
-    Log.Information(
-        "GetSmeAssignmentsAsync completed. SmeEmployeeId={SmeEmployeeId}, ReturnedCount={Count}, TotalCount={TotalCount}",
-        smeEmployeeId, items.Count, totalCount
-    );
+                    LnDConstants.SORT_FIELDS.COMPLETION_RATING => isAscending
+                        ? query.OrderBy(a => a.CompletionRating ?? 0)
+                        : query.OrderByDescending(a => a.CompletionRating ?? 0),
 
-    return (items, totalCount);
-}
+                    _ => query.OrderByDescending(a => a.CreatedOn),
+                };
+            }
+            else
+            {
+                query = query.OrderByDescending(a => a.CreatedOn);
+            }
+
+            var totalCount = await query.CountAsync();
+
+
+            var items = await query
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .Select(a => new AssignmentResponseModel
+                {
+                    AssignmentId = a.AssignmentId,
+                    MenteeEmployeeId = a.MenteeEmployeeId,
+                    MenteeName = a.MenteeEmployee.Userprofile.FirstName + " " + a.MenteeEmployee.Userprofile.LastName,
+                    SmeId = a.SmeId,
+                    SmeEmployeeId = a.Sme.EmployeeId,
+                    SmeName = a.Sme.Employee.Userprofile.FirstName + " " + a.Sme.Employee.Userprofile.LastName,
+                    SkillId = a.SkillId,
+                    SkillName = a.Skill.SkillName,
+                    Deadline = a.Deadline,
+                    Status = a.Status,
+                    ProofFilePath = a.ProofFilePath,
+                    CompletionNotes = a.CompletionNotes,
+                    CompletionRating = a.CompletionRating,
+                    CreatedOn = a.CreatedOn,
+                    UpdatedOn = a.UpdatedOn,
+                    IsOverdue = false,
+                    DaysOverdue = null
+                })
+                .ToListAsync();
+
+            Log.Information(
+                "GetSmeAssignmentsAsync completed. SmeEmployeeId={SmeEmployeeId}, ReturnedCount={Count}, TotalCount={TotalCount}",
+                smeEmployeeId, items.Count, totalCount
+            );
+
+            return (items, totalCount);
+        }
 
 
         /// <summary>Gets all team assignments for Excel export without pagination.</summary>

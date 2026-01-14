@@ -173,7 +173,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         s.EmployeeId == m.EmployeeId && s.IsActive == true
                     ),
                 })
-                .ToList();   
+                .ToList();
 
             Log.Information(
                 "GetSubordinateSkills succeeded. ManagerId={ManagerId}, ReturnedCount={Count}, TotalCount={TotalCount}",
@@ -190,8 +190,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     PageNumber = request.PageNumber,
                     PageSize = 1_000_000,
                 },
-            };   
-        }       
+            };
+        }
 
         /// <summary>Gets paginated skills for the logged-in employee.</summary>
         public async Task<ApiResponse<PaginatedResponse<EmployeeSkillResponseModel>>> GetMySkills(
@@ -373,7 +373,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     Success = false,
                     Message = "Employee not found or not your subordinate",
                 };
-            } 
+            }
 
             var skillIds = request.Skills.Select(s => s.SkillId).ToList();
             var skills = await _repository.GetAllSkills();
@@ -571,7 +571,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var relatedAssignments = await _repository.GetActiveAssignmentsForSkill(
                 mapper.EmployeeId,
                 mapper.SkillId
-            ); 
+            );
 
             if (relatedAssignments.Any())
             {

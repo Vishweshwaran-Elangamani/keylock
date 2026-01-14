@@ -138,7 +138,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         /// <summary>Gets paginated subordinate skill mappings with optional employee filter and search.</summary>
         public async Task<(
-            List<Lndemployeeskillmapper> Items, 
+            List<Lndemployeeskillmapper> Items,
             int TotalCount
         )> GetSubordinateSkills(
             int managerId,
@@ -415,7 +415,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 assignments.Count
             );
 
-            return assignments; 
+            return assignments;
         }
 
         /// <summary>Gets pending approvals for specific assignments.</summary>
@@ -442,7 +442,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             );
 
             return approvals;
-        } 
+        }
 
         /// <summary>Deletes multiple approvals from the database.</summary>
         public async Task DeleteApprovals(List<Lndapproval> approvals)

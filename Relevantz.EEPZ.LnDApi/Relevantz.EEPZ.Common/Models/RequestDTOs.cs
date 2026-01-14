@@ -1,9 +1,9 @@
- 
+
 using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
 namespace Relevantz.EEPZ.Common.DTOs
 {
-    // Approval requests
+
     public class ApprovalDecisionRequestModel
     {
         public int ApprovalId { get; set; }
@@ -11,7 +11,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string? Notes { get; set; }
     }
 
-    // Assignment requests
+
     public class UploadCompletionProofRequestModel
     {
         public int AssignmentId { get; set; }
@@ -26,7 +26,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string? Notes { get; set; }
     }
 
-    // Employee skill requests
+
     public class RecordSkillRequestModel
     {
         public int EmployeeId { get; set; }
@@ -50,10 +50,10 @@ namespace Relevantz.EEPZ.Common.DTOs
     {
         public int MapperId { get; set; }
         public int Rating { get; set; }
-    }  
+    }
 
-    // SME requests
-    public class BecomeSmeRequestModel 
+
+    public class BecomeSmeRequestModel
     {
         public int SkillId { get; set; }
         public IFormFile ProofDocument { get; set; }
@@ -65,9 +65,9 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int MentorEmployeeId { get; set; }
         public int MenteeEmployeeId { get; set; }
         public DateTime? Deadline { get; set; }
-    } 
+    }
 
-    public class MyApprovalsRequestModel 
+    public class MyApprovalsRequestModel
     {
         public string? ApprovalType { get; set; }
         public string? Status { get; set; }
@@ -134,11 +134,11 @@ namespace Relevantz.EEPZ.Common.DTOs
     /// </summary>
     public class ExportOrganizationAssignmentsRequestModel
     {
-        public string? StatusFilter { get; set; }   
+        public string? StatusFilter { get; set; }
         public string? SearchTerm { get; set; }
         public string? SortField { get; set; }
-        public string? SortOrder { get; set; }    
-    }   
+        public string? SortOrder { get; set; }
+    }
 
     /// <summary>
     /// Request model for organization employees with pagination
@@ -149,7 +149,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 9;
         public string ExcludeDepartment { get; set; }
-    }         
+    }
     /// <summary>
     /// Request model for employee skills by ID
     /// </summary>
@@ -217,25 +217,19 @@ namespace Relevantz.EEPZ.Common.DTOs
     public class AvailableSmesRequestModel
 
     {
-
         public int SkillId { get; set; }
-
         public string? SearchTerm { get; set; }
-
         public int PageNumber { get; set; } = 1;
-
         public int PageSize { get; set; } = 10;
-
     }
- 
+
 }
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
+
+
+
+
+
+
+
+
+

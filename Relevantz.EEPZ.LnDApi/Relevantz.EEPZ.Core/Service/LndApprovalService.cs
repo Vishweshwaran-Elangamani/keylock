@@ -359,7 +359,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 "GetApprovalDetails started. ApprovalId={ApprovalId}, EmployeeId={EmployeeId}",
                 approvalId, employeeId
             );
-            // Getting the approvals details by Id
+
             var approval = await _approvalRepository.GetApprovalById(approvalId);
 
             if (approval == null)
@@ -372,7 +372,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     Message = "Approval not found",
                 };
             }
-            //validating the user role like request and approver
+
             if (
                 approval.RequesterEmployeeId != employeeId
                 && approval.ApproverEmployeeId != employeeId
@@ -390,7 +390,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     Message = "You do not have access to this approval",
                 };
             }
-            // Geeting the approval details as response
+
             var details = new ApprovalDetailsResponseModel
             {
                 ApprovalId = approval.ApprovalId,
@@ -426,7 +426,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     approval.RequesterEmployeeId == employeeId ? LnDConstants.ROLE_FILTERS.REQUESTER : LnDConstants.ROLE_FILTERS.APPROVER,
                 CanDownloadAttachment = approval.Attachment != null,
             };
-            // Mapping the assignment details with approval
+
             if (approval.AssignmentId.HasValue && approval.Assignment != null)
             {
                 details.Assignment = new AssignmentDetailsResponseModel

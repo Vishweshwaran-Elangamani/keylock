@@ -1,6 +1,6 @@
 namespace Relevantz.EEPZ.Common.DTOs
 {
-    // Common responses
+
     public class PaginatedResponse<T>
     {
         public List<T> Items { get; set; }
@@ -20,7 +20,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public List<string> Errors { get; set; }
     }
 
-    // Approval responses
+
     public class ApprovalDetailsResponseModel
     {
         public int ApprovalId { get; set; }
@@ -67,7 +67,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string OldAttachmentPath { get; set; }
     }
 
-    // Assignment responses
+
     public class AssignmentDetailsResponseModel
     {
         public int AssignmentId { get; set; }
@@ -102,7 +102,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int? DaysOverdue { get; set; }
     }
 
-    // Employee skill responses
+
     public class EmployeeSkillResponseModel
     {
         public int MapperId { get; set; }
@@ -124,14 +124,12 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string Email { get; set; }
         public string DepartmentName { get; set; }
     }
-
     public class SkillResponseModel
     {
         public int SkillId { get; set; }
         public string SkillName { get; set; }
     }
 
-    // SME responses
     public class SmeResponseModel
     {
         public int SmeId { get; set; }
@@ -146,7 +144,6 @@ namespace Relevantz.EEPZ.Common.DTOs
         public DateOnly? ApprovedOn { get; set; }
     }
 
-    // File responses
     public class FileDownloadResponseModel
     {
         public byte[] FileBytes { get; set; }
