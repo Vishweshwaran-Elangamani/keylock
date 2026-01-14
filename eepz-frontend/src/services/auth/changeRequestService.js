@@ -1,8 +1,5 @@
- 
 import api from './api';
- 
 const ChangeRequestService = {
-  // Employee: Submit a change request (Email or EmployeeCompanyId)
   submitChangeRequest: async (requestData) => {
     try {
       const response = await api.post('/ChangeRequest/submit', requestData);
@@ -18,8 +15,6 @@ const ChangeRequestService = {
       };
     }
   },
- 
-  // Employee: Get my change requests
   getMyChangeRequests: async () => {
     try {
       const response = await api.get('/ChangeRequest/my-requests');
@@ -35,14 +30,12 @@ const ChangeRequestService = {
       };
     }
   },
- 
-  // Employee: Check if user has pending request
   hasPendingRequest: async () => {
     try {
       const response = await api.get('/ChangeRequest/has-pending');
       return {
         success: true,
-        data: response.data.data, // Will be null if no pending request
+        data: response.data.data, 
         message: response.data.message
       };
     } catch (error) {
@@ -53,8 +46,6 @@ const ChangeRequestService = {
       };
     }
   },
- 
-  // Employee: Cancel a pending change request
   cancelChangeRequest: async (requestId) => {
     try {
       const response = await api.delete(`/ChangeRequest/cancel/${requestId}`);
@@ -70,8 +61,6 @@ const ChangeRequestService = {
       };
     }
   },
- 
-  // Admin: Get all pending change requests
   getPendingRequests: async () => {
     try {
       const response = await api.get('/ChangeRequest/pending');
@@ -87,8 +76,6 @@ const ChangeRequestService = {
       };
     }
   },
- 
-  // Admin: Get all change requests
   getAllChangeRequests: async () => {
     try {
       const response = await api.get('/ChangeRequest/all');
@@ -104,8 +91,6 @@ const ChangeRequestService = {
       };
     }
   },
- 
-  // Admin: Process (approve/reject) a change request
   processChangeRequest: async (processData) => {
     try {
       const response = await api.post('/ChangeRequest/process', processData);
@@ -122,7 +107,4 @@ const ChangeRequestService = {
     }
   }
 };
- 
 export default ChangeRequestService;
- 
- 

@@ -1,10 +1,7 @@
 import api from "./api";
-
-// JWT HELPER FUNCTIONS
 const decodeJwt = (token) => {
   try {
     if (!token) return null;
-
     const base64Url = token.split(".")[1];
     const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
     const jsonPayload = decodeURIComponent(
@@ -13,18 +10,15 @@ const decodeJwt = (token) => {
         .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
         .join("")
     );
-
     return JSON.parse(jsonPayload);
   } catch (error) {
     console.error("Error decoding JWT:", error);
     return null;
   }
 };
-
 const getClaimsFromToken = (token) => {
   const decoded = decodeJwt(token);
   if (!decoded) return null;
-
   return {
     userId: decoded.sub,
     email: decoded.email,
@@ -39,11 +33,9 @@ const getClaimsFromToken = (token) => {
     aud: decoded.aud,
   };
 };
-
 const authService = {
   login: async (email, password) => {
     try {
-
       const response = await api.post("/Authentication/login", {
         email,
         password,
@@ -51,15 +43,12 @@ const authService = {
         userAgent: navigator.userAgent,
       });
       const result = response.data;
-
       if (result.success && result.data.requiresTwoFactor) {
         return result;
       }
-
       if (result.success && result.data.requiresPasswordReset) {
         return result;
       }
-
       if (result.success && result.data.accessToken) {
         authService.saveAuthData(
           result.data.user,
@@ -67,7 +56,6 @@ const authService = {
           result.data.refreshToken
         );
       }
-
       return result;
     } catch (error) {
       console.error("Login error:", error);
@@ -76,7 +64,6 @@ const authService = {
       throw error;
     }
   },
-
   logout: async () => {
     try {
       const response = await api.post("/Authentication/logout");
@@ -88,7 +75,6 @@ const authService = {
       throw error.response?.data || error;
     }
   },
-
   verifyOtp: async (email, otpCode) => {
     try {
       const response = await api.post("/Authentication/verify-otp", {
@@ -96,9 +82,7 @@ const authService = {
         otpCode: otpCode,
         otpType: "Login2FA",
       });
-
       const result = response.data;
-
       if (result.success && result.data.accessToken) {
         authService.saveAuthData(
           result.data.user,
@@ -106,14 +90,12 @@ const authService = {
           result.data.refreshToken
         );
       }
-
       return result;
     } catch (error) {
       console.error("OTP verification error:", error);
       throw error.response?.data || error;
     }
   },
-
   verifyFirstLoginOtp: async (email, otpCode) => {
     try {
       const response = await api.post("/Authentication/verify-otp", {
@@ -127,7 +109,6 @@ const authService = {
       throw error.response?.data || error;
     }
   },
-
   verifyResetOtp: async (email, otpCode) => {
     try {
       const response = await api.post("/Authentication/verify-otp", {
@@ -141,7 +122,6 @@ const authService = {
       throw error.response?.data || error;
     }
   },
-
   resendOtp: async (email, otpType) => {
     try {
       const response = await api.post("/Authentication/resend-otp", {
@@ -154,7 +134,6 @@ const authService = {
       throw error.response?.data || error;
     }
   },
-
   forgotPassword: async (email) => {
     try {
       const response = await api.post("/Authentication/forgot-password", {
@@ -166,10 +145,8 @@ const authService = {
       throw error.response?.data || error;
     }
   },
-
   resetPassword: async (email, otpCode, newPassword, confirmPassword) => {
     try {
-
       const response = await api.post("/Authentication/reset-password", {
         email: email,
         otpCode: otpCode,
@@ -182,7 +159,6 @@ const authService = {
       throw error.response?.data || error;
     }
   },
-
   changePassword: async (currentPassword, newPassword) => {
     try {
       const response = await api.post("/Authentication/change-password", {
@@ -195,11 +171,9 @@ const authService = {
       throw error.response?.data || error;
     }
   },
-
   refreshAccessToken: async () => {
     try {
       const refreshToken = localStorage.getItem("refreshToken");
-
       if (!refreshToken) {
         console.error("No refresh token available");
         throw new Error("No refresh token available");
@@ -207,14 +181,10 @@ const authService = {
       const response = await api.post("/Authentication/refresh-token", {
         refreshToken: refreshToken,
       });
-
       const result = response.data;
-
       if (result.success && result.data.accessToken) {
-        // GET CLAIMS FROM NEW TOKEN AND UPDATE USER
         const tokenClaims = getClaimsFromToken(result.data.accessToken);
         const currentUser = authService.getCurrentUser();
-
         if (currentUser && tokenClaims) {
           const updatedUser = {
             ...currentUser,
@@ -222,13 +192,11 @@ const authService = {
           };
           localStorage.setItem("user", JSON.stringify(updatedUser));
         }
-
         localStorage.setItem("accessToken", result.data.accessToken);
         if (result.data.refreshToken) {
           localStorage.setItem("refreshToken", result.data.refreshToken);
         }
       }
-
       return result;
     } catch (error) {
       console.error("Token refresh error:", error);
@@ -236,7 +204,6 @@ const authService = {
       throw error;
     }
   },
-
   getCurrentUser: () => {
     try {
       const userStr = localStorage.getItem("user");
@@ -246,54 +213,42 @@ const authService = {
       return null;
     }
   },
-
   getToken: () => {
     return localStorage.getItem("accessToken");
   },
-
   getRefreshToken: () => {
     return localStorage.getItem("refreshToken");
   },
-
-  // NEW: GET ALL CLAIMS FROM TOKEN
   getClaims: () => {
     const token = authService.getToken();
     if (!token) return null;
-
     return getClaimsFromToken(token);
   },
-
-  // NEW: GET empMasterId FROM TOKEN CLAIMS
   getEmpMasterId: () => {
     const claims = authService.getClaims();
     return claims?.empMasterId || null;
   },
-
   isAuthenticated: () => {
     const token = authService.getToken();
     const user = authService.getCurrentUser();
     return !!(token && user);
   },
-
   hasRole: (role) => {
     const user = authService.getCurrentUser();
     return user?.roleName === role;
   },
-
   isAdmin: () => {
     return authService.hasRole("Admin");
   },
-
   isManager: () => {
     return authService.hasRole("Manager");
   },
-
   clearAuthData: () => {
     try {
       localStorage.removeItem("user");
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
-      localStorage.removeItem("token"); // Remove duplicate token key
+      localStorage.removeItem("token"); 
       localStorage.removeItem("tempUser");
       localStorage.removeItem("firstLoginOtpLockout");
       localStorage.removeItem("otpLockout");
@@ -302,19 +257,13 @@ const authService = {
       console.error("Error clearing auth data:", error);
     }
   },
-
   saveAuthData: (userData, accessToken, refreshToken) => {
     try {
-
-      // DECODE TOKEN TO GET CLAIMS INCLUDING empMasterId
       const tokenClaims = getClaimsFromToken(accessToken);
-
-      // MERGE USER DATA WITH TOKEN CLAIMS
       const enrichedUserData = {
         ...userData,
         empMasterId: tokenClaims?.empMasterId,
       };
-
       localStorage.setItem("user", JSON.stringify(enrichedUserData));
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
@@ -322,7 +271,6 @@ const authService = {
       console.error("Error saving auth data:", error);
     }
   },
-
   saveTempUser: (tempUserData) => {
     try {
       localStorage.setItem("tempUser", JSON.stringify(tempUserData));
@@ -330,7 +278,6 @@ const authService = {
       console.error("Error saving temp user:", error);
     }
   },
-
   getTempUser: () => {
     try {
       const tempUserStr = localStorage.getItem("tempUser");
@@ -340,7 +287,6 @@ const authService = {
       return null;
     }
   },
-
   clearTempUser: () => {
     try {
       localStorage.removeItem("tempUser");
@@ -348,7 +294,6 @@ const authService = {
       console.error("Error clearing temp user:", error);
     }
   },
-
   setOtpLockout: (type = "otp", minutes = 30) => {
     try {
       const lockoutUntil = Date.now() + minutes * 60 * 1000;
@@ -363,7 +308,6 @@ const authService = {
       console.error("Error setting OTP lockout:", error);
     }
   },
-
   isOtpLockedOut: (type = "otp") => {
     try {
       const lockoutKey =
@@ -373,22 +317,17 @@ const authService = {
           ? "firstLoginOtpLockout"
           : "otpLockout";
       const lockoutUntil = localStorage.getItem(lockoutKey);
-
       if (!lockoutUntil) return false;
-
       const isLocked = Date.now() < parseInt(lockoutUntil);
-
       if (!isLocked) {
         localStorage.removeItem(lockoutKey);
       }
-
       return isLocked;
     } catch (error) {
       console.error("Error checking OTP lockout:", error);
       return false;
     }
   },
-
   getRemainingLockoutTime: (type = "otp") => {
     try {
       const lockoutKey =
@@ -398,9 +337,7 @@ const authService = {
           ? "firstLoginOtpLockout"
           : "otpLockout";
       const lockoutUntil = localStorage.getItem(lockoutKey);
-
       if (!lockoutUntil) return 0;
-
       const remaining = Math.max(
         0,
         Math.ceil((parseInt(lockoutUntil) - Date.now()) / 1000)
@@ -411,7 +348,6 @@ const authService = {
       return 0;
     }
   },
-
   clearOtpLockout: (type = "otp") => {
     try {
       const lockoutKey =
@@ -426,5 +362,4 @@ const authService = {
     }
   },
 };
-
 export default authService;

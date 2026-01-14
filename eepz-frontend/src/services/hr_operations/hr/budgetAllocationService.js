@@ -1,7 +1,5 @@
 import hrApi from "./hrApi";
- 
 const budgetAllocationService = {
-  // LEADERSHIP: Create Department Budget
   createDepartmentBudget: async (budgetData) => {
     try {
       const response = await hrApi.post(
@@ -23,8 +21,6 @@ const budgetAllocationService = {
       );
     }
   },
- 
-  // LEADERSHIP: Update Department Budget
   updateDepartmentBudget: async (budgetData) => {
     try {
       const response = await hrApi.put(
@@ -47,8 +43,6 @@ const budgetAllocationService = {
       );
     }
   },
- 
-  // LEADERSHIP: Delete Department Budget
   deleteDepartmentBudget: async (budgetId) => {
     try {
       const response = await hrApi.delete(
@@ -64,8 +58,6 @@ const budgetAllocationService = {
       );
     }
   },
- 
-  // GET: All Department Budgets
   getAllDepartmentBudgets: async () => {
     try {
       const response = await hrApi.get(
@@ -81,8 +73,6 @@ const budgetAllocationService = {
       );
     }
   },
- 
-  // GET: Department Budget by ID
   getDepartmentBudgetById: async (budgetId) => {
     try {
       const response = await hrApi.get(
@@ -96,8 +86,6 @@ const budgetAllocationService = {
       );
     }
   },
- 
-  // GET: Department Budgets by Department
   getDepartmentBudgetsByDepartment: async (departmentId) => {
     try {
       const response = await hrApi.get(
@@ -113,8 +101,6 @@ const budgetAllocationService = {
       );
     }
   },
- 
-  // HR/DEPTHEAD: Create Budget Allocation
   createBudgetAllocation: async (allocationData) => {
     try {
       const response = await hrApi.post("/FundAllocation/create", {
@@ -136,8 +122,6 @@ const budgetAllocationService = {
       );
     }
   },
- 
-  // HR/DEPTHEAD: Update Budget Allocation
   updateBudgetAllocation: async (allocationData) => {
     try {
       const response = await hrApi.put("/FundAllocation/update", {
@@ -156,8 +140,6 @@ const budgetAllocationService = {
       );
     }
   },
- 
-  // HR/DEPTHEAD: Delete Budget Allocation
   deleteBudgetAllocation: async (allocationId) => {
     try {
       const response = await hrApi.delete(`/FundAllocation/${allocationId}`);
@@ -171,8 +153,6 @@ const budgetAllocationService = {
       );
     }
   },
- 
-  // ========== HR: CREATE SUB-ALLOCATION FROM PERIOD ==========
   createFundAllocationFromPeriod: async (allocationData) => {
     try {
       const response = await hrApi.post("/FundAllocation/create", {
@@ -183,8 +163,8 @@ const budgetAllocationService = {
         goalStatus: allocationData.goalStatus || "Approved",
         notes: allocationData.notes || "",
         allocatedByUserId: allocationData.allocatedByUserId,
-        period: allocationData.period,  // NEW
-        periodYear: allocationData.periodYear,  // NEW
+        period: allocationData.period,  
+        periodYear: allocationData.periodYear,  
       });
       return response.data;
     } catch (error) {
@@ -196,8 +176,6 @@ const budgetAllocationService = {
       );
     }
   },
- 
-  // HR/DEPTHEAD: Update Utilized Amount
   updateUtilizedAmount: async (budgetData) => {
     try {
       const response = await hrApi.put(
@@ -215,9 +193,6 @@ const budgetAllocationService = {
       );
     }
   },
- 
-  // GET: Budget Allocations by Budget ID
-  // In budgetAllocationService.js
 getBudgetAllocationsByBudget: async (budgetId) => {
   try {
     const response = await hrApi.get(`/FundAllocation/by-budget/${budgetId}`);
@@ -231,10 +206,6 @@ getBudgetAllocationsByBudget: async (budgetId) => {
     );
   }
 },
- 
-// Add this method to budgetAllocationService.js
- 
-  // ========== GET FUND ALLOCATIONS BY DEPARTMENT ==========
   getFundAllocationsByDepartment: async (departmentId) => {
     try {
       const response = await hrApi.get(`/FundAllocation/by-department/${departmentId}`);
@@ -248,10 +219,6 @@ getBudgetAllocationsByBudget: async (budgetId) => {
       );
     }
   },
- 
- 
- 
-  // GET: Budget Allocations by Type
   getBudgetAllocationsByType: async (type) => {
     try {
       const response = await hrApi.get(`/FundAllocation/by-type/${type}`);
@@ -265,8 +232,6 @@ getBudgetAllocationsByBudget: async (budgetId) => {
       );
     }
   },
- 
-  // GET: All Departments
   getAllDepartments: async () => {
     try {
       const response = await hrApi.get("/EmployeeData/department/all");
@@ -276,8 +241,6 @@ getBudgetAllocationsByBudget: async (budgetId) => {
       throw error.response?.data || { message: "Failed to fetch departments" };
     }
   },
- 
-  // NEW: DEPT HEAD - Update Utilization for Allocation
   updateUtilization: async (data) => {
     try {
       const response = await hrApi.put("/FundAllocation/update-utilization", {
@@ -298,5 +261,4 @@ getBudgetAllocationsByBudget: async (budgetId) => {
     }
   },
 };
- 
 export default budgetAllocationService;

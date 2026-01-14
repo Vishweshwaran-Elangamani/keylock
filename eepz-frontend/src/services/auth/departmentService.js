@@ -1,9 +1,5 @@
 import api from "./api";
-
 const departmentService = {
-  // ==================== EXISTING METHODS (UNCHANGED) ====================
-  
-  // Get all departments
   getAllDepartments: async () => {
     try {
       const response = await api.get("/RoleDepartmentManagement/department/all");
@@ -12,8 +8,6 @@ const departmentService = {
       throw error.response?.data || error.message;
     }
   },
-
-  // Get department by ID
   getDepartmentById: async (departmentId) => {
     try {
       const response = await api.get(`/RoleDepartmentManagement/department/${departmentId}`);
@@ -22,8 +16,6 @@ const departmentService = {
       throw error.response?.data || error.message;
     }
   },
-
-  // Create new department
   createDepartment: async (departmentData) => {
     try {
       const response = await api.post("/RoleDepartmentManagement/department/create", departmentData);
@@ -32,8 +24,6 @@ const departmentService = {
       throw error.response?.data || error.message;
     }
   },
-
-  // Update department
   updateDepartment: async (departmentData) => {
     try {
       const response = await api.put("/RoleDepartmentManagement/department/update", departmentData);
@@ -42,8 +32,6 @@ const departmentService = {
       throw error.response?.data || error.message;
     }
   },
-
-  // Delete department
   deleteDepartment: async (departmentId) => {
     try {
       const response = await api.delete(`/RoleDepartmentManagement/department/${departmentId}`);
@@ -52,10 +40,6 @@ const departmentService = {
       throw error.response?.data || error.message;
     }
   },
-
-  // ==================== NEW METHODS ====================
-
-  // Get active departments (for parent dropdown)
   getActiveDepartments: async () => {
     try {
       const response = await api.get("/RoleDepartmentManagement/department/status/active");
@@ -64,8 +48,6 @@ const departmentService = {
       throw error.response?.data || error.message;
     }
   },
-
-  // Get root departments
   getRootDepartments: async () => {
     try {
       const response = await api.get("/RoleDepartmentManagement/department/hierarchy/roots");
@@ -74,8 +56,6 @@ const departmentService = {
       throw error.response?.data || error.message;
     }
   },
-
-  // Get department hierarchy tree
   getDepartmentHierarchyTree: async (rootDepartmentId = null) => {
     try {
       const url = rootDepartmentId 
@@ -87,8 +67,6 @@ const departmentService = {
       throw error.response?.data || error.message;
     }
   },
-
-  // Get child departments
   getChildDepartments: async (parentDepartmentId) => {
     try {
       const response = await api.get(`/RoleDepartmentManagement/department/${parentDepartmentId}/children`);
@@ -97,8 +75,6 @@ const departmentService = {
       throw error.response?.data || error.message;
     }
   },
-
-  // Get department path (breadcrumb)
   getDepartmentPath: async (departmentId) => {
     try {
       const response = await api.get(`/RoleDepartmentManagement/department/${departmentId}/path`);
@@ -107,8 +83,6 @@ const departmentService = {
       throw error.response?.data || error.message;
     }
   },
-
-  // Update department status
   updateDepartmentStatus: async (departmentId, status) => {
     try {
       const response = await api.patch(
@@ -120,8 +94,6 @@ const departmentService = {
       throw error.response?.data || error.message;
     }
   },
-
-  // Assign HOD to department
   assignHod: async (departmentId, hodEmployeeId) => {
     try {
       const response = await api.post(
@@ -133,8 +105,6 @@ const departmentService = {
       throw error.response?.data || error.message;
     }
   },
-
-  // Remove HOD from department
   removeHod: async (departmentId) => {
     try {
       const response = await api.delete(
@@ -145,8 +115,6 @@ const departmentService = {
       throw error.response?.data || error.message;
     }
   },
-
-  // Search departments
   searchDepartments: async (searchTerm) => {
     try {
       const response = await api.get(
@@ -157,8 +125,6 @@ const departmentService = {
       throw error.response?.data || error.message;
     }
   },
-
-  // Get department by code
   getDepartmentByCode: async (departmentCode) => {
     try {
       const response = await api.get(`/RoleDepartmentManagement/department/code/${departmentCode}`);
@@ -167,8 +133,6 @@ const departmentService = {
       throw error.response?.data || error.message;
     }
   },
-
-  // Get department statistics
   getTotalDepartmentCount: async () => {
     try {
       const response = await api.get("/RoleDepartmentManagement/department/statistics/total");
@@ -177,7 +141,6 @@ const departmentService = {
       throw error.response?.data || error.message;
     }
   },
-
   getActiveDepartmentCount: async () => {
     try {
       const response = await api.get("/RoleDepartmentManagement/department/statistics/active-count");
@@ -187,5 +150,4 @@ const departmentService = {
     }
   },
 };
-
 export default departmentService;

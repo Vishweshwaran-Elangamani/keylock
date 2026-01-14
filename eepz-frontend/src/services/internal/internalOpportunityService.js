@@ -1,13 +1,9 @@
 import internalApi from "./internalApi";
-
 const API_BASE = "InternalOpportunity";
-
 const internalOpportunityService = {
-  //  Get all opportunities - NO filters, NO pagination
   getAllOpportunities: async () => {
     try {
       const response = await internalApi.get(`/${API_BASE}`);
-
       return {
         success: true,
         data: response.data,
@@ -21,8 +17,6 @@ const internalOpportunityService = {
       };
     }
   },
-
-  // Get opportunity by ID
   getOpportunityById: async (id) => {
     try {
       const response = await internalApi.get(`/${API_BASE}/${id}`);
@@ -37,8 +31,6 @@ const internalOpportunityService = {
       };
     }
   },
-
-  // Create new opportunity (HR only)
   createOpportunity: async (opportunityData) => {
     try {
       const response = await internalApi.post(
@@ -58,8 +50,6 @@ const internalOpportunityService = {
       };
     }
   },
-
-  // Update opportunity (HR only)
   updateOpportunity: async (id, opportunityData) => {
     try {
       const response = await internalApi.put(
@@ -78,8 +68,6 @@ const internalOpportunityService = {
       };
     }
   },
-
-  // Delete opportunity (HR only)
   deleteOpportunity: async (id) => {
     try {
       await internalApi.delete(`/${API_BASE}/${id}`);
@@ -95,8 +83,6 @@ const internalOpportunityService = {
       };
     }
   },
-
-  // Get active opportunities
   getActiveOpportunities: async () => {
     try {
       const response = await internalApi.get(`/${API_BASE}/active`);
@@ -113,8 +99,6 @@ const internalOpportunityService = {
       };
     }
   },
-
-  // Get statistics
   getStatistics: async () => {
     try {
       const response = await internalApi.get(`/${API_BASE}/statistics`);
@@ -130,5 +114,4 @@ const internalOpportunityService = {
     }
   },
 };
-
 export default internalOpportunityService;

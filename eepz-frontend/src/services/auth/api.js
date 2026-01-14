@@ -1,26 +1,19 @@
 import axios from "axios";
 import authService from "./authService";
-
 const api = axios.create({
   baseURL: import.meta.env.VITE_AUTH_API_URL+"/api",
   headers: {
     "Content-Type": "application/json",
   },
 });
-
 api.interceptors.request.use(
   (config) => {
     const token = authService.getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-
-    // CRITICAL FIX: Remove Content-Type for FormData
-    // Browser will automatically set multipart/form-data with boundary
     if (config.data instanceof FormData) {
       delete config.headers["Content-Type"];
-      
-      // Also remove from other header types if present
       if (config.headers.common) {
         delete config.headers.common["Content-Type"];
       }
@@ -31,7 +24,6 @@ api.interceptors.request.use(
         delete config.headers.post["Content-Type"];
       }
     }
-
     return config;
   },
   (error) => {
@@ -39,7 +31,6 @@ api.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-
 api.interceptors.response.use(
   (response) => {
     return response;
@@ -49,14 +40,7 @@ api.interceptors.response.use(
     console.error("Status:", error.response?.status);
     console.error("URL:", error.config?.url);
     console.error("Data:", error.response?.data);
-
     const originalRequest = error.config;
-
-    // Only attempt token refresh if:
-    // 1. Status is 401
-    // 2. Request has not been retried yet
-    // 3. Request is NOT login/register/public endpoint
-    // 4. User has a refresh token
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
@@ -67,10 +51,8 @@ api.interceptors.response.use(
       authService.getRefreshToken()
     ) {
       originalRequest._retry = true;
-
       try {
         const refreshResponse = await authService.refreshAccessToken();
-
         if (refreshResponse.success) {
           originalRequest.headers.Authorization = `Bearer ${authService.getToken()}`;
           return api(originalRequest);
@@ -82,9 +64,7 @@ api.interceptors.response.use(
         return Promise.reject(refreshError);
       }
     }
-
     return Promise.reject(error);
   }
 );
-
 export default api;

@@ -1,8 +1,5 @@
 import api from "./api";
-
 const userService = {
-  // ==================== EXISTING METHODS (UNCHANGED) ====================
-
   getAllUsers: async () => {
     try {
       const response = await api.get("/User/all");
@@ -11,7 +8,6 @@ const userService = {
       throw error.response?.data || error.message;
     }
   },
-
   getUserById: async (userId) => {
     try {
       const response = await api.get(`/User/${userId}`);
@@ -20,7 +16,6 @@ const userService = {
       throw error.response?.data || error.message;
     }
   },
-
   createUser: async (userData) => {
     try {
       const response = await api.post("/User/create", userData);
@@ -30,7 +25,6 @@ const userService = {
       throw error.response?.data || error.message;
     }
   },
-
   updateUser: async (userData) => {
     try {
       const response = await api.put("/User/update", userData);
@@ -39,7 +33,6 @@ const userService = {
       throw error.response?.data || error.message;
     }
   },
-
   deactivateUser: async (userId) => {
     try {
       const response = await api.post(`/User/deactivate/${userId}`);
@@ -48,7 +41,6 @@ const userService = {
       throw error.response?.data || error.message;
     }
   },
-
   activateUser: async (userId) => {
     try {
       const response = await api.post(`/User/activate/${userId}`);
@@ -57,7 +49,6 @@ const userService = {
       throw error.response?.data || error.message;
     }
   },
-
   assignRoleDepartment: async (data) => {
     try {
       const response = await api.post("/User/assign-role-department", data);
@@ -66,7 +57,6 @@ const userService = {
       throw error.response?.data || error.message;
     }
   },
-
   getEmployeesByManager: async (managerId) => {
     try {
       const response = await api.get(`/User/manager/${managerId}/employees`);
@@ -79,14 +69,9 @@ const userService = {
       throw error.response?.data || error.message;
     }
   },
-
-  // ==================== NEW METHODS FOR DEPARTMENT HOD ====================
-
-  // Get all active employees (for HOD dropdown in department)
   getActiveEmployees: async () => {
     try {
       const response = await api.get("/User/all");
-      // Filter only active users
       if (response.data.success && response.data.data) {
         return {
           ...response.data,
@@ -98,8 +83,6 @@ const userService = {
       throw error.response?.data || error.message;
     }
   },
-
-  // Get employees by role (optional - if you have this endpoint)
   getEmployeesByRole: async (roleId) => {
     try {
       const response = await api.get(`/User/role/${roleId}`);
@@ -108,8 +91,6 @@ const userService = {
       throw error.response?.data || error.message;
     }
   },
-
-  // Get employees by department
   getEmployeesByDepartment: async (departmentId) => {
     try {
       const response = await api.get(`/User/department/${departmentId}`);
@@ -118,8 +99,6 @@ const userService = {
       throw error.response?.data || error.message;
     }
   },
-
-  // Search employees (for HOD autocomplete)
   searchEmployees: async (searchTerm) => {
     try {
       const response = await api.get(
@@ -130,8 +109,6 @@ const userService = {
       throw error.response?.data || error.message;
     }
   },
-
-  // Get next available Employee Company ID
   getNextEmployeeCompanyId: async () => {
     try {
       const response = await api.get("/User/next-employee-id");
@@ -141,5 +118,4 @@ const userService = {
     }
   },
 };
-
 export default userService;

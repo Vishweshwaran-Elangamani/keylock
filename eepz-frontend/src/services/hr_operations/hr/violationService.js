@@ -1,9 +1,5 @@
 import hrApi from "./hrApi";
-
 const violationService = {
-  // ===== EXISTING VIOLATION ENDPOINTS =====
-
-  // Report new violation
   reportViolation: async (violationData) => {
     try {
       const response = await hrApi.post("/Violation/report", violationData);
@@ -13,8 +9,6 @@ const violationService = {
       throw error.response?.data || { message: "Failed to report violation" };
     }
   },
-
-  // Get all violations
   getAllViolations: async () => {
     try {
       const response = await hrApi.get("/Violation/list");
@@ -24,8 +18,6 @@ const violationService = {
       throw error.response?.data || { message: "Failed to fetch violations" };
     }
   },
-
-  // Get violation by ID
   getViolationById: async (violationId) => {
     try {
       const response = await hrApi.get(`/Violation/${violationId}`);
@@ -35,8 +27,6 @@ const violationService = {
       throw error.response?.data || { message: "Failed to fetch violation" };
     }
   },
-
-  // Get violations by employee
   getViolationsByEmployee: async (employeeUserId) => {
     try {
       const response = await hrApi.get(`/Violation/employee/${employeeUserId}`);
@@ -50,8 +40,6 @@ const violationService = {
       );
     }
   },
-
-  // Get violations by policy
   getViolationsByPolicy: async (policyId) => {
     try {
       const response = await hrApi.get(`/Violation/policy/${policyId}`);
@@ -63,8 +51,6 @@ const violationService = {
       );
     }
   },
-
-  // Resolve violation
   resolveViolation: async (violationId, resolutionData) => {
     try {
       const response = await hrApi.put(
@@ -77,8 +63,6 @@ const violationService = {
       throw error.response?.data || { message: "Failed to resolve violation" };
     }
   },
-
-  // Get violation statistics
   getViolationStats: async () => {
     try {
       const response = await hrApi.get("/Violation/stats");
@@ -92,10 +76,6 @@ const violationService = {
       );
     }
   },
-
-  // ===== NEW SLA ESCALATION ENDPOINTS =====
-
-  // Get all SLA escalations
   getAllSlaEscalations: async () => {
     try {
       const response = await hrApi.get("/Violation/sla-escalations");
@@ -107,8 +87,6 @@ const violationService = {
       );
     }
   },
-
-  // Get SLA escalations by employee
   getSlaEscalationsByEmployee: async (employeeUserId) => {
     try {
       const response = await hrApi.get(
@@ -124,8 +102,6 @@ const violationService = {
       );
     }
   },
-
-  // Get SLA escalation by ID
   getSlaEscalationById: async (escalationId) => {
     try {
       const response = await hrApi.get(
@@ -141,8 +117,6 @@ const violationService = {
       );
     }
   },
-
-  // Get combined violations and escalations
   getCombinedData: async () => {
     try {
       const response = await hrApi.get("/Violation/combined");
@@ -154,8 +128,6 @@ const violationService = {
       );
     }
   },
-
-  // Get SLA escalation statistics
   getSlaEscalationStats: async () => {
     try {
       const response = await hrApi.get("/Violation/sla-escalations/stats");
@@ -170,5 +142,4 @@ const violationService = {
     }
   },
 };
-
 export default violationService;

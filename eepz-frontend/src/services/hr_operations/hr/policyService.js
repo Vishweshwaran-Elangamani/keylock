@@ -1,7 +1,5 @@
 import hrApi from "./hrApi";
-
 const policyService = {
-  // Get all policies
   getAllPolicies: async () => {
     try {
       const response = await hrApi.get("/Policy/list");
@@ -11,8 +9,6 @@ const policyService = {
       throw error;
     }
   },
-
-  // Get active policies
   getActivePolicies: async () => {
     try {
       const response = await hrApi.get("/Policy/active");
@@ -22,8 +18,6 @@ const policyService = {
       throw error;
     }
   },
-
-  // Get inactive policies
   getInactivePolicies: async () => {
     try {
       const response = await hrApi.get("/Policy/inactive");
@@ -33,8 +27,6 @@ const policyService = {
       throw error;
     }
   },
-
-  //   Get published policies
   getPublishedPolicies: async () => {
     try {
       const response = await hrApi.get("/Policy/published");
@@ -44,8 +36,6 @@ const policyService = {
       throw error;
     }
   },
-
-  //  Get draft policies
   getDraftPolicies: async () => {
     try {
       const response = await hrApi.get("/Policy/drafts");
@@ -55,8 +45,6 @@ const policyService = {
       throw error;
     }
   },
-
-  // Get policy by ID
   getPolicyById: async (policyId) => {
     try {
       const response = await hrApi.get(`/Policy/${policyId}`);
@@ -66,8 +54,6 @@ const policyService = {
       throw error;
     }
   },
-
-  // Create new policy
   createPolicy: async (policyData) => {
     try {
       const response = await hrApi.post("/Policy/create", policyData);
@@ -77,8 +63,6 @@ const policyService = {
       throw error;
     }
   },
-
-  // Update policy
   updatePolicy: async (policyId, policyData) => {
     try {
       const response = await hrApi.put(
@@ -91,8 +75,6 @@ const policyService = {
       throw error;
     }
   },
-
-  // Delete policy
   deletePolicy: async (policyId) => {
     try {
       const response = await hrApi.delete(`/Policy/${policyId}`);
@@ -102,14 +84,11 @@ const policyService = {
       throw error;
     }
   },
-
-  //  Upload document (file)
   uploadDocument: async (file) => {
     try {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("documentType", "upload");
-
       const response = await hrApi.post("/Policy/upload-document", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -121,15 +100,12 @@ const policyService = {
       throw error;
     }
   },
-
-  // Add document link
   addDocumentLink: async (documentUrl, documentName) => {
     try {
       const formData = new FormData();
       formData.append("documentUrl", documentUrl);
       formData.append("documentName", documentName);
       formData.append("documentType", "link");
-
       const response = await hrApi.post("/Policy/upload-document", formData);
       return response.data.data;
     } catch (error) {
@@ -137,8 +113,6 @@ const policyService = {
       throw error;
     }
   },
-
-  //  Publish policy
   publishPolicy: async (policyId) => {
     try {
       const response = await hrApi.post(`/Policy/publish/${policyId}`);
@@ -148,8 +122,6 @@ const policyService = {
       throw error;
     }
   },
-
-  //  Unpublish policy
   unpublishPolicy: async (policyId) => {
     try {
       const response = await hrApi.post(`/Policy/unpublish/${policyId}`);
@@ -160,5 +132,4 @@ const policyService = {
     }
   },
 };
-
 export default policyService;

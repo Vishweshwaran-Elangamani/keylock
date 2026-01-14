@@ -1,12 +1,9 @@
 import internalApi from "./internalApi";
-
 const API_BASE = "Promotion";
-
 const promotionService = {
   getAllPromotions: async () => {
     try {
       const response = await internalApi.get(`/${API_BASE}/list`);
-
       return {
         success: true,
         data: Array.isArray(response.data) ? response.data : [],
@@ -20,14 +17,12 @@ const promotionService = {
       };
     }
   },
-
   createPromotion: async (promotionData) => {
     try {
       const response = await internalApi.post(
         `/${API_BASE}/create`,
         promotionData
       );
-
       return {
         success: true,
         data: response.data,
@@ -35,7 +30,6 @@ const promotionService = {
     } catch (error) {
       console.error("Create promotion error:", error);
       console.error("Error details:", error.response?.data);
-
       return {
         success: false,
         message:
@@ -45,13 +39,11 @@ const promotionService = {
       };
     }
   },
-
   getPendingHRApproval: async () => {
     try {
       const response = await internalApi.get(
         `/${API_BASE}/pending-hr-approval`
       );
-
       return {
         success: true,
         data: Array.isArray(response.data) ? response.data : [],
@@ -65,13 +57,11 @@ const promotionService = {
       };
     }
   },
-
   getPendingLeadershipApproval: async () => {
     try {
       const response = await internalApi.get(
         `/${API_BASE}/pending-leadership-approval`
       );
-
       return {
         success: true,
         data: Array.isArray(response.data) ? response.data : [],
@@ -85,14 +75,12 @@ const promotionService = {
       };
     }
   },
-
   approvePromotion: async (promotionId, approvalData) => {
     try {
       const response = await internalApi.put(
         `/${API_BASE}/${promotionId}/approve`,
         approvalData
       );
-
       return {
         success: true,
         data: response.data,
@@ -105,13 +93,11 @@ const promotionService = {
       };
     }
   },
-
   rejectPromotion: async (promotionId) => {
     try {
       const response = await internalApi.put(
         `/${API_BASE}/${promotionId}/reject`
       );
-
       return {
         success: true,
         data: response.data,
@@ -124,14 +110,12 @@ const promotionService = {
       };
     }
   },
-
   leadershipApprove: async (promotionId, approvalData) => {
     try {
       const response = await internalApi.put(
         `/${API_BASE}/${promotionId}/leadership-approve`,
         approvalData
       );
-
       return {
         success: true,
         data: response.data,
@@ -144,14 +128,12 @@ const promotionService = {
       };
     }
   },
-
   leadershipReject: async (promotionId, rejectData) => {
     try {
       const response = await internalApi.put(
         `/${API_BASE}/${promotionId}/leadership-reject`,
         rejectData
       );
-
       return {
         success: true,
         data: response.data,
@@ -164,7 +146,6 @@ const promotionService = {
       };
     }
   },
-
   getPromotionById: async (id) => {
     try {
       const response = await internalApi.get(`/${API_BASE}/${id}`);
@@ -179,7 +160,6 @@ const promotionService = {
       };
     }
   },
-
   getEmployeePromotions: async (employeeUserId) => {
     try {
       const response = await internalApi.get(
@@ -198,7 +178,6 @@ const promotionService = {
       };
     }
   },
-
   getPromotionHistory: async (employeeUserId) => {
     try {
       const response = await internalApi.get(
@@ -217,5 +196,4 @@ const promotionService = {
     }
   },
 };
-
 export default promotionService;

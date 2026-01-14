@@ -1,8 +1,5 @@
 import hrApi from "../hr/hrApi";
-
-
 const careerGoalsService = {
-  
   getOverview: async () => {
     try {
       const response = await hrApi.get("/EmployeeData/goal-tracking/overview");
@@ -14,9 +11,6 @@ const careerGoalsService = {
       );
     }
   },
-
-
-  // Get detailed goal statistics
   getGoalStatistics: async () => {
     try {
       const response = await hrApi.get("/EmployeeData/goal-tracking/goal-statistics");
@@ -28,8 +22,6 @@ const careerGoalsService = {
       );
     }
   },
-
-
   getGoalAdoptionRate: async () => {
     try {
       const response = await hrApi.get("/EmployeeData/goal-tracking/goal-adoption-rate");
@@ -43,12 +35,6 @@ const careerGoalsService = {
       );
     }
   },
-
-
-  // ========== EMPLOYEE GOALS ==========
-
-
-  // Get employees who have not set any career goals
   getEmployeesWithoutGoals: async () => {
     try {
       const response = await hrApi.get("/EmployeeData/goal-tracking/employees-without-goals");
@@ -65,9 +51,6 @@ const careerGoalsService = {
       );
     }
   },
-
-
-  // Get all career goals for an employee
   getEmployeeGoals: async (userId) => {
     try {
       const response = await hrApi.get(`/EmployeeData/goal-tracking/employee-goals/${userId}`);
@@ -79,9 +62,6 @@ const careerGoalsService = {
       );
     }
   },
-
-
-  // Get suggested goals for a given userId
   getGoalSuggestions: async (userId) => {
     try {
       const response = await hrApi.get(`/EmployeeData/goal-tracking/suggest-goals/${userId}`);
@@ -93,12 +73,6 @@ const careerGoalsService = {
       );
     }
   },
-
-
-  // ========== GOAL OPERATIONS ==========
-
-
-  // Get all career goals
   getAllGoals: async () => {
     try {
       const response = await hrApi.get("/EmployeeData/goal-tracking/goals");
@@ -108,9 +82,6 @@ const careerGoalsService = {
       throw error.response?.data || { message: "Failed to fetch goals" };
     }
   },
-
-
-  // Get goal by ID
   getGoalById: async (goalId) => {
     try {
       const response = await hrApi.get(`/EmployeeData/goal-tracking/goal/${goalId}`);
@@ -120,9 +91,6 @@ const careerGoalsService = {
       throw error.response?.data || { message: "Failed to fetch goal" };
     }
   },
-
-
-  // Create new career goal
   createGoal: async (goalData) => {
     try {
       const response = await hrApi.post("/EmployeeData/goal-tracking/goal/create", goalData);
@@ -132,9 +100,6 @@ const careerGoalsService = {
       throw error.response?.data || { message: "Failed to create goal" };
     }
   },
-
-
-  // Update career goal
   updateGoal: async (goalData) => {
     try {
       const response = await hrApi.put("/EmployeeData/goal-tracking/goal/update", goalData);
@@ -144,9 +109,6 @@ const careerGoalsService = {
       throw error.response?.data || { message: "Failed to update goal" };
     }
   },
-
-
-  // Delete career goal
   deleteGoal: async (goalId) => {
     try {
       const response = await hrApi.delete(`/EmployeeData/goal-tracking/goal/${goalId}`);
@@ -156,9 +118,6 @@ const careerGoalsService = {
       throw error.response?.data || { message: "Failed to delete goal" };
     }
   },
-
-
-  // Update goal progress
   updateGoalProgress: async (goalId, progressData) => {
     try {
       const response = await hrApi.put(
@@ -173,12 +132,6 @@ const careerGoalsService = {
       );
     }
   },
-
-
-  // ========== APPROVALS & REVIEWS ==========
-
-
-  // Get pending goal approvals
   getPendingApprovals: async () => {
     try {
       const response = await hrApi.get("/EmployeeData/goal-tracking/goal-approvals/pending");
@@ -190,9 +143,6 @@ const careerGoalsService = {
       );
     }
   },
-
-
-  // Approve goal
   approveGoal: async (goalId, approvalData) => {
     try {
       const response = await hrApi.post(
@@ -205,9 +155,6 @@ const careerGoalsService = {
       throw error.response?.data || { message: "Failed to approve goal" };
     }
   },
-
-
-  // Reject goal
   rejectGoal: async (goalId, rejectionData) => {
     try {
       const response = await hrApi.post(
@@ -220,9 +167,6 @@ const careerGoalsService = {
       throw error.response?.data || { message: "Failed to reject goal" };
     }
   },
-
-
-  // Get goal approvals for a goal
   getGoalApprovals: async (goalId) => {
     try {
       const response = await hrApi.get(`/EmployeeData/goal-tracking/goal/${goalId}/approvals`);
@@ -234,12 +178,6 @@ const careerGoalsService = {
       );
     }
   },
-
-
-  // ========== COMMENTS & DISCUSSIONS ==========
-
-
-  // Add comment to goal
   addComment: async (goalId, commentData) => {
     try {
       const response = await hrApi.post(
@@ -252,9 +190,6 @@ const careerGoalsService = {
       throw error.response?.data || { message: "Failed to add comment" };
     }
   },
-
-
-  // Get comments for a goal
   getGoalComments: async (goalId) => {
     try {
       const response = await hrApi.get(`/EmployeeData/goal-tracking/goal/${goalId}/comments`);
@@ -266,12 +201,6 @@ const careerGoalsService = {
       );
     }
   },
-
-
-  // ========== EMAIL & NOTIFICATIONS ==========
-
-
-  // Send one or more goal-setting reminder emails
   sendGoalReminders: async (reminderData) => {
     try {
       const response = await hrApi.post(
@@ -286,9 +215,6 @@ const careerGoalsService = {
       );
     }
   },
-
-
-  // Send goal approval notification
   sendApprovalNotification: async (goalId, notificationData) => {
     try {
       const response = await hrApi.post(
@@ -301,12 +227,6 @@ const careerGoalsService = {
       throw error.response?.data || { message: "Failed to send notification" };
     }
   },
-
-
-  // ========== BULK OPERATIONS ==========
-
-
-  // Bulk approve goals
   bulkApproveGoals: async (goalIds) => {
     try {
       const response = await hrApi.post("/EmployeeData/goal-tracking/goals/bulk-approve", {
@@ -318,9 +238,6 @@ const careerGoalsService = {
       throw error.response?.data || { message: "Failed to bulk approve goals" };
     }
   },
-
-
-  // Bulk delete goals
   bulkDeleteGoals: async (goalIds) => {
     try {
       const response = await hrApi.post("/EmployeeData/goal-tracking/goals/bulk-delete", {
@@ -332,12 +249,6 @@ const careerGoalsService = {
       throw error.response?.data || { message: "Failed to bulk delete goals" };
     }
   },
-
-
-  // ========== EXPORT & DOWNLOAD ==========
-
-
-  // Export goals to CSV
   exportGoalsToCSV: async (filters = {}) => {
     try {
       const response = await hrApi.get("/EmployeeData/goal-tracking/goals/export/csv", {
@@ -349,9 +260,6 @@ const careerGoalsService = {
       throw error.response?.data || { message: "Failed to export goals" };
     }
   },
-
-
-  // Export goals to PDF
   exportGoalsToPDF: async (filters = {}) => {
     try {
       const response = await hrApi.get("/EmployeeData/goal-tracking/goals/export/pdf", {
@@ -367,6 +275,4 @@ const careerGoalsService = {
     }
   },
 };
-
-
 export default careerGoalsService;

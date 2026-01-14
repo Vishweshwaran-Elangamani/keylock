@@ -1,16 +1,11 @@
 import hrApi from "./hrApi";
-
 const careerProgressionService = {
-  //  GET: All promotions
   getAllPromotions: async () => {
     try {
       const response = await hrApi.get("/CareerProgression/all");
-
-      //  Extract data array from ApiResponseDto
       if (response.data?.data && Array.isArray(response.data.data)) {
         return response.data.data;
       }
-
       console.warn(" Unexpected response structure");
       return [];
     } catch (error) {
@@ -18,14 +13,11 @@ const careerProgressionService = {
       return [];
     }
   },
-
-  //  GET: Promotions by status
   getPromotionsByStatus: async (status) => {
     try {
       const response = await hrApi.get(
         `/CareerProgression/by-status/${status}`
       );
-
       if (response.data?.data && Array.isArray(response.data.data)) {
         return response.data.data;
       }
@@ -35,12 +27,9 @@ const careerProgressionService = {
       return [];
     }
   },
-
-  //  GET: Single promotion
   getPromotionById: async (promotionId) => {
     try {
       const response = await hrApi.get(`/CareerProgression/${promotionId}`);
-
       if (response.data?.data) {
         return response.data.data;
       }
@@ -50,14 +39,11 @@ const careerProgressionService = {
       return null;
     }
   },
-
-  //  GET: Promotions by employee
   getPromotionsByEmployee: async (employeeUserId) => {
     try {
       const response = await hrApi.get(
         `/CareerProgression/by-employee/${employeeUserId}`
       );
-
       if (response.data?.data && Array.isArray(response.data.data)) {
         return response.data.data;
       }
@@ -67,8 +53,6 @@ const careerProgressionService = {
       return [];
     }
   },
-
-  //  CREATE: Create promotion
   createPromotion: async (promotionData) => {
     try {
       const response = await hrApi.post("/CareerProgression/create", {
@@ -88,8 +72,6 @@ const careerProgressionService = {
       throw error;
     }
   },
-
-  //  APPROVE: Approve promotion
   approvePromotion: async (promotionId, approvedByUserId) => {
     try {
       const response = await hrApi.put(`/CareerProgression/approve`, {
@@ -102,8 +84,6 @@ const careerProgressionService = {
       throw error;
     }
   },
-
-  //  REJECT: Reject promotion
   rejectPromotion: async (promotionId) => {
     try {
       const response = await hrApi.put(`/CareerProgression/reject`, {
@@ -115,8 +95,6 @@ const careerProgressionService = {
       throw error;
     }
   },
-
-  //  UPDATE: Update promotion
   updatePromotion: async (promotionId, promotionData) => {
     try {
       const response = await hrApi.put(`/CareerProgression/update`, {
@@ -129,14 +107,11 @@ const careerProgressionService = {
       throw error;
     }
   },
-
-  //  FAIRNESS CHECK: Check for favoritism
   checkFairness: async (promotionId) => {
     try {
       const response = await hrApi.get(
         `/CareerProgression/${promotionId}/favoritism-check`
       );
-
       if (response.data?.data) {
         return response.data.data;
       }
@@ -146,8 +121,6 @@ const careerProgressionService = {
       return null;
     }
   },
-
-  //  SUBMIT TO LEADERSHIP: Submit promotion
   submitToLeadership: async (promotionId) => {
     try {
       const response = await hrApi.put(
@@ -159,8 +132,6 @@ const careerProgressionService = {
       throw error;
     }
   },
-
-  //  UPDATE PAYROLL: Update payroll
   updatePayroll: async (payrollData) => {
     try {
       const response = await hrApi.post(
@@ -173,14 +144,11 @@ const careerProgressionService = {
       throw error;
     }
   },
-
-  //  CHECK PENDING: Check pending promotion
   checkPendingPromotion: async (employeeUserId) => {
     try {
       const response = await hrApi.get(
         `/CareerProgression/check-pending/${employeeUserId}`
       );
-
       if (response.data?.data) {
         return response.data.data;
       }
@@ -190,12 +158,9 @@ const careerProgressionService = {
       return null;
     }
   },
-
-  //  PENDING REVIEWS: Get pending reviews
   getPendingReviews: async () => {
     try {
       const response = await hrApi.get(`/CareerProgression/pending-review`);
-
       if (response.data?.data && Array.isArray(response.data.data)) {
         return response.data.data;
       }
@@ -206,5 +171,4 @@ const careerProgressionService = {
     }
   },
 };
-
 export default careerProgressionService;

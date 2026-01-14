@@ -1,21 +1,14 @@
 import internalApi from "./internalApi";
-
 const API_BASE = "Nomination";
-
 const nominationService = {
-  // ALL nominations (mainly HR/Admin, analytics, etc.)
   getAllNominations: async (status = null) => {
     try {
       let url = `/${API_BASE}/all-nominations`;
       if (status) {
         url += `?status=${encodeURIComponent(status)}`;
       }
-
       const response = await internalApi.get(url);
-
-      // backend might return: array OR { nominations, totalCount, ... }
       const nominations = response.data?.nominations || response.data || [];
-
       return {
         success: true,
         data: Array.isArray(nominations) ? nominations : [],
@@ -34,8 +27,6 @@ const nominationService = {
       };
     }
   },
-
-  //  self nomination (employee_self)
   selfNominate: async (nominationData) => {
     try {
       const response = await internalApi.post(
@@ -51,8 +42,6 @@ const nominationService = {
       };
     }
   },
-
-  // manager nomination (manager_nomination)
   managerNominate: async (nominationData) => {
     try {
       const response = await internalApi.post(
@@ -68,18 +57,14 @@ const nominationService = {
       };
     }
   },
-
-  // Manager dashboard – items waiting for manager review
   getPendingManagerReview: async () => {
     try {
       const response = await internalApi.get(
         `/${API_BASE}/pending-manager-review`
       );
-
       let nominations = [];
       if (Array.isArray(response.data)) nominations = response.data;
       else nominations = response.data.nominations || response.data.data || [];
-
       return {
         success: true,
         data: Array.isArray(nominations) ? nominations : [],
@@ -93,18 +78,14 @@ const nominationService = {
       };
     }
   },
-
-  //  DeptHead dashboard – items waiting for dept head review
   getPendingDeptHeadReview: async () => {
     try {
       const response = await internalApi.get(
         `/${API_BASE}/pending-depthead-review`
       );
-
       let nominations = [];
       if (Array.isArray(response.data)) nominations = response.data;
       else nominations = response.data.nominations || response.data.data || [];
-
       return {
         success: true,
         data: Array.isArray(nominations) ? nominations : [],
@@ -118,15 +99,12 @@ const nominationService = {
       };
     }
   },
-
-  //  Manager / DeptHead review action
   reviewNomination: async (nominationId, reviewData, userRole) => {
     try {
       const endpoint =
         userRole === "Department Head"
           ? `/${API_BASE}/${nominationId}/department-head-review`
           : `/${API_BASE}/${nominationId}/manager-review`;
-
       const response = await internalApi.put(endpoint, reviewData);
       return { success: true, data: response.data };
     } catch (error) {
@@ -136,8 +114,6 @@ const nominationService = {
       };
     }
   },
-
-  //  Single nomination details
   getNominationById: async (id) => {
     try {
       const response = await internalApi.get(`/${API_BASE}/${id}`);
@@ -150,16 +126,12 @@ const nominationService = {
       };
     }
   },
-
-  // MAIN: Logged-in employee “My Nominations”
   getMyNominations: async () => {
     try {
       const response = await internalApi.get(`/${API_BASE}/my-nominations`);
-
       let nominations = [];
       if (Array.isArray(response.data)) nominations = response.data;
       else nominations = response.data.nominations || response.data || [];
-
       return {
         success: true,
         data: Array.isArray(nominations) ? nominations : [],
@@ -172,8 +144,6 @@ const nominationService = {
       };
     }
   },
-
-  // eligibility check before self nomination
   checkEligibility: async (opportunityId) => {
     try {
       const response = await internalApi.post(
@@ -189,17 +159,13 @@ const nominationService = {
       };
     }
   },
-
-  // history (self + team nominated by user) – 
   getMyNominationHistory: async (status = null) => {
     try {
       let url = `/${API_BASE}/my-history`;
       if (status) {
         url += `?status=${encodeURIComponent(status)}`;
       }
-
       const response = await internalApi.get(url);
-
       return {
         success: true,
         data: response.data,
@@ -214,38 +180,28 @@ const nominationService = {
       };
     }
   },
-
-  //  analytics – uses getAllNominations then computes counts
   getMyNominationAnalytics: async () => {
     try {
       const response = await nominationService.getAllNominations();
       if (!response.success || !response.data) {
         return { success: false, message: "Failed to fetch nominations" };
       }
-
       const nominations = response.data;
-
       const totalCount = nominations.length;
-
       const normalize = (status) => {
         if (!status) return "";
         let s = String(status).trim().toLowerCase();
-        // remove leading/trailing quotes if any
         return s.replace(/^["']|["']$/g, "");
       };
-
       const approvedCount = nominations.filter((n) =>
         normalize(n.status).includes("approved")
       ).length;
-
       const pendingCount = nominations.filter((n) =>
         normalize(n.status).includes("pending")
       ).length;
-
       const rejectedCount = nominations.filter((n) =>
         normalize(n.status).includes("rejected")
       ).length;
-
       return {
         success: true,
         data: {
@@ -267,5 +223,4 @@ const nominationService = {
     }
   },
 };
-
 export default nominationService;

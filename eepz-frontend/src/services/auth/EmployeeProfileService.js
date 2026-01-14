@@ -1,6 +1,4 @@
 import api from "./api";
-
-
 const EmployeeProfileService = {
   /**
    * Get current logged-in user's profile
@@ -14,7 +12,6 @@ const EmployeeProfileService = {
       throw error.response?.data || { message: "Failed to fetch profile" };
     }
   },
-
   /**
    * Get profile (alias for getMyProfile for compatibility)
    */
@@ -27,7 +24,6 @@ const EmployeeProfileService = {
       throw error.response?.data || { message: "Failed to fetch profile" };
     }
   },
-
   /**
    * Update current user's profile
    */
@@ -40,7 +36,6 @@ const EmployeeProfileService = {
       throw error.response?.data || { message: "Failed to update profile" };
     }
   },
-
   /**
    * Get profile by specific user ID (Admin/HR use)
    */
@@ -53,7 +48,6 @@ const EmployeeProfileService = {
       throw error.response?.data || { message: "Failed to fetch profile" };
     }
   },
-
   /**
    * Upload/Update profile photo only
    * Uses dedicated endpoint: PUT /User/profile/upload-photo
@@ -62,9 +56,7 @@ const EmployeeProfileService = {
    */
   updateProfilePhoto: async (formData) => {
     try {
-      
       const response = await api.put("/User/profile/upload-photo", formData);
-      
       return response.data;
     } catch (error) {
       console.error("Error updating profile photo:", error);
@@ -73,6 +65,4 @@ const EmployeeProfileService = {
     }
   },
 };
-
-
 export default EmployeeProfileService;

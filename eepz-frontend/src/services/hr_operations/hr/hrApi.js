@@ -1,6 +1,4 @@
 import axios from "axios";
-
-// Create separate Axios instance for HR Operations API
 const hrApi = axios.create({
   baseURL:
     import.meta.env.VITE_HR_API_URL+"/api",
@@ -8,8 +6,6 @@ const hrApi = axios.create({
     "Content-Type": "application/json",
   },
 });
-
-//  Request Interceptor - Add JWT token to all HR API requests
 hrApi.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -25,8 +21,6 @@ hrApi.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-
-//  Response Interceptor - Handle HR API responses
 hrApi.interceptors.response.use(
   (response) => {
     return response;
@@ -37,15 +31,11 @@ hrApi.interceptors.response.use(
       error.response?.status,
       error.response?.data
     );
-
-    // Handle HR-specific errors
     if (error.response) {
       const { status, data } = error.response;
-
       switch (status) {
         case 401:
           console.error(" HR API: Unauthorized - JWT token invalid or expired");
-          //  Clear token and redirect to login
           localStorage.removeItem("token");
           localStorage.removeItem("userId");
           localStorage.removeItem("userEmail");
@@ -68,9 +58,7 @@ hrApi.interceptors.response.use(
     } else {
       console.error(" HR API: Request setup error", error.message);
     }
-
     return Promise.reject(error);
   }
 );
-
 export default hrApi;

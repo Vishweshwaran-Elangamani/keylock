@@ -1,9 +1,5 @@
 import hrApi from "./hrApi";
-
 const periodAllocationService = {
-  // ========== PERIOD ALLOCATION CRUD ==========
-
-  // Create Period Allocation (Leadership)
   createPeriodAllocation: async (data) => {
     try {
       const response = await hrApi.post("/PeriodAllocation/create", {
@@ -24,8 +20,6 @@ const periodAllocationService = {
       );
     }
   },
-
-  // Update Period Allocation (Leadership)
   updatePeriodAllocation: async (data) => {
     try {
       const response = await hrApi.put("/PeriodAllocation/update", {
@@ -43,8 +37,6 @@ const periodAllocationService = {
       );
     }
   },
-
-  // Delete Period Allocation (Leadership)
   deletePeriodAllocation: async (periodAllocationId) => {
     try {
       const response = await hrApi.delete(
@@ -60,8 +52,6 @@ const periodAllocationService = {
       );
     }
   },
-
-  // Get Period Allocation by ID
   getPeriodAllocationById: async (periodAllocationId) => {
     try {
       const response = await hrApi.get(
@@ -77,8 +67,6 @@ const periodAllocationService = {
       );
     }
   },
-
-  // Get All Period Allocations
   getAllPeriodAllocations: async () => {
     try {
       const response = await hrApi.get("/PeriodAllocation/all");
@@ -92,8 +80,6 @@ const periodAllocationService = {
       );
     }
   },
-
-  // Get Period Allocations by Budget ID
   getPeriodAllocationsByBudget: async (budgetId) => {
     try {
       const response = await hrApi.get(
@@ -110,5 +96,4 @@ const periodAllocationService = {
     }
   },
 };
-
 export default periodAllocationService;

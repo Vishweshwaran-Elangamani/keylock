@@ -1,13 +1,10 @@
 import axios from "axios";
-
 const employeeApi = axios.create({
   baseURL: import.meta.env.VITE_HR_API_URL+"/api",
   headers: {
     "Content-Type": "application/json",
   },
 });
-
-
 employeeApi.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -20,8 +17,6 @@ employeeApi.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-
-
 const employeePolicyService = {
   getPublishedPolicies: async () => {
     try {
@@ -32,8 +27,6 @@ const employeePolicyService = {
       throw error;
     }
   },
-
-
   getPolicyById: async (policyId) => {
     try {
       const response = await employeeApi.get(`/EmployeeData/policy/${policyId}`);
@@ -43,30 +36,18 @@ const employeePolicyService = {
       throw error;
     }
   },
-
-
   getFullDocumentUrl: (url) => {
     if (!url) {
       console.warn("Empty document URL provided");
       return "";
     }
-    
-    // If already a full URL (starts with http/https), return as-is
     if (url.startsWith("http://") || url.startsWith("https://")) {
       return url;
     }
-    
-    //  FIXED: Use HR API base URL (port 5104)
     const hrBaseUrl =import.meta.env.VITE_HR_API_URL;
-    
-    // Extract filename from paths like "/uploads/policies/abc.pdf"
     const fileName = url.split('/').pop();
-    
-    // Build document endpoint URL
     const fullUrl = `${hrBaseUrl}/api/policy/document/${fileName}`;
     return fullUrl;
   },
 };
-
-
 export default employeePolicyService;
