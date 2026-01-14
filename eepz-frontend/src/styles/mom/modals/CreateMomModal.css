@@ -1,7 +1,14 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
 .cmm-modal-container {
   border-radius: 12px;
   background: #fff;
   width: 100%;
+  font-family: "Poppins", sans-serif;
+}
+
+.cmm-modal-container * {
+  font-family: inherit;
 }
 
 .cmm-card-body {
@@ -28,10 +35,11 @@
 .cmm-close-btn {
   background: none;
   border: none;
-  padding: 0.25rem;
+  font-size: 1.25rem;
   cursor: pointer;
   opacity: 0.7;
   transition: opacity 0.2s ease;
+  line-height: 1;
 }
 
 .cmm-close-btn:hover {
@@ -76,9 +84,7 @@
 }
 
 .cmm-col-md-6,
-.cmm-col-md-5,
-.cmm-col-md-4,
-.cmm-col-md-3 {
+.cmm-col-md-4 {
   flex: 1 1 100%;
   padding: 0 0.5rem;
   max-width: 100%;
@@ -90,19 +96,9 @@
     max-width: calc(50% - 0.5rem);
   }
 
-  .cmm-col-md-5 {
-    flex: 1 1 calc(41.666% - 0.5rem);
-    max-width: calc(41.666% - 0.5rem);
-  }
-
   .cmm-col-md-4 {
     flex: 1 1 calc(33.333% - 0.5rem);
     max-width: calc(33.333% - 0.5rem);
-  }
-
-  .cmm-col-md-3 {
-    flex: 1 1 calc(25% - 0.5rem);
-    max-width: calc(25% - 0.5rem);
   }
 }
 
@@ -138,7 +134,7 @@
   width: 100%;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
-  padding: 0.5rem 0.75rem;
+  padding: 0.55rem 0.8rem;
   font-size: 0.85rem;
   transition: all 0.2s ease;
   background: #fff;
@@ -152,8 +148,8 @@
 }
 
 .cmm-input-sm {
-  padding: 0.35rem 0.75rem;
-  font-size: 0.8rem;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.82rem;
 }
 
 .cmm-input:disabled {
@@ -165,7 +161,6 @@
 .cmm-textarea {
   resize: vertical;
   min-height: 80px;
-  font-family: inherit;
 }
 
 .cmm-textarea-compact {
@@ -299,7 +294,7 @@
 .cmm-action-item {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border-radius: 10px;
 }
 
 .cmm-discussion-body,
@@ -321,93 +316,16 @@
   width: 100%;
 }
 
-.cmm-dropdown-trigger {
-  width: 100%;
-  border-radius: 9999px;
-  border: 1px solid #e5e7eb;
-  background: #fff;
-  padding: 0.45rem 0.85rem;
-  font-size: 0.8rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.cmm-row-equal .cmm-input,
-.cmm-row-equal .cmm-dropdown-trigger {
-  padding: 0.35rem 0.7rem;
-  font-size: 0.8rem;
-}
-
-.cmm-dropdown-trigger:hover {
-  border-color: #27235c;
-  box-shadow: 0 2px 8px rgba(39, 35, 92, 0.1);
-}
-
-.cmm-dropdown-open {
-  border-color: #27235c !important;
-  box-shadow: 0 4px 12px rgba(39, 35, 92, 0.15);
-}
-
-.cmm-dropdown-text {
-  overflow: hidden;
-  text-align: left;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  flex: 1;
-}
-
-.cmm-dropdown-arrow {
-  display: inline-flex;
-  margin-left: 0.5rem;
-  transition: transform 0.2s ease;
-}
-
-.cmm-dropdown-open .cmm-dropdown-arrow svg {
-  transform: rotate(180deg);
-}
-
-.cmm-dropdown-list {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  margin-top: 0.25rem;
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 0 0 10px 10px;
-  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.2);
-  z-index: 1000;
-  max-height: 240px;
-  overflow-y: auto;
-}
-
-.cmm-dropdown-item {
-  padding: 0.75rem 1rem;
-  text-align: left;
-  cursor: pointer;
-  font-size: 0.85rem;
-  border-bottom: 1px solid #f3f4f6;
-  transition: all 0.2s ease;
-}
-
-.cmm-dropdown-item:hover {
-  background: #27235c;
-  color: #fff;
-}
-
-.cmm-dropdown-item.cmm-active {
-  background: #27235c;
-  color: #fff;
-}
-
-.cmm-no-employees {
-  padding: 0.75rem 1rem;
-  font-size: 0.85rem;
-  color: #6b7280;
-  text-align: center;
+.cmm-relative .cmm-input.cmm-input-sm {
+  padding-top: 0.45rem !important;
+  padding-bottom: 0.45rem !important;
+  padding-left: 0.8rem !important;
+  padding-right: 2.8rem !important;
+  font-size: 0.82rem !important;
+  min-height: 40px !important;
+  line-height: 1.2 !important;
+  border-radius: 8px !important;
+  box-sizing: border-box !important;
 }
 
 .cmm-calendar-trigger {
@@ -415,10 +333,37 @@
   top: 50%;
   right: 0.75rem;
   transform: translateY(-50%);
-  border: none;
-  background: transparent;
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
   cursor: pointer;
-  padding: 0;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  color: #27235c !important;
+  box-shadow: none !important;
+}
+
+
+.cmm-calendar-trigger:active {
+  transform: translateY(-50%) scale(0.98);
+}
+
+.cmm-calendar-svg {
+  width: 18px !important;
+  height: 18px !important;
+  display: block !important;
+  flex-shrink: 0 !important;
+  margin-left: 22px;
+}
+
+.cmm-calendar-svg * {
+  vector-effect: non-scaling-stroke;
 }
 
 .cmm-error {
@@ -448,6 +393,107 @@
   border-top: 1px solid #e2e8f0;
 }
 
+.cmm-dd .cdrop-label {
+  display: none;
+}
+
+.cmm-dd .cdrop-trigger {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  padding: 0.45rem 2.4rem 0.45rem 0.85rem;
+  font-size: 0.82rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 40px;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.cmm-dd .cdrop-trigger:hover:not(.cdrop-disabled) {
+  border-color: #27235c;
+  box-shadow: 0 2px 10px rgba(39, 35, 92, 0.08);
+}
+
+.cmm-dd .cdrop-open {
+  border-color: #27235c;
+  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+}
+
+.cmm-dd .cdrop-value {
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  font-size: 0.82rem;
+}
+
+.cmm-dd .cdrop-placeholder {
+  color: #9ca3af;
+}
+
+.cmm-dd .cdrop-icon {
+  position: absolute !important;
+  right: 14px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  pointer-events: none !important;
+}
+
+.cmm-dd .cdrop-icon-open {
+  transform: translateY(-50%) rotate(180deg) !important;
+}
+
+.cmm-dd .cdrop-menu {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.14);
+  max-height: 250px;
+  overflow-y: auto;
+  z-index: 9999;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.cmm-dd .cdrop-item {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.85rem;
+  border-bottom: 1px solid #f3f4f6;
+  transition: all 0.2s ease;
+  background: #fff;
+  width: 100%;
+}
+
+.cmm-dd .cdrop-item:last-child {
+  border-bottom: none;
+}
+
+.cmm-dd .cdrop-item:hover {
+  background: #27235c;
+  color: #fff;
+  font-weight: 600;
+}
+
+.cmm-dd .cdrop-item-active {
+  background: #efefef;
+  color: #000;
+  font-weight: 600;
+}
+
+.cmm-dd .cdrop-item-active:hover {
+  background: #27235c;
+  color: #fff;
+}
+
 .cmm-actions {
   display: flex;
   gap: 0.75rem;
@@ -459,9 +505,9 @@
   background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
   color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 0.75rem 1.5rem;
-  font-weight: 500;
+  font-weight: 600;
   transition: all 0.3s ease;
   flex: 1;
 }
@@ -469,7 +515,7 @@
 .cmm-submit-btn:hover:not(:disabled) {
   opacity: 0.95;
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(151, 36, 80, 0.4);
+  box-shadow: 0 8px 20px rgba(151, 36, 80, 0.35);
 }
 
 .cmm-submit-btn:disabled {
@@ -482,12 +528,12 @@
   background: #ef4444;
   color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 0.75rem 1.5rem;
-  font-weight: 500;
+  font-weight: 600;
   white-space: nowrap;
   transition: all 0.2s ease;
-  min-width: 100px;
+  min-width: 110px;
 }
 
 .cmm-cancel-btn:hover:not(:disabled) {
@@ -504,7 +550,7 @@
   margin-top: 1.5rem;
   background: #eff6ff;
   border: 1px solid #bfdbfe;
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 1rem;
   display: flex;
   align-items: flex-start;
@@ -516,10 +562,6 @@
   color: #2563eb;
   margin-top: 0.125rem;
   flex-shrink: 0;
-}
-
-.cmm-mr-2 {
-  margin-right: 0.5rem;
 }
 
 @media (max-width: 768px) {
@@ -536,5 +578,9 @@
 
   .cmm-actions {
     flex-direction: column;
+  }
+
+  .cmm-cancel-btn {
+    width: 100%;
   }
 }

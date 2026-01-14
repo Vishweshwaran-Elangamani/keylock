@@ -502,8 +502,10 @@
   color: #6c757d !important;
 }
 .prj-list-page-size-dd {
-  width: 80px !important;
+  width: 60px !important;
   min-width: 70px !important;
+  padding-top: 12px;
+
 }
 
 .prj-list-page-size-dropdown .cdrop-label {
@@ -529,7 +531,7 @@
   font-size: 0.875rem !important;
   font-weight: 600 !important;
   color: #212529 !important;
-  text-align: center !important;
+  text-align: left !important;
 }
 
 .prj-list-page-size-dropdown .cdrop-icon {

@@ -1,16 +1,16 @@
-import React, { useMemo, useState, useRef, useEffect } from "react";
+import React, { useMemo, useState, useRef } from "react";
 import {
   CheckCircle,
   Send,
   AlertTriangle,
   Loader,
   Calendar as CalendarIcon,
-  ChevronDown,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import hrFormApi from "../../../services/feedbackmanagement/hrFormApi";
 import FeedbackBreadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb";
 import CustomCalendar from "../../../components/project_management_components/common/CustomCalendar";
+import CustomDropdown from "../../../components/project_management_components/common/CustomDropdown";
 import "../../../styles/feedback/components/CreateFeedbackForm.css";
 
 export default function CreateFeedbackForm() {
@@ -36,10 +36,12 @@ export default function CreateFeedbackForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [openDropdown, setOpenDropdown] = useState(false);
 
   const [calendarOpen, setCalendarOpen] = useState(false);
   const calendarRef = useRef(null);
+
+  // ✅ dropdown anchor (for portal positioning)
+  const formTypeRef = useRef(null);
 
   const FORM_TYPES = [
     { value: "PerformanceReview", label: "Performance Review" },
@@ -50,14 +52,6 @@ export default function CreateFeedbackForm() {
     { value: "EvaluationForm", label: "Evaluation" },
   ];
 
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (!e.target.closest(".cff-custom-select")) setOpenDropdown(false);
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   const formatDisplayDate = (iso) => {
     if (!iso) return "";
     const d = new Date(iso);
@@ -66,94 +60,6 @@ export default function CreateFeedbackForm() {
     const dd = String(d.getDate()).padStart(2, "0");
     const yyyy = d.getFullYear();
     return `${mm}/${dd}/${yyyy}`;
-  };
-
-  const CustomSelect = ({ value, onChange, options, placeholder, disabled }) => {
-    const selectRef = useRef(null);
-    const dropdownRef = useRef(null);
-
-    const selectedOption = options.find((opt) => opt.value === value);
-
-    const [dropdownPosition, setDropdownPosition] = useState({
-      top: 0,
-      left: 0,
-      width: 0,
-    });
-
-    const [isHovered, setIsHovered] = useState(false);
-    const [hoveredOption, setHoveredOption] = useState(null);
-
-    useEffect(() => {
-      if (openDropdown && selectRef.current) {
-        const rect = selectRef.current.getBoundingClientRect();
-        setDropdownPosition({
-          top: rect.bottom + window.scrollY + 4,
-          left: rect.left + window.scrollX,
-          width: rect.width,
-        });
-      }
-    }, [openDropdown]);
-
-    return (
-      <div className="cff-custom-select" ref={selectRef}>
-        <button
-          type="button"
-          className={`cff-select-trigger ${
-            disabled ? "cff-select-disabled" : ""
-          } ${isHovered && !disabled ? "cff-select-hovered" : ""} ${
-            openDropdown ? "cff-select-open" : ""
-          }`}
-          onClick={() => !disabled && setOpenDropdown(!openDropdown)}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          disabled={disabled}
-        >
-          <span
-            className={`cff-select-value ${
-              !value ? "cff-select-placeholder" : ""
-            }`}
-          >
-            {selectedOption?.label || placeholder}
-          </span>
-          <ChevronDown size={18} className="cff-select-icon" strokeWidth={2} />
-        </button>
-
-        {openDropdown && !disabled && (
-          <div
-            ref={dropdownRef}
-            className="cff-select-dropdown"
-            style={{
-              top: `${dropdownPosition.top}px`,
-              left: `${dropdownPosition.left}px`,
-              width: `${dropdownPosition.width}px`,
-            }}
-          >
-            {options.map((option, index) => (
-              <div
-                key={option.value}
-                className={`cff-select-option ${
-                  value === option.value ? "cff-select-option-selected" : ""
-                } ${
-                  hoveredOption === option.value
-                    ? "cff-select-option-hovered"
-                    : ""
-                } ${index === 0 ? "cff-select-option-first" : ""} ${
-                  index === options.length - 1 ? "cff-select-option-last" : ""
-                }`}
-                onClick={() => {
-                  onChange(option.value);
-                  setOpenDropdown(false);
-                }}
-                onMouseEnter={() => setHoveredOption(option.value)}
-                onMouseLeave={() => setHoveredOption(null)}
-              >
-                {option.label}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    );
   };
 
   const handleDeadlineChange = (value) => {
@@ -166,22 +72,11 @@ export default function CreateFeedbackForm() {
     setError("");
     setSuccess("");
 
-    if (!form.formName?.trim()) {
-      setError("Form name is required");
-      return;
-    }
-    if (!form.formDescription?.trim()) {
-      setError("Form description is required");
-      return;
-    }
-    if (!form.formType) {
-      setError("Form type is required");
-      return;
-    }
-    if (!form.deadline) {
-      setError("Deadline is required");
-      return;
-    }
+    if (!form.formName?.trim()) return setError("Form name is required");
+    if (!form.formDescription?.trim())
+      return setError("Form description is required");
+    if (!form.formType) return setError("Form type is required");
+    if (!form.deadline) return setError("Deadline is required");
 
     setLoading(true);
 
@@ -200,9 +95,7 @@ export default function CreateFeedbackForm() {
         setSuccess(
           `Form created successfully!\n\n` +
             `Form: ${form.formName}\n` +
-            `Type: ${
-              FORM_TYPES.find((t) => t.value === form.formType)?.label
-            }\n` +
+            `Type: ${FORM_TYPES.find((t) => t.value === form.formType)?.label}\n` +
             `Visible to: All Employees`
         );
 
@@ -316,17 +209,28 @@ export default function CreateFeedbackForm() {
               </small>
             </div>
 
-            <div className="cff-form-group">
-              <label htmlFor="formType" className="cff-label">
+            {/* ✅ REUSED CustomDropdown */}
+            <div className="cff-form-group" ref={formTypeRef}>
+              <label className="cff-label">
                 Form Type <span className="cff-required">*</span>
               </label>
-              <CustomSelect
+
+              <CustomDropdown
+                label=""
+                required={false}
+                name="formType"
                 value={form.formType}
-                onChange={(value) => setForm((prev) => ({ ...prev, formType: value }))}
+                onChange={(_, value) =>
+                  setForm((prev) => ({ ...prev, formType: value }))
+                }
                 options={FORM_TYPES}
                 placeholder="-- Select Form Type --"
                 disabled={loading}
+                anchorRef={formTypeRef}
+                align="left"
+                className="cff-dd"
               />
+
               <small className="cff-hint">
                 Choose what type of feedback this form collects
               </small>
@@ -361,18 +265,16 @@ export default function CreateFeedbackForm() {
                 </button>
               </div>
 
-             <CustomCalendar
-  isOpen={calendarOpen}
-  onClose={() => setCalendarOpen(false)}
-  value={form.deadline}
-  onChange={handleDeadlineChange}
-  anchorRef={calendarRef}
-  position="above-icon"
-  align="right"
-  offset={{ x: 0, y: -2 }}
-/>
-
-
+              <CustomCalendar
+                isOpen={calendarOpen}
+                onClose={() => setCalendarOpen(false)}
+                value={form.deadline}
+                onChange={handleDeadlineChange}
+                anchorRef={calendarRef}
+                position="above-icon"
+                align="right"
+                offset={{ x: 0, y: -2 }}
+              />
 
               <small className="cff-hint">
                 When employees need to complete this form by
@@ -380,7 +282,11 @@ export default function CreateFeedbackForm() {
             </div>
 
             <div className="cff-submit-wrapper">
-              <button type="submit" className="cff-submit-btn" disabled={loading}>
+              <button
+                type="submit"
+                className="cff-submit-btn"
+                disabled={loading}
+              >
                 {loading ? (
                   <>
                     <Loader size={18} className="cff-submit-icon cff-spinner" />

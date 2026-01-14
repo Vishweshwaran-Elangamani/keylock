@@ -5,7 +5,6 @@
   justify-content: center;
   padding: 1.25rem 1rem;
   margin-top: -15px;
-
 }
 
 .smf-content {
@@ -128,7 +127,6 @@
   from {
     transform: rotate(0deg);
   }
-
   to {
     transform: rotate(360deg);
   }
@@ -190,6 +188,9 @@
   transform: rotate(180deg);
 }
 
+/* ===========================================================
+   ✅ FIX HERE: remove bullets + reset UL defaults
+   =========================================================== */
 .smf-dropdown-list {
   position: absolute;
   top: 100%;
@@ -202,9 +203,11 @@
   max-height: 260px;
   overflow-y: auto;
   z-index: 1000;
-  list-style: none;
-  margin: 0;
-  padding: 0;
+
+  /* ✅ This is the fix */
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .smf-dropdown-option {
@@ -216,6 +219,9 @@
   border-bottom: 1px solid #e5e7eb;
   background: #ffffff;
   text-align: left;
+
+  /* ✅ extra safety */
+  list-style: none !important;
 }
 
 .smf-dropdown-option:last-child {
@@ -229,11 +235,9 @@
 }
 
 .smf-dropdown-option--selected {
-
   background: #efefef;
   color: #000000;
   font-weight: 600;
-
 }
 
 .smf-form-text {

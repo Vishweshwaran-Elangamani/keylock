@@ -47,6 +47,7 @@
   transition: all 0.2s ease;
   position: relative;
   line-height: 1.25;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .scf-breadcrumb-link:hover {
@@ -83,12 +84,14 @@
   font-weight: 400;
   font-size: 0.875rem;
   line-height: 1.25;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .scf-breadcrumb-active span {
   color: black;
   font-weight: 600;
   font-size: 0.875rem;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 /* Rest of your existing styles unchanged */
@@ -100,6 +103,7 @@
   border: none;
   padding: 0.75rem 1rem;
   margin-bottom: 1.5rem;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .scf-alert-error {
@@ -130,6 +134,7 @@
 .scf-alert-message {
   margin: 0;
   font-size: 0.875rem;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .scf-alert-error .scf-alert-message {
@@ -151,52 +156,89 @@
   padding: 0;
   margin-left: auto;
   transition: opacity 0.2s;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .scf-alert-close:hover {
   opacity: 1;
 }
 
+/* ===========================================================
+   ✅ FIXED: Tabs toggle pill shape should NEVER change
+   =========================================================== */
+
 .scf-tabs {
   background: #27235c;
-  border-radius: 30px;
+  border-radius: 999px;             /* ✅ always perfect pill */
   padding: 4px;
   display: inline-flex;
   gap: 4px;
   margin-bottom: 1.5rem;
   box-shadow: 0 2px 8px rgba(39, 35, 92, 0.15);
+
+  height: 48px;                    /* ✅ lock exact height */
+  align-items: center;
+  box-sizing: border-box;
 }
 
 .scf-tab-button {
   background: transparent;
   color: #fff;
   border: none;
-  border-radius: 26px;
-  padding: 10px 24px;
+  border-radius: 999px;            /* ✅ pill ALWAYS */
+  height: 40px;                    /* ✅ lock button height */
+  padding: 0 24px;                 /* ✅ same size always */
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   white-space: nowrap;
+  font-family: 'Poppins', sans-serif !important;
+  box-sizing: border-box;
+  outline: none;
+
+  /* ✅ prevents tiny width shifts */
+  min-width: 160px;
 }
 
 .scf-tab-button--active {
   background: #fff;
   color: #27235c;
+
+  /* ✅ IMPORTANT: keep pill shape exactly */
+  border-radius: 999px !important;
+  height: 40px !important;
+  padding: 0 24px !important;
+
+  /* ✅ optional: keep consistent inner look */
+  box-shadow: none;
 }
+
+/* ✅ remove focus border/outline causing shape look change */
+.scf-tab-button:focus,
+.scf-tab-button:focus-visible,
+.scf-tab-button:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* =========================================================== */
 
 .scf-card {
   background: white;
   border: none;
   border-radius: 10px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .scf-card-body {
   padding: 1.5rem;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .scf-loading-state {
@@ -224,6 +266,7 @@
   font-size: 0.875rem;
   color: #64748b;
   margin: 0;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .scf-form-group {
@@ -238,112 +281,144 @@
   color: #0f172a;
   margin-bottom: 0.5rem;
   text-align: left;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .scf-required {
   color: #dc2626;
+  font-family: 'Poppins', sans-serif !important;
 }
 
-.scf-dropdown-wrapper {
-  position: relative;
+/* ===========================================================
+   ✅ UPDATED: Reusable CustomDropdown (.cdrop-*) for SCF
+   =========================================================== */
+
+.scf-dd .cdrop-label {
+  display: none;
+}
+
+.scf-dd .cdrop-wrap {
   width: 100%;
+  font-family: 'Poppins', sans-serif !important;
 }
 
-.scf-dropdown-select {
+.scf-dd .cdrop-trigger {
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 2.75rem 0.75rem 1rem;
   font-size: 0.9375rem;
   background: #ffffff;
+
   border: 1.5px solid #e2e8f0;
   border-radius: 10px;
+
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: left;
+
+  position: relative;
+
+  font-family: 'Poppins', sans-serif !important;
 }
 
-.scf-dropdown-select--open {
+.scf-dd .cdrop-open {
   border-color: #27235c;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
 }
 
-.scf-dropdown-select:disabled {
+.scf-dd .cdrop-disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.scf-dropdown-value {
+.scf-dd .cdrop-value {
   flex: 1;
+  min-width: 0;
   text-align: left;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
   color: #111827;
   font-weight: 400;
+
+  font-family: 'Poppins', sans-serif !important;
 }
 
-.scf-dropdown-arrow {
-  color: #6b7280;
-  margin-left: 0.5rem;
-  font-size: 0.85rem;
-  display: flex;
-  align-items: center;
-  transition: transform 0.2s ease;
+.scf-dd .cdrop-placeholder {
+  color: #9ca3af;
+  font-family: 'Poppins', sans-serif !important;
 }
 
-.scf-dropdown-arrow--open {
-  transform: rotate(180deg);
+/* Chevron pinned right */
+.scf-dd .cdrop-icon {
+  position: absolute !important;
+  right: 16px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  pointer-events: none;
 }
 
-.scf-dropdown-arrow svg {
-  display: block;
+.scf-dd .cdrop-icon-open {
+  transform: translateY(-50%) rotate(180deg) !important;
 }
 
-.scf-dropdown-list {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
+/* Dropdown menu */
+.scf-dd .cdrop-menu {
   background: #ffffff;
   border: 1px solid #27235c;
   border-top: none;
+
   border-radius: 0 0 10px 10px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+
   max-height: 260px;
   overflow-y: auto;
-  z-index: 1000;
+  z-index: 9999;
+
   list-style: none;
-  margin: 0;
   padding: 0;
+  margin: 0;
+
+  font-family: 'Poppins', sans-serif !important;
 }
 
-.scf-dropdown-option {
+/* Option item */
+.scf-dd .cdrop-item {
   padding: 0.75rem 1rem;
   font-size: 0.9375rem;
   color: #4b5563;
   cursor: pointer;
+
   transition: all 0.15s ease;
   border-bottom: 1px solid #e5e7eb;
   background: #ffffff;
+
   text-align: left;
+  font-family: 'Poppins', sans-serif !important;
 }
 
-.scf-dropdown-option:last-child {
+.scf-dd .cdrop-item:last-child {
   border-bottom: none;
 }
 
-.scf-dropdown-option:hover {
+.scf-dd .cdrop-item:hover {
   background: #27235c;
   color: #ffffff;
   font-weight: 600;
 }
 
-.scf-dropdown-option--selected {
+.scf-dd .cdrop-item-active {
   background: #efefef;
   color: #000000;
   font-weight: 600;
 }
+
+/* =========================================================== */
 
 .scf-info-box {
   padding: 0.75rem;
@@ -351,29 +426,34 @@
   border-radius: 8px;
   border: 1px solid #e2e8f0;
   margin-bottom: 1.5rem;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .scf-info-label {
   font-size: 0.75rem;
   color: #64748b;
   margin-bottom: 0.25rem;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .scf-info-text {
   font-size: 0.875rem;
   color: #0f172a;
   margin: 0;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .scf-employee-name {
   font-size: 0.875rem;
   font-weight: 600;
   color: #0f172a;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .scf-employee-email {
   font-size: 0.75rem;
   color: #64748b;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .scf-rating-box {
@@ -384,6 +464,7 @@
   background-color: #f8fafc;
   border-radius: 8px;
   border: 1px solid #e2e8f0;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .scf-stars {
@@ -399,6 +480,7 @@
   font-size: 0.875rem;
   font-weight: 600;
   color: #27235c;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .scf-input,
@@ -409,6 +491,8 @@
   font-size: 0.875rem;
   padding: 0.625rem 0.875rem;
   transition: all 0.2s;
+
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .scf-input:focus,
@@ -426,6 +510,7 @@
 .scf-textarea::placeholder,
 .scf-input::placeholder {
   color: #9ca3af;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .scf-textarea-footer {
@@ -437,11 +522,13 @@
 .scf-textarea-hint {
   font-size: 0.75rem;
   color: #64748b;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .scf-textarea-count {
   font-size: 0.75rem;
   color: #64748b;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .scf-textarea-count--warning {
@@ -452,6 +539,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .scf-checkbox-input {
@@ -464,6 +552,7 @@
   font-size: 0.875rem;
   cursor: pointer;
   text-align: left;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .scf-submit-button {
@@ -482,6 +571,7 @@
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(151, 36, 126, 0.2);
   cursor: pointer;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .scf-submit-button:not(:disabled):hover {
@@ -534,11 +624,14 @@
   .scf-tabs {
     flex-direction: column;
     width: 100%;
+    height: auto;              /* ✅ allow stacking */
+    border-radius: 16px;
   }
 
   .scf-tab-button {
     width: 100%;
     justify-content: center;
+    min-width: unset;
   }
 
   .scf-card-body {

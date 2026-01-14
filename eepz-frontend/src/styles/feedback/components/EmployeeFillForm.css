@@ -49,7 +49,6 @@
 
 .eaf-breadcrumb-wrapper {
   margin-bottom: 1rem;
-
 }
 
 .eaf-breadcrumb {
@@ -59,7 +58,6 @@
   margin: 0;
   padding: 0;
   list-style: none;
-
 }
 
 .eaf-breadcrumb-item {
@@ -67,44 +65,77 @@
   align-items: center;
 }
 
-.eaf-breadcrumb-link {
+.eaf-breadcrumb-separator {
   color: #97247e;
-  text-decoration: none;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  transition: opacity 0.2s;
+  font-weight: 600;
 }
 
-.eaf-breadcrumb-link:hover {
-  opacity: 0.8;
+.eaf-breadcrumb-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.45rem;
+  border-radius: 8px;
+  color: #97247e !important;
+  text-decoration: none !important;
+  font-weight: 600;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.eaf-breadcrumb-link:visited {
+  color: #97247e !important;
+}
+
+.eaf-breadcrumb-link svg {
+  color: currentColor !important;
+  stroke: currentColor !important;
+}
+
+.eaf-breadcrumb-link:hover,
+.eaf-breadcrumb-link:focus {
+  background: rgba(151, 36, 126, 0.12);
+  color: #97247e !important;
+  text-decoration: none !important;
+}
+
+.eaf-breadcrumb-link:active {
+  background: rgba(151, 36, 126, 0.18);
+  color: #97247e !important;
 }
 
 .eaf-breadcrumb-icon {
   margin-right: 0.25rem;
 }
 
-.eaf-breadcrumb-separator {
-  color: #97247e;
-}
-
 .eaf-breadcrumb-button {
-  background: none;
+  background: transparent;
   border: none;
-  padding: 0;
+  padding: 0.25rem 0.45rem;
   margin: 0;
-  color: #97247e;
+  border-radius: 8px;
+  color: black;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.eaf-breadcrumb-button:hover {
-  opacity: 0.8;
+.eaf-breadcrumb-button:focus {
+  color: black;
 }
 
 .eaf-breadcrumb-active {
-  color: #6c757d;
+  color: #000000 !important;
+  font-weight: 700 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  cursor: default !important;
+}
+
+.eaf-breadcrumb-active:hover,
+.eaf-breadcrumb-active:focus,
+.eaf-breadcrumb-active:active {
+  color: #000000 !important;
 }
 
 .eaf-alert {
@@ -680,14 +711,12 @@
   from {
     transform: rotate(0deg);
   }
-
   to {
     transform: rotate(360deg);
   }
 }
 
 @media (max-width: 991px) {
-
   .eaf-col-sidebar,
   .eaf-col-main {
     width: 100%;

@@ -4,41 +4,79 @@ const PROJECT_API_URL = import.meta.env.VITE_PROJECT_API_URL;
 const LND_API_URL = import.meta.env.VITE_LND_API_URL;
 
 const employeeService = {
-  base: `${PROJECT_API_URL}/api/employees`,
+  getAllEmployees: async () => {
+    const res = await axios.get(`${PROJECT_API_URL}/api/employees/allEmployees`);
+    return res.data;
+  },
 
-  getAllEmployees: () => axios.get(`${PROJECT_API_URL}/api/employees/allEmployees`),
+  getManagers: async () => {
+    const res = await axios.get(`${PROJECT_API_URL}/api/employees/managers`);
+    return res.data;
+  },
 
-  getManagers: () => axios.get(`${PROJECT_API_URL}/api/employees/managers`),
+  getById: async (employeeId) => {
+    const res = await axios.get(
+      `${PROJECT_API_URL}/api/employees/employeeId/${employeeId}`
+    );
+    return res.data;
+  },
 
-  getById: (employeeId) =>
-    axios.get(`${PROJECT_API_URL}/api/employees/employeeId/${employeeId}`),
+  getByDepartment: async (departmentId) => {
+    const res = await axios.get(
+      `${PROJECT_API_URL}/api/employees/department/${departmentId}`
+    );
+    return res.data;
+  },
 
-  getByDepartment: (departmentId) =>
-    axios.get(`${PROJECT_API_URL}/api/employees/department/${departmentId}`),
+  getByRole: async (roleId) => {
+    const res = await axios.get(
+      `${PROJECT_API_URL}/api/employees/role/${roleId}`
+    );
+    return res.data;
+  },
 
-  getByRole: (roleId) =>
-    axios.get(`${PROJECT_API_URL}/api/employees/role/${roleId}`),
-
-  search: (searchTerm) =>
-    axios.get(`${PROJECT_API_URL}/api/employees/search`, {
+  search: async (searchTerm) => {
+    const res = await axios.get(`${PROJECT_API_URL}/api/employees/search`, {
       params: { searchTerm },
-    }),
+    });
+    return res.data;
+  },
 
-  getAllDepartments: () => axios.get(`${PROJECT_API_URL}/api/employees/departments`),
+  getAllDepartments: async () => {
+    const res = await axios.get(
+      `${PROJECT_API_URL}/api/employees/departments`
+    );
+    return res.data;
+  },
 
-  getAllBusinessUnits: () =>
-    axios.get(`${PROJECT_API_URL}/api/employees/business-units`),
+  getAllBusinessUnits: async () => {
+    const res = await axios.get(
+      `${PROJECT_API_URL}/api/employees/business-units`
+    );
+    return res.data;
+  },
 
-  getInitialStageEmployees: () =>
-    axios.get(`${PROJECT_API_URL}/api/employees/initial-stage`),
+  getInitialStageEmployees: async () => {
+    const res = await axios.get(
+      `${PROJECT_API_URL}/api/employees/initial-stage`
+    );
+    return res.data;
+  },
 
-  mapToResourcePool: (employeeMasterIds) =>
-    axios.post(`${PROJECT_API_URL}/api/employees/map-to-resource-pool`, {
-      employeeMasterIds,
-    }),
+  mapToResourcePool: async (employeeMasterIds) => {
+    const res = await axios.post(
+      `${PROJECT_API_URL}/api/employees/map-to-resource-pool`,
+      { employeeMasterIds }
+    );
+    return res.data;
+  },
 
-  getDepartmentById: (departmentId) =>
-    axios.get(`${PROJECT_API_URL}/api/employees/departments/${departmentId}`),
+  getDepartmentById: async (departmentId) => {
+    const res = await axios.get(
+      `${PROJECT_API_URL}/api/employees/departments/${departmentId}`
+    );
+    return res.data;
+  },
 
   getSubordinates: async () => {
     try {

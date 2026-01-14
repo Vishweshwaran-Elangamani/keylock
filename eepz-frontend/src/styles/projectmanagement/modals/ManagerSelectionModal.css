@@ -193,6 +193,7 @@
   width: 100%;
   padding-right: 7.5rem;
   font-family: "Poppins", sans-serif;
+  min-height: 42px;
 }
 
 .msm-search-btn {

@@ -321,8 +321,6 @@
 }
 
 .employee-forms-card:hover {
-  border-color: #0F62FE;
-  box-shadow: 0 8px 24px rgba(15, 98, 254, 0.18);
   transform: translateY(-4px);
 }
 
@@ -478,7 +476,10 @@
 
 .employee-forms-card-btn-primary:hover {
   transform: translateY(-1px);
+  color: #ffffff !important;
+  text-decoration: none !important;
 }
+
 
 .employee-forms-card-btn-disabled {
   background: #F3F4F6;
@@ -508,8 +509,6 @@
   background: #FEF3C7;
   color: #92400E;
 }
-
-
 
 @media (max-width: 1024px) {
   .employee-forms-stats-grid {
@@ -559,7 +558,6 @@
     max-width: 100%;
   }
 }
-
 
 .employee-forms-container * {
   font-style: normal !important;

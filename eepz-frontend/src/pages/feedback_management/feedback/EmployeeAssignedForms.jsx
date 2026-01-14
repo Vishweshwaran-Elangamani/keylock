@@ -290,7 +290,7 @@ export default function EmployeeAssignedForms() {
                         disabledtitle="Already Submitted"
                         tabIndex={-1}
                         type="button"
-                      >
+>
                         <Lock size={16} />
                         Already Submitted
                       </button>

@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { X, CheckCircle, AlertCircle, ChevronDown } from "lucide-react";
+import { X, CheckCircle, AlertCircle } from "lucide-react";
 import CustomCalendar from "../../../components/project_management_components/common/CustomCalendar";
+import CustomDropdown from "../../../components/project_management_components/common/CustomDropdown";
 import "../../../styles/sla/modals/EditSLAModal.css";
+
 
 const EditSLAModal = ({ sla, onClose, onUpdate }) => {
   const [deadline, setDeadline] = useState("");
@@ -10,21 +12,10 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
   const [updating, setUpdating] = useState(false);
   const [error, setError] = useState(null);
 
-  const [statusOpen, setStatusOpen] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
 
   const statusRef = useRef(null);
   const calendarAnchorRef = useRef(null);
-
-  useEffect(() => {
-    const handler = (e) => {
-      if (statusOpen && statusRef.current && !statusRef.current.contains(e.target)) {
-        setStatusOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [statusOpen]);
 
   useEffect(() => {
     if (sla) {
@@ -86,6 +77,11 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
     setDeadline(value);
     setCalendarOpen(false);
   };
+
+  const statusOptions = [
+    { value: "Open", label: "Open" },
+    { value: "Closed", label: "Closed" },
+  ];
 
   return (
     <div className="esla-overlay" onClick={onClose}>
@@ -192,54 +188,20 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
               offset={{ x: 0, y: 0 }}
             />
 
-            <div className="esla-field">
-              <label className="esla-label">
-                Status <span className="esla-required">*</span>
-              </label>
-
-              <div ref={statusRef} className="esla-status-container">
-                <button
-                  type="button"
-                  className={`esla-status-trigger ${updating ? "esla-status-trigger--disabled" : ""}`}
-                  onClick={() => setStatusOpen((o) => !o)}
-                  disabled={updating}
-                >
-                  <span
-                    className={`esla-status-value ${
-                      status ? "" : "esla-status-value--placeholder"
-                    }`}
-                  >
-                    {status || "Select Status"}
-                  </span>
-                  <ChevronDown
-                    className={`esla-chevron ${statusOpen ? "esla-chevron--open" : ""}`}
-                    size={18}
-                  />
-                </button>
-
-                {statusOpen && (
-                  <div className="esla-status-dropdown">
-                    {["Open", "Closed"].map((opt) => {
-                      const selected = status === opt;
-                      return (
-                        <button
-                          key={opt}
-                          type="button"
-                          className={`esla-status-option ${
-                            selected ? "esla-status-option--selected" : ""
-                          }`}
-                          onClick={() => {
-                            setStatus(opt);
-                            setStatusOpen(false);
-                          }}
-                        >
-                          {opt}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+            <div className="esla-field" ref={statusRef}>
+              <CustomDropdown
+                label="Status"
+                required={true}
+                name="status"
+                value={status}
+                onChange={(_, value) => setStatus(value)}
+                options={statusOptions}
+                placeholder="Select Status"
+                disabled={updating}
+                anchorRef={statusRef}
+                align="left"
+                className="esla-dropdown"
+              />
             </div>
 
             <div className="esla-field esla-reason-field">

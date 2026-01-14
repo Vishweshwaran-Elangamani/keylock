@@ -1,15 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Save,
-  X,
-  AlertCircle,
-  CheckCircle,
-  Users,
-  Building,
-  Calendar as CalendarIcon,
-  UserCog,
-  Home,
+  Save,X,AlertCircle,CheckCircle,
+  Users, Building, Calendar as CalendarIcon,
+  UserCog,Home,
 } from "lucide-react";
 import projectService from "../../services/project_management/projectService";
 import EmployeeSelectionModal from "../../components/project_management_components/modals/EmployeeSelectionModal";
@@ -38,44 +32,33 @@ const CreateProject = () => {
   const [businessUnitsLoading, setBusinessUnitsLoading] = useState(false);
   const [departmentsLoading, setDepartmentsLoading] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
-
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
-
   const [showManagerModal, setShowManagerModal] = useState(false);
   const [activeManagerTab, setActiveManagerTab] = useState("resource");
   const [selectedResourceOwner, setSelectedResourceOwner] = useState(null);
   const [selectedL1Approver, setSelectedL1Approver] = useState(null);
   const [selectedL2Approver, setSelectedL2Approver] = useState(null);
-
   const [startCalendarOpen, setStartCalendarOpen] = useState(false);
   const [endCalendarOpen, setEndCalendarOpen] = useState(false);
-
   const startDateRef = useRef(null);
   const endDateRef = useRef(null);
-
   const statusOptions = ["Active", "On Hold", "Completed", "Cancelled"];
 
-  const engagementModels = [
-    "Fixed Price",
-    "Time and Materials",
-    "Agile - Scrum",
-    "Agile - Kanban",
-    "Consulting",
-    "Retainer",
-  ];
+  const engagementModels = ["Fixed Price", "Time and Materials", "Agile - Scrum", "Agile - Kanban", "Consulting", "Retainer",];
 
   const PROJECTNAMEREGEX = /^ORG\.[A-Za-zA-Za-z0-9-]+\.[A-Za-zA-Za-z0-9-]+$/;
 
   useEffect(() => {
-    setBusinessUnitsLoading(true);
-    setDepartmentsLoading(true);
     fetchDropdownData();
   }, []);
 
   const fetchDropdownData = async () => {
     setIsLoadingData(true);
+    setBusinessUnitsLoading(true);
+    setDepartmentsLoading(true);
+
     try {
       const [employeesRes, departmentsRes, businessUnitsRes] =
         await Promise.all([
@@ -84,16 +67,15 @@ const CreateProject = () => {
           projectService.getAllBusinessUnits(),
         ]);
 
-      if (employeesRes?.success) setEmployees(employeesRes.data || []);
+      const employeesData = employeesRes?.data ?? employeesRes ?? [];
+      const departmentsData = departmentsRes?.data ?? departmentsRes ?? [];
+      const businessUnitsData = businessUnitsRes?.data ?? businessUnitsRes ?? [];
 
-      if (departmentsRes?.success) {
-        setDepartments(departmentsRes.data || []);
-      }
-
-      if (businessUnitsRes?.success) {
-        setBusinessUnits(businessUnitsRes.data || []);
-      }
+      setEmployees(Array.isArray(employeesData) ? employeesData : []);
+      setDepartments(Array.isArray(departmentsData) ? departmentsData : []);
+      setBusinessUnits(Array.isArray(businessUnitsData) ? businessUnitsData : []);
     } catch (error) {
+      console.error("Dropdown Fetch Error:", error);
       setSubmitStatus({
         type: "error",
         message: "Failed to load dropdown data.",
@@ -137,21 +119,16 @@ const CreateProject = () => {
       newErrors.clientName = "Client name must be at least 2 characters";
     }
 
-    if (!formData.startDate) {
-      newErrors.startDate = "Start date is required";
-    }
+    if (!formData.startDate) newErrors.startDate = "Start date is required";
 
-    if (!formData.businessUnit?.trim()) {
+    if (!String(formData.businessUnit || "").trim())
       newErrors.businessUnit = "Business unit is required";
-    }
 
-    if (!formData.department?.trim()) {
+    if (!String(formData.department || "").trim())
       newErrors.department = "Department is required";
-    }
 
-    if (!formData.engagementModel) {
+    if (!formData.engagementModel)
       newErrors.engagementModel = "Engagement model is required";
-    }
 
     if (formData.startDate && formData.endDate) {
       if (new Date(formData.endDate) <= new Date(formData.startDate)) {
@@ -215,8 +192,7 @@ const CreateProject = () => {
     } catch (error) {
       setSubmitStatus({
         type: "error",
-        message:
-          error?.message || "Failed to create project. Please try again.",
+        message: error?.message || "Failed to create project. Please try again.",
       });
     } finally {
       setIsSubmitting(false);
@@ -406,10 +382,7 @@ const CreateProject = () => {
                     name="department"
                     value={formData.department}
                     onChange={handleSelectChange}
-                    options={departments.map((d) => ({
-                      value: d.departmentName,
-                      label: d.departmentName,
-                    }))}
+                    options={departments}
                     placeholder="Select Department"
                     disabled={departmentsLoading}
                     error={errors.department}
@@ -616,8 +589,7 @@ const CreateProject = () => {
                 type="button"
                 onClick={handleReset}
                 disabled={isSubmitting}
-                className="prj-btn prj-btn-secondary"
-              >
+                className="prj-btn prj-btn-secondary">
                 <X size={18} />
                 <span>Reset</span>
               </button>
@@ -625,8 +597,7 @@ const CreateProject = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="prj-btn prj-btn-primary"
-              >
+                className="prj-btn prj-btn-primary">
                 {isSubmitting ? (
                   <>
                     <span className="prj-spinner-border prj-spinner-sm" />
@@ -654,8 +625,7 @@ const CreateProject = () => {
         selectedL1Approver={selectedL1Approver}
         selectedL2Approver={selectedL2Approver}
         onSelectManager={handleManagerSelect}
-        onConfirm={handleConfirmSelection}
-      />
+        onConfirm={handleConfirmSelection}/>
     </div>
   );
 };

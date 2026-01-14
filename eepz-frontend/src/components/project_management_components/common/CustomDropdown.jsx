@@ -7,15 +7,37 @@ const PRIMARY = "#27235C";
 
 const normalizeOptions = (options) => {
   if (!Array.isArray(options)) return [];
-  return options.map((opt) => {
-    if (typeof opt === "string" || typeof opt === "number") {
-      return { value: opt, label: String(opt) };
-    }
-    return {
-      value: opt.value ?? opt.label,
-      label: opt.label ?? String(opt.value),
-    };
-  });
+
+  return options
+    .map((opt) => {
+      if (opt === null || opt === undefined) return null;
+
+      if (typeof opt === "string" || typeof opt === "number") {
+        return { value: opt, label: String(opt) };
+      }
+
+      const value =
+        opt.value ??
+        opt.id ??
+        opt.departmentId ??
+        opt.businessUnitId ??
+        opt.departmentName ??
+        opt.businessUnitName ??
+        opt.name ??
+        opt.label;
+
+      const label =
+        opt.label ??
+        opt.name ??
+        opt.departmentName ??
+        opt.businessUnitName ??
+        (value !== undefined ? String(value) : "");
+
+      if (value === undefined || label === "") return null;
+
+      return { value, label };
+    })
+    .filter(Boolean);
 };
 
 const CustomDropdown = ({

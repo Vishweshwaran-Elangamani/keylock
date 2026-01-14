@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {FolderKanban,Edit,Trash2,UserCog,Users,Calendar,Building,Briefcase,AlertCircle,
-  ChevronLeft, ChevronRight, Home,
-} from "lucide-react";
+  ChevronLeft, ChevronRight, Home,} from "lucide-react";
 import { toast } from "sonner";
 import projectService from "../../services/project_management/projectService";
 import ProjectListFilterBar from "./ProjectListFilterBar";

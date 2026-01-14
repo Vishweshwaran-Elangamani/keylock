@@ -516,9 +516,8 @@ export default function EmployeeFillForm() {
             <li className="eaf-breadcrumb-item">
               <Link
                 to={feedbackDashboardPath.replace("/feedback", "")}
-                className="eaf-breadcrumb-link"
-              >
-                <Home size={16} className="eaf-breadcrumb-icon" />
+                className="eaf-breadcrumb-link">
+                <Home size={18} className="eaf-breadcrumb-icon" />
                 Dashboard{" "}
               </Link>
             </li>
@@ -530,7 +529,7 @@ export default function EmployeeFillForm() {
               </Link>
             </li>
             <li className="eaf-breadcrumb-separator">/</li>
-            <li className="eaf-breadcrumb-item eaf-breadcrumb-active">
+            <li className="eaf-breadcrumb-active">
               Assigned Forms{" "}
             </li>
           </ol>
@@ -564,12 +563,8 @@ export default function EmployeeFillForm() {
           <nav aria-label="breadcrumb" className="eaf-breadcrumb-wrapper">
             <ol className="eaf-breadcrumb">
               <li className="eaf-breadcrumb-item">
-                <Link
-                  to={feedbackDashboardPath.replace("/feedback", "")}
-                  className="eaf-breadcrumb-link"
-                >
-                  <Home size={16} className="eaf-breadcrumb-icon" /> Dashboard
-                </Link>
+                <Link to={feedbackDashboardPath.replace("/feedback", "")} className="eaf-breadcrumb-link">
+                  <Home size={20} className="eaf-breadcrumb-icon" /></Link>
               </li>
               <li className="eaf-breadcrumb-separator">/</li>
               <li className="eaf-breadcrumb-item">

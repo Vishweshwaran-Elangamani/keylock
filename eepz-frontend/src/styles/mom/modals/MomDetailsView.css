@@ -25,9 +25,7 @@
   border-radius: 16px;
   overflow: hidden;
   width: 100%;
-
 }
-
 
 .mdv-header {
   padding: 1.25rem 1.5rem 0.75rem;
@@ -50,7 +48,6 @@
   padding: 0.2rem 0.9rem;
   border: 1px solid rgba(255, 255, 255, 0.4);
 }
-
 
 .mdv-body {
   padding: 1.25rem 1.5rem 1rem;
@@ -81,27 +78,30 @@
   text-decoration: none;
 }
 
-
 .mdv-submitter {
   gap: 6px;
 }
-
 
 .mdv-section-title {
   color: #27235c;
 }
 
+.mdv-comments {
+  text-align: left;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  color: #212529;
+}
 
 .mdv-discussion-item {
   background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
 }
-
 
 .mdv-action-item {
   background-color: #f8f9fa;
   border: 1px solid #e9ecef;
 }
-
 
 .mdv-footer {
   padding: 1rem 1.5rem 1.5rem;
